@@ -71,7 +71,7 @@ public class BukkitProjectSettingsWizardStep extends ModuleWizardStep {
     public JComponent getComponent() {
         pluginNameField.setText(creator.getArtifactId());
         pluginVersionField.setText(creator.getVersion());
-        mainClassField.setText(creator.getGroupId() + "." + creator.getArtifactId());
+        mainClassField.setText(creator.getArtifactId());
 
         return panel;
     }

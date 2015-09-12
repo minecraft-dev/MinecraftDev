@@ -10,11 +10,12 @@
 package com.demonwav.BukkitPlugin.project;
 
 import com.demonwav.BukkitPlugin.BukkitProject;
-
+import com.demonwav.BukkitPlugin.util.BukkitTemplate;
+import com.demonwav.BukkitPlugin.util.MavenSettings;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -29,16 +30,79 @@ public class MavenProjectCreator {
 
     private BukkitProjectSettingsWizardStep.S settings = null;
 
-    public void create() {
-        new File(root.getCanonicalPath(), "src/main/java/" + groupId.replaceAll("\\.", "/")).mkdirs();
-        new File(root.getCanonicalPath(), "src/main/resources/").mkdirs();
-        new File(root.getCanonicalPath(), "src/test/java/").mkdirs();
+    private VirtualFile sourceDir;
+    private VirtualFile resourceDir;
+    private VirtualFile testDir;
+    private VirtualFile pomFile;
 
-        try {
-            root.createChildData(project, "pom.xml");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void create() {
+        root.refresh(false, true);
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            try {
+                // It seems there's no virtual file way of making the whole path in one go
+                // idk, maybe I'm stupid, but I couldn't find it
+                sourceDir = root.createChildDirectory(this, "src")
+                        .createChildDirectory(this, "main")
+                        .createChildDirectory(this, "java");
+                VirtualFile file = sourceDir;
+                String[] files = groupId.split("\\.");
+                for (String s : files)
+                    file = file.createChildDirectory(this, s);
+                file = file.createChildDirectory(this, artifactId);
+
+                resourceDir = root.findOrCreateChildData(this, "src")
+                        .findOrCreateChildData(this, "main")
+                        .createChildDirectory(this, "resource");
+
+                testDir = root.findOrCreateChildData(this, "src")
+                        .createChildDirectory(this, "test")
+                        .createChildDirectory(this, "java");
+
+                pomFile = root.createChildData(project, "pom.xml");
+
+                MavenSettings mavenSettings = new MavenSettings();
+                mavenSettings.setGroupId(groupId);
+                mavenSettings.setArtifactId(artifactId);
+                mavenSettings.setVersion(version);
+                if (settings.author != null && !settings.author.trim().isEmpty())
+                    mavenSettings.setAuthor(settings.author);
+
+                switch (type) {
+                    case BUKKIT:
+                        mavenSettings.setRepoId("spigot-repo");
+                        mavenSettings.setRepoUrl("https://hub.spigotmc.org/nexus/content/repositories/snapshots/");
+                        mavenSettings.setApiName("Bukkit");
+                        mavenSettings.setApiGroupId("org.bukkit");
+                        mavenSettings.setApiArtifactId("bukkit");
+                        mavenSettings.setApiVersion("1.8.8-R0.1-SNAPSHOT");
+                        break;
+                    case SPIGOT:
+                        mavenSettings.setRepoId("spigot-repo");
+                        mavenSettings.setRepoUrl("https://hub.spigotmc.org/nexus/content/repositories/snapshots/");
+                        mavenSettings.setApiName("Spigot");
+                        mavenSettings.setApiGroupId("org.spigotmc");
+                        mavenSettings.setApiArtifactId("spigot-api");
+                        mavenSettings.setApiVersion("1.8.8-R0.1-SNAPSHOT");
+                        break;
+                    case BUNGEECORD:
+                        mavenSettings.setRepoId("bungeecord-repo");
+                        mavenSettings.setRepoUrl("https://oss.sonatype.org/content/repositories/snapshots");
+                        mavenSettings.setApiName("BungeeCord");
+                        mavenSettings.setApiGroupId("net.md-5");
+                        mavenSettings.setApiArtifactId("bungeecord-api");
+                        mavenSettings.setApiVersion("1.8-SNAPSHOT");
+                        break;
+                    default:
+                        break;
+                }
+                BukkitTemplate.applyPomTemplate(project, pomFile, mavenSettings);
+                VirtualFile mainClass = file.findOrCreateChildData(this, settings.mainClass + ".java");
+                String packageName = groupId + "." + artifactId;
+                BukkitTemplate.applyMainClassTemplate(project, mainClass, packageName, settings.mainClass);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public VirtualFile getRoot() {

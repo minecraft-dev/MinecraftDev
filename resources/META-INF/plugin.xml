@@ -34,6 +34,7 @@
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
     <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.BukkitPlugin.project.BukkitProjectModule"/>
+    <fileTemplateGroup implementation="com.demonwav.BukkitPlugin.util.BukkitFileTemplateGroupFactory"/>
   </extensions>
 
   <application-components>

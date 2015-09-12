@@ -79,7 +79,6 @@ public class ProjectBuilder extends JavaModuleBuilder {
         if (getModuleJdk() != null)
             modifiableRootModel.setSdk(getModuleJdk());
 
-
         creator.setRoot(root);
         creator.setProject(project);
         this.project.setProjectType(creator.getType());
