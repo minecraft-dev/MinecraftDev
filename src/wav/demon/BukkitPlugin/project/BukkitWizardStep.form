@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="wav.demon.BukkitPlugin.project.BukkitWizardStep">
+  <grid id="27dc6" binding="panel" layout-manager="BorderLayout" hgap="5" vgap="5">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties>
+      <minimumSize width="-1" height="-1"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <grid id="3581c" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="8f67d" class="javax.swing.JLabel">
+            <constraints border-constraint="North"/>
+            <properties>
+              <requestFocusEnabled value="false"/>
+              <text value="Choose plugin type:"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="c580e" binding="chooserPanel" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
+        <margin top="2" left="10" bottom="10" right="10"/>
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <clientProperties>
+          <html.disable class="java.lang.Boolean" value="false"/>
+        </clientProperties>
+        <border type="none">
+          <color color="-4473925"/>
+        </border>
+        <children>
+          <component id="fc230" class="javax.swing.JRadioButton" binding="bukkitRadioButton">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <selected value="true"/>
+              <text value="Bukkit Plugin"/>
+            </properties>
+          </component>
+          <component id="26f84" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <icon value="icons/Spigot.png"/>
+              <iconTextGap value="0"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="dd3ac" class="javax.swing.JRadioButton" binding="spigotRadioButton">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Spigot Plugin"/>
+            </properties>
+          </component>
+          <component id="c6c2d" class="javax.swing.JRadioButton" binding="bungeeCordRadioButton">
+            <constraints>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="BungeeCord Plugin"/>
+            </properties>
+          </component>
+          <component id="69541" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <icon value="icons/Bukkit.png"/>
+              <iconTextGap value="0"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="a9488" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <icon value="icons/Spigot.png"/>
+              <iconTextGap value="0"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <vspacer id="d9ec2">
+            <constraints>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+        </children>
+      </grid>
+      <grid id="c3a72" binding="infoPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="2" left="10" bottom="10" right="10"/>
+        <constraints border-constraint="South"/>
+        <properties>
+          <maximumSize width="800" height="2147483647"/>
+          <minimumSize width="24" height="100"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="20c91" class="javax.swing.JEditorPane" binding="infoPane">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <minimum-size width="-1" height="100"/>
+                <preferred-size width="150" height="50"/>
+              </grid>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+              <focusable value="false"/>
+              <opaque value="false"/>
+              <text value=""/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+  <buttonGroups>
+    <group name="radioButtonGroup">
+      <member id="fc230"/>
+      <member id="dd3ac"/>
+      <member id="c6c2d"/>
+    </group>
+  </buttonGroups>
+</form>
