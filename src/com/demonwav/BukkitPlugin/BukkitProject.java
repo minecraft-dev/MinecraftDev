@@ -1,4 +1,13 @@
-package wav.demon.BukkitPlugin;
+/*
+ * IntelliJ IDEA Bukkit Support Plugin
+ *
+ * Written by Kyle Wood (DemonWav)
+ * http://demonwav.com
+ *
+ * MIT License
+ */
+
+package com.demonwav.BukkitPlugin;
 
 public class BukkitProject {
 

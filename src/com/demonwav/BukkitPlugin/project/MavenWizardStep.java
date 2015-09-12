@@ -1,4 +1,13 @@
-package wav.demon.BukkitPlugin.project;
+/*
+ * IntelliJ IDEA Bukkit Support Plugin
+ *
+ * Written by Kyle Wood (DemonWav)
+ * http://demonwav.com
+ *
+ * MIT License
+ */
+
+package com.demonwav.BukkitPlugin.project;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;

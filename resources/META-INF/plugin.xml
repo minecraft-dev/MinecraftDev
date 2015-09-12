@@ -1,12 +1,20 @@
+<!--
+  ~ IntelliJ IDEA Bukkit Support Plugin
+  ~
+  ~ Written by Kyle Wood (DemonWav)
+  ~ http://demonwav.com
+  ~
+  ~ MIT License
+  -->
+
 <idea-plugin version="2">
-  <id>wav.demon.BukkitPlugin</id>
+  <id>com.demonwav.BukkitPlugin</id>
   <name>Bukkit Support</name>
   <version>1.0</version>
   <vendor>DemonWav</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      Brings support for Bukkit Projects to Intellij IDEA.
     ]]></description>
 
   <change-notes><![CDATA[
@@ -25,7 +33,7 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
-    <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="wav.demon.BukkitPlugin.project.BukkitProjectModule"/>
+    <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.BukkitPlugin.project.BukkitProjectModule"/>
   </extensions>
 
   <application-components>

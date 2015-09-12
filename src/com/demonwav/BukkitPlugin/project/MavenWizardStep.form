@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="wav.demon.BukkitPlugin.project.MavenWizardStep">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.demonwav.BukkitPlugin.project.MavenWizardStep">
   <grid id="27dc6" binding="panel" layout-manager="GridLayoutManager" row-count="5" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="10" vgap="10">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
