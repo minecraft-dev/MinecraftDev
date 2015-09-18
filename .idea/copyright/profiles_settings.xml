@@ -1,0 +1,11 @@
+<component name="CopyrightManager">
+  <settings default="">
+    <module2copyright>
+      <element module="Project Files" copyright="Project" />
+    </module2copyright>
+    <LanguageOptions name="__TEMPLATE__">
+      <option name="lenBefore" value="100" />
+      <option name="lenAfter" value="100" />
+    </LanguageOptions>
+  </settings>
+</component>
