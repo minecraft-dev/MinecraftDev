@@ -7,11 +7,11 @@
  * MIT License
  */
 
-package com.demonwav.BukkitPlugin.icons;
+package com.demonwav.bukkitplugin.icons;
 
 import com.intellij.openapi.util.IconLoader;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 public class BukkitProjectsIcons {
 

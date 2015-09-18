@@ -54,6 +54,7 @@
             </resource>
         </resources>
     </build>
+
     <repositories>
         <repository>
             <id>${REPO_ID}</id>

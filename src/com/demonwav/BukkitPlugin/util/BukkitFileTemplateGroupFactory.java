@@ -7,9 +7,10 @@
  * MIT License
  */
 
-package com.demonwav.BukkitPlugin.util;
+package com.demonwav.bukkitplugin.util;
 
-import com.demonwav.BukkitPlugin.icons.BukkitProjectsIcons;
+import com.demonwav.bukkitplugin.icons.BukkitProjectsIcons;
+
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
 

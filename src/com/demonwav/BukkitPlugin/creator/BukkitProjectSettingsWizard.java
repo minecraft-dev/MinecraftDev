@@ -7,7 +7,11 @@
  * MIT License
  */
 
-package com.demonwav.BukkitPlugin.project;
+package com.demonwav.bukkitplugin.creator;
+
+import com.demonwav.bukkitplugin.exceptions.BukkitSetupException;
+import com.demonwav.bukkitplugin.util.ProjectSettings;
+import com.demonwav.bukkitplugin.util.ProjectSettings.Load;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -15,14 +19,20 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
+import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class BukkitProjectSettingsWizardStep extends ModuleWizardStep {
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class BukkitProjectSettingsWizard extends ModuleWizardStep {
 
     private static final String pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?";
 
@@ -40,38 +50,33 @@ public class BukkitProjectSettingsWizardStep extends ModuleWizardStep {
     private JTextField loadBeforeField;
     private JTextField dependField;
     private JTextField softDependField;
+    private JLabel title;
 
-    private S settings = new S();
+    private ProjectSettings settings = new ProjectSettings();
     private MavenProjectCreator creator;
 
-    public static class S {
-        public enum L { STARTUP, POSTWORLD }
-
-        public String pluginName;
-        public String pluginVersion;
-        public String mainClass;
-        public String description;
-        public String author;
-        public String authorList;
-        public String website;
-        public String prefix;
-        public boolean database;
-        public L load;
-        public String loadBefore;
-        public String depend;
-        public String softDepend;
-    }
-
-    public BukkitProjectSettingsWizardStep(MavenProjectCreator creator) {
+    public BukkitProjectSettingsWizard(@NotNull MavenProjectCreator creator) {
         super();
         this.creator = creator;
     }
 
     @Override
     public JComponent getComponent() {
-        pluginNameField.setText(creator.getArtifactId());
+        switch (creator.getType()) {
+            case BUKKIT:
+                title.setText("<html><font size=\"5\">Bukkit Settings</font></html>");
+                break;
+            case SPIGOT:
+                title.setText("<html><font size=\"5\">Spigot Settings</font></html>");
+                break;
+            case BUNGEECORD:
+                title.setText("<html><font size=\"5\">BungeeCord Settings</font></html>");
+                break;
+        }
+
+        pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
         pluginVersionField.setText(creator.getVersion());
-        mainClassField.setText(creator.getArtifactId());
+        mainClassField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
 
         return panel;
     }
@@ -80,27 +85,27 @@ public class BukkitProjectSettingsWizardStep extends ModuleWizardStep {
     public boolean validate() throws ConfigurationException {
         try {
             if (pluginNameField.getText().trim().isEmpty())
-                throw new EException("empty", pluginNameField);
+                throw new BukkitSetupException("empty", pluginNameField);
 
             if (pluginVersionField.getText().trim().isEmpty())
-                throw new EException("empty", pluginVersionField);
+                throw new BukkitSetupException("empty", pluginVersionField);
 
             if (mainClassField.getText().trim().isEmpty())
-                throw new EException("empty", mainClassField);
+                throw new BukkitSetupException("empty", mainClassField);
 
             if (!additionAuthorsField.getText().matches(pattern))
-                throw new EException("bad", additionAuthorsField);
+                throw new BukkitSetupException("bad", additionAuthorsField);
 
             if (!loadBeforeField.getText().matches(pattern))
-                throw new EException("bad", loadBeforeField);
+                throw new BukkitSetupException("bad", loadBeforeField);
 
             if (!dependField.getText().matches(pattern))
-                throw new EException("bad", dependField);
+                throw new BukkitSetupException("bad", dependField);
 
             if (!softDependField.getText().matches(pattern))
-                throw new EException("bad", softDependField);
-        } catch (EException e) {
-            String message = "";
+                throw new BukkitSetupException("bad", softDependField);
+        } catch (BukkitSetupException e) {
+            String message;
             switch (e.getMessage()) {
                 case "empty":
                     message = "<html>Please fill in all required fields</html>";
@@ -129,28 +134,18 @@ public class BukkitProjectSettingsWizardStep extends ModuleWizardStep {
         settings.mainClass = mainClassField.getText();
         settings.description = descriptionField.getText();
         settings.author = authorField.getText();
-        settings.authorList = additionAuthorsField.getText();
+        settings.authorList = new ArrayList<>(Arrays.asList(additionAuthorsField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
         settings.website = websiteField.getText();
         settings.prefix = prefixField.getText();
         settings.database = databaseBox.isSelected();
-        settings.load = loadBox.getSelectedIndex() == 0 ? S.L.STARTUP : S.L.POSTWORLD;
-        settings.loadBefore = loadBeforeField.getText();
-        settings.depend = dependField.getText();
-        settings.softDepend = softDependField.getText();
+        settings.load = loadBox.getSelectedIndex() == 0 ? Load.POSTWORLD : Load.STARTUP;
+        settings.loadBefore = new ArrayList<>(Arrays.asList(loadBeforeField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
+        settings.depend = new ArrayList<>(Arrays.asList(dependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
+        settings.softDepend = new ArrayList<>(Arrays.asList(softDependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
         creator.setSettings(settings);
     }
 
     @Override
     public void updateDataModel() {}
 
-    class EException extends Exception {
-        private JComponent j;
-        public EException(String msg, JComponent j) {
-            super(msg);
-            this.j = j;
-        }
-        public JComponent getJ() {
-            return j;
-        }
-    }
 }

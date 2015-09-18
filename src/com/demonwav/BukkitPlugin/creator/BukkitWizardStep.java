@@ -7,12 +7,13 @@
  * MIT License
  */
 
-package com.demonwav.BukkitPlugin.project;
+package com.demonwav.bukkitplugin.creator;
 
-import com.demonwav.BukkitPlugin.BukkitProject;
+import com.demonwav.bukkitplugin.BukkitProject.Type;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ui.IdeBorderFactory;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
@@ -26,7 +27,7 @@ import java.net.URISyntaxException;
 
 public class BukkitWizardStep extends ModuleWizardStep {
 
-    private MavenProjectCreator creator;
+    private final MavenProjectCreator creator;
 
     private JPanel chooserPanel;
     private JPanel panel;
@@ -37,7 +38,7 @@ public class BukkitWizardStep extends ModuleWizardStep {
     private JRadioButton bungeeCordRadioButton;
     private JEditorPane infoPane;
 
-    private BukkitProject.Type type = BukkitProject.Type.BUKKIT;
+    private Type type = Type.BUKKIT;
 
     private static final String bukkitInfo = "<html><font size=\"4\">Create a standard " +
         "<a href=\"https://maven.apache.org/\">Maven</a> <a href=\"http://bukkit.org/\">Bukkit</a> plugin, for use " +
@@ -52,9 +53,8 @@ public class BukkitWizardStep extends ModuleWizardStep {
         "BungeeCord</a> plugin, for use on BungeeCord servers.<br>Generates a default <code>pom.xml</code> and " +
         "<code>plugin.yml</code>, and creates a default run configuration to build.</font></html>";
 
-    public BukkitWizardStep(MavenProjectCreator creator) {
+    public BukkitWizardStep(@NotNull MavenProjectCreator creator) {
         super();
-
         this.creator = creator;
     }
 
@@ -81,22 +81,22 @@ public class BukkitWizardStep extends ModuleWizardStep {
 
         // Set type
         bukkitRadioButton.addChangeListener(e -> {
-            if (type != BukkitProject.Type.BUKKIT) {
-                type = BukkitProject.Type.BUKKIT;
+            if (type != Type.BUKKIT) {
+                type = Type.BUKKIT;
                 infoPane.setText(bukkitInfo);
                 creator.setType(type);
             }
         });
         spigotRadioButton.addChangeListener(e -> {
-            if (type != BukkitProject.Type.SPIGOT) {
-                type = BukkitProject.Type.SPIGOT;
+            if (type != Type.SPIGOT) {
+                type = Type.SPIGOT;
                 infoPane.setText(spigotInfo);
                 creator.setType(type);
             }
         });
         bungeeCordRadioButton.addChangeListener(e -> {
-            if (type != BukkitProject.Type.BUNGEECORD) {
-                type = BukkitProject.Type.BUNGEECORD;
+            if (type != Type.BUNGEECORD) {
+                type = Type.BUNGEECORD;
                 infoPane.setText(bungeeCordInfo);
                 creator.setType(type);
             }

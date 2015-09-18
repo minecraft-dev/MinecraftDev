@@ -7,10 +7,11 @@
  * MIT License
  */
 
-package com.demonwav.BukkitPlugin.project;
+package com.demonwav.bukkitplugin.creator;
 
-import com.demonwav.BukkitPlugin.BukkitProject;
-import com.demonwav.BukkitPlugin.icons.BukkitProjectsIcons;
+import com.demonwav.bukkitplugin.BukkitModuleType;
+import com.demonwav.bukkitplugin.BukkitProject;
+import com.demonwav.bukkitplugin.icons.BukkitProjectsIcons;
 
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
@@ -36,12 +37,12 @@ import javax.swing.Icon;
 
 import java.io.File;
 
-public class ProjectBuilder extends JavaModuleBuilder {
+public class BukkitModuleBuilder extends JavaModuleBuilder {
 
     private BukkitProject project;
     private MavenProjectCreator creator = new MavenProjectCreator();
 
-    public ProjectBuilder(BukkitProject project) {
+    public BukkitModuleBuilder(BukkitProject project) {
         this.project = project;
     }
 
@@ -119,8 +120,8 @@ public class ProjectBuilder extends JavaModuleBuilder {
     }
 
     @Override
-    public BukkitProjectModule getModuleType() {
-        return BukkitProjectModule.getInstance();
+    public BukkitModuleType getModuleType() {
+        return BukkitModuleType.getInstance();
     }
 
     @Override
@@ -132,7 +133,7 @@ public class ProjectBuilder extends JavaModuleBuilder {
     public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
         return new ModuleWizardStep[]{
             new MavenWizardStep(creator),
-            new BukkitProjectSettingsWizardStep(creator)
+            new ProjectSettingsWizardStep(creator)
         };
     }
 

@@ -7,7 +7,7 @@
  * MIT License
  */
 
-package com.demonwav.BukkitPlugin;
+package com.demonwav.bukkitplugin;
 
 public class BukkitProject {
 

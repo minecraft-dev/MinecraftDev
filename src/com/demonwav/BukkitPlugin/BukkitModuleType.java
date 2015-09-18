@@ -7,10 +7,10 @@
  * MIT License
  */
 
-package com.demonwav.BukkitPlugin.project;
+package com.demonwav.bukkitplugin;
 
-import com.demonwav.BukkitPlugin.BukkitProject;
-import com.demonwav.BukkitPlugin.icons.BukkitProjectsIcons;
+import com.demonwav.bukkitplugin.icons.BukkitProjectsIcons;
+import com.demonwav.bukkitplugin.creator.BukkitModuleBuilder;
 
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
@@ -18,23 +18,23 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
 
-public class BukkitProjectModule extends JavaModuleType {
+public class BukkitModuleType extends JavaModuleType {
 
     private static final String ID = "BUKKIT_MODULE_TYPE";
     private BukkitProject project = new BukkitProject();
 
-    public BukkitProjectModule() {
+    public BukkitModuleType() {
         super(ID);
     }
 
-    public static BukkitProjectModule getInstance() {
-        return (BukkitProjectModule) ModuleTypeManager.getInstance().findByID(ID);
+    public static BukkitModuleType getInstance() {
+        return (BukkitModuleType) ModuleTypeManager.getInstance().findByID(ID);
     }
 
     @NotNull
     @Override
-    public ProjectBuilder createModuleBuilder() {
-        return new ProjectBuilder(project);
+    public BukkitModuleBuilder createModuleBuilder() {
+        return new BukkitModuleBuilder(project);
     }
 
     @NotNull

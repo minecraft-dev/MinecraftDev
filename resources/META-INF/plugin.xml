@@ -8,45 +8,53 @@
   -->
 
 <idea-plugin version="2">
-  <id>com.demonwav.BukkitPlugin</id>
-  <name>Bukkit Support</name>
-  <version>1.0</version>
-  <vendor>DemonWav</vendor>
 
-  <description><![CDATA[
+    <depends optional="false">org.jetbrains.idea.maven</depends>
+
+    <id>com.demonwav.bukkitplugin</id>
+    <name>Bukkit Support</name>
+    <version>1.0</version>
+    <vendor>DemonWav</vendor>
+
+    <description><![CDATA[
       Brings support for Bukkit Projects to Intellij IDEA.
     ]]></description>
 
-  <change-notes><![CDATA[
+    <change-notes><![CDATA[
       Initial Release
     ]]>
-  </change-notes>
+    </change-notes>
 
-  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="131"/>
+    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="131"/>
 
-  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
-  -->
+    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
 
-  <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
-    <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.BukkitPlugin.project.BukkitProjectModule"/>
-    <fileTemplateGroup implementation="com.demonwav.BukkitPlugin.util.BukkitFileTemplateGroupFactory"/>
-  </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.bukkitplugin.BukkitModuleType"/>
+        <fileTemplateGroup implementation="com.demonwav.bukkitplugin.util.BukkitFileTemplateGroupFactory"/>
+    </extensions>
+    <extensions defaultExtensionNs="org.jetbrains.idea.maven">
+        <importer implementation="com.demonwav.bukkitplugin.maven.BukkitImporter"/>
+        <importer implementation="com.demonwav.bukkitplugin.maven.SpigotImporter"/>
+        <importer implementation="com.demonwav.bukkitplugin.maven.BungeeCordImporter"/>
+    </extensions>
 
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
 
-  <project-components>
-    <!-- Add your project components here -->
-  </project-components>
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
 
-  <actions>
-    <!-- Add your actions here -->
-  </actions>
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
 
 </idea-plugin>

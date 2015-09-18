@@ -7,7 +7,9 @@
  * MIT License
  */
 
-package com.demonwav.BukkitPlugin.util;
+package com.demonwav.bukkitplugin.util;
+
+import com.demonwav.bukkitplugin.BukkitProject.Type;
 
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.ide.fileTemplates.FileTemplate;
@@ -26,16 +28,16 @@ public class BukkitTemplate {
     public static void applyPomTemplate(Project project, VirtualFile file, MavenSettings settings) {
         Properties properties = new Properties();
 
-        properties.setProperty("GROUP_ID", settings.getGroupId());
-        properties.setProperty("ARTIFACT_ID", settings.getArtifactId());
-        properties.setProperty("AUTHOR", settings.getAuthor() == null ? "" : settings.getAuthor());
-        properties.setProperty("VERSION", settings.getVersion());
-        properties.setProperty("REPO_ID", settings.getRepoId());
-        properties.setProperty("REPO_URL", settings.getRepoUrl());
-        properties.setProperty("API_NAME", settings.getApiName());
-        properties.setProperty("API_GROUP_ID", settings.getApiGroupId());
-        properties.setProperty("API_ARTIFACT_ID", settings.getApiArtifactId());
-        properties.setProperty("API_VERSION", settings.getApiVersion());
+        properties.setProperty("GROUP_ID", settings.groupId);
+        properties.setProperty("ARTIFACT_ID", settings.artifactId);
+        properties.setProperty("AUTHOR", settings.author == null ? "" : settings.author);
+        properties.setProperty("VERSION", settings.version);
+        properties.setProperty("REPO_ID", settings.repoId);
+        properties.setProperty("REPO_URL", settings.repoUrl);
+        properties.setProperty("API_NAME", settings.apiName);
+        properties.setProperty("API_GROUP_ID", settings.apiGroupId);
+        properties.setProperty("API_ARTIFACT_ID", settings.apiArtifactId);
+        properties.setProperty("API_VERSION", settings.apiVersion);
         if (settings.hasAuthor())
             properties.setProperty("HAS_AUTHOR", "true");
 
@@ -46,14 +48,65 @@ public class BukkitTemplate {
         }
     }
 
-    public static void applyMainClassTemplate(Project project, VirtualFile file, String packageName, String className) {
+    public static void applyMainClassTemplate(Project project, VirtualFile file, String packageName, String className, boolean bukkit) {
         Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
+        if (bukkit)
+            properties.setProperty("BUKKIT", "true");
 
         try {
             applyTemplate(project, file, BukkitFileTemplateGroupFactory.BUKKIT_MAIN_CLASS_TEMPLATE, properties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void applyPluginYmlTemplate(Project project, VirtualFile file, Type type, ProjectSettings settings, String groupId) {
+        Properties properties = new Properties();
+
+        properties.setProperty("NAME", settings.pluginName);
+        properties.setProperty("VERSION", settings.pluginVersion);
+        properties.setProperty("DESCRIPTION", settings.description);
+        properties.setProperty("MAIN", groupId + "." + settings.mainClass);
+        properties.setProperty("AUTHOR", settings.author);
+        properties.setProperty("DEPEND", settings.depend.toString());
+        properties.setProperty("SOFT_DEPEND", settings.softDepend.toString());
+
+        if (settings.hasDescription())
+            properties.setProperty("HAS_DESCRIPTION", "true");
+        if (settings.hasAuthor())
+            properties.setProperty("HAS_AUTHOR", "true");
+        if (settings.hasDepend())
+            properties.setProperty("HAS_DEPEND", "true");
+        if (settings.hasSoftDepend())
+            properties.setProperty("HAS_SOFT_DEPEND", "true");
+
+        // These are bukkit and spigot only settings
+        if (type != Type.BUNGEECORD) {
+            properties.setProperty("WEBSITE", settings.website);
+            properties.setProperty("DATABASE", Boolean.toString(settings.database));
+            properties.setProperty("PREFIX", settings.prefix);
+            properties.setProperty("LOAD", settings.load.name());
+            properties.setProperty("AUTHOR_LIST", settings.authorList.toString());
+            properties.setProperty("LOAD_BEFORE", settings.loadBefore.toString());
+
+            if (settings.hasAuthorList())
+                properties.setProperty("HAS_AUTHOR_LIST", "true");
+            if (settings.hasWebsite())
+                properties.setProperty("HAS_WEBSITE", "true");
+            if (settings.hasDatabase())
+                properties.setProperty("HAS_DATABASE", "true");
+            if (settings.hasLoad())
+                properties.setProperty("HAS_LOAD", "true");
+            if (settings.hasPrefix())
+                properties.setProperty("HAS_PREFIX", "true");
+            if (settings.hasLoadBefore())
+                properties.setProperty("HAS_LOAD_BEFORE", "true");
+        }
+        try {
+            applyTemplate(project, file, BukkitFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }

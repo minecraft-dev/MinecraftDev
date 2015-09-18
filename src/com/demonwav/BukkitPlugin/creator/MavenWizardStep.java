@@ -7,7 +7,7 @@
  * MIT License
  */
 
-package com.demonwav.BukkitPlugin.project;
+package com.demonwav.bukkitplugin.creator;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -15,6 +15,7 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -27,9 +28,9 @@ public class MavenWizardStep extends ModuleWizardStep  {
     private JTextField versionField;
     private JPanel panel;
 
-    private MavenProjectCreator creator;
+    private final MavenProjectCreator creator;
 
-    public MavenWizardStep(MavenProjectCreator creator) {
+    public MavenWizardStep(@NotNull MavenProjectCreator creator) {
         super();
         this.creator = creator;
     }
