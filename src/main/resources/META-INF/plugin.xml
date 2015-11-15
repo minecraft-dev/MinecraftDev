@@ -11,9 +11,9 @@
 
     <depends optional="false">org.jetbrains.idea.maven</depends>
 
-    <id>com.demonwav.bukkitplugin</id>
-    <name>Bukkit Support</name>
-    <version>1.0</version>
+    <id>${plugin.id}</id>
+    <name>${plugin.name}</name>
+    <version>${project.version}</version>
     <vendor>DemonWav</vendor>
 
     <description><![CDATA[
