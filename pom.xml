@@ -1,0 +1,136 @@
+<!--
+  ~ IntelliJ IDEA Bukkit Support Plugin
+  ~
+  ~ Written by Kyle Wood (DemonWav)
+  ~ http://demonwav.com
+  ~
+  ~ MIT License
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.demonwav</groupId>
+    <artifactId>bukkit-intellij-plugin</artifactId>
+    <version>0.1</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.targetEncoding>UTF-8</project.build.targetEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
+        <ij.plugin>true</ij.plugin>
+
+        <!-- plugin.xml link -->
+        <plugin.id>com.demonwav.bukkitplugin</plugin.id>
+        <plugin.name>Bukkit Support</plugin.name>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>thirdparty</id>
+            <url>http://repo.knockturnmc.com/content/repositories/thirdparty/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>intellij-idea-iu</artifactId>
+            <version>15.0.1</version>
+            <type>zip</type>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>unzip-distribution</id>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>intellij-idea-iu</includeArtifactIds>
+                            <outputDirectory>${project.build.directory}/dependency/IntelliJ-IDEA-IU</outputDirectory>
+                            <includes>**/*.jar</includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <compilerArguments>
+                        <extdirs>${project.build.directory}/dependency/IntelliJ-IDEA-IU/lib/;${project.build.directory}/dependency/IntelliJ-IDEA-IU/plugins/maven/lib</extdirs>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>compile-forms</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <path id="maven.plugin.complete.classpath">
+                                    <path refid="maven.plugin.classpath" />
+                                    <fileset dir="${project.build.directory}/dependency/IntelliJ-IDEA-IU/lib">
+                                        <include name="**/*.jar"/>
+                                    </fileset>
+                                </path>
+                                <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="maven.plugin.complete.classpath" />
+                                <path id="sourcepath">
+                                    <dirset dir="${project.basedir}">
+                                        <include name="src/main/java" />
+                                        <include name="src/main/resources" />
+                                    </dirset>
+                                </path>
+                                <instrumentIdeaExtensions destdir="${project.build.outputDirectory}"
+                                                          extdirs="${project.build.directory}/dependency/IntelliJ-IDEA-IU/lib;${project.build.directory}/dependency/IntelliJ-IDEA-IU/plugins/maven/lib">
+                                    <classpath refid="maven.compile.classpath" />
+                                    <src refid="sourcepath" />
+                                </instrumentIdeaExtensions>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.sun</groupId>
+                        <artifactId>tools</artifactId>
+                        <version>1.6.0</version>
+                        <scope>system</scope>
+                        <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

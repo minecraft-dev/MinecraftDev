@@ -11,10 +11,10 @@ package com.demonwav.bukkitplugin.maven;
 
 import com.demonwav.bukkitplugin.BukkitModuleType;
 
+import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.importing.MavenImporter;
-import org.jetbrains.idea.maven.importing.MavenModifiableModelsProvider;
 import org.jetbrains.idea.maven.importing.MavenRootModelAdapter;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectChanges;
@@ -39,11 +39,11 @@ public abstract class Importer extends MavenImporter {
     public void preProcess(Module module,
                            MavenProject mavenProject,
                            MavenProjectChanges changes,
-                           MavenModifiableModelsProvider modifiableModelsProvider) {
+                           IdeModifiableModelsProvider modifiableModelsProvider) {
     }
 
     @Override
-    public void process(MavenModifiableModelsProvider modifiableModelsProvider,
+    public void process(IdeModifiableModelsProvider modifiableModelsProvider,
                         Module module,
                         MavenRootModelAdapter rootModel,
                         MavenProjectsTree mavenModel,
