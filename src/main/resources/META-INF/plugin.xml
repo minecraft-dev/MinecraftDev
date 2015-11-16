@@ -17,7 +17,7 @@
     <vendor>DemonWav</vendor>
 
     <description><![CDATA[
-      Brings support for Bukkit Projects to Intellij IDEA.
+      Brings support for Bukkit, Spigot, and BungeeCord Projects to Intellij IDEA.
     ]]></description>
 
     <change-notes><![CDATA[
