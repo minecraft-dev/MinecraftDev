@@ -112,7 +112,8 @@
                                     </dirset>
                                 </path>
                                 <instrumentIdeaExtensions destdir="${project.build.outputDirectory}"
-                                                          extdirs="${project.build.directory}/dependency/IntelliJ-IDEA-IU/lib;${project.build.directory}/dependency/IntelliJ-IDEA-IU/plugins/maven/lib">
+                                                          extdirs="${project.build.directory}/dependency/IntelliJ-IDEA-IU/lib;${project.build.directory}/dependency/IntelliJ-IDEA-IU/plugins/maven/lib"
+                                                          includeantruntime="false">
                                     <classpath refid="maven.compile.classpath" />
                                     <src refid="sourcepath" />
                                 </instrumentIdeaExtensions>
