@@ -31,12 +31,12 @@
         <plugin.name>Bukkit Support</plugin.name>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>thirdparty</id>
-            <url>http://repo.knockturnmc.com/content/repositories/thirdparty/</url>
-        </repository>
-    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>demonwav-repo</id>
+            <url>https://nexus.demonwav.com/content/repositories/snapshots/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencies>
         <dependency>
@@ -129,6 +129,23 @@
                         <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
                     </dependency>
                 </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>com.demonwav</groupId>
+                <artifactId>intellij-plugin-package</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>package-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jarName>bukkit-intellij-plugin-0.1.jar</jarName>
+                    <finalName>BukkitSupport.zip</finalName>
+                </configuration>
             </plugin>
         </plugins>
     </build>
