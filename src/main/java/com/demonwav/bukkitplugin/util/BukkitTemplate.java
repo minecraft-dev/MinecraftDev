@@ -9,8 +9,7 @@
 
 package com.demonwav.bukkitplugin.util;
 
-import com.demonwav.bukkitplugin.BukkitProject.Type;
-
+import com.demonwav.bukkitplugin.creator.Type;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;

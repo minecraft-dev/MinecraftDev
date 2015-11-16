@@ -9,8 +9,6 @@
 
 package com.demonwav.bukkitplugin.creator;
 
-import com.demonwav.bukkitplugin.BukkitProject.Type;
-
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ui.IdeBorderFactory;
 import org.jetbrains.annotations.NotNull;

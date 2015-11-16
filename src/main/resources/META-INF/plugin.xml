@@ -37,6 +37,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.bukkitplugin.BukkitModuleType"/>
+        <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.bukkitplugin.SpigotModuleType"/>
+        <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.bukkitplugin.BungeeCordModuleType"/>
         <fileTemplateGroup implementation="com.demonwav.bukkitplugin.util.BukkitFileTemplateGroupFactory"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.idea.maven">

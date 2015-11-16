@@ -9,11 +9,8 @@
 
 package com.demonwav.bukkitplugin.maven;
 
-import com.demonwav.bukkitplugin.BukkitModuleType;
-
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.module.Module;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.importing.MavenImporter;
 import org.jetbrains.idea.maven.importing.MavenRootModelAdapter;
 import org.jetbrains.idea.maven.project.MavenProject;
@@ -57,12 +54,4 @@ public abstract class Importer extends MavenImporter {
     public boolean isApplicable(MavenProject mavenProject) {
         return !mavenProject.findDependencies(GROUP_ID, ARTIFACT_ID).isEmpty();
     }
-
-    @NotNull
-    @Override
-    public BukkitModuleType getModuleType() {
-        return BukkitModuleType.getInstance();
-    }
-
-
 }

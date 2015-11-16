@@ -10,9 +10,7 @@
 package com.demonwav.bukkitplugin.creator;
 
 import com.demonwav.bukkitplugin.BukkitModuleType;
-import com.demonwav.bukkitplugin.BukkitProject;
 import com.demonwav.bukkitplugin.icons.BukkitProjectsIcons;
-
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
@@ -34,17 +32,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
-
 import java.io.File;
 
 public class BukkitModuleBuilder extends JavaModuleBuilder {
 
-    private BukkitProject project;
     private MavenProjectCreator creator = new MavenProjectCreator();
-
-    public BukkitModuleBuilder(BukkitProject project) {
-        this.project = project;
-    }
 
     @Override
     public String getPresentableName() {
@@ -82,7 +74,6 @@ public class BukkitModuleBuilder extends JavaModuleBuilder {
 
         creator.setRoot(root);
         creator.setProject(project);
-        this.project.setProjectType(creator.getType());
 
         DumbAwareRunnable r = creator::create;
 
@@ -126,7 +117,7 @@ public class BukkitModuleBuilder extends JavaModuleBuilder {
 
     @Override
     public String getParentGroup() {
-        return BukkitProject.BUKKIT_GROUP;
+        return "Bukkit Project";
     }
 
     @Override

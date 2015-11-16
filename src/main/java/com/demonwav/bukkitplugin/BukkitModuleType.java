@@ -21,7 +21,6 @@ import javax.swing.Icon;
 public class BukkitModuleType extends JavaModuleType {
 
     private static final String ID = "BUKKIT_MODULE_TYPE";
-    private BukkitProject project = new BukkitProject();
 
     public BukkitModuleType() {
         super(ID);
@@ -34,7 +33,7 @@ public class BukkitModuleType extends JavaModuleType {
     @NotNull
     @Override
     public BukkitModuleBuilder createModuleBuilder() {
-        return new BukkitModuleBuilder(project);
+        return new BukkitModuleBuilder();
     }
 
     @NotNull
@@ -51,26 +50,17 @@ public class BukkitModuleType extends JavaModuleType {
 
     @Override
     public Icon getBigIcon() {
-        if (project.getProjectType() == BukkitProject.Type.BUKKIT)
-            return BukkitProjectsIcons.BukkitProjectBig;
-        else
-            return BukkitProjectsIcons.SpigotProjectBig;
+        return BukkitProjectsIcons.BukkitProjectBig;
     }
 
     @Override
     public Icon getIcon() {
-        if (project.getProjectType() == BukkitProject.Type.BUKKIT)
-            return BukkitProjectsIcons.BukkitProject;
-        else
-            return BukkitProjectsIcons.SpigotProject;
+        return BukkitProjectsIcons.BukkitProject;
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        if (project.getProjectType() == BukkitProject.Type.BUKKIT)
-            return BukkitProjectsIcons.BukkitProject;
-        else
-            return BukkitProjectsIcons.SpigotProject;
+        return BukkitProjectsIcons.BukkitProject;
     }
 
 

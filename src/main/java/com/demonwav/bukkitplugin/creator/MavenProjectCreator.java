@@ -9,12 +9,9 @@
 
 package com.demonwav.bukkitplugin.creator;
 
-import com.demonwav.bukkitplugin.BukkitProject;
-import com.demonwav.bukkitplugin.BukkitProject.Type;
-import com.demonwav.bukkitplugin.util.ProjectSettings;
 import com.demonwav.bukkitplugin.util.BukkitTemplate;
 import com.demonwav.bukkitplugin.util.MavenSettings;
-
+import com.demonwav.bukkitplugin.util.ProjectSettings;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.ide.util.EditorHelper;
@@ -38,7 +35,7 @@ public class MavenProjectCreator {
     private String groupId = null;
     private String artifactId = null;
     private String version = null;
-    private BukkitProject.Type type = BukkitProject.Type.BUKKIT;
+    private Type type = Type.BUKKIT;
     private Project project = null;
 
     private ProjectSettings settings = null;
