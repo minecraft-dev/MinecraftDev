@@ -29,23 +29,12 @@ public class CommandNode {
      *   back to the plugin.yml). List operations should be done with add and remove methods.
      */
 
-  @Getter
-  @NotNull
-  private String name;
-  @Getter
-  @Nullable
-  private String description;
-  @NotNull
-  private List<String> aliases = new ArrayList<>();
-  @Getter
-  @Nullable
-  private String permission;
-  @Getter
-  @Nullable
-  private String permissionMessage;
-  @Getter
-  @Nullable
-  private String usage;
+  @Getter @NotNull private String name;
+  @Getter @Nullable private String description;
+  @NotNull private List<String> aliases = new ArrayList<>();
+  @Getter @Nullable private String permission;
+  @Getter @Nullable private String permissionMessage;
+  @Getter @Nullable private String usage;
 
   // Constructors
   public CommandNode(@NotNull String name) {

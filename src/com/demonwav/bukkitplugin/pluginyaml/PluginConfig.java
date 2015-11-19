@@ -33,51 +33,30 @@ public class PluginConfig {
 
   public enum Load {STARTUP, POSTWORLD}
 
-  @Getter
-  @NotNull
-  private BukkitProject project;
+  @Getter @NotNull private BukkitProject project;
 
-  @Getter
-  @NotNull
-  private String name = "";
-  @Getter
-  @NotNull
-  private String version = "";
-  @Getter
-  @Nullable
-  private String descrption;
-  @Getter
-  @NotNull
-  private Load load = Load.POSTWORLD;
-  @Getter
-  @Nullable
-  private String author;
-  @Getter
-  @NotNull
-  private List<String> authors = new ArrayList<>();
-  @Getter
-  @Nullable
-  private String website;
-  @Getter
-  @NotNull
-  private String main = "";
-  @Getter
-  private boolean database;
-  @NotNull
-  private List<String> depend = new ArrayList<>();
-  @Getter
-  @Nullable
-  private String prefix;
-  @NotNull
-  private List<String> softdpend = new ArrayList<>();
-  @NotNull
-  private List<String> loadbefore = new ArrayList<>();
-  @Getter
-  @NotNull
-  private CommandList commands = new CommandList();
-  @Getter
-  @NotNull
-  private PermissionList permissions = new PermissionList();
+  // NotNull values with automatic getters
+  @Getter @NotNull private String name = "";
+  @Getter @NotNull private String version = "";
+  @Getter @NotNull private Load load = Load.POSTWORLD;
+  @Getter @NotNull private List<String> authors = new ArrayList<>();
+  @Getter @NotNull private String main = "";
+  @Getter @NotNull private CommandList commands = new CommandList();
+  @Getter @NotNull private PermissionList permissions = new PermissionList();
+
+  // Nullable values with automatic getters
+  @Getter @Nullable private String descrption;
+  @Getter @Nullable private String author;
+  @Getter @Nullable private String website;
+  @Getter @Nullable private String prefix;
+
+  // Primitive value with automatic getter
+  @Getter private boolean database;
+
+  // NotNull values with custom getters
+  @NotNull  private List<String> depend = new ArrayList<>();
+  @NotNull  private List<String> softdpend = new ArrayList<>();
+  @NotNull  private List<String> loadbefore = new ArrayList<>();
 
   public PluginConfig(@NotNull BukkitProject project) {
     this.project = project;
