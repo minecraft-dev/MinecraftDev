@@ -1,0 +1,63 @@
+<!--
+  ~ IntelliJ IDEA Bukkit Support Plugin
+  ~
+  ~ Written by Kyle Wood (DemonWav)
+  ~ http://demonwav.com
+  ~
+  ~ MIT License
+  -->
+
+<idea-plugin version="2">
+
+  <depends optional="false">org.jetbrains.idea.maven</depends>
+  <depends optional="true">org.jetbrains.plugins.yaml</depends>
+
+  <id>${plugin.id}</id>
+  <name>${plugin.name}</name>
+  <version>${project.version}</version>
+  <vendor>DemonWav</vendor>
+
+  <description><![CDATA[
+      Brings support for Bukkit, Spigot, and BungeeCord Projects to Intellij IDEA.
+    ]]></description>
+
+  <change-notes><![CDATA[
+      Initial Release
+    ]]>
+  </change-notes>
+
+  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="143"/>
+
+  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+    <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.bukkitplugin.BukkitModuleType"/>
+    <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.bukkitplugin.SpigotModuleType"/>
+    <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.bukkitplugin.BungeeCordModuleType"/>
+    <fileTemplateGroup implementation="com.demonwav.bukkitplugin.util.BukkitFileTemplateGroupFactory"/>
+  </extensions>
+  <extensions defaultExtensionNs="org.jetbrains.idea.maven">
+    <importer implementation="com.demonwav.bukkitplugin.maven.BukkitImporter"/>
+    <importer implementation="com.demonwav.bukkitplugin.maven.SpigotImporter"/>
+    <importer implementation="com.demonwav.bukkitplugin.maven.BungeeCordImporter"/>
+  </extensions>
+
+  <application-components>
+    <!-- Add your application components here -->
+  </application-components>
+
+  <project-components>
+    <!-- Add your project components here -->
+  </project-components>
+
+  <actions>
+    <!-- Add your actions here -->
+  </actions>
+
+</idea-plugin>

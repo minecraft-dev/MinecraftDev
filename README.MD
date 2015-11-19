@@ -6,13 +6,20 @@ Compiling
 
 To compile IntelliJBukkitSupport, a few steps need to be taken to setup an SDK.
 
-1. Create a zip of the contents of the latest (version 15.0.1 in this case) IntelliJ folder.<br>
-On windows this folder could be: `C:\Program Files (x86)\JetBrains\IntelliJ IDEA 15.0`<br>
-Make sure the name of the file is `IntelliJ.zip`
-2. Install the file to your local repository by running<br>
-`$ mvn install:install-file -Dfile=IntelliJ.zip -DgroupId=org.jetbrains -DartifactId=intellij-idea-iu -Dversion=15.0.1 -Dpackaging=zip`
-3. Now compile the project using `$ mvn package`
+1. Create the IntelliJ Plugin SDK (just follow the steps when you create a new SDK). You must use IntelliJ Ultimate as
+we provide special support for IntelliJ Ultimate's YAML plugin.
+2. Once the SDK has been created, go to Project Structure -> SDK's (Under Platform Settings). Navigate to the
+`plugins/maven/lib` directory in the IntelliJ installation and add all the Jar's in that directory to the classpath.
+We probably don't need all of them, but it's simpler this way.
+3. Do the same thing for `plugins/yaml/lib` as well.
 
-Running with IntelliJ IDEA
---------------------------
-To run this plugin with IntelliJ to debug. You must install a plugin called: "Intellij plugin development with Maven"
+Style Guide
+-----------
+
+This project will follow Google's Java style guidelines, as they are sane and are easy to link to. Link
+[here](https://google.github.io/styleguide/javaguide.html).
+
+License
+-------
+
+This project is licensed under MIT.
