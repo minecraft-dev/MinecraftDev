@@ -16,8 +16,8 @@ We probably don't need all of them, but it's simpler this way.
 Style Guide
 -----------
 
-This project will follow Google's Java style guidelines, as they are sane and are easy to link to. Link
-[here](https://google.github.io/styleguide/javaguide.html).
+This project will follow DemonWav's Java style guidelines (lol, Google's style slightly modified). Link
+[here](http://www.demonwav.com/style).
 
 License
 -------

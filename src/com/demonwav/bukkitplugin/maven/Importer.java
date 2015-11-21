@@ -30,47 +30,47 @@ import java.util.Map;
 
 public abstract class Importer extends MavenImporter {
 
-  protected final String GROUP_ID;
-  protected final String ARTIFACT_ID;
+    protected final String GROUP_ID;
+    protected final String ARTIFACT_ID;
 
-  public Importer(String groupId, String artifactId) {
-    super(groupId, artifactId);
-    GROUP_ID = groupId;
-    ARTIFACT_ID = artifactId;
-  }
+    public Importer(String groupId, String artifactId) {
+        super(groupId, artifactId);
+        GROUP_ID = groupId;
+        ARTIFACT_ID = artifactId;
+    }
 
-  @Override
-  public void preProcess(Module module,
-                         MavenProject mavenProject,
-                         MavenProjectChanges changes,
-                         IdeModifiableModelsProvider modifiableModelsProvider) {
-  }
+    @Override
+    public void preProcess(Module module,
+                           MavenProject mavenProject,
+                           MavenProjectChanges changes,
+                           IdeModifiableModelsProvider modifiableModelsProvider) {
+    }
 
-  @Override
-  public void process(IdeModifiableModelsProvider modifiableModelsProvider,
-                      Module module,
-                      MavenRootModelAdapter rootModel,
-                      MavenProjectsTree mavenModel,
-                      MavenProject mavenProject,
-                      MavenProjectChanges changes,
-                      Map<MavenProject, String> mavenProjectToModuleName,
-                      List<MavenProjectsProcessorTask> postTasks) {
-  }
+    @Override
+    public void process(IdeModifiableModelsProvider modifiableModelsProvider,
+                        Module module,
+                        MavenRootModelAdapter rootModel,
+                        MavenProjectsTree mavenModel,
+                        MavenProject mavenProject,
+                        MavenProjectChanges changes,
+                        Map<MavenProject, String> mavenProjectToModuleName,
+                        List<MavenProjectsProcessorTask> postTasks) {
+    }
 
-  @Override
-  public boolean isApplicable(MavenProject mavenProject) {
-    return !mavenProject.findDependencies(GROUP_ID, ARTIFACT_ID).isEmpty();
-  }
+    @Override
+    public boolean isApplicable(MavenProject mavenProject) {
+        return !mavenProject.findDependencies(GROUP_ID, ARTIFACT_ID).isEmpty();
+    }
 
-  @Override
-  public void resolve(Project project,
-                      MavenProject mavenProject,
-                      NativeMavenProjectHolder nativeMavenProject,
-                      MavenEmbedderWrapper embedder,
-                      ResolveContext context) throws MavenProcessCanceledException {
-    super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
-    BukkitProject bukkitProject = BukkitProject.getInstance(project);
-    bukkitProject.setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
-    bukkitProject.getConfigManager();
-  }
+    @Override
+    public void resolve(Project project,
+                        MavenProject mavenProject,
+                        NativeMavenProjectHolder nativeMavenProject,
+                        MavenEmbedderWrapper embedder,
+                        ResolveContext context) throws MavenProcessCanceledException {
+        super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
+        BukkitProject bukkitProject = BukkitProject.getInstance(project);
+        bukkitProject.setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
+        bukkitProject.getConfigManager();
+    }
 }

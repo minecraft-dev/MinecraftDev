@@ -29,63 +29,63 @@ public class CommandNode {
      *   back to the plugin.yml). List operations should be done with add and remove methods.
      */
 
-  @Getter @NotNull private String name;
-  @Getter @Nullable private String description;
-  @NotNull private List<String> aliases = new ArrayList<>();
-  @Getter @Nullable private String permission;
-  @Getter @Nullable private String permissionMessage;
-  @Getter @Nullable private String usage;
+    @Getter @NotNull private String name;
+    @Getter @Nullable private String description;
+    @NotNull private List<String> aliases = new ArrayList<>();
+    @Getter @Nullable private String permission;
+    @Getter @Nullable private String permissionMessage;
+    @Getter @Nullable private String usage;
 
-  // Constructors
-  public CommandNode(@NotNull String name) {
-    this.name = name;
-  }
+    // Constructors
+    public CommandNode(@NotNull String name) {
+        this.name = name;
+    }
 
-  public CommandNode(@NotNull String name, @NotNull String... aliases) {
-    this.name = name;
-    Collections.addAll(this.aliases, aliases);
-  }
+    public CommandNode(@NotNull String name, @NotNull String... aliases) {
+        this.name = name;
+        Collections.addAll(this.aliases, aliases);
+    }
 
-  // Name
-  public void setName(@NotNull String name) {
+    // Name
+    public void setName(@NotNull String name) {
 
-  }
+    }
 
-  // Description
-  public void setDescription(@Nullable String description) {
+    // Description
+    public void setDescription(@Nullable String description) {
 
-  }
+    }
 
-  // Alias
-  @NotNull
-  public List<String> getAliases() {
-    return Collections.unmodifiableList(aliases);
-  }
+    // Alias
+    @NotNull
+    public List<String> getAliases() {
+        return Collections.unmodifiableList(aliases);
+    }
 
-  public boolean addAlias(@NotNull String alias) {
-    return false;
-  }
+    public boolean addAlias(@NotNull String alias) {
+        return false;
+    }
 
-  public boolean removeAlias(@NotNull String alias) {
-    return false;
-  }
+    public boolean removeAlias(@NotNull String alias) {
+        return false;
+    }
 
-  public boolean containsAlias(@NotNull String alias) {
-    return aliases.contains(alias);
-  }
+    public boolean containsAlias(@NotNull String alias) {
+        return aliases.contains(alias);
+    }
 
-  // Permission
-  public void setPermission(@Nullable String permission) {
+    // Permission
+    public void setPermission(@Nullable String permission) {
 
-  }
+    }
 
-  // Permission
-  public void setPermissionMessage(@Nullable String permissionMessage) {
+    // Permission
+    public void setPermissionMessage(@Nullable String permissionMessage) {
 
-  }
+    }
 
-  // Usage
-  public void setUsage(@Nullable String usage) {
+    // Usage
+    public void setUsage(@Nullable String usage) {
 
-  }
+    }
 }

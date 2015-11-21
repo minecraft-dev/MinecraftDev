@@ -20,48 +20,46 @@ import javax.swing.Icon;
 
 public class BukkitModuleType extends JavaModuleType {
 
-  private static final String ID = "BUKKIT_MODULE_TYPE";
+    private static final String ID = "BUKKIT_MODULE_TYPE";
 
-  public BukkitModuleType() {
-    super(ID);
-  }
+    public BukkitModuleType() {
+        super(ID);
+    }
 
-  public static BukkitModuleType getInstance() {
-    return (BukkitModuleType) ModuleTypeManager.getInstance().findByID(ID);
-  }
+    public static BukkitModuleType getInstance() {
+        return (BukkitModuleType) ModuleTypeManager.getInstance().findByID(ID);
+    }
 
-  @NotNull
-  @Override
-  public BukkitModuleBuilder createModuleBuilder() {
-    return new BukkitModuleBuilder();
-  }
+    @NotNull
+    @Override
+    public BukkitModuleBuilder createModuleBuilder() {
+        return new BukkitModuleBuilder();
+    }
 
-  @NotNull
-  @Override
-  public String getName() {
-    return "Bukkit Project";
-  }
+    @NotNull
+    @Override
+    public String getName() {
+        return "Bukkit Project";
+    }
 
-  @NotNull
-  @Override
-  public String getDescription() {
-    return "Create standard Maven Bukkit, Spigot, or BungeeCord projects";
-  }
+    @NotNull
+    @Override
+    public String getDescription() {
+        return "Create standard Maven Bukkit, Spigot, or BungeeCord projects";
+    }
 
-  @Override
-  public Icon getBigIcon() {
-    return BukkitProjectsIcons.BukkitProjectBig;
-  }
+    @Override
+    public Icon getBigIcon() {
+        return BukkitProjectsIcons.BukkitProjectBig;
+    }
 
-  @Override
-  public Icon getIcon() {
-    return BukkitProjectsIcons.BukkitProject;
-  }
+    @Override
+    public Icon getIcon() {
+        return BukkitProjectsIcons.BukkitProject;
+    }
 
-  @Override
-  public Icon getNodeIcon(@Deprecated boolean isOpened) {
-    return BukkitProjectsIcons.BukkitProject;
-  }
-
-
+    @Override
+    public Icon getNodeIcon(@Deprecated boolean isOpened) {
+        return BukkitProjectsIcons.BukkitProject;
+    }
 }

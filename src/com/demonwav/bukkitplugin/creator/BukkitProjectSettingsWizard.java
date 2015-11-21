@@ -34,119 +34,113 @@ import javax.swing.JTextField;
 
 public class BukkitProjectSettingsWizard extends ModuleWizardStep {
 
-  private static final String pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?";
+    private static final String pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?";
 
-  private JPanel panel;
-  private JTextField pluginNameField;
-  private JTextField pluginVersionField;
-  private JTextField mainClassField;
-  private JTextField descriptionField;
-  private JTextField authorField;
-  private JTextField additionAuthorsField;
-  private JTextField websiteField;
-  private JTextField prefixField;
-  private JCheckBox databaseBox;
-  private JComboBox loadBox;
-  private JTextField loadBeforeField;
-  private JTextField dependField;
-  private JTextField softDependField;
-  private JLabel title;
+    private JPanel panel;
+    private JTextField pluginNameField;
+    private JTextField pluginVersionField;
+    private JTextField mainClassField;
+    private JTextField descriptionField;
+    private JTextField authorField;
+    private JTextField additionAuthorsField;
+    private JTextField websiteField;
+    private JTextField prefixField;
+    private JCheckBox databaseBox;
+    private JComboBox loadBox;
+    private JTextField loadBeforeField;
+    private JTextField dependField;
+    private JTextField softDependField;
+    private JLabel title;
 
-  private ProjectSettings settings = new ProjectSettings();
-  private MavenProjectCreator creator;
+    private ProjectSettings settings = new ProjectSettings();
+    private MavenProjectCreator creator;
 
-  public BukkitProjectSettingsWizard(@NotNull MavenProjectCreator creator) {
-    super();
-    this.creator = creator;
-  }
-
-  @Override
-  public JComponent getComponent() {
-    switch (creator.getType()) {
-      case BUKKIT:
-        title.setText("<html><font size=\"5\">Bukkit Settings</font></html>");
-        break;
-      case SPIGOT:
-        title.setText("<html><font size=\"5\">Spigot Settings</font></html>");
-        break;
-      case BUNGEECORD:
-        title.setText("<html><font size=\"5\">BungeeCord Settings</font></html>");
-        break;
+    public BukkitProjectSettingsWizard(@NotNull MavenProjectCreator creator) {
+        super();
+        this.creator = creator;
     }
 
-    pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
-    pluginVersionField.setText(creator.getVersion());
-    mainClassField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
+    @Override
+    public JComponent getComponent() {
+        switch (creator.getType()) {
+            case BUKKIT:
+                title.setText("<html><font size=\"5\">Bukkit Settings</font></html>");
+                break;
+            case SPIGOT:
+                title.setText("<html><font size=\"5\">Spigot Settings</font></html>");
+                break;
+            case BUNGEECORD:
+                title.setText("<html><font size=\"5\">BungeeCord Settings</font></html>");
+                break;
+        }
 
-    return panel;
-  }
+        pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
+        pluginVersionField.setText(creator.getVersion());
+        mainClassField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
 
-  @Override
-  public boolean validate() throws ConfigurationException {
-    try {
-      if (pluginNameField.getText().trim().isEmpty())
-        throw new BukkitSetupException("empty", pluginNameField);
-
-      if (pluginVersionField.getText().trim().isEmpty())
-        throw new BukkitSetupException("empty", pluginVersionField);
-
-      if (mainClassField.getText().trim().isEmpty())
-        throw new BukkitSetupException("empty", mainClassField);
-
-      if (!additionAuthorsField.getText().matches(pattern))
-        throw new BukkitSetupException("bad", additionAuthorsField);
-
-      if (!loadBeforeField.getText().matches(pattern))
-        throw new BukkitSetupException("bad", loadBeforeField);
-
-      if (!dependField.getText().matches(pattern))
-        throw new BukkitSetupException("bad", dependField);
-
-      if (!softDependField.getText().matches(pattern))
-        throw new BukkitSetupException("bad", softDependField);
-    } catch (BukkitSetupException e) {
-      String message;
-      switch (e.getMessage()) {
-        case "empty":
-          message = "<html>Please fill in all required fields</html>";
-          break;
-        case "bad":
-          message = "<html>Please enter author and plugin names as a comma separated list</html>";
-          break;
-        default:
-          message = "<html>Unknown Error</html>";
-          break;
-      }
-      JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
-          .setFadeoutTime(4000)
-          .createBalloon()
-          .show(RelativePoint.getSouthWestOf(e.getJ()), Balloon.Position.below);
-      return false;
+        return panel;
     }
-    return true;
-  }
 
-  @Override
-  public void onStepLeaving() {
-    super.onStepLeaving();
-    settings.pluginName = pluginNameField.getText();
-    settings.pluginVersion = pluginVersionField.getText();
-    settings.mainClass = mainClassField.getText();
-    settings.description = descriptionField.getText();
-    settings.author = authorField.getText();
-    settings.authorList = new ArrayList<>(Arrays.asList(additionAuthorsField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
-    settings.website = websiteField.getText();
-    settings.prefix = prefixField.getText();
-    settings.database = databaseBox.isSelected();
-    settings.load = loadBox.getSelectedIndex() == 0 ? Load.POSTWORLD : Load.STARTUP;
-    settings.loadBefore = new ArrayList<>(Arrays.asList(loadBeforeField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
-    settings.depend = new ArrayList<>(Arrays.asList(dependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
-    settings.softDepend = new ArrayList<>(Arrays.asList(softDependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
-    creator.setSettings(settings);
-  }
+    @Override
+    public boolean validate() throws ConfigurationException {
+        try {
+            if (pluginNameField.getText().trim().isEmpty()) {
+                throw new BukkitSetupException("empty", pluginNameField);
+            }
 
-  @Override
-  public void updateDataModel() {
-  }
+            if (pluginVersionField.getText().trim().isEmpty()) {
+                throw new BukkitSetupException("empty", pluginVersionField);
+            }
 
+            if (mainClassField.getText().trim().isEmpty()) {
+                throw new BukkitSetupException("empty", mainClassField);
+            }
+
+            if (!additionAuthorsField.getText().matches(pattern)) {
+                throw new BukkitSetupException("bad", additionAuthorsField);
+            }
+
+            if (!loadBeforeField.getText().matches(pattern)) {
+                throw new BukkitSetupException("bad", loadBeforeField);
+            }
+
+            if (!dependField.getText().matches(pattern)) {
+                throw new BukkitSetupException("bad", dependField);
+            }
+
+            if (!softDependField.getText().matches(pattern)) {
+                throw new BukkitSetupException("bad", softDependField);
+            }
+        } catch (BukkitSetupException e) {
+            String message = e.getError();
+            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
+                    .setFadeoutTime(4000)
+                    .createBalloon()
+                    .show(RelativePoint.getSouthWestOf(e.getJ()), Balloon.Position.below);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onStepLeaving() {
+        super.onStepLeaving();
+        settings.pluginName = pluginNameField.getText();
+        settings.pluginVersion = pluginVersionField.getText();
+        settings.mainClass = mainClassField.getText();
+        settings.description = descriptionField.getText();
+        settings.author = authorField.getText();
+        settings.authorList = new ArrayList<>(Arrays.asList(additionAuthorsField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
+        settings.website = websiteField.getText();
+        settings.prefix = prefixField.getText();
+        settings.database = databaseBox.isSelected();
+        settings.load = loadBox.getSelectedIndex() == 0 ? Load.POSTWORLD : Load.STARTUP;
+        settings.loadBefore = new ArrayList<>(Arrays.asList(loadBeforeField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
+        settings.depend = new ArrayList<>(Arrays.asList(dependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
+        settings.softDepend = new ArrayList<>(Arrays.asList(softDependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
+        creator.setSettings(settings);
+    }
+
+    @Override
+    public void updateDataModel() {}
 }

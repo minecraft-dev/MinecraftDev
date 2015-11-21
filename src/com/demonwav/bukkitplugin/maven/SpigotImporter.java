@@ -14,13 +14,13 @@ import com.demonwav.bukkitplugin.SpigotModuleType;
 import org.jetbrains.annotations.NotNull;
 
 public class SpigotImporter extends Importer {
-  public SpigotImporter() {
-    super("org.spigotmc", "spigot-api");
-  }
+    public SpigotImporter() {
+        super("org.spigotmc", "spigot-api");
+    }
 
-  @NotNull
-  @Override
-  public SpigotModuleType getModuleType() {
-    return SpigotModuleType.getInstance();
-  }
+    @NotNull
+    @Override
+    public SpigotModuleType getModuleType() {
+        return SpigotModuleType.getInstance();
+    }
 }

@@ -38,106 +38,107 @@ import javax.swing.Icon;
 
 public class BukkitModuleBuilder extends JavaModuleBuilder {
 
-  private MavenProjectCreator creator = new MavenProjectCreator();
+    private MavenProjectCreator creator = new MavenProjectCreator();
 
-  @Override
-  public String getPresentableName() {
-    return "Bukkit Plugin";
-  }
-
-  @Override
-  public Icon getNodeIcon() {
-    return BukkitProjectsIcons.BukkitProject;
-  }
-
-  @Override
-  public String getGroupName() {
-    return "Bukkit Plugin";
-  }
-
-  @Override
-  public int getWeight() {
-    return JavaModuleBuilder.BUILD_SYSTEM_WEIGHT - 1;
-  }
-
-  @Override
-  public boolean isSuitableSdkType(SdkTypeId sdk) {
-    return sdk == JavaSdk.getInstance();
-  }
-
-  @Override
-  public void setupRootModel(ModifiableRootModel modifiableRootModel) throws ConfigurationException {
-    final Project project = modifiableRootModel.getProject();
-    final VirtualFile root = createAndGetRoot();
-    modifiableRootModel.addContentEntry(root);
-
-    if (getModuleJdk() != null)
-      modifiableRootModel.setSdk(getModuleJdk());
-
-    creator.setRoot(root);
-    creator.setProject(project);
-
-    DumbAwareRunnable r = creator::create;
-
-    if (project.isDisposed())
-      return;
-
-    if (ApplicationManager.getApplication().isUnitTestMode()
-        || ApplicationManager.getApplication().isHeadlessEnvironment()) {
-      r.run();
-      return;
+    @Override
+    public String getPresentableName() {
+        return "Bukkit Plugin";
     }
 
-
-    if (!project.isInitialized()) {
-      StartupManager.getInstance(project).registerPostStartupActivity(r);
-      return;
+    @Override
+    public Icon getNodeIcon() {
+        return BukkitProjectsIcons.BukkitProject;
     }
 
-    if (DumbService.isDumbAware(r)) {
-      r.run();
-    } else {
-      DumbService.getInstance(project).runWhenSmart(r);
+    @Override
+    public String getGroupName() {
+        return "Bukkit Plugin";
     }
-  }
 
-  private VirtualFile createAndGetRoot() {
-    String temp = getContentEntryPath();
+    @Override
+    public int getWeight() {
+        return JavaModuleBuilder.BUILD_SYSTEM_WEIGHT - 1;
+    }
 
-    assert temp != null;
+    @Override
+    public boolean isSuitableSdkType(SdkTypeId sdk) {
+        return sdk == JavaSdk.getInstance();
+    }
 
-    String path = FileUtil.toSystemIndependentName(temp);
-    //noinspection ResultOfMethodCallIgnored
-    new File(path).mkdirs();
-    return LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
-  }
+    @Override
+    public void setupRootModel(ModifiableRootModel modifiableRootModel) throws ConfigurationException {
+        final Project project = modifiableRootModel.getProject();
+        final VirtualFile root = createAndGetRoot();
+        modifiableRootModel.addContentEntry(root);
 
-  @Override
-  public BukkitModuleType getModuleType() {
-    return BukkitModuleType.getInstance();
-  }
+        if (getModuleJdk() != null)
+            modifiableRootModel.setSdk(getModuleJdk());
 
-  @Override
-  public String getParentGroup() {
-    return "Bukkit Project";
-  }
+        creator.setRoot(root);
+        creator.setProject(project);
 
-  @Override
-  public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
-    return new ModuleWizardStep[]{
-        new MavenWizardStep(creator),
-        new ProjectSettingsWizardStep(creator)
-    };
-  }
+        DumbAwareRunnable r = creator::create;
 
-  @Nullable
-  @Override
-  public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
-    return new BukkitWizardStep(creator);
-  }
+        if (project.isDisposed()) {
+            return;
+        }
 
-  @Override
-  public boolean validate(Project current, Project dest) {
-    return true;
-  }
+        if (ApplicationManager.getApplication().isUnitTestMode()
+                || ApplicationManager.getApplication().isHeadlessEnvironment()) {
+            r.run();
+            return;
+        }
+
+
+        if (!project.isInitialized()) {
+            StartupManager.getInstance(project).registerPostStartupActivity(r);
+            return;
+        }
+
+        if (DumbService.isDumbAware(r)) {
+            r.run();
+        } else {
+            DumbService.getInstance(project).runWhenSmart(r);
+        }
+    }
+
+    private VirtualFile createAndGetRoot() {
+        String temp = getContentEntryPath();
+
+        assert temp != null;
+
+        String path = FileUtil.toSystemIndependentName(temp);
+        //noinspection ResultOfMethodCallIgnored
+        new File(path).mkdirs();
+        return LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
+    }
+
+    @Override
+    public BukkitModuleType getModuleType() {
+        return BukkitModuleType.getInstance();
+    }
+
+    @Override
+    public String getParentGroup() {
+        return "Bukkit Project";
+    }
+
+    @Override
+    public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
+        return new ModuleWizardStep[]{
+                new MavenWizardStep(creator),
+                new ProjectSettingsWizardStep(creator)
+        };
+    }
+
+    @Nullable
+    @Override
+    public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
+        return new BukkitWizardStep(creator);
+    }
+
+    @Override
+    public boolean validate(Project current, Project dest) {
+        return true;
+    }
 }

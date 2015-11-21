@@ -17,40 +17,40 @@ import javax.swing.JComponent;
 
 public class ProjectSettingsWizardStep extends ModuleWizardStep {
 
-  private MavenProjectCreator creator;
-  private ModuleWizardStep wizard;
-  private Type type;
+    private MavenProjectCreator creator;
+    private ModuleWizardStep wizard;
+    private Type type;
 
-  public ProjectSettingsWizardStep(@NotNull MavenProjectCreator creator) {
-    this.creator = creator;
-    type = creator.getType();
-  }
-
-  @Override
-  public JComponent getComponent() {
-    if (wizard == null || creator.getType() != type) {
-      // detect type changes
-      type = creator.getType();
-      if (creator.getType() == Type.BUNGEECORD) {
-        wizard = new BungeeCordProjectSettingsWizard(creator);
-      } else {
-        wizard = new BukkitProjectSettingsWizard(creator);
-      }
+    public ProjectSettingsWizardStep(@NotNull MavenProjectCreator creator) {
+        this.creator = creator;
+        type = creator.getType();
     }
-    return wizard.getComponent();
-  }
 
-  @Override
-  public boolean validate() throws ConfigurationException {
-    return wizard.validate();
-  }
+    @Override
+    public JComponent getComponent() {
+        if (wizard == null || creator.getType() != type) {
+            // detect type changes
+            type = creator.getType();
+            if (creator.getType() == Type.BUNGEECORD) {
+                wizard = new BungeeCordProjectSettingsWizard(creator);
+            } else {
+                wizard = new BukkitProjectSettingsWizard(creator);
+            }
+        }
+        return wizard.getComponent();
+    }
 
-  @Override
-  public void onStepLeaving() {
-    wizard.onStepLeaving();
-  }
+    @Override
+    public boolean validate() throws ConfigurationException {
+        return wizard.validate();
+    }
 
-  @Override
-  public void updateDataModel() {
-  }
+    @Override
+    public void onStepLeaving() {
+        wizard.onStepLeaving();
+    }
+
+    @Override
+    public void updateDataModel() {
+    }
 }

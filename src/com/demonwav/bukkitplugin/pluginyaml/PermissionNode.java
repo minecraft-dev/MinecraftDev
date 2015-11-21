@@ -29,45 +29,45 @@ public class PermissionNode {
      *   back to the plugin.yml). List operations should be done with add and remove methods.
      */
 
-  public enum DefaultPermission {TRUE, FALSE, OP, NOT_OP}
+    public enum DefaultPermission { TRUE, FALSE, OP, NOT_OP }
 
-  @Getter @NotNull private String name;
-  @Getter @Nullable private String description;
-  @Getter @NotNull private DefaultPermission defaultPermission = DefaultPermission.OP;
-  @NotNull private Map<String, Boolean> children = new HashMap<>();
+    @Getter @NotNull private String name;
+    @Getter @Nullable private String description;
+    @Getter @NotNull private DefaultPermission defaultPermission = DefaultPermission.OP;
+    @NotNull private Map<String, Boolean> children = new HashMap<>();
 
-  public PermissionNode(@NotNull String name) {
-    this.name = name;
-  }
+    public PermissionNode(@NotNull String name) {
+        this.name = name;
+    }
 
-  // Name
-  public void setName(@NotNull String name) {
+    // Name
+    public void setName(@NotNull String name) {
 
-  }
+    }
 
-  // Description
-  public void setDescription(@Nullable String description) {
+    // Description
+    public void setDescription(@Nullable String description) {
 
-  }
+    }
 
-  // Default Permission
-  public void setDefaultPermission(@NotNull DefaultPermission defaultPermission) {
+    // Default Permission
+    public void setDefaultPermission(@NotNull DefaultPermission defaultPermission) {
 
-  }
+    }
 
-  public Map<String, Boolean> getChildren() {
-    return Collections.unmodifiableMap(children);
-  }
+    public Map<String, Boolean> getChildren() {
+        return Collections.unmodifiableMap(children);
+    }
 
-  public boolean addChild(@NotNull String name, boolean inheritPerms) {
-    return false;
-  }
+    public boolean addChild(@NotNull String name, boolean inheritPerms) {
+        return false;
+    }
 
-  public boolean removeChild(@NotNull String name) {
-    return false;
-  }
+    public boolean removeChild(@NotNull String name) {
+        return false;
+    }
 
-  public boolean containsChild(@NotNull String name) {
-    return children.containsKey(name);
-  }
+    public boolean containsChild(@NotNull String name) {
+        return children.containsKey(name);
+    }
 }

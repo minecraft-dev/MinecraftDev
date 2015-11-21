@@ -12,31 +12,27 @@ import java.util.Map;
 
 public class BukkitProject {
 
-  private static final Map<Project, BukkitProject> map = new HashMap<>();
+    private static final Map<Project, BukkitProject> map = new HashMap<>();
 
-  @Getter
-  @Setter
-  private VirtualFile pluginYml;
-  @Getter
-  @Setter
-  private Project project;
+    @Getter @Setter private VirtualFile pluginYml;
+    @Getter @Setter private Project project;
 
-  private PluginConfigManager configManager;
+    private PluginConfigManager configManager;
 
-  public static BukkitProject getInstance(Project project) {
-    BukkitProject result;
-    if (!map.containsKey(project)) {
-      result = new BukkitProject();
-      map.put(project, result);
-    } else {
-      return map.get(project);
+    public static BukkitProject getInstance(Project project) {
+        BukkitProject result;
+        if (!map.containsKey(project)) {
+            result = new BukkitProject();
+            map.put(project, result);
+        } else {
+            return map.get(project);
+        }
+        return result;
     }
-    return result;
-  }
 
-  public PluginConfigManager getConfigManager() {
-    if (configManager == null)
-      configManager = new PluginConfigManager(this);
-    return configManager;
-  }
+    public PluginConfigManager getConfigManager() {
+        if (configManager == null)
+            configManager = new PluginConfigManager(this);
+        return configManager;
+    }
 }

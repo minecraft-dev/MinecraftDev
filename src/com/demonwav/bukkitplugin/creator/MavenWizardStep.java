@@ -23,66 +23,69 @@ import javax.swing.JTextField;
 
 public class MavenWizardStep extends ModuleWizardStep {
 
-  private JTextField groupIdField;
-  private JTextField artifactIdField;
-  private JTextField versionField;
-  private JPanel panel;
+    private JTextField groupIdField;
+    private JTextField artifactIdField;
+    private JTextField versionField;
+    private JPanel panel;
 
-  private final MavenProjectCreator creator;
+    private final MavenProjectCreator creator;
 
-  public MavenWizardStep(@NotNull MavenProjectCreator creator) {
-    super();
-    this.creator = creator;
-  }
-
-  @Override
-  public JComponent getComponent() {
-    return panel;
-  }
-
-  @Override
-  public void updateDataModel() {
-  }
-
-  @Override
-  public void onStepLeaving() {
-    super.onStepLeaving();
-    creator.setGroupId(groupIdField.getText());
-    creator.setArtifactId(artifactIdField.getText());
-    creator.setVersion(versionField.getText());
-  }
-
-  @Override
-  public boolean validate() throws ConfigurationException {
-    try {
-      if (groupIdField.getText().trim().isEmpty())
-        throw new EException(groupIdField);
-
-      if (artifactIdField.getText().trim().isEmpty())
-        throw new EException(artifactIdField);
-
-      if (versionField.getText().trim().isEmpty())
-        throw new EException(versionField);
-    } catch (EException e) {
-      String message = "<html>Please fill in all fields</html>";
-      JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
-          .setFadeoutTime(4000)
-          .createBalloon()
-          .show(RelativePoint.getSouthWestOf(e.getJ()), Balloon.Position.below);
-      return false;
-    }
-    return true;
-  }
-
-  class EException extends Exception {
-    private JComponent j;
-
-    public EException(JComponent j) {
-      this.j = j;
+    public MavenWizardStep(@NotNull MavenProjectCreator creator) {
+        super();
+        this.creator = creator;
     }
 
-    public JComponent getJ() {
-      return j;
+    @Override
+    public JComponent getComponent() {
+        return panel;
     }
-  }
+
+    @Override
+    public void updateDataModel() {
+    }
+
+    @Override
+    public void onStepLeaving() {
+        super.onStepLeaving();
+        creator.setGroupId(groupIdField.getText());
+        creator.setArtifactId(artifactIdField.getText());
+        creator.setVersion(versionField.getText());
+    }
+
+    @Override
+    public boolean validate() throws ConfigurationException {
+        try {
+            if (groupIdField.getText().trim().isEmpty()) {
+                throw new EException(groupIdField);
+            }
+
+            if (artifactIdField.getText().trim().isEmpty()) {
+                throw new EException(artifactIdField);
+            }
+
+            if (versionField.getText().trim().isEmpty()) {
+                throw new EException(versionField);
+            }
+        } catch (EException e) {
+            String message = "<html>Please fill in all fields</html>";
+            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
+                    .setFadeoutTime(4000)
+                    .createBalloon()
+                    .show(RelativePoint.getSouthWestOf(e.getJ()), Balloon.Position.below);
+            return false;
+        }
+        return true;
+    }
+
+    class EException extends Exception {
+        private JComponent j;
+
+        public EException(JComponent j) {
+            this.j = j;
+        }
+
+        public JComponent getJ() {
+            return j;
+        }
+    }
 }

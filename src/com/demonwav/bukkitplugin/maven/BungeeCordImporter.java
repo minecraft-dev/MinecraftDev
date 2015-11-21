@@ -14,13 +14,13 @@ import com.demonwav.bukkitplugin.BungeeCordModuleType;
 import org.jetbrains.annotations.NotNull;
 
 public class BungeeCordImporter extends Importer {
-  public BungeeCordImporter() {
-    super("net.md-5", "bungeecord-api");
-  }
+    public BungeeCordImporter() {
+        super("net.md-5", "bungeecord-api");
+    }
 
-  @NotNull
-  @Override
-  public BungeeCordModuleType getModuleType() {
-    return BungeeCordModuleType.getInstance();
-  }
+    @NotNull
+    @Override
+    public BungeeCordModuleType getModuleType() {
+        return BungeeCordModuleType.getInstance();
+    }
 }

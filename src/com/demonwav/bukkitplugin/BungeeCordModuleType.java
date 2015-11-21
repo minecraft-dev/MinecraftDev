@@ -9,28 +9,28 @@ import javax.swing.Icon;
 
 public class BungeeCordModuleType extends JavaModuleType {
 
-  private static final String ID = "BUNGEECORD_MODULE_TYPE";
+    private static final String ID = "BUNGEECORD_MODULE_TYPE";
 
-  public BungeeCordModuleType() {
-    super(ID);
-  }
+    public BungeeCordModuleType() {
+        super(ID);
+    }
 
-  public static BungeeCordModuleType getInstance() {
-    return (BungeeCordModuleType) ModuleTypeManager.getInstance().findByID(ID);
-  }
+    public static BungeeCordModuleType getInstance() {
+        return (BungeeCordModuleType) ModuleTypeManager.getInstance().findByID(ID);
+    }
 
-  @Override
-  public Icon getBigIcon() {
-    return BukkitProjectsIcons.SpigotProjectBig;
-  }
+    @Override
+    public Icon getBigIcon() {
+        return BukkitProjectsIcons.SpigotProjectBig;
+    }
 
-  @Override
-  public Icon getIcon() {
-    return BukkitProjectsIcons.SpigotProject;
-  }
+    @Override
+    public Icon getIcon() {
+        return BukkitProjectsIcons.SpigotProject;
+    }
 
-  @Override
-  public Icon getNodeIcon(@Deprecated boolean isOpened) {
-    return BukkitProjectsIcons.SpigotProject;
-  }
+    @Override
+    public Icon getNodeIcon(@Deprecated boolean isOpened) {
+        return BukkitProjectsIcons.SpigotProject;
+    }
 }
