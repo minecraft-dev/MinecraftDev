@@ -115,6 +115,10 @@ public class BukkitTemplate {
     private static void applyTemplate(Project project, VirtualFile file, String template, Properties properties) throws IOException {
         FileTemplateManager manager = FileTemplateManager.getInstance(project);
         FileTemplate fileTemplate = manager.getTemplate(template);
+
+        // remove comments (they leave empty lines
+        fileTemplate.setText(fileTemplate.getText().replaceAll("#\\*.*\\*#\\n", ""));
+
         Properties allProperties = manager.getDefaultProperties();
         allProperties.putAll(properties);
 

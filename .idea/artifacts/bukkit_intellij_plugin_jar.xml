@@ -3,7 +3,6 @@
     <output-path>$PROJECT_DIR$/out/artifacts/bukkit_intellij_plugin_jar</output-path>
     <root id="archive" name="bukkit-intellij-plugin.jar">
       <element id="module-output" name="bukkit-intellij-plugin" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.14.8/lombok-1.14.8.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

@@ -10,6 +10,8 @@
 package com.demonwav.bukkitplugin.creator;
 
 import com.demonwav.bukkitplugin.BukkitModuleType;
+import com.demonwav.bukkitplugin.BungeeCordModuleType;
+import com.demonwav.bukkitplugin.SpigotModuleType;
 import com.demonwav.bukkitplugin.icons.BukkitProjectsIcons;
 
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
@@ -17,6 +19,7 @@ import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAwareRunnable;
 import com.intellij.openapi.project.DumbService;
@@ -114,8 +117,17 @@ public class BukkitModuleBuilder extends JavaModuleBuilder {
     }
 
     @Override
-    public BukkitModuleType getModuleType() {
-        return BukkitModuleType.getInstance();
+    public JavaModuleType getModuleType() {
+        switch (creator.getType()) {
+            case BUKKIT:
+                return BukkitModuleType.getInstance();
+            case SPIGOT:
+                return SpigotModuleType.getInstance();
+            case BUNGEECORD:
+                return BungeeCordModuleType.getInstance();
+            default: // This *should* not happen
+                throw new IllegalStateException("Project type is not one of the three possible types.");
+        }
     }
 
     @Override

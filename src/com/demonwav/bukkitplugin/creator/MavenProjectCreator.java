@@ -22,29 +22,34 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType;
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Objects;
 
+@ToString
+@EqualsAndHashCode
 public class MavenProjectCreator {
 
-    private VirtualFile root = null;
-    private String groupId = null;
-    private String artifactId = null;
-    private String version = null;
-    private Type type = Type.BUKKIT;
-    private Project project = null;
+    @Getter @Setter private VirtualFile root = null;
+    @Getter @Setter private String groupId = null;
+    @Getter @Setter private String artifactId = null;
+    @Getter @Setter private String version = null;
+    @Getter @Setter private Type type = Type.BUKKIT;
+    @Getter @Setter private Project project = null;
 
-    private ProjectSettings settings = null;
+    @Getter @Setter private ProjectSettings settings = null;
 
-    private VirtualFile sourceDir;
-    private VirtualFile resourceDir;
-    private VirtualFile testDir;
-    private VirtualFile pomFile;
+    @Getter @Setter private VirtualFile sourceDir;
+    @Getter @Setter private VirtualFile resourceDir;
+    @Getter @Setter private VirtualFile testDir;
+    @Getter @Setter private VirtualFile pomFile;
 
     public void create() {
         root.refresh(false, true);
@@ -130,96 +135,5 @@ public class MavenProjectCreator {
                 e.printStackTrace();
             }
         });
-    }
-
-    public VirtualFile getRoot() {
-        return root;
-    }
-
-    public void setRoot(VirtualFile root) {
-        this.root = root;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
-
-    public String getArtifactId() {
-        return artifactId;
-    }
-
-    public void setArtifactId(String artifactId) {
-        this.artifactId = artifactId;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public ProjectSettings getSettings() {
-        return settings;
-    }
-
-    public void setSettings(ProjectSettings settings) {
-        this.settings = settings;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MavenProjectCreator)) return false;
-
-        MavenProjectCreator that = (MavenProjectCreator) o;
-
-        return Objects.equals(getRoot(), that.getRoot()) &&
-                Objects.equals(getGroupId(), that.getGroupId()) &&
-                Objects.equals(getArtifactId(), that.getArtifactId()) &&
-                Objects.equals(getVersion(), that.getVersion()) &&
-                getType() == that.getType();
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getRoot() != null ? getRoot().hashCode() : 0;
-        result = 31 * result + (getGroupId() != null ? getGroupId().hashCode() : 0);
-        result = 31 * result + (getArtifactId() != null ? getArtifactId().hashCode() : 0);
-        result = 31 * result + (getVersion() != null ? getVersion().hashCode() : 0);
-        result = 31 * result + (getType() != null ? getType().hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "MavenProjectCreator{" +
-                "root=" + root +
-                ", groupId='" + groupId + '\'' +
-                ", artifactId='" + artifactId + '\'' +
-                ", version='" + version + '\'' +
-                ", type=" + type +
-                '}';
     }
 }
