@@ -45,7 +45,7 @@ public class PluginConfig {
     @Getter @NotNull private PermissionList permissions = new PermissionList();
 
     // Nullable values with automatic getters
-    @Getter @Nullable private String descrption;
+    @Getter @Nullable private String description;
     @Getter @Nullable private String author;
     @Getter @Nullable private String website;
     @Getter @Nullable private String prefix;
@@ -73,7 +73,7 @@ public class PluginConfig {
     }
 
     // Description
-    public void setDescrption(@Nullable String descrption) {
+    public void setDescription(@Nullable String description) {
 
     }
 
