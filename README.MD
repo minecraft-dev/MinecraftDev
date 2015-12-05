@@ -1,4 +1,4 @@
-IntelliJBukkitSupport
+IntelliJBukkitSupport <a href="https://tc.demonwav.com/viewType.html?buildTypeId=IntelliJBukkitSupport_Build&guest=1"><img src="https://tc.demonwav.com/app/rest/builds/buildType(id:IntelliJBukkitSupport_Build)/statusIcon"/></a>
 =====================
 
 Compiling
