@@ -16,18 +16,24 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFileAdapter;
 import com.intellij.openapi.vfs.VirtualFileEvent;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.yaml.psi.YAMLArray;
+import org.jetbrains.yaml.psi.YAMLCompoundValue;
 import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLFile;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLPsiElement;
 import org.jetbrains.yaml.psi.YAMLScalarList;
 import org.jetbrains.yaml.psi.YAMLScalarText;
+import org.jetbrains.yaml.psi.YAMLSequence;
 import org.jetbrains.yaml.psi.impl.YAMLFileImpl;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PluginConfigManager {
 
@@ -46,8 +52,10 @@ public class PluginConfigManager {
         VirtualFileManager.getInstance().addVirtualFileListener(new VirtualFileAdapter() {
             @Override
             public void contentsChanged(@NotNull VirtualFileEvent event) {
+                // TODO: Make this check more substantial
                 if (event.getFile().getName().equals("plugin.yml")) {
                     importConfig();
+                    System.out.println(config.toString());
                 }
             }
         });
@@ -79,45 +87,36 @@ public class PluginConfigManager {
                     String key = keyValue.getKeyText();
 
                     switch (key) {
+                        // Single string values
                         case "name":
-                            handleSingleValue("name", keyValue);
-                            break;
                         case "version":
-                            handleSingleValue("version", keyValue);
-                            break;
                         case "description":
-                            handleSingleValue("description", keyValue);
+                        case "author":
+                        case "website":
+                        case "prefix":
+                            handleSingleValue(key, keyValue);
+                            break;
+                        // List values
+                        case "authors":
+                        case "depend":
+                        case "softdepend":
+                        case "loadbefore":
+                            handleListValue(key, keyValue);
                             break;
                         case "load":
                             // TODO: handle this enum & verify the value is actually valid and warn if not
-                            break;
-                        case "author":
-                            handleSingleValue("author", keyValue);
-                            break;
-                        case "authors":
-                            // TODO: handle list
-                            break;
-                        case "website":
-                            handleSingleValue("website", keyValue);
                             break;
                         case "main":
                             handleSingleValue("main", keyValue);
                             // TODO: verify this is a proper class that exists and extends JavaPlugin
                             break;
                         case "database":
-                            // TODO: handle boolean value
-                            break;
-                        case "depend":
-                            // TODO: handle list
-                            break;
-                        case "prefix":
-                            handleSingleValue("prefix", keyValue);
-                            break;
-                        case "softdepend":
-                            // TODO: handle list
-                            break;
-                        case "loadbefore":
-                            // TODO: Handle list
+                            if (keyValue.getValueText().matches("y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF")) {
+                                handleSingleValue(key, keyValue);
+                            } else {
+                                // TODO: show warning to user, must be a boolean value
+                                setValueInConfig(key, false);
+                            }
                             break;
                         case "commands":
                             // TODO: handle commands
@@ -126,7 +125,7 @@ public class PluginConfigManager {
                             // TODO: handle permissions
                             break;
                         default:
-                            // TODO: Show warning to user
+                            // TODO: Show warning to user, invalid field in plugin.yml
                             break;
                     }
 
@@ -175,7 +174,51 @@ public class PluginConfigManager {
             return;
         }
 
-        setValueInConfig(name, keyValue.getValueText());
+        if (keyValue.getValueText().matches("y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF")) {
+            if (keyValue.getValueText().matches("y|Y|yes|Yes|YES|true|True|TRUE|on|On|ON")) {
+                setValueInConfig(name, true);
+            } else {
+                setValueInConfig(name, false);
+            }
+        } else {
+            setValueInConfig(name, keyValue.getValueText());
+        }
+    }
+
+    private void handleListValue(String name, YAMLKeyValue keyValue) {
+        if (keyValue.getYAMLElements().size() != 1) {
+            // TODO: Show warning to user, should be YAMLCompoundValue with YAMLArray or YAMLSequence child
+            return;
+        }
+
+        if (!(keyValue.getYAMLElements().get(0) instanceof YAMLCompoundValue)) {
+            // TODO: Show warning to user, should be YAMLCompoundValue with YAMLArray or YAMLSequence child
+            return;
+        }
+
+        YAMLCompoundValue compoundValue = (YAMLCompoundValue) keyValue.getYAMLElements().get(0);
+
+        if (compoundValue.getYAMLElements().size() == 0) {
+            // TODO: Show warning to user, should be YAMLArray or YAMLSequence child
+            return;
+        }
+
+        if (compoundValue.getYAMLElements().get(0) instanceof YAMLArray) {
+            if (compoundValue.getYAMLElements().size() > 1) {
+                // TODO: Show warning to user, can only be one YAMLArray
+                return;
+            }
+            YAMLArray array = (YAMLArray) compoundValue.getYAMLElements().get(0);
+            List<String> text = Arrays.stream(array.getText().replaceAll("\\[|\\]", "").split(", ")).collect(Collectors.toList());
+            setValueInConfig(name, text);
+            return;
+        } else if (compoundValue.getYAMLElements().stream().allMatch(element -> element instanceof YAMLSequence)) {
+            List<String> text = compoundValue.getYAMLElements().stream().map(PsiElement::getText).map(s -> s.replaceAll("\\-\\s+|\\n", "")).collect(Collectors.toList());
+            setValueInConfig(name, text);
+            return;
+        }
+
+        // TODO: Show warning to user, the list was not valid
     }
 
     private boolean setValueInConfig(String name, Object value) {

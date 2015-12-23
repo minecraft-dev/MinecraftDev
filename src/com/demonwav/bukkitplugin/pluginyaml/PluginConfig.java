@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@ToString
+@ToString(exclude = "project")
 @EqualsAndHashCode
 public class PluginConfig {
 
