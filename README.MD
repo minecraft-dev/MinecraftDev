@@ -4,7 +4,7 @@ IntelliJBukkitSupport <a href="https://tc.demonwav.com/viewType.html?buildTypeId
 Compiling
 ---------
 
-To compile IntelliJBukkitSupport, a few steps need to be taken to setup an SDK.
+To compile IntelliJ Bukkit Support, a few steps need to be taken to setup an SDK.
 
 1. Create the IntelliJ Plugin SDK (just follow the steps when you create a new SDK). You must use IntelliJ Ultimate as
 we provide special support for IntelliJ Ultimate's YAML plugin.
