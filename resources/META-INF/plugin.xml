@@ -27,7 +27,7 @@
   </change-notes>
 
   <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="143"/>
+  <idea-version since-build="145"/>
 
   <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
@@ -37,15 +37,15 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
-    <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.bukkitplugin.BukkitModuleType"/>
-    <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.bukkitplugin.SpigotModuleType"/>
-    <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.bukkitplugin.BungeeCordModuleType"/>
-    <fileTemplateGroup implementation="com.demonwav.bukkitplugin.util.BukkitFileTemplateGroupFactory"/>
+    <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.BukkitModuleType"/>
+    <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.SpigotModuleType"/>
+    <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.BungeeCordModuleType"/>
+    <fileTemplateGroup implementation="com.demonwav.util.BukkitFileTemplateGroupFactory"/>
   </extensions>
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
-    <importer implementation="com.demonwav.bukkitplugin.maven.BukkitImporter"/>
-    <importer implementation="com.demonwav.bukkitplugin.maven.SpigotImporter"/>
-    <importer implementation="com.demonwav.bukkitplugin.maven.BungeeCordImporter"/>
+    <importer implementation="com.demonwav.maven.BukkitImporter"/>
+    <importer implementation="com.demonwav.maven.SpigotImporter"/>
+    <importer implementation="com.demonwav.maven.BungeeCordImporter"/>
   </extensions>
 
   <application-components>
