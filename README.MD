@@ -1,10 +1,10 @@
-IntelliJBukkitSupport <a href="https://tc.demonwav.com/viewType.html?buildTypeId=IntelliJBukkitSupport_Build&guest=1"><img src="https://tc.demonwav.com/app/rest/builds/buildType(id:IntelliJBukkitSupport_Build)/statusIcon"/></a>
-=====================
+Minecraft Development IntelliJ Plugin <a href="https://tc.demonwav.com/viewType.html?buildTypeId=MinecraftDevIntelliJPlugin_Build&guest=1"><img src="https://tc.demonwav.com/app/rest/builds/buildType(id:MinecraftDevIntelliJPlugin_Build)/statusIcon"/></a>
+=============================================================================================================================================================================================================================================================
 
 Compiling
 ---------
 
-To compile IntelliJ Bukkit Support, a few steps need to be taken to setup an SDK.
+To compile Minecraft Development IntelliJ Plugin, a few steps need to be taken to setup an SDK.
 
 1. Create the IntelliJ Plugin SDK (just follow the steps when you create a new SDK). You must use IntelliJ Ultimate as
 we provide special support for IntelliJ Ultimate's YAML plugin.
