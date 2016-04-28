@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact name="Build">
+    <output-path>$PROJECT_DIR$/out/artifacts/Build</output-path>
+    <root id="root">
+      <element id="archive" name="minecraft-dev-intellij-plugin.zip">
+        <element id="directory" name="minecraft-dev-intellij-plugin">
+          <element id="directory" name="lib">
+            <element id="library" level="project" name="org.projectlombok:lombok:1.16.4" />
+            <element id="archive" name="minecraft-dev-intellij-plugin.jar">
+              <element id="module-output" name="minecraft-dev-intellij-plugin" />
+            </element>
+          </element>
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
