@@ -31,7 +31,7 @@ public class PluginConfig {
      *   back to the plugin.yml). List operations should be done with add and remove methods.
      */
 
-    public enum Load {STARTUP, POSTWORLD}
+    public enum Load { STARTUP, POSTWORLD }
 
     @Getter @NotNull private BukkitProject project;
 
@@ -55,7 +55,7 @@ public class PluginConfig {
 
     // NotNull values with custom getters
     @NotNull private List<String> depend = new ArrayList<>();
-    @NotNull private List<String> softdpend = new ArrayList<>();
+    @NotNull private List<String> softdepend = new ArrayList<>();
     @NotNull private List<String> loadbefore = new ArrayList<>();
 
     public PluginConfig(@NotNull BukkitProject project) {
@@ -108,11 +108,11 @@ public class PluginConfig {
         return Collections.unmodifiableList(depend);
     }
 
-    public boolean addDepend(@NotNull String depend) {
+    public boolean addDepend(@NotNull String... depend) {
         return false;
     }
 
-    public boolean removeDepend(@NotNull String depend) {
+    public boolean removeDepend(@NotNull String... depend) {
         return false;
     }
 
@@ -123,15 +123,15 @@ public class PluginConfig {
 
     // Soft Depend
     @NotNull
-    public List<String> getSoftDepend() {
-        return Collections.unmodifiableList(softdpend);
+    public List<String> getSoftdepend() {
+        return Collections.unmodifiableList(softdepend);
     }
 
-    public boolean addSoftDepend(@NotNull String softdpend) {
+    public boolean addSoftdepend(@NotNull String... softdepend) {
         return false;
     }
 
-    public boolean removeSoftDepend(@NotNull String softDepend) {
+    public boolean removeSoftdepend(@NotNull String... softdepend) {
         return false;
     }
 
@@ -141,11 +141,11 @@ public class PluginConfig {
         return Collections.unmodifiableList(loadbefore);
     }
 
-    public boolean addLoadBefore(@NotNull String loadbefore) {
+    public boolean addLoadbefore(@NotNull String... loadbefore) {
         return false;
     }
 
-    public boolean removeLoadBefore(@NotNull String loadBefore) {
+    public boolean removeLoadbefore(@NotNull String... loadbefore) {
         return false;
     }
 }

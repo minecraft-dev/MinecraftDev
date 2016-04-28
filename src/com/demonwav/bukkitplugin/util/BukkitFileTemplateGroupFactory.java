@@ -15,6 +15,7 @@ import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
 
 public class BukkitFileTemplateGroupFactory implements FileTemplateGroupDescriptorFactory {
+    
     public static final String BUKKIT_MAIN_CLASS_TEMPLATE = "main_class.java";
     public static final String BUKKIT_PLUGIN_YML_TEMPLATE = "plugin_template.yml";
     public static final String BUKKIT_POM_TEMPLATE = "pom_template.xml";

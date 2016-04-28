@@ -16,22 +16,20 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFileAdapter;
 import com.intellij.openapi.vfs.VirtualFileEvent;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.yaml.psi.YAMLArray;
-import org.jetbrains.yaml.psi.YAMLCompoundValue;
 import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLFile;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLPsiElement;
 import org.jetbrains.yaml.psi.YAMLScalarList;
 import org.jetbrains.yaml.psi.YAMLScalarText;
-import org.jetbrains.yaml.psi.YAMLSequence;
+import org.jetbrains.yaml.psi.impl.YAMLArrayImpl;
+import org.jetbrains.yaml.psi.impl.YAMLBlockMappingImpl;
 import org.jetbrains.yaml.psi.impl.YAMLFileImpl;
+import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,12 +70,16 @@ public class PluginConfigManager {
             if (BukkitUtil.isUltimate()) {
                 YAMLFile file = ((YAMLFileImpl) pluginYml);
 
-                if (file == null)
+                if (file == null) {
                     return; // TODO: Show warning to user
+                }
 
                 // TODO: Show warning to user if there is more than one document
                 YAMLDocument document = file.getDocuments().get(0);
-                document.getYAMLElements().forEach(e -> {
+                YAMLBlockMappingImpl blockMapping = (YAMLBlockMappingImpl) document.getTopLevelValue();
+                assert blockMapping != null;
+
+                blockMapping.getYAMLElements().forEach(e -> {
                     if (!(e instanceof YAMLKeyValue)) {
                         // TODO: Show warning to user, this would be invalid in a plugin.yml
                         return;
@@ -94,7 +96,7 @@ public class PluginConfigManager {
                         case "author":
                         case "website":
                         case "prefix":
-                            handleSingleValue(key, keyValue);
+                            handleSingleValue(key, keyValue, false);
                             break;
                         // List values
                         case "authors":
@@ -105,17 +107,18 @@ public class PluginConfigManager {
                             break;
                         case "load":
                             // TODO: handle this enum & verify the value is actually valid and warn if not
+                            handleSingleValue(key, keyValue, true);
                             break;
                         case "main":
-                            handleSingleValue("main", keyValue);
+                            handleSingleValue("main", keyValue, false);
                             // TODO: verify this is a proper class that exists and extends JavaPlugin
                             break;
                         case "database":
                             if (keyValue.getValueText().matches("y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF")) {
-                                handleSingleValue(key, keyValue);
+                                handleSingleValue(key, keyValue, false);
                             } else {
                                 // TODO: show warning to user, must be a boolean value
-                                setValueInConfig(key, false);
+                                setValueInConfig(key, false, false);
                             }
                             break;
                         case "commands":
@@ -139,7 +142,7 @@ public class PluginConfigManager {
         });
     }
 
-    private void handleSingleValue(String name, YAMLKeyValue keyValue) {
+    private void handleSingleValue(String name, YAMLPsiElement keyValue, boolean isEnum) {
         if (keyValue.getYAMLElements().size() > 1) {
             /*
              * TODO: Show warning to user. This would only be valid as 1 if The only child is a YAMLScalarList or
@@ -163,69 +166,61 @@ public class PluginConfigManager {
                     }
                 }
             }
-            setValueInConfig(name, sb.toString());
+            setValueInConfig(name, sb.toString(), isEnum);
             return;
         }
 
-        if (keyValue.getYAMLElements().size() > 0) {
-            /*
-             * TODO: Show warning to user. This would never be valid
-             */
-            return;
-        }
+        if (keyValue.getYAMLElements().size() == 1) {
+            if (keyValue.getYAMLElements().get(0) instanceof YAMLPlainTextImpl) {
+                YAMLPlainTextImpl textImpl = (YAMLPlainTextImpl) keyValue.getYAMLElements().get(0);
+                String text = textImpl.getTextValue();
 
-        if (keyValue.getValueText().matches("y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF")) {
-            if (keyValue.getValueText().matches("y|Y|yes|Yes|YES|true|True|TRUE|on|On|ON")) {
-                setValueInConfig(name, true);
-            } else {
-                setValueInConfig(name, false);
+                // So yaml is a bit weird and this is literally the official regex for matching boolean values in yaml.....
+                if (text.matches("y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF")) {
+                    if (text.matches("y|Y|yes|Yes|YES|true|True|TRUE|on|On|ON")) {
+                        setValueInConfig(name, true, false);
+                    } else {
+                        setValueInConfig(name, false, false);
+                    }
+                } else {
+                    System.out.println(((YAMLKeyValue) keyValue).getValue());
+                    setValueInConfig(name, text, isEnum);
+                }
             }
-        } else {
-            setValueInConfig(name, keyValue.getValueText());
         }
+
+        // TODO: Handle outlier cases
     }
 
-    private void handleListValue(String name, YAMLKeyValue keyValue) {
+    private void handleListValue(String name, YAMLPsiElement keyValue) {
         if (keyValue.getYAMLElements().size() != 1) {
-            // TODO: Show warning to user, should be YAMLCompoundValue with YAMLArray or YAMLSequence child
+            // TODO: Show warning to user, should be YAMLBlockMappingImpl YAMLArrayImpl child
             return;
         }
 
-        if (!(keyValue.getYAMLElements().get(0) instanceof YAMLCompoundValue)) {
-            // TODO: Show warning to user, should be YAMLCompoundValue with YAMLArray or YAMLSequence child
+        keyValue = keyValue.getYAMLElements().get(0);
+
+        if (!(keyValue instanceof YAMLBlockMappingImpl) && !(keyValue instanceof YAMLArrayImpl)) {
+            // TODO: Show warning to user, should be YAMLBlockMappingImpl or YAMLArrayImpl child
             return;
         }
 
-        YAMLCompoundValue compoundValue = (YAMLCompoundValue) keyValue.getYAMLElements().get(0);
-
-        if (compoundValue.getYAMLElements().size() == 0) {
-            // TODO: Show warning to user, should be YAMLArray or YAMLSequence child
-            return;
-        }
-
-        if (compoundValue.getYAMLElements().get(0) instanceof YAMLArray) {
-            if (compoundValue.getYAMLElements().size() > 1) {
-                // TODO: Show warning to user, can only be one YAMLArray
-                return;
-            }
-            YAMLArray array = (YAMLArray) compoundValue.getYAMLElements().get(0);
-            List<String> text = Arrays.stream(array.getText().replaceAll("\\[|\\]", "").split(", ")).collect(Collectors.toList());
-            setValueInConfig(name, text);
-            return;
-        } else if (compoundValue.getYAMLElements().stream().allMatch(element -> element instanceof YAMLSequence)) {
-            List<String> text = compoundValue.getYAMLElements().stream().map(PsiElement::getText).map(s -> s.replaceAll("\\-\\s+|\\n", "")).collect(Collectors.toList());
-            setValueInConfig(name, text);
-            return;
-        }
+        List<String> text = keyValue.getYAMLElements().stream().map(s -> ((YAMLPlainTextImpl) s.getYAMLElements().get(0)).getTextValue()).collect(Collectors.toList());
+        setValueInConfig(name, text, false);
 
         // TODO: Show warning to user, the list was not valid
     }
 
-    private boolean setValueInConfig(String name, Object value) {
+    private boolean setValueInConfig(String name, Object value, boolean isEnum) {
         try {
             Field field = PluginConfig.class.getDeclaredField(name);
             field.setAccessible(true);
-            field.set(config, value);
+
+            if (isEnum) {
+                field.set(config, Enum.valueOf(field.getType().asSubclass(Enum.class), value.toString()));
+            } else {
+                field.set(config, value);
+            }
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
             return false;
