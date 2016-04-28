@@ -12,13 +12,13 @@
   <depends optional="false">org.jetbrains.idea.maven</depends>
   <depends optional="true">org.jetbrains.plugins.yaml</depends>
 
-  <id>com.demonwav.bukkitplugin</id>
-    <name>Bukkit Support</name>
+  <id>com.demonwav.minecraft-dev</id>
+    <name>Minecraft Development</name>
     <version>1.0</version>
     <vendor>DemonWav</vendor>
 
   <description><![CDATA[
-      Brings support for Bukkit, Spigot, and BungeeCord Projects to Intellij IDEA.
+      Brings support for Bukkit, Spigot, Paper, BungeeCord, Sponge, and Forge Projects to Intellij IDEA.
     ]]></description>
 
   <change-notes><![CDATA[

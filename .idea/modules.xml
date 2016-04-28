@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/bukkit-intellij-plugin.iml" filepath="$PROJECT_DIR$/bukkit-intellij-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/minecraft-dev-intellij-plugin.iml" filepath="$PROJECT_DIR$/minecraft-dev-intellij-plugin.iml" />
     </modules>
   </component>
 </project>
