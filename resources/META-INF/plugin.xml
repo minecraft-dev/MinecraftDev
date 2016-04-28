@@ -14,7 +14,7 @@
 
   <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
-    <version>1.0</version>
+    <version>alpha-0.0.1</version>
     <vendor>DemonWav</vendor>
 
   <description><![CDATA[
@@ -22,7 +22,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      Initial Release
+      Alpha release, not many features, may break. More features to come.
     ]]>
   </change-notes>
 
