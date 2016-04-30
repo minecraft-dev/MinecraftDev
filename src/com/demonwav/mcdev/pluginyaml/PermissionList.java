@@ -9,8 +9,6 @@
 
 package com.demonwav.mcdev.pluginyaml;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -18,8 +16,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ToString
-@EqualsAndHashCode
 public class PermissionList {
 
     /*
@@ -58,5 +54,32 @@ public class PermissionList {
 
     public boolean containsPermission(@NotNull String name) {
         return permissions.stream().anyMatch(node -> node.getName().equalsIgnoreCase(name));
+    }
+
+    @Override
+    public String toString() {
+        return "PermissionList{" +
+                "permissions=" + permissions +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        PermissionList that = (PermissionList) o;
+
+        return permissions.equals(that.permissions);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return permissions.hashCode();
     }
 }

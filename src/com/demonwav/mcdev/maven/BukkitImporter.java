@@ -13,7 +13,7 @@ import com.demonwav.mcdev.BukkitModuleType;
 
 import org.jetbrains.annotations.NotNull;
 
-public class BukkitImporter extends Importer {
+public class BukkitImporter extends MinecraftImporter {
     public BukkitImporter() {
         super("org.bukkit", "bukkit");
     }

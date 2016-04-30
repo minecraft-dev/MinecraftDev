@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ProjectSettings {
-    public enum Load {STARTUP, POSTWORLD}
+    public enum Load { STARTUP, POSTWORLD }
 
     public String pluginName;
     public String pluginVersion;

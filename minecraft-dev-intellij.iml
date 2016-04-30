@@ -10,6 +10,5 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="org.projectlombok:lombok:1.16.4" level="project" />
   </component>
 </module>

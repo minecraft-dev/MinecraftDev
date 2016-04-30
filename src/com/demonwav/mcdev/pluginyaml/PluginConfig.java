@@ -11,9 +11,6 @@ package com.demonwav.mcdev.pluginyaml;
 
 import com.demonwav.mcdev.BukkitProject;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@ToString(exclude = "project")
-@EqualsAndHashCode
 public class PluginConfig {
 
     /*
@@ -33,25 +28,25 @@ public class PluginConfig {
 
     public enum Load { STARTUP, POSTWORLD }
 
-    @Getter @NotNull private BukkitProject project;
+    @NotNull private BukkitProject project;
 
-    // NotNull values with automatic getters
-    @Getter @NotNull private String name = "";
-    @Getter @NotNull private String version = "";
-    @Getter @NotNull private Load load = Load.POSTWORLD;
-    @Getter @NotNull private List<String> authors = new ArrayList<>();
-    @Getter @NotNull private String main = "";
-    @Getter @NotNull private CommandList commands = new CommandList();
-    @Getter @NotNull private PermissionList permissions = new PermissionList();
+    // NotNull values
+    @NotNull private String name = "";
+    @NotNull private String version = "";
+    @NotNull private Load load = Load.POSTWORLD;
+    @NotNull private List<String> authors = new ArrayList<>();
+    @NotNull private String main = "";
+    @NotNull private CommandList commands = new CommandList();
+    @NotNull private PermissionList permissions = new PermissionList();
 
-    // Nullable values with automatic getters
-    @Getter @Nullable private String description;
-    @Getter @Nullable private String author;
-    @Getter @Nullable private String website;
-    @Getter @Nullable private String prefix;
+    // Nullable values
+    @Nullable private String description;
+    @Nullable private String author;
+    @Nullable private String website;
+    @Nullable private String prefix;
 
-    // Primitive value with automatic getter
-    @Getter private boolean database;
+    // Primitive value
+    private boolean database;
 
     // NotNull values with custom getters
     @NotNull private List<String> depend = new ArrayList<>();
@@ -62,42 +57,86 @@ public class PluginConfig {
         this.project = project;
     }
 
+    @NotNull
+    public BukkitProject getProject() {
+        return project;
+    }
+
     // Name
+    @NotNull
+    public String getName() {
+        return name;
+    }
+
     public void setName(@NotNull String name) {
 
     }
 
     // Version
+    @NotNull
+    public String getVersion() {
+        return version;
+    }
+
     public void setVersion(@NotNull String version) {
 
     }
 
     // Description
+    @Nullable
+    public String getDescription() {
+        return description;
+    }
+
     public void setDescription(@Nullable String description) {
 
     }
 
     // Load
+    @NotNull
+    public Load getLoad() {
+        return load;
+    }
+
     public void setLoad(@NotNull Load load) {
 
     }
 
     // Author
+    @Nullable
+    public String getAuthor() {
+        return author;
+    }
+
     public void setAuthor(@Nullable String author) {
 
     }
 
     // Website
+    @Nullable
+    public String getWebsite() {
+        return website;
+    }
+
     public void setWebsite(@Nullable String website) {
 
     }
 
     // Main
+    @NotNull
+    public String getMain() {
+        return main;
+    }
+
     public void setMain(@NotNull String main) {
 
     }
 
     // Database
+    public boolean isDatabase() {
+        return database;
+    }
+
     public void setDatabase(boolean database) {
 
     }
@@ -147,5 +186,102 @@ public class PluginConfig {
 
     public boolean removeLoadbefore(@NotNull String... loadbefore) {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "PluginConfig{" +
+                "loadbefore=" + loadbefore +
+                ", name='" + name + '\'' +
+                ", version='" + version + '\'' +
+                ", load=" + load +
+                ", authors=" + authors +
+                ", main='" + main + '\'' +
+                ", commands=" + commands +
+                ", permissions=" + permissions +
+                ", description='" + description + '\'' +
+                ", author='" + author + '\'' +
+                ", website='" + website + '\'' +
+                ", prefix='" + prefix + '\'' +
+                ", database=" + database +
+                ", depend=" + depend +
+                ", softdepend=" + softdepend +
+                '}';
+    }
+
+    @SuppressWarnings("SimplifiableIfStatement")
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        PluginConfig that = (PluginConfig) o;
+
+        if (database != that.database) {
+            return false;
+        }
+        if (!name.equals(that.name)) {
+            return false;
+        }
+        if (!version.equals(that.version)) {
+            return false;
+        }
+        if (load != that.load) return false;
+        if (!authors.equals(that.authors)) {
+            return false;
+        }
+        if (!main.equals(that.main)) {
+            return false;
+        }
+        if (!commands.equals(that.commands)) {
+            return false;
+        }
+        if (!permissions.equals(that.permissions)) {
+            return false;
+        }
+        if (description != null ? !description.equals(that.description) : that.description != null) {
+            return false;
+        }
+        if (author != null ? !author.equals(that.author) : that.author != null) {
+            return false;
+        }
+        if (website != null ? !website.equals(that.website) : that.website != null) {
+            return false;
+        }
+        if (prefix != null ? !prefix.equals(that.prefix) : that.prefix != null) {
+            return false;
+        }
+        if (!depend.equals(that.depend)) {
+            return false;
+        }
+        if (!softdepend.equals(that.softdepend)) {
+            return false;
+        }
+        return loadbefore.equals(that.loadbefore);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + version.hashCode();
+        result = 31 * result + load.hashCode();
+        result = 31 * result + authors.hashCode();
+        result = 31 * result + main.hashCode();
+        result = 31 * result + commands.hashCode();
+        result = 31 * result + permissions.hashCode();
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (author != null ? author.hashCode() : 0);
+        result = 31 * result + (website != null ? website.hashCode() : 0);
+        result = 31 * result + (prefix != null ? prefix.hashCode() : 0);
+        result = 31 * result + (database ? 1 : 0);
+        result = 31 * result + depend.hashCode();
+        result = 31 * result + softdepend.hashCode();
+        result = 31 * result + loadbefore.hashCode();
+        return result;
     }
 }

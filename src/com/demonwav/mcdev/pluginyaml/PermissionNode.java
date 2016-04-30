@@ -9,9 +9,6 @@
 
 package com.demonwav.mcdev.pluginyaml;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,8 +16,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-@ToString
-@EqualsAndHashCode
 public class PermissionNode {
 
     /*
@@ -31,9 +26,9 @@ public class PermissionNode {
 
     public enum DefaultPermission { TRUE, FALSE, OP, NOT_OP }
 
-    @Getter @NotNull private String name;
-    @Getter @Nullable private String description;
-    @Getter @NotNull private DefaultPermission defaultPermission = DefaultPermission.OP;
+    @NotNull private String name;
+    @Nullable private String description;
+    @NotNull private DefaultPermission defaultPermission = DefaultPermission.OP;
     @NotNull private Map<String, Boolean> children = new HashMap<>();
 
     public PermissionNode(@NotNull String name) {
@@ -41,20 +36,36 @@ public class PermissionNode {
     }
 
     // Name
+    @NotNull
+    public String getName() {
+        return name;
+    }
+
     public void setName(@NotNull String name) {
 
     }
 
     // Description
+    @Nullable
+    public String getDescription() {
+        return description;
+    }
+
     public void setDescription(@Nullable String description) {
 
     }
 
     // Default Permission
+    @NotNull
+    public DefaultPermission getDefaultPermission() {
+        return defaultPermission;
+    }
+
     public void setDefaultPermission(@NotNull DefaultPermission defaultPermission) {
 
     }
 
+    // Children
     public Map<String, Boolean> getChildren() {
         return Collections.unmodifiableMap(children);
     }
@@ -69,5 +80,49 @@ public class PermissionNode {
 
     public boolean containsChild(@NotNull String name) {
         return children.containsKey(name);
+    }
+
+    @Override
+    public String toString() {
+        return "PermissionNode{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", defaultPermission=" + defaultPermission +
+                ", children=" + children +
+                '}';
+    }
+
+    @SuppressWarnings("SimplifiableIfStatement")
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        PermissionNode that = (PermissionNode) o;
+
+        if (!name.equals(that.name)) {
+            return false;
+        }
+        if (description != null ? !description.equals(that.description) : that.description != null) {
+            return false;
+        }
+        if (defaultPermission != that.defaultPermission) {
+            return false;
+        }
+        return children.equals(that.children);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + defaultPermission.hashCode();
+        result = 31 * result + children.hashCode();
+        return result;
     }
 }

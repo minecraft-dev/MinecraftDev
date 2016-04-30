@@ -5,7 +5,6 @@
       <element id="archive" name="minecraft-dev-intellij.zip">
         <element id="directory" name="minecraft-dev-intellij">
           <element id="directory" name="lib">
-            <element id="library" level="project" name="org.projectlombok:lombok:1.16.4" />
             <element id="archive" name="minecraft-dev-intellij.jar">
               <element id="module-output" name="minecraft-dev-intellij" />
             </element>

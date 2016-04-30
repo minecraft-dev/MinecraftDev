@@ -13,7 +13,7 @@ import com.demonwav.mcdev.SpigotModuleType;
 
 import org.jetbrains.annotations.NotNull;
 
-public class SpigotImporter extends Importer {
+public class SpigotImporter extends MinecraftImporter {
     public SpigotImporter() {
         super("org.spigotmc", "spigot-api");
     }

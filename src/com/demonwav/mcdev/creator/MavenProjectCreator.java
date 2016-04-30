@@ -22,10 +22,6 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType;
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
@@ -33,23 +29,21 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import java.io.IOException;
 import java.util.Arrays;
 
-@ToString
-@EqualsAndHashCode
 public class MavenProjectCreator {
 
-    @Getter @Setter private VirtualFile root = null;
-    @Getter @Setter private String groupId = null;
-    @Getter @Setter private String artifactId = null;
-    @Getter @Setter private String version = null;
-    @Getter @Setter private Type type = Type.BUKKIT;
-    @Getter @Setter private Project project = null;
+    private VirtualFile root = null;
+    private String groupId = null;
+    private String artifactId = null;
+    private String version = null;
+    private Type type = Type.BUKKIT;
+    private Project project = null;
 
-    @Getter @Setter private ProjectSettings settings = null;
+    private ProjectSettings settings = null;
 
-    @Getter @Setter private VirtualFile sourceDir;
-    @Getter @Setter private VirtualFile resourceDir;
-    @Getter @Setter private VirtualFile testDir;
-    @Getter @Setter private VirtualFile pomFile;
+    private VirtualFile sourceDir;
+    private VirtualFile resourceDir;
+    private VirtualFile testDir;
+    private VirtualFile pomFile;
 
     public void create() {
         root.refresh(false, true);
@@ -135,5 +129,170 @@ public class MavenProjectCreator {
                 e.printStackTrace();
             }
         });
+    }
+
+    public VirtualFile getRoot() {
+        return root;
+    }
+
+    public void setRoot(VirtualFile root) {
+        this.root = root;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getArtifactId() {
+        return artifactId;
+    }
+
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public ProjectSettings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(ProjectSettings settings) {
+        this.settings = settings;
+    }
+
+    public VirtualFile getSourceDir() {
+        return sourceDir;
+    }
+
+    public void setSourceDir(VirtualFile sourceDir) {
+        this.sourceDir = sourceDir;
+    }
+
+    public VirtualFile getResourceDir() {
+        return resourceDir;
+    }
+
+    public void setResourceDir(VirtualFile resourceDir) {
+        this.resourceDir = resourceDir;
+    }
+
+    public VirtualFile getTestDir() {
+        return testDir;
+    }
+
+    public void setTestDir(VirtualFile testDir) {
+        this.testDir = testDir;
+    }
+
+    public VirtualFile getPomFile() {
+        return pomFile;
+    }
+
+    public void setPomFile(VirtualFile pomFile) {
+        this.pomFile = pomFile;
+    }
+
+    @Override
+    public String toString() {
+        return "MavenProjectCreator{" +
+                "root=" + root +
+                ", groupId='" + groupId + '\'' +
+                ", artifactId='" + artifactId + '\'' +
+                ", version='" + version + '\'' +
+                ", type=" + type +
+                ", project=" + project +
+                ", settings=" + settings +
+                ", sourceDir=" + sourceDir +
+                ", resourceDir=" + resourceDir +
+                ", testDir=" + testDir +
+                ", pomFile=" + pomFile +
+                '}';
+    }
+
+    @SuppressWarnings("SimplifiableIfStatement")
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        MavenProjectCreator that = (MavenProjectCreator) o;
+
+        if (root != null ? !root.equals(that.root) : that.root != null) {
+            return false;
+        }
+        if (groupId != null ? !groupId.equals(that.groupId) : that.groupId != null) {
+            return false;
+        }
+        if (artifactId != null ? !artifactId.equals(that.artifactId) : that.artifactId != null) {
+            return false;
+        }
+        if (version != null ? !version.equals(that.version) : that.version != null) {
+            return false;
+        }
+        if (type != that.type) return false;
+        if (project != null ? !project.equals(that.project) : that.project != null) {
+            return false;
+        }
+        if (settings != null ? !settings.equals(that.settings) : that.settings != null) {
+            return false;
+        }
+        if (sourceDir != null ? !sourceDir.equals(that.sourceDir) : that.sourceDir != null) {
+            return false;
+        }
+        if (resourceDir != null ? !resourceDir.equals(that.resourceDir) : that.resourceDir != null) {
+            return false;
+        }
+        if (testDir != null ? !testDir.equals(that.testDir) : that.testDir != null) {
+            return false;
+        }
+        return pomFile != null ? pomFile.equals(that.pomFile) : that.pomFile == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = root != null ? root.hashCode() : 0;
+        result = 31 * result + (groupId != null ? groupId.hashCode() : 0);
+        result = 31 * result + (artifactId != null ? artifactId.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (project != null ? project.hashCode() : 0);
+        result = 31 * result + (settings != null ? settings.hashCode() : 0);
+        result = 31 * result + (sourceDir != null ? sourceDir.hashCode() : 0);
+        result = 31 * result + (resourceDir != null ? resourceDir.hashCode() : 0);
+        result = 31 * result + (testDir != null ? testDir.hashCode() : 0);
+        result = 31 * result + (pomFile != null ? pomFile.hashCode() : 0);
+        return result;
     }
 }
