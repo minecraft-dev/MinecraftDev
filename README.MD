@@ -4,20 +4,25 @@ Minecraft Development IntelliJ Plugin <a href="https://ci.demonwav.com/viewType.
 Compiling
 ---------
 
-To compile Minecraft Development IntelliJ Plugin, a few steps need to be taken to setup an SDK.
+To compile Minecraft Development IntelliJ Plugin, a few steps need to be
+taken to setup an SDK. It is recommended to use Community Edition as the
+basis for building this plugin, even if you use Ultimate, as we are
+targeting Community Edition to make this available to everyone.
 
-1. Create the IntelliJ Plugin SDK (just follow the steps when you create a new SDK). You must use IntelliJ Ultimate as
-we provide special support for IntelliJ Ultimate's YAML plugin.
-2. Once the SDK has been created, go to Project Structure -> SDK's (Under Platform Settings). Navigate to the
-`plugins/maven/lib` directory in the IntelliJ installation and add all the Jar's in that directory to the classpath.
-We probably don't need all of them, but it's simpler this way.
+1. Create the IntelliJ Plugin SDK (just follow the steps when you create
+a new SDK).
+2. Once the SDK has been created, go to Project Structure -> SDK's
+(Under Platform Settings). Navigate to the `plugins/maven/lib` directory
+in the IntelliJ installation and add all the Jar's in that directory to
+the classpath. We probably don't need all of them, but it's simpler this
+way.
 3. Do the same thing for `plugins/yaml/lib` as well.
 
 Style Guide
 -----------
 
-This project will follow DemonWav's Java style guidelines (lol, Google's style slightly modified). Link
-[here](http://www.demonwav.com/style).
+This project will follow DemonWav's Java style guidelines (lol, Google's
+style slightly modified). Link [here](http://www.demonwav.com/style).
 
 License
 -------

@@ -10,9 +10,9 @@
 <idea-plugin version="2">
 
   <depends optional="false">org.jetbrains.idea.maven</depends>
-  <depends optional="true">org.jetbrains.plugins.yaml</depends>
+  <depends optional="false">org.jetbrains.plugins.yaml</depends>
 
-  <id>com.demonwav.minecraft-dev</id>
+  <id>com.demonwav.mcdev</id>
     <name>Minecraft Development</name>
     <version>alpha-0.0.2</version>
     <vendor>DemonWav</vendor>
@@ -37,15 +37,15 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
-    <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.BukkitModuleType"/>
-    <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.SpigotModuleType"/>
-    <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.BungeeCordModuleType"/>
-    <fileTemplateGroup implementation="com.demonwav.util.BukkitFileTemplateGroupFactory"/>
+    <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.BukkitModuleType"/>
+    <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.SpigotModuleType"/>
+    <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.BungeeCordModuleType"/>
+    <fileTemplateGroup implementation="com.demonwav.mcdev.util.BukkitFileTemplateGroupFactory"/>
   </extensions>
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
-    <importer implementation="com.demonwav.maven.BukkitImporter"/>
-    <importer implementation="com.demonwav.maven.SpigotImporter"/>
-    <importer implementation="com.demonwav.maven.BungeeCordImporter"/>
+    <importer implementation="com.demonwav.mcdev.maven.BukkitImporter"/>
+    <importer implementation="com.demonwav.mcdev.maven.SpigotImporter"/>
+    <importer implementation="com.demonwav.mcdev.maven.BungeeCordImporter"/>
   </extensions>
 
   <application-components>
