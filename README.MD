@@ -1,5 +1,5 @@
-Minecraft Development IntelliJ Plugin <a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDevIntelliJPlugin_Build"><img src="https://ci.demonwav.com/app/rest/builds/buildType(id:MinecraftDevIntelliJPlugin_Build)/statusIcon"/></a>
-=====================================================================================================================================================================================================================================================
+Minecraft Development IntelliJ Plugin <a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDevIntelliJ_Build"><img src="https://ci.demonwav.com/app/rest/builds/buildType(id:MinecraftDevIntelliJ_Build)/statusIcon"/></a>
+=========================================================================================================================================================================================================================================
 
 Compiling
 ---------
