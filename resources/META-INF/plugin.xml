@@ -31,6 +31,7 @@
     <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.MinecraftModuleType"/>
     <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.BukkitModuleType"/>
     <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.SpigotModuleType"/>
+    <moduleType id="PAPER_MODULE_TYPE" implementationClass="com.demonwav.mcdev.PaperModuleType"/>
     <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.BungeeCordModuleType"/>
     <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.SpongeModuleType"/>
     <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
@@ -38,6 +39,8 @@
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
     <importer implementation="com.demonwav.mcdev.buildsystem.maven.BukkitImporter"/>
     <importer implementation="com.demonwav.mcdev.buildsystem.maven.SpigotImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.PaperImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.PaperImporter"/>
     <importer implementation="com.demonwav.mcdev.buildsystem.maven.BungeeCordImporter"/>
     <importer implementation="com.demonwav.mcdev.buildsystem.maven.SpongeImporter"/>
   </extensions>

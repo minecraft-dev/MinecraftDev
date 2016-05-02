@@ -14,6 +14,10 @@ public class SpigotModuleType extends BukkitModuleType {
         super(ID);
     }
 
+    public SpigotModuleType(String ID) {
+        super(ID);
+    }
+
     public static SpigotModuleType getInstance() {
         return (SpigotModuleType) ModuleTypeManager.getInstance().findByID(ID);
     }

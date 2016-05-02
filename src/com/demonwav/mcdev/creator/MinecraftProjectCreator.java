@@ -73,6 +73,14 @@ public class MinecraftProjectCreator {
                 dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
                 buildSystem.setBuildVersion("1.7");
                 break;
+            case PAPER:
+                buildRepository.setId("destroystokyo-repo");
+                buildRepository.setUrl("https://repo.destroystokyo.com/content/groups/public/");
+                dependency.setGroupId("com.destroystokyo.paper");
+                dependency.setArtifactId("paper-api");
+                dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
+                buildSystem.setBuildVersion("1.8");
+                break;
             case BUNGEECORD:
                 buildRepository.setId("bungeecord-repo");
                 buildRepository.setUrl("https://oss.sonatype.org/content/repositories/snapshots");

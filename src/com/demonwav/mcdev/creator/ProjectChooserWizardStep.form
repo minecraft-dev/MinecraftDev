@@ -23,7 +23,7 @@
           </component>
         </children>
       </grid>
-      <grid id="c580e" binding="chooserPanel" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
+      <grid id="c580e" binding="chooserPanel" layout-manager="GridLayoutManager" row-count="6" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
         <margin top="2" left="10" bottom="10" right="10"/>
         <constraints border-constraint="Center"/>
         <properties/>
@@ -73,7 +73,7 @@
           </component>
           <component id="46880" class="javax.swing.JRadioButton" binding="spongeRadioButton">
             <constraints>
-              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Sponge Plugin"/>
@@ -81,7 +81,7 @@
           </component>
           <component id="c6c2d" class="javax.swing.JRadioButton" binding="bungeecordRadioButton">
             <constraints>
-              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="BungeeCord Plugin"/>
@@ -89,7 +89,7 @@
           </component>
           <component id="a132a" class="javax.swing.JLabel">
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <icon value="icons/Sponge@2x.png"/>
@@ -98,7 +98,7 @@
           </component>
           <component id="26f84" class="javax.swing.JLabel">
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <icon value="icons/Spigot@2x.png"/>
@@ -108,9 +108,27 @@
           </component>
           <vspacer id="d9ec2">
             <constraints>
-              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
             </constraints>
           </vspacer>
+          <component id="6f1b4" class="javax.swing.JRadioButton" binding="paperRadioButton">
+            <constraints>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Paper Plugin"/>
+            </properties>
+          </component>
+          <component id="254b2" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <icon value="icons/Spigot@2x.png"/>
+              <iconTextGap value="0"/>
+              <text value=""/>
+            </properties>
+          </component>
         </children>
       </grid>
       <grid id="c3a72" binding="infoPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -144,8 +162,9 @@
     <group name="buttonGroup1">
       <member id="fc230"/>
       <member id="dd3ac"/>
-      <member id="c6c2d"/>
       <member id="46880"/>
+      <member id="c6c2d"/>
+      <member id="6f1b4"/>
     </group>
   </buttonGroups>
 </form>

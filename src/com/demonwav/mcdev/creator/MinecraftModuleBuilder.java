@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.BukkitModuleType;
+import com.demonwav.mcdev.PaperModuleType;
 import com.demonwav.mcdev.SpigotModuleType;
 import com.demonwav.mcdev.BungeeCordModuleType;
 import com.demonwav.mcdev.SpongeModuleType;
@@ -115,11 +116,13 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
                 return BukkitModuleType.getInstance();
             case SPIGOT:
                 return SpigotModuleType.getInstance();
+            case PAPER:
+                return PaperModuleType.getInstance();
             case BUNGEECORD:
                 return BungeeCordModuleType.getInstance();
             case SPONGE:
                 return SpongeModuleType.getInstance();
-            default: // This *should* not happen // TODO: Add Paper, Forge support
+            default: // This *should* not happen // TODO: Add Forge support
                 throw new IllegalStateException("MavenProject type is not one of the three possible types.");
         }
     }

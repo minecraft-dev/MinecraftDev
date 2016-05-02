@@ -18,6 +18,10 @@ public class SpigotImporter extends BukkitImporter{
         super("org.spigotmc", "spigot-api");
     }
 
+    public SpigotImporter(String groupId, String artifactId) {
+        super(groupId, artifactId);
+    }
+
     @NotNull
     @Override
     public SpigotModuleType getModuleType() {

@@ -32,6 +32,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
     private JRadioButton bungeecordRadioButton;
     private JEditorPane infoPane;
     private JRadioButton spongeRadioButton;
+    private JRadioButton paperRadioButton;
 
     private Type type = Type.BUKKIT;
 
@@ -40,6 +41,9 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             "on CraftBukkit and Spigot servers.</font></html>";
     private static final String spigotInfo = "<html><font size=\"4\">Create a standard " +
             "<a href=\"https://www.spigotmc.org/\">Spigot</a> plugin, for use " +
+            "on Spigot servers.</font></html>";
+    private static final String paperInfo = "<html><font size=\"4\">Create a standard " +
+            "<a href=\"https://paper.readthedocs.io/en/paper-1.9/\">Paper</a> plugin, for use " +
             "on Spigot servers.</font></html>";
     private static final String bungeeCordInfo = "<html><font size=\"4\">Create a standard " +
             "<a href=\"https://www.spigotmc.org/wiki/bungeecord/\"> BungeeCord</a> plugin, for use " +
@@ -91,20 +95,29 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
                 creator.setSettings(new BukkitSettings());
             }
         });
-        bungeecordRadioButton.addChangeListener(e -> {
-            if (type != Type.BUNGEECORD) {
-                type = Type.BUNGEECORD;
-                infoPane.setText(bungeeCordInfo);
+        paperRadioButton.addChangeListener(e -> {
+            if (type != Type.PAPER) {
+                type = Type.PAPER;
+                infoPane.setText(paperInfo);
                 creator.setType(type);
-                creator.setSettings(new BungeeCordSettings());
+                creator.setSettings(new BukkitSettings());
             }
         });
+
         spongeRadioButton.addChangeListener(e -> {
             if (type != Type.SPONGE) {
                 type = Type.SPONGE;
                 infoPane.setText(spongeInfo);
                 creator.setType(type);
                 creator.setSettings(new SpongeSettings());
+            }
+        });
+        bungeecordRadioButton.addChangeListener(e -> {
+            if (type != Type.BUNGEECORD) {
+                type = Type.BUNGEECORD;
+                infoPane.setText(bungeeCordInfo);
+                creator.setType(type);
+                creator.setSettings(new BungeeCordSettings());
             }
         });
         return panel;

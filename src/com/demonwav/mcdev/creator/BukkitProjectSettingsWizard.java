@@ -59,6 +59,9 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
             case SPIGOT:
                 title.setText("<html><font size=\"5\">Spigot Settings</font></html>");
                 break;
+            case PAPER:
+                title.setText("<html><font size=\"5\">Paper Settings</font></html>");
+                break;
         }
 
         pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
