@@ -1,0 +1,27 @@
+#* @vtlvariable name="PACKAGE" type="java.lang.String" *#
+#* @vtlvariable name="BUKKIT" type="boolean" *#
+#* @vtlvariable name="CLASS_NAME" type="java.lang.String" *#
+package ${PACKAGE};
+
+#if (${BUKKIT})
+import org.bukkit.plugin.java.JavaPlugin;
+#else
+import net.md_5.bungee.api.plugin.Plugin;
+#end
+
+#if (${BUKKIT})
+public final class ${CLASS_NAME} extends JavaPlugin {
+#else
+public final class ${CLASS_NAME} extends Plugin {
+#end
+
+  @Override
+  public void onEnable() {
+    // Plugin startup logic
+  }
+
+  @Override
+  public void onDisable() {
+    // Plugin shutdown logic
+  }
+}

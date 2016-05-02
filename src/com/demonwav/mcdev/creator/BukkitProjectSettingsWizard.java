@@ -9,8 +9,8 @@
 
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.exceptions.BukkitSetupException;
-import com.demonwav.mcdev.util.ProjectSettings;
+import com.demonwav.mcdev.exceptions.MinecraftSetupException;
+import com.demonwav.mcdev.util.BukkitSettings;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -51,7 +51,7 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     private JTextField softDependField;
     private JLabel title;
 
-    private ProjectSettings settings = new ProjectSettings();
+    private BukkitSettings settings = new BukkitSettings();
     private MavenProjectCreator creator;
 
     public BukkitProjectSettingsWizard(@NotNull MavenProjectCreator creator) {
@@ -84,33 +84,33 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     public boolean validate() throws ConfigurationException {
         try {
             if (pluginNameField.getText().trim().isEmpty()) {
-                throw new BukkitSetupException("empty", pluginNameField);
+                throw new MinecraftSetupException("empty", pluginNameField);
             }
 
             if (pluginVersionField.getText().trim().isEmpty()) {
-                throw new BukkitSetupException("empty", pluginVersionField);
+                throw new MinecraftSetupException("empty", pluginVersionField);
             }
 
             if (mainClassField.getText().trim().isEmpty()) {
-                throw new BukkitSetupException("empty", mainClassField);
+                throw new MinecraftSetupException("empty", mainClassField);
             }
 
             if (!additionAuthorsField.getText().matches(pattern)) {
-                throw new BukkitSetupException("bad", additionAuthorsField);
+                throw new MinecraftSetupException("bad", additionAuthorsField);
             }
 
             if (!loadBeforeField.getText().matches(pattern)) {
-                throw new BukkitSetupException("bad", loadBeforeField);
+                throw new MinecraftSetupException("bad", loadBeforeField);
             }
 
             if (!dependField.getText().matches(pattern)) {
-                throw new BukkitSetupException("bad", dependField);
+                throw new MinecraftSetupException("bad", dependField);
             }
 
             if (!softDependField.getText().matches(pattern)) {
-                throw new BukkitSetupException("bad", softDependField);
+                throw new MinecraftSetupException("bad", softDependField);
             }
-        } catch (BukkitSetupException e) {
+        } catch (MinecraftSetupException e) {
             String message = e.getError();
             JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
                     .setFadeoutTime(4000)
@@ -133,7 +133,7 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
         settings.website = websiteField.getText();
         settings.prefix = prefixField.getText();
         settings.database = databaseBox.isSelected();
-        settings.load = loadBox.getSelectedIndex() == 0 ? ProjectSettings.Load.POSTWORLD : ProjectSettings.Load.STARTUP;
+        settings.load = loadBox.getSelectedIndex() == 0 ? BukkitSettings.Load.POSTWORLD : BukkitSettings.Load.STARTUP;
         settings.loadBefore = new ArrayList<>(Arrays.asList(loadBeforeField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
         settings.depend = new ArrayList<>(Arrays.asList(dependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
         settings.softDepend = new ArrayList<>(Arrays.asList(softDependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));

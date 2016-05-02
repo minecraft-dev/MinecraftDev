@@ -7,9 +7,6 @@
     <RunnerSettings RunnerId="Profile ">
       <option name="myExternalizedOptions" value="force-bitness=64&#10;additional-options2=onexit\=snapshot" />
     </RunnerSettings>
-    <method>
-      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_Delete" />
-      <option name="Make" enabled="true" />
-    </method>
+    <method />
   </configuration>
 </component>

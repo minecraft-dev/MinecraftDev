@@ -9,16 +9,17 @@
 
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.util.BukkitTemplate;
-import com.demonwav.mcdev.util.ProjectSettings;
-import com.demonwav.mcdev.util.MavenSettings;
+import com.demonwav.mcdev.buildsystem.BuildDependency;
+import com.demonwav.mcdev.buildsystem.BuildRepository;
+import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.util.MinecraftTemplate;
+import com.demonwav.mcdev.util.BukkitSettings;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
@@ -28,6 +29,7 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class MavenProjectCreator {
 
@@ -37,8 +39,9 @@ public class MavenProjectCreator {
     private String version = null;
     private Type type = Type.BUKKIT;
     private Project project = null;
+    private BuildSystem buildSystem;
 
-    private ProjectSettings settings = null;
+    private BukkitSettings settings = null;
 
     private VirtualFile sourceDir;
     private VirtualFile resourceDir;
@@ -46,65 +49,77 @@ public class MavenProjectCreator {
     private VirtualFile pomFile;
 
     public void create() {
-        root.refresh(false, true);
+        buildSystem.setRootDirectory(root);
+
+        buildSystem.setGroupId(groupId);
+        buildSystem.setArtifactId(artifactId);
+        buildSystem.setVersion(version);
+
+        buildSystem.setPluginAuthor(settings.author);
+        buildSystem.setPluginName(settings.pluginName);
+
+        BuildRepository buildRepository = new BuildRepository();
+        BuildDependency dependency = new BuildDependency();
+        buildSystem.setRepositories(Collections.singletonList(buildRepository));
+        buildSystem.setDependencies(Collections.singletonList(dependency));
+
+        switch (type) {
+            case BUKKIT:
+                buildRepository.setId("spigot-repo");
+                buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/repositories/snapshots/");
+                dependency.setGroupId("org.bukkit");
+                dependency.setArtifactId("bukkit");
+                dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
+                buildSystem.setBuildVersion("1.7");
+                break;
+            case SPIGOT:
+                buildRepository.setId("spigot-repo");
+                buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/repositories/snapshots/");
+                dependency.setGroupId("org.spigotmc");
+                dependency.setArtifactId("spigot-api");
+                dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
+                buildSystem.setBuildVersion("1.7");
+                break;
+            case BUNGEECORD:
+                buildRepository.setId("bungeecord-repo");
+                buildRepository.setUrl("https://oss.sonatype.org/content/repositories/snapshots");
+                dependency.setGroupId("net.md-5");
+                dependency.setArtifactId("bungeecord-api");
+                dependency.setVersion("1.9-SNAPSHOT");
+                buildSystem.setBuildVersion("1.7");
+                break;
+            case SPONGE:
+                buildRepository.setId("sponge");
+                buildRepository.setUrl("http://repo.spongepowered.org/maven");
+                dependency.setGroupId("org.spongepowered");
+                dependency.setArtifactId("spongeapi");
+                dependency.setVersion("4.0.3");
+                buildSystem.setBuildVersion("1.8");
+            default:
+                break;
+        }
+        dependency.setScope("provided");
+
+        buildSystem.create(project);
+
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
-                sourceDir = VfsUtil.createDirectories(root.getPath() + "/src/main/java");
-                resourceDir = VfsUtil.createDirectories(root.getPath() + "/src/main/resources");
-                testDir = VfsUtil.createDirectories(root.getPath() + "/src/test/java");
-
                 // Create plugin main class
-                VirtualFile file = sourceDir;
+                VirtualFile file = buildSystem.getSourceDirectory();
                 String[] files = groupId.split("\\.");
                 for (String s : files) {
                     file = file.createChildDirectory(this, s);
                 }
 
-                pomFile = root.createChildData(project, "pom.xml");
-
-                MavenSettings mavenSettings = new MavenSettings();
-                mavenSettings.groupId = groupId;
-                mavenSettings.artifactId = artifactId;
-                mavenSettings.version = version;
-
-                if (settings.author != null && !settings.author.trim().isEmpty()) {
-                    mavenSettings.author = settings.author;
-                }
-
-                switch (type) {
-                    case BUKKIT:
-                        mavenSettings.repoId = "spigot-repo";
-                        mavenSettings.repoUrl = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/";
-                        mavenSettings.apiName = "Bukkit";
-                        mavenSettings.apiGroupId = "org.bukkit";
-                        mavenSettings.apiArtifactId = "bukkit";
-                        mavenSettings.apiVersion = "1.9.2-R0.1-SNAPSHOT";
-                        break;
-                    case SPIGOT:
-                        mavenSettings.repoId = "spigot-repo";
-                        mavenSettings.repoUrl = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/";
-                        mavenSettings.apiName = "Spigot";
-                        mavenSettings.apiGroupId = "org.spigotmc";
-                        mavenSettings.apiArtifactId = "spigot-api";
-                        mavenSettings.apiVersion = "1.9.2-R0.1-SNAPSHOT";
-                        break;
-                    case BUNGEECORD:
-                        mavenSettings.repoId = "bungeecord-repo";
-                        mavenSettings.repoUrl = "https://oss.sonatype.org/content/repositories/snapshots";
-                        mavenSettings.apiName = "BungeeCord";
-                        mavenSettings.apiGroupId = "net.md-5";
-                        mavenSettings.apiArtifactId = "bungeecord-api";
-                        mavenSettings.apiVersion = "1.9-SNAPSHOT";
-                        break;
-                    default:
-                        break;
-                }
-                // Create the pom.xml, main class, and plugin.yml
-                BukkitTemplate.applyPomTemplate(project, pomFile, mavenSettings);
                 VirtualFile mainClass = file.findOrCreateChildData(this, settings.mainClass + ".java");
-                BukkitTemplate.applyMainClassTemplate(project, mainClass, groupId, settings.mainClass, type != Type.BUNGEECORD);
-                VirtualFile pluginYml = resourceDir.findOrCreateChildData(this, "plugin.yml");
-                BukkitTemplate.applyPluginYmlTemplate(project, pluginYml, type, settings, groupId);
+
+                if (type != Type.SPONGE) {
+                    MinecraftTemplate.applyMainBukkitClassTemplate(project, mainClass, groupId, settings.mainClass, type != Type.BUNGEECORD);
+                    VirtualFile pluginYml = buildSystem.getResourceDirectory().findOrCreateChildData(this, "plugin.yml");
+                    MinecraftTemplate.applyPluginYmlTemplate(project, pluginYml, type, settings, groupId);
+                } else {
+                    MinecraftTemplate.applyMainSpongeClassTemplate(project, mainClass, groupId, settings.mainClass);
+                }
 
                 // Set the editor focus on the main class
                 PsiFile mainClassPsi = PsiManager.getInstance(project).findFile(mainClass);
@@ -116,9 +131,9 @@ public class MavenProjectCreator {
                 MavenProjectsManager.getInstance(project).forceUpdateAllProjectsOrFindAllAvailablePomFiles();
 
                 // Setup the default Maven run config
-                if (root.getCanonicalPath() != null) {
+                if (buildSystem.getRootDirectory().getCanonicalPath() != null) {
                     MavenRunnerParameters params = new MavenRunnerParameters();
-                    params.setWorkingDirPath(root.getCanonicalPath());
+                    params.setWorkingDirPath(buildSystem.getRootDirectory().getCanonicalPath());
                     params.setGoals(Arrays.asList("clean", "package"));
                     RunnerAndConfigurationSettings runnerSettings = MavenRunConfigurationType.createRunnerAndConfigurationSettings(null, null, params, project);
                     runnerSettings.setName("clean package");
@@ -179,11 +194,11 @@ public class MavenProjectCreator {
         this.project = project;
     }
 
-    public ProjectSettings getSettings() {
+    public BukkitSettings getSettings() {
         return settings;
     }
 
-    public void setSettings(ProjectSettings settings) {
+    public void setSettings(BukkitSettings settings) {
         this.settings = settings;
     }
 
@@ -217,6 +232,14 @@ public class MavenProjectCreator {
 
     public void setPomFile(VirtualFile pomFile) {
         this.pomFile = pomFile;
+    }
+
+    public BuildSystem getBuildSystem() {
+        return buildSystem;
+    }
+
+    public void setBuildSystem(BuildSystem buildSystem) {
+        this.buildSystem = buildSystem;
     }
 
     @Override

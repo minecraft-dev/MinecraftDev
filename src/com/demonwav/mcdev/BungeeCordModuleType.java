@@ -1,13 +1,13 @@
 package com.demonwav.mcdev;
 
-import com.demonwav.mcdev.icons.BukkitProjectsIcons;
+import com.demonwav.mcdev.icons.MinecraftProjectsIcons;
 
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
 
 import javax.swing.Icon;
 
-public class BungeeCordModuleType extends JavaModuleType {
+public class BungeeCordModuleType extends MinecraftModuleType {
 
     private static final String ID = "BUNGEECORD_MODULE_TYPE";
 
@@ -21,16 +21,16 @@ public class BungeeCordModuleType extends JavaModuleType {
 
     @Override
     public Icon getBigIcon() {
-        return BukkitProjectsIcons.SpigotProjectBig;
+        return MinecraftProjectsIcons.SpigotBig;
     }
 
     @Override
     public Icon getIcon() {
-        return BukkitProjectsIcons.SpigotProject;
+        return MinecraftProjectsIcons.Spigot;
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return BukkitProjectsIcons.SpigotProject;
+        return MinecraftProjectsIcons.Spigot;
     }
 }

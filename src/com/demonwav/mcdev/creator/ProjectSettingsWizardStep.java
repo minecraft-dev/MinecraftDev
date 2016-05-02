@@ -33,6 +33,8 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
             type = creator.getType();
             if (creator.getType() == Type.BUNGEECORD) {
                 wizard = new BungeeCordProjectSettingsWizard(creator);
+            } else if (creator.getType() == Type.SPONGE) {
+                wizard = new SpongeProjectSettingsWizard(creator);
             } else {
                 wizard = new BukkitProjectSettingsWizard(creator);
             }

@@ -33,23 +33,24 @@ public class MinecraftDevWizardStep extends ModuleWizardStep {
 
     private JRadioButton bukkitRadioButton;
     private JRadioButton spigotRadioButton;
-    private JRadioButton bungeeCordRadioButton;
+    private JRadioButton bungeecordRadioButton;
     private JEditorPane infoPane;
+    private JRadioButton spongeRadioButton;
 
     private Type type = Type.BUKKIT;
 
     private static final String bukkitInfo = "<html><font size=\"4\">Create a standard " +
-            "<a href=\"https://maven.apache.org/\">Maven</a> <a href=\"http://bukkit.org/\">Bukkit</a> plugin, for use " +
-            "on CraftBukkit and Spigot servers.<br>Generates a default <code>pom.xml</code> and <code>plugin.yml</code>, " +
-            "and creates a default run configuration to build.</font></html>";
+            "<a href=\"http://bukkit.org/\">Bukkit</a> plugin, for use " +
+            "on CraftBukkit and Spigot servers.</font></html>";
     private static final String spigotInfo = "<html><font size=\"4\">Create a standard " +
-            "<a href=\"https://maven.apache.org/\">Maven</a> <a href=\"https://www.spigotmc.org/\">Spigot</a> plugin," +
-            " for use on Spigot servers.<br>Generates a default <code>pom.xml</code> and <code>plugin.yml</code>, and " +
-            "creates a default run configuration to build.</font></html>";
+            "<a href=\"https://www.spigotmc.org/\">Spigot</a> plugin, for use " +
+            "on Spigot servers.</font></html>";
     private static final String bungeeCordInfo = "<html><font size=\"4\">Create a standard " +
-            "<a href=\"https://maven.apache.org/\">Maven</a> <a href=\"https://www.spigotmc.org/wiki/bungeecord/\">" +
-            "BungeeCord</a> plugin, for use on BungeeCord servers.<br>Generates a default <code>pom.xml</code> and " +
-            "<code>plugin.yml</code>, and creates a default run configuration to build.</font></html>";
+            "<a href=\"https://www.spigotmc.org/wiki/bungeecord/\"> BungeeCord</a> plugin, for use " +
+            "on BungeeCord servers.</font></html>";
+    private static final String spongeInfo = "<html><font size=\"4\">Create a standard " +
+            "<a href=\"https://www.spongepowered.org/\"> Sponge</a> plugin, for use " +
+            "on Sponge servers.</font></html>";
 
     public MinecraftDevWizardStep(@NotNull MavenProjectCreator creator) {
         super();
@@ -92,14 +93,20 @@ public class MinecraftDevWizardStep extends ModuleWizardStep {
                 creator.setType(type);
             }
         });
-        bungeeCordRadioButton.addChangeListener(e -> {
+        bungeecordRadioButton.addChangeListener(e -> {
             if (type != Type.BUNGEECORD) {
                 type = Type.BUNGEECORD;
                 infoPane.setText(bungeeCordInfo);
                 creator.setType(type);
             }
         });
-
+        spongeRadioButton.addChangeListener(e -> {
+            if (type != Type.SPONGE) {
+                type = Type.SPONGE;
+                infoPane.setText(spongeInfo);
+                creator.setType(type);
+            }
+        });
         return panel;
     }
 

@@ -1,6 +1,6 @@
 package com.demonwav.mcdev;
 
-import com.demonwav.mcdev.pluginyaml.PluginConfigManager;
+import com.demonwav.mcdev.bukkit.PluginConfigManager;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BukkitProject {
+public class BukkitProject extends MinecraftProject {
 
     private static final Map<Project, BukkitProject> map = new HashMap<>();
 

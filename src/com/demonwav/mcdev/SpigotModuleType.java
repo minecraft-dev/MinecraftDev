@@ -1,13 +1,12 @@
 package com.demonwav.mcdev;
 
-import com.demonwav.mcdev.icons.BukkitProjectsIcons;
+import com.demonwav.mcdev.icons.MinecraftProjectsIcons;
 
-import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
 
 import javax.swing.Icon;
 
-public class SpigotModuleType extends JavaModuleType {
+public class SpigotModuleType extends BukkitModuleType {
 
     private static final String ID = "SPIGOT_MODULE_TYPE";
 
@@ -21,16 +20,16 @@ public class SpigotModuleType extends JavaModuleType {
 
     @Override
     public Icon getBigIcon() {
-        return BukkitProjectsIcons.SpigotProjectBig;
+        return MinecraftProjectsIcons.SpigotBig;
     }
 
     @Override
     public Icon getIcon() {
-        return BukkitProjectsIcons.SpigotProject;
+        return MinecraftProjectsIcons.Spigot;
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return BukkitProjectsIcons.SpigotProject;
+        return MinecraftProjectsIcons.Spigot;
     }
 }

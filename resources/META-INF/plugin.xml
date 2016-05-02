@@ -37,15 +37,18 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
+    <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.MinecraftModuleType"/>
     <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.BukkitModuleType"/>
     <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.SpigotModuleType"/>
     <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.BungeeCordModuleType"/>
-    <fileTemplateGroup implementation="com.demonwav.mcdev.util.BukkitFileTemplateGroupFactory"/>
+    <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.SpongeModuleType"/>
+    <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
   </extensions>
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
-    <importer implementation="com.demonwav.mcdev.maven.BukkitImporter"/>
-    <importer implementation="com.demonwav.mcdev.maven.SpigotImporter"/>
-    <importer implementation="com.demonwav.mcdev.maven.BungeeCordImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.BukkitImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.SpigotImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.BungeeCordImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.SpongeImporter"/>
   </extensions>
 
   <application-components>

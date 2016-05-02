@@ -9,8 +9,8 @@
 
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.exceptions.BukkitSetupException;
-import com.demonwav.mcdev.util.ProjectSettings;
+import com.demonwav.mcdev.exceptions.MinecraftSetupException;
+import com.demonwav.mcdev.util.BukkitSettings;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -41,7 +41,7 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
     private JTextField dependField;
     private JTextField softDependField;
 
-    private final ProjectSettings settings = new ProjectSettings();
+    private final BukkitSettings settings = new BukkitSettings();
     private final MavenProjectCreator creator;
 
     public BungeeCordProjectSettingsWizard(@NotNull MavenProjectCreator creator) {
@@ -62,25 +62,25 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
     public boolean validate() throws ConfigurationException {
         try {
             if (pluginNameField.getText().trim().isEmpty()) {
-                throw new BukkitSetupException("empty", pluginNameField);
+                throw new MinecraftSetupException("empty", pluginNameField);
             }
 
             if (pluginVersionField.getText().trim().isEmpty()) {
-                throw new BukkitSetupException("empty", pluginVersionField);
+                throw new MinecraftSetupException("empty", pluginVersionField);
             }
 
             if (mainClassField.getText().trim().isEmpty()) {
-                throw new BukkitSetupException("empty", mainClassField);
+                throw new MinecraftSetupException("empty", mainClassField);
             }
 
             if (!dependField.getText().matches(pattern)) {
-                throw new BukkitSetupException("bad", dependField);
+                throw new MinecraftSetupException("bad", dependField);
             }
 
             if (!softDependField.getText().matches(pattern)) {
-                throw new BukkitSetupException("bad", softDependField);
+                throw new MinecraftSetupException("bad", softDependField);
             }
-        } catch (BukkitSetupException e) {
+        } catch (MinecraftSetupException e) {
             String message = e.getError();
 
             JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
