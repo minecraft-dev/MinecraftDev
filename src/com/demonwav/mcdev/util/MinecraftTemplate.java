@@ -1,15 +1,6 @@
-/*
- * IntelliJ IDEA Bukkit Support Plugin
- *
- * Written by Kyle Wood (DemonWav)
- * http://demonwav.com
- *
- * MIT License
- */
-
 package com.demonwav.mcdev.util;
 
-import com.demonwav.mcdev.creator.Type;
+import com.demonwav.mcdev.Type;
 
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.ide.fileTemplates.FileTemplate;
@@ -45,8 +36,9 @@ public class MinecraftTemplate {
 
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
-        if (bukkit)
+        if (bukkit) {
             properties.setProperty("BUKKIT", "true");
+        }
 
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_MAIN_CLASS_TEMPLATE, properties);
@@ -79,14 +71,18 @@ public class MinecraftTemplate {
         properties.setProperty("DEPEND", settings.depend.toString());
         properties.setProperty("SOFT_DEPEND", settings.softDepend.toString());
 
-        if (settings.hasDescription())
+        if (settings.hasDescription()) {
             properties.setProperty("HAS_DESCRIPTION", "true");
-        if (settings.hasAuthor())
+        }
+        if (settings.hasAuthor()) {
             properties.setProperty("HAS_AUTHOR", "true");
-        if (settings.hasDepend())
+        }
+        if (settings.hasDepend()) {
             properties.setProperty("HAS_DEPEND", "true");
-        if (settings.hasSoftDepend())
+        }
+        if (settings.hasSoftDepend()) {
             properties.setProperty("HAS_SOFT_DEPEND", "true");
+        }
 
         // These are bukkit and spigot only settings
         if (type != Type.BUNGEECORD) {
@@ -97,18 +93,24 @@ public class MinecraftTemplate {
             properties.setProperty("AUTHOR_LIST", settings.authorList.toString());
             properties.setProperty("LOAD_BEFORE", settings.loadBefore.toString());
 
-            if (settings.hasAuthorList())
+            if (settings.hasAuthorList()) {
                 properties.setProperty("HAS_AUTHOR_LIST", "true");
-            if (settings.hasWebsite())
+            }
+            if (settings.hasWebsite()) {
                 properties.setProperty("HAS_WEBSITE", "true");
-            if (settings.hasDatabase())
+            }
+            if (settings.hasDatabase()) {
                 properties.setProperty("HAS_DATABASE", "true");
-            if (settings.hasLoad())
+            }
+            if (settings.hasLoad()) {
                 properties.setProperty("HAS_LOAD", "true");
-            if (settings.hasPrefix())
+            }
+            if (settings.hasPrefix()) {
                 properties.setProperty("HAS_PREFIX", "true");
-            if (settings.hasLoadBefore())
+            }
+            if (settings.hasLoadBefore()) {
                 properties.setProperty("HAS_LOAD_BEFORE", "true");
+            }
         }
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties);

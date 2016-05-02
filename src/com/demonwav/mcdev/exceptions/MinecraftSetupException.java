@@ -1,12 +1,3 @@
-/*
- * IntelliJ IDEA Bukkit Support Plugin
- *
- * Written by Kyle Wood (DemonWav)
- * http://demonwav.com
- *
- * MIT License
- */
-
 package com.demonwav.mcdev.exceptions;
 
 import javax.swing.JComponent;

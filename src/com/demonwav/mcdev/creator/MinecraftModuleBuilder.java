@@ -1,12 +1,3 @@
-/*
- * IntelliJ IDEA Bukkit Support Plugin
- *
- * Written by Kyle Wood (DemonWav)
- * http://demonwav.com
- *
- * MIT License
- */
-
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.BukkitModuleType;
@@ -42,7 +33,7 @@ import javax.swing.Icon;
 
 public class MinecraftModuleBuilder extends JavaModuleBuilder {
 
-    private MavenProjectCreator creator = new MavenProjectCreator();
+    private MinecraftProjectCreator creator = new MinecraftProjectCreator();
 
     @Override
     public String getPresentableName() {
@@ -149,7 +140,7 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
     @Nullable
     @Override
     public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
-        return new MinecraftDevWizardStep(creator);
+        return new ProjectChooserWizardStep(creator);
     }
 
     @Override

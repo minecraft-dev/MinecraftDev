@@ -1,17 +1,10 @@
-/*
- * IntelliJ IDEA Bukkit Support Plugin
- *
- * Written by Kyle Wood (DemonWav)
- * http://demonwav.com
- *
- * MIT License
- */
-
 package com.demonwav.mcdev.creator;
 
+import com.demonwav.mcdev.Type;
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.util.MinecraftSettings;
 import com.demonwav.mcdev.util.MinecraftTemplate;
 import com.demonwav.mcdev.util.BukkitSettings;
 
@@ -31,7 +24,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class MavenProjectCreator {
+public class MinecraftProjectCreator {
 
     private VirtualFile root = null;
     private String groupId = null;
@@ -41,7 +34,7 @@ public class MavenProjectCreator {
     private Project project = null;
     private BuildSystem buildSystem;
 
-    private BukkitSettings settings = null;
+    private MinecraftSettings settings = null;
 
     private VirtualFile sourceDir;
     private VirtualFile resourceDir;
@@ -116,7 +109,7 @@ public class MavenProjectCreator {
                 if (type != Type.SPONGE) {
                     MinecraftTemplate.applyMainBukkitClassTemplate(project, mainClass, groupId, settings.mainClass, type != Type.BUNGEECORD);
                     VirtualFile pluginYml = buildSystem.getResourceDirectory().findOrCreateChildData(this, "plugin.yml");
-                    MinecraftTemplate.applyPluginYmlTemplate(project, pluginYml, type, settings, groupId);
+                    MinecraftTemplate.applyPluginYmlTemplate(project, pluginYml, type, (BukkitSettings) settings, groupId);
                 } else {
                     MinecraftTemplate.applyMainSpongeClassTemplate(project, mainClass, groupId, settings.mainClass);
                 }
@@ -194,11 +187,11 @@ public class MavenProjectCreator {
         this.project = project;
     }
 
-    public BukkitSettings getSettings() {
+    public MinecraftSettings getSettings() {
         return settings;
     }
 
-    public void setSettings(BukkitSettings settings) {
+    public void setSettings(MinecraftSettings settings) {
         this.settings = settings;
     }
 
@@ -244,7 +237,7 @@ public class MavenProjectCreator {
 
     @Override
     public String toString() {
-        return "MavenProjectCreator{" +
+        return "MinecraftProjectCreator{" +
                 "root=" + root +
                 ", groupId='" + groupId + '\'' +
                 ", artifactId='" + artifactId + '\'' +
@@ -269,7 +262,7 @@ public class MavenProjectCreator {
             return false;
         }
 
-        MavenProjectCreator that = (MavenProjectCreator) o;
+        MinecraftProjectCreator that = (MinecraftProjectCreator) o;
 
         if (root != null ? !root.equals(that.root) : that.root != null) {
             return false;

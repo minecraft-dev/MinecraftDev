@@ -1,13 +1,6 @@
-/*
- * IntelliJ IDEA Bukkit Support Plugin
- *
- * Written by Kyle Wood (DemonWav)
- * http://demonwav.com
- *
- * MIT License
- */
-
 package com.demonwav.mcdev.creator;
+
+import com.demonwav.mcdev.Type;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -15,19 +8,25 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JComponent;
 
+/**
+ * This class serves as an in-between for BukkitSettingsWizardStep, BungeeCordSettingsWizardStep, SpongeSettingsWizardStep,
+ * and any other classes which might make sense to go here. This single ProjectSettingsWizardStep class is used in
+ * place of any of those, and it chooses which WizardStep to show based on the current project type selected.
+ */
 public class ProjectSettingsWizardStep extends ModuleWizardStep {
 
-    private MavenProjectCreator creator;
+    private MinecraftProjectCreator creator;
     private ModuleWizardStep wizard;
     private Type type;
 
-    public ProjectSettingsWizardStep(@NotNull MavenProjectCreator creator) {
+    public ProjectSettingsWizardStep(@NotNull MinecraftProjectCreator creator) {
         this.creator = creator;
         type = creator.getType();
     }
 
     @Override
     public JComponent getComponent() {
+        // We don't want to recreate the wizard (and nuke the settings) if the type hasn't changed
         if (wizard == null || creator.getType() != type) {
             // detect type changes
             type = creator.getType();

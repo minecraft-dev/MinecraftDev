@@ -1,16 +1,9 @@
-/*
- * IntelliJ IDEA Bukkit Support Plugin
- *
- * Written by Kyle Wood (DemonWav)
- * http://demonwav.com
- *
- * MIT License
- */
-
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exceptions.MinecraftSetupException;
 import com.demonwav.mcdev.util.BukkitSettings;
+import com.demonwav.mcdev.util.BungeeCordSettings;
+import com.demonwav.mcdev.util.MinecraftSettings;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -41,10 +34,10 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
     private JTextField dependField;
     private JTextField softDependField;
 
-    private final BukkitSettings settings = new BukkitSettings();
-    private final MavenProjectCreator creator;
+    private final BungeeCordSettings settings = new BungeeCordSettings();
+    private final MinecraftProjectCreator creator;
 
-    public BungeeCordProjectSettingsWizard(@NotNull MavenProjectCreator creator) {
+    public BungeeCordProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
         super();
         this.creator = creator;
     }

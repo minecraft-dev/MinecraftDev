@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.demonwav.mcdev.creator.MinecraftDevWizardStep">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.demonwav.mcdev.creator.ProjectChooserWizardStep">
   <grid id="27dc6" binding="panel" layout-manager="BorderLayout" hgap="5" vgap="5">
     <constraints>
       <xy x="20" y="20" width="500" height="400"/>
@@ -23,7 +23,7 @@
           </component>
         </children>
       </grid>
-      <grid id="c580e" binding="chooserPanel" layout-manager="GridLayoutManager" row-count="5" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
+      <grid id="c580e" binding="chooserPanel" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
         <margin top="2" left="10" bottom="10" right="10"/>
         <constraints border-constraint="Center"/>
         <properties/>
@@ -36,37 +36,19 @@
         <children>
           <component id="fc230" class="javax.swing.JRadioButton" binding="bukkitRadioButton">
             <constraints>
-              <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <selected value="true"/>
               <text value="Bukkit Plugin"/>
             </properties>
           </component>
-          <component id="26f84" class="javax.swing.JLabel">
-            <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <icon value="icons/Spigot@2x.png"/>
-              <iconTextGap value="0"/>
-              <text value=""/>
-            </properties>
-          </component>
           <component id="dd3ac" class="javax.swing.JRadioButton" binding="spigotRadioButton">
             <constraints>
-              <grid row="1" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Spigot Plugin"/>
-            </properties>
-          </component>
-          <component id="c6c2d" class="javax.swing.JRadioButton" binding="bungeecordRadioButton">
-            <constraints>
-              <grid row="2" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="BungeeCord Plugin"/>
             </properties>
           </component>
           <component id="69541" class="javax.swing.JLabel">
@@ -91,10 +73,37 @@
           </component>
           <component id="46880" class="javax.swing.JRadioButton" binding="spongeRadioButton">
             <constraints>
-              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Sponge Plugin"/>
+            </properties>
+          </component>
+          <component id="c6c2d" class="javax.swing.JRadioButton" binding="bungeecordRadioButton">
+            <constraints>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="BungeeCord Plugin"/>
+            </properties>
+          </component>
+          <component id="a132a" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <icon value="icons/Sponge@2x.png"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="26f84" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <icon value="icons/Spigot@2x.png"/>
+              <iconTextGap value="0"/>
+              <text value=""/>
             </properties>
           </component>
           <vspacer id="d9ec2">
@@ -102,15 +111,6 @@
               <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
             </constraints>
           </vspacer>
-          <component id="a132a" class="javax.swing.JLabel">
-            <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <icon value="icons/Sponge@2x.png"/>
-              <text value=""/>
-            </properties>
-          </component>
         </children>
       </grid>
       <grid id="c3a72" binding="infoPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">

@@ -1,12 +1,3 @@
-/*
- * IntelliJ IDEA Bukkit Support Plugin
- *
- * Written by Kyle Wood (DemonWav)
- * http://demonwav.com
- *
- * MIT License
- */
-
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
@@ -35,9 +26,9 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
     private JRadioButton mavenRadioButton;
     private JRadioButton gradleRadioButton;
 
-    private final MavenProjectCreator creator;
+    private final MinecraftProjectCreator creator;
 
-    public BuildSystemWizardStep(@NotNull MavenProjectCreator creator) {
+    public BuildSystemWizardStep(@NotNull MinecraftProjectCreator creator) {
         super();
         this.creator = creator;
     }
@@ -90,7 +81,7 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
         return true;
     }
 
-    class EException extends Exception {
+    private class EException extends Exception {
         private JComponent j;
 
         public EException(JComponent j) {

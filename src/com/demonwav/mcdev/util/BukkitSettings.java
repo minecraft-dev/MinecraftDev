@@ -12,16 +12,10 @@ package com.demonwav.mcdev.util;
 import java.util.Iterator;
 import java.util.List;
 
-public class BukkitSettings {
+public class BukkitSettings extends MinecraftSettings {
     public enum Load { STARTUP, POSTWORLD }
 
-    public String pluginName;
-    public String pluginVersion;
-    public String mainClass;
-    public String description;
-    public String author;
     public List<String> authorList;
-    public String website;
     public String prefix;
     public boolean database;
     public Load load;

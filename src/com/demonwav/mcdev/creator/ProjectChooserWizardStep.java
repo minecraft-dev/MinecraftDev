@@ -1,13 +1,9 @@
-/*
- * IntelliJ IDEA Bukkit Support Plugin
- *
- * Written by Kyle Wood (DemonWav)
- * http://demonwav.com
- *
- * MIT License
- */
-
 package com.demonwav.mcdev.creator;
+
+import com.demonwav.mcdev.Type;
+import com.demonwav.mcdev.util.BukkitSettings;
+import com.demonwav.mcdev.util.BungeeCordSettings;
+import com.demonwav.mcdev.util.SpongeSettings;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ui.IdeBorderFactory;
@@ -23,9 +19,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.event.HyperlinkEvent;
 
-public class MinecraftDevWizardStep extends ModuleWizardStep {
+public class ProjectChooserWizardStep extends ModuleWizardStep {
 
-    private final MavenProjectCreator creator;
+    private final MinecraftProjectCreator creator;
 
     private JPanel chooserPanel;
     private JPanel panel;
@@ -52,7 +48,7 @@ public class MinecraftDevWizardStep extends ModuleWizardStep {
             "<a href=\"https://www.spongepowered.org/\"> Sponge</a> plugin, for use " +
             "on Sponge servers.</font></html>";
 
-    public MinecraftDevWizardStep(@NotNull MavenProjectCreator creator) {
+    public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator) {
         super();
         this.creator = creator;
     }
@@ -84,6 +80,7 @@ public class MinecraftDevWizardStep extends ModuleWizardStep {
                 type = Type.BUKKIT;
                 infoPane.setText(bukkitInfo);
                 creator.setType(type);
+                creator.setSettings(new BukkitSettings());
             }
         });
         spigotRadioButton.addChangeListener(e -> {
@@ -91,6 +88,7 @@ public class MinecraftDevWizardStep extends ModuleWizardStep {
                 type = Type.SPIGOT;
                 infoPane.setText(spigotInfo);
                 creator.setType(type);
+                creator.setSettings(new BukkitSettings());
             }
         });
         bungeecordRadioButton.addChangeListener(e -> {
@@ -98,6 +96,7 @@ public class MinecraftDevWizardStep extends ModuleWizardStep {
                 type = Type.BUNGEECORD;
                 infoPane.setText(bungeeCordInfo);
                 creator.setType(type);
+                creator.setSettings(new BungeeCordSettings());
             }
         });
         spongeRadioButton.addChangeListener(e -> {
@@ -105,6 +104,7 @@ public class MinecraftDevWizardStep extends ModuleWizardStep {
                 type = Type.SPONGE;
                 infoPane.setText(spongeInfo);
                 creator.setType(type);
+                creator.setSettings(new SpongeSettings());
             }
         });
         return panel;

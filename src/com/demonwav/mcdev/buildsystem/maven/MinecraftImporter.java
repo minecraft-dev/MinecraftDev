@@ -9,8 +9,6 @@
 
 package com.demonwav.mcdev.buildsystem.maven;
 
-import com.demonwav.mcdev.BukkitProject;
-
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;

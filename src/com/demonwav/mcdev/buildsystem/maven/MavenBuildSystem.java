@@ -29,8 +29,6 @@ import java.util.List;
 
 public class MavenBuildSystem extends BuildSystem {
 
-    public final static String NAMESPACE = "http://maven.apache.org/POM/4.0.0";
-
     private String artifactId;
     private String groupId;
     private String version;

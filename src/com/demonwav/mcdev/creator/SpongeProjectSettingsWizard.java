@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.creator;
 
+import com.demonwav.mcdev.util.SpongeSettings;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import org.apache.commons.lang.WordUtils;
@@ -11,14 +12,16 @@ import javax.swing.JTextField;
 
 public class SpongeProjectSettingsWizard extends ModuleWizardStep {
 
-    private final MavenProjectCreator creator;
     private JTextField pluginNameField;
     private JTextField pluginVersionField;
     private JTextField mainClassField;
     private JPanel panel;
     private JLabel title;
 
-    public SpongeProjectSettingsWizard(MavenProjectCreator creator) {
+    private final SpongeSettings settings = new SpongeSettings();
+    private final MinecraftProjectCreator creator;
+
+    public SpongeProjectSettingsWizard(MinecraftProjectCreator creator) {
         this.creator = creator;
     }
 
@@ -39,5 +42,10 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
     @Override
     public void onStepLeaving() {
         super.onStepLeaving();
+        settings.pluginName = pluginNameField.getText();
+        settings.pluginVersion = pluginVersionField.getText();
+        settings.mainClass = mainClassField.getText();
+        // TODO: set settings
+        creator.setSettings(settings);
     }
 }

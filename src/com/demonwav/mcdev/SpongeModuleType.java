@@ -2,7 +2,6 @@ package com.demonwav.mcdev;
 
 import com.demonwav.mcdev.icons.MinecraftProjectsIcons;
 
-import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
 
 import javax.swing.Icon;

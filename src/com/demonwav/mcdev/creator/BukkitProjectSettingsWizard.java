@@ -1,12 +1,3 @@
-/*
- * IntelliJ IDEA Bukkit Support Plugin
- *
- * Written by Kyle Wood (DemonWav)
- * http://demonwav.com
- *
- * MIT License
- */
-
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exceptions.MinecraftSetupException;
@@ -52,9 +43,9 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     private JLabel title;
 
     private BukkitSettings settings = new BukkitSettings();
-    private MavenProjectCreator creator;
+    private MinecraftProjectCreator creator;
 
-    public BukkitProjectSettingsWizard(@NotNull MavenProjectCreator creator) {
+    public BukkitProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
         super();
         this.creator = creator;
     }
@@ -67,9 +58,6 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
                 break;
             case SPIGOT:
                 title.setText("<html><font size=\"5\">Spigot Settings</font></html>");
-                break;
-            case BUNGEECORD:
-                title.setText("<html><font size=\"5\">BungeeCord Settings</font></html>");
                 break;
         }
 
