@@ -64,7 +64,8 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
 
         pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
         pluginVersionField.setText(creator.getVersion());
-        mainClassField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
+        mainClassField.setText(this.creator.getGroupId() + '.' + this.creator.getArtifactId()
+                + '.' + WordUtils.capitalizeFully(this.creator.getArtifactId()));
 
         return panel;
     }

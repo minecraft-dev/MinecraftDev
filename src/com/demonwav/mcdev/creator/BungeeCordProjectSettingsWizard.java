@@ -44,7 +44,8 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
     public JComponent getComponent() {
         pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
         pluginVersionField.setText(creator.getVersion());
-        mainClassField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
+        mainClassField.setText(this.creator.getGroupId() + '.' + this.creator.getArtifactId()
+                + '.' + WordUtils.capitalizeFully(this.creator.getArtifactId()));
 
         return panel;
     }
