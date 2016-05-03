@@ -20,16 +20,16 @@ public class BungeeCordModuleType extends MinecraftModuleType {
 
     @Override
     public Icon getBigIcon() {
-        return MinecraftProjectsIcons.SpigotBig;
+        return MinecraftProjectsIcons.BungeeCordBig;
     }
 
     @Override
     public Icon getIcon() {
-        return MinecraftProjectsIcons.Spigot;
+        return MinecraftProjectsIcons.BungeeCord;
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return MinecraftProjectsIcons.Spigot;
+        return MinecraftProjectsIcons.BungeeCord;
     }
 }
