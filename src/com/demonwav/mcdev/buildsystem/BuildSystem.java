@@ -68,12 +68,23 @@ public abstract class BuildSystem {
 
     /**
      * Assuming the artifact ID, group ID, and  version are set, along with whatever dependencies and repositories and
-     * the root directory, create a base project consisting of the necessary configuration files, an empty class with
-     * empty initialization methods, and a basic run config which will build the project using the current build system.
-     * This method may also assume required fields not included in this base class are set, as the project types will be
-     * aware of the build system and it's requirements.
+     * the root directory, create a base project consisting of the necessary build system configuration files and
+     * directory structure. This method does not create any classes or project-specific things, nor does it set up
+     * any build configurations or enable the plugin for this build config. This will be done in
+     * {@link #finishSetup(Project)}.
+     *
+     * @param project The Project object for this project
      */
     public abstract void create(@NotNull Project project);
+
+    /**
+     * This is called after {@link #create(Project)}, and after the project has set itself up. This is when the build
+     * system should make whatever calls are necessary to enable the build system's plugin, and setup whatever run
+     * configs should be setup for this build system.
+     *
+     * @param project The Project object for this project
+     */
+    public abstract void finishSetup(@NotNull Project project);
 
     /**
      * Called when something may have made modifications to the build config file, and this class must read it again in

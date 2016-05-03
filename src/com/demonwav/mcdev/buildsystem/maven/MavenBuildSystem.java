@@ -9,6 +9,8 @@ import com.demonwav.mcdev.buildsystem.maven.pom.Repository;
 import com.demonwav.mcdev.util.MinecraftTemplate;
 
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
+import com.intellij.execution.RunManager;
+import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.lang.xml.XMLLanguage;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -23,8 +25,12 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.xml.DomManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.idea.maven.execution.MavenRunConfigurationType;
+import org.jetbrains.idea.maven.execution.MavenRunnerParameters;
+import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public class MavenBuildSystem extends BuildSystem {
@@ -197,6 +203,23 @@ public class MavenBuildSystem extends BuildSystem {
                 e.printStackTrace();
             }
         });
+    }
+
+    @Override
+    public void finishSetup(@NotNull Project project) {
+        // Force Maven to setup the project
+        MavenProjectsManager.getInstance(project).forceUpdateAllProjectsOrFindAllAvailablePomFiles();
+
+        // Setup the default Maven run config
+        if (getRootDirectory().getCanonicalPath() != null) {
+            MavenRunnerParameters params = new MavenRunnerParameters();
+            params.setWorkingDirPath(getRootDirectory().getCanonicalPath());
+            params.setGoals(Arrays.asList("clean", "package"));
+            RunnerAndConfigurationSettings runnerSettings = MavenRunConfigurationType.createRunnerAndConfigurationSettings(null, null, params, project);
+            runnerSettings.setName("clean package");
+            RunManager.getInstance(project).addConfiguration(runnerSettings, true);
+            RunManager.getInstance(project).setSelectedConfiguration(runnerSettings);
+        }
     }
 
     @Override

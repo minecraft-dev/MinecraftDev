@@ -1,9 +1,9 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.Type;
-import com.demonwav.mcdev.util.BukkitSettings;
-import com.demonwav.mcdev.util.BungeeCordSettings;
-import com.demonwav.mcdev.util.SpongeSettings;
+import com.demonwav.mcdev.settings.BukkitSettings;
+import com.demonwav.mcdev.settings.BungeeCordSettings;
+import com.demonwav.mcdev.settings.SpongeSettings;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ui.IdeBorderFactory;

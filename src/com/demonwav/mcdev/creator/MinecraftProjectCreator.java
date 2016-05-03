@@ -4,9 +4,9 @@ import com.demonwav.mcdev.Type;
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.util.MinecraftSettings;
+import com.demonwav.mcdev.settings.MinecraftSettings;
 import com.demonwav.mcdev.util.MinecraftTemplate;
-import com.demonwav.mcdev.util.BukkitSettings;
+import com.demonwav.mcdev.settings.BukkitSettings;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -102,49 +102,8 @@ public class MinecraftProjectCreator {
         dependency.setScope("provided");
 
         buildSystem.create(project);
-
-        ApplicationManager.getApplication().runWriteAction(() -> {
-            try {
-                // Create plugin main class
-                VirtualFile file = buildSystem.getSourceDirectory();
-                String[] files = groupId.split("\\.");
-                for (String s : files) {
-                    file = file.createChildDirectory(this, s);
-                }
-
-                VirtualFile mainClass = file.findOrCreateChildData(this, settings.mainClass + ".java");
-
-                if (type != Type.SPONGE) {
-                    MinecraftTemplate.applyMainBukkitClassTemplate(project, mainClass, groupId, settings.mainClass, type != Type.BUNGEECORD);
-                    VirtualFile pluginYml = buildSystem.getResourceDirectory().findOrCreateChildData(this, "plugin.yml");
-                    MinecraftTemplate.applyPluginYmlTemplate(project, pluginYml, type, (BukkitSettings) settings, groupId);
-                } else {
-                    MinecraftTemplate.applyMainSpongeClassTemplate(project, mainClass, groupId, settings.mainClass);
-                }
-
-                // Set the editor focus on the main class
-                PsiFile mainClassPsi = PsiManager.getInstance(project).findFile(mainClass);
-                if (mainClassPsi != null) {
-                    EditorHelper.openInEditor(mainClassPsi);
-                }
-
-                // Force Maven to setup the project
-                MavenProjectsManager.getInstance(project).forceUpdateAllProjectsOrFindAllAvailablePomFiles();
-
-                // Setup the default Maven run config
-                if (buildSystem.getRootDirectory().getCanonicalPath() != null) {
-                    MavenRunnerParameters params = new MavenRunnerParameters();
-                    params.setWorkingDirPath(buildSystem.getRootDirectory().getCanonicalPath());
-                    params.setGoals(Arrays.asList("clean", "package"));
-                    RunnerAndConfigurationSettings runnerSettings = MavenRunConfigurationType.createRunnerAndConfigurationSettings(null, null, params, project);
-                    runnerSettings.setName("clean package");
-                    RunManager.getInstance(project).addConfiguration(runnerSettings, true);
-                    RunManager.getInstance(project).setSelectedConfiguration(runnerSettings);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        settings.create(project, buildSystem);
+        buildSystem.finishSetup(project);
     }
 
     public VirtualFile getRoot() {

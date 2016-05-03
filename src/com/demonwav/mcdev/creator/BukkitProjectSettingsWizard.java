@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exceptions.MinecraftSetupException;
-import com.demonwav.mcdev.util.BukkitSettings;
+import com.demonwav.mcdev.settings.BukkitSettings;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;

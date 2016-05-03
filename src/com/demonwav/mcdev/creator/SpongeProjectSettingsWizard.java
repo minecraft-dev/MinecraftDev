@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.util.SpongeSettings;
+import com.demonwav.mcdev.settings.SpongeSettings;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import org.apache.commons.lang.WordUtils;

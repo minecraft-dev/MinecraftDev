@@ -1,6 +1,8 @@
 package com.demonwav.mcdev.util;
 
 import com.demonwav.mcdev.Type;
+import com.demonwav.mcdev.settings.BukkitSettings;
+import com.demonwav.mcdev.settings.BungeeCordSettings;
 
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.ide.fileTemplates.FileTemplate;
@@ -31,12 +33,20 @@ public class MinecraftTemplate {
         }
     }
 
-    public static void applyMainBukkitClassTemplate(Project project, VirtualFile file, String packageName, String className, boolean bukkit) {
+    public static void applyMainBukkitClassTemplate(Project project, VirtualFile file, String packageName, String className) {
+        applyMainClassTemplate(project, file, packageName, className, true);
+    }
+
+    public static void applyMainBungeeCordClassTemplate(Project project, VirtualFile file, String packageName, String className) {
+        applyMainClassTemplate(project, file, packageName, className, false);
+    }
+
+    private static void applyMainClassTemplate(Project project, VirtualFile file, String packageName, String className, boolean isBukkit) {
         Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
-        if (bukkit) {
+        if (isBukkit) {
             properties.setProperty("BUKKIT", "true");
         }
 
@@ -60,7 +70,7 @@ public class MinecraftTemplate {
         }
     }
 
-    public static void applyPluginYmlTemplate(Project project, VirtualFile file, Type type, BukkitSettings settings, String groupId) {
+    public static void applyBukkitPluginYmlTemplate(Project project, VirtualFile file, BukkitSettings settings, String groupId) {
         Properties properties = new Properties();
 
         properties.setProperty("NAME", settings.pluginName);
@@ -84,33 +94,60 @@ public class MinecraftTemplate {
             properties.setProperty("HAS_SOFT_DEPEND", "true");
         }
 
-        // These are bukkit and spigot only settings
-        if (type != Type.BUNGEECORD) {
-            properties.setProperty("WEBSITE", settings.website);
-            properties.setProperty("DATABASE", Boolean.toString(settings.database));
-            properties.setProperty("PREFIX", settings.prefix);
-            properties.setProperty("LOAD", settings.load.name());
-            properties.setProperty("AUTHOR_LIST", settings.authorList.toString());
-            properties.setProperty("LOAD_BEFORE", settings.loadBefore.toString());
+        properties.setProperty("WEBSITE", settings.website);
+        properties.setProperty("DATABASE", Boolean.toString(settings.database));
+        properties.setProperty("PREFIX", settings.prefix);
+        properties.setProperty("LOAD", settings.load.name());
+        properties.setProperty("AUTHOR_LIST", settings.authorList.toString());
+        properties.setProperty("LOAD_BEFORE", settings.loadBefore.toString());
 
-            if (settings.hasAuthorList()) {
-                properties.setProperty("HAS_AUTHOR_LIST", "true");
-            }
-            if (settings.hasWebsite()) {
-                properties.setProperty("HAS_WEBSITE", "true");
-            }
-            if (settings.hasDatabase()) {
-                properties.setProperty("HAS_DATABASE", "true");
-            }
-            if (settings.hasLoad()) {
-                properties.setProperty("HAS_LOAD", "true");
-            }
-            if (settings.hasPrefix()) {
-                properties.setProperty("HAS_PREFIX", "true");
-            }
-            if (settings.hasLoadBefore()) {
-                properties.setProperty("HAS_LOAD_BEFORE", "true");
-            }
+        if (settings.hasAuthorList()) {
+            properties.setProperty("HAS_AUTHOR_LIST", "true");
+        }
+        if (settings.hasWebsite()) {
+            properties.setProperty("HAS_WEBSITE", "true");
+        }
+        if (settings.hasDatabase()) {
+            properties.setProperty("HAS_DATABASE", "true");
+        }
+        if (settings.hasLoad()) {
+            properties.setProperty("HAS_LOAD", "true");
+        }
+        if (settings.hasPrefix()) {
+            properties.setProperty("HAS_PREFIX", "true");
+        }
+        if (settings.hasLoadBefore()) {
+            properties.setProperty("HAS_LOAD_BEFORE", "true");
+        }
+        try {
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void applyBungeeCordPluginYmlTemplate(Project project, VirtualFile file, BungeeCordSettings settings, String groupId) {
+        Properties properties = new Properties();
+
+        properties.setProperty("NAME", settings.pluginName);
+        properties.setProperty("VERSION", settings.pluginVersion);
+        properties.setProperty("DESCRIPTION", settings.description);
+        properties.setProperty("MAIN", groupId + "." + settings.mainClass);
+        properties.setProperty("AUTHOR", settings.author);
+        properties.setProperty("DEPEND", settings.depend.toString());
+        properties.setProperty("SOFT_DEPEND", settings.softDepend.toString());
+
+        if (settings.hasDescription()) {
+            properties.setProperty("HAS_DESCRIPTION", "true");
+        }
+        if (settings.hasAuthor()) {
+            properties.setProperty("HAS_AUTHOR", "true");
+        }
+        if (settings.hasDepend()) {
+            properties.setProperty("HAS_DEPEND", "true");
+        }
+        if (settings.hasSoftDepend()) {
+            properties.setProperty("HAS_SOFT_DEPEND", "true");
         }
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties);

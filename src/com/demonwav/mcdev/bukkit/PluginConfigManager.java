@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.bukkit;
 
 import com.demonwav.mcdev.BukkitProject;
-import com.demonwav.mcdev.util.MinecraftUtil;
+import com.demonwav.mcdev.util.BukkitUtil;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFileAdapter;
@@ -57,7 +57,7 @@ public class PluginConfigManager {
 
     private void importConfig() {
         ApplicationManager.getApplication().runReadAction(() -> {
-            PsiFile pluginYml = MinecraftUtil.getPluginYml(project);
+            PsiFile pluginYml = BukkitUtil.getPluginYml(project);
             YAMLFile file = ((YAMLFileImpl) pluginYml);
 
             if (file == null) {
