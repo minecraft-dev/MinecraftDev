@@ -4,13 +4,15 @@
 package ${PACKAGE};
 
 #if (${BUKKIT})
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 #else
 import net.md_5.bungee.api.plugin.Plugin;
 #end
 
 #if (${BUKKIT})
-public final class ${CLASS_NAME} extends JavaPlugin {
+public final class ${CLASS_NAME} extends JavaPlugin implements Listener {
 #else
 public final class ${CLASS_NAME} extends Plugin {
 #end
@@ -18,6 +20,7 @@ public final class ${CLASS_NAME} extends Plugin {
   @Override
   public void onEnable() {
     // Plugin startup logic
+    Bukkit.getPluginManager().registerEvents(this, this);
   }
 
   @Override
