@@ -38,13 +38,13 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
 
     private static final String bukkitInfo = "<html><font size=\"4\">Create a standard " +
             "<a href=\"http://bukkit.org/\">Bukkit</a> plugin, for use " +
-            "on CraftBukkit and Spigot servers.</font></html>";
+            "on CraftBukkit, Spigot, and Paper servers.</font></html>";
     private static final String spigotInfo = "<html><font size=\"4\">Create a standard " +
             "<a href=\"https://www.spigotmc.org/\">Spigot</a> plugin, for use " +
-            "on Spigot servers.</font></html>";
+            "on Spigot and Paper servers.</font></html>";
     private static final String paperInfo = "<html><font size=\"4\">Create a standard " +
             "<a href=\"https://paper.readthedocs.io/en/paper-1.9/\">Paper</a> plugin, for use " +
-            "on Spigot servers.</font></html>";
+            "on Paper servers.</font></html>";
     private static final String bungeeCordInfo = "<html><font size=\"4\">Create a standard " +
             "<a href=\"https://www.spigotmc.org/wiki/bungeecord/\"> BungeeCord</a> plugin, for use " +
             "on BungeeCord servers.</font></html>";
