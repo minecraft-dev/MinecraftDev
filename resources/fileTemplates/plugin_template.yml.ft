@@ -9,8 +9,6 @@
 #* @vtlvariable name="AUTHOR_LIST" type="java.lang.String" *#
 #* @vtlvariable name="HAS_WEBSITE" type="boolean" *#
 #* @vtlvariable name="WEBSITE" type="java.lang.String" *#
-#* @vtlvariable name="HAS_DATABASE" type="boolean" *#
-#* @vtlvariable name="DATABASE" type="java.lang.String" *#
 #* @vtlvariable name="HAS_LOAD" type="boolean" *#
 #* @vtlvariable name="LOAD" type="java.lang.String" *#
 #* @vtlvariable name="HAS_PREFIX" type="boolean" *#
@@ -38,9 +36,6 @@ authors: ${AUTHOR_LIST}
 website: ${WEBSITE}
 #end
 
-#if (${HAS_DATABASE})
-database: ${DATABASE}
-#end
 #if (${HAS_LOAD})
 load: ${LOAD}
 #end

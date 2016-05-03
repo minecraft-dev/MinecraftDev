@@ -35,7 +35,6 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     private JTextField additionAuthorsField;
     private JTextField websiteField;
     private JTextField prefixField;
-    private JCheckBox databaseBox;
     private JComboBox loadBox;
     private JTextField loadBeforeField;
     private JTextField dependField;
@@ -123,7 +122,6 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
         settings.authorList = new ArrayList<>(Arrays.asList(additionAuthorsField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
         settings.website = websiteField.getText();
         settings.prefix = prefixField.getText();
-        settings.database = databaseBox.isSelected();
         settings.load = loadBox.getSelectedIndex() == 0 ? BukkitSettings.Load.POSTWORLD : BukkitSettings.Load.STARTUP;
         settings.loadBefore = new ArrayList<>(Arrays.asList(loadBeforeField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
         settings.depend = new ArrayList<>(Arrays.asList(dependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));

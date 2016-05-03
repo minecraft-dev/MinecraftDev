@@ -95,7 +95,6 @@ public class MinecraftTemplate {
         }
 
         properties.setProperty("WEBSITE", settings.website);
-        properties.setProperty("DATABASE", Boolean.toString(settings.database));
         properties.setProperty("PREFIX", settings.prefix);
         properties.setProperty("LOAD", settings.load.name());
         properties.setProperty("AUTHOR_LIST", settings.authorList.toString());
@@ -106,9 +105,6 @@ public class MinecraftTemplate {
         }
         if (settings.hasWebsite()) {
             properties.setProperty("HAS_WEBSITE", "true");
-        }
-        if (settings.hasDatabase()) {
-            properties.setProperty("HAS_DATABASE", "true");
         }
         if (settings.hasLoad()) {
             properties.setProperty("HAS_LOAD", "true");

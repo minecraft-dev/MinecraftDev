@@ -28,7 +28,6 @@ public class BukkitSettings extends MinecraftSettings {
 
     public List<String> authorList = null;
     public String prefix = null;
-    public boolean database;
     public Load load = Load.POSTWORLD;
     public List<String> loadBefore = null;
     public List<String> depend = null;
@@ -40,10 +39,6 @@ public class BukkitSettings extends MinecraftSettings {
 
     public boolean hasWebsite() {
         return website != null && !website.trim().isEmpty();
-    }
-
-    public boolean hasDatabase() {
-        return database;
     }
 
     public boolean hasLoad() {

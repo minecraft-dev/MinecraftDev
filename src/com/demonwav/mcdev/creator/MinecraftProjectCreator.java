@@ -63,7 +63,6 @@ public class MinecraftProjectCreator {
                 dependency.setGroupId("org.bukkit");
                 dependency.setArtifactId("bukkit");
                 dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
-                buildSystem.setBuildVersion("1.7");
                 break;
             case SPIGOT:
                 buildRepository.setId("spigot-repo");
@@ -71,7 +70,6 @@ public class MinecraftProjectCreator {
                 dependency.setGroupId("org.spigotmc");
                 dependency.setArtifactId("spigot-api");
                 dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
-                buildSystem.setBuildVersion("1.7");
                 break;
             case PAPER:
                 buildRepository.setId("destroystokyo-repo");
@@ -79,7 +77,6 @@ public class MinecraftProjectCreator {
                 dependency.setGroupId("com.destroystokyo.paper");
                 dependency.setArtifactId("paper-api");
                 dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
-                buildSystem.setBuildVersion("1.8");
                 break;
             case BUNGEECORD:
                 buildRepository.setId("bungeecord-repo");
@@ -87,7 +84,6 @@ public class MinecraftProjectCreator {
                 dependency.setGroupId("net.md-5");
                 dependency.setArtifactId("bungeecord-api");
                 dependency.setVersion("1.9-SNAPSHOT");
-                buildSystem.setBuildVersion("1.7");
                 break;
             case SPONGE:
                 buildRepository.setId("sponge");
@@ -95,7 +91,6 @@ public class MinecraftProjectCreator {
                 dependency.setGroupId("org.spongepowered");
                 dependency.setArtifactId("spongeapi");
                 dependency.setVersion("4.0.3");
-                buildSystem.setBuildVersion("1.8");
             default:
                 break;
         }
