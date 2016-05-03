@@ -5,7 +5,7 @@
 
   <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
-    <version>alpha-0.0.3</version>
+    <version>alpha-0.0.3.1</version>
     <vendor>DemonWav</vendor>
 
   <description><![CDATA[
@@ -13,12 +13,16 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      Alpha release, not many features, may break. More features to come.
-
-      Recent changes:
-        Initial Sponge support (not yet fully working) for project creation
-        Paper support for project creation (with temporary logo)
-        New BungeeCord logo
+      <div>
+        Alpha release, not many features, may break. More features to come.
+        <p><p>
+        Recent changes:
+        <ul>
+          <li>Initial Sponge support (not yet fully working) for project creation</li>
+          <li>Paper support for project creation (with temporary logo)</li>
+          <li>New BungeeCord icon</li>
+        </ul>
+      </div>
     ]]>
   </change-notes>
 
