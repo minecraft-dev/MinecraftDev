@@ -18,4 +18,6 @@ public class MinecraftProjectsIcons {
     public static final Icon MinecraftBig = load("/icons/Minecraft@2x.png");
     public static final Icon Sponge = load("/icons/Sponge.png");
     public static final Icon SpongeBig = load("/icons/Sponge@2x.png");
+    public static final Icon Paper = load("/icons/Paper.png");
+    public static final Icon PaperBig = load("/icons/Paper@2x.png");
 }

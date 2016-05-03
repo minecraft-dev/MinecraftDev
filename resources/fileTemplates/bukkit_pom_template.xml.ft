@@ -17,7 +17,7 @@
   </properties>
 
   <build>
-    <defaultGoal>clean install</defaultGoal>
+    <defaultGoal>clean package</defaultGoal>
     <plugins>
       <plugin>
         <version>3.1</version>

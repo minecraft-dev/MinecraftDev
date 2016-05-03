@@ -119,12 +119,12 @@
               <text value="Paper Plugin"/>
             </properties>
           </component>
-          <component id="254b2" class="javax.swing.JLabel">
+          <component id="fe383" class="javax.swing.JLabel">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <icon value="icons/Spigot@2x.png"/>
+              <icon value="icons/Paper@2x.png"/>
               <iconTextGap value="0"/>
               <text value=""/>
             </properties>
