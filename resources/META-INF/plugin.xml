@@ -4,9 +4,9 @@
   <depends optional="false">org.jetbrains.plugins.yaml</depends>
 
   <id>com.demonwav.minecraft-dev</id>
-    <name>Minecraft Development</name>
-    <version>alpha-0.0.3.1</version>
-    <vendor>DemonWav</vendor>
+  <name>Minecraft Development</name>
+  <version>alpha-0.0.3.1</version>
+  <vendor>DemonWav</vendor>
 
   <description><![CDATA[
       Brings support for Bukkit, Spigot, Paper, BungeeCord, Sponge, and Forge Projects to Intellij IDEA.
