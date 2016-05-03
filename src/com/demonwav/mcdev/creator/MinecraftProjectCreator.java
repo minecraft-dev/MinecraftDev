@@ -58,15 +58,15 @@ public class MinecraftProjectCreator {
 
         switch (type) {
             case BUKKIT:
-                buildRepository.setId("spigot-repo");
-                buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/repositories/snapshots/");
+                buildRepository.setId("spigotmc-repo");
+                buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
                 dependency.setGroupId("org.bukkit");
                 dependency.setArtifactId("bukkit");
                 dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
                 break;
             case SPIGOT:
-                buildRepository.setId("spigot-repo");
-                buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/repositories/snapshots/");
+                buildRepository.setId("spigotmc-repo");
+                buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
                 dependency.setGroupId("org.spigotmc");
                 dependency.setArtifactId("spigot-api");
                 dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
@@ -79,15 +79,15 @@ public class MinecraftProjectCreator {
                 dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
                 break;
             case BUNGEECORD:
-                buildRepository.setId("bungeecord-repo");
-                buildRepository.setUrl("https://oss.sonatype.org/content/repositories/snapshots");
+                buildRepository.setId("sonatype-oss-repo");
+                buildRepository.setUrl("https://oss.sonatype.org/content/groups/public/");
                 dependency.setGroupId("net.md-5");
                 dependency.setArtifactId("bungeecord-api");
                 dependency.setVersion("1.9-SNAPSHOT");
                 break;
             case SPONGE:
-                buildRepository.setId("sponge");
-                buildRepository.setUrl("http://repo.spongepowered.org/maven");
+                buildRepository.setId("spongepowered-repo");
+                buildRepository.setUrl("https://repo.spongepowered.org/maven/");
                 dependency.setGroupId("org.spongepowered");
                 dependency.setArtifactId("spongeapi");
                 dependency.setVersion("4.0.3");
