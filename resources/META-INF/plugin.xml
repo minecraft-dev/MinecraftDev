@@ -3,9 +3,9 @@
   <depends optional="false">org.jetbrains.idea.maven</depends>
   <depends optional="false">org.jetbrains.plugins.yaml</depends>
 
-  <id>com.demonwav.mcdev</id>
+  <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
-    <version>alpha-0.0.2</version>
+    <version>alpha-0.0.3</version>
     <vendor>DemonWav</vendor>
 
   <description><![CDATA[
@@ -14,6 +14,11 @@
 
   <change-notes><![CDATA[
       Alpha release, not many features, may break. More features to come.
+
+      Recent changes:
+        Initial Sponge support (not yet fully working) for project creation
+        Paper support for project creation (with temporary logo)
+        New BungeeCord logo
     ]]>
   </change-notes>
 
