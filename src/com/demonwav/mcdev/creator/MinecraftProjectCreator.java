@@ -1,27 +1,14 @@
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.Type;
+import com.demonwav.mcdev.platform.Type;
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.settings.MinecraftSettings;
-import com.demonwav.mcdev.util.MinecraftTemplate;
-import com.demonwav.mcdev.settings.BukkitSettings;
+import com.demonwav.mcdev.platform.MinecraftSettings;
 
-import com.intellij.execution.RunManager;
-import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.ide.util.EditorHelper;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import org.jetbrains.idea.maven.execution.MavenRunConfigurationType;
-import org.jetbrains.idea.maven.execution.MavenRunnerParameters;
-import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class MinecraftProjectCreator {

@@ -1,4 +1,4 @@
-package com.demonwav.mcdev;
+package com.demonwav.mcdev.platform;
 
 public enum Type {
     BUKKIT,

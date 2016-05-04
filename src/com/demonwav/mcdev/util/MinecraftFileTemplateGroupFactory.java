@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.util;
 
-import com.demonwav.mcdev.icons.MinecraftProjectsIcons;
+import com.demonwav.mcdev.resource.MinecraftProjectsIcons;
 
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;

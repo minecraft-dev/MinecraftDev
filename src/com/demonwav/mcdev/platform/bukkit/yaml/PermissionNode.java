@@ -1,4 +1,4 @@
-package com.demonwav.mcdev.bukkit;
+package com.demonwav.mcdev.platform.bukkit.yaml;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

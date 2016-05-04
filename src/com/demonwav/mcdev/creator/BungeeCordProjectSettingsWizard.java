@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.exceptions.MinecraftSetupException;
-import com.demonwav.mcdev.settings.BungeeCordSettings;
+import com.demonwav.mcdev.exception.MinecraftSetupException;
+import com.demonwav.mcdev.platform.bungeecord.BungeeCordSettings;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;

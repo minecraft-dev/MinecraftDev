@@ -1,4 +1,4 @@
-package com.demonwav.mcdev.icons;
+package com.demonwav.mcdev.resource;
 
 import com.intellij.openapi.util.IconLoader;
 

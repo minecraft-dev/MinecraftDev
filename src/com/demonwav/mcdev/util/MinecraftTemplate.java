@@ -1,8 +1,7 @@
 package com.demonwav.mcdev.util;
 
-import com.demonwav.mcdev.Type;
-import com.demonwav.mcdev.settings.BukkitSettings;
-import com.demonwav.mcdev.settings.BungeeCordSettings;
+import com.demonwav.mcdev.platform.bukkit.BukkitSettings;
+import com.demonwav.mcdev.platform.bungeecord.BungeeCordSettings;
 
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.ide.fileTemplates.FileTemplate;

@@ -9,7 +9,7 @@
 
 package com.demonwav.mcdev.buildsystem.maven;
 
-import com.demonwav.mcdev.SpigotModuleType;
+import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 
 import org.jetbrains.annotations.NotNull;
 

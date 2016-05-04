@@ -1,6 +1,6 @@
-package com.demonwav.mcdev;
+package com.demonwav.mcdev.platform.bukkit;
 
-import com.demonwav.mcdev.icons.MinecraftProjectsIcons;
+import com.demonwav.mcdev.resource.MinecraftProjectsIcons;
 
 import com.intellij.openapi.module.ModuleTypeManager;
 

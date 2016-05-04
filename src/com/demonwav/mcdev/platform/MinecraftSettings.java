@@ -1,4 +1,4 @@
-package com.demonwav.mcdev.settings;
+package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 

@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.buildsystem.maven;
 
-import com.demonwav.mcdev.PaperModuleType;
+import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
 
 import org.jetbrains.annotations.NotNull;
 

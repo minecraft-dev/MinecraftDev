@@ -1,6 +1,7 @@
-package com.demonwav.mcdev;
+package com.demonwav.mcdev.platform.bukkit;
 
-import com.demonwav.mcdev.bukkit.PluginConfigManager;
+import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
+import com.demonwav.mcdev.platform.MinecraftProject;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;

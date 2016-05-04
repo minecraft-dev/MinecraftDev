@@ -9,8 +9,8 @@
 
 package com.demonwav.mcdev.buildsystem.maven;
 
-import com.demonwav.mcdev.BukkitModuleType;
-import com.demonwav.mcdev.BukkitProject;
+import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
+import com.demonwav.mcdev.platform.bukkit.BukkitProject;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;

@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.exceptions.MinecraftSetupException;
-import com.demonwav.mcdev.settings.BukkitSettings;
+import com.demonwav.mcdev.exception.MinecraftSetupException;
+import com.demonwav.mcdev.platform.bukkit.BukkitSettings;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;

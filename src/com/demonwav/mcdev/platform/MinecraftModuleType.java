@@ -1,7 +1,7 @@
-package com.demonwav.mcdev;
+package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.creator.MinecraftModuleBuilder;
-import com.demonwav.mcdev.icons.MinecraftProjectsIcons;
+import com.demonwav.mcdev.resource.MinecraftProjectsIcons;
 
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;

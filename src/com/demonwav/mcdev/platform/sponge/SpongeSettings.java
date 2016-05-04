@@ -1,6 +1,7 @@
-package com.demonwav.mcdev.settings;
+package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.platform.MinecraftSettings;
 
 import com.intellij.openapi.project.Project;
 

@@ -1,6 +1,7 @@
-package com.demonwav.mcdev.settings;
+package com.demonwav.mcdev.platform.bungeecord;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.platform.MinecraftSettings;
 import com.demonwav.mcdev.util.MinecraftTemplate;
 
 import com.intellij.ide.util.EditorHelper;

@@ -1,4 +1,4 @@
-package com.demonwav.mcdev.exceptions;
+package com.demonwav.mcdev.exception;
 
 import javax.swing.JComponent;
 

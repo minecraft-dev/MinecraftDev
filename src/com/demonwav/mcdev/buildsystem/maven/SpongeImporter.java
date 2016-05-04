@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.buildsystem.maven;
 
-import com.demonwav.mcdev.SpongeModuleType;
+import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
 import org.jetbrains.annotations.NotNull;
 

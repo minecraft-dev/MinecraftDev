@@ -9,7 +9,7 @@
 
 package com.demonwav.mcdev.buildsystem.maven;
 
-import com.demonwav.mcdev.BungeeCordModuleType;
+import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 
 import org.jetbrains.annotations.NotNull;
 

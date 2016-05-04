@@ -1,11 +1,11 @@
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.BukkitModuleType;
-import com.demonwav.mcdev.PaperModuleType;
-import com.demonwav.mcdev.SpigotModuleType;
-import com.demonwav.mcdev.BungeeCordModuleType;
-import com.demonwav.mcdev.SpongeModuleType;
-import com.demonwav.mcdev.icons.MinecraftProjectsIcons;
+import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
+import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
+import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
+import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
+import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
+import com.demonwav.mcdev.resource.MinecraftProjectsIcons;
 
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
