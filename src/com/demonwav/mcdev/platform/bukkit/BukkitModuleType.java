@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.platform.MinecraftModuleType;
-import com.demonwav.mcdev.resource.MinecraftProjectsIcons;
+import com.demonwav.mcdev.asset.PlatformAssets;
 
 import com.intellij.openapi.module.ModuleTypeManager;
 
@@ -25,16 +25,16 @@ public class BukkitModuleType extends MinecraftModuleType {
 
     @Override
     public Icon getBigIcon() {
-        return MinecraftProjectsIcons.BukkitBig;
+        return PlatformAssets.BUKKIT_ICON_2X;
     }
 
     @Override
     public Icon getIcon() {
-        return MinecraftProjectsIcons.Bukkit;
+        return PlatformAssets.BUKKIT_ICON;
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return MinecraftProjectsIcons.Bukkit;
+        return PlatformAssets.BUKKIT_ICON;
     }
 }

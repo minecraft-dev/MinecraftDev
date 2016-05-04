@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.util;
 
-import com.demonwav.mcdev.resource.MinecraftProjectsIcons;
+import com.demonwav.mcdev.asset.PlatformAssets;
 
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
@@ -19,17 +19,17 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
 
     @Override
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
-        FileTemplateGroupDescriptor group = new FileTemplateGroupDescriptor("Minecraft", MinecraftProjectsIcons.Bukkit);
+        FileTemplateGroupDescriptor group = new FileTemplateGroupDescriptor("Minecraft", PlatformAssets.BUKKIT_ICON);
 
-        group.addTemplate(new FileTemplateGroupDescriptor(BUKKIT_MAIN_CLASS_TEMPLATE, MinecraftProjectsIcons.Bukkit));
-        group.addTemplate(new FileTemplateGroupDescriptor(BUKKIT_PLUGIN_YML_TEMPLATE, MinecraftProjectsIcons.Bukkit));
-        group.addTemplate(new FileTemplateGroupDescriptor(BUKKIT_POM_TEMPLATE, MinecraftProjectsIcons.Bukkit));
+        group.addTemplate(new FileTemplateGroupDescriptor(BUKKIT_MAIN_CLASS_TEMPLATE, PlatformAssets.BUKKIT_ICON));
+        group.addTemplate(new FileTemplateGroupDescriptor(BUKKIT_PLUGIN_YML_TEMPLATE, PlatformAssets.BUKKIT_ICON));
+        group.addTemplate(new FileTemplateGroupDescriptor(BUKKIT_POM_TEMPLATE, PlatformAssets.BUKKIT_ICON));
 
-        group.addTemplate(new FileTemplateGroupDescriptor(SPONGE_MAIN_CLASS_TEMPLATE, MinecraftProjectsIcons.Sponge));
+        group.addTemplate(new FileTemplateGroupDescriptor(SPONGE_MAIN_CLASS_TEMPLATE, PlatformAssets.SPONGE_ICON));
 
-        group.addTemplate(new FileTemplateGroupDescriptor(BUNGEECORD_MAIN_CLASS_TEMPLATE, MinecraftProjectsIcons.BungeeCord));
-        group.addTemplate(new FileTemplateGroupDescriptor(BUNGEECORD_PLUGIN_YML_TEMPLATE, MinecraftProjectsIcons.BungeeCord));
-        group.addTemplate(new FileTemplateGroupDescriptor(BUNGEECORD_POM_TEMPLATE, MinecraftProjectsIcons.BungeeCord));
+        group.addTemplate(new FileTemplateGroupDescriptor(BUNGEECORD_MAIN_CLASS_TEMPLATE, PlatformAssets.BUNGEECORD_ICON));
+        group.addTemplate(new FileTemplateGroupDescriptor(BUNGEECORD_PLUGIN_YML_TEMPLATE, PlatformAssets.BUNGEECORD_ICON));
+        group.addTemplate(new FileTemplateGroupDescriptor(BUNGEECORD_POM_TEMPLATE, PlatformAssets.BUNGEECORD_ICON));
 
         return group;
     }

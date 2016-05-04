@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.platform.bukkit;
 
-import com.demonwav.mcdev.resource.MinecraftProjectsIcons;
+import com.demonwav.mcdev.asset.PlatformAssets;
 
 import com.intellij.openapi.module.ModuleTypeManager;
 
@@ -20,16 +20,16 @@ public class PaperModuleType extends SpigotModuleType {
 
     @Override
     public Icon getBigIcon() {
-        return MinecraftProjectsIcons.PaperBig;
+        return PlatformAssets.PAPER_ICON_2X;
     }
 
     @Override
     public Icon getIcon() {
-        return MinecraftProjectsIcons.Paper;
+        return PlatformAssets.PAPER_ICON;
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return MinecraftProjectsIcons.Paper;
+        return PlatformAssets.PAPER_ICON;
     }
 }

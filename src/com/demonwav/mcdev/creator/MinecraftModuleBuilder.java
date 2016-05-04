@@ -5,7 +5,7 @@ import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
-import com.demonwav.mcdev.resource.MinecraftProjectsIcons;
+import com.demonwav.mcdev.asset.PlatformAssets;
 
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
@@ -43,7 +43,7 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
 
     @Override
     public Icon getNodeIcon() {
-        return MinecraftProjectsIcons.Minecraft;
+        return PlatformAssets.MINECRAFT_ICON;
     }
 
     @Override

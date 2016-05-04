@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.platform.MinecraftModuleType;
-import com.demonwav.mcdev.resource.MinecraftProjectsIcons;
+import com.demonwav.mcdev.asset.PlatformAssets;
 
 import com.intellij.openapi.module.ModuleTypeManager;
 
@@ -21,16 +21,16 @@ public class SpongeModuleType extends MinecraftModuleType {
 
     @Override
     public Icon getBigIcon() {
-        return MinecraftProjectsIcons.SpongeBig;
+        return PlatformAssets.SPONGE_ICON_2X;
     }
 
     @Override
     public Icon getIcon() {
-        return MinecraftProjectsIcons.Sponge;
+        return PlatformAssets.SPONGE_ICON;
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return MinecraftProjectsIcons.Sponge;
+        return PlatformAssets.SPONGE_ICON;
     }
 }
