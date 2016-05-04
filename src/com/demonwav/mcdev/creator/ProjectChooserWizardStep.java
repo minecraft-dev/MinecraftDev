@@ -43,7 +43,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             "<a href=\"https://www.spigotmc.org/\">Spigot</a> plugin, for use " +
             "on Spigot and Paper servers.</font></html>";
     private static final String paperInfo = "<html><font size=\"4\">Create a standard " +
-            "<a href=\"https://paper.readthedocs.io/en/paper-1.9/\">Paper</a> plugin, for use " +
+            "<a href=\"https://paper.emc.gs\">Paper</a> plugin, for use " +
             "on Paper servers.</font></html>";
     private static final String bungeeCordInfo = "<html><font size=\"4\">Create a standard " +
             "<a href=\"https://www.spigotmc.org/wiki/bungeecord/\"> BungeeCord</a> plugin, for use " +
