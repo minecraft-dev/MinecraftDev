@@ -12,7 +12,11 @@ package com.demonwav.mcdev.buildsystem.maven;
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
 import com.demonwav.mcdev.platform.bukkit.BukkitProject;
 
+import com.intellij.ide.FileIconProvider;
+import com.intellij.ide.IconProvider;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.ResolveContext;
@@ -44,6 +48,6 @@ public class BukkitMavenImporter extends MinecraftMavenImporter {
         super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
         BukkitProject bukkitProject = BukkitProject.getInstance(project);
         bukkitProject.setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
-        bukkitProject.getConfigManager();
+        bukkitProject.setIcon(getModuleType().getIcon());
     }
 }

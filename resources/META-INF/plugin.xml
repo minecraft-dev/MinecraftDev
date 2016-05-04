@@ -45,6 +45,8 @@
     <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType"/>
     <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.sponge.SpongeModuleType"/>
     <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
+    <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
+    <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
   </extensions>
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
     <importer implementation="com.demonwav.mcdev.buildsystem.maven.BukkitMavenImporter"/>

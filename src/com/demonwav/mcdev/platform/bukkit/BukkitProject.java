@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.Icon;
+
 public class BukkitProject extends AbstractProject {
 
     private static final Map<Project, BukkitProject> map = new HashMap<>();
@@ -19,6 +21,8 @@ public class BukkitProject extends AbstractProject {
     private Project project;
 
     private PluginConfigManager configManager;
+
+    private Icon icon;
 
     private BukkitProject(@NotNull Project project) {
         this.project = project;
@@ -48,6 +52,14 @@ public class BukkitProject extends AbstractProject {
 
     public void setPluginYml(@NotNull VirtualFile pluginYml) {
         this.pluginYml = pluginYml;
+    }
+
+    public void setIcon(@NotNull Icon icon) {
+        this.icon = icon;
+    }
+
+    public Icon getIcon() {
+        return icon;
     }
 
     @Override
