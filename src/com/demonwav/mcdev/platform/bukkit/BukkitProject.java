@@ -26,20 +26,14 @@ public class BukkitProject extends AbstractProject {
 
     @NotNull
     public static BukkitProject getInstance(@NotNull Project project) {
-        BukkitProject result;
-        if (!map.containsKey(project)) {
-            result = new BukkitProject(project);
-            map.put(project, result);
-        } else {
-            return map.get(project);
-        }
-        return result;
+        return map.computeIfAbsent(project, BukkitProject::new);
     }
 
     @NotNull
     public PluginConfigManager getConfigManager() {
-        if (configManager == null)
+        if (configManager == null) {
             configManager = new PluginConfigManager(this);
+        }
         return configManager;
     }
 
