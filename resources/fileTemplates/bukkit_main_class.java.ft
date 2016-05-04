@@ -2,7 +2,6 @@
 #* @vtlvariable name="CLASS_NAME" type="java.lang.String" *#
 package ${PACKAGE};
 
-import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
