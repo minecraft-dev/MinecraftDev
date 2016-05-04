@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.creator;
 
+import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 
@@ -48,12 +49,15 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     public JComponent getComponent() {
         switch (creator.getType()) {
             case BUKKIT:
+                title.setIcon(PlatformAssets.BUKKIT_ICON_2X);
                 title.setText("<html><font size=\"5\">Bukkit Settings</font></html>");
                 break;
             case SPIGOT:
+                title.setIcon(PlatformAssets.SPIGOT_ICON_2X);
                 title.setText("<html><font size=\"5\">Spigot Settings</font></html>");
                 break;
             case PAPER:
+                title.setIcon(PlatformAssets.PAPER_ICON_2X);
                 title.setText("<html><font size=\"5\">Paper Settings</font></html>");
                 break;
         }
