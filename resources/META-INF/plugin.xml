@@ -19,9 +19,12 @@
         <p><p>
         Recent changes:
         <ul>
-          <li>Initial Sponge support (not yet fully working) for project creation</li>
-          <li>Paper support for project creation (with temporary logo)</li>
-          <li>New BungeeCord icon</li>
+          <li>Forge icons / preliminary project creation added</li>
+          <li>No longer allows not-finished projects to be created</li>
+          <li>Added Bukkit/Spigot/Paper/BungeeCord icons to a few more places</li>
+          <li>Major code refactor</li>
+          <li>Added Java version chooser to the build system config screen</li>
+          <li>Lots of misc changes</li>
         </ul>
       </div>
     ]]>
