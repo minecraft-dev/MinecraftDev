@@ -84,7 +84,6 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
                 type = Type.BUKKIT;
                 infoPane.setText(bukkitInfo);
                 creator.setType(type);
-                creator.setSettings(new BukkitSettings());
             }
         });
         spigotRadioButton.addChangeListener(e -> {
@@ -92,7 +91,6 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
                 type = Type.SPIGOT;
                 infoPane.setText(spigotInfo);
                 creator.setType(type);
-                creator.setSettings(new BukkitSettings());
             }
         });
         paperRadioButton.addChangeListener(e -> {
@@ -100,7 +98,6 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
                 type = Type.PAPER;
                 infoPane.setText(paperInfo);
                 creator.setType(type);
-                creator.setSettings(new BukkitSettings());
             }
         });
 
@@ -109,7 +106,6 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
                 type = Type.SPONGE;
                 infoPane.setText(spongeInfo);
                 creator.setType(type);
-                creator.setSettings(new SpongeSettings());
             }
         });
         bungeecordRadioButton.addChangeListener(e -> {
@@ -117,7 +113,6 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
                 type = Type.BUNGEECORD;
                 infoPane.setText(bungeeCordInfo);
                 creator.setType(type);
-                creator.setSettings(new BungeeCordSettings());
             }
         });
         return panel;
