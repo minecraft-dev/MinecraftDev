@@ -33,14 +33,16 @@ public class BungeeCordSettings extends MinecraftSettings {
             try {
                 // Create plugin main class
                 VirtualFile file = buildSystem.getSourceDirectory();
-                String[] files = buildSystem.getGroupId().split("\\.");
-                for (String s : files) {
+                String[] files = this.mainClass.split("\\.");
+                String name = files[files.length - 1];
+                for (int i = 0, len = files.length - 1; i < len; i++) {
+                    String s = files[i];
                     file = file.createChildDirectory(this, s);
                 }
 
-                VirtualFile mainClassFile = file.findOrCreateChildData(this, mainClass + ".java");
+                VirtualFile mainClassFile = file.findOrCreateChildData(this, name + ".java");
 
-                MinecraftTemplate.applyMainBungeeCordClassTemplate(project, mainClassFile, buildSystem.getGroupId(), mainClass);
+                MinecraftTemplate.applyMainBungeeCordClassTemplate(project, mainClassFile, buildSystem.getGroupId(), name);
                 VirtualFile pluginYml = buildSystem.getResourceDirectory().findOrCreateChildData(this, "plugin.yml");
                 MinecraftTemplate.applyBungeeCordPluginYmlTemplate(project, pluginYml, this, buildSystem.getGroupId());
 

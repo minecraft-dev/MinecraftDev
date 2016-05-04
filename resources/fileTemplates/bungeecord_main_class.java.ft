@@ -2,16 +2,13 @@
 #* @vtlvariable name="CLASS_NAME" type="java.lang.String" *#
 package ${PACKAGE};
 
-import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
+import net.md_5.bungee.api.plugin.Plugin;
 
-public final class ${CLASS_NAME} extends JavaPlugin implements Listener {
+public final class ${CLASS_NAME} extends Plugin {
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-        this.getServer().getPluginManager().registerEvents(this, this);
     }
 
     @Override

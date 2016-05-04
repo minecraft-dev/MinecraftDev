@@ -33,24 +33,26 @@ public class MinecraftTemplate {
     }
 
     public static void applyMainBukkitClassTemplate(Project project, VirtualFile file, String packageName, String className) {
-        applyMainClassTemplate(project, file, packageName, className, true);
-    }
-
-    public static void applyMainBungeeCordClassTemplate(Project project, VirtualFile file, String packageName, String className) {
-        applyMainClassTemplate(project, file, packageName, className, false);
-    }
-
-    private static void applyMainClassTemplate(Project project, VirtualFile file, String packageName, String className, boolean isBukkit) {
         Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
-        if (isBukkit) {
-            properties.setProperty("BUKKIT", "true");
-        }
 
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_MAIN_CLASS_TEMPLATE, properties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void applyMainBungeeCordClassTemplate(Project project, VirtualFile file, String packageName, String className) {
+        Properties properties = new Properties();
+
+        properties.setProperty("PACKAGE", packageName);
+        properties.setProperty("CLASS_NAME", className);
+
+        try {
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUNGEECORD_MAIN_CLASS_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -75,7 +77,7 @@ public class MinecraftTemplate {
         properties.setProperty("NAME", settings.pluginName);
         properties.setProperty("VERSION", settings.pluginVersion);
         properties.setProperty("DESCRIPTION", settings.description);
-        properties.setProperty("MAIN", groupId + "." + settings.mainClass);
+        properties.setProperty("MAIN", settings.mainClass);
         properties.setProperty("AUTHOR", settings.author);
         properties.setProperty("DEPEND", settings.depend.toString());
         properties.setProperty("SOFT_DEPEND", settings.softDepend.toString());
@@ -127,7 +129,7 @@ public class MinecraftTemplate {
         properties.setProperty("NAME", settings.pluginName);
         properties.setProperty("VERSION", settings.pluginVersion);
         properties.setProperty("DESCRIPTION", settings.description);
-        properties.setProperty("MAIN", groupId + "." + settings.mainClass);
+        properties.setProperty("MAIN", settings.mainClass);
         properties.setProperty("AUTHOR", settings.author);
         properties.setProperty("DEPEND", settings.depend.toString());
         properties.setProperty("SOFT_DEPEND", settings.softDepend.toString());
