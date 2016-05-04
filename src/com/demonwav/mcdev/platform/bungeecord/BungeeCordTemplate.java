@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.platform.bungeecord;
 
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
-import com.demonwav.mcdev.util.AbstractTemplate;
+import com.demonwav.mcdev.platform.AbstractTemplate;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;

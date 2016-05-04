@@ -7,4 +7,5 @@ public enum PlatformType {
     FORGE,
     SPONGE,
     BUNGEECORD,
+    ;
 }

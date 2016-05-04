@@ -1,4 +1,6 @@
-package com.demonwav.mcdev.util;
+package com.demonwav.mcdev.platform;
+
+import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.ide.fileTemplates.FileTemplate;
