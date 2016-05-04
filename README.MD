@@ -30,4 +30,11 @@ style slightly modified). Link [here](http://www.demonwav.com/style).
 License
 -------
 
-This project is licensed under MIT.
+This project is licensed under [MIT](LICENSE.txt).
+
+Supported Platforms
+-------------------
+
+- [Bukkit](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse), [Spigot](https://spigotmc.org/), and [Paper](https://paper.emc.gs)
+- [Minecraft Forge](http://minecraftforge.net/forum) and [Sponge](https://www.spongepowered.org/)
+- [BungeeCord](https://www.spigotmc.org/wiki/bungeecord/) and [Waterfall](https://getwaterfall.xyz/)
