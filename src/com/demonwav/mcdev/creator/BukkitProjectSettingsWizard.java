@@ -28,7 +28,6 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     private JTextField mainClassField;
     private JTextField descriptionField;
     private JTextField authorsField;
-    @Deprecated private JTextField additionAuthorsField;
     private JTextField websiteField;
     private JTextField prefixField;
     private JComboBox loadBox;
@@ -80,10 +79,6 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
 
             if (mainClassField.getText().trim().isEmpty()) {
                 throw new MinecraftSetupException("empty", mainClassField);
-            }
-
-            if (!additionAuthorsField.getText().matches(pattern)) {
-                throw new MinecraftSetupException("bad", additionAuthorsField);
             }
 
             if (!loadBeforeField.getText().matches(pattern)) {
