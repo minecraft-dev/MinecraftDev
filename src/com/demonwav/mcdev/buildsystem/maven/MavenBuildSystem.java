@@ -7,6 +7,8 @@ import com.demonwav.mcdev.buildsystem.maven.pom.Dependency;
 import com.demonwav.mcdev.buildsystem.maven.pom.MavenProject;
 import com.demonwav.mcdev.buildsystem.maven.pom.Repository;
 import com.demonwav.mcdev.platform.AbstractTemplate;
+import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.ProjectConfiguration;
 
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
@@ -15,6 +17,7 @@ import com.intellij.lang.xml.XMLLanguage;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectType;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
@@ -42,7 +45,8 @@ public class MavenBuildSystem extends BuildSystem {
     }
 
     @Override
-    public void create(@NotNull Project project) {
+    public void create(@NotNull Project project, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration) {
+        // TODO: this only supports Bukkit pom's right now, need to add Sponge pom support as well
         rootDirectory.refresh(false, true);
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
@@ -111,7 +115,7 @@ public class MavenBuildSystem extends BuildSystem {
     }
 
     @Override
-    public void finishSetup(@NotNull Project project) {
+    public void finishSetup(@NotNull Project project, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration) {
         // Force Maven to setup the project
         MavenProjectsManager.getInstance(project).forceUpdateAllProjectsOrFindAllAvailablePomFiles();
 

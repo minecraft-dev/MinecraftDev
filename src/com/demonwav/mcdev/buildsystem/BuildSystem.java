@@ -1,5 +1,8 @@
 package com.demonwav.mcdev.buildsystem;
 
+import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.ProjectConfiguration;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -134,18 +137,28 @@ public abstract class BuildSystem {
      * the root directory, create a base project consisting of the necessary build system configuration files and
      * directory structure. This method does not create any classes or project-specific things, nor does it set up
      * any build configurations or enable the plugin for this build config. This will be done in
-     * {@link #finishSetup(Project)}.
+     * {@link #finishSetup(Project, PlatformType, ProjectConfiguration)}.
+     * <p>
+     * It is legal for this method to have different default setups for each platform type, so the PlatformType and
+     * ProjectConfiguration are provided here as well.
      *
      * @param project The Project object for this project
+     * @param type The type of the project
+     * @param configuration The configuration object for the project
      */
-    public abstract void create(@NotNull Project project);
+    public abstract void create(@NotNull Project project, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration);
 
     /**
-     * This is called after {@link #create(Project)}, and after the project has set itself up. This is when the build
-     * system should make whatever calls are necessary to enable the build system's plugin, and setup whatever run
-     * configs should be setup for this build system.
+     * This is called after {@link #create(Project, PlatformType, ProjectConfiguration)}, and after the project has set
+     * itself up. This is when the build system should make whatever calls are necessary to enable the build system's
+     * plugin, and setup whatever run configs should be setup for this build system.
+     * <p>
+     * It is legal for this method to have different default setups for each platform type, so the PlatformType and
+     * ProjectConfiguration are provided here as well.
      *
      * @param project The Project object for this project
+     * @param type The type of the project
+     * @param configuration The configuration object for the project
      */
-    public abstract void finishSetup(@NotNull Project project);
+    public abstract void finishSetup(@NotNull Project project, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration);
 }

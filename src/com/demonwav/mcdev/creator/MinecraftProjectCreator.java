@@ -83,9 +83,9 @@ public class MinecraftProjectCreator {
         }
         dependency.setScope("provided");
 
-        buildSystem.create(project);
+        buildSystem.create(project, type, settings);
         settings.create(project, buildSystem);
-        buildSystem.finishSetup(project);
+        buildSystem.finishSetup(project, type, settings);
     }
 
     public VirtualFile getRoot() {
