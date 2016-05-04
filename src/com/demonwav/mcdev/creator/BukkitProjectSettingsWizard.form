@@ -135,35 +135,16 @@
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Author"/>
+                  <text value="Authors"/>
                 </properties>
               </component>
-              <component id="2b443" class="javax.swing.JTextField" binding="authorField">
+              <component id="2b443" class="javax.swing.JTextField" binding="authorsField">
                 <constraints>
-                  <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="1" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="1" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="1" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="171" height="24"/>
                   </grid>
                 </constraints>
-                <properties/>
-              </component>
-              <component id="27e09" class="javax.swing.JTextField" binding="additionAuthorsField">
-                <constraints>
-                  <grid row="1" column="3" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="-1"/>
-                  </grid>
-                </constraints>
                 <properties>
-                  <toolTipText value="Separate the authors' names with commas"/>
-                </properties>
-              </component>
-              <component id="224f9" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="95" height="16"/>
-                  </grid>
-                </constraints>
-                <properties>
-                  <text value="Additional Authors"/>
                   <toolTipText value="Separate the authors' names with commas"/>
                 </properties>
               </component>

@@ -27,7 +27,7 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     private JTextField pluginVersionField;
     private JTextField mainClassField;
     private JTextField descriptionField;
-    private JTextField authorField;
+    private JTextField authorsField;
     @Deprecated private JTextField additionAuthorsField;
     private JTextField websiteField;
     private JTextField prefixField;
@@ -115,7 +115,7 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
         settings.pluginVersion = pluginVersionField.getText();
         settings.mainClass = mainClassField.getText();
         settings.description = descriptionField.getText();
-        this.settings.setAuthors(this.authorField.getText());
+        this.settings.setAuthors(this.authorsField.getText());
         settings.website = websiteField.getText();
         settings.prefix = prefixField.getText();
         settings.load = loadBox.getSelectedIndex() == 0 ? BukkitProjectConfiguration.Load.POSTWORLD : BukkitProjectConfiguration.Load.STARTUP;
