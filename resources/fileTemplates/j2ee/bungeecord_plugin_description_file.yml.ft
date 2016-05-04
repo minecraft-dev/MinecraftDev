@@ -1,0 +1,17 @@
+name: ${NAME}
+version: ${VERSION}
+main: ${MAIN}
+
+#if (${HAS_DEPEND})
+depend: ${DEPEND}
+#end
+#if (${HAS_SOFT_DEPEND})
+softdepend: ${SOFT_DEPEND}
+#end
+
+#if (${HAS_AUTHOR})
+author: ${AUTHOR}
+#end
+#if (${HAS_DESCRIPTION})
+description: ${DESCRIPTION}
+#end

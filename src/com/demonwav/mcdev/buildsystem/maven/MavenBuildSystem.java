@@ -9,6 +9,8 @@ import com.demonwav.mcdev.buildsystem.maven.pom.Repository;
 import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+import com.demonwav.mcdev.platform.bukkit.BukkitTemplate;
+import com.demonwav.mcdev.platform.bungeecord.BungeeCordTemplate;
 
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
@@ -21,6 +23,7 @@ import com.intellij.openapi.project.ProjectType;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
@@ -46,7 +49,7 @@ public class MavenBuildSystem extends BuildSystem {
 
     @Override
     public void create(@NotNull Project project, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration) {
-        // TODO: this only supports Bukkit pom's right now, need to add Sponge pom support as well
+        // TODO: this only supports Bukkit's and BungeeCord's pom right now, need to add Sponge pom support as well
         rootDirectory.refresh(false, true);
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
@@ -54,10 +57,17 @@ public class MavenBuildSystem extends BuildSystem {
                 resourceDirectory = VfsUtil.createDirectories(rootDirectory.getPath() + "/src/main/resources");
                 testDirectory = VfsUtil.createDirectories(rootDirectory.getPath() + "/src/test/java");
 
-                PsiFile pomPsi = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, AbstractTemplate.applyPomTemplate(project, buildVersion));
+                PsiFile pomPsi = null;
+
+                if (type == PlatformType.BUKKIT || type == PlatformType.SPIGOT || type == PlatformType.PAPER) {
+                    pomPsi = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, BukkitTemplate.applyPomTemplate(project, buildVersion));
+                } else if (type == PlatformType.BUNGEECORD) {
+                    pomPsi = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, BungeeCordTemplate.applyPomTemplate(project, buildVersion));
+                } // TODO: Sponge
                 pomPsi.setName("pom.xml");
 
-                XmlFile pomXmlPsi = (XmlFile) pomPsi;
+                final XmlFile pomXmlPsi = (XmlFile) pomPsi;
+                final PsiFile finalPomPsi = pomPsi;
                 new WriteCommandAction.Simple(project, pomPsi) {
                     @Override
                     protected void run() throws Throwable {
@@ -97,7 +107,7 @@ public class MavenBuildSystem extends BuildSystem {
 
                         PsiDirectory rootDirectoryPsi = PsiManager.getInstance(project).findDirectory(rootDirectory);
                         if (rootDirectoryPsi != null) {
-                            rootDirectoryPsi.add(pomPsi);
+                            rootDirectoryPsi.add(finalPomPsi);
                         }
 
                         pomFile = rootDirectory.findChild("pom.xml");

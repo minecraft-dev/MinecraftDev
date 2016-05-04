@@ -1,5 +1,3 @@
-#* @vtlvariable name="PACKAGE" type="java.lang.String" *#
-#* @vtlvariable name="CLASS_NAME" type="java.lang.String" *#
 package ${PACKAGE};
 
 import org.bukkit.event.Listener;

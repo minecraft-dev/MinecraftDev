@@ -3,6 +3,8 @@ package com.demonwav.mcdev.platform.bukkit;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 import com.demonwav.mcdev.platform.AbstractTemplate;
 
+import com.intellij.ide.fileTemplates.FileTemplate;
+import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 
@@ -21,6 +23,21 @@ public class BukkitTemplate extends AbstractTemplate {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_MAIN_CLASS_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static String applyPomTemplate(Project project, String version) {
+        Properties properties = new Properties();
+        properties.setProperty("BUILD_VERSION", version);
+
+        FileTemplateManager manager = FileTemplateManager.getInstance(project);
+        FileTemplate fileTemplate = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUKKIT_POM_TEMPLATE);
+        try {
+            return fileTemplate.getText(properties);
+        } catch (IOException e) {
+            // TODO what to do when this fails?
+            e.printStackTrace();
+            return "";
         }
     }
 
