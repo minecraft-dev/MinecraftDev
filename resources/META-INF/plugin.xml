@@ -1,6 +1,7 @@
 <idea-plugin version="2">
 
   <depends optional="false">org.jetbrains.idea.maven</depends>
+  <depends optional="false">org.jetbrains.plugins.gradle</depends>
   <depends optional="false">org.jetbrains.plugins.yaml</depends>
 
   <id>com.demonwav.minecraft-dev</id>
@@ -46,12 +47,15 @@
     <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
   </extensions>
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.BukkitImporter"/>
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.SpigotImporter"/>
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.PaperImporter"/>
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.PaperImporter"/>
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.BungeeCordImporter"/>
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.SpongeImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.BukkitMavenImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.SpigotMavenImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.PaperMavenImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.PaperMavenImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.BungeeCordMavenImporter"/>
+    <importer implementation="com.demonwav.mcdev.buildsystem.maven.SpongeMavenImporter"/>
+  </extensions>
+
+  <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
   </extensions>
 
   <application-components>

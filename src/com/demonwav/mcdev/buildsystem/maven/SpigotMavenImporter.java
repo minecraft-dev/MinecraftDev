@@ -13,12 +13,12 @@ import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 
 import org.jetbrains.annotations.NotNull;
 
-public class SpigotImporter extends BukkitImporter{
-    public SpigotImporter() {
+public class SpigotMavenImporter extends BukkitMavenImporter {
+    public SpigotMavenImporter() {
         super("org.spigotmc", "spigot-api");
     }
 
-    public SpigotImporter(String groupId, String artifactId) {
+    public SpigotMavenImporter(String groupId, String artifactId) {
         super(groupId, artifactId);
     }
 

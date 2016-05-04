@@ -14,15 +14,100 @@ import java.util.List;
  */
 public abstract class BuildSystem {
 
+    protected String artifactId;
+    protected String groupId;
+    protected String version;
+
+    protected List<BuildDependency> dependencies;
+    protected List<BuildRepository> repositories;
+    protected VirtualFile rootDirectory;
+
+    protected VirtualFile sourceDirectory;
+    protected VirtualFile resourceDirectory;
+    protected VirtualFile testDirectory;
+
     protected String pluginName;
     @Nullable
     protected String pluginAuthor;
 
     protected String buildVersion;
 
+    public String getArtifactId() {
+        return artifactId;
+    }
+
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public List<BuildDependency> getDependencies() {
+        return dependencies;
+    }
+
+    public void setDependencies(List<BuildDependency> dependencies) {
+        this.dependencies = dependencies;
+    }
+
+    public List<BuildRepository> getRepositories() {
+        return repositories;
+    }
+
+    public void setRepositories(List<BuildRepository> repositories) {
+        this.repositories = repositories;
+    }
+
+    public VirtualFile getRootDirectory() {
+        return rootDirectory;
+    }
+
+    public void setRootDirectory(VirtualFile rootDirectory) {
+        this.rootDirectory = rootDirectory;
+    }
+
+    public VirtualFile getSourceDirectory() {
+        return sourceDirectory;
+    }
+
+    public void setSourceDirectory(VirtualFile sourceDirectory) {
+        this.sourceDirectory = sourceDirectory;
+    }
+
+    public VirtualFile getResourceDirectory() {
+        return resourceDirectory;
+    }
+
+    public void setResourceDirectory(VirtualFile resourceDirectory) {
+        this.resourceDirectory = resourceDirectory;
+    }
+
+    public VirtualFile getTestDirectory() {
+        return testDirectory;
+    }
+
+    public void setTestDirectory(VirtualFile testDirectory) {
+        this.testDirectory = testDirectory;
+    }
+
     public String getPluginName() {
         return pluginName;
     }
+
     public void setPluginName(@NotNull String pluginName) {
         this.pluginName = pluginName;
     }
@@ -44,28 +129,6 @@ public abstract class BuildSystem {
         this.buildVersion = buildVersion;
     }
 
-    public abstract String getArtifactId();
-    public abstract void setArtifactId(@NotNull String artifactId);
-
-    public abstract String getGroupId();
-    public abstract void setGroupId(@NotNull String groupId);
-
-    public abstract String getVersion();
-    public abstract void setVersion(@NotNull String version);
-
-    public abstract List<BuildDependency> getDependencies();
-    public abstract void setDependencies(@NotNull List<BuildDependency> dependencies);
-
-    public abstract List<BuildRepository> getRepositories();
-    public abstract void setRepositories(@NotNull List<BuildRepository> repositories);
-
-    public abstract VirtualFile getRootDirectory();
-    public abstract void setRootDirectory(@NotNull VirtualFile rootDirectory);
-
-    public abstract VirtualFile getSourceDirectory();
-    public abstract VirtualFile getTestDirectory();
-    public abstract VirtualFile getResourceDirectory();
-
     /**
      * Assuming the artifact ID, group ID, and  version are set, along with whatever dependencies and repositories and
      * the root directory, create a base project consisting of the necessary build system configuration files and
@@ -85,10 +148,4 @@ public abstract class BuildSystem {
      * @param project The Project object for this project
      */
     public abstract void finishSetup(@NotNull Project project);
-
-    /**
-     * Called when something may have made modifications to the build config file, and this class must read it again in
-     * case there are any changes.
-     */
-    public abstract void reImport();
 }

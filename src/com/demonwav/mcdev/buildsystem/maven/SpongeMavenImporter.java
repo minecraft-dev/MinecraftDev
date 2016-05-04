@@ -4,8 +4,8 @@ import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
 import org.jetbrains.annotations.NotNull;
 
-public class SpongeImporter extends MinecraftImporter {
-    public SpongeImporter() {
+public class SpongeMavenImporter extends MinecraftMavenImporter {
+    public SpongeMavenImporter() {
         super("org.spongepowered", "spongeapi");
     }
 

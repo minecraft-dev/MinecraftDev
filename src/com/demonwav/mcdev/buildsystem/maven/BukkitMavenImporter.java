@@ -20,12 +20,12 @@ import org.jetbrains.idea.maven.server.MavenEmbedderWrapper;
 import org.jetbrains.idea.maven.server.NativeMavenProjectHolder;
 import org.jetbrains.idea.maven.utils.MavenProcessCanceledException;
 
-public class BukkitImporter extends MinecraftImporter {
-    public BukkitImporter() {
+public class BukkitMavenImporter extends MinecraftMavenImporter {
+    public BukkitMavenImporter() {
         super("org.bukkit", "bukkit");
     }
 
-    public BukkitImporter(String  groupId, String artifactId) {
+    public BukkitMavenImporter(String  groupId, String artifactId) {
         super(groupId, artifactId);
     }
 

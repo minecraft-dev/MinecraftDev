@@ -13,8 +13,8 @@ import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 
 import org.jetbrains.annotations.NotNull;
 
-public class BungeeCordImporter extends MinecraftImporter {
-    public BungeeCordImporter() {
+public class BungeeCordMavenImporter extends MinecraftMavenImporter {
+    public BungeeCordMavenImporter() {
         super("net.md-5", "bungeecord-api");
     }
 

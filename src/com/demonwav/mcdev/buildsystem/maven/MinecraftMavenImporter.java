@@ -26,12 +26,12 @@ import org.jetbrains.idea.maven.utils.MavenProcessCanceledException;
 import java.util.List;
 import java.util.Map;
 
-public abstract class MinecraftImporter extends MavenImporter {
+public abstract class MinecraftMavenImporter extends MavenImporter {
 
     protected final String GROUP_ID;
     protected final String ARTIFACT_ID;
 
-    public MinecraftImporter(String groupId, String artifactId) {
+    public MinecraftMavenImporter(String groupId, String artifactId) {
         super(groupId, artifactId);
         GROUP_ID = groupId;
         ARTIFACT_ID = artifactId;

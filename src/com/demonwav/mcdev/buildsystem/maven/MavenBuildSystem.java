@@ -35,102 +35,7 @@ import java.util.List;
 
 public class MavenBuildSystem extends BuildSystem {
 
-    private String artifactId;
-    private String groupId;
-    private String version;
-    private List<BuildDependency> dependencies;
-    private List<BuildRepository> repositories;
-    private VirtualFile rootDirectory;
-
-    private VirtualFile sourceDirectory;
-    private VirtualFile resourceDirectory;
-    private VirtualFile testDirectory;
     private VirtualFile pomFile;
-
-    @Override
-    public String getPluginName() {
-        return pluginName;
-    }
-
-    @Override
-    public void setPluginName(@NotNull String pluginName) {
-        this.pluginName = pluginName;
-    }
-
-    @Override
-    public String getArtifactId() {
-        return artifactId;
-    }
-
-    @Override
-    public void setArtifactId(@NotNull String artifactId) {
-        this.artifactId = artifactId;
-    }
-
-    @Override
-    public String getGroupId() {
-        return groupId;
-    }
-
-    @Override
-    public void setGroupId(@NotNull String groupId) {
-        this.groupId = groupId;
-    }
-
-    @Override
-    public String getVersion() {
-        return version;
-    }
-
-    @Override
-    public void setVersion(@NotNull String version) {
-        this.version = version;
-    }
-
-    @Override
-    public List<BuildDependency> getDependencies() {
-        return dependencies;
-    }
-
-    @Override
-    public void setDependencies(@NotNull List<BuildDependency> dependencies) {
-        this.dependencies = dependencies;
-    }
-
-    @Override
-    public List<BuildRepository> getRepositories() {
-        return repositories;
-    }
-
-    @Override
-    public void setRepositories(@NotNull List<BuildRepository> repositories) {
-        this.repositories = repositories;
-    }
-
-    @Override
-    public VirtualFile getRootDirectory() {
-        return rootDirectory;
-    }
-
-    @Override
-    public void setRootDirectory(@NotNull VirtualFile rootDirectory) {
-        this.rootDirectory = rootDirectory;
-    }
-
-    @Override
-    public VirtualFile getSourceDirectory() {
-        return sourceDirectory;
-    }
-
-    @Override
-    public VirtualFile getResourceDirectory() {
-        return resourceDirectory;
-    }
-
-    @Override
-    public VirtualFile getTestDirectory() {
-        return testDirectory;
-    }
 
     public VirtualFile getPomFile() {
         return pomFile;
@@ -220,10 +125,5 @@ public class MavenBuildSystem extends BuildSystem {
             RunManager.getInstance(project).addConfiguration(runnerSettings, true);
             RunManager.getInstance(project).setSelectedConfiguration(runnerSettings);
         }
-    }
-
-    @Override
-    public void reImport() {
-
     }
 }
