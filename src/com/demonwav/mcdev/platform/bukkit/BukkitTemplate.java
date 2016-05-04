@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
-import com.demonwav.mcdev.util.AbstractTemplate;
+import com.demonwav.mcdev.platform.AbstractTemplate;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -24,51 +24,52 @@ public class BukkitTemplate extends AbstractTemplate {
         }
     }
 
-    public static void applyPluginDescriptionFileTemplate(Project project, VirtualFile file, BukkitSettings settings) {
+    public static void applyPluginDescriptionFileTemplate(Project project, VirtualFile file, BukkitProjectConfiguration settings) {
         Properties properties = new Properties();
 
         properties.setProperty("NAME", settings.pluginName);
         properties.setProperty("VERSION", settings.pluginVersion);
-        properties.setProperty("DESCRIPTION", settings.description);
         properties.setProperty("MAIN", settings.mainClass);
-        properties.setProperty("AUTHOR", settings.author);
-        properties.setProperty("DEPEND", settings.depend.toString());
-        properties.setProperty("SOFT_DEPEND", settings.softDepend.toString());
 
-        if (settings.hasDescription()) {
-            properties.setProperty("HAS_DESCRIPTION", "true");
+        if (settings.hasPrefix()) {
+            properties.setProperty("PREFIX", settings.prefix);
+            properties.setProperty("HAS_PREFIX", "true");
         }
-        if (settings.hasAuthor()) {
-            properties.setProperty("HAS_AUTHOR", "true");
+
+        if (settings.hasLoad()) {
+            properties.setProperty("LOAD", settings.load.name());
+            properties.setProperty("HAS_LOAD", "true");
         }
-        if (settings.hasDepend()) {
+
+        if (settings.hasLoadBefore()) {
+            properties.setProperty("LOAD_BEFORE", settings.loadBefore.toString());
+            properties.setProperty("HAS_LOAD_BEFORE", "true");
+        }
+
+        if (settings.hasDependencies()) {
+            properties.setProperty("DEPEND", settings.dependencies.toString());
             properties.setProperty("HAS_DEPEND", "true");
         }
-        if (settings.hasSoftDepend()) {
+
+        if (settings.hasSoftDependencies()) {
+            properties.setProperty("SOFT_DEPEND", settings.softDependencies.toString());
             properties.setProperty("HAS_SOFT_DEPEND", "true");
         }
 
-        properties.setProperty("WEBSITE", settings.website);
-        properties.setProperty("PREFIX", settings.prefix);
-        properties.setProperty("LOAD", settings.load.name());
-        properties.setProperty("AUTHOR_LIST", settings.authorList.toString());
-        properties.setProperty("LOAD_BEFORE", settings.loadBefore.toString());
-
-        if (settings.hasAuthorList()) {
+        if (settings.hasAuthors()) {
             properties.setProperty("HAS_AUTHOR_LIST", "true");
         }
+
+        if (settings.hasDescription()) {
+            properties.setProperty("DESCRIPTION", settings.description);
+            properties.setProperty("HAS_DESCRIPTION", "true");
+        }
+
         if (settings.hasWebsite()) {
+            properties.setProperty("WEBSITE", settings.website);
             properties.setProperty("HAS_WEBSITE", "true");
         }
-        if (settings.hasLoad()) {
-            properties.setProperty("HAS_LOAD", "true");
-        }
-        if (settings.hasPrefix()) {
-            properties.setProperty("HAS_PREFIX", "true");
-        }
-        if (settings.hasLoadBefore()) {
-            properties.setProperty("HAS_LOAD_BEFORE", "true");
-        }
+
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties);
         } catch (IOException e) {

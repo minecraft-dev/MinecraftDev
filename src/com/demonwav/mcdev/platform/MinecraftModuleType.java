@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.creator.MinecraftModuleBuilder;
-import com.demonwav.mcdev.resource.MinecraftProjectsIcons;
+import com.demonwav.mcdev.asset.PlatformAssets;
 
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
@@ -33,16 +33,16 @@ public class MinecraftModuleType extends JavaModuleType {
 
     @Override
     public Icon getBigIcon() {
-        return MinecraftProjectsIcons.MinecraftBig;
+        return PlatformAssets.MINECRAFT_ICON_2X;
     }
 
     @Override
     public Icon getIcon() {
-        return MinecraftProjectsIcons.Minecraft;
+        return PlatformAssets.MINECRAFT_ICON;
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return MinecraftProjectsIcons.Minecraft;
+        return PlatformAssets.MINECRAFT_ICON;
     }
 }

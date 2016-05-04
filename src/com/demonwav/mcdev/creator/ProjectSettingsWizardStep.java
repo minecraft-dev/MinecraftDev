@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.platform.Type;
+import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -17,7 +17,7 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
 
     private MinecraftProjectCreator creator;
     private ModuleWizardStep wizard;
-    private Type type;
+    private PlatformType type;
 
     public ProjectSettingsWizardStep(@NotNull MinecraftProjectCreator creator) {
         this.creator = creator;
@@ -30,9 +30,9 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
         if (wizard == null || creator.getType() != type) {
             // detect type changes
             type = creator.getType();
-            if (creator.getType() == Type.BUNGEECORD) {
+            if (creator.getType() == PlatformType.BUNGEECORD) {
                 wizard = new BungeeCordProjectSettingsWizard(creator);
-            } else if (creator.getType() == Type.SPONGE) {
+            } else if (creator.getType() == PlatformType.SPONGE) {
                 wizard = new SpongeProjectSettingsWizard(creator);
             } else {
                 wizard = new BukkitProjectSettingsWizard(creator);

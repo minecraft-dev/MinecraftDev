@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.platform.bungeecord;
 
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
-import com.demonwav.mcdev.util.AbstractTemplate;
+import com.demonwav.mcdev.platform.AbstractTemplate;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -24,29 +24,34 @@ public class BungeeCordTemplate extends AbstractTemplate {
         }
     }
 
-    public static void applyPluginDescriptionFileTemplate(Project project, VirtualFile file, BungeeCordSettings settings) {
+    public static void applyPluginDescriptionFileTemplate(Project project, VirtualFile file, BungeeCordProjectConfiguration settings) {
         Properties properties = new Properties();
 
         properties.setProperty("NAME", settings.pluginName);
         properties.setProperty("VERSION", settings.pluginVersion);
-        properties.setProperty("DESCRIPTION", settings.description);
         properties.setProperty("MAIN", settings.mainClass);
-        properties.setProperty("AUTHOR", settings.author);
-        properties.setProperty("DEPEND", settings.depend.toString());
-        properties.setProperty("SOFT_DEPEND", settings.softDepend.toString());
 
-        if (settings.hasDescription()) {
-            properties.setProperty("HAS_DESCRIPTION", "true");
-        }
-        if (settings.hasAuthor()) {
-            properties.setProperty("HAS_AUTHOR", "true");
-        }
-        if (settings.hasDepend()) {
+        if (settings.hasDependencies()) {
+            properties.setProperty("DEPEND", settings.dependencies.toString());
             properties.setProperty("HAS_DEPEND", "true");
         }
-        if (settings.hasSoftDepend()) {
+
+        if (settings.hasSoftDependencies()) {
+            properties.setProperty("SOFT_DEPEND", settings.softDependencies.toString());
             properties.setProperty("HAS_SOFT_DEPEND", "true");
         }
+
+        if (settings.hasAuthors()) {
+            // BungeeCord only supports one author
+            properties.setProperty("AUTHOR", settings.authors.get(0));
+            properties.setProperty("HAS_AUTHOR", "true");
+        }
+
+        if (settings.hasDescription()) {
+            properties.setProperty("DESCRIPTION", settings.description);
+            properties.setProperty("HAS_DESCRIPTION", "true");
+        }
+
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties);
         } catch (IOException e) {

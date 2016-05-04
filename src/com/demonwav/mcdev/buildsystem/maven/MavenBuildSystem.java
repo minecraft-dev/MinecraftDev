@@ -6,7 +6,7 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.pom.Dependency;
 import com.demonwav.mcdev.buildsystem.maven.pom.MavenProject;
 import com.demonwav.mcdev.buildsystem.maven.pom.Repository;
-import com.demonwav.mcdev.util.AbstractTemplate;
+import com.demonwav.mcdev.platform.AbstractTemplate;
 
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;

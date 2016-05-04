@@ -10,7 +10,7 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.platform.MinecraftSettings;
+import com.demonwav.mcdev.platform.ProjectConfiguration;
 
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
@@ -20,45 +20,56 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class BukkitSettings extends MinecraftSettings {
+public class BukkitProjectConfiguration extends ProjectConfiguration {
 
-    public enum Load { STARTUP, POSTWORLD }
-
-    public List<String> authorList = null;
-    public String prefix = null;
     public Load load = Load.POSTWORLD;
-    public List<String> loadBefore = null;
-    public List<String> depend = null;
-    public List<String> softDepend = null;
+    public final List<String> loadBefore = new ArrayList<>();
+    public final List<String> dependencies = new ArrayList<>();
+    public final List<String> softDependencies = new ArrayList<>();
+    public String prefix = null;
+    public String website = null;
 
-    public boolean hasAuthorList() {
-        return testList(authorList);
-    }
-
-    public boolean hasWebsite() {
-        return website != null && !website.trim().isEmpty();
+    public boolean hasPrefix() {
+        return this.prefix != null && !this.prefix.trim().isEmpty();
     }
 
     public boolean hasLoad() {
-        return load == Load.STARTUP;
-    }
-
-    public boolean hasPrefix() {
-        return prefix != null && !prefix.trim().isEmpty();
-    }
-
-    public boolean hasDepend() {
-        return testList(depend);
-    }
-
-    public boolean hasSoftDepend() {
-        return testList(softDepend);
+        return this.load == Load.STARTUP;
     }
 
     public boolean hasLoadBefore() {
-        return testList(loadBefore);
+        return listContainsAtLeastOne(this.loadBefore);
+    }
+
+    public void setLoadBefore(String string) {
+        this.loadBefore.clear();
+        Collections.addAll(this.loadBefore, commaSplit(string));
+    }
+
+    public boolean hasDependencies() {
+        return listContainsAtLeastOne(dependencies);
+    }
+
+    public void setDependencies(String string) {
+        this.dependencies.clear();
+        Collections.addAll(this.dependencies, commaSplit(string));
+    }
+
+    public boolean hasSoftDependencies() {
+        return listContainsAtLeastOne(this.softDependencies);
+    }
+
+    public void setSoftDependencies(String string) {
+        this.softDependencies.clear();
+        Collections.addAll(this.softDependencies, commaSplit(string));
+    }
+
+    public boolean hasWebsite() {
+        return this.website != null && !this.website.trim().isEmpty();
     }
 
     @Override
@@ -90,5 +101,10 @@ public class BukkitSettings extends MinecraftSettings {
                 e.printStackTrace();
             }
         });
+    }
+
+    public enum Load {
+        STARTUP,
+        POSTWORLD
     }
 }

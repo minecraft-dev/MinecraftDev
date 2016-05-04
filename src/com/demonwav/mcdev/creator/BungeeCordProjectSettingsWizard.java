@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exception.MinecraftSetupException;
-import com.demonwav.mcdev.platform.bungeecord.BungeeCordSettings;
+import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -11,9 +11,6 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -32,7 +29,7 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
     private JTextField dependField;
     private JTextField softDependField;
 
-    private final BungeeCordSettings settings = new BungeeCordSettings();
+    private final BungeeCordProjectConfiguration settings = new BungeeCordProjectConfiguration();
     private final MinecraftProjectCreator creator;
 
     public BungeeCordProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
@@ -91,9 +88,9 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
         settings.pluginVersion = pluginVersionField.getText();
         settings.mainClass = mainClassField.getText();
         settings.description = descriptionField.getText();
-        settings.author = authorField.getText();
-        settings.depend = new ArrayList<>(Arrays.asList(dependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
-        settings.softDepend = new ArrayList<>(Arrays.asList(softDependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
+        this.settings.setAuthors(this.authorField.getText());
+        this.settings.setDependencies(this.dependField.getText());
+        this.settings.setSoftDependencies(this.softDependField.getText());
         creator.setSettings(settings);
     }
 
