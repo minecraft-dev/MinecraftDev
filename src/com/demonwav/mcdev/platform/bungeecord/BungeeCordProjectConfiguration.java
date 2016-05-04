@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.platform.bungeecord;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.platform.MinecraftSettings;
+import com.demonwav.mcdev.platform.ProjectConfiguration;
 
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
@@ -11,19 +11,31 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class BungeeCordSettings extends MinecraftSettings {
+public class BungeeCordProjectConfiguration extends ProjectConfiguration {
 
-    public List<String> depend = null;
-    public List<String> softDepend = null;
+    public final List<String> dependencies = new ArrayList<>();
+    public final List<String> softDependencies = new ArrayList<>();
 
-    public boolean hasDepend() {
-        return testList(depend);
+    public boolean hasDependencies() {
+        return listContainsAtLeastOne(this.dependencies);
     }
 
-    public boolean hasSoftDepend() {
-        return testList(softDepend);
+    public void setDependencies(String string) {
+        this.dependencies.clear();
+        Collections.addAll(this.dependencies, commaSplit(string));
+    }
+
+    public boolean hasSoftDependencies() {
+        return listContainsAtLeastOne(this.softDependencies);
+    }
+
+    public void setSoftDependencies(String string) {
+        this.softDependencies.clear();
+        Collections.addAll(this.softDependencies, commaSplit(string));
     }
 
     @Override

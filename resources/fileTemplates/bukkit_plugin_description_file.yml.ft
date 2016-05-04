@@ -1,0 +1,49 @@
+#* @vtlvariable name="NAME" type="java.lang.String" *#
+#* @vtlvariable name="VERSION" type="java.lang.String" *#
+#* @vtlvariable name="MAIN" type="java.lang.String" *#
+#* @vtlvariable name="HAS_PREFIX" type="boolean" *#
+#* @vtlvariable name="PREFIX" type="java.lang.String" *#
+#* @vtlvariable name="HAS_LOAD" type="boolean" *#
+#* @vtlvariable name="LOAD" type="java.lang.String" *#
+#* @vtlvariable name="HAS_LOAD_BEFORE" type="boolean" *#
+#* @vtlvariable name="LOAD_BEFORE" type="java.lang.String" *#
+#* @vtlvariable name="HAS_DEPEND" type="boolean" *#
+#* @vtlvariable name="DEPEND" type="java.lang.String" *#
+#* @vtlvariable name="HAS_SOFT_DEPEND" type="boolean" *#
+#* @vtlvariable name="SOFT_DEPEND" type="java.lang.String" *#
+#* @vtlvariable name="HAS_AUTHOR_LIST" type="boolean" *#
+#* @vtlvariable name="AUTHOR_LIST" type="java.lang.String" *#
+#* @vtlvariable name="HAS_DESCRIPTION" type="boolean" *#
+#* @vtlvariable name="DESCRIPTION" type="java.lang.String" *#
+#* @vtlvariable name="HAS_WEBSITE" type="boolean" *#
+#* @vtlvariable name="WEBSITE" type="java.lang.String" *#
+
+name: ${NAME}
+version: ${VERSION}
+main: ${MAIN}
+#if (${HAS_PREFIX})
+prefix: ${PREFIX}
+#end
+
+#if (${HAS_LOAD})
+load: ${LOAD}
+#end
+#if (${HAS_LOAD_BEFORE})
+loadbefore: ${LOAD_BEFORE}
+#end
+#if (${HAS_DEPEND})
+depend: ${DEPEND}
+#end
+#if (${HAS_SOFT_DEPEND})
+softdepend: ${SOFT_DEPEND}
+#end
+
+#if (${HAS_AUTHOR_LIST})
+authors: ${AUTHOR_LIST}
+#end
+#if (${HAS_DESCRIPTION})
+description: ${DESCRIPTION}
+#end
+#if (${HAS_WEBSITE})
+website: ${WEBSITE}
+#end

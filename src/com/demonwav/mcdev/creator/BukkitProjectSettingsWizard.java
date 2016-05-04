@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exception.MinecraftSetupException;
-import com.demonwav.mcdev.platform.bukkit.BukkitSettings;
+import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -11,9 +11,6 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -31,7 +28,7 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     private JTextField mainClassField;
     private JTextField descriptionField;
     private JTextField authorField;
-    private JTextField additionAuthorsField;
+    @Deprecated private JTextField additionAuthorsField;
     private JTextField websiteField;
     private JTextField prefixField;
     private JComboBox loadBox;
@@ -40,7 +37,7 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     private JTextField softDependField;
     private JLabel title;
 
-    private BukkitSettings settings = new BukkitSettings();
+    private BukkitProjectConfiguration settings = new BukkitProjectConfiguration();
     private MinecraftProjectCreator creator;
 
     public BukkitProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
@@ -118,14 +115,13 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
         settings.pluginVersion = pluginVersionField.getText();
         settings.mainClass = mainClassField.getText();
         settings.description = descriptionField.getText();
-        settings.author = authorField.getText();
-        settings.authorList = new ArrayList<>(Arrays.asList(additionAuthorsField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
+        this.settings.setAuthors(this.authorField.getText());
         settings.website = websiteField.getText();
         settings.prefix = prefixField.getText();
-        settings.load = loadBox.getSelectedIndex() == 0 ? BukkitSettings.Load.POSTWORLD : BukkitSettings.Load.STARTUP;
-        settings.loadBefore = new ArrayList<>(Arrays.asList(loadBeforeField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
-        settings.depend = new ArrayList<>(Arrays.asList(dependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
-        settings.softDepend = new ArrayList<>(Arrays.asList(softDependField.getText().trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*")));
+        settings.load = loadBox.getSelectedIndex() == 0 ? BukkitProjectConfiguration.Load.POSTWORLD : BukkitProjectConfiguration.Load.STARTUP;
+        this.settings.setLoadBefore(this.loadBeforeField.getText());
+        this.settings.setDependencies(this.dependField.getText());
+        this.settings.setSoftDependencies(this.softDependField.getText());
         creator.setSettings(settings);
     }
 

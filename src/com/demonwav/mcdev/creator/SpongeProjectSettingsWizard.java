@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.platform.sponge.SpongeSettings;
+import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import org.apache.commons.lang.WordUtils;
@@ -18,7 +18,7 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
     private JPanel panel;
     private JLabel title;
 
-    private final SpongeSettings settings = new SpongeSettings();
+    private final SpongeProjectConfiguration settings = new SpongeProjectConfiguration();
     private final MinecraftProjectCreator creator;
 
     public SpongeProjectSettingsWizard(MinecraftProjectCreator creator) {

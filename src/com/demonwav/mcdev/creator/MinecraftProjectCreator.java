@@ -4,7 +4,7 @@ import com.demonwav.mcdev.platform.Type;
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.platform.MinecraftSettings;
+import com.demonwav.mcdev.platform.ProjectConfiguration;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -21,7 +21,7 @@ public class MinecraftProjectCreator {
     private Project project = null;
     private BuildSystem buildSystem;
 
-    private MinecraftSettings settings = null;
+    private ProjectConfiguration settings = null;
 
     private VirtualFile sourceDir;
     private VirtualFile resourceDir;
@@ -136,11 +136,11 @@ public class MinecraftProjectCreator {
         this.project = project;
     }
 
-    public MinecraftSettings getSettings() {
+    public ProjectConfiguration getSettings() {
         return settings;
     }
 
-    public void setSettings(MinecraftSettings settings) {
+    public void setSettings(ProjectConfiguration settings) {
         this.settings = settings;
     }
 
