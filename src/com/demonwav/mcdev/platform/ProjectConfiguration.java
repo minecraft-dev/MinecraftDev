@@ -37,14 +37,16 @@ public abstract class ProjectConfiguration {
     }
 
     protected static boolean listContainsAtLeastOne(List<String> list) {
-        if (list == null || list.size() == 0)
+        if (list == null || list.size() == 0) {
             return false;
+        }
 
         Iterator<String> it = list.iterator();
         while (it.hasNext()) {
             String s = it.next();
-            if (s.trim().isEmpty())
+            if (s.trim().isEmpty()) {
                 it.remove();
+            }
         }
 
         return list.size() != 0;
