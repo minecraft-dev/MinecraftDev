@@ -23,7 +23,7 @@
           </component>
         </children>
       </grid>
-      <grid id="c580e" binding="chooserPanel" layout-manager="GridLayoutManager" row-count="6" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
+      <grid id="c580e" binding="chooserPanel" layout-manager="GridLayoutManager" row-count="7" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
         <margin top="2" left="10" bottom="10" right="10"/>
         <constraints border-constraint="Center"/>
         <properties/>
@@ -79,14 +79,6 @@
               <text value="Sponge Plugin"/>
             </properties>
           </component>
-          <component id="c6c2d" class="javax.swing.JRadioButton" binding="bungeecordRadioButton">
-            <constraints>
-              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="BungeeCord Plugin"/>
-            </properties>
-          </component>
           <component id="a132a" class="javax.swing.JLabel">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -101,16 +93,11 @@
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <icon value="assets/platform/icons/BungeeCord@2x.png"/>
+              <icon value="assets/platform/icons/Forge@2x.png"/>
               <iconTextGap value="0"/>
               <text value=""/>
             </properties>
           </component>
-          <vspacer id="d9ec2">
-            <constraints>
-              <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-            </constraints>
-          </vspacer>
           <component id="6f1b4" class="javax.swing.JRadioButton" binding="paperRadioButton">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -127,6 +114,37 @@
               <icon value="assets/platform/icons/Paper@2x.png"/>
               <iconTextGap value="0"/>
               <text value=""/>
+            </properties>
+          </component>
+          <component id="c6c2d" class="javax.swing.JRadioButton" binding="bungeecordRadioButton">
+            <constraints>
+              <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="BungeeCord Plugin"/>
+            </properties>
+          </component>
+          <vspacer id="d9ec2">
+            <constraints>
+              <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+          <component id="ef19b" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <icon value="assets/platform/icons/BungeeCord@2x.png"/>
+              <iconTextGap value="0"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="69a73" class="javax.swing.JRadioButton" binding="forgeRadioButton">
+            <constraints>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Forge Plugin"/>
             </properties>
           </component>
         </children>
@@ -163,8 +181,9 @@
       <member id="fc230"/>
       <member id="dd3ac"/>
       <member id="46880"/>
-      <member id="c6c2d"/>
       <member id="6f1b4"/>
+      <member id="c6c2d"/>
+      <member id="69a73"/>
     </group>
   </buttonGroups>
 </form>

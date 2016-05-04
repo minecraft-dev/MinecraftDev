@@ -20,6 +20,14 @@ public class MinecraftSetupException extends Exception {
                 return "<html>Please fill in all required fields</html>";
             case "bad":
                 return "<html>Please enter author and plugin names as a comma separated list</html>";
+            case "sponge":
+                return "<html>Sorry, Sponge support isn't currently working yet.</html>";
+            case "forge":
+                return "<html>Sorry, Forge support isn't currently working yet.</html>";
+            case "fillAll":
+                return "<html>Please fill in all fields</html>";
+            case "gradle":
+                return "<html>Sorry, Gradle support isn't currently working yet.</html>";
             default:
                 return "<html>Unknown Error</html>";
         }

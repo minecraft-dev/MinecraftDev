@@ -2,6 +2,7 @@ package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
+import com.demonwav.mcdev.exception.MinecraftSetupException;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -57,8 +58,6 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
     public void updateDataModel() {
     }
 
-
-
     @Override
     public void onStepLeaving() {
         super.onStepLeaving();
@@ -81,36 +80,26 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
     public boolean validate() throws ConfigurationException {
         try {
             if (groupIdField.getText().trim().isEmpty()) {
-                throw new EException(groupIdField);
+                throw new MinecraftSetupException("fillAll", groupIdField);
             }
 
             if (artifactIdField.getText().trim().isEmpty()) {
-                throw new EException(artifactIdField);
+                throw new MinecraftSetupException("fillAll", artifactIdField);
             }
 
             if (versionField.getText().trim().isEmpty()) {
-                throw new EException(versionField);
+                throw new MinecraftSetupException("fillAll", versionField);
             }
-        } catch (EException e) {
-            String message = "<html>Please fill in all fields</html>";
-            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
-                    .setFadeoutTime(4000)
+            if (buildSystemBox.getSelectedIndex() == 1) {
+                throw new MinecraftSetupException("gradle", buildSystemBox);
+            }
+        } catch (MinecraftSetupException e) {
+            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(e.getError(), MessageType.ERROR, null)
+                    .setFadeoutTime(2000)
                     .createBalloon()
                     .show(RelativePoint.getSouthWestOf(e.getJ()), Balloon.Position.below);
             return false;
         }
         return true;
-    }
-
-    private class EException extends Exception {
-        private JComponent j;
-
-        public EException(JComponent j) {
-            this.j = j;
-        }
-
-        public JComponent getJ() {
-            return j;
-        }
     }
 }

@@ -1,9 +1,15 @@
 package com.demonwav.mcdev.creator;
 
+import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.IdeBorderFactory;
+import com.intellij.ui.awt.RelativePoint;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Desktop;
@@ -30,6 +36,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
     private JEditorPane infoPane;
     private JRadioButton spongeRadioButton;
     private JRadioButton paperRadioButton;
+    private JRadioButton forgeRadioButton;
 
     private PlatformType type = PlatformType.BUKKIT;
 
@@ -48,6 +55,9 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
     private static final String spongeInfo = "<html><font size=\"4\">Create a standard " +
             "<a href=\"https://www.spongepowered.org/\"> Sponge</a> plugin, for use " +
             "on Sponge servers.</font></html>";
+    private static final String forgeInfo = "<html><font size=\"4\">Create a standard " +
+            "<a href=\"http://files.minecraftforge.net/\"> Forge</a> plugin, for use " +
+            "on Forge servers.</font></html>";
 
     public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator) {
         super();
@@ -97,11 +107,17 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
                 creator.setType(type);
             }
         });
-
         spongeRadioButton.addChangeListener(e -> {
             if (type != PlatformType.SPONGE) {
                 type = PlatformType.SPONGE;
                 infoPane.setText(spongeInfo);
+                creator.setType(type);
+            }
+        });
+        forgeRadioButton.addChangeListener(e -> {
+            if (type != PlatformType.FORGE) {
+                type = PlatformType.FORGE;
+                infoPane.setText(forgeInfo);
                 creator.setType(type);
             }
         });
@@ -113,6 +129,26 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             }
         });
         return panel;
+    }
+
+    @Override
+    public boolean validate() throws ConfigurationException {
+        try {
+            if (spongeRadioButton.isSelected()) {
+                throw new MinecraftSetupException("sponge", spongeRadioButton);
+            }
+            if (forgeRadioButton.isSelected()) {
+                throw new MinecraftSetupException("forge", forgeRadioButton);
+            }
+        } catch (MinecraftSetupException e) {
+            String message = e.getError();
+            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
+                    .setFadeoutTime(2000)
+                    .createBalloon()
+                    .show(RelativePoint.getSouthWestOf(e.getJ()), Balloon.Position.below);
+            return false;
+        }
+        return true;
     }
 
     @Override
