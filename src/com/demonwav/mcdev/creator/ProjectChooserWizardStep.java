@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.platform.Type;
+import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ui.IdeBorderFactory;
@@ -31,7 +31,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
     private JRadioButton spongeRadioButton;
     private JRadioButton paperRadioButton;
 
-    private Type type = Type.BUKKIT;
+    private PlatformType type = PlatformType.BUKKIT;
 
     private static final String bukkitInfo = "<html><font size=\"4\">Create a standard " +
             "<a href=\"http://bukkit.org/\">Bukkit</a> plugin, for use " +
@@ -77,37 +77,37 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
 
         // Set type
         bukkitRadioButton.addChangeListener(e -> {
-            if (type != Type.BUKKIT) {
-                type = Type.BUKKIT;
+            if (type != PlatformType.BUKKIT) {
+                type = PlatformType.BUKKIT;
                 infoPane.setText(bukkitInfo);
                 creator.setType(type);
             }
         });
         spigotRadioButton.addChangeListener(e -> {
-            if (type != Type.SPIGOT) {
-                type = Type.SPIGOT;
+            if (type != PlatformType.SPIGOT) {
+                type = PlatformType.SPIGOT;
                 infoPane.setText(spigotInfo);
                 creator.setType(type);
             }
         });
         paperRadioButton.addChangeListener(e -> {
-            if (type != Type.PAPER) {
-                type = Type.PAPER;
+            if (type != PlatformType.PAPER) {
+                type = PlatformType.PAPER;
                 infoPane.setText(paperInfo);
                 creator.setType(type);
             }
         });
 
         spongeRadioButton.addChangeListener(e -> {
-            if (type != Type.SPONGE) {
-                type = Type.SPONGE;
+            if (type != PlatformType.SPONGE) {
+                type = PlatformType.SPONGE;
                 infoPane.setText(spongeInfo);
                 creator.setType(type);
             }
         });
         bungeecordRadioButton.addChangeListener(e -> {
-            if (type != Type.BUNGEECORD) {
-                type = Type.BUNGEECORD;
+            if (type != PlatformType.BUNGEECORD) {
+                type = PlatformType.BUNGEECORD;
                 infoPane.setText(bungeeCordInfo);
                 creator.setType(type);
             }

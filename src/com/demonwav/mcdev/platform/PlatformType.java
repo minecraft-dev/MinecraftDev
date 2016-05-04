@@ -1,10 +1,10 @@
 package com.demonwav.mcdev.platform;
 
-public enum Type {
+public enum PlatformType {
     BUKKIT,
     SPIGOT,
     PAPER,
-    BUNGEECORD,
+    FORGE,
     SPONGE,
-    FORGE
+    BUNGEECORD,
 }

@@ -16,7 +16,6 @@ public abstract class ProjectConfiguration {
     public String mainClass = null;
     public String description = null;
     public final List<String> authors = new ArrayList<>();
-    public String website = null;
 
     public abstract void create(Project project, BuildSystem buildSystem);
 

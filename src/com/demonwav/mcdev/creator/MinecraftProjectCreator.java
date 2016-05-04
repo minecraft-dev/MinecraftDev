@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.platform.Type;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
@@ -17,7 +17,7 @@ public class MinecraftProjectCreator {
     private String groupId = null;
     private String artifactId = null;
     private String version = null;
-    private Type type = Type.BUKKIT;
+    private PlatformType type = PlatformType.BUKKIT;
     private Project project = null;
     private BuildSystem buildSystem;
 
@@ -35,7 +35,7 @@ public class MinecraftProjectCreator {
         buildSystem.setArtifactId(artifactId);
         buildSystem.setVersion(version);
 
-        buildSystem.setPluginAuthor(settings.author);
+        //buildSystem.setPluginAuthor(settings.author); // TODO: build systems have "developer" blocks
         buildSystem.setPluginName(settings.pluginName);
 
         BuildRepository buildRepository = new BuildRepository();
@@ -120,11 +120,11 @@ public class MinecraftProjectCreator {
         this.version = version;
     }
 
-    public Type getType() {
+    public PlatformType getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(PlatformType type) {
         this.type = type;
     }
 
