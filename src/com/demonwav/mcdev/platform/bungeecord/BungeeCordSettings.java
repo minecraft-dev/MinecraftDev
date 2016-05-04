@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.yourkit.util.Strings;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,15 +35,16 @@ public class BungeeCordSettings extends MinecraftSettings {
                 // Create plugin main class
                 VirtualFile file = buildSystem.getSourceDirectory();
                 String[] files = this.mainClass.split("\\.");
-                String name = files[files.length - 1];
+                String className = files[files.length - 1];
+                String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
                 for (int i = 0, len = files.length - 1; i < len; i++) {
                     String s = files[i];
                     file = file.createChildDirectory(this, s);
                 }
 
-                VirtualFile mainClassFile = file.findOrCreateChildData(this, name + ".java");
+                VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
 
-                MinecraftTemplate.applyMainBungeeCordClassTemplate(project, mainClassFile, buildSystem.getGroupId(), name);
+                MinecraftTemplate.applyMainBungeeCordClassTemplate(project, mainClassFile, packageName, className);
                 VirtualFile pluginYml = buildSystem.getResourceDirectory().findOrCreateChildData(this, "plugin.yml");
                 MinecraftTemplate.applyBungeeCordPluginYmlTemplate(project, pluginYml, this, buildSystem.getGroupId());
 

@@ -69,15 +69,16 @@ public class BukkitSettings extends MinecraftSettings {
                 // Create plugin main class
                 VirtualFile file = buildSystem.getSourceDirectory();
                 String[] files = this.mainClass.split("\\.");
-                String name = files[files.length - 1];
+                String className = files[files.length - 1];
+                String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
                 for (int i = 0, len = files.length - 1; i < len; i++) {
                     String s = files[i];
                     file = file.createChildDirectory(this, s);
                 }
 
-                VirtualFile mainClassFile = file.findOrCreateChildData(this, name + ".java");
+                VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
 
-                MinecraftTemplate.applyMainBukkitClassTemplate(project, mainClassFile, buildSystem.getGroupId(), name);
+                MinecraftTemplate.applyMainBukkitClassTemplate(project, mainClassFile, packageName, className);
                 VirtualFile pluginYml = buildSystem.getResourceDirectory().findOrCreateChildData(this, "plugin.yml");
                 MinecraftTemplate.applyBukkitPluginYmlTemplate(project, pluginYml, this, buildSystem.getGroupId());
 
