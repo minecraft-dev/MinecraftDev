@@ -28,8 +28,8 @@ import java.util.Map;
 
 public abstract class MinecraftMavenImporter extends MavenImporter {
 
-    protected final String GROUP_ID;
-    protected final String ARTIFACT_ID;
+    private final String GROUP_ID;
+    private final String ARTIFACT_ID;
 
     public MinecraftMavenImporter(String groupId, String artifactId) {
         super(groupId, artifactId);

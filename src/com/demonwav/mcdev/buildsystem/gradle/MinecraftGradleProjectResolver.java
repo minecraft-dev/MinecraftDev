@@ -4,8 +4,8 @@ import org.jetbrains.plugins.gradle.service.project.AbstractProjectResolverExten
 
 public abstract class MinecraftGradleProjectResolver extends AbstractProjectResolverExtension {
 
-    protected final String GROUP_ID;
-    protected final String ARTIFACT_ID;
+    private final String GROUP_ID;
+    private final String ARTIFACT_ID;
 
     public MinecraftGradleProjectResolver(String GROUP_ID, String ARTIFACT_ID) {
         this.GROUP_ID = GROUP_ID;
