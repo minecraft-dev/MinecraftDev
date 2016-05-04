@@ -24,6 +24,7 @@
 # Sensitive or high-churn files:
 .idea/dataSources.ids
 .idea/dataSources.xml
+/minecraft-dev-intellij.jar
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
 .idea/uiDesigner.xml
