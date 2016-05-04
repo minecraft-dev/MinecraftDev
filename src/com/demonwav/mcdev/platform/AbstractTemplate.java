@@ -14,7 +14,7 @@ import java.util.Properties;
 
 public abstract class AbstractTemplate {
 
-    public static void applyTemplate(Project project, VirtualFile file, String templateName, Properties properties) throws IOException {
+    protected static void applyTemplate(Project project, VirtualFile file, String templateName, Properties properties) throws IOException {
         FileTemplateManager manager = FileTemplateManager.getInstance(project);
         FileTemplate template = manager.getJ2eeTemplate(templateName);
 
