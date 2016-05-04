@@ -11,7 +11,6 @@ package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.MinecraftSettings;
-import com.demonwav.mcdev.util.MinecraftTemplate;
 
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
@@ -78,9 +77,9 @@ public class BukkitSettings extends MinecraftSettings {
 
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
 
-                MinecraftTemplate.applyMainBukkitClassTemplate(project, mainClassFile, packageName, className);
+                BukkitTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className);
                 VirtualFile pluginYml = buildSystem.getResourceDirectory().findOrCreateChildData(this, "plugin.yml");
-                MinecraftTemplate.applyBukkitPluginYmlTemplate(project, pluginYml, this, buildSystem.getGroupId());
+                BukkitTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this);
 
                 // Set the editor focus on the main class
                 PsiFile mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile);

@@ -6,7 +6,7 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.pom.Dependency;
 import com.demonwav.mcdev.buildsystem.maven.pom.MavenProject;
 import com.demonwav.mcdev.buildsystem.maven.pom.Repository;
-import com.demonwav.mcdev.util.MinecraftTemplate;
+import com.demonwav.mcdev.util.AbstractTemplate;
 
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
@@ -145,7 +145,7 @@ public class MavenBuildSystem extends BuildSystem {
                 resourceDirectory = VfsUtil.createDirectories(rootDirectory.getPath() + "/src/main/resources");
                 testDirectory = VfsUtil.createDirectories(rootDirectory.getPath() + "/src/test/java");
 
-                PsiFile pomPsi = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, MinecraftTemplate.applyPomTemplate(project, buildVersion));
+                PsiFile pomPsi = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, AbstractTemplate.applyPomTemplate(project, buildVersion));
                 pomPsi.setName("pom.xml");
 
                 XmlFile pomXmlPsi = (XmlFile) pomPsi;
