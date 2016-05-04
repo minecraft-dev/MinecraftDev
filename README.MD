@@ -9,13 +9,16 @@ taken to setup an SDK. It is recommended to use Community Edition as the
 basis for building this plugin, even if you use Ultimate, as we are
 targeting Community Edition to make this available to everyone.
 
-1. Create the IntelliJ Plugin SDK (just follow the steps when you create
-a new SDK).
+1. [Create the IntelliJ Plugin SDK.](http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/setting_up_environment.html)
 2. Once the SDK has been created, go to Project Structure -> SDK's
-(Under Platform Settings). Navigate to the `plugins/maven/lib` directory
-in the IntelliJ installation and add all the Jar's in that directory to
-the classpath. We probably don't need all of them, but it's simpler this
-way.
+   (Under Platform Settings). Click on the green + button:
+   
+   ![IntelliJ SDK](http://i.imgur.com/kn0A7cK.png)
+   
+   Navigate to the `plugins/maven/lib` directory
+   in the IntelliJ installation and add all the Jar's in that directory to
+   the classpath. We probably don't need all of them, but it's simpler this
+   way.
 3. Do the same thing for `plugins/yaml/lib` as well.
 
 Style Guide
