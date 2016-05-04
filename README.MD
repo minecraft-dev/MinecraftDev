@@ -19,7 +19,7 @@ targeting Community Edition to make this available to everyone.
    in the IntelliJ installation and add all the Jar's in that directory to
    the classpath. We probably don't need all of them, but it's simpler this
    way.
-3. Do the same thing for `plugins/yaml/lib` as well.
+3. Do the same thing for `plugins/yaml/lib` and `plugins/gradle/lib` as well.
 
 Style Guide
 -----------
