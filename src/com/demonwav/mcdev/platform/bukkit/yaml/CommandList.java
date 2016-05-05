@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform.bukkit.yaml;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +26,11 @@ public class CommandList {
      * @return Commands whose names or aliases match the given name, or an empty list if none are found
      */
     @NotNull
-    public List<CommandNode> getCommand(@NotNull String command) {
+    public List<CommandNode> getCommand(@Nullable String command) {
+        if (command == null) {
+            return Collections.emptyList();
+        }
+
         List<CommandNode> result = new ArrayList<>();
         for (CommandNode node : commands) {
             if (node.getName().equalsIgnoreCase(command)) {

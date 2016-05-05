@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform.bukkit.yaml;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +27,11 @@ public class PermissionList {
      * @return Permissinos whose names match the given name, or an empty list if none are found
      */
     @NotNull
-    public List<PermissionNode> getPermission(@NotNull String permission) {
+    public List<PermissionNode> getPermission(@Nullable String permission) {
+        if (permission == null) {
+            return Collections.emptyList();
+        }
+        
         return permissions.stream().filter(node -> node.getName().equalsIgnoreCase(permission)).collect(Collectors.toList());
     }
 
