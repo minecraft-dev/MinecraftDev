@@ -41,8 +41,7 @@ public class PluginConfigManager {
         VirtualFileManager.getInstance().addVirtualFileListener(new VirtualFileAdapter() {
             @Override
             public void contentsChanged(@NotNull VirtualFileEvent event) {
-                // TODO: Make this check more substantial
-                if (event.getFile().getName().equals("plugin.yml")) {
+                if (event.getFile().equals(project.getPluginYml())) {
                     importConfig();
                     System.out.println(config.toString());
                 }

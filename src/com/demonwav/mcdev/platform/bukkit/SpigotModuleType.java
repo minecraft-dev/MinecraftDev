@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.openapi.module.ModuleTypeManager;
 
@@ -20,6 +21,10 @@ public class SpigotModuleType extends BukkitModuleType {
 
     public static SpigotModuleType getInstance() {
         return (SpigotModuleType) ModuleTypeManager.getInstance().findByID(ID);
+    }
+
+    public PlatformType getPlatformType() {
+        return PlatformType.SPIGOT;
     }
 
     @Override

@@ -10,6 +10,7 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 
 import com.intellij.ide.util.EditorHelper;
@@ -18,6 +19,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,7 +75,7 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
     }
 
     @Override
-    public void create(Project project, BuildSystem buildSystem) {
+    public void create(@NotNull Project project, @NotNull PlatformType type, @NotNull BuildSystem buildSystem) {
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 // Create plugin main class
@@ -101,6 +103,20 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
                 e.printStackTrace();
             }
         });
+
+        BukkitModuleType moduleType = null;
+        switch (type) {
+            case BUKKIT:
+                moduleType = BukkitModuleType.getInstance();
+                break;
+            case SPIGOT:
+                moduleType = SpigotModuleType.getInstance();
+                break;
+            case PAPER:
+                moduleType = PaperModuleType.getInstance();
+                break;
+        }
+        BukkitProject.set(project, moduleType, buildSystem);
     }
 
     public enum Load {

@@ -4,9 +4,8 @@ import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.pom.Dependency;
-import com.demonwav.mcdev.buildsystem.maven.pom.MavenProject;
+import com.demonwav.mcdev.buildsystem.maven.pom.MavenProjectXml;
 import com.demonwav.mcdev.buildsystem.maven.pom.Repository;
-import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.BukkitTemplate;
@@ -19,11 +18,10 @@ import com.intellij.lang.xml.XMLLanguage;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectType;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
@@ -33,11 +31,14 @@ import com.intellij.util.xml.DomManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType;
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters;
+import org.jetbrains.idea.maven.importing.MavenImporter;
+import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MavenBuildSystem extends BuildSystem {
 
@@ -55,7 +56,8 @@ public class MavenBuildSystem extends BuildSystem {
             try {
                 sourceDirectory = VfsUtil.createDirectories(rootDirectory.getPath() + "/src/main/java");
                 resourceDirectory = VfsUtil.createDirectories(rootDirectory.getPath() + "/src/main/resources");
-                testDirectory = VfsUtil.createDirectories(rootDirectory.getPath() + "/src/test/java");
+                testSourcesDirectory = VfsUtil.createDirectories(rootDirectory.getPath() + "/src/test/java");
+                testResourceDirectory = VfsUtil.createDirectories(rootDirectory.getPath() + "/src/test/resources");
 
                 PsiFile pomPsi = null;
 
@@ -74,31 +76,32 @@ public class MavenBuildSystem extends BuildSystem {
                         XmlTag root = pomXmlPsi.getRootTag();
 
                         DomManager manager = DomManager.getDomManager(project);
-                        MavenProject mavenProject = manager.getFileElement(pomXmlPsi, MavenProject.class, "project").getRootElement();
+                        MavenProjectXml mavenProjectXml = manager.getFileElement(pomXmlPsi, MavenProjectXml.class, "project").getRootElement();
 
-                        mavenProject.getGroupId().setValue(groupId);
-                        mavenProject.getArtifactId().setValue(artifactId);
-                        mavenProject.getVersion().setValue(version);
-                        mavenProject.getName().setValue(pluginName);
+                        mavenProjectXml.getGroupId().setValue(groupId);
+                        mavenProjectXml.getArtifactId().setValue(artifactId);
+                        mavenProjectXml.getVersion().setValue(version);
+                        mavenProjectXml.getName().setValue(pluginName);
 
                         assert root != null;
                         XmlTag properties = root.findFirstSubTag("properties");
                         assert properties != null;
                         XmlTag buildProperty = properties.findFirstSubTag("project.build.sourceEncoding");
 
-                        if (pluginAuthor != null && !pluginAuthor.trim().isEmpty()) {
-                            XmlTag authorTag = properties.createChildTag("project.author", null, pluginAuthor, false);
+                        if (configuration.hasAuthors()) {
+                            XmlTag authorTag = properties.createChildTag("project.author", null, configuration.authors.get(0), false);
                             properties.addAfter(authorTag, buildProperty);
+                            pluginAuthor = configuration.authors.get(0);
                         }
 
                         for (BuildRepository buildRepository : repositories) {
-                            Repository repository = mavenProject.getRepositories().addRepository();
+                            Repository repository = mavenProjectXml.getRepositories().addRepository();
                             repository.getId().setValue(buildRepository.getId());
                             repository.getUrl().setValue(buildRepository.getUrl());
                         }
 
                         for (BuildDependency buildDependency : dependencies) {
-                            Dependency dependency = mavenProject.getDependencies().addDependency();
+                            Dependency dependency = mavenProjectXml.getDependencies().addDependency();
                             dependency.getGroupId().setValue(buildDependency.getGroupId());
                             dependency.getArtifactId().setValue(buildDependency.getArtifactId());
                             dependency.getVersion().setValue(buildDependency.getVersion());
@@ -139,5 +142,87 @@ public class MavenBuildSystem extends BuildSystem {
             RunManager.getInstance(project).addConfiguration(runnerSettings, true);
             RunManager.getInstance(project).setSelectedConfiguration(runnerSettings);
         }
+    }
+
+    @Override
+    public BuildSystem reImport(@NotNull Project project, @NotNull PlatformType type) {
+        rootDirectory = project.getBaseDir();
+        List<MavenProject> mavenProjects = MavenProjectsManager.getInstance(project).getProjects();
+        // TODO: change some things around to support multiple modules
+        mavenProjects.stream().filter(this::isApplicable).limit(1).forEach(p -> {
+            artifactId = p.getMavenId().getArtifactId();
+            groupId = p.getMavenId().getGroupId();
+            version = p.getMavenId().getVersion();
+
+            dependencies = p.getDependencies().stream()
+                    .map(d -> new BuildDependency(d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope()))
+                    .collect(Collectors.toList());
+            repositories = p.getRemoteRepositories().stream()
+                    .map(r -> new BuildRepository(r.getId(), r.getUrl()))
+                    .collect(Collectors.toList());
+
+            pomFile = p.getFile();
+            if (p.getSources().size() > 0) {
+                sourceDirectory = LocalFileSystem.getInstance().findFileByPath(p.getSources().get(0));
+            }
+            if (p.getResources().size() > 0) {
+                resourceDirectory = LocalFileSystem.getInstance().findFileByPath(p.getResources().get(0).getDirectory());
+            }
+            if (p.getTestSources().size() > 0) {
+                testSourcesDirectory = LocalFileSystem.getInstance().findFileByPath(p.getTestSources().get(0));
+            }
+            if (p.getTestResources().size() > 0) {
+                testResourceDirectory = LocalFileSystem.getInstance().findFileByPath(p.getTestResources().get(0).getDirectory());
+            }
+
+            // Set author and plugin name, if set
+            ApplicationManager.getApplication().runReadAction(() -> {
+                PsiFile psiPomFile = PsiManager.getInstance(project).findFile(pomFile);
+                if (psiPomFile instanceof XmlFile) {
+                    XmlTag rootTag = ((XmlFile) psiPomFile).getRootTag();
+
+                    if (rootTag != null) {
+                        XmlTag nameTag = rootTag.findFirstSubTag("name");
+
+                        if (nameTag != null) {
+                            pluginName = nameTag.getValue().getText();
+                        }
+
+                        XmlTag propertiesTag = rootTag.findFirstSubTag("properties");
+
+                        if (propertiesTag != null) {
+                            XmlTag projectAuthorTag = propertiesTag.findFirstSubTag("project.author");
+
+                            if (projectAuthorTag != null) {
+                                pluginAuthor = projectAuthorTag.getValue().getText();
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        return this;
+    }
+
+    private boolean isApplicable(MavenProject project) {
+        MavenImporter importer = new BukkitMavenImporter();
+        if (importer.isApplicable(project)) {
+            return true;
+        }
+        importer = new SpigotMavenImporter();
+        if (importer.isApplicable(project)) {
+            return true;
+        }
+        importer = new PaperMavenImporter();
+        if (importer.isApplicable(project)) {
+            return true;
+        }
+        importer = new SpongeMavenImporter();
+        if (importer.isApplicable(project)) {
+            return true;
+        }
+        importer = new BungeeCordMavenImporter();
+        return importer.isApplicable(project);
     }
 }

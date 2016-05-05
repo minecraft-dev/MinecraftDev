@@ -15,8 +15,10 @@ public class BukkitFileIconProvider implements FileIconProvider {
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {
         if (project != null) {
             BukkitProject bukkitProject = BukkitProject.getInstance(project);
-            if (file.equals(bukkitProject.getPluginYml())) {
-                return bukkitProject.getIcon();
+            if (bukkitProject != null) {
+                if (file.equals(bukkitProject.getPluginYml())) {
+                    return bukkitProject.getIcon();
+                }
             }
         }
         return null;

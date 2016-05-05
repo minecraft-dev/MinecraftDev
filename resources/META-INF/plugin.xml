@@ -69,6 +69,10 @@
 
   <project-components>
     <!-- Add your project components here -->
+    <component>
+      <implementation-class>com.demonwav.mcdev.platform.bukkit.BukkitProjectComponent</implementation-class>
+      <loadForDefaultProject/>
+    </component>
   </project-components>
 
   <actions>

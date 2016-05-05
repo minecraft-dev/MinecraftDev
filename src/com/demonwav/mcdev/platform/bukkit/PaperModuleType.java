@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.openapi.module.ModuleTypeManager;
 
@@ -16,6 +17,10 @@ public class PaperModuleType extends SpigotModuleType {
 
     public static PaperModuleType getInstance() {
         return (PaperModuleType) ModuleTypeManager.getInstance().findByID(ID);
+    }
+
+    public PlatformType getPlatformType() {
+        return PlatformType.PAPER;
     }
 
     @Override

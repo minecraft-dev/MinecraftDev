@@ -21,6 +21,13 @@ public class BuildRepository {
         this.url = url;
     }
 
+    public BuildRepository() {}
+
+    public BuildRepository(String id, String url) {
+        this.id = id;
+        this.url = url;
+    }
+
     @Override
     public String toString() {
         return "BuildRepository{" +

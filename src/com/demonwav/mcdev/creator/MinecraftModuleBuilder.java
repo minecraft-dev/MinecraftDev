@@ -123,13 +123,13 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
             case SPONGE:
                 return SpongeModuleType.getInstance();
             default: // This *should* not happen // TODO: Add Forge support
-                throw new IllegalStateException("MavenProject type is not one of the three possible types.");
+                throw new IllegalStateException("MavenProjectXml type is not one of the three possible types.");
         }
     }
 
     @Override
     public String getParentGroup() {
-        return "Minecraft MavenProject";
+        return "Minecraft MavenProjectXml";
     }
 
     @Override

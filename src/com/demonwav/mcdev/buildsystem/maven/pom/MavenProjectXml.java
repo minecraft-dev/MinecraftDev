@@ -3,7 +3,7 @@ package com.demonwav.mcdev.buildsystem.maven.pom;
 import com.intellij.util.xml.DomElement;
 import com.intellij.util.xml.SubTag;
 
-public interface MavenProject extends DomElement {
+public interface MavenProjectXml extends DomElement {
 
     @SubTag("modelVersion")
     ModelVersion getModelVersion();

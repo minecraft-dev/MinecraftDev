@@ -84,7 +84,7 @@ public class MinecraftProjectCreator {
         dependency.setScope("provided");
 
         buildSystem.create(project, type, settings);
-        settings.create(project, buildSystem);
+        settings.create(project, type, buildSystem);
         buildSystem.finishSetup(project, type, settings);
     }
 

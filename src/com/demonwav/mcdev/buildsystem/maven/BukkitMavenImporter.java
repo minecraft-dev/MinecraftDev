@@ -14,15 +14,24 @@ import com.demonwav.mcdev.platform.bukkit.BukkitProject;
 
 import com.intellij.ide.FileIconProvider;
 import com.intellij.ide.IconProvider;
+import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.idea.maven.importing.MavenRootModelAdapter;
 import org.jetbrains.idea.maven.project.MavenProject;
+import org.jetbrains.idea.maven.project.MavenProjectChanges;
+import org.jetbrains.idea.maven.project.MavenProjectsProcessorTask;
+import org.jetbrains.idea.maven.project.MavenProjectsTree;
 import org.jetbrains.idea.maven.project.ResolveContext;
 import org.jetbrains.idea.maven.server.MavenEmbedderWrapper;
 import org.jetbrains.idea.maven.server.NativeMavenProjectHolder;
 import org.jetbrains.idea.maven.utils.MavenProcessCanceledException;
+
+import java.util.List;
+import java.util.Map;
 
 public class BukkitMavenImporter extends MinecraftMavenImporter {
     public BukkitMavenImporter() {
@@ -46,8 +55,11 @@ public class BukkitMavenImporter extends MinecraftMavenImporter {
                         MavenEmbedderWrapper embedder,
                         ResolveContext context) throws MavenProcessCanceledException {
         super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
-        BukkitProject bukkitProject = BukkitProject.getInstance(project);
-        bukkitProject.setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
-        bukkitProject.setIcon(getModuleType().getIcon());
+        BukkitProject bukkitProject = BukkitProject.getInstance(project); // We'll make sure the project is setup
+        if (bukkitProject != null) {
+            bukkitProject.getConfigManager(); // add config watcher
+        }
     }
+
+
 }

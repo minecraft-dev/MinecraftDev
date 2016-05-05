@@ -1,5 +1,7 @@
 package com.demonwav.mcdev.buildsystem;
 
+import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
+import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 
@@ -27,9 +29,21 @@ public abstract class BuildSystem {
 
     protected VirtualFile sourceDirectory;
     protected VirtualFile resourceDirectory;
-    protected VirtualFile testDirectory;
+    protected VirtualFile testSourcesDirectory;
+    protected VirtualFile testResourceDirectory;
 
+    /**
+     * This refers to the plugin name from the perspective of the build system, that being a name field in the build
+     * system's configuration. This is not the actual plugin name, which would be stated in the plugin's description
+     * file, or the main class file, depending on the project. This field is null if this value is missing.
+     */
+    @Nullable
     protected String pluginName;
+    /**
+     * This refers to the plugin author from the perspective of the build system, that being an author field in the build
+     * system's configuration. This is not the actual plugin author's name, which would be stated in the plugin's
+     * description file, or the main class, depending on the project. This field is null if this value is missing.
+     */
     @Nullable
     protected String pluginAuthor;
 
@@ -99,12 +113,12 @@ public abstract class BuildSystem {
         this.resourceDirectory = resourceDirectory;
     }
 
-    public VirtualFile getTestDirectory() {
-        return testDirectory;
+    public VirtualFile getTestSourcesDirectory() {
+        return testSourcesDirectory;
     }
 
-    public void setTestDirectory(VirtualFile testDirectory) {
-        this.testDirectory = testDirectory;
+    public void setTestSourcesDirectory(VirtualFile testSourcesDirectory) {
+        this.testSourcesDirectory = testSourcesDirectory;
     }
 
     public String getPluginName() {
@@ -161,4 +175,26 @@ public abstract class BuildSystem {
      * @param configuration The configuration object for the project
      */
     public abstract void finishSetup(@NotNull Project project, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration);
+
+    /**
+     * This method performs similarly to {@link #create(Project, PlatformType, ProjectConfiguration)} in that it builds
+     * this object's model of the project. The difference here is this method reads the project and builds the model
+     * from the current project's state. The includes settings the artifactId, groupId, and version, setting the root
+     * directory, building the list of dependencies and repositories, settings the source, test, and resource directories,
+     * and setting the build version, and whatever else may be added that consists of this project's build system state.*
+     *
+     * @param project The project The Project object for this project
+     * @return this object
+     */
+    public abstract BuildSystem reImport(@NotNull Project project, @NotNull PlatformType type);
+
+    @NotNull
+    public static BuildSystem getInstance(@NotNull Project project) {
+        VirtualFile pom = project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml");
+        if (pom != null) {
+            return new MavenBuildSystem();
+        } else {
+            return new GradleBuildSystem();
+        }
+    }
 }

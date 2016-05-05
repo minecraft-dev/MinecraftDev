@@ -18,4 +18,9 @@ public class GradleBuildSystem extends BuildSystem {
     public void finishSetup(@NotNull Project project, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration) {
         // TODO impl
     }
+
+    @Override
+    public BuildSystem reImport(@NotNull Project project, @NotNull PlatformType type) {
+        return null;
+    }
 }

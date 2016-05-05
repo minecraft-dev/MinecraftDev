@@ -22,6 +22,8 @@ public class SpigotMavenImporter extends BukkitMavenImporter {
         super(groupId, artifactId);
     }
 
+
+
     @NotNull
     @Override
     public SpigotModuleType getModuleType() {
