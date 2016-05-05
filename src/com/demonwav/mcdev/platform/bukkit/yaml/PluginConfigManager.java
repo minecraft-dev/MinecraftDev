@@ -26,10 +26,8 @@ import java.util.stream.Collectors;
 
 public class PluginConfigManager {
 
-    @NotNull
-    private BukkitProject project;
-    @NotNull
-    private PluginConfig config;
+    @NotNull private BukkitProject project;
+    @NotNull private PluginConfig config;
 
     public PluginConfigManager(@NotNull BukkitProject project) {
         // TODO: This doesn't setup when a project is opened
@@ -78,43 +76,41 @@ public class PluginConfigManager {
                 String key = keyValue.getKeyText();
 
                 switch (key) {
-                    // Single string values
-                    case "name":
-                    case "version":
-                    case "description":
-                    case "author":
-                    case "website":
-                    case "prefix":
+                    case PluginDescriptionFileConstants.NAME:
+                    case PluginDescriptionFileConstants.VERSION:
+                    case PluginDescriptionFileConstants.AUTHOR:
+                    case PluginDescriptionFileConstants.DESCRIPTION:
+                    case PluginDescriptionFileConstants.WEBSITE:
+                    case PluginDescriptionFileConstants.PREFIX:
                         handleSingleValue(key, keyValue, false);
                         break;
-                    // List values
-                    case "authors":
-                    case "depend":
-                    case "softdepend":
-                    case "loadbefore":
-                        handleListValue(key, keyValue);
+                    case PluginDescriptionFileConstants.MAIN:
+                        handleSingleValue(PluginDescriptionFileConstants.MAIN, keyValue, false);
+                        // TODO: verify this is a proper class that exists and extends JavaPlugin
                         break;
-                    case "load":
+                    case PluginDescriptionFileConstants.LOAD:
                         // TODO: handle this enum & verify the value is actually valid and warn if not
                         handleSingleValue(key, keyValue, true);
                         break;
-                    case "main":
-                        handleSingleValue("main", keyValue, false);
-                        // TODO: verify this is a proper class that exists and extends JavaPlugin
+                    case PluginDescriptionFileConstants.AUTHORS:
+                    case PluginDescriptionFileConstants.LOADBEFORE:
+                    case PluginDescriptionFileConstants.DEPEND:
+                    case PluginDescriptionFileConstants.SOFTDEPEND:
+                        handleListValue(key, keyValue);
                         break;
-                    case "database":
+                    case PluginDescriptionFileConstants.COMMANDS:
+                        // TODO: handle commands
+                        break;
+                    case PluginDescriptionFileConstants.PERMISSIONS:
+                        // TODO: handle permissions
+                        break;
+                    case PluginDescriptionFileConstants.DATABASE:
                         if (keyValue.getValueText().matches("y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF")) {
                             handleSingleValue(key, keyValue, false);
                         } else {
                             // TODO: show warning to user, must be a boolean value
                             setValueInConfig(key, false, false);
                         }
-                        break;
-                    case "commands":
-                        // TODO: handle commands
-                        break;
-                    case "permissions":
-                        // TODO: handle permissions
                         break;
                     default:
                         // TODO: Show warning to user, invalid field in plugin.yml

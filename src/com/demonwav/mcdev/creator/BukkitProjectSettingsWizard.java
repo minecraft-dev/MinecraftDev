@@ -3,6 +3,7 @@ package com.demonwav.mcdev.creator;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
+import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -31,7 +32,7 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     private JTextField authorsField;
     private JTextField websiteField;
     private JTextField prefixField;
-    private JComboBox loadBox;
+    private JComboBox loadOrderBox;
     private JTextField loadBeforeField;
     private JTextField dependField;
     private JTextField softDependField;
@@ -117,7 +118,7 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
         this.settings.setAuthors(this.authorsField.getText());
         settings.website = websiteField.getText();
         settings.prefix = prefixField.getText();
-        settings.load = loadBox.getSelectedIndex() == 0 ? BukkitProjectConfiguration.Load.POSTWORLD : BukkitProjectConfiguration.Load.STARTUP;
+        this.settings.loadOrder = this.loadOrderBox.getSelectedIndex() == 0 ? LoadOrder.POSTWORLD : LoadOrder.STARTUP;
         this.settings.setLoadBefore(this.loadBeforeField.getText());
         this.settings.setDependencies(this.dependField.getText());
         this.settings.setSoftDependencies(this.softDependField.getText());

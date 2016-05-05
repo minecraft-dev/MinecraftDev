@@ -53,8 +53,8 @@ public class BukkitTemplate extends AbstractTemplate {
             properties.setProperty("HAS_PREFIX", "true");
         }
 
-        if (settings.hasLoad()) {
-            properties.setProperty("LOAD", settings.load.name());
+        if (settings.loadOrder != null) {
+            properties.setProperty("LOAD", settings.loadOrder.name());
             properties.setProperty("HAS_LOAD", "true");
         }
 

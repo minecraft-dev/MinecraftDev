@@ -237,7 +237,7 @@
                   <toolTipText value="Give a comma separated list of plugins"/>
                 </properties>
               </component>
-              <component id="3e9d1" class="javax.swing.JComboBox" binding="loadBox">
+              <component id="3e9d1" class="javax.swing.JComboBox" binding="loadOrderBox">
                 <constraints>
                   <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>

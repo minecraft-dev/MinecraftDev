@@ -1,7 +1,9 @@
 package com.demonwav.mcdev.platform.bukkit.yaml;
 
 import com.demonwav.mcdev.platform.bukkit.BukkitProject;
+import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 
+import com.google.common.base.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,32 +19,75 @@ public class PluginConfig {
      *   back to the plugin.yml). List operations should be done with add and remove methods.
      */
 
-    public enum Load { STARTUP, POSTWORLD }
-
     @NotNull private BukkitProject project;
 
-    // NotNull values
+    /**
+     * The name of the plugin.
+     */
     @NotNull private String name = "";
-    @NotNull private String version = "";
-    @NotNull private Load load = Load.POSTWORLD;
-    @NotNull private List<String> authors = new ArrayList<>();
+    /**
+     * The fully qualified name of the main class for the plugin.
+     */
     @NotNull private String main = "";
+    /**
+     * The version of the plugin.
+     */
+    @NotNull private String version = "";
+    /**
+     * The order in which the plugin should be loaded.
+     *
+     * @see LoadOrder
+     */
+    @NotNull private LoadOrder load = LoadOrder.POSTWORLD;
+    /**
+     * A list of plugins the plugin should load before.
+     *
+     * <p>The plugin will be loaded <b>before</b> plugins specified in this list.</p>
+     */
+    @NotNull
+    @SuppressWarnings("SpellCheckingInspection")
+    private List<String> loadbefore = new ArrayList<>();
+    /**
+     * A list of plugins that the plugin has a hard dependency on.
+     *
+     * <p>The plugin will be loaded <b>after</b> plugins specified in this list.</p>
+     */
+    @NotNull private List<String> depend = new ArrayList<>();
+    /**
+     * A list of plugins that the plugin has a soft dependency on.
+     *
+     * <p>The plugin will be loaded <b>after</b> plugins specified in this list.</p>
+     */
+    @NotNull
+    @SuppressWarnings("SpellCheckingInspection")
+    private List<String> softdepend = new ArrayList<>();
+    /**
+     * The name of a single author.
+     *
+     * @see #authors
+     */
+    @Nullable private String author;
+    /**
+     * A list of author names.
+     *
+     * @see #author
+     */
+    @NotNull private List<String> authors = new ArrayList<>();
+    /**
+     * A human-friendly description of the functionality the plugin provides.
+     */
+    @Nullable private String description;
+    /**
+     * The plugin's, or plugin's author's, website.
+     */
+    @Nullable private String website;
+    /**
+     * The token to prefix plugin-specific logging messages with.
+     */
+    @Nullable private String prefix;
     @NotNull private CommandList commands = new CommandList();
     @NotNull private PermissionList permissions = new PermissionList();
-
-    // Nullable values
-    @Nullable private String description;
-    @Nullable private String author;
-    @Nullable private String website;
-    @Nullable private String prefix;
-
-    // Primitive value
     private boolean database;
-
-    // NotNull values with custom getters
-    @NotNull private List<String> depend = new ArrayList<>();
-    @NotNull private List<String> softdepend = new ArrayList<>();
-    @NotNull private List<String> loadbefore = new ArrayList<>();
 
     public PluginConfig(@NotNull BukkitProject project) {
         this.project = project;
@@ -53,7 +98,6 @@ public class PluginConfig {
         return project;
     }
 
-    // Name
     @NotNull
     public String getName() {
         return name;
@@ -63,57 +107,6 @@ public class PluginConfig {
 
     }
 
-    // Version
-    @NotNull
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(@NotNull String version) {
-
-    }
-
-    // Description
-    @Nullable
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(@Nullable String description) {
-
-    }
-
-    // Load
-    @NotNull
-    public Load getLoad() {
-        return load;
-    }
-
-    public void setLoad(@NotNull Load load) {
-
-    }
-
-    // Author
-    @Nullable
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(@Nullable String author) {
-
-    }
-
-    // Website
-    @Nullable
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(@Nullable String website) {
-
-    }
-
-    // Main
     @NotNull
     public String getMain() {
         return main;
@@ -123,49 +116,24 @@ public class PluginConfig {
 
     }
 
-    // Database
-    public boolean isDatabase() {
-        return database;
-    }
-
-    public void setDatabase(boolean database) {
-
-    }
-
-    // Depend
     @NotNull
-    public List<String> getDepend() {
-        return Collections.unmodifiableList(depend);
+    public String getVersion() {
+        return version;
     }
 
-    public boolean addDepend(@NotNull String... depend) {
-        return false;
-    }
-
-    public boolean removeDepend(@NotNull String... depend) {
-        return false;
-    }
-
-    // Prefix
-    public void setPrefix(@Nullable String prefix) {
+    public void setVersion(@NotNull String version) {
 
     }
 
-    // Soft Depend
     @NotNull
-    public List<String> getSoftdepend() {
-        return Collections.unmodifiableList(softdepend);
+    public LoadOrder getLoad() {
+        return load;
     }
 
-    public boolean addSoftdepend(@NotNull String... softdepend) {
-        return false;
+    public void setLoad(@NotNull LoadOrder load) {
+
     }
 
-    public boolean removeSoftdepend(@NotNull String... softdepend) {
-        return false;
-    }
-
-    // Load Before
     @NotNull
     public List<String> getLoadbefore() {
         return Collections.unmodifiableList(loadbefore);
@@ -179,100 +147,142 @@ public class PluginConfig {
         return false;
     }
 
-    @Override
-    public String toString() {
-        return "PluginConfig{" +
-                "loadbefore=" + loadbefore +
-                ", name='" + name + '\'' +
-                ", version='" + version + '\'' +
-                ", load=" + load +
-                ", authors=" + authors +
-                ", main='" + main + '\'' +
-                ", commands=" + commands +
-                ", permissions=" + permissions +
-                ", description='" + description + '\'' +
-                ", author='" + author + '\'' +
-                ", website='" + website + '\'' +
-                ", prefix='" + prefix + '\'' +
-                ", database=" + database +
-                ", depend=" + depend +
-                ", softdepend=" + softdepend +
-                '}';
+    @NotNull
+    public List<String> getDepend() {
+        return Collections.unmodifiableList(depend);
     }
 
-    @SuppressWarnings("SimplifiableIfStatement")
+    public boolean addDepend(@NotNull String... depend) {
+        return false;
+    }
+
+    public boolean removeDepend(@NotNull String... depend) {
+        return false;
+    }
+
+    @NotNull
+    public List<String> getSoftdepend() {
+        return Collections.unmodifiableList(softdepend);
+    }
+
+    public boolean addSoftdepend(@NotNull String... softdepend) {
+        return false;
+    }
+
+    public boolean removeSoftdepend(@NotNull String... softdepend) {
+        return false;
+    }
+
+    @Nullable
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(@Nullable String author) {
+
+    }
+
+    @NotNull
+    public List<String> getAuthors() {
+        return Collections.unmodifiableList(this.authors);
+    }
+
+    public boolean addAuthor(@NotNull String... authors) {
+        return false;
+    }
+
+    public boolean removeAuthor(@NotNull String... authors) {
+        return false;
+    }
+
+    @Nullable
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(@Nullable String description) {
+
+    }
+
+    @Nullable
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(@Nullable String website) {
+
+    }
+
+    @Nullable
+    public String getPrefix() {
+        return this.prefix;
+    }
+
+    public void setPrefix(@Nullable String prefix) {
+
+    }
+
+    public boolean isDatabase() {
+        return database;
+    }
+
+    public void setDatabase(boolean database) {
+
+    }
+
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public String toString() {
+        return Objects.toStringHelper(this)
+                .add("name", this.name)
+                .add("main", this.main)
+                .add("version", this.version)
+                .add("load", this.load)
+                .add("loadbefore", this.loadbefore)
+                .add("depend", this.depend)
+                .add("softdepend", this.softdepend)
+                .add("author", this.author)
+                .add("authors", this.authors)
+                .add("description", this.description)
+                .add("website", this.website)
+                .add("prefix", this.prefix)
+                .add("commands", this.commands)
+                .add("permissions", this.permissions)
+                .add("database", this.database)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+
+        if (other == null || getClass() != other.getClass()) {
             return false;
         }
 
-        PluginConfig that = (PluginConfig) o;
-
-        if (database != that.database) {
-            return false;
-        }
-        if (!name.equals(that.name)) {
-            return false;
-        }
-        if (!version.equals(that.version)) {
-            return false;
-        }
-        if (load != that.load) return false;
-        if (!authors.equals(that.authors)) {
-            return false;
-        }
-        if (!main.equals(that.main)) {
-            return false;
-        }
-        if (!commands.equals(that.commands)) {
-            return false;
-        }
-        if (!permissions.equals(that.permissions)) {
-            return false;
-        }
-        if (description != null ? !description.equals(that.description) : that.description != null) {
-            return false;
-        }
-        if (author != null ? !author.equals(that.author) : that.author != null) {
-            return false;
-        }
-        if (website != null ? !website.equals(that.website) : that.website != null) {
-            return false;
-        }
-        if (prefix != null ? !prefix.equals(that.prefix) : that.prefix != null) {
-            return false;
-        }
-        if (!depend.equals(that.depend)) {
-            return false;
-        }
-        if (!softdepend.equals(that.softdepend)) {
-            return false;
-        }
-        return loadbefore.equals(that.loadbefore);
-
+        PluginConfig that = (PluginConfig) other;
+        return Objects.equal(this.name, that.name)
+                && Objects.equal(this.main, that.main)
+                && Objects.equal(this.version, that.version)
+                && this.load == that.load
+                && Objects.equal(this.loadbefore, that.loadbefore)
+                && Objects.equal(this.depend, that.depend)
+                && Objects.equal(this.softdepend, that.softdepend)
+                && Objects.equal(this.author, that.author)
+                && Objects.equal(this.authors, that.authors)
+                && Objects.equal(this.description, that.description)
+                && Objects.equal(this.website, that.website)
+                && Objects.equal(this.prefix, that.prefix)
+                && Objects.equal(this.commands, that.commands)
+                && Objects.equal(this.permissions, that.permissions)
+                && this.database == that.database;
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + version.hashCode();
-        result = 31 * result + load.hashCode();
-        result = 31 * result + authors.hashCode();
-        result = 31 * result + main.hashCode();
-        result = 31 * result + commands.hashCode();
-        result = 31 * result + permissions.hashCode();
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (author != null ? author.hashCode() : 0);
-        result = 31 * result + (website != null ? website.hashCode() : 0);
-        result = 31 * result + (prefix != null ? prefix.hashCode() : 0);
-        result = 31 * result + (database ? 1 : 0);
-        result = 31 * result + depend.hashCode();
-        result = 31 * result + softdepend.hashCode();
-        result = 31 * result + loadbefore.hashCode();
-        return result;
+        return Objects.hashCode(this.name, this.main, this.version, this.load, this.loadbefore, this.depend,
+                this.softdepend, this.author, this.authors, this.description, this.website, this.prefix,
+                this.commands, this.permissions, this.database);
     }
 }

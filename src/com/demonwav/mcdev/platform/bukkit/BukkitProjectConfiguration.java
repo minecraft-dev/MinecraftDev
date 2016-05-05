@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.bukkit;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
@@ -20,6 +21,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ import java.util.List;
 
 public class BukkitProjectConfiguration extends ProjectConfiguration {
 
-    public Load load = Load.POSTWORLD;
+    @Nullable public LoadOrder loadOrder = null;
     public final List<String> loadBefore = new ArrayList<>();
     public final List<String> dependencies = new ArrayList<>();
     public final List<String> softDependencies = new ArrayList<>();
@@ -37,10 +39,6 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
 
     public boolean hasPrefix() {
         return this.prefix != null && !this.prefix.trim().isEmpty();
-    }
-
-    public boolean hasLoad() {
-        return this.load == Load.STARTUP;
     }
 
     public boolean hasLoadBefore() {
@@ -117,10 +115,5 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
                 break;
         }
         BukkitProject.set(project, moduleType, buildSystem);
-    }
-
-    public enum Load {
-        STARTUP,
-        POSTWORLD
     }
 }
