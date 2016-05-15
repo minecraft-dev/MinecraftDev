@@ -1,7 +1,6 @@
 package com.demonwav.mcdev.buildsystem.maven;
 
 import com.demonwav.mcdev.platform.MinecraftModuleType;
-import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
 
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.module.Module;
