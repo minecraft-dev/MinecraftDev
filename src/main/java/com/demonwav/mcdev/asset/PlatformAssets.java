@@ -17,7 +17,7 @@ public final class PlatformAssets {
     public static final Icon PAPER_ICON_2X = loadIcon("/assets/platform/icons/Paper@2x.png");
 
     public static final Icon FORGE_ICON = loadIcon("/assets/platform/icons/Forge.png");
-    public static final Icon FORGE_BIG = loadIcon("/assets/platform/icons/Forge@2x.png");
+    public static final Icon FORGE_ICON_2X = loadIcon("/assets/platform/icons/Forge@2x.png");
 
     public static final Icon SPONGE_ICON = loadIcon("/assets/platform/icons/Sponge.png");
     public static final Icon SPONGE_ICON_2X = loadIcon("/assets/platform/icons/Sponge@2x.png");

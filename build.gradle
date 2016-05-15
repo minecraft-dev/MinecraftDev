@@ -1,0 +1,42 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id "org.jetbrains.intellij" version "0.0.43"
+}
+
+apply plugin: 'idea'
+apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'java'
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+intellij {
+    // IntelliJ IDEA dependency
+    version ideaVersion
+    // Bundled plugin dependencies 
+    plugins = ['maven', 'gradle', 'yaml']
+    pluginName 'Minecraft Development'
+
+    downloadSources Boolean.valueOf(downloadIdeaSources)
+    sandboxDirectory project.rootDir.canonicalPath + "/.sandbox"
+}
+
+idea {
+    project {
+        jdkName = 1.8
+        languageLevel = 1.8
+    }
+}
+
+group 'org.demonwav.minecraft-dev'
+version pluginVersion // Plugin version
+
