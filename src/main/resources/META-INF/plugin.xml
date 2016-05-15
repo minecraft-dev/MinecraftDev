@@ -6,7 +6,6 @@
 
   <id>com.demonwav.minecraft-dev</id>
   <name>Minecraft Development</name>
-  <version>alpha-0.0.4</version>
   <vendor>DemonWav</vendor>
 
   <description><![CDATA[
@@ -19,12 +18,9 @@
         <p><p>
         Recent changes:
         <ul>
-          <li>Forge icons / preliminary project creation added</li>
-          <li>No longer allows not-finished projects to be created</li>
-          <li>Added Bukkit/Spigot/Paper/BungeeCord icons to a few more places</li>
-          <li>Major code refactor</li>
-          <li>Added Java version chooser to the build system config screen</li>
-          <li>Lots of misc changes</li>
+          <li>Fixed bug with NPE on Bukkit projects</li>
+          <li>Initial Sponge Maven project creation is working</li>
+          <li>Initial Gradle project detection is working</li>
         </ul>
       </div>
     ]]>
