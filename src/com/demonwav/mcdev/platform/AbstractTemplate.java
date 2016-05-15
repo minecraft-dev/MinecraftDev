@@ -3,7 +3,7 @@ package com.demonwav.mcdev.platform;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
@@ -14,8 +14,8 @@ import java.util.Properties;
 
 public abstract class AbstractTemplate {
 
-    protected static void applyTemplate(Project project, VirtualFile file, String templateName, Properties properties) throws IOException {
-        FileTemplateManager manager = FileTemplateManager.getInstance(project);
+    protected static void applyTemplate(Module module, VirtualFile file, String templateName, Properties properties) throws IOException {
+        FileTemplateManager manager = FileTemplateManager.getInstance(module.getProject());
         FileTemplate template = manager.getJ2eeTemplate(templateName);
 
         Properties allProperties = manager.getDefaultProperties();
@@ -23,9 +23,9 @@ public abstract class AbstractTemplate {
 
         VfsUtil.saveText(file, template.getText(allProperties));
 
-        PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+        PsiFile psiFile = PsiManager.getInstance(module.getProject()).findFile(file);
         if (psiFile != null) {
-            new ReformatCodeProcessor(project, psiFile, null, false).run();
+            new ReformatCodeProcessor(module.getProject(), psiFile, null, false).run();
         }
     }
 }

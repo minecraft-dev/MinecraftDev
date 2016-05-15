@@ -50,14 +50,19 @@
     <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
     <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
     <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
+    <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.BukkitDataService"/>
+    <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.SpigotDataService"/>
+    <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.PaperDataService"/>
+    <externalProjectDataService implementation="com.demonwav.mcdev.platform.bungeecord.gradle.BungeeCordDataService"/>
+    <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeDataService"/>
   </extensions>
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.BukkitMavenImporter"/>
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.SpigotMavenImporter"/>
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.PaperMavenImporter"/>
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.PaperMavenImporter"/>
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.BungeeCordMavenImporter"/>
-    <importer implementation="com.demonwav.mcdev.buildsystem.maven.SpongeMavenImporter"/>
+    <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.BukkitMavenImporter"/>
+    <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.SpigotMavenImporter"/>
+    <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
+    <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
+    <importer implementation="com.demonwav.mcdev.platform.bungeecord.maven.BungeeCordMavenImporter"/>
+    <importer implementation="com.demonwav.mcdev.platform.sponge.maven.SpongeMavenImporter"/>
   </extensions>
 
   <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">

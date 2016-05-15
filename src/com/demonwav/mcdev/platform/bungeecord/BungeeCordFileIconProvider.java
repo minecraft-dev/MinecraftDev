@@ -1,8 +1,8 @@
 package com.demonwav.mcdev.platform.bungeecord;
 
-import com.demonwav.mcdev.platform.bukkit.BukkitProject;
-
 import com.intellij.ide.FileIconProvider;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -16,9 +16,11 @@ public class BungeeCordFileIconProvider implements FileIconProvider {
     @Override
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {
         if (project != null) {
-            BungeeCordProject bukkitProject = BungeeCordProject.getInstance(project);
-            if (file.equals(bukkitProject.getPluginYml())) {
-                return bukkitProject.getIcon();
+            for (Module module : ModuleManager.getInstance(project).getModules()) {
+                BungeeCordModule bungeeCordModule = BungeeCordModule.getInstance(module);
+                if (bungeeCordModule != null && file.equals(bungeeCordModule.getPluginYml())) {
+                    return bungeeCordModule.getIcon();
+                }
             }
         }
         return null;

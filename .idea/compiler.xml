@@ -18,7 +18,7 @@
       <profile default="true" name="Default" enabled="true">
         <processorPath useClasspath="true" />
       </profile>
-      <profile default="false" name="Annotation profile for bukkit-intellij-plugin" enabled="true">
+      <profile default="false" name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -27,6 +27,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
       <module name="bukkit-intellij-plugin" target="1.8" />
+      <module name="testtest" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

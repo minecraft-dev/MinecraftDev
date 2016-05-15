@@ -1,4 +1,4 @@
-package com.demonwav.mcdev.buildsystem.maven;
+package com.demonwav.mcdev.platform.bukkit.maven;
 
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
 
@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class PaperMavenImporter extends SpigotMavenImporter {
     public PaperMavenImporter() {
-        super("com.destroystokyo.paper", "paper-api");
+        super(PaperModuleType.getInstance());
     }
 
     @NotNull

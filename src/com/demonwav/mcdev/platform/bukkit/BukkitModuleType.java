@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.platform.bukkit;
 
-import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.openapi.module.ModuleTypeManager;
@@ -13,17 +13,18 @@ public class BukkitModuleType extends MinecraftModuleType {
     private static final String ID = "BUKKIT_MODULE_TYPE";
 
     public BukkitModuleType() {
-        super(ID);
+        super(ID, "org.bukkit", "bukkit");
     }
 
-    public BukkitModuleType(String ID) {
-        super(ID);
+    public BukkitModuleType(final String ID, final String groupId, final String artifactId) {
+        super(ID, groupId, artifactId);
     }
 
     public static BukkitModuleType getInstance() {
         return (BukkitModuleType) ModuleTypeManager.getInstance().findByID(ID);
     }
 
+    @Override
     public PlatformType getPlatformType() {
         return PlatformType.BUKKIT;
     }
@@ -42,6 +43,4 @@ public class BukkitModuleType extends MinecraftModuleType {
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
         return PlatformAssets.BUKKIT_ICON;
     }
-
-
 }

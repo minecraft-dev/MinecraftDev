@@ -1,11 +1,11 @@
 package com.demonwav.mcdev.platform.bukkit;
 
-import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 import com.demonwav.mcdev.platform.AbstractTemplate;
+import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.io.IOException;
@@ -13,24 +13,24 @@ import java.util.Properties;
 
 public class BukkitTemplate extends AbstractTemplate {
 
-    public static void applyMainClassTemplate(Project project, VirtualFile file, String packageName, String className) {
+    public static void applyMainClassTemplate(Module module, VirtualFile file, String packageName, String className) {
         Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_MAIN_CLASS_TEMPLATE, properties);
+            applyTemplate(module, file, MinecraftFileTemplateGroupFactory.BUKKIT_MAIN_CLASS_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static String applyPomTemplate(Project project, String version) {
+    public static String applyPomTemplate(Module module, String version) {
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", version);
 
-        FileTemplateManager manager = FileTemplateManager.getInstance(project);
+        FileTemplateManager manager = FileTemplateManager.getInstance(module.getProject());
         FileTemplate fileTemplate = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUKKIT_POM_TEMPLATE);
         try {
             return fileTemplate.getText(properties);
@@ -41,7 +41,7 @@ public class BukkitTemplate extends AbstractTemplate {
         }
     }
 
-    public static void applyPluginDescriptionFileTemplate(Project project, VirtualFile file, BukkitProjectConfiguration settings) {
+    public static void applyPluginDescriptionFileTemplate(Module module, VirtualFile file, BukkitProjectConfiguration settings) {
         Properties properties = new Properties();
 
         properties.setProperty("NAME", settings.pluginName);
@@ -88,7 +88,7 @@ public class BukkitTemplate extends AbstractTemplate {
         }
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties);
+            applyTemplate(module, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }

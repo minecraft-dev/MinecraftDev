@@ -5,7 +5,6 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
-import com.intellij.ide.fileTemplates.FileTemplateManager;
 
 public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescriptorFactory {
     

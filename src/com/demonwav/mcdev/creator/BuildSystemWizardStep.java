@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 // TODO gradle it up

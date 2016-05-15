@@ -12,13 +12,14 @@ public class PaperModuleType extends SpigotModuleType {
     private static final String ID = "PAPER_MODULE_TYPE";
 
     public PaperModuleType() {
-        super(ID);
+        super(ID, "com.destroystokyo.paper", "paper-api");
     }
 
     public static PaperModuleType getInstance() {
         return (PaperModuleType) ModuleTypeManager.getInstance().findByID(ID);
     }
 
+    @Override
     public PlatformType getPlatformType() {
         return PlatformType.PAPER;
     }

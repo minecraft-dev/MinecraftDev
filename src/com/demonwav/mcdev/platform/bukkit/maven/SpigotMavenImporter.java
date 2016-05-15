@@ -7,7 +7,7 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.buildsystem.maven;
+package com.demonwav.mcdev.platform.bukkit.maven;
 
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 
@@ -15,14 +15,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class SpigotMavenImporter extends BukkitMavenImporter {
     public SpigotMavenImporter() {
-        super("org.spigotmc", "spigot-api");
+        super(SpigotModuleType.getInstance());
     }
 
-    public SpigotMavenImporter(String groupId, String artifactId) {
-        super(groupId, artifactId);
+    public SpigotMavenImporter(@NotNull final SpigotModuleType type) {
+        super(type);
     }
-
-
 
     @NotNull
     @Override

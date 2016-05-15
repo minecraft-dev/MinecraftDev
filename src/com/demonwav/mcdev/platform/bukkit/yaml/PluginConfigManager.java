@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.platform.bukkit.yaml;
 
-import com.demonwav.mcdev.platform.bukkit.BukkitProject;
+import com.demonwav.mcdev.platform.bukkit.BukkitModule;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitUtil;
 
 import com.intellij.openapi.application.ApplicationManager;
@@ -26,20 +26,19 @@ import java.util.stream.Collectors;
 
 public class PluginConfigManager {
 
-    @NotNull private BukkitProject project;
+    @NotNull private BukkitModule module;
     @NotNull private PluginConfig config;
 
-    public PluginConfigManager(@NotNull BukkitProject project) {
-        // TODO: This doesn't setup when a project is opened
-        this.project = project;
-        this.config = new PluginConfig(project);
+    public PluginConfigManager(@NotNull BukkitModule module) {
+        this.module = module;
+        this.config = new PluginConfig(module);
 
         importConfig();
 
         VirtualFileManager.getInstance().addVirtualFileListener(new VirtualFileAdapter() {
             @Override
             public void contentsChanged(@NotNull VirtualFileEvent event) {
-                if (event.getFile().equals(project.getPluginYml())) {
+                if (event.getFile().equals(module.getPluginYml())) {
                     importConfig();
                     System.out.println(config.toString());
                 }
@@ -54,7 +53,7 @@ public class PluginConfigManager {
 
     private void importConfig() {
         ApplicationManager.getApplication().runReadAction(() -> {
-            PsiFile pluginYml = BukkitUtil.getPluginYml(project);
+            PsiFile pluginYml = BukkitUtil.getPluginYml(module);
             YAMLFile file = ((YAMLFileImpl) pluginYml);
 
             if (file == null) {
@@ -118,11 +117,11 @@ public class PluginConfigManager {
                 }
 
                 // Temp code for testing
-                System.out.println(e.getClass().getSimpleName());
-                if (e.getYAMLElements().size() != 0)
-                    printYamlEles(e.getYAMLElements(), 1);
+//                System.out.println(e.getClass().getSimpleName());
+//                if (e.getYAMLElements().size() != 0)
+//                    printYamlEles(e.getYAMLElements(), 1);
             });
-            System.out.println();
+//            System.out.println();
 
         });
     }
@@ -168,7 +167,7 @@ public class PluginConfigManager {
                         setValueInConfig(name, false, false);
                     }
                 } else {
-                    System.out.println(((YAMLKeyValue) keyValue).getValue());
+//                    System.out.println(((YAMLKeyValue) keyValue).getValue());
                     setValueInConfig(name, text, isEnum);
                 }
             }
@@ -192,8 +191,6 @@ public class PluginConfigManager {
 
         List<String> text = keyValue.getYAMLElements().stream().map(s -> ((YAMLPlainTextImpl) s.getYAMLElements().get(0)).getTextValue()).collect(Collectors.toList());
         setValueInConfig(name, text, false);
-
-        // TODO: Show warning to user, the list was not valid
     }
 
     private boolean setValueInConfig(String name, Object value, boolean isEnum) {

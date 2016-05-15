@@ -31,7 +31,6 @@ public class PermissionList {
         if (permission == null) {
             return Collections.emptyList();
         }
-        
         return permissions.stream().filter(node -> node.getName().equalsIgnoreCase(permission)).collect(Collectors.toList());
     }
 

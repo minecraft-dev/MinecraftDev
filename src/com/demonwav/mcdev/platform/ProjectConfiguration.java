@@ -2,7 +2,7 @@ package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public abstract class ProjectConfiguration {
     public String description = null;
     public final List<String> authors = new ArrayList<>();
 
-    public abstract void create(@NotNull Project project, @NotNull PlatformType type, @NotNull BuildSystem buildSystem);
+    public abstract void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem);
 
     public boolean hasAuthors() {
         return listContainsAtLeastOne(this.authors);

@@ -1,12 +1,13 @@
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 
-import com.intellij.openapi.project.Project;
+import com.google.common.base.Objects;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.util.Collections;
@@ -18,7 +19,7 @@ public class MinecraftProjectCreator {
     private String artifactId = null;
     private String version = null;
     private PlatformType type = PlatformType.BUKKIT;
-    private Project project = null;
+    private Module module = null;
     private BuildSystem buildSystem;
 
     private ProjectConfiguration settings = null;
@@ -83,9 +84,9 @@ public class MinecraftProjectCreator {
         }
         dependency.setScope("provided");
 
-        buildSystem.create(project, type, settings);
-        settings.create(project, type, buildSystem);
-        buildSystem.finishSetup(project, type, settings);
+        buildSystem.create(module, type, settings);
+        settings.create(module, type, buildSystem);
+        buildSystem.finishSetup(module, type, settings);
     }
 
     public VirtualFile getRoot() {
@@ -128,12 +129,12 @@ public class MinecraftProjectCreator {
         this.type = type;
     }
 
-    public Project getProject() {
-        return project;
+    public Module getModule() {
+        return module;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setModule(Module module) {
+        this.module = module;
     }
 
     public ProjectConfiguration getSettings() {
@@ -192,7 +193,7 @@ public class MinecraftProjectCreator {
                 ", artifactId='" + artifactId + '\'' +
                 ", version='" + version + '\'' +
                 ", type=" + type +
-                ", project=" + project +
+                ", module=" + module +
                 ", settings=" + settings +
                 ", sourceDir=" + sourceDir +
                 ", resourceDir=" + resourceDir +
@@ -213,51 +214,54 @@ public class MinecraftProjectCreator {
 
         MinecraftProjectCreator that = (MinecraftProjectCreator) o;
 
-        if (root != null ? !root.equals(that.root) : that.root != null) {
+        if (!Objects.equal(this.root, that.root)) {
             return false;
         }
-        if (groupId != null ? !groupId.equals(that.groupId) : that.groupId != null) {
+        if (!Objects.equal(this.groupId, that.groupId)) {
             return false;
         }
-        if (artifactId != null ? !artifactId.equals(that.artifactId) : that.artifactId != null) {
+        if (!Objects.equal(this.artifactId, that.artifactId)) {
             return false;
         }
-        if (version != null ? !version.equals(that.version) : that.version != null) {
+        if (!Objects.equal(this.version, that.version)) {
             return false;
         }
-        if (type != that.type) return false;
-        if (project != null ? !project.equals(that.project) : that.project != null) {
+        if (type != that.type) {
             return false;
         }
-        if (settings != null ? !settings.equals(that.settings) : that.settings != null) {
+        if (!Objects.equal(this.module, that.module)) {
             return false;
         }
-        if (sourceDir != null ? !sourceDir.equals(that.sourceDir) : that.sourceDir != null) {
+        if (!Objects.equal(this.settings, that.settings)) {
             return false;
         }
-        if (resourceDir != null ? !resourceDir.equals(that.resourceDir) : that.resourceDir != null) {
+        if (!Objects.equal(this.sourceDir, that.sourceDir)) {
             return false;
         }
-        if (testDir != null ? !testDir.equals(that.testDir) : that.testDir != null) {
+        if (!Objects.equal(this.resourceDir, that.resourceDir)) {
             return false;
         }
-        return pomFile != null ? pomFile.equals(that.pomFile) : that.pomFile == null;
+        if (!Objects.equal(this.testDir, that.testDir)) {
+            return false;
+        }
+        return Objects.equal(this.pomFile, that.pomFile);
 
     }
 
     @Override
     public int hashCode() {
-        int result = root != null ? root.hashCode() : 0;
-        result = 31 * result + (groupId != null ? groupId.hashCode() : 0);
-        result = 31 * result + (artifactId != null ? artifactId.hashCode() : 0);
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (project != null ? project.hashCode() : 0);
-        result = 31 * result + (settings != null ? settings.hashCode() : 0);
-        result = 31 * result + (sourceDir != null ? sourceDir.hashCode() : 0);
-        result = 31 * result + (resourceDir != null ? resourceDir.hashCode() : 0);
-        result = 31 * result + (testDir != null ? testDir.hashCode() : 0);
-        result = 31 * result + (pomFile != null ? pomFile.hashCode() : 0);
-        return result;
+        return Objects.hashCode(
+                root,
+                groupId,
+                artifactId,
+                version,
+                type,
+                module,
+                settings,
+                sourceDir,
+                resourceDir,
+                testDir,
+                pomFile
+        );
     }
 }

@@ -4,13 +4,13 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
 public class SpongeProjectConfiguration extends ProjectConfiguration {
 
     @Override
-    public void create(@NotNull Project project, @NotNull PlatformType type, @NotNull BuildSystem buildSystem) {
+    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem) {
 
     }
 }

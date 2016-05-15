@@ -1,6 +1,8 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.intellij.openapi.components.AbstractProjectComponent;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupManager;
 
@@ -13,6 +15,10 @@ public class BukkitProjectComponent extends AbstractProjectComponent {
     @Override
     public void projectOpened() {
         super.projectOpened();
-        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> BukkitProject.getInstance(myProject));
+        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> {
+            for (Module module : ModuleManager.getInstance(myProject).getModules()) {
+                BukkitModule.getInstance(module);
+            }
+        });
     }
 }

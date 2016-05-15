@@ -7,12 +7,17 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.buildsystem.maven;
+package com.demonwav.mcdev.platform.bungeecord.maven;
 
+import com.demonwav.mcdev.buildsystem.maven.AbstractMavenImporter;
+import com.demonwav.mcdev.platform.bungeecord.BungeeCordModule;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
-import com.demonwav.mcdev.platform.bungeecord.BungeeCordProject;
 
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.ResolveContext;
@@ -20,9 +25,11 @@ import org.jetbrains.idea.maven.server.MavenEmbedderWrapper;
 import org.jetbrains.idea.maven.server.NativeMavenProjectHolder;
 import org.jetbrains.idea.maven.utils.MavenProcessCanceledException;
 
-public class BungeeCordMavenImporter extends MinecraftMavenImporter {
+import java.util.Objects;
+
+public class BungeeCordMavenImporter extends AbstractMavenImporter {
     public BungeeCordMavenImporter() {
-        super("net.md-5", "bungeecord-api");
+        super(BungeeCordModuleType.getInstance());
     }
 
     @NotNull
@@ -38,8 +45,15 @@ public class BungeeCordMavenImporter extends MinecraftMavenImporter {
                         MavenEmbedderWrapper embedder,
                         ResolveContext context) throws MavenProcessCanceledException {
         super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
-        BungeeCordProject bungeeCordProject = BungeeCordProject.getInstance(project);
-        bungeeCordProject.setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
-        bungeeCordProject.setIcon(getModuleType().getIcon());
+        for (Module module : ModuleManager.getInstance(project).getModules()) {
+            // We'll make sure the project is setup
+            if (Objects.equals(LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module)), mavenProject.getFile().getParent())) {
+                BungeeCordModule bungeeCordModule = BungeeCordModule.getInstance(module);
+                if (bungeeCordModule != null) {
+                    bungeeCordModule.setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
+                    break;
+                }
+            }
+        }
     }
 }

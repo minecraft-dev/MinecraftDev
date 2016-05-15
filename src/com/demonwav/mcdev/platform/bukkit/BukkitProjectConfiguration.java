@@ -16,7 +16,7 @@ import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
@@ -73,7 +73,7 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
     }
 
     @Override
-    public void create(@NotNull Project project, @NotNull PlatformType type, @NotNull BuildSystem buildSystem) {
+    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem) {
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 // Create plugin main class
@@ -88,12 +88,12 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
 
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
 
-                BukkitTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className);
+                BukkitTemplate.applyMainClassTemplate(module, mainClassFile, packageName, className);
                 VirtualFile pluginYml = buildSystem.getResourceDirectory().findOrCreateChildData(this, "plugin.yml");
-                BukkitTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this);
+                BukkitTemplate.applyPluginDescriptionFileTemplate(module, pluginYml, this);
 
                 // Set the editor focus on the main class
-                PsiFile mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile);
+                PsiFile mainClassPsi = PsiManager.getInstance(module.getProject()).findFile(mainClassFile);
                 if (mainClassPsi != null) {
                     EditorHelper.openInEditor(mainClassPsi);
                 }
@@ -114,6 +114,6 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
                 moduleType = PaperModuleType.getInstance();
                 break;
         }
-        BukkitProject.set(project, moduleType, buildSystem);
+        BukkitModule.setBuildSystem(module, moduleType, buildSystem);
     }
 }

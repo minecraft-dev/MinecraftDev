@@ -1,7 +1,8 @@
 package com.demonwav.mcdev.platform.sponge;
 
-import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.openapi.module.ModuleTypeManager;
 
@@ -12,11 +13,16 @@ public class SpongeModuleType extends MinecraftModuleType {
     private static final String ID = "SPONGE_MODULE_TYPE";
 
     public SpongeModuleType() {
-        super(ID);
+        super(ID, "org.spongepowered", "spongeapi");
     }
 
     public static SpongeModuleType getInstance() {
         return (SpongeModuleType) ModuleTypeManager.getInstance().findByID(ID);
+    }
+
+    @Override
+    public PlatformType getPlatformType() {
+        return PlatformType.SPONGE;
     }
 
     @Override

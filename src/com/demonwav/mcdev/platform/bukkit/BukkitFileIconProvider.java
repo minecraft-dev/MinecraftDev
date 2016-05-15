@@ -1,6 +1,8 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.intellij.ide.FileIconProvider;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -14,10 +16,12 @@ public class BukkitFileIconProvider implements FileIconProvider {
     @Override
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {
         if (project != null) {
-            BukkitProject bukkitProject = BukkitProject.getInstance(project);
-            if (bukkitProject != null) {
-                if (file.equals(bukkitProject.getPluginYml())) {
-                    return bukkitProject.getIcon();
+            for (Module module : ModuleManager.getInstance(project).getModules()) {
+                BukkitModule bukkitModule = BukkitModule.getInstance(module);
+                if (bukkitModule != null) {
+                    if (file.equals(bukkitModule.getPluginYml())) {
+                        return bukkitModule.getIcon();
+                    }
                 }
             }
         }

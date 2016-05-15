@@ -1,13 +1,13 @@
 package com.demonwav.mcdev.platform.bukkit.util;
 
-import com.demonwav.mcdev.platform.bukkit.BukkitProject;
+import com.demonwav.mcdev.platform.bukkit.BukkitModule;
 
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 
 public class BukkitUtil {
 
-    public static PsiFile getPluginYml(BukkitProject project) {
-        return PsiManager.getInstance(project.getProject()).findFile(project.getPluginYml());
+    public static PsiFile getPluginYml(BukkitModule module) {
+        return PsiManager.getInstance(module.getModule().getProject()).findFile(module.getPluginYml());
     }
 }

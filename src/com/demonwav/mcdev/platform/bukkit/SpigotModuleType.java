@@ -12,17 +12,18 @@ public class SpigotModuleType extends BukkitModuleType {
     private static final String ID = "SPIGOT_MODULE_TYPE";
 
     public SpigotModuleType() {
-        super(ID);
+        super(ID, "org.spigotmc", "spigot-api");
     }
 
-    public SpigotModuleType(String ID) {
-        super(ID);
+    public SpigotModuleType(final String ID, final String groupId, final String artifactId) {
+        super(ID, groupId, artifactId);
     }
 
     public static SpigotModuleType getInstance() {
         return (SpigotModuleType) ModuleTypeManager.getInstance().findByID(ID);
     }
 
+    @Override
     public PlatformType getPlatformType() {
         return PlatformType.SPIGOT;
     }

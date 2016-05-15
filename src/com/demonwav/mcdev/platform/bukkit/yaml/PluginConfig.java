@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.platform.bukkit.yaml;
 
-import com.demonwav.mcdev.platform.bukkit.BukkitProject;
+import com.demonwav.mcdev.platform.bukkit.BukkitModule;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 
 import com.google.common.base.Objects;
@@ -19,7 +19,7 @@ public class PluginConfig {
      *   back to the plugin.yml). List operations should be done with add and remove methods.
      */
 
-    @NotNull private BukkitProject project;
+    @NotNull private BukkitModule project;
 
     /**
      * The name of the plugin.
@@ -89,12 +89,12 @@ public class PluginConfig {
     @NotNull private PermissionList permissions = new PermissionList();
     private boolean database;
 
-    public PluginConfig(@NotNull BukkitProject project) {
+    public PluginConfig(@NotNull BukkitModule project) {
         this.project = project;
     }
 
     @NotNull
-    public BukkitProject getProject() {
+    public BukkitModule getProject() {
         return project;
     }
 

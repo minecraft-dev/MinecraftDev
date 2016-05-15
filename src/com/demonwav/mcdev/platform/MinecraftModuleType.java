@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.platform;
 
-import com.demonwav.mcdev.creator.MinecraftModuleBuilder;
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.creator.MinecraftModuleBuilder;
 
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
@@ -11,18 +11,31 @@ import javax.swing.Icon;
 
 public class MinecraftModuleType extends JavaModuleType {
 
+    @NotNull
     private static final String ID = "MINECRAFT_MODULE_TYPE";
+    @NotNull
+    private final String groupId;
+    @NotNull
+    private final String artifactId;
 
     public MinecraftModuleType() {
         super(ID);
+        this.groupId = "";
+        this.artifactId = "";
     }
 
-    public MinecraftModuleType(String ID) {
+    public MinecraftModuleType(final String ID, @NotNull final String groupId, @NotNull final String artifactId) {
         super(ID);
+        this.groupId = groupId;
+        this.artifactId = artifactId;
     }
 
     public static MinecraftModuleType getInstance() {
         return (MinecraftModuleType) ModuleTypeManager.getInstance().findByID(ID);
+    }
+
+    public PlatformType getPlatformType() {
+        return null;
     }
 
     @NotNull
@@ -44,5 +57,15 @@ public class MinecraftModuleType extends JavaModuleType {
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
         return PlatformAssets.MINECRAFT_ICON;
+    }
+
+    @NotNull
+    public String getGroupId() {
+        return groupId;
+    }
+
+    @NotNull
+    public String getArtifactId() {
+        return artifactId;
     }
 }

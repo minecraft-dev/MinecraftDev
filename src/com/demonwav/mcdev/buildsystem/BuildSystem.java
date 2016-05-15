@@ -5,7 +5,9 @@ import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -148,53 +150,61 @@ public abstract class BuildSystem {
 
     /**
      * Assuming the artifact ID, group ID, and  version are set, along with whatever dependencies and repositories and
-     * the root directory, create a base project consisting of the necessary build system configuration files and
+     * the root directory, create a base module consisting of the necessary build system configuration files and
      * directory structure. This method does not create any classes or project-specific things, nor does it set up
      * any build configurations or enable the plugin for this build config. This will be done in
-     * {@link #finishSetup(Project, PlatformType, ProjectConfiguration)}.
+     * {@link #finishSetup(Module, PlatformType, ProjectConfiguration)}.
      * <p>
      * It is legal for this method to have different default setups for each platform type, so the PlatformType and
      * ProjectConfiguration are provided here as well.
      *
-     * @param project The Project object for this project
+     * @param module The module
      * @param type The type of the project
      * @param configuration The configuration object for the project
      */
-    public abstract void create(@NotNull Project project, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration);
+    public abstract void create(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration);
 
     /**
-     * This is called after {@link #create(Project, PlatformType, ProjectConfiguration)}, and after the project has set
+     * This is called after {@link #create(Module, PlatformType, ProjectConfiguration)}, and after the module has set
      * itself up. This is when the build system should make whatever calls are necessary to enable the build system's
      * plugin, and setup whatever run configs should be setup for this build system.
      * <p>
      * It is legal for this method to have different default setups for each platform type, so the PlatformType and
      * ProjectConfiguration are provided here as well.
      *
-     * @param project The Project object for this project
+     * @param module the module
      * @param type The type of the project
      * @param configuration The configuration object for the project
      */
-    public abstract void finishSetup(@NotNull Project project, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration);
+    public abstract void finishSetup(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration);
 
     /**
-     * This method performs similarly to {@link #create(Project, PlatformType, ProjectConfiguration)} in that it builds
+     * This method performs similarly to {@link #create(Module, PlatformType, ProjectConfiguration)} in that it builds
      * this object's model of the project. The difference here is this method reads the project and builds the model
      * from the current project's state. The includes settings the artifactId, groupId, and version, setting the root
      * directory, building the list of dependencies and repositories, settings the source, test, and resource directories,
      * and setting the build version, and whatever else may be added that consists of this project's build system state.*
      *
-     * @param project The project The Project object for this project
+     * @param module The module
      * @return this object
      */
-    public abstract BuildSystem reImport(@NotNull Project project, @NotNull PlatformType type);
+    public abstract void reImport(@NotNull Module module, @NotNull PlatformType type);
 
-    @NotNull
-    public static BuildSystem getInstance(@NotNull Project project) {
-        VirtualFile pom = project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml");
-        if (pom != null) {
-            return new MavenBuildSystem();
-        } else {
-            return new GradleBuildSystem();
+    @Nullable
+    public static BuildSystem getInstance(@NotNull Module module) {
+        //VirtualFile pom = project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml");
+        VirtualFile root = LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module));
+        if (root != null) {
+            VirtualFile pom = root.findChild("pom.xml");
+            VirtualFile gradle = root.findChild("build.gradle");
+
+            if (pom != null) {
+                return new MavenBuildSystem();
+            } else if (gradle != null) {
+                return new GradleBuildSystem();
+            }
         }
+
+        return null;
     }
 }

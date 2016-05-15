@@ -1,11 +1,11 @@
 package com.demonwav.mcdev.creator;
 
+import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
-import com.demonwav.mcdev.asset.PlatformAssets;
 
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
@@ -72,7 +72,7 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
         }
 
         creator.setRoot(root);
-        creator.setProject(project);
+        creator.setModule(modifiableRootModel.getModule());
 
         DumbAwareRunnable r = creator::create;
 
