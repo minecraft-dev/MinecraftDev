@@ -16,6 +16,9 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
     public static final String BUNGEECORD_PLUGIN_YML_TEMPLATE = "bungeecord_plugin_description_file.yml";
     public static final String BUNGEECORD_POM_TEMPLATE = "bungeecord_pom_template.xml";
 
+    public static final String SPONGE_MAIN_CLASS_TEMPLATE = "sponge_main_class.java";
+    public static final String SPONGE_POM_TEMPLATE = "sponge_pom_template.xml";
+
     @Override
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
         FileTemplateGroupDescriptor group = new FileTemplateGroupDescriptor("Minecraft", PlatformAssets.MINECRAFT_ICON);
@@ -27,6 +30,9 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
         group.addTemplate(new FileTemplateDescriptor(BUNGEECORD_MAIN_CLASS_TEMPLATE, PlatformAssets.BUNGEECORD_ICON));
         group.addTemplate(new FileTemplateDescriptor(BUNGEECORD_PLUGIN_YML_TEMPLATE, PlatformAssets.BUNGEECORD_ICON));
         group.addTemplate(new FileTemplateDescriptor(BUNGEECORD_POM_TEMPLATE, PlatformAssets.BUNGEECORD_ICON));
+
+        group.addTemplate(new FileTemplateDescriptor(SPONGE_MAIN_CLASS_TEMPLATE, PlatformAssets.SPONGE_ICON));
+        group.addTemplate(new FileTemplateDescriptor(SPONGE_POM_TEMPLATE, PlatformAssets.SPONGE_ICON));
 
         return group;
     }

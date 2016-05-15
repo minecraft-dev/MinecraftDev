@@ -14,8 +14,11 @@ import com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter;
 import com.demonwav.mcdev.platform.bukkit.maven.SpigotMavenImporter;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordTemplate;
 import com.demonwav.mcdev.platform.bungeecord.maven.BungeeCordMavenImporter;
+import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
+import com.demonwav.mcdev.platform.sponge.SpongeTemplate;
 import com.demonwav.mcdev.platform.sponge.maven.SpongeMavenImporter;
 
+import com.google.common.base.Strings;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -52,7 +55,6 @@ public class MavenBuildSystem extends BuildSystem {
 
     @Override
     public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration) {
-        // TODO: this only supports Bukkit's and BungeeCord's pom right now, need to add Sponge pom support as well
         rootDirectory.refresh(false, true);
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
@@ -63,11 +65,19 @@ public class MavenBuildSystem extends BuildSystem {
 
                 PsiFile pomPsi = null;
 
+                String text = null;
                 if (type == PlatformType.BUKKIT || type == PlatformType.SPIGOT || type == PlatformType.PAPER) {
-                    pomPsi = PsiFileFactory.getInstance(module.getProject()).createFileFromText(XMLLanguage.INSTANCE, BukkitTemplate.applyPomTemplate(module, buildVersion));
+                    text = BukkitTemplate.applyPomTemplate(module, buildVersion);
                 } else if (type == PlatformType.BUNGEECORD) {
-                    pomPsi = PsiFileFactory.getInstance(module.getProject()).createFileFromText(XMLLanguage.INSTANCE, BungeeCordTemplate.applyPomTemplate(module, buildVersion));
-                } // TODO: Sponge
+                    text = BungeeCordTemplate.applyPomTemplate(module, buildVersion);
+                } else if (type == PlatformType.SPONGE) {
+                    text = SpongeTemplate.applyPomTemplate(module, buildVersion);
+                }
+
+                if (text != null) {
+                    pomPsi = PsiFileFactory.getInstance(module.getProject()).createFileFromText(XMLLanguage.INSTANCE, text);
+                }
+
                 if (pomPsi != null) {
                     pomPsi.setName("pom.xml");
 
@@ -95,6 +105,16 @@ public class MavenBuildSystem extends BuildSystem {
                                 XmlTag authorTag = properties.createChildTag("project.author", null, configuration.authors.get(0), false);
                                 properties.addAfter(authorTag, buildProperty);
                                 pluginAuthor = configuration.authors.get(0);
+                            }
+
+                            if (!Strings.isNullOrEmpty(configuration.website)) {
+                                XmlTag url = root.createChildTag("url", null, configuration.website, false);
+                                root.addAfter(url, properties);
+                            }
+
+                            if (!Strings.isNullOrEmpty(configuration.description)) {
+                                XmlTag description = root.createChildTag("description", null, configuration.description, false);
+                                root.addBefore(description, properties);
                             }
 
                             for (BuildRepository buildRepository : repositories) {

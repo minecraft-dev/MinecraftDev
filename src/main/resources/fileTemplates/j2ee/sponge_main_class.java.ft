@@ -1,0 +1,17 @@
+package ${PACKAGE};
+
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.plugin.Plugin;
+#if (${HAS_DEPENDENCIES})
+import org.spongepowered.api.plugin.Dependency;
+#end
+
+public class ${CLASS_NAME} {
+    @Listener
+    public void onServerStart(GameStartedServerEvent event) {
+        // Hey! The server has started!
+        // Try instantiating your logger in here.
+        // (There's a guide for that)
+    }
+}

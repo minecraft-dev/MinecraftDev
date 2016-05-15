@@ -22,8 +22,6 @@ import javax.swing.JTextField;
 
 public class BukkitProjectSettingsWizard extends ModuleWizardStep {
 
-    private static final String pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?";
-
     private JPanel panel;
     private JTextField pluginNameField;
     private JTextField pluginVersionField;
@@ -86,15 +84,15 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
                 throw new MinecraftSetupException("empty", mainClassField);
             }
 
-            if (!loadBeforeField.getText().matches(pattern)) {
+            if (!loadBeforeField.getText().matches(ProjectSettingsWizardStep.pattern)) {
                 throw new MinecraftSetupException("bad", loadBeforeField);
             }
 
-            if (!dependField.getText().matches(pattern)) {
+            if (!dependField.getText().matches(ProjectSettingsWizardStep.pattern)) {
                 throw new MinecraftSetupException("bad", dependField);
             }
 
-            if (!softDependField.getText().matches(pattern)) {
+            if (!softDependField.getText().matches(ProjectSettingsWizardStep.pattern)) {
                 throw new MinecraftSetupException("bad", softDependField);
             }
         } catch (MinecraftSetupException e) {

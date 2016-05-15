@@ -50,21 +50,21 @@ public class MinecraftProjectCreator {
                 buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
                 dependency.setGroupId("org.bukkit");
                 dependency.setArtifactId("bukkit");
-                dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
+                dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
                 break;
             case SPIGOT:
                 buildRepository.setId("spigotmc-repo");
                 buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
                 dependency.setGroupId("org.spigotmc");
                 dependency.setArtifactId("spigot-api");
-                dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
+                dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
                 break;
             case PAPER:
                 buildRepository.setId("destroystokyo-repo");
                 buildRepository.setUrl("https://repo.destroystokyo.com/content/groups/public/");
                 dependency.setGroupId("com.destroystokyo.paper");
                 dependency.setArtifactId("paper-api");
-                dependency.setVersion("1.9.2-R0.1-SNAPSHOT");
+                dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
                 break;
             case BUNGEECORD:
                 buildRepository.setId("sonatype-oss-repo");

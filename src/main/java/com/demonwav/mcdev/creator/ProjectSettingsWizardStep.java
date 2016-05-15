@@ -15,6 +15,8 @@ import javax.swing.JComponent;
  */
 public class ProjectSettingsWizardStep extends ModuleWizardStep {
 
+    public static final String pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?";
+
     private MinecraftProjectCreator creator;
     private ModuleWizardStep wizard;
     private PlatformType type;

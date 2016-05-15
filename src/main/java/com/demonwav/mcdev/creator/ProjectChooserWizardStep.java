@@ -134,9 +134,6 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
     @Override
     public boolean validate() throws ConfigurationException {
         try {
-            if (spongeRadioButton.isSelected()) {
-                throw new MinecraftSetupException("sponge", spongeRadioButton);
-            }
             if (forgeRadioButton.isSelected()) {
                 throw new MinecraftSetupException("forge", forgeRadioButton);
             }
