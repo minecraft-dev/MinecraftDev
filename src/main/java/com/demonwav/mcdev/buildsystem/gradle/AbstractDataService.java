@@ -47,7 +47,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                            @Nullable ProjectData projectData,
                            @NotNull Project project,
                            @NotNull IdeModifiableModelsProvider modelsProvider) {
-        if (projectData == null || !projectData.getOwner().equals(GradleConstants.SYSTEM_ID)) {
+        if (projectData == null) { //|| !projectData.getOwner().equals(GradleConstants.SYSTEM_ID)) {
             return;
         }
 
@@ -65,19 +65,31 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
         ApplicationManager.getApplication().runReadAction(() -> {
             final Module module = modelsProvider.getModules()[0];
             if (module != null) {
-                if (goodModules.stream().anyMatch(m -> {
-                    String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(m);
-                    if (paths != null && paths.length > 0) {
-                        if (Arrays.stream(paths).anyMatch(module.getName()::equals)) {
-                            return true;
+                if (modelsProvider.getModules().length == 1) {
+                    // Okay so all that up there is only one case. The other case is when it's just a single module
+                    if (goodModules.contains(module)) {
+                        module.setOption("type", type.getId());
+                    } else {
+                        if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
+                            module.setOption("type", JavaModuleType.getModuleType().getId());
                         }
                     }
-                    return false;
-                })) {
-                    module.setOption("type", type.getId());
                 } else {
-                    if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
-                        module.setOption("type", JavaModuleType.getModuleType().getId());
+                    // This is a group of modules
+                    if (goodModules.stream().anyMatch(m -> {
+                        String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(m);
+                        if (paths != null && paths.length > 0) {
+                            if (Arrays.stream(paths).anyMatch(module.getName()::equals)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    })) {
+                        module.setOption("type", type.getId());
+                    } else {
+                        if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
+                            module.setOption("type", JavaModuleType.getModuleType().getId());
+                        }
                     }
                 }
             }
