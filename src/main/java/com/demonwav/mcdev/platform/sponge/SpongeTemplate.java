@@ -31,13 +31,17 @@ public class SpongeTemplate extends AbstractTemplate {
                                               VirtualFile mainClassFile,
                                               String packageName,
                                               String className,
-                                              boolean hasDependencies) {
+                                              SpongeProjectConfiguration configuration) {
         Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
-        if (hasDependencies) {
+        if (configuration.hasDependencies()) {
             properties.setProperty("HAS_DEPENDENCIES", "true");
+        }
+
+        if (configuration.generateDocumentedListeners) {
+            properties.setProperty("GENERATE_DOCUMENTATION", "true");
         }
 
         try {

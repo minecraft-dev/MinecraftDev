@@ -10,9 +10,11 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang.WordUtils;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JTextField;
 
 public class SpongeProjectSettingsWizard extends ModuleWizardStep {
@@ -26,6 +28,7 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
     private JTextField authorsField;
     private JTextField websiteField;
     private JTextField dependField;
+    private JCheckBox generateDocumentedListenersCheckBox;
 
     private final SpongeProjectConfiguration settings = new SpongeProjectConfiguration();
     private final MinecraftProjectCreator creator;
@@ -88,6 +91,8 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
         settings.setDependencies(dependField.getText());
         settings.description = descriptionField.getText();
         settings.website = websiteField.getText();
+
+        settings.generateDocumentedListeners = this.generateDocumentedListenersCheckBox.isSelected();
 
         creator.setSettings(settings);
     }

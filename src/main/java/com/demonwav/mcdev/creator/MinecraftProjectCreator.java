@@ -77,7 +77,7 @@ public class MinecraftProjectCreator {
                 buildRepository.setUrl("https://repo.spongepowered.org/maven/");
                 dependency.setGroupId("org.spongepowered");
                 dependency.setArtifactId("spongeapi");
-                dependency.setVersion("4.0.3");
+                dependency.setVersion("4.1.0-SNAPSHOT");
             default:
                 break;
         }

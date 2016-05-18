@@ -26,6 +26,7 @@ import java.util.List;
 public class SpongeProjectConfiguration extends ProjectConfiguration {
 
     public List<String> dependencies = new ArrayList<>();
+    public boolean generateDocumentedListeners;
 
     public boolean hasDependencies() {
         return listContainsAtLeastOne(dependencies);
@@ -50,7 +51,7 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
                 }
 
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
-                SpongeTemplate.applyMainClassTemplate(module, mainClassFile, packageName, className, hasDependencies());
+                SpongeTemplate.applyMainClassTemplate(module, mainClassFile, packageName, className, this);
 
                 PsiJavaFile mainClassPsi = (PsiJavaFile) PsiManager.getInstance(module.getProject()).findFile(mainClassFile);
                 assert mainClassPsi != null;
