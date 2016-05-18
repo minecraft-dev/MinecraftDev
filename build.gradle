@@ -37,4 +37,3 @@ idea {
 
 group 'org.demonwav.minecraft-dev'
 version pluginVersion // Plugin version
-
