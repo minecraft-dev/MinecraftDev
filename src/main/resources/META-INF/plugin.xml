@@ -19,9 +19,7 @@
         <p><p>
         Recent changes:
         <ul>
-          <li>Fixed bug with NPE on Bukkit projects</li>
-          <li>Initial Sponge Maven project creation is working</li>
-          <li>Initial Gradle project detection is working</li>
+          <li>Gradle support added</li>
         </ul>
       </div>
     ]]>
