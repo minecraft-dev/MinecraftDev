@@ -4,6 +4,7 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.intellij.openapi.module.ModuleTypeManager;
+import com.intellij.util.ui.UIUtil;
 
 import javax.swing.Icon;
 
@@ -26,16 +27,28 @@ public class SpongeModuleType extends MinecraftModuleType {
 
     @Override
     public Icon getBigIcon() {
-        return PlatformAssets.SPONGE_ICON_2X;
+        if (UIUtil.isUnderDarcula()) {
+            return PlatformAssets.SPONGE_ICON_2X;
+        } else {
+            return PlatformAssets.SPONGE_ICON_DARK_2X;
+        }
     }
 
     @Override
     public Icon getIcon() {
-        return PlatformAssets.SPONGE_ICON;
+        if (UIUtil.isUnderDarcula()) {
+            return PlatformAssets.SPONGE_ICON;
+        } else {
+            return PlatformAssets.SPONGE_ICON_DARK;
+        }
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return PlatformAssets.SPONGE_ICON;
+        if (UIUtil.isUnderDarcula()) {
+            return PlatformAssets.SPONGE_ICON_2X;
+        } else {
+            return PlatformAssets.SPONGE_ICON_DARK_2X;
+        }
     }
 }

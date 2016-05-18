@@ -1,19 +1,19 @@
 <idea-plugin version="2">
 
-  <depends optional="false">org.jetbrains.idea.maven</depends>
-  <depends optional="false">org.jetbrains.plugins.gradle</depends>
-  <depends optional="false">org.intellij.groovy</depends>
-  <depends optional="false">org.jetbrains.plugins.yaml</depends>
+    <depends optional="false">org.jetbrains.idea.maven</depends>
+    <depends optional="false">org.jetbrains.plugins.gradle</depends>
+    <depends optional="false">org.intellij.groovy</depends>
+    <depends optional="false">org.jetbrains.plugins.yaml</depends>
 
-  <id>com.demonwav.minecraft-dev</id>
-  <name>Minecraft Development</name>
-  <vendor>DemonWav</vendor>
+    <id>com.demonwav.minecraft-dev</id>
+    <name>Minecraft Development</name>
+    <vendor>DemonWav</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
       Brings support for Bukkit, Spigot, Paper, BungeeCord, Sponge, and Forge Projects to Intellij IDEA.
     ]]></description>
 
-  <change-notes><![CDATA[
+    <change-notes><![CDATA[
       <div>
         Alpha release, not many features, may break. More features to come.
         <p><p>
@@ -23,59 +23,61 @@
         </ul>
       </div>
     ]]>
-  </change-notes>
+    </change-notes>
 
-  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="145"/>
+    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="145"/>
 
-  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
-  -->
+    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
 
-  <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
-    <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
-    <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bukkit.BukkitModuleType"/>
-    <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bukkit.SpigotModuleType"/>
-    <moduleType id="PAPER_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bukkit.PaperModuleType"/>
-    <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType"/>
-    <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.sponge.SpongeModuleType"/>
-    <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
-    <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
-    <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
-    <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.BukkitDataService"/>
-    <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.SpigotDataService"/>
-    <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.PaperDataService"/>
-    <externalProjectDataService implementation="com.demonwav.mcdev.platform.bungeecord.gradle.BungeeCordDataService"/>
-    <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeDataService"/>
-  </extensions>
-  <extensions defaultExtensionNs="org.jetbrains.idea.maven">
-    <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.BukkitMavenImporter"/>
-    <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.SpigotMavenImporter"/>
-    <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
-    <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
-    <importer implementation="com.demonwav.mcdev.platform.bungeecord.maven.BungeeCordMavenImporter"/>
-    <importer implementation="com.demonwav.mcdev.platform.sponge.maven.SpongeMavenImporter"/>
-  </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
+        <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bukkit.BukkitModuleType"/>
+        <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bukkit.SpigotModuleType"/>
+        <moduleType id="PAPER_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bukkit.PaperModuleType"/>
+        <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType"/>
+        <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.sponge.SpongeModuleType"/>
+        <moduleType id="FORGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.forge.ForgeModuleType"/>
+        <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.BukkitDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.SpigotDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.PaperDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bungeecord.gradle.BungeeCordDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeDataService"/>
+    </extensions>
+    <extensions defaultExtensionNs="org.jetbrains.idea.maven">
+        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.BukkitMavenImporter"/>
+        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.SpigotMavenImporter"/>
+        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
+        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
+        <importer implementation="com.demonwav.mcdev.platform.bungeecord.maven.BungeeCordMavenImporter"/>
+        <importer implementation="com.demonwav.mcdev.platform.sponge.maven.SpongeMavenImporter"/>
+    </extensions>
 
-  <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
-  </extensions>
+    <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
+    </extensions>
 
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
 
-  <project-components>
-    <!-- Add your project components here -->
-    <component>
-      <implementation-class>com.demonwav.mcdev.platform.bukkit.BukkitProjectComponent</implementation-class>
-      <loadForDefaultProject/>
-    </component>
-  </project-components>
+    <project-components>
+        <!-- Add your project components here -->
+        <component>
+            <implementation-class>com.demonwav.mcdev.platform.bukkit.BukkitProjectComponent</implementation-class>
+            <loadForDefaultProject/>
+        </component>
+    </project-components>
 
-  <actions>
-    <!-- Add your actions here -->
-  </actions>
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
 </idea-plugin>
