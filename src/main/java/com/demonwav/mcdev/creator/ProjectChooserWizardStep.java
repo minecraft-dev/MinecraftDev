@@ -2,7 +2,6 @@ package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.PlatformType;
-
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
@@ -12,15 +11,14 @@ import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.awt.RelativePoint;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.event.HyperlinkEvent;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class ProjectChooserWizardStep extends ModuleWizardStep {
 

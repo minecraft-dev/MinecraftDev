@@ -4,10 +4,8 @@ import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
-
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,10 +27,10 @@ public abstract class BuildSystem {
     protected List<BuildRepository> repositories;
     protected VirtualFile rootDirectory;
 
-    protected VirtualFile sourceDirectory;
-    protected VirtualFile resourceDirectory;
-    protected VirtualFile testSourcesDirectory;
-    protected VirtualFile testResourceDirectory;
+    protected List<VirtualFile> sourceDirectories;
+    protected List<VirtualFile> resourceDirectories;
+    protected List<VirtualFile> testSourcesDirectories;
+    protected List<VirtualFile> testResourceDirectories;
 
     /**
      * This refers to the plugin name from the perspective of the build system, that being a name field in the build
@@ -41,13 +39,6 @@ public abstract class BuildSystem {
      */
     @Nullable
     protected String pluginName;
-    /**
-     * This refers to the plugin author from the perspective of the build system, that being an author field in the build
-     * system's configuration. This is not the actual plugin author's name, which would be stated in the plugin's
-     * description file, or the main class, depending on the project. This field is null if this value is missing.
-     */
-    @Nullable
-    protected String pluginAuthor;
 
     protected String buildVersion;
 
@@ -99,45 +90,37 @@ public abstract class BuildSystem {
         this.rootDirectory = rootDirectory;
     }
 
-    public VirtualFile getSourceDirectory() {
-        return sourceDirectory;
+    public List<VirtualFile> getSourceDirectories() {
+        return sourceDirectories;
     }
 
-    public void setSourceDirectory(VirtualFile sourceDirectory) {
-        this.sourceDirectory = sourceDirectory;
+    public void setSourceDirectories(List<VirtualFile> sourceDirectories) {
+        this.sourceDirectories = sourceDirectories;
     }
 
-    public VirtualFile getResourceDirectory() {
-        return resourceDirectory;
+    public List<VirtualFile> getResourceDirectories() {
+        return resourceDirectories;
     }
 
-    public void setResourceDirectory(VirtualFile resourceDirectory) {
-        this.resourceDirectory = resourceDirectory;
+    public void setResourceDirectories(List<VirtualFile> resourceDirectories) {
+        this.resourceDirectories = resourceDirectories;
     }
 
-    public VirtualFile getTestSourcesDirectory() {
-        return testSourcesDirectory;
+    public List<VirtualFile> getTestSourcesDirectories() {
+        return testSourcesDirectories;
     }
 
-    public void setTestSourcesDirectory(VirtualFile testSourcesDirectory) {
-        this.testSourcesDirectory = testSourcesDirectory;
+    public void setTestSourcesDirectories(List<VirtualFile> testSourcesDirectories) {
+        this.testSourcesDirectories = testSourcesDirectories;
     }
 
+    @Nullable
     public String getPluginName() {
         return pluginName;
     }
 
     public void setPluginName(@NotNull String pluginName) {
         this.pluginName = pluginName;
-    }
-
-    @Nullable
-    public String getPluginAuthor() {
-        return pluginAuthor;
-    }
-
-    public void setPluginAuthor(@Nullable String pluginAuthor) {
-        this.pluginAuthor = pluginAuthor;
     }
 
     public String getBuildVersion() {
@@ -186,14 +169,12 @@ public abstract class BuildSystem {
      * and setting the build version, and whatever else may be added that consists of this project's build system state.*
      *
      * @param module The module
-     * @return this object
      */
     public abstract void reImport(@NotNull Module module, @NotNull PlatformType type);
 
     @Nullable
     public static BuildSystem getInstance(@NotNull Module module) {
-        //VirtualFile pom = project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml");
-        VirtualFile root = LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module));
+        VirtualFile root = ModuleRootManager.getInstance(module).getContentRoots()[0];
         if (root != null) {
             VirtualFile pom = root.findChild("pom.xml");
             VirtualFile gradle = root.findChild("build.gradle");
@@ -205,6 +186,51 @@ public abstract class BuildSystem {
             }
         }
 
+        return null;
+    }
+
+    @Nullable
+    public VirtualFile findFile(String path, SourceType type) {
+        switch (type) {
+            case SOURCE:
+                return findFile(sourceDirectories, path);
+            case RESOURCE:
+                return findFile(resourceDirectories, path);
+            case TEST_SOURCE:
+                return findFile(testSourcesDirectories, path);
+            case TEST_RESOURCE:
+                return findFile(testResourceDirectories, path);
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "BuildSystem{" +
+                "artifactId='" + artifactId + '\'' +
+                ", groupId='" + groupId + '\'' +
+                ", version='" + version + '\'' +
+                ", dependencies=" + dependencies +
+                ", repositories=" + repositories +
+                ", rootDirectory=" + rootDirectory +
+                ", sourceDirectories=" + sourceDirectories +
+                ", resourceDirectories=" + resourceDirectories +
+                ", testSourcesDirectories=" + testSourcesDirectories +
+                ", testResourceDirectories=" + testResourceDirectories +
+                ", pluginName='" + pluginName + '\'' +
+                ", buildVersion='" + buildVersion + '\'' +
+                '}';
+    }
+
+    private VirtualFile findFile(List<VirtualFile> dirs, String path) {
+        VirtualFile file;
+        for (VirtualFile dir : dirs) {
+            file = dir.findFileByRelativePath(path);
+            if (file != null) {
+                return file;
+            }
+        }
         return null;
     }
 }

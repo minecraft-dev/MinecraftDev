@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.buildsystem.gradle;
 
+import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
-
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.externalSystem.model.DataNode;
@@ -23,6 +23,7 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                            @Nullable ProjectData projectData,
                            @NotNull Project project,
                            @NotNull IdeModifiableModelsProvider modelsProvider) {
-        if (projectData == null) { //|| !projectData.getOwner().equals(GradleConstants.SYSTEM_ID)) {
+        if (projectData == null || !projectData.getOwner().equals(GradleConstants.SYSTEM_ID)) {
             return;
         }
 
@@ -69,6 +70,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                     // Okay so all that up there is only one case. The other case is when it's just a single module
                     if (goodModules.contains(module)) {
                         module.setOption("type", type.getId());
+                        Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(m -> m.reImport(module, type.getPlatformType()));
                     } else {
                         if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
                             module.setOption("type", JavaModuleType.getModuleType().getId());
@@ -86,6 +88,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                         return false;
                     })) {
                         module.setOption("type", type.getId());
+                        Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(m -> m.reImport(module, type.getPlatformType()));
                     } else {
                         if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
                             module.setOption("type", JavaModuleType.getModuleType().getId());

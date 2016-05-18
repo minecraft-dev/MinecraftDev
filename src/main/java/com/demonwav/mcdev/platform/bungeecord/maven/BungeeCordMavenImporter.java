@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.bungeecord.maven;
 import com.demonwav.mcdev.buildsystem.maven.AbstractMavenImporter;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModule;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
-
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtil;

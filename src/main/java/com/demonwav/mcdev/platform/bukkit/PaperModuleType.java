@@ -2,7 +2,6 @@ package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
-
 import com.intellij.openapi.module.ModuleTypeManager;
 
 import javax.swing.Icon;

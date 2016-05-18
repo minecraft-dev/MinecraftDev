@@ -1,8 +1,8 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.platform.AbstractTemplate;
+import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
-
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.openapi.module.Module;
@@ -53,8 +53,8 @@ public class BukkitTemplate extends AbstractTemplate {
             properties.setProperty("HAS_PREFIX", "true");
         }
 
-        if (settings.loadOrder != null) {
-            properties.setProperty("LOAD", settings.loadOrder.name());
+        if (settings.loadOrder != LoadOrder.POSTWORLD) {
+            properties.setProperty("LOAD", LoadOrder.STARTUP.name());
             properties.setProperty("HAS_LOAD", "true");
         }
 
@@ -88,7 +88,7 @@ public class BukkitTemplate extends AbstractTemplate {
         }
 
         try {
-            applyTemplate(module, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties);
+            applyTemplate(module, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties, true);
         } catch (IOException e) {
             e.printStackTrace();
         }

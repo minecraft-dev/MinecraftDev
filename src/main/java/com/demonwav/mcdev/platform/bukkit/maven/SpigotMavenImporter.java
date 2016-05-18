@@ -10,7 +10,6 @@
 package com.demonwav.mcdev.platform.bukkit.maven;
 
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
-
 import org.jetbrains.annotations.NotNull;
 
 public class SpigotMavenImporter extends BukkitMavenImporter {

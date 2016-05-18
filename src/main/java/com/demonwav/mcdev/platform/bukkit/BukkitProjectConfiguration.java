@@ -13,7 +13,6 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
-
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
@@ -76,7 +75,7 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 // Create plugin main class
-                VirtualFile file = buildSystem.getSourceDirectory();
+                VirtualFile file = buildSystem.getSourceDirectories().get(0);
                 String[] files = this.mainClass.split("\\.");
                 String className = files[files.length - 1];
                 String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
@@ -88,7 +87,7 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
 
                 BukkitTemplate.applyMainClassTemplate(module, mainClassFile, packageName, className);
-                VirtualFile pluginYml = buildSystem.getResourceDirectory().findOrCreateChildData(this, "plugin.yml");
+                VirtualFile pluginYml = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "plugin.yml");
                 BukkitTemplate.applyPluginDescriptionFileTemplate(module, pluginYml, this);
 
                 // Set the editor focus on the main class

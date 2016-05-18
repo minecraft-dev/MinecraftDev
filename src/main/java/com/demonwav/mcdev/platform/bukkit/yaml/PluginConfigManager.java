@@ -2,7 +2,6 @@ package com.demonwav.mcdev.platform.bukkit.yaml;
 
 import com.demonwav.mcdev.platform.bukkit.BukkitModule;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitUtil;
-
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFileAdapter;
 import com.intellij.openapi.vfs.VirtualFileEvent;
@@ -117,11 +116,11 @@ public class PluginConfigManager {
                 }
 
                 // Temp code for testing
-//                System.out.println(e.getClass().getSimpleName());
-//                if (e.getYAMLElements().size() != 0)
-//                    printYamlEles(e.getYAMLElements(), 1);
+                System.out.println(e.getClass().getSimpleName());
+                if (e.getYAMLElements().size() != 0)
+                    printYamlEles(e.getYAMLElements(), 1);
             });
-//            System.out.println();
+            System.out.println();
 
         });
     }
@@ -167,7 +166,6 @@ public class PluginConfigManager {
                         setValueInConfig(name, false, false);
                     }
                 } else {
-//                    System.out.println(((YAMLKeyValue) keyValue).getValue());
                     setValueInConfig(name, text, isEnum);
                 }
             }

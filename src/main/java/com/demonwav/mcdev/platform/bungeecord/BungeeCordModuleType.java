@@ -3,7 +3,6 @@ package com.demonwav.mcdev.platform.bungeecord;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
-
 import com.intellij.openapi.module.ModuleTypeManager;
 
 import javax.swing.Icon;

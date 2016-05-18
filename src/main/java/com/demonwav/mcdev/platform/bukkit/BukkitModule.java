@@ -1,10 +1,10 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
-
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleUtil;
@@ -13,22 +13,17 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.Icon;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.Icon;
 
 public class BukkitModule extends AbstractModule {
 
     private static final Map<VirtualFile, BukkitModule> map = new HashMap<>();
 
     private VirtualFile pluginYml;
-    @NotNull
-    private Module module;
     private PlatformType type;
     private PluginConfigManager configManager;
-
-    private BuildSystem buildSystem;
 
     private BukkitModule(@NotNull Module module, @NotNull BukkitModuleType type) {
         this.type = type.getPlatformType();
@@ -36,13 +31,10 @@ public class BukkitModule extends AbstractModule {
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
             buildSystem.reImport(module, type.getPlatformType());
+            pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
 
-            if (buildSystem.getResourceDirectory() != null) {
-                pluginYml = buildSystem.getResourceDirectory().findChild("plugin.yml");
-
-                if (pluginYml != null) {
-                    this.configManager = new PluginConfigManager(this);
-                }
+            if (pluginYml != null) {
+                this.configManager = new PluginConfigManager(this);
             }
         }
     }
@@ -60,8 +52,8 @@ public class BukkitModule extends AbstractModule {
             }
         }
         // it may still be null if there was no valid build system detected
-        if (buildSystem != null && buildSystem.getResourceDirectory() != null) {
-            this.pluginYml = buildSystem.getResourceDirectory().findChild("plugin.yml");
+        if (buildSystem != null) {
+            this.pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
             if (pluginYml != null) {
                 this.configManager = new PluginConfigManager(this);
             }
@@ -96,27 +88,16 @@ public class BukkitModule extends AbstractModule {
         return configManager;
     }
 
-    @NotNull
-    public Module getModule() {
-        return module;
-    }
-
     public VirtualFile getPluginYml() {
         return pluginYml;
     }
 
-    public void setPluginYml(@NotNull VirtualFile pluginYml) {
-        this.pluginYml = pluginYml;
-    }
-
+    @Override
     public Icon getIcon() {
         return type.getType().getIcon();
     }
 
-    public BuildSystem getBuildSystem() {
-        return buildSystem;
-    }
-
+    @Override
     public PlatformType getType() {
         return type;
     }

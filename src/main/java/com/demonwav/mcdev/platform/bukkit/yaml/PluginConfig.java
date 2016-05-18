@@ -2,7 +2,6 @@ package com.demonwav.mcdev.platform.bukkit.yaml;
 
 import com.demonwav.mcdev.platform.bukkit.BukkitModule;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
-
 import com.google.common.base.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

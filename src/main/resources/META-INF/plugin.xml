@@ -2,6 +2,7 @@
 
   <depends optional="false">org.jetbrains.idea.maven</depends>
   <depends optional="false">org.jetbrains.plugins.gradle</depends>
+  <depends optional="false">org.intellij.groovy</depends>
   <depends optional="false">org.jetbrains.plugins.yaml</depends>
 
   <id>com.demonwav.minecraft-dev</id>

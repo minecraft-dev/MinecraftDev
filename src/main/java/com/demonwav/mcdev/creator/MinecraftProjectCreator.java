@@ -5,7 +5,6 @@ import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
-
 import com.google.common.base.Objects;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;

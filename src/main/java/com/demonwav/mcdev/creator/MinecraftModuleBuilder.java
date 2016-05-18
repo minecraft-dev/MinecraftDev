@@ -6,7 +6,6 @@ import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
-
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
@@ -28,9 +27,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-
 import javax.swing.Icon;
+import java.io.File;
 
 public class MinecraftModuleBuilder extends JavaModuleBuilder {
 

@@ -3,8 +3,8 @@ package com.demonwav.mcdev.platform.sponge;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
-
 import com.google.common.base.Strings;
+import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
@@ -40,7 +40,7 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
     public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem) {
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
-                VirtualFile file = buildSystem.getSourceDirectory();
+                VirtualFile file = buildSystem.getSourceDirectories().get(0);
                 String[] files = this.mainClass.split("\\.");
                 String className = files[files.length - 1];
                 String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
@@ -67,7 +67,7 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
                 // handle indentation for us.
 
                 String annotationString = "@Plugin(";
-                annotationString += "\nid = \"" + buildSystem.getArtifactId() + "\"";
+                annotationString += "\nid = \"" + buildSystem.getGroupId() + "." + buildSystem.getArtifactId() + "\"";
                 annotationString += ",\nname = \"" + pluginName + "\"";
                 annotationString += ",\nversion = \"" + buildSystem.getVersion() + "\"";
 
@@ -118,6 +118,8 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
                         psiClass.getModifierList().addBefore(annotation, psiClass.getModifierList().getFirstChild());
                     }
                 }.execute();
+
+                EditorHelper.openInEditor(mainClassPsi);
             } catch (IOException e) {
                 e.printStackTrace();
             }
