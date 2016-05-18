@@ -14,7 +14,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JTextField;
 
 public class SpongeProjectSettingsWizard extends ModuleWizardStep {
