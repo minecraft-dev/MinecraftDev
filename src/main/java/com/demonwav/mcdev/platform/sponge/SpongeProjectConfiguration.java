@@ -58,7 +58,7 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
 
                 PsiElementFactory factory = JavaPsiFacade.getElementFactory(module.getProject());
 
-                // I am absolutely sure this is now how this should be done. Raw string manipulation is messy and can
+                // I am absolutely sure this is not how this should be done. Raw string manipulation is messy and can
                 // probably pretty easily break. However, I couldn't figure out the correct IntelliJ Psi way to do this,
                 // and I didn't feel like spending stupid amounts of time trying to figure it out. This may get changed
                 // in the future to a more correct method if someone can figure out how to properly do it.
