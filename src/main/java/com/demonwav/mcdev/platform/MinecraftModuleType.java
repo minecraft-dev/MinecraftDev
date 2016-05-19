@@ -7,6 +7,8 @@ import com.intellij.openapi.module.ModuleTypeManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
+import java.util.Collections;
+import java.util.List;
 
 public class MinecraftModuleType extends JavaModuleType {
 
@@ -61,6 +63,11 @@ public class MinecraftModuleType extends JavaModuleType {
     @NotNull
     public String getGroupId() {
         return groupId;
+    }
+
+    @NotNull
+    public List<String> getIgnoredAnnotations() {
+        return Collections.emptyList();
     }
 
     @NotNull

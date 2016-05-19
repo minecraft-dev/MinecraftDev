@@ -4,10 +4,13 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.google.common.base.Strings;
+import com.intellij.codeInspection.ex.EntryPointsManager;
+import com.intellij.codeInspection.ex.EntryPointsManagerBase;
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.util.JDOMExternalizableStringList;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
@@ -120,6 +123,7 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
                     }
                 }.execute();
 
+                performCreationSettingSetup(module, type);
                 EditorHelper.openInEditor(mainClassPsi);
             } catch (IOException e) {
                 e.printStackTrace();

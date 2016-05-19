@@ -1,7 +1,10 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.intellij.codeInspection.ex.EntryPointsManager;
+import com.intellij.codeInspection.ex.EntryPointsManagerBase;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.util.JDOMExternalizableStringList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -35,6 +38,15 @@ public abstract class ProjectConfiguration {
 
     protected static String[] commaSplit(String string) {
         return string.trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*");
+    }
+
+    protected void performCreationSettingSetup(Module module, PlatformType type) {
+        JDOMExternalizableStringList annotations = ((EntryPointsManagerBase) EntryPointsManager.getInstance(module.getProject())).ADDITIONAL_ANNOTATIONS;
+        for (String annotation : type.getType().getIgnoredAnnotations()) {
+            if (!annotations.contains(annotation)) {
+                annotations.add(annotation);
+            }
+        }
     }
 
     protected static boolean listContainsAtLeastOne(List<String> list) {

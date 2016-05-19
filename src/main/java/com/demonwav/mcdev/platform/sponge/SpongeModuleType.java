@@ -3,10 +3,13 @@ package com.demonwav.mcdev.platform.sponge;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.ModuleTypeManager;
 import com.intellij.util.ui.UIUtil;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
+import java.util.List;
 
 public class SpongeModuleType extends MinecraftModuleType {
 
@@ -50,5 +53,11 @@ public class SpongeModuleType extends MinecraftModuleType {
         } else {
             return PlatformAssets.SPONGE_ICON_DARK_2X;
         }
+    }
+
+    @NotNull
+    @Override
+    public List<String> getIgnoredAnnotations() {
+        return ImmutableList.of("org.spongepowered.api.event.Listener");
     }
 }
