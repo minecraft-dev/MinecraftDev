@@ -10,7 +10,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Base class for Maven and Gradle build systems. The general contract of any class which implements this is any
@@ -18,6 +20,8 @@ import java.util.List;
  * represent changes in the project itself.
  */
 public abstract class BuildSystem {
+
+    private static final Map<Module, BuildSystem> map = new HashMap<>();
 
     protected String artifactId;
     protected String groupId;
@@ -174,19 +178,21 @@ public abstract class BuildSystem {
 
     @Nullable
     public static BuildSystem getInstance(@NotNull Module module) {
-        VirtualFile root = ModuleRootManager.getInstance(module).getContentRoots()[0];
-        if (root != null) {
-            VirtualFile pom = root.findChild("pom.xml");
-            VirtualFile gradle = root.findChild("build.gradle");
+        return map.computeIfAbsent(module, (m -> {
+            VirtualFile root = ModuleRootManager.getInstance(module).getContentRoots()[0];
+            if (root != null) {
+                VirtualFile pom = root.findChild("pom.xml");
+                VirtualFile gradle = root.findChild("build.gradle");
 
-            if (pom != null) {
-                return new MavenBuildSystem();
-            } else if (gradle != null) {
-                return new GradleBuildSystem();
+                if (pom != null) {
+                    return new MavenBuildSystem();
+                } else if (gradle != null) {
+                    return new GradleBuildSystem();
+                }
             }
-        }
 
-        return null;
+            return null;
+        }));
     }
 
     @Nullable
