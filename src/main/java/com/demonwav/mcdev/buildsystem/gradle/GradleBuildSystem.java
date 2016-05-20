@@ -8,14 +8,27 @@ import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.google.common.base.Strings;
 import com.intellij.compiler.options.CompileStepBeforeRun;
+import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.BeforeRunTaskProvider;
 import com.intellij.execution.RunManager;
+import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.execution.configurations.RunConfigurationBase;
+import com.intellij.execution.configurations.RunConfigurationModule;
+import com.intellij.execution.configurations.RunProfileWithCompileBeforeLaunchOption;
+import com.intellij.execution.configurations.RuntimeConfigurationError;
+import com.intellij.execution.impl.RunManagerImpl;
+import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
+import com.intellij.execution.junit.RuntimeConfigurationProducer;
 import com.intellij.ide.actions.ImportModuleAction;
 import com.intellij.ide.util.newProjectWizard.AddModuleWizard;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.externalSystem.model.project.ExternalSystemSourceType;
+import com.intellij.openapi.externalSystem.service.execution.ExternalSystemBeforeRunTask;
+import com.intellij.openapi.externalSystem.service.execution.ExternalSystemBeforeRunTaskProvider;
+import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration;
 import com.intellij.openapi.externalSystem.service.project.manage.ExternalProjectsManager;
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager;
 import com.intellij.openapi.module.Module;
@@ -26,6 +39,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
+import org.gradle.api.invocation.Gradle;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.model.idea.IdeaDependency;
@@ -33,8 +47,11 @@ import org.gradle.tooling.model.idea.IdeaModule;
 import org.gradle.tooling.model.idea.IdeaProject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.plugins.gradle.execution.GradleBeforeRunTaskProvider;
 import org.jetbrains.plugins.gradle.model.ExternalProject;
 import org.jetbrains.plugins.gradle.model.ExternalSourceSet;
+import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType;
+import org.jetbrains.plugins.gradle.service.execution.GradleRuntimeConfigurationProducer;
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportBuilder;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportProvider;
@@ -57,6 +74,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class GradleBuildSystem extends BuildSystem {
 
@@ -117,27 +135,53 @@ public class GradleBuildSystem extends BuildSystem {
             }
 
             // Set up the run config
-            if (GroovyScriptRunConfigurationType.getInstance().getConfigurationFactories().length > 0) {
-                RunnerAndConfigurationSettings settings = RunManager.getInstance(project).createRunConfiguration(module.getName() + " Build", GroovyScriptRunConfigurationType.getInstance().getConfigurationFactories()[0]);
-                GroovyScriptRunConfiguration runConfiguration = (GroovyScriptRunConfiguration) settings.getConfiguration();
-                runConfiguration.setName(module.getName() + " Build");
-                runConfiguration.setModule(module);
-                runConfiguration.setScriptPath(buildGradle.getCanonicalPath());
-                runConfiguration.setWorkingDirectory(getRootDirectory().getCanonicalPath());
-                runConfiguration.setScriptParameters("build");
+            RunnerAndConfigurationSettings settings = RunManager.getInstance(project)
+                    .createRunConfiguration(
+                            module.getName() + " Build",
+                            GroovyScriptRunConfigurationType.getInstance().getConfigurationFactories()[0]
+                    );
+            GroovyScriptRunConfiguration runConfiguration = (GroovyScriptRunConfiguration) settings.getConfiguration();
+            // Set some general settings
+            runConfiguration.setModule(module);
+            runConfiguration.setScriptPath(buildGradle.getCanonicalPath());
+            runConfiguration.setWorkingDirectory(getRootDirectory().getCanonicalPath());
+            runConfiguration.setScriptParameters("build");
 
-                settings.setActivateToolWindowBeforeRun(true);
-                settings.setSingleton(true);
+            settings.setActivateToolWindowBeforeRun(true);
+            settings.setSingleton(true);
 
-                BeforeRunTaskProvider<CompileStepBeforeRun.MakeBeforeRunTask> provider = BeforeRunTaskProvider.getProvider(project, CompileStepBeforeRun.ID);
-                if (provider != null) {
-                    provider.configureTask(runConfiguration, null);
+            // FIXME this always puts "make" in the run before thing, which we don't want
+            // I've tried this, I've tried giving it an empty list, I've tried setting it to null, I don't know what to
+            // try at this point
+
+            // I also tried this, which prevents the make build to run, but doesn't remove it, so that also isn't optimal
+//            GroovyScriptRunConfiguration runConfiguration = new GroovyScriptRunConfiguration(
+//                    module.getName() + " build",
+//                    project,
+//                    GroovyScriptRunConfigurationType.getInstance().getConfigurationFactories()[0
+//            ) {
+//                @Override
+//                public boolean excludeCompileBeforeLaunchOption() {
+//                    return true;
+//                }
+//            };
+//
+//            RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
+//                    RunManagerImpl.getInstanceImpl(project), runConfiguration, false
+//            );
+
+            List<BeforeRunTask> tasks = RunManagerEx.getInstanceEx(project).getBeforeRunTasks(runConfiguration);
+            tasks = tasks.stream().peek(t -> {
+                if (t instanceof CompileStepBeforeRun.MakeBeforeRunTask) {
+                    t.setEnabled(false);
                 }
+            }).collect(Collectors.toList());
+            RunManagerEx.getInstanceEx(project).setBeforeRunTasks(runConfiguration, tasks, true);
 
-                // FIXME this always puts "make" in the run before thing, which we don't want
-                RunManager.getInstance(project).addConfiguration(settings, false);
-                RunManager.getInstance(project).setSelectedConfiguration(settings);
-            }
+            // Apply the run config and select it
+            RunManager.getInstance(project).addConfiguration(settings, false);
+            RunManager.getInstance(project).setSelectedConfiguration(settings);
+
         }
     }
 
