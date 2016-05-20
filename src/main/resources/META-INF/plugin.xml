@@ -7,7 +7,11 @@
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
-    <vendor>DemonWav</vendor>
+    <vendor><![CDATA[
+        DemonWav
+        gabizou
+        kashike
+    ]]></vendor>
 
     <description><![CDATA[
       Brings support for Bukkit, Spigot, Paper, BungeeCord, Sponge, and Forge Projects to Intellij IDEA.
