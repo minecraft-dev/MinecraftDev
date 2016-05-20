@@ -17,20 +17,23 @@ public class PlatformUtil {
 
     @Nullable
     public static AbstractModule getInstance(@NotNull Module module) {
-        VirtualFile moduleRoot = ModuleRootManager.getInstance(module).getContentRoots()[0];
+        VirtualFile[] roots = ModuleRootManager.getInstance(module).getContentRoots();
+        if (roots.length > 1) {
+            VirtualFile moduleRoot = roots[0];
 
-        ModuleType moduleType = ModuleUtil.getModuleType(module);
+            ModuleType moduleType = ModuleUtil.getModuleType(module);
 
-        if (moduleType instanceof MinecraftModuleType) {
-            return map.computeIfAbsent(moduleRoot, m -> ((MinecraftModuleType) moduleType).generateModule(module));
-        } else { // last ditch effort for gradle multi projects
-            String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
-            if (paths != null && paths.length >= 1) {
-                // The last element will be this module, the second to last is the parent
-                String parentName = paths[paths.length - 1];
-                Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(parentName);
-                if (parentModule != null) {
-                    return getInstance(parentModule);
+            if (moduleType instanceof MinecraftModuleType) {
+                return map.computeIfAbsent(moduleRoot, m -> ((MinecraftModuleType) moduleType).generateModule(module));
+            } else { // last ditch effort for gradle multi projects
+                String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
+                if (paths != null && paths.length >= 1) {
+                    // The last element will be this module, the second to last is the parent
+                    String parentName = paths[paths.length - 1];
+                    Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(parentName);
+                    if (parentModule != null) {
+                        return getInstance(parentModule);
+                    }
                 }
             }
         }
