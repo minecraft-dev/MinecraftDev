@@ -74,6 +74,7 @@ public class BukkitTemplate extends AbstractTemplate {
         }
 
         if (settings.hasAuthors()) {
+            properties.setProperty("AUTHOR_LIST", settings.authors.toString());
             properties.setProperty("HAS_AUTHOR_LIST", "true");
         }
 

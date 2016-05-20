@@ -253,6 +253,9 @@ public abstract class BuildSystem {
 
     private VirtualFile findFile(List<VirtualFile> dirs, String path) {
         VirtualFile file;
+        if (dirs == null) {
+            return null;
+        }
         for (VirtualFile dir : dirs) {
             file = dir.findFileByRelativePath(path);
             if (file != null) {
