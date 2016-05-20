@@ -58,7 +58,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             "<a href=\"https://www.spongepowered.org/\"> Sponge</a> plugin, for use " +
             "on Sponge servers.</font></html>";
     private static final String forgeInfo = "<html><font size=\"4\">Create a standard " +
-            "<a href=\"http://files.minecraftforge.net/\"> Forge</a> plugin, for use " +
+            "<a href=\"http://files.minecraftforge.net/\"> Forge</a> mod, for use " +
             "on Forge servers.</font></html>";
 
     public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator) {
