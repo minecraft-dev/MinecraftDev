@@ -7,6 +7,8 @@ import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.google.common.base.Strings;
+import com.intellij.compiler.options.CompileStepBeforeRun;
+import com.intellij.execution.BeforeRunTaskProvider;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.ide.actions.ImportModuleAction;
@@ -14,6 +16,7 @@ import com.intellij.ide.util.newProjectWizard.AddModuleWizard;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.externalSystem.model.project.ExternalSystemSourceType;
+import com.intellij.openapi.externalSystem.service.project.manage.ExternalProjectsManager;
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -115,9 +118,9 @@ public class GradleBuildSystem extends BuildSystem {
 
             // Set up the run config
             if (GroovyScriptRunConfigurationType.getInstance().getConfigurationFactories().length > 0) {
-                RunnerAndConfigurationSettings settings = RunManager.getInstance(project).createRunConfiguration("Build", GroovyScriptRunConfigurationType.getInstance().getConfigurationFactories()[0]);
+                RunnerAndConfigurationSettings settings = RunManager.getInstance(project).createRunConfiguration(module.getName() + " Build", GroovyScriptRunConfigurationType.getInstance().getConfigurationFactories()[0]);
                 GroovyScriptRunConfiguration runConfiguration = (GroovyScriptRunConfiguration) settings.getConfiguration();
-                runConfiguration.setName("Build");
+                runConfiguration.setName(module.getName() + " Build");
                 runConfiguration.setModule(module);
                 runConfiguration.setScriptPath(buildGradle.getCanonicalPath());
                 runConfiguration.setWorkingDirectory(getRootDirectory().getCanonicalPath());
@@ -125,6 +128,11 @@ public class GradleBuildSystem extends BuildSystem {
 
                 settings.setActivateToolWindowBeforeRun(true);
                 settings.setSingleton(true);
+
+                BeforeRunTaskProvider<CompileStepBeforeRun.MakeBeforeRunTask> provider = BeforeRunTaskProvider.getProvider(project, CompileStepBeforeRun.ID);
+                if (provider != null) {
+                    provider.configureTask(runConfiguration, null);
+                }
 
                 // FIXME this always puts "make" in the run before thing, which we don't want
                 RunManager.getInstance(project).addConfiguration(settings, false);

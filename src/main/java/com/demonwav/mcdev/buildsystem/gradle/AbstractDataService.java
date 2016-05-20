@@ -74,15 +74,14 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             checkedModules.addAll(goodModules);
 
             goodModules.stream().forEach(m -> {
-                String[] path = ModuleManager.getInstance(project).getModuleGroupPath(m);
+                String[] path = modelsProvider.getModifiableModuleModel().getModuleGroupPath(m);
                 if (path == null) {
                     m.setOption("type", type.getId());
                     checkedModules.add(m);
                     Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m, type.getPlatformType()));
                 } else {
-                    System.out.println(Arrays.toString(path));
                     String parentName = path[0];
-                    Module parentModule = ModuleManager.getInstance(project).findModuleByName(parentName);
+                    Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
                     if (parentModule != null) {
                         parentModule.setOption("type", type.getId());
                         badModules.add(m);

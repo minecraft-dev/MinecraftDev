@@ -18,7 +18,7 @@ public class PlatformUtil {
     @Nullable
     public static AbstractModule getInstance(@NotNull Module module) {
         VirtualFile[] roots = ModuleRootManager.getInstance(module).getContentRoots();
-        if (roots.length > 1) {
+        if (roots.length > 0) {
             VirtualFile moduleRoot = roots[0];
 
             ModuleType moduleType = ModuleUtil.getModuleType(module);
@@ -27,12 +27,15 @@ public class PlatformUtil {
                 return map.computeIfAbsent(moduleRoot, m -> ((MinecraftModuleType) moduleType).generateModule(module));
             } else { // last ditch effort for gradle multi projects
                 String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
-                if (paths != null && paths.length > 0) {
+                if (paths != null) {
                     // The last element will be the module's parent
-                    String parentName = paths[paths.length - 1];
+                    String parentName = paths[0];
                     Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(parentName);
                     if (parentModule != null) {
-                        return getInstance(parentModule);
+                        ModuleType parentModuleType = ModuleUtil.getModuleType(parentModule);
+                        if (parentModuleType instanceof MinecraftModuleType) {
+                            return map.computeIfAbsent(moduleRoot, m -> ((MinecraftModuleType) parentModuleType).generateModule(module));
+                        }
                     }
                 }
             }
