@@ -19,7 +19,11 @@
         <p><p>
         Recent changes:
         <ul>
-          <li>Gradle support added</li>
+          <li>Added sidebar icon to Event listeners</li>
+          <li>Added Event object inspections</li>
+          <li>Fixed bug with Maven when ModuleType changes</li>
+          <li>Initial progress made on Forge importing</li>
+          <li>Fixed issues with multi-module Gradle projects</li>
         </ul>
       </div>
     ]]>

@@ -1,9 +1,15 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.IdeBorderFactory;
+import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,6 +64,23 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
     public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator) {
         super();
         this.creator = creator;
+    }
+
+    @Override
+    public boolean validate() throws ConfigurationException {
+        try {
+            if (forgeRadioButton.isSelected()) {
+                throw new MinecraftSetupException("forge", forgeRadioButton);
+            }
+        } catch (MinecraftSetupException e) {
+            String message = e.getError();
+            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
+                    .setFadeoutTime(4000)
+                    .createBalloon()
+                    .show(RelativePoint.getSouthWestOf(e.getJ()), Balloon.Position.below);
+            return false;
+        }
+        return true;
     }
 
     @Override
