@@ -3,6 +3,7 @@ package com.demonwav.mcdev.buildsystem.gradle;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.google.common.base.Strings;
+import com.intellij.ide.projectView.impl.ModuleGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
@@ -23,7 +24,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -66,45 +69,38 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
         // do apply to. We're interested (when setting the module type) in the parent, which is what we do here. The
         // first module should be the parent, but we check to make sure anyways
         ApplicationManager.getApplication().runReadAction(() -> {
-            final Module module = modelsProvider.getModules()[0];
-            if (module != null) {
-                if (modelsProvider.getModules().length == 1) {
-                    // Okay so all that up there is only one case. The other case is when it's just a single module
-                    if (goodModules.contains(module)) {
-                        module.setOption("type", type.getId());
-                        Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(m -> m.reImport(module, type.getPlatformType()));
-                    } else {
-                        if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
-                            module.setOption("type", JavaModuleType.getModuleType().getId());
-                        }
-                    }
+            Set<Module> checkedModules = new HashSet<>();
+            Set<Module> badModules = new HashSet<>();
+            checkedModules.addAll(goodModules);
+
+            goodModules.stream().forEach(m -> {
+                String[] path = ModuleManager.getInstance(project).getModuleGroupPath(m);
+                if (path == null) {
+                    m.setOption("type", type.getId());
+                    checkedModules.add(m);
+                    Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m, type.getPlatformType()));
                 } else {
-                    // This is a group of modules
-                    goodModules.forEach(m -> {
-                        Project currentProject = m.getProject();
-                        String[] paths = ModuleManager.getInstance(currentProject).getModuleGroupPath(m);
-                        if (paths != null && paths.length > 1) {
-                            // The last element will be this module, the second to last is the parent
-                            String parentName = paths[paths.length - 2];
-                            Module parentModule = ModuleManager.getInstance(project).findModuleByName(parentName);
+                    System.out.println(Arrays.toString(path));
+                    String parentName = path[0];
+                    Module parentModule = ModuleManager.getInstance(project).findModuleByName(parentName);
+                    if (parentModule != null) {
+                        parentModule.setOption("type", type.getId());
+                        badModules.add(m);
+                        checkedModules.add(parentModule);
+                        Optional.ofNullable(BuildSystem.getInstance(parentModule)).ifPresent(thisModule -> thisModule.reImport(parentModule, type.getPlatformType()));
+                    }
+                }
+            });
 
-                            if (Objects.equals(parentModule, module)) {
-                                VirtualFile root = ModuleRootManager.getInstance(module).getContentRoots()[0];
-                                VirtualFile gradle = root.findChild("build.gradle");
-
-                                if (gradle != null) {
-                                    module.setOption("type", type.getId());
-                                    Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(thisModule -> thisModule.reImport(module, type.getPlatformType()));
-                                    return;
-                                }
-                            }
-                        }
-                        if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
-                            module.setOption("type", JavaModuleType.getModuleType().getId());
+            // Reset all other modules back to JavaModule
+            toImport.stream()
+                    .map(n -> modelsProvider.findIdeModule(n.getData().getOwnerModule()))
+                    .filter(m -> !checkedModules.contains(m) || badModules.contains(m))
+                    .forEach(m -> {
+                        if (Strings.nullToEmpty(m.getOptionValue("type")).equals(type.getId())) {
+                            m.setOption("type", JavaModuleType.getModuleType().getId());
                         }
                     });
-                }
-            }
         });
     }
 }

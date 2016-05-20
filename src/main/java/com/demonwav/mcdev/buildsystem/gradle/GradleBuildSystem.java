@@ -78,8 +78,6 @@ public class GradleBuildSystem extends BuildSystem {
                     // mappings http://export.mcpbot.bspk.rs/versions.json
 
                 } else {
-
-
                     AbstractTemplate.applyBuildGradleTemplate(
                             module,
                             buildGradle,

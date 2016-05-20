@@ -181,36 +181,38 @@ public abstract class BuildSystem {
     @Nullable
     public static BuildSystem getInstance(@NotNull Module module) {
         return map.computeIfAbsent(module, (m -> {
-            VirtualFile root = ModuleRootManager.getInstance(module).getContentRoots()[0];
-            if (root != null) {
-                VirtualFile pom = root.findChild("pom.xml");
-                VirtualFile gradle = root.findChild("build.gradle");
+            VirtualFile[] roots = ModuleRootManager.getInstance(module).getContentRoots();
+            if (roots.length > 0) {
+                VirtualFile root = roots[0];
+                if (root != null) {
+                    VirtualFile pom = root.findChild("pom.xml");
+                    VirtualFile gradle = root.findChild("build.gradle");
 
-                if (pom != null) {
-                    return new MavenBuildSystem();
-                } else if (gradle != null) {
-                    return new GradleBuildSystem();
-                } else {
-                    // We need to check if this is a multi-module gradle project
-                    Project project = module.getProject();
-                    String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(module);
-                    if (paths != null && paths.length > 1) {
-                        // The last element will be this module, the second to last is the parent
-                        String parentName = paths[paths.length - 2];
-                        Module parentModule = ModuleManager.getInstance(project).findModuleByName(parentName);
+                    if (pom != null) {
+                        return new MavenBuildSystem();
+                    } else if (gradle != null) {
+                        return new GradleBuildSystem();
+                    } else {
+                        // We need to check if this is a multi-module gradle project
+                        Project project = module.getProject();
+                        String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(module);
+                        if (paths != null && paths.length > 1) {
+                            // The last element will be this module, the second to last is the parent
+                            String parentName = paths[paths.length - 2];
+                            Module parentModule = ModuleManager.getInstance(project).findModuleByName(parentName);
 
-                        if (parentModule != null) {
-                            root = ModuleRootManager.getInstance(parentModule).getContentRoots()[0];
-                            gradle = root.findChild("build.gradle");
+                            if (parentModule != null) {
+                                root = ModuleRootManager.getInstance(parentModule).getContentRoots()[0];
+                                gradle = root.findChild("build.gradle");
 
-                            if (gradle != null) {
-                                return new GradleBuildSystem();
+                                if (gradle != null) {
+                                    return new GradleBuildSystem();
+                                }
                             }
                         }
                     }
                 }
             }
-
             return null;
         }));
     }

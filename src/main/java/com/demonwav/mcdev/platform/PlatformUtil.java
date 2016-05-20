@@ -27,8 +27,8 @@ public class PlatformUtil {
                 return map.computeIfAbsent(moduleRoot, m -> ((MinecraftModuleType) moduleType).generateModule(module));
             } else { // last ditch effort for gradle multi projects
                 String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
-                if (paths != null && paths.length >= 1) {
-                    // The last element will be this module, the second to last is the parent
+                if (paths != null && paths.length > 0) {
+                    // The last element will be the module's parent
                     String parentName = paths[paths.length - 1];
                     Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(parentName);
                     if (parentModule != null) {
