@@ -24,6 +24,8 @@
           <li>Fixed bug with Maven when ModuleType changes</li>
           <li>Initial progress made on Forge importing</li>
           <li>Fixed issues with multi-module Gradle projects</li>
+          <li>Fixed ArrayIndexOutOfBoundsException in PlatformUtil</li>
+          <li>Disabled Forge detection for nowS</li>
         </ul>
       </div>
     ]]>
