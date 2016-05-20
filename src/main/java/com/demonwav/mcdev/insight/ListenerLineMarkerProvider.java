@@ -69,7 +69,7 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
         // By this point, we can guarantee that the action of "go to declaration" will work
         // since the PsiClass can be resolved, meaning the event listener is listening to
         // a valid event.
-        LineMarkerInfo info = new EventLineMarkerInfo(element, element.getTextRange(), this.getIcon(), Pass.UPDATE_ALL, createHanlder(listener.getSecond()));
+        LineMarkerInfo info = new EventLineMarkerInfo(element, element.getTextRange(), this.getIcon(), Pass.UPDATE_ALL, createHandler(listener.getSecond()));
         EditorColorsScheme globalScheme = this.myColorsManager.getGlobalScheme();
         info.separatorColor = globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR);
         info.separatorPlacement = SeparatorPlacement.TOP;
@@ -78,7 +78,7 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
 
     // This is a navigation handler that just simply goes and opens up the event's declaration,
     // even if the event target is a nested class.
-    private static GutterIconNavigationHandler<PsiElement> createHanlder(PsiMethod method) {
+    private static GutterIconNavigationHandler<PsiElement> createHandler(PsiMethod method) {
         return (e, element1) -> {
             // We need to re-evaluate the targeted method, because if the method signature slightly changes before
             // IntelliJ decides to re-evaluate the method, but the class is no longer valid.
@@ -160,7 +160,7 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
         }
     }
 
-    static void gotoTargetElement(@NotNull PsiElement element, @NotNull Editor currentEditor, @NotNull PsiFile currentFile) {
+    private static void gotoTargetElement(@NotNull PsiElement element, @NotNull Editor currentEditor, @NotNull PsiFile currentFile) {
         if (element.getContainingFile() == currentFile) {
             int offset = element.getTextOffset();
             PsiElement leaf = currentFile.findElementAt(offset);

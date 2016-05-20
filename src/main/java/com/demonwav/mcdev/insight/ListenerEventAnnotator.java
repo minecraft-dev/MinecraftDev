@@ -21,9 +21,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-/**
- * Created by gabizou on 5/19/2016.
- */
 public class ListenerEventAnnotator implements Annotator {
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
@@ -92,18 +89,18 @@ public class ListenerEventAnnotator implements Annotator {
             return;
         }
 
-        if (!isSuperEventListenrAllowed(eventClass, method, instance)) {
+        if (!isSuperEventListenerAllowed(eventClass, method, instance)) {
             holder.createErrorAnnotation(eventParameter, instance.writeErrorMessageForEventParameter(eventClass));
         }
     }
 
-    private static boolean isSuperEventListenrAllowed(PsiClass eventClass, PsiMethod method, AbstractModule module) {
+    private static boolean isSuperEventListenerAllowed(PsiClass eventClass, PsiMethod method, AbstractModule module) {
         final PsiClass[] supers = eventClass.getSupers();
         for (PsiClass aSuper : supers) {
             if (module.isEventClassValid(aSuper, method)) {
                 return true;
             }
-            if (isSuperEventListenrAllowed(aSuper, method, module)) {
+            if (isSuperEventListenerAllowed(aSuper, method, module)) {
                 return true;
             }
         }

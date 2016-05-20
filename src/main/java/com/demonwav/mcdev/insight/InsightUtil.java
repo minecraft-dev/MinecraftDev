@@ -20,9 +20,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * Created by gabizou on 5/19/2016.
- */
 public class InsightUtil {
 
     @Nullable

@@ -189,10 +189,7 @@ public class GradleBuildSystem extends BuildSystem {
                                 String tempVersion = matcher.group(3);
                                 String scope = ideaDependency.getScope().getScope().toLowerCase();
 
-                                // We only want dependencies that are declared, not transitive
-                                if (groovyFile.getText().contains(tempGroupId + ":" + tempArtifactId + ":" + tempVersion)) {
-                                    dependencies.add(new BuildDependency(tempGroupId, tempArtifactId, tempVersion, scope));
-                                }
+                                dependencies.add(new BuildDependency(tempGroupId, tempArtifactId, tempVersion, scope));
                             }
                         }
                     }
