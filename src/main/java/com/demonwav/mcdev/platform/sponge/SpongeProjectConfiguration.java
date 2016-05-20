@@ -68,7 +68,7 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
                 // handle indentation for us.
 
                 String annotationString = "@Plugin(";
-                annotationString += "\nid = \"" + buildSystem.getGroupId() + "." + buildSystem.getArtifactId() + "\"";
+                annotationString += "\nid = \"" + buildSystem.getArtifactId().toLowerCase() + "\"";
                 annotationString += ",\nname = \"" + pluginName + "\"";
                 annotationString += ",\nversion = \"" + buildSystem.getVersion() + "\"";
 
