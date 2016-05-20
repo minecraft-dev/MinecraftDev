@@ -23,6 +23,7 @@ import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
@@ -60,66 +61,14 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
     @Override
     @Nullable
     public LineMarkerInfo getLineMarkerInfo(@NotNull final PsiElement element) {
-        // Since we want to line up with the method declaration, not the annotation
-        // declaration, we need to target identifiers, not just PsiMethods.
-        if (!(element instanceof PsiIdentifier && (element.getParent() instanceof PsiMethod))) {
+        final Pair<PsiClass, PsiMethod> listener = InsightUtil.getEventListenerFromElement(element);
+        if (listener == null) {
             return null;
         }
-        // The PsiIdentifier is going to be a method of course!
-        PsiMethod method = (PsiMethod) element.getParent();
-        if (method.hasModifierProperty(PsiModifier.ABSTRACT) || method.hasModifierProperty(PsiModifier.STATIC)) {
-            // I don't think any implementation allows for abstract or static method listeners.
-            return null;
-        }
-        PsiModifierList modifierList = method.getModifierList();
-        Module module = ModuleUtilCore.findModuleForPsiElement(element);
-        if (module == null) {
-            return null;
-        }
-        AbstractModule instance = PlatformUtil.getInstance(module);
-        if (instance == null) {
-            return null;
-        }
-        // Since each platform has their own valid listener annotations,
-        // some platforms may have multiple allowed annotations for various cases
-        final List<String> listenerAnnotations = instance.getModuleType().getListenerAnnotations();
-        boolean contains = false;
-        for (String listenerAnnotation : listenerAnnotations) {
-            if (modifierList.findAnnotation(listenerAnnotation) != null) {
-                contains = true;
-                break;
-            }
-        }
-        if (!contains) {
-            return null;
-        }
-        final PsiParameter psiParameter = method.getParameterList().getParameters()[0];
-        if (psiParameter == null) {
-            // Listeners must have at least a single parameter
-            return null;
-        }
-        // Get the type of the parameter so we can start resolving it
-        PsiTypeElement psiEventElement = psiParameter.getTypeElement();
-        if (psiEventElement == null) {
-            return null;
-        }
-        final PsiType type = psiEventElement.getType();
-        // Validate that it is a class reference type, I don't know if this will work with
-        // other JVM languages such as Kotlin or Scala, but it might!
-        if (!(type instanceof PsiClassReferenceType)) {
-            return null;
-        }
-        // And again, make sure that we can at least resolve the type, otherwise it's not a valid
-        // class reference.
-        final PsiClass resolve = ((PsiClassReferenceType) type).resolve();
-        if (resolve == null) {
-            return null;
-        }
-
         // By this point, we can guarantee that the action of "go to declaration" will work
         // since the PsiClass can be resolved, meaning the event listener is listening to
         // a valid event.
-        LineMarkerInfo info = new EventLineMarkerInfo(element, element.getTextRange(), this.getIcon(), Pass.UPDATE_ALL, createHanlder(resolve));
+        LineMarkerInfo info = new EventLineMarkerInfo(element, element.getTextRange(), this.getIcon(), Pass.UPDATE_ALL, createHanlder(listener.getSecond()));
         EditorColorsScheme globalScheme = this.myColorsManager.getGlobalScheme();
         info.separatorColor = globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR);
         info.separatorPlacement = SeparatorPlacement.TOP;
@@ -128,19 +77,27 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
 
     // This is a navigation handler that just simply goes and opens up the event's declaration,
     // even if the event target is a nested class.
-    private static GutterIconNavigationHandler<PsiElement> createHanlder(PsiClass psiClass) {
+    private static GutterIconNavigationHandler<PsiElement> createHanlder(PsiMethod method) {
         return (e, element1) -> {
-            final PsiFile containingFile = psiClass.getContainingFile();
-            final VirtualFile virtualFile = PsiUtilCore.getVirtualFile(psiClass);
+            // We need to re-evaluate the targeted method, because if the method signature slightly changes before
+            // IntelliJ decides to re-evaluate the method, but the class is no longer valid.
+            // In this circumstance, we can find the class anyways because it's still a valid listener.
+            final PsiFile containingFile = element1.getContainingFile();
+            final Pair<PsiParameter, PsiClass> parameter = InsightUtil.getEventParameterPairFromMethod(method);
+            if (parameter == null) {
+                return;
+            }
+            final PsiClass resolve = parameter.second;
+            final VirtualFile virtualFile = PsiUtilCore.getVirtualFile(resolve);
 
             if (virtualFile != null && containingFile != null) {
-                final Project project = psiClass.getProject();
+                final Project project = method.getProject();
                 final Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
 
                 if (editor != null) {
                     FeatureUsageTracker.getInstance().triggerFeatureUsed("navigation.goto.declaration");
-                    PsiElement navElement = psiClass.getNavigationElement();
-                    navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(psiClass, navElement);
+                    PsiElement navElement = resolve.getNavigationElement();
+                    navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(resolve, navElement);
                     if (navElement != null) {
                         gotoTargetElement(navElement, editor, containingFile);
                     }

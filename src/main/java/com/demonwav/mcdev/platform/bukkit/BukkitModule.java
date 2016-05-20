@@ -11,6 +11,8 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -120,5 +122,16 @@ public class BukkitModule extends AbstractModule {
     public static BukkitModule setBuildSystem(@NotNull Module module, @NotNull BukkitModuleType type, @NotNull BuildSystem buildSystem) {
         VirtualFile moduleRoot = LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module));
         return map.compute(moduleRoot, (m, b) -> new BukkitModule(module, type, buildSystem));
+    }
+
+    @Override
+    public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
+        return "org.bukkit.event.Event".equals(eventClass.getQualifiedName());
+    }
+
+    @Override
+    public String writeErrorMessageForEventParameter(PsiClass eventClass) {
+        return "Parameter is not a subclass of org.bukkit.event.Event\n" +
+                "Compiling and running this listener may result in a runtime exception";
     }
 }
