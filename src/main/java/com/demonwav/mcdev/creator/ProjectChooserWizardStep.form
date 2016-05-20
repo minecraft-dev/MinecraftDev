@@ -79,7 +79,7 @@
               <text value="Sponge Plugin"/>
             </properties>
           </component>
-          <component id="a132a" class="javax.swing.JLabel">
+          <component id="a132a" class="javax.swing.JLabel" binding="spongeIcon">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -178,12 +178,16 @@
   </grid>
   <buttonGroups>
     <group name="buttonGroup1">
-      <member id="fc230"/>
       <member id="dd3ac"/>
+      <member id="46880"/>
+      <member id="c6c2d"/>
+      <member id="69a73"/>
+      <member id="fc230"/>
       <member id="46880"/>
       <member id="6f1b4"/>
       <member id="c6c2d"/>
       <member id="69a73"/>
+      <member id="dd3ac"/>
     </group>
   </buttonGroups>
 </form>

@@ -9,13 +9,8 @@ import com.demonwav.mcdev.buildsystem.maven.pom.Repository;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.BukkitTemplate;
-import com.demonwav.mcdev.platform.bukkit.maven.BukkitMavenImporter;
-import com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter;
-import com.demonwav.mcdev.platform.bukkit.maven.SpigotMavenImporter;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordTemplate;
-import com.demonwav.mcdev.platform.bungeecord.maven.BungeeCordMavenImporter;
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate;
-import com.demonwav.mcdev.platform.sponge.maven.SpongeMavenImporter;
 import com.google.common.base.Strings;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
@@ -39,7 +34,6 @@ import com.intellij.util.xml.DomManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType;
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters;
-import org.jetbrains.idea.maven.importing.MavenImporter;
 import org.jetbrains.idea.maven.model.MavenResource;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
@@ -150,7 +144,10 @@ public class MavenBuildSystem extends BuildSystem {
         Project project = module.getProject();
 
         // Force Maven to setup the project
-        MavenProjectsManager.getInstance(project).forceUpdateAllProjectsOrFindAllAvailablePomFiles();
+        MavenProjectsManager manager = MavenProjectsManager.getInstance(project);
+        manager.addManagedFilesOrUnignore(Collections.singletonList(pomFile));
+        manager.getImportingSettings().setDownloadDocsAutomatically(true);
+        manager.getImportingSettings().setDownloadSourcesAutomatically(true);
 
         // Setup the default Maven run config
         if (getRootDirectory().getCanonicalPath() != null) {
@@ -170,7 +167,6 @@ public class MavenBuildSystem extends BuildSystem {
         List<MavenProject> mavenProjects = MavenProjectsManager.getInstance(module.getProject()).getProjects();
 
         mavenProjects.stream()
-                .filter(this::isApplicable)
                 .filter(p -> p.getFile().getParent().equals(rootDirectory))
                 .findFirst()
                 .ifPresent(p -> {
@@ -246,28 +242,5 @@ public class MavenBuildSystem extends BuildSystem {
                         }
                     });
                 });
-
-        System.out.println(buildVersion);
-    }
-
-    private boolean isApplicable(MavenProject project) {
-        MavenImporter importer = new BukkitMavenImporter();
-        if (importer.isApplicable(project)) {
-            return true;
-        }
-        importer = new SpigotMavenImporter();
-        if (importer.isApplicable(project)) {
-            return true;
-        }
-        importer = new PaperMavenImporter();
-        if (importer.isApplicable(project)) {
-            return true;
-        }
-        importer = new SpongeMavenImporter();
-        if (importer.isApplicable(project)) {
-            return true;
-        }
-        importer = new BungeeCordMavenImporter();
-        return importer.isApplicable(project);
     }
 }

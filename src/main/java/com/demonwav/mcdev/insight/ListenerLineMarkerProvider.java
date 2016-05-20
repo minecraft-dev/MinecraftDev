@@ -1,8 +1,6 @@
 package com.demonwav.mcdev.insight;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.PlatformUtil;
 import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
@@ -20,15 +18,18 @@ import com.intellij.openapi.editor.markup.SeparatorPlacement;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
-import com.intellij.psi.*;
-import com.intellij.psi.impl.source.PsiClassReferenceType;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiExpression;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFunctionalExpression;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.util.PsiExpressionTrimRenderer;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
@@ -37,7 +38,7 @@ import com.intellij.util.NullableFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.Icon;
 import java.util.Collection;
 import java.util.List;
 

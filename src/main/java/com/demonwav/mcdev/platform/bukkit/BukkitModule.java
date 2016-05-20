@@ -7,7 +7,6 @@ import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -44,7 +43,7 @@ public class BukkitModule extends AbstractModule {
         }
     }
 
-    BukkitModule(@NotNull Module module, @NotNull BukkitModuleType type, @Nullable BuildSystem buildSystem) {
+    private BukkitModule(@NotNull Module module, @NotNull BukkitModuleType type, @Nullable BuildSystem buildSystem) {
         this.moduleType = type;
         this.type = type.getPlatformType();
         this.module = module;

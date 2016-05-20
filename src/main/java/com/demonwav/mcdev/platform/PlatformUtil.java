@@ -1,12 +1,10 @@
 package com.demonwav.mcdev.platform;
 
-import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,15 +12,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by gabizou on 5/19/2016.
- */
 public class PlatformUtil {
     private static final Map<VirtualFile, AbstractModule> map = new HashMap<>();
 
     @Nullable
     public static AbstractModule getInstance(@NotNull Module module) {
-        VirtualFile moduleRoot = LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module));
+        VirtualFile moduleRoot = ModuleRootManager.getInstance(module).getContentRoots()[0];
 
         ModuleType moduleType = ModuleUtil.getModuleType(module);
 
@@ -38,7 +33,6 @@ public class PlatformUtil {
                     return getInstance(parentModule);
                 }
             }
-
         }
         return null;
     }

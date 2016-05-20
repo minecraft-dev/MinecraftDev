@@ -100,19 +100,5 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
                 e.printStackTrace();
             }
         });
-
-        BukkitModuleType moduleType = null;
-        switch (type) {
-            case BUKKIT:
-                moduleType = BukkitModuleType.getInstance();
-                break;
-            case SPIGOT:
-                moduleType = SpigotModuleType.getInstance();
-                break;
-            case PAPER:
-                moduleType = PaperModuleType.getInstance();
-                break;
-        }
-        BukkitModule.setBuildSystem(module, moduleType, buildSystem);
     }
 }

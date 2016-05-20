@@ -1,18 +1,15 @@
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.exception.MinecraftSetupException;
+import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.IdeBorderFactory;
-import com.intellij.ui.awt.RelativePoint;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.event.HyperlinkEvent;
@@ -35,6 +32,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
     private JRadioButton spongeRadioButton;
     private JRadioButton paperRadioButton;
     private JRadioButton forgeRadioButton;
+    private JLabel spongeIcon;
 
     private PlatformType type = PlatformType.BUKKIT;
 
@@ -84,66 +82,57 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
         infoPane.setText(bukkitInfo);
 
         // Set type
-        bukkitRadioButton.addChangeListener(e -> {
+        bukkitRadioButton.addActionListener(e -> {
             if (type != PlatformType.BUKKIT) {
                 type = PlatformType.BUKKIT;
                 infoPane.setText(bukkitInfo);
                 creator.setType(type);
             }
         });
-        spigotRadioButton.addChangeListener(e -> {
+        spigotRadioButton.addActionListener(e -> {
             if (type != PlatformType.SPIGOT) {
                 type = PlatformType.SPIGOT;
                 infoPane.setText(spigotInfo);
                 creator.setType(type);
             }
         });
-        paperRadioButton.addChangeListener(e -> {
+        paperRadioButton.addActionListener(e -> {
             if (type != PlatformType.PAPER) {
                 type = PlatformType.PAPER;
                 infoPane.setText(paperInfo);
                 creator.setType(type);
             }
         });
-        spongeRadioButton.addChangeListener(e -> {
+        spongeRadioButton.addActionListener(e -> {
             if (type != PlatformType.SPONGE) {
                 type = PlatformType.SPONGE;
                 infoPane.setText(spongeInfo);
                 creator.setType(type);
             }
         });
-        forgeRadioButton.addChangeListener(e -> {
+        forgeRadioButton.addActionListener(e -> {
             if (type != PlatformType.FORGE) {
                 type = PlatformType.FORGE;
                 infoPane.setText(forgeInfo);
                 creator.setType(type);
             }
         });
-        bungeecordRadioButton.addChangeListener(e -> {
+        bungeecordRadioButton.addActionListener(e -> {
             if (type != PlatformType.BUNGEECORD) {
                 type = PlatformType.BUNGEECORD;
                 infoPane.setText(bungeeCordInfo);
                 creator.setType(type);
             }
         });
-        return panel;
-    }
 
-    @Override
-    public boolean validate() throws ConfigurationException {
-        try {
-            if (forgeRadioButton.isSelected()) {
-                throw new MinecraftSetupException("forge", forgeRadioButton);
-            }
-        } catch (MinecraftSetupException e) {
-            String message = e.getError();
-            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
-                    .setFadeoutTime(2000)
-                    .createBalloon()
-                    .show(RelativePoint.getSouthWestOf(e.getJ()), Balloon.Position.below);
-            return false;
+        // show the right sponge icon
+        if (UIUtil.isUnderDarcula()) {
+            spongeIcon.setIcon(PlatformAssets.SPONGE_ICON_2X);
+        } else {
+            spongeIcon.setIcon(PlatformAssets.SPONGE_ICON_DARK_2X);
         }
-        return true;
+
+        return panel;
     }
 
     @Override

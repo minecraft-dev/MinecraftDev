@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.creator;
 
+import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
@@ -8,6 +9,7 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
+import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 
 import javax.swing.JCheckBox;
@@ -43,6 +45,12 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
         mainClassField.setText(this.creator.getGroupId() + '.' + this.creator.getArtifactId()
                 + '.' + WordUtils.capitalizeFully(this.creator.getArtifactId()));
 
+        if (UIUtil.isUnderDarcula()) {
+            title.setIcon(PlatformAssets.SPONGE_ICON_2X);
+        } else {
+            title.setIcon(PlatformAssets.SPONGE_ICON_DARK_2X);
+        }
+
         return panel;
     }
 
@@ -60,7 +68,6 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
             if (mainClassField.getText().trim().isEmpty()) {
                 throw new MinecraftSetupException("empty", mainClassField);
             }
-
             if (!authorsField.getText().matches(ProjectSettingsWizardStep.pattern)) {
                 throw new MinecraftSetupException("bad", authorsField);
             }
@@ -81,7 +88,6 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
 
     @Override
     public void onStepLeaving() {
-        super.onStepLeaving();
         settings.pluginName = pluginNameField.getText();
         settings.pluginVersion = pluginVersionField.getText();
         settings.mainClass = mainClassField.getText();

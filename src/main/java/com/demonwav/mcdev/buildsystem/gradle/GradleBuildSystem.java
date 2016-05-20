@@ -71,22 +71,30 @@ public class GradleBuildSystem extends BuildSystem {
                 resourceDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/main/resources"));
                 testSourcesDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/test/java"));
                 testResourceDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/test/resources"));
-
                 buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
-                AbstractTemplate.applyBuildGradleTemplate(
-                        module,
-                        buildGradle,
-                        groupId,
-                        version,
-                        Strings.emptyToNull(configuration.description),
-                        buildVersion,
-                        // TODO: use psi instead of templates to allow all repos and dependencies to be added dynamically
-                        repositories.get(0).getId(),
-                        repositories.get(0).getUrl(),
-                        dependencies.get(0).getGroupId(),
-                        dependencies.get(0).getArtifactId(),
-                        dependencies.get(0).getVersion()
-                        );
+
+                if (type == PlatformType.FORGE) {
+                    // version http://files.minecraftforge.net/maven/net/minecraftforge/forge/json
+                    // mappings http://export.mcpbot.bspk.rs/versions.json
+
+                } else {
+
+
+                    AbstractTemplate.applyBuildGradleTemplate(
+                            module,
+                            buildGradle,
+                            groupId,
+                            version,
+                            Strings.emptyToNull(configuration.description),
+                            buildVersion,
+                            // TODO: use psi instead of templates to allow all repos and dependencies to be added dynamically
+                            repositories.get(0).getId(),
+                            repositories.get(0).getUrl(),
+                            dependencies.get(0).getGroupId(),
+                            dependencies.get(0).getArtifactId(),
+                            dependencies.get(0).getVersion()
+                    );
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

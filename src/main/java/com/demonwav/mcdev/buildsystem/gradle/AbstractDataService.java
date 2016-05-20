@@ -17,12 +17,14 @@ import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,22 +80,29 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                     }
                 } else {
                     // This is a group of modules
-                    if (goodModules.stream().anyMatch(m -> {
-                        String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(m);
-                        if (paths != null && paths.length > 0) {
-                            if (Arrays.stream(paths).anyMatch(module.getName()::equals)) {
-                                return true;
+                    goodModules.forEach(m -> {
+                        Project currentProject = m.getProject();
+                        String[] paths = ModuleManager.getInstance(currentProject).getModuleGroupPath(m);
+                        if (paths != null && paths.length > 1) {
+                            // The last element will be this module, the second to last is the parent
+                            String parentName = paths[paths.length - 2];
+                            Module parentModule = ModuleManager.getInstance(project).findModuleByName(parentName);
+
+                            if (Objects.equals(parentModule, module)) {
+                                VirtualFile root = ModuleRootManager.getInstance(module).getContentRoots()[0];
+                                VirtualFile gradle = root.findChild("build.gradle");
+
+                                if (gradle != null) {
+                                    module.setOption("type", type.getId());
+                                    Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(thisModule -> thisModule.reImport(module, type.getPlatformType()));
+                                    return;
+                                }
                             }
                         }
-                        return false;
-                    })) {
-                        module.setOption("type", type.getId());
-                        Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(m -> m.reImport(module, type.getPlatformType()));
-                    } else {
                         if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
                             module.setOption("type", JavaModuleType.getModuleType().getId());
                         }
-                    }
+                    });
                 }
             }
         });

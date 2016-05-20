@@ -9,6 +9,7 @@ import org.jetbrains.idea.maven.importing.MavenImporter;
 import org.jetbrains.idea.maven.importing.MavenRootModelAdapter;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectChanges;
+import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.idea.maven.project.MavenProjectsProcessorTask;
 import org.jetbrains.idea.maven.project.MavenProjectsTree;
 import org.jetbrains.idea.maven.project.ResolveContext;
@@ -16,6 +17,7 @@ import org.jetbrains.idea.maven.server.MavenEmbedderWrapper;
 import org.jetbrains.idea.maven.server.NativeMavenProjectHolder;
 import org.jetbrains.idea.maven.utils.MavenProcessCanceledException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +47,9 @@ public abstract class AbstractMavenImporter extends MavenImporter {
                                  MavenProjectChanges changes,
                                  Map<MavenProject, String> mavenProjectToModuleName,
                                  List<MavenProjectsProcessorTask> postTasks) {
+        postTasks.add((project, embeddersManager, console, indicator) -> {
+            MavenProjectsManager.getInstance(module.getProject()).addManagedFilesOrUnignore(Collections.singletonList(mavenProject.getFile()));
+        });
     }
 
     @Override
