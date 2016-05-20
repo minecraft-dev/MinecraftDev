@@ -27,6 +27,8 @@ public final class PlatformAssets {
     public static final Icon BUNGEECORD_ICON = loadIcon("/assets/platform/icons/BungeeCord.png");
     public static final Icon BUNGEECORD_ICON_2X = loadIcon("/assets/platform/icons/BungeeCord@2x.png");
 
+    public static final Icon LISTENER = loadIcon("/assets/platform/icons/listener/EventListener_dark.png");
+
     private PlatformAssets() {
     }
 

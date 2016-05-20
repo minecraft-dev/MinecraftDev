@@ -2,7 +2,9 @@ package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.creator.MinecraftModuleBuilder;
+import com.demonwav.mcdev.platform.bukkit.BukkitModule;
 import com.intellij.openapi.module.JavaModuleType;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleTypeManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -73,5 +75,13 @@ public class MinecraftModuleType extends JavaModuleType {
     @NotNull
     public String getArtifactId() {
         return artifactId;
+    }
+
+    public AbstractModule generateModule(Module module) {
+        return null;
+    }
+
+    public List<String> getListenerAnnotations() {
+        return Collections.emptyList();
     }
 }

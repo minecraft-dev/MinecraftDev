@@ -1,9 +1,11 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleTypeManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,6 +51,16 @@ public class BukkitModuleType extends MinecraftModuleType {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
+        return ImmutableList.of("org.bukkit.event.EventHandler");
+    }
+
+    @Override
+    public AbstractModule generateModule(Module module) {
+        return new BukkitModule(module, this);
+    }
+
+    @Override
+    public List<String> getListenerAnnotations() {
         return ImmutableList.of("org.bukkit.event.EventHandler");
     }
 }

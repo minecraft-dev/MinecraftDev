@@ -4,6 +4,7 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.platform.AbstractModule;
+import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
@@ -31,18 +32,14 @@ public class BungeeCordModule extends AbstractModule {
         }
     }
 
-    @Nullable
-    public static BungeeCordModule getInstance(@NotNull Module module) {
-        ModuleType moduleType = ModuleUtil.getModuleType(module);
-        if (moduleType instanceof BungeeCordModuleType) {
-            return map.computeIfAbsent(module, BungeeCordModule::new);
-        }
-        return null;
-    }
-
     @NotNull
     public Module getModule() {
         return module;
+    }
+
+    @Override
+    public MinecraftModuleType getModuleType() {
+        return BungeeCordModuleType.getInstance();
     }
 
     public VirtualFile getPluginYml() {

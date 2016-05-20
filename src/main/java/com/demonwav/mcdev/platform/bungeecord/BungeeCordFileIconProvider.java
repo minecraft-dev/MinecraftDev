@@ -1,5 +1,7 @@
 package com.demonwav.mcdev.platform.bungeecord;
 
+import com.demonwav.mcdev.platform.AbstractModule;
+import com.demonwav.mcdev.platform.PlatformUtil;
 import com.intellij.ide.FileIconProvider;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -17,8 +19,8 @@ public class BungeeCordFileIconProvider implements FileIconProvider {
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {
         if (project != null) {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
-                BungeeCordModule bungeeCordModule = BungeeCordModule.getInstance(module);
-                if (bungeeCordModule != null && file.equals(bungeeCordModule.getPluginYml())) {
+                AbstractModule bungeeCordModule = PlatformUtil.getInstance(module);
+                if (bungeeCordModule instanceof BungeeCordModule && file.equals(((BungeeCordModule) bungeeCordModule).getPluginYml())) {
                     return bungeeCordModule.getIcon();
                 }
             }

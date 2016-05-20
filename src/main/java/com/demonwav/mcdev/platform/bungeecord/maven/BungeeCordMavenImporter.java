@@ -10,6 +10,8 @@
 package com.demonwav.mcdev.platform.bungeecord.maven;
 
 import com.demonwav.mcdev.buildsystem.maven.AbstractMavenImporter;
+import com.demonwav.mcdev.platform.AbstractModule;
+import com.demonwav.mcdev.platform.PlatformUtil;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModule;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 import com.intellij.openapi.module.Module;
@@ -47,9 +49,9 @@ public class BungeeCordMavenImporter extends AbstractMavenImporter {
         for (Module module : ModuleManager.getInstance(project).getModules()) {
             // We'll make sure the project is setup
             if (Objects.equals(LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module)), mavenProject.getFile().getParent())) {
-                BungeeCordModule bungeeCordModule = BungeeCordModule.getInstance(module);
-                if (bungeeCordModule != null) {
-                    bungeeCordModule.setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
+                AbstractModule bungeeCordModule = PlatformUtil.getInstance(module);
+                if (bungeeCordModule instanceof BungeeCordModule) {
+                    ((BungeeCordModule) bungeeCordModule).setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
                     break;
                 }
             }

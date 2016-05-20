@@ -52,6 +52,7 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bungeecord.gradle.BungeeCordDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeDataService"/>
+        <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.idea.maven">
         <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.BukkitMavenImporter"/>

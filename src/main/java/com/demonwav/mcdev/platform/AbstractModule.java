@@ -17,6 +17,7 @@ public abstract class AbstractModule {
         return buildSystem;
     }
 
+    public abstract MinecraftModuleType getModuleType();
     public abstract PlatformType getType();
     public abstract Icon getIcon();
 }

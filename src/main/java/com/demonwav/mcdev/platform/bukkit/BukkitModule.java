@@ -3,6 +3,7 @@ package com.demonwav.mcdev.platform.bukkit;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.platform.AbstractModule;
+import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
 import com.intellij.openapi.module.Module;
@@ -24,8 +25,10 @@ public class BukkitModule extends AbstractModule {
     private VirtualFile pluginYml;
     private PlatformType type;
     private PluginConfigManager configManager;
+    private final BukkitModuleType moduleType;
 
-    private BukkitModule(@NotNull Module module, @NotNull BukkitModuleType type) {
+    BukkitModule(@NotNull Module module, @NotNull BukkitModuleType type) {
+        this.moduleType = type;
         this.type = type.getPlatformType();
         this.module = module;
         buildSystem = BuildSystem.getInstance(module);
@@ -39,7 +42,8 @@ public class BukkitModule extends AbstractModule {
         }
     }
 
-    private BukkitModule(@NotNull Module module, @NotNull BukkitModuleType type, @Nullable BuildSystem buildSystem) {
+    BukkitModule(@NotNull Module module, @NotNull BukkitModuleType type, @Nullable BuildSystem buildSystem) {
+        this.moduleType = type;
         this.type = type.getPlatformType();
         this.module = module;
         this.buildSystem = buildSystem;
@@ -61,24 +65,6 @@ public class BukkitModule extends AbstractModule {
     }
 
     @Nullable
-    public static BukkitModule getInstance(@NotNull Module module) {
-        VirtualFile moduleRoot = LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module));
-        ModuleType moduleType = ModuleUtil.getModuleType(module);
-        // order matters here
-        if (moduleType instanceof BukkitModuleType) {
-            if (moduleType instanceof SpigotModuleType) {
-                if (module instanceof PaperModuleType) {
-                    return map.computeIfAbsent(moduleRoot, m -> new BukkitModule(module, PaperModuleType.getInstance()));
-                }
-                return map.computeIfAbsent(moduleRoot, m -> new BukkitModule(module, SpigotModuleType.getInstance()));
-            }
-            return map.computeIfAbsent(moduleRoot, m -> new BukkitModule(module, BukkitModuleType.getInstance()));
-        }
-
-        return null;
-    }
-
-    @Nullable
     public PluginConfigManager getConfigManager() {
         if (configManager == null) {
             if (pluginYml != null) {
@@ -95,6 +81,11 @@ public class BukkitModule extends AbstractModule {
     @Override
     public Icon getIcon() {
         return type.getType().getIcon();
+    }
+
+    @Override
+    public MinecraftModuleType getModuleType() {
+        return moduleType;
     }
 
     @Override

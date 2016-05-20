@@ -1,9 +1,11 @@
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleTypeManager;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
@@ -58,6 +60,16 @@ public class SpongeModuleType extends MinecraftModuleType {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
+        return ImmutableList.of("org.spongepowered.api.event.Listener", "org.spongepowered.api.plugin.Plugin");
+    }
+
+    @Override
+    public AbstractModule generateModule(Module module) {
+        return new SpongeModule(module);
+    }
+
+    @Override
+    public List<String> getListenerAnnotations() {
         return ImmutableList.of("org.spongepowered.api.event.Listener");
     }
 }
