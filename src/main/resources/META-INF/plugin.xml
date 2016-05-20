@@ -19,13 +19,8 @@
         <p><p>
         Recent changes:
         <ul>
-          <li>Added sidebar icon to Event listeners</li>
-          <li>Added Event object inspections</li>
-          <li>Fixed bug with Maven when ModuleType changes</li>
-          <li>Initial progress made on Forge importing</li>
-          <li>Fixed issues with multi-module Gradle projects</li>
-          <li>Fixed ArrayIndexOutOfBoundsException in PlatformUtil</li>
-          <li>Disabled Forge detection for now</li>
+          <li>Fixed issue with platforms importing</li>
+          <li>Fixed issue with Gradle project creation</li>
         </ul>
       </div>
     ]]>
