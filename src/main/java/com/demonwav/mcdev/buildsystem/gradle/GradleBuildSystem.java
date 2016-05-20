@@ -158,7 +158,7 @@ public class GradleBuildSystem extends BuildSystem {
 //            GroovyScriptRunConfiguration runConfiguration = new GroovyScriptRunConfiguration(
 //                    module.getName() + " build",
 //                    project,
-//                    GroovyScriptRunConfigurationType.getInstance().getConfigurationFactories()[0
+//                    GroovyScriptRunConfigurationType.getInstance().getConfigurationFactories()[0]
 //            ) {
 //                @Override
 //                public boolean excludeCompileBeforeLaunchOption() {
