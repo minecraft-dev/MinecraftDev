@@ -21,6 +21,8 @@
         <ul>
           <li>Fixed issue with platforms importing</li>
           <li>Fixed issue with Gradle project creation</li>
+          <li>Fixed NPE when Bukkit projects open and are not yet ready</li>
+          <li>Fixed AUTHOR_LIST not being set for Bukkit plugin.yml</li>
         </ul>
       </div>
     ]]>
