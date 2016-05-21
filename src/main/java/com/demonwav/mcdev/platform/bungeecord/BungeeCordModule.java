@@ -11,16 +11,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
-import java.util.HashMap;
-import java.util.Map;
 
 public class BungeeCordModule extends AbstractModule {
 
-    private static final Map<Module, BungeeCordModule> map = new HashMap<>();
-
     private VirtualFile pluginYml;
 
-    private BungeeCordModule(@NotNull Module module) {
+    BungeeCordModule(@NotNull Module module) {
         this.module = module;
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {

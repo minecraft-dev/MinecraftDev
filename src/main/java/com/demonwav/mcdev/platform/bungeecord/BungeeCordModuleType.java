@@ -1,8 +1,10 @@
 package com.demonwav.mcdev.platform.bungeecord;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleTypeManager;
 
 import javax.swing.Icon;
@@ -37,5 +39,10 @@ public class BungeeCordModuleType extends MinecraftModuleType {
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
         return PlatformAssets.BUNGEECORD_ICON;
+    }
+
+    @Override
+    public AbstractModule generateModule(Module module) {
+        return new BungeeCordModule(module);
     }
 }

@@ -69,7 +69,7 @@ public class BungeeCordTemplate extends AbstractTemplate {
         }
 
         try {
-            applyTemplate(module, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties);
+            applyTemplate(module, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties, true);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -21,6 +21,7 @@ import com.intellij.openapi.externalSystem.model.project.ExternalSystemSourceTyp
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration;
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -53,13 +54,13 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrAssign
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrCommandArgumentList;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrExpression;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression;
-import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.path.GrMethodCallExpression;
 import org.jetbrains.plugins.groovy.lang.psi.impl.GroovyPsiElementFactoryImpl;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -266,19 +267,33 @@ public class GradleBuildSystem extends BuildSystem {
             testResourceDirectories = new ArrayList<>();
 
             ExternalProjectDataCache externalProjectDataCache = ExternalProjectDataCache.getInstance(project);
-            if (project.getBaseDir() == null) {
-                return;
-            }
 
-            ExternalProject externalRootProject = externalProjectDataCache.getRootExternalProject(GradleConstants.SYSTEM_ID, new File(project.getBasePath()));
+            String name = module.getName();
+            // I can't find a way to read module group children, group path only goes up
+            // So I guess check each module to see if it's a child....
+            Collection<Module> children = Arrays.stream(ModuleManager.getInstance(project).getModules())
+                    .filter(m -> {
+                        String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(m);
+                        if (paths != null && paths.length > 0) {
+                            if (name.equals(paths[0])) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }).collect(Collectors.toList());
+
+
+            ExternalProject externalRootProject = externalProjectDataCache.getRootExternalProject(GradleConstants.SYSTEM_ID, new File(rootDirectory.getCanonicalPath()));
             if (externalRootProject != null) {
-                Map<String, ExternalSourceSet> externalSourceSets = externalProjectDataCache.findExternalProject(externalRootProject, module);
+                for (Module child : children) {
+                    Map<String, ExternalSourceSet> externalSourceSets = externalProjectDataCache.findExternalProject(externalRootProject, child);
 
-                for (ExternalSourceSet sourceSet : externalSourceSets.values()) {
-                    setupDirs(sourceDirectories, sourceSet, ExternalSystemSourceType.SOURCE);
-                    setupDirs(resourceDirectories, sourceSet, ExternalSystemSourceType.RESOURCE);
-                    setupDirs(testSourcesDirectories, sourceSet, ExternalSystemSourceType.TEST);
-                    setupDirs(testResourceDirectories, sourceSet, ExternalSystemSourceType.TEST_RESOURCE);
+                    for (ExternalSourceSet sourceSet : externalSourceSets.values()) {
+                        setupDirs(sourceDirectories, sourceSet, ExternalSystemSourceType.SOURCE);
+                        setupDirs(resourceDirectories, sourceSet, ExternalSystemSourceType.RESOURCE);
+                        setupDirs(testSourcesDirectories, sourceSet, ExternalSystemSourceType.TEST);
+                        setupDirs(testResourceDirectories, sourceSet, ExternalSystemSourceType.TEST_RESOURCE);
+                    }
                 }
 
                 groupId = externalRootProject.getGroup();
@@ -330,8 +345,6 @@ public class GradleBuildSystem extends BuildSystem {
                     }
                 }
             }
-
-            System.out.println(this);
         }
     }
 

@@ -1,15 +1,14 @@
-package com.demonwav.mcdev.platform.bukkit;
+package com.demonwav.mcdev.platform;
 
-import com.demonwav.mcdev.platform.PlatformUtil;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupManager;
 
-public class BukkitProjectComponent extends AbstractProjectComponent {
+public class MinecraftProjectComponent extends AbstractProjectComponent {
 
-    protected BukkitProjectComponent(Project project) {
+    protected MinecraftProjectComponent(Project project) {
         super(project);
     }
 

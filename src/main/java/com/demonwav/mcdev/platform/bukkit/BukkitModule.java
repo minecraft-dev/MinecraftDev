@@ -7,8 +7,6 @@ import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
@@ -16,17 +14,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
-import java.util.HashMap;
-import java.util.Map;
 
 public class BukkitModule extends AbstractModule {
-
-    private static final Map<VirtualFile, BukkitModule> map = new HashMap<>();
 
     private VirtualFile pluginYml;
     private PlatformType type;
     private PluginConfigManager configManager;
-    private final BukkitModuleType moduleType;
+    private BukkitModuleType moduleType;
 
     BukkitModule(@NotNull Module module, @NotNull BukkitModuleType type) {
         this.moduleType = type;
@@ -94,9 +88,17 @@ public class BukkitModule extends AbstractModule {
         return moduleType;
     }
 
+    private void setModuleType(BukkitModuleType moduleType) {
+        this.moduleType = moduleType;
+    }
+
     @Override
     public PlatformType getType() {
         return type;
+    }
+
+    private void setType(PlatformType type) {
+        this.type = type;
     }
 
     @Override
@@ -116,16 +118,6 @@ public class BukkitModule extends AbstractModule {
     @Override
     public int hashCode() {
         return module.hashCode();
-    }
-
-    public static BukkitModule setType(@NotNull Module module, @NotNull BukkitModuleType type) {
-        VirtualFile moduleRoot = LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module));
-        return map.compute(moduleRoot, (m, b) -> new BukkitModule(module, type, null));
-    }
-
-    public static BukkitModule setBuildSystem(@NotNull Module module, @NotNull BukkitModuleType type, @NotNull BuildSystem buildSystem) {
-        VirtualFile moduleRoot = LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module));
-        return map.compute(moduleRoot, (m, b) -> new BukkitModule(module, type, buildSystem));
     }
 
     @Override

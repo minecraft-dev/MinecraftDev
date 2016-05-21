@@ -20,8 +20,10 @@ public class BungeeCordFileIconProvider implements FileIconProvider {
         if (project != null) {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
                 AbstractModule bungeeCordModule = PlatformUtil.getInstance(module);
-                if (bungeeCordModule instanceof BungeeCordModule && file.equals(((BungeeCordModule) bungeeCordModule).getPluginYml())) {
-                    return bungeeCordModule.getIcon();
+                if (bungeeCordModule instanceof BungeeCordModule) {
+                    if (file.equals(((BungeeCordModule) bungeeCordModule).getPluginYml())) {
+                        return bungeeCordModule.getIcon();
+                    }
                 }
             }
         }

@@ -19,8 +19,8 @@ import com.intellij.lang.xml.XMLLanguage;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -167,7 +167,7 @@ public class MavenBuildSystem extends BuildSystem {
 
     @Override
     public void reImport(@NotNull Module module, @NotNull PlatformType type) {
-        rootDirectory = LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module));
+        rootDirectory = ModuleRootManager.getInstance(module).getContentRoots()[0];
         List<MavenProject> mavenProjects = MavenProjectsManager.getInstance(module.getProject()).getProjects();
 
         mavenProjects.stream()

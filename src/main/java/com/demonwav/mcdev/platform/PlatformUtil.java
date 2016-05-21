@@ -27,14 +27,17 @@ public class PlatformUtil {
                 return map.computeIfAbsent(moduleRoot, m -> ((MinecraftModuleType) moduleType).generateModule(module));
             } else { // last ditch effort for gradle multi projects
                 String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
-                if (paths != null) {
-                    // The last element will be the module's parent
+                if (paths != null && paths.length > 0) {
+                    // The first element will be the module's parent
                     String parentName = paths[0];
                     Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(parentName);
                     if (parentModule != null) {
                         ModuleType parentModuleType = ModuleUtil.getModuleType(parentModule);
                         if (parentModuleType instanceof MinecraftModuleType) {
-                            return map.computeIfAbsent(moduleRoot, m -> ((MinecraftModuleType) parentModuleType).generateModule(module));
+                            roots = ModuleRootManager.getInstance(parentModule).getContentRoots();
+                            if (roots.length > 0) {
+                                return map.computeIfAbsent(roots[0], m -> ((MinecraftModuleType) parentModuleType).generateModule(parentModule));
+                            }
                         }
                     }
                 }

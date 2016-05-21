@@ -81,7 +81,7 @@
     <project-components>
         <!-- Add your project components here -->
         <component>
-            <implementation-class>com.demonwav.mcdev.platform.bukkit.BukkitProjectComponent</implementation-class>
+            <implementation-class>com.demonwav.mcdev.platform.MinecraftProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>
     </project-components>
