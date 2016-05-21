@@ -27,6 +27,9 @@
           <li>Fixed NPE on Bukkit projects when it's opened and not yet ready</li>
           <li>Changed wording from "Forge Plugin" to "Forge Mod"</li>
           <li>Don't fully quality Sponge's plugin id</li>
+          <li>Fix Gradle project's BuildSystem content roots not being filled in</li>
+          <li>Add BungeeCord generator</li>
+          <li>Trim BungeeCord plugin.yml output</li>
         </ul>
       </div>
     ]]>
