@@ -99,7 +99,9 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
     private VirtualFile createAndGetRoot() {
         String temp = getContentEntryPath();
 
-        assert temp != null;
+        if (temp == null) {
+            return null;
+        }
 
         String path = FileUtil.toSystemIndependentName(temp);
         //noinspection ResultOfMethodCallIgnored

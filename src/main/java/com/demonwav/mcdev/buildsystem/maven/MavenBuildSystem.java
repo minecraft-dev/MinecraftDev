@@ -91,9 +91,13 @@ public class MavenBuildSystem extends BuildSystem {
                             mavenProjectXml.getVersion().setValue(version);
                             mavenProjectXml.getName().setValue(pluginName);
 
-                            assert root != null;
+                            if (root == null) {
+                                return;
+                            }
                             XmlTag properties = root.findFirstSubTag("properties");
-                            assert properties != null;
+                            if (properties == null) {
+                                return;
+                            }
 
                             if (!Strings.isNullOrEmpty(configuration.website)) {
                                 XmlTag url = root.createChildTag("url", null, configuration.website, false);

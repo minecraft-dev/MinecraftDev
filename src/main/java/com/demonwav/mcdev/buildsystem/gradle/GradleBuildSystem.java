@@ -266,7 +266,10 @@ public class GradleBuildSystem extends BuildSystem {
             testResourceDirectories = new ArrayList<>();
 
             ExternalProjectDataCache externalProjectDataCache = ExternalProjectDataCache.getInstance(project);
-            assert project.getBasePath() != null;
+            if (project.getBaseDir() == null) {
+                return;
+            }
+
             ExternalProject externalRootProject = externalProjectDataCache.getRootExternalProject(GradleConstants.SYSTEM_ID, new File(project.getBasePath()));
             if (externalRootProject != null) {
                 Map<String, ExternalSourceSet> externalSourceSets = externalProjectDataCache.findExternalProject(externalRootProject, module);

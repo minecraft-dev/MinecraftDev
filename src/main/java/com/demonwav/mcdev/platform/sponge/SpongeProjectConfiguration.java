@@ -54,7 +54,9 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
                 SpongeTemplate.applyMainClassTemplate(module, mainClassFile, packageName, className, this);
 
                 PsiJavaFile mainClassPsi = (PsiJavaFile) PsiManager.getInstance(module.getProject()).findFile(mainClassFile);
-                assert mainClassPsi != null;
+                if (mainClassPsi == null) {
+                    return;
+                }
                 PsiClass psiClass = mainClassPsi.getClasses()[0];
 
                 PsiElementFactory factory = JavaPsiFacade.getElementFactory(module.getProject());

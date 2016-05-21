@@ -62,7 +62,9 @@ public class PluginConfigManager {
             // TODO: Show warning to user if there is more than one document
             YAMLDocument document = file.getDocuments().get(0);
             YAMLBlockMappingImpl blockMapping = (YAMLBlockMappingImpl) document.getTopLevelValue();
-            assert blockMapping != null;
+            if (blockMapping == null) {
+                return;
+            }
 
             blockMapping.getYAMLElements().forEach(e -> {
                 if (!(e instanceof YAMLKeyValue)) {
