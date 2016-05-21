@@ -11,13 +11,8 @@ targetCompatibility = ${BUILD_VERSION}
 
 repositories {
     mavenCentral()
-    maven {
-        name = '${REPO_NAME}'
-        url = '${REPO_URL}'
-    }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    compile '${DEP_GROUP_ID}:${DEP_ARTIFACT_ID}:${DEP_VERSION}'
 }

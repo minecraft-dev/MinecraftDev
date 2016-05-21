@@ -7,29 +7,18 @@ import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.google.common.base.Strings;
-import com.intellij.compiler.options.CompileStepBeforeRun;
-import com.intellij.execution.BeforeRunTask;
-import com.intellij.execution.BeforeRunTaskProvider;
+import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
-import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.execution.configurations.RunConfigurationBase;
-import com.intellij.execution.configurations.RunConfigurationModule;
-import com.intellij.execution.configurations.RunProfileWithCompileBeforeLaunchOption;
-import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
-import com.intellij.execution.junit.RuntimeConfigurationProducer;
 import com.intellij.ide.actions.ImportModuleAction;
 import com.intellij.ide.util.newProjectWizard.AddModuleWizard;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.externalSystem.model.project.ExternalSystemSourceType;
-import com.intellij.openapi.externalSystem.service.execution.ExternalSystemBeforeRunTask;
-import com.intellij.openapi.externalSystem.service.execution.ExternalSystemBeforeRunTaskProvider;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration;
-import com.intellij.openapi.externalSystem.service.project.manage.ExternalProjectsManager;
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -37,9 +26,11 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
-import org.gradle.api.invocation.Gradle;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.model.idea.IdeaDependency;
@@ -47,33 +38,32 @@ import org.gradle.tooling.model.idea.IdeaModule;
 import org.gradle.tooling.model.idea.IdeaProject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.gradle.execution.GradleBeforeRunTaskProvider;
-import org.jetbrains.plugins.gradle.execution.test.runner.PatternGradleConfigurationProducer;
 import org.jetbrains.plugins.gradle.model.ExternalProject;
 import org.jetbrains.plugins.gradle.model.ExternalSourceSet;
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType;
-import org.jetbrains.plugins.gradle.service.execution.GradleRuntimeConfigurationProducer;
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportBuilder;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportProvider;
-import org.jetbrains.plugins.gradle.settings.GradleSystemRunningSettings;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
+import org.jetbrains.plugins.groovy.GroovyLanguage;
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlock;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrApplicationStatement;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrAssignmentExpression;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrCommandArgumentList;
+import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrExpression;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.path.GrMethodCallExpression;
-import org.jetbrains.plugins.groovy.runner.GroovyScriptRunConfiguration;
-import org.jetbrains.plugins.groovy.runner.GroovyScriptRunConfigurationType;
+import org.jetbrains.plugins.groovy.lang.psi.impl.GroovyPsiElementFactoryImpl;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -94,32 +84,127 @@ public class GradleBuildSystem extends BuildSystem {
                 resourceDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/main/resources"));
                 testSourcesDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/test/java"));
                 testResourceDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/test/resources"));
-                buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
                 if (type == PlatformType.FORGE) {
                     // version http://files.minecraftforge.net/maven/net/minecraftforge/forge/json
                     // mappings http://export.mcpbot.bspk.rs/versions.json
-
                 } else {
-                    AbstractTemplate.applyBuildGradleTemplate(
+                    String buildGradleText = AbstractTemplate.applyBuildGradleTemplate(
                             module,
-                            buildGradle,
                             groupId,
                             version,
                             Strings.emptyToNull(configuration.description),
-                            buildVersion,
-                            // TODO: use psi instead of templates to allow all repos and dependencies to be added dynamically
-                            repositories.get(0).getId(),
-                            repositories.get(0).getUrl(),
-                            dependencies.get(0).getGroupId(),
-                            dependencies.get(0).getArtifactId(),
-                            dependencies.get(0).getVersion()
+                            buildVersion
                     );
+
+                    if (buildGradleText == null) {
+                        return;
+                    }
+
+                    // Create the PSI file from the text, but don't write it until we are finished with it
+                    PsiFile buildGradlePsi = PsiFileFactory.getInstance(module.getProject()).createFileFromText(GroovyLanguage.INSTANCE, buildGradleText);
+
+                    if (buildGradlePsi == null) {
+                        return;
+                    }
+
+                    // Write the repository and dependency data to the psi file
+                    new WriteCommandAction.Simple(module.getProject(), buildGradlePsi) {
+                        @Override
+                        protected void run() throws Throwable {
+                            buildGradlePsi.setName("build.gradle");
+                            final GroovyFile groovyFile = (GroovyFile) buildGradlePsi;
+
+                            // Add repositories
+                            createRepositoriesOrDependencies(
+                                    module.getProject(),
+                                    groovyFile,
+                                    "repositories",
+                                    repositories.stream()
+                                        .map(r -> String.format("maven {\nname = '%s'\nurl = '%s'\n}", r.getId(), r.getUrl()))
+                                        .collect(Collectors.toList())
+                            );
+
+                            // Add dependencies
+                            createRepositoriesOrDependencies(
+                                    module.getProject(),
+                                    groovyFile,
+                                    "dependencies",
+                                    dependencies.stream()
+                                            .map(d -> String.format("compile '%s:%s:%s'", d.getGroupId(), d.getArtifactId(), d.getVersion()))
+                                            .collect(Collectors.toList())
+                            );
+
+                            PsiDirectory rootDirectoryPsi = PsiManager.getInstance(module.getProject()).findDirectory(rootDirectory);
+                            if (rootDirectoryPsi != null) {
+                                rootDirectoryPsi.add(buildGradlePsi);
+                            }
+                            buildGradle = rootDirectory.findChild("build.gradle");
+                            if (buildGradle == null) {
+                                return;
+                            }
+
+                            // Reformat the code to match their code style
+                            PsiFile newBuildGradlePsi = PsiManager.getInstance(module.getProject()).findFile(buildGradle);
+                            if (newBuildGradlePsi != null) {
+                                new ReformatCodeProcessor(newBuildGradlePsi, false).run();
+                            }
+                        }
+                    }.execute();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void createRepositoriesOrDependencies(Project project, GroovyFile file, String name, List<String> expressions) {
+        // Get the block so we can start working with it
+        GrClosableBlock block = getClosableBlockByName(file, name);
+
+        if (block == null) {
+            return;
+        }
+
+        // Add each repository
+        expressions.forEach(expressionText -> {
+            // Create expression and add it to the end of the method block
+            GrExpression methodCallExpression = GroovyPsiElementFactoryImpl.getInstance(project).createExpressionFromText(expressionText);
+            PsiElement last = block.getChildren()[block.getChildren().length - 1];
+            block.addBefore(methodCallExpression, last);
+        });
+
+    }
+
+    @Nullable
+    private GrClosableBlock getClosableBlockByName(PsiElement element, String name) {
+        List<GrClosableBlock> blocks = getClosableBlocksByName(element, name);
+        if (blocks.isEmpty()) {
+            return null;
+        } else {
+            return blocks.get(0);
+        }
+    }
+
+    @NotNull
+    private List<GrClosableBlock> getClosableBlocksByName(PsiElement element, String name) {
+        return Arrays.stream(element.getChildren())
+                .filter(c -> {
+                    // We want to find the child which has a GrReferenceExpression with the right name
+                    return Arrays.stream(c.getChildren())
+                            .filter(g -> g instanceof GrReferenceExpression && g.getText().equals(name))
+                            .findAny().isPresent();
+                }).map(c -> {
+                    // We want to find the grandchild which is a GrCloseableBlock, this is the
+                    // basis for the method block
+                    return Arrays.stream(c.getChildren())
+                            .filter(g -> g instanceof GrClosableBlock)
+                            // cast to closable block so generics can handle this conversion
+                            .map(g -> (GrClosableBlock) g)
+                            .findFirst();
+                }).filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -234,62 +319,36 @@ public class GradleBuildSystem extends BuildSystem {
 
                     // get repositories
                     repositories = new ArrayList<>();
-                    for (PsiElement element : groovyFile.getChildren()) {
-                        if (element instanceof GrMethodCallExpression) {
-                            GrMethodCallExpression expression = (GrMethodCallExpression) element;
-                            for (PsiElement child : expression.getChildren()) {
-                                if (child instanceof GrReferenceExpression) {
-                                    GrReferenceExpression referenceExpression = (GrReferenceExpression) child;
-                                    if (referenceExpression.getText().equals("repositories")) {
-                                        while (!(child instanceof GrClosableBlock)) {
-                                            child = child.getNextSibling();
-                                            if (child == null) {
-                                                break;
-                                            }
-                                        }
-                                        if (child != null) {
-                                            addRepositories((GrClosableBlock) child);
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    // We need to climb the tree to get to the repositories
+
+                    GrClosableBlock block = getClosableBlockByName(groovyFile, "repositories");
+                    if (block != null) {
+                        addRepositories(block);
                     }
                 }
             }
+
+            System.out.println(this);
         }
     }
 
     private void addRepositories(GrClosableBlock block) {
-        for (PsiElement element : block.getChildren()) {
-            if (element instanceof GrMethodCallExpression) {
-                GrMethodCallExpression methodCallExpression = (GrMethodCallExpression) element;
-                for (PsiElement psiElement : methodCallExpression.getChildren()) {
-                    if (psiElement instanceof GrReferenceExpression) {
-                        GrReferenceExpression referenceExpression = (GrReferenceExpression) psiElement;
-                        if (referenceExpression.getText().equals("maven")) {
-                            while (!(psiElement instanceof GrClosableBlock)) {
-                                psiElement = psiElement.getNextSibling();
-                                if (psiElement == null) {
-                                    break;
-                                }
-                            }
-                            if (psiElement != null) {
-                                BuildRepository repository = new BuildRepository();
-                                for (PsiElement child : psiElement.getChildren()) {
-                                    if (child instanceof GrApplicationStatement) {
-                                        handleApplicationStatement((GrApplicationStatement) child, repository);
-                                    } else if (child instanceof GrAssignmentExpression) {
-                                        handleAssignmentExpression((GrAssignmentExpression) child, repository);
-                                    }
-                                }
-                                repositories.add(repository);
-                            }
-                        }
-                    }
+        List<GrClosableBlock> mavenBlocks = getClosableBlocksByName(block, "maven");
+        if (mavenBlocks.isEmpty()) {
+            return;
+        }
+
+        mavenBlocks.forEach(mavenBlock -> {
+            BuildRepository repository = new BuildRepository();
+            for (PsiElement child : mavenBlock.getChildren()) {
+                if (child instanceof GrApplicationStatement) {
+                    handleApplicationStatement((GrApplicationStatement) child, repository);
+                } else if (child instanceof GrAssignmentExpression) {
+                    handleAssignmentExpression((GrAssignmentExpression) child, repository);
                 }
             }
-        }
+            repositories.add(repository);
+        });
     }
 
     private void handleApplicationStatement(GrApplicationStatement statement, BuildRepository repository) {
