@@ -19,10 +19,14 @@
         <p><p>
         Recent changes:
         <ul>
-          <li>Fixed issue with platforms importing</li>
-          <li>Fixed issue with Gradle project creation</li>
-          <li>Fixed NPE when Bukkit projects open and are not yet ready</li>
-          <li>Fixed AUTHOR_LIST not being set for Bukkit plugin.yml</li>
+          <li>Fixed plugin.yml icon not showing up for project creation for Bukkit/BungeeCord</li>
+          <li>Change Gradle project creation to dynamically set repositories and dependencies</li>
+          <li>Fix Gradle's build config having, now uses Gradle instead of Groovy</li>
+          <li>Removed assertions in favor of if-statements which don't catastrophically fail</li>
+          <li>Removed Java version combo box on build settings wizard</li>
+          <li>Fixed NPE on Bukkit projects when it's opened and not yet ready</li>
+          <li>Changed wording from "Forge Plugin" to "Forge Mod"</li>
+          <li>Don't fully quality Sponge's plugin id</li>
         </ul>
       </div>
     ]]>
