@@ -76,6 +76,11 @@ public class BukkitModule extends AbstractModule {
     }
 
     public VirtualFile getPluginYml() {
+        if (pluginYml == null && buildSystem != null) {
+            // try and find the file again if it's not already present
+            // when this object was first created it may not have been ready
+            pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
+        }
         return pluginYml;
     }
 

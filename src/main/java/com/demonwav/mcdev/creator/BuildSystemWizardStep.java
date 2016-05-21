@@ -33,7 +33,6 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
     public BuildSystemWizardStep(@NotNull MinecraftProjectCreator creator) {
         super();
         this.creator = creator;
-        javaVersion.setSelectedIndex(2);
     }
 
     @Override
@@ -69,8 +68,8 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
         } else {
             buildSystem = new GradleBuildSystem();
         }
-        // index 0 == 6, index 1 == 7, index 2 = 8
-        buildSystem.setBuildVersion("1." + (javaVersion.getSelectedIndex() + 6));
+        // Java 8 always
+        buildSystem.setBuildVersion("1.8");
         creator.setBuildSystem(buildSystem);
     }
 
