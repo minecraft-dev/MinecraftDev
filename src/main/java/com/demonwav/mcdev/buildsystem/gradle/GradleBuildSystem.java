@@ -48,6 +48,7 @@ import org.gradle.tooling.model.idea.IdeaProject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.gradle.execution.GradleBeforeRunTaskProvider;
+import org.jetbrains.plugins.gradle.execution.test.runner.PatternGradleConfigurationProducer;
 import org.jetbrains.plugins.gradle.model.ExternalProject;
 import org.jetbrains.plugins.gradle.model.ExternalSourceSet;
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType;
@@ -55,6 +56,7 @@ import org.jetbrains.plugins.gradle.service.execution.GradleRuntimeConfiguration
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportBuilder;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportProvider;
+import org.jetbrains.plugins.gradle.settings.GradleSystemRunningSettings;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlock;
@@ -135,48 +137,28 @@ public class GradleBuildSystem extends BuildSystem {
             }
 
             // Set up the run config
-            RunnerAndConfigurationSettings settings = RunManager.getInstance(project)
-                    .createRunConfiguration(
-                            module.getName() + " Build",
-                            GroovyScriptRunConfigurationType.getInstance().getConfigurationFactories()[0]
-                    );
-            GroovyScriptRunConfiguration runConfiguration = (GroovyScriptRunConfiguration) settings.getConfiguration();
-            // Set some general settings
-            runConfiguration.setModule(module);
-            runConfiguration.setScriptPath(buildGradle.getCanonicalPath());
-            runConfiguration.setWorkingDirectory(getRootDirectory().getCanonicalPath());
-            runConfiguration.setScriptParameters("build");
-
+            // Get the gradle external task type, this is what set's it as a gradle task
+            GradleExternalTaskConfigurationType gradleType = GradleExternalTaskConfigurationType.getInstance();
+            // Create a gradle external system run config
+            ExternalSystemRunConfiguration runConfiguration = new ExternalSystemRunConfiguration(
+                    GradleConstants.SYSTEM_ID,
+                    project,
+                    gradleType.getConfigurationFactories()[0],
+                    module.getName() + " build"
+            );
+            // Set relevant gradle values
+            runConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
+            runConfiguration.getSettings().setExecutionName(module.getName() + " build");
+            runConfiguration.getSettings().setTaskNames(Collections.singletonList("build"));
+            // Create a RunAndConfigurationSettings object, which defines general settings for the run configu
+            RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
+                    RunManagerImpl.getInstanceImpl(project),
+                    runConfiguration,
+                    false
+            );
+            // Open the tool window and set it as a singleton run type
             settings.setActivateToolWindowBeforeRun(true);
             settings.setSingleton(true);
-
-            // FIXME this always puts "make" in the run before thing, which we don't want
-            // I've tried this, I've tried giving it an empty list, I've tried setting it to null, I don't know what to
-            // try at this point
-
-            // I also tried this, which prevents the make build to run, but doesn't remove it, so that also isn't optimal
-//            GroovyScriptRunConfiguration runConfiguration = new GroovyScriptRunConfiguration(
-//                    module.getName() + " build",
-//                    project,
-//                    GroovyScriptRunConfigurationType.getInstance().getConfigurationFactories()[0]
-//            ) {
-//                @Override
-//                public boolean excludeCompileBeforeLaunchOption() {
-//                    return true;
-//                }
-//            };
-//
-//            RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
-//                    RunManagerImpl.getInstanceImpl(project), runConfiguration, false
-//            );
-
-            List<BeforeRunTask> tasks = RunManagerEx.getInstanceEx(project).getBeforeRunTasks(runConfiguration);
-            tasks = tasks.stream().peek(t -> {
-                if (t instanceof CompileStepBeforeRun.MakeBeforeRunTask) {
-                    t.setEnabled(false);
-                }
-            }).collect(Collectors.toList());
-            RunManagerEx.getInstanceEx(project).setBeforeRunTasks(runConfiguration, tasks, true);
 
             // Apply the run config and select it
             RunManager.getInstance(project).addConfiguration(settings, false);
