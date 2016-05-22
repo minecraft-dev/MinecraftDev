@@ -63,7 +63,7 @@ public class MinecraftProjectCreator {
                 dependency.setGroupId("org.spigotmc");
                 dependency.setArtifactId("spigot-api");
                 dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
-                addSonatype(dependencies, buildRepositories);
+                addSonatype(buildRepositories);
                 break;
             case PAPER:
                 buildRepository.setId("destroystokyo-repo");
@@ -71,7 +71,7 @@ public class MinecraftProjectCreator {
                 dependency.setGroupId("com.destroystokyo.paper");
                 dependency.setArtifactId("paper-api");
                 dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
-                addSonatype(dependencies, buildRepositories);
+                addSonatype(buildRepositories);
                 break;
             case BUNGEECORD:
                 buildRepository.setId("sonatype-oss-repo");
@@ -96,9 +96,8 @@ public class MinecraftProjectCreator {
         buildSystem.finishSetup(module, type, settings);
     }
 
-    private void addSonatype(List<BuildDependency> buildDependencies, List<BuildRepository> buildRepositories) {
+    private void addSonatype(List<BuildRepository> buildRepositories) {
         buildRepositories.add(new BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/"));
-        buildDependencies.add(new BuildDependency("net.md-5", "bungeecord-chat", "1.9-SNAPSHOT", "provided"));
     }
 
     public VirtualFile getRoot() {
