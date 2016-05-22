@@ -3,6 +3,7 @@ package com.demonwav.mcdev.platform.bukkit;
 import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
+
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.openapi.module.Module;

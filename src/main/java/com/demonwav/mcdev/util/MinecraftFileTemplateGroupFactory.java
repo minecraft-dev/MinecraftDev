@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.util;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
@@ -19,6 +20,7 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
     public static final String SPONGE_POM_TEMPLATE = "sponge_pom_template.xml";
 
     public static final String BUILD_GRADLE_TEMPLATE = "build.gradle";
+    public static final String FORGE_BUILD_GRADLE_TEMPLATE = "forge_build.gradle";
 
     @Override
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
@@ -36,6 +38,7 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
         group.addTemplate(new FileTemplateDescriptor(SPONGE_POM_TEMPLATE, PlatformAssets.SPONGE_ICON));
 
         group.addTemplate(new FileTemplateDescriptor(BUILD_GRADLE_TEMPLATE, PlatformAssets.MINECRAFT_ICON));
+        group.addTemplate(new FileTemplateDescriptor(FORGE_BUILD_GRADLE_TEMPLATE, PlatformAssets.FORGE_ICON));
 
         return group;
     }

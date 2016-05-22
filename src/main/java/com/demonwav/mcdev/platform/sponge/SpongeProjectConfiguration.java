@@ -3,11 +3,14 @@ package com.demonwav.mcdev.platform.sponge;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+
 import com.google.common.base.Strings;
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
@@ -38,9 +41,10 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
     }
 
     @Override
-    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem) {
-        ApplicationManager.getApplication().runWriteAction(() -> {
+    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
+        ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {
+                indicator.setText("Writing main class");
                 VirtualFile file = buildSystem.getSourceDirectories().get(0);
                 String[] files = this.mainClass.split("\\.");
                 String className = files[files.length - 1];
@@ -127,6 +131,6 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
+        }), ModalityState.any());
     }
 }

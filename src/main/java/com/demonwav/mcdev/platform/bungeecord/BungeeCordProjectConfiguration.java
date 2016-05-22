@@ -3,9 +3,12 @@ package com.demonwav.mcdev.platform.bungeecord;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
@@ -40,9 +43,10 @@ public class BungeeCordProjectConfiguration extends ProjectConfiguration {
     }
 
     @Override
-    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem) {
-        ApplicationManager.getApplication().runWriteAction(() -> {
+    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
+        ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {
+                indicator.setText("Writing main class");
                 // Create plugin main class
                 VirtualFile file = buildSystem.getSourceDirectories().get(0);
                 String[] files = this.mainClass.split("\\.");
@@ -68,6 +72,6 @@ public class BungeeCordProjectConfiguration extends ProjectConfiguration {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
+        }), ModalityState.any());
     }
 }

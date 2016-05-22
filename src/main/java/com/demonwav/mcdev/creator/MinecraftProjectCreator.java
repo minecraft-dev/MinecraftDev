@@ -5,12 +5,16 @@ import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+
 import com.google.common.base.Objects;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class MinecraftProjectCreator {
@@ -91,9 +95,16 @@ public class MinecraftProjectCreator {
         }
         dependency.setScope("provided");
 
-        buildSystem.create(module, type, settings);
-        settings.create(module, type, buildSystem);
-        buildSystem.finishSetup(module, type, settings);
+        // We want to show some info to the user
+        ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Setting Up Project", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+                buildSystem.create(module, type, settings, indicator);
+                settings.create(module, type, buildSystem, indicator);
+                buildSystem.finishSetup(module, type, settings, indicator);
+            }
+        });
     }
 
     private void addSonatype(List<BuildRepository> buildRepositories) {

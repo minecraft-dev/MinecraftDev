@@ -3,8 +3,11 @@ package com.demonwav.mcdev.platform.forge;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -16,6 +19,9 @@ public class ForgeProjectConfiguration extends ProjectConfiguration {
     public List<String> dependencies = new ArrayList<>();
     public String updateUrl;
 
+    public String mcpVersion;
+    public String forgeVersion;
+
     public boolean hasDependencies() {
         return listContainsAtLeastOne(dependencies);
     }
@@ -26,9 +32,9 @@ public class ForgeProjectConfiguration extends ProjectConfiguration {
     }
 
     @Override
-    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem) {
-        ApplicationManager.getApplication().runWriteAction(() -> {
-
-        });
+    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
+        ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+            // TODO impl
+        }), ModalityState.any());
     }
 }

@@ -24,7 +24,7 @@ group= "${GROUP_ID}" // http://maven.apache.org/guides/mini/guide-naming-convent
 archivesBaseName = "${ARTIFACT_ID}"
 
 minecraft {
-    version = "1.9-12.16.1.1907"
+    version = "${FORGE_VERSION}"
     runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.
@@ -32,7 +32,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20160312"
+    mappings = "${MCP_VERSION}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 

@@ -3,6 +3,7 @@ package com.demonwav.mcdev.insight;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformUtil;
+
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.module.Module;

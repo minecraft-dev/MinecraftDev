@@ -4,8 +4,10 @@ import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -142,7 +144,7 @@ public abstract class BuildSystem {
      * the root directory, create a base module consisting of the necessary build system configuration files and
      * directory structure. This method does not create any classes or project-specific things, nor does it set up
      * any build configurations or enable the plugin for this build config. This will be done in
-     * {@link #finishSetup(Module, PlatformType, ProjectConfiguration)}.
+     * {@link #finishSetup(Module, PlatformType, ProjectConfiguration, ProgressIndicator)}.
      * <p>
      * It is legal for this method to have different default setups for each platform type, so the PlatformType and
      * ProjectConfiguration are provided here as well.
@@ -151,10 +153,10 @@ public abstract class BuildSystem {
      * @param type The type of the project
      * @param configuration The configuration object for the project
      */
-    public abstract void create(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration);
+    public abstract void create(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator);
 
     /**
-     * This is called after {@link #create(Module, PlatformType, ProjectConfiguration)}, and after the module has set
+     * This is called after {@link #create(Module, PlatformType, ProjectConfiguration, ProgressIndicator)}, and after the module has set
      * itself up. This is when the build system should make whatever calls are necessary to enable the build system's
      * plugin, and setup whatever run configs should be setup for this build system.
      * <p>
@@ -165,10 +167,10 @@ public abstract class BuildSystem {
      * @param type The type of the project
      * @param configuration The configuration object for the project
      */
-    public abstract void finishSetup(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration);
+    public abstract void finishSetup(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator);
 
     /**
-     * This method performs similarly to {@link #create(Module, PlatformType, ProjectConfiguration)} in that it builds
+     * This method performs similarly to {@link #create(Module, PlatformType, ProjectConfiguration, ProgressIndicator)} in that it builds
      * this object's model of the project. The difference here is this method reads the project and builds the model
      * from the current project's state. The includes settings the artifactId, groupId, and version, setting the root
      * directory, building the list of dependencies and repositories, settings the source, test, and resource directories,

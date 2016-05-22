@@ -6,6 +6,9 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
+import com.demonwav.mcdev.platform.forge.ForgeTemplate;
+
 import com.google.common.base.Strings;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
@@ -15,6 +18,7 @@ import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
 import com.intellij.ide.actions.ImportModuleAction;
 import com.intellij.ide.util.newProjectWizard.AddModuleWizard;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.externalSystem.model.project.ExternalSystemSourceType;
@@ -22,6 +26,7 @@ import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunCo
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -35,6 +40,7 @@ import com.intellij.psi.PsiManager;
 import org.apache.commons.io.FileUtils;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
+import org.gradle.tooling.ProgressListener;
 import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.model.idea.IdeaDependency;
 import org.gradle.tooling.model.idea.IdeaModule;
@@ -78,105 +84,153 @@ public class GradleBuildSystem extends BuildSystem {
     private VirtualFile buildGradle;
 
     @Override
-    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration) {
+    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
         rootDirectory.refresh(false, true);
-        ApplicationManager.getApplication().runWriteAction(() -> {
+        ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 sourceDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/main/java"));
                 resourceDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/main/resources"));
                 testSourcesDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/test/java"));
                 testResourceDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/test/resources"));
-
-                if (type == PlatformType.FORGE) {
-                    // version http://files.minecraftforge.net/maven/net/minecraftforge/forge/json
-                    // mappings http://export.mcpbot.bspk.rs/versions.json
-                } else {
-                    String buildGradleText = AbstractTemplate.applyBuildGradleTemplate(
-                            module,
-                            groupId,
-                            version,
-                            Strings.emptyToNull(configuration.description),
-                            buildVersion
-                    );
-
-                    if (buildGradleText == null) {
-                        return;
-                    }
-
-                    // Create the PSI file from the text, but don't write it until we are finished with it
-                    PsiFile buildGradlePsi = PsiFileFactory.getInstance(module.getProject()).createFileFromText(GroovyLanguage.INSTANCE, buildGradleText);
-
-                    if (buildGradlePsi == null) {
-                        return;
-                    }
-
-                    // Write the repository and dependency data to the psi file
-                    new WriteCommandAction.Simple(module.getProject(), buildGradlePsi) {
-                        @Override
-                        protected void run() throws Throwable {
-                            buildGradlePsi.setName("build.gradle");
-                            final GroovyFile groovyFile = (GroovyFile) buildGradlePsi;
-
-                            // Add repositories
-                            createRepositoriesOrDependencies(
-                                    module.getProject(),
-                                    groovyFile,
-                                    "repositories",
-                                    repositories.stream()
-                                        .map(r -> String.format("maven {name = '%s'\nurl = '%s'\n}", r.getId(), r.getUrl()))
-                                        .collect(Collectors.toList())
-                            );
-
-                            // Add dependencies
-                            createRepositoriesOrDependencies(
-                                    module.getProject(),
-                                    groovyFile,
-                                    "dependencies",
-                                    dependencies.stream()
-                                            .map(d -> String.format("compile '%s:%s:%s'", d.getGroupId(), d.getArtifactId(), d.getVersion()))
-                                            .collect(Collectors.toList())
-                            );
-
-                            new ReformatCodeProcessor(buildGradlePsi, false).run();
-                            PsiDirectory rootDirectoryPsi = PsiManager.getInstance(module.getProject()).findDirectory(rootDirectory);
-                            if (rootDirectoryPsi != null) {
-                                rootDirectoryPsi.add(buildGradlePsi);
-                            }
-                            buildGradle = rootDirectory.findChild("build.gradle");
-                            if (buildGradle == null) {
-                                return;
-                            }
-
-                            // Reformat the code to match their code style
-                            PsiFile newBuildGradlePsi = PsiManager.getInstance(module.getProject()).findFile(buildGradle);
-                            if (newBuildGradlePsi != null) {
-                                new ReformatCodeProcessor(newBuildGradlePsi, false).run();
-                            }
-                        }
-                    }.execute();
-
-                    // Setup gradle wrapper
-                    // We'll write the properties file to ensure it sets up with the right version
-                    String wrapperDirPath = rootDirectory.createChildDirectory(this, "gradle").createChildDirectory(this, "wrapper").getPath();
-                    FileUtils.writeLines(new File(wrapperDirPath, "gradle-wrapper.properties"), Collections.singletonList(
-                            "distributionUrl=https\\://services.gradle.org/distributions/gradle-2.13-bin.zip"
-                    ));
-
-                    // Use gradle tooling to run the wrapper task
-                    GradleConnector connector = GradleConnector.newConnector();
-                    connector.forProjectDirectory(new File(rootDirectory.getPath()));
-                    ProjectConnection connection = connector.connect();
-                    BuildLauncher launcher = connection.newBuild();
-                    try {
-                        launcher.forTasks("wrapper").run();
-                    } finally {
-                        connection.close();
-                    }
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
+        }), ModalityState.any());
+
+        if (type == PlatformType.FORGE) {
+            ForgeProjectConfiguration settings = (ForgeProjectConfiguration) configuration;
+
+            ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+                try {
+                    buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
+
+                    ForgeTemplate.applyBuildGradleTemplate(
+                            module,
+                            buildGradle,
+                            groupId,
+                            artifactId,
+                            settings.forgeVersion,
+                            settings.mcpVersion,
+                            version
+                    );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }), ModalityState.any());
+
+            setupWrapper(indicator);
+
+            // We need to setup decomp workspace first
+            // We'll use gradle tooling to run it
+            GradleConnector connector = GradleConnector.newConnector();
+            connector.forProjectDirectory(new File(rootDirectory.getPath()));
+            ProjectConnection connection = connector.connect();
+            BuildLauncher launcher = connection.newBuild();
+
+            try {
+                launcher.forTasks("setupDecompWorkspace").setJvmArguments("-Xmx2G").addProgressListener((ProgressListener) progressEvent ->
+                        indicator.setText(progressEvent.getDescription())
+                ).run();
+            } finally {
+                connection.close();
+            }
+        } else {
+            ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+                String buildGradleText = AbstractTemplate.applyBuildGradleTemplate(
+                        module,
+                        groupId,
+                        version,
+                        Strings.emptyToNull(configuration.description),
+                        buildVersion
+                );
+
+                if (buildGradleText == null) {
+                    return;
+                }
+
+                // Create the PSI file from the text, but don't write it until we are finished with it
+                PsiFile buildGradlePsi = PsiFileFactory.getInstance(module.getProject()).createFileFromText(GroovyLanguage.INSTANCE, buildGradleText);
+
+                if (buildGradlePsi == null) {
+                    return;
+                }
+
+                // Write the repository and dependency data to the psi file
+                new WriteCommandAction.Simple(module.getProject(), buildGradlePsi) {
+                    @Override
+                    protected void run() throws Throwable {
+                        buildGradlePsi.setName("build.gradle");
+                        final GroovyFile groovyFile = (GroovyFile) buildGradlePsi;
+
+                        // Add repositories
+                        createRepositoriesOrDependencies(
+                                module.getProject(),
+                                groovyFile,
+                                "repositories",
+                                repositories.stream()
+                                        .map(r -> String.format("maven {name = '%s'\nurl = '%s'\n}", r.getId(), r.getUrl()))
+                                        .collect(Collectors.toList())
+                        );
+
+                        // Add dependencies
+                        createRepositoriesOrDependencies(
+                                module.getProject(),
+                                groovyFile,
+                                "dependencies",
+                                dependencies.stream()
+                                        .map(d -> String.format("compile '%s:%s:%s'", d.getGroupId(), d.getArtifactId(), d.getVersion()))
+                                        .collect(Collectors.toList())
+                        );
+
+                        new ReformatCodeProcessor(buildGradlePsi, false).run();
+                        PsiDirectory rootDirectoryPsi = PsiManager.getInstance(module.getProject()).findDirectory(rootDirectory);
+                        if (rootDirectoryPsi != null) {
+                            rootDirectoryPsi.add(buildGradlePsi);
+                        }
+                        buildGradle = rootDirectory.findChild("build.gradle");
+                        if (buildGradle == null) {
+                            return;
+                        }
+
+                        // Reformat the code to match their code style
+                        PsiFile newBuildGradlePsi = PsiManager.getInstance(module.getProject()).findFile(buildGradle);
+                        if (newBuildGradlePsi != null) {
+                            new ReformatCodeProcessor(newBuildGradlePsi, false).run();
+                        }
+                    }
+                }.execute();
+            }), ModalityState.any());
+
+            setupWrapper(indicator);
+        }
+    }
+
+    private void setupWrapper(@NotNull ProgressIndicator indicator) {
+        // Setup gradle wrapper
+        // We'll write the properties file to ensure it sets up with the right version
+        ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+            try {
+                String wrapperDirPath = rootDirectory.createChildDirectory(this, "gradle").createChildDirectory(this, "wrapper").getPath();
+                FileUtils.writeLines(new File(wrapperDirPath, "gradle-wrapper.properties"), Collections.singletonList(
+                        "distributionUrl=https\\://services.gradle.org/distributions/gradle-2.13-bin.zip"
+                ));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }), ModalityState.any());
+
+        // Use gradle tooling to run the wrapper task
+        GradleConnector connector = GradleConnector.newConnector();
+        connector.forProjectDirectory(new File(rootDirectory.getPath()));
+        ProjectConnection connection = connector.connect();
+        BuildLauncher launcher = connection.newBuild();
+        try {
+            launcher.forTasks("wrapper").addProgressListener((ProgressListener) progressEvent ->
+                    indicator.setText(progressEvent.getDescription())
+            ).run();
+        } finally {
+            connection.close();
+        }
     }
 
     private void createRepositoriesOrDependencies(Project project, GroovyFile file, String name, List<String> expressions) {
@@ -230,7 +284,7 @@ public class GradleBuildSystem extends BuildSystem {
     }
 
     @Override
-    public void finishSetup(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration) {
+    public void finishSetup(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
         Project project = module.getProject();
 
         // Tell Gradle to import this project
@@ -238,39 +292,41 @@ public class GradleBuildSystem extends BuildSystem {
         GradleProjectImportBuilder gradleProjectImportBuilder = new GradleProjectImportBuilder(projectDataManager);
         final GradleProjectImportProvider gradleProjectImportProvider = new GradleProjectImportProvider(gradleProjectImportBuilder);
         if (buildGradle != null) {
-            AddModuleWizard wizard = new AddModuleWizard(project, buildGradle.getPath(), gradleProjectImportProvider);
-            if (wizard.showAndGet()) {
-                ImportModuleAction.createFromWizard(project, wizard);
-            }
+            indicator.setText("Running Gradle Setup");
+            ApplicationManager.getApplication().invokeAndWait(() -> {
+                AddModuleWizard wizard = new AddModuleWizard(project, buildGradle.getPath(), gradleProjectImportProvider);
+                if (wizard.showAndGet()) {
+                    ImportModuleAction.createFromWizard(project, wizard);
+                }
 
-            // Set up the run config
-            // Get the gradle external task type, this is what set's it as a gradle task
-            GradleExternalTaskConfigurationType gradleType = GradleExternalTaskConfigurationType.getInstance();
-            // Create a gradle external system run config
-            ExternalSystemRunConfiguration runConfiguration = new ExternalSystemRunConfiguration(
-                    GradleConstants.SYSTEM_ID,
-                    project,
-                    gradleType.getConfigurationFactories()[0],
-                    module.getName() + " build"
-            );
-            // Set relevant gradle values
-            runConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
-            runConfiguration.getSettings().setExecutionName(module.getName() + " build");
-            runConfiguration.getSettings().setTaskNames(Collections.singletonList("build"));
-            // Create a RunAndConfigurationSettings object, which defines general settings for the run configu
-            RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
-                    RunManagerImpl.getInstanceImpl(project),
-                    runConfiguration,
-                    false
-            );
-            // Open the tool window and set it as a singleton run type
-            settings.setActivateToolWindowBeforeRun(true);
-            settings.setSingleton(true);
+                // Set up the run config
+                // Get the gradle external task type, this is what set's it as a gradle task
+                GradleExternalTaskConfigurationType gradleType = GradleExternalTaskConfigurationType.getInstance();
+                // Create a gradle external system run config
+                ExternalSystemRunConfiguration runConfiguration = new ExternalSystemRunConfiguration(
+                        GradleConstants.SYSTEM_ID,
+                        project,
+                        gradleType.getConfigurationFactories()[0],
+                        module.getName() + " build"
+                );
+                // Set relevant gradle values
+                runConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
+                runConfiguration.getSettings().setExecutionName(module.getName() + " build");
+                runConfiguration.getSettings().setTaskNames(Collections.singletonList("build"));
+                // Create a RunAndConfigurationSettings object, which defines general settings for the run configu
+                RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
+                        RunManagerImpl.getInstanceImpl(project),
+                        runConfiguration,
+                        false
+                );
+                // Open the tool window and set it as a singleton run type
+                settings.setActivateToolWindowBeforeRun(true);
+                settings.setSingleton(true);
 
-            // Apply the run config and select it
-            RunManager.getInstance(project).addConfiguration(settings, false);
-            RunManager.getInstance(project).setSelectedConfiguration(settings);
-
+                // Apply the run config and select it
+                RunManager.getInstance(project).addConfiguration(settings, false);
+                RunManager.getInstance(project).setSelectedConfiguration(settings);
+            }, ModalityState.any());
         }
     }
 

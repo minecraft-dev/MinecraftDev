@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.platform.PlatformType;
+
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import org.jetbrains.annotations.NotNull;

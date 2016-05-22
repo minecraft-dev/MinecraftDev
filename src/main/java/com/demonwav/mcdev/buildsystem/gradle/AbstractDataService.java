@@ -2,6 +2,7 @@ package com.demonwav.mcdev.buildsystem.gradle;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
+
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.externalSystem.model.DataNode;

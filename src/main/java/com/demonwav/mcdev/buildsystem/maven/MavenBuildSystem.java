@@ -11,14 +11,17 @@ import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.BukkitTemplate;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordTemplate;
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate;
+
 import com.google.common.base.Strings;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.lang.xml.XMLLanguage;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -49,9 +52,9 @@ public class MavenBuildSystem extends BuildSystem {
     private VirtualFile pomFile;
 
     @Override
-    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration) {
+    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
         rootDirectory.refresh(false, true);
-        ApplicationManager.getApplication().runWriteAction(() -> {
+        ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 sourceDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/main/java"));
                 resourceDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/main/resources"));
@@ -140,29 +143,31 @@ public class MavenBuildSystem extends BuildSystem {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
+        }), ModalityState.any());
     }
 
     @Override
-    public void finishSetup(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration) {
-        Project project = module.getProject();
+    public void finishSetup(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
+        ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+            Project project = module.getProject();
 
-        // Force Maven to setup the project
-        MavenProjectsManager manager = MavenProjectsManager.getInstance(project);
-        manager.addManagedFilesOrUnignore(Collections.singletonList(pomFile));
-        manager.getImportingSettings().setDownloadDocsAutomatically(true);
-        manager.getImportingSettings().setDownloadSourcesAutomatically(true);
+            // Force Maven to setup the project
+            MavenProjectsManager manager = MavenProjectsManager.getInstance(project);
+            manager.addManagedFilesOrUnignore(Collections.singletonList(pomFile));
+            manager.getImportingSettings().setDownloadDocsAutomatically(true);
+            manager.getImportingSettings().setDownloadSourcesAutomatically(true);
 
-        // Setup the default Maven run config
-        if (getRootDirectory().getCanonicalPath() != null) {
-            MavenRunnerParameters params = new MavenRunnerParameters();
-            params.setWorkingDirPath(getRootDirectory().getCanonicalPath());
-            params.setGoals(Arrays.asList("clean", "package"));
-            RunnerAndConfigurationSettings runnerSettings = MavenRunConfigurationType.createRunnerAndConfigurationSettings(null, null, params, module.getProject());
-            runnerSettings.setName(module.getName() + " build");
-            RunManager.getInstance(project).addConfiguration(runnerSettings, false);
-            RunManager.getInstance(project).setSelectedConfiguration(runnerSettings);
-        }
+            // Setup the default Maven run config
+            if (getRootDirectory().getCanonicalPath() != null) {
+                MavenRunnerParameters params = new MavenRunnerParameters();
+                params.setWorkingDirPath(getRootDirectory().getCanonicalPath());
+                params.setGoals(Arrays.asList("clean", "package"));
+                RunnerAndConfigurationSettings runnerSettings = MavenRunConfigurationType.createRunnerAndConfigurationSettings(null, null, params, module.getProject());
+                runnerSettings.setName(module.getName() + " build");
+                RunManager.getInstance(project).addConfiguration(runnerSettings, false);
+                RunManager.getInstance(project).setSelectedConfiguration(runnerSettings);
+            }
+        }), ModalityState.any());
     }
 
     @Override

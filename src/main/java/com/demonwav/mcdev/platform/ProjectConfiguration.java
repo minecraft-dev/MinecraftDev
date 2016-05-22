@@ -1,9 +1,11 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+
 import com.intellij.codeInspection.ex.EntryPointsManager;
 import com.intellij.codeInspection.ex.EntryPointsManagerBase;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.util.JDOMExternalizableStringList;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +23,7 @@ public abstract class ProjectConfiguration {
     public final List<String> authors = new ArrayList<>();
     public String website = null;
 
-    public abstract void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem);
+    public abstract void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator);
 
     public boolean hasAuthors() {
         return listContainsAtLeastOne(this.authors);

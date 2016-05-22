@@ -4,6 +4,8 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
+import com.demonwav.mcdev.platform.PlatformType;
+
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
@@ -86,6 +88,10 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
 
             if (versionField.getText().trim().isEmpty()) {
                 throw new MinecraftSetupException("fillAll", versionField);
+            }
+
+            if (creator.getType() == PlatformType.FORGE && buildSystemBox.getSelectedIndex() == 0) {
+                throw new MinecraftSetupException("Forge does not support Maven", buildSystemBox);
             }
         } catch (MinecraftSetupException e) {
             JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(e.getError(), MessageType.ERROR, null)
