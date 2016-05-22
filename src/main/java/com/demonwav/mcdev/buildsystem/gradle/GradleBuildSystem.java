@@ -29,9 +29,16 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiPrimitiveType;
+import com.intellij.psi.PsiWhiteSpace;
+import com.intellij.psi.impl.PsiElementFactoryImpl;
+import com.intellij.psi.impl.source.tree.ElementType;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.model.idea.IdeaDependency;
@@ -54,6 +61,7 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrAssign
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrCommandArgumentList;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrExpression;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression;
+import org.jetbrains.plugins.groovy.lang.psi.api.toplevel.GrTopStatement;
 import org.jetbrains.plugins.groovy.lang.psi.impl.GroovyPsiElementFactoryImpl;
 
 import java.io.File;
@@ -132,10 +140,11 @@ public class GradleBuildSystem extends BuildSystem {
                                     groovyFile,
                                     "dependencies",
                                     dependencies.stream()
-                                            .map(d -> String.format("compile '%s:%s:%s'", d.getGroupId(), d.getArtifactId(), d.getVersion()))
+                                            .map(d -> String.format("\ncompile '%s:%s:%s'", d.getGroupId(), d.getArtifactId(), d.getVersion()))
                                             .collect(Collectors.toList())
                             );
 
+                            new ReformatCodeProcessor(buildGradlePsi, false).run();
                             PsiDirectory rootDirectoryPsi = PsiManager.getInstance(module.getProject()).findDirectory(rootDirectory);
                             if (rootDirectoryPsi != null) {
                                 rootDirectoryPsi.add(buildGradlePsi);
@@ -167,14 +176,15 @@ public class GradleBuildSystem extends BuildSystem {
             return;
         }
 
-        // Add each repository
-        expressions.forEach(expressionText -> {
-            // Create expression and add it to the end of the method block
-            GrExpression methodCallExpression = GroovyPsiElementFactoryImpl.getInstance(project).createExpressionFromText(expressionText);
-            PsiElement last = block.getChildren()[block.getChildren().length - 1];
-            block.addBefore(methodCallExpression, last);
-        });
+        // Create a super expression with all the expressions tied together
+        String expressionText = expressions.stream().collect(Collectors.joining("\n"));
 
+        // We can't create each expression and add them to the file...that won't work. Groovy requires a new line
+        // from one method call expression to another, and there's no way to put whitespace in Psi because Psi is
+        // stupid. So instead we make the whole thing as one big clump and insert it into the block
+        GroovyFile fakeFile = GroovyPsiElementFactoryImpl.getInstance(project).createGroovyFile(expressionText, false, null);
+        PsiElement last = block.getChildren()[block.getChildren().length - 1];
+        block.addBefore(fakeFile, last);
     }
 
     @Nullable
@@ -282,7 +292,8 @@ public class GradleBuildSystem extends BuildSystem {
                         return false;
                     }).collect(Collectors.toList());
 
-
+            // We need to check the parent too if it's a single module project
+            children.add(module);
             ExternalProject externalRootProject = externalProjectDataCache.getRootExternalProject(GradleConstants.SYSTEM_ID, new File(rootDirectory.getCanonicalPath()));
             if (externalRootProject != null) {
                 for (Module child : children) {

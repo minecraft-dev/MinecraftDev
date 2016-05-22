@@ -159,7 +159,7 @@ public class MavenBuildSystem extends BuildSystem {
             params.setWorkingDirPath(getRootDirectory().getCanonicalPath());
             params.setGoals(Arrays.asList("clean", "package"));
             RunnerAndConfigurationSettings runnerSettings = MavenRunConfigurationType.createRunnerAndConfigurationSettings(null, null, params, module.getProject());
-            runnerSettings.setName(module.getName() + " Build");
+            runnerSettings.setName(module.getName() + " build");
             RunManager.getInstance(project).addConfiguration(runnerSettings, false);
             RunManager.getInstance(project).setSelectedConfiguration(runnerSettings);
         }

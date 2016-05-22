@@ -9,7 +9,9 @@ import com.google.common.base.Objects;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class MinecraftProjectCreator {
 
@@ -38,11 +40,15 @@ public class MinecraftProjectCreator {
         //buildSystem.setPluginAuthor(settings.author); // TODO: build systems have "developer" blocks
         buildSystem.setPluginName(settings.pluginName);
 
+        List<BuildRepository> buildRepositories = new ArrayList<>();
+        List<BuildDependency> dependencies = new ArrayList<>();
+        buildSystem.setRepositories(buildRepositories);
+        buildSystem.setDependencies(dependencies);
+
         BuildRepository buildRepository = new BuildRepository();
         BuildDependency dependency = new BuildDependency();
-        buildSystem.setRepositories(Collections.singletonList(buildRepository));
-        buildSystem.setDependencies(Collections.singletonList(dependency));
-
+        buildRepositories.add(buildRepository);
+        dependencies.add(dependency);
         switch (type) {
             case BUKKIT:
                 buildRepository.setId("spigotmc-repo");
@@ -57,6 +63,7 @@ public class MinecraftProjectCreator {
                 dependency.setGroupId("org.spigotmc");
                 dependency.setArtifactId("spigot-api");
                 dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
+                addSonatype(dependencies, buildRepositories);
                 break;
             case PAPER:
                 buildRepository.setId("destroystokyo-repo");
@@ -64,6 +71,7 @@ public class MinecraftProjectCreator {
                 dependency.setGroupId("com.destroystokyo.paper");
                 dependency.setArtifactId("paper-api");
                 dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
+                addSonatype(dependencies, buildRepositories);
                 break;
             case BUNGEECORD:
                 buildRepository.setId("sonatype-oss-repo");
@@ -86,6 +94,11 @@ public class MinecraftProjectCreator {
         buildSystem.create(module, type, settings);
         settings.create(module, type, buildSystem);
         buildSystem.finishSetup(module, type, settings);
+    }
+
+    private void addSonatype(List<BuildDependency> buildDependencies, List<BuildRepository> buildRepositories) {
+        buildRepositories.add(new BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/"));
+        buildDependencies.add(new BuildDependency("net.md-5", "bungeecord-chat", "1.9-SNAPSHOT", "provided"));
     }
 
     public VirtualFile getRoot() {
