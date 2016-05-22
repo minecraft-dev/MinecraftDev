@@ -130,7 +130,7 @@ public class GradleBuildSystem extends BuildSystem {
                                     groovyFile,
                                     "repositories",
                                     repositories.stream()
-                                        .map(r -> String.format("maven {\nname = '%s'\nurl = '%s'\n}", r.getId(), r.getUrl()))
+                                        .map(r -> String.format("maven {name = '%s'\nurl = '%s'\n}", r.getId(), r.getUrl()))
                                         .collect(Collectors.toList())
                             );
 
@@ -140,7 +140,7 @@ public class GradleBuildSystem extends BuildSystem {
                                     groovyFile,
                                     "dependencies",
                                     dependencies.stream()
-                                            .map(d -> String.format("\ncompile '%s:%s:%s'", d.getGroupId(), d.getArtifactId(), d.getVersion()))
+                                            .map(d -> String.format("compile '%s:%s:%s'", d.getGroupId(), d.getArtifactId(), d.getVersion()))
                                             .collect(Collectors.toList())
                             );
 
