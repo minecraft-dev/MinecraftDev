@@ -1,5 +1,5 @@
 name: ${NAME}
-version: ${VERSION}
+version: ${project.version}
 main: ${MAIN}
 
 #if (${HAS_DEPEND})
