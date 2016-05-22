@@ -29,16 +29,11 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.PsiPrimitiveType;
-import com.intellij.psi.PsiWhiteSpace;
-import com.intellij.psi.impl.PsiElementFactoryImpl;
-import com.intellij.psi.impl.source.tree.ElementType;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl;
+import org.apache.commons.io.FileUtils;
+import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.model.idea.IdeaDependency;
@@ -59,9 +54,7 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlo
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrApplicationStatement;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrAssignmentExpression;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrCommandArgumentList;
-import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrExpression;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression;
-import org.jetbrains.plugins.groovy.lang.psi.api.toplevel.GrTopStatement;
 import org.jetbrains.plugins.groovy.lang.psi.impl.GroovyPsiElementFactoryImpl;
 
 import java.io.File;
@@ -161,6 +154,24 @@ public class GradleBuildSystem extends BuildSystem {
                             }
                         }
                     }.execute();
+
+                    // Setup gradle wrapper
+                    // We'll write the properties file to ensure it sets up with the right version
+                    String wrapperDirPath = rootDirectory.createChildDirectory(this, "gradle").createChildDirectory(this, "wrapper").getPath();
+                    FileUtils.writeLines(new File(wrapperDirPath, "gradle-wrapper.properties"), Collections.singletonList(
+                            "distributionUrl=https\\://services.gradle.org/distributions/gradle-2.13-bin.zip"
+                    ));
+
+                    // Use gradle tooling to run the wrapper task
+                    GradleConnector connector = GradleConnector.newConnector();
+                    connector.forProjectDirectory(new File(rootDirectory.getPath()));
+                    ProjectConnection connection = connector.connect();
+                    BuildLauncher launcher = connection.newBuild();
+                    try {
+                        launcher.forTasks("wrapper").run();
+                    } finally {
+                        connection.close();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
