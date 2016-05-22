@@ -42,11 +42,7 @@ public abstract class ProjectConfiguration {
 
     protected void performCreationSettingSetup(Module module, PlatformType type) {
         JDOMExternalizableStringList annotations = ((EntryPointsManagerBase) EntryPointsManager.getInstance(module.getProject())).ADDITIONAL_ANNOTATIONS;
-        for (String annotation : type.getType().getIgnoredAnnotations()) {
-            if (!annotations.contains(annotation)) {
-                annotations.add(annotation);
-            }
-        }
+        type.getType().getIgnoredAnnotations().stream().filter(annotation -> !annotations.contains(annotation)).forEach(annotations::add);
     }
 
     protected static boolean listContainsAtLeastOne(List<String> list) {
