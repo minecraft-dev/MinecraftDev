@@ -4,13 +4,14 @@ import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
+import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
 public enum PlatformType {
     BUKKIT(BukkitModuleType.getInstance()),
     SPIGOT(SpigotModuleType.getInstance()),
     PAPER(PaperModuleType.getInstance()),
-    FORGE(null),
+    FORGE(ForgeModuleType.getInstance()),
     SPONGE(SpongeModuleType.getInstance()),
     BUNGEECORD(BungeeCordModuleType.getInstance());
 

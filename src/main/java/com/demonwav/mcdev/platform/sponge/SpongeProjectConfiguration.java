@@ -126,7 +126,6 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
                     }
                 }.execute();
 
-                performCreationSettingSetup(module, type);
                 EditorHelper.openInEditor(mainClassPsi);
             } catch (IOException e) {
                 e.printStackTrace();

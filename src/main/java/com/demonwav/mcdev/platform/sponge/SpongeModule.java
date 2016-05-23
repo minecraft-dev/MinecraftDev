@@ -13,9 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
 
-/**
- * Created by gabizou on 5/19/2016.
- */
 public class SpongeModule extends AbstractModule {
 
     SpongeModule(@NotNull Module module) {

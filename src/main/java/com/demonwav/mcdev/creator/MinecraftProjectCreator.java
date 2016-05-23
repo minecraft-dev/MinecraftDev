@@ -103,6 +103,7 @@ public class MinecraftProjectCreator {
                 buildSystem.create(module, type, settings, indicator);
                 settings.create(module, type, buildSystem, indicator);
                 buildSystem.finishSetup(module, type, settings, indicator);
+                settings.performCreationSettingSetup(module, type);
             }
         });
     }

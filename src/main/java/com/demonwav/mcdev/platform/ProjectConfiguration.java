@@ -42,8 +42,9 @@ public abstract class ProjectConfiguration {
         return string.trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*");
     }
 
-    protected void performCreationSettingSetup(Module module, PlatformType type) {
+    public void performCreationSettingSetup(Module module, PlatformType type) {
         JDOMExternalizableStringList annotations = ((EntryPointsManagerBase) EntryPointsManager.getInstance(module.getProject())).ADDITIONAL_ANNOTATIONS;
+        System.out.println(type.getType().getIgnoredAnnotations().stream());
         type.getType().getIgnoredAnnotations().stream().filter(annotation -> !annotations.contains(annotation)).forEach(annotations::add);
     }
 
