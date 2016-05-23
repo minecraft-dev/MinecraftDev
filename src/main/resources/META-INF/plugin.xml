@@ -19,6 +19,7 @@
         <p><p>
         Recent changes:
         <ul>
+          <li>Fix Gradle tooling connection not always closing</li>
           <li>Fixed plugin.yml icon not showing up for project creation for Bukkit/BungeeCord</li>
           <li>Change Gradle project creation to dynamically set repositories and dependencies</li>
           <li>Fix Gradle's build config having, now uses Gradle instead of Groovy</li>
