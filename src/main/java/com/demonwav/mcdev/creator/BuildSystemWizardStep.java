@@ -45,10 +45,14 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
             case PAPER:
             case BUNGEECORD:
                 buildSystemBox.setSelectedIndex(0);
+                buildSystemBox.setVisible(true);
                 break;
             case SPONGE:
-            case FORGE:
                 buildSystemBox.setSelectedIndex(1);
+                buildSystemBox.setVisible(true);
+                break;
+            case FORGE:buildSystemBox.setSelectedIndex(1);
+                buildSystemBox.setVisible(false);
                 break;
         }
         return panel;

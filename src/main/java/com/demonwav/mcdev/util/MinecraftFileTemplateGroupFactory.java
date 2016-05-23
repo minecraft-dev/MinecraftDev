@@ -22,6 +22,9 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
     public static final String BUILD_GRADLE_TEMPLATE = "build.gradle";
     public static final String FORGE_BUILD_GRADLE_TEMPLATE = "forge_build.gradle";
 
+    public static final String FORGE_MAIN_CLASS_TEMPLATE = "forge_main_class.java";
+    public static final String MCMOD_INFO_TEMPLATE = "mcmod.info";
+
     @Override
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
         FileTemplateGroupDescriptor group = new FileTemplateGroupDescriptor("Minecraft", PlatformAssets.MINECRAFT_ICON);
@@ -39,6 +42,9 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
 
         group.addTemplate(new FileTemplateDescriptor(BUILD_GRADLE_TEMPLATE, PlatformAssets.MINECRAFT_ICON));
         group.addTemplate(new FileTemplateDescriptor(FORGE_BUILD_GRADLE_TEMPLATE, PlatformAssets.FORGE_ICON));
+
+        group.addTemplate(new FileTemplateDescriptor(FORGE_MAIN_CLASS_TEMPLATE, PlatformAssets.FORGE_ICON));
+        group.addTemplate(new FileTemplateDescriptor(MCMOD_INFO_TEMPLATE, PlatformAssets.FORGE_ICON));
 
         return group;
     }

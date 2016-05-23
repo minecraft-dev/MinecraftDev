@@ -87,6 +87,10 @@
             <implementation-class>com.demonwav.mcdev.platform.MinecraftProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>
+        <component>
+            <implementation-class>com.demonwav.mcdev.platform.forge.ForgeProjectComponent</implementation-class>
+            <loadForDefaultProject/>
+        </component>
     </project-components>
 
     <actions>
