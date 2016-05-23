@@ -6,6 +6,7 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+
 import com.google.common.base.Strings;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
@@ -69,6 +70,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static org.gradle.tooling.GradleConnector.newConnector;
 
 public class GradleBuildSystem extends BuildSystem {
 
@@ -163,7 +166,7 @@ public class GradleBuildSystem extends BuildSystem {
                     ));
 
                     // Use gradle tooling to run the wrapper task
-                    GradleConnector connector = GradleConnector.newConnector();
+                    GradleConnector connector = newConnector();
                     connector.forProjectDirectory(new File(rootDirectory.getPath()));
                     ProjectConnection connection = connector.connect();
                     BuildLauncher launcher = connection.newBuild();
@@ -334,28 +337,33 @@ public class GradleBuildSystem extends BuildSystem {
 
                     GradleConnector connector = GradleConnector.newConnector();
                     connector.forProjectDirectory(new File(rootDirectory.getCanonicalPath()));
-                    ProjectConnection connection = connector.connect();
-                    IdeaProject ideaProject = connection.getModel(IdeaProject.class);
-                    for (IdeaModule ideaModule : ideaProject.getModules()) {
-                        for (IdeaDependency ideaDependency : ideaModule.getDependencies()) {
-                            String version = ideaDependency.toString();
-                            Matcher matcher = pattern.matcher(version);
-                            if (matcher.find()) {
-                                String tempGroupId = matcher.group(1);
-                                String tempArtifactId = matcher.group(2);
-                                String tempVersion = matcher.group(3);
-                                String scope = ideaDependency.getScope().getScope().toLowerCase();
+                    ProjectConnection connection = null;
+                    try {
+                        connection = connector.connect();
+                        IdeaProject ideaProject = connection.getModel(IdeaProject.class);
+                        for (IdeaModule ideaModule : ideaProject.getModules()) {
+                            for (IdeaDependency ideaDependency : ideaModule.getDependencies()) {
+                                String version = ideaDependency.toString();
+                                Matcher matcher = pattern.matcher(version);
+                                if (matcher.find()) {
+                                    String tempGroupId = matcher.group(1);
+                                    String tempArtifactId = matcher.group(2);
+                                    String tempVersion = matcher.group(3);
+                                    String scope = ideaDependency.getScope().getScope().toLowerCase();
 
-                                dependencies.add(new BuildDependency(tempGroupId, tempArtifactId, tempVersion, scope));
+                                    dependencies.add(new BuildDependency(tempGroupId, tempArtifactId, tempVersion, scope));
+                                }
                             }
                         }
+
+                        // get build version
+                        buildVersion = ideaProject.getLanguageLevel().getLevel();
+                        buildVersion = buildVersion.replaceAll("JDK_", "").replaceAll("_", ".");
+                    } finally {
+                        if (connection != null) {
+                            connection.close();
+                        }
                     }
-
-                    // get build version
-                    buildVersion = ideaProject.getLanguageLevel().getLevel();
-                    buildVersion = buildVersion.replaceAll("JDK_", "").replaceAll("_", ".");
-
-                    connection.close();
 
                     // get repositories
                     repositories = new ArrayList<>();
