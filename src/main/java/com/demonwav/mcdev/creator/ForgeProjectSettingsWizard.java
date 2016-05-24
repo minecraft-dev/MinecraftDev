@@ -34,9 +34,9 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
     private JTextField websiteField;
     private JTextField dependField;
     private JTextField updateUrlField;
-    private JComboBox minecraftVersionBox;
-    private JComboBox forgeVersionBox;
-    private JComboBox mcpVersionBox;
+    private JComboBox<String> minecraftVersionBox;
+    private JComboBox<String> forgeVersionBox;
+    private JComboBox<String> mcpVersionBox;
     private JProgressBar loadingBar;
 
     private final ForgeProjectConfiguration settings = new ForgeProjectConfiguration();

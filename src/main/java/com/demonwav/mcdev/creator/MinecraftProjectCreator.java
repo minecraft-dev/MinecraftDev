@@ -5,6 +5,8 @@ import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
+import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
 
 import com.google.common.base.Objects;
 import com.intellij.openapi.module.Module;
@@ -59,14 +61,14 @@ public class MinecraftProjectCreator {
                 buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
                 dependency.setGroupId("org.bukkit");
                 dependency.setArtifactId("bukkit");
-                dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
+                dependency.setVersion(((BukkitProjectConfiguration) settings).minecraftVersion + "-R0.1-SNAPSHOT");
                 break;
             case SPIGOT:
                 buildRepository.setId("spigotmc-repo");
                 buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
                 dependency.setGroupId("org.spigotmc");
                 dependency.setArtifactId("spigot-api");
-                dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
+                dependency.setVersion(((BukkitProjectConfiguration) settings).minecraftVersion + "-R0.1-SNAPSHOT");
                 addSonatype(buildRepositories);
                 break;
             case PAPER:
@@ -74,7 +76,7 @@ public class MinecraftProjectCreator {
                 buildRepository.setUrl("https://repo.destroystokyo.com/content/groups/public/");
                 dependency.setGroupId("com.destroystokyo.paper");
                 dependency.setArtifactId("paper-api");
-                dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
+                dependency.setVersion(((BukkitProjectConfiguration) settings).minecraftVersion + "-R0.1-SNAPSHOT");
                 addSonatype(buildRepositories);
                 break;
             case BUNGEECORD:
@@ -82,7 +84,7 @@ public class MinecraftProjectCreator {
                 buildRepository.setUrl("https://oss.sonatype.org/content/groups/public/");
                 dependency.setGroupId("net.md-5");
                 dependency.setArtifactId("bungeecord-api");
-                dependency.setVersion("1.9-SNAPSHOT");
+                dependency.setVersion(((BungeeCordProjectConfiguration) settings).minecraftVersion + "-SNAPSHOT");
                 break;
             case SPONGE:
                 buildRepository.setId("spongepowered-repo");

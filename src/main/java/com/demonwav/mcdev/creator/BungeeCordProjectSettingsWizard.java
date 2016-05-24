@@ -12,6 +12,7 @@ import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -28,6 +29,7 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
     private JTextField authorField;
     private JTextField dependField;
     private JTextField softDependField;
+    private JComboBox<String> minecraftVersionBox;
 
     private final BungeeCordProjectConfiguration settings = new BungeeCordProjectConfiguration();
     private final MinecraftProjectCreator creator;
@@ -84,13 +86,14 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
     @Override
     public void onStepLeaving() {
         super.onStepLeaving();
-        settings.pluginName = pluginNameField.getText();
-        settings.pluginVersion = pluginVersionField.getText();
-        settings.mainClass = mainClassField.getText();
-        settings.description = descriptionField.getText();
+        this.settings.pluginName = pluginNameField.getText();
+        this.settings.pluginVersion = pluginVersionField.getText();
+        this.settings.mainClass = mainClassField.getText();
+        this.settings.description = descriptionField.getText();
         this.settings.setAuthors(this.authorField.getText());
         this.settings.setDependencies(this.dependField.getText());
         this.settings.setSoftDependencies(this.softDependField.getText());
+        this.settings.minecraftVersion = (String) minecraftVersionBox.getSelectedItem();
         creator.setSettings(settings);
     }
 

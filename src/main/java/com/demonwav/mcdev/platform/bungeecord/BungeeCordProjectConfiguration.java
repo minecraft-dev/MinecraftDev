@@ -23,6 +23,7 @@ public class BungeeCordProjectConfiguration extends ProjectConfiguration {
 
     public final List<String> dependencies = new ArrayList<>();
     public final List<String> softDependencies = new ArrayList<>();
+    public String minecraftVersion;
 
     public boolean hasDependencies() {
         return listContainsAtLeastOne(this.dependencies);

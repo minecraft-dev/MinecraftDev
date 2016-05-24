@@ -27,8 +27,7 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
     private JTextField artifactIdField;
     private JTextField versionField;
     private JPanel panel;
-    private JComboBox javaVersion;
-    private JComboBox buildSystemBox;
+    private JComboBox<String> buildSystemBox;
 
     private final MinecraftProjectCreator creator;
 

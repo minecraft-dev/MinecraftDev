@@ -37,6 +37,7 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
     public final List<String> dependencies = new ArrayList<>();
     public final List<String> softDependencies = new ArrayList<>();
     public String prefix = null;
+    public String minecraftVersion;
 
     public boolean hasPrefix() {
         return this.prefix != null && !this.prefix.trim().isEmpty();

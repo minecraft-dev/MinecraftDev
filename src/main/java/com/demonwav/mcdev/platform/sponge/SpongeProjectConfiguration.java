@@ -122,6 +122,7 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
                 new WriteCommandAction.Simple(module.getProject(), mainClassPsi) {
                     @Override
                     protected void run() throws Throwable {
+                        //noinspection ConstantConditions
                         psiClass.getModifierList().addBefore(annotation, psiClass.getModifierList().getFirstChild());
                     }
                 }.execute();
