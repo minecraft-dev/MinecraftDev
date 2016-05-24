@@ -1,5 +1,8 @@
 package com.demonwav.mcdev.platform.bukkit;
 
+import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
+import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
@@ -45,7 +48,14 @@ public class BukkitTemplate extends AbstractTemplate {
         Properties properties = new Properties();
 
         properties.setProperty("NAME", settings.pluginName);
-        properties.setProperty("VERSION", settings.pluginVersion);
+
+        BuildSystem buildSystem = BuildSystem.getInstance(module);
+        if (buildSystem instanceof GradleBuildSystem) {
+            properties.setProperty("VERSION", "@version@");
+        } else if (buildSystem instanceof MavenBuildSystem) {
+            properties.setProperty("VERSION", "${project.version}");
+        }
+
         properties.setProperty("MAIN", settings.mainClass);
 
         if (settings.hasPrefix()) {

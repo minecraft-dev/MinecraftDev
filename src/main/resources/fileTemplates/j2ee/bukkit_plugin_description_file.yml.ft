@@ -1,5 +1,5 @@
 name: ${NAME}
-version: ${project.version}
+version: ${VERSION}
 main: ${MAIN}
 #if (${HAS_PREFIX})
 prefix: ${PREFIX}

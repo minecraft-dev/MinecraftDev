@@ -16,3 +16,11 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+processResources {
+    from('src/main/resources') {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
