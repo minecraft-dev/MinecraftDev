@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.buildsystem.gradle;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
@@ -31,9 +31,9 @@ import java.util.stream.Collectors;
 public abstract class AbstractDataService extends AbstractProjectDataService<LibraryDependencyData, Module> {
 
     @NotNull
-    private final MinecraftModuleType type;
+    private final AbstractModuleType type;
 
-    public AbstractDataService(@NotNull final MinecraftModuleType type) {
+    public AbstractDataService(@NotNull final AbstractModuleType type) {
         this.type = type;
     }
 
@@ -71,14 +71,16 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             goodModules.stream().forEach(m -> {
                 String[] path = modelsProvider.getModifiableModuleModel().getModuleGroupPath(m);
                 if (path == null) {
-                    m.setOption("type", type.getId());
+                    // Always reset back to JavaModule
+                    m.setOption("type", JavaModuleType.getModuleType().getId());
                     checkedModules.add(m);
                     Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m, type.getPlatformType()));
                 } else {
                     String parentName = path[0];
                     Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
                     if (parentModule != null) {
-                        parentModule.setOption("type", type.getId());
+                        // Always reset back to JavaModule
+                        parentModule.setOption("type", JavaModuleType.getModuleType().getId());
                         badModules.add(m);
                         checkedModules.add(parentModule);
                         Optional.ofNullable(BuildSystem.getInstance(parentModule)).ifPresent(thisModule -> thisModule.reImport(parentModule, type.getPlatformType()));

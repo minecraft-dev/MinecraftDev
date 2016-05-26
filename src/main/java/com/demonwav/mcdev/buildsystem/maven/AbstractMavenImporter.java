@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.buildsystem.maven;
 
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.module.Module;
@@ -25,9 +25,9 @@ import java.util.Map;
 public abstract class AbstractMavenImporter extends MavenImporter {
 
     @NotNull
-    protected final MinecraftModuleType type;
+    protected final AbstractModuleType type;
 
-    public AbstractMavenImporter(@NotNull final MinecraftModuleType type) {
+    public AbstractMavenImporter(@NotNull final AbstractModuleType type) {
         super(type.getGroupId(), type.getArtifactId());
         this.type = type;
     }

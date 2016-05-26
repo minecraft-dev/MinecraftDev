@@ -1,13 +1,10 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.google.common.collect.ImmutableList;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleTypeManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
@@ -16,17 +13,18 @@ import java.util.List;
 public class BukkitModuleType extends AbstractModuleType {
 
     private static final String ID = "BUKKIT_MODULE_TYPE";
+    private static final BukkitModuleType instance = new BukkitModuleType();
 
-    public BukkitModuleType() {
-        super(ID, "org.bukkit", "bukkit");
+    private BukkitModuleType() {
+        super("org.bukkit", "bukkit");
     }
 
-    public BukkitModuleType(final String ID, final String groupId, final String artifactId) {
-        super(ID, groupId, artifactId);
+    protected BukkitModuleType(final String ID, final String groupId, final String artifactId) {
+        super(groupId, artifactId);
     }
 
     public static BukkitModuleType getInstance() {
-        return (BukkitModuleType) ModuleTypeManager.getInstance().findByID(ID);
+        return instance;
     }
 
     @Override
@@ -44,9 +42,8 @@ public class BukkitModuleType extends AbstractModuleType {
         return PlatformAssets.BUKKIT_ICON;
     }
 
-    @Override
-    public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return PlatformAssets.BUKKIT_ICON;
+    public String getId() {
+        return ID;
     }
 
     @NotNull
@@ -55,11 +52,7 @@ public class BukkitModuleType extends AbstractModuleType {
         return ImmutableList.of("org.bukkit.event.EventHandler");
     }
 
-    @Override
-    public AbstractModule generateModule(Module module) {
-        return new BukkitModule(module, this);
-    }
-
+    @NotNull
     @Override
     public List<String> getListenerAnnotations() {
         return ImmutableList.of("org.bukkit.event.EventHandler");

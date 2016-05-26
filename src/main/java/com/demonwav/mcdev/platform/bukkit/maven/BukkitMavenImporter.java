@@ -4,8 +4,10 @@ import com.demonwav.mcdev.buildsystem.maven.AbstractMavenImporter;
 import com.demonwav.mcdev.platform.PlatformUtil;
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
 
+import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -30,8 +32,8 @@ public class BukkitMavenImporter extends AbstractMavenImporter {
 
     @NotNull
     @Override
-    public BukkitModuleType getModuleType() {
-        return BukkitModuleType.getInstance();
+    public ModuleType getModuleType() {
+        return JavaModuleType.getModuleType();
     }
 
     @Override

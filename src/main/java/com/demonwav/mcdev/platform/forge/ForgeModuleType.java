@@ -1,13 +1,10 @@
 package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.google.common.collect.ImmutableList;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleTypeManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
@@ -16,13 +13,14 @@ import java.util.List;
 public class ForgeModuleType extends AbstractModuleType {
 
     private static final String ID = "FORGE_MODULE_TYPE";
+    private static final ForgeModuleType instance = new ForgeModuleType();
 
-    public ForgeModuleType() {
-        super(ID, "net.minecraftforge.gradle", "ForgeGradle");
+    private ForgeModuleType() {
+        super("net.minecraftforge.gradle", "ForgeGradle");
     }
 
     public static ForgeModuleType getInstance() {
-        return (ForgeModuleType) ModuleTypeManager.getInstance().findByID(ID);
+        return instance;
     }
 
     @Override
@@ -41,8 +39,8 @@ public class ForgeModuleType extends AbstractModuleType {
     }
 
     @Override
-    public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return PlatformAssets.FORGE_ICON;
+    public String getId() {
+        return ID;
     }
 
     @NotNull
@@ -55,11 +53,7 @@ public class ForgeModuleType extends AbstractModuleType {
         );
     }
 
-    @Override
-    public AbstractModule generateModule(Module module) {
-        return new ForgeModule(module);
-    }
-
+    @NotNull
     @Override
     public List<String> getListenerAnnotations() {
         return ImmutableList.of(

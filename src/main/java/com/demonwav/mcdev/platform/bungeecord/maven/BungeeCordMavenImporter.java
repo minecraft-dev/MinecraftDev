@@ -15,8 +15,11 @@ import com.demonwav.mcdev.platform.PlatformUtil;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModule;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 
+import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
+import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -36,8 +39,8 @@ public class BungeeCordMavenImporter extends AbstractMavenImporter {
 
     @NotNull
     @Override
-    public BungeeCordModuleType getModuleType() {
-        return BungeeCordModuleType.getInstance();
+    public ModuleType getModuleType() {
+        return JavaModuleType.getModuleType();
     }
 
     @Override
