@@ -2,7 +2,7 @@ package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.google.common.collect.ImmutableList;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.Icon;
 import java.util.List;
 
-public class BukkitModuleType extends MinecraftModuleType {
+public class BukkitModuleType extends AbstractModuleType {
 
     private static final String ID = "BUKKIT_MODULE_TYPE";
 

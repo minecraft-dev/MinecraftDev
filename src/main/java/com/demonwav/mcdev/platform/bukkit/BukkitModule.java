@@ -3,7 +3,7 @@ package com.demonwav.mcdev.platform.bukkit;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
 
@@ -85,7 +85,7 @@ public class BukkitModule extends AbstractModule {
     }
 
     @Override
-    public MinecraftModuleType getModuleType() {
+    public AbstractModuleType getModuleType() {
         return moduleType;
     }
 

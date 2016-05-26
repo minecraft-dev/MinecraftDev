@@ -1,7 +1,6 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.creator.MinecraftModuleBuilder;
 
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
@@ -9,79 +8,59 @@ import com.intellij.openapi.module.ModuleTypeManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MinecraftModuleType extends JavaModuleType {
 
     @NotNull
     private static final String ID = "MINECRAFT_MODULE_TYPE";
-    @NotNull
-    private final String groupId;
-    @NotNull
-    private final String artifactId;
-
-    public MinecraftModuleType() {
-        super(ID);
-        this.groupId = "";
-        this.artifactId = "";
-    }
-
-    public MinecraftModuleType(final String ID, @NotNull final String groupId, @NotNull final String artifactId) {
-        super(ID);
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-    }
+    public static final String OPTION = "com.demonwav.mcdev.MinecraftModuleTypes";
 
     public static MinecraftModuleType getInstance() {
         return (MinecraftModuleType) ModuleTypeManager.getInstance().findByID(ID);
     }
 
-    public PlatformType getPlatformType() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public MinecraftModuleBuilder createModuleBuilder() {
-        return new MinecraftModuleBuilder();
-    }
-
     @Override
     public Icon getBigIcon() {
-        return PlatformAssets.MINECRAFT_ICON_2X;
+        if (moduleTypes.size() == 0 || moduleTypes.size() != 1) {
+            return PlatformAssets.MINECRAFT_ICON_2X;
+        } else {
+            return moduleTypes.get(0).getBigIcon();
+        }
     }
 
     @Override
     public Icon getIcon() {
-        return PlatformAssets.MINECRAFT_ICON;
+        if (moduleTypes.size() == 0 || moduleTypes.size() != 1) {
+            return PlatformAssets.MINECRAFT_ICON;
+        } else {
+            return moduleTypes.get(0).getIcon();
+        }
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return PlatformAssets.MINECRAFT_ICON;
+        if (moduleTypes.size() == 0 || moduleTypes.size() != 1) {
+            return PlatformAssets.MINECRAFT_ICON;
+        } else {
+            return moduleTypes.get(0).getNodeIcon(isOpened);
+        }
     }
 
-    @NotNull
-    public String getGroupId() {
-        return groupId;
-    }
-
-    @NotNull
     public List<String> getIgnoredAnnotations() {
-        return Collections.emptyList();
+        List<String> ignoredAnnotations = new ArrayList<>();
+        moduleTypes.stream().forEach(m -> ignoredAnnotations.addAll(m.getIgnoredAnnotations()));
+        return ignoredAnnotations;
     }
 
-    @NotNull
-    public String getArtifactId() {
-        return artifactId;
-    }
-
-    public AbstractModule generateModule(Module module) {
-        return null;
+    public MinecraftModule generateModule(Module module) {
+        return MinecraftModule.generate(moduleTypes, module);
     }
 
     public List<String> getListenerAnnotations() {
-        return Collections.emptyList();
+        List<String> listenerAnnotations = new ArrayList<>();
+        moduleTypes.stream().forEach(m -> listenerAnnotations.addAll(m.getListenerAnnotations()));
+        return listenerAnnotations;
     }
 }

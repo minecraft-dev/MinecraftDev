@@ -2,7 +2,7 @@ package com.demonwav.mcdev.platform.bungeecord;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.openapi.module.Module;
@@ -10,7 +10,7 @@ import com.intellij.openapi.module.ModuleTypeManager;
 
 import javax.swing.Icon;
 
-public class BungeeCordModuleType extends MinecraftModuleType {
+public class BungeeCordModuleType extends AbstractModuleType {
 
     private static final String ID = "BUNGEECORD_MODULE_TYPE";
 

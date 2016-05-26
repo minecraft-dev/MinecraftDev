@@ -2,7 +2,7 @@ package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.google.common.collect.ImmutableList;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.Icon;
 import java.util.List;
 
-public class ForgeModuleType extends MinecraftModuleType {
+public class ForgeModuleType extends AbstractModuleType {
 
     private static final String ID = "FORGE_MODULE_TYPE";
 

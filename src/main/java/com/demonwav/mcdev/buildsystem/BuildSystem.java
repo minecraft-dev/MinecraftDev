@@ -198,16 +198,19 @@ public abstract class BuildSystem {
                         // We need to check if this is a multi-module gradle project
                         Project project = module.getProject();
                         String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(module);
-                        if (paths != null && paths.length > 1) {
-                            // The last element will be this module, the second to last is the parent
-                            String parentName = paths[paths.length - 2];
+                        if (paths != null && paths.length > 0) {
+                            // The first element is the parent
+                            String parentName = paths[0];
                             Module parentModule = ModuleManager.getInstance(project).findModuleByName(parentName);
 
                             if (parentModule != null) {
                                 root = ModuleRootManager.getInstance(parentModule).getContentRoots()[0];
+                                pom = root.findChild("pom.xml");
                                 gradle = root.findChild("build.gradle");
 
-                                if (gradle != null) {
+                                if (pom != null) {
+                                    return new MavenBuildSystem();
+                                } else if (gradle != null) {
                                     return new GradleBuildSystem();
                                 }
                             }

@@ -1,6 +1,8 @@
 package com.demonwav.mcdev.insight;
 
 import com.demonwav.mcdev.platform.AbstractModule;
+import com.demonwav.mcdev.platform.AbstractModuleType;
+import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.PlatformUtil;
 
@@ -41,24 +43,27 @@ public class ListenerEventAnnotator implements Annotator {
         if (module == null) {
             return;
         }
-        AbstractModule instance = PlatformUtil.getInstance(module);
+        MinecraftModule instance = MinecraftModule.getInstance(module);
         if (instance == null) {
             return;
         }
         // Since each platform has their own valid listener annotations,
         // some platforms may have multiple allowed annotations for various cases
-        final MinecraftModuleType moduleType = instance.getModuleType();
-        final List<String> listenerAnnotations = moduleType.getListenerAnnotations();
+        final List<AbstractModuleType> moduleTypes = instance.getTypes();
         boolean contains = false;
-        for (String listenerAnnotation : listenerAnnotations) {
-            if (modifierList.findAnnotation(listenerAnnotation) != null) {
-                contains = true;
-                break;
+        for (AbstractModuleType moduleType : moduleTypes) {
+            final List<String> listenerAnnotations = moduleType.getListenerAnnotations();
+            for (String listenerAnnotation : listenerAnnotations) {
+                if (modifierList.findAnnotation(listenerAnnotation) != null) {
+                    contains = true;
+                    break;
+                }
             }
         }
         if (!contains) {
             return;
         }
+
         final PsiParameter[] parameters = method.getParameterList().getParameters();
         if (parameters.length < 1) {
             return;
