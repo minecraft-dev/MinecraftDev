@@ -57,7 +57,7 @@ public class BungeeCordProjectConfiguration extends ProjectConfiguration {
 
                 BungeeCordTemplate.applyMainClassTemplate(module, mainClassFile, packageName, className);
                 VirtualFile pluginYml = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "plugin.yml");
-                BungeeCordTemplate.applyPluginDescriptionFileTemplate(module, pluginYml, this);
+                BungeeCordTemplate.applyPluginDescriptionFileTemplate(module, pluginYml, this, buildSystem);
 
                 performCreationSettingSetup(module, type);
                 // Set the editor focus on the main class

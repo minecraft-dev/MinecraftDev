@@ -88,7 +88,7 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
 
                 BukkitTemplate.applyMainClassTemplate(module, mainClassFile, packageName, className);
                 VirtualFile pluginYml = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "plugin.yml");
-                BukkitTemplate.applyPluginDescriptionFileTemplate(module, pluginYml, this);
+                BukkitTemplate.applyPluginDescriptionFileTemplate(module, pluginYml, this, buildSystem);
 
                 performCreationSettingSetup(module, type);
                 // Set the editor focus on the main class

@@ -44,12 +44,11 @@ public class BukkitTemplate extends AbstractTemplate {
         }
     }
 
-    public static void applyPluginDescriptionFileTemplate(Module module, VirtualFile file, BukkitProjectConfiguration settings) {
+    public static void applyPluginDescriptionFileTemplate(Module module, VirtualFile file, BukkitProjectConfiguration settings, BuildSystem buildSystem) {
         Properties properties = new Properties();
 
         properties.setProperty("NAME", settings.pluginName);
 
-        BuildSystem buildSystem = BuildSystem.getInstance(module);
         if (buildSystem instanceof GradleBuildSystem) {
             properties.setProperty("VERSION", "@version@");
         } else if (buildSystem instanceof MavenBuildSystem) {
