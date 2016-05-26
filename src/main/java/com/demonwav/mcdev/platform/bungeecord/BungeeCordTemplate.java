@@ -49,7 +49,7 @@ public class BungeeCordTemplate extends AbstractTemplate {
         properties.setProperty("NAME", settings.pluginName);
 
         if (buildSystem instanceof GradleBuildSystem) {
-            properties.setProperty("VERSION", "@project.version@");
+            properties.setProperty("VERSION", "@version@");
         } else if (buildSystem instanceof MavenBuildSystem) {
             properties.setProperty("VERSION", "${project.version}");
         }
