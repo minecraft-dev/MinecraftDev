@@ -3,7 +3,6 @@ package com.demonwav.mcdev.platform.bukkit;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
 
@@ -16,14 +15,14 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
 
-public class BukkitModule extends AbstractModule {
+public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
     private VirtualFile pluginYml;
     private PlatformType type;
     private PluginConfigManager configManager;
-    private BukkitModuleType moduleType;
+    private T moduleType;
 
-    BukkitModule(@NotNull Module module, @NotNull BukkitModuleType type) {
+    BukkitModule(@NotNull Module module, @NotNull T type) {
         this.moduleType = type;
         this.type = type.getPlatformType();
         this.module = module;
@@ -38,7 +37,7 @@ public class BukkitModule extends AbstractModule {
         }
     }
 
-    private BukkitModule(@NotNull Module module, @NotNull BukkitModuleType type, @Nullable BuildSystem buildSystem) {
+    private BukkitModule(@NotNull Module module, @NotNull T type, @Nullable BuildSystem buildSystem) {
         this.moduleType = type;
         this.type = type.getPlatformType();
         this.module = module;
@@ -85,11 +84,11 @@ public class BukkitModule extends AbstractModule {
     }
 
     @Override
-    public AbstractModuleType getModuleType() {
+    public T getModuleType() {
         return moduleType;
     }
 
-    private void setModuleType(BukkitModuleType moduleType) {
+    private void setModuleType(T moduleType) {
         this.moduleType = moduleType;
     }
 
@@ -127,7 +126,7 @@ public class BukkitModule extends AbstractModule {
     }
 
     @Override
-    public String writeErrorMessageForEventParameter(PsiClass eventClass) {
+    public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "Parameter is not a subclass of org.bukkit.event.Event\n" +
                 "Compiling and running this listener may result in a runtime exception";
     }

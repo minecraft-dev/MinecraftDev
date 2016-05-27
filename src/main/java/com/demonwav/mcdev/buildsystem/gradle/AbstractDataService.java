@@ -2,6 +2,7 @@ package com.demonwav.mcdev.buildsystem.gradle;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractModuleType;
+import com.demonwav.mcdev.platform.MinecraftModuleType;
 
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
@@ -26,6 +27,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.demonwav.mcdev.platform.MinecraftModuleType.setOption;
 
 @Order(ExternalSystemConstants.UNORDERED)
 public abstract class AbstractDataService extends AbstractProjectDataService<LibraryDependencyData, Module> {
@@ -74,6 +77,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                     // Always reset back to JavaModule
                     m.setOption("type", JavaModuleType.getModuleType().getId());
                     checkedModules.add(m);
+                    MinecraftModuleType.setOption(m, type.getId());
                     Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m, type.getPlatformType()));
                 } else {
                     String parentName = path[0];
@@ -83,6 +87,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                         parentModule.setOption("type", JavaModuleType.getModuleType().getId());
                         badModules.add(m);
                         checkedModules.add(parentModule);
+                        setOption(parentModule, type.getId());
                         Optional.ofNullable(BuildSystem.getInstance(parentModule)).ifPresent(thisModule -> thisModule.reImport(parentModule, type.getPlatformType()));
                     }
                 }

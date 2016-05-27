@@ -1,7 +1,6 @@
 package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 
 import com.intellij.openapi.application.ApplicationManager;
@@ -17,13 +16,17 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class ForgeProjectConfiguration extends ProjectConfiguration {
+public class ForgeProjectConfiguration extends ProjectConfiguration<ForgeModule, ForgeModuleType> {
 
     public List<String> dependencies = new ArrayList<>();
     public String updateUrl;
 
     public String mcpVersion;
     public String forgeVersion;
+
+    public ForgeProjectConfiguration() {
+        super(ForgeModuleType.getInstance());
+    }
 
     public boolean hasDependencies() {
         return listContainsAtLeastOne(dependencies);
@@ -35,7 +38,7 @@ public class ForgeProjectConfiguration extends ProjectConfiguration {
     }
 
     @Override
-    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
+    public void create(@NotNull Module module, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
         ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 indicator.setText("Writing main class");

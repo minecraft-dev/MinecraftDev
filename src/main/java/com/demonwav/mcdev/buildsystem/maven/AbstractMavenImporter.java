@@ -1,10 +1,14 @@
 package com.demonwav.mcdev.buildsystem.maven;
 
 import com.demonwav.mcdev.platform.AbstractModuleType;
+import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.platform.MinecraftModuleType;
 
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.importing.MavenImporter;
 import org.jetbrains.idea.maven.importing.MavenRootModelAdapter;
@@ -21,6 +25,7 @@ import org.jetbrains.idea.maven.utils.MavenProcessCanceledException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class AbstractMavenImporter extends MavenImporter {
 
@@ -65,5 +70,13 @@ public abstract class AbstractMavenImporter extends MavenImporter {
                         MavenEmbedderWrapper embedder,
                         ResolveContext context) throws MavenProcessCanceledException {
         super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
+        for (Module module : ModuleManager.getInstance(project).getModules()) {
+            // We'll make sure the project is setup
+            if (Objects.equals(ModuleRootManager.getInstance(module).getContentRoots()[0], mavenProject.getFile().getParent())) {
+                MinecraftModuleType.setOption(module, type.getId());
+
+                MinecraftModule.getInstance(module);
+            }
+        }
     }
 }

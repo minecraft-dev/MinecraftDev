@@ -1,7 +1,6 @@
 package com.demonwav.mcdev.platform.bungeecord;
 
-import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.PlatformUtil;
+import com.demonwav.mcdev.platform.MinecraftModule;
 
 import com.intellij.ide.FileIconProvider;
 import com.intellij.openapi.module.Module;
@@ -20,9 +19,9 @@ public class BungeeCordFileIconProvider implements FileIconProvider {
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {
         if (project != null) {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
-                AbstractModule bungeeCordModule = PlatformUtil.getInstance(module);
-                if (bungeeCordModule instanceof BungeeCordModule) {
-                    if (file.equals(((BungeeCordModule) bungeeCordModule).getPluginYml())) {
+                BungeeCordModule bungeeCordModule = MinecraftModule.getInstance(module, BungeeCordModuleType.getInstance());
+                if (bungeeCordModule != null) {
+                    if (file.equals(bungeeCordModule.getPluginYml())) {
                         return bungeeCordModule.getIcon();
                     }
                 }

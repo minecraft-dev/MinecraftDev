@@ -5,12 +5,13 @@ import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
 import java.util.List;
 
-public class ForgeModuleType extends AbstractModuleType {
+public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
 
     private static final String ID = "FORGE_MODULE_TYPE";
     private static final ForgeModuleType instance = new ForgeModuleType();
@@ -60,5 +61,11 @@ public class ForgeModuleType extends AbstractModuleType {
                 "net.minecraftforge.fml.common.Mod.EventHandler",
                 "net.minecraftforge.fml.common.eventhandler.SubscribeEvent"
         );
+    }
+
+    @NotNull
+    @Override
+    public ForgeModule generateModule(Module module) {
+        return new ForgeModule(module);
     }
 }

@@ -5,13 +5,14 @@ import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.module.Module;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
 import java.util.List;
 
-public class SpongeModuleType extends AbstractModuleType {
+public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
 
     private static final String ID = "SPONGE_MODULE_TYPE";
     private static final SpongeModuleType instance = new SpongeModuleType();
@@ -62,5 +63,11 @@ public class SpongeModuleType extends AbstractModuleType {
     @Override
     public List<String> getListenerAnnotations() {
         return ImmutableList.of("org.spongepowered.api.event.Listener");
+    }
+
+    @NotNull
+    @Override
+    public SpongeModule generateModule(Module module) {
+        return new SpongeModule(module);
     }
 }

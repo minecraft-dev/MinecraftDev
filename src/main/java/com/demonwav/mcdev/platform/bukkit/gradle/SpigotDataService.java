@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.platform.bukkit.gradle;
 
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +10,7 @@ public class SpigotDataService extends BukkitDataService {
         super(SpigotModuleType.getInstance());
     }
 
-    public SpigotDataService(@NotNull final MinecraftModuleType minecraftModuleType) {
-        super(minecraftModuleType);
+    public SpigotDataService(@NotNull final AbstractModuleType abstractModuleType) {
+        super(abstractModuleType);
     }
 }

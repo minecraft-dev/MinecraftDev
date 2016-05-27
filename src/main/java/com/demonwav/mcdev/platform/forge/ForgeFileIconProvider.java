@@ -1,4 +1,4 @@
-package com.demonwav.mcdev.platform.bukkit;
+package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.platform.MinecraftModule;
 
@@ -13,24 +13,16 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
 
-public class BukkitFileIconProvider implements FileIconProvider {
+public class ForgeFileIconProvider implements FileIconProvider {
     @Nullable
     @Override
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {
         if (project != null) {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
-                BukkitModule bukkitModule = MinecraftModule.getInstance(module, BukkitModuleType.getInstance());
-                if (bukkitModule == null) {
-                    bukkitModule = MinecraftModule.getInstance(module, SpigotModuleType.getInstance());
-                }
-
-                if (bukkitModule == null) {
-                    bukkitModule = MinecraftModule.getInstance(module, PaperModuleType.getInstance());
-                }
-
-                if (bukkitModule != null) {
-                    if (file.equals(bukkitModule.getPluginYml())) {
-                        return bukkitModule.getIcon();
+                ForgeModule forgeModule = MinecraftModule.getInstance(module, ForgeModuleType.getInstance());
+                if (forgeModule != null) {
+                    if (file.equals(forgeModule.getMcmod())) {
+                        return forgeModule.getIcon();
                     }
                 }
             }

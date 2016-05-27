@@ -5,12 +5,13 @@ import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
 import java.util.List;
 
-public class BukkitModuleType extends AbstractModuleType {
+public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
 
     private static final String ID = "BUKKIT_MODULE_TYPE";
     private static final BukkitModuleType instance = new BukkitModuleType();
@@ -56,5 +57,11 @@ public class BukkitModuleType extends AbstractModuleType {
     @Override
     public List<String> getListenerAnnotations() {
         return ImmutableList.of("org.bukkit.event.EventHandler");
+    }
+
+    @NotNull
+    @Override
+    public BukkitModule generateModule(Module module) {
+        return new BukkitModule<>(module, this);
     }
 }

@@ -2,7 +2,10 @@ package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
+import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
+import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
+import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
@@ -37,7 +40,7 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     private JLabel title;
     private JComboBox<String> minecraftVersionBox;
 
-    private BukkitProjectConfiguration settings = new BukkitProjectConfiguration();
+    private BukkitProjectConfiguration settings;
     private MinecraftProjectCreator creator;
 
     public BukkitProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
@@ -55,14 +58,17 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
             case BUKKIT:
                 title.setIcon(PlatformAssets.BUKKIT_ICON_2X);
                 title.setText("<html><font size=\"5\">Bukkit Settings</font></html>");
+                settings = new BukkitProjectConfiguration(BukkitModuleType.getInstance());
                 break;
             case SPIGOT:
                 title.setIcon(PlatformAssets.SPIGOT_ICON_2X);
                 title.setText("<html><font size=\"5\">Spigot Settings</font></html>");
+                settings = new BukkitProjectConfiguration(SpigotModuleType.getInstance());
                 break;
             case PAPER:
                 title.setIcon(PlatformAssets.PAPER_ICON_2X);
                 title.setText("<html><font size=\"5\">Paper Settings</font></html>");
+                settings = new BukkitProjectConfiguration(PaperModuleType.getInstance());
                 break;
         }
 

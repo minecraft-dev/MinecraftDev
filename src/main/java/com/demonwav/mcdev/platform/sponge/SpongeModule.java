@@ -3,7 +3,7 @@ package com.demonwav.mcdev.platform.sponge;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.openapi.module.Module;
@@ -29,7 +29,7 @@ public class SpongeModule extends AbstractModule {
     }
 
     @Override
-    public MinecraftModuleType getModuleType() {
+    public AbstractModuleType<SpongeModule> getModuleType() {
         return SpongeModuleType.getInstance();
     }
 
@@ -49,7 +49,7 @@ public class SpongeModule extends AbstractModule {
     }
 
     @Override
-    public String writeErrorMessageForEventParameter(PsiClass eventClass) {
+    public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "Parameter is not an instance of org.spongepowered.api.event.Event\n" +
         "Compiling and running this listener may result in a runtime exception";
     }

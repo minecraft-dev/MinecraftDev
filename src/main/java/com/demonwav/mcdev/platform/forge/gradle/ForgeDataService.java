@@ -2,6 +2,7 @@ package com.demonwav.mcdev.platform.forge.gradle;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService;
+import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 
 import com.google.common.base.Strings;
@@ -23,6 +24,7 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public class ForgeDataService extends AbstractDataService {
     public ForgeDataService() {
@@ -38,7 +40,7 @@ public class ForgeDataService extends AbstractDataService {
             return;
         }
 
-        ForgeModuleType  type = ForgeModuleType.getInstance();
+        ForgeModuleType type = ForgeModuleType.getInstance();
         ApplicationManager.getApplication().runReadAction(() -> {
             final Module module = modelsProvider.getModules()[0];
             if (!checkModule(module, modelsProvider)) {
@@ -47,8 +49,9 @@ public class ForgeDataService extends AbstractDataService {
 
             for (Module m : modelsProvider.getModules()) {
                 if (m.equals(module)) {
-                    m.setOption("type", type.getId());
-                    java.util.Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(md -> md.reImport(module, type.getPlatformType()));
+                    m.setOption("type", JavaModuleType.getModuleType().getId());
+                    MinecraftModuleType.setOption(m, type.getId());
+                    Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(md -> md.reImport(module, type.getPlatformType()));
                 } else {
                     if (Strings.nullToEmpty(m.getOptionValue("type")).equals(type.getId())) {
                         m.setOption("type", JavaModuleType.getModuleType().getId());

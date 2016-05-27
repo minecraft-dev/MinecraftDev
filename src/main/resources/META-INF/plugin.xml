@@ -47,15 +47,16 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
-        <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bukkit.BukkitModuleType"/>
-        <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bukkit.SpigotModuleType"/>
-        <moduleType id="PAPER_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bukkit.PaperModuleType"/>
-        <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType"/>
-        <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.sponge.SpongeModuleType"/>
-        <moduleType id="FORGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.forge.ForgeModuleType"/>
+        <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BukkitModuleTypeTransition"/>
+        <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.SpigotModuleTypeTransition"/>
+        <moduleType id="PAPER_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.PaperModuleTypeTransition"/>
+        <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BungeeCordModuleTypeTransition"/>
+        <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.SpongeModuleTypeTransition"/>
+        <moduleType id="FORGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.ForgeModuleTypeTransition"/>
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.forge.ForgeFileIconProvider"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.BukkitDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.SpigotDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.PaperDataService"/>
@@ -89,6 +90,10 @@
         </component>
         <component>
             <implementation-class>com.demonwav.mcdev.platform.forge.ForgeProjectComponent</implementation-class>
+            <loadForDefaultProject/>
+        </component>
+        <component>
+            <implementation-class>com.demonwav.mcdev.transition.TransitionProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>
     </project-components>

@@ -17,7 +17,7 @@ public class MinecraftProjectComponent extends AbstractProjectComponent {
         super.projectOpened();
         StartupManager.getInstance(myProject).registerPostStartupActivity(() -> {
             for (Module module : ModuleManager.getInstance(myProject).getModules()) {
-                PlatformUtil.getInstance(module);
+                MinecraftModule.getInstance(module);
             }
         });
     }

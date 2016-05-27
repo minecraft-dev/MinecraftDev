@@ -1,7 +1,6 @@
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 
 import com.google.common.base.Strings;
@@ -26,10 +25,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class SpongeProjectConfiguration extends ProjectConfiguration {
+public class SpongeProjectConfiguration extends ProjectConfiguration<SpongeModule, SpongeModuleType> {
 
     public List<String> dependencies = new ArrayList<>();
     public boolean generateDocumentedListeners;
+
+    public SpongeProjectConfiguration() {
+        super(SpongeModuleType.getInstance());
+    }
 
     public boolean hasDependencies() {
         return listContainsAtLeastOne(dependencies);
@@ -41,7 +44,7 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
     }
 
     @Override
-    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
+    public void create(@NotNull Module module, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
         ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 indicator.setText("Writing main class");

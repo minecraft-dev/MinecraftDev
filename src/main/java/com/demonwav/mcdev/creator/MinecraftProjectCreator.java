@@ -88,7 +88,7 @@ public class MinecraftProjectCreator {
                 break;
             case SPONGE:
                 buildRepository.setId("spongepowered-repo");
-                buildRepository.setUrl("https://repo.spongepowered.org/maven/");
+                buildRepository.setUrl("get");
                 dependency.setGroupId("org.spongepowered");
                 dependency.setArtifactId("spongeapi");
                 dependency.setVersion("4.1.0-SNAPSHOT");
@@ -103,9 +103,9 @@ public class MinecraftProjectCreator {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 buildSystem.create(module, type, settings, indicator);
-                settings.create(module, type, buildSystem, indicator);
+                settings.create(module, buildSystem, indicator);
                 buildSystem.finishSetup(module, type, settings, indicator);
-                settings.performCreationSettingSetup(module, type);
+                type.getType().performCreationSettingSetup(module);
             }
         });
     }

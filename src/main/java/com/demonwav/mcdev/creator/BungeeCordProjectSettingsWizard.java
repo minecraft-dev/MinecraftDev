@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exception.MinecraftSetupException;
+import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;

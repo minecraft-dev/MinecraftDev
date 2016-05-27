@@ -10,7 +10,6 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class BukkitProjectConfiguration extends ProjectConfiguration {
+public class BukkitProjectConfiguration extends ProjectConfiguration<BukkitModule<?>, BukkitModuleType> {
 
     @Nullable public LoadOrder loadOrder = null;
     public final List<String> loadBefore = new ArrayList<>();
@@ -38,6 +37,10 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
     public final List<String> softDependencies = new ArrayList<>();
     public String prefix = null;
     public String minecraftVersion;
+
+    public BukkitProjectConfiguration(BukkitModuleType type) {
+        super(type);
+    }
 
     public boolean hasPrefix() {
         return this.prefix != null && !this.prefix.trim().isEmpty();
@@ -75,7 +78,7 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
     }
 
     @Override
-    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
+    public void create(@NotNull Module module, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
         ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 indicator.setText("Writing main class");

@@ -1,11 +1,15 @@
 package com.demonwav.mcdev.platform;
 
+import com.intellij.codeInspection.ex.EntryPointsManager;
+import com.intellij.codeInspection.ex.EntryPointsManagerBase;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.util.JDOMExternalizableStringList;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
 import java.util.List;
 
-public abstract class AbstractModuleType {
+public abstract class AbstractModuleType<T extends AbstractModule> {
 
     @NotNull
     private final String groupId;
@@ -40,4 +44,12 @@ public abstract class AbstractModuleType {
 
     @NotNull
     public abstract List<String> getListenerAnnotations();
+
+    @NotNull
+    public abstract T generateModule(Module module);
+
+    public void performCreationSettingSetup(@NotNull Module module) {
+        JDOMExternalizableStringList annotations = ((EntryPointsManagerBase) EntryPointsManager.getInstance(module.getProject())).ADDITIONAL_ANNOTATIONS;
+        getIgnoredAnnotations().stream().filter(annotation -> !annotations.contains(annotation)).forEach(annotations::add);
+    }
 }

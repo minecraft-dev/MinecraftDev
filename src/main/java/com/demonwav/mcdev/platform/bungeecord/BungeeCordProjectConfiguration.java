@@ -1,7 +1,6 @@
 package com.demonwav.mcdev.platform.bungeecord;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 
 import com.intellij.ide.util.EditorHelper;
@@ -19,11 +18,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class BungeeCordProjectConfiguration extends ProjectConfiguration {
+public class BungeeCordProjectConfiguration extends ProjectConfiguration<BungeeCordModule, BungeeCordModuleType> {
 
     public final List<String> dependencies = new ArrayList<>();
     public final List<String> softDependencies = new ArrayList<>();
     public String minecraftVersion;
+
+    public BungeeCordProjectConfiguration() {
+        super(BungeeCordModuleType.getInstance());
+    }
 
     public boolean hasDependencies() {
         return listContainsAtLeastOne(this.dependencies);
@@ -44,7 +47,7 @@ public class BungeeCordProjectConfiguration extends ProjectConfiguration {
     }
 
     @Override
-    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
+    public void create(@NotNull Module module, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
         ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 indicator.setText("Writing main class");

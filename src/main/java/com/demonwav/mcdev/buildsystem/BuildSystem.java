@@ -11,6 +11,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -223,7 +224,7 @@ public abstract class BuildSystem {
     }
 
     @Nullable
-    public VirtualFile findFile(String path, SourceType type) {
+    public VirtualFile findFile(@NotNull String path, @NotNull SourceType type) {
         switch (type) {
             case SOURCE:
                 return findFile(sourceDirectories, path);
@@ -256,12 +257,18 @@ public abstract class BuildSystem {
                 '}';
     }
 
-    private VirtualFile findFile(List<VirtualFile> dirs, String path) {
+    @Nullable
+    @Contract("null, _ -> null")
+    private VirtualFile findFile(List<VirtualFile> dirs, @NotNull String path) {
         VirtualFile file;
         if (dirs == null) {
             return null;
         }
         for (VirtualFile dir : dirs) {
+            if (dir == null) {
+                continue;
+            }
+
             file = dir.findFileByRelativePath(path);
             if (file != null) {
                 return file;

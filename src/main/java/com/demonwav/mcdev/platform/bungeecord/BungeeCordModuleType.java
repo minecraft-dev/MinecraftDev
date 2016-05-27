@@ -4,13 +4,14 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 
+import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
-import java.util.Collections;
 import java.util.List;
 
-public class BungeeCordModuleType extends AbstractModuleType {
+public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
 
     private static final String ID = "BUNGEECORD_MODULE_TYPE";
     private static final BungeeCordModuleType instance = new BungeeCordModuleType();
@@ -46,14 +47,20 @@ public class BungeeCordModuleType extends AbstractModuleType {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        // TODO
-        return Collections.emptyList();
+        return ImmutableList.of("net.md_5.bungee.event.EventHandler");
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        // TODO
-        return Collections.emptyList();
+        return ImmutableList.of("net.md_5.bungee.event.EventHandler");
     }
+
+    @NotNull
+    @Override
+    public BungeeCordModule generateModule(Module module) {
+        return new BungeeCordModule(module);
+    }
+
+
 }
