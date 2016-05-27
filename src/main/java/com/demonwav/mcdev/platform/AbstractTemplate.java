@@ -22,16 +22,11 @@ public abstract class AbstractTemplate {
     public static String applyBuildGradleTemplate(@NotNull Module module,
                                                 @NotNull String groupId,
                                                 @NotNull String pluginVersion,
-                                                @Nullable String description,
                                                 @NotNull String buildVersion) {
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", buildVersion);
         properties.setProperty("PLUGIN_VERSION", pluginVersion);
         properties.setProperty("GROUP_ID", groupId);
-        if (description != null) {
-            properties.setProperty("HAS_DESCRIPTION", "true");
-            properties.setProperty("DESCRIPTION", description);
-        }
 
         FileTemplateManager manager = FileTemplateManager.getInstance(module.getProject());
         FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUILD_GRADLE_TEMPLATE);

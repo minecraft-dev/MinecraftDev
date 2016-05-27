@@ -1,7 +1,6 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exception.MinecraftSetupException;
-import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
@@ -32,20 +31,31 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
     private JTextField softDependField;
     private JComboBox<String> minecraftVersionBox;
 
-    private final BungeeCordProjectConfiguration settings = new BungeeCordProjectConfiguration();
+    private final BungeeCordProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
     public BungeeCordProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
         super();
         this.creator = creator;
+        this.settings = (BungeeCordProjectConfiguration) creator.getSettings().stream().filter(s -> s instanceof BungeeCordProjectConfiguration).findFirst().get();
     }
 
     @Override
     public JComponent getComponent() {
         pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
         pluginVersionField.setText(creator.getVersion());
+
+        if (creator.index != 0) {
+            pluginNameField.setEditable(false);
+            pluginVersionField.setEditable(false);
+        }
+
         mainClassField.setText(this.creator.getGroupId() + '.' + this.creator.getArtifactId()
                 + '.' + WordUtils.capitalizeFully(this.creator.getArtifactId()));
+
+        if (creator.getSettings().size() > 1) {
+            mainClassField.setText(mainClassField.getText() + WordUtils.capitalizeFully(creator.getSettings().get(creator.index).type.name()));
+        }
 
         return panel;
     }
@@ -95,7 +105,6 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
         this.settings.setDependencies(this.dependField.getText());
         this.settings.setSoftDependencies(this.softDependField.getText());
         this.settings.minecraftVersion = (String) minecraftVersionBox.getSelectedItem();
-        creator.setSettings(settings);
     }
 
     @Override

@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class BukkitProjectConfiguration extends ProjectConfiguration<BukkitModule<?>, BukkitModuleType> {
+public class BukkitProjectConfiguration extends ProjectConfiguration {
 
     @Nullable public LoadOrder loadOrder = null;
     public final List<String> loadBefore = new ArrayList<>();
@@ -37,10 +37,6 @@ public class BukkitProjectConfiguration extends ProjectConfiguration<BukkitModul
     public final List<String> softDependencies = new ArrayList<>();
     public String prefix = null;
     public String minecraftVersion;
-
-    public BukkitProjectConfiguration(BukkitModuleType type) {
-        super(type);
-    }
 
     public boolean hasPrefix() {
         return this.prefix != null && !this.prefix.trim().isEmpty();
@@ -90,7 +86,12 @@ public class BukkitProjectConfiguration extends ProjectConfiguration<BukkitModul
                 String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
                 for (int i = 0, len = files.length - 1; i < len; i++) {
                     String s = files[i];
-                    file = file.createChildDirectory(this, s);
+                    VirtualFile temp = file.findChild(s);
+                    if (temp != null && temp.isDirectory()) {
+                        file = temp;
+                    } else {
+                        file = file.createChildDirectory(this, s);
+                    }
                 }
 
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");

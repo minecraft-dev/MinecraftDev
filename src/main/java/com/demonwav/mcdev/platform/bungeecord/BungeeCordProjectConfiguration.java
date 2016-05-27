@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform.bungeecord;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 
 import com.intellij.ide.util.EditorHelper;
@@ -18,14 +19,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class BungeeCordProjectConfiguration extends ProjectConfiguration<BungeeCordModule, BungeeCordModuleType> {
+public class BungeeCordProjectConfiguration extends ProjectConfiguration {
 
     public final List<String> dependencies = new ArrayList<>();
     public final List<String> softDependencies = new ArrayList<>();
     public String minecraftVersion;
 
     public BungeeCordProjectConfiguration() {
-        super(BungeeCordModuleType.getInstance());
+        type = PlatformType.BUNGEECORD;
     }
 
     public boolean hasDependencies() {
@@ -58,7 +59,12 @@ public class BungeeCordProjectConfiguration extends ProjectConfiguration<BungeeC
                 String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
                 for (int i = 0, len = files.length - 1; i < len; i++) {
                     String s = files[i];
-                    file = file.createChildDirectory(this, s);
+                    VirtualFile temp = file.findChild(s);
+                    if (temp != null && temp.isDirectory()) {
+                        file = temp;
+                    } else {
+                        file = file.createChildDirectory(this, s);
+                    }
                 }
 
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");

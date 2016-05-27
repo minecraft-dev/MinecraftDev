@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class ProjectConfiguration<M extends AbstractModule, T extends AbstractModuleType<M>> {
+public abstract class ProjectConfiguration {
 
     public String pluginName = null;
     public String pluginVersion = null;
@@ -20,12 +20,7 @@ public abstract class ProjectConfiguration<M extends AbstractModule, T extends A
     public String description = null;
     public final List<String> authors = new ArrayList<>();
     public String website = null;
-
-    private T t;
-
-    public ProjectConfiguration(T t) {
-        this.t = t;
-    }
+    public PlatformType type = null;
 
     public abstract void create(@NotNull Module module, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator);
 

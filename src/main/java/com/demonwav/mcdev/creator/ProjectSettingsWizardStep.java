@@ -11,7 +11,7 @@ import javax.swing.JComponent;
 /**
  * This class serves as an in-between for BukkitSettingsWizardStep, BungeeCordSettingsWizardStep, SpongeSettingsWizardStep,
  * and any other classes which might make sense to go here. This single ProjectSettingsWizardStep class is used in
- * place of any of those, and it chooses which WizardStep to show based on the current project type selected.
+ * place of any of those, and it chooses which WizardStep to show based on the current project types selected.
  */
 public class ProjectSettingsWizardStep extends ModuleWizardStep {
 
@@ -20,23 +20,47 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
     private MinecraftProjectCreator creator;
     private ModuleWizardStep wizard;
     private PlatformType type;
+    private int index = -1;
 
     public ProjectSettingsWizardStep(@NotNull MinecraftProjectCreator creator) {
         this.creator = creator;
-        type = creator.getType();
     }
 
     @Override
     public JComponent getComponent() {
+        // If size == 0 then we aren't actually initialized yet
+        if (creator.getSettings().size() == 0) {
+            return null;
+        }
+
+        if (index == -1) {
+            // This is first load, so we know two things
+            //   1. The user got to this by clicking next
+            //   2. The index will be he current index instance on the creator
+            // So we will set it likewise
+            index = creator.index;
+        } else {
+            // This is not first load, so we know our index. At this point we
+            // don't know how we got here, so we tell the creator which index we
+            // are instead of getting the index from it.
+            creator.index = index;
+        }
+
+        if (creator.index == creator.getSettings().size()) {
+            return null;
+        }
+
+        // Grab all type changes
+        PlatformType newType = creator.getSettings().get(creator.index).type;
         // We don't want to recreate the wizard (and nuke the settings) if the type hasn't changed
-        if (wizard == null || creator.getType() != type) {
-            // detect type changes
-            type = creator.getType();
-            if (creator.getType() == PlatformType.BUNGEECORD) {
+        if (wizard == null || newType != this.type) {
+            // remember what type we are now, so we know if it changes later
+            this.type = newType;
+            if (newType == PlatformType.BUNGEECORD) {
                 wizard = new BungeeCordProjectSettingsWizard(creator);
-            } else if (creator.getType() == PlatformType.SPONGE) {
+            } else if (newType == PlatformType.SPONGE) {
                 wizard = new SpongeProjectSettingsWizard(creator);
-            } else if (creator.getType() == PlatformType.FORGE) {
+            } else if (newType == PlatformType.FORGE) {
                 wizard = new ForgeProjectSettingsWizard(creator);
             } else {
                 wizard = new BukkitProjectSettingsWizard(creator);
@@ -46,13 +70,27 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
     }
 
     @Override
+    public void updateStep() {}
+
+    @Override
+    public boolean isStepVisible() {
+        return creator.index < creator.getSettings().size();
+    }
+
+    @Override
     public boolean validate() throws ConfigurationException {
-        return wizard.validate();
+        if (wizard == null || wizard.validate()) {
+            creator.index++;
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void onStepLeaving() {
-        wizard.onStepLeaving();
+        if (wizard != null) {
+            wizard.onStepLeaving();
+        }
     }
 
     @Override

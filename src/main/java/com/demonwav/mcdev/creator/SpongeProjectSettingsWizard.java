@@ -32,19 +32,30 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
     private JTextField dependField;
     private JCheckBox generateDocumentedListenersCheckBox;
 
-    private final SpongeProjectConfiguration settings = new SpongeProjectConfiguration();
+    private final SpongeProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
     public SpongeProjectSettingsWizard(MinecraftProjectCreator creator) {
         this.creator = creator;
+        this.settings = (SpongeProjectConfiguration) creator.getSettings().stream().filter(s -> s instanceof SpongeProjectConfiguration).findFirst().get();
     }
 
     @Override
     public JComponent getComponent() {
         pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
         pluginVersionField.setText(creator.getVersion());
+
+        if (creator.index != 0) {
+            pluginNameField.setEditable(false);
+            pluginVersionField.setEditable(false);
+        }
+
         mainClassField.setText(this.creator.getGroupId() + '.' + this.creator.getArtifactId()
                 + '.' + WordUtils.capitalizeFully(this.creator.getArtifactId()));
+
+        if (creator.getSettings().size() > 1) {
+            mainClassField.setText(mainClassField.getText() + WordUtils.capitalizeFully(creator.getSettings().get(creator.index).type.name()));
+        }
 
         if (UIUtil.isUnderDarcula()) {
             title.setIcon(PlatformAssets.SPONGE_ICON_2X);
@@ -99,8 +110,6 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
         settings.website = websiteField.getText();
 
         settings.generateDocumentedListeners = this.generateDocumentedListenersCheckBox.isSelected();
-
-        creator.setSettings(settings);
     }
 
     @Override

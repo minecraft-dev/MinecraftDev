@@ -52,7 +52,7 @@ public class MavenBuildSystem extends BuildSystem {
     private VirtualFile pomFile;
 
     @Override
-    public void create(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
+    public void create(@NotNull Module module, @NotNull List<ProjectConfiguration> configurations, @NotNull ProgressIndicator indicator) {
         rootDirectory.refresh(false, true);
         ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {
@@ -63,12 +63,14 @@ public class MavenBuildSystem extends BuildSystem {
 
                 PsiFile pomPsi = null;
 
+                // TODO: Generify the pom, having multiple projects doesn't allow a different pom for each project
                 String text = null;
-                if (type == PlatformType.BUKKIT || type == PlatformType.SPIGOT || type == PlatformType.PAPER) {
+                List<PlatformType> types = configurations.stream().map(c -> c.type).collect(Collectors.toList());
+                if (types.contains(PlatformType.BUKKIT) || types.contains(PlatformType.SPIGOT) || types.contains(PlatformType.PAPER)) {
                     text = BukkitTemplate.applyPomTemplate(module, buildVersion);
-                } else if (type == PlatformType.BUNGEECORD) {
+                } else if (types.contains(PlatformType.BUNGEECORD)) {
                     text = BungeeCordTemplate.applyPomTemplate(module, buildVersion);
-                } else if (type == PlatformType.SPONGE) {
+                } else if (types.contains(PlatformType.SPONGE)) {
                     text = SpongeTemplate.applyPomTemplate(module, buildVersion);
                 }
 
@@ -84,6 +86,7 @@ public class MavenBuildSystem extends BuildSystem {
                     new WriteCommandAction.Simple(module.getProject(), pomPsi) {
                         @Override
                         protected void run() throws Throwable {
+                            ProjectConfiguration configuration = configurations.get(0);
                             XmlTag root = pomXmlPsi.getRootTag();
 
                             DomManager manager = DomManager.getDomManager(module.getProject());
@@ -147,7 +150,7 @@ public class MavenBuildSystem extends BuildSystem {
     }
 
     @Override
-    public void finishSetup(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
+    public void finishSetup(@NotNull Module module, @NotNull List<ProjectConfiguration> configuration, @NotNull ProgressIndicator indicator) {
         ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             Project project = module.getProject();
 

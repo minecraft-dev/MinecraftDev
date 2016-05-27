@@ -39,7 +39,7 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
     private JComboBox<String> mcpVersionBox;
     private JProgressBar loadingBar;
 
-    private final ForgeProjectConfiguration settings = new ForgeProjectConfiguration();
+    private final ForgeProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
     private McpVersion mcpVersion;
@@ -47,6 +47,7 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
 
     public ForgeProjectSettingsWizard(MinecraftProjectCreator creator) {
         this.creator = creator;
+        this.settings = (ForgeProjectConfiguration) creator.getSettings().stream().filter(s -> s instanceof ForgeProjectConfiguration).findFirst().get();
         minecraftVersionBox.addActionListener(e -> {
             setMcpVersion();
             setForgeVersion();
@@ -101,8 +102,18 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
     public JComponent getComponent() {
         pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
         pluginVersionField.setText(creator.getVersion());
+
+        if (creator.index != 0) {
+            pluginNameField.setEditable(false);
+            pluginVersionField.setEditable(false);
+        }
+
         mainClassField.setText(this.creator.getGroupId() + '.' + this.creator.getArtifactId()
                 + '.' + WordUtils.capitalizeFully(this.creator.getArtifactId()));
+
+        if (creator.getSettings().size() > 1) {
+            mainClassField.setText(mainClassField.getText() + WordUtils.capitalizeFully(creator.getSettings().get(creator.index).type.name()));
+        }
 
         loadingBar.setIndeterminate(true);
 
@@ -155,7 +166,7 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
             int index = 0;
             for (int i = 0; i < forgeVersionBox.getItemCount(); i++) {
                 try {
-                    if (((String) forgeVersionBox.getItemAt(i)).endsWith(String.valueOf(promo.intValue()))) {
+                    if (forgeVersionBox.getItemAt(i).endsWith(String.valueOf(promo.intValue()))) {
                         index = i;
                     }
                 } catch (NumberFormatException ignored) {}
@@ -210,8 +221,6 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
 
         settings.mcpVersion = (String) mcpVersionBox.getSelectedItem();
         settings.forgeVersion = forgeVersion.getFullVersion((String) forgeVersionBox.getSelectedItem());
-
-        creator.setSettings(settings);
     }
 
     @Override

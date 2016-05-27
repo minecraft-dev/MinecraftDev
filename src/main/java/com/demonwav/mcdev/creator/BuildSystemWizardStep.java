@@ -4,7 +4,6 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
-import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -19,7 +18,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-// TODO gradle it up
+import static com.demonwav.mcdev.platform.PlatformType.FORGE;
+import static com.demonwav.mcdev.platform.PlatformType.SPONGE;
 
 public class BuildSystemWizardStep extends ModuleWizardStep {
 
@@ -38,28 +38,25 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
 
     @Override
     public JComponent getComponent() {
-        switch (creator.getType()) {
-            case BUKKIT:
-            case SPIGOT:
-            case PAPER:
-            case BUNGEECORD:
-                buildSystemBox.setSelectedIndex(0);
-                buildSystemBox.setVisible(true);
-                break;
-            case SPONGE:
-                buildSystemBox.setSelectedIndex(1);
-                buildSystemBox.setVisible(true);
-                break;
-            case FORGE:buildSystemBox.setSelectedIndex(1);
-                buildSystemBox.setVisible(false);
-                break;
-        }
         return panel;
     }
 
     @Override
-    public void updateDataModel() {
+    public void updateStep() {
+        if (creator.getSettings().stream().anyMatch(s -> s.type == FORGE)) {
+            buildSystemBox.setSelectedIndex(1);
+            buildSystemBox.setVisible(false);
+        } else if (creator.getSettings().stream().anyMatch(s -> s.type == SPONGE)) {
+            buildSystemBox.setSelectedIndex(1);
+            buildSystemBox.setVisible(true);
+        } else {
+            buildSystemBox.setSelectedIndex(0);
+            buildSystemBox.setVisible(true);
+        }
     }
+
+    @Override
+    public void updateDataModel() {}
 
     @Override
     public void onStepLeaving() {
@@ -93,7 +90,7 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
                 throw new MinecraftSetupException("fillAll", versionField);
             }
 
-            if (creator.getType() == PlatformType.FORGE && buildSystemBox.getSelectedIndex() == 0) {
+            if (creator.getSettings().stream().anyMatch(s -> s.type == FORGE) && buildSystemBox.getSelectedIndex() == 0) {
                 throw new MinecraftSetupException("Forge does not support Maven", buildSystemBox);
             }
         } catch (MinecraftSetupException e) {

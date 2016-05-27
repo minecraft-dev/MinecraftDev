@@ -34,23 +34,6 @@
           <color color="-4473925"/>
         </border>
         <children>
-          <component id="fc230" class="javax.swing.JRadioButton" binding="bukkitRadioButton">
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <selected value="true"/>
-              <text value="Bukkit Plugin"/>
-            </properties>
-          </component>
-          <component id="dd3ac" class="javax.swing.JRadioButton" binding="spigotRadioButton">
-            <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Spigot Plugin"/>
-            </properties>
-          </component>
           <component id="69541" class="javax.swing.JLabel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -69,14 +52,6 @@
               <icon value="assets/platform/icons/Spigot@2x.png"/>
               <iconTextGap value="0"/>
               <text value=""/>
-            </properties>
-          </component>
-          <component id="46880" class="javax.swing.JRadioButton" binding="spongeRadioButton">
-            <constraints>
-              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Sponge Plugin"/>
             </properties>
           </component>
           <component id="a132a" class="javax.swing.JLabel" binding="spongeIcon">
@@ -98,14 +73,6 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="6f1b4" class="javax.swing.JRadioButton" binding="paperRadioButton">
-            <constraints>
-              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Paper Plugin"/>
-            </properties>
-          </component>
           <component id="fe383" class="javax.swing.JLabel">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -114,14 +81,6 @@
               <icon value="assets/platform/icons/Paper@2x.png"/>
               <iconTextGap value="0"/>
               <text value=""/>
-            </properties>
-          </component>
-          <component id="c6c2d" class="javax.swing.JRadioButton" binding="bungeecordRadioButton">
-            <constraints>
-              <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="BungeeCord Plugin"/>
             </properties>
           </component>
           <vspacer id="d9ec2">
@@ -139,12 +98,52 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="69a73" class="javax.swing.JRadioButton" binding="forgeRadioButton">
+          <component id="1a539" class="javax.swing.JCheckBox" binding="bukkitPluginCheckBox" default-binding="true">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Bukkit Plugin"/>
+            </properties>
+          </component>
+          <component id="1a691" class="javax.swing.JCheckBox" binding="spigotPluginCheckBox" default-binding="true">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Spigot Plugin"/>
+            </properties>
+          </component>
+          <component id="24d89" class="javax.swing.JCheckBox" binding="paperPluginCheckBox">
+            <constraints>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Paper Plugin"/>
+            </properties>
+          </component>
+          <component id="657b2" class="javax.swing.JCheckBox" binding="spongePluginCheckBox">
+            <constraints>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Sponge Plugin"/>
+            </properties>
+          </component>
+          <component id="d9577" class="javax.swing.JCheckBox" binding="forgeModCheckBox">
             <constraints>
               <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Forge Mod"/>
+            </properties>
+          </component>
+          <component id="51426" class="javax.swing.JCheckBox" binding="bungeeCordPluginCheckBox">
+            <constraints>
+              <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="BungeeCord Plugin"/>
             </properties>
           </component>
         </children>
@@ -161,8 +160,8 @@
           <component id="20c91" class="javax.swing.JEditorPane" binding="infoPane">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <minimum-size width="-1" height="100"/>
-                <preferred-size width="150" height="50"/>
+                <minimum-size width="-1" height="150"/>
+                <preferred-size width="150" height="150"/>
               </grid>
             </constraints>
             <properties>

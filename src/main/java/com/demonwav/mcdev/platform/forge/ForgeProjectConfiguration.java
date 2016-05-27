@@ -1,13 +1,17 @@
 package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 
+import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -16,7 +20,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class ForgeProjectConfiguration extends ProjectConfiguration<ForgeModule, ForgeModuleType> {
+public class ForgeProjectConfiguration extends ProjectConfiguration {
 
     public List<String> dependencies = new ArrayList<>();
     public String updateUrl;
@@ -25,7 +29,7 @@ public class ForgeProjectConfiguration extends ProjectConfiguration<ForgeModule,
     public String forgeVersion;
 
     public ForgeProjectConfiguration() {
-        super(ForgeModuleType.getInstance());
+        type = PlatformType.FORGE;
     }
 
     public boolean hasDependencies() {
@@ -48,7 +52,12 @@ public class ForgeProjectConfiguration extends ProjectConfiguration<ForgeModule,
                 String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
                 for (int i = 0, len = files.length - 1; i < len; i++) {
                     String s = files[i];
-                    file = file.createChildDirectory(this, s);
+                    VirtualFile temp = file.findChild(s);
+                    if (temp != null && temp.isDirectory()) {
+                        file = temp;
+                    } else {
+                        file = file.createChildDirectory(this, s);
+                    }
                 }
 
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
@@ -104,6 +113,12 @@ public class ForgeProjectConfiguration extends ProjectConfiguration<ForgeModule,
                         authorsText,
                         dependenciesText
                 );
+
+                // Set the editor focus on the main class
+                PsiFile mainClassPsi = PsiManager.getInstance(module.getProject()).findFile(mainClassFile);
+                if (mainClassPsi != null) {
+                    EditorHelper.openInEditor(mainClassPsi);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -129,9 +129,15 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
     public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
         return new ModuleWizardStep[]{
                 new BuildSystemWizardStep(creator),
-                new ProjectSettingsWizardStep(creator)
+                // Due to this not allow dynamic steps at runtime, we just fill out all of them and skip the ones we don't use
+                new ProjectSettingsWizardStep(creator), // Bukkit, Spigot, Paper
+                new ProjectSettingsWizardStep(creator), // Sponge
+                new ProjectSettingsWizardStep(creator), // Forge
+                new ProjectSettingsWizardStep(creator)  // BungeeCord
         };
     }
+
+
 
     @Nullable
     @Override
