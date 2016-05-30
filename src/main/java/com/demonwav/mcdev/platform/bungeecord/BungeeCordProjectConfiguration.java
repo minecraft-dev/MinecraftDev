@@ -3,12 +3,11 @@ package com.demonwav.mcdev.platform.bungeecord;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+import com.demonwav.mcdev.util.Util;
 
 import com.intellij.ide.util.EditorHelper;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
@@ -48,8 +47,8 @@ public class BungeeCordProjectConfiguration extends ProjectConfiguration {
     }
 
     @Override
-    public void create(@NotNull Module module, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
-        ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+    public void create(@NotNull Project project, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
+        Util.runWriteTask(() -> {
             try {
                 indicator.setText("Writing main class");
                 // Create plugin main class
@@ -57,30 +56,22 @@ public class BungeeCordProjectConfiguration extends ProjectConfiguration {
                 String[] files = this.mainClass.split("\\.");
                 String className = files[files.length - 1];
                 String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
-                for (int i = 0, len = files.length - 1; i < len; i++) {
-                    String s = files[i];
-                    VirtualFile temp = file.findChild(s);
-                    if (temp != null && temp.isDirectory()) {
-                        file = temp;
-                    } else {
-                        file = file.createChildDirectory(this, s);
-                    }
-                }
+                file = getMainClassDirectory(files, file);
 
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
 
-                BungeeCordTemplate.applyMainClassTemplate(module, mainClassFile, packageName, className);
+                BungeeCordTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className);
                 VirtualFile pluginYml = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "plugin.yml");
-                BungeeCordTemplate.applyPluginDescriptionFileTemplate(module, pluginYml, this);
+                BungeeCordTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this);
 
                 // Set the editor focus on the main class
-                PsiFile mainClassPsi = PsiManager.getInstance(module.getProject()).findFile(mainClassFile);
+                PsiFile mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile);
                 if (mainClassPsi != null) {
                     EditorHelper.openInEditor(mainClassPsi);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }), ModalityState.any());
+        });
     }
 }

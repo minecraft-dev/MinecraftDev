@@ -3,14 +3,13 @@ package com.demonwav.mcdev.platform.sponge;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+import com.demonwav.mcdev.util.Util;
 
 import com.google.common.base.Strings;
 import com.intellij.ide.util.EditorHelper;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
@@ -45,101 +44,121 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
     }
 
     @Override
-    public void create(@NotNull Module module, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
-        ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+    public void create(@NotNull Project project, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
+        Util.runWriteTask(() -> {
             try {
                 indicator.setText("Writing main class");
                 VirtualFile file = buildSystem.getSourceDirectories().get(0);
                 String[] files = this.mainClass.split("\\.");
                 String className = files[files.length - 1];
                 String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
-                for (int i = 0, len = files.length - 1; i < len; i++) {
-                    String s = files[i];
-                    VirtualFile temp = file.findChild(s);
-                    if (temp != null && temp.isDirectory()) {
-                        file = temp;
-                    } else {
-                        file = file.createChildDirectory(this, s);
-                    }
-                }
+                file = getMainClassDirectory(files, file);
 
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
-                SpongeTemplate.applyMainClassTemplate(module, mainClassFile, packageName, className, this);
+                SpongeTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className, hasDependencies(), generateDocumentedListeners);
 
-                PsiJavaFile mainClassPsi = (PsiJavaFile) PsiManager.getInstance(module.getProject()).findFile(mainClassFile);
+                PsiJavaFile mainClassPsi = (PsiJavaFile) PsiManager.getInstance(project).findFile(mainClassFile);
                 if (mainClassPsi == null) {
                     return;
                 }
                 PsiClass psiClass = mainClassPsi.getClasses()[0];
 
-                PsiElementFactory factory = JavaPsiFacade.getElementFactory(module.getProject());
-
-                // I am absolutely sure this is not how this should be done. Raw string manipulation is messy and can
-                // probably pretty easily break. However, I couldn't figure out the correct IntelliJ Psi way to do this,
-                // and I didn't feel like spending stupid amounts of time trying to figure it out. This may get changed
-                // in the future to a more correct method if someone can figure out how to properly do it.
-
-                // Don't worry about whitespace between elements other than new-lines, the reformat operation will
-                // handle indentation for us.
-
-                String annotationString = "@Plugin(";
-                annotationString += "\nid = \"" + buildSystem.getArtifactId().toLowerCase() + "\"";
-                annotationString += ",\nname = \"" + pluginName + "\"";
-                annotationString += ",\nversion = \"" + buildSystem.getVersion() + "\"";
-
-                if (!Strings.isNullOrEmpty(description)) {
-                    annotationString += ",\ndescription = \"" + description + "\"";
-                }
-
-                if (!Strings.isNullOrEmpty(website)) {
-                    annotationString += ",\nurl = \"" + website + "\"";
-                }
-
-                if (hasAuthors()) {
-                    annotationString += ",\nauthors = { ";
-                    Iterator<String> iterator = authors.iterator();
-                    while (iterator.hasNext()) {
-                        String author = iterator.next();
-                        annotationString += "\n\"" + author + "\"";
-                        if (iterator.hasNext()) {
-                            annotationString += ", ";
-                        } else {
-                            annotationString += " ";
-                        }
-                    }
-                    annotationString += "\n}";
-                }
-
-                if (hasDependencies()) {
-                    annotationString += ",\ndependencies = { ";
-                    Iterator<String> iterator = dependencies.iterator();
-                    while (iterator.hasNext()) {
-                        String dependency = iterator.next();
-                        annotationString += "\n@Dependency(id = \"" + dependency + "\")";
-                        if (iterator.hasNext()) {
-                            annotationString += ", ";
-                        } else {
-                            annotationString += " ";
-                        }
-                    }
-                    annotationString += "\n}";
-                }
-
-                annotationString += "\n)";
-                PsiAnnotation annotation = factory.createAnnotationFromText(annotationString, null);
-
-                new WriteCommandAction.Simple(module.getProject(), mainClassPsi) {
-                    @Override
-                    protected void run() throws Throwable {
-                        //noinspection ConstantConditions
-                        psiClass.getModifierList().addBefore(annotation, psiClass.getModifierList().getFirstChild());
-                    }
-                }.execute();
+                writeMainSpongeClass(
+                        project,
+                        mainClassPsi,
+                        psiClass,
+                        buildSystem,
+                        pluginName,
+                        description,
+                        website,
+                        hasAuthors(),
+                        authors,
+                        hasDependencies(),
+                        dependencies
+                );
 
                 EditorHelper.openInEditor(mainClassPsi);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }), ModalityState.any());
+        });
+    }
+
+    // Ugly hacks to avoid duplicate code
+    public static void writeMainSpongeClass(
+            Project project,
+            PsiJavaFile mainClassPsi,
+            PsiClass psiClass,
+            BuildSystem buildSystem,
+            String pluginName,
+            String description,
+            String website,
+            boolean hasAuthors,
+            List<String> authors,
+            boolean hasDependencies,
+            List<String> dependencies
+    ) {
+        // I am absolutely sure this is not how this should be done. Raw string manipulation is messy and can
+        // probably pretty easily break. However, I couldn't figure out the correct IntelliJ Psi way to do this,
+        // and I didn't feel like spending stupid amounts of time trying to figure it out. This may get changed
+        // in the future to a more correct method if someone can figure out how to properly do it.
+
+        // Don't worry about whitespace between elements other than new-lines, the reformat operation will
+        // handle indentation for us.
+
+        String annotationString = "@Plugin(";
+        annotationString += "\nid = \"" + buildSystem.getArtifactId().toLowerCase() + "\"";
+        annotationString += ",\nname = \"" + pluginName + "\"";
+        annotationString += ",\nversion = \"" + buildSystem.getVersion() + "\"";
+
+        if (!Strings.isNullOrEmpty(description)) {
+            annotationString += ",\ndescription = \"" + description + "\"";
+        }
+
+        if (!Strings.isNullOrEmpty(website)) {
+            annotationString += ",\nurl = \"" + website + "\"";
+        }
+
+        if (hasAuthors) {
+            annotationString += ",\nauthors = { ";
+            Iterator<String> iterator = authors.iterator();
+            while (iterator.hasNext()) {
+                String author = iterator.next();
+                annotationString += "\n\"" + author + "\"";
+                if (iterator.hasNext()) {
+                    annotationString += ", ";
+                } else {
+                    annotationString += " ";
+                }
+            }
+            annotationString += "\n}";
+        }
+
+        if (hasDependencies) {
+            annotationString += ",\ndependencies = { ";
+            Iterator<String> iterator = dependencies.iterator();
+            while (iterator.hasNext()) {
+                String dependency = iterator.next();
+                annotationString += "\n@Dependency(id = \"" + dependency + "\")";
+                if (iterator.hasNext()) {
+                    annotationString += ", ";
+                } else {
+                    annotationString += " ";
+                }
+            }
+            annotationString += "\n}";
+        }
+
+        annotationString += "\n)";
+        PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
+        PsiAnnotation annotation = factory.createAnnotationFromText(annotationString, null);
+
+        new WriteCommandAction.Simple(project, mainClassPsi) {
+            @Override
+            protected void run() throws Throwable {
+                //noinspection ConstantConditions
+                psiClass.getModifierList().addBefore(annotation, psiClass.getModifierList().getFirstChild());
+            }
+        }.execute();
     }
 }

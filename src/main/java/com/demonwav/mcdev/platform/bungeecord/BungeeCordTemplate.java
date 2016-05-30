@@ -5,7 +5,7 @@ import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
-import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.io.IOException;
@@ -13,24 +13,24 @@ import java.util.Properties;
 
 public class BungeeCordTemplate extends AbstractTemplate {
 
-    public static void applyMainClassTemplate(Module module, VirtualFile file, String packageName, String className) {
+    public static void applyMainClassTemplate(Project project, VirtualFile file, String packageName, String className) {
         Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
 
         try {
-            applyTemplate(module, file, MinecraftFileTemplateGroupFactory.BUNGEECORD_MAIN_CLASS_TEMPLATE, properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUNGEECORD_MAIN_CLASS_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static String applyPomTemplate(Module module, String version) {
+    public static String applyPomTemplate(Project project, String version) {
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", version);
 
-        FileTemplateManager manager = FileTemplateManager.getInstance(module.getProject());
+        FileTemplateManager manager = FileTemplateManager.getInstance(project);
         FileTemplate fileTemplate = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUNGEECORD_POM_TEMPLATE);
         try {
             return fileTemplate.getText(properties);
@@ -41,7 +41,7 @@ public class BungeeCordTemplate extends AbstractTemplate {
         }
     }
 
-    public static void applyPluginDescriptionFileTemplate(Module module, VirtualFile file, BungeeCordProjectConfiguration settings) {
+    public static void applyPluginDescriptionFileTemplate(Project project, VirtualFile file, BungeeCordProjectConfiguration settings) {
         Properties properties = new Properties();
 
         properties.setProperty("NAME", settings.pluginName);
@@ -70,7 +70,7 @@ public class BungeeCordTemplate extends AbstractTemplate {
         }
 
         try {
-            applyTemplate(module, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties, true);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties, true);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -19,7 +19,9 @@ public class SpongeModule extends AbstractModule {
         this.module = module;
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            buildSystem.reImport(module, PlatformType.SPONGE);
+            if (!buildSystem.isImported()) {
+                buildSystem.reImport(module);
+            }
         }
     }
 

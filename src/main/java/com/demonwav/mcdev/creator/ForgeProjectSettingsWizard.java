@@ -1,9 +1,11 @@
 package com.demonwav.mcdev.creator;
 
+import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.forge.versionapi.ForgeVersion;
 import com.demonwav.mcdev.platform.forge.versionapi.McpVersion;
+import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -11,8 +13,10 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
+import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -38,12 +42,15 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
     private JComboBox<String> forgeVersionBox;
     private JComboBox<String> mcpVersionBox;
     private JProgressBar loadingBar;
+    private JCheckBox generateDocsCheckbox;
 
     private final ForgeProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
     private McpVersion mcpVersion;
     private ForgeVersion forgeVersion;
+
+    public boolean spongeForge = false;
 
     public ForgeProjectSettingsWizard(MinecraftProjectCreator creator) {
         this.creator = creator;
@@ -116,6 +123,16 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
         }
 
         loadingBar.setIndeterminate(true);
+
+        if (spongeForge) {
+            if (UIUtil.isUnderDarcula()) {
+                title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X);
+            } else {
+                title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_DARK_2X);
+            }
+            title.setText("<html><font size=\"5\">Sponge Forge Settings</font></html>");
+            generateDocsCheckbox.setVisible(true);
+        }
 
         return panel;
     }
@@ -220,7 +237,18 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
         settings.updateUrl = updateUrlField.getText();
 
         settings.mcpVersion = (String) mcpVersionBox.getSelectedItem();
-        settings.forgeVersion = forgeVersion.getFullVersion((String) forgeVersionBox.getSelectedItem());
+
+        if (settings instanceof SpongeForgeProjectConfiguration) {
+            SpongeForgeProjectConfiguration configuration = (SpongeForgeProjectConfiguration) settings;
+            configuration.generateDocumentation = generateDocsCheckbox.isSelected();
+        }
+
+        // If an error occurs while fetching the API, this may prevent the user from closing the dialog.
+        try {
+            settings.forgeVersion = forgeVersion.getFullVersion((String) forgeVersionBox.getSelectedItem());
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
+import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -43,7 +44,13 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
 
     @Override
     public void updateStep() {
-        if (creator.getSettings().stream().anyMatch(s -> s.type == FORGE)) {
+        if (creator.getSettings().size() > 1) {
+            buildSystemBox.setSelectedIndex(1);
+            buildSystemBox.setVisible(false);
+            return;
+        }
+        if (creator.getSettings().stream().anyMatch(s -> s.type == FORGE) ||
+                creator.getSettings().stream().anyMatch( s -> s instanceof SpongeForgeProjectConfiguration)) {
             buildSystemBox.setSelectedIndex(1);
             buildSystemBox.setVisible(false);
         } else if (creator.getSettings().stream().anyMatch(s -> s.type == SPONGE)) {

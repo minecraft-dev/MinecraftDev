@@ -23,7 +23,9 @@ public class ForgeModule extends AbstractModule {
         this.module = module;
         this.buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            buildSystem.reImport(module, PlatformType.FORGE);
+            if (!buildSystem.isImported()) {
+                buildSystem.reImport(module);
+            }
 
             if (buildSystem != null) {
                 mcmod = buildSystem.findFile("mcmod.info", SourceType.RESOURCE);

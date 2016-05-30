@@ -28,7 +28,9 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         this.module = module;
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            buildSystem.reImport(module, type.getPlatformType());
+            if (!buildSystem.isImported()) {
+                buildSystem.reImport(module);
+            }
             pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
 
             if (pluginYml != null) {
@@ -42,17 +44,19 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         this.type = type.getPlatformType();
         this.module = module;
         this.buildSystem = buildSystem;
-        if (buildSystem == null) {
+        if (this.buildSystem == null) {
             // set up build system
-            buildSystem = BuildSystem.getInstance(module);
-            if (buildSystem != null) {
+            this.buildSystem = BuildSystem.getInstance(module);
+            if (this.buildSystem != null) {
                 // a valid build system was detected, import it
-                buildSystem.reImport(module, type.getPlatformType());
+                if (!this.buildSystem.isImported()) {
+                    this.buildSystem.reImport(module);
+                }
             }
         }
         // it may still be null if there was no valid build system detected
-        if (buildSystem != null) {
-            this.pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
+        if (this.buildSystem != null) {
+            this.pluginYml = this.buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
             if (pluginYml != null) {
                 this.configManager = new PluginConfigManager(this);
             }

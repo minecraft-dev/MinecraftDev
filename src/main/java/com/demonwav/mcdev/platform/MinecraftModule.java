@@ -1,8 +1,10 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 
 import com.google.common.base.Strings;
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -33,7 +35,19 @@ public class MinecraftModule {
         MinecraftModule minecraftModule = new MinecraftModule();
         minecraftModule.module = module;
         minecraftModule.buildSystem = BuildSystem.getInstance(module);
-        types.forEach(minecraftModule::register);
+        if (minecraftModule.buildSystem != null) {
+            minecraftModule.buildSystem.reImport(module);
+
+            // Remove invalid entries
+            types = types.stream().filter(type ->
+                    minecraftModule.buildSystem.getDependencies().stream().anyMatch(buildDependency ->
+                            buildDependency.getGroupId().equals(type.getGroupId()) && buildDependency.getArtifactId().equals(type.getArtifactId())
+                    ) ||
+                            // We can't check forge right here
+                            type instanceof ForgeModuleType
+            ).collect(Collectors.toList());
+            types.forEach(minecraftModule::register);
+        }
         return minecraftModule;
     }
 
@@ -59,12 +73,12 @@ public class MinecraftModule {
     @Nullable
     public static MinecraftModule getInstance(@NotNull Module module) {
         if (map.containsKey(module)) {
-            MinecraftModule minecraftModule = map.get(module);
-            minecraftModule.checkModule();
             return map.get(module);
         } else {
             if (isModuleApplicable(module)) {
-                return map.put(module, createFromModule(module));
+                MinecraftModule minecraftModule = map.put(module, createFromModule(module));
+                ProjectView.getInstance(module.getProject()).refresh();
+                return minecraftModule;
             } else {
                 String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
                 if (paths != null && paths.length > 0) {
@@ -72,7 +86,6 @@ public class MinecraftModule {
                     if (parentModule != null) {
                         if (map.containsKey(parentModule)) {
                             MinecraftModule minecraftModule = map.get(parentModule);
-                            minecraftModule.checkModule();
                             map.put(module, minecraftModule);
                             return map.get(module);
                         } else if (isModuleApplicable(parentModule)) {
@@ -105,40 +118,42 @@ public class MinecraftModule {
         return false;
     }
 
-    private void checkModule() {
+    public void checkModule() {
         String moduleTypesString = module.getOptionValue(MinecraftModuleType.OPTION);
         if (moduleTypesString == null) {
             return;
         }
 
         List<String> moduleTypes = Arrays.asList(moduleTypesString.split(","));
-
-
-        List<String> toBeAdded = moduleTypes.stream().filter(t -> {
-            AbstractModuleType<?> moduleType = PlatformType.getByName(t);
-            return !modules.containsKey(moduleType);
-        }).collect(Collectors.toList());
+        List<String> modifiableModuletypes = new ArrayList<>(moduleTypes);
 
         List<String> toBeRemoved = modules.keySet().stream().map(AbstractModuleType::getId)
                 .filter(t -> !moduleTypes.contains(t)).collect(Collectors.toList());
 
-        if (toBeAdded.size() > 0) {
-            for (String moduleType : toBeAdded) {
-                AbstractModuleType<?> abstractModuleType= PlatformType.getByName(moduleType);
-                if (abstractModuleType != null) {
-                    register(abstractModuleType);
+        modules.forEach((type, module) -> {
+            if (!buildSystem.getDependencies().stream().anyMatch(buildDependency ->
+                    buildDependency.getArtifactId().equals(type.getArtifactId()) && buildDependency.getGroupId().equals(type.getGroupId())
+            ) && !(type instanceof ForgeModuleType)) {
+                if (!toBeRemoved.contains(type.getPlatformType().getName())) {
+                    toBeRemoved.add(type.getPlatformType().getName());
                 }
             }
-        }
+        });
 
         if (toBeRemoved.size() > 0) {
             for (String s : toBeRemoved) {
                 AbstractModuleType<?> type = PlatformType.getByName(s);
                 if (type != null) {
                     modules.remove(type);
+                    modifiableModuletypes.remove(s);
                 }
             }
         }
+
+        // Write the changes to the module settings
+        module.setOption(MinecraftModuleType.OPTION, modifiableModuletypes.stream().collect(Collectors.joining(",")));
+
+        ProjectView.getInstance(module.getProject()).refresh();
     }
 
     public Module getIdeaModule() {
@@ -150,7 +165,7 @@ public class MinecraftModule {
     }
 
     private void register(@NotNull AbstractModuleType<?> type) {
-        type.performCreationSettingSetup(module);
+        type.performCreationSettingSetup(module.getProject());
         modules.put(type, type.generateModule(module));
     }
 
@@ -169,7 +184,7 @@ public class MinecraftModule {
     }
 
     @Nullable
-    public <T extends AbstractModule> T getModuleOfType(@Nullable AbstractModuleType<T> type) {
+    private <T extends AbstractModule> T getModuleOfType(@Nullable AbstractModuleType<T> type) {
         //noinspection unchecked
         return (T) modules.get(type);
     }

@@ -1,0 +1,27 @@
+group '${GROUP_ID}'
+version '${PLUGIN_VERSION}'
+
+plugins {
+    id "com.qixalite.spongestart" version "1.4.6"
+    id "java"
+}
+
+sourceCompatibility = ${BUILD_VERSION}
+targetCompatibility = ${BUILD_VERSION}
+
+spongestart {
+    eula true
+
+    //optional configs
+    spongeVanillaBuild 'LATEST'
+    spongeForgeBuild 'LATEST'
+    vanillaServerFolder 'run'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}

@@ -3,7 +3,7 @@ package com.demonwav.mcdev.platform.forge;
 import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 
-import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +13,7 @@ import java.util.Properties;
 
 public class ForgeTemplate extends AbstractTemplate {
 
-    public static void applyBuildGradleTemplate(@NotNull Module module,
+    public static void applyBuildGradleTemplate(@NotNull Project project,
                                                 @NotNull VirtualFile file,
                                                 @NotNull String groupId,
                                                 @NotNull String artifactId,
@@ -29,13 +29,33 @@ public class ForgeTemplate extends AbstractTemplate {
         properties.setProperty("MCP_VERSION", mcpVersion);
 
         try {
-            applyTemplate(module, file, MinecraftFileTemplateGroupFactory.FORGE_BUILD_GRADLE_TEMPLATE, properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_BUILD_GRADLE_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void applyMcmodInfoTemplate(@NotNull Module module,
+    public static void applySubmoduleBuildGradleTemplate(@NotNull Project project,
+                                                         @NotNull VirtualFile file,
+                                                         @NotNull String artifactId,
+                                                         @NotNull String forgeVersion,
+                                                         @NotNull String mcpVersion,
+                                                         @NotNull String commonProjectName) {
+
+        Properties properties = new Properties();
+        properties.setProperty("ARTIFACT_ID", artifactId);
+        properties.setProperty("FORGE_VERSION", forgeVersion);
+        properties.setProperty("MCP_VERSION", mcpVersion);
+        properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
+
+        try {
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void applyMcmodInfoTemplate(@NotNull Project project,
                                               @NotNull VirtualFile file,
                                               @NotNull String artifactId,
                                               @NotNull String pluginName,
@@ -63,13 +83,13 @@ public class ForgeTemplate extends AbstractTemplate {
         }
 
         try {
-            applyTemplate(module, file, MinecraftFileTemplateGroupFactory.MCMOD_INFO_TEMPLATE, properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MCMOD_INFO_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void applyMainClassTemplate(@NotNull Module module,
+    public static void applyMainClassTemplate(@NotNull Project project,
                                               @NotNull VirtualFile file,
                                               @NotNull String packageName,
                                               @NotNull String artifactId,
@@ -85,7 +105,7 @@ public class ForgeTemplate extends AbstractTemplate {
         properties.setProperty("CLASS_NAME", className);
 
         try {
-            applyTemplate(module, file, MinecraftFileTemplateGroupFactory.FORGE_MAIN_CLASS_TEMPLATE, properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_MAIN_CLASS_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }

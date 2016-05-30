@@ -2,6 +2,7 @@ package com.demonwav.mcdev.buildsystem.gradle;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractModuleType;
+import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 
 import com.google.common.base.Strings;
@@ -78,7 +79,8 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                     m.setOption("type", JavaModuleType.getModuleType().getId());
                     checkedModules.add(m);
                     MinecraftModuleType.setOption(m, type.getId());
-                    Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m, type.getPlatformType()));
+                    Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m));
+                    Optional.ofNullable(MinecraftModule.getInstance(m)).ifPresent(MinecraftModule::checkModule);
                 } else {
                     String parentName = path[0];
                     Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
@@ -88,7 +90,8 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                         badModules.add(m);
                         checkedModules.add(parentModule);
                         setOption(parentModule, type.getId());
-                        Optional.ofNullable(BuildSystem.getInstance(parentModule)).ifPresent(thisModule -> thisModule.reImport(parentModule, type.getPlatformType()));
+                        Optional.ofNullable(BuildSystem.getInstance(parentModule)).ifPresent(thisModule -> thisModule.reImport(parentModule));
+                        Optional.ofNullable(MinecraftModule.getInstance(parentModule)).ifPresent(MinecraftModule::checkModule);
                     }
                 }
             });

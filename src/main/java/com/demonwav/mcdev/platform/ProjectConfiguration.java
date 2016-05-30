@@ -2,11 +2,13 @@ package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -22,7 +24,7 @@ public abstract class ProjectConfiguration {
     public String website = null;
     public PlatformType type = null;
 
-    public abstract void create(@NotNull Module module, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator);
+    public abstract void create(@NotNull Project project, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator);
 
     public boolean hasAuthors() {
         return listContainsAtLeastOne(this.authors);
@@ -57,5 +59,22 @@ public abstract class ProjectConfiguration {
         }
 
         return list.size() != 0;
+    }
+
+    public VirtualFile getMainClassDirectory(String[] files, VirtualFile file) {
+        try {
+            for (int i = 0, len = files.length - 1; i < len; i++) {
+                String s = files[i];
+                VirtualFile temp = file.findChild(s);
+                if (temp != null && temp.isDirectory()) {
+                    file = temp;
+                } else {
+                    file = file.createChildDirectory(this, s);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
     }
 }

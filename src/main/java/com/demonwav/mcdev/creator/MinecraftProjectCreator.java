@@ -3,7 +3,7 @@ package com.demonwav.mcdev.creator;
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
@@ -18,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import static com.demonwav.mcdev.platform.PlatformType.BUNGEECORD;
 import static com.demonwav.mcdev.platform.PlatformType.FORGE;
 
 public class MinecraftProjectCreator {
@@ -55,81 +55,106 @@ public class MinecraftProjectCreator {
         buildSystem.setRepositories(buildRepositories);
         buildSystem.setDependencies(dependencies);
 
-        for (int i = 0; i < settings.size(); i++) {
-            PlatformType type = settings.get(i).type;
-
-            // Forge doesn't have a dependency like this
-            if (type == FORGE) {
-                continue;
-            }
-
-            BuildRepository buildRepository = new BuildRepository();
-            BuildDependency dependency = new BuildDependency();
-            buildRepositories.add(buildRepository);
-            dependencies.add(dependency);
-            switch (type) {
-                case BUKKIT:
-                    buildRepository.setId("spigotmc-repo");
-                    buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
-                    dependency.setGroupId("org.bukkit");
-                    dependency.setArtifactId("bukkit");
-                    dependency.setVersion(((BukkitProjectConfiguration) settings.get(i)).minecraftVersion + "-R0.1-SNAPSHOT");
-                    break;
-                case SPIGOT:
-                    buildRepository.setId("spigotmc-repo");
-                    buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
-                    dependency.setGroupId("org.spigotmc");
-                    dependency.setArtifactId("spigot-api");
-                    dependency.setVersion(((BukkitProjectConfiguration) settings.get(i)).minecraftVersion + "-R0.1-SNAPSHOT");
-                    if (!settings.stream().anyMatch(s -> s.type == BUNGEECORD)) {
-                        addSonatype(buildRepositories);
-                    }
-                    break;
-                case PAPER:
-                    buildRepository.setId("destroystokyo-repo");
-                    buildRepository.setUrl("https://repo.destroystokyo.com/content/groups/public/");
-                    dependency.setGroupId("com.destroystokyo.paper");
-                    dependency.setArtifactId("paper-api");
-                    dependency.setVersion(((BukkitProjectConfiguration) settings.get(i)).minecraftVersion + "-R0.1-SNAPSHOT");
-                    if (!settings.stream().anyMatch(s -> s.type == BUNGEECORD)) {
-                        addSonatype(buildRepositories);
-                    }
-                    break;
-                case BUNGEECORD:
-                    buildRepository.setId("sonatype-oss-repo");
-                    buildRepository.setUrl("https://oss.sonatype.org/content/groups/public/");
-                    dependency.setGroupId("net.md-5");
-                    dependency.setArtifactId("bungeecord-api");
-                    dependency.setVersion(((BungeeCordProjectConfiguration) settings).minecraftVersion + "-SNAPSHOT");
-                    break;
-                case SPONGE:
-                    buildRepository.setId("spongepowered-repo");
-                    buildRepository.setUrl("https://repo.spongepowered.org/maven/");
-                    dependency.setGroupId("org.spongepowered");
-                    dependency.setArtifactId("spongeapi");
-                    dependency.setVersion("4.1.0-SNAPSHOT");
-                default:
-                    break;
-            }
-            dependency.setScope("provided");
+        if (settings.size() == 1) {
+            doSingleModuleCreate();
+        } else {
+            doMultiModuleCreate();
         }
+    }
 
-        // We want to show some info to the user
+    private void doSingleModuleCreate() {
+        ProjectConfiguration configuration = settings.get(0);
+        addDependencies(configuration, buildSystem.getRepositories(), buildSystem.getDependencies());
+
         ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Setting Up Project", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                buildSystem.create(module, settings, indicator);
-                for (int i = 0; i < settings.size(); i++) {
-                    settings.get(i).create(module, buildSystem, indicator);
-                    settings.get(i).type.getType().performCreationSettingSetup(module);
-                }
-                buildSystem.finishSetup(module, settings, indicator);
+
+                buildSystem.create(module.getProject(), configuration, indicator);
+                configuration.create(module.getProject(), buildSystem, indicator);
+                configuration.type.getType().performCreationSettingSetup(module.getProject());
+                buildSystem.finishSetup(module, configuration, indicator);
             }
         });
     }
 
-    private void addSonatype(List<BuildRepository> buildRepositories) {
+    private void doMultiModuleCreate() {
+        if (!(buildSystem instanceof GradleBuildSystem)) {
+            throw new IllegalStateException("BuildSystem must be Gradle");
+        }
+
+        GradleBuildSystem gradleBuildSystem = (GradleBuildSystem) buildSystem;
+        ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Setting Up Project", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+
+                Map<GradleBuildSystem, ProjectConfiguration> map = gradleBuildSystem.createMultiModuleProject(module.getProject(), settings, indicator);
+                map.forEach((g, p) -> {
+                    p.create(module.getProject(), g, indicator);
+                    p.type.getType().performCreationSettingSetup(module.getProject());
+                });
+                gradleBuildSystem.finishSetup(module, null, indicator);
+            }
+        });
+    }
+
+    public static void addDependencies(ProjectConfiguration configuration, List<BuildRepository> buildRepositories, List<BuildDependency> buildDependencies) {
+        // Forge doesn't have a dependency like this
+        if (configuration.type == FORGE) {
+            return;
+        }
+
+        BuildRepository buildRepository = new BuildRepository();
+        BuildDependency buildDependency = new BuildDependency();
+
+        buildRepositories.add(buildRepository);
+        buildDependencies.add(buildDependency);
+        switch (configuration.type) {
+            case BUKKIT:
+                buildRepository.setId("spigotmc-repo");
+                buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
+                buildDependency.setGroupId("org.bukkit");
+                buildDependency.setArtifactId("bukkit");
+                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
+                break;
+            case SPIGOT:
+                buildRepository.setId("spigotmc-repo");
+                buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
+                buildDependency.setGroupId("org.spigotmc");
+                buildDependency.setArtifactId("spigot-api");
+                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
+                addSonatype(buildRepositories);
+                break;
+            case PAPER:
+                buildRepository.setId("destroystokyo-repo");
+                buildRepository.setUrl("https://repo.destroystokyo.com/content/groups/public/");
+                buildDependency.setGroupId("com.destroystokyo.paper");
+                buildDependency.setArtifactId("paper-api");
+                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
+                addSonatype(buildRepositories);
+                break;
+            case BUNGEECORD:
+                buildRepository.setId("sonatype-oss-repo");
+                buildRepository.setUrl("https://oss.sonatype.org/content/groups/public/");
+                buildDependency.setGroupId("net.md-5");
+                buildDependency.setArtifactId("bungeecord-api");
+                buildDependency.setVersion(((BungeeCordProjectConfiguration) configuration).minecraftVersion + "-SNAPSHOT");
+                break;
+            case SPONGE:
+                buildRepository.setId("spongepowered-repo");
+                buildRepository.setUrl("https://repo.spongepowered.org/maven/");
+                buildDependency.setGroupId("org.spongepowered");
+                buildDependency.setArtifactId("spongeapi");
+                buildDependency.setVersion("4.1.0-SNAPSHOT");
+            default:
+                break;
+        }
+        buildDependency.setScope("provided");
+    }
+
+    private static void addSonatype(List<BuildRepository> buildRepositories) {
         buildRepositories.add(new BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/"));
     }
 

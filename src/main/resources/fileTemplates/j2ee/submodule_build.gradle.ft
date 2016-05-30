@@ -1,0 +1,18 @@
+repositories {
+}
+
+dependencies {
+    compile project(':${COMMON_PROJECT_NAME}')
+}
+
+processResources {
+    from('src/main/resources') {
+        expand 'version': project.version
+    }
+}
+
+shadowJar {
+    dependencies {
+        include(dependency(':${COMMON_PROJECT_NAME}'))
+    }
+}

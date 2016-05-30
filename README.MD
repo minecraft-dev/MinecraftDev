@@ -1,5 +1,6 @@
-Minecraft Development IntelliJ Plugin <a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDevIntelliJ_Build"><img src="https://ci.demonwav.com/app/rest/builds/buildType(id:MinecraftDevIntelliJ_Build)/statusIcon"/></a>
-=========================================================================================================================================================================================================================================
+Minecraft Development IntelliJ Plugin [![forthebadge](http://forthebadge.com/images/badges/made-with-crayons.svg)](http://forthebadge.com)
+==========================================================================================================================================
+[![GitHub stars](https://img.shields.io/github/stars/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/stargazers) [![GitHub issues](https://img.shields.io/github/issues/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/issues)<a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDevIntelliJ_Build"><img src="https://ci.demonwav.com/app/rest/builds/buildType(id:MinecraftDevIntelliJ_Build)/statusIcon"/></a>
 
 Building
 --------
@@ -35,5 +36,5 @@ Supported Platforms
 -------------------
 
 - [Bukkit](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse), [Spigot](https://spigotmc.org/), and [Paper](https://paper.emc.gs)
-- [Minecraft Forge](http://minecraftforge.net/forum) and [Sponge](https://www.spongepowered.org/)
-- [BungeeCord](https://www.spigotmc.org/wiki/bungeecord/) and [Waterfall](https://getwaterfall.xyz/)
+- [Sponge](https://www.spongepowered.org/) and [Minecraft Forge](http://minecraftforge.net/forum)
+- [BungeeCord](https://www.spigotmc.org/wiki/bungeecord/)

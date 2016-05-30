@@ -128,6 +128,7 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
     @Override
     public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
         return new ModuleWizardStep[]{
+                new SpongeForgeChooser(creator),
                 new BuildSystemWizardStep(creator),
                 // Due to this not allow dynamic steps at runtime, we just fill out all of them and skip the ones we don't use
                 new ProjectSettingsWizardStep(creator), // Bukkit, Spigot, Paper

@@ -38,6 +38,4 @@ public class TransitionProjectComponent extends AbstractProjectComponent {
             }
         }
     }
-
-
 }

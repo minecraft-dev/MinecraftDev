@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.buildsystem.maven;
 
+import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public abstract class AbstractMavenImporter extends MavenImporter {
 
@@ -74,8 +76,9 @@ public abstract class AbstractMavenImporter extends MavenImporter {
             // We'll make sure the project is setup
             if (Objects.equals(ModuleRootManager.getInstance(module).getContentRoots()[0], mavenProject.getFile().getParent())) {
                 MinecraftModuleType.setOption(module, type.getId());
-
-                MinecraftModule.getInstance(module);
+                // We want to make sure the project "knows" about this change
+                Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(buildSystem -> buildSystem.reImport(module));
+                Optional.ofNullable(MinecraftModule.getInstance(module)).ifPresent(MinecraftModule::checkModule);
             }
         }
     }

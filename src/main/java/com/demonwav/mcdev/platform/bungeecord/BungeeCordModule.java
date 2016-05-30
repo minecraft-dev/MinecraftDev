@@ -23,7 +23,9 @@ public class BungeeCordModule extends AbstractModule {
         this.module = module;
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            buildSystem.reImport(module, PlatformType.BUNGEECORD);
+            if (!buildSystem.isImported()) {
+                buildSystem.reImport(module);
+            }
             pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
         }
     }

@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
@@ -56,7 +57,11 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
         if (wizard == null || newType != this.type) {
             // remember what type we are now, so we know if it changes later
             this.type = newType;
-            if (newType == PlatformType.BUNGEECORD) {
+            if (creator.getSettings().get(creator.index) instanceof SpongeForgeProjectConfiguration) {
+                wizard = new ForgeProjectSettingsWizard(creator);
+                // This will set the icon and the title text
+                ((ForgeProjectSettingsWizard) wizard).spongeForge = true;
+            } else if (newType == PlatformType.BUNGEECORD) {
                 wizard = new BungeeCordProjectSettingsWizard(creator);
             } else if (newType == PlatformType.SPONGE) {
                 wizard = new SpongeProjectSettingsWizard(creator);
@@ -74,7 +79,7 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
 
     @Override
     public boolean isStepVisible() {
-        return creator.index < creator.getSettings().size();
+        return creator.index < creator.getSettings().size() || index != -1;
     }
 
     @Override
