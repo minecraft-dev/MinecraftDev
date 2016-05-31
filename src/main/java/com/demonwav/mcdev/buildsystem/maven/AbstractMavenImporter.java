@@ -55,9 +55,9 @@ public abstract class AbstractMavenImporter extends MavenImporter {
                                  MavenProjectChanges changes,
                                  Map<MavenProject, String> mavenProjectToModuleName,
                                  List<MavenProjectsProcessorTask> postTasks) {
-        postTasks.add((project, embeddersManager, console, indicator) -> {
-            MavenProjectsManager.getInstance(module.getProject()).addManagedFilesOrUnignore(Collections.singletonList(mavenProject.getFile()));
-        });
+        postTasks.add((project, embeddersManager, console, indicator) ->
+            MavenProjectsManager.getInstance(module.getProject()).addManagedFilesOrUnignore(Collections.singletonList(mavenProject.getFile()))
+        );
     }
 
     @Override
@@ -75,7 +75,7 @@ public abstract class AbstractMavenImporter extends MavenImporter {
         for (Module module : ModuleManager.getInstance(project).getModules()) {
             // We'll make sure the project is setup
             if (Objects.equals(ModuleRootManager.getInstance(module).getContentRoots()[0], mavenProject.getFile().getParent())) {
-                MinecraftModuleType.setOption(module, type.getId());
+                MinecraftModuleType.addOption(module, type.getId());
                 // We want to make sure the project "knows" about this change
                 Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(buildSystem -> buildSystem.reImport(module));
                 Optional.ofNullable(MinecraftModule.getInstance(module)).ifPresent(MinecraftModule::checkModule);

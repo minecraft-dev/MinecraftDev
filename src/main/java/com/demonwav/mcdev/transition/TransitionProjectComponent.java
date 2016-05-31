@@ -33,7 +33,7 @@ public class TransitionProjectComponent extends AbstractProjectComponent {
             for (String type : types) {
                 if (Objects.equals(module.getOptionValue("type"), type)) {
                     module.setOption("type", JavaModuleType.getModuleType().getId());
-                    MinecraftModuleType.setOption(module, type);
+                    MinecraftModuleType.addOption(module, type);
                 }
             }
         }

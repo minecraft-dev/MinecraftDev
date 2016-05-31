@@ -37,15 +37,6 @@ public class MinecraftModule {
         minecraftModule.buildSystem = BuildSystem.getInstance(module);
         if (minecraftModule.buildSystem != null) {
             minecraftModule.buildSystem.reImport(module);
-
-            // Remove invalid entries
-            types = types.stream().filter(type ->
-                    minecraftModule.buildSystem.getDependencies().stream().anyMatch(buildDependency ->
-                            buildDependency.getGroupId().equals(type.getGroupId()) && buildDependency.getArtifactId().equals(type.getArtifactId())
-                    ) ||
-                            // We can't check forge right here
-                            type instanceof ForgeModuleType
-            ).collect(Collectors.toList());
             types.forEach(minecraftModule::register);
         }
         return minecraftModule;
@@ -211,5 +202,21 @@ public class MinecraftModule {
             }
         }
         return null;
+    }
+
+    public void addModuleType(String moduleTypeName) {
+        AbstractModuleType<?> type = PlatformType.getByName(moduleTypeName);
+        if (type != null && !modules.containsKey(type)) {
+            modules.put(type, type.generateModule(module));
+        }
+        ProjectView.getInstance(module.getProject()).refresh();
+    }
+
+    public void removeModuleType(String moduleTypeName) {
+        AbstractModuleType<?> type = PlatformType.getByName(moduleTypeName);
+        if (type != null && modules.containsKey(type)) {
+            modules.remove(type);
+        }
+        ProjectView.getInstance(module.getProject()).refresh();
     }
 }

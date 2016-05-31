@@ -29,8 +29,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.demonwav.mcdev.platform.MinecraftModuleType.setOption;
-
 @Order(ExternalSystemConstants.UNORDERED)
 public abstract class AbstractDataService extends AbstractProjectDataService<LibraryDependencyData, Module> {
 
@@ -78,7 +76,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                     // Always reset back to JavaModule
                     m.setOption("type", JavaModuleType.getModuleType().getId());
                     checkedModules.add(m);
-                    MinecraftModuleType.setOption(m, type.getId());
+                    MinecraftModuleType.addOption(m, type.getId());
                     Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m));
                     Optional.ofNullable(MinecraftModule.getInstance(m)).ifPresent(MinecraftModule::checkModule);
                 } else {
@@ -89,7 +87,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                         parentModule.setOption("type", JavaModuleType.getModuleType().getId());
                         badModules.add(m);
                         checkedModules.add(parentModule);
-                        setOption(parentModule, type.getId());
+                        MinecraftModuleType.addOption(parentModule, type.getId());
                         Optional.ofNullable(BuildSystem.getInstance(parentModule)).ifPresent(thisModule -> thisModule.reImport(parentModule));
                         Optional.ofNullable(MinecraftModule.getInstance(parentModule)).ifPresent(MinecraftModule::checkModule);
                     }
@@ -104,6 +102,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                         if (Strings.nullToEmpty(m.getOptionValue("type")).equals(type.getId())) {
                             m.setOption("type", JavaModuleType.getModuleType().getId());
                         }
+                        MinecraftModuleType.removeOption(m, type.getId());
                     });
         });
     }

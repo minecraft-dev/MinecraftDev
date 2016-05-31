@@ -25,9 +25,7 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,31 +49,8 @@ public class ForgeDataService extends AbstractDataService {
             List<Module> forgeModules = new ArrayList<>();
             for (Module module : modules) {
                 if (!checkModule(module, modelsProvider)) {
-                    String value = module.getOptionValue(MinecraftModuleType.OPTION);
-                    if (value == null) {
-                        continue;
-                    }
-
-                    if (value.contains(type.getId())) {
-                        // This is marked as forge, but isn't
-                        String[] parts = value.split(",");
-                        String newValue = "";
-                        Iterator<String> partsIterator = Arrays.asList(parts).iterator();
-                        while (partsIterator.hasNext()) {
-                            String part = partsIterator.next();
-                            if (part.equals(type.getId())) {
-                                // Skip the bad part
-                                continue;
-                            }
-
-                            newValue += part;
-                            if (partsIterator.hasNext()) {
-                                newValue += ",";
-                            }
-                        }
-
-                        module.setOption(MinecraftModuleType.OPTION, newValue);
-                    }
+                    // Make sure this isn't marked as a forge module
+                    MinecraftModuleType.removeOption(module, type.getId());
                     continue;
                 }
 
@@ -85,7 +60,7 @@ public class ForgeDataService extends AbstractDataService {
             for (Module testModule : modelsProvider.getModules()) {
                 if (forgeModules.contains(testModule)) {
                     testModule.setOption("type", JavaModuleType.getModuleType().getId());
-                    MinecraftModuleType.setOption(testModule, type.getId());
+                    MinecraftModuleType.addOption(testModule, type.getId());
                     Optional.ofNullable(BuildSystem.getInstance(testModule)).ifPresent(md -> md.reImport(testModule));
                     Optional.ofNullable(MinecraftModule.getInstance(testModule)).ifPresent(MinecraftModule::checkModule);
                 } else {

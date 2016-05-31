@@ -10,6 +10,8 @@ import com.intellij.openapi.module.ModuleTypeManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
+import java.util.Arrays;
+import java.util.Iterator;
 
 public class MinecraftModuleType extends JavaModuleType {
 
@@ -21,7 +23,7 @@ public class MinecraftModuleType extends JavaModuleType {
         return (MinecraftModuleType) ModuleTypeManager.getInstance().findByID(ID);
     }
 
-    public static void setOption(@NotNull Module module, @NotNull String option) {
+    public static void addOption(@NotNull Module module, @NotNull String option) {
         String currentOption = module.getOptionValue(OPTION);
         if (Strings.isNullOrEmpty(currentOption)) {
             currentOption = option;
@@ -31,6 +33,43 @@ public class MinecraftModuleType extends JavaModuleType {
             }
         }
         module.setOption(OPTION, currentOption);
+        MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
+        if (minecraftModule != null) {
+            minecraftModule.addModuleType(option);
+        }
+    }
+
+    public static void removeOption(@NotNull Module module, @NotNull String option) {
+        String currentOption = module.getOptionValue(OPTION);
+        if (Strings.isNullOrEmpty(currentOption)) {
+            return;
+        }
+
+        if (currentOption.contains(option)) {
+            String[] parts = currentOption.split(",");
+            String newOption = "";
+            Iterator<String> partIterator = Arrays.asList(parts).iterator();
+            while (partIterator.hasNext()) {
+                String part = partIterator.next();
+
+                if (part.equals(option)) {
+                    continue;
+                }
+
+                newOption += part;
+
+                if (partIterator.hasNext()) {
+                    newOption += ",";
+                }
+            }
+
+            module.setOption(OPTION, newOption);
+        }
+
+        MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
+        if (minecraftModule != null) {
+            minecraftModule.removeModuleType(option);
+        }
     }
 
     @NotNull
