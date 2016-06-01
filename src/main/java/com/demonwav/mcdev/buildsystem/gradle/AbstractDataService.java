@@ -94,16 +94,15 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                 }
             });
 
-            // Reset all other modules back to JavaModule
-            toImport.stream()
-                    .map(n -> modelsProvider.findIdeModule(n.getData().getOwnerModule()))
-                    .filter(m -> !checkedModules.contains(m) || badModules.contains(m))
-                    .forEach(m -> {
-                        if (Strings.nullToEmpty(m.getOptionValue("type")).equals(type.getId())) {
-                            m.setOption("type", JavaModuleType.getModuleType().getId());
-                        }
-                        MinecraftModuleType.removeOption(m, type.getId());
-                    });
+            // Reset all other modules back to JavaModule && remove the type
+            for (Module module : modelsProvider.getModules()) {
+                if (!checkedModules.contains(module) || badModules.contains(module)) {
+                    if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
+                        module.setOption("type", JavaModuleType.getModuleType().getId());
+                    }
+                    MinecraftModuleType.removeOption(module, type.getId());
+                }
+            }
         });
     }
 }

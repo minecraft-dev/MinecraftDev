@@ -22,6 +22,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -35,6 +37,8 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.xml.DomManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.concurrency.AsyncPromise;
+import org.jetbrains.concurrency.Promise;
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType;
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters;
 import org.jetbrains.idea.maven.model.MavenResource;
@@ -174,89 +178,117 @@ public class MavenBuildSystem extends BuildSystem {
     }
 
     @Override
-    public void reImport(@NotNull Module module) {
-        synchronized (lock) {
-            imported = true;
-            rootDirectory = ModuleRootManager.getInstance(module).getContentRoots()[0];
-            List<MavenProject> mavenProjects = MavenProjectsManager.getInstance(module.getProject()).getProjects();
+    public Promise<MavenBuildSystem> reImport(@NotNull Module module) {
+        imported = true;
+        AsyncPromise<MavenBuildSystem> promise = new AsyncPromise<>();
 
-            mavenProjects.stream()
-                    .filter(p -> p.getFile().getParent().equals(rootDirectory))
-                    .findFirst()
-                    .ifPresent(p -> {
+        MavenBuildSystem thisRef = this;
 
-                        artifactId = p.getMavenId().getArtifactId();
-                        groupId = p.getMavenId().getGroupId();
-                        version = p.getMavenId().getVersion();
+        ApplicationManager.getApplication().invokeLater(() -> {
+            ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Importing Maven Project", false) {
+                @Override
+                public void run(@NotNull ProgressIndicator indicator) {
+                    ApplicationManager.getApplication().runReadAction(() -> {
+                        rootDirectory = ModuleRootManager.getInstance(module).getContentRoots()[0];
+                        List<MavenProject> mavenProjects = MavenProjectsManager.getInstance(module.getProject()).getProjects();
 
-                        dependencies = p.getDependencies().stream()
-                                .map(d -> new BuildDependency(d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope()))
-                                .collect(Collectors.toList());
-                        repositories = p.getRemoteRepositories().stream()
-                                .map(r -> new BuildRepository(r.getId(), r.getUrl()))
-                                .collect(Collectors.toList());
+                        mavenProjects.stream()
+                                .filter(p -> p.getFile().getParent().equals(rootDirectory))
+                                .findFirst()
+                                .ifPresent(p -> {
 
-                        pomFile = p.getFile();
-                        sourceDirectories = p.getSources().stream()
-                                .map(LocalFileSystem.getInstance()::findFileByPath)
-                                .collect(Collectors.toList());
+                                    artifactId = p.getMavenId().getArtifactId();
+                                    groupId = p.getMavenId().getGroupId();
+                                    version = p.getMavenId().getVersion();
 
-                        resourceDirectories = p.getResources().stream()
-                                .map(MavenResource::getDirectory)
-                                .map(LocalFileSystem.getInstance()::findFileByPath)
-                                .collect(Collectors.toList());
+                                    dependencies = p.getDependencies().stream()
+                                            .map(d -> new BuildDependency(d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope()))
+                                            .collect(Collectors.toList());
+                                    repositories = p.getRemoteRepositories().stream()
+                                            .map(r -> new BuildRepository(r.getId(), r.getUrl()))
+                                            .collect(Collectors.toList());
 
-                        testSourcesDirectories = p.getTestSources().stream()
-                                .map(LocalFileSystem.getInstance()::findFileByPath)
-                                .collect(Collectors.toList());
+                                    pomFile = p.getFile();
+                                    sourceDirectories = p.getSources().stream()
+                                            .map(LocalFileSystem.getInstance()::findFileByPath)
+                                            .collect(Collectors.toList());
 
-                        testResourceDirectories = p.getTestResources().stream()
-                                .map(MavenResource::getDirectory)
-                                .map(LocalFileSystem.getInstance()::findFileByPath)
-                                .collect(Collectors.toList());
+                                    resourceDirectories = p.getResources().stream()
+                                            .map(MavenResource::getDirectory)
+                                            .map(LocalFileSystem.getInstance()::findFileByPath)
+                                            .collect(Collectors.toList());
 
-                        // Set author and plugin name, if set
-                        ApplicationManager.getApplication().runReadAction(() -> {
-                            PsiFile psiPomFile = PsiManager.getInstance(module.getProject()).findFile(pomFile);
-                            if (psiPomFile instanceof XmlFile) {
-                                XmlTag rootTag = ((XmlFile) psiPomFile).getRootTag();
+                                    testSourcesDirectories = p.getTestSources().stream()
+                                            .map(LocalFileSystem.getInstance()::findFileByPath)
+                                            .collect(Collectors.toList());
 
-                                if (rootTag != null) {
-                                    XmlTag nameTag = rootTag.findFirstSubTag("name");
+                                    testResourceDirectories = p.getTestResources().stream()
+                                            .map(MavenResource::getDirectory)
+                                            .map(LocalFileSystem.getInstance()::findFileByPath)
+                                            .collect(Collectors.toList());
 
-                                    if (nameTag != null) {
-                                        pluginName = nameTag.getValue().getText();
-                                    }
+                                    // Set author and plugin name, if set
+                                    ApplicationManager.getApplication().runReadAction(() -> {
+                                        PsiFile psiPomFile = PsiManager.getInstance(module.getProject()).findFile(pomFile);
+                                        if (psiPomFile instanceof XmlFile) {
+                                            XmlTag rootTag = ((XmlFile) psiPomFile).getRootTag();
 
-                                    // this is just awful...
-                                    // anyways, find the build version somewhere in there
-                                    XmlTag buildTag = rootTag.findFirstSubTag("build");
-                                    if (buildTag != null) {
-                                        XmlTag pluginsTag = buildTag.findFirstSubTag("plugins");
-                                        if (pluginsTag != null) {
-                                            XmlTag[] pluginTags = pluginsTag.findSubTags("plugin");
-                                            for (XmlTag pluginTag : pluginTags) {
-                                                XmlTag artifactIdTag = pluginTag.findFirstSubTag("artifactId");
-                                                if (artifactIdTag != null) {
-                                                    if (artifactIdTag.getValue().getText().equals("maven-compiler-plugin")) {
-                                                        XmlTag configuration = pluginTag.findFirstSubTag("configuration");
-                                                        if (configuration != null) {
-                                                            XmlTag sourceTag = configuration.findFirstSubTag("source");
-                                                            if (sourceTag != null) {
-                                                                buildVersion = sourceTag.getValue().getText();
-                                                                break;
-                                                            }
-                                                        }
+                                            if (rootTag != null) {
+                                                XmlTag nameTag = rootTag.findFirstSubTag("name");
+
+                                                if (nameTag != null) {
+                                                    pluginName = nameTag.getValue().getText();
+                                                }
+
+
+
+                                                // this is just awful...
+                                                // anyways, find the build version somewhere in there
+                                                XmlTag buildTag = rootTag.findFirstSubTag("build");
+                                                if (buildTag == null) {
+                                                    return;
+                                                }
+
+                                                XmlTag pluginsTag = buildTag.findFirstSubTag("plugins");
+                                                if (pluginsTag == null) {
+                                                    return;
+                                                }
+
+                                                XmlTag[] pluginTags = pluginsTag.findSubTags("plugin");
+                                                for (XmlTag pluginTag : pluginTags) {
+                                                    XmlTag artifactIdTag = pluginTag.findFirstSubTag("artifactId");
+                                                    if (artifactIdTag == null) {
+                                                        continue;
                                                     }
+
+                                                    if (!artifactIdTag.getValue().getText().equals("maven-compiler-plugin")) {
+                                                        continue;
+                                                    }
+
+                                                    XmlTag configuration = pluginTag.findFirstSubTag("configuration");
+                                                    if (configuration == null) {
+                                                        continue;
+                                                    }
+
+                                                    XmlTag sourceTag = configuration.findFirstSubTag("source");
+                                                    if (sourceTag == null) {
+                                                        continue;
+                                                    }
+
+                                                    buildVersion = sourceTag.getValue().getText();
+                                                    break;
                                                 }
                                             }
                                         }
-                                    }
-                                }
-                            }
-                        });
+                                    });
+                                });
                     });
-        }
+                    promise.setResult(thisRef);
+                }
+            });
+        });
+
+        return promise;
     }
 
     @Override

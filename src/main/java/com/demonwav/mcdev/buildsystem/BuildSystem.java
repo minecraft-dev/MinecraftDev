@@ -13,6 +13,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.concurrency.Promise;
 
 import java.util.HashMap;
 import java.util.List;
@@ -176,7 +177,7 @@ public abstract class BuildSystem {
      *
      * @param module The module
      */
-    public abstract void reImport(@NotNull Module module);
+    public abstract Promise<? extends BuildSystem> reImport(@NotNull Module module);
 
     /**
      * Return true when reImport has run.

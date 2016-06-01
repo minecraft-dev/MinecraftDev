@@ -36,8 +36,7 @@ public class MinecraftModule {
         minecraftModule.module = module;
         minecraftModule.buildSystem = BuildSystem.getInstance(module);
         if (minecraftModule.buildSystem != null) {
-            minecraftModule.buildSystem.reImport(module);
-            types.forEach(minecraftModule::register);
+            minecraftModule.buildSystem.reImport(module).done(buildSystem -> types.forEach(minecraftModule::register));
         }
         return minecraftModule;
     }
@@ -64,7 +63,9 @@ public class MinecraftModule {
     @Nullable
     public static MinecraftModule getInstance(@NotNull Module module) {
         if (map.containsKey(module)) {
-            return map.get(module);
+            MinecraftModule minecraftModule = map.get(module);
+            minecraftModule.checkModule();
+            return minecraftModule;
         } else {
             if (isModuleApplicable(module)) {
                 MinecraftModule minecraftModule = map.put(module, createFromModule(module));
@@ -78,9 +79,12 @@ public class MinecraftModule {
                         if (map.containsKey(parentModule)) {
                             MinecraftModule minecraftModule = map.get(parentModule);
                             map.put(module, minecraftModule);
-                            return map.get(module);
+                            minecraftModule.checkModule();
+                            return minecraftModule;
                         } else if (isModuleApplicable(parentModule)) {
-                            return map.put(parentModule, createFromModule(parentModule));
+                            MinecraftModule minecraftModule = map.put(parentModule, createFromModule(parentModule));
+                            ProjectView.getInstance(module.getProject()).refresh();
+                            return minecraftModule;
                         }
                     }
                 }
@@ -110,13 +114,17 @@ public class MinecraftModule {
     }
 
     public void checkModule() {
+        if (buildSystem == null) {
+            return;
+        }
+
         String moduleTypesString = module.getOptionValue(MinecraftModuleType.OPTION);
         if (moduleTypesString == null) {
             return;
         }
 
         List<String> moduleTypes = Arrays.asList(moduleTypesString.split(","));
-        List<String> modifiableModuletypes = new ArrayList<>(moduleTypes);
+        List<String> modifiableModuleTypes = new ArrayList<>(moduleTypes);
 
         List<String> toBeRemoved = modules.keySet().stream().map(AbstractModuleType::getId)
                 .filter(t -> !moduleTypes.contains(t)).collect(Collectors.toList());
@@ -136,13 +144,13 @@ public class MinecraftModule {
                 AbstractModuleType<?> type = PlatformType.getByName(s);
                 if (type != null) {
                     modules.remove(type);
-                    modifiableModuletypes.remove(s);
+                    modifiableModuleTypes.remove(s);
                 }
             }
         }
 
         // Write the changes to the module settings
-        module.setOption(MinecraftModuleType.OPTION, modifiableModuletypes.stream().collect(Collectors.joining(",")));
+        module.setOption(MinecraftModuleType.OPTION, modifiableModuleTypes.stream().collect(Collectors.joining(",")));
 
         ProjectView.getInstance(module.getProject()).refresh();
     }
