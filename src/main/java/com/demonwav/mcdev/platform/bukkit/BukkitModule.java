@@ -30,35 +30,19 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         if (buildSystem != null) {
             if (!buildSystem.isImported()) {
                 buildSystem.reImport(module).done(buildSystem  -> {
-                    pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
-
-                    if (pluginYml != null) {
-                        this.configManager = new PluginConfigManager(this);
-                    }
+                   setup();
                 });
+            } else {
+                setup();
             }
         }
     }
 
-    private BukkitModule(@NotNull Module module, @NotNull T type, @Nullable BuildSystem buildSystem) {
-        this.moduleType = type;
-        this.type = type.getPlatformType();
-        this.module = module;
-        this.buildSystem = buildSystem;
-        if (this.buildSystem == null) {
-            // set up build system
-            this.buildSystem = BuildSystem.getInstance(module);
-            if (this.buildSystem != null) {
-                // a valid build system was detected, import it
-                if (!this.buildSystem.isImported()) {
-                    this.buildSystem.reImport(module).done(b -> {
-                        pluginYml = b.findFile("plugin.yml", SourceType.RESOURCE);
-                        if (pluginYml != null) {
-                            this.configManager = new PluginConfigManager(this);
-                        }
-                    });
-                }
-            }
+    public void setup() {
+        pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
+
+        if (pluginYml != null) {
+            this.configManager = new PluginConfigManager(this);
         }
     }
 
