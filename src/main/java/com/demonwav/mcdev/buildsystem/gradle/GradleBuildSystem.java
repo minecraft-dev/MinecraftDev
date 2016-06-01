@@ -377,32 +377,12 @@ public class GradleBuildSystem extends BuildSystem {
                                             // I should probably remove scope, as I'm not even using it here...
                                             dependencies.add(new BuildDependency(groupId, artifactId, version, "provided"));
                                         } else if (child.getData() instanceof JavaProjectData) {
+                                            // kashike guilt tripped me into this
                                             JavaProjectData data = (JavaProjectData) child.getData();
-                                            switch (data.getLanguageLevel()) {
-                                                case JDK_1_3:
-                                                    buildVersion = "1.3";
-                                                    break;
-                                                case JDK_1_4:
-                                                    buildVersion = "1.4";
-                                                    break;
-                                                case JDK_1_5:
-                                                    buildVersion = "1.5";
-                                                    break;
-                                                case JDK_1_6:
-                                                    buildVersion = "1.6";
-                                                    break;
-                                                case JDK_1_7:
-                                                    buildVersion = "1.7";
-                                                    break;
-                                                case JDK_1_8:
-                                                    buildVersion = "1.8";
-                                                    break;
-                                                case JDK_1_9:
-                                                    buildVersion = "1.9";
-                                                    break;
-                                                case JDK_X:
-                                                    buildVersion = "X";
-                                                    break;
+                                            String languageLevelName = data.getLanguageLevel().name();
+                                            int index = languageLevelName.lastIndexOf('_') - 1;
+                                            if (index != -1) {
+                                                buildVersion = languageLevelName.substring(index, name.length()).replace("_", ".");
                                             }
                                         }
                                     });
