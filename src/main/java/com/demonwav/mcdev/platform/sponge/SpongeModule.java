@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
@@ -12,6 +13,8 @@ import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
+import java.util.Collections;
+import java.util.List;
 
 public class SpongeModule extends AbstractModule {
 
@@ -54,5 +57,19 @@ public class SpongeModule extends AbstractModule {
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "Parameter is not an instance of org.spongepowered.api.event.Event\n" +
         "Compiling and running this listener may result in a runtime exception";
+    }
+
+    @Override
+    public List<PsiClass> getEventPossibilities(List<BuildDependency> dependencies) {
+        BuildDependency spongeDependency = null;
+        for (BuildDependency dependency : dependencies) {
+            if (dependency.getArtifactId().equals("spongeapi")) {
+                spongeDependency = dependency;
+            }
+        }
+        if (spongeDependency == null) {
+            return Collections.emptyList();
+        }
+        return super.getEventPossibilities(dependencies);
     }
 }
