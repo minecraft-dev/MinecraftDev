@@ -68,6 +68,7 @@
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
         <projectViewNodeDecorator implementation="com.demonwav.mcdev.platform.MinecraftProjectViewNodeDecorator"/>
+        <deadCode implementation="com.demonwav.mcdev.inspection.PlatformAnnotationEntryPoint"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.idea.maven">
         <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.BukkitMavenImporter"/>
@@ -102,6 +103,11 @@
     </project-components>
 
     <actions>
-        <!-- Add your actions here -->
+        <action class="com.demonwav.mcdev.insight.generation.GenerateEventListenerAction"
+                id="GenerateEventListener"
+                text="Event Listener"
+                description="Generates a new Event Listener for the appropriate platform">
+            <add-to-group group-id="GenerateGroup" anchor="last"/>
+        </action>
     </actions>
 </idea-plugin>

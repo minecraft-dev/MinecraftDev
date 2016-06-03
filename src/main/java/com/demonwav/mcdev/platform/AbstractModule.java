@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.platform;
 
+import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 
 import com.intellij.openapi.module.Module;
@@ -7,6 +8,8 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 
 import javax.swing.Icon;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class AbstractModule {
     protected Module module;
@@ -42,5 +45,9 @@ public abstract class AbstractModule {
 
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "Parameter does not extend the proper Event Class!";
+    }
+
+    public List<PsiClass> getEventPossibilities(List<BuildDependency> dependencies) {
+        return Collections.emptyList();
     }
 }
