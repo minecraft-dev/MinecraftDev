@@ -44,10 +44,15 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
 
     @Override
     public JComponent getComponent() {
-        pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
+        if (creator.getArtifactId() == null) {
+            return panel;
+        }
+
+        String name = WordUtils.capitalize(creator.getArtifactId());
+        pluginNameField.setText(name);
         pluginVersionField.setText(creator.getVersion());
-        mainClassField.setText(this.creator.getGroupId() + '.' + this.creator.getArtifactId()
-                + '.' + WordUtils.capitalizeFully(this.creator.getArtifactId()));
+        mainClassField.setText(creator.getGroupId().toLowerCase() + '.' + creator.getArtifactId().toLowerCase()
+            + '.' + name);
 
         switch (creator.getType()) {
             case BUKKIT:
