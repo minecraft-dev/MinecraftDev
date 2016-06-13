@@ -7,7 +7,6 @@ import com.demonwav.mcdev.platform.forge.versionapi.ForgeVersion;
 import com.demonwav.mcdev.platform.forge.versionapi.McpVersion;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 
-import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -26,7 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import java.util.List;
 
-public class ForgeProjectSettingsWizard extends ModuleWizardStep {
+public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     private JTextField pluginNameField;
     private JTextField pluginVersionField;
@@ -44,7 +43,7 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
     private JProgressBar loadingBar;
     private JCheckBox generateDocsCheckbox;
 
-    private final ForgeProjectConfiguration settings;
+    private ForgeProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
     private McpVersion mcpVersion;
@@ -52,9 +51,9 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
 
     public boolean spongeForge = false;
 
-    public ForgeProjectSettingsWizard(MinecraftProjectCreator creator) {
+    public ForgeProjectSettingsWizard(MinecraftProjectCreator creator, int index) {
         this.creator = creator;
-        this.settings = (ForgeProjectConfiguration) creator.getSettings().stream().filter(s -> s instanceof ForgeProjectConfiguration).findFirst().get();
+        this.settings = (ForgeProjectConfiguration) creator.getSettings().get(index);
         minecraftVersionBox.addActionListener(e -> {
             setMcpVersion();
             setForgeVersion();
@@ -253,4 +252,9 @@ public class ForgeProjectSettingsWizard extends ModuleWizardStep {
 
     @Override
     public void updateDataModel() {}
+
+    @Override
+    public void setIndex(int index) {
+        this.settings = (ForgeProjectConfiguration) creator.getSettings().get(index);
+    }
 }

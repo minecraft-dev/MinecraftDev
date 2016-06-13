@@ -74,6 +74,14 @@ public class ForgeModule extends AbstractModule {
     }
 
     public VirtualFile getMcmod() {
+        if (buildSystem == null) {
+            buildSystem = BuildSystem.getInstance(module);
+        }
+        if (mcmod == null && buildSystem != null) {
+            // try and find the file again if it's not already present
+            // when this object was first created it may not have been ready
+            mcmod = buildSystem.findFile("mcmod.info", SourceType.RESOURCE);
+        }
         return mcmod;
     }
 }

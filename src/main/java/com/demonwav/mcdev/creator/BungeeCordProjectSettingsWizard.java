@@ -3,7 +3,6 @@ package com.demonwav.mcdev.creator;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
 
-import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -17,7 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
+public class BungeeCordProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     private static final String pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?";
 
@@ -31,13 +30,13 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
     private JTextField softDependField;
     private JComboBox<String> minecraftVersionBox;
 
-    private final BungeeCordProjectConfiguration settings;
+    private BungeeCordProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
-    public BungeeCordProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
+    public BungeeCordProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
         super();
         this.creator = creator;
-        this.settings = (BungeeCordProjectConfiguration) creator.getSettings().stream().filter(s -> s instanceof BungeeCordProjectConfiguration).findFirst().get();
+        this.settings = (BungeeCordProjectConfiguration) creator.getSettings().get(index);
     }
 
     @Override
@@ -109,4 +108,9 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
 
     @Override
     public void updateDataModel() {}
+
+    @Override
+    public void setIndex(int index) {
+        this.settings = (BungeeCordProjectConfiguration) creator.getSettings().get(index);
+    }
 }

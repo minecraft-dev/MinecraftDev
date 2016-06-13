@@ -4,7 +4,6 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
-import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -19,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class SpongeProjectSettingsWizard extends ModuleWizardStep {
+public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     private JTextField pluginNameField;
     private JTextField pluginVersionField;
@@ -32,12 +31,12 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
     private JTextField dependField;
     private JCheckBox generateDocumentedListenersCheckBox;
 
-    private final SpongeProjectConfiguration settings;
+    private SpongeProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
-    public SpongeProjectSettingsWizard(MinecraftProjectCreator creator) {
+    public SpongeProjectSettingsWizard(MinecraftProjectCreator creator, int index) {
         this.creator = creator;
-        this.settings = (SpongeProjectConfiguration) creator.getSettings().stream().filter(s -> s instanceof SpongeProjectConfiguration).findFirst().get();
+        this.settings = (SpongeProjectConfiguration) creator.getSettings().get(index);
     }
 
     @Override
@@ -114,4 +113,9 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
 
     @Override
     public void updateDataModel() {}
+
+    @Override
+    public void setIndex(int index) {
+        this.settings = (SpongeProjectConfiguration) creator.getSettings().get(index);
+    }
 }

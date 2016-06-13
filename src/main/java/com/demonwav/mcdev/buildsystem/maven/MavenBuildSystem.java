@@ -172,7 +172,6 @@ public class MavenBuildSystem extends BuildSystem {
                 RunnerAndConfigurationSettings runnerSettings = MavenRunConfigurationType.createRunnerAndConfigurationSettings(null, null, params, module.getProject());
                 runnerSettings.setName(module.getName() + " build");
                 RunManager.getInstance(project).addConfiguration(runnerSettings, false);
-                RunManager.getInstance(project).setSelectedConfiguration(runnerSettings);
             }
         });
     }

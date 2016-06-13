@@ -5,7 +5,6 @@ import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 
-import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -24,7 +23,7 @@ import static com.demonwav.mcdev.platform.PlatformType.BUKKIT;
 import static com.demonwav.mcdev.platform.PlatformType.PAPER;
 import static com.demonwav.mcdev.platform.PlatformType.SPIGOT;
 
-public class BukkitProjectSettingsWizard extends ModuleWizardStep {
+public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     private JTextField pluginNameField;
     private JTextField pluginVersionField;
@@ -41,12 +40,12 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     private JLabel title;
     private JComboBox<String> minecraftVersionBox;
 
-    private final BukkitProjectConfiguration settings;
+    private BukkitProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
-    public BukkitProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
+    public BukkitProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
         this.creator = creator;
-        this.settings = (BukkitProjectConfiguration) creator.getSettings().stream().filter(s -> s instanceof BukkitProjectConfiguration).findFirst().get();
+        this.settings = (BukkitProjectConfiguration) creator.getSettings().get(index);
     }
 
     @Override
@@ -141,4 +140,9 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
 
     @Override
     public void updateDataModel() {}
+
+    @Override
+    public void setIndex(int index) {
+        this.settings = (BukkitProjectConfiguration) creator.getSettings().get(index);
+    }
 }

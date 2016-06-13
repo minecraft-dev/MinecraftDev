@@ -1,16 +1,3 @@
-plugins {
-    id "com.qixalite.spongestart" version "1.4.6"
-}
-
-spongestart {
-    eula true
-
-    //optional configs
-    spongeVanillaBuild 'LATEST'
-    spongeForgeBuild 'LATEST'
-    vanillaServerFolder 'run'
-}
-
 repositories {
     mavenCentral()
 }

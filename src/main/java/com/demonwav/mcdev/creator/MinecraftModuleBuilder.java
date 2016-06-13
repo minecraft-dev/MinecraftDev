@@ -30,6 +30,12 @@ import java.io.File;
 public class MinecraftModuleBuilder extends JavaModuleBuilder {
 
     private MinecraftProjectCreator creator = new MinecraftProjectCreator();
+    private final ProjectSettingsWizardStep[] steps = new ProjectSettingsWizardStep[] {
+            new ProjectSettingsWizardStep(creator), // Bukkit, Spigot, Paper
+            new ProjectSettingsWizardStep(creator), // Sponge
+            new ProjectSettingsWizardStep(creator), // Forge
+            new ProjectSettingsWizardStep(creator)  // BungeeCord
+    };
 
     @Override
     public String getPresentableName() {
@@ -127,14 +133,14 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
 
     @Override
     public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
-        return new ModuleWizardStep[]{
+        return new ModuleWizardStep[] {
                 new SpongeForgeChooser(creator),
                 new BuildSystemWizardStep(creator),
                 // Due to this not allow dynamic steps at runtime, we just fill out all of them and skip the ones we don't use
-                new ProjectSettingsWizardStep(creator), // Bukkit, Spigot, Paper
-                new ProjectSettingsWizardStep(creator), // Sponge
-                new ProjectSettingsWizardStep(creator), // Forge
-                new ProjectSettingsWizardStep(creator)  // BungeeCord
+                steps[0], // Bukkit, Spigot, Paper
+                steps[1], // Sponge
+                steps[2], // Forge
+                steps[3]  // BungeeCord
         };
     }
 
@@ -143,7 +149,7 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
     @Nullable
     @Override
     public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
-        return new ProjectChooserWizardStep(creator);
+        return new ProjectChooserWizardStep(creator, steps);
     }
 
     @Override

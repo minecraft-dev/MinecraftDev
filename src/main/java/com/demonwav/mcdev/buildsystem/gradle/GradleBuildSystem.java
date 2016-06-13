@@ -280,7 +280,6 @@ public class GradleBuildSystem extends BuildSystem {
 
                 // Apply the run config and select it
                 RunManager.getInstance(project).addConfiguration(settings, false);
-                RunManager.getInstance(project).setSelectedConfiguration(settings);
             }, ModalityState.any());
         }
     }
@@ -382,7 +381,7 @@ public class GradleBuildSystem extends BuildSystem {
                                             String languageLevelName = data.getLanguageLevel().name();
                                             int index = languageLevelName.lastIndexOf('_') - 1;
                                             if (index != -1) {
-                                                buildVersion = languageLevelName.substring(index, name.length()).replace("_", ".");
+                                                buildVersion = languageLevelName.substring(index, languageLevelName.length()).replace("_", ".");
                                             }
                                         }
                                     });

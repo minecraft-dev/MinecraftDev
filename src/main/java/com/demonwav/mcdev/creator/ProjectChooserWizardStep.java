@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 public class ProjectChooserWizardStep extends ModuleWizardStep {
 
     private final MinecraftProjectCreator creator;
+    private final ProjectSettingsWizardStep[] steps;
 
     private JPanel chooserPanel;
     private JPanel panel;
@@ -58,9 +59,10 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             "<a href=\"http://files.minecraftforge.net/\"> Forge</a> mod, for use " +
             "on Forge servers.";
 
-    public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator) {
+    public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator, @NotNull ProjectSettingsWizardStep[] steps) {
         super();
         this.creator = creator;
+        this.steps = steps;
     }
 
     @Override
@@ -194,6 +196,11 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
 
         if (bungeeCordPluginCheckBox.isSelected()) {
             creator.getSettings().add(new BungeeCordProjectConfiguration());
+        }
+
+        creator.index = 0;
+        for (ProjectSettingsWizardStep step : steps) {
+            step.resetIndex();
         }
     }
 }

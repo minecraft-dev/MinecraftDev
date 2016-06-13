@@ -19,12 +19,16 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
     public static final String pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?";
 
     private MinecraftProjectCreator creator;
-    private ModuleWizardStep wizard;
+    private MinecraftModuleWizardStep wizard;
     private PlatformType type;
     private int index = -1;
 
     public ProjectSettingsWizardStep(@NotNull MinecraftProjectCreator creator) {
         this.creator = creator;
+    }
+
+    public void resetIndex() {
+        index = -1;
     }
 
     @Override
@@ -37,7 +41,7 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
         if (index == -1) {
             // This is first load, so we know two things
             //   1. The user got to this by clicking next
-            //   2. The index will be he current index instance on the creator
+            //   2. The index will be the current index instance on the creator
             // So we will set it likewise
             index = creator.index;
         } else {
@@ -54,23 +58,28 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
         // Grab all type changes
         PlatformType newType = creator.getSettings().get(creator.index).type;
         // We don't want to recreate the wizard (and nuke the settings) if the type hasn't changed
-        if (wizard == null || newType != this.type) {
+        if (wizard != null && newType == this.type) {
+            // Make sure it points to the right settings object, this may change if they go back and change the project
+            // types afterwards
+            wizard.setIndex(index);
+        } else {
             // remember what type we are now, so we know if it changes later
             this.type = newType;
-            if (creator.getSettings().get(creator.index) instanceof SpongeForgeProjectConfiguration) {
-                wizard = new ForgeProjectSettingsWizard(creator);
+            if (creator.getSettings().get(index) instanceof SpongeForgeProjectConfiguration) {
+                wizard = new ForgeProjectSettingsWizard(creator, index);
                 // This will set the icon and the title text
                 ((ForgeProjectSettingsWizard) wizard).spongeForge = true;
             } else if (newType == PlatformType.BUNGEECORD) {
-                wizard = new BungeeCordProjectSettingsWizard(creator);
+                wizard = new BungeeCordProjectSettingsWizard(creator, index);
             } else if (newType == PlatformType.SPONGE) {
-                wizard = new SpongeProjectSettingsWizard(creator);
+                wizard = new SpongeProjectSettingsWizard(creator, index);
             } else if (newType == PlatformType.FORGE) {
-                wizard = new ForgeProjectSettingsWizard(creator);
+                wizard = new ForgeProjectSettingsWizard(creator, index);
             } else {
-                wizard = new BukkitProjectSettingsWizard(creator);
+                wizard = new BukkitProjectSettingsWizard(creator, index);
             }
         }
+
         return wizard.getComponent();
     }
 

@@ -29,16 +29,14 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
             if (!buildSystem.isImported()) {
-                buildSystem.reImport(module).done(buildSystem  -> {
-                   setup();
-                });
+                buildSystem.reImport(module).done(buildSystem  -> setup());
             } else {
                 setup();
             }
         }
     }
 
-    public void setup() {
+    private void setup() {
         pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
 
         if (pluginYml != null) {
@@ -57,6 +55,9 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
     }
 
     public VirtualFile getPluginYml() {
+        if (buildSystem == null) {
+            buildSystem = BuildSystem.getInstance(module);
+        }
         if (pluginYml == null && buildSystem != null) {
             // try and find the file again if it's not already present
             // when this object was first created it may not have been ready
