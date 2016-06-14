@@ -30,11 +30,11 @@ style slightly modified). Link [here](http://www.demonwav.com/style).
 Developers
 ----------
 
-[**@DemonWav** Kyle Wood](https://github.com/DemonWav)
+[**@DemonWav** - Kyle Wood](https://github.com/DemonWav)
 
 #### **Contributors**
 
-- [**@gabizou** Gabriel Harris-Rouquette](https://github.com/gabizou)
+- [**@gabizou** - Gabriel Harris-Rouquette](https://github.com/gabizou)
 - [**@kashike**](https://github.com/kashike)
 
 License
