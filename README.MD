@@ -5,17 +5,17 @@ Minecraft Development IntelliJ Plugin [![forthebadge](http://forthebadge.com/ima
 Building
 --------
 
-Make sure you have Java 8 and Gradle (version >= 2.1) installed.
+Make sure you have Java 8 installed.
 
 Build the plugin with:
 
-`gradle clean buildPlugin`
+`./gradle clean buildPlugin`
 
 The output .zip file for the plugin will be in `build/distributions`.
 
 Test the plugin in IntelliJ with:
 
-`gradle clean runIdea`
+`./gradle clean runIdea`
 
 The [Gradle IntelliJ Plugin](https://github.com/JetBrains/gradle-intellij-plugin)
 will handle downloading the IntelliJ dependencies and packaging the
