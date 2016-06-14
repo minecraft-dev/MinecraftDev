@@ -87,12 +87,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class GradleBuildSystem extends BuildSystem {
-
-    final private static Pattern pattern = Pattern.compile("id='GradleModuleVersion\\{group='([a-zA-Z_\\-\\d\\.]+)', name='([a-zA-Z_\\-\\d\\.]+)', version='([a-zA-Z_\\-\\d\\.]+)'\\}'");
 
     @Nullable
     private VirtualFile buildGradle;
