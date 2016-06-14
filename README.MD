@@ -27,6 +27,16 @@ Style Guide
 This project will follow DemonWav's Java style guidelines (lol, Google's
 style slightly modified). Link [here](http://www.demonwav.com/style).
 
+Developers
+----------
+
+[**@DemonWav** Kyle Wood](https://github.com/DemonWav)
+
+#### **Contributors**
+
+- [**@gabizou** Gabriel Harris-Rouquette](https://github.com/gabizou)
+- [**@kashike**](https://github.com/kashike)
+
 License
 -------
 
