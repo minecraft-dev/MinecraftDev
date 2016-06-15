@@ -19,7 +19,8 @@ public class ForgeTemplate extends AbstractTemplate {
                                                 @NotNull String artifactId,
                                                 @NotNull String forgeVersion,
                                                 @NotNull String mcpVersion,
-                                                @NotNull String pluginVersion) {
+                                                @NotNull String pluginVersion,
+                                                boolean spongeForge) {
 
         Properties properties = new Properties();
         properties.setProperty("GROUP_ID", groupId);
@@ -27,6 +28,10 @@ public class ForgeTemplate extends AbstractTemplate {
         properties.setProperty("PLUGIN_VERSION", pluginVersion);
         properties.setProperty("FORGE_VERSION", forgeVersion);
         properties.setProperty("MCP_VERSION", mcpVersion);
+
+        if (spongeForge) {
+            properties.setProperty("SPONGE_FORGE", "true");
+        }
 
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_BUILD_GRADLE_TEMPLATE, properties);
@@ -40,13 +45,18 @@ public class ForgeTemplate extends AbstractTemplate {
                                                          @NotNull String artifactId,
                                                          @NotNull String forgeVersion,
                                                          @NotNull String mcpVersion,
-                                                         @NotNull String commonProjectName) {
+                                                         @NotNull String commonProjectName,
+                                                         boolean spongeForge) {
 
         Properties properties = new Properties();
         properties.setProperty("ARTIFACT_ID", artifactId);
         properties.setProperty("FORGE_VERSION", forgeVersion);
         properties.setProperty("MCP_VERSION", mcpVersion);
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
+
+        if (spongeForge) {
+            properties.setProperty("SPONGE_FORGE", "true");
+        }
 
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties);

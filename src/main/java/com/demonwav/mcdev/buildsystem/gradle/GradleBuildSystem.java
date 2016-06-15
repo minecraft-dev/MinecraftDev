@@ -118,7 +118,8 @@ public class GradleBuildSystem extends BuildSystem {
                             artifactId,
                             settings.forgeVersion,
                             settings.mcpVersion,
-                            version
+                            version,
+                            configuration instanceof SpongeForgeProjectConfiguration
                     );
 
                     if (configuration instanceof SpongeForgeProjectConfiguration) {
@@ -507,7 +508,8 @@ public class GradleBuildSystem extends BuildSystem {
                             artifactId,
                             settings.forgeVersion,
                             settings.mcpVersion,
-                            commonProjectName
+                            commonProjectName,
+                            configuration instanceof SpongeForgeProjectConfiguration
                     );
 
                     // We're only going to write the dependencies if it's a sponge forge project
