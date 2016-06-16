@@ -9,13 +9,13 @@ Make sure you have Java 8 installed.
 
 Build the plugin with:
 
-`./gradle clean buildPlugin`
+`./gradlew buildPlugin`
 
 The output .zip file for the plugin will be in `build/distributions`.
 
 Test the plugin in IntelliJ with:
 
-`./gradle clean runIdea`
+`./gradlew runIdea`
 
 The [Gradle IntelliJ Plugin](https://github.com/JetBrains/gradle-intellij-plugin)
 will handle downloading the IntelliJ dependencies and packaging the
