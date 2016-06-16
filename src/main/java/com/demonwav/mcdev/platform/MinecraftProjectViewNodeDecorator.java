@@ -1,6 +1,8 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.forge.ForgeModuleType;
+import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.projectView.ProjectViewNode;
@@ -61,6 +63,18 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
             AbstractModuleType<?> type = typeIterator.next();
 
             if (typeIterator.hasNext()) {
+                // Sponge Forge has it's own special icon
+                if (type.equals(SpongeModuleType.getInstance()) || type.equals(ForgeModuleType.getInstance())) {
+                    AbstractModuleType<?> next = typeIterator.next();
+
+                    // The first needs to be either sponge or forge, and the second needs to be either sponge or forge
+                    // We don't worry about duplicates here for simplicity's sake
+                    // We only want to apply the special icon if it's only sponge and forge, so these need to be the only two types
+                    if ((next.equals(SpongeModuleType.getInstance()) || next.equals(SpongeModuleType.getInstance())) && !typeIterator.hasNext()) {
+                        data.setIcon(PlatformAssets.SPONGE_FORGE_ICON);
+                        break;
+                    }
+                }
                 // There are more than one type in this collection, so use a minecraft icon
                 data.setIcon(PlatformAssets.MINECRAFT_ICON);
             } else {

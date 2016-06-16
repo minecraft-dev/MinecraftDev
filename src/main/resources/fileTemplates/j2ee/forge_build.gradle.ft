@@ -1,4 +1,3 @@
-// For those who want the bleeding edge
 buildscript {
     repositories {
         jcenter()
@@ -11,27 +10,22 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
 #end
-}
+    }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
 #if (${SPONGE_FORGE})
         classpath "gradle.plugin.org.spongepowered:spongegradle:0.6"
 #end
     }
 }
+
 apply plugin: 'net.minecraftforge.gradle.forge'
 #if (${SPONGE_FORGE})
 apply plugin: "org.spongepowered.plugin"
 #end
 
-/*
-// for people who want stable - not yet functional for MC 1.8.8 - we require the forgegradle 2.1 snapshot
-plugins {
-    id "net.minecraftforge.gradle.forge" version "2.0.2"
-}
-*/
 version = "${PLUGIN_VERSION}"
-group= "${GROUP_ID}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group= "${GROUP_ID}"
 archivesBaseName = "${ARTIFACT_ID}"
 
 minecraft {
@@ -52,26 +46,6 @@ repositories {
 }
 
 dependencies {
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-
-    // real examples
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // the 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
-    //provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // the deobf configurations:  'deobfCompile' and 'deobfProvided' are the same as the normal compile and provided,
-    // except that these dependencies get remapped to your current MCP mappings
-    //deobfCompile 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-    //deobfProvided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
 }
 
 processResources {

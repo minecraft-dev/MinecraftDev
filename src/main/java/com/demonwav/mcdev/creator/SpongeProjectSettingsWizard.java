@@ -13,6 +13,7 @@ import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,6 +31,7 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
     private JTextField websiteField;
     private JTextField dependField;
     private JCheckBox generateDocumentedListenersCheckBox;
+    private JComboBox<String> spongeApiVersionBox;
 
     private SpongeProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
@@ -109,6 +111,7 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
         settings.website = websiteField.getText();
 
         settings.generateDocumentedListeners = this.generateDocumentedListenersCheckBox.isSelected();
+        settings.spongeApiVersion = (String) spongeApiVersionBox.getSelectedItem();
     }
 
     @Override

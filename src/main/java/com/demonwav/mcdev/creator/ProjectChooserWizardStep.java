@@ -203,4 +203,9 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             step.resetIndex();
         }
     }
+
+//    @Override
+//    public boolean validate() throws ConfigurationException {
+//        return bukkitPluginCheckBox.isSelected() || spigotPluginCheckBox.isSelected() || paperPluginCheckBox.isSelected() || spongePluginCheckBox.isSelected() || forgeModCheckBox.isSelected() || bungeeCordPluginCheckBox.isSelected();
+//    }
 }

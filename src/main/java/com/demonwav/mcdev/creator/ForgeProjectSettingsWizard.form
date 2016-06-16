@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="panel" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="685" height="551"/>
+      <xy x="20" y="20" width="685" height="557"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -129,16 +129,16 @@
                       <model/>
                     </properties>
                   </component>
-                  <component id="3c9ae" class="javax.swing.JLabel">
+                  <component id="3c9ae" class="javax.swing.JLabel" binding="minecraftVersionLabel">
                     <constraints>
-                      <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                        <preferred-size width="127" height="17"/>
+                      <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                        <preferred-size width="-1" height="17"/>
                       </grid>
                     </constraints>
                     <properties>
                       <horizontalAlignment value="4"/>
                       <horizontalTextPosition value="4"/>
-                      <text value="Minecraft Version"/>
+                      <text value="    Minecraft Version"/>
                     </properties>
                   </component>
                   <component id="fb76c" class="javax.swing.JComboBox" binding="mcpVersionBox">
@@ -150,13 +150,13 @@
                   <component id="c1beb" class="javax.swing.JLabel">
                     <constraints>
                       <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                        <preferred-size width="97" height="17"/>
+                        <preferred-size width="-1" height="17"/>
                       </grid>
                     </constraints>
                     <properties>
                       <horizontalAlignment value="4"/>
                       <horizontalTextPosition value="4"/>
-                      <text value="MCP Version"/>
+                      <text value="    MCP Version"/>
                     </properties>
                   </component>
                   <component id="7dd91" class="javax.swing.JComboBox" binding="forgeVersionBox">
@@ -177,7 +177,7 @@
                       <text value="Forge Version"/>
                     </properties>
                   </component>
-                  <hspacer id="f5fb1">
+                  <hspacer id="a10ca">
                     <constraints>
                       <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>

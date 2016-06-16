@@ -29,6 +29,7 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
 
     public List<String> dependencies = new ArrayList<>();
     public boolean generateDocumentedListeners;
+    public String spongeApiVersion;
 
     public SpongeProjectConfiguration() {
         type = PlatformType.SPONGE;

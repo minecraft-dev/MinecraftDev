@@ -21,6 +21,7 @@ import java.io.IOException;
 public class SpongeForgeProjectConfiguration extends ForgeProjectConfiguration {
 
     public boolean generateDocumentation = false;
+    public String spongeApiVersion;
 
     public SpongeForgeProjectConfiguration() {
         // We set our platform type to sponge because we want it to provide us the dependency. The GradleBuildSystem

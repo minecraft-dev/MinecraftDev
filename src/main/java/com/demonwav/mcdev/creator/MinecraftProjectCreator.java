@@ -7,6 +7,8 @@ import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
+import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
+import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
 import com.google.common.base.Objects;
 import com.intellij.openapi.module.Module;
@@ -147,7 +149,11 @@ public class MinecraftProjectCreator {
                 buildRepository.setUrl("https://repo.spongepowered.org/maven/");
                 buildDependency.setGroupId("org.spongepowered");
                 buildDependency.setArtifactId("spongeapi");
-                buildDependency.setVersion("4.1.0-SNAPSHOT");
+                if (configuration instanceof SpongeProjectConfiguration) {
+                    buildDependency.setVersion(((SpongeProjectConfiguration) configuration).spongeApiVersion + "-SNAPSHOT");
+                } else {
+                    buildDependency.setVersion(((SpongeForgeProjectConfiguration) configuration).spongeApiVersion + "-SNAPSHOT");
+                }
             default:
                 break;
         }

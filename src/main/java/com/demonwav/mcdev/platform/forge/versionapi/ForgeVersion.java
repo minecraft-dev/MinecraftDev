@@ -70,6 +70,7 @@ public class ForgeVersion {
             if (v instanceof Map) {
                 Map number = (Map) v;
                 String currentVersion = (String) number.get("mcversion");
+
                 if (Objects.equal(currentVersion, version)) {
                     list.add((String) number.get("version"));
                 }

@@ -24,10 +24,8 @@ public final class PlatformAssets {
     public static final Icon SPONGE_ICON_DARK = loadIcon("/assets/platform/icons/SpongeDark.png");
     public static final Icon SPONGE_ICON_DARK_2X = loadIcon("/assets/platform/icons/SpongeDark@2x.png");
 
-    public static final Icon SPONGE_FORGE_ICON = MultiIcon.create(SPONGE_ICON, FORGE_ICON);
-    public static final Icon SPONGE_FORGE_ICON_2X = MultiIcon.create(SPONGE_ICON_2X, FORGE_ICON_2X);
-    public static final Icon SPONGE_FORGE_ICON_DARK = MultiIcon.create(SPONGE_ICON_DARK, FORGE_ICON);
-    public static final Icon SPONGE_FORGE_ICON_DARK_2X = MultiIcon.create(SPONGE_ICON_DARK_2X, FORGE_ICON_2X);
+    public static final Icon SPONGE_FORGE_ICON = loadIcon("/assets/platform/icons/SpongeForge.png");
+    public static final Icon SPONGE_FORGE_ICON_2X = loadIcon("/assets/platform/icons/SpongeForge@2x.png");
 
     public static final Icon BUNGEECORD_ICON = loadIcon("/assets/platform/icons/BungeeCord.png");
     public static final Icon BUNGEECORD_ICON_2X = loadIcon("/assets/platform/icons/BungeeCord@2x.png");

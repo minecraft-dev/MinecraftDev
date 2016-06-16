@@ -12,7 +12,6 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
-import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 
 import javax.swing.JCheckBox;
@@ -42,6 +41,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
     private JComboBox<String> mcpVersionBox;
     private JProgressBar loadingBar;
     private JCheckBox generateDocsCheckbox;
+    private JLabel minecraftVersionLabel;
 
     private ForgeProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
@@ -75,17 +75,23 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
                     }
 
                     minecraftVersionBox.removeAllItems();
-                    // reverse order the versions
-                    mcpVersion.getVersions().stream().sorted((one, two) -> one.compareTo(two) * -1).forEach(minecraftVersionBox::addItem);
-                    String recommended = forgeVersion.getRecommended(mcpVersion.getVersions());
 
-                    int index = 0;
-                    for (int i = 0; i < minecraftVersionBox.getItemCount(); i++) {
-                        if (minecraftVersionBox.getItemAt(i).equals(recommended)) {
-                            index = i;
+                    // reverse order the versions
+                    if (!spongeForge) {
+                        mcpVersion.getVersions().stream().sorted((one, two) -> one.compareTo(two) * -1).filter(s -> !s.equals("1.8") && !s.equals("1.7.10")).forEach(minecraftVersionBox::addItem);
+                        String recommended = forgeVersion.getRecommended(mcpVersion.getVersions());
+
+                        int index = 0;
+                        for (int i = 0; i < minecraftVersionBox.getItemCount(); i++) {
+                            if (minecraftVersionBox.getItemAt(i).equals(recommended)) {
+                                index = i;
+                            }
                         }
+                        minecraftVersionBox.setSelectedIndex(index);
+                    } else {
+                        minecraftVersionBox.addItem("4.1.0");
+                        minecraftVersionBox.addItem("5.0.0");
                     }
-                    minecraftVersionBox.setSelectedIndex(index);
 
                     setMcpVersion();
 
@@ -124,13 +130,11 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         loadingBar.setIndeterminate(true);
 
         if (spongeForge) {
-            if (UIUtil.isUnderDarcula()) {
-                title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X);
-            } else {
-                title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_DARK_2X);
-            }
+            title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X);
             title.setText("<html><font size=\"5\">Sponge Forge Settings</font></html>");
             generateDocsCheckbox.setVisible(true);
+
+            minecraftVersionLabel.setText("    Sponge API");
         }
 
         return panel;
@@ -141,7 +145,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
             return;
         }
 
-        String version = (String) minecraftVersionBox.getSelectedItem();
+        String version = getVersion();
 
         mcpVersionBox.removeAllItems();
         List<Integer> stable = mcpVersion.getStable(version);
@@ -163,7 +167,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
             return;
         }
 
-        String version = (String) minecraftVersionBox.getSelectedItem();
+        String version = getVersion();
 
         if (version == null) {
             return;
@@ -189,6 +193,20 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
             }
             forgeVersionBox.setSelectedIndex(index);
         }
+    }
+
+    private String getVersion() {
+        String version;
+        if (!spongeForge) {
+            version = (String) minecraftVersionBox.getSelectedItem();
+        } else {
+            if (minecraftVersionBox.getSelectedItem().equals("4.1.0")) {
+                version = "1.8.9";
+            } else {
+                version = "1.9.4";
+            }
+        }
+        return version;
     }
 
     @Override
@@ -240,6 +258,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         if (settings instanceof SpongeForgeProjectConfiguration) {
             SpongeForgeProjectConfiguration configuration = (SpongeForgeProjectConfiguration) settings;
             configuration.generateDocumentation = generateDocsCheckbox.isSelected();
+            configuration.spongeApiVersion = (String) minecraftVersionBox.getSelectedItem();
         }
 
         // If an error occurs while fetching the API, this may prevent the user from closing the dialog.

@@ -144,8 +144,6 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
         };
     }
 
-
-
     @Nullable
     @Override
     public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
