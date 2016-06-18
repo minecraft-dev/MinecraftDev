@@ -89,7 +89,7 @@ public class ForgeDataService extends AbstractDataService {
             if (file != null) {
                 GroovyFile groovyFile = (GroovyFile) PsiManager.getInstance(module.getProject()).findFile(file);
                 if (groovyFile != null) {
-                    if (groovyFile.getText().contains("'net.minecraftforge.gradle.forge'")) {
+                    if (groovyFile.getText().contains("net.minecraftforge.gradle.forge")) {
                         return true;
                     }
                 }

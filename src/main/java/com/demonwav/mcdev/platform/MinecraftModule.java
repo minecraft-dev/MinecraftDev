@@ -118,6 +118,13 @@ public class MinecraftModule {
             return;
         }
 
+        if (!buildSystem.isFinishImport()) {
+            if (!buildSystem.isImported()) {
+                buildSystem.reImport(module);
+            }
+            return;
+        }
+
         String moduleTypesString = module.getOptionValue(MinecraftModuleType.OPTION);
         if (moduleTypesString == null) {
             return;

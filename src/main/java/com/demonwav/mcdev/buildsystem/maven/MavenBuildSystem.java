@@ -55,6 +55,7 @@ public class MavenBuildSystem extends BuildSystem {
 
     private VirtualFile pomFile;
     private boolean imported = false;
+    private boolean finishImport = false;
 
     @Override
     public void create(@NotNull Project project, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
@@ -282,6 +283,7 @@ public class MavenBuildSystem extends BuildSystem {
                                     });
                                 });
                     });
+                    thisRef.finishImport = true;
                     promise.setResult(thisRef);
                 }
             });
@@ -293,5 +295,10 @@ public class MavenBuildSystem extends BuildSystem {
     @Override
     public boolean isImported() {
         return imported;
+    }
+
+    @Override
+    public boolean isFinishImport() {
+        return finishImport;
     }
 }

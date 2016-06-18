@@ -95,6 +95,7 @@ public class GradleBuildSystem extends BuildSystem {
     private VirtualFile buildGradle;
 
     private boolean imported = false;
+    private boolean finishImport = false;
 
     @Override
     public void create(@NotNull Project project, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
@@ -397,6 +398,7 @@ public class GradleBuildSystem extends BuildSystem {
                             }
                         }
                     });
+                    thisRef.finishImport = true;
                     promise.setResult(thisRef);
                 }
             })
@@ -407,6 +409,11 @@ public class GradleBuildSystem extends BuildSystem {
     @Override
     public boolean isImported() {
         return imported;
+    }
+
+    @Override
+    public boolean isFinishImport() {
+        return finishImport;
     }
 
     @NotNull

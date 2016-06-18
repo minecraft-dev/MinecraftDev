@@ -35,5 +35,5 @@ idea {
     }
 }
 
-group 'org.demonwav.minecraft-dev'
+group 'com.demonwav.minecraft-dev'
 version pluginVersion // Plugin version

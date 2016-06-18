@@ -12,13 +12,13 @@ buildscript {
 #end
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT"
 #if (${SPONGE_FORGE})
         classpath "gradle.plugin.org.spongepowered:spongegradle:0.6"
 #end
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: "net.minecraftforge.gradle.forge"
 #if (${SPONGE_FORGE})
 apply plugin: "org.spongepowered.plugin"
 #end
@@ -43,7 +43,7 @@ repositories {
 }
 
 dependencies {
-    compile project(':${COMMON_PROJECT_NAME}')
+    compile project(":${COMMON_PROJECT_NAME}")
 }
 
 processResources {
@@ -53,20 +53,20 @@ processResources {
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
+        include "mcmod.info"
 
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand "version":project.version, "mcversion":project.minecraft.version
     }
 
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+        exclude "mcmod.info"
     }
 }
 
 shadowJar {
     dependencies {
-        include(dependency(':${COMMON_PROJECT_NAME}'))
+        include(dependency(":${COMMON_PROJECT_NAME}"))
     }
 }

@@ -186,6 +186,13 @@ public abstract class BuildSystem {
      */
     public abstract boolean isImported();
 
+    /**
+     * Return true when reImport has finished.
+     *
+     * @return True if reImport has finished.
+     */
+    public abstract boolean isFinishImport();
+
     @Nullable
     public static BuildSystem getInstance(@NotNull Module module) {
         // generally the other way around, by synchronizing this block and the reImport for GradleBuildSystem and
