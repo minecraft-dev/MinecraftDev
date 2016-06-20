@@ -2,15 +2,18 @@ package com.demonwav.mcdev.buildsystem;
 
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
-import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.concurrency.Promise;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.Map;
  * represent changes in the project itself.
  */
 public abstract class BuildSystem {
+    protected final static Object lock = new Object();
 
     private static final Map<Module, BuildSystem> map = new HashMap<>();
 
@@ -43,7 +47,6 @@ public abstract class BuildSystem {
      * system's configuration. This is not the actual plugin name, which would be stated in the plugin's description
      * file, or the main class file, depending on the project. This field is null if this value is missing.
      */
-    @Nullable
     protected String pluginName;
 
     protected String buildVersion;
@@ -142,19 +145,18 @@ public abstract class BuildSystem {
      * the root directory, create a base module consisting of the necessary build system configuration files and
      * directory structure. This method does not create any classes or project-specific things, nor does it set up
      * any build configurations or enable the plugin for this build config. This will be done in
-     * {@link #finishSetup(Module, PlatformType, ProjectConfiguration)}.
+     * {@link #finishSetup(Module, ProjectConfiguration, ProgressIndicator)}.
      * <p>
      * It is legal for this method to have different default setups for each platform type, so the PlatformType and
      * ProjectConfiguration are provided here as well.
      *
-     * @param module The module
-     * @param type The type of the project
-     * @param configuration The configuration object for the project
+     * @param project The project
+     * @param configurations The configuration objects for the project
      */
-    public abstract void create(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration);
+    public abstract void create(@NotNull Project project, @NotNull ProjectConfiguration configurations, @NotNull ProgressIndicator indicator);
 
     /**
-     * This is called after {@link #create(Module, PlatformType, ProjectConfiguration)}, and after the module has set
+     * This is called after {@link #create(Project, ProjectConfiguration, ProgressIndicator)}, and after the module has set
      * itself up. This is when the build system should make whatever calls are necessary to enable the build system's
      * plugin, and setup whatever run configs should be setup for this build system.
      * <p>
@@ -162,63 +164,84 @@ public abstract class BuildSystem {
      * ProjectConfiguration are provided here as well.
      *
      * @param module the module
-     * @param type The type of the project
-     * @param configuration The configuration object for the project
+     * @param configurations The configuration object for the project
      */
-    public abstract void finishSetup(@NotNull Module module, @NotNull PlatformType type, @NotNull ProjectConfiguration configuration);
+    public abstract void finishSetup(@NotNull Module module, @NotNull ProjectConfiguration configurations, @NotNull ProgressIndicator indicator);
 
     /**
-     * This method performs similarly to {@link #create(Module, PlatformType, ProjectConfiguration)} in that it builds
+     * This method performs similarly to {@link #create(Project, ProjectConfiguration, ProgressIndicator)} in that it builds
      * this object's model of the project. The difference here is this method reads the project and builds the model
      * from the current project's state. The includes settings the artifactId, groupId, and version, setting the root
      * directory, building the list of dependencies and repositories, settings the source, test, and resource directories,
-     * and setting the build version, and whatever else may be added that consists of this project's build system state.*
+     * and setting the build version, and whatever else may be added that consists of this project's build system state.
      *
      * @param module The module
      */
-    public abstract void reImport(@NotNull Module module, @NotNull PlatformType type);
+    public abstract Promise<? extends BuildSystem> reImport(@NotNull Module module);
+
+    /**
+     * Return true when reImport has run.
+     *
+     * @return True if reImport has been run.
+     */
+    public abstract boolean isImported();
+
+    /**
+     * Return true when reImport has finished.
+     *
+     * @return True if reImport has finished.
+     */
+    public abstract boolean isFinishImport();
 
     @Nullable
     public static BuildSystem getInstance(@NotNull Module module) {
-        return map.computeIfAbsent(module, (m -> {
-            VirtualFile[] roots = ModuleRootManager.getInstance(module).getContentRoots();
-            if (roots.length > 0) {
-                VirtualFile root = roots[0];
-                if (root != null) {
-                    VirtualFile pom = root.findChild("pom.xml");
-                    VirtualFile gradle = root.findChild("build.gradle");
+        // generally the other way around, by synchronizing this block and the reImport for GradleBuildSystem and
+        // MavenBuildSystem, performance is significantly increased, as it dramatically decreases the number of times
+        // the module will be reimported.
+        synchronized (lock) {
+            return map.computeIfAbsent(module, (m -> {
+                VirtualFile[] roots = ModuleRootManager.getInstance(module).getContentRoots();
+                if (roots.length > 0) {
+                    VirtualFile root = roots[0];
+                    if (root != null) {
+                        VirtualFile pom = root.findChild("pom.xml");
+                        VirtualFile gradle = root.findChild("build.gradle");
 
-                    if (pom != null) {
-                        return new MavenBuildSystem();
-                    } else if (gradle != null) {
-                        return new GradleBuildSystem();
-                    } else {
-                        // We need to check if this is a multi-module gradle project
-                        Project project = module.getProject();
-                        String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(module);
-                        if (paths != null && paths.length > 1) {
-                            // The last element will be this module, the second to last is the parent
-                            String parentName = paths[paths.length - 2];
-                            Module parentModule = ModuleManager.getInstance(project).findModuleByName(parentName);
+                        if (pom != null) {
+                            return new MavenBuildSystem();
+                        } else if (gradle != null) {
+                            return new GradleBuildSystem();
+                        } else {
+                            // We need to check if this is a multi-module gradle project
+                            Project project = module.getProject();
+                            String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(module);
+                            if (paths != null && paths.length > 0) {
+                                // The first element is the parent
+                                String parentName = paths[0];
+                                Module parentModule = ModuleManager.getInstance(project).findModuleByName(parentName);
 
-                            if (parentModule != null) {
-                                root = ModuleRootManager.getInstance(parentModule).getContentRoots()[0];
-                                gradle = root.findChild("build.gradle");
+                                if (parentModule != null) {
+                                    root = ModuleRootManager.getInstance(parentModule).getContentRoots()[0];
+                                    pom = root.findChild("pom.xml");
+                                    gradle = root.findChild("build.gradle");
 
-                                if (gradle != null) {
-                                    return new GradleBuildSystem();
+                                    if (pom != null) {
+                                        return new MavenBuildSystem();
+                                    } else if (gradle != null) {
+                                        return new GradleBuildSystem();
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            return null;
-        }));
+                return null;
+            }));
+        }
     }
 
     @Nullable
-    public VirtualFile findFile(String path, SourceType type) {
+    public VirtualFile findFile(@NotNull String path, @NotNull SourceType type) {
         switch (type) {
             case SOURCE:
                 return findFile(sourceDirectories, path);
@@ -251,12 +274,18 @@ public abstract class BuildSystem {
                 '}';
     }
 
-    private VirtualFile findFile(List<VirtualFile> dirs, String path) {
+    @Nullable
+    @Contract("null, _ -> null")
+    private VirtualFile findFile(List<VirtualFile> dirs, @NotNull String path) {
         VirtualFile file;
         if (dirs == null) {
             return null;
         }
         for (VirtualFile dir : dirs) {
+            if (dir == null) {
+                continue;
+            }
+
             file = dir.findFileByRelativePath(path);
             if (file != null) {
                 return file;

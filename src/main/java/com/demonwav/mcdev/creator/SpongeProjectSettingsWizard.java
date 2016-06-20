@@ -3,7 +3,7 @@ package com.demonwav.mcdev.creator;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
-import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -13,12 +13,13 @@ import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class SpongeProjectSettingsWizard extends ModuleWizardStep {
+public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     private JTextField pluginNameField;
     private JTextField pluginVersionField;
@@ -30,12 +31,14 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
     private JTextField websiteField;
     private JTextField dependField;
     private JCheckBox generateDocumentedListenersCheckBox;
+    private JComboBox<String> spongeApiVersionBox;
 
-    private final SpongeProjectConfiguration settings = new SpongeProjectConfiguration();
+    private SpongeProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
-    public SpongeProjectSettingsWizard(MinecraftProjectCreator creator) {
+    public SpongeProjectSettingsWizard(MinecraftProjectCreator creator, int index) {
         this.creator = creator;
+        this.settings = (SpongeProjectConfiguration) creator.getSettings().get(index);
     }
 
     @Override
@@ -47,8 +50,18 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
         String name = WordUtils.capitalize(creator.getArtifactId());
         pluginNameField.setText(name);
         pluginVersionField.setText(creator.getVersion());
+
+        if (creator.index != 0) {
+            pluginNameField.setEditable(false);
+            pluginVersionField.setEditable(false);
+        }
+
         mainClassField.setText(creator.getGroupId().toLowerCase() + '.' + creator.getArtifactId().toLowerCase()
             + '.' + name);
+
+        if (creator.getSettings().size() > 1) {
+            mainClassField.setText(mainClassField.getText() + WordUtils.capitalizeFully(creator.getSettings().get(creator.index).type.name()));
+        }
 
         if (UIUtil.isUnderDarcula()) {
             title.setIcon(PlatformAssets.SPONGE_ICON_2X);
@@ -103,10 +116,14 @@ public class SpongeProjectSettingsWizard extends ModuleWizardStep {
         settings.website = websiteField.getText();
 
         settings.generateDocumentedListeners = this.generateDocumentedListenersCheckBox.isSelected();
-
-        creator.setSettings(settings);
+        settings.spongeApiVersion = (String) spongeApiVersionBox.getSelectedItem();
     }
 
     @Override
     public void updateDataModel() {}
+
+    @Override
+    public void setIndex(int index) {
+        this.settings = (SpongeProjectConfiguration) creator.getSettings().get(index);
+    }
 }

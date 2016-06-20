@@ -1,24 +1,27 @@
 package com.demonwav.mcdev.platform.bungeecord;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+
+import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleTypeManager;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
+import java.util.List;
 
-public class BungeeCordModuleType extends MinecraftModuleType {
+public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
 
     private static final String ID = "BUNGEECORD_MODULE_TYPE";
+    private static final BungeeCordModuleType instance = new BungeeCordModuleType();
 
-    public BungeeCordModuleType() {
-        super(ID, "net.md-5", "bungeecord-api");
+    private BungeeCordModuleType() {
+        super("net.md-5", "bungeecord-api");
     }
 
     public static BungeeCordModuleType getInstance() {
-        return (BungeeCordModuleType) ModuleTypeManager.getInstance().findByID(ID);
+        return instance;
     }
 
     @Override
@@ -37,12 +40,27 @@ public class BungeeCordModuleType extends MinecraftModuleType {
     }
 
     @Override
-    public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return PlatformAssets.BUNGEECORD_ICON;
+    public String getId() {
+        return ID;
     }
 
+    @NotNull
     @Override
-    public AbstractModule generateModule(Module module) {
+    public List<String> getIgnoredAnnotations() {
+        return ImmutableList.of("net.md_5.bungee.event.EventHandler");
+    }
+
+    @NotNull
+    @Override
+    public List<String> getListenerAnnotations() {
+        return ImmutableList.of("net.md_5.bungee.event.EventHandler");
+    }
+
+    @NotNull
+    @Override
+    public BungeeCordModule generateModule(Module module) {
         return new BungeeCordModule(module);
     }
+
+
 }

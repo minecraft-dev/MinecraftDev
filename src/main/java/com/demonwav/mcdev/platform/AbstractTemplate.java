@@ -1,38 +1,34 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
+
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
-import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Properties;
 
 public abstract class AbstractTemplate {
 
     @Nullable
-    public static String applyBuildGradleTemplate(@NotNull Module module,
+    public static String applyBuildGradleTemplate(@NotNull Project project,
                                                 @NotNull String groupId,
                                                 @NotNull String pluginVersion,
-                                                @Nullable String description,
                                                 @NotNull String buildVersion) {
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", buildVersion);
         properties.setProperty("PLUGIN_VERSION", pluginVersion);
         properties.setProperty("GROUP_ID", groupId);
-        if (description != null) {
-            properties.setProperty("HAS_DESCRIPTION", "true");
-            properties.setProperty("DESCRIPTION", description);
-        }
 
-        FileTemplateManager manager = FileTemplateManager.getInstance(module.getProject());
+        FileTemplateManager manager = FileTemplateManager.getInstance(project);
         FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUILD_GRADLE_TEMPLATE);
 
         try {
@@ -43,12 +39,61 @@ public abstract class AbstractTemplate {
         return null;
     }
 
-    protected static void applyTemplate(Module module, VirtualFile file, String templateName, Properties properties) throws IOException {
-        applyTemplate(module, file, templateName, properties, false);
+    public static void applyMultiModuleBuildGradleTemplate(@NotNull Project project,
+                                                           @NotNull VirtualFile file,
+                                                           @NotNull String groupId,
+                                                           @NotNull String pluginVersion,
+                                                           @NotNull String buildVersion) {
+        Properties properties = new Properties();
+        properties.setProperty("BUILD_VERSION", buildVersion);
+        properties.setProperty("VERSION", pluginVersion);
+        properties.setProperty("GROUP_ID", groupId);
+
+        try {
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MULTI_MODULE_BUILD_GRADLE_TEMPLATE, properties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    protected static void applyTemplate(Module module, VirtualFile file, String templateName, Properties properties, boolean trimNewlines) throws IOException {
-        FileTemplateManager manager = FileTemplateManager.getInstance(module.getProject());
+    public static void applySettingsGradleTemplate(@NotNull Project project,
+                                                   @NotNull VirtualFile  file,
+                                                   @NotNull String projectName,
+                                                   @NotNull String includes) {
+        Properties properties = new Properties();
+        properties.setProperty("PROJECT_NAME", projectName);
+        properties.setProperty("INCLUDES", includes);
+
+        try {
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.SETTINGS_GRADLE_TEMPLATE, properties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Nullable
+    public static String applySubmoduleBuildGradleTemplate(@NotNull Project project,
+                                                         @NotNull String commonProjectName) {
+        Properties properties = new Properties();
+        properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
+
+        FileTemplateManager manager = FileTemplateManager.getInstance(project);
+        FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SUBMODULE_BUILD_GRADLE_TEMPLATE);
+
+        try {
+            return template.getText(properties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    protected static void applyTemplate(Project project, VirtualFile file, String templateName, Properties properties) throws IOException {
+        applyTemplate(project, file, templateName, properties, false);
+    }
+
+    protected static void applyTemplate(Project project, VirtualFile file, String templateName, Properties properties, boolean trimNewlines) throws IOException {
+        FileTemplateManager manager = FileTemplateManager.getInstance(project);
         FileTemplate template = manager.getJ2eeTemplate(templateName);
 
         Properties allProperties = manager.getDefaultProperties();
@@ -60,9 +105,9 @@ public abstract class AbstractTemplate {
         }
         VfsUtil.saveText(file, text);
 
-        PsiFile psiFile = PsiManager.getInstance(module.getProject()).findFile(file);
+        PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
         if (psiFile != null) {
-            new ReformatCodeProcessor(module.getProject(), psiFile, null, false).run();
+            new ReformatCodeProcessor(project, psiFile, null, false).run();
         }
     }
 }

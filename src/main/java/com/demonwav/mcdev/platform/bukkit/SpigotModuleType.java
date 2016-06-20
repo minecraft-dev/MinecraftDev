@@ -1,27 +1,28 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
+
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleTypeManager;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
 
 public class SpigotModuleType extends BukkitModuleType {
 
     private static final String ID = "SPIGOT_MODULE_TYPE";
+    private static final SpigotModuleType instance = new SpigotModuleType();
 
-    public SpigotModuleType() {
+    private SpigotModuleType() {
         super(ID, "org.spigotmc", "spigot-api");
     }
 
-    public SpigotModuleType(final String ID, final String groupId, final String artifactId) {
+    protected SpigotModuleType(final String ID, final String groupId, final String artifactId) {
         super(ID, groupId, artifactId);
     }
 
     public static SpigotModuleType getInstance() {
-        return (SpigotModuleType) ModuleTypeManager.getInstance().findByID(ID);
+        return instance;
     }
 
     @Override
@@ -40,12 +41,13 @@ public class SpigotModuleType extends BukkitModuleType {
     }
 
     @Override
-    public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return PlatformAssets.SPIGOT_ICON;
+    public String getId() {
+        return ID;
     }
 
+    @NotNull
     @Override
-    public AbstractModule generateModule(Module module) {
-        return new BukkitModule(module, this);
+    public BukkitModule generateModule(Module module) {
+        return new BukkitModule<>(module, this);
     }
 }

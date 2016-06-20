@@ -10,6 +10,9 @@
 package com.demonwav.mcdev.platform.bukkit.maven;
 
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
+
+import com.intellij.openapi.module.JavaModuleType;
+import com.intellij.openapi.module.ModuleType;
 import org.jetbrains.annotations.NotNull;
 
 public class SpigotMavenImporter extends BukkitMavenImporter {
@@ -23,7 +26,7 @@ public class SpigotMavenImporter extends BukkitMavenImporter {
 
     @NotNull
     @Override
-    public SpigotModuleType getModuleType() {
-        return SpigotModuleType.getInstance();
+    public ModuleType getModuleType() {
+        return JavaModuleType.getModuleType();
     }
 }

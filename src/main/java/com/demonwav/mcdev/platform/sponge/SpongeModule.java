@@ -3,8 +3,9 @@ package com.demonwav.mcdev.platform.sponge;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
@@ -12,16 +13,15 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
 
-/**
- * Created by gabizou on 5/19/2016.
- */
 public class SpongeModule extends AbstractModule {
 
     SpongeModule(@NotNull Module module) {
         this.module = module;
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            buildSystem.reImport(module, PlatformType.SPONGE);
+            if (!buildSystem.isImported()) {
+                buildSystem.reImport(module);
+            }
         }
     }
 
@@ -31,7 +31,7 @@ public class SpongeModule extends AbstractModule {
     }
 
     @Override
-    public MinecraftModuleType getModuleType() {
+    public AbstractModuleType<SpongeModule> getModuleType() {
         return SpongeModuleType.getInstance();
     }
 
@@ -51,7 +51,7 @@ public class SpongeModule extends AbstractModule {
     }
 
     @Override
-    public String writeErrorMessageForEventParameter(PsiClass eventClass) {
+    public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "Parameter is not an instance of org.spongepowered.api.event.Event\n" +
         "Compiling and running this listener may result in a runtime exception";
     }

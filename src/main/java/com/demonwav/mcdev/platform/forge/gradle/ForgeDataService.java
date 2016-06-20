@@ -2,7 +2,10 @@ package com.demonwav.mcdev.platform.forge.gradle;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService;
+import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
+
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.externalSystem.model.DataNode;
@@ -11,19 +14,20 @@ import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 public class ForgeDataService extends AbstractDataService {
     public ForgeDataService() {
@@ -39,62 +43,58 @@ public class ForgeDataService extends AbstractDataService {
             return;
         }
 
-        Set<Module> goodModules = toImport.stream()
-                .map(n -> {
-                    Module module = modelsProvider.findIdeModule(n.getData().getOwnerModule());
-                    if (module != null) {
-                        VirtualFile file = modelsProvider.getModifiableRootModel(module).getContentRoots()[0];
-                        file = file.findFileByRelativePath("build.gradle");
-
-                        if (file != null) {
-                            GroovyFile groovyFile = (GroovyFile) PsiManager.getInstance(project).findFile(file);
-                            if (groovyFile != null) {
-                                if (groovyFile.getText().contains("apply plugin: 'net.minecraftforge.gradle.forge'")) {
-                                    return module;
-                                }
-                            }
-                        }
-                    }
-                    return null;
-                })
-                .filter(m -> m != null)
-                .distinct()
-                .collect(Collectors.toSet());
-
-        ForgeModuleType  type = ForgeModuleType.getInstance();
+        ForgeModuleType type = ForgeModuleType.getInstance();
         ApplicationManager.getApplication().runReadAction(() -> {
-            final Module module = modelsProvider.getModules()[0];
-            if (module != null) {
-                if (modelsProvider.getModules().length == 1) {
-                    // Okay so all that up there is only one case. The other case is when it's just a single module
-                    if (goodModules.contains(module)) {
-                        module.setOption("type", type.getId());
-                        java.util.Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(m -> m.reImport(module, type.getPlatformType()));
-                    } else {
-                        if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
-                            module.setOption("type", JavaModuleType.getModuleType().getId());
-                        }
-                    }
+            final Module[] modules = modelsProvider.getModules();
+            List<Module> forgeModules = new ArrayList<>();
+            for (Module module : modules) {
+                if (!checkModule(module, modelsProvider)) {
+                    // Make sure this isn't marked as a forge module
+                    MinecraftModuleType.removeOption(module, type.getId());
+                    continue;
+                }
+
+                forgeModules.add(module);
+            }
+
+            for (Module testModule : modelsProvider.getModules()) {
+                if (forgeModules.contains(testModule)) {
+                    testModule.setOption("type", JavaModuleType.getModuleType().getId());
+                    MinecraftModuleType.addOption(testModule, type.getId());
+                    Optional.ofNullable(BuildSystem.getInstance(testModule)).ifPresent(md -> md.reImport(testModule));
+                    Optional.ofNullable(MinecraftModule.getInstance(testModule)).ifPresent(MinecraftModule::checkModule);
                 } else {
-                    // This is a group of modules
-                    if (goodModules.stream().anyMatch(m -> {
-                        String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(m);
-                        if (paths != null && paths.length > 0) {
-                            if (Arrays.stream(paths).anyMatch(module.getName()::equals)) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    })) {
-                        module.setOption("type", type.getId());
-                        java.util.Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(m -> m.reImport(module, type.getPlatformType()));
-                    } else {
-                        if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
-                            module.setOption("type", JavaModuleType.getModuleType().getId());
-                        }
+                    if (Strings.nullToEmpty(testModule.getOptionValue("type")).equals(type.getId())) {
+                        testModule.setOption("type", JavaModuleType.getModuleType().getId());
                     }
                 }
             }
         });
+    }
+
+    @Contract("null, _ -> false")
+    private boolean checkModule(Module module, IdeModifiableModelsProvider provider) {
+        if (module != null) {
+            VirtualFile[] roots = provider.getModifiableRootModel(module).getContentRoots();
+            if (roots.length == 0) {
+                // last ditch effort
+                roots = ModuleRootManager.getInstance(module).getContentRoots();
+                if (roots.length == 0) {
+                    return false;
+                }
+            }
+            VirtualFile file = roots[0];
+            file = file.findFileByRelativePath("build.gradle");
+
+            if (file != null) {
+                GroovyFile groovyFile = (GroovyFile) PsiManager.getInstance(module.getProject()).findFile(file);
+                if (groovyFile != null) {
+                    if (groovyFile.getText().contains("net.minecraftforge.gradle.forge")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

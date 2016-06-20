@@ -3,27 +3,39 @@ package com.demonwav.mcdev.creator;
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
+import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
+import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
+import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
+
 import com.google.common.base.Objects;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import static com.demonwav.mcdev.platform.PlatformType.FORGE;
 
 public class MinecraftProjectCreator {
+
+    public int index = 0;
 
     private VirtualFile root = null;
     private String groupId = null;
     private String artifactId = null;
     private String version = null;
-    private PlatformType type = PlatformType.BUKKIT;
     private Module module = null;
     private BuildSystem buildSystem;
 
-    private ProjectConfiguration settings = null;
+    private List<ProjectConfiguration> settings = new ArrayList<>();
 
     private VirtualFile sourceDir;
     private VirtualFile resourceDir;
@@ -38,65 +50,117 @@ public class MinecraftProjectCreator {
         buildSystem.setVersion(version);
 
         //buildSystem.setPluginAuthor(settings.author); // TODO: build systems have "developer" blocks
-        buildSystem.setPluginName(settings.pluginName);
+        buildSystem.setPluginName(settings.get(0).pluginName);
 
         List<BuildRepository> buildRepositories = new ArrayList<>();
         List<BuildDependency> dependencies = new ArrayList<>();
         buildSystem.setRepositories(buildRepositories);
         buildSystem.setDependencies(dependencies);
 
+        if (settings.size() == 1) {
+            doSingleModuleCreate();
+        } else {
+            doMultiModuleCreate();
+        }
+    }
+
+    private void doSingleModuleCreate() {
+        ProjectConfiguration configuration = settings.get(0);
+        addDependencies(configuration, buildSystem.getRepositories(), buildSystem.getDependencies());
+
+        ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Setting Up Project", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+
+                buildSystem.create(module.getProject(), configuration, indicator);
+                configuration.create(module.getProject(), buildSystem, indicator);
+                configuration.type.getType().performCreationSettingSetup(module.getProject());
+                buildSystem.finishSetup(module, configuration, indicator);
+            }
+        });
+    }
+
+    private void doMultiModuleCreate() {
+        if (!(buildSystem instanceof GradleBuildSystem)) {
+            throw new IllegalStateException("BuildSystem must be Gradle");
+        }
+
+        GradleBuildSystem gradleBuildSystem = (GradleBuildSystem) buildSystem;
+        ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Setting Up Project", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+
+                Map<GradleBuildSystem, ProjectConfiguration> map = gradleBuildSystem.createMultiModuleProject(module.getProject(), settings, indicator);
+                map.forEach((g, p) -> {
+                    p.create(module.getProject(), g, indicator);
+                    p.type.getType().performCreationSettingSetup(module.getProject());
+                });
+                gradleBuildSystem.finishSetup(module, null, indicator);
+            }
+        });
+    }
+
+    public static void addDependencies(ProjectConfiguration configuration, List<BuildRepository> buildRepositories, List<BuildDependency> buildDependencies) {
+        // Forge doesn't have a dependency like this
+        if (configuration.type == FORGE) {
+            return;
+        }
+
         BuildRepository buildRepository = new BuildRepository();
-        BuildDependency dependency = new BuildDependency();
+        BuildDependency buildDependency = new BuildDependency();
+
         buildRepositories.add(buildRepository);
-        dependencies.add(dependency);
-        switch (type) {
+        buildDependencies.add(buildDependency);
+        switch (configuration.type) {
             case BUKKIT:
                 buildRepository.setId("spigotmc-repo");
                 buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
-                dependency.setGroupId("org.bukkit");
-                dependency.setArtifactId("bukkit");
-                dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
+                buildDependency.setGroupId("org.bukkit");
+                buildDependency.setArtifactId("bukkit");
+                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
                 break;
             case SPIGOT:
                 buildRepository.setId("spigotmc-repo");
                 buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
-                dependency.setGroupId("org.spigotmc");
-                dependency.setArtifactId("spigot-api");
-                dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
+                buildDependency.setGroupId("org.spigotmc");
+                buildDependency.setArtifactId("spigot-api");
+                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
                 addSonatype(buildRepositories);
                 break;
             case PAPER:
                 buildRepository.setId("destroystokyo-repo");
                 buildRepository.setUrl("https://repo.destroystokyo.com/content/groups/public/");
-                dependency.setGroupId("com.destroystokyo.paper");
-                dependency.setArtifactId("paper-api");
-                dependency.setVersion("1.9.4-R0.1-SNAPSHOT");
+                buildDependency.setGroupId("com.destroystokyo.paper");
+                buildDependency.setArtifactId("paper-api");
+                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
                 addSonatype(buildRepositories);
                 break;
             case BUNGEECORD:
                 buildRepository.setId("sonatype-oss-repo");
                 buildRepository.setUrl("https://oss.sonatype.org/content/groups/public/");
-                dependency.setGroupId("net.md-5");
-                dependency.setArtifactId("bungeecord-api");
-                dependency.setVersion("1.9-SNAPSHOT");
+                buildDependency.setGroupId("net.md-5");
+                buildDependency.setArtifactId("bungeecord-api");
+                buildDependency.setVersion(((BungeeCordProjectConfiguration) configuration).minecraftVersion + "-SNAPSHOT");
                 break;
             case SPONGE:
                 buildRepository.setId("spongepowered-repo");
                 buildRepository.setUrl("https://repo.spongepowered.org/maven/");
-                dependency.setGroupId("org.spongepowered");
-                dependency.setArtifactId("spongeapi");
-                dependency.setVersion("4.1.0-SNAPSHOT");
+                buildDependency.setGroupId("org.spongepowered");
+                buildDependency.setArtifactId("spongeapi");
+                if (configuration instanceof SpongeProjectConfiguration) {
+                    buildDependency.setVersion(((SpongeProjectConfiguration) configuration).spongeApiVersion + "-SNAPSHOT");
+                } else {
+                    buildDependency.setVersion(((SpongeForgeProjectConfiguration) configuration).spongeApiVersion + "-SNAPSHOT");
+                }
             default:
                 break;
         }
-        dependency.setScope("provided");
-
-        buildSystem.create(module, type, settings);
-        settings.create(module, type, buildSystem);
-        buildSystem.finishSetup(module, type, settings);
+        buildDependency.setScope("provided");
     }
 
-    private void addSonatype(List<BuildRepository> buildRepositories) {
+    private static void addSonatype(List<BuildRepository> buildRepositories) {
         buildRepositories.add(new BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/"));
     }
 
@@ -132,14 +196,6 @@ public class MinecraftProjectCreator {
         this.version = version;
     }
 
-    public PlatformType getType() {
-        return type;
-    }
-
-    public void setType(PlatformType type) {
-        this.type = type;
-    }
-
     public Module getModule() {
         return module;
     }
@@ -148,12 +204,8 @@ public class MinecraftProjectCreator {
         this.module = module;
     }
 
-    public ProjectConfiguration getSettings() {
+    public List<ProjectConfiguration> getSettings() {
         return settings;
-    }
-
-    public void setSettings(ProjectConfiguration settings) {
-        this.settings = settings;
     }
 
     public VirtualFile getSourceDir() {
@@ -203,7 +255,6 @@ public class MinecraftProjectCreator {
                 ", groupId='" + groupId + '\'' +
                 ", artifactId='" + artifactId + '\'' +
                 ", version='" + version + '\'' +
-                ", type=" + type +
                 ", module=" + module +
                 ", settings=" + settings +
                 ", sourceDir=" + sourceDir +
@@ -237,9 +288,6 @@ public class MinecraftProjectCreator {
         if (!Objects.equal(this.version, that.version)) {
             return false;
         }
-        if (type != that.type) {
-            return false;
-        }
         if (!Objects.equal(this.module, that.module)) {
             return false;
         }
@@ -266,7 +314,6 @@ public class MinecraftProjectCreator {
                 groupId,
                 artifactId,
                 version,
-                type,
                 module,
                 settings,
                 sourceDir,

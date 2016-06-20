@@ -1,28 +1,28 @@
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleTypeManager;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
 import java.util.List;
 
-public class SpongeModuleType extends MinecraftModuleType {
+public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
 
     private static final String ID = "SPONGE_MODULE_TYPE";
+    private static final SpongeModuleType instance = new SpongeModuleType();
 
-    public SpongeModuleType() {
-        super(ID, "org.spongepowered", "spongeapi");
+    private SpongeModuleType() {
+        super("org.spongepowered", "spongeapi");
     }
 
     public static SpongeModuleType getInstance() {
-        return (SpongeModuleType) ModuleTypeManager.getInstance().findByID(ID);
+        return instance;
     }
 
     @Override
@@ -49,12 +49,8 @@ public class SpongeModuleType extends MinecraftModuleType {
     }
 
     @Override
-    public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        if (UIUtil.isUnderDarcula()) {
-            return PlatformAssets.SPONGE_ICON_2X;
-        } else {
-            return PlatformAssets.SPONGE_ICON_DARK_2X;
-        }
+    public String getId() {
+        return ID;
     }
 
     @NotNull
@@ -63,13 +59,15 @@ public class SpongeModuleType extends MinecraftModuleType {
         return ImmutableList.of("org.spongepowered.api.event.Listener", "org.spongepowered.api.plugin.Plugin");
     }
 
-    @Override
-    public AbstractModule generateModule(Module module) {
-        return new SpongeModule(module);
-    }
-
+    @NotNull
     @Override
     public List<String> getListenerAnnotations() {
         return ImmutableList.of("org.spongepowered.api.event.Listener");
+    }
+
+    @NotNull
+    @Override
+    public SpongeModule generateModule(Module module) {
+        return new SpongeModule(module);
     }
 }

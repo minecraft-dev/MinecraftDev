@@ -2,7 +2,7 @@ package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
-import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -11,11 +11,12 @@ import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
+public class BungeeCordProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     private static final String pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?";
 
@@ -27,13 +28,15 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
     private JTextField authorField;
     private JTextField dependField;
     private JTextField softDependField;
+    private JComboBox<String> minecraftVersionBox;
 
-    private final BungeeCordProjectConfiguration settings = new BungeeCordProjectConfiguration();
+    private BungeeCordProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
-    public BungeeCordProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
+    public BungeeCordProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
         super();
         this.creator = creator;
+        this.settings = (BungeeCordProjectConfiguration) creator.getSettings().get(index);
     }
 
     @Override
@@ -45,8 +48,18 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
         String name = WordUtils.capitalize(creator.getArtifactId());
         pluginNameField.setText(name);
         pluginVersionField.setText(creator.getVersion());
+
+        if (creator.index != 0) {
+            pluginNameField.setEditable(false);
+            pluginVersionField.setEditable(false);
+        }
+
         mainClassField.setText(creator.getGroupId().toLowerCase() + '.' + creator.getArtifactId().toLowerCase()
             + '.' + name);
+
+        if (creator.getSettings().size() > 1) {
+            mainClassField.setText(mainClassField.getText() + WordUtils.capitalizeFully(creator.getSettings().get(creator.index).type.name()));
+        }
 
         return panel;
     }
@@ -88,16 +101,21 @@ public class BungeeCordProjectSettingsWizard extends ModuleWizardStep {
     @Override
     public void onStepLeaving() {
         super.onStepLeaving();
-        settings.pluginName = pluginNameField.getText();
-        settings.pluginVersion = pluginVersionField.getText();
-        settings.mainClass = mainClassField.getText();
-        settings.description = descriptionField.getText();
+        this.settings.pluginName = pluginNameField.getText();
+        this.settings.pluginVersion = pluginVersionField.getText();
+        this.settings.mainClass = mainClassField.getText();
+        this.settings.description = descriptionField.getText();
         this.settings.setAuthors(this.authorField.getText());
         this.settings.setDependencies(this.dependField.getText());
         this.settings.setSoftDependencies(this.softDependField.getText());
-        creator.setSettings(settings);
+        this.settings.minecraftVersion = (String) minecraftVersionBox.getSelectedItem();
     }
 
     @Override
     public void updateDataModel() {}
+
+    @Override
+    public void setIndex(int index) {
+        this.settings = (BungeeCordProjectConfiguration) creator.getSettings().get(index);
+    }
 }

@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
@@ -19,7 +20,7 @@ public abstract class AbstractModule {
         return buildSystem;
     }
 
-    public abstract MinecraftModuleType getModuleType();
+    public abstract AbstractModuleType<?> getModuleType();
     public abstract PlatformType getType();
     public abstract Icon getIcon();
 
@@ -39,7 +40,7 @@ public abstract class AbstractModule {
         return true;
     }
 
-    public String writeErrorMessageForEventParameter(PsiClass eventClass) {
+    public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "Parameter does not extend the proper Event Class!";
     }
 }

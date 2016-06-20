@@ -1,0 +1,15 @@
+group '${GROUP_ID}'
+version '${PLUGIN_VERSION}'
+
+apply plugin: 'java'
+
+sourceCompatibility = ${BUILD_VERSION}
+targetCompatibility = ${BUILD_VERSION}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}

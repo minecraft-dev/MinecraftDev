@@ -1,7 +1,10 @@
 package com.demonwav.mcdev.buildsystem.gradle;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.platform.AbstractModuleType;
+import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
+
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.externalSystem.model.DataNode;
@@ -30,9 +33,9 @@ import java.util.stream.Collectors;
 public abstract class AbstractDataService extends AbstractProjectDataService<LibraryDependencyData, Module> {
 
     @NotNull
-    private final MinecraftModuleType type;
+    private final AbstractModuleType type;
 
-    public AbstractDataService(@NotNull final MinecraftModuleType type) {
+    public AbstractDataService(@NotNull final AbstractModuleType type) {
         this.type = type;
     }
 
@@ -70,30 +73,36 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             goodModules.stream().forEach(m -> {
                 String[] path = modelsProvider.getModifiableModuleModel().getModuleGroupPath(m);
                 if (path == null) {
-                    m.setOption("type", type.getId());
+                    // Always reset back to JavaModule
+                    m.setOption("type", JavaModuleType.getModuleType().getId());
                     checkedModules.add(m);
-                    Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m, type.getPlatformType()));
+                    MinecraftModuleType.addOption(m, type.getId());
+                    Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m));
+                    Optional.ofNullable(MinecraftModule.getInstance(m)).ifPresent(MinecraftModule::checkModule);
                 } else {
                     String parentName = path[0];
                     Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
                     if (parentModule != null) {
-                        parentModule.setOption("type", type.getId());
+                        // Always reset back to JavaModule
+                        parentModule.setOption("type", JavaModuleType.getModuleType().getId());
                         badModules.add(m);
                         checkedModules.add(parentModule);
-                        Optional.ofNullable(BuildSystem.getInstance(parentModule)).ifPresent(thisModule -> thisModule.reImport(parentModule, type.getPlatformType()));
+                        MinecraftModuleType.addOption(parentModule, type.getId());
+                        Optional.ofNullable(BuildSystem.getInstance(parentModule)).ifPresent(thisModule -> thisModule.reImport(parentModule));
+                        Optional.ofNullable(MinecraftModule.getInstance(parentModule)).ifPresent(MinecraftModule::checkModule);
                     }
                 }
             });
 
-            // Reset all other modules back to JavaModule
-            toImport.stream()
-                    .map(n -> modelsProvider.findIdeModule(n.getData().getOwnerModule()))
-                    .filter(m -> !checkedModules.contains(m) || badModules.contains(m))
-                    .forEach(m -> {
-                        if (Strings.nullToEmpty(m.getOptionValue("type")).equals(type.getId())) {
-                            m.setOption("type", JavaModuleType.getModuleType().getId());
-                        }
-                    });
+            // Reset all other modules back to JavaModule && remove the type
+            for (Module module : modelsProvider.getModules()) {
+                if (!checkedModules.contains(module) || badModules.contains(module)) {
+                    if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
+                        module.setOption("type", JavaModuleType.getModuleType().getId());
+                    }
+                    MinecraftModuleType.removeOption(module, type.getId());
+                }
+            }
         });
     }
 }

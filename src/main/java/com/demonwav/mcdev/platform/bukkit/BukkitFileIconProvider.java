@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.platform.bukkit;
 
-import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.PlatformUtil;
+import com.demonwav.mcdev.platform.MinecraftModule;
+
 import com.intellij.ide.FileIconProvider;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -19,9 +19,17 @@ public class BukkitFileIconProvider implements FileIconProvider {
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {
         if (project != null) {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
-                AbstractModule bukkitModule = PlatformUtil.getInstance(module);
-                if (bukkitModule instanceof BukkitModule) {
-                    if (file.equals(((BukkitModule) bukkitModule).getPluginYml())) {
+                BukkitModule bukkitModule = MinecraftModule.getInstance(module, BukkitModuleType.getInstance());
+                if (bukkitModule == null) {
+                    bukkitModule = MinecraftModule.getInstance(module, SpigotModuleType.getInstance());
+                }
+
+                if (bukkitModule == null) {
+                    bukkitModule = MinecraftModule.getInstance(module, PaperModuleType.getInstance());
+                }
+
+                if (bukkitModule != null) {
+                    if (file.equals(bukkitModule.getPluginYml())) {
                         return bukkitModule.getIcon();
                     }
                 }

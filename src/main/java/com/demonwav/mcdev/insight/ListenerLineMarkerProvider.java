@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.insight;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+
 import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;

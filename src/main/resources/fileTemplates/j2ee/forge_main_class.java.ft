@@ -1,0 +1,18 @@
+package ${PACKAGE_NAME};
+
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+
+@Mod(
+        modid = "${ARTIFACT_ID}",
+        name = "${PLUGIN_NAME}",
+        version = "${PLUGIN_VERSION}"
+)
+public class ${CLASS_NAME} {
+
+    @EventHandler
+    public void init(FMLInitializationEvent event) {
+
+    }
+}

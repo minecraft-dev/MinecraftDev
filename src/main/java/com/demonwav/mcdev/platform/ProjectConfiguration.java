@@ -1,12 +1,14 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.intellij.codeInspection.ex.EntryPointsManager;
-import com.intellij.codeInspection.ex.EntryPointsManagerBase;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.util.JDOMExternalizableStringList;
+
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -20,8 +22,9 @@ public abstract class ProjectConfiguration {
     public String description = null;
     public final List<String> authors = new ArrayList<>();
     public String website = null;
+    public PlatformType type = null;
 
-    public abstract void create(@NotNull Module module, @NotNull PlatformType type, @NotNull BuildSystem buildSystem);
+    public abstract void create(@NotNull Project project, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator);
 
     public boolean hasAuthors() {
         return listContainsAtLeastOne(this.authors);
@@ -36,15 +39,12 @@ public abstract class ProjectConfiguration {
         return description != null && !description.trim().isEmpty();
     }
 
-    protected static String[] commaSplit(String string) {
+    @NotNull
+    protected static String[] commaSplit(@NotNull String string) {
         return string.trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*");
     }
 
-    protected void performCreationSettingSetup(Module module, PlatformType type) {
-        JDOMExternalizableStringList annotations = ((EntryPointsManagerBase) EntryPointsManager.getInstance(module.getProject())).ADDITIONAL_ANNOTATIONS;
-        type.getType().getIgnoredAnnotations().stream().filter(annotation -> !annotations.contains(annotation)).forEach(annotations::add);
-    }
-
+    @Contract("null -> false")
     protected static boolean listContainsAtLeastOne(List<String> list) {
         if (list == null || list.size() == 0) {
             return false;
@@ -59,5 +59,22 @@ public abstract class ProjectConfiguration {
         }
 
         return list.size() != 0;
+    }
+
+    public VirtualFile getMainClassDirectory(String[] files, VirtualFile file) {
+        try {
+            for (int i = 0, len = files.length - 1; i < len; i++) {
+                String s = files[i];
+                VirtualFile temp = file.findChild(s);
+                if (temp != null && temp.isDirectory()) {
+                    file = temp;
+                } else {
+                    file = file.createChildDirectory(this, s);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
     }
 }

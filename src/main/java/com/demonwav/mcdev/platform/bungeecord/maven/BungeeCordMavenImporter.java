@@ -10,15 +10,16 @@
 package com.demonwav.mcdev.platform.bungeecord.maven;
 
 import com.demonwav.mcdev.buildsystem.maven.AbstractMavenImporter;
-import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.PlatformUtil;
+import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModule;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
+
+import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.roots.ModuleRootManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.ResolveContext;
@@ -35,8 +36,8 @@ public class BungeeCordMavenImporter extends AbstractMavenImporter {
 
     @NotNull
     @Override
-    public BungeeCordModuleType getModuleType() {
-        return BungeeCordModuleType.getInstance();
+    public ModuleType getModuleType() {
+        return JavaModuleType.getModuleType();
     }
 
     @Override
@@ -48,11 +49,11 @@ public class BungeeCordMavenImporter extends AbstractMavenImporter {
         super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
         for (Module module : ModuleManager.getInstance(project).getModules()) {
             // We'll make sure the project is setup
-            if (Objects.equals(LocalFileSystem.getInstance().findFileByPath(ModuleUtil.getModuleDirPath(module)), mavenProject.getFile().getParent())) {
-                AbstractModule bungeeCordModule = PlatformUtil.getInstance(module);
-                if (bungeeCordModule instanceof BungeeCordModule) {
-                    ((BungeeCordModule) bungeeCordModule).setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
-                    break;
+            if (Objects.equals(ModuleRootManager.getInstance(module).getContentRoots()[0], mavenProject.getFile().getParent())) {
+                BungeeCordModule bungeeCordModule = MinecraftModule.getInstance(module, BungeeCordModuleType.getInstance());
+                if (bungeeCordModule != null) {
+                    bungeeCordModule.setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
+                    return;
                 }
             }
         }

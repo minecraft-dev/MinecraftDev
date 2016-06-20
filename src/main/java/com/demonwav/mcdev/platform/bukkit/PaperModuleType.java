@@ -1,23 +1,24 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
+
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleTypeManager;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
 
 public class PaperModuleType extends SpigotModuleType {
 
     private static final String ID = "PAPER_MODULE_TYPE";
+    private static final PaperModuleType instance = new PaperModuleType();
 
-    public PaperModuleType() {
+    private PaperModuleType() {
         super(ID, "com.destroystokyo.paper", "paper-api");
     }
 
     public static PaperModuleType getInstance() {
-        return (PaperModuleType) ModuleTypeManager.getInstance().findByID(ID);
+        return instance;
     }
 
     @Override
@@ -36,12 +37,13 @@ public class PaperModuleType extends SpigotModuleType {
     }
 
     @Override
-    public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return PlatformAssets.PAPER_ICON;
+    public String getId() {
+        return ID;
     }
 
+    @NotNull
     @Override
-    public AbstractModule generateModule(Module module) {
-        return new BukkitModule(module, this);
+    public BukkitModule generateModule(Module module) {
+        return new BukkitModule<>(module, this);
     }
 }

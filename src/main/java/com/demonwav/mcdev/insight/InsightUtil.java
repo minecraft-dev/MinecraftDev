@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.insight;
 
-import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.PlatformUtil;
+import com.demonwav.mcdev.platform.MinecraftModule;
+
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.Pair;
@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class InsightUtil {
 
@@ -31,7 +32,7 @@ public class InsightUtil {
         }
         // The PsiIdentifier is going to be a method of course!
         PsiMethod method = (PsiMethod) element.getParent();
-        if (method.hasModifierProperty(PsiModifier.ABSTRACT) || method.hasModifierProperty(PsiModifier.STATIC)) {
+        if (method.hasModifierProperty(PsiModifier.ABSTRACT) || method.hasModifierProperty(PsiModifier.STATIC) || method.hasModifierProperty(PsiModifier.PRIVATE)) {
             // I don't think any implementation allows for abstract or static method listeners.
             return null;
         }
@@ -40,13 +41,13 @@ public class InsightUtil {
         if (module == null) {
             return null;
         }
-        AbstractModule instance = PlatformUtil.getInstance(module);
+        MinecraftModule instance = MinecraftModule.getInstance(module);
         if (instance == null) {
             return null;
         }
         // Since each platform has their own valid listener annotations,
         // some platforms may have multiple allowed annotations for various cases
-        final List<String> listenerAnnotations = instance.getModuleType().getListenerAnnotations();
+        final List<String> listenerAnnotations = instance.getTypes().stream().flatMap(t -> t.getListenerAnnotations().stream()).collect(Collectors.toList());
         boolean contains = false;
         for (String listenerAnnotation : listenerAnnotations) {
             if (modifierList.findAnnotation(listenerAnnotation) != null) {

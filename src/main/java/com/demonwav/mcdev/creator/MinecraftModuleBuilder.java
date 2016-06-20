@@ -1,17 +1,14 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
-import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
-import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
-import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
-import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
+
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.JavaModuleType;
+import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAwareRunnable;
 import com.intellij.openapi.project.DumbService;
@@ -33,6 +30,12 @@ import java.io.File;
 public class MinecraftModuleBuilder extends JavaModuleBuilder {
 
     private MinecraftProjectCreator creator = new MinecraftProjectCreator();
+    private final ProjectSettingsWizardStep[] steps = new ProjectSettingsWizardStep[] {
+            new ProjectSettingsWizardStep(creator), // Bukkit, Spigot, Paper
+            new ProjectSettingsWizardStep(creator), // Sponge
+            new ProjectSettingsWizardStep(creator), // Forge
+            new ProjectSettingsWizardStep(creator)  // BungeeCord
+    };
 
     @Override
     public String getPresentableName() {
@@ -54,6 +57,12 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
         return JavaModuleBuilder.BUILD_SYSTEM_WEIGHT - 1;
     }
 
+    @Nullable
+    @Override
+    public String getBuilderId() {
+        return "MINECRAFT_MODULE";
+    }
+
     @Override
     public boolean isSuitableSdkType(SdkTypeId sdk) {
         return sdk == JavaSdk.getInstance();
@@ -63,6 +72,9 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
     public void setupRootModel(ModifiableRootModel modifiableRootModel) throws ConfigurationException {
         final Project project = modifiableRootModel.getProject();
         final VirtualFile root = createAndGetRoot();
+        if (root == null) {
+            return;
+        }
         modifiableRootModel.addContentEntry(root);
 
         if (getModuleJdk() != null) {
@@ -110,40 +122,32 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
     }
 
     @Override
-    public JavaModuleType getModuleType() {
-        switch (creator.getType()) {
-            case BUKKIT:
-                return BukkitModuleType.getInstance();
-            case SPIGOT:
-                return SpigotModuleType.getInstance();
-            case PAPER:
-                return PaperModuleType.getInstance();
-            case BUNGEECORD:
-                return BungeeCordModuleType.getInstance();
-            case SPONGE:
-                return SpongeModuleType.getInstance();
-            default: // This *should* not happen // TODO: Add Forge support
-                throw new IllegalStateException("MavenProjectXml type is not one of the three possible types.");
-        }
+    public ModuleType getModuleType() {
+        return JavaModuleType.getModuleType();
     }
 
     @Override
     public String getParentGroup() {
-        return "Minecraft MavenProjectXml";
+        return "Minecraft Project";
     }
 
     @Override
     public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
-        return new ModuleWizardStep[]{
+        return new ModuleWizardStep[] {
+                new SpongeForgeChooser(creator),
                 new BuildSystemWizardStep(creator),
-                new ProjectSettingsWizardStep(creator)
+                // Due to this not allow dynamic steps at runtime, we just fill out all of them and skip the ones we don't use
+                steps[0], // Bukkit, Spigot, Paper
+                steps[1], // Sponge
+                steps[2], // Forge
+                steps[3]  // BungeeCord
         };
     }
 
     @Nullable
     @Override
     public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
-        return new ProjectChooserWizardStep(creator);
+        return new ProjectChooserWizardStep(creator, steps);
     }
 
     @Override

@@ -2,6 +2,9 @@ package com.demonwav.mcdev.platform.sponge.maven;
 
 import com.demonwav.mcdev.buildsystem.maven.AbstractMavenImporter;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
+
+import com.intellij.openapi.module.JavaModuleType;
+import com.intellij.openapi.module.ModuleType;
 import org.jetbrains.annotations.NotNull;
 
 public class SpongeMavenImporter extends AbstractMavenImporter {
@@ -12,7 +15,7 @@ public class SpongeMavenImporter extends AbstractMavenImporter {
 
     @NotNull
     @Override
-    public SpongeModuleType getModuleType() {
-        return SpongeModuleType.getInstance();
+    public ModuleType getModuleType() {
+        return JavaModuleType.getModuleType();
     }
 }

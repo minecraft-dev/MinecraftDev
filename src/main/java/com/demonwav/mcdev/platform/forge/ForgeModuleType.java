@@ -1,22 +1,27 @@
 package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
-import com.intellij.openapi.module.ModuleTypeManager;
+
+import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.module.Module;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
+import java.util.List;
 
-public class ForgeModuleType extends MinecraftModuleType {
+public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
 
     private static final String ID = "FORGE_MODULE_TYPE";
+    private static final ForgeModuleType instance = new ForgeModuleType();
 
-    public ForgeModuleType() {
-        super(ID, "net.minecraftforge.gradle", "ForgeGradle");
+    private ForgeModuleType() {
+        super("net.minecraftforge.gradle", "ForgeGradle");
     }
 
     public static ForgeModuleType getInstance() {
-        return (ForgeModuleType) ModuleTypeManager.getInstance().findByID(ID);
+        return instance;
     }
 
     @Override
@@ -35,7 +40,32 @@ public class ForgeModuleType extends MinecraftModuleType {
     }
 
     @Override
-    public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return PlatformAssets.FORGE_ICON;
+    public String getId() {
+        return ID;
+    }
+
+    @NotNull
+    @Override
+    public List<String> getIgnoredAnnotations() {
+        return ImmutableList.of(
+                "net.minecraftforge.fml.common.Mod",
+                "net.minecraftforge.fml.common.Mod.EventHandler",
+                "net.minecraftforge.fml.common.eventhandler.SubscribeEvent"
+        );
+    }
+
+    @NotNull
+    @Override
+    public List<String> getListenerAnnotations() {
+        return ImmutableList.of(
+                "net.minecraftforge.fml.common.Mod.EventHandler",
+                "net.minecraftforge.fml.common.eventhandler.SubscribeEvent"
+        );
+    }
+
+    @NotNull
+    @Override
+    public ForgeModule generateModule(Module module) {
+        return new ForgeModule(module);
     }
 }

@@ -1,8 +1,5 @@
 group '${GROUP_ID}'
 version '${PLUGIN_VERSION}'
-#if (${HAS_DESCRIPTION})
-description '${DESCRIPTION}'
-#end
 
 apply plugin: 'java'
 

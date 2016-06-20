@@ -1,8 +1,8 @@
 package com.demonwav.mcdev.insight;
 
-import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.MinecraftModuleType;
-import com.demonwav.mcdev.platform.PlatformUtil;
+import com.demonwav.mcdev.platform.AbstractModuleType;
+import com.demonwav.mcdev.platform.MinecraftModule;
+
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.module.Module;
@@ -19,6 +19,7 @@ import com.intellij.psi.PsiTypeElement;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.List;
 
 public class ListenerEventAnnotator implements Annotator {
@@ -40,24 +41,27 @@ public class ListenerEventAnnotator implements Annotator {
         if (module == null) {
             return;
         }
-        AbstractModule instance = PlatformUtil.getInstance(module);
+        MinecraftModule instance = MinecraftModule.getInstance(module);
         if (instance == null) {
             return;
         }
         // Since each platform has their own valid listener annotations,
         // some platforms may have multiple allowed annotations for various cases
-        final MinecraftModuleType moduleType = instance.getModuleType();
-        final List<String> listenerAnnotations = moduleType.getListenerAnnotations();
+        final Collection<AbstractModuleType<?>> moduleTypes = instance.getTypes();
         boolean contains = false;
-        for (String listenerAnnotation : listenerAnnotations) {
-            if (modifierList.findAnnotation(listenerAnnotation) != null) {
-                contains = true;
-                break;
+        for (AbstractModuleType<?> moduleType : moduleTypes) {
+            final List<String> listenerAnnotations = moduleType.getListenerAnnotations();
+            for (String listenerAnnotation : listenerAnnotations) {
+                if (modifierList.findAnnotation(listenerAnnotation) != null) {
+                    contains = true;
+                    break;
+                }
             }
         }
         if (!contains) {
             return;
         }
+
         final PsiParameter[] parameters = method.getParameterList().getParameters();
         if (parameters.length < 1) {
             return;
@@ -90,11 +94,11 @@ public class ListenerEventAnnotator implements Annotator {
         }
 
         if (!isSuperEventListenerAllowed(eventClass, method, instance)) {
-            holder.createErrorAnnotation(eventParameter, instance.writeErrorMessageForEventParameter(eventClass));
+            holder.createErrorAnnotation(eventParameter, instance.writeErrorMessageForEvent(eventClass, method));
         }
     }
 
-    private static boolean isSuperEventListenerAllowed(PsiClass eventClass, PsiMethod method, AbstractModule module) {
+    private static boolean isSuperEventListenerAllowed(PsiClass eventClass, PsiMethod method, MinecraftModule module) {
         final PsiClass[] supers = eventClass.getSupers();
         for (PsiClass aSuper : supers) {
             if (module.isEventClassValid(aSuper, method)) {

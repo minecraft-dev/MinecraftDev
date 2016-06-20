@@ -2,6 +2,7 @@ package com.demonwav.mcdev.platform.bukkit.yaml;
 
 import com.demonwav.mcdev.platform.bukkit.BukkitModule;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitUtil;
+
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFileAdapter;
 import com.intellij.openapi.vfs.VirtualFileEvent;

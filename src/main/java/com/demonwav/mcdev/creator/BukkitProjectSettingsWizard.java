@@ -4,7 +4,7 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
-import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -19,7 +19,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class BukkitProjectSettingsWizard extends ModuleWizardStep {
+import static com.demonwav.mcdev.platform.PlatformType.BUKKIT;
+import static com.demonwav.mcdev.platform.PlatformType.PAPER;
+import static com.demonwav.mcdev.platform.PlatformType.SPIGOT;
+
+public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     private JTextField pluginNameField;
     private JTextField pluginVersionField;
@@ -34,12 +38,14 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
     private JTextField dependField;
     private JTextField softDependField;
     private JLabel title;
+    private JComboBox<String> minecraftVersionBox;
 
-    private BukkitProjectConfiguration settings = new BukkitProjectConfiguration();
-    private MinecraftProjectCreator creator;
+    private BukkitProjectConfiguration settings;
+    private final MinecraftProjectCreator creator;
 
-    public BukkitProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
+    public BukkitProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
         this.creator = creator;
+        this.settings = (BukkitProjectConfiguration) creator.getSettings().get(index);
     }
 
     @Override
@@ -51,21 +57,34 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
         String name = WordUtils.capitalize(creator.getArtifactId());
         pluginNameField.setText(name);
         pluginVersionField.setText(creator.getVersion());
+
+        if (creator.index != 0) {
+            pluginNameField.setEditable(false);
+            pluginVersionField.setEditable(false);
+        }
+
         mainClassField.setText(creator.getGroupId().toLowerCase() + '.' + creator.getArtifactId().toLowerCase()
             + '.' + name);
 
-        switch (creator.getType()) {
+        if (creator.getSettings().size() > 1) {
+            mainClassField.setText(mainClassField.getText() + WordUtils.capitalizeFully(creator.getSettings().get(creator.index).type.name()));
+        }
+
+        switch (creator.getSettings().get(creator.index).type) {
             case BUKKIT:
                 title.setIcon(PlatformAssets.BUKKIT_ICON_2X);
                 title.setText("<html><font size=\"5\">Bukkit Settings</font></html>");
+                settings.type = BUKKIT;
                 break;
             case SPIGOT:
                 title.setIcon(PlatformAssets.SPIGOT_ICON_2X);
                 title.setText("<html><font size=\"5\">Spigot Settings</font></html>");
+                settings.type = SPIGOT;
                 break;
             case PAPER:
                 title.setIcon(PlatformAssets.PAPER_ICON_2X);
                 title.setText("<html><font size=\"5\">Paper Settings</font></html>");
+                settings.type = PAPER;
                 break;
         }
 
@@ -110,20 +129,25 @@ public class BukkitProjectSettingsWizard extends ModuleWizardStep {
 
     @Override
     public void onStepLeaving() {
-        settings.pluginName = pluginNameField.getText();
-        settings.pluginVersion = pluginVersionField.getText();
-        settings.mainClass = mainClassField.getText();
-        settings.description = descriptionField.getText();
+        this.settings.pluginName = pluginNameField.getText();
+        this.settings.pluginVersion = pluginVersionField.getText();
+        this.settings.mainClass = mainClassField.getText();
+        this.settings.description = descriptionField.getText();
         this.settings.setAuthors(this.authorsField.getText());
-        settings.website = websiteField.getText();
-        settings.prefix = prefixField.getText();
+        this.settings.website = websiteField.getText();
+        this.settings.prefix = prefixField.getText();
         this.settings.loadOrder = this.loadOrderBox.getSelectedIndex() == 0 ? LoadOrder.POSTWORLD : LoadOrder.STARTUP;
         this.settings.setLoadBefore(this.loadBeforeField.getText());
         this.settings.setDependencies(this.dependField.getText());
         this.settings.setSoftDependencies(this.softDependField.getText());
-        creator.setSettings(settings);
+        this.settings.minecraftVersion = (String) minecraftVersionBox.getSelectedItem();
     }
 
     @Override
     public void updateDataModel() {}
+
+    @Override
+    public void setIndex(int index) {
+        this.settings = (BukkitProjectConfiguration) creator.getSettings().get(index);
+    }
 }
