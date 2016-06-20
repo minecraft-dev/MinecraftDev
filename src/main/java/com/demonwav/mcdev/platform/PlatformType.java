@@ -11,19 +11,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public enum PlatformType {
-    BUKKIT(BukkitModuleType.getInstance(), "BUKKIT_MODULE_TYPE"),
-    SPIGOT(SpigotModuleType.getInstance(), "SPIGOT_MODULE_TYPE"),
-    PAPER(PaperModuleType.getInstance(), "PAPER_MODULE_TYPE"),
-    FORGE(ForgeModuleType.getInstance(), "FORGE_MODULE_TYPE"),
-    SPONGE(SpongeModuleType.getInstance(), "SPONGE_MODULE_TYPE"),
-    BUNGEECORD(BungeeCordModuleType.getInstance(), "BUNGEECORD_MODULE_TYPE");
+    BUKKIT(BukkitModuleType.getInstance(), "BUKKIT_MODULE_TYPE", "Bukkit"),
+    SPIGOT(SpigotModuleType.getInstance(), "SPIGOT_MODULE_TYPE", "Spigot"),
+    PAPER(PaperModuleType.getInstance(), "PAPER_MODULE_TYPE", "Paper"),
+    FORGE(ForgeModuleType.getInstance(), "FORGE_MODULE_TYPE", "Forge"),
+    SPONGE(SpongeModuleType.getInstance(), "SPONGE_MODULE_TYPE", "Sponge"),
+    BUNGEECORD(BungeeCordModuleType.getInstance(), "BUNGEECORD_MODULE_TYPE", "BungeeCord");
 
     private final AbstractModuleType<?> type;
     private final String name;
+    private final String normalName;
 
-    PlatformType(final AbstractModuleType<?> type, final String name) {
+    PlatformType(final AbstractModuleType<?> type, final String name, final String normalName) {
         this.type = type;
         this.name = name;
+        this.normalName = normalName;
     }
 
     @NotNull
@@ -34,6 +36,11 @@ public enum PlatformType {
     @NotNull
     public String getName() {
         return name;
+    }
+
+    @NotNull
+    public String getNormalName() {
+        return normalName;
     }
 
     @Nullable

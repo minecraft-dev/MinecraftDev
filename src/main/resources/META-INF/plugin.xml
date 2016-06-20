@@ -26,6 +26,7 @@
           <li>Moved away from IntelliJ's ModuleType system in favor of our own</li>
           <li>Added code to transition from old ModuleType system to the new system</li>
           <li>Special support for SpongeForge project creation</li>
+          <li>New Paper icon</li>
           <li>Lots and lots of bug fixes</li>
           <li>Lots and lots of new bugs</li>
         </ul>

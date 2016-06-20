@@ -89,7 +89,7 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
 
                 BukkitTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className);
                 VirtualFile pluginYml = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "plugin.yml");
-                BukkitTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this);
+                BukkitTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this, buildSystem);
 
                 // Set the editor focus on the main class
                 PsiFile mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile);

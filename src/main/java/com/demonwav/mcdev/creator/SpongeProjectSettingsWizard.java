@@ -60,7 +60,7 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
             + '.' + name);
 
         if (creator.getSettings().size() > 1) {
-            mainClassField.setText(mainClassField.getText() + WordUtils.capitalizeFully(creator.getSettings().get(creator.index).type.name()));
+            mainClassField.setText(mainClassField.getText() + creator.getSettings().get(creator.index).type.getNormalName());
         }
 
         if (UIUtil.isUnderDarcula()) {
