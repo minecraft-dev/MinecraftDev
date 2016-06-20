@@ -15,21 +15,19 @@
 
     <change-notes><![CDATA[
       <div>
-        Alpha release, not many features, may break. More features to come.
+        Alpha release, not many features, may break. More features to come. Please report issues to
+        <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p><p>
         Recent changes:
         <ul>
-          <li>Fixed plugin.yml icon not showing up for project creation for Bukkit/BungeeCord</li>
-          <li>Change Gradle project creation to dynamically set repositories and dependencies</li>
-          <li>Fix Gradle's build config having, now uses Gradle instead of Groovy</li>
-          <li>Removed assertions in favor of if-statements which don't catastrophically fail</li>
-          <li>Removed Java version combo box on build settings wizard</li>
-          <li>Fixed NPE on Bukkit projects when it's opened and not yet ready</li>
-          <li>Changed wording from "Forge Plugin" to "Forge Mod"</li>
-          <li>Don't fully quality Sponge's plugin id</li>
-          <li>Fix Gradle project's BuildSystem content roots not being filled in</li>
-          <li>Add BungeeCord generator</li>
-          <li>Trim BungeeCord plugin.yml output</li>
+          <li>Forge support and project creation added</li>
+          <li>Single modules can now be multiple Minecraft module types</li>
+          <li>Module creation can now create several modules which share common code at the same time</li>
+          <li>Moved away from IntelliJ's ModuleType system in favor of our own</li>
+          <li>Added code to transition from old ModuleType system to the new system</li>
+          <li>Special support for SpongeForge project creation</li>
+          <li>Lots and lots of bug fixes</li>
+          <li>Lots and lots of new bugs</li>
         </ul>
       </div>
     ]]>

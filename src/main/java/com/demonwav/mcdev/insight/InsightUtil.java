@@ -32,7 +32,7 @@ public class InsightUtil {
         }
         // The PsiIdentifier is going to be a method of course!
         PsiMethod method = (PsiMethod) element.getParent();
-        if (method.hasModifierProperty(PsiModifier.ABSTRACT) || method.hasModifierProperty(PsiModifier.STATIC)) {
+        if (method.hasModifierProperty(PsiModifier.ABSTRACT) || method.hasModifierProperty(PsiModifier.STATIC) || method.hasModifierProperty(PsiModifier.PRIVATE)) {
             // I don't think any implementation allows for abstract or static method listeners.
             return null;
         }

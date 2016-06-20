@@ -14,7 +14,7 @@
         </constraints>
         <properties>
           <font size="22"/>
-          <icon value="assets/platform/icons/Sponge@2x.png"/>
+          <icon value="assets/platform/icons/SpongeForge@2x.png"/>
           <text value="Sponge Forge"/>
         </properties>
       </component>

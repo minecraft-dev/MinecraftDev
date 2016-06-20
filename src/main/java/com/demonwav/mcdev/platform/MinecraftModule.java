@@ -5,6 +5,7 @@ import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 
 import com.google.common.base.Strings;
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -159,7 +160,7 @@ public class MinecraftModule {
         // Write the changes to the module settings
         module.setOption(MinecraftModuleType.OPTION, modifiableModuleTypes.stream().collect(Collectors.joining(",")));
 
-        ProjectView.getInstance(module.getProject()).refresh();
+        ApplicationManager.getApplication().invokeLater(() -> ProjectView.getInstance(module.getProject()).refresh());
     }
 
     public Module getIdeaModule() {
