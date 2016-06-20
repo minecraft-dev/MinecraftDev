@@ -15,7 +15,7 @@ tasks.withType(JavaCompile) {
 
 intellij {
     // IntelliJ IDEA dependency
-    version ideaVersion
+    version project.hasProperty('intellij') ? project.getProperty('intellij') : ideaVersion
     // Bundled plugin dependencies 
     plugins = ['maven', 'gradle', 'Groovy', 'yaml']
     pluginName 'Minecraft Development'

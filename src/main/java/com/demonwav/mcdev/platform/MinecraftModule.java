@@ -115,6 +115,10 @@ public class MinecraftModule {
     }
 
     public void checkModule() {
+        if (module.getProject().isDisposed()) {
+            return;
+        }
+
         if (buildSystem == null) {
             return;
         }
@@ -123,6 +127,11 @@ public class MinecraftModule {
             if (!buildSystem.isImported()) {
                 buildSystem.reImport(module);
             }
+            return;
+        }
+
+        if (buildSystem.getDependencies() == null) {
+            //  The importer doesn't work sometimes? It seems to be an IntelliJ issue?
             return;
         }
 
@@ -155,12 +164,12 @@ public class MinecraftModule {
                     modifiableModuleTypes.remove(s);
                 }
             }
+
+            // Write the changes to the module settings
+            module.setOption(MinecraftModuleType.OPTION, modifiableModuleTypes.stream().collect(Collectors.joining(",")));
+
+            ApplicationManager.getApplication().invokeLater(() -> ProjectView.getInstance(module.getProject()).refresh());
         }
-
-        // Write the changes to the module settings
-        module.setOption(MinecraftModuleType.OPTION, modifiableModuleTypes.stream().collect(Collectors.joining(",")));
-
-        ApplicationManager.getApplication().invokeLater(() -> ProjectView.getInstance(module.getProject()).refresh());
     }
 
     public Module getIdeaModule() {
