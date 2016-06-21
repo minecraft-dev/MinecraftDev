@@ -62,7 +62,7 @@ public class ForgeDataService extends AbstractDataService {
                     testModule.setOption("type", JavaModuleType.getModuleType().getId());
                     MinecraftModuleType.addOption(testModule, type.getId());
                     Optional.ofNullable(BuildSystem.getInstance(testModule)).ifPresent(md -> md.reImport(testModule));
-                    Optional.ofNullable(MinecraftModule.getInstance(testModule)).ifPresent(MinecraftModule::checkModule);
+                    MinecraftModule.getInstance(testModule);
                 } else {
                     if (Strings.nullToEmpty(testModule.getOptionValue("type")).equals(type.getId())) {
                         testModule.setOption("type", JavaModuleType.getModuleType().getId());

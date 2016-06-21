@@ -37,6 +37,8 @@ public class MinecraftModuleType extends JavaModuleType {
         if (minecraftModule != null) {
             minecraftModule.addModuleType(option);
         }
+
+        cleanOption(module);
     }
 
     public static void removeOption(@NotNull Module module, @NotNull String option) {
@@ -70,6 +72,24 @@ public class MinecraftModuleType extends JavaModuleType {
         if (minecraftModule != null) {
             minecraftModule.removeModuleType(option);
         }
+
+        cleanOption(module);
+    }
+
+    private static void cleanOption(@NotNull Module module) {
+        String option = module.getOptionValue(OPTION);
+        if (Strings.isNullOrEmpty(option)) {
+            return;
+        }
+
+        // Remove ,'s at the beginning of the text
+        option = option.replaceAll("^,+", "");
+        // Remove ,'s at the end of the text
+        option = option.replaceAll(",+$", "");
+        // Remove duplicate ,'s
+        option = option.replaceAll(",{2,}", ",");
+
+        module.setOption(OPTION, option);
     }
 
     @NotNull

@@ -79,7 +79,7 @@ public abstract class AbstractMavenImporter extends MavenImporter {
                     MinecraftModuleType.addOption(module, type.getId());
                     // We want to make sure the project "knows" about this change
 
-                    Optional.ofNullable(MinecraftModule.getInstance(module)).ifPresent(MinecraftModule::checkModule);
+                    MinecraftModule.getInstance(module);
                 }));
             }
         }

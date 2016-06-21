@@ -4,6 +4,7 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractDataService extends AbstractProjectDataService<LibraryDependencyData, Module> {
 
     @NotNull
-    private final AbstractModuleType type;
+    private final AbstractModuleType<?> type;
 
     public AbstractDataService(@NotNull final AbstractModuleType type) {
         this.type = type;
@@ -54,12 +55,32 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             return;
         }
 
-        // Set module type accordingly
         Set<Module> goodModules = toImport.stream()
                 .filter(n -> n.getData().getExternalName().startsWith(type.getGroupId() + ":" + type.getArtifactId()))
                 .map(n -> modelsProvider.findIdeModule(n.getData().getOwnerModule()))
                 .distinct()
                 .collect(Collectors.toSet());
+
+        setupModules(goodModules, modelsProvider, type);
+    }
+
+    /**
+     * We have two checks for Sponge, so we hold the first one here until the second one finishes. This is so hacky it hurts.
+     */
+    private static Set<Module> firstGoodModules;
+
+    public static void setupModules(@NotNull Set<Module> goodModules,
+                                    @NotNull IdeModifiableModelsProvider modelsProvider,
+                                    @NotNull AbstractModuleType<?> type) {
+
+        if (type == SpongeModuleType.getInstance()) {
+            if (firstGoodModules == null) {
+                firstGoodModules = goodModules;
+                return;
+            }
+
+            goodModules.addAll(firstGoodModules);
+        }
 
         // So the way the Gradle plugin sets it up is with 3 modules. There's the parent module, which the Gradle
         // dependencies don't apply to, then submodules under it, normally main and test, which the Gradle dependencies
@@ -78,7 +99,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                     checkedModules.add(m);
                     MinecraftModuleType.addOption(m, type.getId());
                     Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m));
-                    Optional.ofNullable(MinecraftModule.getInstance(m)).ifPresent(MinecraftModule::checkModule);
+                    MinecraftModule.getInstance(m);
                 } else {
                     String parentName = path[0];
                     Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
@@ -89,7 +110,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                         checkedModules.add(parentModule);
                         MinecraftModuleType.addOption(parentModule, type.getId());
                         Optional.ofNullable(BuildSystem.getInstance(parentModule)).ifPresent(thisModule -> thisModule.reImport(parentModule));
-                        Optional.ofNullable(MinecraftModule.getInstance(parentModule)).ifPresent(MinecraftModule::checkModule);
+                        MinecraftModule.getInstance(parentModule);
                     }
                 }
             });
@@ -104,5 +125,9 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                 }
             }
         });
+
+        if (firstGoodModules != null) {
+            firstGoodModules = null;
+        }
     }
 }

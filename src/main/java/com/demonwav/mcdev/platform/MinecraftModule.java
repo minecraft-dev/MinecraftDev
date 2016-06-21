@@ -1,11 +1,9 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 
 import com.google.common.base.Strings;
 import com.intellij.ide.projectView.ProjectView;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -17,12 +15,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class MinecraftModule {
 
@@ -64,9 +60,7 @@ public class MinecraftModule {
     @Nullable
     public static MinecraftModule getInstance(@NotNull Module module) {
         if (map.containsKey(module)) {
-            MinecraftModule minecraftModule = map.get(module);
-            minecraftModule.checkModule();
-            return minecraftModule;
+            return map.get(module);
         } else {
             if (isModuleApplicable(module)) {
                 MinecraftModule minecraftModule = map.put(module, createFromModule(module));
@@ -80,7 +74,6 @@ public class MinecraftModule {
                         if (map.containsKey(parentModule)) {
                             MinecraftModule minecraftModule = map.get(parentModule);
                             map.put(module, minecraftModule);
-                            minecraftModule.checkModule();
                             return minecraftModule;
                         } else if (isModuleApplicable(parentModule)) {
                             MinecraftModule minecraftModule = map.put(parentModule, createFromModule(parentModule));
@@ -112,64 +105,6 @@ public class MinecraftModule {
             }
         }
         return false;
-    }
-
-    public void checkModule() {
-        if (module.getProject().isDisposed()) {
-            return;
-        }
-
-        if (buildSystem == null) {
-            return;
-        }
-
-        if (!buildSystem.isFinishImport()) {
-            if (!buildSystem.isImported()) {
-                buildSystem.reImport(module);
-            }
-            return;
-        }
-
-        if (buildSystem.getDependencies() == null) {
-            //  The importer doesn't work sometimes? It seems to be an IntelliJ issue?
-            return;
-        }
-
-        String moduleTypesString = module.getOptionValue(MinecraftModuleType.OPTION);
-        if (moduleTypesString == null) {
-            return;
-        }
-
-        List<String> moduleTypes = Arrays.asList(moduleTypesString.split(","));
-        List<String> modifiableModuleTypes = new ArrayList<>(moduleTypes);
-
-        List<String> toBeRemoved = modules.keySet().stream().map(AbstractModuleType::getId)
-                .filter(t -> !moduleTypes.contains(t)).collect(Collectors.toList());
-
-        modules.forEach((type, module) -> {
-            if (!buildSystem.getDependencies().stream().anyMatch(buildDependency ->
-                    buildDependency.getArtifactId().equals(type.getArtifactId()) && buildDependency.getGroupId().equals(type.getGroupId())
-            ) && !(type instanceof ForgeModuleType)) {
-                if (!toBeRemoved.contains(type.getPlatformType().getName())) {
-                    toBeRemoved.add(type.getPlatformType().getName());
-                }
-            }
-        });
-
-        if (toBeRemoved.size() > 0) {
-            for (String s : toBeRemoved) {
-                AbstractModuleType<?> type = PlatformType.getByName(s);
-                if (type != null) {
-                    modules.remove(type);
-                    modifiableModuleTypes.remove(s);
-                }
-            }
-
-            // Write the changes to the module settings
-            module.setOption(MinecraftModuleType.OPTION, modifiableModuleTypes.stream().collect(Collectors.joining(",")));
-
-            ApplicationManager.getApplication().invokeLater(() -> ProjectView.getInstance(module.getProject()).refresh());
-        }
     }
 
     public Module getIdeaModule() {
