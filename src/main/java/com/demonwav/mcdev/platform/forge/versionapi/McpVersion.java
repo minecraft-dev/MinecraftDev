@@ -2,6 +2,7 @@ package com.demonwav.mcdev.platform.forge.versionapi;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.intellij.openapi.util.Pair;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,10 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class McpVersion {
 
@@ -43,22 +41,33 @@ public class McpVersion {
         return map.keySet();
     }
 
-    @Nullable
-    public List<Integer> getSnapshot(String version) {
+    @NotNull
+    public Pair<List<Integer>, List<Integer>> getSnapshot(String version) {
         return get(version, "snapshot");
     }
 
-    @Nullable
-    public List<Integer> getStable(String version) {
+    @NotNull
+    public Pair<List<Integer>, List<Integer>> getStable(String version) {
         return get(version, "stable");
     }
 
-    @Nullable
-    private List<Integer> get(String version, String type) {
-        Map<String, List<Integer>> versions = map.get(version);
-        if (versions != null) {
-            return versions.get(type);
+    @NotNull
+    private Pair<List<Integer>, List<Integer>> get(String version, String type) {
+        List<Integer> good = new ArrayList<>();
+        List<Integer> bad = new ArrayList<>();
+
+        Set<String> keySet = map.keySet();
+        for (String key : keySet) {
+            Map<String, List<Integer>> versions = map.get(key);
+            if (versions != null) {
+                if (key.equals(version)) {
+                    good.addAll(versions.get(type));
+                } else {
+                    bad.addAll(versions.get(type));
+                }
+            }
         }
-        return null;
+
+        return new Pair<>(good, bad);
     }
 }

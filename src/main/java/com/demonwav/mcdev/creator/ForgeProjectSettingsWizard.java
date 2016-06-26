@@ -11,6 +11,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.Pair;
 import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang.WordUtils;
 
@@ -22,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
@@ -42,6 +44,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
     private JProgressBar loadingBar;
     private JCheckBox generateDocsCheckbox;
     private JLabel minecraftVersionLabel;
+    private JLabel mcpWarning;
 
     private ForgeProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
@@ -49,11 +52,23 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
     private McpVersion mcpVersion;
     private ForgeVersion forgeVersion;
 
+    private final ActionListener mcpBoxActionListener = e -> {
+        if (((String) mcpVersionBox.getSelectedItem()).contains("html")) {
+            mcpWarning.setVisible(true);
+        } else {
+            mcpWarning.setVisible(false);
+        }
+    };
+
     public boolean spongeForge = false;
 
     public ForgeProjectSettingsWizard(MinecraftProjectCreator creator, int index) {
         this.creator = creator;
         this.settings = (ForgeProjectConfiguration) creator.getSettings().get(index);
+
+        generateDocsCheckbox.setVisible(false);
+        mcpWarning.setVisible(false);
+
         minecraftVersionBox.addActionListener(e -> {
             setMcpVersion();
             setForgeVersion();
@@ -78,7 +93,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
                     // reverse order the versions
                     if (!spongeForge) {
-                        mcpVersion.getVersions().stream().sorted((one, two) -> one.compareTo(two) * -1).filter(s -> !s.equals("1.8") && !s.equals("1.7.10")).forEach(minecraftVersionBox::addItem);
+                        forgeVersion.getSortedMcVersions().forEach(minecraftVersionBox::addItem);
                         String recommended = forgeVersion.getRecommended(mcpVersion.getVersions());
 
                         int index = 0;
@@ -147,19 +162,22 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
         String version = getVersion();
 
+        mcpVersionBox.removeActionListener(mcpBoxActionListener);
         mcpVersionBox.removeAllItems();
-        List<Integer> stable = mcpVersion.getStable(version);
-        if (stable == null) {
-            return;
-        }
 
-        stable.stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> "stable_" + s).forEach(mcpVersionBox::addItem);
-        List<Integer> snapshot = mcpVersion.getSnapshot(version);
-        if (snapshot == null) {
-            return;
-        }
+        Pair<List<Integer>, List<Integer>> stable = mcpVersion.getStable(version);
+        stable.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> "stable_" + s).forEach(mcpVersionBox::addItem);
 
-        snapshot.stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> "snapshot_" + s).forEach(mcpVersionBox::addItem);
+        Pair<List<Integer>, List<Integer>> snapshot = mcpVersion.getSnapshot(version);
+        snapshot.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> "snapshot_" + s).forEach(mcpVersionBox::addItem);
+
+        // The "seconds" in the pairs are bad, but still available to the user
+        // We will color them read
+
+        stable.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> "<html><font color='red'>stable_" + s + "</font></html>").forEach(mcpVersionBox::addItem);
+        snapshot.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> "<html><font color='red'>snapshot_" + s + "</font></html>").forEach(mcpVersionBox::addItem);
+
+        mcpVersionBox.addActionListener(mcpBoxActionListener);
     }
 
     private void setForgeVersion() {
@@ -254,6 +272,10 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         settings.updateUrl = updateUrlField.getText();
 
         settings.mcpVersion = (String) mcpVersionBox.getSelectedItem();
+        if (settings.mcpVersion.contains("html")) {
+            settings.mcpVersion = settings.mcpVersion.substring("<html><font color='red'>".length());
+            settings.mcpVersion = settings.mcpVersion.substring(0, settings.mcpVersion.indexOf("<"));
+        }
 
         if (settings instanceof SpongeForgeProjectConfiguration) {
             SpongeForgeProjectConfiguration configuration = (SpongeForgeProjectConfiguration) settings;
