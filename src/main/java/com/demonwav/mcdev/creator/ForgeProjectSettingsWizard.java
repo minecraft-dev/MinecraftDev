@@ -5,6 +5,7 @@ import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.forge.versionapi.ForgeVersion;
 import com.demonwav.mcdev.platform.forge.versionapi.McpVersion;
+import com.demonwav.mcdev.platform.forge.versionapi.McpVersionEntry;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 
 import com.intellij.openapi.options.ConfigurationException;
@@ -40,7 +41,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
     private JTextField updateUrlField;
     private JComboBox<String> minecraftVersionBox;
     private JComboBox<String> forgeVersionBox;
-    private JComboBox<String> mcpVersionBox;
+    private JComboBox<McpVersionEntry> mcpVersionBox;
     private JProgressBar loadingBar;
     private JCheckBox generateDocsCheckbox;
     private JLabel minecraftVersionLabel;
@@ -53,7 +54,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
     private ForgeVersion forgeVersion;
 
     private final ActionListener mcpBoxActionListener = e -> {
-        if (((String) mcpVersionBox.getSelectedItem()).contains("html")) {
+        if (((McpVersionEntry) mcpVersionBox.getSelectedItem()).isRed()) {
             mcpWarning.setVisible(true);
         } else {
             mcpWarning.setVisible(false);
@@ -166,16 +167,16 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         mcpVersionBox.removeAllItems();
 
         Pair<List<Integer>, List<Integer>> stable = mcpVersion.getStable(version);
-        stable.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> "stable_" + s).forEach(mcpVersionBox::addItem);
+        stable.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("stable_" + s)).forEach(mcpVersionBox::addItem);
 
         Pair<List<Integer>, List<Integer>> snapshot = mcpVersion.getSnapshot(version);
-        snapshot.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> "snapshot_" + s).forEach(mcpVersionBox::addItem);
+        snapshot.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("snapshot_" + s)).forEach(mcpVersionBox::addItem);
 
         // The "seconds" in the pairs are bad, but still available to the user
         // We will color them read
 
-        stable.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> "<html><font color='red'>stable_" + s + "</font></html>").forEach(mcpVersionBox::addItem);
-        snapshot.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> "<html><font color='red'>snapshot_" + s + "</font></html>").forEach(mcpVersionBox::addItem);
+        stable.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("stable_" + s, true)).forEach(mcpVersionBox::addItem);
+        snapshot.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("snapshot_" + s, true)).forEach(mcpVersionBox::addItem);
 
         mcpVersionBox.addActionListener(mcpBoxActionListener);
     }
@@ -271,11 +272,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         settings.website = websiteField.getText();
         settings.updateUrl = updateUrlField.getText();
 
-        settings.mcpVersion = (String) mcpVersionBox.getSelectedItem();
-        if (settings.mcpVersion.contains("html")) {
-            settings.mcpVersion = settings.mcpVersion.substring("<html><font color='red'>".length());
-            settings.mcpVersion = settings.mcpVersion.substring(0, settings.mcpVersion.indexOf("<"));
-        }
+        settings.mcpVersion = ((McpVersionEntry) mcpVersionBox.getSelectedItem()).getText();
 
         if (settings instanceof SpongeForgeProjectConfiguration) {
             SpongeForgeProjectConfiguration configuration = (SpongeForgeProjectConfiguration) settings;
