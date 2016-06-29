@@ -20,6 +20,8 @@
         <p><p>
         Recent changes:
         <ul>
+          <li>Added 1.10 and 1.10.2 versions for Bukkit creation</li>
+          <li>Allow choosing any Forge version, rather than MCP versions</li>
           <li>Forge support and project creation added</li>
           <li>Single modules can now be multiple Minecraft module types</li>
           <li>Module creation can now create several modules which share common code at the same time</li>
