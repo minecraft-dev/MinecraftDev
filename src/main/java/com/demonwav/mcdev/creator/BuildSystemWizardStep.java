@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import static com.demonwav.mcdev.platform.PlatformType.FORGE;
+import static com.demonwav.mcdev.platform.PlatformType.LITELOADER;
 import static com.demonwav.mcdev.platform.PlatformType.SPONGE;
 
 public class BuildSystemWizardStep extends ModuleWizardStep {
@@ -50,7 +51,8 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
             return;
         }
         if (creator.getSettings().stream().anyMatch(s -> s.type == FORGE) ||
-                creator.getSettings().stream().anyMatch( s -> s instanceof SpongeForgeProjectConfiguration)) {
+                creator.getSettings().stream().anyMatch(s -> s.type == LITELOADER) ||
+                creator.getSettings().stream().anyMatch(s -> s instanceof SpongeForgeProjectConfiguration)) {
             buildSystemBox.setSelectedIndex(1);
             buildSystemBox.setVisible(false);
         } else if (creator.getSettings().stream().anyMatch(s -> s.type == SPONGE)) {
