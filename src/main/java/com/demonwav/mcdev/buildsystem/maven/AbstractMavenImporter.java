@@ -10,6 +10,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.importing.MavenImporter;
 import org.jetbrains.idea.maven.importing.MavenRootModelAdapter;
@@ -74,7 +75,12 @@ public abstract class AbstractMavenImporter extends MavenImporter {
         super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
         for (Module module : ModuleManager.getInstance(project).getModules()) {
             // We'll make sure the project is setup
-            if (Objects.equals(ModuleRootManager.getInstance(module).getContentRoots()[0], mavenProject.getFile().getParent())) {
+            VirtualFile[] roots = ModuleRootManager.getInstance(module).getContentRoots();
+            if (roots.length == 0) {
+                continue;
+            }
+
+            if (Objects.equals(roots[0], mavenProject.getFile().getParent())) {
                 Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(buildSystem -> buildSystem.reImport(module).done(b -> {
                     MinecraftModuleType.addOption(module, type.getId());
                     // We want to make sure the project "knows" about this change
