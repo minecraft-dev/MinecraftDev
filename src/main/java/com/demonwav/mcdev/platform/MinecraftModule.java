@@ -2,6 +2,7 @@ package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 
+import com.demonwav.mcdev.util.Util;
 import com.google.common.base.Strings;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.module.JavaModuleType;
@@ -32,7 +33,7 @@ public class MinecraftModule {
         MinecraftModule minecraftModule = new MinecraftModule();
         minecraftModule.module = module;
         minecraftModule.buildSystem = BuildSystem.getInstance(module);
-        if (minecraftModule.buildSystem != null) {
+        if (minecraftModule.buildSystem != null && !minecraftModule.buildSystem.isImported()) {
             minecraftModule.buildSystem.reImport(module).done(buildSystem -> types.forEach(minecraftModule::register));
         }
         return minecraftModule;
@@ -64,7 +65,7 @@ public class MinecraftModule {
         } else {
             if (isModuleApplicable(module)) {
                 MinecraftModule minecraftModule = map.put(module, createFromModule(module));
-                ProjectView.getInstance(module.getProject()).refresh();
+                Util.runWriteTask(ProjectView.getInstance(module.getProject())::refresh);
                 return minecraftModule;
             } else {
                 String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
@@ -73,11 +74,12 @@ public class MinecraftModule {
                     if (parentModule != null) {
                         if (map.containsKey(parentModule)) {
                             MinecraftModule minecraftModule = map.get(parentModule);
+                            // Save the parent module for this MinecraftModule so we don't have to do this check next time
                             map.put(module, minecraftModule);
                             return minecraftModule;
                         } else if (isModuleApplicable(parentModule)) {
                             MinecraftModule minecraftModule = map.put(parentModule, createFromModule(parentModule));
-                            ProjectView.getInstance(module.getProject()).refresh();
+                            Util.runWriteTask(ProjectView.getInstance(module.getProject())::refresh);
                             return minecraftModule;
                         }
                     }

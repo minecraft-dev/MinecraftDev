@@ -31,7 +31,9 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
             if (!buildSystem.isImported()) {
                 buildSystem.reImport(module).done(buildSystem  -> setup());
             } else {
-                setup();
+                if (buildSystem.isFinishImport()) {
+                    setup();
+                }
             }
         }
     }
