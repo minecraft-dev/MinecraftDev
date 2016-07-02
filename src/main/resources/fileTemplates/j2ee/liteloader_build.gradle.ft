@@ -1,0 +1,43 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = 'sponge'
+            url = 'http://repo.spongepowered.org/maven'
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.4-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.liteloader'
+apply plugin: 'org.spongepowered.mixin'
+
+version = "${VERSION}"
+group = "${GROUP_ID}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "${ARTIFACT_ID}"
+
+minecraft {
+    version = "${MC_VERSION}"
+    mappings = "${MCP_MAPPINGS}"
+    runDir = "run"
+}
+
+mixin {
+    defaultObfuscationEnv notch
+}
+
+jar {
+    from litemod.outputs
+}

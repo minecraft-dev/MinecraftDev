@@ -1,5 +1,7 @@
 package com.demonwav.mcdev.platform.forge.versionapi;
 
+import com.demonwav.mcdev.util.Sorting;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Ordering;
@@ -20,30 +22,6 @@ public class ForgeVersion {
 
     @NotNull
     private Map map = new HashMap();
-
-    private final Comparator<int[]> lexicographicalOrder = (one, two) -> {
-        int length = Math.min(one.length, two.length);
-        for (int i = 0; i < length; i++) {
-            int first = one[i];
-            int second = two[i];
-
-            if (first < second) {
-                return -1;
-            } else if (second < first) {
-                return 1;
-            }
-        }
-
-        // We've got here so they are now equal, if one has more then they are not equal
-        if (one.length < two.length) {
-            return -1;
-        } else if (two.length < one.length) {
-            return 1;
-        }
-        // They are the same
-        return 0;
-    };
-    private final Comparator<int[]> reverseLexicographicalOrder = (one, two) -> lexicographicalOrder.compare(two, one);
 
     private final int[] ARRAY_1_8_8 = new int[] { 1, 8, 8 };
 
@@ -66,32 +44,11 @@ public class ForgeVersion {
 
     public List<String> getSortedMcVersions() {
         Map mcversion = (Map) map.get("mcversion");
-        Set keySet = mcversion.keySet();
-        // Populate a list of the keys (and cast them to String) so they can be sorted
-        List<String> list = new ArrayList<>(keySet.size());
-        for (Object key : keySet) {
-            list.add((String) key);
-        }
-
-        // We map each version string (1.2, 1.9.4, 1.10, etc) to an array of integers {1, 2}, {1, 9, 4}, {1, 10} so we
-        // can lexicographically order them. We throw out the odd-balls in the process (like 1.10-pre4)
-        List<int[]> intList = list.stream().distinct().map(s -> {
-            try {
-                return Stream.of(s.split("\\.")).mapToInt(Integer::parseInt).toArray();
-            } catch (NumberFormatException e) {
-                return null;
-            }
-        }).filter(array -> array != null).collect(Collectors.toList());
-
-        // Sort them correctly
-        intList.sort(reverseLexicographicalOrder);
-        intList.removeIf(ints -> lexicographicalOrder.compare(ints, ARRAY_1_8_8) < 0);
-
-        return intList.stream().map(ints -> Arrays.stream(ints).mapToObj(String::valueOf).collect(Collectors.joining("."))).collect(Collectors.toList());
+        return Sorting.sortVersions(mcversion.keySet());
     }
 
     @Nullable
-    public String getRecommended(Set<String> versions) {
+    public String getRecommended(List<String> versions) {
         String recommended = "1.7";
         for (String version : versions) {
             Double promo = getPromo(version);

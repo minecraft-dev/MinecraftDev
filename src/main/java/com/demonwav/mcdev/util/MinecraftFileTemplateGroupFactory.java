@@ -31,6 +31,8 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
     public static final String SETTINGS_GRADLE_TEMPLATE = "settings.gradle";
     public static final String SUBMODULE_BUILD_GRADLE_TEMPLATE = "submodule_build.gradle";
 
+    public static final String LITELOADER_BUILD_GRADLE_TEMPLATE = "liteloader_build.gradle";
+
     @Override
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
         FileTemplateGroupDescriptor group = new FileTemplateGroupDescriptor("Minecraft", PlatformAssets.MINECRAFT_ICON);

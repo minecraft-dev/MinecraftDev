@@ -1,4 +1,4 @@
-package com.demonwav.mcdev.platform.forge.versionapi;
+package com.demonwav.mcdev.platform.mcp;
 
 public class McpVersionEntry {
 

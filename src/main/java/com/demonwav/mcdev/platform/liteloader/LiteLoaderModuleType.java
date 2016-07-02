@@ -46,14 +46,12 @@ public class LiteLoaderModuleType extends AbstractModuleType<LiteLoaderModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        // TODO
         return Collections.emptyList();
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        // TODO
         return Collections.emptyList();
     }
 

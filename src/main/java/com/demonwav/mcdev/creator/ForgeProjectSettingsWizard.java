@@ -4,8 +4,8 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.forge.versionapi.ForgeVersion;
-import com.demonwav.mcdev.platform.forge.versionapi.McpVersion;
-import com.demonwav.mcdev.platform.forge.versionapi.McpVersionEntry;
+import com.demonwav.mcdev.platform.mcp.McpVersion;
+import com.demonwav.mcdev.platform.mcp.McpVersionEntry;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 
 import com.intellij.openapi.options.ConfigurationException;
@@ -71,7 +71,9 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         mcpWarning.setVisible(false);
 
         minecraftVersionBox.addActionListener(e -> {
-            setMcpVersion();
+            if (mcpVersion != null) {
+                mcpVersion.setMcpVersion(mcpVersionBox, getVersion(), mcpBoxActionListener);
+            }
             setForgeVersion();
         });
 
@@ -109,7 +111,9 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
                         minecraftVersionBox.addItem("5.0.0");
                     }
 
-                    setMcpVersion();
+                    if (mcpVersion != null) {
+                        mcpVersion.setMcpVersion(mcpVersionBox, getVersion(), mcpBoxActionListener);
+                    }
 
                     if (forgeVersion == null) {
                         return;
@@ -154,31 +158,6 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         }
 
         return panel;
-    }
-
-    private void setMcpVersion() {
-        if (mcpVersion == null) {
-            return;
-        }
-
-        String version = getVersion();
-
-        mcpVersionBox.removeActionListener(mcpBoxActionListener);
-        mcpVersionBox.removeAllItems();
-
-        Pair<List<Integer>, List<Integer>> stable = mcpVersion.getStable(version);
-        stable.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("stable_" + s)).forEach(mcpVersionBox::addItem);
-
-        Pair<List<Integer>, List<Integer>> snapshot = mcpVersion.getSnapshot(version);
-        snapshot.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("snapshot_" + s)).forEach(mcpVersionBox::addItem);
-
-        // The "seconds" in the pairs are bad, but still available to the user
-        // We will color them read
-
-        stable.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("stable_" + s, true)).forEach(mcpVersionBox::addItem);
-        snapshot.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("snapshot_" + s, true)).forEach(mcpVersionBox::addItem);
-
-        mcpVersionBox.addActionListener(mcpBoxActionListener);
     }
 
     private void setForgeVersion() {

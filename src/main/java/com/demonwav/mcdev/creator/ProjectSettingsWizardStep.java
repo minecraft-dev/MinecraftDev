@@ -75,6 +75,8 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
                 wizard = new SpongeProjectSettingsWizard(creator, index);
             } else if (newType == PlatformType.FORGE) {
                 wizard = new ForgeProjectSettingsWizard(creator, index);
+            } else if (newType == PlatformType.LITELOADER) {
+                wizard = new LiteLoaderProjectSettingsWizard(creator, index);
             } else {
                 wizard = new BukkitProjectSettingsWizard(creator, index);
             }
