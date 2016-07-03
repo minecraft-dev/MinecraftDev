@@ -1,5 +1,9 @@
 package com.demonwav.mcdev.creator;
 
+import static com.demonwav.mcdev.platform.PlatformType.BUKKIT;
+import static com.demonwav.mcdev.platform.PlatformType.PAPER;
+import static com.demonwav.mcdev.platform.PlatformType.SPIGOT;
+
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
@@ -18,10 +22,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import static com.demonwav.mcdev.platform.PlatformType.BUKKIT;
-import static com.demonwav.mcdev.platform.PlatformType.PAPER;
-import static com.demonwav.mcdev.platform.PlatformType.SPIGOT;
 
 public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
 

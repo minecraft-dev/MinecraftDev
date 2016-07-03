@@ -1,18 +1,21 @@
 package com.demonwav.mcdev.platform.forge.versionapi;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Ordering;
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
-import org.apache.xerces.impl.dv.xs.IntegerDV;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

@@ -8,8 +8,9 @@ import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.Icon;
 import java.util.List;
+
+import javax.swing.Icon;
 
 public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
 

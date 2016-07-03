@@ -1,5 +1,7 @@
 package com.demonwav.mcdev.creator;
 
+import static com.demonwav.mcdev.platform.PlatformType.FORGE;
+
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
@@ -21,8 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.demonwav.mcdev.platform.PlatformType.FORGE;
 
 public class MinecraftProjectCreator {
 

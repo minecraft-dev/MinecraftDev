@@ -24,8 +24,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.Icon;
 import java.io.File;
+
+import javax.swing.Icon;
 
 public class MinecraftModuleBuilder extends JavaModuleBuilder {
 

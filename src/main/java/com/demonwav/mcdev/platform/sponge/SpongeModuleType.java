@@ -9,8 +9,9 @@ import com.intellij.openapi.module.Module;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.Icon;
 import java.util.List;
+
+import javax.swing.Icon;
 
 public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
 

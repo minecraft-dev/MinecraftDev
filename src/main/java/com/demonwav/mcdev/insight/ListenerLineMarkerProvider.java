@@ -39,9 +39,10 @@ import com.intellij.util.NullableFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.Icon;
 import java.util.Collection;
 import java.util.List;
+
+import javax.swing.Icon;
 
 /**
  * A {@link LineMarkerProviderDescriptor} that will provide a line marker info icon

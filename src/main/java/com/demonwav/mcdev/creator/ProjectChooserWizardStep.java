@@ -12,15 +12,16 @@ import com.intellij.ui.IdeBorderFactory;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 public class ProjectChooserWizardStep extends ModuleWizardStep {
 

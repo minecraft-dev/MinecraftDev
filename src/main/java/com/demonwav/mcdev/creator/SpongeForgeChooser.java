@@ -10,11 +10,12 @@ import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
+
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import java.util.Iterator;
 
 public class SpongeForgeChooser extends ModuleWizardStep {
     private JPanel panel;

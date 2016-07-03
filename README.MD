@@ -2,6 +2,16 @@ Minecraft Development IntelliJ Plugin [![forthebadge](http://forthebadge.com/ima
 ==========================================================================================================================================
 [![GitHub stars](https://img.shields.io/github/stars/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/stargazers) [![GitHub issues](https://img.shields.io/github/issues/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/issues) <a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDevIntelliJ_Build"><img src="https://ci.demonwav.com/app/rest/builds/buildType(id:MinecraftDevIntelliJ_Build)/statusIcon"/></a>
 
+Installation
+------------
+
+This plugin is available on the [Jetbrains IntelliJ plugin repository](https://plugins.jetbrains.com/plugin/8327).
+
+Because of this, you can install the plugin through IntelliJ's internal plugin browser. Navigate to
+`File -> Settings -> Plugins` and click the `Browser Repositories...` button at the bottom of the window. In the search
+box, simply search for `Minecraft` and this plugin will be the only result it shows. You can install it from there and
+restart IntelliJ to activate the plugin.
+
 Building
 --------
 

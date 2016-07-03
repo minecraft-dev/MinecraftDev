@@ -1,8 +1,8 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
-
 import com.demonwav.mcdev.util.Util;
+
 import com.google.common.base.Strings;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.module.JavaModuleType;

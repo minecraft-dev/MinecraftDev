@@ -1,5 +1,8 @@
 package com.demonwav.mcdev.creator;
 
+import static com.demonwav.mcdev.platform.PlatformType.FORGE;
+import static com.demonwav.mcdev.platform.PlatformType.SPONGE;
+
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
@@ -18,9 +21,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import static com.demonwav.mcdev.platform.PlatformType.FORGE;
-import static com.demonwav.mcdev.platform.PlatformType.SPONGE;
 
 public class BuildSystemWizardStep extends ModuleWizardStep {
 

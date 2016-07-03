@@ -9,9 +9,10 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleTypeManager;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.Icon;
 import java.util.Arrays;
 import java.util.Iterator;
+
+import javax.swing.Icon;
 
 public class MinecraftModuleType extends JavaModuleType {
 

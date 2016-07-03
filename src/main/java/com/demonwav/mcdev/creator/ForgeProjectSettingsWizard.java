@@ -16,6 +16,9 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang.WordUtils;
 
+import java.awt.event.ActionListener;
+import java.util.List;
+
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -24,8 +27,6 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
-import java.awt.event.ActionListener;
-import java.util.List;
 
 public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 

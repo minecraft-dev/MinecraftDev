@@ -7,8 +7,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.JDOMExternalizableStringList;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.Icon;
 import java.util.List;
+
+import javax.swing.Icon;
 
 public abstract class AbstractModuleType<T extends AbstractModule> {
 
