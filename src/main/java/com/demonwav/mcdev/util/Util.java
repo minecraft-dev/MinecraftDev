@@ -8,4 +8,8 @@ public class Util {
     public static void runWriteTask(Runnable runnable) {
         ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication().runWriteAction(runnable), ModalityState.any());
     }
+
+    public static void invokeLater(Runnable runnable) {
+        ApplicationManager.getApplication().invokeLater(runnable);
+    }
 }

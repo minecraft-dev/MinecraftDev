@@ -19,9 +19,17 @@
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p><p>
         Recent changes:
+        <h3>alpha-0.0.19</h3>
+        <ul>
+          <li>Fixed deadlock issue</li>
+        </ul>
+        <h3>alpha-0.0.18</h3>
         <ul>
           <li>Added 1.10 and 1.10.2 versions for Bukkit creation</li>
           <li>Allow choosing any Forge version, rather than MCP versions</li>
+        </ul>
+        <h3>alpha-0.0.17</h3>
+        <ul>
           <li>Forge support and project creation added</li>
           <li>Single modules can now be multiple Minecraft module types</li>
           <li>Module creation can now create several modules which share common code at the same time</li>

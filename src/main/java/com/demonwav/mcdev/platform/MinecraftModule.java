@@ -65,7 +65,7 @@ public class MinecraftModule {
         } else {
             if (isModuleApplicable(module)) {
                 MinecraftModule minecraftModule = map.put(module, createFromModule(module));
-                Util.runWriteTask(ProjectView.getInstance(module.getProject())::refresh);
+                Util.invokeLater(ProjectView.getInstance(module.getProject())::refresh);
                 return minecraftModule;
             } else {
                 String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
@@ -79,7 +79,7 @@ public class MinecraftModule {
                             return minecraftModule;
                         } else if (isModuleApplicable(parentModule)) {
                             MinecraftModule minecraftModule = map.put(parentModule, createFromModule(parentModule));
-                            Util.runWriteTask(ProjectView.getInstance(module.getProject())::refresh);
+                            Util.invokeLater(ProjectView.getInstance(module.getProject())::refresh);
                             return minecraftModule;
                         }
                     }
