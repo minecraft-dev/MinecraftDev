@@ -20,6 +20,8 @@ intellij {
     plugins = ['maven', 'gradle', 'Groovy', 'yaml']
     pluginName 'Minecraft Development'
 
+    updateSinceUntilBuild false
+
     downloadSources Boolean.valueOf(downloadIdeaSources)
     sandboxDirectory project.rootDir.canonicalPath + "/.sandbox"
 }
