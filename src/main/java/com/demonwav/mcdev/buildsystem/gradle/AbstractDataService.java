@@ -4,6 +4,7 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.platform.sponge.SpongeModule;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
 import com.google.common.base.Strings;
@@ -126,7 +127,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             }
         });
 
-        if (firstGoodModules != null) {
+        if (firstGoodModules != null && type == SpongeModuleType.getInstance()) {
             firstGoodModules = null;
         }
     }
