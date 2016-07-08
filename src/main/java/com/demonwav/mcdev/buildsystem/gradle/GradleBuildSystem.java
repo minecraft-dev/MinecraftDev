@@ -32,6 +32,7 @@ import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskId;
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListenerAdapter;
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskType;
+import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration;
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -41,7 +42,9 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -134,8 +137,8 @@ public class GradleBuildSystem extends BuildSystem {
                 }
             });
 
-            setupWrapper(indicator);
-            setupDecompWorkspace(indicator);
+            setupWrapper(project, indicator);
+            setupDecompWorkspace(project, indicator);
         } else {
             Util.runWriteTask(() -> {
                 String buildGradleText;
@@ -152,14 +155,14 @@ public class GradleBuildSystem extends BuildSystem {
                 addBuildGradleDependencies(project, buildGradleText);
             });
 
-            setupWrapper(indicator);
+            setupWrapper(project, indicator);
         }
 
         // The file needs to be saved, if not Gradle will see the file without the dependencies and won't import correctly
         Util.runWriteTask(() -> FileDocumentManager.getInstance().saveDocument(FileDocumentManager.getInstance().getDocument(buildGradle)));
     }
 
-    private void setupWrapper(@NotNull ProgressIndicator indicator) {
+    private void setupWrapper(@NotNull Project project, @NotNull ProgressIndicator indicator) {
         // Setup gradle wrapper
         // We'll write the properties file to ensure it sets up with the right version
         Util.runWriteTask(() -> {
@@ -179,6 +182,11 @@ public class GradleBuildSystem extends BuildSystem {
         ProjectConnection connection = connector.connect();
         BuildLauncher launcher = connection.newBuild();
         try {
+            Pair<String, Sdk> sdkPair = ExternalSystemJdkUtil.getAvailableJdk(project);
+            if (sdkPair != null && sdkPair.getSecond() != null && sdkPair.getSecond().getHomePath() != null && !ExternalSystemJdkUtil.USE_INTERNAL_JAVA.equals(sdkPair.getFirst())) {
+                launcher.setJavaHome(new File(sdkPair.getSecond().getHomePath()));
+            }
+
             launcher.forTasks("wrapper").addProgressListener((ProgressListener) progressEvent ->
                     indicator.setText(progressEvent.getDescription())
             ).run();
@@ -486,7 +494,7 @@ public class GradleBuildSystem extends BuildSystem {
             map.put(gradleBuildSystem, configuration);
         }
 
-        setupWrapper(indicator);
+        setupWrapper(project, indicator);
 
         return map;
     }
@@ -531,7 +539,7 @@ public class GradleBuildSystem extends BuildSystem {
                 }
             });
 
-            setupDecompWorkspace(indicator);
+            setupDecompWorkspace(project, indicator);
         } else {
             Util.runWriteTask(() -> {
                 String buildGradleText;
@@ -627,7 +635,7 @@ public class GradleBuildSystem extends BuildSystem {
         });
     }
 
-    private void setupDecompWorkspace(@NotNull ProgressIndicator indicator) {
+    private void setupDecompWorkspace(@NotNull Project project, @NotNull ProgressIndicator indicator) {
         // We need to setup decomp workspace first
         // We'll use gradle tooling to run it
         GradleConnector connector = GradleConnector.newConnector();
@@ -636,6 +644,11 @@ public class GradleBuildSystem extends BuildSystem {
         BuildLauncher launcher = connection.newBuild();
 
         try {
+            Pair<String, Sdk> sdkPair = ExternalSystemJdkUtil.getAvailableJdk(project);
+            if (sdkPair != null && sdkPair.getSecond() != null && sdkPair.getSecond().getHomePath() != null && !ExternalSystemJdkUtil.USE_INTERNAL_JAVA.equals(sdkPair.getFirst())) {
+                launcher.setJavaHome(new File(sdkPair.getSecond().getHomePath()));
+            }
+
             launcher.forTasks("setupDecompWorkspace").setJvmArguments("-Xmx2G").addProgressListener((ProgressListener) progressEvent ->
                     indicator.setText(progressEvent.getDescription())
             ).run();
