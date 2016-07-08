@@ -1,6 +1,6 @@
 Minecraft Development IntelliJ Plugin [![forthebadge](http://forthebadge.com/images/badges/made-with-crayons.svg)](http://forthebadge.com)
 ==========================================================================================================================================
-[![GitHub stars](https://img.shields.io/github/stars/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/stargazers) [![GitHub issues](https://img.shields.io/github/issues/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/issues) <a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDevIntelliJ_Build"><img src="https://ci.demonwav.com/app/rest/builds/buildType(id:MinecraftDevIntelliJ_Build)/statusIcon"/></a>
+[![GitHub stars](https://img.shields.io/github/stars/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/stargazers) [![GitHub issues](https://img.shields.io/github/issues/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/issues) [![TeamCity build status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDevIntelliJ_Build.svg)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDevIntelliJ_Build)
 
 Installation
 ------------
