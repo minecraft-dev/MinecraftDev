@@ -146,7 +146,7 @@ public class MinecraftProjectCreator {
                 break;
             case SPONGE:
                 buildRepository.setId("spongepowered-repo");
-                buildRepository.setUrl("https://repo.spongepowered.org/maven/");
+                buildRepository.setUrl("http://repo.spongepowered.org/maven/");
                 buildDependency.setGroupId("org.spongepowered");
                 buildDependency.setArtifactId("spongeapi");
                 if (configuration instanceof SpongeProjectConfiguration) {

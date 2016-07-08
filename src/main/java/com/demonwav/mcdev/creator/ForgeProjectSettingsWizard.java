@@ -223,7 +223,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
             if (minecraftVersionBox.getSelectedItem().equals("4.1.0")) {
                 version = "1.8.9";
             } else {
-                version = "1.9.4";
+                version = "1.10.2";
             }
         }
         return version;

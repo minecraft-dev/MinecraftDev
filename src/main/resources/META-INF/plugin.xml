@@ -19,6 +19,10 @@
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p><p>
         Recent changes:
+        <h3>alpha-0.0.23</h3>
+        <ul>
+          <li>Updated a couple things for Sponge projects</li>
+        </ul>
         <h3>alpha-0.0.22</h3>
         <ul>
           <li>Fixed Gradle using wrong JAVA_HOME</li>
