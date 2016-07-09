@@ -19,6 +19,10 @@
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p><p>
         Recent changes:
+        <h3>alpha-0.0.24</h3>
+        <ul>
+          <li>Fixed line marker being shown with event listener indicator icon</li>
+        </ul>
         <h3>alpha-0.0.23</h3>
         <ul>
           <li>Updated a couple things for Sponge projects</li>

@@ -55,11 +55,6 @@ import javax.swing.Icon;
  * @author gabizou
  */
 public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
-    private final EditorColorsManager myColorsManager;
-
-    public ListenerLineMarkerProvider(EditorColorsManager colorsManager) {
-        myColorsManager = colorsManager;
-    }
 
     @Override
     @Nullable
@@ -71,15 +66,12 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
         // By this point, we can guarantee that the action of "go to declaration" will work
         // since the PsiClass can be resolved, meaning the event listener is listening to
         // a valid event.
-        LineMarkerInfo info = new EventLineMarkerInfo(element, element.getTextRange(), this.getIcon(), Pass.UPDATE_ALL, createHandler(listener.getSecond()));
-        EditorColorsScheme globalScheme = this.myColorsManager.getGlobalScheme();
-        info.separatorColor = globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR);
-        info.separatorPlacement = SeparatorPlacement.TOP;
-        return info;
+        return new EventLineMarkerInfo(element, element.getTextRange(), this.getIcon(), Pass.UPDATE_ALL, createHandler(listener.getSecond()));
     }
 
     // This is a navigation handler that just simply goes and opens up the event's declaration,
     // even if the event target is a nested class.
+    @NotNull
     private static GutterIconNavigationHandler<PsiElement> createHandler(PsiMethod method) {
         return (e, element1) -> {
             // We need to re-evaluate the targeted method, because if the method signature slightly changes before

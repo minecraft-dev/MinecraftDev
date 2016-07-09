@@ -73,7 +73,7 @@ public abstract class AbstractTemplate {
 
     @Nullable
     public static String applySubmoduleBuildGradleTemplate(@NotNull Project project,
-                                                         @NotNull String commonProjectName) {
+                                                           @NotNull String commonProjectName) {
         Properties properties = new Properties();
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
 
