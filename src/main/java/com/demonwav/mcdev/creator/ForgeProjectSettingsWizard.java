@@ -14,6 +14,7 @@ import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Pair;
 import com.intellij.ui.awt.RelativePoint;
+import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 
 import java.awt.event.ActionListener;
@@ -147,7 +148,11 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         loadingBar.setIndeterminate(true);
 
         if (spongeForge) {
-            title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X);
+            if (UIUtil.isUnderDarcula()) {
+                title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X);
+            } else {
+                title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_DARK_2X);
+            }
             title.setText("<html><font size=\"5\">Sponge Forge Settings</font></html>");
             generateDocsCheckbox.setVisible(true);
 
