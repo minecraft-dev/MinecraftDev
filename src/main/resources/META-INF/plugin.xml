@@ -19,6 +19,12 @@
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p><p>
         Recent changes:
+        <h3>alpha-0.0.25</h3>
+        <ul>
+          <li>Fixed fork-bomb on project import</li>
+          <li>Dramatically decreased project loading time</li>
+          <li>Fixed wrong Sponge-Forge icon appearing in Sponge-Forge settings window when not using Darcula</li>
+        </ul>
         <h3>alpha-0.0.24</h3>
         <ul>
           <li>Fixed line marker being shown with event listener indicator icon</li>
