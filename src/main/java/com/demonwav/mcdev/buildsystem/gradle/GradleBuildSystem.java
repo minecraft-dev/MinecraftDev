@@ -25,7 +25,11 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.externalSystem.ExternalSystemManager;
+import com.intellij.openapi.externalSystem.action.ExternalSystemNodeAction;
 import com.intellij.openapi.externalSystem.model.DataNode;
+import com.intellij.openapi.externalSystem.model.ExternalProjectInfo;
+import com.intellij.openapi.externalSystem.model.ProjectKeys;
 import com.intellij.openapi.externalSystem.model.project.ExternalSystemSourceType;
 import com.intellij.openapi.externalSystem.model.project.LibraryData;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
@@ -34,6 +38,7 @@ import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotifica
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskType;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration;
+import com.intellij.openapi.externalSystem.service.project.manage.ExternalProjectsManager;
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
@@ -64,9 +69,11 @@ import org.jetbrains.concurrency.AsyncPromise;
 import org.jetbrains.concurrency.Promise;
 import org.jetbrains.plugins.gradle.model.ExternalProject;
 import org.jetbrains.plugins.gradle.model.ExternalSourceSet;
+import org.jetbrains.plugins.gradle.model.data.GradleSourceSetData;
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType;
 import org.jetbrains.plugins.gradle.service.project.GradleProjectResolver;
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache;
+import org.jetbrains.plugins.gradle.service.project.data.GradleSourceSetDataService;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportBuilder;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportProvider;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
@@ -90,6 +97,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class GradleBuildSystem extends BuildSystem {
@@ -97,8 +105,8 @@ public class GradleBuildSystem extends BuildSystem {
     @Nullable
     private VirtualFile buildGradle;
 
-    private boolean imported = false;
-    private boolean finishImport = false;
+    private AtomicBoolean imported = new AtomicBoolean(false);
+    private AtomicBoolean finishImport = new AtomicBoolean(false);
 
     @Override
     public void create(@NotNull Project project, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
@@ -293,7 +301,7 @@ public class GradleBuildSystem extends BuildSystem {
 
     @Override
     public Promise<GradleBuildSystem> reImport(@NotNull Module module) {
-        imported = true;
+        imported.set(true);
         AsyncPromise<GradleBuildSystem> promise = new AsyncPromise<>();
 
         GradleBuildSystem thisRef = this;
@@ -336,7 +344,7 @@ public class GradleBuildSystem extends BuildSystem {
                                 }).collect(Collectors.toList());
 
                         // We need to check the parent too if it's a single module project
-                        ExternalProject externalRootProject = externalProjectDataCache.getRootExternalProject(GradleConstants.SYSTEM_ID, new File(module.getProject().getBasePath()));
+                        ExternalProject externalRootProject = externalProjectDataCache.getRootExternalProject(GradleConstants.SYSTEM_ID, new File(project.getBasePath()));
                         if (externalRootProject != null) {
                             for (Module child : children) {
                                 Map<String, ExternalSourceSet> externalSourceSets = externalProjectDataCache.findExternalProject(externalRootProject, child);
@@ -355,16 +363,13 @@ public class GradleBuildSystem extends BuildSystem {
 
                             pluginName = externalRootProject.getName();
 
-                            // This is the mechanism we use for getting the library dependencies for the project
-                            // I don't know if there is a simpler method, but this is faster than gradle tooling
-                            GradleProjectResolver resolver = new GradleProjectResolver();
-                            DataNode<ProjectData> node = resolver.resolveProjectInfo(
-                                    ExternalSystemTaskId.create(GradleConstants.SYSTEM_ID, ExternalSystemTaskType.RESOLVE_PROJECT, module.getProject()),
-                                    buildGradle.getPath(),
-                                    false,
-                                    null,
-                                    new ExternalSystemTaskNotificationListenerAdapter(){}
-                            );
+                            // We need to get the project info from gradle
+                            ExternalProjectInfo info = ProjectDataManager.getInstance().getExternalProjectData(project, GradleConstants.SYSTEM_ID, project.getBasePath());
+                            if (info == null) {
+                                return;
+                            }
+
+                            DataNode<ProjectData> node = info.getExternalProjectStructure();
 
                             if (node == null) {
                                 return;
@@ -406,7 +411,7 @@ public class GradleBuildSystem extends BuildSystem {
                             }
                         }
                     });
-                    thisRef.finishImport = true;
+                    thisRef.finishImport.set(true);
                     promise.setResult(thisRef);
                 }
             })
@@ -416,12 +421,12 @@ public class GradleBuildSystem extends BuildSystem {
 
     @Override
     public boolean isImported() {
-        return imported;
+        return imported.get();
     }
 
     @Override
     public boolean isFinishImport() {
-        return finishImport;
+        return finishImport.get();
     }
 
     @NotNull

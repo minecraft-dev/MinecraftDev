@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MinecraftModule {
 
@@ -27,7 +28,7 @@ public class MinecraftModule {
 
     private Module module;
     private BuildSystem buildSystem;
-    private Map<AbstractModuleType<?>, AbstractModule> modules = new HashMap<>();
+    private Map<AbstractModuleType<?>, AbstractModule> modules = new ConcurrentHashMap<>();
 
     private static MinecraftModule generate(@NotNull List<AbstractModuleType<?>> types, @NotNull Module module) {
         MinecraftModule minecraftModule = new MinecraftModule();
@@ -59,7 +60,7 @@ public class MinecraftModule {
     }
 
     @Nullable
-    public static MinecraftModule getInstance(@NotNull Module module) {
+    public static synchronized MinecraftModule getInstance(@NotNull Module module) {
         if (map.containsKey(module)) {
             return map.get(module);
         } else {
@@ -90,7 +91,7 @@ public class MinecraftModule {
     }
 
     @Nullable
-    public static <T extends AbstractModule> T getInstance(@NotNull Module module, @NotNull AbstractModuleType<T> type) {
+    public static synchronized <T extends AbstractModule> T getInstance(@NotNull Module module, @NotNull AbstractModuleType<T> type) {
         MinecraftModule minecraftModule = getInstance(module);
         if (minecraftModule != null) {
             return minecraftModule.getModuleOfType(type);

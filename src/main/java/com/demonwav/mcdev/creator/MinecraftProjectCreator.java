@@ -70,6 +70,11 @@ public class MinecraftProjectCreator {
 
         ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Setting Up Project", false) {
             @Override
+            public boolean shouldStartInBackground() {
+                return false;
+            }
+
+            @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
 
@@ -88,6 +93,11 @@ public class MinecraftProjectCreator {
 
         GradleBuildSystem gradleBuildSystem = (GradleBuildSystem) buildSystem;
         ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Setting Up Project", false) {
+            @Override
+            public boolean shouldStartInBackground() {
+                return false;
+            }
+
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
