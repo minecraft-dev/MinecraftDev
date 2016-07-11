@@ -16,7 +16,15 @@ import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 
-import javax.swing.*;
+import javax.swing.JTextField;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JComboBox;
+import javax.swing.JProgressBar;
+import javax.swing.JCheckBox;
+import javax.swing.SwingWorker;
+import javax.swing.JComponent;
+
 import java.awt.event.ActionListener;
 import java.util.List;
 
