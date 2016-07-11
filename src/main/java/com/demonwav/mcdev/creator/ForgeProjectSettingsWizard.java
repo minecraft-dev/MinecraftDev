@@ -7,7 +7,6 @@ import com.demonwav.mcdev.platform.forge.versionapi.ForgeVersion;
 import com.demonwav.mcdev.platform.forge.versionapi.McpVersion;
 import com.demonwav.mcdev.platform.forge.versionapi.McpVersionEntry;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
-
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -17,17 +16,9 @@ import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 
+import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.List;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JTextField;
-import javax.swing.SwingWorker;
 
 public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
@@ -138,8 +129,8 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
             pluginVersionField.setEditable(false);
         }
 
-        mainClassField.setText(this.creator.getGroupId() + '.' + this.creator.getArtifactId()
-                + '.' + WordUtils.capitalizeFully(this.creator.getArtifactId()));
+        mainClassField.setText(this.creator.getGroupId().toLowerCase() + '.' + this.creator.getArtifactId().toLowerCase()
+                + '.' + WordUtils.capitalize(this.creator.getArtifactId()));
 
         if (creator.getSettings().size() > 1) {
             mainClassField.setText(mainClassField.getText() + creator.getSettings().get(creator.index).type.getNormalName());
