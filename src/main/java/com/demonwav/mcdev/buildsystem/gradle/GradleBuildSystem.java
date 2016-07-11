@@ -12,7 +12,6 @@ import com.demonwav.mcdev.platform.forge.ForgeTemplate;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate;
 import com.demonwav.mcdev.util.Util;
-
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -25,20 +24,13 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.externalSystem.ExternalSystemManager;
-import com.intellij.openapi.externalSystem.action.ExternalSystemNodeAction;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.ExternalProjectInfo;
-import com.intellij.openapi.externalSystem.model.ProjectKeys;
 import com.intellij.openapi.externalSystem.model.project.ExternalSystemSourceType;
 import com.intellij.openapi.externalSystem.model.project.LibraryData;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
-import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskId;
-import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListenerAdapter;
-import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskType;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration;
-import com.intellij.openapi.externalSystem.service.project.manage.ExternalProjectsManager;
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
@@ -53,11 +45,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
-import com.intellij.psi.PsiManager;
+import com.intellij.psi.*;
 import org.apache.commons.io.FileUtils;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
@@ -69,11 +57,8 @@ import org.jetbrains.concurrency.AsyncPromise;
 import org.jetbrains.concurrency.Promise;
 import org.jetbrains.plugins.gradle.model.ExternalProject;
 import org.jetbrains.plugins.gradle.model.ExternalSourceSet;
-import org.jetbrains.plugins.gradle.model.data.GradleSourceSetData;
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType;
-import org.jetbrains.plugins.gradle.service.project.GradleProjectResolver;
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache;
-import org.jetbrains.plugins.gradle.service.project.data.GradleSourceSetDataService;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportBuilder;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportProvider;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
@@ -88,15 +73,7 @@ import org.jetbrains.plugins.groovy.lang.psi.impl.GroovyPsiElementFactoryImpl;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -272,6 +249,27 @@ public class GradleBuildSystem extends BuildSystem {
                 // Set up the run config
                 // Get the gradle external task type, this is what set's it as a gradle task
                 GradleExternalTaskConfigurationType gradleType = GradleExternalTaskConfigurationType.getInstance();
+
+                assert configuration != null;
+                if(configuration.type == PlatformType.FORGE) {
+                    ExternalSystemRunConfiguration runClientConfiguration = new ExternalSystemRunConfiguration(
+                            GradleConstants.SYSTEM_ID,
+                            project,
+                            gradleType.getConfigurationFactories()[0],
+                            module.getName() + " runClient"
+                    );
+                    runClientConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
+                    runClientConfiguration.getSettings().setExecutionName(module.getName() + " runClient");
+                    runClientConfiguration.getSettings().setTaskNames(Collections.singletonList("runClient"));
+                    RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
+                            RunManagerImpl.getInstanceImpl(project),
+                            runClientConfiguration,
+                            false
+                    );
+                    settings.setActivateToolWindowBeforeRun(true);
+                    settings.setSingleton(true);
+                    RunManager.getInstance(project).addConfiguration(settings, false);
+                }
                 // Create a gradle external system run config
                 ExternalSystemRunConfiguration runConfiguration = new ExternalSystemRunConfiguration(
                         GradleConstants.SYSTEM_ID,
