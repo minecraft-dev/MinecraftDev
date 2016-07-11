@@ -5,11 +5,15 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 
 @Mod(
-        modid = "${ARTIFACT_ID}",
-        name = "${PLUGIN_NAME}",
-        version = "${PLUGIN_VERSION}"
+        modid = ${CLASS_NAME}.MOD_ID,
+        name = ${CLASS_NAME}.MOD_NAME,
+        version = ${CLASS_NAME}.VERSION
 )
 public class ${CLASS_NAME} {
+
+    public static final String MOD_ID = "${ARTIFACT_ID}";
+    public static final String MOD_NAME = "${PLUGIN_NAME}";
+    public static final String VERSION = "${PLUGIN_VERSION";
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
