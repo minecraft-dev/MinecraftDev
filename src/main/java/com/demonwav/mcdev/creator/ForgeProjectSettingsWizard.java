@@ -7,6 +7,7 @@ import com.demonwav.mcdev.platform.forge.versionapi.ForgeVersion;
 import com.demonwav.mcdev.platform.forge.versionapi.McpVersion;
 import com.demonwav.mcdev.platform.forge.versionapi.McpVersionEntry;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
+
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -16,17 +17,17 @@ import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 
-import javax.swing.JTextField;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JComboBox;
-import javax.swing.JProgressBar;
-import javax.swing.JCheckBox;
-import javax.swing.SwingWorker;
-import javax.swing.JComponent;
-
 import java.awt.event.ActionListener;
 import java.util.List;
+
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 
 public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
@@ -129,7 +130,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public JComponent getComponent() {
-        pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
+        pluginNameField.setText(WordUtils.capitalize(creator.getArtifactId()));
         pluginVersionField.setText(creator.getVersion());
 
         if (creator.index != 0) {

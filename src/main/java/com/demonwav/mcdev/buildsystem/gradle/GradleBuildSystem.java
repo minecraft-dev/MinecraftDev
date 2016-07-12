@@ -12,6 +12,7 @@ import com.demonwav.mcdev.platform.forge.ForgeTemplate;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate;
 import com.demonwav.mcdev.util.Util;
+
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -86,7 +87,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -244,7 +244,7 @@ public class GradleBuildSystem extends BuildSystem {
     }
 
     @Override
-    public void finishSetup(@NotNull Module module, @Nullable ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
+    public void finishSetup(@NotNull Module module, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
         Project project = module.getProject();
 
         // Tell Gradle to import this project
@@ -263,26 +263,50 @@ public class GradleBuildSystem extends BuildSystem {
                 // Get the gradle external task type, this is what set's it as a gradle task
                 GradleExternalTaskConfigurationType gradleType = GradleExternalTaskConfigurationType.getInstance();
 
-                assert configuration != null;
-                if(configuration.type == PlatformType.FORGE) {
+                // Set the Forge client and server run configs
+                if (configuration.type == PlatformType.FORGE) {
+                    // Client run config
                     ExternalSystemRunConfiguration runClientConfiguration = new ExternalSystemRunConfiguration(
                             GradleConstants.SYSTEM_ID,
                             project,
                             gradleType.getConfigurationFactories()[0],
-                            module.getName() + " runClient"
+                            module.getName() + " run client"
                     );
                     runClientConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
-                    runClientConfiguration.getSettings().setExecutionName(module.getName() + " runClient");
+                    runClientConfiguration.getSettings().setExecutionName(module.getName() + " run client");
                     runClientConfiguration.getSettings().setTaskNames(Collections.singletonList("runClient"));
-                    RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
+                    RunnerAndConfigurationSettings clientSettings = new RunnerAndConfigurationSettingsImpl(
                             RunManagerImpl.getInstanceImpl(project),
                             runClientConfiguration,
                             false
                     );
-                    settings.setActivateToolWindowBeforeRun(true);
-                    settings.setSingleton(true);
-                    RunManager.getInstance(project).addConfiguration(settings, false);
+                    clientSettings.setActivateToolWindowBeforeRun(true);
+                    clientSettings.setSingleton(true);
+                    RunManager.getInstance(project).addConfiguration(clientSettings, false);
+                    // Set run client as the default run config
+                    RunManager.getInstance(project).setSelectedConfiguration(clientSettings);
+
+
+                    // Server run config
+                    ExternalSystemRunConfiguration runServerConfiguration = new ExternalSystemRunConfiguration(
+                            GradleConstants.SYSTEM_ID,
+                            project,
+                            gradleType.getConfigurationFactories()[0],
+                            module.getName() + " run server"
+                    );
+                    runServerConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
+                    runServerConfiguration.getSettings().setExecutionName(module.getName() + " run server");
+                    runServerConfiguration.getSettings().setTaskNames(Collections.singletonList("runServer"));
+                    RunnerAndConfigurationSettings serverSettings = new RunnerAndConfigurationSettingsImpl(
+                            RunManagerImpl.getInstanceImpl(project),
+                            runServerConfiguration,
+                            false
+                    );
+                    serverSettings.setActivateToolWindowBeforeRun(true);
+                    serverSettings.setSingleton(true);
+                    RunManager.getInstance(project).addConfiguration(serverSettings, false);
                 }
+
                 // Create a gradle external system run config
                 ExternalSystemRunConfiguration runConfiguration = new ExternalSystemRunConfiguration(
                         GradleConstants.SYSTEM_ID,
