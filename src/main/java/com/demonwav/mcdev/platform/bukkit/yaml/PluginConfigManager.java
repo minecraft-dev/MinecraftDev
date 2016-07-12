@@ -115,7 +115,6 @@ public class PluginConfigManager {
                         break;
                     default:
                         // TODO: Show warning to user, invalid field in plugin.yml
-                        break;
                 }
 
                 // Temp code for testing

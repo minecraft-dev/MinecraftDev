@@ -86,6 +86,7 @@ public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
                 title.setText("<html><font size=\"5\">Paper Settings</font></html>");
                 settings.type = PAPER;
                 break;
+            default:
         }
 
         return panel;

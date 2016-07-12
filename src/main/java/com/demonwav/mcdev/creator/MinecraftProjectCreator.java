@@ -164,8 +164,8 @@ public class MinecraftProjectCreator {
                 } else {
                     buildDependency.setVersion(((SpongeForgeProjectConfiguration) configuration).spongeApiVersion + "-SNAPSHOT");
                 }
-            default:
                 break;
+            default:
         }
         buildDependency.setScope("provided");
     }

@@ -74,34 +74,7 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public boolean validate() throws ConfigurationException {
-        try {
-            if (pluginNameField.getText().trim().isEmpty()) {
-                throw new MinecraftSetupException("empty", pluginNameField);
-            }
-
-            if (pluginVersionField.getText().trim().isEmpty()) {
-                throw new MinecraftSetupException("empty", pluginVersionField);
-            }
-
-            if (mainClassField.getText().trim().isEmpty()) {
-                throw new MinecraftSetupException("empty", mainClassField);
-            }
-            if (!authorsField.getText().matches(ProjectSettingsWizardStep.pattern)) {
-                throw new MinecraftSetupException("bad", authorsField);
-            }
-
-            if (!dependField.getText().matches(ProjectSettingsWizardStep.pattern)) {
-                throw new MinecraftSetupException("bad", dependField);
-            }
-        } catch (MinecraftSetupException e) {
-            String message = e.getError();
-            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
-                    .setFadeoutTime(4000)
-                    .createBalloon()
-                    .show(RelativePoint.getSouthWestOf(e.getJ()), Balloon.Position.below);
-            return false;
-        }
-        return true;
+        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField);
     }
 
     @Override
