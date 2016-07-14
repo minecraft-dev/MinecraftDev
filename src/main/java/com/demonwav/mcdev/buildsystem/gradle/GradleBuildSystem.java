@@ -10,6 +10,8 @@ import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.forge.ForgeTemplate;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
+import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration;
+import com.demonwav.mcdev.platform.liteloader.LiteLoaderTemplate;
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate;
 import com.demonwav.mcdev.util.Util;
 
@@ -129,6 +131,32 @@ public class GradleBuildSystem extends BuildSystem {
                             addBuildGradleDependencies(project, buildGradlePsi, false);
                         }
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            setupWrapper(indicator);
+            setupDecompWorkspace(indicator);
+        } else if (configuration.type == PlatformType.LITELOADER) {
+            if (!(configuration instanceof LiteLoaderProjectConfiguration)) {
+                return;
+            }
+
+            LiteLoaderProjectConfiguration settings = (LiteLoaderProjectConfiguration) configuration;
+            Util.runWriteTask(() -> {
+                try {
+                    buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
+
+                    LiteLoaderTemplate.applyBuildGradleTemplate(
+                            project,
+                            buildGradle,
+                            groupId,
+                            artifactId,
+                            settings.pluginVersion,
+                            settings.mcVersion,
+                            settings.mcpVersion
+                    );
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -363,7 +391,7 @@ public class GradleBuildSystem extends BuildSystem {
                             }
 
                             dependencies = new ArrayList<>();
-                            node.getChildren().stream()
+                            node.getChildren()
                                     .forEach(child -> {
                                         if (child.getData() instanceof LibraryData) {
                                             LibraryData data = (LibraryData) child.getData();
@@ -526,6 +554,32 @@ public class GradleBuildSystem extends BuildSystem {
                             addBuildGradleDependencies(project, buildGradlePsi, false);
                         }
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            setupDecompWorkspace(indicator);
+        } else if (configuration.type == PlatformType.LITELOADER) {
+            if (!(configuration instanceof LiteLoaderProjectConfiguration)) {
+                return;
+            }
+
+            LiteLoaderProjectConfiguration settings = (LiteLoaderProjectConfiguration) configuration;
+            Util.runWriteTask(() -> {
+                try {
+                    buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
+
+                    LiteLoaderTemplate.applySubmoduleBuildGradleTemplate(
+                            project,
+                            buildGradle,
+                            groupId,
+                            artifactId,
+                            settings.pluginVersion,
+                            settings.mcVersion,
+                            settings.mcpVersion,
+                            commonProjectName
+                    );
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

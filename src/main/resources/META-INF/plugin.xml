@@ -65,6 +65,7 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeProjectDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.liteloader.gradle.LiteLoaderDataService"/>
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
         <projectViewNodeDecorator implementation="com.demonwav.mcdev.platform.MinecraftProjectViewNodeDecorator"/>

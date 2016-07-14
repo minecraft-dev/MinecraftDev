@@ -40,12 +40,10 @@ public class LiteLoaderModule extends AbstractModule {
 
     @Override
     public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
-        // TODO
         return true;
     }
 
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
-        // TODO
         return "";
     }
 }

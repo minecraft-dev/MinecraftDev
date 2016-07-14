@@ -5,6 +5,7 @@ import com.demonwav.mcdev.platform.mcp.McpVersion;
 import com.demonwav.mcdev.platform.mcp.McpVersionEntry;
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -12,9 +13,11 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -24,8 +27,14 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
 
 public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
+
+    private static final String LITEMOD = "LiteMod";
+    private static final Pattern javaClassPattern = Pattern.compile("\\s+|-|\\$");
+
     private JPanel panel;
     private JLabel mcpWarning;
     private JTextField pluginNameField;
@@ -33,18 +42,48 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
     private JTextField mainClassField;
     private JComboBox<String> minecraftVersionBox;
     private JComboBox<McpVersionEntry> mcpVersionBox;
-    private JProgressBar loadingBar;
 
+    private JProgressBar loadingBar;
     private LiteLoaderProjectConfiguration settings;
+
     private final MinecraftProjectCreator creator;
 
     private McpVersion mcpVersion;
+
+    private boolean mainClassModified = false;
 
     private final ActionListener mcpBoxActionListener = e -> {
         if (((McpVersionEntry) mcpVersionBox.getSelectedItem()).isRed()) {
             mcpWarning.setVisible(true);
         } else {
             mcpWarning.setVisible(false);
+        }
+    };
+
+    private final DocumentListener listener = new DocumentAdapter() {
+        @Override
+        protected void textChanged(DocumentEvent e) {
+            // Make sure they don't try to add spaces or whatever
+            if (javaClassPattern.matcher(mainClassField.getText()).find()) {
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    mainClassField.getDocument().removeDocumentListener(this);
+                    ((AbstractDocument.DefaultDocumentEvent) e).undo();
+                    mainClassField.getDocument().addDocumentListener(this);
+                });
+                return;
+            }
+
+            // We just need to make sure they aren't messing up the LiteMod text
+            String[] words = mainClassField.getText().split("\\.");
+            if (!words[words.length - 1].startsWith(LITEMOD)) {
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    mainClassField.getDocument().removeDocumentListener(this);
+
+                    mainClassModified = true;
+                    ((AbstractDocument.DefaultDocumentEvent) e).undo();
+                    mainClassField.getDocument().addDocumentListener(this);
+                });
+            }
         }
     };
 
@@ -63,13 +102,23 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
         pluginNameField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(DocumentEvent e) {
+                if (mainClassModified) {
+                    return;
+                }
+
                 String[] words = pluginNameField.getText().split("\\s+");
                 String word = Arrays.stream(words).map(WordUtils::capitalize).collect(Collectors.joining());
 
-                mainClassField.setText(creator.getGroupId() + '.' + creator.getArtifactId()
-                        + ".LiteMod" + word);
+                String[] mainClassWords = mainClassField.getText().split("\\.");
+                mainClassWords[mainClassWords.length - 1] = LITEMOD + word;
+
+                mainClassField.getDocument().removeDocumentListener(listener);
+                mainClassField.setText(Arrays.stream(mainClassWords).collect(Collectors.joining(".")));
+                mainClassField.getDocument().addDocumentListener(listener);
             }
         });
+
+        mainClassField.getDocument().addDocumentListener(listener);
 
         try {
             new SwingWorker() {
@@ -114,8 +163,10 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
             pluginVersionField.setEditable(false);
         }
 
+        mainClassField.getDocument().removeDocumentListener(listener);
         mainClassField.setText(this.creator.getGroupId() + '.' + this.creator.getArtifactId()
-                + ".LiteMod" + WordUtils.capitalizeFully(creator.getArtifactId()));
+                + "." + LITEMOD + WordUtils.capitalizeFully(creator.getArtifactId()));
+        mainClassField.getDocument().addDocumentListener(listener);
 
         loadingBar.setIndeterminate(true);
 
@@ -154,6 +205,7 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
         settings.pluginVersion = pluginVersionField.getText();
         settings.mainClass = mainClassField.getText();
 
+        settings.mcVersion = (String) minecraftVersionBox.getSelectedItem();
         settings.mcpVersion = ((McpVersionEntry) mcpVersionBox.getSelectedItem()).getText();
     }
 

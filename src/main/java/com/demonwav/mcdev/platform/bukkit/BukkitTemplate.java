@@ -11,13 +11,17 @@ import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Properties;
 
 public class BukkitTemplate extends AbstractTemplate {
 
-    public static void applyMainClassTemplate(Project project, VirtualFile file, String packageName, String className) {
+    public static void applyMainClassTemplate(@NotNull Project project,
+                                              @NotNull VirtualFile file,
+                                              @NotNull String packageName,
+                                              @NotNull String className) {
         Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
@@ -30,7 +34,8 @@ public class BukkitTemplate extends AbstractTemplate {
         }
     }
 
-    public static String applyPomTemplate(Project project, String version) {
+    public static String applyPomTemplate(@NotNull Project project,
+                                          @NotNull String version) {
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", version);
 
@@ -45,7 +50,10 @@ public class BukkitTemplate extends AbstractTemplate {
         }
     }
 
-    public static void applyPluginDescriptionFileTemplate(Project project, VirtualFile file, BukkitProjectConfiguration settings, BuildSystem buildSystem) {
+    public static void applyPluginDescriptionFileTemplate(@NotNull Project project,
+                                                          @NotNull VirtualFile file,
+                                                          @NotNull BukkitProjectConfiguration settings,
+                                                          @NotNull BuildSystem buildSystem) {
         Properties properties = new Properties();
 
         properties.setProperty("NAME", settings.pluginName);
