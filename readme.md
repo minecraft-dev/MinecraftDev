@@ -55,11 +55,11 @@ This project is licensed under [MIT](LICENSE.txt).
 Supported Platforms
 -------------------
 
-- ![Bukkit Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/Bukkit.png) [**Bukkit**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse)
-- ![Sponge Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/Sponge.png) [**Sponge**](https://www.spongepowered.org/)
-- ![Forge Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/Forge.png) [**Minecraft Forge**](http://minecraftforge.net/forum)
-- ![LiteLoader Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/LiteLoader.png) [**LiteLoader**](http://www.liteloader.com/)
-- ![BungeeCord Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/BungeeCord.png) [**BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/)
+- [![Bukkit Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/Bukkit.png) **Bukkit**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse)
+- [![Sponge Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/Sponge.png) **Sponge**](https://www.spongepowered.org/)
+- [![Forge Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/Forge.png) **Minecraft Forge**](http://minecraftforge.net/forum)
+- [![LiteLoader Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/LiteLoader.png) **LiteLoader**](http://www.liteloader.com/)
+- [![BungeeCord Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/BungeeCord.png) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/)
 - Misc Bukkit Forks
-  * ![Spigot Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/Spigot.png) [Spigot](https://spigotmc.org/)
-  * ![Paper Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/Paper.png) [Paper](https://paper.emc.gs)
+  * [![Spigot Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/Spigot.png) Spigot](https://spigotmc.org/)
+  * [![Paper Icon](https://github.com/DemonWav/MinecraftDevIntelliJ/raw/master/src/main/resources/assets/platform/icons/Paper.png) Paper](https://paper.emc.gs)
