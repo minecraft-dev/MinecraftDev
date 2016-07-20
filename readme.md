@@ -50,7 +50,7 @@ Developers
 License
 -------
 
-This project is licensed under [MIT](LICENSE.txt).
+This project is licensed under [MIT](license.txt).
 
 Supported Platforms
 -------------------
