@@ -16,7 +16,8 @@ import java.util.Properties;
 public class SpongeTemplate extends AbstractTemplate {
 
     @Nullable
-    public static String applyPomTemplate(Project project, String version) {
+    public static String applyPomTemplate(@NotNull Project project,
+                                          @NotNull String version) {
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", version);
 
@@ -30,12 +31,12 @@ public class SpongeTemplate extends AbstractTemplate {
         return null;
     }
 
-    public static void applyMainClassTemplate(Project project,
-                                              VirtualFile mainClassFile,
-                                              String packageName,
-                                              String className,
-                                              boolean hasDependencies,
-                                              boolean generateDocumentation) {
+    public static void applyMainClassTemplate(@NotNull Project project,
+                                              @NotNull VirtualFile mainClassFile,
+                                              @NotNull String packageName,
+                                              @NotNull String className,
+                                              @NotNull boolean hasDependencies,
+                                              @NotNull boolean generateDocumentation) {
         Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
@@ -77,6 +78,7 @@ public class SpongeTemplate extends AbstractTemplate {
         return null;
     }
 
+    @Nullable
     public static String applySubmoduleBuildGradleTemplate(@NotNull Project project,
                                                            @NotNull String commonProjectName) {
 

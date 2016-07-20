@@ -31,6 +31,10 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
     public static final String SETTINGS_GRADLE_TEMPLATE = "settings.gradle";
     public static final String SUBMODULE_BUILD_GRADLE_TEMPLATE = "submodule_build.gradle";
 
+    public static final String LITELOADER_BUILD_GRADLE_TEMPLATE = "liteloader_build.gradle";
+    public static final String LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE = "liteloader_submodule_build.gradle";
+    public static final String LITELOADER_MAIN_CLASS_TEMPLATE = "liteloader_main_class.java";
+
     @Override
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
         FileTemplateGroupDescriptor group = new FileTemplateGroupDescriptor("Minecraft", PlatformAssets.MINECRAFT_ICON);
@@ -57,6 +61,10 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
         group.addTemplate(new FileTemplateDescriptor(MULTI_MODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.MINECRAFT_ICON));
         group.addTemplate(new FileTemplateDescriptor(SETTINGS_GRADLE_TEMPLATE, PlatformAssets.MINECRAFT_ICON));
         group.addTemplate(new FileTemplateDescriptor(SUBMODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.MINECRAFT_ICON));
+
+        group.addTemplate(new FileTemplateDescriptor(LITELOADER_BUILD_GRADLE_TEMPLATE, PlatformAssets.LITELOADER_ICON));
+        group.addTemplate(new FileTemplateDescriptor(LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.LITELOADER_ICON));
+        group.addTemplate(new FileTemplateDescriptor(LITELOADER_MAIN_CLASS_TEMPLATE, PlatformAssets.LITELOADER_ICON));
 
         return group;
     }

@@ -1,7 +1,7 @@
-package com.demonwav.mcdev.platform.forge.gradle;
+package com.demonwav.mcdev.platform.liteloader.gradle;
 
 import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService;
-import com.demonwav.mcdev.platform.forge.ForgeModuleType;
+import com.demonwav.mcdev.platform.liteloader.LiteLoaderModuleType;
 
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.project.LibraryDependencyData;
@@ -14,9 +14,10 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 import java.util.Collection;
 
-public class ForgeDataService extends AbstractDataService {
-    public ForgeDataService() {
-        super(ForgeModuleType.getInstance());
+public class LiteLoaderDataService extends AbstractDataService {
+
+    public LiteLoaderDataService() {
+        super(LiteLoaderModuleType.getInstance());
     }
 
     @Override
@@ -28,6 +29,6 @@ public class ForgeDataService extends AbstractDataService {
             return;
         }
 
-        checkModule(modelsProvider, ForgeModuleType.getInstance(), "net.minecraftforge.gradle.forge");
+        checkModule(modelsProvider, LiteLoaderModuleType.getInstance(), "net.minecraftforge.gradle.liteloader");
     }
 }

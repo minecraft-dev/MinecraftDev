@@ -5,6 +5,7 @@ import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
+import com.demonwav.mcdev.platform.liteloader.LiteLoaderModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,8 @@ public enum PlatformType {
     PAPER(PaperModuleType.getInstance(), "PAPER_MODULE_TYPE", "Paper"),
     FORGE(ForgeModuleType.getInstance(), "FORGE_MODULE_TYPE", "Forge"),
     SPONGE(SpongeModuleType.getInstance(), "SPONGE_MODULE_TYPE", "Sponge"),
-    BUNGEECORD(BungeeCordModuleType.getInstance(), "BUNGEECORD_MODULE_TYPE", "BungeeCord");
+    BUNGEECORD(BungeeCordModuleType.getInstance(), "BUNGEECORD_MODULE_TYPE", "BungeeCord"),
+    LITELOADER(LiteLoaderModuleType.getInstance(), "LITELOADER_MODULE_TYPE", "LiteLoader");
 
     private final AbstractModuleType<?> type;
     private final String name;

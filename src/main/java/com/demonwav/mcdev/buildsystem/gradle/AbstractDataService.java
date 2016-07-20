@@ -20,12 +20,19 @@ import com.intellij.openapi.externalSystem.util.Order;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiManager;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
+import org.jetbrains.plugins.groovy.lang.psi.GroovyFile;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -129,5 +136,62 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
         if (firstGoodModules != null && type == SpongeModuleType.getInstance()) {
             firstGoodModules = null;
         }
+    }
+
+    protected void checkModule(@NotNull IdeModifiableModelsProvider modelsProvider,
+                                  @NotNull AbstractModuleType<?> type,
+                                  @NotNull String text) {
+        ApplicationManager.getApplication().runReadAction(() -> {
+            final Module[] modules = modelsProvider.getModules();
+            List<Module> forgeModules = new ArrayList<>();
+            for (Module module : modules) {
+                if (!checkModuleText(module, modelsProvider, text)) {
+                    // Make sure this isn't marked as a forge module
+                    MinecraftModuleType.removeOption(module, type.getId());
+                    continue;
+                }
+
+                forgeModules.add(module);
+            }
+
+            for (Module testModule : modelsProvider.getModules()) {
+                if (forgeModules.contains(testModule)) {
+                    testModule.setOption("type", JavaModuleType.getModuleType().getId());
+                    MinecraftModuleType.addOption(testModule, type.getId());
+                    Optional.ofNullable(BuildSystem.getInstance(testModule)).ifPresent(md -> md.reImport(testModule));
+                    MinecraftModule.getInstance(testModule);
+                } else {
+                    if (Strings.nullToEmpty(testModule.getOptionValue("type")).equals(type.getId())) {
+                        testModule.setOption("type", JavaModuleType.getModuleType().getId());
+                    }
+                }
+            }
+        });
+    }
+
+    @Contract("null, _, _ -> false")
+    protected boolean checkModuleText(Module module, IdeModifiableModelsProvider provider, String text) {
+        if (module != null) {
+            VirtualFile[] roots = provider.getModifiableRootModel(module).getContentRoots();
+            if (roots.length == 0) {
+                // last ditch effort
+                roots = ModuleRootManager.getInstance(module).getContentRoots();
+                if (roots.length == 0) {
+                    return false;
+                }
+            }
+            VirtualFile file = roots[0];
+            file = file.findFileByRelativePath("build.gradle");
+
+            if (file != null) {
+                GroovyFile groovyFile = (GroovyFile) PsiManager.getInstance(module.getProject()).findFile(file);
+                if (groovyFile != null) {
+                    if (groovyFile.getText().contains(text)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

@@ -5,6 +5,7 @@ import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
+import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
@@ -40,6 +41,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
     private JCheckBox spongePluginCheckBox;
     private JCheckBox forgeModCheckBox;
     private JCheckBox bungeeCordPluginCheckBox;
+    private JCheckBox liteLoaderModCheckBox;
 
     private static final String bukkitInfo = "Create a standard " +
             "<a href=\"http://bukkit.org/\">Bukkit</a> plugin, for use " +
@@ -58,7 +60,10 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             "on Sponge servers.";
     private static final String forgeInfo = "Create a standard " +
             "<a href=\"http://files.minecraftforge.net/\"> Forge</a> mod, for use " +
-            "on Forge servers.";
+            "on Forge servers and clients.";
+    private static final String liteLoaderInfo = "Create a standard " +
+            "<a href=\"http://www.liteloader.com/\"> LiteLoader</a> mod, for use " +
+            "on LiteLoader clients.";
 
     public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator, @NotNull ProjectSettingsWizardStep[] steps) {
         super();
@@ -103,6 +108,10 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
         );
 
         forgeModCheckBox.addActionListener(e ->
+                fillInInfoPane()
+        );
+
+        liteLoaderModCheckBox.addActionListener(e ->
                 fillInInfoPane()
         );
 
@@ -156,6 +165,11 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             text += "<p/>";
         }
 
+        if (liteLoaderModCheckBox.isSelected()) {
+            text += liteLoaderInfo;
+            text += "<p/>";
+        }
+
         if (bungeeCordPluginCheckBox.isSelected()) {
             text += bungeeCordInfo;
         }
@@ -193,6 +207,10 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
 
         if (forgeModCheckBox.isSelected()) {
             creator.getSettings().add(new ForgeProjectConfiguration());
+        }
+
+        if (liteLoaderModCheckBox.isSelected()) {
+            creator.getSettings().add(new LiteLoaderProjectConfiguration());
         }
 
         if (bungeeCordPluginCheckBox.isSelected()) {

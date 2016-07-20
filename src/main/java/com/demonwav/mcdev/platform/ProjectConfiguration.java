@@ -61,7 +61,7 @@ public abstract class ProjectConfiguration {
         return list.size() != 0;
     }
 
-    public VirtualFile getMainClassDirectory(String[] files, VirtualFile file) {
+    protected VirtualFile getMainClassDirectory(String[] files, VirtualFile file) {
         try {
             for (int i = 0, len = files.length - 1; i < len; i++) {
                 String s = files[i];
