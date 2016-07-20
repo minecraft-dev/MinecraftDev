@@ -32,6 +32,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.Function;
 import com.intellij.util.NullableFunction;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -128,14 +129,15 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
             return otherElement != null && myElement != null;
         }
 
-
         @Override
+        @Contract(pure = true)
         public Icon getCommonIcon(@NotNull List<MergeableLineMarkerInfo> infos) {
             return myIcon;
         }
 
         @NotNull
         @Override
+        @Contract(pure = true)
         public Function<? super PsiElement, String> getCommonTooltip(@NotNull List<MergeableLineMarkerInfo> infos) {
             return (Function<PsiElement, String>) element -> "Multiple method overrides";
         }
@@ -169,6 +171,4 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
             navigatable.navigate(true);
         }
     }
-
-
 }

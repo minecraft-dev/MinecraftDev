@@ -7,7 +7,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.JDOMExternalizableStringList;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.Color;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -46,6 +49,11 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
 
     @NotNull
     public abstract List<String> getListenerAnnotations();
+
+    @NotNull
+    public Map<String, Color> getClassToColorMappings() {
+        return new HashMap<>();
+    }
 
     @NotNull
     public abstract T generateModule(Module module);
