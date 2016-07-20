@@ -448,6 +448,8 @@ public class GradleBuildSystem extends BuildSystem {
     public Map<GradleBuildSystem, ProjectConfiguration> createMultiModuleProject(@NotNull Project project, @NotNull List<ProjectConfiguration> configurations, @NotNull ProgressIndicator indicator) {
         final Map<GradleBuildSystem, ProjectConfiguration> map = new HashMap<>();
 
+        setupWrapper(indicator);
+
         rootDirectory.refresh(false, true);
 
         // Create the includes string for settings.gradle
@@ -513,8 +515,6 @@ public class GradleBuildSystem extends BuildSystem {
             gradleBuildSystem.createSubModule(project, configuration, artifactId.toLowerCase() + "-common", indicator);
             map.put(gradleBuildSystem, configuration);
         }
-
-        setupWrapper(indicator);
 
         return map;
     }

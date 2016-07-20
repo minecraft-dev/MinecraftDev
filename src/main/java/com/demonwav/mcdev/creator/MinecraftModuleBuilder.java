@@ -34,6 +34,7 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
             new ProjectSettingsWizardStep(creator), // Bukkit, Spigot, Paper
             new ProjectSettingsWizardStep(creator), // Sponge
             new ProjectSettingsWizardStep(creator), // Forge
+            new ProjectSettingsWizardStep(creator), // LiteLoader
             new ProjectSettingsWizardStep(creator)  // BungeeCord
     };
 
@@ -140,7 +141,8 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
                 steps[0], // Bukkit, Spigot, Paper
                 steps[1], // Sponge
                 steps[2], // Forge
-                steps[3]  // BungeeCord
+                steps[3], // LiteLoader
+                steps[4]  // BungeeCord
         };
     }
 
