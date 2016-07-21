@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.platform;
 
+import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
@@ -24,6 +25,10 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
 
     @Override
     public void decorate(ProjectViewNode node, PresentationData data) {
+        if (!MinecraftSettings.getInstance().isShowProjectPlatformIcons()) {
+            return;
+        }
+
         if (node.getProject() == null) {
             return;
         }

@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.insight;
 
+import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.MinecraftModule;
 
@@ -25,6 +26,10 @@ import java.util.List;
 public class ListenerEventAnnotator implements Annotator {
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
+        if (!MinecraftSettings.getInstance().isShowEventListenerGutterIcons()) {
+            return;
+        }
+
         // Since we want to line up with the method declaration, not the annotation
         // declaration, we need to target identifiers, not just PsiMethods.
         if (!(element instanceof PsiIdentifier && (element.getParent() instanceof PsiMethod))) {

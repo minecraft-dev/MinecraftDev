@@ -109,7 +109,13 @@
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ColorLineMarkerProvider"/>
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
+        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ColorAnnotator"/>
         <projectViewNodeDecorator implementation="com.demonwav.mcdev.platform.MinecraftProjectViewNodeDecorator"/>
+        <applicationConfigurable displayName="Minecraft Development"
+                                 id="Settings.Minecraft"
+                                 groupId="language"
+                                 instance="com.demonwav.mcdev.MinecraftConfigurable"/>
+        <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.idea.maven">
         <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.BukkitMavenImporter"/>

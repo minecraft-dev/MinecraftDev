@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.insight;
 
+import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.asset.PlatformAssets;
 
 import com.intellij.codeHighlighting.Pass;
@@ -56,6 +57,10 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
     @Override
     @Nullable
     public LineMarkerInfo getLineMarkerInfo(@NotNull final PsiElement element) {
+        if (!MinecraftSettings.getInstance().isShowEventListenerGutterIcons()) {
+            return null;
+        }
+
         final Pair<PsiClass, PsiMethod> listener = InsightUtil.getEventListenerFromElement(element);
         if (listener == null) {
             return null;

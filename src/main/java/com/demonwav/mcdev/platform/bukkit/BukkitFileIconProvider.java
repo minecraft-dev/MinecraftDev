@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.platform.bukkit;
 
+import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.platform.MinecraftModule;
 
 import com.intellij.ide.FileIconProvider;
@@ -17,6 +18,10 @@ public class BukkitFileIconProvider implements FileIconProvider {
     @Nullable
     @Override
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {
+        if (!MinecraftSettings.getInstance().isShowProjectPlatformIcons()) {
+            return null;
+        }
+
         if (project != null) {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
                 BukkitModule bukkitModule = MinecraftModule.getInstance(module, BukkitModuleType.getInstance());
