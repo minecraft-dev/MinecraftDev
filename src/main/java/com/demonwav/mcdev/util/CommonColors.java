@@ -3,6 +3,7 @@ package com.demonwav.mcdev.util;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
+import java.util.Map;
 
 public final class CommonColors {
 
