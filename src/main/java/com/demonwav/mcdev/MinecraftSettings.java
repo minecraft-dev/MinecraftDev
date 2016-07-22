@@ -8,7 +8,6 @@ import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.editor.markup.EffectType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @State(
         name = "MinecraftSettings",
@@ -16,13 +15,15 @@ import org.jetbrains.annotations.Nullable;
 )
 public class MinecraftSettings implements PersistentStateComponent<MinecraftSettingsState> {
 
+    @NotNull
     private MinecraftSettingsState state = new MinecraftSettingsState();
 
+    @NotNull
     public static MinecraftSettings getInstance() {
         return ServiceManager.getService(MinecraftSettings.class);
     }
 
-    @Nullable
+    @NotNull
     @Override
     public MinecraftSettingsState getState() {
         return state;
@@ -66,11 +67,12 @@ public class MinecraftSettings implements PersistentStateComponent<MinecraftSett
         state.setShowChatColorUnderlines(showChatColorUnderlines);
     }
 
+    @NotNull
     public UnderlineType getUnderlineType() {
         return state.getUnderlineType();
     }
 
-    public void setUnderlineType(UnderlineType underlineType) {
+    public void setUnderlineType(@NotNull UnderlineType underlineType) {
         state.setUnderlineType(underlineType);
     }
 
@@ -85,6 +87,7 @@ public class MinecraftSettings implements PersistentStateComponent<MinecraftSett
     }
 
     public enum UnderlineType {
+
         NORMAL("Normal", EffectType.LINE_UNDERSCORE),
         BOLD("Bold", EffectType.BOLD_LINE_UNDERSCORE),
         DOTTED("Dotted", EffectType.BOLD_DOTTED_LINE),
@@ -95,11 +98,12 @@ public class MinecraftSettings implements PersistentStateComponent<MinecraftSett
         private final String regular;
         private final EffectType effectType;
 
-        UnderlineType(final String regular, final EffectType effectType) {
+        UnderlineType(@NotNull final String regular, @NotNull final EffectType effectType) {
             this.regular = regular;
             this.effectType = effectType;
         }
 
+        @NotNull
         @Override
         @Contract(pure = true)
         public String toString() {

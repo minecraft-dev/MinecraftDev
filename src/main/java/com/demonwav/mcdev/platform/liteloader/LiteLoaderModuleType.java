@@ -3,16 +3,13 @@ package com.demonwav.mcdev.platform.liteloader;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
-import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.util.CommonColors;
 
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -33,11 +30,6 @@ public class LiteLoaderModuleType extends AbstractModuleType<LiteLoaderModule> {
     @Override
     public PlatformType getPlatformType() {
         return PlatformType.LITELOADER;
-    }
-
-    @Override
-    public Icon getBigIcon() {
-        return PlatformAssets.LITELOADER_ICON_2X;
     }
 
     @Override

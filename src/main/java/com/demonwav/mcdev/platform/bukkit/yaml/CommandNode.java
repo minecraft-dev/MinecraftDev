@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.platform.bukkit.yaml;
 
+import com.google.common.base.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class CommandNode {
 
     /*
@@ -102,55 +104,31 @@ public class CommandNode {
 
     @Override
     public String toString() {
-        return "CommandNode{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", aliases=" + aliases +
-                ", permission='" + permission + '\'' +
-                ", permissionMessage='" + permissionMessage + '\'' +
-                ", usage='" + usage + '\'' +
-                '}';
+        return Objects.toStringHelper(this)
+            .add("name", name)
+            .add("description", description)
+            .add("aliases", aliases)
+            .add("permission", permission)
+            .add("permissionMessage", permissionMessage)
+            .add("usage", usage)
+            .toString();
     }
 
-    @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         CommandNode that = (CommandNode) o;
-
-        if (!name.equals(that.name)) {
-            return false;
-        }
-        if (description != null ? !description.equals(that.description) : that.description != null) {
-            return false;
-        }
-        if (!aliases.equals(that.aliases)) {
-            return false;
-        }
-        if (permission != null ? !permission.equals(that.permission) : that.permission != null) {
-            return false;
-        }
-        if (permissionMessage != null ? !permissionMessage.equals(that.permissionMessage) : that.permissionMessage != null) {
-            return false;
-        }
-        return usage != null ? usage.equals(that.usage) : that.usage == null;
-
+        return Objects.equal(name, that.name) &&
+            Objects.equal(description, that.description) &&
+            Objects.equal(aliases, that.aliases) &&
+            Objects.equal(permission, that.permission) &&
+            Objects.equal(permissionMessage, that.permissionMessage) &&
+            Objects.equal(usage, that.usage);
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + aliases.hashCode();
-        result = 31 * result + (permission != null ? permission.hashCode() : 0);
-        result = 31 * result + (permissionMessage != null ? permissionMessage.hashCode() : 0);
-        result = 31 * result + (usage != null ? usage.hashCode() : 0);
-        return result;
+        return Objects.hashCode(name, description, aliases, permission, permissionMessage, usage);
     }
 }

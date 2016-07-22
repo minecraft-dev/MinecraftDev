@@ -18,6 +18,7 @@ public class SpongeTemplate extends AbstractTemplate {
     @Nullable
     public static String applyPomTemplate(@NotNull Project project,
                                           @NotNull String version) {
+
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", version);
 
@@ -35,8 +36,9 @@ public class SpongeTemplate extends AbstractTemplate {
                                               @NotNull VirtualFile mainClassFile,
                                               @NotNull String packageName,
                                               @NotNull String className,
-                                              @NotNull boolean hasDependencies,
-                                              @NotNull boolean generateDocumentation) {
+                                              boolean hasDependencies,
+                                              boolean generateDocumentation) {
+
         Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);

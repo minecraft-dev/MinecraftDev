@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class MinecraftProjectCreator {
 
     public int index = 0;
@@ -103,7 +104,9 @@ public class MinecraftProjectCreator {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
 
-                Map<GradleBuildSystem, ProjectConfiguration> map = gradleBuildSystem.createMultiModuleProject(module.getProject(), settings, indicator);
+                Map<GradleBuildSystem, ProjectConfiguration> map = gradleBuildSystem
+                    .createMultiModuleProject(module.getProject(), settings, indicator);
+
                 map.forEach((g, p) -> {
                     p.create(module.getProject(), g, indicator);
                     p.type.getType().performCreationSettingSetup(module.getProject());
@@ -113,7 +116,9 @@ public class MinecraftProjectCreator {
         });
     }
 
-    public static void addDependencies(ProjectConfiguration configuration, List<BuildRepository> buildRepositories, List<BuildDependency> buildDependencies) {
+    public static void addDependencies(@NotNull ProjectConfiguration configuration,
+                                       @NotNull List<BuildRepository> buildRepositories,
+                                       @NotNull List<BuildDependency> buildDependencies) {
         // Forge doesn't have a dependency like this
         if (configuration.type == FORGE) {
             return;
@@ -261,76 +266,44 @@ public class MinecraftProjectCreator {
 
     @Override
     public String toString() {
-        return "MinecraftProjectCreator{" +
-                "root=" + root +
-                ", groupId='" + groupId + '\'' +
-                ", artifactId='" + artifactId + '\'' +
-                ", version='" + version + '\'' +
-                ", module=" + module +
-                ", settings=" + settings +
-                ", sourceDir=" + sourceDir +
-                ", resourceDir=" + resourceDir +
-                ", testDir=" + testDir +
-                ", pomFile=" + pomFile +
-                '}';
+        return Objects.toStringHelper(this)
+            .add("index", index)
+            .add("root", root)
+            .add("groupId", groupId)
+            .add("artifactId", artifactId)
+            .add("version", version)
+            .add("module", module)
+            .add("buildSystem", buildSystem)
+            .add("settings", settings)
+            .add("sourceDir", sourceDir)
+            .add("resourceDir", resourceDir)
+            .add("testDir", testDir)
+            .add("pomFile", pomFile)
+            .toString();
     }
 
-    @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         MinecraftProjectCreator that = (MinecraftProjectCreator) o;
-
-        if (!Objects.equal(this.root, that.root)) {
-            return false;
-        }
-        if (!Objects.equal(this.groupId, that.groupId)) {
-            return false;
-        }
-        if (!Objects.equal(this.artifactId, that.artifactId)) {
-            return false;
-        }
-        if (!Objects.equal(this.version, that.version)) {
-            return false;
-        }
-        if (!Objects.equal(this.module, that.module)) {
-            return false;
-        }
-        if (!Objects.equal(this.settings, that.settings)) {
-            return false;
-        }
-        if (!Objects.equal(this.sourceDir, that.sourceDir)) {
-            return false;
-        }
-        if (!Objects.equal(this.resourceDir, that.resourceDir)) {
-            return false;
-        }
-        if (!Objects.equal(this.testDir, that.testDir)) {
-            return false;
-        }
-        return Objects.equal(this.pomFile, that.pomFile);
-
+        return index == that.index &&
+            Objects.equal(root, that.root) &&
+            Objects.equal(groupId, that.groupId) &&
+            Objects.equal(artifactId, that.artifactId) &&
+            Objects.equal(version, that.version) &&
+            Objects.equal(module, that.module) &&
+            Objects.equal(buildSystem, that.buildSystem) &&
+            Objects.equal(settings, that.settings) &&
+            Objects.equal(sourceDir, that.sourceDir) &&
+            Objects.equal(resourceDir, that.resourceDir) &&
+            Objects.equal(testDir, that.testDir) &&
+            Objects.equal(pomFile, that.pomFile);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(
-                root,
-                groupId,
-                artifactId,
-                version,
-                module,
-                settings,
-                sourceDir,
-                resourceDir,
-                testDir,
-                pomFile
-        );
+        return Objects.hashCode(index, root, groupId, artifactId, version, module,
+            buildSystem, settings, sourceDir, resourceDir, testDir,pomFile);
     }
 }

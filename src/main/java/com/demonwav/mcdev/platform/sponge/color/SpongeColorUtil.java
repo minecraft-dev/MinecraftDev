@@ -23,6 +23,7 @@ import java.awt.Color;
 
 public class SpongeColorUtil {
 
+    @Nullable
     public static Pair<Color, PsiElement> findColorFromElement(@NotNull PsiElement element) {
         if (!(element instanceof PsiMethodCallExpression)) {
             return null;
@@ -40,7 +41,7 @@ public class SpongeColorUtil {
             return null;
         }
 
-        if (!minecraftModule.getTypes().contains(SpongeModuleType.getInstance())) {
+        if (!minecraftModule.isOfType(SpongeModuleType.getInstance())) {
             return null;
         }
 
@@ -63,19 +64,19 @@ public class SpongeColorUtil {
         // Single Integer Argument
         if (types.length == 1 && types[0] == PsiType.INT) {
             pair = new Pair<>(
-                handleSingleArgument(element, (PsiLiteralExpression) expressionList.getExpressions()[0]),
+                handleSingleArgument((PsiLiteralExpression) expressionList.getExpressions()[0]),
                 expressionList.getExpressions()[0]
             );
 
 
-            // Triple Integer Argument
+        // Triple Integer Argument
         } else if (types.length == 3 && types[0] == PsiType.INT && types[1] == PsiType.INT && types[2] == PsiType.INT) {
             pair = new Pair<>(
-                handleThreeArguments(element, expressionList),
+                handleThreeArguments(expressionList),
                 expressionList
             );
 
-            // Single Vector3* Argument
+        // Single Vector3* Argument
         } else if (types.length == 1 &&
             (
                 types[0].equals(PsiType.getTypeByName("com.flowpowered.math.vector.Vector3i", project, GlobalSearchScope.allScope(project))) ||
@@ -85,7 +86,7 @@ public class SpongeColorUtil {
         ) {
             try {
                 pair = new Pair<>(
-                    handleVectorArgument(element, (PsiNewExpression) expressionList.getExpressions()[0]),
+                    handleVectorArgument((PsiNewExpression) expressionList.getExpressions()[0]),
                     expressionList.getExpressions()[0]
                 );
             } catch (Exception ignored) {}
@@ -95,14 +96,14 @@ public class SpongeColorUtil {
     }
 
     @NotNull
-    private static Color handleSingleArgument(@NotNull PsiElement element, @NotNull PsiLiteralExpression expression) {
+    private static Color handleSingleArgument(@NotNull PsiLiteralExpression expression) {
         int value = Integer.decode(expression.getText());
 
         return new Color(value);
     }
 
     @Nullable
-    private static Color handleThreeArguments(@NotNull PsiElement element, @NotNull PsiExpressionList expressionList) {
+    private static Color handleThreeArguments(@NotNull PsiExpressionList expressionList) {
         try {
             PsiLiteralExpression expressionOne = (PsiLiteralExpression) expressionList.getExpressions()[0];
             PsiLiteralExpression expressionTwo= (PsiLiteralExpression) expressionList.getExpressions()[1];
@@ -118,12 +119,12 @@ public class SpongeColorUtil {
     }
 
     @Nullable
-    private static Color handleVectorArgument(@NotNull PsiElement element, @NotNull PsiNewExpression newExpression) {
+    private static Color handleVectorArgument(@NotNull PsiNewExpression newExpression) {
         PsiExpressionList expressionList = (PsiExpressionList) newExpression.getNode().findChildByType(JavaElementType.EXPRESSION_LIST);
         if (expressionList == null) {
             return null;
         }
 
-        return handleThreeArguments(element, expressionList);
+        return handleThreeArguments(expressionList);
     }
 }

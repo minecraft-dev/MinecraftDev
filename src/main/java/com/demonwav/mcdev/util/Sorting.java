@@ -1,5 +1,7 @@
 package com.demonwav.mcdev.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@SuppressWarnings("WeakerAccess")
 public class Sorting {
 
     public static final Comparator<int[]> LEXICOGRAPHICAL_ORDER = (one, two) -> {
@@ -40,7 +43,8 @@ public class Sorting {
      */
     private static final int[] ARRAY_1_8_8 = new int[] { 1, 8, 8 };
 
-    public static List<String> sortVersions(Collection<?> versions) {
+    @NotNull
+    public static List<String> sortVersions(@NotNull Collection<?> versions) {
         // Populate a list of the keys (and cast them to String) so they can be sorted
         List<String> list = new ArrayList<>(versions.size());
         list.addAll(versions.stream().map(Object::toString).collect(Collectors.toList()));
@@ -59,6 +63,7 @@ public class Sorting {
         intList.sort(Sorting.REVERSE_LEXICOGRAPHICAL_ORDER);
         intList.removeIf(ints -> Sorting.LEXICOGRAPHICAL_ORDER.compare(ints, ARRAY_1_8_8) < 0);
 
-        return intList.stream().map(ints -> Arrays.stream(ints).mapToObj(String::valueOf).collect(Collectors.joining("."))).collect(Collectors.toList());
+        return intList.stream().map(ints -> Arrays.stream(ints).mapToObj(String::valueOf).collect(Collectors.joining(".")))
+            .collect(Collectors.toList());
     }
 }

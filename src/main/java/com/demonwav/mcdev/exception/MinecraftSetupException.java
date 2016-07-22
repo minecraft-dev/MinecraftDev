@@ -1,11 +1,13 @@
 package com.demonwav.mcdev.exception;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.JComponent;
 
 public class MinecraftSetupException extends Exception {
     private JComponent j;
 
-    public MinecraftSetupException(String msg, JComponent j) {
+    public MinecraftSetupException(@NotNull String msg, @NotNull JComponent j) {
         super(msg);
         this.j = j;
     }

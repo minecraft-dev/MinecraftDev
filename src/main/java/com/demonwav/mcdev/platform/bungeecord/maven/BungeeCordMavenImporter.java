@@ -30,6 +30,7 @@ import org.jetbrains.idea.maven.utils.MavenProcessCanceledException;
 import java.util.Objects;
 
 public class BungeeCordMavenImporter extends AbstractMavenImporter {
+
     public BungeeCordMavenImporter() {
         super(BungeeCordModuleType.getInstance());
     }
@@ -46,6 +47,7 @@ public class BungeeCordMavenImporter extends AbstractMavenImporter {
                         NativeMavenProjectHolder nativeMavenProject,
                         MavenEmbedderWrapper embedder,
                         ResolveContext context) throws MavenProcessCanceledException {
+
         super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
         for (Module module : ModuleManager.getInstance(project).getModules()) {
             // We'll make sure the project is setup

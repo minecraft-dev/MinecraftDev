@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class PluginConfig {
 
     /*
@@ -38,7 +39,7 @@ public class PluginConfig {
      *
      * @see LoadOrder
      */
-    @NotNull private LoadOrder load = LoadOrder.POSTWORLD;
+    @NotNull private LoadOrder load = LoadOrder.POST_WORLD;
     /**
      * A list of plugins the plugin should load before.
      *

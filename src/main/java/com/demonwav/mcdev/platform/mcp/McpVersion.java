@@ -22,6 +22,7 @@ import java.util.Set;
 
 import javax.swing.JComboBox;
 
+@SuppressWarnings("WeakerAccess")
 public class McpVersion {
 
     @NotNull
@@ -85,16 +86,20 @@ public class McpVersion {
         mcpVersionBox.removeAllItems();
 
         Pair<List<Integer>, List<Integer>> stable = getStable(version);
-        stable.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("stable_" + s)).forEach(mcpVersionBox::addItem);
+        stable.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1)
+            .map(s -> new McpVersionEntry("stable_" + s)).forEach(mcpVersionBox::addItem);
 
         Pair<List<Integer>, List<Integer>> snapshot = getSnapshot(version);
-        snapshot.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("snapshot_" + s)).forEach(mcpVersionBox::addItem);
+        snapshot.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1)
+            .map(s -> new McpVersionEntry("snapshot_" + s)).forEach(mcpVersionBox::addItem);
 
         // The "seconds" in the pairs are bad, but still available to the user
         // We will color them read
 
-        stable.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("stable_" + s, true)).forEach(mcpVersionBox::addItem);
-        snapshot.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1).map(s -> new McpVersionEntry("snapshot_" + s, true)).forEach(mcpVersionBox::addItem);
+        stable.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1)
+            .map(s -> new McpVersionEntry("stable_" + s, true)).forEach(mcpVersionBox::addItem);
+        snapshot.getSecond().stream().sorted((one, two) -> one.compareTo(two) * -1)
+            .map(s -> new McpVersionEntry("snapshot_" + s, true)).forEach(mcpVersionBox::addItem);
 
         mcpVersionBox.addActionListener(actionListener);
     }

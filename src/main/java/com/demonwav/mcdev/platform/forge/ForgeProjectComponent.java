@@ -18,7 +18,7 @@ public class ForgeProjectComponent extends AbstractProjectComponent {
     @Override
     public void projectOpened() {
         // assign mcmod.info json thing
-        ApplicationManager.getApplication().runWriteAction(() -> {
+        ApplicationManager.getApplication().runWriteAction(() ->
             FileTypeManager.getInstance().associate(JsonFileType.INSTANCE, new FileNameMatcher() {
                 @Override
                 public boolean accept(@NonNls @NotNull String fileName) {
@@ -30,7 +30,7 @@ public class ForgeProjectComponent extends AbstractProjectComponent {
                 public String getPresentableString() {
                     return "mcmod.info";
                 }
-            });
-        });
+            })
+        );
     }
 }

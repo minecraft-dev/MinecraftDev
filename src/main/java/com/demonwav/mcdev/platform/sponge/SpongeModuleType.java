@@ -10,9 +10,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -34,15 +32,6 @@ public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
     @Override
     public PlatformType getPlatformType() {
         return PlatformType.SPONGE;
-    }
-
-    @Override
-    public Icon getBigIcon() {
-        if (UIUtil.isUnderDarcula()) {
-            return PlatformAssets.SPONGE_ICON_2X;
-        } else {
-            return PlatformAssets.SPONGE_ICON_DARK_2X;
-        }
     }
 
     @Override

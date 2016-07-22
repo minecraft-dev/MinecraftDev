@@ -7,6 +7,7 @@ import com.intellij.openapi.module.ModuleType;
 import org.jetbrains.annotations.NotNull;
 
 public class PaperMavenImporter extends SpigotMavenImporter {
+
     public PaperMavenImporter() {
         super(PaperModuleType.getInstance());
     }

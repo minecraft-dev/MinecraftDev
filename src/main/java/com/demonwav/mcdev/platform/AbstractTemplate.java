@@ -23,6 +23,7 @@ public abstract class AbstractTemplate {
                                                 @NotNull String groupId,
                                                 @NotNull String pluginVersion,
                                                 @NotNull String buildVersion) {
+
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", buildVersion);
         properties.setProperty("PLUGIN_VERSION", pluginVersion);
@@ -44,6 +45,7 @@ public abstract class AbstractTemplate {
                                                            @NotNull String groupId,
                                                            @NotNull String pluginVersion,
                                                            @NotNull String buildVersion) {
+
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", buildVersion);
         properties.setProperty("VERSION", pluginVersion);
@@ -60,6 +62,7 @@ public abstract class AbstractTemplate {
                                                    @NotNull VirtualFile  file,
                                                    @NotNull String projectName,
                                                    @NotNull String includes) {
+
         Properties properties = new Properties();
         properties.setProperty("PROJECT_NAME", projectName);
         properties.setProperty("INCLUDES", includes);
@@ -74,6 +77,7 @@ public abstract class AbstractTemplate {
     @Nullable
     public static String applySubmoduleBuildGradleTemplate(@NotNull Project project,
                                                            @NotNull String commonProjectName) {
+
         Properties properties = new Properties();
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
 
@@ -88,11 +92,20 @@ public abstract class AbstractTemplate {
         return null;
     }
 
-    protected static void applyTemplate(Project project, VirtualFile file, String templateName, Properties properties) throws IOException {
+    protected static void applyTemplate(@NotNull Project project,
+                                        @NotNull VirtualFile file,
+                                        @NotNull String templateName,
+                                        @NotNull Properties properties) throws IOException {
+
         applyTemplate(project, file, templateName, properties, false);
     }
 
-    protected static void applyTemplate(Project project, VirtualFile file, String templateName, Properties properties, boolean trimNewlines) throws IOException {
+    protected static void applyTemplate(@NotNull Project project,
+                                        @NotNull VirtualFile file,
+                                        @NotNull String templateName,
+                                        @NotNull Properties properties,
+                                        boolean trimNewlines) throws IOException {
+
         FileTemplateManager manager = FileTemplateManager.getInstance(project);
         FileTemplate template = manager.getJ2eeTemplate(templateName);
 

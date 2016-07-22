@@ -20,6 +20,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class ColorPicker {
+
+    @NotNull
     private JPanel panel = new JPanel(new GridBagLayout());
 
     private String chosenColor;
@@ -35,6 +37,7 @@ public class ColorPicker {
         this.colorMap = colorMap;
     }
 
+    @Nullable
     public String showDialog() {
         init();
 
@@ -73,13 +76,14 @@ public class ColorPicker {
             constraints.insets = new Insets(10, 10, 10, 10);
 
             panel.add(
-                    label,
-                    constraints
+                label,
+                constraints
             );
         }
     }
 
     private static class ColorPickerDialog extends DialogWrapper {
+
         private final JComponent component;
 
         ColorPickerDialog(@NotNull Component parent, @NotNull JComponent component) {

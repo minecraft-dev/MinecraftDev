@@ -1,11 +1,15 @@
 package com.demonwav.mcdev;
 
+import org.jetbrains.annotations.NotNull;
+
 public class MinecraftSettingsState {
+
     private boolean showProjectPlatformIcons = true;
     private boolean showEventListenerGutterIcons = true;
     private boolean showChatColorGutterIcons = true;
     private boolean showChatColorUnderlines = false;
 
+    @NotNull
     private MinecraftSettings.UnderlineType underlineType = MinecraftSettings.UnderlineType.DOTTED;
 
     public boolean isShowProjectPlatformIcons() {
@@ -40,11 +44,12 @@ public class MinecraftSettingsState {
         this.showChatColorUnderlines = showChatColorUnderlines;
     }
 
+    @NotNull
     public MinecraftSettings.UnderlineType getUnderlineType() {
         return underlineType;
     }
 
-    public void setUnderlineType(MinecraftSettings.UnderlineType underlineType) {
+    public void setUnderlineType(@NotNull MinecraftSettings.UnderlineType underlineType) {
         this.underlineType = underlineType;
     }
 }

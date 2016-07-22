@@ -5,35 +5,37 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
+import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("WeakerAccess")
 public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescriptorFactory {
     
-    public static final String BUKKIT_MAIN_CLASS_TEMPLATE = "bukkit_main_class.java";
-    public static final String BUKKIT_PLUGIN_YML_TEMPLATE = "bukkit_plugin_description_file.yml";
-    public static final String BUKKIT_POM_TEMPLATE = "bukkit_pom_template.xml";
+    @NotNull public static final String BUKKIT_MAIN_CLASS_TEMPLATE = "bukkit_main_class.java";
+    @NotNull public static final String BUKKIT_PLUGIN_YML_TEMPLATE = "bukkit_plugin_description_file.yml";
+    @NotNull public static final String BUKKIT_POM_TEMPLATE = "bukkit_pom_template.xml";
 
-    public static final String BUNGEECORD_MAIN_CLASS_TEMPLATE = "bungeecord_main_class.java";
-    public static final String BUNGEECORD_PLUGIN_YML_TEMPLATE = "bungeecord_plugin_description_file.yml";
-    public static final String BUNGEECORD_POM_TEMPLATE = "bungeecord_pom_template.xml";
+    @NotNull public static final String BUNGEECORD_MAIN_CLASS_TEMPLATE = "bungeecord_main_class.java";
+    @NotNull public static final String BUNGEECORD_PLUGIN_YML_TEMPLATE = "bungeecord_plugin_description_file.yml";
+    @NotNull public static final String BUNGEECORD_POM_TEMPLATE = "bungeecord_pom_template.xml";
 
-    public static final String SPONGE_BUILD_GRADLE_TEMPLATE = "sponge_build.gradle";
-    public static final String SPONGE_SUBMODULE_BUILD_GRADLE_TEMPLATE = "sponge_submodule_build.gradle";
-    public static final String SPONGE_MAIN_CLASS_TEMPLATE = "sponge_main_class.java";
-    public static final String SPONGE_POM_TEMPLATE = "sponge_pom_template.xml";
+    @NotNull public static final String SPONGE_BUILD_GRADLE_TEMPLATE = "sponge_build.gradle";
+    @NotNull public static final String SPONGE_SUBMODULE_BUILD_GRADLE_TEMPLATE = "sponge_submodule_build.gradle";
+    @NotNull public static final String SPONGE_MAIN_CLASS_TEMPLATE = "sponge_main_class.java";
+    @NotNull public static final String SPONGE_POM_TEMPLATE = "sponge_pom_template.xml";
 
-    public static final String FORGE_BUILD_GRADLE_TEMPLATE = "forge_build.gradle";
-    public static final String FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE = "forge_submodule_build.gradle";
-    public static final String FORGE_MAIN_CLASS_TEMPLATE = "forge_main_class.java";
-    public static final String MCMOD_INFO_TEMPLATE = "mcmod.info";
+    @NotNull public static final String FORGE_BUILD_GRADLE_TEMPLATE = "forge_build.gradle";
+    @NotNull public static final String FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE = "forge_submodule_build.gradle";
+    @NotNull public static final String FORGE_MAIN_CLASS_TEMPLATE = "forge_main_class.java";
+    @NotNull public static final String MCMOD_INFO_TEMPLATE = "mcmod.info";
 
-    public static final String MULTI_MODULE_BUILD_GRADLE_TEMPLATE = "multi_module_build.gradle";
-    public static final String BUILD_GRADLE_TEMPLATE = "build.gradle";
-    public static final String SETTINGS_GRADLE_TEMPLATE = "settings.gradle";
-    public static final String SUBMODULE_BUILD_GRADLE_TEMPLATE = "submodule_build.gradle";
+    @NotNull public static final String MULTI_MODULE_BUILD_GRADLE_TEMPLATE = "multi_module_build.gradle";
+    @NotNull public static final String BUILD_GRADLE_TEMPLATE = "build.gradle";
+    @NotNull public static final String SETTINGS_GRADLE_TEMPLATE = "settings.gradle";
+    @NotNull public static final String SUBMODULE_BUILD_GRADLE_TEMPLATE = "submodule_build.gradle";
 
-    public static final String LITELOADER_BUILD_GRADLE_TEMPLATE = "liteloader_build.gradle";
-    public static final String LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE = "liteloader_submodule_build.gradle";
-    public static final String LITELOADER_MAIN_CLASS_TEMPLATE = "liteloader_main_class.java";
+    @NotNull public static final String LITELOADER_BUILD_GRADLE_TEMPLATE = "liteloader_build.gradle";
+    @NotNull public static final String LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE = "liteloader_submodule_build.gradle";
+    @NotNull public static final String LITELOADER_MAIN_CLASS_TEMPLATE = "liteloader_main_class.java";
 
     @Override
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {

@@ -42,12 +42,12 @@ public class SpongeForgeProjectConfiguration extends ForgeProjectConfiguration {
 
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
                 SpongeTemplate.applyMainClassTemplate(
-                        project,
-                        mainClassFile,
-                        packageName,
-                        className,
-                        hasDependencies(),
-                        generateDocumentation
+                    project,
+                    mainClassFile,
+                    packageName,
+                    className,
+                    hasDependencies(),
+                    generateDocumentation
                 );
 
                 writeMcmodInfo(project, buildSystem);
@@ -59,17 +59,17 @@ public class SpongeForgeProjectConfiguration extends ForgeProjectConfiguration {
                 PsiClass psiClass = mainClassPsi.getClasses()[0];
 
                 SpongeProjectConfiguration.writeMainSpongeClass(
-                        project,
-                        mainClassPsi,
-                        psiClass,
-                        buildSystem,
-                        pluginName,
-                        description,
-                        website,
-                        hasAuthors(),
-                        authors,
-                        hasDependencies(),
-                        dependencies
+                    project,
+                    mainClassPsi,
+                    psiClass,
+                    buildSystem,
+                    pluginName,
+                    description,
+                    website,
+                    hasAuthors(),
+                    authors,
+                    hasDependencies(),
+                    dependencies
                 );
 
                 // Set the editor focus on the main class

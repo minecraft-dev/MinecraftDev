@@ -25,8 +25,9 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
         CommonColors.applyStandardColors(this.colorMap, "org.bukkit.ChatColor");
     }
 
-    protected BukkitModuleType(final String ID, final String groupId, final String artifactId) {
+    protected BukkitModuleType(final String groupId, final String artifactId) {
         super(groupId, artifactId);
+
         CommonColors.applyStandardColors(this.colorMap, "org.bukkit.ChatColor");
     }
 
@@ -37,11 +38,6 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
     @Override
     public PlatformType getPlatformType() {
         return PlatformType.BUKKIT;
-    }
-
-    @Override
-    public Icon getBigIcon() {
-        return PlatformAssets.BUKKIT_ICON_2X;
     }
 
     @Override

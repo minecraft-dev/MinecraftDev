@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.Icon;
 
 public class BungeeCordFileIconProvider implements FileIconProvider {
+
     @Nullable
     @Override
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {

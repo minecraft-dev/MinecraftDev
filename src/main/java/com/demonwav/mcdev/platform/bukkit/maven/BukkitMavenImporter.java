@@ -7,6 +7,7 @@ import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.ModuleType;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public class BukkitMavenImporter extends AbstractMavenImporter {
 
     public BukkitMavenImporter() {

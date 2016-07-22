@@ -49,15 +49,17 @@ public abstract class AbstractMavenImporter extends MavenImporter {
 
     @Override
     public void process(IdeModifiableModelsProvider modifiableModelsProvider,
-                                 Module module,
-                                 MavenRootModelAdapter rootModel,
-                                 MavenProjectsTree mavenModel,
-                                 MavenProject mavenProject,
-                                 MavenProjectChanges changes,
-                                 Map<MavenProject, String> mavenProjectToModuleName,
-                                 List<MavenProjectsProcessorTask> postTasks) {
+                        Module module,
+                        MavenRootModelAdapter rootModel,
+                        MavenProjectsTree mavenModel,
+                        MavenProject mavenProject,
+                        MavenProjectChanges changes,
+                        Map<MavenProject, String> mavenProjectToModuleName,
+                        List<MavenProjectsProcessorTask> postTasks) {
+
         postTasks.add((project, embeddersManager, console, indicator) ->
-            MavenProjectsManager.getInstance(module.getProject()).addManagedFilesOrUnignore(Collections.singletonList(mavenProject.getFile()))
+            MavenProjectsManager.getInstance(module.getProject())
+                .addManagedFilesOrUnignore(Collections.singletonList(mavenProject.getFile()))
         );
     }
 
@@ -72,6 +74,7 @@ public abstract class AbstractMavenImporter extends MavenImporter {
                         NativeMavenProjectHolder nativeMavenProject,
                         MavenEmbedderWrapper embedder,
                         ResolveContext context) throws MavenProcessCanceledException {
+
         super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
         for (Module module : ModuleManager.getInstance(project).getModules()) {
             // We'll make sure the project is setup

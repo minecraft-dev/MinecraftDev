@@ -14,7 +14,7 @@ public class PaperModuleType extends SpigotModuleType {
     private static final PaperModuleType instance = new PaperModuleType();
 
     private PaperModuleType() {
-        super(ID, "com.destroystokyo.paper", "paper-api");
+        super("com.destroystokyo.paper", "paper-api");
     }
 
     public static PaperModuleType getInstance() {
@@ -24,11 +24,6 @@ public class PaperModuleType extends SpigotModuleType {
     @Override
     public PlatformType getPlatformType() {
         return PlatformType.PAPER;
-    }
-
-    @Override
-    public Icon getBigIcon() {
-        return PlatformAssets.PAPER_ICON_2X;
     }
 
     @Override

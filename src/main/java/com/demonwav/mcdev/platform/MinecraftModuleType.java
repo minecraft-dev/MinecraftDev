@@ -20,6 +20,7 @@ public class MinecraftModuleType extends JavaModuleType {
     private static final String ID = "MINECRAFT_MODULE_TYPE";
     public static final String OPTION = "com.demonwav.mcdev.MinecraftModuleTypes";
 
+    @NotNull
     public static MinecraftModuleType getInstance() {
         return (MinecraftModuleType) ModuleTypeManager.getInstance().findByID(ID);
     }

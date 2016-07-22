@@ -143,7 +143,7 @@ public class MinecraftModule {
         return (T) modules.get(type);
     }
 
-    public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
+    public boolean isEventClassValid(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
         for (AbstractModule abstractModule : modules.values()) {
             boolean good = abstractModule.getModuleType().getListenerAnnotations().stream()
                     .anyMatch(listenerAnnotation -> method.getModifierList().findAnnotation(listenerAnnotation) != null);
@@ -155,7 +155,7 @@ public class MinecraftModule {
         return false;
     }
 
-    public String writeErrorMessageForEvent(PsiClass eventClass, PsiMethod method) {
+    public String writeErrorMessageForEvent(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
         for (AbstractModule abstractModule : modules.values()) {
             boolean good = abstractModule.getModuleType().getListenerAnnotations().stream()
                     .anyMatch(listenerAnnotation -> method.getModifierList().findAnnotation(listenerAnnotation) != null);
@@ -167,7 +167,7 @@ public class MinecraftModule {
         return null;
     }
 
-    public void addModuleType(String moduleTypeName) {
+    public void addModuleType(@NotNull String moduleTypeName) {
         AbstractModuleType<?> type = PlatformType.getByName(moduleTypeName);
         if (type != null && !modules.containsKey(type)) {
             modules.put(type, type.generateModule(module));
@@ -175,7 +175,7 @@ public class MinecraftModule {
         ProjectView.getInstance(module.getProject()).refresh();
     }
 
-    public void removeModuleType(String moduleTypeName) {
+    public void removeModuleType(@NotNull String moduleTypeName) {
         AbstractModuleType<?> type = PlatformType.getByName(moduleTypeName);
         if (type != null && modules.containsKey(type)) {
             modules.remove(type);

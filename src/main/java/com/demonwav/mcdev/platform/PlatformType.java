@@ -8,10 +8,12 @@ import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public enum PlatformType {
+
     BUKKIT(BukkitModuleType.getInstance(), "BUKKIT_MODULE_TYPE", "Bukkit"),
     SPIGOT(SpigotModuleType.getInstance(), "SPIGOT_MODULE_TYPE", "Spigot"),
     PAPER(PaperModuleType.getInstance(), "PAPER_MODULE_TYPE", "Paper"),
@@ -31,6 +33,7 @@ public enum PlatformType {
     }
 
     @NotNull
+    @Contract(pure = true)
     public AbstractModuleType getType() {
         return type;
     }

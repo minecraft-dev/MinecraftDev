@@ -36,7 +36,7 @@ public class ColorLineMarkerProvider implements LineMarkerProvider {
             return null;
         }
 
-        ColorInfo info =  ColorUtil.findColorFromElement(element, (map, chosenEntry) -> new ColorInfo(element, chosenEntry.getValue(), map));
+        ColorInfo info =  ColorUtil.findColorFromElement(element, (map, chosen) -> new ColorInfo(element, chosen.getValue(), map));
         if (info != null) {
             NavigateAction.setNavigateAction(info, "Change color", null);
         }
@@ -80,15 +80,17 @@ public class ColorLineMarkerProvider implements LineMarkerProvider {
             this.color = color;
         }
 
-        public ColorInfo(@NotNull final PsiElement element, @NotNull final Color color, @NotNull GutterIconNavigationHandler<PsiElement> handler) {
+        public ColorInfo(@NotNull PsiElement element,
+                         @NotNull Color color,
+                         @NotNull GutterIconNavigationHandler<PsiElement> handler) {
             super(
-                    element,
-                    element.getTextRange(),
-                    new ColorIcon(12, color),
-                    Pass.UPDATE_ALL,
-                    FunctionUtil.<Object, String>nullConstant(),
-                    handler,
-                    GutterIconRenderer.Alignment.LEFT
+                element,
+                element.getTextRange(),
+                new ColorIcon(12, color),
+                Pass.UPDATE_ALL,
+                FunctionUtil.<Object, String>nullConstant(),
+                handler,
+                GutterIconRenderer.Alignment.LEFT
             );
             this.color = color;
         }

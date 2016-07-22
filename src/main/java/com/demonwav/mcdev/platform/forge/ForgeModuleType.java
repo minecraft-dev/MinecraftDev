@@ -9,9 +9,7 @@ import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -32,11 +30,6 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
     @Override
     public PlatformType getPlatformType() {
         return PlatformType.FORGE;
-    }
-
-    @Override
-    public Icon getBigIcon() {
-        return PlatformAssets.FORGE_ICON_2X;
     }
 
     @Override

@@ -68,7 +68,13 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
         // By this point, we can guarantee that the action of "go to declaration" will work
         // since the PsiClass can be resolved, meaning the event listener is listening to
         // a valid event.
-        return new EventLineMarkerInfo(element, element.getTextRange(), this.getIcon(), Pass.UPDATE_ALL, createHandler(listener.getSecond()));
+        return new EventLineMarkerInfo(
+            element,
+            element.getTextRange(),
+            getIcon(),
+            Pass.UPDATE_ALL,
+            createHandler(listener.getSecond())
+        );
     }
 
     // This is a navigation handler that just simply goes and opens up the event's declaration,
@@ -120,15 +126,28 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
     }
 
     private static final class EventLineMarkerInfo extends MergeableLineMarkerInfo<PsiElement> {
-        EventLineMarkerInfo(@NotNull PsiElement element, @NotNull TextRange range, @NotNull Icon icon, int passId, GutterIconNavigationHandler<PsiElement> handler) {
-            super(element, range, icon, passId,
-                    (NullableFunction<PsiElement, String>) element1 -> "Go to Event declaration",
-                    handler, GutterIconRenderer.Alignment.RIGHT);
+        EventLineMarkerInfo(@NotNull PsiElement element,
+                            @NotNull TextRange range,
+                            @NotNull Icon icon,
+                            int passId,
+                            GutterIconNavigationHandler<PsiElement> handler) {
+            super(
+                element,
+                range,
+                icon,
+                passId,
+                (NullableFunction<PsiElement, String>) element1 -> "Go to Event declaration",
+                handler,
+                GutterIconRenderer.Alignment.RIGHT
+            );
         }
 
         @Override
         public boolean canMergeWith(@NotNull MergeableLineMarkerInfo<?> info) {
-            if (!(info instanceof EventLineMarkerInfo)) return false;
+            if (!(info instanceof EventLineMarkerInfo)) {
+                return false;
+            }
+
             PsiElement otherElement = info.getElement();
             PsiElement myElement = getElement();
             return otherElement != null && myElement != null;

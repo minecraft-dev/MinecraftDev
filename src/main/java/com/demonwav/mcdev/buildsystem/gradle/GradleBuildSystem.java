@@ -27,6 +27,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.ExternalProjectInfo;
 import com.intellij.openapi.externalSystem.model.project.ExternalSystemSourceType;
@@ -97,8 +98,8 @@ public class GradleBuildSystem extends BuildSystem {
     @Nullable
     private VirtualFile buildGradle;
 
-    private AtomicBoolean imported = new AtomicBoolean(false);
-    private AtomicBoolean finishImport = new AtomicBoolean(false);
+    @NotNull private AtomicBoolean imported = new AtomicBoolean(false);
+    @NotNull private AtomicBoolean finishImport = new AtomicBoolean(false);
 
     @Override
     public void create(@NotNull Project project, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
@@ -116,14 +117,14 @@ public class GradleBuildSystem extends BuildSystem {
                     buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
                     ForgeTemplate.applyBuildGradleTemplate(
-                            project,
-                            buildGradle,
-                            groupId,
-                            artifactId,
-                            settings.forgeVersion,
-                            settings.mcpVersion,
-                            version,
-                            configuration instanceof SpongeForgeProjectConfiguration
+                        project,
+                        buildGradle,
+                        groupId,
+                        artifactId,
+                        settings.forgeVersion,
+                        settings.mcpVersion,
+                        version,
+                        configuration instanceof SpongeForgeProjectConfiguration
                     );
 
                     if (configuration instanceof SpongeForgeProjectConfiguration) {
@@ -150,13 +151,13 @@ public class GradleBuildSystem extends BuildSystem {
                     buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
                     LiteLoaderTemplate.applyBuildGradleTemplate(
-                            project,
-                            buildGradle,
-                            groupId,
-                            artifactId,
-                            settings.pluginVersion,
-                            settings.mcVersion,
-                            settings.mcpVersion
+                        project,
+                        buildGradle,
+                        groupId,
+                        artifactId,
+                        settings.pluginVersion,
+                        settings.mcVersion,
+                        settings.mcpVersion
                     );
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -185,7 +186,16 @@ public class GradleBuildSystem extends BuildSystem {
         }
 
         // The file needs to be saved, if not Gradle will see the file without the dependencies and won't import correctly
-        Util.runWriteTask(() -> FileDocumentManager.getInstance().saveDocument(FileDocumentManager.getInstance().getDocument(buildGradle)));
+        if (buildGradle == null) {
+            return;
+        }
+
+        Document document = FileDocumentManager.getInstance().getDocument(buildGradle);
+        if (document == null) {
+            return;
+        }
+
+        Util.runWriteTask(() -> FileDocumentManager.getInstance().saveDocument(document));
     }
 
     private void setupWrapper(@NotNull Project project, @NotNull ProgressIndicator indicator) {
@@ -195,7 +205,7 @@ public class GradleBuildSystem extends BuildSystem {
             try {
                 String wrapperDirPath = rootDirectory.createChildDirectory(this, "gradle").createChildDirectory(this, "wrapper").getPath();
                 FileUtils.writeLines(new File(wrapperDirPath, "gradle-wrapper.properties"), Collections.singletonList(
-                        "distributionUrl=https\\://services.gradle.org/distributions/gradle-2.13-bin.zip"
+                    "distributionUrl=https\\://services.gradle.org/distributions/gradle-2.13-bin.zip"
                 ));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -209,19 +219,25 @@ public class GradleBuildSystem extends BuildSystem {
         BuildLauncher launcher = connection.newBuild();
         try {
             Pair<String, Sdk> sdkPair = ExternalSystemJdkUtil.getAvailableJdk(project);
-            if (sdkPair != null && sdkPair.getSecond() != null && sdkPair.getSecond().getHomePath() != null && !ExternalSystemJdkUtil.USE_INTERNAL_JAVA.equals(sdkPair.getFirst())) {
+            if (sdkPair != null && sdkPair.getSecond() != null && sdkPair.getSecond().getHomePath() != null &&
+                !ExternalSystemJdkUtil.USE_INTERNAL_JAVA.equals(sdkPair.getFirst())) {
+
                 launcher.setJavaHome(new File(sdkPair.getSecond().getHomePath()));
             }
 
             launcher.forTasks("wrapper").addProgressListener((ProgressListener) progressEvent ->
-                    indicator.setText(progressEvent.getDescription())
+                indicator.setText(progressEvent.getDescription())
             ).run();
         } finally {
             connection.close();
         }
     }
 
-    private void createRepositoriesOrDependencies(Project project, GroovyFile file, String name, List<String> expressions) {
+    private void createRepositoriesOrDependencies(@NotNull Project project,
+                                                  @NotNull GroovyFile file,
+                                                  @NotNull String name,
+                                                  @NotNull List<String> expressions) {
+
         // Get the block so we can start working with it
         GrClosableBlock block = getClosableBlockByName(file, name);
 
@@ -241,7 +257,7 @@ public class GradleBuildSystem extends BuildSystem {
     }
 
     @Nullable
-    private GrClosableBlock getClosableBlockByName(PsiElement element, String name) {
+    private GrClosableBlock getClosableBlockByName(@NotNull PsiElement element, @NotNull String name) {
         List<GrClosableBlock> blocks = getClosableBlocksByName(element, name);
         if (blocks.isEmpty()) {
             return null;
@@ -251,24 +267,24 @@ public class GradleBuildSystem extends BuildSystem {
     }
 
     @NotNull
-    private List<GrClosableBlock> getClosableBlocksByName(PsiElement element, String name) {
+    private List<GrClosableBlock> getClosableBlocksByName(@NotNull PsiElement element, @NotNull String name) {
         return Arrays.stream(element.getChildren())
-                .filter(c -> {
-                    // We want to find the child which has a GrReferenceExpression with the right name
-                    return Arrays.stream(c.getChildren())
-                            .filter(g -> g instanceof GrReferenceExpression && g.getText().equals(name))
-                            .findAny().isPresent();
-                }).map(c -> {
-                    // We want to find the grandchild which is a GrCloseableBlock, this is the
-                    // basis for the method block
-                    return Arrays.stream(c.getChildren())
-                            .filter(g -> g instanceof GrClosableBlock)
-                            // cast to closable block so generics can handle this conversion
-                            .map(g -> (GrClosableBlock) g)
-                            .findFirst();
-                }).filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+            .filter(c -> {
+                // We want to find the child which has a GrReferenceExpression with the right name
+                return Arrays.stream(c.getChildren())
+                    .filter(g -> g instanceof GrReferenceExpression && g.getText().equals(name))
+                    .findAny().isPresent();
+            }).map(c -> {
+                // We want to find the grandchild which is a GrCloseableBlock, this is the
+                // basis for the method block
+                return Arrays.stream(c.getChildren())
+                    .filter(g -> g instanceof GrClosableBlock)
+                    // cast to closable block so generics can handle this conversion
+                    .map(g -> (GrClosableBlock) g)
+                    .findFirst();
+            }).filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -362,6 +378,7 @@ public class GradleBuildSystem extends BuildSystem {
         }
     }
 
+    @NotNull
     @Override
     public Promise<GradleBuildSystem> reImport(@NotNull Module module) {
         imported.set(true);
@@ -406,11 +423,17 @@ public class GradleBuildSystem extends BuildSystem {
                                     return false;
                                 }).collect(Collectors.toList());
 
+                        if (project.getBasePath() == null) {
+                            return;
+                        }
+
                         // We need to check the parent too if it's a single module project
-                        ExternalProject externalRootProject = externalProjectDataCache.getRootExternalProject(GradleConstants.SYSTEM_ID, new File(project.getBasePath()));
+                        ExternalProject externalRootProject = externalProjectDataCache
+                            .getRootExternalProject(GradleConstants.SYSTEM_ID, new File(project.getBasePath()));
                         if (externalRootProject != null) {
                             for (Module child : children) {
-                                Map<String, ExternalSourceSet> externalSourceSets = externalProjectDataCache.findExternalProject(externalRootProject, child);
+                                Map<String, ExternalSourceSet> externalSourceSets = externalProjectDataCache
+                                    .findExternalProject(externalRootProject, child);
 
                                 for (ExternalSourceSet sourceSet : externalSourceSets.values()) {
                                     setupDirs(sourceDirectories, sourceSet, ExternalSystemSourceType.SOURCE);
@@ -427,7 +450,8 @@ public class GradleBuildSystem extends BuildSystem {
                             pluginName = externalRootProject.getName();
 
                             // We need to get the project info from gradle
-                            ExternalProjectInfo info = ProjectDataManager.getInstance().getExternalProjectData(project, GradleConstants.SYSTEM_ID, project.getBasePath());
+                            ExternalProjectInfo info = ProjectDataManager.getInstance()
+                                .getExternalProjectData(project, GradleConstants.SYSTEM_ID, project.getBasePath());
                             if (info == null) {
                                 return;
                             }
@@ -439,27 +463,26 @@ public class GradleBuildSystem extends BuildSystem {
                             }
 
                             dependencies = new ArrayList<>();
-                            node.getChildren()
-                                    .forEach(child -> {
-                                        if (child.getData() instanceof LibraryData) {
-                                            LibraryData data = (LibraryData) child.getData();
-
-                                            String[] parts = data.getExternalName().split(":");
-                                            String groupId = parts[0];
-                                            String artifactId = parts[1];
-                                            String version = parts[2];
-                                            // I should probably remove scope, as I'm not even using it here...
-                                            dependencies.add(new BuildDependency(groupId, artifactId, version, "provided"));
-                                        } else if (child.getData() instanceof JavaProjectData) {
-                                            // kashike guilt tripped me into this
-                                            JavaProjectData data = (JavaProjectData) child.getData();
-                                            String languageLevelName = data.getLanguageLevel().name();
-                                            int index = languageLevelName.lastIndexOf('_') - 1;
-                                            if (index != -1) {
-                                                buildVersion = languageLevelName.substring(index, languageLevelName.length()).replace("_", ".");
-                                            }
-                                        }
-                                    });
+                            node.getChildren().forEach(child -> {
+                                if (child.getData() instanceof LibraryData) {
+                                    LibraryData data = (LibraryData) child.getData();
+                                    String[] parts = data.getExternalName().split(":");
+                                    String groupId = parts[0];
+                                    String artifactId = parts[1];
+                                    String version = parts[2];
+                                    // I should probably remove scope, as I'm not even using it here...
+                                    dependencies.add(new BuildDependency(groupId, artifactId, version, "provided"));
+                                } else if (child.getData() instanceof JavaProjectData) {
+                                    // kashike guilt tripped me into this
+                                    JavaProjectData data = (JavaProjectData) child.getData();
+                                    String languageLevelName = data.getLanguageLevel().name();
+                                    int index = languageLevelName.lastIndexOf('_') - 1;
+                                    if (index != -1) {
+                                        buildVersion = languageLevelName
+                                            .substring(index, languageLevelName.length()).replace("_", ".");
+                                    }
+                                }
+                            });
                         }
 
                         GroovyFile groovyFile = (GroovyFile) PsiManager.getInstance(project).findFile(buildGradle);
@@ -493,7 +516,10 @@ public class GradleBuildSystem extends BuildSystem {
     }
 
     @NotNull
-    public Map<GradleBuildSystem, ProjectConfiguration> createMultiModuleProject(@NotNull Project project, @NotNull List<ProjectConfiguration> configurations, @NotNull ProgressIndicator indicator) {
+    public Map<GradleBuildSystem, ProjectConfiguration> createMultiModuleProject(@NotNull Project project,
+                                                                                 @NotNull List<ProjectConfiguration> configurations,
+                                                                                 @NotNull ProgressIndicator indicator) {
+
         final Map<GradleBuildSystem, ProjectConfiguration> map = new HashMap<>();
 
         setupWrapper(project, indicator);
@@ -539,7 +565,8 @@ public class GradleBuildSystem extends BuildSystem {
             Util.runWriteTask(() -> {
                 try {
                     // Add settings for the new build system before it creates the module
-                    gradleBuildSystem.rootDirectory = rootDirectory.createChildDirectory(this, artifactId.toLowerCase() + "-" + configuration.type.name().toLowerCase());
+                    gradleBuildSystem.rootDirectory = rootDirectory
+                        .createChildDirectory(this, artifactId.toLowerCase() + "-" + configuration.type.name().toLowerCase());
 
                     gradleBuildSystem.artifactId = artifactId;
                     gradleBuildSystem.groupId = groupId;
@@ -586,13 +613,13 @@ public class GradleBuildSystem extends BuildSystem {
                     buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
                     ForgeTemplate.applySubmoduleBuildGradleTemplate(
-                            project,
-                            buildGradle,
-                            artifactId,
-                            settings.forgeVersion,
-                            settings.mcpVersion,
-                            commonProjectName,
-                            configuration instanceof SpongeForgeProjectConfiguration
+                        project,
+                        buildGradle,
+                        artifactId,
+                        settings.forgeVersion,
+                        settings.mcpVersion,
+                        commonProjectName,
+                        configuration instanceof SpongeForgeProjectConfiguration
                     );
 
                     // We're only going to write the dependencies if it's a sponge forge project
@@ -619,14 +646,14 @@ public class GradleBuildSystem extends BuildSystem {
                     buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
                     LiteLoaderTemplate.applySubmoduleBuildGradleTemplate(
-                            project,
-                            buildGradle,
-                            groupId,
-                            artifactId,
-                            settings.pluginVersion,
-                            settings.mcVersion,
-                            settings.mcpVersion,
-                            commonProjectName
+                        project,
+                        buildGradle,
+                        groupId,
+                        artifactId,
+                        settings.pluginVersion,
+                        settings.mcVersion,
+                        settings.mcpVersion,
+                        commonProjectName
                     );
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -652,7 +679,16 @@ public class GradleBuildSystem extends BuildSystem {
         }
 
         // The file needs to be saved, if not Gradle will see the file without the dependencies and won't import correctly
-        Util.runWriteTask(() -> FileDocumentManager.getInstance().saveDocument(FileDocumentManager.getInstance().getDocument(buildGradle)));
+        if (buildGradle == null) {
+            return;
+        }
+
+        Document document = FileDocumentManager.getInstance().getDocument(buildGradle);
+        if (document == null) {
+            return;
+        }
+
+        Util.runWriteTask(() -> FileDocumentManager.getInstance().saveDocument(document));
     }
 
     private void addBuildGradleDependencies(@NotNull Project project, @NotNull PsiFile file, boolean addToDirectory) {
@@ -716,7 +752,7 @@ public class GradleBuildSystem extends BuildSystem {
         createDirectories(rootDirectory);
     }
 
-    private void createDirectories(VirtualFile root) {
+    private void createDirectories(@NotNull VirtualFile root) {
         Util.runWriteTask(() -> {
             try {
                 sourceDirectories = Collections.singletonList(VfsUtil.createDirectories(root.getPath() + "/src/main/java"));
@@ -738,6 +774,13 @@ public class GradleBuildSystem extends BuildSystem {
         BuildLauncher launcher = connection.newBuild();
 
         try {
+            Pair<String, Sdk> sdkPair = ExternalSystemJdkUtil.getAvailableJdk(project);
+            if (sdkPair != null && sdkPair.getSecond() != null && sdkPair.getSecond().getHomePath() != null &&
+                !ExternalSystemJdkUtil.USE_INTERNAL_JAVA.equals(sdkPair.getFirst())) {
+
+                launcher.setJavaHome(new File(sdkPair.getSecond().getHomePath()));
+            }
+
             launcher.forTasks("setupDecompWorkspace").setJvmArguments("-Xmx2G").addProgressListener((ProgressListener) progressEvent ->
                     indicator.setText(progressEvent.getDescription())
             ).run();
@@ -746,7 +789,7 @@ public class GradleBuildSystem extends BuildSystem {
         }
     }
 
-    private void addRepositories(GrClosableBlock block) {
+    private void addRepositories(@NotNull GrClosableBlock block) {
         List<GrClosableBlock> mavenBlocks = getClosableBlocksByName(block, "maven");
         if (mavenBlocks.isEmpty()) {
             return;
@@ -765,7 +808,7 @@ public class GradleBuildSystem extends BuildSystem {
         });
     }
 
-    private void handleApplicationStatement(GrApplicationStatement statement, BuildRepository repository) {
+    private void handleApplicationStatement(@NotNull GrApplicationStatement statement, @NotNull BuildRepository repository) {
         GrCommandArgumentList list = statement.getArgumentList();
         if (list.getChildren().length > 0) {
             if (statement.getInvokedExpression().getText().equals("name")) {
@@ -776,7 +819,7 @@ public class GradleBuildSystem extends BuildSystem {
         }
     }
 
-    private void handleAssignmentExpression(GrAssignmentExpression expression, BuildRepository repository) {
+    private void handleAssignmentExpression(@NotNull GrAssignmentExpression expression, @NotNull BuildRepository repository) {
         if (expression.getLValue().getText().equals("name")) {
             if (expression.getRValue() != null) {
                 repository.setId(expression.getRValue().getText().replaceAll("'", ""));
@@ -788,7 +831,7 @@ public class GradleBuildSystem extends BuildSystem {
         }
     }
 
-    private void setupDirs(List<VirtualFile> directories, ExternalSourceSet set, ExternalSystemSourceType type) {
+    private void setupDirs(@NotNull List<VirtualFile> directories, @NotNull ExternalSourceSet set, @NotNull ExternalSystemSourceType type) {
         if (set.getSources().get(type) != null) {
             set.getSources().get(type).getSrcDirs().forEach(dir ->
                     directories.add(LocalFileSystem.getInstance().findFileByPath(dir.getAbsolutePath()))

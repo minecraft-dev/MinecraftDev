@@ -32,7 +32,9 @@ public class InsightUtil {
         }
         // The PsiIdentifier is going to be a method of course!
         PsiMethod method = (PsiMethod) element.getParent();
-        if (method.hasModifierProperty(PsiModifier.ABSTRACT) || method.hasModifierProperty(PsiModifier.STATIC) || method.hasModifierProperty(PsiModifier.PRIVATE)) {
+        if (method.hasModifierProperty(PsiModifier.ABSTRACT) ||
+            method.hasModifierProperty(PsiModifier.STATIC) ||
+            method.hasModifierProperty(PsiModifier.PRIVATE)) {
             // I don't think any implementation allows for abstract or static method listeners.
             return null;
         }
@@ -47,7 +49,8 @@ public class InsightUtil {
         }
         // Since each platform has their own valid listener annotations,
         // some platforms may have multiple allowed annotations for various cases
-        final List<String> listenerAnnotations = instance.getTypes().stream().flatMap(t -> t.getListenerAnnotations().stream()).collect(Collectors.toList());
+        final List<String> listenerAnnotations = instance.getTypes().stream()
+            .flatMap(t -> t.getListenerAnnotations().stream()).collect(Collectors.toList());
         boolean contains = false;
         for (String listenerAnnotation : listenerAnnotations) {
             if (modifierList.findAnnotation(listenerAnnotation) != null) {

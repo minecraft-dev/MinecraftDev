@@ -19,9 +19,7 @@ import java.util.Map;
 public class ForgeVersion {
 
     @NotNull
-    private Map map = new HashMap();
-
-    private final int[] ARRAY_1_8_8 = new int[] { 1, 8, 8 };
+    private Map<?, ?> map = new HashMap<>();
 
     private ForgeVersion() {}
 
@@ -73,7 +71,7 @@ public class ForgeVersion {
 
     public List<String> getForgeVersions(String version) {
         List<String> list = new ArrayList<>();
-        Map numbers = (Map) map.get("number");
+        Map<?, ?> numbers = (Map) map.get("number");
         numbers.forEach((k, v) -> {
             if (v instanceof Map) {
                 Map number = (Map) v;
@@ -89,10 +87,10 @@ public class ForgeVersion {
 
     @Nullable
     public String getFullVersion(String version) {
-        Map numbers = (Map) map.get("number");
+        Map<?, ?> numbers = (Map<?, ?>) map.get("number");
         String[] parts = version.split("\\.");
         String versionSmall = parts[parts.length - 1];
-        Map number = (Map) numbers.get(versionSmall);
+        Map<?, ?> number = (Map<?, ?>) numbers.get(versionSmall);
         if (number == null) {
             return null;
         }

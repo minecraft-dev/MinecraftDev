@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 public class SpongeProjectConfiguration extends ProjectConfiguration {
 
     public List<String> dependencies = new ArrayList<>();
@@ -65,17 +66,17 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
                 PsiClass psiClass = mainClassPsi.getClasses()[0];
 
                 writeMainSpongeClass(
-                        project,
-                        mainClassPsi,
-                        psiClass,
-                        buildSystem,
-                        pluginName,
-                        description,
-                        website,
-                        hasAuthors(),
-                        authors,
-                        hasDependencies(),
-                        dependencies
+                    project,
+                    mainClassPsi,
+                    psiClass,
+                    buildSystem,
+                    pluginName,
+                    description,
+                    website,
+                    hasAuthors(),
+                    authors,
+                    hasDependencies(),
+                    dependencies
                 );
 
                 EditorHelper.openInEditor(mainClassPsi);
@@ -87,17 +88,17 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
 
     // Ugly hacks to avoid duplicate code
     public static void writeMainSpongeClass(
-            Project project,
-            PsiJavaFile mainClassPsi,
-            PsiClass psiClass,
-            BuildSystem buildSystem,
-            String pluginName,
-            String description,
-            String website,
-            boolean hasAuthors,
-            List<String> authors,
-            boolean hasDependencies,
-            List<String> dependencies
+        @NotNull Project project,
+        @NotNull PsiJavaFile mainClassPsi,
+        @NotNull PsiClass psiClass,
+        @NotNull BuildSystem buildSystem,
+        @NotNull String pluginName,
+        @NotNull String description,
+        @NotNull String website,
+        boolean hasAuthors,
+        @NotNull List<String> authors,
+        boolean hasDependencies,
+        @NotNull List<String> dependencies
     ) {
         // I am absolutely sure this is not how this should be done. Raw string manipulation is messy and can
         // probably pretty easily break. However, I couldn't figure out the correct IntelliJ Psi way to do this,
@@ -157,8 +158,9 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
         new WriteCommandAction.Simple(project, mainClassPsi) {
             @Override
             protected void run() throws Throwable {
-                //noinspection ConstantConditions
-                psiClass.getModifierList().addBefore(annotation, psiClass.getModifierList().getFirstChild());
+                if (psiClass.getModifierList() != null) {
+                    psiClass.getModifierList().addBefore(annotation, psiClass.getModifierList().getFirstChild());
+                }
             }
         }.execute();
     }

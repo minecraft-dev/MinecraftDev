@@ -13,6 +13,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionListener;
 import java.util.Arrays;
@@ -52,6 +53,7 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     private boolean mainClassModified = false;
 
+    @NotNull
     private final ActionListener mcpBoxActionListener = e -> {
         if (((McpVersionEntry) mcpVersionBox.getSelectedItem()).isRed()) {
             mcpWarning.setVisible(true);
@@ -60,6 +62,7 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
         }
     };
 
+    @NotNull
     private final DocumentListener listener = new DocumentAdapter() {
         @Override
         protected void textChanged(DocumentEvent e) {
@@ -87,7 +90,7 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
         }
     };
 
-    public LiteLoaderProjectSettingsWizard(MinecraftProjectCreator creator, int index) {
+    public LiteLoaderProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
         this.creator = creator;
         this.settings = (LiteLoaderProjectConfiguration) creator.getSettings().get(index);
 

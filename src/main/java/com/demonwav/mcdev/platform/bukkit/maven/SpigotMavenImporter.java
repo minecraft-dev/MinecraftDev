@@ -15,7 +15,9 @@ import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.ModuleType;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public class SpigotMavenImporter extends BukkitMavenImporter {
+
     public SpigotMavenImporter() {
         super(SpigotModuleType.getInstance());
     }

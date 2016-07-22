@@ -2,26 +2,17 @@ package com.demonwav.mcdev.platform.sponge.color;
 
 import com.demonwav.mcdev.insight.ColorLineMarkerProvider;
 import com.demonwav.mcdev.insight.ColorUtil;
-import com.demonwav.mcdev.platform.MinecraftModule;
-import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.daemon.NavigateAction;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtilCore;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiExpressionList;
 import com.intellij.psi.PsiLiteralExpression;
-import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiNewExpression;
-import com.intellij.psi.PsiReferenceExpression;
-import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.source.tree.JavaElementType;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.ui.ColorChooser;
 import org.jetbrains.annotations.NotNull;
@@ -74,7 +65,9 @@ public class SpongeColorLineMarkerProvider implements LineMarkerProvider {
                         } else if (workElement instanceof PsiExpressionList) {
                             ColorUtil.setColorTo((PsiExpressionList) workElement, c.getRed(), c.getGreen(), c.getBlue());
                         } else if (workElement instanceof PsiNewExpression) {
-                            PsiExpressionList expressionList = (PsiExpressionList) workElement.getNode().findChildByType(JavaElementType.EXPRESSION_LIST);
+                            PsiExpressionList expressionList = (PsiExpressionList) workElement.getNode()
+                                .findChildByType(JavaElementType.EXPRESSION_LIST);
+
                             if (expressionList != null) {
                                 ColorUtil.setColorTo(expressionList, c.getRed(), c.getGreen(), c.getBlue());
                             }

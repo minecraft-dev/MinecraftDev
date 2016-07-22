@@ -76,7 +76,9 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
                     // The first needs to be either sponge or forge, and the second needs to be either sponge or forge
                     // We don't worry about duplicates here for simplicity's sake
                     // We only want to apply the special icon if it's only sponge and forge, so these need to be the only two types
-                    if ((next.equals(SpongeModuleType.getInstance()) || next.equals(ForgeModuleType.getInstance())) && !typeIterator.hasNext()) {
+                    if ((next.equals(SpongeModuleType.getInstance()) || next.equals(ForgeModuleType.getInstance())) &&
+                            !typeIterator.hasNext()) {
+
                         if (UIUtil.isUnderDarcula()) {
                             data.setIcon(PlatformAssets.SPONGE_FORGE_ICON);
                         } else {

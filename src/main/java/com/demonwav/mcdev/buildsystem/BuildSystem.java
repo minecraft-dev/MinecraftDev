@@ -4,6 +4,7 @@ import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 
+import com.google.common.base.Objects;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -24,8 +25,10 @@ import java.util.Map;
  * change in a setter in this class will reflect back on the actual files that these classes represent, and in turn
  * represent changes in the project itself.
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class BuildSystem {
-    protected final static Object lock = new Object();
+
+    private final static Object lock = new Object();
 
     private static final Map<Module, BuildSystem> map = new HashMap<>();
 
@@ -153,7 +156,9 @@ public abstract class BuildSystem {
      * @param project The project
      * @param configurations The configuration objects for the project
      */
-    public abstract void create(@NotNull Project project, @NotNull ProjectConfiguration configurations, @NotNull ProgressIndicator indicator);
+    public abstract void create(@NotNull Project project,
+                                @NotNull ProjectConfiguration configurations,
+                                @NotNull ProgressIndicator indicator);
 
     /**
      * This is called after {@link #create(Project, ProjectConfiguration, ProgressIndicator)}, and after the module has set
@@ -166,7 +171,9 @@ public abstract class BuildSystem {
      * @param module the module
      * @param configurations The configuration object for the project
      */
-    public abstract void finishSetup(@NotNull Module module, @NotNull ProjectConfiguration configurations, @NotNull ProgressIndicator indicator);
+    public abstract void finishSetup(@NotNull Module module,
+                                     @NotNull ProjectConfiguration configurations,
+                                     @NotNull ProgressIndicator indicator);
 
     /**
      * This method performs similarly to {@link #create(Project, ProjectConfiguration, ProgressIndicator)} in that it builds
@@ -256,24 +263,6 @@ public abstract class BuildSystem {
         }
     }
 
-    @Override
-    public String toString() {
-        return "BuildSystem{" +
-                "artifactId='" + artifactId + '\'' +
-                ", groupId='" + groupId + '\'' +
-                ", version='" + version + '\'' +
-                ", dependencies=" + dependencies +
-                ", repositories=" + repositories +
-                ", rootDirectory=" + rootDirectory +
-                ", sourceDirectories=" + sourceDirectories +
-                ", resourceDirectories=" + resourceDirectories +
-                ", testSourcesDirectories=" + testSourcesDirectories +
-                ", testResourceDirectories=" + testResourceDirectories +
-                ", pluginName='" + pluginName + '\'' +
-                ", buildVersion='" + buildVersion + '\'' +
-                '}';
-    }
-
     @Nullable
     @Contract("null, _ -> null")
     private VirtualFile findFile(List<VirtualFile> dirs, @NotNull String path) {
@@ -292,5 +281,48 @@ public abstract class BuildSystem {
             }
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+            .add("artifactId", artifactId)
+            .add("groupId", groupId)
+            .add("version", version)
+            .add("dependencies", dependencies)
+            .add("repositories", repositories)
+            .add("rootDirectory", rootDirectory)
+            .add("sourceDirectories", sourceDirectories)
+            .add("resourceDirectories", resourceDirectories)
+            .add("testSourcesDirectories", testSourcesDirectories)
+            .add("testResourceDirectories", testResourceDirectories)
+            .add("pluginName", pluginName)
+            .add("buildVersion", buildVersion)
+            .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BuildSystem that = (BuildSystem) o;
+        return Objects.equal(artifactId, that.artifactId) &&
+            Objects.equal(groupId, that.groupId) &&
+            Objects.equal(version, that.version) &&
+            Objects.equal(dependencies, that.dependencies) &&
+            Objects.equal(repositories, that.repositories) &&
+            Objects.equal(rootDirectory, that.rootDirectory) &&
+            Objects.equal(sourceDirectories, that.sourceDirectories) &&
+            Objects.equal(resourceDirectories, that.resourceDirectories) &&
+            Objects.equal(testSourcesDirectories, that.testSourcesDirectories) &&
+            Objects.equal(testResourceDirectories, that.testResourceDirectories) &&
+            Objects.equal(pluginName, that.pluginName) &&
+            Objects.equal(buildVersion, that.buildVersion);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(artifactId, groupId, version, dependencies, repositories, rootDirectory, sourceDirectories,
+            resourceDirectories, testSourcesDirectories, testResourceDirectories, pluginName, buildVersion);
     }
 }

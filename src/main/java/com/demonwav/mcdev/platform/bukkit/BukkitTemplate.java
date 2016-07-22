@@ -34,6 +34,7 @@ public class BukkitTemplate extends AbstractTemplate {
         }
     }
 
+    @NotNull
     public static String applyPomTemplate(@NotNull Project project,
                                           @NotNull String version) {
         Properties properties = new Properties();
@@ -71,7 +72,7 @@ public class BukkitTemplate extends AbstractTemplate {
             properties.setProperty("HAS_PREFIX", "true");
         }
 
-        if (settings.loadOrder != LoadOrder.POSTWORLD) {
+        if (settings.loadOrder != LoadOrder.POST_WORLD) {
             properties.setProperty("LOAD", LoadOrder.STARTUP.name());
             properties.setProperty("HAS_LOAD", "true");
         }

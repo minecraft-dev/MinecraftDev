@@ -72,7 +72,8 @@ public class MavenBuildSystem extends BuildSystem {
                 // TODO: Generify the pom, having multiple projects doesn't allow a different pom for each project
                 String text = null;
 
-                if (configuration.type == PlatformType.BUKKIT || configuration.type == PlatformType.SPIGOT || configuration.type == PlatformType.PAPER) {
+                if (configuration.type == PlatformType.BUKKIT || configuration.type == PlatformType.SPIGOT ||
+                        configuration.type == PlatformType.PAPER) {
                     text = BukkitTemplate.applyPomTemplate(project, buildVersion);
                 } else if (configuration.type == PlatformType.BUNGEECORD) {
                     text = BungeeCordTemplate.applyPomTemplate(project, buildVersion);
@@ -95,7 +96,8 @@ public class MavenBuildSystem extends BuildSystem {
                             XmlTag root = pomXmlPsi.getRootTag();
 
                             DomManager manager = DomManager.getDomManager(project);
-                            MavenProjectXml mavenProjectXml = manager.getFileElement(pomXmlPsi, MavenProjectXml.class, "project").getRootElement();
+                            MavenProjectXml mavenProjectXml = manager.getFileElement(pomXmlPsi, MavenProjectXml.class, "project")
+                                .getRootElement();
 
                             mavenProjectXml.getGroupId().setValue(groupId);
                             mavenProjectXml.getArtifactId().setValue(artifactId);
@@ -170,7 +172,8 @@ public class MavenBuildSystem extends BuildSystem {
                 MavenRunnerParameters params = new MavenRunnerParameters();
                 params.setWorkingDirPath(getRootDirectory().getCanonicalPath());
                 params.setGoals(Arrays.asList("clean", "package"));
-                RunnerAndConfigurationSettings runnerSettings = MavenRunConfigurationType.createRunnerAndConfigurationSettings(null, null, params, module.getProject());
+                RunnerAndConfigurationSettings runnerSettings = MavenRunConfigurationType
+                    .createRunnerAndConfigurationSettings(null, null, params, module.getProject());
                 runnerSettings.setName(module.getName() + " build");
                 RunManager.getInstance(project).addConfiguration(runnerSettings, false);
             }
@@ -184,7 +187,7 @@ public class MavenBuildSystem extends BuildSystem {
 
         MavenBuildSystem thisRef = this;
 
-        ApplicationManager.getApplication().invokeLater(() -> {
+        ApplicationManager.getApplication().invokeLater(() ->
             ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Importing Maven Project", false) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
@@ -286,8 +289,8 @@ public class MavenBuildSystem extends BuildSystem {
                     thisRef.finishImport = true;
                     promise.setResult(thisRef);
                 }
-            });
-        });
+            })
+        );
 
         return promise;
     }

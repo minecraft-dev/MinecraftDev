@@ -18,8 +18,10 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 public class SpongeForgeChooser extends ModuleWizardStep {
+
     private JPanel panel;
     private JRadioButton singleRadioButton;
+    @SuppressWarnings("unused")
     private JRadioButton multiRadioButton;
     private JLabel title;
 
@@ -47,8 +49,8 @@ public class SpongeForgeChooser extends ModuleWizardStep {
     public boolean isStepVisible() {
         // Only show this if both Sponge and Forge are selected
         return creator.getSettings().stream().filter(configuration ->
-                configuration instanceof ForgeProjectConfiguration || configuration instanceof SpongeProjectConfiguration
-        ).count() >= 2 || creator.getSettings().stream().anyMatch(configuration -> configuration instanceof SpongeForgeProjectConfiguration);
+            configuration instanceof ForgeProjectConfiguration || configuration instanceof SpongeProjectConfiguration
+        ).count() >= 2 || creator.getSettings().stream().anyMatch(conf -> conf instanceof SpongeForgeProjectConfiguration);
     }
 
     @Override

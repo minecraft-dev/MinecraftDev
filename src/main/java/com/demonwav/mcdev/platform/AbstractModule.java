@@ -9,6 +9,7 @@ import com.intellij.psi.PsiMethod;
 import javax.swing.Icon;
 
 public abstract class AbstractModule {
+
     protected Module module;
     protected BuildSystem buildSystem;
 

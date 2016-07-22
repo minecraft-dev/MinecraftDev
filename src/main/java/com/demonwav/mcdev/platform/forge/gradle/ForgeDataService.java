@@ -15,6 +15,7 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 import java.util.Collection;
 
 public class ForgeDataService extends AbstractDataService {
+
     public ForgeDataService() {
         super(ForgeModuleType.getInstance());
     }

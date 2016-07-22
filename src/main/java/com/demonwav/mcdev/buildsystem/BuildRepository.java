@@ -1,5 +1,8 @@
 package com.demonwav.mcdev.buildsystem;
 
+import com.google.common.base.Objects;
+import org.jetbrains.annotations.NotNull;
+
 public class BuildRepository {
 
     private String id;
@@ -23,42 +26,31 @@ public class BuildRepository {
 
     public BuildRepository() {}
 
-    public BuildRepository(String id, String url) {
+    public BuildRepository(@NotNull String id, @NotNull String url) {
         this.id = id;
         this.url = url;
     }
 
     @Override
-    public String toString() {
-        return "BuildRepository{" +
-                "id='" + id + '\'' +
-                ", url='" + url + '\'' +
-                '}';
-    }
-
-    @SuppressWarnings("SimplifiableIfStatement")
-    @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         BuildRepository that = (BuildRepository) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) {
-            return false;
-        }
-        return url != null ? url.equals(that.url) : that.url == null;
-
+        return Objects.equal(id, that.id) &&
+            Objects.equal(url, that.url);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (url != null ? url.hashCode() : 0);
-        return result;
+        return Objects.hashCode(id, url);
     }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+            .add("id", id)
+            .add("url", url)
+            .toString();
+    }
+
 }

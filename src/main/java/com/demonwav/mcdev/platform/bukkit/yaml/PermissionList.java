@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.platform.bukkit.yaml;
 
+import com.google.common.base.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public class PermissionList {
 
     /*
@@ -53,28 +55,21 @@ public class PermissionList {
 
     @Override
     public String toString() {
-        return "PermissionList{" +
-                "permissions=" + permissions +
-                '}';
+        return Objects.toStringHelper(this)
+            .add("permissions", permissions)
+            .toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         PermissionList that = (PermissionList) o;
-
-        return permissions.equals(that.permissions);
-
+        return Objects.equal(permissions, that.permissions);
     }
 
     @Override
     public int hashCode() {
-        return permissions.hashCode();
+        return Objects.hashCode(permissions);
     }
 }

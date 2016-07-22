@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.platform.bukkit.yaml;
 
+import com.google.common.base.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -7,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class PermissionNode {
 
     /*
@@ -75,45 +77,27 @@ public class PermissionNode {
 
     @Override
     public String toString() {
-        return "PermissionNode{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", defaultPermission=" + defaultPermission +
-                ", children=" + children +
-                '}';
+        return Objects.toStringHelper(this)
+            .add("name", name)
+            .add("description", description)
+            .add("defaultPermission", defaultPermission)
+            .add("children", children)
+            .toString();
     }
 
-    @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         PermissionNode that = (PermissionNode) o;
-
-        if (!name.equals(that.name)) {
-            return false;
-        }
-        if (description != null ? !description.equals(that.description) : that.description != null) {
-            return false;
-        }
-        if (defaultPermission != that.defaultPermission) {
-            return false;
-        }
-        return children.equals(that.children);
-
+        return Objects.equal(name, that.name) &&
+            Objects.equal(description, that.description) &&
+            defaultPermission == that.defaultPermission &&
+            Objects.equal(children, that.children);
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + defaultPermission.hashCode();
-        result = 31 * result + children.hashCode();
-        return result;
+        return Objects.hashCode(name, description, defaultPermission, children);
     }
 }

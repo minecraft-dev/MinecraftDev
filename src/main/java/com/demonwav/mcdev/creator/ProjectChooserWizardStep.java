@@ -9,6 +9,7 @@ import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
@@ -43,25 +44,25 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
     private JCheckBox bungeeCordPluginCheckBox;
     private JCheckBox liteLoaderModCheckBox;
 
-    private static final String bukkitInfo = "Create a standard " +
+    @NotNull private static final String bukkitInfo = "Create a standard " +
             "<a href=\"http://bukkit.org/\">Bukkit</a> plugin, for use " +
             "on CraftBukkit, Spigot, and Paper servers.";
-    private static final String spigotInfo = "Create a standard " +
+    @NotNull private static final String spigotInfo = "Create a standard " +
             "<a href=\"https://www.spigotmc.org/\">Spigot</a> plugin, for use " +
             "on Spigot and Paper servers.";
-    private static final String paperInfo = "Create a standard " +
+    @NotNull private static final String paperInfo = "Create a standard " +
             "<a href=\"https://paper.emc.gs\">Paper</a> plugin, for use " +
             "on Paper servers.";
-    private static final String bungeeCordInfo = "Create a standard " +
+    @NotNull private static final String bungeeCordInfo = "Create a standard " +
             "<a href=\"https://www.spigotmc.org/wiki/bungeecord/\"> BungeeCord</a> plugin, for use " +
             "on BungeeCord servers.";
-    private static final String spongeInfo = "Create a standard " +
+    @NotNull private static final String spongeInfo = "Create a standard " +
             "<a href=\"https://www.spongepowered.org/\"> Sponge</a> plugin, for use " +
             "on Sponge servers.";
-    private static final String forgeInfo = "Create a standard " +
+    @NotNull private static final String forgeInfo = "Create a standard " +
             "<a href=\"http://files.minecraftforge.net/\"> Forge</a> mod, for use " +
             "on Forge servers and clients.";
-    private static final String liteLoaderInfo = "Create a standard " +
+    @NotNull private static final String liteLoaderInfo = "Create a standard " +
             "<a href=\"http://www.liteloader.com/\"> LiteLoader</a> mod, for use " +
             "on LiteLoader clients.";
 
@@ -223,8 +224,16 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
         }
     }
 
-//    @Override
-//    public boolean validate() throws ConfigurationException {
-//        return bukkitPluginCheckBox.isSelected() || spigotPluginCheckBox.isSelected() || paperPluginCheckBox.isSelected() || spongePluginCheckBox.isSelected() || forgeModCheckBox.isSelected() || bungeeCordPluginCheckBox.isSelected();
-//    }
+
+
+    @Override
+    public boolean validate() throws ConfigurationException {
+        return bukkitPluginCheckBox .isSelected() ||
+            spigotPluginCheckBox    .isSelected() ||
+            paperPluginCheckBox     .isSelected() ||
+            spongePluginCheckBox    .isSelected() ||
+            forgeModCheckBox        .isSelected() ||
+            liteLoaderModCheckBox   .isSelected() ||
+            bungeeCordPluginCheckBox.isSelected();
+    }
 }

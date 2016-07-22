@@ -6,6 +6,7 @@ import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -31,7 +32,7 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
     private SpongeProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
-    public SpongeProjectSettingsWizard(MinecraftProjectCreator creator, int index) {
+    public SpongeProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
         this.creator = creator;
         this.settings = (SpongeProjectConfiguration) creator.getSettings().get(index);
     }

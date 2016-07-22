@@ -5,10 +5,11 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupManager;
+import org.jetbrains.annotations.NotNull;
 
 public class MinecraftProjectComponent extends AbstractProjectComponent {
 
-    protected MinecraftProjectComponent(Project project) {
+    protected MinecraftProjectComponent(@NotNull Project project) {
         super(project);
     }
 

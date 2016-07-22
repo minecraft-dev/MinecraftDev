@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 public class ForgeProjectConfiguration extends ProjectConfiguration {
 
     public List<String> dependencies = new ArrayList<>();
@@ -53,13 +54,13 @@ public class ForgeProjectConfiguration extends ProjectConfiguration {
 
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
                 ForgeTemplate.applyMainClassTemplate(
-                        project,
-                        mainClassFile,
-                        packageName,
-                        buildSystem.getArtifactId(),
-                        pluginName,
-                        pluginVersion,
-                        className
+                    project,
+                    mainClassFile,
+                    packageName,
+                    buildSystem.getArtifactId(),
+                    pluginName,
+                    pluginVersion,
+                    className
                 );
 
                 writeMcmodInfo(project, buildSystem);
@@ -109,15 +110,15 @@ public class ForgeProjectConfiguration extends ProjectConfiguration {
             }
 
             ForgeTemplate.applyMcmodInfoTemplate(
-                    project,
-                    mcmodInfoFile,
-                    buildSystem.getArtifactId(),
-                    pluginName,
-                    description,
-                    website,
-                    updateUrl,
-                    authorsText,
-                    dependenciesText
+                project,
+                mcmodInfoFile,
+                buildSystem.getArtifactId(),
+                pluginName,
+                description,
+                website,
+                updateUrl,
+                authorsText,
+                dependenciesText
             );
         } catch (IOException e) {
             e.printStackTrace();

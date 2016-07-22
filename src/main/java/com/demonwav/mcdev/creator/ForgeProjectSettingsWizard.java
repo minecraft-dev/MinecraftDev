@@ -10,6 +10,7 @@ import com.demonwav.mcdev.platform.mcp.McpVersionEntry;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -59,7 +60,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     public boolean spongeForge = false;
 
-    public ForgeProjectSettingsWizard(MinecraftProjectCreator creator, int index) {
+    public ForgeProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
         this.creator = creator;
         this.settings = (ForgeProjectConfiguration) creator.getSettings().get(index);
 

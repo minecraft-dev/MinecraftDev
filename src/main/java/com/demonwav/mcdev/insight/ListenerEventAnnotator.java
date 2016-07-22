@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class ListenerEventAnnotator implements Annotator {
+
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         if (!MinecraftSettings.getInstance().isShowEventListenerGutterIcons()) {

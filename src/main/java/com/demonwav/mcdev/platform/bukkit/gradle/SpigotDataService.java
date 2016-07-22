@@ -5,7 +5,9 @@ import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public class SpigotDataService extends BukkitDataService {
+
     public SpigotDataService() {
         super(SpigotModuleType.getInstance());
     }

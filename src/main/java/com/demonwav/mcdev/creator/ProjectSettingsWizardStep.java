@@ -6,6 +6,7 @@ import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
 
@@ -31,6 +32,7 @@ public class ProjectSettingsWizardStep extends ModuleWizardStep {
         index = -1;
     }
 
+    @Nullable
     @Override
     public JComponent getComponent() {
         // If size == 0 then we aren't actually initialized yet

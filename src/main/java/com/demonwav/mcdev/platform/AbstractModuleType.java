@@ -40,8 +40,6 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
 
     public abstract PlatformType getPlatformType();
 
-    public abstract Icon getBigIcon();
-
     public abstract Icon getIcon();
 
     public abstract String getId();
@@ -61,7 +59,7 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
     public abstract T generateModule(Module module);
 
     public void performCreationSettingSetup(@NotNull Project project) {
-        JDOMExternalizableStringList annotations = ((EntryPointsManagerBase) EntryPointsManager.getInstance(project)).ADDITIONAL_ANNOTATIONS;
+        JDOMExternalizableStringList annotations = ((EntryPointsManagerBase)EntryPointsManager.getInstance(project)).ADDITIONAL_ANNOTATIONS;
         getIgnoredAnnotations().stream().filter(annotation -> !annotations.contains(annotation)).forEach(annotations::add);
     }
 }

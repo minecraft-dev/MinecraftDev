@@ -24,6 +24,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public class PluginConfigManager {
 
     @NotNull private BukkitModule module;
@@ -106,7 +107,8 @@ public class PluginConfigManager {
                         // TODO: handle permissions
                         break;
                     case PluginDescriptionFileConstants.DATABASE:
-                        if (keyValue.getValueText().matches("y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF")) {
+                        if (keyValue.getValueText()
+                                .matches("y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF")) {
                             handleSingleValue(key, keyValue, false);
                         } else {
                             // TODO: show warning to user, must be a boolean value

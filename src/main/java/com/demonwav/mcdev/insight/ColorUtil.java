@@ -16,9 +16,6 @@ import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiType;
-import com.intellij.psi.impl.JavaPsiFacadeEx;
-import com.intellij.psi.impl.JavaPsiFacadeImpl;
-import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +26,8 @@ import java.util.function.BiFunction;
 public class ColorUtil {
 
     @Nullable
-    public static <T> T findColorFromElement(@NotNull PsiElement element, @NotNull BiFunction<Map<String, Color>, Map.Entry<String, Color>, T> function) {
+    public static <T> T findColorFromElement(@NotNull PsiElement element,
+                                             @NotNull BiFunction<Map<String, Color>, Map.Entry<String, Color>, T> function) {
         if (!(element instanceof PsiReferenceExpression)) {
             return null;
         }

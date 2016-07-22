@@ -6,7 +6,9 @@ import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
 
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public class BukkitDataService extends AbstractDataService {
+
     public BukkitDataService() {
         super(BukkitModuleType.getInstance());
     }

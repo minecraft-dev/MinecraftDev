@@ -2,7 +2,6 @@ package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
-import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 import com.demonwav.mcdev.util.CommonColors;
 
 import com.intellij.openapi.module.Module;
@@ -16,12 +15,12 @@ public class SpigotModuleType extends BukkitModuleType {
     private static final SpigotModuleType instance = new SpigotModuleType();
 
     private SpigotModuleType() {
-        super(ID, "org.spigotmc", "spigot-api");
+        super("org.spigotmc", "spigot-api");
         CommonColors.applyStandardColors(this.colorMap, "net.md_5.bungee.api.ChatColor");
     }
 
-    protected SpigotModuleType(final String ID, final String groupId, final String artifactId) {
-        super(ID, groupId, artifactId);
+    protected SpigotModuleType(final String groupId, final String artifactId) {
+        super(groupId, artifactId);
         CommonColors.applyStandardColors(this.colorMap, "net.md_5.bungee.api.ChatColor");
     }
 
@@ -32,11 +31,6 @@ public class SpigotModuleType extends BukkitModuleType {
     @Override
     public PlatformType getPlatformType() {
         return PlatformType.SPIGOT;
-    }
-
-    @Override
-    public Icon getBigIcon() {
-        return PlatformAssets.SPIGOT_ICON_2X;
     }
 
     @Override

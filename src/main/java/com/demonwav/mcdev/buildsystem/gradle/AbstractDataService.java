@@ -58,6 +58,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                            @Nullable ProjectData projectData,
                            @NotNull Project project,
                            @NotNull IdeModifiableModelsProvider modelsProvider) {
+
         if (projectData == null || !projectData.getOwner().equals(GradleConstants.SYSTEM_ID)) {
             return;
         }
@@ -98,7 +99,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             Set<Module> badModules = new HashSet<>();
             checkedModules.addAll(goodModules);
 
-            goodModules.stream().forEach(m -> {
+            goodModules.forEach(m -> {
                 String[] path = modelsProvider.getModifiableModuleModel().getModuleGroupPath(m);
                 if (path == null) {
                     // Always reset back to JavaModule
@@ -116,7 +117,8 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                         badModules.add(m);
                         checkedModules.add(parentModule);
                         MinecraftModuleType.addOption(parentModule, type.getId());
-                        Optional.ofNullable(BuildSystem.getInstance(parentModule)).ifPresent(thisModule -> thisModule.reImport(parentModule));
+                        Optional.ofNullable(BuildSystem.getInstance(parentModule))
+                            .ifPresent(thisModule -> thisModule.reImport(parentModule));
                         MinecraftModule.getInstance(parentModule);
                     }
                 }
@@ -139,8 +141,9 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
     }
 
     protected void checkModule(@NotNull IdeModifiableModelsProvider modelsProvider,
-                                  @NotNull AbstractModuleType<?> type,
-                                  @NotNull String text) {
+                               @NotNull AbstractModuleType<?> type,
+                               @NotNull String text) {
+
         ApplicationManager.getApplication().runReadAction(() -> {
             final Module[] modules = modelsProvider.getModules();
             List<Module> forgeModules = new ArrayList<>();
@@ -170,7 +173,8 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
     }
 
     @Contract("null, _, _ -> false")
-    protected boolean checkModuleText(Module module, IdeModifiableModelsProvider provider, String text) {
+    private boolean checkModuleText(Module module, IdeModifiableModelsProvider provider, String text) {
+
         if (module != null) {
             VirtualFile[] roots = provider.getModifiableRootModel(module).getContentRoots();
             if (roots.length == 0) {

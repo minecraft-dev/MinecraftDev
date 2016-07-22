@@ -25,6 +25,7 @@ public class LiteLoaderDataService extends AbstractDataService {
                            @Nullable ProjectData projectData,
                            @NotNull Project project,
                            @NotNull IdeModifiableModelsProvider modelsProvider) {
+
         if (projectData == null || !projectData.getOwner().equals(GradleConstants.SYSTEM_ID)) {
             return;
         }

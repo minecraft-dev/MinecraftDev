@@ -1,6 +1,5 @@
 package com.demonwav.mcdev;
 
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import org.jetbrains.annotations.Nls;
@@ -13,6 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 public class MinecraftConfigurable implements Configurable {
+
     private JPanel panel;
     private JCheckBox showProjectPlatformIconsCheckBox;
     private JCheckBox showEventListenerGutterCheckBox;
@@ -20,13 +20,8 @@ public class MinecraftConfigurable implements Configurable {
     private JComboBox<MinecraftSettings.UnderlineType> chatColorUnderlinesComboBox;
     private JCheckBox showChatGutterIconsCheckBox;
 
-    @NotNull private final PropertiesComponent component;
-
-    public MinecraftConfigurable(@NotNull final PropertiesComponent component) {
-        this.component = component;
-    }
-
     @Nls
+    @NotNull
     @Override
     public String getDisplayName() {
         return "Minecraft Development";
@@ -38,7 +33,7 @@ public class MinecraftConfigurable implements Configurable {
         return null;
     }
 
-    @Nullable
+    @NotNull
     @Override
     public JComponent createComponent() {
         showChatColorUnderlinesCheckBox.addActionListener(e -> setUnderlineBox());

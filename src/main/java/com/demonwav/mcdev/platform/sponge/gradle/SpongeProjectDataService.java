@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Order(ExternalSystemConstants.UNORDERED)
 public class SpongeProjectDataService extends AbstractProjectDataService<ModuleDependencyData, Module> {
+
     @NotNull
     @Override
     public Key<ModuleDependencyData> getTargetDataKey() {
