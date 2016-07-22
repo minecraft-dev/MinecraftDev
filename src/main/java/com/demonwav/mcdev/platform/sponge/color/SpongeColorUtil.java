@@ -47,6 +47,10 @@ public class SpongeColorUtil {
 
         PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) element;
 
+        if (!(methodCallExpression.getMethodExpression().getQualifier() instanceof PsiReferenceExpression)) {
+            return null;
+        }
+
         PsiReferenceExpression qualifier = (PsiReferenceExpression) methodCallExpression.getMethodExpression().getQualifier();
         if (qualifier == null) {
             return null;

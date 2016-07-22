@@ -19,6 +19,10 @@
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p><p>
         Recent changes:
+        <h3>alpha-0.1.5</h3>
+        <ul>
+          <li>Fix ClassCastException in Sponge modules</li>
+        </ul>
         <h3>alpha-0.1.4</h3>
         <ul>
           <li>Added support for Sponge Color class for gutter icons and underlines</li>
