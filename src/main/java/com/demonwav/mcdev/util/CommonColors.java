@@ -38,7 +38,7 @@ public final class CommonColors {
         map.put(prefix + ".DARK_BLUE", DARK_BLUE);
         map.put(prefix + ".BLUE", BLUE);
         map.put(prefix + ".LIGHT_PURPLE", LIGHT_PURPLE);
-        map.put(prefix + ".DARK_PURPLE", DARK_PURPLE;
+        map.put(prefix + ".DARK_PURPLE", DARK_PURPLE);
         map.put(prefix + ".WHITE", WHITE);
         map.put(prefix + ".GRAY", GRAY);
         map.put(prefix + ".DARK_GRAY", DARK_GRAY);
