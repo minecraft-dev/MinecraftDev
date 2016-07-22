@@ -6,9 +6,12 @@ import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo;
+import com.intellij.codeInsight.daemon.NavigateAction;
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.Function;
 import com.intellij.util.FunctionUtil;
 import com.intellij.util.ui.ColorIcon;
@@ -19,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.Color;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -31,7 +35,12 @@ public class ColorLineMarkerProvider implements LineMarkerProvider {
             return null;
         }
 
-        return ColorUtil.findColorFromElement(element, entry -> new ColorInfo(element, entry.getValue()));
+        ColorInfo info =  ColorUtil.findColorFromElement(element, (map, chosenEntry) -> new ColorInfo(element, chosenEntry.getValue(), map));
+        if (info != null) {
+            NavigateAction.setNavigateAction(info, "Change color", null);
+        }
+
+        return info;
     }
 
     @Override
@@ -39,17 +48,31 @@ public class ColorLineMarkerProvider implements LineMarkerProvider {
     }
 
     private static class ColorInfo extends MergeableLineMarkerInfo<PsiElement> {
-
         private final Color color;
 
-        public ColorInfo(@NotNull final PsiElement element, @NotNull final Color color) {
+        public ColorInfo(@NotNull final PsiElement element, @NotNull final Color color, @NotNull Map<String, Color> map) {
             super(
                     element,
                     element.getTextRange(),
                     new ColorIcon(12, color),
                     Pass.UPDATE_ALL,
                     FunctionUtil.<Object, String>nullConstant(),
-                    null,
+                    (mouseEvent, psiElement) -> {
+                        if (!psiElement.isWritable()) {
+                            return;
+                        }
+
+                        final Editor editor = PsiUtilBase.findEditor(element);
+                        if (editor == null) {
+                            return;
+                        }
+
+                        ColorPicker picker = new ColorPicker(map, editor.getComponent());
+                        final String newColor = picker.showDialog();
+                        if (newColor != null) {
+                            ColorUtil.setColorTo(element, newColor);
+                        }
+                    },
                     GutterIconRenderer.Alignment.CENTER
             );
             this.color = color;

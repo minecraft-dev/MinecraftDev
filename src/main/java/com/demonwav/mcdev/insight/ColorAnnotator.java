@@ -1,30 +1,19 @@
 package com.demonwav.mcdev.insight;
 
 import com.demonwav.mcdev.MinecraftSettings;
-import com.demonwav.mcdev.platform.AbstractModuleType;
-import com.demonwav.mcdev.platform.MinecraftModule;
 
 import com.intellij.codeInsight.daemon.impl.AnnotationHolderImpl;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
-
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReferenceExpression;
-import com.intellij.psi.PsiType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.Map;
-import java.util.function.Function;
 
 public class ColorAnnotator implements Annotator {
     @Override
@@ -33,7 +22,7 @@ public class ColorAnnotator implements Annotator {
             return;
         }
 
-        final Color color = ColorUtil.findColorFromElement(element, Map.Entry::getValue);
+        final Color color = ColorUtil.findColorFromElement(element, (map, chosenEntry) -> chosenEntry.getValue());
         if (color == null) {
             return;
         }

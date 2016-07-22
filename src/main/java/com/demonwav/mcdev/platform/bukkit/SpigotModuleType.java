@@ -7,8 +7,6 @@ import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
-
 import javax.swing.Icon;
 
 public class SpigotModuleType extends BukkitModuleType {

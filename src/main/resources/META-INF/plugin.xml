@@ -19,6 +19,11 @@
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p><p>
         Recent changes:
+        <h3>alpha-0.1.3</h3>
+        <ul>
+          <li>Added click and Alt-Enter action to color gutter icons</li>
+          <li>Added Forge and LiteLoader TextFormatting classes</li>
+        </ul>
         <h3>alpha-0.1.2</h3>
         <ul>
           <li>Added settings page</li>
