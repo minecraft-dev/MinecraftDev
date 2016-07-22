@@ -3,6 +3,7 @@ package com.demonwav.mcdev.insight;
 import com.demonwav.mcdev.MinecraftSettings;
 
 import com.intellij.codeHighlighting.Pass;
+import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo;
@@ -47,8 +48,9 @@ public class ColorLineMarkerProvider implements LineMarkerProvider {
     public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
     }
 
-    private static class ColorInfo extends MergeableLineMarkerInfo<PsiElement> {
-        private final Color color;
+    public static class ColorInfo extends MergeableLineMarkerInfo<PsiElement> {
+
+        protected final Color color;
 
         public ColorInfo(@NotNull final PsiElement element, @NotNull final Color color, @NotNull Map<String, Color> map) {
             super(
@@ -74,6 +76,19 @@ public class ColorLineMarkerProvider implements LineMarkerProvider {
                         }
                     },
                     GutterIconRenderer.Alignment.CENTER
+            );
+            this.color = color;
+        }
+
+        public ColorInfo(@NotNull final PsiElement element, @NotNull final Color color, @NotNull GutterIconNavigationHandler<PsiElement> handler) {
+            super(
+                    element,
+                    element.getTextRange(),
+                    new ColorIcon(12, color),
+                    Pass.UPDATE_ALL,
+                    FunctionUtil.<Object, String>nullConstant(),
+                    handler,
+                    GutterIconRenderer.Alignment.LEFT
             );
             this.color = color;
         }

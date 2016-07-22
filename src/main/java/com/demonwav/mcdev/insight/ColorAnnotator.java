@@ -16,6 +16,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 public class ColorAnnotator implements Annotator {
+
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         if (!MinecraftSettings.getInstance().isShowChatColorUnderlines()) {
@@ -27,22 +28,26 @@ public class ColorAnnotator implements Annotator {
             return;
         }
 
+        setColorAnnotator(color, element, holder);
+    }
+
+    public static void setColorAnnotator(@NotNull Color color, @NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         final TextAttributesKey key = TextAttributesKey.createTextAttributesKey("MC_COLOR_" + color.toString(), new TextAttributes(
-                null,
-                null,
-                color,
-                MinecraftSettings.getInstance().getUnderlineType().getEffectType(),
-                Font.PLAIN
+            null,
+            null,
+            color,
+            MinecraftSettings.getInstance().getUnderlineType().getEffectType(),
+            Font.PLAIN
         ));
         // We need to reset it even though we passed it in the create method, since the TextAttributesKey's are cached, so if this changes
         // then the cached version of it still wont. We set it here to make sure it's always set properly
         key.getDefaultAttributes().setEffectType(MinecraftSettings.getInstance().getUnderlineType().getEffectType());
         final Annotation annotation = new Annotation(
-                element.getTextRange().getStartOffset(),
-                element.getTextRange().getEndOffset(),
-                HighlightSeverity.INFORMATION,
-                null,
-                null
+            element.getTextRange().getStartOffset(),
+            element.getTextRange().getEndOffset(),
+            HighlightSeverity.INFORMATION,
+            null,
+            null
         );
         annotation.setTextAttributes(key);
         ((AnnotationHolderImpl) holder).add(annotation);

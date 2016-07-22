@@ -10,10 +10,17 @@ import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiExpression;
+import com.intellij.psi.PsiExpressionList;
 import com.intellij.psi.PsiIdentifier;
+import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.impl.JavaPsiFacadeEx;
+import com.intellij.psi.impl.JavaPsiFacadeImpl;
+import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;
 import java.util.Map;
@@ -21,6 +28,7 @@ import java.util.function.BiFunction;
 
 public class ColorUtil {
 
+    @Nullable
     public static <T> T findColorFromElement(@NotNull PsiElement element, @NotNull BiFunction<Map<String, Color>, Map.Entry<String, Color>, T> function) {
         if (!(element instanceof PsiReferenceExpression)) {
             return null;
@@ -73,6 +81,48 @@ public class ColorUtil {
                 PsiIdentifier identifier = JavaPsiFacade.getElementFactory(element.getProject()).createIdentifier(newColorBase);
 
                 child.getPsi().replace(identifier);
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
+    public static void setColorTo(@NotNull PsiLiteralExpression expression, int value) {
+        try {
+            WriteCommandAction.runWriteCommandAction(expression.getProject(), () -> {
+                ASTNode node = expression.getNode();
+
+                PsiLiteralExpression literalExpression = (PsiLiteralExpression) JavaPsiFacade.getElementFactory(expression.getProject())
+                        .createExpressionFromText("0x" + Integer.toHexString(value).toUpperCase(), null);
+
+                node.getPsi().replace(literalExpression);
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
+    public static void setColorTo(@NotNull PsiExpressionList expressionList, int red, int green, int blue) {
+        try {
+            WriteCommandAction.runWriteCommandAction(expressionList.getProject(), () -> {
+                PsiExpression expressionOne = expressionList.getExpressions()[0];
+                PsiExpression expressionTwo = expressionList.getExpressions()[1];
+                PsiExpression expressionThree = expressionList.getExpressions()[2];
+
+                ASTNode nodeOne = expressionOne.getNode();
+                ASTNode nodeTwo = expressionTwo.getNode();
+                ASTNode nodeThree  = expressionThree.getNode();
+
+                PsiExpression literalExpressionOne = JavaPsiFacade.getElementFactory(expressionList.getProject())
+                        .createExpressionFromText(String.valueOf(red), null);
+                PsiExpression literalExpressionTwo = JavaPsiFacade.getElementFactory(expressionList.getProject())
+                        .createExpressionFromText(String.valueOf(green), null);
+                PsiExpression literalExpressionThree = JavaPsiFacade.getElementFactory(expressionList.getProject())
+                        .createExpressionFromText(String.valueOf(blue), null);
+
+                nodeOne.getPsi().replace(literalExpressionOne);
+                nodeTwo.getPsi().replace(literalExpressionTwo);
+                nodeThree.getPsi().replace(literalExpressionThree);
             });
         } catch (Throwable throwable) {
             throwable.printStackTrace();
