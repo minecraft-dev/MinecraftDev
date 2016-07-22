@@ -3,6 +3,7 @@ package com.demonwav.mcdev.platform.bukkit;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
+import com.demonwav.mcdev.util.CommonColors;
 
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
@@ -16,12 +17,12 @@ public class SpigotModuleType extends BukkitModuleType {
 
     private SpigotModuleType() {
         super(ID, "org.spigotmc", "spigot-api");
-        BungeeCordModuleType.addBungeeColors(colorMap);
+        CommonColors.applyStandardColors(this.colorMap, "net.md_5.bungee.api.ChatColor");
     }
 
     protected SpigotModuleType(final String ID, final String groupId, final String artifactId) {
         super(ID, groupId, artifactId);
-        BungeeCordModuleType.addBungeeColors(colorMap);
+        CommonColors.applyStandardColors(this.colorMap, "net.md_5.bungee.api.ChatColor");
     }
 
     public static SpigotModuleType getInstance() {

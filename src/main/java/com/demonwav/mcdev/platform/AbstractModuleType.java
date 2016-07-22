@@ -8,7 +8,7 @@ import com.intellij.openapi.util.JDOMExternalizableStringList;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +20,8 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
     private final String groupId;
     @NotNull
     private final String artifactId;
+    @NotNull
+    protected final LinkedHashMap<String, Color> colorMap = new LinkedHashMap<>();
 
     public AbstractModuleType(@NotNull final String groupId, @NotNull final String artifactId) {
         this.groupId = groupId;
@@ -52,7 +54,7 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
 
     @NotNull
     public Map<String, Color> getClassToColorMappings() {
-        return new HashMap<>();
+        return this.colorMap;
     }
 
     @NotNull
