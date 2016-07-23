@@ -203,5 +203,4 @@ public final class SideOnlyUtil {
         }
         return Side.NONE;
     }
-
 }

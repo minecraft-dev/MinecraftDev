@@ -28,7 +28,7 @@ public class VariableSideOnlyAnnotator implements Annotator {
             return;
         }
 
-        if (SideOnlyUtil.beginningCheck(element)) {
+        if (!SideOnlyUtil.beginningCheck(element)) {
             return;
         }
 

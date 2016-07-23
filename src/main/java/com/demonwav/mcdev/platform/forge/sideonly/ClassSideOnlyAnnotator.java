@@ -19,7 +19,7 @@ public class ClassSideOnlyAnnotator implements Annotator{
             return;
         }
 
-        if (SideOnlyUtil.beginningCheck(element)) {
+        if (!SideOnlyUtil.beginningCheck(element)) {
             return;
         }
 
