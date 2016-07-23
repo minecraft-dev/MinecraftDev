@@ -140,11 +140,38 @@
         <!-- Sponge Annotator -->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
 
-        <!-- Forge Annotators -->
-        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.forge.sideonly.VariableSideOnlyAnnotator"/>
-        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.forge.sideonly.ClassSideOnlyAnnotator"/>
-        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.forge.sideonly.MethodSideOnlyAnnotator"/>
-        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.forge.sideonly.FieldDeclarationSideOnlyAnnotator"/>
+        <!-- Forge Inspections -->
+        <localInspection displayName="Invalid usage of @SideOnly in nested class declaration"
+                         groupName="MinecraftDev.Forge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.forge.sideonly.NestedClassSideOnlyInspection"/>
+
+        <localInspection displayName="Invalid usage of @SideOnly in field declaration"
+                         groupName="MinecraftDev.Forge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.forge.sideonly.FieldDeclarationSideOnlyInspection"/>
+
+        <localInspection displayName="Invalid usage of @SideOnly in method declaration"
+                         groupName="MinecraftDev.Forge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.forge.sideonly.MethodSideOnlyInspection"/>
+
+        <localInspection displayName="Invalid usage of variable annotated with @SideOnly"
+                         groupName="MinecraftDev.Forge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.forge.sideonly.VariableSideOnlyInspection"/>
 
         <!-- Project View Node Decorators provide the project icons -->
         <projectViewNodeDecorator implementation="com.demonwav.mcdev.platform.MinecraftProjectViewNodeDecorator"/>
