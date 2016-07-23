@@ -51,7 +51,7 @@ public final class SideOnlyUtil {
     public static String normalize(@NotNull String text) {
         if (text.startsWith(SIDE)) {
             // We chop off the "net.minecraftforge.fml.relauncher." part here
-            text = text.substring(text.lastIndexOf(".") - 4);
+            return text.substring(text.lastIndexOf(".") - 4);
         }
         return text;
     }

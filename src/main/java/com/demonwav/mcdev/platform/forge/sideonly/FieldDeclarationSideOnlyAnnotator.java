@@ -26,12 +26,12 @@ public class FieldDeclarationSideOnlyAnnotator implements Annotator {
 
         PsiFieldImpl field = (PsiFieldImpl) element;
 
-        Side fieldSide = SideOnlyUtil.checkField(field);
-
         PsiClass psiClass = PsiUtil.getClassOfElement(field);
         if (psiClass == null) {
             return;
         }
+
+        Side fieldSide = SideOnlyUtil.checkField(field);
 
         List<Pair<Side, PsiClass>> classHierarchySides = SideOnlyUtil.checkClassHierarchy(psiClass);
         Side classSide = SideOnlyUtil.getHighestLevelSide(classHierarchySides);

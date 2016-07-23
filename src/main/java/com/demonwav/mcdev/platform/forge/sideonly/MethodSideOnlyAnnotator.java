@@ -27,12 +27,12 @@ public class MethodSideOnlyAnnotator implements Annotator {
 
         PsiMethod method = (PsiMethod) element;
 
-        Side methodSide = SideOnlyUtil.checkMethod(method);
-
         PsiClass psiClass = PsiUtil.getClassOfElement(method);
         if (psiClass == null) {
             return;
         }
+
+        Side methodSide = SideOnlyUtil.checkMethod(method);
 
         List<Pair<Side, PsiClass>> classHierarchySides = SideOnlyUtil.checkClassHierarchy(psiClass);
         Side classSide = SideOnlyUtil.getHighestLevelSide(classHierarchySides);
