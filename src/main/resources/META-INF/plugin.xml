@@ -98,14 +98,8 @@
     <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="145"/>
 
-    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-         on how to target different products -->
-    <!-- uncomment to enable plugin in all products
-    <depends>com.intellij.modules.lang</depends>
-    -->
-
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
+        <!-- Module types are for transitions from old versions only -->
         <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
         <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BukkitModuleTypeTransition"/>
         <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.SpigotModuleTypeTransition"/>
@@ -113,10 +107,16 @@
         <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BungeeCordModuleTypeTransition"/>
         <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.SpongeModuleTypeTransition"/>
         <moduleType id="FORGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.ForgeModuleTypeTransition"/>
+
+        <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
+
+        <!-- File icon providers are project defined -->
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
         <fileIconProvider implementation="com.demonwav.mcdev.platform.forge.ForgeFileIconProvider"/>
+
+        <!-- External Project Datat Services are for Gradle project imports -->
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.BukkitDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.SpigotDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.PaperDataService"/>
@@ -125,13 +125,31 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeProjectDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.liteloader.gradle.LiteLoaderDataService"/>
+
+        <!-- Project-independent Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ColorLineMarkerProvider"/>
+
+        <!-- Sponge Line Marker Provider -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorLineMarkerProvider"/>
+
+        <!-- Project-independent Annotators-->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ColorAnnotator"/>
+
+        <!-- Sponge Annotator -->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
+
+        <!-- Forge Annotators -->
+        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.forge.sideonly.VariableSideOnlyAnnotator"/>
+        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.forge.sideonly.ClassSideOnlyAnnotator"/>
+        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.forge.sideonly.MethodSideOnlyAnnotator"/>
+        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.forge.sideonly.FieldDeclarationSideOnlyAnnotator"/>
+
+        <!-- Project View Node Decorators provide the project icons -->
         <projectViewNodeDecorator implementation="com.demonwav.mcdev.platform.MinecraftProjectViewNodeDecorator"/>
+
+        <!-- Application Configurable provides the Minecraft settings page -->
         <applicationConfigurable displayName="Minecraft Development"
                                  id="Settings.Minecraft"
                                  groupId="language"
@@ -139,6 +157,7 @@
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.idea.maven">
+        <!-- Maven importers for, well, Maven project importing -->
         <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.BukkitMavenImporter"/>
         <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.SpigotMavenImporter"/>
         <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
@@ -151,11 +170,10 @@
     </extensions>
 
     <application-components>
-        <!-- Add your application components here -->
     </application-components>
 
     <project-components>
-        <!-- Add your project components here -->
+        <!-- Application components for Project open listeners -->
         <component>
             <implementation-class>com.demonwav.mcdev.platform.MinecraftProjectComponent</implementation-class>
             <loadForDefaultProject/>
@@ -171,6 +189,5 @@
     </project-components>
 
     <actions>
-        <!-- Add your actions here -->
     </actions>
 </idea-plugin>

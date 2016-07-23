@@ -86,6 +86,14 @@ public class MinecraftSettings implements PersistentStateComponent<MinecraftSett
         return 0;
     }
 
+    public boolean isEnableSideOnlyChecks() {
+        return state.isEnableSideOnlyChecks();
+    }
+
+    public void setEnableSideOnlyChecks(boolean enableSideOnlyChecks) {
+        state.setEnableSideOnlyChecks(enableSideOnlyChecks);
+    }
+
     public enum UnderlineType {
 
         NORMAL("Normal", EffectType.LINE_UNDERSCORE),

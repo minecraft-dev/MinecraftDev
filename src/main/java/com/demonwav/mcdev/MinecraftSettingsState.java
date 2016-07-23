@@ -9,6 +9,8 @@ public class MinecraftSettingsState {
     private boolean showChatColorGutterIcons = true;
     private boolean showChatColorUnderlines = false;
 
+    private boolean enableSideOnlyChecks = true;
+
     @NotNull
     private MinecraftSettings.UnderlineType underlineType = MinecraftSettings.UnderlineType.DOTTED;
 
@@ -51,5 +53,13 @@ public class MinecraftSettingsState {
 
     public void setUnderlineType(@NotNull MinecraftSettings.UnderlineType underlineType) {
         this.underlineType = underlineType;
+    }
+
+    public boolean isEnableSideOnlyChecks() {
+        return enableSideOnlyChecks;
+    }
+
+    public void setEnableSideOnlyChecks(boolean enableSideOnlyChecks) {
+        this.enableSideOnlyChecks = enableSideOnlyChecks;
     }
 }

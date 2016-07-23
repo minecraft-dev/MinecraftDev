@@ -19,6 +19,7 @@ public class MinecraftConfigurable implements Configurable {
     private JCheckBox showChatColorUnderlinesCheckBox;
     private JComboBox<MinecraftSettings.UnderlineType> chatColorUnderlinesComboBox;
     private JCheckBox showChatGutterIconsCheckBox;
+    private JCheckBox enableSideOnlyChecksCheckBox;
 
     @Nls
     @NotNull
@@ -55,6 +56,8 @@ public class MinecraftConfigurable implements Configurable {
 
         chatColorUnderlinesComboBox.setSelectedIndex(settings.getUnderlineTypeIndex());
         setUnderlineBox();
+
+        enableSideOnlyChecksCheckBox.setSelected(settings.isEnableSideOnlyChecks());
     }
 
     private void setUnderlineBox() {
@@ -70,10 +73,11 @@ public class MinecraftConfigurable implements Configurable {
         final MinecraftSettings settings = MinecraftSettings.getInstance();
 
         return showProjectPlatformIconsCheckBox.isSelected() != settings.isShowProjectPlatformIcons() ||
-                showEventListenerGutterCheckBox.isSelected() != settings.isShowEventListenerGutterIcons() ||
-                showChatGutterIconsCheckBox.isSelected() != settings.isShowChatColorGutterIcons() ||
-                showChatColorUnderlinesCheckBox.isSelected() != settings.isShowChatColorUnderlines() ||
-                chatColorUnderlinesComboBox.getSelectedItem() != settings.getUnderlineType();
+            showEventListenerGutterCheckBox.isSelected() != settings.isShowEventListenerGutterIcons() ||
+            showChatGutterIconsCheckBox.isSelected() != settings.isShowChatColorGutterIcons() ||
+            showChatColorUnderlinesCheckBox.isSelected() != settings.isShowChatColorUnderlines() ||
+            chatColorUnderlinesComboBox.getSelectedItem() != settings.getUnderlineType() ||
+            enableSideOnlyChecksCheckBox.isSelected() != settings.isEnableSideOnlyChecks();
     }
 
     @Override
@@ -85,6 +89,7 @@ public class MinecraftConfigurable implements Configurable {
         settings.setShowChatColorGutterIcons(showChatGutterIconsCheckBox.isSelected());
         settings.setShowChatColorUnderlines(showChatColorUnderlinesCheckBox.isSelected());
         settings.setUnderlineType((MinecraftSettings.UnderlineType) chatColorUnderlinesComboBox.getSelectedItem());
+        settings.setEnableSideOnlyChecks(enableSideOnlyChecksCheckBox.isSelected());
     }
 
     @Override
