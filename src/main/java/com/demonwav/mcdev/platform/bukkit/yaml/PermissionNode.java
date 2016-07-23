@@ -87,8 +87,12 @@ public class PermissionNode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         PermissionNode that = (PermissionNode) o;
         return Objects.equal(name, that.name) &&
             Objects.equal(description, that.description) &&

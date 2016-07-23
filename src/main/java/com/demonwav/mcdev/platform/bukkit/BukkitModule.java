@@ -106,8 +106,12 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         BukkitModule<?> that = (BukkitModule<?>) o;
         return Objects.equal(pluginYml, that.pluginYml) &&
             type == that.type &&

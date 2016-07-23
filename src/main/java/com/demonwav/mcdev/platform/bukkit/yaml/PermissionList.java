@@ -62,8 +62,12 @@ public class PermissionList {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         PermissionList that = (PermissionList) o;
         return Objects.equal(permissions, that.permissions);
     }

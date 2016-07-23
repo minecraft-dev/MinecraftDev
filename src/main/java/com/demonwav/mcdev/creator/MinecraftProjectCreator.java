@@ -284,8 +284,12 @@ public class MinecraftProjectCreator {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MinecraftProjectCreator that = (MinecraftProjectCreator) o;
         return index == that.index &&
             Objects.equal(root, that.root) &&

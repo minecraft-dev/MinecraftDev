@@ -33,8 +33,12 @@ public class BuildRepository {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         BuildRepository that = (BuildRepository) o;
         return Objects.equal(id, that.id) &&
             Objects.equal(url, that.url);
@@ -52,5 +56,4 @@ public class BuildRepository {
             .add("url", url)
             .toString();
     }
-
 }

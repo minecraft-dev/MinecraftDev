@@ -116,8 +116,12 @@ public class CommandNode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         CommandNode that = (CommandNode) o;
         return Objects.equal(name, that.name) &&
             Objects.equal(description, that.description) &&

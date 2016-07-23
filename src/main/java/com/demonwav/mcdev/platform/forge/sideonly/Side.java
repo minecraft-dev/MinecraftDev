@@ -3,7 +3,7 @@ package com.demonwav.mcdev.platform.forge.sideonly;
 import org.jetbrains.annotations.NotNull;
 
 public enum Side {
-    
+
     CLIENT("SideOnly.CLIENT"),
     SERVER("SideOnly.SERVER"),
     NONE("NONE"),

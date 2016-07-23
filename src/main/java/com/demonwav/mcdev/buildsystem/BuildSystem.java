@@ -303,8 +303,12 @@ public abstract class BuildSystem {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         BuildSystem that = (BuildSystem) o;
         return Objects.equal(artifactId, that.artifactId) &&
             Objects.equal(groupId, that.groupId) &&
