@@ -142,7 +142,7 @@
 
         <!-- Forge Inspections -->
         <localInspection displayName="Invalid usage of @SideOnly in nested class declaration"
-                         groupName="MinecraftDev.Forge"
+                         groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
@@ -150,7 +150,7 @@
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.NestedClassSideOnlyInspection"/>
 
         <localInspection displayName="Invalid usage of @SideOnly in field declaration"
-                         groupName="MinecraftDev.Forge"
+                         groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
@@ -158,7 +158,7 @@
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.FieldDeclarationSideOnlyInspection"/>
 
         <localInspection displayName="Invalid usage of @SideOnly in method declaration"
-                         groupName="MinecraftDev.Forge"
+                         groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
@@ -166,21 +166,21 @@
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.MethodSideOnlyInspection"/>
 
         <localInspection displayName="Invalid usage of variable annotated with @SideOnly"
-                         groupName="MinecraftDev.Forge"
+                         groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.VariableSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of method annotated with @SideOnly"
-                         groupName="MinecraftDev.Forge"
+                         groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.MethodCallSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of class annotated with @SideOnly"
-                         groupName="MinecraftDev.Forge"
+                         groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
