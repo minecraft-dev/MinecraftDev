@@ -15,11 +15,11 @@ public class ClassSideOnlyAnnotator implements Annotator{
 
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        if (SideOnlyUtil.beginningCheck(element)) {
+        if (!(element instanceof PsiClass)) {
             return;
         }
 
-        if (!(element instanceof PsiClass)) {
+        if (SideOnlyUtil.beginningCheck(element)) {
             return;
         }
 

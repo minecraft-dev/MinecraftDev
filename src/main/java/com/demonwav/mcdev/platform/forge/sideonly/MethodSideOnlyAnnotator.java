@@ -16,12 +16,12 @@ public class MethodSideOnlyAnnotator implements Annotator {
 
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        if (SideOnlyUtil.beginningCheck(element)) {
+        // Only worried about methods here
+        if (!(element instanceof PsiMethod)) {
             return;
         }
 
-        // Only worried about methods here
-        if (!(element instanceof PsiMethod)) {
+        if (SideOnlyUtil.beginningCheck(element)) {
             return;
         }
 

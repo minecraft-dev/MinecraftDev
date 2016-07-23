@@ -19,16 +19,16 @@ public class VariableSideOnlyAnnotator implements Annotator {
 
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        if (SideOnlyUtil.beginningCheck(element)) {
-            return;
-        }
-
         // We are only checking PsiReferenceExpressions
         // We can get the PsiIdentifier from the PsiReferenceExpression later (which we do)
         // the PsiIdentifier is the actual element we are worried about, but we can only get
         // the declaration of the element from a PsiReferenceExpression, which wraps the
         // PsiIdentifier
         if (!(element instanceof PsiReferenceExpression)) {
+            return;
+        }
+
+        if (SideOnlyUtil.beginningCheck(element)) {
             return;
         }
 

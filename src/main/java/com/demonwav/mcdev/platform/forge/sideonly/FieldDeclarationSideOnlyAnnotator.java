@@ -16,11 +16,11 @@ public class FieldDeclarationSideOnlyAnnotator implements Annotator {
 
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        if (SideOnlyUtil.beginningCheck(element)) {
+        if (!(element instanceof PsiFieldImpl)) {
             return;
         }
 
-        if (!(element instanceof PsiFieldImpl)) {
+        if (SideOnlyUtil.beginningCheck(element)) {
             return;
         }
 
