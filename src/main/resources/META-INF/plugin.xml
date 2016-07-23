@@ -172,6 +172,20 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.VariableSideOnlyInspection"/>
+        <localInspection displayName="Invalid usage of method annotated with @SideOnly"
+                         groupName="MinecraftDev.Forge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.forge.sideonly.MethodCallSideOnlyInspection"/>
+        <localInspection displayName="Invalid usage of class annotated with @SideOnly"
+                         groupName="MinecraftDev.Forge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.forge.sideonly.NewExpressionSideOnlyInspection"/>
 
         <!-- Project View Node Decorators provide the project icons -->
         <projectViewNodeDecorator implementation="com.demonwav.mcdev.platform.MinecraftProjectViewNodeDecorator"/>

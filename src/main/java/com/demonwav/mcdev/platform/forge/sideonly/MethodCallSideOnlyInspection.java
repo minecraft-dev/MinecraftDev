@@ -8,9 +8,10 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiReferenceExpression;
-import com.intellij.psi.impl.source.PsiFieldImpl;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import com.siyeh.ig.InspectionGadgetsFix;
@@ -20,13 +21,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class VariableSideOnlyInspection extends BaseInspection {
+public class MethodCallSideOnlyInspection extends BaseInspection {
 
     @Nls
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Invalid usage of variable annotated with @SideOnly";
+        return "Invalid usage of a @SideOnly method call";
     }
 
     @NotNull
@@ -38,23 +39,23 @@ public class VariableSideOnlyInspection extends BaseInspection {
         if (i == 0) {
             if (infos[1] == null) {
                 if (!inherited) {
-                    return "Variable annotated with " + infos[0] + " cannot be referenced in an un-annotated method.";
+                    return "Method annotated with " + infos[0] + " cannot be referenced in an un-annotated method.";
                 } else {
-                    return "Variable declared in a class annotated with " + infos[0] + " cannot be referenced in an un-annotated method.";
+                    return "Method declared in a class annotated with " + infos[0] + " cannot be referenced in an un-annotated method.";
                 }
             } else {
                 if (!inherited) {
-                    return "Variable annotated with " + infos[0] + " cannot be referenced in a method annotated with " + infos[1] + ".";
+                    return "Method annotated with " + infos[0] + " cannot be referenced in a method annotated with " + infos[1] + ".";
                 } else {
-                    return "Variable declared in a class annotated with " + infos[0] +
+                    return "Method declared in a class annotated with " + infos[0] +
                         " cannot be referenced in a method annotated with " + infos[1] + ".";
                 }
             }
         } else {
             if (!inherited) {
-                return "Variable annotated with " + infos[0] + " cannot be referenced in a class annotated with " + infos[1] + ".";
+                return "Method annotated with " + infos[0] + " cannot be referenced in a class annotated with " + infos[1] + ".";
             } else {
-                return "Variable declared in a class annotated with " + infos[0] +
+                return "Method declared in a class annotated with " + infos[0] +
                     " cannot be referenced in a class annotated with " + infos[1] + ".";
             }
         }
@@ -63,65 +64,65 @@ public class VariableSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     public String getStaticDescription() {
-        return "Variables which are declared with a @SideOnly annotation can only be used in matching @SideOnly classes and methods.";
+        return "Methods which are declared with a @SideOnly annotation can only be used in matching @SideOnly classes and methods.";
     }
 
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        if (!(boolean) infos[4]) {
-            return new InspectionGadgetsFix() {
-                @Override
-                protected void doFix(Project project, ProblemDescriptor descriptor) {
-                    PsiFieldImpl field = (PsiFieldImpl) infos[3];
+        return new InspectionGadgetsFix() {
+            @Override
+            protected void doFix(Project project, ProblemDescriptor descriptor) {
+                PsiMethod method = (PsiMethod) infos[3];
 
-                    PsiModifierList list = field.getModifierList();
+                PsiModifierList list = method.getModifierList();
 
-                    PsiAnnotation annotation = list.findAnnotation(SideOnlyUtil.SIDE_ONLY);
-                    if (annotation == null) {
-                        return;
-                    }
-
-                    annotation.delete();
+                PsiAnnotation annotation = list.findAnnotation(SideOnlyUtil.SIDE_ONLY);
+                if (annotation == null) {
+                    return;
                 }
 
-                @Nls
-                @NotNull
-                @Override
-                public String getName() {
-                    return "Remove @SideOnly annotation from field declaration";
-                }
+                annotation.delete();
+            }
 
-                @Nls
-                @NotNull
-                @Override
-                public String getFamilyName() {
-                    return getName();
-                }
-            };
-        }
-        return null;
+            @Nls
+            @NotNull
+            @Override
+            public String getName() {
+                return "Remove @SideOnly annotation from method declaration";
+            }
+
+            @Nls
+            @NotNull
+            @Override
+            public String getFamilyName() {
+                return getName();
+            }
+        };
     }
 
     @Override
     public BaseInspectionVisitor buildVisitor() {
         return new BaseInspectionVisitor() {
+
             @Override
-            public void visitReferenceExpression(PsiReferenceExpression expression) {
+            public void visitMethodCallExpression(PsiMethodCallExpression expression) {
                 if (!SideOnlyUtil.beginningCheck(expression)) {
                     return;
                 }
 
-                PsiElement declaration = expression.resolve();
+                PsiReferenceExpression referenceExpression = expression.getMethodExpression();
+
+                PsiElement declaration = referenceExpression.resolve();
 
                 // We can't really do anything unless this is a PsiFieldImpl, which it should be, but to be safe,
                 // check the type before we make the cast
-                if (!(declaration instanceof PsiFieldImpl)) {
+                if (!(declaration instanceof PsiMethod)) {
                     return;
                 }
 
-                PsiFieldImpl field = (PsiFieldImpl) declaration;
-                Side elementSide = SideOnlyUtil.checkField(field);
+                PsiMethod method = (PsiMethod) declaration;
+                Side elementSide = SideOnlyUtil.checkMethod(method);
 
                 // Check the class(es) the element is declared in
                 PsiClass declarationContainingClass = PsiUtil.getClassOfElement(declaration);
@@ -164,7 +165,7 @@ public class VariableSideOnlyInspection extends BaseInspection {
                 for (Pair<Side, PsiClass> classHierarchySide : classHierarchySides) {
                     if (classHierarchySide.first != Side.NONE && classHierarchySide.first != Side.INVALID) {
                         if (classHierarchySide.first != elementSide) {
-                            registerError(expression.getElement(), elementSide.getName(), classHierarchySide.first.getName(), 1, field, inherited);
+                            registerError(referenceExpression.getElement(), elementSide.getName(), classHierarchySide.first.getName(), 1, method, inherited);
                         }
                         classAnnotated = true;
                         break;
@@ -179,10 +180,10 @@ public class VariableSideOnlyInspection extends BaseInspection {
                     if (methodSide == Side.NONE) {
                         // If the class is properly annotated the method doesn't need to also be annotated
                         if (!classAnnotated) {
-                            registerError(expression.getElement(), elementSide.getName(), null, 0, field, inherited);
+                            registerError(referenceExpression.getElement(), elementSide.getName(), null, 0, method, inherited);
                         }
                     } else {
-                        registerError(expression.getElement(), elementSide.getName(), methodSide.getName(), 0, field, inherited);
+                        registerError(referenceExpression.getElement(), elementSide.getName(), methodSide.getName(), 0, method, inherited);
                     }
                 }
             }
