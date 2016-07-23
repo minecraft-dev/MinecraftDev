@@ -195,10 +195,10 @@ public final class SideOnlyUtil {
     }
 
     @NotNull
-    public static Side getHighestLevelSide(@NotNull List<Pair<Side, PsiClass>> list) {
-        for (int i = list.size() - 1; i >= 0; i--) {
-            if (list.get(i).first != Side.NONE) {
-                return list.get(i).first;
+    public static Side getFirstSide(@NotNull List<Pair<Side, PsiClass>> list) {
+        for (Pair<Side, PsiClass> pair : list) {
+            if (pair.first != Side.NONE) {
+                return pair.first;
             }
         }
         return Side.NONE;

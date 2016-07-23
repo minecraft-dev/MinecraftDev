@@ -1,13 +1,13 @@
 package com.demonwav.mcdev.platform.forge.sideonly;
 
 import com.demonwav.mcdev.util.PsiUtil;
-import com.demonwav.mcdev.util.Util;
 
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.impl.source.PsiFieldImpl;
@@ -32,7 +32,13 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        return "Field annotated with " + infos[0] + " cannot be declared inside a class annotated with " + infos[1] + ".";
+        boolean normal = (boolean) infos[3];
+
+        if (normal) {
+            return "Field annotated with " + infos[0] + " cannot be declared inside a class annotated with " + infos[1] + ".";
+        } else {
+            return "Field with type annotation " + infos[1] + " cannot be declared as " + infos[0] + ".";
+        }
     }
 
     @Nullable
@@ -101,12 +107,37 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
                 Side fieldSide = SideOnlyUtil.checkField((PsiFieldImpl) field);
 
                 List<Pair<Side, PsiClass>> classHierarchySides = SideOnlyUtil.checkClassHierarchy(psiClass);
-                Side classSide = SideOnlyUtil.getHighestLevelSide(classHierarchySides);
+                Side classSide = SideOnlyUtil.getFirstSide(classHierarchySides);
 
                 if (fieldSide != classSide) {
                     if (fieldSide != Side.NONE && classSide != Side.NONE && fieldSide != Side.INVALID && classSide != Side.INVALID) {
-                        registerFieldError(field, fieldSide.getName(), classSide.getName(), field);
+                        registerFieldError(field, fieldSide.getName(), classSide.getName(), field, true);
                     }
+                }
+
+                if (fieldSide == Side.INVALID || fieldSide == Side.NONE) {
+                    return;
+                }
+
+                if (!(field.getType() instanceof PsiClassType)) {
+                    return;
+                }
+
+                PsiClassType type = (PsiClassType) field.getType();
+                PsiClass fieldClass = type.resolve();
+                if (fieldClass == null) {
+                    return;
+                }
+
+                List<Pair<Side, PsiClass>> fieldClassHierarchySides = SideOnlyUtil.checkClassHierarchy(fieldClass);
+                Side fieldClassSide = SideOnlyUtil.getFirstSide(fieldClassHierarchySides);
+
+                if (fieldClassSide == Side.NONE || fieldClassSide == Side.INVALID) {
+                    return;
+                }
+
+                if (fieldClassSide != fieldSide) {
+                    registerFieldError(field, fieldSide.getName(), fieldClassSide.getName(), field, false);
                 }
             }
         };

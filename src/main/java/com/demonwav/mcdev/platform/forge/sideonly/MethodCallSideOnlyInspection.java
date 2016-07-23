@@ -132,14 +132,7 @@ public class MethodCallSideOnlyInspection extends BaseInspection {
 
                 List<Pair<Side, PsiClass>> declarationClassHierarchySides = SideOnlyUtil.checkClassHierarchy(declarationContainingClass);
 
-                Side declarationClassSide = Side.NONE;
-
-                for (Pair<Side, PsiClass> classHierarchySide : declarationClassHierarchySides) {
-                    if (classHierarchySide.first != Side.NONE && classHierarchySide.first != Side.INVALID) {
-                        declarationClassSide = classHierarchySide.first;
-                        break;
-                    }
-                }
+                Side declarationClassSide = SideOnlyUtil.getFirstSide(declarationClassHierarchySides);
 
                 // The element inherits the @SideOnly from it's parent class if it doesn't explicitly set it itself
                 boolean inherited = false;
