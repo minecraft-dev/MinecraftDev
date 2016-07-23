@@ -72,15 +72,8 @@ public final class SideOnlyUtil {
             return Side.INVALID;
         }
 
-        // Safety check before cast
-        if (!(methodValue instanceof PsiReferenceExpressionImpl)) {
-            return Side.INVALID;
-        }
-
-        PsiReferenceExpressionImpl methodValueExpression = (PsiReferenceExpressionImpl) methodValue;
-
         // Return the value of the annotation
-        return getFromName(methodValueExpression.getClassNameText());
+        return getFromName(methodValue.getText());
     }
 
     @NotNull
@@ -145,14 +138,7 @@ public final class SideOnlyUtil {
             return new Pair<>(Side.INVALID, psiClass);
         }
 
-        // Safety check before cast
-        if (!(value instanceof PsiReferenceExpressionImpl)) {
-            return new Pair<>(Side.INVALID, psiClass);
-        }
-
-        PsiReferenceExpressionImpl valueExpression = (PsiReferenceExpressionImpl) value;
-
-        return new Pair<>(getFromName(valueExpression.getClassNameText()), psiClass);
+        return new Pair<>(getFromName(value.getText()), psiClass);
     }
 
     @NotNull
@@ -171,15 +157,8 @@ public final class SideOnlyUtil {
             return Side.INVALID;
         }
 
-        // Again, this should be a PsiReferenceExpressionImpl, but for safety, check before cast
-        if (!(value instanceof PsiReferenceExpressionImpl)) {
-            return Side.INVALID;
-        }
-
-        PsiReferenceExpressionImpl valueExpression = (PsiReferenceExpressionImpl) value;
-
         // Finally, get the value of the SideOnly
-        return SideOnlyUtil.getFromName(valueExpression.getClassNameText());
+        return SideOnlyUtil.getFromName(value.getText());
     }
 
     @NotNull
