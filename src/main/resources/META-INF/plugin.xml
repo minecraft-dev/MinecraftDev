@@ -204,14 +204,6 @@
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.LocalVariableDeclarationSideOnlyInspection"/>
 
-        <!--<localInspection displayName="@SidedProxy annotator"-->
-                         <!--groupName="Minecraft Forge"-->
-                         <!--language="JAVA"-->
-                         <!--enabledByDefault="true"-->
-                         <!--level="WARNING"-->
-                         <!--hasStaticDescription="false"-->
-                         <!--implementationClass="com.demonwav.mcdev.platform.forge.sideonly.SidedProxyInspection"/>-->
-
         <!-- Project View Node Decorators provide the project icons -->
         <projectViewNodeDecorator implementation="com.demonwav.mcdev.platform.MinecraftProjectViewNodeDecorator"/>
 
