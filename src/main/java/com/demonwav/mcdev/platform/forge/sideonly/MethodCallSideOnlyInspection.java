@@ -1,16 +1,13 @@
 package com.demonwav.mcdev.platform.forge.sideonly;
 
-import com.demonwav.mcdev.util.PsiUtil;
+import com.demonwav.mcdev.util.McPsiUtil;
 
-import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
-import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiReferenceExpression;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
@@ -70,35 +67,26 @@ public class MethodCallSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        return new InspectionGadgetsFix() {
-            @Override
-            protected void doFix(Project project, ProblemDescriptor descriptor) {
-                PsiMethod method = (PsiMethod) infos[3];
+        PsiMethod method = (PsiMethod) infos[3];
 
-                PsiModifierList list = method.getModifierList();
-
-                PsiAnnotation annotation = list.findAnnotation(SideOnlyUtil.SIDE_ONLY);
-                if (annotation == null) {
-                    return;
+        if (method.isWritable()) {
+            return new RemoveAnnotationInspectionGadgetsFix() {
+                @Nullable
+                @Override
+                public PsiModifierListOwner getListOwner() {
+                    return method;
                 }
 
-                annotation.delete();
-            }
-
-            @Nls
-            @NotNull
-            @Override
-            public String getName() {
-                return "Remove @SideOnly annotation from method declaration";
-            }
-
-            @Nls
-            @NotNull
-            @Override
-            public String getFamilyName() {
-                return getName();
-            }
-        };
+                @Nls
+                @NotNull
+                @Override
+                public String getName() {
+                    return "Remove @SideOnly annotation from method declaration";
+                }
+            };
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -125,7 +113,7 @@ public class MethodCallSideOnlyInspection extends BaseInspection {
                 Side elementSide = SideOnlyUtil.checkMethod(method);
 
                 // Check the class(es) the element is declared in
-                PsiClass declarationContainingClass = PsiUtil.getClassOfElement(declaration);
+                PsiClass declarationContainingClass = McPsiUtil.getClassOfElement(declaration);
                 if (declarationContainingClass == null) {
                     return;
                 }
@@ -146,23 +134,20 @@ public class MethodCallSideOnlyInspection extends BaseInspection {
                 }
 
                 // Check the class(es) the element is in
-                PsiClass containingClass = PsiUtil.getClassOfElement(expression);
+                PsiClass containingClass = McPsiUtil.getClassOfElement(expression);
                 if (containingClass == null) {
                     return;
                 }
 
-                List<Pair<Side, PsiClass>> classHierarchySides = SideOnlyUtil.checkClassHierarchy(containingClass);
+                Side classSide = SideOnlyUtil.getSideForClass(containingClass);
 
                 boolean classAnnotated = false;
 
-                for (Pair<Side, PsiClass> classHierarchySide : classHierarchySides) {
-                    if (classHierarchySide.first != Side.NONE && classHierarchySide.first != Side.INVALID) {
-                        if (classHierarchySide.first != elementSide) {
-                            registerError(referenceExpression.getElement(), elementSide.getName(), classHierarchySide.first.getName(), 1, method, inherited);
-                        }
-                        classAnnotated = true;
-                        break;
+                if (classSide != Side.NONE && classSide != Side.INVALID) {
+                    if (classSide != elementSide) {
+                        registerError(referenceExpression.getElement(), elementSide.getName(), classSide.getName(), 1, method, inherited);
                     }
+                    classAnnotated = true;
                 }
 
                 // Check the method the element is in

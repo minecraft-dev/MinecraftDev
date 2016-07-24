@@ -1,15 +1,11 @@
 package com.demonwav.mcdev.platform.forge.sideonly;
 
-import com.demonwav.mcdev.util.PsiUtil;
+import com.demonwav.mcdev.util.McPsiUtil;
 
-import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Pair;
-import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiField;
-import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.impl.source.PsiFieldImpl;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
@@ -17,8 +13,6 @@ import com.siyeh.ig.InspectionGadgetsFix;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class FieldDeclarationSideOnlyInspection extends BaseInspection {
 
@@ -33,8 +27,12 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
     @Override
     protected String buildErrorString(Object... infos) {
         boolean normal = (boolean) infos[3];
+        boolean matchContainingClass = (boolean) infos[4];
 
-        if (normal) {
+
+        if (matchContainingClass) {
+            return "Field with type annotation " + infos[1] + " cannot be declared in an un-annotated class";
+        } else if (normal) {
             return "Field annotated with " + infos[0] + " cannot be declared inside a class annotated with " + infos[1] + ".";
         } else {
             return "Field with type annotation " + infos[1] + " cannot be declared as " + infos[0] + ".";
@@ -52,38 +50,26 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        return new InspectionGadgetsFix() {
-            @Override
-            protected void doFix(Project project, ProblemDescriptor descriptor) {
-                PsiField field = (PsiField) infos[2];
+        PsiField field = (PsiField) infos[2];
 
-                PsiModifierList list = field.getModifierList();
-                if (list == null) {
-                    return;
+        if (field.isWritable()) {
+            return new RemoveAnnotationInspectionGadgetsFix() {
+                @Nullable
+                @Override
+                public PsiModifierListOwner getListOwner() {
+                    return field;
                 }
 
-                PsiAnnotation annotation = list.findAnnotation(SideOnlyUtil.SIDE_ONLY);
-                if (annotation == null) {
-                    return;
+                @Nls
+                @NotNull
+                @Override
+                public String getName() {
+                    return "Remove @SideOnly annotation from field";
                 }
-
-                annotation.delete();
-            }
-
-            @Nls
-            @NotNull
-            @Override
-            public String getName() {
-                return "Remove @SideOnly annotation from field";
-            }
-
-            @Nls
-            @NotNull
-            @Override
-            public String getFamilyName() {
-                return getName();
-            }
-        };
+            };
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -95,7 +81,7 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                PsiClass psiClass = PsiUtil.getClassOfElement(field);
+                PsiClass psiClass = McPsiUtil.getClassOfElement(field);
                 if (psiClass == null) {
                     return;
                 }
@@ -105,18 +91,18 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
                 }
 
                 Side fieldSide = SideOnlyUtil.checkField((PsiFieldImpl) field);
-
-                List<Pair<Side, PsiClass>> classHierarchySides = SideOnlyUtil.checkClassHierarchy(psiClass);
-                Side classSide = SideOnlyUtil.getFirstSide(classHierarchySides);
-
-                if (fieldSide != classSide) {
-                    if (fieldSide != Side.NONE && classSide != Side.NONE && fieldSide != Side.INVALID && classSide != Side.INVALID) {
-                        registerFieldError(field, fieldSide.getName(), classSide.getName(), field, true);
-                    }
+                if (fieldSide == Side.INVALID) {
+                    return;
                 }
 
-                if (fieldSide == Side.INVALID || fieldSide == Side.NONE) {
-                    return;
+                Side classSide = SideOnlyUtil.getSideForClass(psiClass);
+
+                if (fieldSide != Side.NONE && fieldSide != classSide) {
+                    if (classSide != Side.NONE && classSide != Side.INVALID) {
+                        registerFieldError(field, fieldSide.getName(), classSide.getName(), field, true, false);
+                    } else if (classSide != Side.NONE) {
+                        registerFieldError(field, fieldSide.getName(), classSide.getName(), field, true, false);
+                    }
                 }
 
                 if (!(field.getType() instanceof PsiClassType)) {
@@ -129,15 +115,18 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                List<Pair<Side, PsiClass>> fieldClassHierarchySides = SideOnlyUtil.checkClassHierarchy(fieldClass);
-                Side fieldClassSide = SideOnlyUtil.getFirstSide(fieldClassHierarchySides);
+                Side fieldClassSide = SideOnlyUtil.getSideForClass(fieldClass);
 
                 if (fieldClassSide == Side.NONE || fieldClassSide == Side.INVALID) {
                     return;
                 }
 
-                if (fieldClassSide != fieldSide) {
-                    registerFieldError(field, fieldSide.getName(), fieldClassSide.getName(), field, false);
+                if (fieldClassSide != fieldSide && fieldSide != Side.NONE) {
+                    registerFieldError(field, fieldSide.getName(), fieldClassSide.getName(), field, false, false);
+                }
+
+                if (fieldClassSide != classSide) {
+                    registerFieldError(field, fieldSide.getName(), fieldClassSide.getName(), field, false, true);
                 }
             }
         };

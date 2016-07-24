@@ -14,7 +14,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.impl.source.PsiFieldImpl;
-import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -27,6 +26,7 @@ public final class SideOnlyUtil {
 
     @NotNull public static final String SIDE_ONLY = "net.minecraftforge.fml.relauncher.SideOnly";
     @NotNull public static final String SIDE = "net.minecraftforge.fml.relauncher.Side";
+    @NotNull public static final String SIDED_PROXY = "net.minecraftforge.fml.common.SidedProxy";
 
     public static boolean beginningCheck(@NotNull PsiElement element) {
         // Don't check if this is disabled
@@ -89,6 +89,10 @@ public final class SideOnlyUtil {
             } else {
                 element = parent;
             }
+
+            if (parent instanceof PsiClass) {
+                break;
+            }
         }
 
         // No method was found
@@ -115,6 +119,11 @@ public final class SideOnlyUtil {
 
         // We want to use an array list so indexing into the list is not expensive
         return classList.stream().map(SideOnlyUtil::checkClass).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    @NotNull
+    public static Side getSideForClass(@NotNull PsiClass psiClass) {
+        return getFirstSide(checkClassHierarchy(psiClass));
     }
 
     @NotNull
@@ -147,7 +156,7 @@ public final class SideOnlyUtil {
         // If it doesn't, we aren't worried about it
         PsiAnnotation annotation = field.getModifierList().findAnnotation(SideOnlyUtil.SIDE_ONLY);
         if (annotation == null) {
-            return Side.INVALID;
+            return Side.NONE;
         }
 
         // The value may not necessarily be set, but that will give an error by default as "value" is a

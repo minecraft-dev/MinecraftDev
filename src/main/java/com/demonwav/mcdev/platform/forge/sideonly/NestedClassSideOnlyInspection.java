@@ -1,12 +1,9 @@
 package com.demonwav.mcdev.platform.forge.sideonly;
 
-import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiIdentifier;
-import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiModifierListOwner;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import com.siyeh.ig.InspectionGadgetsFix;
@@ -43,37 +40,26 @@ public class NestedClassSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        return new InspectionGadgetsFix() {
-            @Override
-            protected void doFix(Project project, ProblemDescriptor descriptor) {
-                PsiClass psiClass = (PsiClass) infos[0];
-                PsiModifierList list = psiClass.getModifierList();
-                if (list == null) {
-                    return;
+        PsiClass psiClass = (PsiClass) infos[0];
+
+        if (psiClass.isWritable()) {
+            return new RemoveAnnotationInspectionGadgetsFix() {
+                @Nullable
+                @Override
+                public PsiModifierListOwner getListOwner() {
+                    return psiClass;
                 }
 
-                PsiAnnotation annotation = list.findAnnotation(SideOnlyUtil.SIDE_ONLY);
-                if (annotation == null) {
-                    return;
+                @Nls
+                @NotNull
+                @Override
+                public String getName() {
+                    return "Remove @SideOnly annotation from nested class";
                 }
-
-                annotation.delete();
-            }
-
-            @Nls
-            @NotNull
-            @Override
-            public String getName() {
-                return "Remove @SideOnly annotation from nested class";
-            }
-
-            @Nls
-            @NotNull
-            @Override
-            public String getFamilyName() {
-                return getName();
-            }
-        };
+            };
+        } else {
+            return null;
+        }
     }
 
     @Override

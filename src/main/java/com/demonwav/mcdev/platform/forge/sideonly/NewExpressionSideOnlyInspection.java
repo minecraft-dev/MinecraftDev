@@ -1,15 +1,12 @@
 package com.demonwav.mcdev.platform.forge.sideonly;
 
-import com.demonwav.mcdev.util.PsiUtil;
+import com.demonwav.mcdev.util.McPsiUtil;
 
-import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
-import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNewExpression;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
@@ -46,38 +43,26 @@ public class NewExpressionSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        return new InspectionGadgetsFix() {
-            @Override
-            protected void doFix(Project project, ProblemDescriptor descriptor) {
-                PsiClass psiClass = (PsiClass) infos[3];
+        PsiClass psiClass = (PsiClass) infos[3];
 
-                PsiModifierList list = psiClass.getModifierList();
-                if (list == null) {
-                    return;
+        if (psiClass.isWritable()) {
+            return new RemoveAnnotationInspectionGadgetsFix() {
+                @Nullable
+                @Override
+                public PsiModifierListOwner getListOwner() {
+                    return psiClass;
                 }
 
-                PsiAnnotation annotation = list.findAnnotation(SideOnlyUtil.SIDE_ONLY);
-                if (annotation == null) {
-                    return;
+                @Nls
+                @NotNull
+                @Override
+                public String getName() {
+                    return "Remove @SideOnly annotation from class declaration";
                 }
-
-                annotation.delete();
-            }
-
-            @Nls
-            @NotNull
-            @Override
-            public String getName() {
-                return "Remove @SideOnly annotation from class declaration";
-            }
-
-            @Nls
-            @NotNull
-            @Override
-            public String getFamilyName() {
-                return getName();
-            }
-        };
+            };
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -123,27 +108,29 @@ public class NewExpressionSideOnlyInspection extends BaseInspection {
                 }
 
                 // Check the class(es) the element is in
-                PsiClass containingClass = PsiUtil.getClassOfElement(expression);
+                PsiClass containingClass = McPsiUtil.getClassOfElement(expression);
                 if (containingClass == null) {
                     return;
                 }
 
-                List<Pair<Side, PsiClass>> classHierarchySides = SideOnlyUtil.checkClassHierarchy(containingClass);
+                Side containingClassSide = SideOnlyUtil.getSideForClass(containingClass);
+                // Check the method the element is in
+                Side methodSide = SideOnlyUtil.checkElementInMethod(expression);
 
                 boolean classAnnotated = false;
 
-                for (Pair<Side, PsiClass> classHierarchySide : classHierarchySides) {
-                    if (classHierarchySide.first != Side.NONE && classHierarchySide.first != Side.INVALID) {
-                        if (classHierarchySide.first != classSide) {
-                            registerError(expression, classSide.getName(), classHierarchySide.first.getName(), 1, offender);
-                        }
-                        classAnnotated = true;
-                        break;
+                if (containingClassSide != Side.NONE && containingClassSide != Side.INVALID) {
+                    if (containingClassSide != classSide) {
+                        registerError(expression, classSide.getName(), containingClassSide.getName(), 1, offender);
+                    }
+                    classAnnotated = true;
+                } else {
+                    if (methodSide == Side.INVALID) {
+                        // It's not in a method
+                        registerError(expression, classSide.getName(), containingClassSide.getName(), 1, offender);
+                        return;
                     }
                 }
-
-                // Check the method the element is in
-                Side methodSide = SideOnlyUtil.checkElementInMethod(expression);
 
                 // Put error on for method
                 if (classSide != methodSide && methodSide != Side.INVALID) {

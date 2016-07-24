@@ -1,14 +1,11 @@
 package com.demonwav.mcdev.platform.forge.sideonly;
 
-import com.demonwav.mcdev.util.PsiUtil;
+import com.demonwav.mcdev.util.McPsiUtil;
 
-import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiModifierListOwner;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import com.siyeh.ig.InspectionGadgetsFix;
@@ -45,35 +42,26 @@ public class MethodSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        return new InspectionGadgetsFix() {
-            @Override
-            protected void doFix(Project project, ProblemDescriptor descriptor) {
-                PsiMethod method = (PsiMethod) infos[2];
+        PsiMethod method = (PsiMethod) infos[2];
 
-                PsiModifierList list = method.getModifierList();
-
-                PsiAnnotation annotation = list.findAnnotation(SideOnlyUtil.SIDE_ONLY);
-                if (annotation == null) {
-                    return;
+        if (method.isWritable()) {
+            return new RemoveAnnotationInspectionGadgetsFix() {
+                @Nullable
+                @Override
+                public PsiModifierListOwner getListOwner() {
+                    return method;
                 }
 
-                annotation.delete();
-            }
-
-            @Nls
-            @NotNull
-            @Override
-            public String getName() {
-                return "Remove @SideOnly annotation from method";
-            }
-
-            @Nls
-            @NotNull
-            @Override
-            public String getFamilyName() {
-                return getName();
-            }
-        };
+                @Nls
+                @NotNull
+                @Override
+                public String getName() {
+                    return "Remove @SideOnly annotation from method";
+                }
+            };
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -81,7 +69,7 @@ public class MethodSideOnlyInspection extends BaseInspection {
         return new BaseInspectionVisitor() {
             @Override
             public void visitMethod(PsiMethod method) {
-                PsiClass psiClass = PsiUtil.getClassOfElement(method);
+                PsiClass psiClass = McPsiUtil.getClassOfElement(method);
                 if (psiClass == null) {
                     return;
                 }
