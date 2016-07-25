@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform.mixin.inspections;
 
 import com.demonwav.mcdev.util.McPsiUtil;
+import com.demonwav.mcdev.util.MethodUtil;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -27,6 +28,8 @@ import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.impl.source.PsiImmediateClassType;
 import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
 import com.intellij.psi.impl.source.tree.java.PsiKeywordImpl;
+import com.intellij.psi.util.MethodSignatureUtil;
+import com.intellij.psi.util.TypeConversionUtil;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import org.jetbrains.annotations.Nls;
@@ -34,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -152,6 +156,9 @@ public class ShadowInspection extends BaseInspection {
                             visitor.registerError(shadowAnnotation, ShadowMemberErrorMessages.Keys.MULTI_TARGET_REMAPPED_TRUE, containingClass);
                             return false;
                         }
+                        if (classes.length <= 0) {
+                            return false;
+                        }
                         if (!(classes[0] instanceof PsiClassObjectAccessExpression)) {
                             visitor.registerError(shadowAnnotation, ShadowMemberErrorMessages.Keys.MULTI_TARGET_REMAPPED_TRUE, containingClass);
                             return false;
@@ -184,52 +191,27 @@ public class ShadowInspection extends BaseInspection {
                         }
                         final Map.Entry<PsiTypeParameter, PsiType> next = entries.iterator().next();
                         final PsiClassReferenceType value = (PsiClassReferenceType) next.getValue();
-                        final PsiClass targetClass = value.resolve();
-                        if (targetClass == null) {
-                            return false;
-                        }
-                        final PsiAnnotationMemberValue shadowPrefixValue = shadowAnnotation.findDeclaredAttributeValue("prefix");
-                        if (shadowPrefixValue != null && !(shadowPrefixValue instanceof PsiLiteralExpression)) {
-                            return false;
-                        }
-                        final String shadowPrefix = shadowPrefixValue == null ? "shadow$" : ((PsiLiteralExpression) shadowPrefixValue).getValue().toString();
-                        String shadowTargetMethodName = method.getName().replace(shadowPrefix, "");
-                        final PsiMethod[] methodsByName = targetClass.findMethodsByName(shadowTargetMethodName, false);
-                        if (methodsByName.length == 0) {
-                            visitor.registerError(method, ShadowMemberErrorMessages.Keys.NO_SHADOW_METHOD_FOUND_WITH_REMAP, method.getName(), targetClass.getName());
-                            return false;
-                        }
-                        final String methodAccessModifier = McPsiUtil.getMethodAccessModifier(method);
-                        // There are multiple
-                        List<PsiMethod> validAccessMethods = new ArrayList<>(methodsByName.length);
-                        for (PsiMethod psiMethod : methodsByName) {
-                            if (McPsiUtil.getMethodAccessModifier(psiMethod).equalsIgnoreCase(methodAccessModifier)) {
-                                validAccessMethods.add(psiMethod);
-                            }
-                        }
-                        List<PsiMethod> validSignatureMethods = new ArrayList<>(methodsByName.length);
-                        final PsiParameter[] shadowMethodParameters = method.getParameterList().getParameters();
-                        final int targetedParameterCount = method.getParameterList().getParametersCount();
-                        for (PsiMethod psiMethod : methodsByName) {
-                            final PsiParameter[] possibleTargetParameters = psiMethod.getParameterList().getParameters();
-                            final int possibleTargetParameterCount = psiMethod.getParameterList().getParametersCount();
-                            if (targetedParameterCount != possibleTargetParameterCount) {
-                                continue;
-                            }
-                            for (int i = 0; i < shadowMethodParameters.length; i++) {
-                                final PsiParameter shadowMethodParameter = shadowMethodParameters[i];
-                                final PsiParameter possibleTargetParameter = possibleTargetParameters[i];
-                                final PsiTypeElement shadowTypeElement = shadowMethodParameter.getTypeElement();
-                                final PsiTypeElement possibleTypeElement = possibleTargetParameter.getTypeElement();
-
-                            }
-                        }
-                        if (validSignatureMethods.isEmpty() && validAccessMethods.isEmpty() && methodsByName.length > 0) {
-                            visitor.registerError(method, ShadowMemberErrorMessages.Keys.NO_MATCHING_METHODS_FOUND);
-                        }
-
+                        targetedMixinClass = value.resolve();
                     }
-                    return false;
+                    if (targetClasses instanceof PsiClassObjectAccessExpressionImpl) {
+                        final PsiType type = ((PsiClassObjectAccessExpressionImpl) targetClasses).getType();
+                        if (!(type instanceof PsiImmediateClassType)) {
+                            return false;
+                        }
+                        final PsiSubstitutor substitutor = ((PsiImmediateClassType) type).resolveGenerics().getSubstitutor();
+                        final Map<PsiTypeParameter, PsiType> substitutionMap = substitutor.getSubstitutionMap();
+                        final Set<Map.Entry<PsiTypeParameter, PsiType>> entries = substitutionMap.entrySet();
+                        if (entries.size() != 1) {
+                            return false;
+                        }
+                        final Map.Entry<PsiTypeParameter, PsiType> next = entries.iterator().next();
+                        final PsiClassReferenceType value = (PsiClassReferenceType) next.getValue();
+                        targetedMixinClass = value.resolve();
+                    }
+                    if (targetedMixinClass != null) {
+                        isMethodValidFromClass(method, visitor, shadowAnnotation, targetedMixinClass);
+                    }
+                    return true;
                 }
             },
             CLASS_NOT_SHADOW_TRUE(false, true) { // Shadows are not remapped if the target is not remapped.
@@ -276,6 +258,64 @@ public class ShadowInspection extends BaseInspection {
                 }
             },
             ;
+
+            private static boolean isMethodValidFromClass(PsiMethod method, ShadowVisitor visitor, PsiAnnotation shadowAnnotation, PsiClass targetClass) {
+                if (targetClass == null) {
+                    return true;
+                }
+                final PsiAnnotationMemberValue shadowPrefixValue = shadowAnnotation.findDeclaredAttributeValue("prefix");
+                if (shadowPrefixValue != null && !(shadowPrefixValue instanceof PsiLiteralExpression)) {
+                    return true;
+                }
+                final String shadowPrefix = shadowPrefixValue == null ? "shadow$" : ((PsiLiteralExpression) shadowPrefixValue).getValue().toString();
+                String shadowTargetMethodName = method.getName().replace(shadowPrefix, "");
+                final PsiMethod[] methodsByName = targetClass.findMethodsByName(shadowTargetMethodName, false);
+                if (methodsByName.length == 0) {
+                    visitor.registerError(method, ShadowMemberErrorMessages.Keys.NO_SHADOW_METHOD_FOUND_WITH_REMAP, method.getName(), targetClass.getName());
+                    return true;
+                }
+                final String methodAccessModifier = McPsiUtil.getMethodAccessModifier(method);
+                // There are multiple
+                List<PsiMethod> validAccessMethods = new ArrayList<>(methodsByName.length);
+                for (PsiMethod psiMethod : methodsByName) {
+                    if (McPsiUtil.getMethodAccessModifier(psiMethod).equalsIgnoreCase(methodAccessModifier)) {
+                        validAccessMethods.add(psiMethod);
+                    }
+                }
+                List<PsiMethod> validSignatureMethods = new ArrayList<>(methodsByName.length);
+                for (PsiMethod psiMethod : methodsByName) {
+                    if (MethodUtil.areSignaturesEqualLightweight(psiMethod.getSignature(PsiSubstitutor.EMPTY), method.getSignature(PsiSubstitutor.EMPTY), shadowTargetMethodName)) {
+                        // Don't worry about the nullable because it's not a constructor.
+                        final PsiType returnType = method.getReturnType();
+                        final PsiType possibleReturnType = psiMethod.getReturnType();
+                        final PsiType erasedReturnType = TypeConversionUtil.erasure(returnType);
+                        final PsiType erasedPossibleReturnType = TypeConversionUtil.erasure(possibleReturnType);
+                        final boolean areTypesAgreed = TypeConversionUtil.typesAgree(returnType, possibleReturnType, true);
+
+                        if (erasedReturnType.equals(erasedPossibleReturnType)) {
+                            validSignatureMethods.add(psiMethod);
+                        }
+                    }
+                }
+                if (validSignatureMethods.isEmpty()) {
+                    visitor.registerError(method, ShadowMemberErrorMessages.Keys.NO_MATCHING_METHODS_FOUND, method.getSignature(PsiSubstitutor.EMPTY).getName(), targetClass.getName(), methodsByName);
+                    return true;
+                }
+
+                for (Iterator<PsiMethod> iterator = validAccessMethods.iterator(); iterator.hasNext(); ) {
+                    if (!validSignatureMethods.contains(iterator.next())) {
+                        iterator.remove();
+                    }
+                }
+                if (validAccessMethods.isEmpty()) {
+                    final PsiMethod psiMethod = validSignatureMethods.get(0);
+                    final String probableAccessModifier = McPsiUtil.getMethodAccessModifier(psiMethod);
+                    visitor.registerError(method, ShadowMemberErrorMessages.Keys.INVALID_ACCESSOR_ON_SHADOW_METHOD, methodAccessModifier, probableAccessModifier);
+                    return true;
+                }
+                return false;
+            }
+
             final boolean targetRemap;
             final boolean shadowRemap;
 
@@ -358,6 +398,25 @@ public class ShadowInspection extends BaseInspection {
                         return "No method found by the name: " + methodName + " in target class: " + targetClassName;
                     }
                 })
+                .add(new ShadowMemberErrorMessageFormatter(Keys.NO_MATCHING_METHODS_FOUND) {
+                    @Override
+                    String formatMessage(Object... args) {
+                        Preconditions.checkArgument(args[0].equals(Keys.NO_MATCHING_METHODS_FOUND));
+                        final String methodName = (String) args[1];
+                        final String targetClassName = (String) args[2];
+                        final PsiMethod[] foundMethods = (PsiMethod[]) args[3];
+                        return "No methods found matching signature: " + methodName + " in target class: " + targetClassName + ".";
+                    }
+                })
+                .add(new ShadowMemberErrorMessageFormatter(Keys.INVALID_ACCESSOR_ON_SHADOW_METHOD) {
+                    @Override
+                    String formatMessage(Object... args) {
+                        Preconditions.checkArgument(args[0].equals(Keys.INVALID_ACCESSOR_ON_SHADOW_METHOD));
+                        final String current = (String) args[1];
+                        final String expected = (String) args[2];
+                        return "Method has invalid access modifiers, has: " + current + " but target method has: " + expected + ".";
+                    }
+                })
                 .build();
 
         static final class Keys {
@@ -365,6 +424,7 @@ public class ShadowInspection extends BaseInspection {
             static final String MULTI_TARGET = "multi-target";
             static final String NO_SHADOW_METHOD_FOUND_WITH_REMAP = "no-shadow-method-found-in-obfuscated-environment";
             static final String NO_MATCHING_METHODS_FOUND = "methods-found-but-parameter-mismatch";
+            static final String INVALID_ACCESSOR_ON_SHADOW_METHOD = "invalid-method-accessor-modifier-on-shadow";
         }
 
     }
