@@ -46,6 +46,10 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
 
     public abstract Icon getIcon();
 
+    public boolean hasIcon() {
+        return true;
+    }
+
     public abstract String getId();
 
     @NotNull

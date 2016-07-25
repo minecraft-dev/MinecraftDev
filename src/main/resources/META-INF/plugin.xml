@@ -53,6 +53,7 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeProjectDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.liteloader.gradle.LiteLoaderDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.mixin.gradle.MixinDataService"/>
 
         <!-- Project-independent Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
@@ -135,6 +136,22 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.LocalVariableDeclarationSideOnlyInspection"/>
+
+        <!-- Mixin Inspections -->
+        <localInspection displayName="Invalid Shadow"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.ShadowInspection"/>
+        <localInspection displayName="Invalid Mixin Target"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.MixinInspection"/>
 
         <!-- Project View Node Decorators provide the project icons -->
         <projectViewNodeDecorator implementation="com.demonwav.mcdev.platform.MinecraftProjectViewNodeDecorator"/>

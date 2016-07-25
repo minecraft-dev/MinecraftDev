@@ -16,7 +16,10 @@ import com.intellij.packageDependencies.ui.PackageDependenciesNode;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.util.ui.UIUtil;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class sets the icons for the modules in the project view.
@@ -58,43 +61,27 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
                 continue;
             }
 
-            // We use an iterator to get the element(s) from the collection, to avoid any list creation
-            Iterator<AbstractModuleType<?>> typeIterator = minecraftModule.getTypes().iterator();
-            // This shouldn't happen, but as a safety check
-            if (!typeIterator.hasNext()) {
+            List<AbstractModuleType<?>> validTypes = minecraftModule.getTypes().stream()
+                    .filter(AbstractModuleType::hasIcon)
+                    .collect(Collectors.toList());
+            if (validTypes.isEmpty()) {
                 continue;
             }
-
-            // We will use this type if it turns out this collection only has one item in it
-            AbstractModuleType<?> type = typeIterator.next();
-
-            if (typeIterator.hasNext()) {
-                // Sponge Forge has it's own special icon
-                if (type.equals(SpongeModuleType.getInstance()) || type.equals(ForgeModuleType.getInstance())) {
-                    AbstractModuleType<?> next = typeIterator.next();
-
-                    // The first needs to be either sponge or forge, and the second needs to be either sponge or forge
-                    // We don't worry about duplicates here for simplicity's sake
-                    // We only want to apply the special icon if it's only sponge and forge, so these need to be the only two types
-                    if ((next.equals(SpongeModuleType.getInstance()) || next.equals(ForgeModuleType.getInstance())) &&
-                            !typeIterator.hasNext()) {
-
-                        if (UIUtil.isUnderDarcula()) {
-                            data.setIcon(PlatformAssets.SPONGE_FORGE_ICON);
-                        } else {
-                            data.setIcon(PlatformAssets.SPONGE_FORGE_ICON_DARK);
-                        }
-                        break;
-                    }
-                }
-                // There are more than one type in this collection, so use a minecraft icon
-                data.setIcon(PlatformAssets.MINECRAFT_ICON);
-            } else {
-                // There is only one type in this collection, so use it's icon
-                data.setIcon(type.getIcon());
+            if (validTypes.size() == 1) {
+                data.setIcon(validTypes.get(0).getIcon());
+                continue;
             }
-            // After we've set the icon, no need to continue
-            break;
+            if (validTypes.size() == 2) {
+                if (validTypes.contains(SpongeModuleType.getInstance()) && validTypes.contains(ForgeModuleType.getInstance())) {
+                    if (UIUtil.isUnderDarcula()) {
+                        data.setIcon(PlatformAssets.SPONGE_FORGE_ICON);
+                    } else {
+                        data.setIcon(PlatformAssets.SPONGE_FORGE_ICON_DARK);
+                    }
+                    continue;
+                }
+            }
+            data.setIcon(PlatformAssets.MINECRAFT_ICON);
         }
     }
 
