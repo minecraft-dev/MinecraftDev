@@ -23,6 +23,7 @@ import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
 import com.intellij.externalSystem.JavaProjectData;
 import com.intellij.ide.actions.ImportModuleAction;
 import com.intellij.ide.util.newProjectWizard.AddModuleWizard;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -190,12 +191,7 @@ public class GradleBuildSystem extends BuildSystem {
             return;
         }
 
-        Document document = FileDocumentManager.getInstance().getDocument(buildGradle);
-        if (document == null) {
-            return;
-        }
-
-        Util.runWriteTask(() -> FileDocumentManager.getInstance().saveDocument(document));
+        saveFile(buildGradle);
     }
 
     private void setupWrapper(@NotNull Project project, @NotNull ProgressIndicator indicator) {
@@ -683,12 +679,7 @@ public class GradleBuildSystem extends BuildSystem {
             return;
         }
 
-        Document document = FileDocumentManager.getInstance().getDocument(buildGradle);
-        if (document == null) {
-            return;
-        }
-
-        Util.runWriteTask(() -> FileDocumentManager.getInstance().saveDocument(document));
+        saveFile(buildGradle);
     }
 
     private void addBuildGradleDependencies(@NotNull Project project, @NotNull PsiFile file, boolean addToDirectory) {
@@ -837,5 +828,20 @@ public class GradleBuildSystem extends BuildSystem {
                     directories.add(LocalFileSystem.getInstance().findFileByPath(dir.getAbsolutePath()))
             );
         }
+    }
+
+    private void saveFile(@Nullable VirtualFile file) {
+        if (file == null) {
+            return;
+        }
+
+        Util.runWriteTask(() -> {
+            Document document = FileDocumentManager.getInstance().getDocument(file);
+            if (document == null) {
+                return;
+            }
+
+            FileDocumentManager.getInstance().saveDocument(document);
+        });
     }
 }
