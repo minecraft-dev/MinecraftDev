@@ -46,6 +46,11 @@ public class ForgeModule extends AbstractModule {
 
     @Override
     public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
+        if (method == null ) {
+            return "net.minecraftforge.fml.common.event.FMLEvent".equals(eventClass.getQualifiedName()) ||
+                "net.minecraftforge.fml.common.eventhandler.Event".equals(eventClass.getQualifiedName());
+        }
+
         PsiAnnotation annotation = method.getModifierList().findAnnotation("net.minecraftforge.fml.common.Mod.EventHandler");
         if (annotation != null) {
             return "net.minecraftforge.fml.common.event.FMLEvent".equals(eventClass.getQualifiedName());

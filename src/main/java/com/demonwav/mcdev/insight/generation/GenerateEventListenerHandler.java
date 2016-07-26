@@ -6,6 +6,8 @@ import com.intellij.codeInsight.generation.ClassMember;
 import com.intellij.codeInsight.generation.GenerateMembersHandlerBase;
 import com.intellij.codeInsight.generation.GenerationInfo;
 import com.intellij.codeInsight.generation.PsiElementClassMember;
+import com.intellij.codeInsight.generation.PsiGenerationInfo;
+import com.intellij.codeInsight.generation.PsiMethodMember;
 import com.intellij.ide.util.TreeClassChooser;
 import com.intellij.ide.util.TreeClassChooserFactory;
 import com.intellij.openapi.editor.Editor;
@@ -13,6 +15,9 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.JavaPsiFacadeEx;
+import com.intellij.psi.impl.source.tree.JavaElementType;
+import com.intellij.psi.impl.source.tree.java.PsiNameValuePairImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.refactoring.RefactoringBundle;
@@ -28,8 +33,6 @@ import java.awt.event.ActionListener;
  * The standard handler to generate a new event listener as a method.
  * Note that this is a psuedo generator as it relies on a wizard and the
  * {@link #cleanup()} to complete
- *
- * @author gabizou
  */
 public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
 
@@ -86,11 +89,30 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
         chooser.showDialog();
         PsiClass chosenClass = chooser.getSelected();
 
-        this.project = null;
         if (chosenClass != null) {
+            this.project = chosenClass.getProject();
+
             myTfTargetClassName.setText(chosenClass.getQualifiedName());
+            if (chosenClass.getName() != null) {
+                // TODO: delegate this to the platform, currently only working for bukkit
+                PsiMethod newMethod = JavaPsiFacade.getElementFactory(project).createMethod("on" + chosenClass.getName().replace("Event", ""), PsiType.VOID);
+
+                PsiParameterList list = newMethod.getParameterList();
+                PsiParameter parameter = JavaPsiFacade.getElementFactory(project).createParameter("event", PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.moduleScope(moduleForPsiElement)));
+                list.add(parameter);
+
+                PsiModifierList modifierList = newMethod.getModifierList();
+                PsiAnnotation annotation = modifierList.addAnnotation("org.bukkit.event.EventHandler");
+
+                PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project).createExpressionFromText("true", annotation);
+
+                annotation.setDeclaredAttributeValue("ignoreCancelled", value);
+
+
+                return new PsiMethodMember[] { new PsiMethodMember(newMethod) };
+            }
         }
-        final String s = "";
+
         return DUMMY_RESULT;
     }
 
@@ -105,6 +127,11 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
 
     @Override
     protected GenerationInfo[] generateMemberPrototypes(PsiClass aClass, ClassMember originalMember) {
+        if (originalMember instanceof PsiMethodMember) {
+            return new GenerationInfo[] {
+                new PsiGenerationInfo<>(((PsiMethodMember) originalMember).getElement())
+            };
+        }
         return null;
     }
 
@@ -148,7 +175,7 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
     private static boolean isSuperEventListenerAllowed(PsiClass eventClass, MinecraftModule module) {
         final PsiClass[] supers = eventClass.getSupers();
         for (PsiClass aSuper : supers) {
-            if (module.isEventClassValid(aSuper, null)) {
+            if (module.isEventClassValidForModule(aSuper)) {
                 return true;
             }
             if (isSuperEventListenerAllowed(aSuper, module)) {

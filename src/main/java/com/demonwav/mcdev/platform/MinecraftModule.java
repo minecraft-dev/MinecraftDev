@@ -143,6 +143,15 @@ public class MinecraftModule {
         return (T) modules.get(type);
     }
 
+    public boolean isEventClassValidForModule(@NotNull PsiClass eventClass) {
+        for (AbstractModule abstractModule : modules.values()) {
+            if (abstractModule.isEventClassValid(eventClass, null)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isEventClassValid(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
         for (AbstractModule abstractModule : modules.values()) {
             boolean good = abstractModule.getModuleType().getListenerAnnotations().stream()
