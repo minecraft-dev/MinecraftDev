@@ -2,6 +2,7 @@ package com.demonwav.mcdev.insight;
 
 import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.util.McEditorUtil;
 
 import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.TargetElementUtil;
@@ -10,17 +11,13 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor;
 import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo;
 import com.intellij.featureStatistics.FeatureUsageTracker;
-import com.intellij.ide.util.EditSourceUtil;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.OpenFileDescriptor;
-import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiExpression;
@@ -29,7 +26,6 @@ import com.intellij.psi.PsiFunctionalExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.util.PsiExpressionTrimRenderer;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.Function;
 import com.intellij.util.NullableFunction;
@@ -102,7 +98,7 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
                     PsiElement navElement = resolve.getNavigationElement();
                     navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(resolve, navElement);
                     if (navElement != null) {
-                        gotoTargetElement(navElement, editor, containingFile);
+                        McEditorUtil.gotoTargetElement(navElement, editor, containingFile);
                     }
                 }
             }
@@ -173,26 +169,6 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
                 return PsiExpressionTrimRenderer.render((PsiExpression)parent);
             }
             return super.getElementPresentation(element);
-        }
-    }
-
-    private static void gotoTargetElement(@NotNull PsiElement element, @NotNull Editor currentEditor, @NotNull PsiFile currentFile) {
-        if (element.getContainingFile() == currentFile) {
-            int offset = element.getTextOffset();
-            PsiElement leaf = currentFile.findElementAt(offset);
-            // check that element is really physically inside the file
-            // there are fake elements with custom navigation (e.g. opening URL in browser) that override getContainingFile for various reasons
-            if (leaf != null && PsiTreeUtil.isAncestor(element, leaf, false)) {
-                Project project = element.getProject();
-                IdeDocumentHistory.getInstance(project).includeCurrentCommandAsNavigation();
-                new OpenFileDescriptor(project, currentFile.getViewProvider().getVirtualFile(), offset).navigateIn(currentEditor);
-                return;
-            }
-        }
-
-        Navigatable navigatable = element instanceof Navigatable ? (Navigatable)element : EditSourceUtil.getDescriptor(element);
-        if (navigatable != null && navigatable.canNavigate()) {
-            navigatable.navigate(true);
         }
     }
 }

@@ -6,7 +6,7 @@ import com.intellij.psi.PsiType;
 import com.intellij.psi.util.MethodSignature;
 import org.jetbrains.annotations.NotNull;
 
-public class MethodUtil {
+public class McMethodUtil {
 
 
     public static boolean areSignaturesEqualLightweight(@NotNull MethodSignature sig1,

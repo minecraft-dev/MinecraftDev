@@ -40,6 +40,9 @@ public final class PlatformAssets {
     @NotNull public static final Icon LISTENER = loadIcon("/assets/platform/icons/listener/EventListener_dark.png");
     @NotNull public static final Icon PLUGIN = loadIcon("/assets/platform/icons/plugin.png");
 
+    @NotNull public static final Icon MIXIN = loadIcon("/assets/platform/icons/mixin/mixin.png");
+    @NotNull public static final Icon MIXIN_DARK = loadIcon("/assets/platform/icons/mixin/mixin_dark.png");
+
     private PlatformAssets() {
     }
 

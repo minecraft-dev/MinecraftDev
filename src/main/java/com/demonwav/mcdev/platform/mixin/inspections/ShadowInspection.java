@@ -1,34 +1,25 @@
 package com.demonwav.mcdev.platform.mixin.inspections;
 
 import com.demonwav.mcdev.util.McPsiUtil;
-import com.demonwav.mcdev.util.MethodUtil;
+import com.demonwav.mcdev.util.McMethodUtil;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.intellij.codeInsight.TargetElementUtil;
-import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassObjectAccessExpression;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
-import com.intellij.psi.PsiKeyword;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
-import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
-import com.intellij.psi.PsiTypeElement;
 import com.intellij.psi.PsiTypeParameter;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.impl.source.PsiImmediateClassType;
 import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
-import com.intellij.psi.impl.source.tree.java.PsiKeywordImpl;
-import com.intellij.psi.util.MethodSignatureUtil;
 import com.intellij.psi.util.TypeConversionUtil;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
@@ -174,40 +165,7 @@ public class ShadowInspection extends BaseInspection {
 
                 @Override
                 boolean validateShadowExists(PsiMethod method, PsiClass psiClass, ShadowVisitor visitor, PsiAnnotation shadowAnnotation, @Nullable PsiAnnotationMemberValue targetClasses, @Nullable PsiAnnotationMemberValue stringTargets) {
-                    PsiClass targetedMixinClass = null;
-                    if (targetClasses instanceof PsiArrayInitializerMemberValue) {
-                        final PsiAnnotationMemberValue[] initializers = ((PsiArrayInitializerMemberValue) targetClasses).getInitializers();
-                        final PsiClassObjectAccessExpressionImpl targetExpression = ((PsiClassObjectAccessExpressionImpl) initializers[0]);
-                        final PsiType type = targetExpression.getType();
-
-                        if (!(type instanceof PsiImmediateClassType)) {
-                            return false;
-                        }
-                        final PsiSubstitutor substitutor = ((PsiImmediateClassType) type).resolveGenerics().getSubstitutor();
-                        final Map<PsiTypeParameter, PsiType> substitutionMap = substitutor.getSubstitutionMap();
-                        final Set<Map.Entry<PsiTypeParameter, PsiType>> entries = substitutionMap.entrySet();
-                        if (entries.size() != 1) {
-                            return false;
-                        }
-                        final Map.Entry<PsiTypeParameter, PsiType> next = entries.iterator().next();
-                        final PsiClassReferenceType value = (PsiClassReferenceType) next.getValue();
-                        targetedMixinClass = value.resolve();
-                    }
-                    if (targetClasses instanceof PsiClassObjectAccessExpressionImpl) {
-                        final PsiType type = ((PsiClassObjectAccessExpressionImpl) targetClasses).getType();
-                        if (!(type instanceof PsiImmediateClassType)) {
-                            return false;
-                        }
-                        final PsiSubstitutor substitutor = ((PsiImmediateClassType) type).resolveGenerics().getSubstitutor();
-                        final Map<PsiTypeParameter, PsiType> substitutionMap = substitutor.getSubstitutionMap();
-                        final Set<Map.Entry<PsiTypeParameter, PsiType>> entries = substitutionMap.entrySet();
-                        if (entries.size() != 1) {
-                            return false;
-                        }
-                        final Map.Entry<PsiTypeParameter, PsiType> next = entries.iterator().next();
-                        final PsiClassReferenceType value = (PsiClassReferenceType) next.getValue();
-                        targetedMixinClass = value.resolve();
-                    }
+                    PsiClass targetedMixinClass = McPsiUtil.resolveGenericClass(targetClasses);
                     if (targetedMixinClass != null) {
                         isMethodValidFromClass(method, visitor, shadowAnnotation, targetedMixinClass);
                     }
@@ -284,7 +242,7 @@ public class ShadowInspection extends BaseInspection {
                 }
                 List<PsiMethod> validSignatureMethods = new ArrayList<>(methodsByName.length);
                 for (PsiMethod psiMethod : methodsByName) {
-                    if (MethodUtil.areSignaturesEqualLightweight(psiMethod.getSignature(PsiSubstitutor.EMPTY), method.getSignature(PsiSubstitutor.EMPTY), shadowTargetMethodName)) {
+                    if (McMethodUtil.areSignaturesEqualLightweight(psiMethod.getSignature(PsiSubstitutor.EMPTY), method.getSignature(PsiSubstitutor.EMPTY), shadowTargetMethodName)) {
                         // Don't worry about the nullable because it's not a constructor.
                         final PsiType returnType = method.getReturnType();
                         final PsiType possibleReturnType = psiMethod.getReturnType();
