@@ -7,6 +7,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupManager;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 public class MinecraftProjectComponent extends AbstractProjectComponent {
 
     protected MinecraftProjectComponent(@NotNull Project project) {
@@ -18,7 +20,8 @@ public class MinecraftProjectComponent extends AbstractProjectComponent {
         super.projectOpened();
         StartupManager.getInstance(myProject).registerPostStartupActivity(() -> {
             for (Module module : ModuleManager.getInstance(myProject).getModules()) {
-                MinecraftModule.getInstance(module);
+                Optional.ofNullable(MinecraftModule.getInstance(module))
+                    .ifPresent(m -> m.getTypes().forEach(t -> t.performCreationSettingSetup(myProject)));
             }
         });
     }
