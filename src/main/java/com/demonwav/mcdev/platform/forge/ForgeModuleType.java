@@ -21,10 +21,11 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
     private static final ForgeModuleType instance = new ForgeModuleType();
 
     private ForgeModuleType() {
-        super("net.minecraftforge.gradle", "ForgeGradle");
+        super("", "");
         CommonColors.applyStandardColors(this.colorMap, "net.minecraft.util.text.TextFormatting");
     }
 
+    @NotNull
     public static ForgeModuleType getInstance() {
         return instance;
     }

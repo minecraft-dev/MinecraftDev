@@ -29,6 +29,7 @@ public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
         CommonColors.applyStandardColors(this.colorMap, "net.minecraft.util.text.TextFormatting");
     }
 
+
     public static SpongeModuleType getInstance() {
         return instance;
     }

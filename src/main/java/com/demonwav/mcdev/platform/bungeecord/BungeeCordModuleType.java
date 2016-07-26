@@ -27,6 +27,7 @@ public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
         CommonColors.applyStandardColors(this.colorMap, BungeeCordConstants.BUNGEECORD_CHAT_COLOR_CLASS);
     }
 
+    @NotNull
     public static BungeeCordModuleType getInstance() {
         return instance;
     }

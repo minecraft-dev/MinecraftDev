@@ -55,6 +55,7 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
         CommonColors.applyStandardColors(this.colorMap, BukkitConstants.BUKKIT_CHAT_COLOR_CLASS);
     }
 
+    @NotNull
     public static BukkitModuleType getInstance() {
         return instance;
     }

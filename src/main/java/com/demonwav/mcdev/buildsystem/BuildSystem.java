@@ -159,6 +159,7 @@ public abstract class BuildSystem {
      *
      * @param project The project
      * @param configurations The configuration objects for the project
+     * @author DemonWav
      */
     public abstract void create(@NotNull Project project,
                                 @NotNull ProjectConfiguration configurations,

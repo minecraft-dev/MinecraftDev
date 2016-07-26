@@ -152,6 +152,16 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspections.MixinInspection"/>
+        <localInspection displayName="Overwrite lacking @author JavaDoc tag"
+                         shortName="OverwriteAuthorRequired"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WEAK WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.AuthorInspection"/>
+
+        <customJavadocTagProvider implementation="com.demonwav.mcdev.platform.mixin.MixinCustomJavaDocTagProvider"/>
 
         <!-- Project View Node Decorators provide the project icons -->
         <projectViewNodeDecorator implementation="com.demonwav.mcdev.platform.MinecraftProjectViewNodeDecorator"/>
@@ -162,6 +172,7 @@
                                  id="Settings.Minecraft"
                                  groupId="language"
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
+
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.idea.maven">

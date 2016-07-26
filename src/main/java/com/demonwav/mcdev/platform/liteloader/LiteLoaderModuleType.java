@@ -5,6 +5,7 @@ import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.util.CommonColors;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +24,7 @@ public class LiteLoaderModuleType extends AbstractModuleType<LiteLoaderModule> {
         CommonColors.applyStandardColors(this.colorMap, "net.minecraft.util.text.TextFormatting");
     }
 
+    @NotNull
     public static LiteLoaderModuleType getInstance() {
         return instance;
     }

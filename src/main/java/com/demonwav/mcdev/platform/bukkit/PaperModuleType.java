@@ -17,6 +17,7 @@ public class PaperModuleType extends SpigotModuleType {
         super("com.destroystokyo.paper", "paper-api");
     }
 
+    @NotNull
     public static PaperModuleType getInstance() {
         return instance;
     }

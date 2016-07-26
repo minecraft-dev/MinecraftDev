@@ -11,15 +11,17 @@ import javax.swing.*;
 import java.util.List;
 
 public class MixinModuleType extends AbstractModuleType<MixinModule> {
+
     public static final String ID = "MIXIN_MODULE_TYPE";
     private static final MixinModuleType instance = new MixinModuleType();
 
-    public static MixinModuleType getInstance() {
-        return instance;
-    }
-
     private MixinModuleType() {
         super("org.spongepowered", "mixin");
+    }
+
+    @NotNull
+    public static MixinModuleType getInstance() {
+        return instance;
     }
 
     @Override

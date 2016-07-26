@@ -24,6 +24,7 @@ public class SpigotModuleType extends BukkitModuleType {
         CommonColors.applyStandardColors(this.colorMap, "net.md_5.bungee.api.ChatColor");
     }
 
+    @NotNull
     public static SpigotModuleType getInstance() {
         return instance;
     }
