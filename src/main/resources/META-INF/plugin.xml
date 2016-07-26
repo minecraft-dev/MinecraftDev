@@ -19,6 +19,10 @@
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p><p>
         Recent changes:
+        <h3>alpha-0.1.8</h3>
+        <ul>
+          <li>Fix read-access bug in Gradle project creation</li>
+        </ul>
         <h3>alpha-0.1.7</h3>
         <ul>
           <li>Fixed a bug in the @SideOnly inspections which omitted net.minecraft.client.* classes</li>
