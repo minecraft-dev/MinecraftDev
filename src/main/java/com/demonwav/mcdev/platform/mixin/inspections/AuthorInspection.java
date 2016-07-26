@@ -77,7 +77,7 @@ public class AuthorInspection extends BaseInspection {
                     PsiDocTag tag = JavaPsiFacade.getElementFactory(method.getProject()).createDocTagFromText("@author");
 
                     if (docComment.getTags().length != 0) {
-                        docComment.addAfter(tag, docComment.getTags()[docComment.getTags().length - 1]);
+                        docComment.addBefore(tag, docComment.getTags()[0]);
                     } else {
                         docComment.add(tag);
                     }

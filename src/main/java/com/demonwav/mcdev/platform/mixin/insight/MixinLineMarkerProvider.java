@@ -80,6 +80,7 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
             identifier,
             identifier.getTextRange(),
             Pass.UPDATE_ALL,
+            getIcon(),
             (mouseEvent, psiElement) -> {
                 PsiAnnotationMemberValue value = annotation.findDeclaredAttributeValue("value");
                 PsiClass resolve = McPsiUtil.resolveGenericClass(value);
@@ -112,21 +113,22 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
         return "Mixin line marker";
     }
 
-    @Nullable
+    @NotNull
     @Override
     public Icon getIcon() {
-        return UIUtil.isUnderDarcula() ? PlatformAssets.MIXIN : PlatformAssets.MIXIN_DARK;
+        return PlatformAssets.MIXIN;
     }
 
     private static final class MixinLineMarkerInfo extends MergeableLineMarkerInfo<PsiElement> {
         MixinLineMarkerInfo(@NotNull PsiElement element,
-                                   @NotNull TextRange textRange,
-                                   int updatePass,
-                                   @Nullable GutterIconNavigationHandler<PsiElement> navHandler) {
+                            @NotNull TextRange textRange,
+                            int updatePass,
+                            @NotNull Icon icon,
+                            @Nullable GutterIconNavigationHandler<PsiElement> navHandler) {
             super(
                 element,
                 textRange,
-                UIUtil.isUnderDarcula() ? PlatformAssets.MIXIN : PlatformAssets.MIXIN_DARK,
+                icon,
                 updatePass,
                 (NullableFunction<PsiElement, String>) element1 -> "Go to Mixin class",
                 navHandler,
@@ -134,14 +136,16 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
         }
 
         @Override
+        @Contract(pure = true)
         public boolean canMergeWith(@NotNull MergeableLineMarkerInfo<?> info) {
             return info instanceof MixinLineMarkerInfo;
         }
 
+        @NotNull
         @Override
         @Contract(pure = true)
         public Icon getCommonIcon(@NotNull List<MergeableLineMarkerInfo> infos) {
-            return UIUtil.isUnderDarcula() ? PlatformAssets.MIXIN : PlatformAssets.MIXIN_DARK;
+            return PlatformAssets.MIXIN;
         }
 
         @NotNull
