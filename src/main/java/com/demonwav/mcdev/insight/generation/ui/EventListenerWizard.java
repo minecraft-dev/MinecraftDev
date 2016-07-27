@@ -20,11 +20,11 @@ public class EventListenerWizard {
     private JPanel contentPanel;
 
     private JPanel innerContentPanel;
-    private String chosenClassName;
+    private String defaultListenerName;
 
-    public EventListenerWizard(@Nullable JPanel panel, @NotNull String chosenClassName) {
+    public EventListenerWizard(@Nullable JPanel panel, @NotNull String defaultListenerName) {
         this.innerContentPanel = panel;
-        this.chosenClassName = chosenClassName;
+        this.defaultListenerName = defaultListenerName;
     }
 
     public JPanel getPanel() {
@@ -41,8 +41,8 @@ public class EventListenerWizard {
             contentPanel.add(innerContentPanel);
         }
 
-        classNameTextField.setText(chosenClassName);
-        listenerNameTextField.setText("on" + chosenClassName.replace("Event", ""));
+        classNameTextField.setText(defaultListenerName);
+        listenerNameTextField.setText(defaultListenerName);
 
         IdeFocusTraversalPolicy.getPreferredFocusedComponent(listenerNameTextField).requestFocus();
         listenerNameTextField.requestFocus();

@@ -15,14 +15,13 @@ public class EventGenerationDialog extends DialogWrapper {
     private final EventGenerationPanel panel;
     private EventListenerWizard wizard;
     private GenerationData data;
-    private String chosenName;
 
-    public EventGenerationDialog(@NotNull Editor editor, @NotNull EventGenerationPanel panel) {
+    public EventGenerationDialog(@NotNull Editor editor, @NotNull EventGenerationPanel panel, @NotNull String defaultListenerName) {
         super(editor.getComponent(), false);
 
         this.panel = panel;
         //noinspection ConstantConditions
-        this.wizard = new EventListenerWizard(panel.getPanel(), panel.getChosenClass().getName());
+        this.wizard = new EventListenerWizard(panel.getPanel(), defaultListenerName);
 
         setTitle("Event Listener Settings");
         setOKActionEnabled(true);

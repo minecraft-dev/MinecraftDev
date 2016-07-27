@@ -18,7 +18,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
-import com.intellij.openapi.module.impl.ModuleEx;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
@@ -90,22 +89,24 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
 
         if (relevantModule.isPresent()) {
             this.relevantModule = relevantModule.get();
-        }
 
-        EventGenerationDialog generationDialog = new EventGenerationDialog(editor, relevantModule
-            .flatMap(m -> Optional.of(m.getModuleType().getEventGenerationPanel(chosenClass))).orElse(new EventGenerationPanel(chosenClass))
-        );
+            EventGenerationDialog generationDialog = new EventGenerationDialog(
+                editor,
+                relevantModule.get().getModuleType().getEventGenerationPanel(chosenClass),
+                relevantModule.get().getModuleType().getDefaultListenerName(chosenClass)
+            );
 
-        okay = generationDialog.showAndGet();
+            okay = generationDialog.showAndGet();
 
-        if (okay){
-            data = generationDialog.getData();
-            chosenName = generationDialog.getChosenName();
+            if (okay){
+                data = generationDialog.getData();
+                chosenName = generationDialog.getChosenName();
 
-            model = editor.getCaretModel();
-            position = model.getLogicalPosition();
+                model = editor.getCaretModel();
+                position = model.getLogicalPosition();
 
-            method = PsiTreeUtil.getParentOfType(aClass.getContainingFile().findElementAt(model.getOffset()), PsiMethod.class);
+                method = PsiTreeUtil.getParentOfType(aClass.getContainingFile().findElementAt(model.getOffset()), PsiMethod.class);
+            }
         }
 
         return DUMMY_RESULT;

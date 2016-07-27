@@ -78,4 +78,10 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
     public boolean isEventGenAvailable() {
         return false;
     }
+
+    @NotNull
+    public String getDefaultListenerName(@NotNull PsiClass psiClass) {
+        //noinspection ConstantConditions
+        return "on" + psiClass.getName().replace("Event", "");
+    }
 }
