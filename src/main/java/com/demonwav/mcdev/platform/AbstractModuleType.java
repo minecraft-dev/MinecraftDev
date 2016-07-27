@@ -1,11 +1,16 @@
 package com.demonwav.mcdev.platform;
 
+import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
+
 import com.intellij.codeInspection.ex.EntryPointsManager;
 import com.intellij.codeInspection.ex.EntryPointsManagerBase;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.JDOMExternalizableStringList;
+import com.intellij.psi.PsiClass;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;
 import java.util.LinkedHashMap;
@@ -13,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
+import javax.swing.JPanel;
 
 public abstract class AbstractModuleType<T extends AbstractModule> {
 
@@ -61,5 +67,15 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
     public void performCreationSettingSetup(@NotNull Project project) {
         JDOMExternalizableStringList annotations = ((EntryPointsManagerBase)EntryPointsManager.getInstance(project)).ADDITIONAL_ANNOTATIONS;
         getIgnoredAnnotations().stream().filter(annotation -> !annotations.contains(annotation)).forEach(annotations::add);
+    }
+
+    @NotNull
+    public EventGenerationPanel getEventGenerationPanel(@NotNull PsiClass chosenClass) {
+        return new EventGenerationPanel(chosenClass);
+    }
+
+    @Contract(pure = true)
+    public boolean isEventGenAvailable() {
+        return false;
     }
 }

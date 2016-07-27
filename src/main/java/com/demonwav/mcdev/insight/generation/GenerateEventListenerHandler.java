@@ -1,33 +1,34 @@
 package com.demonwav.mcdev.insight.generation;
 
-import com.demonwav.mcdev.asset.MessageAssets;
+import com.demonwav.mcdev.insight.generation.ui.EventGenerationDialog;
+import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
+import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.MinecraftModule;
+
 import com.intellij.codeInsight.generation.ClassMember;
 import com.intellij.codeInsight.generation.GenerateMembersHandlerBase;
 import com.intellij.codeInsight.generation.GenerationInfo;
 import com.intellij.codeInsight.generation.PsiElementClassMember;
 import com.intellij.codeInsight.generation.PsiGenerationInfo;
-import com.intellij.codeInsight.generation.PsiMethodMember;
 import com.intellij.ide.util.TreeClassChooser;
 import com.intellij.ide.util.TreeClassChooserFactory;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.openapi.module.impl.ModuleEx;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
-import com.intellij.psi.impl.JavaPsiFacadeEx;
-import com.intellij.psi.impl.source.tree.JavaElementType;
-import com.intellij.psi.impl.source.tree.java.PsiNameValuePairImpl;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.util.PsiUtil;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.refactoring.RefactoringBundle;
-import com.intellij.refactoring.util.classMembers.MemberInfo;
-import com.intellij.refactoring.util.classMembers.UsesAndInterfacesDependencyMemberInfoModel;
-import com.intellij.ui.ReferenceEditorComboWithBrowseButton;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.Optional;
 
 /**
  * The standard handler to generate a new event listener as a method.
@@ -37,9 +38,16 @@ import java.awt.event.ActionListener;
 public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
 
     private static final PsiElementClassMember[] DUMMY_RESULT = new PsiElementClassMember[1]; //cannot return empty array, but this result won't be used anyway
-    private ReferenceEditorComboWithBrowseButton myTfTargetClassName;
-    private PsiClass mySourceClass;
-    private Project project;
+    private Editor editor;
+    private LogicalPosition position;
+    private PsiMethod method;
+    private CaretModel model;
+
+    private GenerationData data;
+    private PsiClass chosenClass;
+    private String chosenName;
+    private AbstractModule relevantModule;
+    private boolean okay;
 
     public GenerateEventListenerHandler() {
         super("Generate Event Listener");
@@ -53,6 +61,7 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
 
     @Override
     protected ClassMember[] chooseOriginalMembers(PsiClass aClass, Project project, Editor editor) {
+        this.editor = editor;
 
         final Module moduleForPsiElement = ModuleUtilCore.findModuleForPsiElement(aClass);
         if (moduleForPsiElement == null) {
@@ -64,11 +73,6 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
             return null;
         }
 
-
-        this.project = project;
-
-        myTfTargetClassName = new ReferenceEditorComboWithBrowseButton(new ChooseClassAction(), "Event", this.project, true, JavaCodeFragment.VisibilityChecker.PROJECT_SCOPE_VISIBLE, "");
-
         TreeClassChooser chooser = TreeClassChooserFactory.getInstance(project)
                 .createWithInnerClassesScopeChooser(RefactoringBundle.message("choose.destination.class"),
                         GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(moduleForPsiElement, false),
@@ -76,48 +80,35 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
                                 isSuperEventListenerAllowed(aClass1, minecraftModule),
                         null
                 );
-        final String targetClassName = getTargetClassName();
-        if (targetClassName != null) {
-            final PsiClass psiClass = JavaPsiFacade.getInstance(project).findClass(targetClassName, GlobalSearchScope.allScope(project));
-            if (psiClass != null) {
-                chooser.selectDirectory(psiClass.getContainingFile().getContainingDirectory());
-            } else {
-                chooser.selectDirectory(aClass.getContainingFile().getContainingDirectory());
-            }
-        }
 
         chooser.showDialog();
-        PsiClass chosenClass = chooser.getSelected();
+        chosenClass = chooser.getSelected();
 
-        if (chosenClass != null) {
-            this.project = chosenClass.getProject();
+        Optional<AbstractModule> relevantModule = minecraftModule.getModules().stream()
+            .filter(m -> isSuperEventListenerAllowed(chosenClass, m))
+            .findFirst();
 
-            myTfTargetClassName.setText(chosenClass.getQualifiedName());
-            if (chosenClass.getName() != null) {
-                // TODO: delegate this to the platform, currently only working for bukkit
-                PsiMethod newMethod = JavaPsiFacade.getElementFactory(project).createMethod("on" + chosenClass.getName().replace("Event", ""), PsiType.VOID);
+        if (relevantModule.isPresent()) {
+            this.relevantModule = relevantModule.get();
+        }
 
-                PsiParameterList list = newMethod.getParameterList();
-                PsiParameter parameter = JavaPsiFacade.getElementFactory(project).createParameter("event", PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.moduleScope(moduleForPsiElement)));
-                list.add(parameter);
+        EventGenerationDialog generationDialog = new EventGenerationDialog(editor, relevantModule
+            .flatMap(m -> Optional.of(m.getModuleType().getEventGenerationPanel(chosenClass))).orElse(new EventGenerationPanel(chosenClass))
+        );
 
-                PsiModifierList modifierList = newMethod.getModifierList();
-                PsiAnnotation annotation = modifierList.addAnnotation("org.bukkit.event.EventHandler");
+        okay = generationDialog.showAndGet();
 
-                PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project).createExpressionFromText("true", annotation);
+        if (okay){
+            data = generationDialog.getData();
+            chosenName = generationDialog.getChosenName();
 
-                annotation.setDeclaredAttributeValue("ignoreCancelled", value);
+            model = editor.getCaretModel();
+            position = model.getLogicalPosition();
 
-
-                return new PsiMethodMember[] { new PsiMethodMember(newMethod) };
-            }
+            method = PsiTreeUtil.getParentOfType(aClass.getContainingFile().findElementAt(model.getOffset()), PsiMethod.class);
         }
 
         return DUMMY_RESULT;
-    }
-
-    public String getTargetClassName() {
-        return myTfTargetClassName.getText();
     }
 
     @Override
@@ -127,49 +118,32 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
 
     @Override
     protected GenerationInfo[] generateMemberPrototypes(PsiClass aClass, ClassMember originalMember) {
-        if (originalMember instanceof PsiMethodMember) {
-            return new GenerationInfo[] {
-                new PsiGenerationInfo<>(((PsiMethodMember) originalMember).getElement())
-            };
-        }
-        return null;
-    }
-
-    @Override
-    protected void cleanup() {
-        super.cleanup();
-    }
-
-    private class MyMemberInfoModel extends UsesAndInterfacesDependencyMemberInfoModel<PsiMember, MemberInfo> {
-        PsiClass myTargetClass = null;
-        public MyMemberInfoModel() {
-            super(mySourceClass, null, false, DEFAULT_CONTAINMENT_VERIFIER);
-        }
-
-        @Override
-        @Nullable
-        public Boolean isFixedAbstract(MemberInfo member) {
+        if (!okay) {
             return null;
         }
 
-        @Override
-        public boolean isCheckedWhenDisabled(MemberInfo member) {
-            return false;
-        }
+        if (relevantModule != null) {
+            relevantModule.doPreEventGenerate(aClass, data);
 
-        @Override
-        public boolean isMemberEnabled(MemberInfo member) {
-            if(myTargetClass != null && myTargetClass.isInterface() && !PsiUtil.isLanguageLevel8OrHigher(myTargetClass)) {
-                return !(member.getMember() instanceof PsiMethod);
+            model.moveToLogicalPosition(position);
+
+            PsiMethod newMethod = relevantModule.generateEventListenerMethod(aClass, chosenClass, chosenName, data);
+
+            if (newMethod != null) {
+                PsiGenerationInfo<PsiMethod> info = new PsiGenerationInfo<>(newMethod);
+                info.positionCaret(editor, true);
+                if (method != null) {
+                    info.insert(aClass, method, false);
+                }
+
+                return new GenerationInfo[]{
+                    info
+                };
             }
-            return super.isMemberEnabled(member);
         }
 
-        public void updateTargetClass() {
-            final PsiManager manager = PsiManager.getInstance(project);
-            myTargetClass =
-                    JavaPsiFacade.getInstance(manager.getProject()).findClass(getTargetClassName(), GlobalSearchScope.projectScope(project));
-        }
+
+        return null;
     }
 
     private static boolean isSuperEventListenerAllowed(PsiClass eventClass, MinecraftModule module) {
@@ -185,35 +159,27 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
         return false;
     }
 
-    private class ChooseClassAction implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            TreeClassChooser chooser = TreeClassChooserFactory.getInstance(project)
-                    .createWithInnerClassesScopeChooser(
-                            MessageAssets.getGenerateEventListenerTitle(),
-                            GlobalSearchScope.projectScope(project),
-                            aClass ->
-                                    (aClass.getParent() instanceof PsiFile
-                                            || aClass.hasModifierProperty(PsiModifier.STATIC))
-                                            && aClass.hasModifierProperty(PsiModifier.PUBLIC)
-                            ,
-                            null
-                    );
-            final String targetClassName = getTargetClassName();
-            if (targetClassName != null) {
-                final PsiClass aClass = JavaPsiFacade.getInstance(project)
-                        .findClass(targetClassName, GlobalSearchScope.allScope(project));
-                if (aClass != null) {
-                    chooser.selectDirectory(aClass.getContainingFile().getContainingDirectory());
-                } else {
-                    chooser.selectDirectory(mySourceClass.getContainingFile().getContainingDirectory());
-                }
+    private static boolean isSuperEventListenerAllowed(PsiClass eventClass, AbstractModule module) {
+        final PsiClass[] supers = eventClass.getSupers();
+        for (PsiClass aSuper : supers) {
+            if (module.isEventClassValid(aSuper, null)) {
+                return true;
             }
-
-            chooser.showDialog();
-            PsiClass aClass = chooser.getSelected();
-            if (aClass != null) {
-                myTfTargetClassName.setText(aClass.getQualifiedName());
+            if (isSuperEventListenerAllowed(aSuper, module)) {
+                return true;
             }
         }
+        return false;
+    }
+
+    @Override
+    public boolean isAvailableForQuickList(@NotNull Editor editor, @NotNull PsiFile file, @NotNull DataContext dataContext) {
+        Module module = ModuleUtilCore.findModuleForPsiElement(file);
+        if (module == null) {
+            return false;
+        }
+
+        MinecraftModule instance = MinecraftModule.getInstance(module);
+        return instance != null && instance.isEventGenAvailable();
     }
 }

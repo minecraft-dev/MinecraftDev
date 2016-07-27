@@ -15,7 +15,7 @@ import javax.swing.Icon;
 public class LiteLoaderModule extends AbstractModule {
 
     LiteLoaderModule(@NotNull Module module) {
-        this.module = module;
+        super(module);
         this.buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
             if (!buildSystem.isImported()) {

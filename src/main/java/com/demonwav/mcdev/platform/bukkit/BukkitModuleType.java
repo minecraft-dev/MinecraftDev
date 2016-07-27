@@ -7,6 +7,7 @@ import com.demonwav.mcdev.util.CommonColors;
 
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -63,5 +64,10 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
     @Override
     public BukkitModule generateModule(Module module) {
         return new BukkitModule<>(module, this);
+    }
+    @Contract(pure = true)
+    @Override
+    public boolean isEventGenAvailable() {
+        return true;
     }
 }

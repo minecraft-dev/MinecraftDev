@@ -20,7 +20,7 @@ public class ForgeModule extends AbstractModule {
     private VirtualFile mcmod;
 
     ForgeModule(@NotNull Module module) {
-        this.module = module;
+        super(module);
         this.buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
             if (!buildSystem.isImported()) {

@@ -191,4 +191,8 @@ public class MinecraftModule {
         }
         ProjectView.getInstance(module.getProject()).refresh();
     }
+
+    public boolean isEventGenAvailable() {
+        return modules.keySet().stream().anyMatch(AbstractModuleType::isEventGenAvailable);
+    }
 }

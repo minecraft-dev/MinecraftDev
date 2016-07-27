@@ -19,7 +19,7 @@ import java.util.List;
 public class SpongeModule extends AbstractModule {
 
     SpongeModule(@NotNull Module module) {
-        this.module = module;
+        super(module);
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
             if (!buildSystem.isImported()) {

@@ -20,7 +20,7 @@ public class BungeeCordModule extends AbstractModule {
     private VirtualFile pluginYml;
 
     BungeeCordModule(@NotNull Module module) {
-        this.module = module;
+        super(module);
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
             if (!buildSystem.isImported()) {

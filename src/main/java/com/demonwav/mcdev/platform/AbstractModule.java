@@ -2,19 +2,30 @@ package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.insight.generation.GenerationData;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.swing.Icon;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.Icon;
+
 public abstract class AbstractModule {
 
+    protected Project project;
     protected Module module;
     protected BuildSystem buildSystem;
+
+    public AbstractModule(@NotNull Module module) {
+        this.module = module;
+        this.project = module.getProject();
+    }
 
     public Module getModule() {
         return module;
@@ -50,5 +61,16 @@ public abstract class AbstractModule {
 
     public List<PsiClass> getEventPossibilities(List<BuildDependency> dependencies) {
         return Collections.emptyList();
+    }
+
+    public void doPreEventGenerate(@NotNull PsiClass psiClass, @Nullable GenerationData data) {
+    }
+
+    @Nullable
+    public PsiMethod generateEventListenerMethod(@NotNull PsiClass containingClass,
+                                                 @NotNull PsiClass chosenClass,
+                                                 @NotNull String chosenName,
+                                                 @Nullable GenerationData data) {
+        return null;
     }
 }
