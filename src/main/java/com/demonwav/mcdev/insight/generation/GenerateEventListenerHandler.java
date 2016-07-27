@@ -90,9 +90,11 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
         if (relevantModule.isPresent()) {
             this.relevantModule = relevantModule.get();
 
+            @SuppressWarnings("ConstantConditions")
             EventGenerationDialog generationDialog = new EventGenerationDialog(
                 editor,
                 relevantModule.get().getModuleType().getEventGenerationPanel(chosenClass),
+                chosenClass.getNameIdentifier().getText(),
                 relevantModule.get().getModuleType().getDefaultListenerName(chosenClass)
             );
 
