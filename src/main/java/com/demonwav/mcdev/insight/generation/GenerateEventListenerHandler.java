@@ -1,7 +1,6 @@
 package com.demonwav.mcdev.insight.generation;
 
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationDialog;
-import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.MinecraftModule;
 

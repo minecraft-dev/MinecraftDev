@@ -6,6 +6,7 @@ import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
+import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.base.Objects;
 import com.intellij.openapi.module.Module;
@@ -24,6 +25,9 @@ import com.intellij.psi.PsiReferenceList;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.refactoring.RefactoringFactory;
+import com.intellij.refactoring.util.RefactoringChangeUtil;
+import com.intellij.refactoring.util.RefactoringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -121,11 +125,10 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
     @Override
     public void doPreEventGenerate(@NotNull PsiClass psiClass, @Nullable GenerationData data) {
-        PsiReferenceList referenceList = psiClass.getImplementsList();
-        boolean needsToImplementListener = referenceList == null || !Arrays.stream(referenceList.getReferenceElements())
-            .anyMatch(e -> e.getQualifiedName().equals("org.bukkit.event.Listener"));
+        boolean needsToImplementListener = !McPsiUtil.extendsOrImplementsClass(psiClass, "org.bukkit.event.Listener");
 
         if (needsToImplementListener) {
+            PsiReferenceList referenceList = psiClass.getImplementsList();
             PsiClass listenerClass = JavaPsiFacade.getInstance(project).findClass("org.bukkit.event.Listener", GlobalSearchScope.allScope(project));
             if (listenerClass != null) {
                 PsiJavaCodeReferenceElement element = JavaPsiFacade.getElementFactory(project).createClassReferenceElement(listenerClass);
@@ -148,7 +151,8 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         PsiMethod newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
 
         PsiParameterList list = newMethod.getParameterList();
-        PsiParameter parameter = JavaPsiFacade.getElementFactory(project).createParameter("event", PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.moduleScope(module)));
+        PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
+            .createParameter("event", PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.moduleScope(module)));
         list.add(parameter);
 
         PsiModifierList modifierList = newMethod.getModifierList();

@@ -29,4 +29,17 @@ public final class McPsiUtil {
         }
         return null;
     }
+
+    public static boolean extendsOrImplementsClass(@NotNull PsiClass psiClass, @NotNull String qualifiedClassName) {
+        final PsiClass[] supers = psiClass.getSupers();
+        for (PsiClass aSuper : supers) {
+            if (qualifiedClassName.equals(aSuper.getQualifiedName())) {
+                return true;
+            }
+            if (extendsOrImplementsClass(aSuper, qualifiedClassName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
