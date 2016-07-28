@@ -10,6 +10,7 @@ import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.base.Objects;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
@@ -125,20 +126,10 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
     @Override
     public void doPreEventGenerate(@NotNull PsiClass psiClass, @Nullable GenerationData data) {
-        boolean needsToImplementListener = !McPsiUtil.extendsOrImplementsClass(psiClass, "org.bukkit.event.Listener");
+        final String bukkitListenerClass = "org.bukkit.event.Listener";
 
-        if (needsToImplementListener) {
-            PsiReferenceList referenceList = psiClass.getImplementsList();
-            PsiClass listenerClass = JavaPsiFacade.getInstance(project).findClass("org.bukkit.event.Listener", GlobalSearchScope.allScope(project));
-            if (listenerClass != null) {
-                PsiJavaCodeReferenceElement element = JavaPsiFacade.getElementFactory(project).createClassReferenceElement(listenerClass);
-                if (referenceList != null) {
-                    referenceList.add(element);
-                } else {
-                    PsiReferenceList list = JavaPsiFacade.getElementFactory(project).createReferenceList(new PsiJavaCodeReferenceElement[]{element});
-                    psiClass.add(list);
-                }
-            }
+        if (!McPsiUtil.extendsOrImplementsClass(psiClass, bukkitListenerClass)) {
+            McPsiUtil.addImplements(psiClass, bukkitListenerClass, module);
         }
     }
 
@@ -148,19 +139,41 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
                                                  @NotNull PsiClass chosenClass,
                                                  @NotNull String chosenName,
                                                  @Nullable GenerationData data) {
+        return generateBukkitStyleEventListenerMethod(
+            containingClass,
+            chosenClass,
+            chosenName,
+            project,
+            "org.bukkit.event.EventHandler",
+            true,
+            module
+        );
+    }
+
+    public static PsiMethod generateBukkitStyleEventListenerMethod(@NotNull PsiClass containingClass,
+                                                                   @NotNull PsiClass chosenClass,
+                                                                   @NotNull String chosenName,
+                                                                   @NotNull Project project,
+                                                                   @NotNull String annotationName,
+                                                                   boolean setIgnoreCancelled,
+                                                                   @NotNull Module resolveScopeModule) {
         PsiMethod newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
 
         PsiParameterList list = newMethod.getParameterList();
         PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
-            .createParameter("event", PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.moduleScope(module)));
+            .createParameter(
+                "event",
+                PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.moduleScope(resolveScopeModule))
+            );
         list.add(parameter);
 
         PsiModifierList modifierList = newMethod.getModifierList();
-        PsiAnnotation annotation = modifierList.addAnnotation("org.bukkit.event.EventHandler");
+        PsiAnnotation annotation = modifierList.addAnnotation(annotationName);
 
-        PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project).createExpressionFromText("true", annotation);
-
-        annotation.setDeclaredAttributeValue("ignoreCancelled", value);
+        if (setIgnoreCancelled) {
+            PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project).createExpressionFromText("true", annotation);
+            annotation.setDeclaredAttributeValue("ignoreCancelled", value);
+        }
 
         return newMethod;
     }

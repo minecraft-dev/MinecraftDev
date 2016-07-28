@@ -59,4 +59,9 @@ public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
     public BungeeCordModule generateModule(Module module) {
         return new BungeeCordModule(module);
     }
+
+    @Override
+    public boolean isEventGenAvailable() {
+        return true;
+    }
 }

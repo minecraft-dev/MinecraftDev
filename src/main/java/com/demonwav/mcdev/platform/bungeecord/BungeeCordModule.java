@@ -3,15 +3,30 @@ package com.demonwav.mcdev.platform.bungeecord;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
+import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.bukkit.BukkitModule;
+import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiParameterList;
+import com.intellij.psi.PsiReferenceList;
+import com.intellij.psi.PsiType;
+import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
 
@@ -74,5 +89,31 @@ public class BungeeCordModule extends AbstractModule {
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "Parameter is not a subclass of net.md_5.bungee.api.plugin.Event\n" +
                 "Compiling and running this listener may result in a runtime exception";
+    }
+
+    @Override
+    public void doPreEventGenerate(@NotNull PsiClass psiClass, @Nullable GenerationData data) {
+        final String bungeeCordListenerClass = "net.md_5.bungee.api.plugin.Listener";
+
+        if (!McPsiUtil.extendsOrImplementsClass(psiClass, bungeeCordListenerClass)) {
+            McPsiUtil.addImplements(psiClass, bungeeCordListenerClass, module);
+        }
+    }
+
+    @Nullable
+    @Override
+    public PsiMethod generateEventListenerMethod(@NotNull PsiClass containingClass,
+                                                 @NotNull PsiClass chosenClass,
+                                                 @NotNull String chosenName,
+                                                 @Nullable GenerationData data) {
+        return BukkitModule.generateBukkitStyleEventListenerMethod(
+            containingClass,
+            chosenClass,
+            chosenName,
+            project,
+            "net.md_5.bungee.event.EventHandler",
+            false,
+            module
+        );
     }
 }
