@@ -7,7 +7,10 @@ import com.demonwav.mcdev.util.CommonColors;
 
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.plugins.groovy.lang.psi.util.PsiUtil;
 
 import java.util.List;
 
@@ -65,5 +68,36 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
     @Override
     public ForgeModule generateModule(Module module) {
         return new ForgeModule(module);
+    }
+
+    @NotNull
+    @Override
+    public String getDefaultListenerName(@NotNull PsiClass psiClass) {
+        boolean isInnerClass = !(psiClass.getParent() instanceof PsiFile);
+
+        StringBuilder name = new StringBuilder();
+        if (isInnerClass) {
+            PsiClass containingClass = PsiUtil.getContainingNotInnerClass(psiClass);
+            if (containingClass != null) {
+                if (containingClass.getName() != null) {
+                    name.append(containingClass.getName().replaceAll("Event", ""));
+                }
+            }
+        }
+
+        String className = psiClass.getName();
+        assert className != null;
+        if (className.startsWith(name.toString())) {
+            className = className.substring(name.length());
+        }
+        name.append(className.replaceAll("Event", ""));
+
+        name.insert(0, "on");
+        return name.toString();
+    }
+
+    @Override
+    public boolean isEventGenAvailable() {
+        return true;
     }
 }
