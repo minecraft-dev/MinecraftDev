@@ -12,9 +12,10 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.Icon;
 import java.util.Collections;
 import java.util.List;
+
+import javax.swing.Icon;
 
 public class SpongeModule extends AbstractModule {
 

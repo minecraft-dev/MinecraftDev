@@ -12,19 +12,8 @@ import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiClassType;
-import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiModifierList;
-import com.intellij.psi.PsiParameter;
-import com.intellij.psi.PsiParameterList;
-import com.intellij.psi.PsiReferenceList;
-import com.intellij.psi.PsiType;
-import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

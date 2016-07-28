@@ -10,7 +10,6 @@ import com.intellij.openapi.util.JDOMExternalizableStringList;
 import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;
 import java.util.LinkedHashMap;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
-import javax.swing.JPanel;
 
 public abstract class AbstractModuleType<T extends AbstractModule> {
 
