@@ -4,6 +4,7 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.util.CommonColors;
+import com.demonwav.mcdev.util.Util;
 
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
@@ -73,27 +74,7 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
     @NotNull
     @Override
     public String getDefaultListenerName(@NotNull PsiClass psiClass) {
-        boolean isInnerClass = !(psiClass.getParent() instanceof PsiFile);
-
-        StringBuilder name = new StringBuilder();
-        if (isInnerClass) {
-            PsiClass containingClass = PsiUtil.getContainingNotInnerClass(psiClass);
-            if (containingClass != null) {
-                if (containingClass.getName() != null) {
-                    name.append(containingClass.getName().replaceAll("Event", ""));
-                }
-            }
-        }
-
-        String className = psiClass.getName();
-        assert className != null;
-        if (className.startsWith(name.toString())) {
-            className = className.substring(name.length());
-        }
-        name.append(className.replaceAll("Event", ""));
-
-        name.insert(0, "on");
-        return name.toString();
+        return Util.defaultNameForSubClassEvents(psiClass);
     }
 
     @Override

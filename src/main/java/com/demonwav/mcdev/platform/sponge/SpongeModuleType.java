@@ -4,9 +4,11 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.util.CommonColors;
+import com.demonwav.mcdev.util.Util;
 
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
+import com.intellij.psi.PsiClass;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -62,7 +64,18 @@ public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
 
     @NotNull
     @Override
+    public String getDefaultListenerName(@NotNull PsiClass psiClass) {
+        return Util.defaultNameForSubClassEvents(psiClass);
+    }
+
+    @NotNull
+    @Override
     public SpongeModule generateModule(Module module) {
         return new SpongeModule(module);
+    }
+
+    @Override
+    public boolean isEventGenAvailable() {
+        return true;
     }
 }

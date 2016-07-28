@@ -3,14 +3,24 @@ package com.demonwav.mcdev.platform.sponge;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiParameterList;
+import com.intellij.psi.PsiType;
+import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -72,5 +82,28 @@ public class SpongeModule extends AbstractModule {
             return Collections.emptyList();
         }
         return super.getEventPossibilities(dependencies);
+    }
+
+    @Nullable
+    @Override
+    public PsiMethod generateEventListenerMethod(@NotNull PsiClass containingClass,
+                                                 @NotNull PsiClass chosenClass,
+                                                 @NotNull String chosenName,
+                                                 @Nullable GenerationData data) {
+        PsiMethod method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
+        PsiParameterList parameterList = method.getParameterList();
+
+        PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
+            .createParameter(
+                "event",
+                PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.moduleScope(module))
+            );
+
+        parameterList.add(parameter);
+        PsiModifierList modifierList = method.getModifierList();
+
+        modifierList.addAnnotation("org.spongepowered.api.event.Listener");
+
+        return method;
     }
 }
