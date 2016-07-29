@@ -157,7 +157,6 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
             PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
                 .createExpressionFromText(eventPriority + "." + bukkitData.getEventPriority(), annotation);
 
-
             annotation.setDeclaredAttributeValue("priority", value);
         }
 

@@ -42,9 +42,7 @@ public class EventListenerWizard {
         this.innerContentPanel = panel;
         this.className = className;
         this.defaultListenerName = defaultListenerName;
-    }
 
-    public JPanel getPanel() {
         classNameTextField.setFont(EditorUtil.getEditorFont());
         listenerNameTextField.setFont(EditorUtil.getEditorFont());
         publicVoidLabel.setFont(EditorUtil.getEditorFont());
@@ -64,7 +62,9 @@ public class EventListenerWizard {
 
         IdeFocusTraversalPolicy.getPreferredFocusedComponent(listenerNameTextField).requestFocus();
         listenerNameTextField.requestFocus();
+    }
 
+    public JPanel getPanel() {
         return panel;
     }
 

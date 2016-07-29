@@ -39,7 +39,7 @@ idea {
 group 'com.demonwav.minecraft-dev'
 version pluginVersion
 
-task initProp(type: Copy) {
+task initProp << {
     def baseProp = new File('src/main/resources/messages.MinecraftDevelopment_en.properties')
     def baseEnglishProp = new File('src/main/resources/messages.MinecraftDevelopment.properties')
 
@@ -47,19 +47,21 @@ task initProp(type: Copy) {
 # This file is automatically copied from messages.MinecraftDevelopment_en_US.properties at build time
 '''
 
-    from('src/main/resources/messages.MinecraftDevelopment_en_US.properties')
-    eachFile { details ->
-        details.copyTo(baseProp)
-        details.copyTo(baseEnglishProp)
+    def baseUsEnglishProp = new File('src/main/resources/messages.MinecraftDevelopment_en_US.properties')
 
-        baseProp.write comment + baseProp.text
-        baseEnglishProp.write comment + baseEnglishProp.text
-    }
-    into 'src/main/java/resources/'
-    outputs.upToDateWhen { false }
+    baseProp.write comment + baseUsEnglishProp.text
+    baseEnglishProp.write comment + baseUsEnglishProp.text
+}
+
+// The intellij gui form creator doesn't seem to be reliable unless we delete the plugin contents each time...
+task cleanPlugin << {
+    def pluginDir = new File(intellij.sandboxDirectory, 'plugins/Minecraft Development')
+
+    pluginDir.deleteDir()
 }
 
 afterEvaluate {
     buildPlugin.dependsOn initProp
     runIdea.dependsOn initProp
+    prepareSandbox.dependsOn cleanPlugin
 }

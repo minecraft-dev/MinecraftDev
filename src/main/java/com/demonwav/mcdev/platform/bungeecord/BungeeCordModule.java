@@ -8,12 +8,17 @@ import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.BukkitModule;
+import com.demonwav.mcdev.platform.bungeecord.generation.BungeeCordGenerationData;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,13 +100,38 @@ public class BungeeCordModule extends AbstractModule {
                                                  @NotNull PsiClass chosenClass,
                                                  @NotNull String chosenName,
                                                  @Nullable GenerationData data) {
-        return BukkitModule.generateBukkitStyleEventListenerMethod(
+        final String eventHandler = "net.md_5.bungee.event.EventHandler";
+        final String eventPriority = "net.md_5.bungee.event.EventPriority";
+
+        PsiMethod method = BukkitModule.generateBukkitStyleEventListenerMethod(
             containingClass,
             chosenClass,
             chosenName,
             project,
-            "net.md_5.bungee.event.EventHandler",
+            eventHandler,
             false
         );
+
+        BungeeCordGenerationData generationData = (BungeeCordGenerationData) data;
+        if (generationData == null) {
+            return method;
+        }
+
+        PsiModifierList modifierList = method.getModifierList();
+        PsiAnnotation annotation = modifierList.findAnnotation(eventHandler);
+        if (annotation == null) {
+            return method;
+        }
+
+        if (generationData.getEventPriority().equals("NORMAL")) {
+            return method;
+        }
+
+        PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+            .createExpressionFromText(eventPriority + "." + generationData.getEventPriority(), annotation);
+
+        annotation.setDeclaredAttributeValue("priority", value);
+
+        return method;
     }
 }
