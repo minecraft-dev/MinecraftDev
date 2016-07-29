@@ -5,6 +5,7 @@ import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bungeecord.generation.BungeeCordEventGenerationPanel;
+import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants;
 import com.demonwav.mcdev.util.CommonColors;
 
 import com.google.common.collect.ImmutableList;
@@ -23,7 +24,7 @@ public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
 
     private BungeeCordModuleType() {
         super("net.md-5", "bungeecord-api");
-        CommonColors.applyStandardColors(this.colorMap, "net.md_5.bungee.api.ChatColor");
+        CommonColors.applyStandardColors(this.colorMap, BungeeCordConstants.BUNGEECORD_CHAT_COLOR_CLASS);
     }
 
     public static BungeeCordModuleType getInstance() {
@@ -48,13 +49,13 @@ public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ImmutableList.of("net.md_5.bungee.event.EventHandler");
+        return ImmutableList.of(BungeeCordConstants.BUNGEECORD_HANDLER_ANNOTATION);
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of("net.md_5.bungee.event.EventHandler");
+        return ImmutableList.of(BungeeCordConstants.BUNGEECORD_HANDLER_ANNOTATION);
     }
 
     @NotNull

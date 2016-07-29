@@ -6,6 +6,7 @@ import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData;
+import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
 import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
 import com.demonwav.mcdev.util.McPsiUtil;
 
@@ -108,7 +109,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
     @Override
     public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
-        return "org.bukkit.event.Event".equals(eventClass.getQualifiedName());
+        return BukkitConstants.BUKKIT_EVENT_CLASS.equals(eventClass.getQualifiedName());
     }
 
     @Override
@@ -119,10 +120,8 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
     @Override
     public void doPreEventGenerate(@NotNull PsiClass psiClass, @Nullable GenerationData data) {
-        final String bukkitListenerClass = "org.bukkit.event.Listener";
-
-        if (!McPsiUtil.extendsOrImplementsClass(psiClass, bukkitListenerClass)) {
-            McPsiUtil.addImplements(psiClass, bukkitListenerClass, project);
+        if (!McPsiUtil.extendsOrImplementsClass(psiClass, BukkitConstants.BUKKIT_LISTENER_CLASS)) {
+            McPsiUtil.addImplements(psiClass, BukkitConstants.BUKKIT_LISTENER_CLASS, project);
         }
     }
 
@@ -132,9 +131,6 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
                                                  @NotNull PsiClass chosenClass,
                                                  @NotNull String chosenName,
                                                  @Nullable GenerationData data) {
-        final String eventHandler = "org.bukkit.event.EventHandler";
-        final String eventPriority = "org.bukkit.event.EventPriority";
-
         BukkitGenerationData bukkitData = (BukkitGenerationData) data;
         assert  bukkitData != null;
 
@@ -143,19 +139,19 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
             chosenClass,
             chosenName,
             project,
-            eventHandler,
+            BukkitConstants.BUKKIT_HANDLER_ANNOTATION,
             bukkitData.isIgnoreCanceled()
         );
 
         if (!bukkitData.getEventPriority().equals("NORMAL")) {
             PsiModifierList list = method.getModifierList();
-            PsiAnnotation annotation = list.findAnnotation(eventHandler);
+            PsiAnnotation annotation = list.findAnnotation(BukkitConstants.BUKKIT_HANDLER_ANNOTATION);
             if (annotation == null) {
                 return method;
             }
 
             PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
-                .createExpressionFromText(eventPriority + "." + bukkitData.getEventPriority(), annotation);
+                .createExpressionFromText(BukkitConstants.BUKKIT_EVENT_PRIORITY_CLASS + "." + bukkitData.getEventPriority(), annotation);
 
             annotation.setDeclaredAttributeValue("priority", value);
         }

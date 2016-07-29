@@ -9,6 +9,7 @@ import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.BukkitModule;
 import com.demonwav.mcdev.platform.bungeecord.generation.BungeeCordGenerationData;
+import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
@@ -76,7 +77,7 @@ public class BungeeCordModule extends AbstractModule {
 
     @Override
     public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
-        return "net.md_5.bungee.api.plugin.Event".equals(eventClass.getQualifiedName());
+        return BungeeCordConstants.BUNGEECORD_EVENT_CLASS.equals(eventClass.getQualifiedName());
     }
 
     @Override
@@ -87,7 +88,7 @@ public class BungeeCordModule extends AbstractModule {
 
     @Override
     public void doPreEventGenerate(@NotNull PsiClass psiClass, @Nullable GenerationData data) {
-        final String bungeeCordListenerClass = "net.md_5.bungee.api.plugin.Listener";
+        final String bungeeCordListenerClass = BungeeCordConstants.BUNGEECORD_LISTENER_CLASS;
 
         if (!McPsiUtil.extendsOrImplementsClass(psiClass, bungeeCordListenerClass)) {
             McPsiUtil.addImplements(psiClass, bungeeCordListenerClass, project);
@@ -100,15 +101,12 @@ public class BungeeCordModule extends AbstractModule {
                                                  @NotNull PsiClass chosenClass,
                                                  @NotNull String chosenName,
                                                  @Nullable GenerationData data) {
-        final String eventHandler = "net.md_5.bungee.event.EventHandler";
-        final String eventPriority = "net.md_5.bungee.event.EventPriority";
-
         PsiMethod method = BukkitModule.generateBukkitStyleEventListenerMethod(
             containingClass,
             chosenClass,
             chosenName,
             project,
-            eventHandler,
+            BungeeCordConstants.BUNGEECORD_HANDLER_ANNOTATION,
             false
         );
 
@@ -118,7 +116,7 @@ public class BungeeCordModule extends AbstractModule {
         }
 
         PsiModifierList modifierList = method.getModifierList();
-        PsiAnnotation annotation = modifierList.findAnnotation(eventHandler);
+        PsiAnnotation annotation = modifierList.findAnnotation(BungeeCordConstants.BUNGEECORD_HANDLER_ANNOTATION);
         if (annotation == null) {
             return method;
         }
@@ -128,7 +126,7 @@ public class BungeeCordModule extends AbstractModule {
         }
 
         PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
-            .createExpressionFromText(eventPriority + "." + generationData.getEventPriority(), annotation);
+            .createExpressionFromText(BungeeCordConstants.BUNGEECORD_EVENT_PRIORITY_CLASS + "." + generationData.getEventPriority(), annotation);
 
         annotation.setDeclaredAttributeValue("priority", value);
 

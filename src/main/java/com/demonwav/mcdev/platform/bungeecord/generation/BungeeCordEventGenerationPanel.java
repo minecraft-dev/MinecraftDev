@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 public class BungeeCordEventGenerationPanel extends EventGenerationPanel {
 
-    private JComboBox eventPriorityComboBox;
+    private JComboBox<String> eventPriorityComboBox;
     private JPanel panel;
 
     public BungeeCordEventGenerationPanel(@NotNull PsiClass chosenClass) {
@@ -22,6 +22,15 @@ public class BungeeCordEventGenerationPanel extends EventGenerationPanel {
     @Nullable
     @Override
     public JPanel getPanel() {
+        // Not static because the form builder is not reliable
+        eventPriorityComboBox.addItem("HIGHEST");
+        eventPriorityComboBox.addItem("HIGH");
+        eventPriorityComboBox.addItem("NORMAL");
+        eventPriorityComboBox.addItem("LOW");
+        eventPriorityComboBox.addItem("LOWEST");
+
+        eventPriorityComboBox.setSelectedIndex(2);
+
         return panel;
     }
 

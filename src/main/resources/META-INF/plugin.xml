@@ -152,6 +152,22 @@
         <!-- Sponge Annotator -->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
 
+        <!-- Bukkit Inspections -->
+        <localInspection displayName="Bukkit EventHandler in class not implementing Listener"
+                         groupName="Minecraft Bukkit"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.bukkit.inspection.BukkitListenerImplementedInspection"/>
+        <!-- BungeeCord Inspections -->
+        <localInspection displayName="BungeeCord EventHandler in class not implementing Listener"
+                         groupName="Minecraft BungeeCord"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.bungeecord.inspection.BungeeCordListenerImplementedInspection"/>
         <!-- Forge Inspections -->
         <localInspection displayName="Invalid usage of @SideOnly in nested class declaration"
                          groupName="Minecraft Forge"
@@ -160,7 +176,6 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.NestedClassSideOnlyInspection"/>
-
         <localInspection displayName="Invalid usage of @SideOnly in field declaration"
                          groupName="Minecraft Forge"
                          language="JAVA"
@@ -168,7 +183,6 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.FieldDeclarationSideOnlyInspection"/>
-
         <localInspection displayName="Invalid usage of @SideOnly in method declaration"
                          groupName="Minecraft Forge"
                          language="JAVA"
@@ -176,7 +190,6 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.MethodSideOnlyInspection"/>
-
         <localInspection displayName="Invalid usage of variable annotated with @SideOnly"
                          groupName="Minecraft Forge"
                          language="JAVA"
@@ -191,7 +204,6 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.MethodCallSideOnlyInspection"/>
-
         <localInspection displayName="Invalid usage of new object annotated with @SideOnly"
                          groupName="Minecraft Forge"
                          language="JAVA"
@@ -199,7 +211,6 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.sideonly.NewExpressionSideOnlyInspection"/>
-
         <localInspection displayName="Invalid usage of local variable declaration annotated with @SideOnly"
                          groupName="Minecraft Forge"
                          language="JAVA"

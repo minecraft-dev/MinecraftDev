@@ -26,6 +26,16 @@ public class BukkitEventGenerationPanel extends EventGenerationPanel {
     public JPanel getPanel() {
         ignoreCanceledRadioButton.setSelected(true);
 
+        // Not static because the form builder is not reliable
+        eventPriorityComboBox.addItem("MONITOR");
+        eventPriorityComboBox.addItem("HIGHEST");
+        eventPriorityComboBox.addItem("HIGH");
+        eventPriorityComboBox.addItem("NORMAL");
+        eventPriorityComboBox.addItem("LOW");
+        eventPriorityComboBox.addItem("LOWEST");
+
+        eventPriorityComboBox.setSelectedIndex(3);
+
         return panel;
     }
 

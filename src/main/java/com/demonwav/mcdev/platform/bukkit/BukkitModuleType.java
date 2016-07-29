@@ -5,6 +5,7 @@ import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitEventGenerationPanel;
+import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
 import com.demonwav.mcdev.util.CommonColors;
 
 import com.google.common.collect.ImmutableList;
@@ -24,13 +25,13 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
 
     private BukkitModuleType() {
         super("org.bukkit", "bukkit");
-        CommonColors.applyStandardColors(this.colorMap, "org.bukkit.ChatColor");
+        CommonColors.applyStandardColors(this.colorMap, BukkitConstants.BUKKIT_CHAT_COLOR_CLASS);
     }
 
     protected BukkitModuleType(final String groupId, final String artifactId) {
         super(groupId, artifactId);
 
-        CommonColors.applyStandardColors(this.colorMap, "org.bukkit.ChatColor");
+        CommonColors.applyStandardColors(this.colorMap, BukkitConstants.BUKKIT_CHAT_COLOR_CLASS);
     }
 
     public static BukkitModuleType getInstance() {
@@ -54,13 +55,13 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ImmutableList.of("org.bukkit.event.EventHandler");
+        return ImmutableList.of(BukkitConstants.BUKKIT_HANDLER_ANNOTATION);
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of("org.bukkit.event.EventHandler");
+        return ImmutableList.of(BukkitConstants.BUKKIT_HANDLER_ANNOTATION);
     }
 
     @NotNull
