@@ -19,7 +19,6 @@ intellij {
     // Bundled plugin dependencies 
     plugins = ['maven', 'gradle', 'Groovy', 'yaml']
     pluginName 'Minecraft Development'
-
     updateSinceUntilBuild false
 
     downloadSources Boolean.valueOf(downloadIdeaSources)
@@ -38,4 +37,29 @@ idea {
 }
 
 group 'com.demonwav.minecraft-dev'
-version pluginVersion // Plugin version
+version pluginVersion
+
+task initProp(type: Copy) {
+    def baseProp = new File('src/main/resources/messages.MinecraftDevelopment_en.properties')
+    def baseEnglishProp = new File('src/main/resources/messages.MinecraftDevelopment.properties')
+
+    def comment = '''# Do not manually edit this file
+# This file is automatically copied from messages.MinecraftDevelopment_en_US.properties at build time
+'''
+
+    from('src/main/resources/messages.MinecraftDevelopment_en_US.properties')
+    eachFile { details ->
+        details.copyTo(baseProp)
+        details.copyTo(baseEnglishProp)
+
+        baseProp.write comment + baseProp.text
+        baseEnglishProp.write comment + baseEnglishProp.text
+    }
+    into 'src/main/java/resources/'
+    outputs.upToDateWhen { false }
+}
+
+afterEvaluate {
+    buildPlugin.dependsOn initProp
+    runIdea.dependsOn initProp
+}

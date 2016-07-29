@@ -3,7 +3,6 @@ package com.demonwav.mcdev.asset;
 import com.intellij.CommonBundle;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.PropertyKey;
 
 import java.lang.ref.Reference;
@@ -12,6 +11,7 @@ import java.util.ResourceBundle;
 
 public final class MessageAssets {
 
+    @NotNull
     public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key, @NotNull Object... params) {
         return CommonBundle.message(getBundle(), key, params);
     }
@@ -23,40 +23,9 @@ public final class MessageAssets {
     private MessageAssets() {
     }
 
+    @NotNull
     public static String getGenerateEventListenerTitle() {
         return message("generate.event_listener");
-    }
-
-    public static String getSearchForTextOccurrencesText() {
-        return message("search.for.text.occurrences");
-    }
-
-    public static String getVisibilityPackageLocal() {
-        return message("visibility.package.local");
-    }
-
-    public static String getVisibilityPrivate() {
-        return message("visibility.private");
-    }
-
-    public static String getVisibilityProtected() {
-        return message("visibility.protected");
-    }
-
-    public static String getVisibilityPublic() {
-        return message("visibility.public");
-    }
-
-    public static String getVisibilityAsIs() {
-        return message("visibility.as.is");
-    }
-
-    public static String getEscalateVisibility() {
-        return message("visibility.escalate");
-    }
-
-    public static String getCannotRefactorMessage(@Nullable final String message) {
-        return message("cannot.perform.refactoring") + (message == null ? "" : "\n" + message);
     }
 
     public static String message(@PropertyKey(resourceBundle = BUNDLE) String key) {
@@ -67,7 +36,7 @@ public final class MessageAssets {
         ResourceBundle bundle = com.intellij.reference.SoftReference.dereference(ourBundle);
         if (bundle == null) {
             bundle = ResourceBundle.getBundle(BUNDLE);
-            ourBundle = new SoftReference<ResourceBundle>(bundle);
+            ourBundle = new SoftReference<>(bundle);
         }
         return bundle;
     }
