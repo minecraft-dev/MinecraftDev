@@ -49,11 +49,9 @@ public final class McPsiUtil {
         return false;
     }
 
-    public static void addImplements(@NotNull PsiClass psiClass, @NotNull String qualifiedClassName, @NotNull Module resolveScopeModule) {
-        Project project = resolveScopeModule.getProject();
-
+    public static void addImplements(@NotNull PsiClass psiClass, @NotNull String qualifiedClassName, @NotNull Project project) {
         PsiReferenceList referenceList = psiClass.getImplementsList();
-        PsiClass listenerClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, GlobalSearchScope.moduleScope(resolveScopeModule));
+        PsiClass listenerClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, GlobalSearchScope.allScope(project));
         if (listenerClass != null) {
             PsiJavaCodeReferenceElement element = JavaPsiFacade.getElementFactory(project).createClassReferenceElement(listenerClass);
             if (referenceList != null) {

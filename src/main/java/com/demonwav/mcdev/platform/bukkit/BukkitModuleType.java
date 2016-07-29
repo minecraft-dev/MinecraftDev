@@ -1,12 +1,15 @@
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.bukkit.generation.BukkitEventGenerationPanel;
 import com.demonwav.mcdev.util.CommonColors;
 
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
+import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,5 +72,11 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
     @Override
     public boolean isEventGenAvailable() {
         return true;
+    }
+
+    @NotNull
+    @Override
+    public EventGenerationPanel getEventGenerationPanel(@NotNull PsiClass chosenClass) {
+        return new BukkitEventGenerationPanel(chosenClass);
     }
 }

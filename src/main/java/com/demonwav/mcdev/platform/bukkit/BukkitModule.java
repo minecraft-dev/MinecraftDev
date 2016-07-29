@@ -5,6 +5,7 @@ import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData;
 import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
 import com.demonwav.mcdev.util.McPsiUtil;
 
@@ -121,7 +122,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         final String bukkitListenerClass = "org.bukkit.event.Listener";
 
         if (!McPsiUtil.extendsOrImplementsClass(psiClass, bukkitListenerClass)) {
-            McPsiUtil.addImplements(psiClass, bukkitListenerClass, module);
+            McPsiUtil.addImplements(psiClass, bukkitListenerClass, project);
         }
     }
 
@@ -131,15 +132,36 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
                                                  @NotNull PsiClass chosenClass,
                                                  @NotNull String chosenName,
                                                  @Nullable GenerationData data) {
-        return generateBukkitStyleEventListenerMethod(
+        final String eventHandler = "org.bukkit.event.EventHandler";
+        final String eventPriority = "org.bukkit.event.EventPriority";
+
+        BukkitGenerationData bukkitData = (BukkitGenerationData) data;
+        assert  bukkitData != null;
+
+        PsiMethod method = generateBukkitStyleEventListenerMethod(
             containingClass,
             chosenClass,
             chosenName,
             project,
-            "org.bukkit.event.EventHandler",
-            true,
-            module
+            eventHandler,
+            bukkitData.isIgnoreCanceled()
         );
+
+        if (!bukkitData.getEventPriority().equals("NORMAL")) {
+            PsiModifierList list = method.getModifierList();
+            PsiAnnotation annotation = list.findAnnotation(eventHandler);
+            if (annotation == null) {
+                return method;
+            }
+
+            PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+                .createExpressionFromText(eventPriority + "." + bukkitData.getEventPriority(), annotation);
+
+
+            annotation.setDeclaredAttributeValue("priority", value);
+        }
+
+        return method;
     }
 
     public static PsiMethod generateBukkitStyleEventListenerMethod(@NotNull PsiClass containingClass,
@@ -147,15 +169,14 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
                                                                    @NotNull String chosenName,
                                                                    @NotNull Project project,
                                                                    @NotNull String annotationName,
-                                                                   boolean setIgnoreCancelled,
-                                                                   @NotNull Module resolveScopeModule) {
+                                                                   boolean setIgnoreCancelled) {
         PsiMethod newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
 
         PsiParameterList list = newMethod.getParameterList();
         PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
             .createParameter(
                 "event",
-                PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.moduleScope(resolveScopeModule))
+                PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.allScope(project))
             );
         list.add(parameter);
 

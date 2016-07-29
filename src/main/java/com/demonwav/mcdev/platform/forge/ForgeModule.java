@@ -114,7 +114,7 @@ public class ForgeModule extends AbstractModule {
         PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
             .createParameter(
                 "event",
-                PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.moduleScope(module))
+                PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.allScope(project))
             );
 
         parameterList.add(parameter);

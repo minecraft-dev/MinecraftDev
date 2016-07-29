@@ -85,7 +85,7 @@ public class BungeeCordModule extends AbstractModule {
         final String bungeeCordListenerClass = "net.md_5.bungee.api.plugin.Listener";
 
         if (!McPsiUtil.extendsOrImplementsClass(psiClass, bungeeCordListenerClass)) {
-            McPsiUtil.addImplements(psiClass, bungeeCordListenerClass, module);
+            McPsiUtil.addImplements(psiClass, bungeeCordListenerClass, project);
         }
     }
 
@@ -101,8 +101,7 @@ public class BungeeCordModule extends AbstractModule {
             chosenName,
             project,
             "net.md_5.bungee.event.EventHandler",
-            false,
-            module
+            false
         );
     }
 }
