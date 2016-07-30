@@ -1,6 +1,6 @@
 Minecraft Development IntelliJ Plugin [![forthebadge](http://forthebadge.com/images/badges/made-with-crayons.svg)](http://forthebadge.com)
 ==========================================================================================================================================
-[![GitHub Stars](https://img.shields.io/github/stars/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/issues) [![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDevIntelliJ_Build.svg)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDevIntelliJ_Build) [![Current Release](https://img.shields.io/badge/release-alpha--0.1.8-lightgrey.svg)](https://plugins.jetbrains.com/plugin/8327)
+[![GitHub Stars](https://img.shields.io/github/stars/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/DemonWav/MinecraftDevIntelliJ.svg)](https://github.com/DemonWav/MinecraftDevIntelliJ/issues) [![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDevIntelliJ_Build.svg)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDevIntelliJ_Build) [![Current Release](https://img.shields.io/badge/release-alpha--0.1.9-lightgrey.svg)](https://plugins.jetbrains.com/plugin/8327)
 
 Installation
 ------------

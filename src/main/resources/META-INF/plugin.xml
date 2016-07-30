@@ -19,6 +19,11 @@
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p><p>
         Recent changes:
+        <h3>alpha-0.1.9</h3>
+        <ul>
+          <li>Bukkit, BungeeCord, Sponge, and Forge event listener generation added (in Alt-Insert menu)</li>
+          <li>Bukkit and BungeeCord inspection checking that EventHandlers are in a class implementing Listener added</li>
+        </ul>
         <h3>alpha-0.1.8</h3>
         <ul>
           <li>Fix read-access bug in Gradle project creation</li>
