@@ -81,6 +81,9 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
 
         chooser.showDialog();
         chosenClass = chooser.getSelected();
+        if (chosenClass == null) {
+            return null;
+        }
 
         Optional<AbstractModule> relevantModule = minecraftModule.getModules().stream()
             .filter(m -> isSuperEventListenerAllowed(chosenClass, m))
