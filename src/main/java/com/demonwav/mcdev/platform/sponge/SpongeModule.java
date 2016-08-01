@@ -7,10 +7,13 @@ import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiMethod;
@@ -102,7 +105,25 @@ public class SpongeModule extends AbstractModule {
         parameterList.add(parameter);
         PsiModifierList modifierList = method.getModifierList();
 
-        modifierList.addAnnotation("org.spongepowered.api.event.Listener");
+        PsiAnnotation listenerAnnotation = modifierList.addAnnotation("org.spongepowered.api.event.Listener");
+
+        SpongeGenerationData generationData = (SpongeGenerationData) data;
+        assert generationData != null;
+
+        if (!generationData.isIgnoreCanceled()) {
+            PsiAnnotation annotation = modifierList.addAnnotation("org.spongepowered.api.event.filter.IsCancelled");
+            PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+                .createExpressionFromText("org.spongepowered.api.util.Tristate.UNDEFINED", annotation);
+
+            annotation.setDeclaredAttributeValue("value", value);
+        }
+
+        if (!generationData.getEventOrder().equals("DEFAULT")) {
+            PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+                .createExpressionFromText("org.spongepowered.api.event.Order." + generationData.getEventOrder(), listenerAnnotation);
+
+            listenerAnnotation.setDeclaredAttributeValue("order", value);
+        }
 
         return method;
     }

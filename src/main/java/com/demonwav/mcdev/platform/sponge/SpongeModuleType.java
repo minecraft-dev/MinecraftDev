@@ -1,8 +1,10 @@
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.sponge.generation.SpongeEventGenerationPanel;
 import com.demonwav.mcdev.util.CommonColors;
 import com.demonwav.mcdev.util.Util;
 
@@ -77,5 +79,11 @@ public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
     @Override
     public boolean isEventGenAvailable() {
         return true;
+    }
+
+    @NotNull
+    @Override
+    public EventGenerationPanel getEventGenerationPanel(@NotNull PsiClass chosenClass) {
+        return new SpongeEventGenerationPanel(chosenClass);
     }
 }

@@ -22,10 +22,6 @@ public class EventListenerWizard {
     private JPanel contentPanel;
     private JSeparator separator;
 
-    private JPanel innerContentPanel;
-    private String className;
-    private String defaultListenerName;
-
     private static final GridConstraints innerContentPanelConstraints = new GridConstraints();
     static {
         innerContentPanelConstraints.setRow(0);
@@ -39,10 +35,6 @@ public class EventListenerWizard {
     }
 
     public EventListenerWizard(@Nullable JPanel panel, @NotNull String className, @NotNull String defaultListenerName) {
-        this.innerContentPanel = panel;
-        this.className = className;
-        this.defaultListenerName = defaultListenerName;
-
         classNameTextField.setFont(EditorUtil.getEditorFont());
         listenerNameTextField.setFont(EditorUtil.getEditorFont());
         publicVoidLabel.setFont(EditorUtil.getEditorFont());
@@ -52,9 +44,9 @@ public class EventListenerWizard {
             publicVoidLabel.setForeground(JavaHighlightingColors.KEYWORD.getFallbackAttributeKey().getDefaultAttributes().getForegroundColor());
         }
 
-        if (innerContentPanel != null) {
+        if (panel != null) {
             separator.setVisible(true);
-            contentPanel.add(innerContentPanel, innerContentPanelConstraints);
+            contentPanel.add(panel, innerContentPanelConstraints);
         }
 
         classNameTextField.setText(className);

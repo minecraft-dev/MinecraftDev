@@ -102,7 +102,7 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
 
             okay = generationDialog.showAndGet();
 
-            if (okay){
+            if (okay) {
                 data = generationDialog.getData();
                 chosenName = generationDialog.getChosenName();
 
@@ -110,7 +110,11 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
                 position = model.getLogicalPosition();
 
                 method = PsiTreeUtil.getParentOfType(aClass.getContainingFile().findElementAt(model.getOffset()), PsiMethod.class);
+            } else {
+                return null;
             }
+        } else {
+            return null;
         }
 
         return DUMMY_RESULT;
