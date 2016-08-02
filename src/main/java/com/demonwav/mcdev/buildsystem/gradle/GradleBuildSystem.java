@@ -316,9 +316,10 @@ public class GradleBuildSystem extends BuildSystem {
                     if (!runningDir.exists()) {
                         runningDir.mkdir();
                     }
+                    Module mainModule = ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main");
                     runClientConfiguration.setWorkingDirectory(project.getBasePath() + File.separator + "run");
                     runClientConfiguration.setMainClassName("GradleStart");
-                    runClientConfiguration.setModule(ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main") != null ? ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main") : module);
+                    runClientConfiguration.setModule(mainModule != null ? mainModule : module);
                     RunnerAndConfigurationSettings clientSettings = new RunnerAndConfigurationSettingsImpl(
                             RunManagerImpl.getInstanceImpl(project),
                             runClientConfiguration,
@@ -337,7 +338,7 @@ public class GradleBuildSystem extends BuildSystem {
                     );
                     runServerConfiguration.setMainClassName("GradleStartServer");
                     runServerConfiguration.setWorkingDirectory(project.getBasePath() + File.separator + "run");
-                    runServerConfiguration.setModule(ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main") != null ? ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main") : module);
+                    runServerConfiguration.setModule(mainModule != null ? mainModule : module);
                     RunnerAndConfigurationSettings serverSettings = new RunnerAndConfigurationSettingsImpl(
                             RunManagerImpl.getInstanceImpl(project),
                             runServerConfiguration,
