@@ -76,12 +76,13 @@ public class ListenerEventAnnotator implements Annotator {
             }
 
             if(statement.getText().contains("isCancelled()")) {
-                if(eventHandler.findAttributeValue("ignoreCancelled") == null
-                        || !(((PsiLiteral)eventHandler.findAttributeValue("ignoreCancelled")).getValue() instanceof Boolean)
-                        || ((PsiLiteral)eventHandler.findAttributeValue("ignoreCancelled")).getValue() == null) {
+                PsiAnnotationMemberValue ignoreCancelled = eventHandler.findAttributeValue("ignoreCancelled");
+                if(ignoreCancelled == null
+                        || !(((PsiLiteral)ignoreCancelled).getValue() instanceof Boolean)
+                        || ((PsiLiteral)ignoreCancelled).getValue() == null) {
                     return;
                 }
-                if((Boolean)((PsiLiteral)eventHandler.findAttributeValue("ignoreCancelled")).getValue()) {
+                if((Boolean)((PsiLiteral)ignoreCancelled).getValue()) {
                     holder.createWarningAnnotation(statement, "Redundant call to isCancelled(). EventHandler annotated to ignore cancelled.");
                 }
             }
