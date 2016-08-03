@@ -69,9 +69,13 @@ public class ListenerEventAnnotator implements Annotator {
 
             PsiAnnotation eventHandler = null;
 
-            for (PsiAnnotation psiAnnotation : method.getModifierList().getAnnotations()) {
-                if (psiAnnotation.getQualifiedName().contains("EventHandler")) {
-                    eventHandler = psiAnnotation;
+            for (AbstractModuleType<?> moduleType : moduleTypes) {
+                final List<String> listenerAnnotations = moduleType.getListenerAnnotations();
+                for (String listenerAnnotation : listenerAnnotations) {
+                    PsiAnnotation annotation = modifierList.findAnnotation(listenerAnnotation);
+                    if (annotation != null) {
+                        eventHandler = annotation;
+                    }
                 }
             }
 
