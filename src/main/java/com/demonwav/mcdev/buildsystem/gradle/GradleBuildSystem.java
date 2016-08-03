@@ -18,6 +18,8 @@ import com.demonwav.mcdev.util.Util;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.application.ApplicationConfiguration;
+import com.intellij.execution.application.ApplicationConfigurationType;
 import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
 import com.intellij.externalSystem.JavaProjectData;
@@ -305,15 +307,19 @@ public class GradleBuildSystem extends BuildSystem {
                 // Set the Forge client and server run configs
                 if (configuration.type == PlatformType.FORGE) {
                     // Client run config
-                    ExternalSystemRunConfiguration runClientConfiguration = new ExternalSystemRunConfiguration(
-                            GradleConstants.SYSTEM_ID,
+                    ApplicationConfiguration runClientConfiguration = new ApplicationConfiguration(
+                            module.getName() + " run client",
                             project,
-                            gradleType.getConfigurationFactories()[0],
-                            module.getName() + " run client"
+                            ApplicationConfigurationType.getInstance()
                     );
-                    runClientConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
-                    runClientConfiguration.getSettings().setExecutionName(module.getName() + " run client");
-                    runClientConfiguration.getSettings().setTaskNames(Collections.singletonList("runClient"));
+                    File runningDir = new File(project.getBasePath(), "run");
+                    if (!runningDir.exists()) {
+                        runningDir.mkdir();
+                    }
+                    Module mainModule = ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main");
+                    runClientConfiguration.setWorkingDirectory(project.getBasePath() + File.separator + "run");
+                    runClientConfiguration.setMainClassName("GradleStart");
+                    runClientConfiguration.setModule(mainModule != null ? mainModule : module);
                     RunnerAndConfigurationSettings clientSettings = new RunnerAndConfigurationSettingsImpl(
                             RunManagerImpl.getInstanceImpl(project),
                             runClientConfiguration,
@@ -322,20 +328,17 @@ public class GradleBuildSystem extends BuildSystem {
                     clientSettings.setActivateToolWindowBeforeRun(true);
                     clientSettings.setSingleton(true);
                     RunManager.getInstance(project).addConfiguration(clientSettings, false);
-                    // Set run client as the default run config
                     RunManager.getInstance(project).setSelectedConfiguration(clientSettings);
 
-
                     // Server run config
-                    ExternalSystemRunConfiguration runServerConfiguration = new ExternalSystemRunConfiguration(
-                            GradleConstants.SYSTEM_ID,
+                    ApplicationConfiguration runServerConfiguration = new ApplicationConfiguration(
+                            module.getName() + " run server",
                             project,
-                            gradleType.getConfigurationFactories()[0],
-                            module.getName() + " run server"
+                            ApplicationConfigurationType.getInstance()
                     );
-                    runServerConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
-                    runServerConfiguration.getSettings().setExecutionName(module.getName() + " run server");
-                    runServerConfiguration.getSettings().setTaskNames(Collections.singletonList("runServer"));
+                    runServerConfiguration.setMainClassName("GradleStartServer");
+                    runServerConfiguration.setWorkingDirectory(project.getBasePath() + File.separator + "run");
+                    runServerConfiguration.setModule(mainModule != null ? mainModule : module);
                     RunnerAndConfigurationSettings serverSettings = new RunnerAndConfigurationSettingsImpl(
                             RunManagerImpl.getInstanceImpl(project),
                             runServerConfiguration,
