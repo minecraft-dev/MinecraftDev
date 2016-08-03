@@ -61,7 +61,7 @@ public class ListenerEventAnnotator implements Annotator {
         }
 
         PsiCodeBlock methodCodeBlock = method.getBody();
-        if(methodCodeBlock == null) {
+        if (methodCodeBlock == null) {
             return;
         }
         PsiStatement[] methodBodyStatements = methodCodeBlock.getStatements();
@@ -70,19 +70,19 @@ public class ListenerEventAnnotator implements Annotator {
             PsiAnnotation eventHandler = null;
 
             for (PsiAnnotation psiAnnotation : method.getModifierList().getAnnotations()) {
-                if(psiAnnotation.getQualifiedName().contains("EventHandler")) {
+                if (psiAnnotation.getQualifiedName().contains("EventHandler")) {
                     eventHandler = psiAnnotation;
                 }
             }
 
-            if(statement.getText().contains("isCancelled()")) {
+            if (statement.getText().contains("isCancelled()")) {
                 PsiAnnotationMemberValue ignoreCancelled = eventHandler.findAttributeValue("ignoreCancelled");
-                if(ignoreCancelled == null
+                if (ignoreCancelled == null
                         || !(((PsiLiteral)ignoreCancelled).getValue() instanceof Boolean)
                         || ((PsiLiteral)ignoreCancelled).getValue() == null) {
                     return;
                 }
-                if((Boolean)((PsiLiteral)ignoreCancelled).getValue()) {
+                if ((Boolean)((PsiLiteral)ignoreCancelled).getValue()) {
                     holder.createWarningAnnotation(statement, "Redundant call to isCancelled(). EventHandler annotated to ignore cancelled.");
                 }
             }
