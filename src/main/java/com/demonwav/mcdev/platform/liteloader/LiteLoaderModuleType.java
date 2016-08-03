@@ -4,14 +4,13 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.util.CommonColors;
-
 import com.intellij.openapi.module.Module;
+import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.Icon;
 
 public class LiteLoaderModuleType extends AbstractModuleType<LiteLoaderModule> {
 
@@ -58,5 +57,10 @@ public class LiteLoaderModuleType extends AbstractModuleType<LiteLoaderModule> {
     @Override
     public LiteLoaderModule generateModule(Module module) {
         return new LiteLoaderModule(module);
+    }
+
+    @Override
+    public boolean eventIgnoresCancelled(PsiMethod method) {
+        return false; // Not the same as other modules. Events aren't really a thing.
     }
 }

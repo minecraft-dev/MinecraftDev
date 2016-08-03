@@ -7,15 +7,14 @@ import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bungeecord.generation.BungeeCordEventGenerationPanel;
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants;
 import com.demonwav.mcdev.util.CommonColors;
-
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.List;
-
-import javax.swing.Icon;
 
 public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
 
@@ -73,5 +72,10 @@ public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
     @Override
     public EventGenerationPanel getEventGenerationPanel(@NotNull PsiClass chosenClass) {
         return new BungeeCordEventGenerationPanel(chosenClass);
+    }
+
+    @Override
+    public boolean eventIgnoresCancelled(PsiMethod method) {
+        return false; // Nothing in @EventHandler bungeecord set to ignore cancelled events.
     }
 }

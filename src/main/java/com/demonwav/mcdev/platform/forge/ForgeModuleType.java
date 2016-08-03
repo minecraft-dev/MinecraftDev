@@ -5,17 +5,14 @@ import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.util.CommonColors;
 import com.demonwav.mcdev.util.Util;
-
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.plugins.groovy.lang.psi.util.PsiUtil;
 
+import javax.swing.*;
 import java.util.List;
-
-import javax.swing.Icon;
 
 public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
 
@@ -69,6 +66,11 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
     @Override
     public ForgeModule generateModule(Module module) {
         return new ForgeModule(module);
+    }
+
+    @Override
+    public boolean eventIgnoresCancelled(PsiMethod method) {
+        return false; // Cancel means cancelled for Forge events -McJty, #minecraftforge on esper
     }
 
     @NotNull

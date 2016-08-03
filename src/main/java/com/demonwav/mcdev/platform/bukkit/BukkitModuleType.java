@@ -7,16 +7,14 @@ import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitEventGenerationPanel;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
 import com.demonwav.mcdev.util.CommonColors;
-
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
-import com.intellij.psi.PsiClass;
+import com.intellij.psi.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.List;
-
-import javax.swing.Icon;
 
 public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
 
@@ -79,5 +77,18 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
     @Override
     public EventGenerationPanel getEventGenerationPanel(@NotNull PsiClass chosenClass) {
         return new BukkitEventGenerationPanel(chosenClass);
+    }
+
+    @Override
+    public boolean eventIgnoresCancelled(PsiMethod method) {
+        PsiLiteral literal = null;
+
+        for (PsiAnnotation annotation : method.getModifierList().getAnnotations()) {
+            if (annotation.getQualifiedName().contains("EventHandler")) {
+                literal = (PsiLiteral) annotation.findAttributeValue("ignoreCancelled");
+            }
+        }
+        return !(literal == null || literal.getValue() == null || !(literal.getValue() instanceof Boolean)) && (boolean) literal.getValue();
+
     }
 }
