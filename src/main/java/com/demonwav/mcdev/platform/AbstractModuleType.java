@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
+
 import com.intellij.codeInspection.ex.EntryPointsManager;
 import com.intellij.codeInspection.ex.EntryPointsManagerBase;
 import com.intellij.openapi.module.Module;
@@ -11,11 +12,12 @@ import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.Icon;
 
 public abstract class AbstractModuleType<T extends AbstractModule> {
 

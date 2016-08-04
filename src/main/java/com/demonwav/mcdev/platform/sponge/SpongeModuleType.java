@@ -5,6 +5,7 @@ import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.util.CommonColors;
 import com.demonwav.mcdev.util.Util;
+
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiAnnotation;
@@ -14,8 +15,9 @@ import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.List;
+
+import javax.swing.Icon;
 
 public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
 

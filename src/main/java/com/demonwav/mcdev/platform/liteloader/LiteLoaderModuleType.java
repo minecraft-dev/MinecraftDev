@@ -4,13 +4,15 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.util.CommonColors;
+
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
+
+import javax.swing.Icon;
 
 public class LiteLoaderModuleType extends AbstractModuleType<LiteLoaderModule> {
 

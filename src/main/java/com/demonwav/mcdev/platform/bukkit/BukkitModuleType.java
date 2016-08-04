@@ -7,14 +7,19 @@ import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitEventGenerationPanel;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
 import com.demonwav.mcdev.util.CommonColors;
+
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiLiteral;
+import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.List;
+
+import javax.swing.Icon;
 
 public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
 
