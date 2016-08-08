@@ -147,7 +147,7 @@ public class MinecraftProjectCreator {
                 break;
             case PAPER:
                 buildRepository.setId("destroystokyo-repo");
-                buildRepository.setUrl("https://repo.destroystokyo.com/content/groups/public/");
+                buildRepository.setUrl("https://repo.destroystokyo.com/repository/maven-public/");
                 buildDependency.setGroupId("com.destroystokyo.paper");
                 buildDependency.setArtifactId("paper-api");
                 buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
