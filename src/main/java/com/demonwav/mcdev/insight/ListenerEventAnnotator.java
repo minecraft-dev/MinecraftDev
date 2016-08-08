@@ -8,13 +8,16 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiCodeBlock;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiStatement;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypeElement;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
@@ -66,6 +69,44 @@ public class ListenerEventAnnotator implements Annotator {
         }
         if (!contains) {
             return;
+        }
+
+        PsiCodeBlock methodCodeBlock = method.getBody();
+        if (methodCodeBlock == null) {
+            return;
+        }
+        PsiStatement[] methodBodyStatements = methodCodeBlock.getStatements();
+        for (PsiStatement statement : methodBodyStatements) {
+
+            PsiAnnotation eventHandler = null;
+
+            for (AbstractModuleType<?> moduleType : moduleTypes) {
+                final List<String> listenerAnnotations = moduleType.getListenerAnnotations();
+                for (String listenerAnnotation : listenerAnnotations) {
+                    PsiAnnotation annotation = modifierList.findAnnotation(listenerAnnotation);
+                    if (annotation != null) {
+                        eventHandler = annotation;
+                    }
+                }
+            }
+
+            if (statement.getText().contains("isCancelled()")) {
+                for (AbstractModuleType<?> moduleType : moduleTypes) {
+                    final boolean ignores = moduleType.eventIgnoresCancelled(method);
+                    if(ignores) {
+                        holder.createWarningAnnotation(statement, "Redundant call to isCancelled(), method annotated to ignore cancelled.");
+                    }
+                }
+//                PsiAnnotationMemberValue ignoreCancelled = eventHandler.findAttributeValue("ignoreCancelled");
+//                if (ignoreCancelled == null
+//                        || !(((PsiLiteral)ignoreCancelled).getValue() instanceof Boolean)
+//                        || ((PsiLiteral)ignoreCancelled).getValue() == null) {
+//                    return;
+//                }
+//                if ((Boolean)((PsiLiteral)ignoreCancelled).getValue()) {
+//                    holder.createWarningAnnotation(statement, "Redundant call to isCancelled(). EventHandler annotated to ignore cancelled.");
+//                }
+            }
         }
 
         final PsiParameter[] parameters = method.getParameterList().getParameters();

@@ -11,6 +11,7 @@ import com.demonwav.mcdev.util.CommonColors;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -73,5 +74,10 @@ public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
     @Override
     public EventGenerationPanel getEventGenerationPanel(@NotNull PsiClass chosenClass) {
         return new BungeeCordEventGenerationPanel(chosenClass);
+    }
+
+    @Override
+    public boolean eventIgnoresCancelled(PsiMethod method) {
+        return false; // Nothing in @EventHandler bungeecord set to ignore cancelled events.
     }
 }

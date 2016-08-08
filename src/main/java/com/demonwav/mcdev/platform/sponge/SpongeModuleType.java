@@ -10,7 +10,10 @@ import com.demonwav.mcdev.util.Util;
 
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
+import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -74,6 +77,24 @@ public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
     @Override
     public SpongeModule generateModule(Module module) {
         return new SpongeModule(module);
+    }
+
+    // I have a feeling this is the wrong way to do things, but oh well!
+    @Override
+    public boolean eventIgnoresCancelled(PsiMethod method) {
+
+        PsiReferenceExpression expression = null;
+
+        for (PsiAnnotation annotation : method.getModifierList().getAnnotations()) {
+            if(annotation.getQualifiedName().contains("IsCancelled")) {
+                expression = ((PsiReferenceExpression)annotation.findAttributeValue("value"));
+            }
+        }
+
+        if(expression == null || expression.getQualifiedName() == null) {
+            return false;
+        }
+        return expression.getQualifiedName().equals("Tristate.TRUE") || expression.getQualifiedName().equals("Tristate.UNDEFINED");
     }
 
     @Override
