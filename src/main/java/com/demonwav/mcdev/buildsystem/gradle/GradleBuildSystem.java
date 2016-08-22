@@ -314,6 +314,7 @@ public class GradleBuildSystem extends BuildSystem {
                     );
                     File runningDir = new File(project.getBasePath(), "run");
                     if (!runningDir.exists()) {
+                        //noinspection ResultOfMethodCallIgnored
                         runningDir.mkdir();
                     }
                     Module mainModule = ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main");
@@ -337,6 +338,7 @@ public class GradleBuildSystem extends BuildSystem {
                             ApplicationConfigurationType.getInstance()
                     );
                     runServerConfiguration.setMainClassName("GradleStartServer");
+                    runServerConfiguration.setProgramParameters("nogui");
                     runServerConfiguration.setWorkingDirectory(project.getBasePath() + File.separator + "run");
                     runServerConfiguration.setModule(mainModule != null ? mainModule : module);
                     RunnerAndConfigurationSettings serverSettings = new RunnerAndConfigurationSettingsImpl(
