@@ -19,6 +19,12 @@
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p><p>
         Recent changes:
+        <h3>alpha-0.1.10</h3>
+        <ul>
+          <li>Update Paper nexus repository URL</li>
+          <li>Mitigate several ArrayIndexOutOfBounds issues with Gradle imports</li>
+          <li>Add some extra error logging for Gradle imports when they fail</li>
+        </ul>
         <h3>alpha-0.1.9</h3>
         <ul>
           <li>Bukkit, BungeeCord, Sponge, and Forge event listener generation added (in Alt-Insert menu)</li>
