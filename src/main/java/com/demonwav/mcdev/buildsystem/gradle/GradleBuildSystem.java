@@ -56,7 +56,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProgressListener;
@@ -96,6 +98,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class GradleBuildSystem extends BuildSystem {
+
+    private final static Logger logger = Logger.getLogger(GradleBuildSystem.class);
 
     @Nullable
     private VirtualFile buildGradle;
@@ -395,10 +399,24 @@ public class GradleBuildSystem extends BuildSystem {
                         Project project = module.getProject();
 
                         // root directory is the first content root
-                        rootDirectory = ModuleRootManager.getInstance(module).getContentRoots()[0];
+                        ModuleRootManager manager = ModuleRootManager.getInstance(module);
+                        if (manager.getContentRoots().length == 0) {
+                            // TODO handle import failed
+                            logger.error("GradleBuildSystem import FAILED: no content roots found");
+                            thisRef.finishImport.set(true);
+                            promise.setResult(thisRef);
+                            return;
+                        }
+
+                        rootDirectory = manager.getContentRoots()[0];
                         buildGradle = rootDirectory.findChild("build.gradle");
 
                         if (rootDirectory.getCanonicalPath() == null || buildGradle == null) {
+                            logger.error("GradleBuildSystem import FAILED: Root Directory or Build Gradle paths null");
+                            logger.error("rootDirectory: " + rootDirectory);
+                            logger.error("buildGradle: " + buildGradle);
+                            thisRef.finishImport.set(true);
+                            promise.setResult(thisRef);
                             return;
                         }
 
@@ -424,6 +442,9 @@ public class GradleBuildSystem extends BuildSystem {
                                 }).collect(Collectors.toList());
 
                         if (project.getBasePath() == null) {
+                            logger.error("GradleBuildSystem import FAILED: Project base path null");
+                            thisRef.finishImport.set(true);
+                            promise.setResult(thisRef);
                             return;
                         }
 
@@ -453,12 +474,18 @@ public class GradleBuildSystem extends BuildSystem {
                             ExternalProjectInfo info = ProjectDataManager.getInstance()
                                 .getExternalProjectData(project, GradleConstants.SYSTEM_ID, project.getBasePath());
                             if (info == null) {
+                                logger.error("GradleBuildSystem import FAILED: External project info null");
+                                thisRef.finishImport.set(true);
+                                promise.setResult(thisRef);
                                 return;
                             }
 
                             DataNode<ProjectData> node = info.getExternalProjectStructure();
 
                             if (node == null) {
+                                logger.error("GradleBuildSystem import FAILED: Project data node null");
+                                thisRef.finishImport.set(true);
+                                promise.setResult(thisRef);
                                 return;
                             }
 
@@ -467,6 +494,10 @@ public class GradleBuildSystem extends BuildSystem {
                                 if (child.getData() instanceof LibraryData) {
                                     LibraryData data = (LibraryData) child.getData();
                                     String[] parts = data.getExternalName().split(":");
+                                    if (parts.length < 3) {
+                                        logger.warn("LibraryData held incompatible data: " + data.getExternalName());
+                                        return;
+                                    }
                                     String groupId = parts[0];
                                     String artifactId = parts[1];
                                     String version = parts[2];
