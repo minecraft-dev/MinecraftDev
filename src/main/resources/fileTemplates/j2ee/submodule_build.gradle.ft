@@ -6,7 +6,7 @@ dependencies {
 }
 
 processResources {
-    from('src/main/resources') {
+    from(sourceSets.main.resources.srcDirs) {
         expand 'version': project.version
     }
 }
