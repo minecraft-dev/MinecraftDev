@@ -100,22 +100,12 @@ val initPropTask = task("initProp") {
     baseEnglishProp.writeText(comment + baseUsEnglish.readText())
 }
 
-val cleanPluginTask = task("cleanPlugin") {
-    if (intellijSandboxDirectory == null) {
-        return@task
-    }
-
-    val pluginDir = File(intellijSandboxDirectory, "plugins/Minecraft Development")
-
-    pluginDir.deleteRecursively()
-}
-
 afterEvaluate {
     val buildPlugin = getTasksByName("buildPlugin", false)
     val runIdea = getTasksByName("runIdea", false)
 
-    buildPlugin.forEach { it.dependsOn.addAll(listOf(initPropTask, cleanPluginTask)) }
-    runIdea.forEach { it.dependsOn.addAll(listOf(initPropTask, cleanPluginTask)) }
+    buildPlugin.forEach { it.dependsOn.addAll(listOf(initPropTask)) }
+    runIdea.forEach { it.dependsOn.addAll(listOf(initPropTask)) }
 }
 
 defaultTasks("buildPlugin")
