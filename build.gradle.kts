@@ -51,7 +51,7 @@ repositories {
 }
 
 dependencies {
-    "compile"("org.scala-lang:scala-library:2.11.8")
+    compile("org.scala-lang:scala-library:2.11.8")
     compile(kotlinModule("stdlib-jre8"))
 }
 
