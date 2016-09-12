@@ -47,6 +47,15 @@ Developers
 - [**@gabizou** - Gabriel Harris-Rouquette](https://github.com/gabizou)
 - [**@kashike**](https://github.com/kashike)
 
+Issues
+------
+
+We have a few ambiguous labels on the issues page, so here are their definitions:
+* `platform: all` - All platforms supported by this plugin (`Bukkit`, `Sponge`, `BungeeCord`, `Forge`, and `LiteLoader`)
+* `platform: main` - Multiple platforms, containing at least `Bukkit`, `Sponge`, and `Forge`. It can contain either of the other two as
+  well, as long as it doesn't contain all of them. In that case, `platform: all` would be more appropriate, of course.
+* `platform: multi` - Any issue with multiple platforms that doesn't fall under the first two categories.
+
 License
 -------
 
