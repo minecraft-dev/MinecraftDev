@@ -6,11 +6,9 @@ import org.jetbrains.intellij.IntelliJPluginExtension
 import java.io.File
 
 buildscript {
-    extensions.add("kotlin_version", "1.0.3")
-    extensions.add("scala_version", "2.11.8")
-
     repositories {
         mavenCentral()
+        gradleScriptKotlin()
         maven {
             setUrl("https://plugins.gradle.org/m2/")
         }
@@ -20,7 +18,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${extensions.getByName("kotlin_version")}")
+        classpath(kotlinModule("gradle-plugin"))
         classpath("gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.1.10")
     }
 }
@@ -49,11 +47,12 @@ version = pluginVersion
 
 repositories {
     mavenCentral()
+    gradleScriptKotlin()
 }
 
 dependencies {
-    "compile"("org.scala-lang:scala-library:${extensions.getByName("scala_version")}")
-    "compile"("org.jetbrains.kotlin:kotlin-stdlib:${extensions.getByName("kotlin_version")}")
+    "compile"("org.scala-lang:scala-library:2.11.8")
+    compile(kotlinModule("stdlib-jre8"))
 }
 
 var intellijSandboxDirectory: String? = null
