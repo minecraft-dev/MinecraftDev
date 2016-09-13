@@ -1,0 +1,66 @@
+plugins {
+    id "org.jetbrains.intellij" version "0.0.43"
+}
+
+apply plugin: 'idea'
+apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'java'
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+intellij {
+    // IntelliJ IDEA dependency
+    version project.hasProperty('intellijVersion') ? project.getProperty('intellijVersion') : ideaVersion
+    // Bundled plugin dependencies
+    plugins = ['maven', 'gradle', 'Groovy', 'yaml']
+    pluginName 'Minecraft Development'
+    updateSinceUntilBuild false
+
+    downloadSources Boolean.valueOf(downloadIdeaSources)
+    sandboxDirectory project.rootDir.canonicalPath + "/.sandbox"
+}
+
+idea {
+    project {
+        jdkName = 1.8
+        languageLevel = 1.8
+    }
+
+    module {
+        excludeDirs += file('.sandbox');
+    }
+}
+
+group 'com.demonwav.minecraft-dev'
+version pluginVersion
+
+task initProp << {
+    def baseProp = new File('src/main/resources/messages.MinecraftDevelopment_en.properties')
+    def baseEnglishProp = new File('src/main/resources/messages.MinecraftDevelopment.properties')
+
+    def comment = '''# Do not manually edit this file
+# This file is automatically copied from messages.MinecraftDevelopment_en_US.properties at build time
+'''
+
+    def baseUsEnglishProp = new File('src/main/resources/messages.MinecraftDevelopment_en_US.properties')
+
+    baseProp.write comment + baseUsEnglishProp.text
+    baseEnglishProp.write comment + baseUsEnglishProp.text
+}
+
+// The intellij gui form creator doesn't seem to be reliable unless we delete the plugin contents each time...
+task cleanPlugin << {
+    def pluginDir = new File(intellij.sandboxDirectory, 'plugins/Minecraft Development')
+
+    pluginDir.deleteDir()
+}
+
+afterEvaluate {
+    buildPlugin.dependsOn initProp, cleanPlugin
+    runIdea.dependsOn initProp, cleanPlugin
+}
