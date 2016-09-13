@@ -61,6 +61,6 @@ task cleanPlugin << {
 }
 
 afterEvaluate {
-    buildPlugin.dependsOn initProp, cleanPlugin
-    runIdea.dependsOn initProp, cleanPlugin
+    buildPlugin.dependsOn initProp
+    runIdea.dependsOn initProp
 }
