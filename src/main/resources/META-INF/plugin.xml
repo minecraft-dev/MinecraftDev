@@ -280,5 +280,14 @@
                 description="Generates a new Event Listener for the appropriate platform">
             <add-to-group group-id="GenerateGroup" anchor="last"/>
         </action>
+
+        <group id="MinecraftDevToolsGroup" popup="true" text="Minecraft Development">
+            <add-to-group group-id="ToolsMenu"/>
+        </group>
+        <action class="com.demonwav.mcdev.update.ConfigurePluginUpdatesAction" id="MinecraftDevConfigureUpdates"
+                text="Configure Minecraft Development Plugin Updates"
+                description="Configure automatic updates for the Minecraft Development plugin">
+            <add-to-group group-id="MinecraftDevToolsGroup"/>
+        </action>
     </actions>
 </idea-plugin>
