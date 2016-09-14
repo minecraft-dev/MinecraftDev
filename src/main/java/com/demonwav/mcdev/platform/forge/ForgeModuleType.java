@@ -9,9 +9,7 @@ import com.demonwav.mcdev.util.Util;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.plugins.groovy.lang.psi.util.PsiUtil;
 
 import java.util.List;
 

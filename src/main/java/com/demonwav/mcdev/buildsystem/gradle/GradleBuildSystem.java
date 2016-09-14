@@ -56,7 +56,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.gradle.tooling.BuildLauncher;

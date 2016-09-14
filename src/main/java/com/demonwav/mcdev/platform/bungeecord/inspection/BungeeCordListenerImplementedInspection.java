@@ -1,6 +1,5 @@
 package com.demonwav.mcdev.platform.bungeecord.inspection;
 
-import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants;
 import com.demonwav.mcdev.util.McPsiUtil;
 

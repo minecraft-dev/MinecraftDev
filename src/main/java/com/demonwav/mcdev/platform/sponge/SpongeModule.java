@@ -8,7 +8,6 @@ import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData;
-import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.JavaPsiFacade;
