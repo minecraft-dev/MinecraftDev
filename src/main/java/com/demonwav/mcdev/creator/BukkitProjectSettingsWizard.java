@@ -137,7 +137,7 @@ public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
         this.settings.setAuthors(this.authorsField.getText());
         this.settings.website = websiteField.getText();
         this.settings.prefix = prefixField.getText();
-        this.settings.loadOrder = this.loadOrderBox.getSelectedIndex() == 0 ? LoadOrder.POST_WORLD : LoadOrder.STARTUP;
+        this.settings.loadOrder = this.loadOrderBox.getSelectedIndex() == 0 ? LoadOrder.POSTWORLD : LoadOrder.STARTUP;
         this.settings.setLoadBefore(this.loadBeforeField.getText());
         this.settings.setDependencies(this.dependField.getText());
         this.settings.setSoftDependencies(this.softDependField.getText());

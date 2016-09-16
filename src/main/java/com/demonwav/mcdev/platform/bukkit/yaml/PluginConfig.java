@@ -39,7 +39,7 @@ public class PluginConfig {
      *
      * @see LoadOrder
      */
-    @NotNull private LoadOrder load = LoadOrder.POST_WORLD;
+    @NotNull private LoadOrder load = LoadOrder.POSTWORLD;
     /**
      * A list of plugins the plugin should load before.
      *

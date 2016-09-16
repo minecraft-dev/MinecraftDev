@@ -72,7 +72,7 @@ public class BukkitTemplate extends AbstractTemplate {
             properties.setProperty("HAS_PREFIX", "true");
         }
 
-        if (settings.loadOrder != LoadOrder.POST_WORLD) {
+        if (settings.loadOrder != LoadOrder.POSTWORLD) {
             properties.setProperty("LOAD", LoadOrder.STARTUP.name());
             properties.setProperty("HAS_LOAD", "true");
         }
