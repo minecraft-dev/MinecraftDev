@@ -60,6 +60,8 @@ public class MavenBuildSystem extends BuildSystem {
     @Override
     public void create(@NotNull Project project, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
         rootDirectory.refresh(false, true);
+        createDirectories();
+
         Util.runWriteTask(() -> {
             try {
                 sourceDirectories = Collections.singletonList(VfsUtil.createDirectories(rootDirectory.getPath() + "/src/main/java"));

@@ -773,23 +773,6 @@ public class GradleBuildSystem extends BuildSystem {
         addBuildGradleDependencies(project, buildGradlePsi, true);
     }
 
-    private void createDirectories() {
-        createDirectories(rootDirectory);
-    }
-
-    private void createDirectories(@NotNull VirtualFile root) {
-        Util.runWriteTask(() -> {
-            try {
-                sourceDirectories = Collections.singletonList(VfsUtil.createDirectories(root.getPath() + "/src/main/java"));
-                resourceDirectories = Collections.singletonList(VfsUtil.createDirectories(root.getPath() + "/src/main/resources"));
-                testSourcesDirectories = Collections.singletonList(VfsUtil.createDirectories(root.getPath() + "/src/test/java"));
-                testResourceDirectories = Collections.singletonList(VfsUtil.createDirectories(root.getPath() + "/src/test/resources"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
     private void setupDecompWorkspace(@NotNull Project project, @NotNull ProgressIndicator indicator) {
         // We need to setup decomp workspace first
         // We'll use gradle tooling to run it

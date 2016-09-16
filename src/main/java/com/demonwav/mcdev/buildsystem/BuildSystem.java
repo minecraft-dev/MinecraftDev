@@ -3,6 +3,7 @@ package com.demonwav.mcdev.buildsystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+import com.demonwav.mcdev.util.Util;
 
 import com.google.common.base.Objects;
 import com.intellij.openapi.module.Module;
@@ -10,12 +11,15 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.concurrency.Promise;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -281,6 +285,23 @@ public abstract class BuildSystem {
             }
         }
         return null;
+    }
+
+    protected void createDirectories() {
+        createDirectories(rootDirectory);
+    }
+
+    protected void createDirectories(@NotNull VirtualFile root) {
+        Util.runWriteTask(() -> {
+            try {
+                sourceDirectories = Collections.singletonList(VfsUtil.createDirectories(root.getPath() + "/src/main/java"));
+                resourceDirectories = Collections.singletonList(VfsUtil.createDirectories(root.getPath() + "/src/main/resources"));
+                testSourcesDirectories = Collections.singletonList(VfsUtil.createDirectories(root.getPath() + "/src/test/java"));
+                testResourceDirectories = Collections.singletonList(VfsUtil.createDirectories(root.getPath() + "/src/test/resources"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
