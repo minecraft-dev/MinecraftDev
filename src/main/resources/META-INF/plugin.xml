@@ -18,7 +18,11 @@
         Alpha release, not many features, may break. More features to come. Please report issues to
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p><p>
-        Recent changes:\
+        Recent changes:
+        <h3>alpha-0.2.1</h3>
+        <ul>
+          <li>Fix Bukkit POSTWORLD, it was POST_WORLD and was causing issues</li>
+        </ul>
         <h3>alpha-0.2.0</h3>
         <ul>
           <li>Added ability to change the update channel of the plugin, to allow testing of specific features before they are released</li>
