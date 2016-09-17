@@ -2,6 +2,11 @@ Minecraft Development IntelliJ Plugin [![forthebadge](http://forthebadge.com/ima
 ==========================================================================================================================================
 [![GitHub Stars](https://img.shields.io/github/stars/DemonWav/MinecraftDevIntelliJ.svg?style=flat-square)](https://github.com/DemonWav/MinecraftDevIntelliJ/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/DemonWav/MinecraftDevIntelliJ.svg?style=flat-square)](https://github.com/DemonWav/MinecraftDevIntelliJ/issues) [![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDevIntelliJ_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDevIntelliJ_Build) [![Current Release](https://img.shields.io/badge/release-alpha--0.2.1-lightgrey.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 
+Info and Documentation
+----------------------
+
+Visit [https://minecraftdev.org](https://minecraftdev.org) for information about the project, change logs, features, FAQs, and chat.
+
 Installation
 ------------
 
