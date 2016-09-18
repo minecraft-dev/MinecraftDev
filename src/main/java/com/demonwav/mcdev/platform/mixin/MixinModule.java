@@ -14,7 +14,7 @@ import javax.swing.Icon;
 public class MixinModule extends AbstractModule {
 
     public MixinModule(@NotNull Module module) {
-        this.module = module;
+        super(module);
         this.buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
             if (!buildSystem.isImported()) {
