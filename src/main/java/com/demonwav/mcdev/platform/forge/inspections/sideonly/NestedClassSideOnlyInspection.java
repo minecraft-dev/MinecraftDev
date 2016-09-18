@@ -1,4 +1,4 @@
-package com.demonwav.mcdev.platform.forge.sideonly;
+package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;

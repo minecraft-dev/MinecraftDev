@@ -1,7 +1,8 @@
-package com.demonwav.mcdev.platform.forge.sideonly;
+package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
 import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.platform.forge.ForgeConstants;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 
 import com.intellij.openapi.module.Module;
@@ -24,10 +25,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings("WeakerAccess")
 public final class SideOnlyUtil {
 
-    @NotNull public static final String SIDE_ONLY = "net.minecraftforge.fml.relauncher.SideOnly";
-    @NotNull public static final String SIDE = "net.minecraftforge.fml.relauncher.Side";
-    @NotNull public static final String SIDED_PROXY = "net.minecraftforge.fml.common.SidedProxy";
-
     public static boolean beginningCheck(@NotNull PsiElement element) {
         // Don't check if this is disabled
         if (!MinecraftSettings.getInstance().isEnableSideOnlyChecks()) {
@@ -49,7 +46,7 @@ public final class SideOnlyUtil {
 
     @NotNull
     public static String normalize(@NotNull String text) {
-        if (text.startsWith(SIDE)) {
+        if (text.startsWith(ForgeConstants.SIDE_ANNOTATION)) {
             // We chop off the "net.minecraftforge.fml.relauncher." part here
             return text.substring(text.lastIndexOf(".") - 4);
         }
@@ -58,7 +55,7 @@ public final class SideOnlyUtil {
 
     @NotNull
     public static Side checkMethod(@NotNull PsiMethod method) {
-        PsiAnnotation methodAnnotation = method.getModifierList().findAnnotation(SIDE_ONLY);
+        PsiAnnotation methodAnnotation = method.getModifierList().findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
         if (methodAnnotation == null) {
             // It's not annotated, which would be invalid if the element was annotated
             // (which, if we've gotten this far, is true)
@@ -135,7 +132,7 @@ public final class SideOnlyUtil {
 
         // Check for the annotation, if it's not there then we return none, but this is
         // usually irrelevant for classes
-        PsiAnnotation annotation = modifierList.findAnnotation(SIDE_ONLY);
+        PsiAnnotation annotation = modifierList.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
         if (annotation == null) {
             return new Pair<>(Side.NONE, psiClass);
         }
@@ -154,7 +151,7 @@ public final class SideOnlyUtil {
     public static Side checkField(@NotNull PsiFieldImpl field) {
         // We check if this field has the @SideOnly annotation we are looking for
         // If it doesn't, we aren't worried about it
-        PsiAnnotation annotation = field.getModifierList().findAnnotation(SideOnlyUtil.SIDE_ONLY);
+        PsiAnnotation annotation = field.getModifierList().findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
         if (annotation == null) {
             return Side.NONE;
         }
@@ -190,5 +187,12 @@ public final class SideOnlyUtil {
             }
         }
         return Side.NONE;
+    }
+
+    @NotNull
+    public static Object[] getSubArray(@NotNull Object[] infos) {
+        final Object[] objects = new Object[2];
+        System.arraycopy(infos, 1, objects, 0, 2);
+        return objects;
     }
 }

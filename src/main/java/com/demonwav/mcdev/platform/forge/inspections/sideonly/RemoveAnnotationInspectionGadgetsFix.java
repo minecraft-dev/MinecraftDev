@@ -1,4 +1,6 @@
-package com.demonwav.mcdev.platform.forge.sideonly;
+package com.demonwav.mcdev.platform.forge.inspections.sideonly;
+
+import com.demonwav.mcdev.platform.forge.ForgeConstants;
 
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
@@ -27,7 +29,7 @@ public abstract class RemoveAnnotationInspectionGadgetsFix extends InspectionGad
             return;
         }
 
-        PsiAnnotation annotation = list.findAnnotation(SideOnlyUtil.SIDE_ONLY);
+        PsiAnnotation annotation = list.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
         if (annotation == null) {
             return;
         }

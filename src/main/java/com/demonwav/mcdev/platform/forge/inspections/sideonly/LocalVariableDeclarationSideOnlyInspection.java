@@ -1,4 +1,4 @@
-package com.demonwav.mcdev.platform.forge.sideonly;
+package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
 import com.demonwav.mcdev.util.McPsiUtil;
 
@@ -26,18 +26,8 @@ public class LocalVariableDeclarationSideOnlyInspection extends BaseInspection {
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        boolean isClassError = (boolean) infos[3];
-        boolean isContainerAnnotated = (boolean) infos[4];
-
-        if (isClassError) {
-            return "A local variable whose class is annotated with " + infos[0] + " cannot be used in a class annotated with " + infos[1];
-        } else {
-            if (isContainerAnnotated) {
-                return "A local variable whose class is annotated with " + infos[0] + " cannot be used in a method annotated with " + infos[1];
-            } else {
-                return "A local variable whose class is annotated with " + infos[0] + " cannot be used in an un-annotated method.";
-            }
-        }
+        final Error error = (Error) infos[0];
+        return error.getErrorString(SideOnlyUtil.getSubArray(infos));
     }
 
     @Nullable
@@ -77,7 +67,7 @@ public class LocalVariableDeclarationSideOnlyInspection extends BaseInspection {
         return new BaseInspectionVisitor() {
             @Override
             public void visitLocalVariable(PsiLocalVariable variable) {
-                PsiClass psiClass = McPsiUtil.getClassOfElement(variable);
+                final PsiClass psiClass = McPsiUtil.getClassOfElement(variable);
                 if (psiClass == null) {
                     return;
                 }
@@ -86,32 +76,38 @@ public class LocalVariableDeclarationSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                PsiType type = variable.getType();
+                final PsiType type = variable.getType();
 
                 if (!(type instanceof PsiClassType)) {
                     return;
                 }
 
-                PsiClassType classType = (PsiClassType) type;
+                final PsiClassType classType = (PsiClassType) type;
 
-                PsiClass variableClass = classType.resolve();
+                final PsiClass variableClass = classType.resolve();
                 if (variableClass == null) {
                     return;
                 }
 
-                Side variableSide = SideOnlyUtil.getSideForClass(variableClass);
+                final Side variableSide = SideOnlyUtil.getSideForClass(variableClass);
                 if (variableSide == Side.NONE || variableSide == Side.INVALID) {
                     return;
                 }
 
-                Side containingClassSide = SideOnlyUtil.getSideForClass(psiClass);
-                Side methodSide = SideOnlyUtil.checkElementInMethod(variable);
+                final Side containingClassSide = SideOnlyUtil.getSideForClass(psiClass);
+                final Side methodSide = SideOnlyUtil.checkElementInMethod(variable);
 
                 boolean classAnnotated = false;
 
                 if (containingClassSide != Side.NONE && containingClassSide != Side.INVALID) {
                     if (variableSide != containingClassSide) {
-                        registerVariableError(variable, variableSide.getName(), containingClassSide.getName(), variableClass, true, true);
+                        registerVariableError(
+                                variable,
+                                Error.VAR_CROSS_ANNOTATED_CLASS,
+                                variableSide.getName(),
+                                containingClassSide.getName(),
+                                variableClass
+                        );
                     }
                     classAnnotated = true;
                 }
@@ -123,13 +119,48 @@ public class LocalVariableDeclarationSideOnlyInspection extends BaseInspection {
                 if (variableSide != methodSide) {
                     if (methodSide == Side.NONE) {
                         if (!classAnnotated) {
-                            registerVariableError(variable, variableSide.getName(), methodSide.getName(), variableClass, false, false);
+                            registerVariableError(
+                                    variable,
+                                    Error.VAR_UNANNOTATED_METHOD,
+                                    variableSide.getName(),
+                                    methodSide.getName(),
+                                    variableClass
+                            );
                         }
                     } else {
-                        registerVariableError(variable, variableSide.getName(), methodSide.getName(), variableClass, false, true);
+                        registerVariableError(
+                                variable,
+                                Error.VAR_CROSS_ANNOTATED_METHOD,
+                                variableSide.getName(),
+                                methodSide.getName(),
+                                variableClass
+                        );
                     }
                 }
             }
         };
+    }
+
+    enum Error {
+        VAR_CROSS_ANNOTATED_CLASS {
+            @Override
+            String getErrorString(Object... infos) {
+                return null;
+            }
+        },
+        VAR_CROSS_ANNOTATED_METHOD {
+            @Override
+            String getErrorString(Object... infos) {
+                return null;
+            }
+        },
+        VAR_UNANNOTATED_METHOD {
+            @Override
+            String getErrorString(Object... infos) {
+                return null;
+            }
+        };
+
+        abstract String getErrorString(Object... infos);
     }
 }

@@ -1,4 +1,4 @@
-package com.demonwav.mcdev.platform.forge.sideonly;
+package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
 import com.demonwav.mcdev.util.McPsiUtil;
 
@@ -26,17 +26,8 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        boolean normal = (boolean) infos[3];
-        boolean matchContainingClass = (boolean) infos[4];
-
-
-        if (matchContainingClass) {
-            return "Field with type annotation " + infos[1] + " cannot be declared in an un-annotated class";
-        } else if (normal) {
-            return "Field annotated with " + infos[0] + " cannot be declared inside a class annotated with " + infos[1] + ".";
-        } else {
-            return "Field with type annotation " + infos[1] + " cannot be declared as " + infos[0] + ".";
-        }
+        final Error error = (Error) infos[0];
+        return error.getErrorString(SideOnlyUtil.getSubArray(infos));
     }
 
     @Nullable
@@ -50,7 +41,7 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        PsiField field = (PsiField) infos[2];
+        final PsiField field = (PsiField) infos[3];
 
         if (field.isWritable()) {
             return new RemoveAnnotationInspectionGadgetsFix() {
@@ -81,7 +72,7 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                PsiClass psiClass = McPsiUtil.getClassOfElement(field);
+                final PsiClass psiClass = McPsiUtil.getClassOfElement(field);
                 if (psiClass == null) {
                     return;
                 }
@@ -90,45 +81,68 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                Side fieldSide = SideOnlyUtil.checkField((PsiFieldImpl) field);
+                final Side fieldSide = SideOnlyUtil.checkField((PsiFieldImpl) field);
                 if (fieldSide == Side.INVALID) {
                     return;
                 }
 
-                Side classSide = SideOnlyUtil.getSideForClass(psiClass);
+                final Side classSide = SideOnlyUtil.getSideForClass(psiClass);
 
                 if (fieldSide != Side.NONE && fieldSide != classSide) {
                     if (classSide != Side.NONE && classSide != Side.INVALID) {
-                        registerFieldError(field, fieldSide.getName(), classSide.getName(), field, true, false);
+                        registerFieldError(field, Error.CLASS_CROSS_ANNOTATED, fieldSide.getName(), classSide.getName(), field);
                     } else if (classSide != Side.NONE) {
-                        registerFieldError(field, fieldSide.getName(), classSide.getName(), field, true, false);
+                        registerFieldError(field, Error.CLASS_UNANNOTATED, fieldSide.getName(), null, field);
                     }
+                }
+
+                if (fieldSide == Side.NONE) {
+                    return;
                 }
 
                 if (!(field.getType() instanceof PsiClassType)) {
                     return;
                 }
 
-                PsiClassType type = (PsiClassType) field.getType();
-                PsiClass fieldClass = type.resolve();
+                final PsiClassType type = (PsiClassType) field.getType();
+                final PsiClass fieldClass = type.resolve();
                 if (fieldClass == null) {
                     return;
                 }
 
-                Side fieldClassSide = SideOnlyUtil.getSideForClass(fieldClass);
+                final Side fieldClassSide = SideOnlyUtil.getSideForClass(fieldClass);
 
                 if (fieldClassSide == Side.NONE || fieldClassSide == Side.INVALID) {
                     return;
                 }
 
-                if (fieldClassSide != fieldSide && fieldSide != Side.NONE) {
-                    registerFieldError(field, fieldSide.getName(), fieldClassSide.getName(), field, false, false);
-                }
-
-                if (fieldClassSide != classSide) {
-                    registerFieldError(field, fieldSide.getName(), fieldClassSide.getName(), field, false, true);
+                if (fieldClassSide != fieldSide) {
+                    registerFieldError(field, Error.FIELD_CROSS_ANNOTATED, fieldClassSide.getName(), fieldSide.getName(), field);
                 }
             }
         };
+    }
+
+    enum Error {
+        CLASS_UNANNOTATED {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Field with type annotation " + infos[1] + " cannot be declared in an un-annotated class";
+            }
+        },
+        CLASS_CROSS_ANNOTATED {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Field annotated with " + infos[0] + " cannot be declared inside a class annotated with " + infos[1] + ".";
+            }
+        },
+        FIELD_CROSS_ANNOTATED {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Field with type annotation " + infos[0] + " cannot be declared as " + infos[1] + ".";
+            }
+        };
+
+        abstract String getErrorString(Object... infos);
     }
 }
