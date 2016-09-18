@@ -108,7 +108,7 @@ public class PluginUpdater {
         pluginNode.setName(plugin.getName());
         pluginNode.setDescription(plugin.getDescription());
 
-        if (VersionComparatorUtil.compare(pluginNode.getVersion(), PluginUtil.getPluginVersion()) <= 0) {
+        if (pluginNode.getVersion().equals(PluginUtil.getPluginVersion())) {
             return new PluginUpdateStatus.LatestVersionInstalled();
         }
 
@@ -134,10 +134,9 @@ public class PluginUpdater {
     }
 
     private PluginUpdateStatus updateIfNotLatest(IdeaPluginDescriptor plugin, String host) {
-        if (VersionComparatorUtil.compare(plugin.getVersion(), PluginUtil.getPluginVersion()) <= 0) {
+        if (plugin.getVersion().equals(PluginUtil.getPluginVersion())) {
             return new PluginUpdateStatus.LatestVersionInstalled();
         }
-
         return new PluginUpdateStatus.Update(plugin, host);
     }
 
