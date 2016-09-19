@@ -40,7 +40,7 @@ public class LocalVariableDeclarationSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        PsiClass variableClass = (PsiClass) infos[2];
+        final PsiClass variableClass = (PsiClass) infos[2];
 
         if (variableClass.isWritable()) {
             return new RemoveAnnotationInspectionGadgetsFix() {
@@ -102,11 +102,11 @@ public class LocalVariableDeclarationSideOnlyInspection extends BaseInspection {
                 if (containingClassSide != Side.NONE && containingClassSide != Side.INVALID) {
                     if (variableSide != containingClassSide) {
                         registerVariableError(
-                                variable,
-                                Error.VAR_CROSS_ANNOTATED_CLASS,
-                                variableSide.getName(),
-                                containingClassSide.getName(),
-                                variableClass
+                            variable,
+                            Error.VAR_CROSS_ANNOTATED_CLASS,
+                            variableSide.getName(),
+                            containingClassSide.getName(),
+                            variableClass
                         );
                     }
                     classAnnotated = true;
@@ -120,20 +120,20 @@ public class LocalVariableDeclarationSideOnlyInspection extends BaseInspection {
                     if (methodSide == Side.NONE) {
                         if (!classAnnotated) {
                             registerVariableError(
-                                    variable,
-                                    Error.VAR_UNANNOTATED_METHOD,
-                                    variableSide.getName(),
-                                    methodSide.getName(),
-                                    variableClass
+                                variable,
+                                Error.VAR_UNANNOTATED_METHOD,
+                                variableSide.getName(),
+                                methodSide.getName(),
+                                variableClass
                             );
                         }
                     } else {
                         registerVariableError(
-                                variable,
-                                Error.VAR_CROSS_ANNOTATED_METHOD,
-                                variableSide.getName(),
-                                methodSide.getName(),
-                                variableClass
+                            variable,
+                            Error.VAR_CROSS_ANNOTATED_METHOD,
+                            variableSide.getName(),
+                            methodSide.getName(),
+                            variableClass
                         );
                     }
                 }

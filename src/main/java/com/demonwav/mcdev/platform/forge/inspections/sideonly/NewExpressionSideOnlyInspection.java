@@ -43,7 +43,7 @@ public class NewExpressionSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        PsiClass psiClass = (PsiClass) infos[3];
+        final PsiClass psiClass = (PsiClass) infos[1];
 
         if (psiClass.isWritable()) {
             return new RemoveAnnotationInspectionGadgetsFix() {
@@ -74,12 +74,12 @@ public class NewExpressionSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                PsiJavaCodeReferenceElement element = expression.getClassReference();
+                final PsiJavaCodeReferenceElement element = expression.getClassReference();
                 if (element == null) {
                     return;
                 }
 
-                PsiElement psiElement = element.resolve();
+                final PsiElement psiElement = element.resolve();
                 if (psiElement == null) {
                     return;
                 }
@@ -88,9 +88,9 @@ public class NewExpressionSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                PsiClass psiClass = (PsiClass) psiElement;
+                final PsiClass psiClass = (PsiClass) psiElement;
 
-                List<Pair<Side, PsiClass>> list = SideOnlyUtil.checkClassHierarchy(psiClass);
+                final List<Pair<Side, PsiClass>> list = SideOnlyUtil.checkClassHierarchy(psiClass);
 
                 Side classSide = Side.NONE;
 
@@ -108,26 +108,26 @@ public class NewExpressionSideOnlyInspection extends BaseInspection {
                 }
 
                 // Check the class(es) the element is in
-                PsiClass containingClass = McPsiUtil.getClassOfElement(expression);
+                final PsiClass containingClass = McPsiUtil.getClassOfElement(expression);
                 if (containingClass == null) {
                     return;
                 }
 
-                Side containingClassSide = SideOnlyUtil.getSideForClass(containingClass);
+                final Side containingClassSide = SideOnlyUtil.getSideForClass(containingClass);
                 // Check the method the element is in
-                Side methodSide = SideOnlyUtil.checkElementInMethod(expression);
+                final Side methodSide = SideOnlyUtil.checkElementInMethod(expression);
 
                 boolean classAnnotated = false;
 
                 if (containingClassSide != Side.NONE && containingClassSide != Side.INVALID) {
                     if (containingClassSide != classSide) {
-                        registerError(expression, classSide.getName(), containingClassSide.getName(), 1, offender);
+                        registerError(expression, offender);
                     }
                     classAnnotated = true;
                 } else {
                     if (methodSide == Side.INVALID) {
                         // It's not in a method
-                        registerError(expression, classSide.getName(), containingClassSide.getName(), 1, offender);
+                        registerError(expression, offender);
                         return;
                     }
                 }
@@ -137,10 +137,10 @@ public class NewExpressionSideOnlyInspection extends BaseInspection {
                     if (methodSide == Side.NONE) {
                         // If the class is properly annotated the method doesn't need to also be annotated
                         if (!classAnnotated) {
-                            registerError(expression, classSide.getName(), null, 0, offender);
+                            registerError(expression, offender);
                         }
                     } else {
-                        registerError(expression, classSide.getName(), methodSide.getName(), 0, offender);
+                        registerError(expression, offender);
                     }
                 }
             }

@@ -19,17 +19,17 @@ public abstract class RemoveAnnotationInspectionGadgetsFix extends InspectionGad
 
     @Override
     protected void doFix(Project project, ProblemDescriptor descriptor) {
-        PsiModifierListOwner owner = getListOwner();
+        final PsiModifierListOwner owner = getListOwner();
         if (owner == null) {
             return;
         }
 
-        PsiModifierList list = owner.getModifierList();
+        final PsiModifierList list = owner.getModifierList();
         if (list == null) {
             return;
         }
 
-        PsiAnnotation annotation = list.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
+        final PsiAnnotation annotation = list.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
         if (annotation == null) {
             return;
         }

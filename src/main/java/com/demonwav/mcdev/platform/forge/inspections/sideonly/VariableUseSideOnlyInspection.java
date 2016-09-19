@@ -29,32 +29,8 @@ public class VariableUseSideOnlyInspection extends BaseInspection {
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        int i = (int) infos[2];
-        boolean inherited = (boolean) infos[4];
-
-        if (i == 0) {
-            if (infos[1] == null) {
-                if (!inherited) {
-                    return "Variable annotated with " + infos[0] + " cannot be referenced in an un-annotated method.";
-                } else {
-                    return "Variable declared in a class annotated with " + infos[0] + " cannot be referenced in an un-annotated method.";
-                }
-            } else {
-                if (!inherited) {
-                    return "Variable annotated with " + infos[0] + " cannot be referenced in a method annotated with " + infos[1] + ".";
-                } else {
-                    return "Variable declared in a class annotated with " + infos[0] +
-                        " cannot be referenced in a method annotated with " + infos[1] + ".";
-                }
-            }
-        } else {
-            if (!inherited) {
-                return "Variable annotated with " + infos[0] + " cannot be referenced in a class annotated with " + infos[1] + ".";
-            } else {
-                return "Variable declared in a class annotated with " + infos[0] +
-                    " cannot be referenced in a class annotated with " + infos[1] + ".";
-            }
-        }
+        final Error error = (Error) infos[0];
+        return error.getErrorString(SideOnlyUtil.getSubArray(infos));
     }
 
     @Nullable
@@ -96,7 +72,7 @@ public class VariableUseSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                PsiElement declaration = expression.resolve();
+                final PsiElement declaration = expression.resolve();
 
                 // We can't really do anything unless this is a PsiFieldImpl, which it should be, but to be safe,
                 // check the type before we make the cast
@@ -104,18 +80,18 @@ public class VariableUseSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                PsiFieldImpl field = (PsiFieldImpl) declaration;
+                final PsiFieldImpl field = (PsiFieldImpl) declaration;
                 Side elementSide = SideOnlyUtil.checkField(field);
 
                 // Check the class(es) the element is declared in
-                PsiClass declarationContainingClass = McPsiUtil.getClassOfElement(declaration);
+                final PsiClass declarationContainingClass = McPsiUtil.getClassOfElement(declaration);
                 if (declarationContainingClass == null) {
                     return;
                 }
 
-                List<Pair<Side, PsiClass>> declarationClassHierarchySides = SideOnlyUtil.checkClassHierarchy(declarationContainingClass);
+                final List<Pair<Side, PsiClass>> declarationClassHierarchySides = SideOnlyUtil.checkClassHierarchy(declarationContainingClass);
 
-                Side declarationClassSide = SideOnlyUtil.getFirstSide(declarationClassHierarchySides);
+                final Side declarationClassSide = SideOnlyUtil.getFirstSide(declarationClassHierarchySides);
 
                 // The element inherits the @SideOnly from it's parent class if it doesn't explicitly set it itself
                 boolean inherited = false;
@@ -129,37 +105,128 @@ public class VariableUseSideOnlyInspection extends BaseInspection {
                 }
 
                 // Check the class(es) the element is in
-                PsiClass containingClass = McPsiUtil.getClassOfElement(expression);
+                final PsiClass containingClass = McPsiUtil.getClassOfElement(expression);
                 if (containingClass == null) {
                     return;
                 }
 
-                Side classSide = SideOnlyUtil.getSideForClass(containingClass);
+                final Side classSide = SideOnlyUtil.getSideForClass(containingClass);
 
                 boolean classAnnotated = false;
 
                 if (classSide != Side.NONE && classSide != Side.INVALID) {
                     if (classSide != elementSide) {
-                        registerError(expression.getElement(), elementSide.getName(), classSide.getName(), 1, field, inherited);
+                        if (inherited) {
+                            registerError(
+                                expression.getElement(),
+                                Error.ANNOTATED_CLASS_VAR_IN_CROSS_ANNOTATED_CLASS_METHOD,
+                                elementSide.getName(),
+                                classSide.getName(),
+                                field
+                            );
+                        } else {
+                            registerError(
+                                expression.getElement(),
+                                Error.ANNOTATED_VAR_IN_CROSS_ANNOTATED_CLASS_METHOD,
+                                elementSide.getName(),
+                                classSide.getName(),
+                                field
+                            );
+                        }
                     }
                     classAnnotated = true;
                 }
 
                 // Check the method the element is in
-                Side methodSide = SideOnlyUtil.checkElementInMethod(expression);
+                final Side methodSide = SideOnlyUtil.checkElementInMethod(expression);
 
                 // Put error on for method
                 if (elementSide != methodSide && methodSide != Side.INVALID) {
                     if (methodSide == Side.NONE) {
                         // If the class is properly annotated the method doesn't need to also be annotated
                         if (!classAnnotated) {
-                            registerError(expression.getElement(), elementSide.getName(), null, 0, field, inherited);
+                            if (inherited) {
+                                registerError(
+                                    expression.getElement(),
+                                    Error.ANNOTATED_CLASS_VAR_IN_UNANNOTATED_METHOD,
+                                    elementSide.getName(),
+                                    null,
+                                    field
+                                );
+                            } else {
+                                registerError(
+                                    expression.getElement(),
+                                    Error.ANNOTATED_VAR_IN_UNANNOTATED_METHOD,
+                                    elementSide.getName(),
+                                    null,
+                                    field
+                                );
+                            }
                         }
                     } else {
-                        registerError(expression.getElement(), elementSide.getName(), methodSide.getName(), 0, field, inherited);
+                        if (inherited) {
+                            registerError(
+                                expression.getElement(),
+                                Error.ANNOTATED_CLASS_VAR_IN_CROSS_ANNOTATED_METHOD,
+                                elementSide.getName(),
+                                methodSide.getName(),
+                                field
+                            );
+                        } else {
+                            registerError(
+                                expression.getElement(),
+                                Error.ANNOTATED_VAR_IN_CROSS_ANNOTATED_METHOD,
+                                elementSide.getName(),
+                                methodSide.getName(),
+                                field
+                            );
+                        }
                     }
                 }
             }
         };
+    }
+
+    enum Error {
+        ANNOTATED_VAR_IN_UNANNOTATED_METHOD {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Variable annotated with " + infos[0] + " cannot be referenced in an un-annotated method.";
+            }
+        },
+        ANNOTATED_CLASS_VAR_IN_UNANNOTATED_METHOD {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Variable declared in a class annotated with " + infos[0] + " cannot be referenced in an un-annotated method.";
+            }
+        },
+        ANNOTATED_VAR_IN_CROSS_ANNOTATED_METHOD {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Variable annotated with " + infos[0] + " cannot be referenced in a method annotated with " + infos[1] + ".";
+            }
+        },
+        ANNOTATED_CLASS_VAR_IN_CROSS_ANNOTATED_METHOD {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Variable declared in a class annotated with " + infos[0] +
+                    " cannot be referenced in a method annotated with " + infos[1] + ".";
+            }
+        },
+        ANNOTATED_VAR_IN_CROSS_ANNOTATED_CLASS_METHOD {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Variable annotated with " + infos[0] + " cannot be referenced in a class annotated with " + infos[1] + ".";
+            }
+        },
+        ANNOTATED_CLASS_VAR_IN_CROSS_ANNOTATED_CLASS_METHOD {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Variable declared in a class annotated with " + infos[0] +
+                    " cannot be referenced in a class annotated with " + infos[1] + ".";
+            }
+        };
+
+        abstract String getErrorString(Object... infos);
     }
 }

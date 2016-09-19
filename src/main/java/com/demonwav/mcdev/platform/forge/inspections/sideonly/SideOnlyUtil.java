@@ -32,7 +32,7 @@ public final class SideOnlyUtil {
         }
 
         // We need the module to get the MinecraftModule
-        Module module = ModuleUtilCore.findModuleForPsiElement(element);
+        final Module module = ModuleUtilCore.findModuleForPsiElement(element);
         if (module == null) {
             return false;
         }
@@ -40,7 +40,7 @@ public final class SideOnlyUtil {
         // Check that the MinecraftModule
         //   1. Exists
         //   2. Is a ForgeModuleType
-        MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
+        final MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
         return minecraftModule != null && minecraftModule.isOfType(ForgeModuleType.getInstance());
     }
 
@@ -55,7 +55,7 @@ public final class SideOnlyUtil {
 
     @NotNull
     public static Side checkMethod(@NotNull PsiMethod method) {
-        PsiAnnotation methodAnnotation = method.getModifierList().findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
+        final PsiAnnotation methodAnnotation = method.getModifierList().findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
         if (methodAnnotation == null) {
             // It's not annotated, which would be invalid if the element was annotated
             // (which, if we've gotten this far, is true)
@@ -63,7 +63,7 @@ public final class SideOnlyUtil {
         }
 
         // Check the value of the annotation
-        PsiAnnotationMemberValue methodValue = methodAnnotation.findAttributeValue("value");
+        final PsiAnnotationMemberValue methodValue = methodAnnotation.findAttributeValue("value");
         if (methodValue == null) {
             // The annotation has no value yet, IntelliJ will give it's own error because a value is required
             return Side.INVALID;
@@ -79,7 +79,7 @@ public final class SideOnlyUtil {
         // method this element is in. If it's not in a method it won't find one and the PsiMethod will be null
         PsiMethod method = null;
         while (method == null && element.getParent() != null) {
-            PsiElement parent = element.getParent();
+            final PsiElement parent = element.getParent();
 
             if (parent instanceof PsiMethod) {
                 method = (PsiMethod) parent;
@@ -102,7 +102,7 @@ public final class SideOnlyUtil {
 
     @NotNull
     public static List<Pair<Side, PsiClass>> checkClassHierarchy(@NotNull PsiClass psiClass) {
-        List<PsiClass> classList = new LinkedList<>();
+        final List<PsiClass> classList = new LinkedList<>();
         classList.add(psiClass);
 
         PsiElement parent = psiClass;
@@ -125,21 +125,21 @@ public final class SideOnlyUtil {
 
     @NotNull
     public static Pair<Side, PsiClass> checkClass(@NotNull PsiClass psiClass) {
-        PsiModifierList modifierList = psiClass.getModifierList();
+        final PsiModifierList modifierList = psiClass.getModifierList();
         if (modifierList == null) {
             return new Pair<>(Side.NONE, psiClass);
         }
 
         // Check for the annotation, if it's not there then we return none, but this is
         // usually irrelevant for classes
-        PsiAnnotation annotation = modifierList.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
+        final PsiAnnotation annotation = modifierList.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
         if (annotation == null) {
             return new Pair<>(Side.NONE, psiClass);
         }
 
         // Check the value on the annotation. If it's not there, IntelliJ will throw
         // it's own error
-        PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
+        final PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
         if (value == null) {
             return new Pair<>(Side.INVALID, psiClass);
         }
@@ -151,14 +151,14 @@ public final class SideOnlyUtil {
     public static Side checkField(@NotNull PsiFieldImpl field) {
         // We check if this field has the @SideOnly annotation we are looking for
         // If it doesn't, we aren't worried about it
-        PsiAnnotation annotation = field.getModifierList().findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
+        final PsiAnnotation annotation = field.getModifierList().findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
         if (annotation == null) {
             return Side.NONE;
         }
 
         // The value may not necessarily be set, but that will give an error by default as "value" is a
         // required value for @SideOnly
-        PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
+        final PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
         if (value == null) {
             return Side.INVALID;
         }

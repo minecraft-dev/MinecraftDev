@@ -40,7 +40,7 @@ public class NestedClassSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        PsiClass psiClass = (PsiClass) infos[0];
+        final PsiClass psiClass = (PsiClass) infos[0];
 
         if (psiClass.isWritable()) {
             return new RemoveAnnotationInspectionGadgetsFix() {
@@ -71,7 +71,7 @@ public class NestedClassSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                PsiIdentifier identifier = aClass.getNameIdentifier();
+                final PsiIdentifier identifier = aClass.getNameIdentifier();
                 if (identifier == null) {
                     return;
                 }
@@ -80,7 +80,7 @@ public class NestedClassSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                List<Pair<Side, PsiClass>> classHierarchyList = SideOnlyUtil.checkClassHierarchy(aClass);
+                final List<Pair<Side, PsiClass>> classHierarchyList = SideOnlyUtil.checkClassHierarchy(aClass);
 
                 // The class lists are ordered from lowest to highest in the hierarchy - that is the first element in the list
                 // is the most nested class, and the last element in the list is the top level class

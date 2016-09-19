@@ -42,7 +42,7 @@ public class MethodSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        PsiMethod method = (PsiMethod) infos[2];
+        final PsiMethod method = (PsiMethod) infos[2];
 
         if (method.isWritable()) {
             return new RemoveAnnotationInspectionGadgetsFix() {
@@ -69,7 +69,7 @@ public class MethodSideOnlyInspection extends BaseInspection {
         return new BaseInspectionVisitor() {
             @Override
             public void visitMethod(PsiMethod method) {
-                PsiClass psiClass = McPsiUtil.getClassOfElement(method);
+                final PsiClass psiClass = McPsiUtil.getClassOfElement(method);
                 if (psiClass == null) {
                     return;
                 }
@@ -78,12 +78,12 @@ public class MethodSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                Side methodSide = SideOnlyUtil.checkMethod(method);
+                final Side methodSide = SideOnlyUtil.checkMethod(method);
                 if (methodSide == Side.INVALID || methodSide == Side.NONE) {
                     return;
                 }
 
-                List<Pair<Side, PsiClass>> classHierarchySides = SideOnlyUtil.checkClassHierarchy(psiClass);
+                final List<Pair<Side, PsiClass>> classHierarchySides = SideOnlyUtil.checkClassHierarchy(psiClass);
 
                 for (Pair<Side, PsiClass> classHierarchySide : classHierarchySides) {
                     if (classHierarchySide.first != Side.NONE && classHierarchySide.first != Side.INVALID) {
