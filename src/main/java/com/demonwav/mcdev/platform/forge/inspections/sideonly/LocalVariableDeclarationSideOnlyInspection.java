@@ -145,19 +145,19 @@ public class LocalVariableDeclarationSideOnlyInspection extends BaseInspection {
         VAR_CROSS_ANNOTATED_CLASS {
             @Override
             String getErrorString(Object... infos) {
-                return null;
+                return "A local variable whose class is annotated with " + infos[0] + " cannot be used in a class annotated with " + infos[1];
             }
         },
         VAR_CROSS_ANNOTATED_METHOD {
             @Override
             String getErrorString(Object... infos) {
-                return null;
+                return "A local variable whose class is annotated with " + infos[0] + " cannot be used in a method annotated with " + infos[1];
             }
         },
         VAR_UNANNOTATED_METHOD {
             @Override
             String getErrorString(Object... infos) {
-                return null;
+                return "A local variable whose class is annotated with " + infos[0] + " cannot be used in an un-annotated method.";
             }
         };
 
