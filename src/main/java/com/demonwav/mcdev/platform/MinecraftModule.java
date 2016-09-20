@@ -11,7 +11,9 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -194,5 +196,10 @@ public class MinecraftModule {
 
     public boolean isEventGenAvailable() {
         return modules.keySet().stream().anyMatch(AbstractModuleType::isEventGenAvailable);
+    }
+
+    @Contract(value = "null -> false", pure = true)
+    public boolean shouldShowPluginIcon(@Nullable PsiElement element) {
+        return getModules().stream().filter(m -> m.shouldShowPluginIcon(element)).findAny().isPresent();
     }
 }

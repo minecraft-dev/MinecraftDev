@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
-import com.demonwav.mcdev.platform.forge.ForgeConstants;
+import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
 
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;

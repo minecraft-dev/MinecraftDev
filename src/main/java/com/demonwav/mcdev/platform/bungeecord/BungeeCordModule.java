@@ -13,15 +13,23 @@ import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiTypesUtil;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
 
 import javax.swing.Icon;
 
@@ -131,5 +139,29 @@ public class BungeeCordModule extends AbstractModule {
         annotation.setDeclaredAttributeValue("priority", value);
 
         return method;
+    }
+
+    @Override
+    @Contract(value = "null -> false", pure = true)
+    public boolean shouldShowPluginIcon(@Nullable PsiElement element) {
+        if (!(element instanceof PsiIdentifier)) {
+            return false;
+        }
+
+        if (!(element.getParent() instanceof PsiClass)) {
+            return false;
+        }
+
+        final Project project = element.getProject();
+
+        final PsiClass psiClass = (PsiClass) element.getParent();
+
+        final PsiClass pluginClass = JavaPsiFacade.getInstance(project)
+            .findClass(BungeeCordConstants.PLUGIN, GlobalSearchScope.allScope(project));
+
+        return pluginClass != null &&
+            Arrays.stream(psiClass.getExtendsListTypes())
+                .filter(c -> c.equals(PsiTypesUtil.getClassType(pluginClass)))
+                .findAny().isPresent();
     }
 }

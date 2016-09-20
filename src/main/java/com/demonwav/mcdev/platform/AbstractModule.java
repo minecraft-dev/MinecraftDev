@@ -7,7 +7,9 @@ import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,5 +74,10 @@ public abstract class AbstractModule {
                                                  @NotNull String chosenName,
                                                  @Nullable GenerationData data) {
         return null;
+    }
+
+    @Contract(value = "null -> false", pure = true)
+    public boolean shouldShowPluginIcon(@Nullable PsiElement element) {
+        return false;
     }
 }

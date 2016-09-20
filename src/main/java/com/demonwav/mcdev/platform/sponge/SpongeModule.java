@@ -8,6 +8,7 @@ import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData;
+import com.demonwav.mcdev.platform.sponge.util.SpongeConstants;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.JavaPsiFacade;
@@ -15,12 +16,15 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.search.GlobalSearchScope;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -125,5 +129,22 @@ public class SpongeModule extends AbstractModule {
         }
 
         return method;
+    }
+
+    @Override
+    @Contract(value = "null -> false", pure = true)
+    public boolean shouldShowPluginIcon(@Nullable PsiElement element) {
+        if (!(element instanceof PsiIdentifier)) {
+            return false;
+        }
+
+        if (!(element.getParent() instanceof PsiClass)) {
+            return false;
+        }
+
+        final PsiClass psiClass = (PsiClass) element.getParent();
+
+        final PsiModifierList modifierList = psiClass.getModifierList();
+        return modifierList != null && modifierList.findAnnotation(SpongeConstants.PLUGIN_ANNOTATION) != null;
     }
 }

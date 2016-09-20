@@ -19,14 +19,20 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiTypesUtil;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
 
 import javax.swing.Icon;
 
@@ -184,6 +190,30 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         }
 
         return newMethod;
+    }
+
+    @Override
+    @Contract(value = "null -> false", pure = true)
+    public boolean shouldShowPluginIcon(@Nullable PsiElement element) {
+        if (!(element instanceof PsiIdentifier)) {
+            return false;
+        }
+
+        if (!(element.getParent() instanceof PsiClass)) {
+            return false;
+        }
+
+        final Project project = element.getProject();
+
+        final PsiClass psiClass = (PsiClass) element.getParent();
+
+        final PsiClass javaPluginClass = JavaPsiFacade.getInstance(project)
+            .findClass(BukkitConstants.JAVA_PLUGIN, GlobalSearchScope.allScope(project));
+
+        return javaPluginClass != null &&
+            Arrays.stream(psiClass.getExtendsListTypes())
+                .filter(c -> c.equals(PsiTypesUtil.getClassType(javaPluginClass)))
+                .findAny().isPresent();
     }
 
     @Override

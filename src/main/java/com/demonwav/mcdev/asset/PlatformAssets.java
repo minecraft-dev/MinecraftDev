@@ -38,6 +38,7 @@ public final class PlatformAssets {
     @NotNull public static final Icon LITELOADER_ICON_2X = loadIcon("/assets/platform/icons/LiteLoader@2x.png");
 
     @NotNull public static final Icon LISTENER = loadIcon("/assets/platform/icons/listener/EventListener_dark.png");
+    @NotNull public static final Icon PLUGIN = loadIcon("/assets/platform/icons/plugin.png");
 
     private PlatformAssets() {
     }

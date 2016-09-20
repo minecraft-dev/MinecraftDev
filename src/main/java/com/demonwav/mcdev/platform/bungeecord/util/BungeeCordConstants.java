@@ -9,6 +9,7 @@ public class BungeeCordConstants {
     @NotNull public static final String BUNGEECORD_LISTENER_CLASS = "net.md_5.bungee.api.plugin.Listener";
     @NotNull public static final String BUNGEECORD_CHAT_COLOR_CLASS = "net.md_5.bungee.api.ChatColor";
     @NotNull public static final String BUNGEECORD_EVENT_CLASS = "net.md_5.bungee.api.plugin.Event";
+    @NotNull public static final String PLUGIN = "net.md_5.bungee.api.plugin.Plugin";
 
     private BungeeCordConstants() {
     }

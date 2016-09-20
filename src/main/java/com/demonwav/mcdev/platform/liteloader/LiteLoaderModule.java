@@ -7,8 +7,11 @@ import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
 
@@ -46,5 +49,12 @@ public class LiteLoaderModule extends AbstractModule {
 
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "";
+    }
+
+    @Override
+    public boolean shouldShowPluginIcon(@Nullable PsiElement element) {
+        return element instanceof PsiIdentifier &&
+            element.getParent() instanceof PsiClass &&
+            element.getText().startsWith("LiteMod");
     }
 }
