@@ -152,7 +152,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
             } else {
                 title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_DARK_2X);
             }
-            title.setText("<html><font size=\"5\">Sponge Forge Settings</font></html>");
+            title.setText("<html><font size=\"5\">SpongeForge Settings</font></html>");
             generateDocsCheckbox.setVisible(true);
 
             minecraftVersionLabel.setText("    Sponge API");
