@@ -1,5 +1,5 @@
-group '${GROUP_ID}'
-version '${PLUGIN_VERSION}'
+group pluginGroup
+version pluginVersion
 
 apply plugin: 'java'
 

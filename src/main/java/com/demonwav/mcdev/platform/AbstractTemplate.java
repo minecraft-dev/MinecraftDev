@@ -20,20 +20,30 @@ public abstract class AbstractTemplate {
 
     @Nullable
     public static String applyBuildGradleTemplate(@NotNull Project project,
-                                                @NotNull String groupId,
-                                                @NotNull String pluginVersion,
-                                                @NotNull String buildVersion) {
+                                                  @NotNull VirtualFile file,
+                                                  @NotNull String groupId,
+                                                  @NotNull String pluginVersion,
+                                                  @NotNull String buildVersion) {
 
-        Properties properties = new Properties();
-        properties.setProperty("BUILD_VERSION", buildVersion);
-        properties.setProperty("PLUGIN_VERSION", pluginVersion);
-        properties.setProperty("GROUP_ID", groupId);
+        Properties buildGradleProps = new Properties();
+        buildGradleProps.setProperty("BUILD_VERSION", buildVersion);
 
         FileTemplateManager manager = FileTemplateManager.getInstance(project);
         FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUILD_GRADLE_TEMPLATE);
 
+        Properties gradleProps = new Properties();
+        gradleProps .setProperty("PLUGIN_VERSION", pluginVersion);
+        gradleProps .setProperty("GROUP_ID", groupId);
+
+        // create gradle.properties
         try {
-            return template.getText(properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.GRADLE_PROPERTIES_TEMPLATE, gradleProps);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            return template.getText(buildGradleProps);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,14 +52,24 @@ public abstract class AbstractTemplate {
 
     public static void applyMultiModuleBuildGradleTemplate(@NotNull Project project,
                                                            @NotNull VirtualFile file,
+                                                           @NotNull VirtualFile prop,
                                                            @NotNull String groupId,
                                                            @NotNull String pluginVersion,
                                                            @NotNull String buildVersion) {
 
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", buildVersion);
-        properties.setProperty("VERSION", pluginVersion);
-        properties.setProperty("GROUP_ID", groupId);
+
+        Properties gradleProps = new Properties();
+        gradleProps .setProperty("PLUGIN_VERSION", pluginVersion);
+        gradleProps .setProperty("GROUP_ID", groupId);
+
+        // create gradle.properties
+        try {
+            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.GRADLE_PROPERTIES_TEMPLATE, gradleProps);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MULTI_MODULE_BUILD_GRADLE_TEMPLATE, properties);

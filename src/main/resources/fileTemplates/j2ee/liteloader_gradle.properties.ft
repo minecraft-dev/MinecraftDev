@@ -1,0 +1,9 @@
+#if (${VERSION})
+modVersion = ${VERSION}
+# http://maven.apache.org/guides/mini/guide-naming-conventions.html
+modGroup = ${GROUP_ID}
+#end
+modBaseName = ${ARTIFACT_ID}
+
+mcVersion = ${MC_VERSION}
+mcpMappings = ${MCP_MAPPINGS}

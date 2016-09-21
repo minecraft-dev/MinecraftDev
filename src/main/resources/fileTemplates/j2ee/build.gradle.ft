@@ -1,7 +1,7 @@
-group '${GROUP_ID}'
-version '${PLUGIN_VERSION}'
-
 apply plugin: 'java'
+
+group = pluginGroup
+version = pluginVersion
 
 sourceCompatibility = ${BUILD_VERSION}
 targetCompatibility = ${BUILD_VERSION}

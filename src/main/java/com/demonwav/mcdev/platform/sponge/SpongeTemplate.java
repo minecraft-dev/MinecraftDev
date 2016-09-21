@@ -60,6 +60,7 @@ public class SpongeTemplate extends AbstractTemplate {
 
     @Nullable
     public static String applyBuildGradleTemplate(@NotNull Project project,
+                                                  @NotNull VirtualFile file,
                                                   @NotNull String groupId,
                                                   @NotNull String pluginVersion,
                                                   @NotNull String buildVersion) {
@@ -71,6 +72,16 @@ public class SpongeTemplate extends AbstractTemplate {
 
         FileTemplateManager manager = FileTemplateManager.getInstance(project);
         FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SPONGE_BUILD_GRADLE_TEMPLATE);
+
+        Properties gradleProps = new Properties();
+        gradleProps.setProperty("GROUP_ID", groupId);
+        gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
+
+        try {
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.SPONGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         try {
             return template.getText(properties);

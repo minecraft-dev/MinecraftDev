@@ -119,11 +119,14 @@ public class GradleBuildSystem extends BuildSystem {
             ForgeProjectConfiguration settings = (ForgeProjectConfiguration) configuration;
             Util.runWriteTask(() -> {
                 try {
+                    final VirtualFile gradleProp = rootDirectory.createChildData(this, "gradle.properties");
+
                     buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
                     ForgeTemplate.applyBuildGradleTemplate(
                         project,
                         buildGradle,
+                        gradleProp,
                         groupId,
                         artifactId,
                         settings.forgeVersion,
@@ -153,11 +156,14 @@ public class GradleBuildSystem extends BuildSystem {
             LiteLoaderProjectConfiguration settings = (LiteLoaderProjectConfiguration) configuration;
             Util.runWriteTask(() -> {
                 try {
+                    final VirtualFile gradleProp = rootDirectory.createChildData(this, "gradle.properties");
+
                     buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
                     LiteLoaderTemplate.applyBuildGradleTemplate(
                         project,
                         buildGradle,
+                        gradleProp,
                         groupId,
                         artifactId,
                         settings.pluginVersion,
@@ -173,18 +179,24 @@ public class GradleBuildSystem extends BuildSystem {
             setupDecompWorkspace(project, indicator);
         } else {
             Util.runWriteTask(() -> {
-                String buildGradleText;
-                if (configuration.type == PlatformType.SPONGE) {
-                    buildGradleText = SpongeTemplate.applyBuildGradleTemplate(project, groupId, version, buildVersion);
-                } else {
-                    buildGradleText = AbstractTemplate.applyBuildGradleTemplate(project, groupId, version, buildVersion);
-                }
+                try {
+                    final VirtualFile gradleProp = rootDirectory.createChildData(this, "gradle.properties");
 
-                if (buildGradleText == null) {
-                    return;
-                }
+                    String buildGradleText;
+                    if (configuration.type == PlatformType.SPONGE) {
+                        buildGradleText = SpongeTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, version, buildVersion);
+                    } else {
+                        buildGradleText = AbstractTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, version, buildVersion);
+                    }
 
-                addBuildGradleDependencies(project, buildGradleText);
+                    if (buildGradleText == null) {
+                        return;
+                    }
+
+                    addBuildGradleDependencies(project, buildGradleText);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             });
 
             setupWrapper(project, indicator);
@@ -575,9 +587,10 @@ public class GradleBuildSystem extends BuildSystem {
             try {
                 // Write the parent files to disk so the children modules can import correctly
                 buildGradle = rootDirectory.createChildData(this, "build.gradle");
-                VirtualFile settingsGradle = rootDirectory.createChildData(this, "settings.gradle");
+                final VirtualFile gradleProp = rootDirectory.createChildData(this, "gradle.properties");
+                final VirtualFile settingsGradle = rootDirectory.createChildData(this, "settings.gradle");
 
-                AbstractTemplate.applyMultiModuleBuildGradleTemplate(project, buildGradle, groupId, version, buildVersion);
+                AbstractTemplate.applyMultiModuleBuildGradleTemplate(project, buildGradle, gradleProp, groupId, version, buildVersion);
 
                 AbstractTemplate.applySettingsGradleTemplate(project, settingsGradle, artifactId.toLowerCase(), includes);
 
@@ -639,12 +652,20 @@ public class GradleBuildSystem extends BuildSystem {
 
             ForgeProjectConfiguration settings = (ForgeProjectConfiguration) configuration;
             Util.runWriteTask(() -> {
+                final VirtualFile gradleProp;
+                try {
+                    gradleProp = rootDirectory.createChildData(this, "gradle.properties");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
                 try {
                     buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
                     ForgeTemplate.applySubmoduleBuildGradleTemplate(
                         project,
                         buildGradle,
+                        gradleProp,
                         artifactId,
                         settings.forgeVersion,
                         settings.mcpVersion,
@@ -672,14 +693,20 @@ public class GradleBuildSystem extends BuildSystem {
 
             LiteLoaderProjectConfiguration settings = (LiteLoaderProjectConfiguration) configuration;
             Util.runWriteTask(() -> {
+                final VirtualFile gradleProp;
+                try {
+                    gradleProp = rootDirectory.createChildData(this, "gradle.properties");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
                 try {
                     buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
                     LiteLoaderTemplate.applySubmoduleBuildGradleTemplate(
                         project,
                         buildGradle,
-                        groupId,
-                        artifactId,
+                        gradleProp,
                         settings.pluginVersion,
                         settings.mcVersion,
                         settings.mcpVersion,

@@ -24,13 +24,13 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.liteloader'
 apply plugin: 'org.spongepowered.mixin'
 
-version = "${VERSION}"
-group = "${GROUP_ID}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "${ARTIFACT_ID}"
+version = modVersion
+group = modGroup
+archivesBaseName = modBaseName
 
 minecraft {
-    version = "${MC_VERSION}"
-    mappings = "${MCP_MAPPINGS}"
+    version = project.mcVersion
+    mappings = project.mcpMappings
     runDir = "run"
 }
 

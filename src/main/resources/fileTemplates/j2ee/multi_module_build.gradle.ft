@@ -14,8 +14,8 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'com.github.johnrengelman.shadow'
 
-    group = '${GROUP_ID}'
-    version = '${VERSION}'
+    group project.pluginGroup
+    version project.pluginVersion
 
     sourceCompatibility = '${BUILD_VERSION}'
     targetCompatibility = '${BUILD_VERSION}'

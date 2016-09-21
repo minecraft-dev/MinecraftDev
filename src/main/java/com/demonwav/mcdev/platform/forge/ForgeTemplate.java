@@ -15,6 +15,7 @@ public class ForgeTemplate extends AbstractTemplate {
 
     public static void applyBuildGradleTemplate(@NotNull Project project,
                                                 @NotNull VirtualFile file,
+                                                @NotNull VirtualFile prop,
                                                 @NotNull String groupId,
                                                 @NotNull String artifactId,
                                                 @NotNull String forgeVersion,
@@ -23,11 +24,6 @@ public class ForgeTemplate extends AbstractTemplate {
                                                 boolean spongeForge) {
 
         Properties properties = new Properties();
-        properties.setProperty("GROUP_ID", groupId);
-        properties.setProperty("ARTIFACT_ID", artifactId);
-        properties.setProperty("PLUGIN_VERSION", pluginVersion);
-        properties.setProperty("FORGE_VERSION", forgeVersion);
-        properties.setProperty("MCP_VERSION", mcpVersion);
 
         if (spongeForge) {
             properties.setProperty("SPONGE_FORGE", "true");
@@ -38,10 +34,25 @@ public class ForgeTemplate extends AbstractTemplate {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Properties gradleProps = new Properties();
+        gradleProps.setProperty("GROUP_ID", groupId);
+        gradleProps.setProperty("ARTIFACT_ID", artifactId);
+        gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
+        gradleProps.setProperty("FORGE_VERSION", forgeVersion);
+        gradleProps.setProperty("MCP_VERSION", mcpVersion);
+
+        // create gradle.properties
+        try {
+            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void applySubmoduleBuildGradleTemplate(@NotNull Project project,
                                                          @NotNull VirtualFile file,
+                                                         @NotNull VirtualFile prop,
                                                          @NotNull String artifactId,
                                                          @NotNull String forgeVersion,
                                                          @NotNull String mcpVersion,
@@ -49,9 +60,6 @@ public class ForgeTemplate extends AbstractTemplate {
                                                          boolean spongeForge) {
 
         Properties properties = new Properties();
-        properties.setProperty("ARTIFACT_ID", artifactId);
-        properties.setProperty("FORGE_VERSION", forgeVersion);
-        properties.setProperty("MCP_VERSION", mcpVersion);
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
 
         if (spongeForge) {
@@ -60,6 +68,18 @@ public class ForgeTemplate extends AbstractTemplate {
 
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Properties gradleProps = new Properties();
+        gradleProps.setProperty("ARTIFACT_ID", artifactId);
+        gradleProps.setProperty("FORGE_VERSION", forgeVersion);
+        gradleProps.setProperty("MCP_VERSION", mcpVersion);
+
+        // create gradle.properties
+        try {
+            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
         } catch (IOException e) {
             e.printStackTrace();
         }
