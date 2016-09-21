@@ -5,6 +5,7 @@ import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.sponge.generation.SpongeEventGenerationPanel;
+import com.demonwav.mcdev.platform.sponge.util.SpongeConstants;
 import com.demonwav.mcdev.util.CommonColors;
 import com.demonwav.mcdev.util.Util;
 
@@ -25,8 +26,8 @@ public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
 
     private SpongeModuleType() {
         super("org.spongepowered", "spongeapi");
-        CommonColors.applyStandardColors(this.colorMap, "org.spongepowered.api.text.format.TextColors");
-        CommonColors.applyStandardColors(this.colorMap, "net.minecraft.util.text.TextFormatting");
+        CommonColors.applyStandardColors(this.colorMap, SpongeConstants.TEXT_COLORS);
+        CommonColors.applyStandardColors(this.colorMap, SpongeConstants.TEXT_FORMATTING);
     }
 
 
@@ -56,13 +57,13 @@ public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ImmutableList.of("org.spongepowered.api.event.Listener", "org.spongepowered.api.plugin.Plugin");
+        return ImmutableList.of(SpongeConstants.LISTENER_ANNOTATION, SpongeConstants.PLUGIN_ANNOTATION);
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of("org.spongepowered.api.event.Listener");
+        return ImmutableList.of(SpongeConstants.LISTENER_ANNOTATION);
     }
 
     @NotNull
