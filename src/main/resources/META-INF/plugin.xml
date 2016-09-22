@@ -73,6 +73,14 @@
         <!-- Sponge Annotator -->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
 
+        <!-- IsCancelled Inspection -->
+        <localInspection displayName="Useless event is cancelled check"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="false"
+                         implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
         <!-- Bukkit Inspections -->
         <localInspection displayName="Bukkit EventHandler in class not implementing Listener"
                          groupName="Minecraft Bukkit"

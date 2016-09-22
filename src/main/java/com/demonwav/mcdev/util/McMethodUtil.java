@@ -1,10 +1,18 @@
 package com.demonwav.mcdev.util;
 
 import com.intellij.psi.HierarchicalMethodSignature;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiMember;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiPrimitiveType;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.MethodSignature;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class McMethodUtil {
 
@@ -45,4 +53,29 @@ public class McMethodUtil {
         return true;
     }
 
+    @Nullable
+    @Contract(value = "null -> null", pure = true)
+    public static PsiMethod getContainingMethod(@Nullable PsiElement element) {
+        if (element == null) {
+            return null;
+        }
+
+        if (element instanceof PsiMethod) {
+            return (PsiMethod) element;
+        }
+
+        // Class, File, and Directory, if we've hit that, we're not in a method
+        // Member, if we've hit that immediately after failing the "are we a method" check, then we
+        // aren't in a method
+        if (element instanceof PsiClass || element instanceof PsiMember || element instanceof PsiFile || element instanceof PsiDirectory) {
+            return null;
+        }
+
+        final PsiElement parent = element.getParent();
+        if (parent == null) {
+            return null;
+        }
+
+        return getContainingMethod(parent);
+    }
 }

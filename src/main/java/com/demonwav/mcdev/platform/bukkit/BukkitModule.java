@@ -3,11 +3,13 @@ package com.demonwav.mcdev.platform.bukkit;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.insight.generation.GenerationData;
+import com.demonwav.mcdev.inspection.IsCancelled;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
 import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
+import com.demonwav.mcdev.util.McMethodUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.base.Objects;
@@ -21,8 +23,11 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
+import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
@@ -190,6 +195,48 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         }
 
         return newMethod;
+    }
+
+    @Nullable
+    @Override
+    public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
+        final PsiMethod method = McMethodUtil.getContainingMethod(expression);
+        if (method == null) {
+            return null;
+        }
+
+        final PsiAnnotation annotation = method.getModifierList().findAnnotation(BukkitConstants.BUKKIT_HANDLER_ANNOTATION);
+        if (annotation == null) {
+            return null;
+        }
+
+        // We are in an event method
+        final PsiAnnotationMemberValue annotationMemberValue = annotation.findAttributeValue("ignoreCancelled");
+        if (!(annotationMemberValue instanceof PsiNameValuePair)) {
+            return null;
+        }
+
+        final PsiNameValuePair pair = (PsiNameValuePair) annotationMemberValue;
+        if (!(pair.getValue() instanceof PsiLiteralExpression)) {
+            return null;
+        }
+
+        final PsiLiteralExpression value = (PsiLiteralExpression) pair.getValue();
+        if (!(value.getValue() instanceof Boolean)) {
+            return null;
+        }
+
+        final boolean ignoreCancelled = (Boolean) value.getValue();
+
+        // If we aren't ignoring cancelled then any check for event being cancelled is valid
+        if (!ignoreCancelled) {
+            return null;
+        }
+
+
+
+        final IsCancelled useless = new IsCancelled();
+        return useless;
     }
 
     @Override
