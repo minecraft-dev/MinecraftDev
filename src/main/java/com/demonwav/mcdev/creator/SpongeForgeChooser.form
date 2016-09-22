@@ -15,7 +15,7 @@
         <properties>
           <font size="22"/>
           <icon value="assets/platform/icons/SpongeForge@2x.png"/>
-          <text value="Sponge Forge"/>
+          <text value="SpongeForge"/>
         </properties>
       </component>
       <vspacer id="443bc">
