@@ -2,6 +2,7 @@ package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -23,6 +24,8 @@ public abstract class ProjectConfiguration {
     public final List<String> authors = new ArrayList<>();
     public String website = null;
     public PlatformType type = null;
+
+    public Module module;
 
     public abstract void create(@NotNull Project project, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator);
 

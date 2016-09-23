@@ -41,6 +41,8 @@ import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataMan
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -309,8 +311,8 @@ public class GradleBuildSystem extends BuildSystem {
     }
 
     @Override
-    public void finishSetup(@NotNull Module module, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
-        Project project = module.getProject();
+    public void finishSetup(@NotNull Module rootModule, @NotNull Collection<ProjectConfiguration> configurations, @NotNull ProgressIndicator indicator) {
+        Project project = rootModule.getProject();
 
         // Tell Gradle to import this project
         final ProjectDataManager projectDataManager = ServiceManager.getService(ProjectDataManager.class);
@@ -329,10 +331,18 @@ public class GradleBuildSystem extends BuildSystem {
                 GradleExternalTaskConfigurationType gradleType = GradleExternalTaskConfigurationType.getInstance();
 
                 // Set the Forge client and server run configs
-                if (configuration.type == PlatformType.FORGE) {
+                if (configurations.stream().filter(c -> c.type == PlatformType.FORGE).findAny().isPresent()) {
+                    Module mainModule;
+                    if (configurations.size() == 1) {
+                        mainModule = ModuleManager.getInstance(project).findModuleByName(rootModule.getName() + "_main");
+                    } else {
+                        mainModule = ModuleManager.getInstance(project).findModuleByName(rootModule.getName() + "-forge_main");
+                    }
+                    Module forgeModule = ModuleManager.getInstance(project).findModuleByName(rootModule.getName() + "-forge");
+
                     // Client run config
                     ApplicationConfiguration runClientConfiguration = new ApplicationConfiguration(
-                            module.getName() + " run client",
+                            (forgeModule != null ? forgeModule : rootModule).getName() + " run client",
                             project,
                             ApplicationConfigurationType.getInstance()
                     );
@@ -341,10 +351,13 @@ public class GradleBuildSystem extends BuildSystem {
                         //noinspection ResultOfMethodCallIgnored
                         runningDir.mkdir();
                     }
-                    Module mainModule = ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main");
                     runClientConfiguration.setWorkingDirectory(project.getBasePath() + File.separator + "run");
                     runClientConfiguration.setMainClassName("GradleStart");
-                    runClientConfiguration.setModule(mainModule != null ? mainModule : module);
+                    if (configurations.size() == 1) {
+                        runClientConfiguration.setModule(mainModule != null ? mainModule : rootModule);
+                    } else {
+                        runClientConfiguration.setModule(mainModule != null ? mainModule : forgeModule != null ? forgeModule : rootModule);
+                    }
                     RunnerAndConfigurationSettings clientSettings = new RunnerAndConfigurationSettingsImpl(
                             RunManagerImpl.getInstanceImpl(project),
                             runClientConfiguration,
@@ -357,14 +370,18 @@ public class GradleBuildSystem extends BuildSystem {
 
                     // Server run config
                     ApplicationConfiguration runServerConfiguration = new ApplicationConfiguration(
-                            module.getName() + " run server",
+                            rootModule.getName() + " run server",
                             project,
                             ApplicationConfigurationType.getInstance()
                     );
                     runServerConfiguration.setMainClassName("GradleStartServer");
                     runServerConfiguration.setProgramParameters("nogui");
                     runServerConfiguration.setWorkingDirectory(project.getBasePath() + File.separator + "run");
-                    runServerConfiguration.setModule(mainModule != null ? mainModule : module);
+                    if (configurations.size() == 1) {
+                        runServerConfiguration.setModule(mainModule != null ? mainModule : rootModule);
+                    } else {
+                        runServerConfiguration.setModule(mainModule != null ? mainModule : forgeModule != null ? forgeModule : rootModule);
+                    }
                     RunnerAndConfigurationSettings serverSettings = new RunnerAndConfigurationSettingsImpl(
                             RunManagerImpl.getInstanceImpl(project),
                             runServerConfiguration,
@@ -380,11 +397,11 @@ public class GradleBuildSystem extends BuildSystem {
                         GradleConstants.SYSTEM_ID,
                         project,
                         gradleType.getConfigurationFactories()[0],
-                        module.getName() + " build"
+                        rootModule.getName() + " build"
                 );
                 // Set relevant gradle values
                 runConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
-                runConfiguration.getSettings().setExecutionName(module.getName() + " build");
+                runConfiguration.getSettings().setExecutionName(rootModule.getName() + " build");
                 runConfiguration.getSettings().setTaskNames(Collections.singletonList("build"));
                 // Create a RunAndConfigurationSettings object, which defines general settings for the run configuration
                 RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
@@ -400,7 +417,7 @@ public class GradleBuildSystem extends BuildSystem {
                 RunManager.getInstance(project).addConfiguration(settings, false);
             }, ModalityState.any());
 
-            if (configuration.type == PlatformType.SPONGE) {
+            if (configurations.stream().filter(c -> c.type == PlatformType.SPONGE).findAny().isPresent()) {
                 Util.invokeLater(() -> ProgressManager.getInstance().run(new Task.Backgroundable(project, "SpongeStart", false) {
                     @Override
                     public boolean shouldStartInBackground() {
@@ -412,31 +429,14 @@ public class GradleBuildSystem extends BuildSystem {
                         DumbService.getInstance(project).runReadActionInSmartMode(() -> {
                             indicator.setIndeterminate(true);
 
-                            setupSpongeStart(project, indicator);
-
-                            indicator.setText("Adding run config");
-                            Util.runWriteTaskLater(() -> {
-                                // Client run config
-                                ApplicationConfiguration runConfiguration = new ApplicationConfiguration(
-                                        module.getName() + " run",
-                                        project,
-                                        ApplicationConfigurationType.getInstance()
-                                );
-                                Module mainModule = ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main");
-                                runConfiguration.setWorkingDirectory(project.getBasePath() + File.separator + "run" + File.separator + "vanilla");
-                                runConfiguration.setMainClassName("StartServer");
-                                runConfiguration.setProgramParameters("-scan-classpath");
-                                runConfiguration.setModule(mainModule != null ? mainModule : module);
-                                RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
-                                        RunManagerImpl.getInstanceImpl(project),
-                                        runConfiguration,
-                                        false
-                                );
-                                settings.setActivateToolWindowBeforeRun(true);
-                                settings.setSingleton(true);
-                                RunManager.getInstance(project).addConfiguration(settings, false);
-                                RunManager.getInstance(project).setSelectedConfiguration(settings);
-                            });
+                            if (configurations.size() == 1) {
+                                setupSpongeStart(project, rootModule, indicator);
+                            } else {
+                                Module module = ModuleManager.getInstance(project).findModuleByName(rootModule.getName() + "-sponge");
+                                if (module != null) {
+                                    setupSpongeStart(project, module, indicator);
+                                }
+                            }
                         });
                     }
                 }));
@@ -879,7 +879,7 @@ public class GradleBuildSystem extends BuildSystem {
         }
     }
 
-    private void setupSpongeStart(@NotNull Project project, @NotNull ProgressIndicator indicator) {
+    private void setupSpongeStart(@NotNull Project project, @NotNull Module module, @NotNull ProgressIndicator indicator) {
         // Use gradle tooling to run setupVanilla
         GradleConnector connector = GradleConnector.newConnector();
         connector.forProjectDirectory(new File(rootDirectory.getPath()));
@@ -895,13 +895,48 @@ public class GradleBuildSystem extends BuildSystem {
             }
 
             launcher.forTasks("setupVanillaServer")
-                    .addProgressListener((ProgressListener) progressEvent -> {
-                        indicator.setText(progressEvent.getDescription());
-                    }
-            ).run();
+                    .addProgressListener((ProgressListener) progressEvent -> indicator.setText(progressEvent.getDescription()))
+                    .run();
         } finally {
             connection.close();
         }
+
+        indicator.setText("Adding run config");
+        Util.runWriteTaskLater(() -> {
+            // Client run config
+            ApplicationConfiguration runConfiguration = new ApplicationConfiguration(
+                    module.getName() + " run",
+                    project,
+                    ApplicationConfigurationType.getInstance()
+            );
+            Module mainModule = ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main");
+
+            VirtualFile dir = null;
+            if (module.isDisposed()) {
+                dir = project.getBaseDir();
+            } else {
+                final VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+                if (contentRoots.length < 1) {
+                    dir = project.getBaseDir();
+                } else {
+                    dir = contentRoots[0];
+                }
+            }
+
+            runConfiguration.setWorkingDirectory(dir.getPath() + File.separator + "run" + File.separator + "vanilla");
+            runConfiguration.setMainClassName("StartServer");
+            runConfiguration.setProgramParameters("-scan-classpath");
+            runConfiguration.setModule(mainModule != null ? mainModule : module);
+            RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
+                    RunManagerImpl.getInstanceImpl(project),
+                    runConfiguration,
+                    false
+            );
+            settings.setActivateToolWindowBeforeRun(true);
+            settings.setSingleton(true);
+            RunManager.getInstance(project).addConfiguration(settings, false);
+            RunManager.getInstance(project).setSelectedConfiguration(settings);
+        });
     }
 
     private void addRepositories(@NotNull GrClosableBlock block) {

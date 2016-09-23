@@ -1,3 +1,7 @@
+plugins {
+    id "com.qixalite.spongestart" version "1.5.2"
+}
+
 repositories {
     mavenCentral()
 }
@@ -11,6 +15,14 @@ processResources {
     from('src/main/resources') {
         expand 'version': project.version
     }
+}
+
+spongestart{
+    eula true
+
+    //optional configs
+    spongeVanillaBuild 'LATEST'
+    vanillaServerFolder project.file('run/vanilla').getAbsolutePath()
 }
 
 shadowJar {
