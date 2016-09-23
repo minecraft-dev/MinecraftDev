@@ -14,6 +14,11 @@ public class Util {
             ApplicationManager.getApplication().runWriteAction(runnable), ModalityState.any());
     }
 
+    public static void runWriteTaskLater(@NotNull Runnable runnable) {
+        ApplicationManager.getApplication().invokeLater(() ->
+            ApplicationManager.getApplication().runWriteAction(runnable), ModalityState.any());
+    }
+
     public static void invokeLater(@NotNull Runnable runnable) {
         ApplicationManager.getApplication().invokeLater(runnable);
     }

@@ -1,2 +1,5 @@
 pluginGroup = ${GROUP_ID}
 pluginVersion = ${PLUGIN_VERSION}
+
+minecraftVersion=${MINECRAFT_VERSION}
+mcpMappings=${MCP_MAPPINGS}

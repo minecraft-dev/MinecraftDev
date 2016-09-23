@@ -1,10 +1,21 @@
+plugins {
+    id "com.qixalite.spongestart" version "1.5.2"
+    id "java"
+}
+
 group pluginGroup
 version pluginVersion
 
-apply plugin: 'java'
-
 sourceCompatibility = ${BUILD_VERSION}
 targetCompatibility = ${BUILD_VERSION}
+
+spongestart{
+    eula true
+
+    //optional configs
+    spongeVanillaBuild 'LATEST'
+    vanillaServerFolder project.file('run/vanilla').getAbsolutePath()
+}
 
 repositories {
     mavenCentral()
