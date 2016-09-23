@@ -331,7 +331,7 @@ public class GradleBuildSystem extends BuildSystem {
                 GradleExternalTaskConfigurationType gradleType = GradleExternalTaskConfigurationType.getInstance();
 
                 // Set the Forge client and server run configs
-                if (configurations.stream().filter(c -> c.type == PlatformType.FORGE).findAny().isPresent()) {
+                if (configurations.stream().anyMatch(c -> c.type == PlatformType.FORGE)) {
                     Module mainModule;
                     if (configurations.size() == 1) {
                         mainModule = ModuleManager.getInstance(project).findModuleByName(rootModule.getName() + "_main");
@@ -417,7 +417,7 @@ public class GradleBuildSystem extends BuildSystem {
                 RunManager.getInstance(project).addConfiguration(settings, false);
             }, ModalityState.any());
 
-            if (configurations.stream().filter(c -> c.type == PlatformType.SPONGE).findAny().isPresent()) {
+            if (configurations.stream().anyMatch(c -> c.type == PlatformType.SPONGE)) {
                 Util.invokeLater(() -> ProgressManager.getInstance().run(new Task.Backgroundable(project, "SpongeStart", false) {
                     @Override
                     public boolean shouldStartInBackground() {
