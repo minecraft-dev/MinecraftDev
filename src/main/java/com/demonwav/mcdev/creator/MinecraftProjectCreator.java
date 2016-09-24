@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.creator;
 
 import static com.demonwav.mcdev.platform.PlatformType.FORGE;
+import static com.demonwav.mcdev.platform.PlatformType.SPONGE;
 
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
@@ -69,7 +70,7 @@ public class MinecraftProjectCreator {
 
     private void doSingleModuleCreate() {
         ProjectConfiguration configuration = settings.get(0);
-        addDependencies(configuration, buildSystem.getRepositories(), buildSystem.getDependencies());
+        addDependencies(configuration, buildSystem);
 
         ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Setting Up Project", false) {
             @Override
@@ -118,8 +119,7 @@ public class MinecraftProjectCreator {
     }
 
     public static void addDependencies(@NotNull ProjectConfiguration configuration,
-                                       @NotNull List<BuildRepository> buildRepositories,
-                                       @NotNull List<BuildDependency> buildDependencies) {
+                                       @NotNull BuildSystem buildSystem) {
         // Forge doesn't have a dependency like this
         if (configuration.type == FORGE) {
             return;
@@ -128,8 +128,12 @@ public class MinecraftProjectCreator {
         BuildRepository buildRepository = new BuildRepository();
         BuildDependency buildDependency = new BuildDependency();
 
-        buildRepositories.add(buildRepository);
-        buildDependencies.add(buildDependency);
+        // Sponge projects using Gradle use SpongeGradle which automatically adds the required repositories
+        if (configuration.type != SPONGE || !(buildSystem instanceof GradleBuildSystem)) {
+            buildSystem.getRepositories().add(buildRepository);
+        }
+
+        buildSystem.getDependencies().add(buildDependency);
         switch (configuration.type) {
             case BUKKIT:
                 buildRepository.setId("spigotmc-repo");
@@ -144,7 +148,7 @@ public class MinecraftProjectCreator {
                 buildDependency.setGroupId("org.spigotmc");
                 buildDependency.setArtifactId("spigot-api");
                 buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
-                addSonatype(buildRepositories);
+                addSonatype(buildSystem.getRepositories());
                 break;
             case PAPER:
                 buildRepository.setId("destroystokyo-repo");
@@ -152,7 +156,7 @@ public class MinecraftProjectCreator {
                 buildDependency.setGroupId("com.destroystokyo.paper");
                 buildDependency.setArtifactId("paper-api");
                 buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
-                addSonatype(buildRepositories);
+                addSonatype(buildSystem.getRepositories());
                 break;
             case BUNGEECORD:
                 buildRepository.setId("sonatype-oss-repo");
