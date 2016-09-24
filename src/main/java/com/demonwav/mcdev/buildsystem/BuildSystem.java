@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.concurrency.Promise;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -152,14 +153,13 @@ public abstract class BuildSystem {
      * the root directory, create a base module consisting of the necessary build system configuration files and
      * directory structure. This method does not create any classes or project-specific things, nor does it set up
      * any build configurations or enable the plugin for this build config. This will be done in
-     * {@link #finishSetup(Module, ProjectConfiguration, ProgressIndicator)}.
+     * {@link #finishSetup(Module, Collection, ProgressIndicator)}.
      * <p>
      * It is legal for this method to have different default setups for each platform type, so the PlatformType and
      * ProjectConfiguration are provided here as well.
      *
      * @param project The project
      * @param configurations The configuration objects for the project
-     * @author DemonWav
      */
     public abstract void create(@NotNull Project project,
                                 @NotNull ProjectConfiguration configurations,
@@ -177,7 +177,7 @@ public abstract class BuildSystem {
      * @param configurations The configuration object for the project
      */
     public abstract void finishSetup(@NotNull Module module,
-                                     @NotNull ProjectConfiguration configurations,
+                                     @NotNull Collection<ProjectConfiguration> configurations,
                                      @NotNull ProgressIndicator indicator);
 
     /**

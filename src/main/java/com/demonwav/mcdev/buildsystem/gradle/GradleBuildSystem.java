@@ -41,16 +41,19 @@ import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataMan
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -119,7 +122,7 @@ public class GradleBuildSystem extends BuildSystem {
             ForgeProjectConfiguration settings = (ForgeProjectConfiguration) configuration;
             Util.runWriteTask(() -> {
                 try {
-                    final VirtualFile gradleProp = rootDirectory.createChildData(this, "gradle.properties");
+                    final VirtualFile gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
 
                     buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
@@ -156,19 +159,19 @@ public class GradleBuildSystem extends BuildSystem {
             LiteLoaderProjectConfiguration settings = (LiteLoaderProjectConfiguration) configuration;
             Util.runWriteTask(() -> {
                 try {
-                    final VirtualFile gradleProp = rootDirectory.createChildData(this, "gradle.properties");
+                    final VirtualFile gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
 
                     buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
                     LiteLoaderTemplate.applyBuildGradleTemplate(
-                        project,
-                        buildGradle,
-                        gradleProp,
-                        groupId,
-                        artifactId,
-                        settings.pluginVersion,
-                        settings.mcVersion,
-                        settings.mcpVersion
+                            project,
+                            buildGradle,
+                            gradleProp,
+                            groupId,
+                            artifactId,
+                            settings.pluginVersion,
+                            settings.mcVersion,
+                            settings.mcpVersion
                     );
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -180,11 +183,17 @@ public class GradleBuildSystem extends BuildSystem {
         } else {
             Util.runWriteTask(() -> {
                 try {
-                    final VirtualFile gradleProp = rootDirectory.createChildData(this, "gradle.properties");
+                    final VirtualFile gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
 
                     String buildGradleText;
                     if (configuration.type == PlatformType.SPONGE) {
-                        buildGradleText = SpongeTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, version, buildVersion);
+                        buildGradleText = SpongeTemplate.applyBuildGradleTemplate(
+                                project,
+                                gradleProp,
+                                groupId,
+                                version,
+                                buildVersion
+                        );
                     } else {
                         buildGradleText = AbstractTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, version, buildVersion);
                     }
@@ -194,6 +203,8 @@ public class GradleBuildSystem extends BuildSystem {
                     }
 
                     addBuildGradleDependencies(project, buildGradleText);
+
+                    VirtualFileManager.getInstance().refreshWithoutFileWatcher(false);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -300,8 +311,8 @@ public class GradleBuildSystem extends BuildSystem {
     }
 
     @Override
-    public void finishSetup(@NotNull Module module, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
-        Project project = module.getProject();
+    public void finishSetup(@NotNull Module rootModule, @NotNull Collection<ProjectConfiguration> configurations, @NotNull ProgressIndicator indicator) {
+        Project project = rootModule.getProject();
 
         // Tell Gradle to import this project
         final ProjectDataManager projectDataManager = ServiceManager.getService(ProjectDataManager.class);
@@ -320,10 +331,18 @@ public class GradleBuildSystem extends BuildSystem {
                 GradleExternalTaskConfigurationType gradleType = GradleExternalTaskConfigurationType.getInstance();
 
                 // Set the Forge client and server run configs
-                if (configuration.type == PlatformType.FORGE) {
+                if (configurations.stream().anyMatch(c -> c.type == PlatformType.FORGE)) {
+                    Module mainModule;
+                    if (configurations.size() == 1) {
+                        mainModule = ModuleManager.getInstance(project).findModuleByName(rootModule.getName() + "_main");
+                    } else {
+                        mainModule = ModuleManager.getInstance(project).findModuleByName(rootModule.getName() + "-forge_main");
+                    }
+                    Module forgeModule = ModuleManager.getInstance(project).findModuleByName(rootModule.getName() + "-forge");
+
                     // Client run config
                     ApplicationConfiguration runClientConfiguration = new ApplicationConfiguration(
-                            module.getName() + " run client",
+                            (forgeModule != null ? forgeModule : rootModule).getName() + " run client",
                             project,
                             ApplicationConfigurationType.getInstance()
                     );
@@ -332,10 +351,13 @@ public class GradleBuildSystem extends BuildSystem {
                         //noinspection ResultOfMethodCallIgnored
                         runningDir.mkdir();
                     }
-                    Module mainModule = ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main");
                     runClientConfiguration.setWorkingDirectory(project.getBasePath() + File.separator + "run");
                     runClientConfiguration.setMainClassName("GradleStart");
-                    runClientConfiguration.setModule(mainModule != null ? mainModule : module);
+                    if (configurations.size() == 1) {
+                        runClientConfiguration.setModule(mainModule != null ? mainModule : rootModule);
+                    } else {
+                        runClientConfiguration.setModule(mainModule != null ? mainModule : forgeModule != null ? forgeModule : rootModule);
+                    }
                     RunnerAndConfigurationSettings clientSettings = new RunnerAndConfigurationSettingsImpl(
                             RunManagerImpl.getInstanceImpl(project),
                             runClientConfiguration,
@@ -348,14 +370,18 @@ public class GradleBuildSystem extends BuildSystem {
 
                     // Server run config
                     ApplicationConfiguration runServerConfiguration = new ApplicationConfiguration(
-                            module.getName() + " run server",
+                            rootModule.getName() + " run server",
                             project,
                             ApplicationConfigurationType.getInstance()
                     );
                     runServerConfiguration.setMainClassName("GradleStartServer");
                     runServerConfiguration.setProgramParameters("nogui");
                     runServerConfiguration.setWorkingDirectory(project.getBasePath() + File.separator + "run");
-                    runServerConfiguration.setModule(mainModule != null ? mainModule : module);
+                    if (configurations.size() == 1) {
+                        runServerConfiguration.setModule(mainModule != null ? mainModule : rootModule);
+                    } else {
+                        runServerConfiguration.setModule(mainModule != null ? mainModule : forgeModule != null ? forgeModule : rootModule);
+                    }
                     RunnerAndConfigurationSettings serverSettings = new RunnerAndConfigurationSettingsImpl(
                             RunManagerImpl.getInstanceImpl(project),
                             runServerConfiguration,
@@ -371,11 +397,11 @@ public class GradleBuildSystem extends BuildSystem {
                         GradleConstants.SYSTEM_ID,
                         project,
                         gradleType.getConfigurationFactories()[0],
-                        module.getName() + " build"
+                        rootModule.getName() + " build"
                 );
                 // Set relevant gradle values
                 runConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
-                runConfiguration.getSettings().setExecutionName(module.getName() + " build");
+                runConfiguration.getSettings().setExecutionName(rootModule.getName() + " build");
                 runConfiguration.getSettings().setTaskNames(Collections.singletonList("build"));
                 // Create a RunAndConfigurationSettings object, which defines general settings for the run configuration
                 RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
@@ -390,6 +416,31 @@ public class GradleBuildSystem extends BuildSystem {
                 // Apply the run config and select it
                 RunManager.getInstance(project).addConfiguration(settings, false);
             }, ModalityState.any());
+
+            if (configurations.stream().anyMatch(c -> c.type == PlatformType.SPONGE)) {
+                Util.invokeLater(() -> ProgressManager.getInstance().run(new Task.Backgroundable(project, "SpongeStart", false) {
+                    @Override
+                    public boolean shouldStartInBackground() {
+                        return false;
+                    }
+
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                        DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+                            indicator.setIndeterminate(true);
+
+                            if (configurations.size() == 1) {
+                                setupSpongeStart(project, rootModule, indicator);
+                            } else {
+                                Module module = ModuleManager.getInstance(project).findModuleByName(rootModule.getName() + "-sponge");
+                                if (module != null) {
+                                    setupSpongeStart(project, module, indicator);
+                                }
+                            }
+                        });
+                    }
+                }));
+            }
         }
     }
 
@@ -587,7 +638,7 @@ public class GradleBuildSystem extends BuildSystem {
             try {
                 // Write the parent files to disk so the children modules can import correctly
                 buildGradle = rootDirectory.createChildData(this, "build.gradle");
-                final VirtualFile gradleProp = rootDirectory.createChildData(this, "gradle.properties");
+                final VirtualFile gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
                 final VirtualFile settingsGradle = rootDirectory.createChildData(this, "settings.gradle");
 
                 AbstractTemplate.applyMultiModuleBuildGradleTemplate(project, buildGradle, gradleProp, groupId, version, buildVersion);
@@ -654,7 +705,7 @@ public class GradleBuildSystem extends BuildSystem {
             Util.runWriteTask(() -> {
                 final VirtualFile gradleProp;
                 try {
-                    gradleProp = rootDirectory.createChildData(this, "gradle.properties");
+                    gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -695,7 +746,7 @@ public class GradleBuildSystem extends BuildSystem {
             Util.runWriteTask(() -> {
                 final VirtualFile gradleProp;
                 try {
-                    gradleProp = rootDirectory.createChildData(this, "gradle.properties");
+                    gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -748,6 +799,8 @@ public class GradleBuildSystem extends BuildSystem {
         new WriteCommandAction.Simple(project, file) {
             @Override
             protected void run() throws Throwable {
+                final VirtualFile buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
+
                 file.setName("build.gradle");
                 final GroovyFile groovyFile = (GroovyFile) file;
 
@@ -775,17 +828,19 @@ public class GradleBuildSystem extends BuildSystem {
                 if (addToDirectory) {
                     PsiDirectory rootDirectoryPsi = PsiManager.getInstance(project).findDirectory(rootDirectory);
                     if (rootDirectoryPsi != null) {
+                        buildGradle.delete(this);
+
                         rootDirectoryPsi.add(file);
                     }
                 }
 
-                buildGradle = rootDirectory.findChild("build.gradle");
-                if (buildGradle == null) {
+                GradleBuildSystem.this.buildGradle = rootDirectory.findChild("build.gradle");
+                if (GradleBuildSystem.this.buildGradle == null) {
                     return;
                 }
 
                 // Reformat the code to match their code style
-                PsiFile newBuildGradlePsi = PsiManager.getInstance(project).findFile(buildGradle);
+                PsiFile newBuildGradlePsi = PsiManager.getInstance(project).findFile(GradleBuildSystem.this.buildGradle);
                 if (newBuildGradlePsi != null) {
                     new ReformatCodeProcessor(newBuildGradlePsi, false).run();
                 }
@@ -822,6 +877,66 @@ public class GradleBuildSystem extends BuildSystem {
         } finally {
             connection.close();
         }
+    }
+
+    private void setupSpongeStart(@NotNull Project project, @NotNull Module module, @NotNull ProgressIndicator indicator) {
+        // Use gradle tooling to run setupVanilla
+        GradleConnector connector = GradleConnector.newConnector();
+        connector.forProjectDirectory(new File(rootDirectory.getPath()));
+        ProjectConnection connection = connector.connect();
+        BuildLauncher launcher = connection.newBuild();
+
+        try {
+            Pair<String, Sdk> sdkPair = ExternalSystemJdkUtil.getAvailableJdk(project);
+            if (sdkPair != null && sdkPair.getSecond() != null && sdkPair.getSecond().getHomePath() != null &&
+                    !ExternalSystemJdkUtil.USE_INTERNAL_JAVA.equals(sdkPair.getFirst())) {
+
+                launcher.setJavaHome(new File(sdkPair.getSecond().getHomePath()));
+            }
+
+            launcher.forTasks("setupVanillaServer")
+                    .addProgressListener((ProgressListener) progressEvent -> indicator.setText(progressEvent.getDescription()))
+                    .run();
+        } finally {
+            connection.close();
+        }
+
+        indicator.setText("Adding run config");
+        Util.runWriteTaskLater(() -> {
+            // Client run config
+            ApplicationConfiguration runConfiguration = new ApplicationConfiguration(
+                    module.getName() + " run",
+                    project,
+                    ApplicationConfigurationType.getInstance()
+            );
+            Module mainModule = ModuleManager.getInstance(project).findModuleByName(module.getName() + "_main");
+
+            VirtualFile dir = null;
+            if (module.isDisposed()) {
+                dir = project.getBaseDir();
+            } else {
+                final VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+                if (contentRoots.length < 1) {
+                    dir = project.getBaseDir();
+                } else {
+                    dir = contentRoots[0];
+                }
+            }
+
+            runConfiguration.setWorkingDirectory(dir.getPath() + File.separator + "run" + File.separator + "vanilla");
+            runConfiguration.setMainClassName("StartServer");
+            runConfiguration.setProgramParameters("-scan-classpath");
+            runConfiguration.setModule(mainModule != null ? mainModule : module);
+            RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
+                    RunManagerImpl.getInstanceImpl(project),
+                    runConfiguration,
+                    false
+            );
+            settings.setActivateToolWindowBeforeRun(true);
+            settings.setSingleton(true);
+            RunManager.getInstance(project).addConfiguration(settings, false);
+            RunManager.getInstance(project).setSelectedConfiguration(settings);
+        });
     }
 
     private void addRepositories(@NotNull GrClosableBlock block) {

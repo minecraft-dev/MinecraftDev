@@ -47,6 +47,7 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -159,7 +160,7 @@ public class MavenBuildSystem extends BuildSystem {
     }
 
     @Override
-    public void finishSetup(@NotNull Module module, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
+    public void finishSetup(@NotNull Module module, @NotNull Collection<ProjectConfiguration> configurations, @NotNull ProgressIndicator indicator) {
         Util.runWriteTask(() -> {
             Project project = module.getProject();
 

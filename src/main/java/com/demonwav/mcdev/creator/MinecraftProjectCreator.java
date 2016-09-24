@@ -14,6 +14,7 @@ import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -83,7 +84,7 @@ public class MinecraftProjectCreator {
                 buildSystem.create(module.getProject(), configuration, indicator);
                 configuration.create(module.getProject(), buildSystem, indicator);
                 configuration.type.getType().performCreationSettingSetup(module.getProject());
-                buildSystem.finishSetup(module, configuration, indicator);
+                buildSystem.finishSetup(module, ImmutableList.of(configuration), indicator);
             }
         });
     }
@@ -111,7 +112,7 @@ public class MinecraftProjectCreator {
                     p.create(module.getProject(), g, indicator);
                     p.type.getType().performCreationSettingSetup(module.getProject());
                 });
-                gradleBuildSystem.finishSetup(module, new BlankProjectConfiguration(), indicator);
+                gradleBuildSystem.finishSetup(module, map.values(), indicator);
             }
         });
     }
