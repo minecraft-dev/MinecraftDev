@@ -13,6 +13,7 @@ import com.demonwav.mcdev.util.McMethodUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.base.Objects;
+import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -31,9 +32,12 @@ import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTypesUtil;
+import com.siyeh.ig.InspectionGadgetsFix;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -212,16 +216,11 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
         // We are in an event method
         final PsiAnnotationMemberValue annotationMemberValue = annotation.findAttributeValue("ignoreCancelled");
-        if (!(annotationMemberValue instanceof PsiNameValuePair)) {
+        if (!(annotationMemberValue instanceof PsiLiteralExpression)) {
             return null;
         }
 
-        final PsiNameValuePair pair = (PsiNameValuePair) annotationMemberValue;
-        if (!(pair.getValue() instanceof PsiLiteralExpression)) {
-            return null;
-        }
-
-        final PsiLiteralExpression value = (PsiLiteralExpression) pair.getValue();
+        final PsiLiteralExpression value = (PsiLiteralExpression) annotationMemberValue;
         if (!(value.getValue() instanceof Boolean)) {
             return null;
         }
@@ -233,10 +232,33 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
             return null;
         }
 
+        final PsiElement resolve = expression.getMethodExpression().resolve();
+        if (resolve == null) {
+            return null;
+        }
 
+        final PsiElement context = resolve.getContext();
+        if (!(context instanceof PsiClass)) {
+            return null;
+        }
 
-        final IsCancelled useless = new IsCancelled();
-        return useless;
+        final PsiClass psiClass = (PsiClass) context;
+        if (!McPsiUtil.extendsOrImplementsClass(psiClass, BukkitConstants.BUKKIT_EVENT_CLASS)) {
+            return null;
+        }
+
+        if (!(resolve instanceof ClsMethodImpl)) {
+            return null;
+        }
+
+        if (!((ClsMethodImpl) resolve).getName().equals(BukkitConstants.BUKKIT_EVENT_ISCANCELLED_METHOD_NAME)) {
+            return null;
+        }
+
+        return IsCancelled.builder()
+                .setErrorString("Event.isCancelled() check is useless in a method annotated with ignoreCancelled=true.")
+                .setFix(descriptor -> expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression)))
+                .build();
     }
 
     @Override

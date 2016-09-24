@@ -1,6 +1,5 @@
 package com.demonwav.mcdev.inspection;
 
-import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.MinecraftModule;
 
 import com.intellij.openapi.module.Module;
@@ -52,7 +51,10 @@ public class IsCancelledInspection extends BaseInspection {
                     return;
                 }
 
-                Optional<IsCancelled> useless = instance.getModules().stream().map(m -> m.checkUselessCancelCheck(expression)).findAny();
+                Optional<IsCancelled> useless = instance.getModules().stream()
+                        .map(m -> m.checkUselessCancelCheck(expression))
+                        .filter(i -> i != null)
+                        .findAny();
                 if (!useless.isPresent()) {
                     return;
                 }
