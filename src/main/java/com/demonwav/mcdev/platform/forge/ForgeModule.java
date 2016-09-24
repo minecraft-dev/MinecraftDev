@@ -4,6 +4,7 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.insight.generation.GenerationData;
+import com.demonwav.mcdev.inspection.IsCancelled;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
@@ -18,6 +19,7 @@ import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
@@ -148,5 +150,11 @@ public class ForgeModule extends AbstractModule {
 
         final PsiModifierList modifierList = psiClass.getModifierList();
         return modifierList != null && modifierList.findAnnotation(ForgeConstants.MOD_ANNOTATION) != null;
+    }
+
+    @Nullable
+    @Override
+    public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
+        return null;
     }
 }

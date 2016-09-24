@@ -243,7 +243,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         }
 
         final PsiClass psiClass = (PsiClass) context;
-        if (!McPsiUtil.extendsOrImplementsClass(psiClass, BukkitConstants.BUKKIT_EVENT_CLASS)) {
+        if (!McPsiUtil.extendsOrImplementsClass(psiClass, BukkitConstants.BUKKIT_CANCELLABLE_CLASS)) {
             return null;
         }
 
@@ -256,7 +256,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         }
 
         return IsCancelled.builder()
-                .setErrorString("Event.isCancelled() check is useless in a method annotated with ignoreCancelled=true.")
+                .setErrorString("Cancellable.isCancelled() check is useless in a method annotated with ignoreCancelled=true.")
                 .setFix(descriptor -> expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression)))
                 .build();
     }
