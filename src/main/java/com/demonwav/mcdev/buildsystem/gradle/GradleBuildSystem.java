@@ -191,6 +191,7 @@ public class GradleBuildSystem extends BuildSystem {
                                 project,
                                 gradleProp,
                                 groupId,
+                                artifactId,
                                 version,
                                 buildVersion
                         );
@@ -677,7 +678,7 @@ public class GradleBuildSystem extends BuildSystem {
             });
 
             // it knows which dependencies are needed for each configuration
-            MinecraftProjectCreator.addDependencies(configuration, gradleBuildSystem.repositories, gradleBuildSystem.dependencies);
+            MinecraftProjectCreator.addDependencies(configuration, gradleBuildSystem);
 
             // For each build system we initialize it, but not the same as a normal create. We need to know the common
             // project name, as we automatically add it as a dependency too

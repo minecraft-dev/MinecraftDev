@@ -55,4 +55,5 @@ public class ${CLASS_NAME} {
         // The text message could be configurable, check the docs on how to do so!
         player.sendMessage(Text.of(TextColors.AQUA, TextStyles.BOLD, "Hi " + player.getName()));
     }
+
 }
