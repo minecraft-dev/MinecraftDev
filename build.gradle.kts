@@ -1,5 +1,4 @@
 // Not used atm :(
-import org.gradle.api.plugins.scala.ScalaPlugin
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.plugins.ide.idea.model.IdeaModel
@@ -9,7 +8,6 @@ import java.io.File
 buildscript {
     repositories {
         mavenCentral()
-        gradleScriptKotlin()
         maven {
             setUrl("https://plugins.gradle.org/m2/")
         }
@@ -19,7 +17,6 @@ buildscript {
     }
 
     dependencies {
-        classpath(kotlinModule("gradle-plugin"))
         classpath("gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.1.10")
     }
 }
@@ -30,9 +27,6 @@ val pluginVersion by project
 val downloadIdeaSources by project
 
 apply {
-    plugin<JavaPlugin>()
-    plugin<ScalaPlugin>()
-    plugin("kotlin")
     plugin<IdeaPlugin>()
     plugin("org.jetbrains.intellij")
 }
@@ -45,16 +39,6 @@ tasks.withType<JavaCompile> {
 
 group = "com.demonwav.minecraft-dev"
 version = pluginVersion
-
-repositories {
-    mavenCentral()
-    gradleScriptKotlin()
-}
-
-dependencies {
-    compile("org.scala-lang:scala-library:2.11.8")
-    compile(kotlinModule("stdlib-jre8"))
-}
 
 var intellijSandboxDirectory: String? = null
 configure<IntelliJPluginExtension> {
