@@ -1,6 +1,5 @@
 plugins {
     id 'org.spongepowered.plugin' version '0.7'
-    id "com.qixalite.spongestart" version "1.5.2"
 }
 
 dependencies {
@@ -11,14 +10,6 @@ processResources {
     from('src/main/resources') {
         expand 'version': project.version
     }
-}
-
-spongestart {
-    eula true
-
-    //optional configs
-    spongeVanillaBuild 'LATEST'
-    vanillaServerFolder project.file('run/vanilla').getAbsolutePath()
 }
 
 shadowJar {
