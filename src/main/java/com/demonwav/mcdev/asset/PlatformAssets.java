@@ -43,6 +43,9 @@ public final class PlatformAssets {
     @NotNull public static final Icon MIXIN = loadIcon("/assets/platform/icons/mixin/mixin.png");
     @NotNull public static final Icon MIXIN_DARK = loadIcon("/assets/platform/icons/mixin/mixin_dark.png");
 
+    @NotNull public static final Icon SHADOW = loadIcon("/assets/platform/icons/mixin/shadow.png");
+    @NotNull public static final Icon SHADOW_DARK = loadIcon("/assets/platform/icons/mixin/shadow_dark.png");
+
     private PlatformAssets() {
     }
 
