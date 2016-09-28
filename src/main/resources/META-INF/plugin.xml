@@ -178,6 +178,8 @@
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
+
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspections.ShadowNullabilityInspectionSuppressor"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.idea.maven">
         <!-- Maven importers for, well, Maven project importing -->

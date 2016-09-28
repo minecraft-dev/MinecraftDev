@@ -3,6 +3,8 @@ package com.demonwav.mcdev.platform.mixin.insight;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.mixin.MixinModuleType;
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants;
+import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.util.McEditorUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
 
@@ -45,51 +47,23 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
         }
         final PsiField field = (PsiField) element;
 
-        final Module module = ModuleUtilCore.findModuleForPsiElement(field);
-        if (module == null) {
-            return null;
-        }
-
-        final MinecraftModule instance = MinecraftModule.getInstance(module);
-        if (instance == null) {
-            return null;
-        }
-
-        if (!instance.isOfType(MixinModuleType.getInstance())) {
+        if (!MixinUtils.isMixinModule(element)) {
             return null;
         }
 
         final PsiClass containingClass = McPsiUtil.getClassOfElement(field);
-        if (containingClass == null) {
+
+        final PsiAnnotationMemberValue value = MixinUtils.getMemberValueTargetOfMixinClass(containingClass);
+        if (value == null) {
             return null;
         }
 
-        final PsiModifierList classList = containingClass.getModifierList();
-        if (classList == null) {
-            return null;
-        }
-
-        final PsiAnnotation classAnnotation = classList.findAnnotation("org.spongepowered.asm.mixin.Mixin");
-        if (classAnnotation == null) {
-            return null;
-        }
-
-        final PsiModifierList list = field.getModifierList();
-        if (list == null) {
-            return null;
-        }
-
-        final PsiAnnotation annotation = list.findAnnotation("org.spongepowered.asm.mixin.Shadow");
+        final PsiAnnotation annotation = McPsiUtil.getAnnotation(field, MixinConstants.Annotations.SHADOW);
         if (annotation == null) {
             return null;
         }
 
         final PsiIdentifier identifier = field.getNameIdentifier();
-
-        final PsiAnnotationMemberValue value = classAnnotation.findDeclaredAttributeValue("value");
-        if (value == null) {
-            return null;
-        }
 
         return new ShadowLineMarkerInfo(
             identifier,

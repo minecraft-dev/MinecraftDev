@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.psi.JavaTokenType;
+import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
@@ -11,6 +12,8 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
+import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiReferenceList;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.PsiKeyword;
@@ -25,6 +28,7 @@ import com.intellij.psi.impl.source.PsiImmediateClassType;
 import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.java.IKeywordElementType;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,9 +36,15 @@ import java.util.Map;
 import java.util.Set;
 
 public final class McPsiUtil {
+    private McPsiUtil() {}
 
     @Nullable
-    public static PsiClass getClassOfElement(@NotNull PsiElement element) {
+    @Contract(value = "null -> null", pure = true)
+    public static PsiClass getClassOfElement(@Nullable PsiElement element) {
+        if (element == null) {
+            return null;
+        }
+
         if (element instanceof PsiClass) {
             return (PsiClass) element;
         }
@@ -141,5 +151,19 @@ public final class McPsiUtil {
             }
         }
         return JavaTokenType.PUBLIC_KEYWORD;
+    }
+
+    @Nullable
+    public static PsiAnnotation getAnnotation(@Nullable PsiModifierListOwner owner, @NotNull String annotationName) {
+        if (owner == null) {
+            return null;
+        }
+
+        final PsiModifierList list = owner.getModifierList();
+        if (list == null) {
+            return null;
+        }
+
+        return list.findAnnotation(annotationName);
     }
 }
