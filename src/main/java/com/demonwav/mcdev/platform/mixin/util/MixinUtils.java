@@ -4,19 +4,42 @@ import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 import com.demonwav.mcdev.util.McPsiUtil;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.intellij.lang.ASTNode;
+import com.intellij.navigation.AnonymousElementProvider;
+import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
+import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassObjectAccessExpression;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiReferenceExpression;
+import com.intellij.psi.PsiSubstitutor;
+import com.intellij.psi.PsiType;
+import com.intellij.psi.PsiTypeParameter;
+import com.intellij.psi.impl.source.PsiClassReferenceType;
+import com.intellij.psi.impl.source.PsiImmediateClassType;
+import com.intellij.psi.impl.source.tree.ElementType;
+import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
+import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
+import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+@SuppressWarnings("unused")
 public final class MixinUtils {
     private MixinUtils() {}
 
@@ -72,7 +95,7 @@ public final class MixinUtils {
             return null;
         }
 
-        if (getMixinAnnotationFromClass(classOfElement) == null) {
+        if (getMixinAnnotation(classOfElement) == null) {
             return null;
         }
 
@@ -89,7 +112,7 @@ public final class MixinUtils {
     @Nullable
     @Contract(value = "null -> null", pure = true)
     public static PsiAnnotation getMixinAnnotationOfContainingClass(@Nullable PsiElement element) {
-        return getMixinAnnotationFromClass(McPsiUtil.getClassOfElement(element));
+        return getMixinAnnotation(McPsiUtil.getClassOfElement(element));
     }
 
     /**
@@ -101,89 +124,140 @@ public final class MixinUtils {
      */
     @Nullable
     @Contract(value = "null -> null", pure = true)
-    public static PsiAnnotation getMixinAnnotationFromClass(@Nullable PsiClass psiClass) {
+    public static PsiAnnotation getMixinAnnotation(@Nullable PsiClass psiClass) {
         return McPsiUtil.getAnnotation(psiClass, MixinConstants.Annotations.MIXIN);
     }
 
     /**
-     * For Mixin classes which define a {@code target} value in the Mixin annotation, return the first value in that list.
-     * Returns null if there is no {@code target} value in the Mixin annotation, or the first class in the {@code target} annotation cannot
-     * be resolved.
+     * For Mixin classes which define a {@code targets} attribute in the Mixin annotation, return the first value in that list.
+     * Returns null if there is no {@code target} attribute in the Mixin annotation, or the first class in the {@code target} annotation
+     * cannot be resolved.
      *
      * @param psiClass The PsiClass to check.
-     * @return The first class defined in the {@code target} value in the Mixin annotation of the given PsiClass.
+     * @return The first class defined in the {@code targets} value in the Mixin annotation of the given PsiClass.
      */
     @Nullable
     @Contract(value = "null -> null", pure = true)
-    public static PsiClass getFirstTargetOfMixinClass(@Nullable PsiClass psiClass) {
+    public static Pair<PsiElement, PsiClass> getFirstTargetOfTarget(@Nullable PsiClass psiClass) {
         if (psiClass == null) {
             return null;
         }
 
-        final List<PsiClass> targets = getAllTargetsOfMultiTargetMixinClass(psiClass);
+        final Map<PsiElement, PsiClass> targets = getAllMixedClassesOfTarget(psiClass);
         if (targets.isEmpty()) {
             return null;
         }
 
-        return targets.get(0);
+        Map.Entry<PsiElement, PsiClass> next = targets.entrySet().iterator().next();
+        return Pair.create(next.getKey(), next.getValue());
     }
 
     /**
-     * For Mixin classes which define a {@code target} value in the Mixin annotation, return all classes defined in that list.
-     * Returns an empty list if there is no {@code target} value in the Mixin annotation, or no classes in the {@code target} annotation
+     * For Mixin classes which define a {@code targets} attribute in the Mixin annotation, return all classes defined in that list.
+     * Returns an empty list if there is no {@code target} attribute in the Mixin annotation, or no classes in the {@code target} annotation
      * can be resolved.
      *
      * @param psiClass The PsiClass to check.
-     * @return A list of classes defined in the {@code target} value in the Mixin annotation of the given PsiClass.
+     * @return A list of classes defined in the {@code targets} value in the Mixin annotation of the given PsiClass.
      */
     @NotNull
     @Contract(pure = true)
-    public static List<PsiClass> getAllTargetsOfMultiTargetMixinClass(@Nullable PsiClass psiClass) {
-        if (psiClass == null) {
-            return Collections.emptyList();
-        }
-
-        // TODO
-        return Collections.emptyList();
+    public static Map<PsiElement, PsiClass> getAllMixedClassesOfTarget(@Nullable PsiClass psiClass) {
+        final PsiAnnotationMemberValue value = getMixinAnnotationTarget(psiClass);
+        return resolveGenericClass(value);
     }
 
     /**
-     * Return the single {@code value} PsiClass target of the provided Mixin class. Returns null if the provided class is null,
-     * there is no value set for the Mixin annotation, or the value cannot be resolved to a class.
+     * For Mixin classes which define a {@code value} attribute in the Mixin annotation, return the first value in that list.
+     * Returns null if there is no {@code value} attribute in the Mixin annotation, or the first class in the {@code value} annotation
+     * cannot be resolved.
      *
      * @param psiClass The PsiClass to check.
-     * @return The single {@code value} PsiClass target of the provided Mixin class.
+     * @return The first class defined in the {@code value} value in the Mixin annotation of the given PsiClass.
      */
     @Nullable
     @Contract(value = "null -> null", pure = true)
-    public static PsiClass getValueTargetOfMixinClass(@Nullable PsiClass psiClass) {
-        final PsiAnnotationMemberValue value = getMemberValueTargetOfMixinClass(psiClass);
-        return McPsiUtil.resolveGenericClass(value);
-    }
-
-    /**
-     * Return the PsiAnnotationMemberValue of the single {@code value} field of the Mixin annotation on the provided class. This is useful
-     * if you need the reference to the PsiAnnotationMemberValue, but want to resolve the class later, as resolving is an expensive process.
-     * Returns null if the provided class is null, is not a Mixin class, or if the attribute value does not exist.
-     *
-     * You can easily resolve the class later using {@link McPsiUtil#resolveGenericClass(PsiAnnotationMemberValue)}.
-     *
-     * @param psiClass The PsiClass to check.
-     * @return The single {@code value} PsiAnnotationMemberValue target of the provided Mixin class.
-     */
-    @Nullable
-    @Contract(value = "null -> null", pure = true)
-    public static PsiAnnotationMemberValue getMemberValueTargetOfMixinClass(@Nullable PsiClass psiClass) {
+    public static Pair<PsiElement, PsiClass> getFirstTargetOfValue(@Nullable PsiClass psiClass) {
         if (psiClass == null) {
             return null;
         }
 
-        final PsiAnnotation annotation = getMixinAnnotationFromClass(psiClass);
+        final Map<PsiElement, PsiClass> classes = getAllMixedClassesOfValue(psiClass);
+        if (classes.isEmpty()) {
+            return null;
+        }
+        Map.Entry<PsiElement, PsiClass> next = classes.entrySet().iterator().next();
+        return Pair.create(next.getKey(), next.getValue());
+    }
+
+    /**
+     * For Mixin classes which define a {@code value} attribute in the Mixin annotation, return all classes defined in that list.
+     * Returns an empty list if there is no {@code value} attribute in the Mixin annotation, or no classes in the {@code target} annotation
+     * can be resolved.
+     *
+     * @param psiClass The PsiClass to check.
+     * @return A list of classes defined in the {@code value} value in the Mixin annotation of the given PsiClass.
+     */
+    @NotNull
+    @Contract(pure = true)
+    public static Map<PsiElement, PsiClass> getAllMixedClassesOfValue(@Nullable PsiClass psiClass) {
+        final PsiAnnotationMemberValue value = getMixinAnnotationValue(psiClass);
+        return resolveGenericClass(value);
+    }
+
+    /**
+     * Return the PsiAnnotationMemberValue of the {@code targets} attribute of the Mixin annotation on the provided class. This is useful
+     * if you need the reference to the PsiAnnotationMemberValue, but want to resolve the classes later, as resolving is an expensive
+     * process. Returns null if the provided class is null, is not a Mixin class, or if the attribute target does not exist.
+     *
+     * You can easily resolve the classes later using {@link #resolveGenericClass(PsiAnnotationMemberValue)}.
+     *
+     * @param psiClass The PsiClass to check.
+     * @return The {@code target} PsiAnnotationMemberValue targets of the provided Mixin class.
+     */
+    @Nullable
+    @Contract(value = "null -> null", pure = true)
+    public static PsiAnnotationMemberValue getMixinAnnotationTarget(@Nullable PsiClass psiClass) {
+        return getMixinAnnotationAttribute(psiClass, "targets");
+    }
+
+    /**
+     * Return the PsiAnnotationMemberValue of the {@code value} attribute of the Mixin annotation on the provided class. This is useful
+     * if you need the reference to the PsiAnnotationMemberValue, but want to resolve the classes later, as resolving is an expensive
+     * process. Returns null if the provided class is null, is not a Mixin class, or if the attribute value does not exist.
+     *
+     * You can easily resolve the classes later using {@link #resolveGenericClass(PsiAnnotationMemberValue)}.
+     *
+     * @param psiClass The PsiClass to check.
+     * @return The {@code value} PsiAnnotationMemberValue targets of the provided Mixin class.
+     */
+    @Nullable
+    @Contract(value = "null -> null", pure = true)
+    public static PsiAnnotationMemberValue getMixinAnnotationValue(@Nullable PsiClass psiClass) {
+        return getMixinAnnotationAttribute(psiClass, "value");
+    }
+
+    /**
+     * Return the PsiAnnotationMemberValue of the given attribute of the Mixin annotation on the provided class. Returns null if the
+     * provided class is null, is not a Mixin class, or if the attribute value does not exist.
+     *
+     * @param psiClass The PsiClass to check.
+     * @param attribute The attribute to look for.
+     * @return The {@code value} PsiAnnotationMemberValue targets of the provided Mixin class.
+     */
+    @Nullable
+    @Contract("null, _ -> null")
+    public static PsiAnnotationMemberValue getMixinAnnotationAttribute(@Nullable PsiClass psiClass, @NotNull String attribute) {
+        if (psiClass == null) {
+            return null;
+        }
+
+        final PsiAnnotation annotation = getMixinAnnotation(psiClass);
         if (annotation == null) {
             return null;
         }
 
-        return annotation.findDeclaredAttributeValue("value");
+        return annotation.findDeclaredAttributeValue(attribute);
     }
 
     /**
@@ -195,13 +269,159 @@ public final class MixinUtils {
      */
     @NotNull
     @Contract(pure = true)
-    public static List<PsiClass> getAllTargetsOfMixinClass(@Nullable PsiClass psiClass) {
-        final List<PsiClass> list = getAllTargetsOfMultiTargetMixinClass(psiClass);
-        final PsiClass value = getValueTargetOfMixinClass(psiClass);
-        if (value != null) {
-            list.add(value);
+    public static Map<PsiElement, PsiClass> getAllMixedClasses(@Nullable PsiClass psiClass) {
+        final Map<PsiElement, PsiClass> map = getAllMixedClassesOfTarget(psiClass);
+        map.putAll(getAllMixedClassesOfValue(psiClass));
+        return map;
+    }
+
+    /**
+     * Given a Mixin target class string (the string given to the {@code targets} Mixin annotation attribute), find, if possible,
+     * the corresponding class.
+     *
+     * @param s The String to check.
+     * @return The corresponding class for the given String, or null if not found.
+     */
+    @Nullable
+    @Contract(value = "null, _ -> null", pure = true)
+    public static PsiClass getClassFromMixinTargetString(@Nullable String s, @NotNull Project project) {
+        if (s == null) {
+            return null;
         }
 
-        return list;
+        final String replaced = s.replaceAll("/", ".");
+        String text = replaced;
+        if (text.contains("$")) {
+            text = text.substring(0, text.indexOf('$'));
+        }
+
+        final PsiClass psiClass = JavaPsiFacade.getInstance(project).findClass(text, GlobalSearchScope.allScope(project));
+        if (!replaced.contains("$")) {
+            return psiClass;
+        }
+
+        if (psiClass == null) {
+            return null;
+        }
+
+        // Handle anonymous classes
+        final String[] classes = replaced.substring(replaced.indexOf('$')).split("\\$");
+        List<Integer> indexes = Lists.newArrayList();
+        for (String cls : classes) {
+            if (cls.isEmpty()) {
+                continue;
+            }
+
+            try {
+                indexes.add(Integer.parseInt(cls) - 1);
+            } catch (Exception e) {
+                return psiClass;
+            }
+        }
+
+        PsiElement current = psiClass;
+        for (int index : indexes) {
+            PsiElement[] anonymousClasses = null;
+            for (AnonymousElementProvider provider : Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
+                anonymousClasses = provider.getAnonymousElements(psiClass);
+                if (anonymousClasses.length > 0) {
+                    break;
+                }
+            }
+            if (anonymousClasses == null) {
+                return psiClass;
+            }
+
+            if (index >= 0 && index < anonymousClasses.length) {
+                current = anonymousClasses[index];
+            } else {
+                return (PsiClass) current;
+            }
+        }
+
+        return (PsiClass) current;
+    }
+
+    @NotNull
+    @Contract(pure = true)
+    public static Map<PsiElement, PsiClass> resolveGenericClass(@Nullable PsiAnnotationMemberValue targetClasses) {
+        final Map<PsiElement, PsiClass> map = Maps.newHashMap();
+
+        if (targetClasses instanceof PsiArrayInitializerMemberValue) {
+            final PsiAnnotationMemberValue[] initializers = ((PsiArrayInitializerMemberValue) targetClasses).getInitializers();
+            for (PsiAnnotationMemberValue initializer : initializers) {
+                final PsiClass psiClass = resolveGenericClass((PsiElement) initializer);
+                if (psiClass != null) {
+                    map.put(initializer, psiClass);
+                }
+            }
+        } else {
+            final PsiClass psiClass = resolveGenericClass((PsiElement) targetClasses);
+            if (psiClass != null) {
+                map.put(targetClasses, psiClass);
+            }
+        }
+        return map;
+    }
+
+    @Nullable
+    @Contract(value = "null -> null", pure = true)
+    public static PsiClass resolveGenericClass(@Nullable PsiElement element) {
+        if (element instanceof PsiClassObjectAccessExpressionImpl) {
+            final PsiClassObjectAccessExpressionImpl expression = (PsiClassObjectAccessExpressionImpl) element;
+
+            final PsiType type = expression.getType();
+            if (!(type instanceof PsiImmediateClassType)) {
+                return null;
+            }
+
+            final PsiSubstitutor substitutor = ((PsiImmediateClassType) type).resolveGenerics().getSubstitutor();
+            final Map<PsiTypeParameter, PsiType> substitutionMap = substitutor.getSubstitutionMap();
+
+            final Set<Map.Entry<PsiTypeParameter, PsiType>> entries = substitutionMap.entrySet();
+            if (entries.size() != 1) {
+                return null;
+            }
+            final PsiClassReferenceType value = (PsiClassReferenceType) entries.iterator().next().getValue();
+
+            return value.resolve();
+        } else if (element instanceof PsiReferenceExpression) {
+            // We need to find what value the reference expression is set to
+            final PsiReferenceExpression expression = (PsiReferenceExpression) element;
+
+            final PsiElement resolveEl = expression.resolve();
+            if (resolveEl == null) {
+                return null;
+            }
+
+            if (!(resolveEl instanceof PsiField)) {
+                return null;
+            }
+
+            final PsiField resolveField = (PsiField) resolveEl;
+            final ASTNode childByType = resolveField.getNode().findChildByType(ElementType.LITERAL_EXPRESSION);
+            if (childByType == null) {
+                return null;
+            }
+
+            final PsiElement psi = childByType.getPsi();
+            if (psi == null) {
+                return null;
+            }
+
+            if (!(psi instanceof PsiLiteralExpressionImpl)) {
+                return null;
+            }
+
+            final PsiLiteralExpressionImpl lit = (PsiLiteralExpressionImpl) psi;
+
+            final String text = lit.getInnerText();
+            return MixinUtils.getClassFromMixinTargetString(text, element.getProject());
+        } else if (element instanceof PsiLiteralExpressionImpl) {
+            final PsiLiteralExpressionImpl expression = (PsiLiteralExpressionImpl) element;
+            return MixinUtils.getClassFromMixinTargetString(expression.getInnerText(), element.getProject());
+        }
+
+        return null;
     }
 }

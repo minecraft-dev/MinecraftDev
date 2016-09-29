@@ -11,7 +11,8 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
-public class McEditorUtil {
+public final class McEditorUtil {
+    private McEditorUtil() {}
 
     public static void gotoTargetElement(@NotNull PsiElement element, @NotNull Editor currentEditor, @NotNull PsiFile currentFile) {
         if (element.getContainingFile() == currentFile) {

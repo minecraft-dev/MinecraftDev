@@ -75,7 +75,7 @@ public class ColorLineMarkerProvider implements LineMarkerProvider {
                             ColorUtil.setColorTo(element, newColor);
                         }
                     },
-                    GutterIconRenderer.Alignment.CENTER
+                    GutterIconRenderer.Alignment.RIGHT
             );
             this.color = color;
         }
@@ -90,7 +90,7 @@ public class ColorLineMarkerProvider implements LineMarkerProvider {
                 Pass.UPDATE_ALL,
                 FunctionUtil.<Object, String>nullConstant(),
                 handler,
-                GutterIconRenderer.Alignment.LEFT
+                GutterIconRenderer.Alignment.RIGHT
             );
             this.color = color;
         }
@@ -98,6 +98,11 @@ public class ColorLineMarkerProvider implements LineMarkerProvider {
         @Override
         public boolean canMergeWith(@NotNull MergeableLineMarkerInfo<?> info) {
             return info instanceof ColorInfo;
+        }
+
+        @Override
+        public GutterIconRenderer.Alignment getCommonIconAlignment(@NotNull List<MergeableLineMarkerInfo> infos) {
+            return GutterIconRenderer.Alignment.RIGHT;
         }
 
         @Override

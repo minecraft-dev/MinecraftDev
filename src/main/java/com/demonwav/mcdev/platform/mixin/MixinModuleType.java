@@ -8,15 +8,16 @@ import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.List;
+
+import javax.swing.Icon;
 
 public class MixinModuleType extends AbstractModuleType<MixinModule> {
 
     public static final String ID = "MIXIN_MODULE_TYPE";
     private static final MixinModuleType instance = new MixinModuleType();
 
-    private static final ImmutableList<String> annotations = ImmutableList.<String>builder()
+    private static final ImmutableList<String> ANNOTATIONS = ImmutableList.<String>builder()
             .add(Annotations.DEBUG)
             .add(Annotations.FINAL)
             .add(Annotations.IMPLEMENTS)
@@ -68,7 +69,7 @@ public class MixinModuleType extends AbstractModuleType<MixinModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return annotations;
+        return ANNOTATIONS;
     }
 
     @NotNull

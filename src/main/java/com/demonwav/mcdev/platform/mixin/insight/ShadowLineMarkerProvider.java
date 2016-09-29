@@ -1,8 +1,6 @@
 package com.demonwav.mcdev.platform.mixin.insight;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.MinecraftModule;
-import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.util.McEditorUtil;
@@ -18,8 +16,6 @@ import com.intellij.featureStatistics.FeatureUsageTracker;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
@@ -27,7 +23,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiIdentifier;
-import com.intellij.psi.PsiModifierList;
 import com.intellij.util.Function;
 import com.intellij.util.NullableFunction;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -53,7 +49,7 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
 
         final PsiClass containingClass = McPsiUtil.getClassOfElement(field);
 
-        final PsiAnnotationMemberValue value = MixinUtils.getMemberValueTargetOfMixinClass(containingClass);
+        final PsiAnnotationMemberValue value = MixinUtils.getMixinAnnotationValue(containingClass);
         if (value == null) {
             return null;
         }
@@ -71,26 +67,24 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
             Pass.UPDATE_ALL,
             getIcon(),
             (mouseEvent, psiElement) -> {
-                final PsiClass resolve = McPsiUtil.resolveGenericClass(value);
-                if (resolve == null) {
-                    return;
-                }
+                final Map<PsiElement, PsiClass> psiClassMap = MixinUtils.resolveGenericClass(value);
+                for (Map.Entry<PsiElement, PsiClass> entry : psiClassMap.entrySet()) {
+                    final PsiField resolveField = entry.getValue().findFieldByName(identifier.getText(), false);
+                    if (resolveField == null) {
+                        continue;
+                    }
 
-                final PsiField resolveField = resolve.findFieldByName(identifier.getText(), false);
-                if (resolveField == null) {
-                    return;
-                }
+                    final Editor editor = FileEditorManager.getInstance(entry.getValue().getProject()).getSelectedTextEditor();
+                    if (editor == null) {
+                        return;
+                    }
 
-                final Editor editor = FileEditorManager.getInstance(resolve.getProject()).getSelectedTextEditor();
-                if (editor == null) {
-                    return;
-                }
-
-                FeatureUsageTracker.getInstance().triggerFeatureUsed("navigation.goto.declaration");
-                PsiElement navElement = resolveField.getNavigationElement();
-                navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(resolveField, navElement);
-                if (navElement != null) {
-                    McEditorUtil.gotoTargetElement(navElement, editor, resolveField.getContainingFile());
+                    FeatureUsageTracker.getInstance().triggerFeatureUsed("navigation.goto.declaration");
+                    PsiElement navElement = resolveField.getNavigationElement();
+                    navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(resolveField, navElement);
+                    if (navElement != null) {
+                        McEditorUtil.gotoTargetElement(navElement, editor, resolveField.getContainingFile());
+                    }
                 }
             }
         );
