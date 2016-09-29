@@ -16,6 +16,26 @@ public class MixinModuleType extends AbstractModuleType<MixinModule> {
     public static final String ID = "MIXIN_MODULE_TYPE";
     private static final MixinModuleType instance = new MixinModuleType();
 
+    private static final ImmutableList<String> annotations = ImmutableList.<String>builder()
+            .add(Annotations.DEBUG)
+            .add(Annotations.FINAL)
+            .add(Annotations.IMPLEMENTS)
+            .add(Annotations.INTERFACE)
+            .add(Annotations.INTRINSIC)
+            .add(Annotations.MIXIN)
+            .add(Annotations.MUTABLE)
+            .add(Annotations.OVERWRITE)
+            .add(Annotations.SHADOW)
+            .add(Annotations.SOFT_OVERRIDE)
+            .add(Annotations.UNIQUE)
+            .add(Annotations.INJECT)
+            .add(Annotations.MODIFY_ARG)
+            .add(Annotations.MODIFY_CONSTANT)
+            .add(Annotations.MODIFY_VARIABLE)
+            .add(Annotations.REDIRECT)
+            .add(Annotations.SURROGATE)
+            .build();
+
     private MixinModuleType() {
         super("org.spongepowered", "mixin");
     }
@@ -45,30 +65,10 @@ public class MixinModuleType extends AbstractModuleType<MixinModule> {
         return ID;
     }
 
-    private final ImmutableList<String> annotations = ImmutableList.<String>builder()
-            .add(Annotations.DEBUG)
-            .add(Annotations.FINAL)
-            .add(Annotations.IMPLEMENTS)
-            .add(Annotations.INTERFACE)
-            .add(Annotations.INTRINSIC)
-            .add(Annotations.MIXIN)
-            .add(Annotations.MUTABLE)
-            .add(Annotations.OVERWRITE)
-            .add(Annotations.SHADOW)
-            .add(Annotations.SOFT_OVERRIDE)
-            .add(Annotations.UNIQUE)
-            .add(Annotations.INJECT)
-            .add(Annotations.MODIFY_ARG)
-            .add(Annotations.MODIFY_CONSTANT)
-            .add(Annotations.MODIFY_VARIABLE)
-            .add(Annotations.REDIRECT)
-            .add(Annotations.SURROGATE)
-            .build();
-
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return this.annotations;
+        return annotations;
     }
 
     @NotNull
