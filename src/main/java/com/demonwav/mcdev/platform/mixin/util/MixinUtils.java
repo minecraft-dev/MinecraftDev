@@ -2,7 +2,7 @@ package com.demonwav.mcdev.platform.mixin.util;
 
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.mixin.MixinModuleType;
-import com.demonwav.mcdev.platform.mixin.inspections.ShadowInspection.ShadowMemberErrorMessages.Key;
+import com.demonwav.mcdev.platform.mixin.util.ShadowError.Key;
 import com.demonwav.mcdev.util.McMethodUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
 
@@ -18,6 +18,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassObjectAccessExpression;
@@ -26,6 +27,8 @@ import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifier;
+import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReferenceExpression;
@@ -35,6 +38,7 @@ import com.intellij.psi.PsiTypeParameter;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.impl.source.PsiImmediateClassType;
 import com.intellij.psi.impl.source.tree.ElementType;
+import com.intellij.psi.impl.source.tree.java.PsiArrayInitializerMemberValueImpl;
 import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -315,7 +319,7 @@ public final class MixinUtils {
 
         // Handle anonymous classes
         final String[] classes = replaced.substring(replaced.indexOf('$')).split("\\$");
-        List<Integer> indexes = Lists.newArrayList();
+        List<Object> indexes = Lists.newArrayList();
         for (String cls : classes) {
             if (cls.isEmpty()) {
                 continue;
@@ -324,27 +328,35 @@ public final class MixinUtils {
             try {
                 indexes.add(Integer.parseInt(cls) - 1);
             } catch (Exception e) {
-                return psiClass;
+                indexes.add(cls);
             }
         }
 
         PsiElement current = psiClass;
-        for (int index : indexes) {
-            PsiElement[] anonymousClasses = null;
-            for (AnonymousElementProvider provider : Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
-                anonymousClasses = provider.getAnonymousElements(psiClass);
-                if (anonymousClasses.length > 0) {
-                    break;
+        for (Object index : indexes) {
+            if (index instanceof Integer) {
+                PsiElement[] anonymousClasses = null;
+                for (AnonymousElementProvider provider : Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
+                    anonymousClasses = provider.getAnonymousElements(psiClass);
+                    if (anonymousClasses.length > 0) {
+                        break;
+                    }
                 }
-            }
-            if (anonymousClasses == null) {
-                return psiClass;
-            }
+                if (anonymousClasses == null) {
+                    return psiClass;
+                }
 
-            if (index >= 0 && index < anonymousClasses.length) {
-                current = anonymousClasses[index];
+                if ((((Integer) index) >= 0) && (((Integer) index) < anonymousClasses.length)) {
+                    current = anonymousClasses[((Integer) index)];
+                } else {
+                    return (PsiClass) current;
+                }
             } else {
-                return (PsiClass) current;
+                final PsiClass newClass = ((PsiClass) current).findInnerClassByName((String) index, false);
+                if (newClass == null) {
+                    return ((PsiClass) current);
+                }
+                current = newClass;
             }
         }
 
@@ -482,49 +494,141 @@ public final class MixinUtils {
 
         final PsiClass containingClass = MixinUtils.getContainingMixinClass(element);
         if (containingClass == null) {
-            return Pair.create(null, ShadowError.builder().setError(true).addContext(Key.CANNOT_FIND_MIXIN_TARGET).build());
+            return Pair.create(null, ShadowError.builder().addContext(Key.CANNOT_FIND_MIXIN_TARGET).build());
         }
 
         final Map<PsiElement, PsiClass> allMixedClasses = MixinUtils.getAllMixedClasses(containingClass);
         if (allMixedClasses.isEmpty()) {
-            return Pair.create(null, ShadowError.builder().setError(true).addContext(Key.NO_MIXIN_CLASS_TARGETS).build());
+            return Pair.create(null, ShadowError.builder().addContext(Key.NO_MIXIN_CLASS_TARGETS).build());
+        }
+
+        final PsiAnnotationMemberValue shadowPrefixValue = annotation.findDeclaredAttributeValue("prefix");
+        final PsiAnnotationMemberValue shadowAliasValue = annotation.findAttributeValue("aliases");
+        if (shadowPrefixValue != null && !(shadowPrefixValue instanceof PsiLiteralExpression)) {
+            // Don't handle case
+            // TODO can we?
+            return Pair.create(null, null);
+        }
+
+        final String shadowPrefix;
+        if (shadowPrefixValue == null) {
+            shadowPrefix = "shadow$";
+        } else {
+            final Object value = ((PsiLiteralExpression) shadowPrefixValue).getValue();
+            if (value != null) {
+                shadowPrefix = value.toString();
+            } else {
+                shadowPrefix = "";
+            }
+        }
+        String name = ((PsiNamedElement) element).getName();
+        assert name != null;
+        String shadowTargetName = name.replace(shadowPrefix, "");
+
+        List<String> aliases = Lists.newArrayList();
+        if (shadowAliasValue instanceof PsiArrayInitializerMemberValueImpl) {
+            final PsiAnnotationMemberValue[] initializers = ((PsiArrayInitializerMemberValueImpl) shadowAliasValue).getInitializers();
+            for (PsiAnnotationMemberValue initializer : initializers) {
+                if (initializer instanceof PsiLiteralExpressionImpl) {
+                    String text = ((PsiLiteralExpressionImpl) initializer).getInnerText();
+                    if (text != null) {
+                        aliases.add(text);
+                    }
+                }
+            }
+        } else if (shadowAliasValue instanceof PsiLiteralExpressionImpl) {
+            String text = ((PsiLiteralExpressionImpl) shadowAliasValue).getInnerText();
+            if (text != null) {
+                aliases.add(text);
+            }
+        } // else: Ignore aliases
+
+        if (aliases.contains("this$0")) {
+            // Don't handle this case
+            // TODO can we?
+            return Pair.create(null, null);
         }
 
         if (element instanceof PsiField) {
             final PsiField field = (PsiField) element;
 
             for (Map.Entry<PsiElement, PsiClass> entry : allMixedClasses.entrySet()) {
-                final PsiField resolveField = entry.getValue().findFieldByName(field.getNameIdentifier().getText(), false);
+                PsiField resolveField = entry.getValue().findFieldByName(shadowTargetName, true);
                 if (resolveField == null) {
+                    if (!aliases.isEmpty()) {
+                        for (String alias : aliases) {
+                            resolveField = entry.getValue().findFieldByName(alias, true);
+                            if (resolveField != null) {
+                                break;
+                            }
+                        }
+                        if (resolveField == null) {
+                            continue;
+                        }
+                    }
                     continue;
                 }
 
-                // TODO check for errors
+                final String fieldAccessModifier = McPsiUtil.getAccessModifier(field);
+                final String neededAccessModifier = McPsiUtil.getAccessModifier(resolveField);
+
+                if (!neededAccessModifier.equals(fieldAccessModifier)) {
+                    return Pair.create(null, ShadowError.builder()
+                        .addContext(Key.INVALID_ACCESSOR_ON_SHADOW_FIELD)
+                        .addContext(fieldAccessModifier)
+                        .addContext(neededAccessModifier)
+                        .build()
+                    );
+                }
+
+                if (!field.getType().equals(resolveField.getType())) {
+                    return Pair.create(null, ShadowError.builder()
+                        .addContext(Key.INVALID_FIELD_TYPE)
+                        .addContext(field.getType().getCanonicalText())
+                        .addContext(resolveField.getType().getCanonicalText())
+                        .build()
+                    );
+                }
+
+                final PsiModifierList modifierList = field.getModifierList();
+                if (resolveField.hasModifierProperty(PsiModifier.FINAL)) {
+                    if (modifierList != null && modifierList.findAnnotation(MixinConstants.Annotations.FINAL) == null) {
+                        return Pair.create(null, ShadowError.builder()
+                            .addContext(Key.NO_FINAL_ANNOTATION_WITH_FINAL_TARGET)
+                            .build()
+                        );
+                    }
+                }
+
                 return Pair.create(resolveField, null);
             }
+
+            // We haven't returned yet, so no shadow was found
+            return Pair.create(null, ShadowError.builder()
+                .addContext(Key.NO_SHADOW_FIELD_FOUND_WITH_REMAP)
+                .addContext(field.getName())
+                .addContext(allMixedClasses.entrySet().stream().map(e -> {
+                    if (e.getValue() instanceof PsiAnonymousClass) {
+                        return e.getKey().getText();
+                    }
+                    return e.getValue().getName();
+                }).collect(Collectors.joining(", ")))
+                .build()
+            );
         } else if (element instanceof PsiMethod) {
             final PsiMethod method = (PsiMethod) element;
 
-            final PsiAnnotationMemberValue shadowPrefixValue = annotation.findDeclaredAttributeValue("prefix");
-            if (shadowPrefixValue != null && !(shadowPrefixValue instanceof PsiLiteralExpression)) {
-                // Don't handle case
-                // TODO can we?
-                return Pair.create(null, null);
-            }
-            final String shadowPrefix = shadowPrefixValue == null ? "shadow$" : ((PsiLiteralExpression) shadowPrefixValue).getValue().toString();
-            String shadowTargetMethodName = method.getName().replace(shadowPrefix, "");
-
             for (Map.Entry<PsiElement, PsiClass> entry : allMixedClasses.entrySet()) {
-                final PsiMethod[] methodsByName = entry.getValue().findMethodsByName(shadowTargetMethodName, false);
+                final PsiMethod[] methodsByName = entry.getValue().findMethodsByName(shadowTargetName, true);
                 if (methodsByName.length == 0) {
                     continue;
                 }
 
-                final String methodAccessModifier = McPsiUtil.getMethodAccessModifier(method);
+                final String methodAccessModifier = McPsiUtil.getAccessModifier(method);
                 // There are multiple
                 final ArrayList<PsiMethod> validAccessMethods = new ArrayList<>(methodsByName.length);
                 for (PsiMethod psiMethod : methodsByName) {
-                    if (McPsiUtil.getMethodAccessModifier(psiMethod).equalsIgnoreCase(methodAccessModifier)) {
+                    if (McPsiUtil.getAccessModifier(psiMethod).equalsIgnoreCase(methodAccessModifier)) {
                         validAccessMethods.add(psiMethod);
                     }
                 }
@@ -533,7 +637,7 @@ public final class MixinUtils {
                     if (McMethodUtil.areSignaturesEqualLightweight(
                         psiMethod.getSignature(PsiSubstitutor.EMPTY),
                         method.getSignature(PsiSubstitutor.EMPTY),
-                        shadowTargetMethodName
+                        shadowTargetName
                     )) {
                         // Don't worry about the nullable because it's not a constructor.
                         final PsiType returnType = method.getReturnType();
@@ -552,8 +656,7 @@ public final class MixinUtils {
                     }
                 }
                 if (validSignatureMethods.isEmpty()) {
-                    // TODO ERROR
-                    return Pair.create(null, ShadowError.builder().setError(true)
+                    return Pair.create(null, ShadowError.builder()
                         .addContext(Key.NO_MATCHING_METHODS_FOUND)
                         .addContext(method.getSignature(PsiSubstitutor.EMPTY).getName())
                         .addContext(entry.getValue().getName())
@@ -569,8 +672,8 @@ public final class MixinUtils {
                 }
                 if (validAccessMethods.isEmpty()) {
                     final PsiMethod psiMethod = validSignatureMethods.get(0);
-                    final String probableAccessModifier = McPsiUtil.getMethodAccessModifier(psiMethod);
-                    return Pair.create(null, ShadowError.builder().setError(true)
+                    final String probableAccessModifier = McPsiUtil.getAccessModifier(psiMethod);
+                    return Pair.create(null, ShadowError.builder()
                         .addContext(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD)
                         .addContext(methodAccessModifier)
                         .addContext(probableAccessModifier)
@@ -579,7 +682,7 @@ public final class MixinUtils {
 
                 return Pair.create(validAccessMethods.get(0), null);
             }
-            return Pair.create(null, ShadowError.builder().setError(true)
+            return Pair.create(null, ShadowError.builder()
                 .addContext(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP)
                 .addContext(method.getName())
                 .addContext(allMixedClasses.values().stream().map(PsiNamedElement::getName).collect(Collectors.joining(", ")))

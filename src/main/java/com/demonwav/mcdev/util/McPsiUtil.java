@@ -11,6 +11,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiKeyword;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
@@ -85,9 +86,9 @@ public final class McPsiUtil {
             .add(PsiModifier.PRIVATE)
             .build();
 
-    public static String getMethodAccessModifier(PsiMethod method) {
+    public static String getAccessModifier(PsiMember member) {
         return METHOD_ACCESS_MODIFIERS.stream()
-                .filter(method::hasModifierProperty)
+                .filter(member::hasModifierProperty)
                 .findFirst()
                 .orElse(PsiModifier.PUBLIC);
     }

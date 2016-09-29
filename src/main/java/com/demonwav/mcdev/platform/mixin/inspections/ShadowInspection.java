@@ -2,29 +2,27 @@ package com.demonwav.mcdev.platform.mixin.inspections;
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
-import com.demonwav.mcdev.util.McMethodUtil;
+import com.demonwav.mcdev.platform.mixin.util.ShadowError;
+import com.demonwav.mcdev.platform.mixin.util.ShadowError.Key;
 import com.demonwav.mcdev.util.McPsiUtil;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteralExpression;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiSubstitutor;
-import com.intellij.psi.PsiType;
-import com.intellij.psi.util.TypeConversionUtil;
+import com.intellij.psi.PsiModifierListOwner;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class ShadowInspection extends BaseInspection {
@@ -39,7 +37,7 @@ public class ShadowInspection extends BaseInspection {
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        return ShadowMemberErrorMessages.formatError(infos);
+        return ShadowError.ErrorMessages.formatError(infos);
     }
 
     @Override
@@ -50,24 +48,54 @@ public class ShadowInspection extends BaseInspection {
     private static class ShadowVisitor extends BaseInspectionVisitor {
         @Override
         public void visitMethod(PsiMethod method) {
-            if (!MixinUtils.isMixinModule(method)) {
+            final Info info = getInfo(method);
+            if (info == null) {
                 return;
             }
 
-            final PsiAnnotation shadowAnnotation = McPsiUtil.getAnnotation(method, Annotations.SHADOW);
+            if (!info.strategy.validateMemberCanBeUsedInMixin(method, info.containingClass, this, info.shadowAnnotation, info.psiClassMap)) {
+                return; // Means we already got an error to display
+            }
+
+            // Now we can actually validate that the method is actually available in the target class
+            info.strategy.validateShadowMethodExists(method, info.containingClass, this, info.shadowAnnotation, info.psiClassMap);
+        }
+
+        @Override
+        public void visitField(PsiField field) {
+            final Info info = getInfo(field);
+            if (info == null) {
+                return;
+            }
+
+            if (!info.strategy.validateMemberCanBeUsedInMixin(field, info.containingClass, this, info.shadowAnnotation, info.psiClassMap)) {
+                return; // Means we already go an error to display
+            }
+
+            info.strategy.validateShadowFieldExists(field, info.containingClass, this, info.shadowAnnotation, info.psiClassMap);
+        }
+
+        @Nullable
+        @Contract(value = "null -> null", pure = true)
+        private Info getInfo(@Nullable PsiModifierListOwner owner) {
+            if (!MixinUtils.isMixinModule(owner)) {
+                return null;
+            }
+
+            final PsiAnnotation shadowAnnotation = McPsiUtil.getAnnotation(owner, Annotations.SHADOW);
             if (shadowAnnotation == null) {
-                return;
+                return null;
             }
 
-            final PsiClass containingClass = MixinUtils.getContainingMixinClass(method);
+            final PsiClass containingClass = MixinUtils.getContainingMixinClass(owner);
             if (containingClass == null) {
-                return;
+                return null;
             }
 
-            // Success, we have a mixin!
+            // We have a mixin
             final Map<PsiElement, PsiClass> psiClassMap = MixinUtils.getAllMixedClasses(containingClass);
             if (psiClassMap.isEmpty()) {
-                return;
+                return null;
             }
 
             final PsiAnnotationMemberValue mixinTargetRemapValue = MixinUtils.getMixinAnnotationAttribute(containingClass, "remap");
@@ -81,97 +109,134 @@ public class ShadowInspection extends BaseInspection {
             if (shadowRemap instanceof PsiLiteralExpression) {
                 shadowTargetRemapped = (boolean) ((PsiLiteralExpression) shadowRemap).getValue();
             }
-            final RemapStrategy remapStrategy = RemapStrategy.match(isTargetRemapped, shadowTargetRemapped);
 
-            if (!remapStrategy.validateMethodCanBeUsedInMixin(method, containingClass, this, shadowAnnotation, psiClassMap)) {
-                return; // Means we already got an error to display
-            }
-
-            // Now we can actually validate that the method is actually available in the target class
-            remapStrategy.validateShadowExists(method, containingClass, this, shadowAnnotation, psiClassMap);
+            return new Info(
+                RemapStrategy.match(isTargetRemapped, shadowTargetRemapped),
+                containingClass,
+                shadowAnnotation,
+                psiClassMap
+            );
         }
 
-        @Override
-        public void visitField(PsiField field) {
-
+        private static class Info {
+            public RemapStrategy strategy;
+            public PsiClass containingClass;
+            public PsiAnnotation shadowAnnotation;
+            public Map<PsiElement, PsiClass> psiClassMap;
+            public Info(RemapStrategy strategy, PsiClass containingClass, PsiAnnotation shadowAnnotation, Map<PsiElement, PsiClass> psiClassMap) {
+                this.strategy = strategy;
+                this.containingClass = containingClass;
+                this.shadowAnnotation = shadowAnnotation;
+                this.psiClassMap = psiClassMap;
+            }
         }
 
         enum RemapStrategy {
             BOTH(true, true) {
                 @Override
-                boolean validateMethodCanBeUsedInMixin(@NotNull PsiMethod method,
+                boolean validateMemberCanBeUsedInMixin(@NotNull PsiMember member,
                                                        @NotNull PsiClass containingClass,
                                                        ShadowVisitor visitor,
                                                        PsiAnnotation shadowAnnotation,
                                                        @NotNull Map<PsiElement, PsiClass> mixedClasses) {
                     if (mixedClasses.size() > 1) {
-                        visitor.registerError(shadowAnnotation, ShadowMemberErrorMessages.Key.MULTI_TARGET_CLASS_REMAPPED_TRUE, containingClass);
+                        visitor.registerError(shadowAnnotation, Key.MULTI_TARGET_CLASS_REMAPPED_TRUE, containingClass);
                         return false;
                     }
                     return true;
                 }
 
                 @Override
-                boolean validateShadowExists(PsiMethod method,
-                                             PsiClass psiClass,
-                                             ShadowVisitor visitor,
-                                             PsiAnnotation shadowAnnotation,
-                                             @NotNull Map<PsiElement, PsiClass> mixedClasses) {
+                boolean validateShadowFieldExists(PsiField field,
+                                                  PsiClass psiClass,
+                                                  ShadowVisitor visitor,
+                                                  PsiAnnotation shadowAnnotation,
+                                                  @NotNull Map<PsiElement, PsiClass> mixedClasses) {
                     if (!mixedClasses.isEmpty()) {
-                        isMethodValidFromClass(method, visitor, shadowAnnotation, mixedClasses);
+                        isFieldValidFromClass(field, visitor);
+                    }
+                    return true;
+                }
+
+                @Override
+                boolean validateShadowMethodExists(PsiMethod method,
+                                                   PsiClass psiClass,
+                                                   ShadowVisitor visitor,
+                                                   PsiAnnotation shadowAnnotation,
+                                                   @NotNull Map<PsiElement, PsiClass> mixedClasses) {
+                    if (!mixedClasses.isEmpty()) {
+                        isMethodValidFromClass(method, visitor);
                     }
                     return true;
                 }
             },
             CLASS_NOT_SHADOW_REMAPPED(false, true) { // Shadows are not remapped if the target is not remapped.
                 @Override
-                boolean validateMethodCanBeUsedInMixin(@NotNull PsiMethod method,
+                boolean validateMemberCanBeUsedInMixin(@NotNull PsiMember member,
                                                        @NotNull PsiClass containingClass,
                                                        ShadowVisitor visitor,
                                                        PsiAnnotation shadowAnnotation,
                                                        @NotNull Map<PsiElement, PsiClass> mixedClasses) {
                     if (mixedClasses.size() > 1) {
-                        visitor.registerError(shadowAnnotation, ShadowMemberErrorMessages.Key.MULTI_TARGET_SHADOW_REMAPPED_TRUE, containingClass);
+                        visitor.registerError(shadowAnnotation, Key.MULTI_TARGET_SHADOW_REMAPPED_TRUE, containingClass);
                         return false;
                     }
                     return true;
                 }
 
                 @Override
-                boolean validateShadowExists(PsiMethod method,
-                                             PsiClass psiClass,
-                                             ShadowVisitor visitor,
-                                             PsiAnnotation shadowAnnotation,
-                                             @NotNull Map<PsiElement, PsiClass> mixedClasses) {
+                boolean validateShadowFieldExists(PsiField field,
+                                                  PsiClass psiClass,
+                                                  ShadowVisitor visitor,
+                                                  PsiAnnotation shadowAnnotation,
+                                                  @NotNull Map<PsiElement, PsiClass> mixedClasses) {
+                    return false;
+                }
+
+                @Override
+                boolean validateShadowMethodExists(PsiMethod method,
+                                                   PsiClass psiClass,
+                                                   ShadowVisitor visitor,
+                                                   PsiAnnotation shadowAnnotation,
+                                                   @NotNull Map<PsiElement, PsiClass> mixedClasses) {
                     return false;
                 }
             },
             CLASS_REMAPPED_SHADOW_NOT(true, false) {
                 @Override
-                boolean validateMethodCanBeUsedInMixin(@NotNull PsiMethod method,
+                boolean validateMemberCanBeUsedInMixin(@NotNull PsiMember member,
                                                        @NotNull PsiClass containingClass,
                                                        ShadowVisitor visitor,
                                                        PsiAnnotation shadowAnnotation,
                                                        @NotNull Map<PsiElement, PsiClass> mixedClasses) {
                     if (mixedClasses.size() > 1) {
-                        visitor.registerError(shadowAnnotation, ShadowMemberErrorMessages.Key.MULTI_TARGET_CLASS_REMAPPED_TRUE, containingClass);
+                        visitor.registerError(shadowAnnotation, Key.MULTI_TARGET_CLASS_REMAPPED_TRUE, containingClass);
                         return false;
                     }
                     return true;
                 }
 
                 @Override
-                boolean validateShadowExists(PsiMethod method,
-                                             PsiClass psiClass,
-                                             ShadowVisitor visitor,
-                                             PsiAnnotation shadowAnnotation,
-                                             @NotNull Map<PsiElement, PsiClass> mixedClasses) {
+                boolean validateShadowFieldExists(PsiField field,
+                                                  PsiClass psiClass,
+                                                  ShadowVisitor visitor,
+                                                  PsiAnnotation shadowAnnotation,
+                                                  @NotNull Map<PsiElement, PsiClass> mixedClasses) {
+                    return false;
+                }
+
+                @Override
+                boolean validateShadowMethodExists(PsiMethod method,
+                                                   PsiClass psiClass,
+                                                   ShadowVisitor visitor,
+                                                   PsiAnnotation shadowAnnotation,
+                                                   @NotNull Map<PsiElement, PsiClass> mixedClasses) {
                     return false;
                 }
             },
             NONE(false, false) { // Both are not remapped
                 @Override
-                boolean validateMethodCanBeUsedInMixin(@NotNull PsiMethod method,
+                boolean validateMemberCanBeUsedInMixin(@NotNull PsiMember member,
                                                        @NotNull PsiClass containingClass,
                                                        ShadowVisitor visitor,
                                                        PsiAnnotation shadowAnnotation,
@@ -184,95 +249,43 @@ public class ShadowInspection extends BaseInspection {
                 }
 
                 @Override
-                boolean validateShadowExists(PsiMethod method,
-                                             PsiClass psiClass,
-                                             ShadowVisitor visitor,
-                                             PsiAnnotation shadowAnnotation,
-                                             @NotNull Map<PsiElement, PsiClass> mixedClasses) {
+                boolean validateShadowFieldExists(PsiField field,
+                                                  PsiClass psiClass,
+                                                  ShadowVisitor visitor,
+                                                  PsiAnnotation shadowAnnotation,
+                                                  @NotNull Map<PsiElement, PsiClass> mixedClasses) {
+                    return false;
+                }
+
+                @Override
+                boolean validateShadowMethodExists(PsiMethod method,
+                                                   PsiClass psiClass,
+                                                   ShadowVisitor visitor,
+                                                   PsiAnnotation shadowAnnotation,
+                                                   @NotNull Map<PsiElement, PsiClass> mixedClasses) {
                     return false;
                 }
             },
             ;
 
             private static boolean isMethodValidFromClass(PsiMethod method,
-                                                          ShadowVisitor visitor,
-                                                          PsiAnnotation shadowAnnotation,
-                                                          Map<PsiElement, PsiClass> mixedClasses) {
-                if (mixedClasses.isEmpty()) {
-                    visitor.registerError(method, ShadowMemberErrorMessages.Key.CANNOT_FIND_MIXIN_TARGET);
-                    return false;
-                }
+                                                          ShadowVisitor visitor) {
 
-                final PsiAnnotationMemberValue shadowPrefixValue = shadowAnnotation.findDeclaredAttributeValue("prefix");
-                if (shadowPrefixValue != null && !(shadowPrefixValue instanceof PsiLiteralExpression)) {
+                final Pair<PsiElement, ShadowError> shadowedElement = MixinUtils.getShadowedElement(method);
+                if (shadowedElement.getSecond() != null) {
+                    visitor.registerError(method, shadowedElement.getSecond().getErrorContextInfos());
                     return true;
                 }
-                final String shadowPrefix = shadowPrefixValue == null ? "shadow$" : ((PsiLiteralExpression) shadowPrefixValue).getValue().toString();
-                String shadowTargetMethodName = method.getName().replace(shadowPrefix, "");
+                return false;
+            }
 
-                boolean error = false;
-                for (Map.Entry<PsiElement, PsiClass> entry : mixedClasses.entrySet()) {
-                    final PsiClass targetClass = entry.getValue();
-
-                    final PsiMethod[] methodsByName = targetClass.findMethodsByName(shadowTargetMethodName, false);
-                    if (methodsByName.length == 0) {
-                        visitor.registerError(method, ShadowMemberErrorMessages.Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP, method.getName(), targetClass.getName());
-                        error = true;
-                        continue;
-                    }
-                    final String methodAccessModifier = McPsiUtil.getMethodAccessModifier(method);
-                    // There are multiple
-                    List<PsiMethod> validAccessMethods = new ArrayList<>(methodsByName.length);
-                    for (PsiMethod psiMethod : methodsByName) {
-                        if (McPsiUtil.getMethodAccessModifier(psiMethod).equalsIgnoreCase(methodAccessModifier)) {
-                            validAccessMethods.add(psiMethod);
-                        }
-                    }
-                    List<PsiMethod> validSignatureMethods = new ArrayList<>(methodsByName.length);
-                    for (PsiMethod psiMethod : methodsByName) {
-                        if (McMethodUtil.areSignaturesEqualLightweight(
-                                psiMethod.getSignature(PsiSubstitutor.EMPTY),
-                                method.getSignature(PsiSubstitutor.EMPTY),
-                                shadowTargetMethodName
-                        )) {
-                            // Don't worry about the nullable because it's not a constructor.
-//                            final PsiType returnType = method.getReturnType();
-//                            final PsiType possibleReturnType = psiMethod.getReturnType();
-//                            final PsiType erasedReturnType = TypeConversionUtil.erasure(returnType);
-//                            final PsiType erasedPossibleReturnType = TypeConversionUtil.erasure(possibleReturnType);
-//                            final boolean areTypesAgreed = TypeConversionUtil.typesAgree(returnType, possibleReturnType, true);
-//
-//                            if (erasedReturnType.equals(erasedPossibleReturnType)) {
-//                                validSignatureMethods.add(psiMethod);
-//                            }
-                        }
-                    }
-                    if (validSignatureMethods.isEmpty()) {
-                        visitor.registerError(
-                                method,
-                                ShadowMemberErrorMessages.Key.NO_MATCHING_METHODS_FOUND,
-                                method.getSignature(PsiSubstitutor.EMPTY).getName(),
-                                targetClass.getName(),
-                                methodsByName
-                        );
-                        error = true;
-                        continue;
-                    }
-
-                    for (Iterator<PsiMethod> iterator = validAccessMethods.iterator(); iterator.hasNext(); ) {
-                        if (!validSignatureMethods.contains(iterator.next())) {
-                            iterator.remove();
-                        }
-                    }
-                    if (validAccessMethods.isEmpty()) {
-                        final PsiMethod psiMethod = validSignatureMethods.get(0);
-                        final String probableAccessModifier = McPsiUtil.getMethodAccessModifier(psiMethod);
-                        visitor.registerError(method, ShadowMemberErrorMessages.Key.INVALID_ACCESSOR_ON_SHADOW_METHOD, methodAccessModifier, probableAccessModifier);
-                        error = true;
-                    }
+            private static boolean isFieldValidFromClass(PsiField field, ShadowVisitor visitor) {
+                final Pair<PsiElement, ShadowError> shadowedElement = MixinUtils.getShadowedElement(field);
+                if (shadowedElement.getSecond() != null) {
+                    visitor.registerError(field, shadowedElement.getSecond().getErrorContextInfos());
+                    return true;
                 }
-
-                return error;
+                return false;
             }
 
             final boolean targetRemap;
@@ -292,135 +305,23 @@ public class ShadowInspection extends BaseInspection {
                 return BOTH;
             }
 
-            abstract boolean validateShadowExists(PsiMethod method,
-                                                  PsiClass psiClass,
-                                                  ShadowVisitor visitor,
-                                                  PsiAnnotation shadowAnnotation,
-                                                  @NotNull Map<PsiElement, PsiClass> mixedClasses);
+            abstract boolean validateShadowMethodExists(PsiMethod method,
+                                                        PsiClass psiClass,
+                                                        ShadowVisitor visitor,
+                                                        PsiAnnotation shadowAnnotation,
+                                                        @NotNull Map<PsiElement, PsiClass> mixedClasses);
 
-            abstract boolean validateMethodCanBeUsedInMixin(PsiMethod method,
+            abstract boolean validateShadowFieldExists(PsiField field,
+                                                       PsiClass psiClass,
+                                                       ShadowVisitor visitor,
+                                                       PsiAnnotation shadowAnnotation,
+                                                       @NotNull Map<PsiElement, PsiClass> mixedClasses);
+
+            abstract boolean validateMemberCanBeUsedInMixin(PsiMember member,
                                                             PsiClass containingClass,
                                                             ShadowVisitor visitor,
                                                             PsiAnnotation shadowAnnotation,
                                                             @NotNull Map<PsiElement, PsiClass> mixedClasses);
         }
-
-    }
-
-    public static final class ShadowMemberErrorMessages {
-
-        static String formatError(Object... args) {
-            if (args.length == 0) {
-                return "Error";
-            }
-
-            final Object first = args[0];
-            if (!(first instanceof Key)) {
-                return "Error";
-            }
-            return FORMATTERS.stream()
-                    .filter(formatter -> formatter.matches((Key) first))
-                    .findFirst()
-                    .map(found -> found.formatMessage(args))
-                    .orElse("Error");
-        }
-
-        static final List<ShadowMemberErrorMessageFormatter> FORMATTERS = ImmutableList.<ShadowMemberErrorMessageFormatter>builder()
-            .add(new ShadowMemberErrorMessageFormatter(Key.MULTI_TARGET_CLASS_REMAPPED_TRUE) {
-                @Override
-                String formatMessage(Object... args) {
-                    Preconditions.checkArgument(args[0].equals(Key.MULTI_TARGET_CLASS_REMAPPED_TRUE));
-                    final PsiClass containingClass = (PsiClass) args[1];
-                    final String containingName = containingClass.getName();
-
-                    return "Cannot have a shadow when " + containingName + " is mixing into multiple remapped targets.";
-                }
-            })
-            .add(new ShadowMemberErrorMessageFormatter(Key.MULTI_TARGET_SHADOW_REMAPPED_TRUE) {
-                @Override
-                String formatMessage(Object... args) {
-                    Preconditions.checkArgument(args[0].equals(Key.MULTI_TARGET_SHADOW_REMAPPED_TRUE));
-                    final PsiClass containingClass = (PsiClass) args[1];
-                    final String containingName = containingClass.getName();
-
-                    return "Cannot have a remapped shadow when " + containingName + " is mixing into multiple targets.";
-                }
-            })
-            .add(new ShadowMemberErrorMessageFormatter(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP) {
-                @Override
-                String formatMessage(Object... args) {
-                    Preconditions.checkArgument(args[0].equals(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP));
-                    final String methodName = (String) args[1];
-                    final String targetClassName = (String) args[2];
-
-                    return "No method found by the name: " + methodName + " in target classes: " + targetClassName;
-                }
-            })
-            .add(new ShadowMemberErrorMessageFormatter(Key.NO_MATCHING_METHODS_FOUND) {
-                @Override
-                String formatMessage(Object... args) {
-                    Preconditions.checkArgument(args[0].equals(Key.NO_MATCHING_METHODS_FOUND));
-                    final String methodName = (String) args[1];
-                    final String targetClassName = (String) args[2];
-                    final PsiMethod[] foundMethods = (PsiMethod[]) args[3];
-                    return "No methods found matching signature: " + methodName + " in target classes: " + targetClassName + ".";
-                }
-            })
-            .add(new ShadowMemberErrorMessageFormatter(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD) {
-                @Override
-                String formatMessage(Object... args) {
-                    Preconditions.checkArgument(args[0].equals(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD));
-                    final String current = (String) args[1];
-                    final String expected = (String) args[2];
-                    return "Method has invalid access modifiers, has: " + current + " but target method has: " + expected + ".";
-                }
-            })
-            .add(new ShadowMemberErrorMessageFormatter(Key.CANNOT_FIND_MIXIN_TARGET) {
-                @Override
-                String formatMessage(Object... args) {
-                    Preconditions.checkArgument(args[0].equals(Key.CANNOT_FIND_MIXIN_TARGET));
-                    return "Cannot shadow nonexistent target: target class undefined";
-                }
-            })
-            .add(new ShadowMemberErrorMessageFormatter(Key.NOT_MIXIN_CLASS) {
-                @Override
-                String formatMessage(Object... args) {
-                    Preconditions.checkArgument(args[0].equals(Key.NOT_MIXIN_CLASS));
-                    return "Cannot shadow anything in a non-@Mixin annotated class.";
-                }
-            })
-            .add(new ShadowMemberErrorMessageFormatter(Key.NO_MIXIN_CLASS_TARGETS) {
-                @Override
-                String formatMessage(Object... args) {
-                    Preconditions.checkArgument(args[0].equals(Key.NO_MIXIN_CLASS_TARGETS));
-                    return "Cannot shadow anything when the Mixin class has no targets.";
-                }
-            })
-            .build();
-
-        public enum Key {
-            MULTI_TARGET_CLASS_REMAPPED_TRUE,
-            MULTI_TARGET_SHADOW_REMAPPED_TRUE,
-            NO_SHADOW_METHOD_FOUND_WITH_REMAP,
-            NO_MATCHING_METHODS_FOUND,
-            INVALID_ACCESSOR_ON_SHADOW_METHOD,
-            CANNOT_FIND_MIXIN_TARGET,
-            NOT_MIXIN_CLASS,
-            NO_MIXIN_CLASS_TARGETS
-        }
-    }
-
-    static abstract class ShadowMemberErrorMessageFormatter {
-        final ShadowMemberErrorMessages.Key key;
-
-        ShadowMemberErrorMessageFormatter(ShadowMemberErrorMessages.Key key) {
-            this.key = key;
-        }
-
-        boolean matches(ShadowMemberErrorMessages.Key key) {
-            return this.key == key;
-        }
-
-        abstract String formatMessage(Object... args);
     }
 }

@@ -4,6 +4,7 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.util.McEditorUtil;
 
+import com.github.rjeschke.txtmark.Run;
 import com.google.common.collect.Lists;
 import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.TargetElementUtil;
@@ -16,6 +17,7 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.PopupChooserBuilder;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiClass;
@@ -88,40 +90,39 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
                     return;
                 }
 
-                // There's more than one, so create a pseudo-popup as if it was a merged icon
-                List<MixinLineMarkerInfo> infos = Lists.newArrayList();
-                for (Map.Entry<PsiElement, PsiClass> entry : psiClassMap.entrySet()) {
-                    infos.add(new MixinLineMarkerInfo(
-                        entry.getKey(),
-                        entry.getKey().getTextRange(),
-                        Pass.UPDATE_ALL,
-                        getIcon(),
-                        (mouseEvent1, psiElement1) -> {
-                            PsiElement navElement = entry.getValue().getNavigationElement();
-                            navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(entry.getValue(), navElement);
-                            if (navElement != null) {
-                                McEditorUtil.gotoTargetElement(navElement, editor, psiClass.getContainingFile());
-                            }
-                        }
-                    ));
+                final class Data {
+                    public Icon icon;
+                    public String text;
+                    public int offset;
+                    public Runnable runnable;
+                    public Data(Icon icon, String text, int offset, Runnable runnable) {
+                        this.icon = icon;
+                        this.text = text;
+                        this.offset = offset;
+                        this.runnable = runnable;
+                    }
                 }
 
-                Collections.sort(infos, (o1, o2) -> o1.startOffset - o2.startOffset);
+                // There's more than one, so create a pseudo-popup as if it was a merged icon
+                List<Data> infos = Lists.newArrayList();
+                for (Map.Entry<PsiElement, PsiClass> entry : psiClassMap.entrySet()) {
+                    infos.add(new Data(getIcon(), entry.getKey().getText(), entry.getKey().getTextOffset(), () -> {
+                        PsiElement navElement = entry.getValue().getNavigationElement();
+                        navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(entry.getValue(), navElement);
+                        if (navElement != null) {
+                            McEditorUtil.gotoTargetElement(navElement, editor, psiClass.getContainingFile());
+                        }
+                    }));
+                }
+
+                Collections.sort(infos, (o1, o2) -> o1.offset - o2.offset);
                 final JBList list = new JBList(infos);
                 PopupChooserBuilder builder  = JBPopupFactory.getInstance().createListPopupBuilder(list);
-                // Jetbrains code
+                // Modified Jetbrains code
                 list.installCellRenderer(dom -> {
-                    if (dom instanceof LineMarkerInfo) {
-                        Icon icon = null;
-                        final GutterIconRenderer renderer = ((LineMarkerInfo)dom).createGutterRenderer();
-                        if (renderer != null) {
-                            icon = renderer.getIcon();
-                        }
-                        PsiElement el = ((LineMarkerInfo)dom).getElement();
-                        assert el != null;
-                        final String elementPresentation =
-                            dom instanceof MergeableLineMarkerInfo ? ((MergeableLineMarkerInfo)dom).getElementPresentation(el) : el.getText();
-                        String text = StringUtil.first(elementPresentation, 100, true).replace('\n', ' ');
+                    if (dom instanceof Data) {
+                        Icon icon = ((Data) dom).icon;
+                        String text = ((Data)dom).text;
 
                         final JBLabel label = new JBLabel(text, icon, SwingConstants.LEFT);
                         label.setBorder(IdeBorderFactory.createEmptyBorder(2));
@@ -132,12 +133,8 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
                 });
                 builder.setItemChoosenCallback(() -> {
                     final Object value = list.getSelectedValue();
-                    if (value instanceof LineMarkerInfo) {
-                        final GutterIconNavigationHandler handler = ((LineMarkerInfo)value).getNavigationHandler();
-                        if (handler != null) {
-                            //noinspection unchecked
-                            handler.navigate(mouseEvent, ((LineMarkerInfo)value).getElement());
-                        }
+                    if (value instanceof Data) {
+                        ((Data)value).runnable.run();
                     }
                 }).createPopup().show(new RelativePoint(mouseEvent));
                 // End Jetbrains code
@@ -161,7 +158,7 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
         return PlatformAssets.MIXIN;
     }
 
-    private static final class MixinLineMarkerInfo extends MergeableLineMarkerInfo<PsiElement> {
+    public static final class MixinLineMarkerInfo extends MergeableLineMarkerInfo<PsiElement> {
         MixinLineMarkerInfo(@NotNull PsiElement element,
                             @NotNull TextRange textRange,
                             int updatePass,
@@ -198,7 +195,7 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
         @NotNull
         @Override
         public Function<? super PsiElement, String> getCommonTooltip(@NotNull List<MergeableLineMarkerInfo> infos) {
-            return element -> "Multiple Mixins";
+            return element -> "Go to Mixin class";
         }
 
         @Override

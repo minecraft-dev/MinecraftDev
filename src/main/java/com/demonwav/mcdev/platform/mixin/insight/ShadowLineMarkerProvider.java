@@ -1,10 +1,9 @@
 package com.demonwav.mcdev.platform.mixin.insight;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
+import com.demonwav.mcdev.platform.mixin.util.ShadowError;
 import com.demonwav.mcdev.util.McEditorUtil;
-import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.TargetElementUtil;
@@ -16,13 +15,11 @@ import com.intellij.featureStatistics.FeatureUsageTracker;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiAnnotationMemberValue;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiIdentifier;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.util.Function;
 import com.intellij.util.NullableFunction;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -38,26 +34,20 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
-        if (!(element instanceof PsiField)) {
-            return null;
-        }
-        final PsiField field = (PsiField) element;
-
-        if (!MixinUtils.isMixinModule(element)) {
+        final Pair<PsiElement, ShadowError> shadowedElement = MixinUtils.getShadowedElement(element);
+        final PsiElement first = shadowedElement.getFirst();
+        if (first == null) {
             return null;
         }
 
-        final PsiClass containingClass = MixinUtils.getContainingMixinClass(field);
-        if (containingClass == null) {
+        if (!(element instanceof PsiNameIdentifierOwner)) {
             return null;
         }
 
-        final PsiAnnotation annotation = McPsiUtil.getAnnotation(field, MixinConstants.Annotations.SHADOW);
-        if (annotation == null) {
+        final PsiIdentifier identifier = (PsiIdentifier) ((PsiNameIdentifierOwner) element).getNameIdentifier();
+        if (identifier == null) {
             return null;
         }
-
-        final PsiIdentifier identifier = field.getNameIdentifier();
 
         return new ShadowLineMarkerInfo(
             identifier,
@@ -65,24 +55,16 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
             Pass.UPDATE_ALL,
             getIcon(),
             (mouseEvent, psiElement) -> {
-                final Map<PsiElement, PsiClass> psiClassMap = MixinUtils.getAllMixedClasses(containingClass);
-                for (Map.Entry<PsiElement, PsiClass> entry : psiClassMap.entrySet()) {
-                    final PsiField resolveField = entry.getValue().findFieldByName(identifier.getText(), false);
-                    if (resolveField == null) {
-                        continue;
-                    }
+                final Editor editor = FileEditorManager.getInstance(element.getProject()).getSelectedTextEditor();
+                if (editor == null) {
+                    return;
+                }
 
-                    final Editor editor = FileEditorManager.getInstance(entry.getValue().getProject()).getSelectedTextEditor();
-                    if (editor == null) {
-                        return;
-                    }
-
-                    FeatureUsageTracker.getInstance().triggerFeatureUsed("navigation.goto.declaration");
-                    PsiElement navElement = resolveField.getNavigationElement();
-                    navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(resolveField, navElement);
-                    if (navElement != null) {
-                        McEditorUtil.gotoTargetElement(navElement, editor, resolveField.getContainingFile());
-                    }
+                FeatureUsageTracker.getInstance().triggerFeatureUsed("navigation.goto.declaration");
+                PsiElement navElement = shadowedElement.getFirst().getNavigationElement();
+                navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(shadowedElement.getFirst(), navElement);
+                if (navElement != null) {
+                    McEditorUtil.gotoTargetElement(navElement, editor, element.getContainingFile());
                 }
             }
         );
@@ -116,9 +98,9 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
                 textRange,
                 icon,
                 updatePass,
-                (NullableFunction<PsiElement, String>) element1 -> "Go to Shadow field",
+                (NullableFunction<PsiElement, String>) element1 -> "Go to Shadow element",
                 navHandler,
-                GutterIconRenderer.Alignment.RIGHT
+                GutterIconRenderer.Alignment.LEFT
             );
         }
 
@@ -136,6 +118,11 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
         @Override
         public Function<? super PsiElement, String> getCommonTooltip(@NotNull List<MergeableLineMarkerInfo> infos) {
             return element -> "Multiple Shadows";
+        }
+
+        @Override
+        public GutterIconRenderer.Alignment getCommonIconAlignment(@NotNull List<MergeableLineMarkerInfo> infos) {
+            return GutterIconRenderer.Alignment.LEFT;
         }
     }
 }
