@@ -577,6 +577,7 @@ public final class MixinUtils {
                         .addContext(Key.INVALID_ACCESSOR_ON_SHADOW_FIELD)
                         .addContext(fieldAccessModifier)
                         .addContext(neededAccessModifier)
+                        .addContext(field)
                         .build()
                     );
                 }
@@ -586,6 +587,8 @@ public final class MixinUtils {
                         .addContext(Key.INVALID_FIELD_TYPE)
                         .addContext(field.getType().getCanonicalText())
                         .addContext(resolveField.getType().getCanonicalText())
+                        .addContext(field)
+                        .addContext(resolveField.getType())
                         .build()
                     );
                 }
@@ -595,6 +598,7 @@ public final class MixinUtils {
                     if (modifierList != null && modifierList.findAnnotation(MixinConstants.Annotations.FINAL) == null) {
                         return Pair.create(null, ShadowError.builder()
                             .addContext(Key.NO_FINAL_ANNOTATION_WITH_FINAL_TARGET)
+                            .addContext(field)
                             .build()
                         );
                     }
@@ -677,6 +681,7 @@ public final class MixinUtils {
                         .addContext(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD)
                         .addContext(methodAccessModifier)
                         .addContext(probableAccessModifier)
+                        .addContext(method)
                         .build());
                 }
 
