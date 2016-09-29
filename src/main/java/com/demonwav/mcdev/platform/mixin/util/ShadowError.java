@@ -1,7 +1,5 @@
 package com.demonwav.mcdev.platform.mixin.util;
 
-import com.demonwav.mcdev.platform.mixin.inspections.ShadowInspection;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
