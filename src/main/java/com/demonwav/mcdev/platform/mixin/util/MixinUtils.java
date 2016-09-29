@@ -2,6 +2,7 @@ package com.demonwav.mcdev.platform.mixin.util;
 
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.mixin.MixinModuleType;
+import com.demonwav.mcdev.platform.mixin.inspections.ShadowInspection.ShadowMemberErrorMessages.Key;
 import com.demonwav.mcdev.util.McMethodUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
 
@@ -22,9 +23,11 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassObjectAccessExpression;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
+import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
@@ -45,6 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public final class MixinUtils {
@@ -471,7 +475,6 @@ public final class MixinUtils {
             return Pair.create(null, null);
         }
 
-
         final PsiAnnotation annotation = McPsiUtil.getAnnotation((PsiModifierListOwner) element, MixinConstants.Annotations.SHADOW);
         if (annotation == null) {
             return Pair.create(null, null);
@@ -479,12 +482,12 @@ public final class MixinUtils {
 
         final PsiClass containingClass = MixinUtils.getContainingMixinClass(element);
         if (containingClass == null) {
-            return Pair.create(null, null);
+            return Pair.create(null, ShadowError.builder().setError(true).addContext(Key.CANNOT_FIND_MIXIN_TARGET).build());
         }
 
         final Map<PsiElement, PsiClass> allMixedClasses = MixinUtils.getAllMixedClasses(containingClass);
         if (allMixedClasses.isEmpty()) {
-            return Pair.create(null, null);
+            return Pair.create(null, ShadowError.builder().setError(true).addContext(Key.NO_MIXIN_CLASS_TARGETS).build());
         }
 
         if (element instanceof PsiField) {
@@ -496,14 +499,23 @@ public final class MixinUtils {
                     continue;
                 }
 
-                // TODO ERROR
+                // TODO check for errors
                 return Pair.create(resolveField, null);
             }
         } else if (element instanceof PsiMethod) {
             final PsiMethod method = (PsiMethod) element;
 
+            final PsiAnnotationMemberValue shadowPrefixValue = annotation.findDeclaredAttributeValue("prefix");
+            if (shadowPrefixValue != null && !(shadowPrefixValue instanceof PsiLiteralExpression)) {
+                // Don't handle case
+                // TODO can we?
+                return Pair.create(null, null);
+            }
+            final String shadowPrefix = shadowPrefixValue == null ? "shadow$" : ((PsiLiteralExpression) shadowPrefixValue).getValue().toString();
+            String shadowTargetMethodName = method.getName().replace(shadowPrefix, "");
+
             for (Map.Entry<PsiElement, PsiClass> entry : allMixedClasses.entrySet()) {
-                final PsiMethod[] methodsByName = entry.getValue().findMethodsByName(method.getName(), false);
+                final PsiMethod[] methodsByName = entry.getValue().findMethodsByName(shadowTargetMethodName, false);
                 if (methodsByName.length == 0) {
                     continue;
                 }
@@ -521,7 +533,7 @@ public final class MixinUtils {
                     if (McMethodUtil.areSignaturesEqualLightweight(
                         psiMethod.getSignature(PsiSubstitutor.EMPTY),
                         method.getSignature(PsiSubstitutor.EMPTY),
-                        method.getName()
+                        shadowTargetMethodName
                     )) {
                         // Don't worry about the nullable because it's not a constructor.
                         final PsiType returnType = method.getReturnType();
@@ -541,7 +553,13 @@ public final class MixinUtils {
                 }
                 if (validSignatureMethods.isEmpty()) {
                     // TODO ERROR
-                    return Pair.create(null, new ShadowError());
+                    return Pair.create(null, ShadowError.builder().setError(true)
+                        .addContext(Key.NO_MATCHING_METHODS_FOUND)
+                        .addContext(method.getSignature(PsiSubstitutor.EMPTY).getName())
+                        .addContext(entry.getValue().getName())
+                        .addContext(methodsByName)
+                        .build()
+                    );
                 }
 
                 for (Iterator<PsiMethod> iterator = validAccessMethods.iterator(); iterator.hasNext();) {
@@ -550,12 +568,23 @@ public final class MixinUtils {
                     }
                 }
                 if (validAccessMethods.isEmpty()) {
-                    // TODO ERROR
-                    return Pair.create(null, new ShadowError());
+                    final PsiMethod psiMethod = validSignatureMethods.get(0);
+                    final String probableAccessModifier = McPsiUtil.getMethodAccessModifier(psiMethod);
+                    return Pair.create(null, ShadowError.builder().setError(true)
+                        .addContext(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD)
+                        .addContext(methodAccessModifier)
+                        .addContext(probableAccessModifier)
+                        .build());
                 }
 
                 return Pair.create(validAccessMethods.get(0), null);
             }
+            return Pair.create(null, ShadowError.builder().setError(true)
+                .addContext(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP)
+                .addContext(method.getName())
+                .addContext(allMixedClasses.values().stream().map(PsiNamedElement::getName).collect(Collectors.joining(", ")))
+                .build()
+            );
         }
 
         return Pair.create(null, null);

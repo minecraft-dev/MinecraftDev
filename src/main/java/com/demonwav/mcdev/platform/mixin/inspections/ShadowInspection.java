@@ -307,7 +307,7 @@ public class ShadowInspection extends BaseInspection {
 
     }
 
-    static final class ShadowMemberErrorMessages {
+    public static final class ShadowMemberErrorMessages {
 
         static String formatError(Object... args) {
             if (args.length == 0) {
@@ -326,71 +326,87 @@ public class ShadowInspection extends BaseInspection {
         }
 
         static final List<ShadowMemberErrorMessageFormatter> FORMATTERS = ImmutableList.<ShadowMemberErrorMessageFormatter>builder()
-                .add(new ShadowMemberErrorMessageFormatter(Key.MULTI_TARGET_CLASS_REMAPPED_TRUE) {
-                    @Override
-                    String formatMessage(Object... args) {
-                        Preconditions.checkArgument(args[0].equals(Key.MULTI_TARGET_CLASS_REMAPPED_TRUE));
-                        final PsiClass containingClass = (PsiClass) args[1];
-                        final String containingName = containingClass.getName();
+            .add(new ShadowMemberErrorMessageFormatter(Key.MULTI_TARGET_CLASS_REMAPPED_TRUE) {
+                @Override
+                String formatMessage(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.MULTI_TARGET_CLASS_REMAPPED_TRUE));
+                    final PsiClass containingClass = (PsiClass) args[1];
+                    final String containingName = containingClass.getName();
 
-                        return "Cannot have a shadow when " + containingName + " is mixing into multiple remapped targets.";
-                    }
-                })
-                .add(new ShadowMemberErrorMessageFormatter(Key.MULTI_TARGET_SHADOW_REMAPPED_TRUE) {
-                    @Override
-                    String formatMessage(Object... args) {
-                        Preconditions.checkArgument(args[0].equals(Key.MULTI_TARGET_SHADOW_REMAPPED_TRUE));
-                        final PsiClass containingClass = (PsiClass) args[1];
-                        final String containingName = containingClass.getName();
+                    return "Cannot have a shadow when " + containingName + " is mixing into multiple remapped targets.";
+                }
+            })
+            .add(new ShadowMemberErrorMessageFormatter(Key.MULTI_TARGET_SHADOW_REMAPPED_TRUE) {
+                @Override
+                String formatMessage(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.MULTI_TARGET_SHADOW_REMAPPED_TRUE));
+                    final PsiClass containingClass = (PsiClass) args[1];
+                    final String containingName = containingClass.getName();
 
-                        return "Cannot have a remapped shadow when " + containingName + " is mixing into multiple targets.";
-                    }
-                })
-                .add(new ShadowMemberErrorMessageFormatter(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP) {
-                    @Override
-                    String formatMessage(Object... args) {
-                        Preconditions.checkArgument(args[0].equals(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP));
-                        final String methodName = (String) args[1];
-                        final String targetClassName = (String) args[2];
+                    return "Cannot have a remapped shadow when " + containingName + " is mixing into multiple targets.";
+                }
+            })
+            .add(new ShadowMemberErrorMessageFormatter(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP) {
+                @Override
+                String formatMessage(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP));
+                    final String methodName = (String) args[1];
+                    final String targetClassName = (String) args[2];
 
-                        return "No method found by the name: " + methodName + " in target class: " + targetClassName;
-                    }
-                })
-                .add(new ShadowMemberErrorMessageFormatter(Key.NO_MATCHING_METHODS_FOUND) {
-                    @Override
-                    String formatMessage(Object... args) {
-                        Preconditions.checkArgument(args[0].equals(Key.NO_MATCHING_METHODS_FOUND));
-                        final String methodName = (String) args[1];
-                        final String targetClassName = (String) args[2];
-                        final PsiMethod[] foundMethods = (PsiMethod[]) args[3];
-                        return "No methods found matching signature: " + methodName + " in target class: " + targetClassName + ".";
-                    }
-                })
-                .add(new ShadowMemberErrorMessageFormatter(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD) {
-                    @Override
-                    String formatMessage(Object... args) {
-                        Preconditions.checkArgument(args[0].equals(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD));
-                        final String current = (String) args[1];
-                        final String expected = (String) args[2];
-                        return "Method has invalid access modifiers, has: " + current + " but target method has: " + expected + ".";
-                    }
-                })
-                .add(new ShadowMemberErrorMessageFormatter(Key.CANNOT_FIND_MIXIN_TARGET) {
-                    @Override
-                    String formatMessage(Object... args) {
-                        Preconditions.checkArgument(args[0].equals(Key.CANNOT_FIND_MIXIN_TARGET));
-                        return "Cannot shadow nonexistent target: target class undefined";
-                    }
-                })
-                .build();
+                    return "No method found by the name: " + methodName + " in target classes: " + targetClassName;
+                }
+            })
+            .add(new ShadowMemberErrorMessageFormatter(Key.NO_MATCHING_METHODS_FOUND) {
+                @Override
+                String formatMessage(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.NO_MATCHING_METHODS_FOUND));
+                    final String methodName = (String) args[1];
+                    final String targetClassName = (String) args[2];
+                    final PsiMethod[] foundMethods = (PsiMethod[]) args[3];
+                    return "No methods found matching signature: " + methodName + " in target classes: " + targetClassName + ".";
+                }
+            })
+            .add(new ShadowMemberErrorMessageFormatter(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD) {
+                @Override
+                String formatMessage(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD));
+                    final String current = (String) args[1];
+                    final String expected = (String) args[2];
+                    return "Method has invalid access modifiers, has: " + current + " but target method has: " + expected + ".";
+                }
+            })
+            .add(new ShadowMemberErrorMessageFormatter(Key.CANNOT_FIND_MIXIN_TARGET) {
+                @Override
+                String formatMessage(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.CANNOT_FIND_MIXIN_TARGET));
+                    return "Cannot shadow nonexistent target: target class undefined";
+                }
+            })
+            .add(new ShadowMemberErrorMessageFormatter(Key.NOT_MIXIN_CLASS) {
+                @Override
+                String formatMessage(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.NOT_MIXIN_CLASS));
+                    return "Cannot shadow anything in a non-@Mixin annotated class.";
+                }
+            })
+            .add(new ShadowMemberErrorMessageFormatter(Key.NO_MIXIN_CLASS_TARGETS) {
+                @Override
+                String formatMessage(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.NO_MIXIN_CLASS_TARGETS));
+                    return "Cannot shadow anything when the Mixin class has no targets.";
+                }
+            })
+            .build();
 
-        enum Key {
+        public enum Key {
             MULTI_TARGET_CLASS_REMAPPED_TRUE,
             MULTI_TARGET_SHADOW_REMAPPED_TRUE,
             NO_SHADOW_METHOD_FOUND_WITH_REMAP,
             NO_MATCHING_METHODS_FOUND,
             INVALID_ACCESSOR_ON_SHADOW_METHOD,
-            CANNOT_FIND_MIXIN_TARGET
+            CANNOT_FIND_MIXIN_TARGET,
+            NOT_MIXIN_CLASS,
+            NO_MIXIN_CLASS_TARGETS
         }
     }
 
