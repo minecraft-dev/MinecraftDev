@@ -47,8 +47,7 @@ public class ShadowInspection extends BaseInspection {
         return new ShadowVisitor();
     }
 
-    static class ShadowVisitor extends BaseInspectionVisitor {
-
+    private static class ShadowVisitor extends BaseInspectionVisitor {
         @Override
         public void visitMethod(PsiMethod method) {
             if (!MixinUtils.isMixinModule(method)) {
@@ -154,7 +153,7 @@ public class ShadowInspection extends BaseInspection {
                                                        ShadowVisitor visitor,
                                                        PsiAnnotation shadowAnnotation,
                                                        @NotNull Map<PsiElement, PsiClass> mixedClasses) {
-                    if (!mixedClasses.isEmpty()) {
+                    if (mixedClasses.size() > 1) {
                         visitor.registerError(shadowAnnotation, ShadowMemberErrorMessages.Key.MULTI_TARGET_CLASS_REMAPPED_TRUE, containingClass);
                         return false;
                     }
@@ -237,15 +236,15 @@ public class ShadowInspection extends BaseInspection {
                                 shadowTargetMethodName
                         )) {
                             // Don't worry about the nullable because it's not a constructor.
-                            final PsiType returnType = method.getReturnType();
-                            final PsiType possibleReturnType = psiMethod.getReturnType();
-                            final PsiType erasedReturnType = TypeConversionUtil.erasure(returnType);
-                            final PsiType erasedPossibleReturnType = TypeConversionUtil.erasure(possibleReturnType);
-                            final boolean areTypesAgreed = TypeConversionUtil.typesAgree(returnType, possibleReturnType, true);
-
-                            if (erasedReturnType.equals(erasedPossibleReturnType)) {
-                                validSignatureMethods.add(psiMethod);
-                            }
+//                            final PsiType returnType = method.getReturnType();
+//                            final PsiType possibleReturnType = psiMethod.getReturnType();
+//                            final PsiType erasedReturnType = TypeConversionUtil.erasure(returnType);
+//                            final PsiType erasedPossibleReturnType = TypeConversionUtil.erasure(possibleReturnType);
+//                            final boolean areTypesAgreed = TypeConversionUtil.typesAgree(returnType, possibleReturnType, true);
+//
+//                            if (erasedReturnType.equals(erasedPossibleReturnType)) {
+//                                validSignatureMethods.add(psiMethod);
+//                            }
                         }
                     }
                     if (validSignatureMethods.isEmpty()) {

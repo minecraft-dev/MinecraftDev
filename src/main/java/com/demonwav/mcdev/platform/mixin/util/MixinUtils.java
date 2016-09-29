@@ -2,6 +2,7 @@ package com.demonwav.mcdev.platform.mixin.util;
 
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.mixin.MixinModuleType;
+import com.demonwav.mcdev.util.McMethodUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.collect.Lists;
@@ -21,6 +22,9 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassObjectAccessExpression;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiMember;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
@@ -31,10 +35,13 @@ import com.intellij.psi.impl.source.tree.ElementType;
 import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.TypeConversionUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -439,5 +446,118 @@ public final class MixinUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Given a {@link PsiElement}, being either a {@link PsiMethod} or {@link PsiField}, find the corresponding field or method that is
+     * being shadowed. Returns a notnull Pair of nullable values. The first value is the {@link PsiElement} that is found, or null if not
+     * found. The second value is the {@link ShadowError error} if there is an actual error in the code regarding shadow validity. If the
+     * first value is notnull, the second value is always null. If the first value is null, the second value may not be null. If both values
+     * are null, then that means this is simply not a valid shadow, there isn't a specific error in the code. This could be, for example,
+     * if this method is called on a {@link PsiElement} that isn't a {@link PsiMember} or {@link PsiField}, or it isn't in a Mixin class,
+     * or it isn't {@code @Shadow} annotated, or it is null.
+     *
+     * @param element The element to check.
+     * @return The PsiElement that is being shadowed, or the error if there is an error in the code.
+     */
+    @NotNull
+    @Contract(pure = true)
+    public static Pair<PsiElement, ShadowError> getShadowedElement(@Nullable PsiElement element) {
+        if (element == null) {
+            return Pair.create(null, null);
+        }
+
+        if (!(element instanceof PsiModifierListOwner)) {
+            return Pair.create(null, null);
+        }
+
+
+        final PsiAnnotation annotation = McPsiUtil.getAnnotation((PsiModifierListOwner) element, MixinConstants.Annotations.SHADOW);
+        if (annotation == null) {
+            return Pair.create(null, null);
+        }
+
+        final PsiClass containingClass = MixinUtils.getContainingMixinClass(element);
+        if (containingClass == null) {
+            return Pair.create(null, null);
+        }
+
+        final Map<PsiElement, PsiClass> allMixedClasses = MixinUtils.getAllMixedClasses(containingClass);
+        if (allMixedClasses.isEmpty()) {
+            return Pair.create(null, null);
+        }
+
+        if (element instanceof PsiField) {
+            final PsiField field = (PsiField) element;
+
+            for (Map.Entry<PsiElement, PsiClass> entry : allMixedClasses.entrySet()) {
+                final PsiField resolveField = entry.getValue().findFieldByName(field.getNameIdentifier().getText(), false);
+                if (resolveField == null) {
+                    continue;
+                }
+
+                // TODO ERROR
+                return Pair.create(resolveField, null);
+            }
+        } else if (element instanceof PsiMethod) {
+            final PsiMethod method = (PsiMethod) element;
+
+            for (Map.Entry<PsiElement, PsiClass> entry : allMixedClasses.entrySet()) {
+                final PsiMethod[] methodsByName = entry.getValue().findMethodsByName(method.getName(), false);
+                if (methodsByName.length == 0) {
+                    continue;
+                }
+
+                final String methodAccessModifier = McPsiUtil.getMethodAccessModifier(method);
+                // There are multiple
+                final ArrayList<PsiMethod> validAccessMethods = new ArrayList<>(methodsByName.length);
+                for (PsiMethod psiMethod : methodsByName) {
+                    if (McPsiUtil.getMethodAccessModifier(psiMethod).equalsIgnoreCase(methodAccessModifier)) {
+                        validAccessMethods.add(psiMethod);
+                    }
+                }
+                final ArrayList<PsiMethod> validSignatureMethods = new ArrayList<>(methodsByName.length);
+                for (PsiMethod psiMethod : methodsByName) {
+                    if (McMethodUtil.areSignaturesEqualLightweight(
+                        psiMethod.getSignature(PsiSubstitutor.EMPTY),
+                        method.getSignature(PsiSubstitutor.EMPTY),
+                        method.getName()
+                    )) {
+                        // Don't worry about the nullable because it's not a constructor.
+                        final PsiType returnType = method.getReturnType();
+                        final PsiType possibleReturnType = psiMethod.getReturnType();
+                        if (returnType == null || possibleReturnType == null) {
+                            continue;
+                        }
+
+                        final PsiType erasedReturnType = TypeConversionUtil.erasure(returnType);
+                        final PsiType erasedPossibleReturnType = TypeConversionUtil.erasure(possibleReturnType);
+                        final boolean areTypesAgreed = TypeConversionUtil.typesAgree(returnType, possibleReturnType, true);
+
+                        if (erasedReturnType.equals(erasedPossibleReturnType)) {
+                            validSignatureMethods.add(psiMethod);
+                        }
+                    }
+                }
+                if (validSignatureMethods.isEmpty()) {
+                    // TODO ERROR
+                    return Pair.create(null, new ShadowError());
+                }
+
+                for (Iterator<PsiMethod> iterator = validAccessMethods.iterator(); iterator.hasNext();) {
+                    if (!validSignatureMethods.contains(iterator.next())) {
+                        iterator.remove();
+                    }
+                }
+                if (validAccessMethods.isEmpty()) {
+                    // TODO ERROR
+                    return Pair.create(null, new ShadowError());
+                }
+
+                return Pair.create(validAccessMethods.get(0), null);
+            }
+        }
+
+        return Pair.create(null, null);
     }
 }

@@ -47,10 +47,8 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
             return null;
         }
 
-        final PsiClass containingClass = McPsiUtil.getClassOfElement(field);
-
-        final PsiAnnotationMemberValue value = MixinUtils.getMixinAnnotationValue(containingClass);
-        if (value == null) {
+        final PsiClass containingClass = MixinUtils.getContainingMixinClass(field);
+        if (containingClass == null) {
             return null;
         }
 
@@ -67,7 +65,7 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
             Pass.UPDATE_ALL,
             getIcon(),
             (mouseEvent, psiElement) -> {
-                final Map<PsiElement, PsiClass> psiClassMap = MixinUtils.resolveGenericClass(value);
+                final Map<PsiElement, PsiClass> psiClassMap = MixinUtils.getAllMixedClasses(containingClass);
                 for (Map.Entry<PsiElement, PsiClass> entry : psiClassMap.entrySet()) {
                     final PsiField resolveField = entry.getValue().findFieldByName(identifier.getText(), false);
                     if (resolveField == null) {
