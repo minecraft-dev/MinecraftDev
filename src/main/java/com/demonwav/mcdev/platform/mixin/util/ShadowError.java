@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
+import com.siyeh.ig.InspectionGadgetsFix;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -54,7 +56,7 @@ public final class ShadowError {
         NO_FINAL_ANNOTATION_WITH_FINAL_TARGET
     }
 
-    public static final class ErrorMessages {
+    public static final class Errors {
         public static String formatError(Object... args) {
             if (args.length == 0) {
                 return "Error";
@@ -69,6 +71,24 @@ public final class ShadowError {
                 .findFirst()
                 .map(found -> found.formatMessage(args))
                 .orElse("Error");
+        }
+
+        @Nullable
+        public static InspectionGadgetsFix fixError(Object... args) {
+            if (args.length == 0) {
+                return null;
+            }
+
+            final Object first = args[0];
+            if (!(first instanceof Key)) {
+                return null;
+            }
+
+            return FIXERS.stream()
+                .filter(fixer -> fixer.matches((Key) first))
+                .findFirst()
+                .map(found -> found.getFix(args))
+                .orElse(null);
         }
 
         public static final List<Formatter> FORMATTERS = ImmutableList.<Formatter>builder()
@@ -178,6 +198,93 @@ public final class ShadowError {
                 }
             })
             .build();
+
+        public static final List<Fixer> FIXERS = ImmutableList.<Fixer>builder()
+            .add(new Fixer(Key.MULTI_TARGET_CLASS_REMAPPED_TRUE) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.MULTI_TARGET_CLASS_REMAPPED_TRUE));
+                    return null;
+                }
+            })
+            .add(new Fixer(Key.MULTI_TARGET_SHADOW_REMAPPED_TRUE) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.MULTI_TARGET_SHADOW_REMAPPED_TRUE));
+                    return null;
+                }
+            })
+            .add(new Fixer(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP));
+                    return null;
+                }
+            })
+            .add(new Fixer(Key.NO_MATCHING_METHODS_FOUND) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.NO_MATCHING_METHODS_FOUND));
+                    return null;
+                }
+            })
+            .add(new Fixer(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD));
+                    return null;
+                }
+            })
+            .add(new Fixer(Key.CANNOT_FIND_MIXIN_TARGET) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.CANNOT_FIND_MIXIN_TARGET));
+                    return null;
+                }
+            })
+            .add(new Fixer(Key.NOT_MIXIN_CLASS) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.NOT_MIXIN_CLASS));
+                    return null;
+                }
+            })
+            .add(new Fixer(Key.NO_MIXIN_CLASS_TARGETS) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.NO_MIXIN_CLASS_TARGETS));
+                    return null;
+                }
+            })
+            .add(new Fixer(Key.NO_SHADOW_FIELD_FOUND_WITH_REMAP) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.NO_SHADOW_FIELD_FOUND_WITH_REMAP));
+                    return null;
+                }
+            })
+            .add(new Fixer(Key.INVALID_ACCESSOR_ON_SHADOW_FIELD) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.INVALID_ACCESSOR_ON_SHADOW_FIELD));
+                    return null;
+                }
+            })
+            .add(new Fixer(Key.INVALID_FIELD_TYPE) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.INVALID_FIELD_TYPE));
+                    return null;
+                }
+            })
+            .add(new Fixer(Key.NO_FINAL_ANNOTATION_WITH_FINAL_TARGET) {
+                @Override
+                InspectionGadgetsFix getFix(Object... args) {
+                    Preconditions.checkArgument(args[0].equals(Key.NO_FINAL_ANNOTATION_WITH_FINAL_TARGET));
+                    return null;
+                }
+            })
+            .build();
     }
 
     public static abstract class Formatter {
@@ -192,5 +299,19 @@ public final class ShadowError {
         }
 
         abstract String formatMessage(Object... args);
+    }
+
+    public static abstract class Fixer {
+        private final Key key;
+
+        Fixer(Key key) {
+            this.key = key;
+        }
+
+        boolean matches(Key key) {
+            return this.key == key;
+        }
+
+        abstract InspectionGadgetsFix getFix(Object... args);
     }
 }

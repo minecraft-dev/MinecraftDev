@@ -18,6 +18,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
+import com.siyeh.ig.InspectionGadgetsFix;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,13 @@ public class ShadowInspection extends BaseInspection {
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        return ShadowError.ErrorMessages.formatError(infos);
+        return ShadowError.Errors.formatError(infos);
+    }
+
+    @Nullable
+    @Override
+    protected InspectionGadgetsFix buildFix(Object... infos) {
+        return ShadowError.Errors.fixError(infos);
     }
 
     @Override
