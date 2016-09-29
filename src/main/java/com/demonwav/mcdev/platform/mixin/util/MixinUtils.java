@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public final class MixinUtils {
     private MixinUtils() {}
 
@@ -134,7 +134,7 @@ public final class MixinUtils {
      * cannot be resolved.
      *
      * @param psiClass The PsiClass to check.
-     * @return The first class defined in the {@code targets} value in the Mixin annotation of the given PsiClass.
+     * @return The first target class pair defined in the {@code targets} attribute in the Mixin annotation of the given PsiClass.
      */
     @Nullable
     @Contract(value = "null -> null", pure = true)
@@ -158,13 +158,12 @@ public final class MixinUtils {
      * can be resolved.
      *
      * @param psiClass The PsiClass to check.
-     * @return A list of classes defined in the {@code targets} value in the Mixin annotation of the given PsiClass.
+     * @return A map of targets defined in the {@code targets} attribute in the Mixin annotation to the relevant PsiClasses they point to.
      */
     @NotNull
     @Contract(pure = true)
     public static Map<PsiElement, PsiClass> getAllMixedClassesOfTarget(@Nullable PsiClass psiClass) {
-        final PsiAnnotationMemberValue value = getMixinAnnotationTarget(psiClass);
-        return resolveGenericClass(value);
+        return resolveGenericClass(getMixinAnnotationTarget(psiClass));
     }
 
     /**
@@ -173,7 +172,7 @@ public final class MixinUtils {
      * cannot be resolved.
      *
      * @param psiClass The PsiClass to check.
-     * @return The first class defined in the {@code value} value in the Mixin annotation of the given PsiClass.
+     * @return The first target class pair defined in the {@code value} attribute in the Mixin annotation of the given PsiClass.
      */
     @Nullable
     @Contract(value = "null -> null", pure = true)
@@ -196,13 +195,12 @@ public final class MixinUtils {
      * can be resolved.
      *
      * @param psiClass The PsiClass to check.
-     * @return A list of classes defined in the {@code value} value in the Mixin annotation of the given PsiClass.
+     * @return A map of targets defined in the {@code value} attribute in the Mixin annotation to the relevant PsiClasses they point to.
      */
     @NotNull
     @Contract(pure = true)
     public static Map<PsiElement, PsiClass> getAllMixedClassesOfValue(@Nullable PsiClass psiClass) {
-        final PsiAnnotationMemberValue value = getMixinAnnotationValue(psiClass);
-        return resolveGenericClass(value);
+        return resolveGenericClass(getMixinAnnotationValue(psiClass));
     }
 
     /**
@@ -265,7 +263,7 @@ public final class MixinUtils {
      * class or if there are no resolvable targets defined in the Mixin annotation.
      *
      * @param psiClass The PsiClass to check.
-     * @return A list of every PsiClass target defined in the Mixin annotation of the given class.
+     * @return A map of every attribute target defined in the given class and the PsiClass it relates to.
      */
     @NotNull
     @Contract(pure = true)
@@ -342,6 +340,16 @@ public final class MixinUtils {
         return (PsiClass) current;
     }
 
+    /**
+     * Given a {@link PsiAnnotationMemberValue}, find the mapping of child PsiElements and PsiClasses that they point to. If the given
+     * {@link PsiAnnotationMemberValue} is a {@link PsiArrayInitializerMemberValue}, the returned map may return more than one entry.
+     * If the {@link PsiAnnotationMemberValue} is a {@link PsiClassObjectAccessExpression}, {@link PsiReferenceExpression}, or
+     * {@link PsiLiteralExpressionImpl}, only a single entry will be returned in the map. If target classes is any other type, an empty map
+     * will be returned. An empty map will also be returned if the given {@link PsiAnnotationMemberValue} is null.
+     *
+     * @param targetClasses The {@link PsiAnnotationMemberValue} to check.
+     * @return The {@link PsiElement} to {@link PsiClass} mapping that is defined in the given {@link PsiAnnotationMemberValue}.
+     */
     @NotNull
     @Contract(pure = true)
     public static Map<PsiElement, PsiClass> resolveGenericClass(@Nullable PsiAnnotationMemberValue targetClasses) {
@@ -364,6 +372,14 @@ public final class MixinUtils {
         return map;
     }
 
+    /**
+     * Given a single PsiElement of type {@link PsiClassObjectAccessExpression}, {@link PsiReferenceExpression}, or
+     * {@link PsiLiteralExpressionImpl}, find the PsiClass that the element points to. If the element is not one of these types,
+     * return null. Also return null if the given element is null, or if no PsiClass could be found.
+     *
+     * @param element The element to check.
+     * @return The PsiClass which the given element is referring to.
+     */
     @Nullable
     @Contract(value = "null -> null", pure = true)
     public static PsiClass resolveGenericClass(@Nullable PsiElement element) {
