@@ -12,6 +12,17 @@ tasks.withType(JavaCompile) {
     targetCompatibility = javaVersion
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'src/main/gen']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
+
 intellij {
     // IntelliJ IDEA dependency
     version project.hasProperty('intellijVersion') ? project.getProperty('intellijVersion') : ideaVersion

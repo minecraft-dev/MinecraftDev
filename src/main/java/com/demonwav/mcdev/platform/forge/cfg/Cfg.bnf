@@ -1,0 +1,44 @@
+{
+    parserClass="com.demonwav.mcdev.platform.forge.cfg.parser.CfgParser"
+
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="Cfg"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.demonwav.mcdev.platform.forge.cfg.psi"
+    psiImplPackage="com.demonwav.mcdev.platform.forge.cfg.psi.impl"
+
+    elementTypeHolderClass="com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes"
+    elementTypeClass="com.demonwav.mcdev.platform.forge.cfg.psi.CfgElementType"
+    tokenTypeClass="com.demonwav.mcdev.platform.forge.cfg.psi.CfgTokenType"
+
+    tokens = [
+        crlf="regexp:[\n|\r|\r\n]"
+        class_value="regexp:[ZBCSIFDJLV\[][\[\/a-zA-Z0-9$_;]*"
+        open_paren="("
+        close_paren=")"
+        asterisk="*"
+        init="<init>"
+        keyword_element="regexp:(public|public-f|private|private-f|protected|protected-f)"
+        name_element="regexp:[a-zA-Z0-9_]+"
+        class_name_element="regexp:[a-zA-Z_$0-9\.]*[a-zA-Z_$0-9]"
+        comment="regexp:#.*"
+    ]
+}
+
+cfgFile ::= item_*
+
+private item_ ::= (entry comment?|comment|crlf)?
+
+entry ::= keyword class_name (function|field_name|asterisk)?
+
+keyword ::= keyword_element
+class_name ::= class_name_element
+field_name ::= name_element
+
+function ::= func_name open_paren arguments? close_paren return_value
+func_name ::= name_element | init
+
+arguments ::= class_value
+
+return_value ::= class_value

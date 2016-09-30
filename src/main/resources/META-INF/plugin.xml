@@ -67,6 +67,11 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.MixinLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.ShadowLineMarkerProvider"/>
 
+        <!-- Mixin file type -->
+        <fileTypeFactory implementation="com.demonwav.mcdev.platform.mixin.lang.cfg.CfgFiletypeFactory"/>
+        <lang.parserDefinition language="cfg" implementationClass="com.demonwav.mcdev.platform.mixin.lang.cfg.CfgParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="cfg" implementationClass="com.demonwav.mcdev.platform.mixin.lang.cfg.CfgSyntaxHighlighterFactory"/>
+
         <!-- Project-independent Annotators-->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ColorAnnotator"/>
