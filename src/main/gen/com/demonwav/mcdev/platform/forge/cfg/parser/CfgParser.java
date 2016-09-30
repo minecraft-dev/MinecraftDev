@@ -203,19 +203,12 @@ public class CfgParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (entry comment?|comment|crlf)?
+  // entry comment?|comment|crlf
   static boolean item_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item_")) return false;
-    item__0(b, l + 1);
-    return true;
-  }
-
-  // entry comment?|comment|crlf
-  private static boolean item__0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = item__0_0(b, l + 1);
+    r = item__0(b, l + 1);
     if (!r) r = consumeToken(b, COMMENT);
     if (!r) r = consumeToken(b, CRLF);
     exit_section_(b, m, null, r);
@@ -223,19 +216,19 @@ public class CfgParser implements PsiParser, LightPsiParser {
   }
 
   // entry comment?
-  private static boolean item__0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__0_0")) return false;
+  private static boolean item__0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = entry(b, l + 1);
-    r = r && item__0_0_1(b, l + 1);
+    r = r && item__0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // comment?
-  private static boolean item__0_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__0_0_1")) return false;
+  private static boolean item__0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__0_1")) return false;
     consumeToken(b, COMMENT);
     return true;
   }

@@ -28,7 +28,7 @@
 
 cfgFile ::= item_*
 
-private item_ ::= (entry comment?|comment|crlf)?
+private item_ ::= (entry comment?|comment|crlf)
 
 entry ::= keyword class_name (function|field_name|asterisk)?
 
