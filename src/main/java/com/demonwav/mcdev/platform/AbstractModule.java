@@ -54,7 +54,7 @@ public abstract class AbstractModule {
      *     method as an error and prevent compiling.
      */
     public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
-        return true;
+        return false;
     }
 
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
