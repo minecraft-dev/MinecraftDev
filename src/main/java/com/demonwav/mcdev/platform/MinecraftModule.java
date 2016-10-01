@@ -36,7 +36,7 @@ public class MinecraftModule {
         MinecraftModule minecraftModule = new MinecraftModule();
         minecraftModule.module = module;
         minecraftModule.buildSystem = BuildSystem.getInstance(module);
-        if (minecraftModule.buildSystem != null && !minecraftModule.buildSystem.isImported()) {
+        if (minecraftModule.buildSystem != null) {
             minecraftModule.buildSystem.reImport(module).done(buildSystem -> types.forEach(minecraftModule::register));
         }
         return minecraftModule;

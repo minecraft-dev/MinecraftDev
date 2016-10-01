@@ -106,7 +106,6 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                     m.setOption("type", JavaModuleType.getModuleType().getId());
                     checkedModules.add(m);
                     MinecraftModuleType.addOption(m, type.getId());
-                    Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m));
                     MinecraftModule.getInstance(m);
                 } else {
                     String parentName = path[0];
@@ -117,8 +116,6 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                         badModules.add(m);
                         checkedModules.add(parentModule);
                         MinecraftModuleType.addOption(parentModule, type.getId());
-                        Optional.ofNullable(BuildSystem.getInstance(parentModule))
-                            .ifPresent(thisModule -> thisModule.reImport(parentModule));
                         MinecraftModule.getInstance(parentModule);
                     }
                 }

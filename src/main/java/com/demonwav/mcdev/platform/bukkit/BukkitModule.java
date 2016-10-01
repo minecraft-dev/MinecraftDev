@@ -50,13 +50,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         this.type = type.getPlatformType();
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            if (!buildSystem.isImported()) {
-                buildSystem.reImport(module).done(buildSystem  -> setup());
-            } else {
-                if (buildSystem.isFinishImport()) {
-                    setup();
-                }
-            }
+            buildSystem.reImport(module).done(buildSystem -> setup());
         }
     }
 

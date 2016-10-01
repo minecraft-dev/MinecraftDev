@@ -16,9 +16,7 @@ public class McpModule extends AbstractModule {
         super(module);
         this.buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            if (!buildSystem.isImported()) {
-                buildSystem.reImport(module);
-            }
+            buildSystem.reImport(module);
         }
     }
 

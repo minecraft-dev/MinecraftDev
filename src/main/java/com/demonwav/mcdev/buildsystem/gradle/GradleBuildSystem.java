@@ -65,7 +65,6 @@ import org.gradle.tooling.ProgressListener;
 import org.gradle.tooling.ProjectConnection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.concurrency.AsyncPromise;
 import org.jetbrains.concurrency.Promise;
 import org.jetbrains.plugins.gradle.model.ExternalProject;
 import org.jetbrains.plugins.gradle.model.ExternalSourceSet;
@@ -94,7 +93,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class GradleBuildSystem extends BuildSystem {
@@ -103,9 +101,6 @@ public class GradleBuildSystem extends BuildSystem {
 
     @Nullable
     private VirtualFile buildGradle;
-
-    @NotNull private AtomicBoolean imported = new AtomicBoolean(false);
-    @NotNull private AtomicBoolean finishImport = new AtomicBoolean(false);
 
     @Override
     public void create(@NotNull Project project, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
@@ -443,13 +438,16 @@ public class GradleBuildSystem extends BuildSystem {
         }
     }
 
+
     @NotNull
     @Override
-    public Promise<GradleBuildSystem> reImport(@NotNull Module module) {
-        imported.set(true);
-        AsyncPromise<GradleBuildSystem> promise = new AsyncPromise<>();
+    public Promise<BuildSystem> reImport(@NotNull Module module) {
+        synchronized(this) {
+            if (synchronize()) {
+                return importPromise;
+            }
+        }
 
-        GradleBuildSystem thisRef = this;
         // We must be on the event dispatch thread to run a backgroundable task
         ApplicationManager.getApplication().invokeLater(() ->
             ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Importing Gradle Module", false) {
@@ -464,8 +462,9 @@ public class GradleBuildSystem extends BuildSystem {
                         if (manager.getContentRoots().length == 0) {
                             // TODO handle import failed
                             logger.error("GradleBuildSystem import FAILED: no content roots found");
-                            thisRef.finishImport.set(true);
-                            promise.setResult(thisRef);
+                            importPromise.setResult(GradleBuildSystem.this);
+                            // We're done importing, don't hold a reference to the promise anymore
+                            importPromise = null;
                             return;
                         }
 
@@ -476,8 +475,9 @@ public class GradleBuildSystem extends BuildSystem {
                             logger.error("GradleBuildSystem import FAILED: Root Directory or Build Gradle paths null");
                             logger.error("rootDirectory: " + rootDirectory);
                             logger.error("buildGradle: " + buildGradle);
-                            thisRef.finishImport.set(true);
-                            promise.setResult(thisRef);
+                            importPromise.setResult(GradleBuildSystem.this);
+                            // We're done importing, don't hold a reference to the promise anymore
+                            importPromise = null;
                             return;
                         }
 
@@ -504,8 +504,9 @@ public class GradleBuildSystem extends BuildSystem {
 
                         if (project.getBasePath() == null) {
                             logger.error("GradleBuildSystem import FAILED: Project base path null");
-                            thisRef.finishImport.set(true);
-                            promise.setResult(thisRef);
+                            importPromise.setResult(GradleBuildSystem.this);
+                            // We're done importing, don't hold a reference to the promise anymore
+                            importPromise = null;
                             return;
                         }
 
@@ -536,8 +537,9 @@ public class GradleBuildSystem extends BuildSystem {
                                 .getExternalProjectData(project, GradleConstants.SYSTEM_ID, project.getBasePath());
                             if (info == null) {
                                 logger.error("GradleBuildSystem import FAILED: External project info null");
-                                thisRef.finishImport.set(true);
-                                promise.setResult(thisRef);
+                                importPromise.setResult(GradleBuildSystem.this);
+                                // We're done importing, don't hold a reference to the promise anymore
+                                importPromise = null;
                                 return;
                             }
 
@@ -545,8 +547,9 @@ public class GradleBuildSystem extends BuildSystem {
 
                             if (node == null) {
                                 logger.error("GradleBuildSystem import FAILED: Project data node null");
-                                thisRef.finishImport.set(true);
-                                promise.setResult(thisRef);
+                                importPromise.setResult(GradleBuildSystem.this);
+                                // We're done importing, don't hold a reference to the promise anymore
+                                importPromise = null;
                                 return;
                             }
 
@@ -589,22 +592,13 @@ public class GradleBuildSystem extends BuildSystem {
                             }
                         }
                     });
-                    thisRef.finishImport.set(true);
-                    promise.setResult(thisRef);
+                    importPromise.setResult(GradleBuildSystem.this);
+                    // We're done importing, don't hold a reference to the promise anymore
+                    importPromise = null;
                 }
             })
         );
-        return promise;
-    }
-
-    @Override
-    public boolean isImported() {
-        return imported.get();
-    }
-
-    @Override
-    public boolean isFinishImport() {
-        return finishImport.get();
+        return importPromise;
     }
 
     @NotNull

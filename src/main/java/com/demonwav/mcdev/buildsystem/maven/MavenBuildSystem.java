@@ -37,7 +37,6 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.xml.DomManager;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.concurrency.AsyncPromise;
 import org.jetbrains.concurrency.Promise;
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType;
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters;
@@ -55,8 +54,6 @@ import java.util.stream.Collectors;
 public class MavenBuildSystem extends BuildSystem {
 
     private VirtualFile pomFile;
-    private boolean imported = false;
-    private boolean finishImport = false;
 
     @Override
     public void create(@NotNull Project project, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
@@ -184,9 +181,8 @@ public class MavenBuildSystem extends BuildSystem {
     }
 
     @Override
-    public Promise<MavenBuildSystem> reImport(@NotNull Module module) {
-        imported = true;
-        AsyncPromise<MavenBuildSystem> promise = new AsyncPromise<>();
+    public Promise<BuildSystem> reImport(@NotNull Module module) {
+        synchronize();
 
         MavenBuildSystem thisRef = this;
 
@@ -289,22 +285,11 @@ public class MavenBuildSystem extends BuildSystem {
                                     });
                                 });
                     });
-                    thisRef.finishImport = true;
-                    promise.setResult(thisRef);
+                    importPromise.setResult(thisRef);
                 }
             })
         );
 
-        return promise;
-    }
-
-    @Override
-    public boolean isImported() {
-        return imported;
-    }
-
-    @Override
-    public boolean isFinishImport() {
-        return finishImport;
+        return importPromise;
     }
 }

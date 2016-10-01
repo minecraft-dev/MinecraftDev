@@ -16,6 +16,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.concurrency.AsyncPromise;
 import org.jetbrains.concurrency.Promise;
 
 import java.io.IOException;
@@ -49,6 +50,8 @@ public abstract class BuildSystem {
     protected List<VirtualFile> resourceDirectories;
     protected List<VirtualFile> testSourcesDirectories;
     protected List<VirtualFile> testResourceDirectories;
+
+    protected AsyncPromise<BuildSystem> importPromise = null;
 
     /**
      * This refers to the plugin name from the perspective of the build system, that being a name field in the build
@@ -191,19 +194,15 @@ public abstract class BuildSystem {
      */
     public abstract Promise<? extends BuildSystem> reImport(@NotNull Module module);
 
-    /**
-     * Return true when reImport has run.
-     *
-     * @return True if reImport has been run.
-     */
-    public abstract boolean isImported();
+    protected boolean synchronize() {
+        if (importPromise != null) {
+            // we're in the process of importing
+            return true;
+        }
 
-    /**
-     * Return true when reImport has finished.
-     *
-     * @return True if reImport has finished.
-     */
-    public abstract boolean isFinishImport();
+        importPromise = new AsyncPromise<>();
+        return false;
+    }
 
     @Nullable
     public static BuildSystem getInstance(@NotNull Module module) {
