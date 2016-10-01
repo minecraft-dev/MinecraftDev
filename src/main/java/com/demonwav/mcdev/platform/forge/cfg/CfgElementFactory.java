@@ -87,6 +87,15 @@ public class CfgElementFactory {
         PROTECTED,
         PROTECTED_F,
         PUBLIC,
-        PUBLIC_F
+        PUBLIC_F;
+
+        public static Keyword match(String s) {
+            for (Keyword keyword : values()) {
+                if (keyword.name().equals(s)) {
+                    return keyword;
+                }
+            }
+            return null;
+        }
     }
 }

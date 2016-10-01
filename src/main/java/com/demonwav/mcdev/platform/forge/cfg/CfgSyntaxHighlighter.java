@@ -56,7 +56,7 @@ public class CfgSyntaxHighlighter extends SyntaxHighlighterBase {
             return CLASS_VALUE_KEYS;
         } else if (tokenType.equals(CfgTypes.NAME_ELEMENT)) {
             return ELEMENT_NAME_KEYS;
-        } else if (tokenType.equals(CfgTypes.ASTERISK)) {
+        } else if (tokenType.equals(CfgTypes.ASTERISK_ELEMENT)) {
             return ASTERISK_KEYS;
         } else if (tokenType.equals(CfgTypes.PRIMITIVE)) {
             return PRIMITIVE_KEYS;

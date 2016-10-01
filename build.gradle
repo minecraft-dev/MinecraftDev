@@ -2,33 +2,26 @@ plugins {
     id "org.jetbrains.intellij" version "0.1.10"
 }
 
-apply plugin: 'idea'
-apply plugin: 'org.jetbrains.intellij'
-apply plugin: 'java'
+apply plugin: "idea"
+apply plugin: "org.jetbrains.intellij"
+apply plugin: "java"
 
 tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+    options.encoding = "UTF-8"
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
 }
 
 sourceSets {
-    main {
-        java {
-            srcDirs = ['src/main/java', 'src/main/gen']
-        }
-        resources {
-            srcDirs = ['src/main/resources']
-        }
-    }
+    main.java.srcDirs += "gen"
 }
 
 intellij {
     // IntelliJ IDEA dependency
-    version project.hasProperty('intellijVersion') ? project.getProperty('intellijVersion') : ideaVersion
+    version project.hasProperty("intellijVersion") ? project.getProperty("intellijVersion") : ideaVersion
     // Bundled plugin dependencies
-    plugins = ['maven', 'gradle', 'Groovy', 'yaml']
-    pluginName 'Minecraft Development'
+    plugins = ["maven", "gradle", "Groovy", "yaml"]
+    pluginName "Minecraft Development"
     updateSinceUntilBuild false
 
     downloadSources Boolean.valueOf(downloadIdeaSources)
@@ -42,33 +35,74 @@ idea {
     }
 
     module {
-        excludeDirs += file('.sandbox');
+        generatedSourceDirs += file("gen")
+        excludeDirs += file(".sandbox");
     }
 }
 
-group 'com.demonwav.minecraft-dev'
+group "com.demonwav.minecraft-dev"
 version pluginVersion
 
 task initProp << {
-    def baseProp = file('src/main/resources/messages.MinecraftDevelopment_en.properties')
-    def baseEnglishProp = file('src/main/resources/messages.MinecraftDevelopment.properties')
+    def baseProp = file("src/main/resources/messages.MinecraftDevelopment_en.properties")
+    def baseEnglishProp = file("src/main/resources/messages.MinecraftDevelopment.properties")
 
     def comment =
             "# Do not manually edit this file\n"
             "# This file is automatically copied from messages.MinecraftDevelopment_en_US.properties at build time\n"
 
-    def baseUsEnglishProp = file('src/main/resources/messages.MinecraftDevelopment_en_US.properties')
+    def baseUsEnglishProp = file("src/main/resources/messages.MinecraftDevelopment_en_US.properties")
 
     baseProp.write comment + baseUsEnglishProp.text
     baseEnglishProp.write comment + baseUsEnglishProp.text
 }
 
-// The intellij gui form creator doesn't seem to be reliable unless we delete the plugin contents each time...
-task cleanPlugin << {
-    def pluginDir = new File(intellij.sandboxDirectory, 'plugins/Minecraft Development')
+// Credit for this intellij-rust https://github.com/intellij-rust/intellij-rust/blob/master/build.gradle#L114
+def lexerConfig(src, dst, lexerFileName) {
+    return {
+        classpath = files("libs/jflex-1.7.0-SNAPSHOT.jar")
+        main = "jflex.Main"
 
-    pluginDir.deleteDir()
+        args = ["--skel",   "libs/idea-flex.skeleton",
+                "-d",       dst,
+                src
+        ]
+
+        inputs  .file   file(src)
+        outputs .dir    file(dst + lexerFileName)
+    }
 }
+
+task generateCfgLexer(type: JavaExec) {
+    configure lexerConfig(
+            "src/main/java/com/demonwav/mcdev/platform/forge/cfg/Cfg.flex",
+            "gen/com/demonwav/mcdev/platform/forge/cfg/",
+            "CfgLexer.java"
+    )
+}
+
+task generateCfgPsiAndParser(type: JavaExec) {
+    doFirst {
+        delete file("gen/com/demonwav/mcdev/platform/forge/cfg/psi/")
+    }
+    ext.src     = "src/main/java/com/demonwav/mcdev/platform/forge/cfg/Cfg.bnf"
+    ext.dstRoot = "gen"
+
+    main = "org.intellij.grammar.Main"
+
+    args = [ dstRoot, file(src) ]
+
+    inputs  .file   file(src)
+    outputs .dir    fileTree(dir: dstRoot + "/com/demonwav/mcdev/platform/forge/cfg/", include: "**/*.java")
+
+    classpath(configurations.compile, file("libs/grammar-kit.jar"))
+}
+
+task generate {
+    dependsOn generateCfgLexer, generateCfgPsiAndParser
+}
+
+compileJava.dependsOn generate
 
 afterEvaluate {
     buildPlugin.dependsOn initProp

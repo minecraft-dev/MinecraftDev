@@ -37,7 +37,7 @@ WHITE_SPACE=\s
 
     "("                                         { return OPEN_PAREN; }
     ")"                                         { return CLOSE_PAREN; }
-    "*"                                         { return ASTERISK; }
+    "*"                                         { return ASTERISK_ELEMENT; }
 
     {PRIMITIVE} ({PRIMITIVE}|{CLASS_VALUE})*    { zzMarkedPos = zzStartRead + 1; return PRIMITIVE; }
 

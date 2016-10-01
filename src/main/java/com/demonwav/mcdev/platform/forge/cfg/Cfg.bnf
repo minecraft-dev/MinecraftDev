@@ -8,9 +8,7 @@
     psiPackage="com.demonwav.mcdev.platform.forge.cfg.psi"
     psiImplPackage="com.demonwav.mcdev.platform.forge.cfg.psi.impl"
 
-    parserImports="static com.intellij.psi.TokenType.*"
-
-    psiImplUtilClass="com.demonwav.mcdev.platform.forge.cfg.psi.impl.CfgPsiImplUtil"
+//    psiImplUtilClass="com.demonwav.mcdev.platform.forge.cfg.psi.impl.CfgPsiImplUtil"
 
     elementTypeHolderClass="com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes"
     elementTypeClass="com.demonwav.mcdev.platform.forge.cfg.psi.CfgElementType"
@@ -21,7 +19,7 @@
         class_value="regexp:\[*([ZBCSIFDJ]|L[^;]+;)"
         open_paren="("
         close_paren=")"
-        asterisk="*"
+        asterisk_element="*"
         keyword_element="regexp:(public|public-f|private|private-f|protected|protected-f)"
         name_element="regexp:[a-zA-Z0-9_]+|<init>"
         class_name_element="regexp:[a-zA-Z_$0-9\.]*[a-zA-Z_$0-9]"
@@ -29,12 +27,25 @@
         crlf="regexp:\n|\r|\r\n"
     ]
 
+    //
+    // Mixins
+
+    mixin ("function")      = "com.demonwav.mcdev.platform.forge.cfg.psi.mixins.CfgFunctionMixin"
+    mixin ("entry")         = "com.demonwav.mcdev.platform.forge.cfg.psi.mixins.CfgEntryMixin"
+    mixin ("argument")      = "com.demonwav.mcdev.platform.forge.cfg.psi.mixins.CfgArgumentMixin"
+    mixin ("class_name")    = "com.demonwav.mcdev.platform.forge.cfg.psi.mixins.CfgClassNameMixin"
+    mixin ("field_name")    = "com.demonwav.mcdev.platform.forge.cfg.psi.mixins.CfgFieldNameMixin"
+    mixin ("func_name")     = "com.demonwav.mcdev.platform.forge.cfg.psi.mixins.CfgFuncNameMixin"
+    mixin ("keyword")       = "com.demonwav.mcdev.platform.forge.cfg.psi.mixins.CfgKeywordMixin"
+    mixin ("return_value")  = "com.demonwav.mcdev.platform.forge.cfg.psi.mixins.CfgReturnValueMixin"
+
     consumeTokenMethod="consumeTokenFast"
 }
 
 cfg_file ::= (entry? comment? crlf)*
 
 entry ::= keyword class_name (function|field_name|asterisk)? {methods=[setEntry setKeyword setClassName setFieldName setFunction]}
+asterisk ::= asterisk_element
 
 keyword ::= keyword_element {methods=[getKeywordText setKeyword]}
 class_name ::= class_name_element {methods=[getClassNameText setClassName]}
