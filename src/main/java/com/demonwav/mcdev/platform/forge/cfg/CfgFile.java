@@ -29,6 +29,6 @@ public class CfgFile extends PsiFileBase {
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return PlatformAssets.MIXIN;
+        return PlatformAssets.FORGE_ICON;
     }
 }
