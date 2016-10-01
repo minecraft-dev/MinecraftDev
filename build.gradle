@@ -75,17 +75,17 @@ def lexerConfig(src, dst, lexerFileName) {
 
 task generateCfgLexer(type: JavaExec) {
     configure lexerConfig(
-            "src/main/java/com/demonwav/mcdev/platform/forge/cfg/Cfg.flex",
-            "gen/com/demonwav/mcdev/platform/forge/cfg/",
+            "src/main/java/com/demonwav/mcdev/platform/mcp/cfg/Cfg.flex",
+            "gen/com/demonwav/mcdev/platform/mcp/cfg/",
             "CfgLexer.java"
     )
 }
 
 task generateCfgPsiAndParser(type: JavaExec) {
     doFirst {
-        delete file("gen/com/demonwav/mcdev/platform/forge/cfg/psi/")
+        delete file("gen/com/demonwav/mcdev/platform/mcp/cfg/psi/")
     }
-    ext.src     = "src/main/java/com/demonwav/mcdev/platform/forge/cfg/Cfg.bnf"
+    ext.src     = "src/main/java/com/demonwav/mcdev/platform/mcp/cfg/Cfg.bnf"
     ext.dstRoot = "gen"
 
     main = "org.intellij.grammar.Main"
@@ -93,7 +93,7 @@ task generateCfgPsiAndParser(type: JavaExec) {
     args = [ dstRoot, file(src) ]
 
     inputs  .file   file(src)
-    outputs .dir    fileTree(dir: dstRoot + "/com/demonwav/mcdev/platform/forge/cfg/", include: "**/*.java")
+    outputs .dir    fileTree(dir: dstRoot + "/com/demonwav/mcdev/platform/mcp/cfg/", include: "**/*.java")
 
     classpath(configurations.compile, file("libs/grammar-kit.jar"))
 }

@@ -11,7 +11,6 @@ import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.ui.IdeBorderFactory;
-import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Desktop;
@@ -120,12 +119,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
                 fillInInfoPane()
         );
 
-        // show the right sponge icon
-        if (UIUtil.isUnderDarcula()) {
-            spongeIcon.setIcon(PlatformAssets.SPONGE_ICON_2X);
-        } else {
-            spongeIcon.setIcon(PlatformAssets.SPONGE_ICON_DARK_2X);
-        }
+        spongeIcon.setIcon(PlatformAssets.SPONGE_ICON_2X);
 
         return panel;
     }

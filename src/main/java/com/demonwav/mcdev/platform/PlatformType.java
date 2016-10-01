@@ -6,6 +6,7 @@ import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderModuleType;
+import com.demonwav.mcdev.platform.mcp.McpModuleType;
 import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
@@ -23,6 +24,7 @@ public enum PlatformType {
     BUNGEECORD(BungeeCordModuleType.getInstance(), "BUNGEECORD_MODULE_TYPE", "BungeeCord"),
     LITELOADER(LiteLoaderModuleType.getInstance(), "LITELOADER_MODULE_TYPE", "LiteLoader"),
     MIXIN(MixinModuleType.getInstance(), "MIXIN_MODULE_TYPE", "Mixin"),
+    MCP(McpModuleType.getInstance(), "MCP_MODULE_TYPE", "MCP")
     ;
 
     private final AbstractModuleType<?> type;

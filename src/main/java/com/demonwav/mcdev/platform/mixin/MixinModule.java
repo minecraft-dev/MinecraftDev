@@ -13,7 +13,7 @@ import javax.swing.Icon;
 
 public class MixinModule extends AbstractModule {
 
-    public MixinModule(@NotNull Module module) {
+    MixinModule(@NotNull Module module) {
         super(module);
         this.buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
@@ -36,11 +36,6 @@ public class MixinModule extends AbstractModule {
     @Override
     public Icon getIcon() {
         return null;
-    }
-
-    @Override
-    public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
-        return true;
     }
 
     @Override

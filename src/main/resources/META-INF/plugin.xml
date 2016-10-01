@@ -54,6 +54,7 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.liteloader.gradle.LiteLoaderDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mixin.gradle.MixinDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
 
         <!-- Project-independent Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
@@ -67,14 +68,14 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.MixinLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.ShadowLineMarkerProvider"/>
 
-        <!-- Forge CFG file type -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.platform.forge.cfg.CfgFiletypeFactory"/>
-        <lang.parserDefinition language="cfg" implementationClass="com.demonwav.mcdev.platform.forge.cfg.CfgParserDefinition"/>
-        <lang.syntaxHighlighterFactory language="cfg" implementationClass="com.demonwav.mcdev.platform.forge.cfg.CfgSyntaxHighlighterFactory"/>
-        <colorSettingsPage implementation="com.demonwav.mcdev.platform.forge.cfg.CfgColorSettingsPage" />
-        <lang.commenter language="cfg" implementationClass="com.demonwav.mcdev.platform.forge.cfg.CfgCommenter" />
-        <completion.contributor language="cfg" implementationClass="com.demonwav.mcdev.platform.forge.cfg.CfgCompletionContributor" />
-        <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.forge.cfg.CfgGotoDeclarationHandler" />
+        <!-- MCP CFG file type -->
+        <fileTypeFactory implementation="com.demonwav.mcdev.platform.mcp.cfg.CfgFiletypeFactory"/>
+        <lang.parserDefinition language="cfg" implementationClass="com.demonwav.mcdev.platform.mcp.cfg.CfgParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="cfg" implementationClass="com.demonwav.mcdev.platform.mcp.cfg.CfgSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.cfg.CfgColorSettingsPage" />
+        <lang.commenter language="cfg" implementationClass="com.demonwav.mcdev.platform.mcp.cfg.CfgCommenter" />
+        <completion.contributor language="cfg" implementationClass="com.demonwav.mcdev.platform.mcp.cfg.CfgCompletionContributor" />
+        <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.cfg.CfgGotoDeclarationHandler" />
 
         <!-- Project-independent Annotators-->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>

@@ -2,8 +2,8 @@ package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration;
-import com.demonwav.mcdev.platform.mcp.McpVersion;
-import com.demonwav.mcdev.platform.mcp.McpVersionEntry;
+import com.demonwav.mcdev.platform.mcp.version.McpVersion;
+import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;

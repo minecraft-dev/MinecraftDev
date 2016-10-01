@@ -12,7 +12,6 @@ import com.demonwav.mcdev.util.Util;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
-import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -42,11 +41,7 @@ public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
 
     @Override
     public Icon getIcon() {
-        if (UIUtil.isUnderDarcula()) {
-            return PlatformAssets.SPONGE_ICON;
-        } else {
-            return PlatformAssets.SPONGE_ICON_DARK;
-        }
+        return PlatformAssets.SPONGE_ICON;
     }
 
     @Override

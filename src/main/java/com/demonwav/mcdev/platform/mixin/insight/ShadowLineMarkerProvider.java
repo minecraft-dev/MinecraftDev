@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.platform.mixin.insight;
 
-import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.asset.MixinAssets;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError;
 import com.demonwav.mcdev.util.McEditorUtil;
@@ -84,7 +84,7 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
     @NotNull
     @Override
     public Icon getIcon() {
-        return PlatformAssets.SHADOW;
+        return MixinAssets.SHADOW;
     }
 
     private static final class ShadowLineMarkerInfo extends MergeableLineMarkerInfo<PsiElement> {
@@ -111,7 +111,7 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
 
         @Override
         public Icon getCommonIcon(@NotNull List<MergeableLineMarkerInfo> infos) {
-            return PlatformAssets.SHADOW;
+            return MixinAssets.SHADOW;
         }
 
         @NotNull

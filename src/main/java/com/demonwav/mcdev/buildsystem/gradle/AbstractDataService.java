@@ -142,13 +142,13 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
 
     protected void checkModule(@NotNull IdeModifiableModelsProvider modelsProvider,
                                @NotNull AbstractModuleType<?> type,
-                               @NotNull String text) {
+                               @NotNull String... texts) {
 
         ApplicationManager.getApplication().runReadAction(() -> {
             final Module[] modules = modelsProvider.getModules();
             List<Module> forgeModules = new ArrayList<>();
             for (Module module : modules) {
-                if (!checkModuleText(module, modelsProvider, text)) {
+                if (!checkModuleText(module, modelsProvider, texts)) {
                     // Make sure this isn't marked as a forge module
                     MinecraftModuleType.removeOption(module, type.getId());
                     continue;
@@ -173,7 +173,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
     }
 
     @Contract("null, _, _ -> false")
-    private boolean checkModuleText(Module module, IdeModifiableModelsProvider provider, String text) {
+    private boolean checkModuleText(Module module, IdeModifiableModelsProvider provider, String... text) {
 
         if (module != null) {
             VirtualFile[] roots = provider.getModifiableRootModel(module).getContentRoots();
@@ -190,8 +190,10 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             if (file != null) {
                 GroovyFile groovyFile = (GroovyFile) PsiManager.getInstance(module.getProject()).findFile(file);
                 if (groovyFile != null) {
-                    if (groovyFile.getText().contains(text)) {
-                        return true;
+                    for (String s : text) {
+                        if (groovyFile.getText().contains(s)) {
+                            return true;
+                        }
                     }
                 }
             }

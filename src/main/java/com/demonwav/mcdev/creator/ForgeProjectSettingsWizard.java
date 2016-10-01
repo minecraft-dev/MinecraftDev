@@ -2,13 +2,12 @@ package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
-import com.demonwav.mcdev.platform.forge.versionapi.ForgeVersion;
+import com.demonwav.mcdev.platform.forge.version.ForgeVersion;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
-import com.demonwav.mcdev.platform.mcp.McpVersion;
-import com.demonwav.mcdev.platform.mcp.McpVersionEntry;
+import com.demonwav.mcdev.platform.mcp.version.McpVersion;
+import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry;
 
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -147,11 +146,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         loadingBar.setIndeterminate(true);
 
         if (spongeForge) {
-            if (UIUtil.isUnderDarcula()) {
-                title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X);
-            } else {
-                title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_DARK_2X);
-            }
+            title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X);
             title.setText("<html><font size=\"5\">SpongeForge Settings</font></html>");
             generateDocsCheckbox.setVisible(true);
 

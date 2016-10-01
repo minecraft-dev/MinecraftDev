@@ -1,7 +1,7 @@
 package com.demonwav.mcdev.insight;
 
 import com.demonwav.mcdev.MinecraftSettings;
-import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.asset.GeneralAssets;
 import com.demonwav.mcdev.util.McEditorUtil;
 
 import com.intellij.codeHighlighting.Pass;
@@ -118,7 +118,7 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
     @NotNull
     @Override
     public Icon getIcon() {
-        return PlatformAssets.LISTENER;
+        return GeneralAssets.LISTENER;
     }
 
     private static final class EventLineMarkerInfo extends MergeableLineMarkerInfo<PsiElement> {

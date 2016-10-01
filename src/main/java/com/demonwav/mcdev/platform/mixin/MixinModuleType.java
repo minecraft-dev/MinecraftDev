@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -75,7 +76,7 @@ public class MixinModuleType extends AbstractModuleType<MixinModule> {
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of();
+        return Collections.emptyList();
     }
 
     @NotNull
