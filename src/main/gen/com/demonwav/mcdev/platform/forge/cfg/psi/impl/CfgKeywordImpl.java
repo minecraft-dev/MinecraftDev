@@ -3,6 +3,7 @@ package com.demonwav.mcdev.platform.forge.cfg.psi.impl;
 
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.KEYWORD_ELEMENT;
 
+import com.demonwav.mcdev.platform.forge.cfg.CfgElementFactory.Keyword;
 import com.demonwav.mcdev.platform.forge.cfg.psi.CfgKeyword;
 import com.demonwav.mcdev.platform.forge.cfg.psi.CfgVisitor;
 
@@ -31,6 +32,14 @@ public class CfgKeywordImpl extends ASTWrapperPsiElement implements CfgKeyword {
   @NotNull
   public PsiElement getKeywordElement() {
     return findNotNullChildByType(KEYWORD_ELEMENT);
+  }
+
+  public String getKeywordText() {
+    return CfgPsiImplUtil.getKeywordText(this);
+  }
+
+  public void setKeyword(Keyword keyword) {
+    CfgPsiImplUtil.setKeyword(this, keyword);
   }
 
 }

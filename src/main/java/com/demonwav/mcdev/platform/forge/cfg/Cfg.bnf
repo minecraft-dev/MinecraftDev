@@ -8,19 +8,20 @@
     psiPackage="com.demonwav.mcdev.platform.forge.cfg.psi"
     psiImplPackage="com.demonwav.mcdev.platform.forge.cfg.psi.impl"
 
+    psiImplUtilClass="com.demonwav.mcdev.platform.forge.cfg.psi.impl.CfgPsiImplUtil"
+
     elementTypeHolderClass="com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes"
     elementTypeClass="com.demonwav.mcdev.platform.forge.cfg.psi.CfgElementType"
     tokenTypeClass="com.demonwav.mcdev.platform.forge.cfg.psi.CfgTokenType"
 
     tokens = [
-        crlf="regexp:[\n|\r|\r\n]"
-        class_value="regexp:[ZBCSIFDJLV\[][\[\/a-zA-Z0-9$_;]*"
+        primitive="regexp:[ZBCSIFDJV]"
+        class_value="regexp:\[*([ZBCSIFDJ]|L[^;]+;)"
         open_paren="("
         close_paren=")"
         asterisk="*"
-        init="<init>"
         keyword_element="regexp:(public|public-f|private|private-f|protected|protected-f)"
-        name_element="regexp:[a-zA-Z0-9_]+"
+        name_element="regexp:[a-zA-Z0-9_]+|<init>"
         class_name_element="regexp:[a-zA-Z_$0-9\.]*[a-zA-Z_$0-9]"
         comment="regexp:#.*"
     ]
@@ -28,17 +29,17 @@
 
 cfgFile ::= item_*
 
-private item_ ::= (entry comment?|comment|crlf)
+private item_ ::= entry? comment?
 
-entry ::= keyword class_name (function|field_name|asterisk)?
+entry ::= keyword class_name (function|field_name|asterisk)? {methods=[setEntry setKeyword setClassName setFieldName setFunction]}
 
-keyword ::= keyword_element
-class_name ::= class_name_element
-field_name ::= name_element
+keyword ::= keyword_element {methods=[getKeywordText setKeyword]}
+class_name ::= class_name_element {methods=[getClassNameText setClassName]}
+field_name ::= name_element {methods=[getFieldNameText setFieldName]}
 
-function ::= func_name open_paren arguments? close_paren return_value
-func_name ::= name_element | init
+function ::= func_name open_paren argument* close_paren return_value {methods=[setFunction setArgumentList setReturnValue]}
+func_name ::= name_element {methods=[getFuncNameText setFuncName]}
 
-arguments ::= class_value
+argument ::= primitive | class_value {methods=[getPrimitiveArgumentType getArgumentText setArgument]}
 
-return_value ::= class_value
+return_value ::= primitive | class_value {methods=[getReturnValueText setReturnValue]}

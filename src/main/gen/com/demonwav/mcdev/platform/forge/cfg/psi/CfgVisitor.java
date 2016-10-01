@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class CfgVisitor extends PsiElementVisitor {
 
-  public void visitArguments(@NotNull CfgArguments o) {
+  public void visitArgument(@NotNull CfgArgument o) {
     visitPsiElement(o);
   }
 

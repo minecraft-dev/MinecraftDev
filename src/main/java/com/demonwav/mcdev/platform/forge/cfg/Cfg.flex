@@ -21,28 +21,28 @@ import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.*;
 
 WHITE_SPACE=\s
 
-CLASS_VALUE=[ZBCSIFDJLV\[][\[\/a-zA-Z0-9$_;]*
+PRIMITIVE=[ZBCSIFDJV]
+CLASS_VALUE=\[*([ZBCSIFDJ]|L[^;]+;)
 KEYWORD_ELEMENT=(public|public-f|private|private-f|protected|protected-f)
-NAME_ELEMENT=[a-zA-Z0-9_]+
+NAME_ELEMENT=[a-zA-Z0-9_]+|<init>
 CLASS_NAME_ELEMENT=[a-zA-Z_$0-9\.]*[a-zA-Z_$0-9]
 COMMENT=#.*
-CRLF=[\n|\r|\r\n]
 
 %%
 <YYINITIAL> {
-  {WHITE_SPACE}             { return com.intellij.psi.TokenType.WHITE_SPACE; }
+  {WHITE_SPACE}                             { return com.intellij.psi.TokenType.WHITE_SPACE; }
 
-  "("                       { return OPEN_PAREN; }
-  ")"                       { return CLOSE_PAREN; }
-  "*"                       { return ASTERISK; }
-  "<init>"                  { return INIT; }
+  "("                                       { return OPEN_PAREN; }
+  ")"                                       { return CLOSE_PAREN; }
+  "*"                                       { return ASTERISK; }
 
-  {CLASS_VALUE}             { return CLASS_VALUE; }
-  {KEYWORD_ELEMENT}         { return KEYWORD_ELEMENT; }
-  {NAME_ELEMENT}            { return NAME_ELEMENT; }
-  {CLASS_NAME_ELEMENT}      { return CLASS_NAME_ELEMENT; }
-  {COMMENT}                 { return COMMENT; }
-  {CRLF}                    { return CRLF; }
+  {PRIMITIVE} ({PRIMITIVE}|{CLASS_VALUE})*  { zzMarkedPos = zzStartRead + 1; return PRIMITIVE; }
+
+  {CLASS_VALUE}                             { return CLASS_VALUE; }
+  {KEYWORD_ELEMENT}                         { return KEYWORD_ELEMENT; }
+  {NAME_ELEMENT}                            { return NAME_ELEMENT; }
+  {CLASS_NAME_ELEMENT}                      { return CLASS_NAME_ELEMENT; }
+  {COMMENT}                                 { return COMMENT; }
 
 }
 

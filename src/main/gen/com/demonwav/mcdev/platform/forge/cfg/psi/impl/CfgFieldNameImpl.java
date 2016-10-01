@@ -33,4 +33,12 @@ public class CfgFieldNameImpl extends ASTWrapperPsiElement implements CfgFieldNa
     return findNotNullChildByType(NAME_ELEMENT);
   }
 
+  public String getFieldNameText() {
+    return CfgPsiImplUtil.getFieldNameText(this);
+  }
+
+  public void setFieldName(String fieldName) {
+    CfgPsiImplUtil.setFieldName(this, fieldName);
+  }
+
 }

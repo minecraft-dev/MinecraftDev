@@ -11,7 +11,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class CfgFuncNameImpl extends ASTWrapperPsiElement implements CfgFuncName {
 
@@ -29,9 +28,17 @@ public class CfgFuncNameImpl extends ASTWrapperPsiElement implements CfgFuncName
   }
 
   @Override
-  @Nullable
+  @NotNull
   public PsiElement getNameElement() {
-    return findChildByType(NAME_ELEMENT);
+    return findNotNullChildByType(NAME_ELEMENT);
+  }
+
+  public String getFuncNameText() {
+    return CfgPsiImplUtil.getFuncNameText(this);
+  }
+
+  public void setFuncName(String funcName) {
+    CfgPsiImplUtil.setFuncName(this, funcName);
   }
 
 }

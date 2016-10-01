@@ -1,7 +1,7 @@
 // This is a generated file. Not intended for manual editing.
 package com.demonwav.mcdev.platform.forge.cfg.psi;
 
-import com.demonwav.mcdev.platform.forge.cfg.psi.impl.CfgArgumentsImpl;
+import com.demonwav.mcdev.platform.forge.cfg.psi.impl.CfgArgumentImpl;
 import com.demonwav.mcdev.platform.forge.cfg.psi.impl.CfgClassNameImpl;
 import com.demonwav.mcdev.platform.forge.cfg.psi.impl.CfgEntryImpl;
 import com.demonwav.mcdev.platform.forge.cfg.psi.impl.CfgFieldNameImpl;
@@ -16,7 +16,7 @@ import com.intellij.psi.tree.IElementType;
 
 public interface CfgTypes {
 
-  IElementType ARGUMENTS = new CfgElementType("ARGUMENTS");
+  IElementType ARGUMENT = new CfgElementType("ARGUMENT");
   IElementType CLASS_NAME = new CfgElementType("CLASS_NAME");
   IElementType ENTRY = new CfgElementType("ENTRY");
   IElementType FIELD_NAME = new CfgElementType("FIELD_NAME");
@@ -30,17 +30,16 @@ public interface CfgTypes {
   IElementType CLASS_VALUE = new CfgTokenType("class_value");
   IElementType CLOSE_PAREN = new CfgTokenType(")");
   IElementType COMMENT = new CfgTokenType("comment");
-  IElementType CRLF = new CfgTokenType("crlf");
-  IElementType INIT = new CfgTokenType("<init>");
   IElementType KEYWORD_ELEMENT = new CfgTokenType("keyword_element");
   IElementType NAME_ELEMENT = new CfgTokenType("name_element");
   IElementType OPEN_PAREN = new CfgTokenType("(");
+  IElementType PRIMITIVE = new CfgTokenType("primitive");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ARGUMENTS) {
-        return new CfgArgumentsImpl(node);
+       if (type == ARGUMENT) {
+        return new CfgArgumentImpl(node);
       }
       else if (type == CLASS_NAME) {
         return new CfgClassNameImpl(node);

@@ -33,4 +33,12 @@ public class CfgClassNameImpl extends ASTWrapperPsiElement implements CfgClassNa
     return findNotNullChildByType(CLASS_NAME_ELEMENT);
   }
 
+  public String getClassNameText() {
+    return CfgPsiImplUtil.getClassNameText(this);
+  }
+
+  public void setClassName(String className) {
+    CfgPsiImplUtil.setClassName(this, className);
+  }
+
 }

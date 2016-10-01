@@ -40,6 +40,6 @@ public class CfgFileType  extends LanguageFileType {
     @Nullable
     @Override
     public Icon getIcon() {
-        return PlatformAssets.MIXIN;
+        return PlatformAssets.FORGE_ICON;
     }
 }

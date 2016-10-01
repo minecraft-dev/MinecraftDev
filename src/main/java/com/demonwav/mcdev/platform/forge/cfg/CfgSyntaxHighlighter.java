@@ -20,8 +20,10 @@ public class CfgSyntaxHighlighter extends SyntaxHighlighterBase {
         TextAttributesKey.createTextAttributesKey("CFG_CLASS_VALUE", DefaultLanguageHighlighterColors.STATIC_METHOD);
     public static final TextAttributesKey ELEMENT_NAME =
         TextAttributesKey.createTextAttributesKey("CFG_ELEMENT_NAME", DefaultLanguageHighlighterColors.STATIC_FIELD);
-    public static final TextAttributesKey ASTRISK =
-        TextAttributesKey.createTextAttributesKey("CFG_ASTERISK", DefaultLanguageHighlighterColors.NUMBER);
+    public static final TextAttributesKey ASTERISK =
+        TextAttributesKey.createTextAttributesKey("CFG_ASTERISK", DefaultLanguageHighlighterColors.KEYWORD);
+    public static final TextAttributesKey PRIMITIVE =
+        TextAttributesKey.createTextAttributesKey("CFG_PRIMITIVE", DefaultLanguageHighlighterColors.NUMBER);
     public static final TextAttributesKey COMMENT =
         TextAttributesKey.createTextAttributesKey("CFG_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
     public static final TextAttributesKey BAD_CHARACTER =
@@ -31,7 +33,8 @@ public class CfgSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] CLASS_NAME_KEYS = new TextAttributesKey[]{CLASS_NAME};
     private static final TextAttributesKey[] CLASS_VALUE_KEYS = new TextAttributesKey[]{CLASS_VALUE};
     private static final TextAttributesKey[] ELEMENT_NAME_KEYS = new TextAttributesKey[]{ELEMENT_NAME};
-    private static final TextAttributesKey[] ASTERISK_KEYS = new TextAttributesKey[]{ASTRISK};
+    private static final TextAttributesKey[] ASTERISK_KEYS = new TextAttributesKey[]{ASTERISK};
+    private static final TextAttributesKey[] PRIMITIVE_KEYS = new TextAttributesKey[]{PRIMITIVE};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] BAD_CHARACTER_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
@@ -55,6 +58,8 @@ public class CfgSyntaxHighlighter extends SyntaxHighlighterBase {
             return ELEMENT_NAME_KEYS;
         } else if (tokenType.equals(CfgTypes.ASTERISK)) {
             return ASTERISK_KEYS;
+        } else if (tokenType.equals(CfgTypes.PRIMITIVE)) {
+            return PRIMITIVE_KEYS;
         } else if (tokenType.equals(CfgTypes.COMMENT)) {
             return COMMENT_KEYS;
         } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {

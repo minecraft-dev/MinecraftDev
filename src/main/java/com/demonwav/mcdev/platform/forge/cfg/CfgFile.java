@@ -23,7 +23,7 @@ public class CfgFile extends PsiFileBase {
 
     @Override
     public String toString() {
-        return "Cfg file";
+        return "cfg file";
     }
 
     @Nullable

@@ -1,7 +1,7 @@
 // This is a generated file. Not intended for manual editing.
 package com.demonwav.mcdev.platform.forge.cfg.psi.impl;
 
-import com.demonwav.mcdev.platform.forge.cfg.psi.CfgArguments;
+import com.demonwav.mcdev.platform.forge.cfg.psi.CfgArgument;
 import com.demonwav.mcdev.platform.forge.cfg.psi.CfgFuncName;
 import com.demonwav.mcdev.platform.forge.cfg.psi.CfgFunction;
 import com.demonwav.mcdev.platform.forge.cfg.psi.CfgReturnValue;
@@ -10,8 +10,10 @@ import com.demonwav.mcdev.platform.forge.cfg.psi.CfgVisitor;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class CfgFunctionImpl extends ASTWrapperPsiElement implements CfgFunction {
 
@@ -29,9 +31,9 @@ public class CfgFunctionImpl extends ASTWrapperPsiElement implements CfgFunction
   }
 
   @Override
-  @Nullable
-  public CfgArguments getArguments() {
-    return findChildByClass(CfgArguments.class);
+  @NotNull
+  public List<CfgArgument> getArgumentList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, CfgArgument.class);
   }
 
   @Override
@@ -44,6 +46,18 @@ public class CfgFunctionImpl extends ASTWrapperPsiElement implements CfgFunction
   @NotNull
   public CfgReturnValue getReturnValue() {
     return findNotNullChildByClass(CfgReturnValue.class);
+  }
+
+  public void setFunction(String function) {
+    CfgPsiImplUtil.setFunction(this, function);
+  }
+
+  public void setArgumentList(String arguments) {
+    CfgPsiImplUtil.setArgumentList(this, arguments);
+  }
+
+  public void setReturnValue(String returnValue) {
+    CfgPsiImplUtil.setReturnValue(this, returnValue);
   }
 
 }

@@ -1,23 +1,22 @@
 // This is a generated file. Not intended for manual editing.
 package com.demonwav.mcdev.platform.forge.cfg.parser;
 
-import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.ARGUMENTS;
+import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.ARGUMENT;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.ASTERISK;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.CLASS_NAME;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.CLASS_NAME_ELEMENT;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.CLASS_VALUE;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.CLOSE_PAREN;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.COMMENT;
-import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.CRLF;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.ENTRY;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.FIELD_NAME;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.FUNCTION;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.FUNC_NAME;
-import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.INIT;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.KEYWORD;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.KEYWORD_ELEMENT;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.NAME_ELEMENT;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.OPEN_PAREN;
+import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.PRIMITIVE;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.RETURN_VALUE;
 import static com.intellij.lang.parser.GeneratedParserUtilBase.TRUE_CONDITION;
 import static com.intellij.lang.parser.GeneratedParserUtilBase._COLLAPSE_;
@@ -50,8 +49,8 @@ public class CfgParser implements PsiParser, LightPsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, null);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == ARGUMENTS) {
-      r = arguments(b, 0);
+    if (t == ARGUMENT) {
+      r = argument(b, 0);
     }
     else if (t == CLASS_NAME) {
       r = class_name(b, 0);
@@ -85,14 +84,15 @@ public class CfgParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // class_value
-  public static boolean arguments(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "arguments")) return false;
-    if (!nextTokenIs(b, CLASS_VALUE)) return false;
+  // primitive | class_value
+  public static boolean argument(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "argument")) return false;
+    if (!nextTokenIs(b, "<argument>", CLASS_VALUE, PRIMITIVE)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, CLASS_VALUE);
-    exit_section_(b, m, ARGUMENTS, r);
+    Marker m = enter_section_(b, l, _NONE_, ARGUMENT, "<argument>");
+    r = consumeToken(b, PRIMITIVE);
+    if (!r) r = consumeToken(b, CLASS_VALUE);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -167,68 +167,67 @@ public class CfgParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // name_element | init
+  // name_element
   public static boolean func_name(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "func_name")) return false;
-    if (!nextTokenIs(b, "<func name>", INIT, NAME_ELEMENT)) return false;
+    if (!nextTokenIs(b, NAME_ELEMENT)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, FUNC_NAME, "<func name>");
+    Marker m = enter_section_(b);
     r = consumeToken(b, NAME_ELEMENT);
-    if (!r) r = consumeToken(b, INIT);
-    exit_section_(b, l, m, r, false, null);
+    exit_section_(b, m, FUNC_NAME, r);
     return r;
   }
 
   /* ********************************************************** */
-  // func_name open_paren arguments? close_paren return_value
+  // func_name open_paren argument* close_paren return_value
   public static boolean function(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function")) return false;
-    if (!nextTokenIs(b, "<function>", INIT, NAME_ELEMENT)) return false;
+    if (!nextTokenIs(b, NAME_ELEMENT)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, FUNCTION, "<function>");
+    Marker m = enter_section_(b);
     r = func_name(b, l + 1);
     r = r && consumeToken(b, OPEN_PAREN);
     r = r && function_2(b, l + 1);
     r = r && consumeToken(b, CLOSE_PAREN);
     r = r && return_value(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
+    exit_section_(b, m, FUNCTION, r);
     return r;
   }
 
-  // arguments?
+  // argument*
   private static boolean function_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function_2")) return false;
-    arguments(b, l + 1);
+    int c = current_position_(b);
+    while (true) {
+      if (!argument(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "function_2", c)) break;
+      c = current_position_(b);
+    }
     return true;
   }
 
   /* ********************************************************** */
-  // entry comment?|comment|crlf
+  // entry? comment?
   static boolean item_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item_")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = item__0(b, l + 1);
-    if (!r) r = consumeToken(b, COMMENT);
-    if (!r) r = consumeToken(b, CRLF);
+    r = r && item__1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // entry comment?
+  // entry?
   private static boolean item__0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item__0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = entry(b, l + 1);
-    r = r && item__0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    entry(b, l + 1);
+    return true;
   }
 
   // comment?
-  private static boolean item__0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__0_1")) return false;
+  private static boolean item__1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__1")) return false;
     consumeToken(b, COMMENT);
     return true;
   }
@@ -246,14 +245,15 @@ public class CfgParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // class_value
+  // primitive | class_value
   public static boolean return_value(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_value")) return false;
-    if (!nextTokenIs(b, CLASS_VALUE)) return false;
+    if (!nextTokenIs(b, "<return value>", CLASS_VALUE, PRIMITIVE)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, CLASS_VALUE);
-    exit_section_(b, m, RETURN_VALUE, r);
+    Marker m = enter_section_(b, l, _NONE_, RETURN_VALUE, "<return value>");
+    r = consumeToken(b, PRIMITIVE);
+    if (!r) r = consumeToken(b, CLASS_VALUE);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 

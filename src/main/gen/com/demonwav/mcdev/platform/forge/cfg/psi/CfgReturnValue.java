@@ -2,11 +2,18 @@
 package com.demonwav.mcdev.platform.forge.cfg.psi;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface CfgReturnValue extends PsiElement {
 
-  @NotNull
+  @Nullable
   PsiElement getClassValue();
+
+  @Nullable
+  PsiElement getPrimitive();
+
+  String getReturnValueText();
+
+  void setReturnValue(String returnValue);
 
 }

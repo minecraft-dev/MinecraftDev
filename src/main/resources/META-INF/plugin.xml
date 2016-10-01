@@ -67,10 +67,14 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.MixinLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.ShadowLineMarkerProvider"/>
 
-        <!-- Mixin file type -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.platform.mixin.lang.cfg.CfgFiletypeFactory"/>
-        <lang.parserDefinition language="cfg" implementationClass="com.demonwav.mcdev.platform.mixin.lang.cfg.CfgParserDefinition"/>
-        <lang.syntaxHighlighterFactory language="cfg" implementationClass="com.demonwav.mcdev.platform.mixin.lang.cfg.CfgSyntaxHighlighterFactory"/>
+        <!-- Forge CFG file type -->
+        <fileTypeFactory implementation="com.demonwav.mcdev.platform.forge.cfg.CfgFiletypeFactory"/>
+        <lang.parserDefinition language="cfg" implementationClass="com.demonwav.mcdev.platform.forge.cfg.CfgParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="cfg" implementationClass="com.demonwav.mcdev.platform.forge.cfg.CfgSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.platform.forge.cfg.CfgColorSettingsPage" />
+        <lang.commenter language="cfg" implementationClass="com.demonwav.mcdev.platform.forge.cfg.CfgCommenter" />
+        <completion.contributor language="cfg" implementationClass="com.demonwav.mcdev.platform.forge.cfg.CfgCompletionContributor" />
+        <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.forge.cfg.CfgGotoDeclarationHandler" />
 
         <!-- Project-independent Annotators-->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>

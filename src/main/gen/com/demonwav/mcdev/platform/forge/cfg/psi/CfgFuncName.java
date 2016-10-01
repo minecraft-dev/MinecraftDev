@@ -2,11 +2,15 @@
 package com.demonwav.mcdev.platform.forge.cfg.psi;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public interface CfgFuncName extends PsiElement {
 
-  @Nullable
+  @NotNull
   PsiElement getNameElement();
+
+  String getFuncNameText();
+
+  void setFuncName(String funcName);
 
 }

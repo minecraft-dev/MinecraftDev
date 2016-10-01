@@ -9,4 +9,8 @@ public interface CfgClassName extends PsiElement {
   @NotNull
   PsiElement getClassNameElement();
 
+  String getClassNameText();
+
+  void setClassName(String className);
+
 }

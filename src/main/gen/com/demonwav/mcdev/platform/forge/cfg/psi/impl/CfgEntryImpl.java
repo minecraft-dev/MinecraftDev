@@ -1,6 +1,7 @@
 // This is a generated file. Not intended for manual editing.
 package com.demonwav.mcdev.platform.forge.cfg.psi.impl;
 
+import com.demonwav.mcdev.platform.forge.cfg.CfgElementFactory.Keyword;
 import com.demonwav.mcdev.platform.forge.cfg.psi.CfgClassName;
 import com.demonwav.mcdev.platform.forge.cfg.psi.CfgEntry;
 import com.demonwav.mcdev.platform.forge.cfg.psi.CfgFieldName;
@@ -51,6 +52,26 @@ public class CfgEntryImpl extends ASTWrapperPsiElement implements CfgEntry {
   @NotNull
   public CfgKeyword getKeyword() {
     return findNotNullChildByClass(CfgKeyword.class);
+  }
+
+  public void setEntry(String entry) {
+    CfgPsiImplUtil.setEntry(this, entry);
+  }
+
+  public void setKeyword(Keyword keyword) {
+    CfgPsiImplUtil.setKeyword(this, keyword);
+  }
+
+  public void setClassName(String className) {
+    CfgPsiImplUtil.setClassName(this, className);
+  }
+
+  public void setFieldName(String fieldName) {
+    CfgPsiImplUtil.setFieldName(this, fieldName);
+  }
+
+  public void setFunction(String function) {
+    CfgPsiImplUtil.setFunction(this, function);
   }
 
 }

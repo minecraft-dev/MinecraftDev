@@ -9,4 +9,8 @@ public interface CfgFieldName extends PsiElement {
   @NotNull
   PsiElement getNameElement();
 
+  String getFieldNameText();
+
+  void setFieldName(String fieldName);
+
 }

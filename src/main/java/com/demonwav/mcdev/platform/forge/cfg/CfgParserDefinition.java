@@ -78,15 +78,15 @@ public class CfgParserDefinition implements ParserDefinition {
 
     private static final Map<Pair<IElementType, IElementType>, SpaceRequirements> map =
         ImmutableMap.<Pair<IElementType, IElementType>, SpaceRequirements>builder()
-        .put(Pair.create(CfgTypes.KEYWORD, CfgTypes.CLASS_NAME), SpaceRequirements.MUST)
-        .put(Pair.create(CfgTypes.CLASS_NAME, CfgTypes.FIELD_NAME), SpaceRequirements.MUST)
-        .put(Pair.create(CfgTypes.CLASS_NAME, CfgTypes.FUNCTION), SpaceRequirements.MUST)
-        .put(Pair.create(CfgTypes.CLASS_NAME, CfgTypes.ASTERISK), SpaceRequirements.MUST)
-        .put(Pair.create(CfgTypes.FIELD_NAME, CfgTypes.COMMENT), SpaceRequirements.MUST)
-        .put(Pair.create(CfgTypes.FUNCTION, CfgTypes.COMMENT), SpaceRequirements.MUST)
-        .put(Pair.create(CfgTypes.ASTERISK, CfgTypes.COMMENT), SpaceRequirements.MUST)
-        .put(Pair.create(CfgTypes.COMMENT, CfgTypes.KEYWORD), SpaceRequirements.MUST_LINE_BREAK)
-        .build();
+            .put(Pair.create(CfgTypes.KEYWORD, CfgTypes.CLASS_NAME), SpaceRequirements.MUST)
+            .put(Pair.create(CfgTypes.CLASS_NAME, CfgTypes.FIELD_NAME), SpaceRequirements.MUST)
+            .put(Pair.create(CfgTypes.CLASS_NAME, CfgTypes.FUNCTION), SpaceRequirements.MUST)
+            .put(Pair.create(CfgTypes.CLASS_NAME, CfgTypes.ASTERISK), SpaceRequirements.MUST)
+            .put(Pair.create(CfgTypes.FIELD_NAME, CfgTypes.COMMENT), SpaceRequirements.MUST)
+            .put(Pair.create(CfgTypes.ASTERISK, CfgTypes.COMMENT), SpaceRequirements.MUST)
+            .put(Pair.create(CfgTypes.COMMENT, CfgTypes.KEYWORD), SpaceRequirements.MUST_LINE_BREAK)
+            .put(Pair.create(CfgTypes.FUNCTION, CfgTypes.COMMENT), SpaceRequirements.MUST)
+            .build();
 
     @NotNull
     @Override

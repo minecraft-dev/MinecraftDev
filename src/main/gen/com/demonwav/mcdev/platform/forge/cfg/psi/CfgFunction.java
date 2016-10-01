@@ -3,17 +3,24 @@ package com.demonwav.mcdev.platform.forge.cfg.psi;
 
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public interface CfgFunction extends PsiElement {
 
-  @Nullable
-  CfgArguments getArguments();
+  @NotNull
+  List<CfgArgument> getArgumentList();
 
   @NotNull
   CfgFuncName getFuncName();
 
   @NotNull
   CfgReturnValue getReturnValue();
+
+  void setFunction(String function);
+
+  void setArgumentList(String arguments);
+
+  void setReturnValue(String returnValue);
 
 }
