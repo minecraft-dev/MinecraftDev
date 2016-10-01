@@ -85,6 +85,7 @@ public class CfgParserDefinition implements ParserDefinition {
             .put(Pair.create(CfgTypes.FIELD_NAME, CfgTypes.COMMENT), SpaceRequirements.MUST)
             .put(Pair.create(CfgTypes.ASTERISK, CfgTypes.COMMENT), SpaceRequirements.MUST)
             .put(Pair.create(CfgTypes.COMMENT, CfgTypes.KEYWORD), SpaceRequirements.MUST_LINE_BREAK)
+            .put(Pair.create(CfgTypes.COMMENT, CfgTypes.COMMENT), SpaceRequirements.MUST_LINE_BREAK)
             .put(Pair.create(CfgTypes.FUNCTION, CfgTypes.COMMENT), SpaceRequirements.MUST)
             .build();
 

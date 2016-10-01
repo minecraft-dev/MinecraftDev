@@ -30,6 +30,7 @@ public interface CfgTypes {
   IElementType CLASS_VALUE = new CfgTokenType("class_value");
   IElementType CLOSE_PAREN = new CfgTokenType(")");
   IElementType COMMENT = new CfgTokenType("comment");
+  IElementType CRLF = new CfgTokenType("crlf");
   IElementType KEYWORD_ELEMENT = new CfgTokenType("keyword_element");
   IElementType NAME_ELEMENT = new CfgTokenType("name_element");
   IElementType OPEN_PAREN = new CfgTokenType("(");

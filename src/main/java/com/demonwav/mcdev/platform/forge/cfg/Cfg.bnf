@@ -8,6 +8,8 @@
     psiPackage="com.demonwav.mcdev.platform.forge.cfg.psi"
     psiImplPackage="com.demonwav.mcdev.platform.forge.cfg.psi.impl"
 
+    parserImports="static com.intellij.psi.TokenType.*"
+
     psiImplUtilClass="com.demonwav.mcdev.platform.forge.cfg.psi.impl.CfgPsiImplUtil"
 
     elementTypeHolderClass="com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes"
@@ -24,12 +26,13 @@
         name_element="regexp:[a-zA-Z0-9_]+|<init>"
         class_name_element="regexp:[a-zA-Z_$0-9\.]*[a-zA-Z_$0-9]"
         comment="regexp:#.*"
+        crlf="regexp:\n|\r|\r\n"
     ]
+
+    consumeTokenMethod="consumeTokenFast"
 }
 
-cfgFile ::= item_*
-
-private item_ ::= entry? comment?
+cfg_file ::= (entry? comment? crlf)*
 
 entry ::= keyword class_name (function|field_name|asterisk)? {methods=[setEntry setKeyword setClassName setFieldName setFunction]}
 

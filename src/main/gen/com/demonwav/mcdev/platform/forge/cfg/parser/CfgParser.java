@@ -8,6 +8,7 @@ import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.CLASS_NAME_ELEM
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.CLASS_VALUE;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.CLOSE_PAREN;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.COMMENT;
+import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.CRLF;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.ENTRY;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.FIELD_NAME;
 import static com.demonwav.mcdev.platform.forge.cfg.psi.CfgTypes.FUNCTION;
@@ -23,11 +24,12 @@ import static com.intellij.lang.parser.GeneratedParserUtilBase._COLLAPSE_;
 import static com.intellij.lang.parser.GeneratedParserUtilBase._NONE_;
 import static com.intellij.lang.parser.GeneratedParserUtilBase.adapt_builder_;
 import static com.intellij.lang.parser.GeneratedParserUtilBase.consumeToken;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.consumeTokenFast;
 import static com.intellij.lang.parser.GeneratedParserUtilBase.current_position_;
 import static com.intellij.lang.parser.GeneratedParserUtilBase.empty_element_parsed_guard_;
 import static com.intellij.lang.parser.GeneratedParserUtilBase.enter_section_;
 import static com.intellij.lang.parser.GeneratedParserUtilBase.exit_section_;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.nextTokenIs;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.nextTokenIsFast;
 import static com.intellij.lang.parser.GeneratedParserUtilBase.recursion_guard_;
 
 import com.intellij.lang.ASTNode;
@@ -80,32 +82,58 @@ public class CfgParser implements PsiParser, LightPsiParser {
   }
 
   protected boolean parse_root_(IElementType t, PsiBuilder b, int l) {
-    return cfgFile(b, l + 1);
+    return cfg_file(b, l + 1);
   }
 
   /* ********************************************************** */
   // primitive | class_value
   public static boolean argument(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "argument")) return false;
-    if (!nextTokenIs(b, "<argument>", CLASS_VALUE, PRIMITIVE)) return false;
+    if (!nextTokenIsFast(b, CLASS_VALUE, PRIMITIVE)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ARGUMENT, "<argument>");
-    r = consumeToken(b, PRIMITIVE);
-    if (!r) r = consumeToken(b, CLASS_VALUE);
+    r = consumeTokenFast(b, PRIMITIVE);
+    if (!r) r = consumeTokenFast(b, CLASS_VALUE);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // item_*
-  static boolean cfgFile(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "cfgFile")) return false;
+  // (entry? comment? crlf)*
+  static boolean cfg_file(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfg_file")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!item_(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "cfgFile", c)) break;
+      if (!cfg_file_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "cfg_file", c)) break;
       c = current_position_(b);
     }
+    return true;
+  }
+
+  // entry? comment? crlf
+  private static boolean cfg_file_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfg_file_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = cfg_file_0_0(b, l + 1);
+    r = r && cfg_file_0_1(b, l + 1);
+    r = r && consumeToken(b, CRLF);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // entry?
+  private static boolean cfg_file_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfg_file_0_0")) return false;
+    entry(b, l + 1);
+    return true;
+  }
+
+  // comment?
+  private static boolean cfg_file_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "cfg_file_0_1")) return false;
+    consumeTokenFast(b, COMMENT);
     return true;
   }
 
@@ -113,10 +141,10 @@ public class CfgParser implements PsiParser, LightPsiParser {
   // class_name_element
   public static boolean class_name(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_name")) return false;
-    if (!nextTokenIs(b, CLASS_NAME_ELEMENT)) return false;
+    if (!nextTokenIsFast(b, CLASS_NAME_ELEMENT)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, CLASS_NAME_ELEMENT);
+    r = consumeTokenFast(b, CLASS_NAME_ELEMENT);
     exit_section_(b, m, CLASS_NAME, r);
     return r;
   }
@@ -125,7 +153,7 @@ public class CfgParser implements PsiParser, LightPsiParser {
   // keyword class_name (function|field_name|asterisk)?
   public static boolean entry(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "entry")) return false;
-    if (!nextTokenIs(b, KEYWORD_ELEMENT)) return false;
+    if (!nextTokenIsFast(b, KEYWORD_ELEMENT)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = keyword(b, l + 1);
@@ -149,7 +177,7 @@ public class CfgParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = function(b, l + 1);
     if (!r) r = field_name(b, l + 1);
-    if (!r) r = consumeToken(b, ASTERISK);
+    if (!r) r = consumeTokenFast(b, ASTERISK);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -158,10 +186,10 @@ public class CfgParser implements PsiParser, LightPsiParser {
   // name_element
   public static boolean field_name(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "field_name")) return false;
-    if (!nextTokenIs(b, NAME_ELEMENT)) return false;
+    if (!nextTokenIsFast(b, NAME_ELEMENT)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, NAME_ELEMENT);
+    r = consumeTokenFast(b, NAME_ELEMENT);
     exit_section_(b, m, FIELD_NAME, r);
     return r;
   }
@@ -170,10 +198,10 @@ public class CfgParser implements PsiParser, LightPsiParser {
   // name_element
   public static boolean func_name(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "func_name")) return false;
-    if (!nextTokenIs(b, NAME_ELEMENT)) return false;
+    if (!nextTokenIsFast(b, NAME_ELEMENT)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, NAME_ELEMENT);
+    r = consumeTokenFast(b, NAME_ELEMENT);
     exit_section_(b, m, FUNC_NAME, r);
     return r;
   }
@@ -182,7 +210,7 @@ public class CfgParser implements PsiParser, LightPsiParser {
   // func_name open_paren argument* close_paren return_value
   public static boolean function(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function")) return false;
-    if (!nextTokenIs(b, NAME_ELEMENT)) return false;
+    if (!nextTokenIsFast(b, NAME_ELEMENT)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = func_name(b, l + 1);
@@ -207,39 +235,13 @@ public class CfgParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // entry? comment?
-  static boolean item_(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item_")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = item__0(b, l + 1);
-    r = r && item__1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // entry?
-  private static boolean item__0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__0")) return false;
-    entry(b, l + 1);
-    return true;
-  }
-
-  // comment?
-  private static boolean item__1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__1")) return false;
-    consumeToken(b, COMMENT);
-    return true;
-  }
-
-  /* ********************************************************** */
   // keyword_element
   public static boolean keyword(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "keyword")) return false;
-    if (!nextTokenIs(b, KEYWORD_ELEMENT)) return false;
+    if (!nextTokenIsFast(b, KEYWORD_ELEMENT)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, KEYWORD_ELEMENT);
+    r = consumeTokenFast(b, KEYWORD_ELEMENT);
     exit_section_(b, m, KEYWORD, r);
     return r;
   }
@@ -248,11 +250,11 @@ public class CfgParser implements PsiParser, LightPsiParser {
   // primitive | class_value
   public static boolean return_value(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_value")) return false;
-    if (!nextTokenIs(b, "<return value>", CLASS_VALUE, PRIMITIVE)) return false;
+    if (!nextTokenIsFast(b, CLASS_VALUE, PRIMITIVE)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, RETURN_VALUE, "<return value>");
-    r = consumeToken(b, PRIMITIVE);
-    if (!r) r = consumeToken(b, CLASS_VALUE);
+    r = consumeTokenFast(b, PRIMITIVE);
+    if (!r) r = consumeTokenFast(b, CLASS_VALUE);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
