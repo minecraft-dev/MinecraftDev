@@ -3,6 +3,7 @@ package com.demonwav.mcdev.platform.mixin.util;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Key;
+import com.demonwav.mcdev.platform.mixin.util.ShadowError.Level;
 import com.demonwav.mcdev.util.McMethodUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
 
@@ -51,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -494,12 +496,12 @@ public final class MixinUtils {
 
         final PsiClass containingClass = MixinUtils.getContainingMixinClass(element);
         if (containingClass == null) {
-            return Pair.create(null, ShadowError.builder().addContext(Key.CANNOT_FIND_MIXIN_TARGET).build());
+            return Pair.create(null, ShadowError.builder().setError(Key.CANNOT_FIND_MIXIN_TARGET).build());
         }
 
         final Map<PsiElement, PsiClass> allMixedClasses = MixinUtils.getAllMixedClasses(containingClass);
         if (allMixedClasses.isEmpty()) {
-            return Pair.create(null, ShadowError.builder().addContext(Key.NO_MIXIN_CLASS_TARGETS).build());
+            return Pair.create(null, ShadowError.builder().setError(Key.NO_MIXIN_CLASS_TARGETS).build());
         }
 
         final PsiAnnotationMemberValue shadowPrefixValue = annotation.findDeclaredAttributeValue("prefix");
@@ -574,7 +576,8 @@ public final class MixinUtils {
 
                 if (!neededAccessModifier.equals(fieldAccessModifier)) {
                     return Pair.create(null, ShadowError.builder()
-                        .addContext(Key.INVALID_ACCESSOR_ON_SHADOW_FIELD)
+                        .setLevel(Level.SOFT_WARNING)
+                        .setError(Key.INVALID_ACCESSOR_ON_SHADOW_FIELD)
                         .addContext(fieldAccessModifier)
                         .addContext(neededAccessModifier)
                         .addContext(field)
@@ -584,7 +587,7 @@ public final class MixinUtils {
 
                 if (!field.getType().equals(resolveField.getType())) {
                     return Pair.create(null, ShadowError.builder()
-                        .addContext(Key.INVALID_FIELD_TYPE)
+                        .setError(Key.INVALID_FIELD_TYPE)
                         .addContext(field.getType().getCanonicalText())
                         .addContext(resolveField.getType().getCanonicalText())
                         .addContext(field)
@@ -597,7 +600,7 @@ public final class MixinUtils {
                 if (resolveField.hasModifierProperty(PsiModifier.FINAL)) {
                     if (modifierList != null && modifierList.findAnnotation(MixinConstants.Annotations.FINAL) == null) {
                         return Pair.create(null, ShadowError.builder()
-                            .addContext(Key.NO_FINAL_ANNOTATION_WITH_FINAL_TARGET)
+                            .setError(Key.NO_FINAL_ANNOTATION_WITH_FINAL_TARGET)
                             .addContext(field)
                             .build()
                         );
@@ -609,7 +612,7 @@ public final class MixinUtils {
 
             // We haven't returned yet, so no shadow was found
             return Pair.create(null, ShadowError.builder()
-                .addContext(Key.NO_SHADOW_FIELD_FOUND_WITH_REMAP)
+                .setError(Key.NO_SHADOW_FIELD_FOUND_WITH_REMAP)
                 .addContext(field.getName())
                 .addContext(allMixedClasses.entrySet().stream().map(e -> {
                     if (e.getValue() instanceof PsiAnonymousClass) {
@@ -632,7 +635,10 @@ public final class MixinUtils {
                 // There are multiple
                 final ArrayList<PsiMethod> validAccessMethods = new ArrayList<>(methodsByName.length);
                 for (PsiMethod psiMethod : methodsByName) {
-                    if (McPsiUtil.getAccessModifier(psiMethod).equalsIgnoreCase(methodAccessModifier)) {
+                    final String targetMethodAccessModifier = McPsiUtil.getAccessModifier(psiMethod);
+                    if (Objects.equals(targetMethodAccessModifier, PsiModifier.PRIVATE) && Objects.equals(methodAccessModifier, PsiModifier.PROTECTED)) {
+                        validAccessMethods.add(psiMethod);
+                    } else if (Objects.equals(targetMethodAccessModifier, methodAccessModifier)) {
                         validAccessMethods.add(psiMethod);
                     }
                 }
@@ -661,7 +667,7 @@ public final class MixinUtils {
                 }
                 if (validSignatureMethods.isEmpty()) {
                     return Pair.create(null, ShadowError.builder()
-                        .addContext(Key.NO_MATCHING_METHODS_FOUND)
+                        .setError(Key.NO_MATCHING_METHODS_FOUND)
                         .addContext(method.getSignature(PsiSubstitutor.EMPTY).getName())
                         .addContext(entry.getValue().getName())
                         .addContext(methodsByName)
@@ -678,7 +684,8 @@ public final class MixinUtils {
                     final PsiMethod psiMethod = validSignatureMethods.get(0);
                     final String probableAccessModifier = McPsiUtil.getAccessModifier(psiMethod);
                     return Pair.create(null, ShadowError.builder()
-                        .addContext(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD)
+                        .setLevel(Level.SOFT_WARNING)
+                        .setError(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD)
                         .addContext(methodAccessModifier)
                         .addContext(probableAccessModifier)
                         .addContext(method)
@@ -688,7 +695,7 @@ public final class MixinUtils {
                 return Pair.create(validAccessMethods.get(0), null);
             }
             return Pair.create(null, ShadowError.builder()
-                .addContext(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP)
+                .setError(Key.NO_SHADOW_METHOD_FOUND_WITH_REMAP)
                 .addContext(method.getName())
                 .addContext(allMixedClasses.values().stream().map(PsiNamedElement::getName).collect(Collectors.joining(", ")))
                 .build()
