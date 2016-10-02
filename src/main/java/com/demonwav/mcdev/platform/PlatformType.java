@@ -16,24 +16,24 @@ import org.jetbrains.annotations.Nullable;
 
 public enum PlatformType {
 
-    BUKKIT(BukkitModuleType.getInstance(), "BUKKIT_MODULE_TYPE", "Bukkit"),
-    SPIGOT(SpigotModuleType.getInstance(), "SPIGOT_MODULE_TYPE", "Spigot"),
-    PAPER(PaperModuleType.getInstance(), "PAPER_MODULE_TYPE", "Paper"),
-    FORGE(ForgeModuleType.getInstance(), "FORGE_MODULE_TYPE", "Forge"),
-    SPONGE(SpongeModuleType.getInstance(), "SPONGE_MODULE_TYPE", "Sponge"),
-    BUNGEECORD(BungeeCordModuleType.getInstance(), "BUNGEECORD_MODULE_TYPE", "BungeeCord"),
-    LITELOADER(LiteLoaderModuleType.getInstance(), "LITELOADER_MODULE_TYPE", "LiteLoader"),
-    MIXIN(MixinModuleType.getInstance(), "MIXIN_MODULE_TYPE", "Mixin"),
-    MCP(McpModuleType.getInstance(), "MCP_MODULE_TYPE", "MCP")
+    BUKKIT(BukkitModuleType.getInstance(), "Bukkit"),
+    SPIGOT(SpigotModuleType.getInstance(), "Spigot"),
+    PAPER(PaperModuleType.getInstance(), "Paper"),
+    FORGE(ForgeModuleType.getInstance(), "Forge"),
+    SPONGE(SpongeModuleType.getInstance(), "Sponge"),
+    BUNGEECORD(BungeeCordModuleType.getInstance(), "BungeeCord"),
+    LITELOADER(LiteLoaderModuleType.getInstance(), "LiteLoader"),
+    MIXIN(MixinModuleType.getInstance(), "Mixin"),
+    MCP(McpModuleType.getInstance(), "MCP")
     ;
 
     private final AbstractModuleType<?> type;
     private final String name;
     private final String normalName;
 
-    PlatformType(final AbstractModuleType<?> type, final String name, final String normalName) {
+    PlatformType(final AbstractModuleType<?> type, final String normalName) {
         this.type = type;
-        this.name = name;
+        this.name = type.getId();
         this.normalName = normalName;
     }
 

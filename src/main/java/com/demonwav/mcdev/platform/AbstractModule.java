@@ -39,7 +39,10 @@ public abstract class AbstractModule {
 
     public abstract AbstractModuleType<?> getModuleType();
     public abstract PlatformType getType();
-    public abstract Icon getIcon();
+
+    public Icon getIcon() {
+        return getModuleType().getIcon();
+    }
 
     /**
      * By default, this method is provided in the case that a specific platform has no

@@ -109,7 +109,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
     @Override
     public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
-        return BukkitConstants.BUKKIT_EVENT_CLASS.equals(eventClass.getQualifiedName());
+        return BukkitConstants.EVENT_CLASS.equals(eventClass.getQualifiedName());
     }
 
     @Override
@@ -120,8 +120,8 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
     @Override
     public void doPreEventGenerate(@NotNull PsiClass psiClass, @Nullable GenerationData data) {
-        if (!McPsiUtil.extendsOrImplementsClass(psiClass, BukkitConstants.BUKKIT_LISTENER_CLASS)) {
-            McPsiUtil.addImplements(psiClass, BukkitConstants.BUKKIT_LISTENER_CLASS, project);
+        if (!McPsiUtil.extendsOrImplementsClass(psiClass, BukkitConstants.LISTENER_CLASS)) {
+            McPsiUtil.addImplements(psiClass, BukkitConstants.LISTENER_CLASS, project);
         }
     }
 
@@ -139,19 +139,19 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
             chosenClass,
             chosenName,
             project,
-            BukkitConstants.BUKKIT_HANDLER_ANNOTATION,
+            BukkitConstants.HANDLER_ANNOTATION,
             bukkitData.isIgnoreCanceled()
         );
 
         if (!bukkitData.getEventPriority().equals("NORMAL")) {
             PsiModifierList list = method.getModifierList();
-            PsiAnnotation annotation = list.findAnnotation(BukkitConstants.BUKKIT_HANDLER_ANNOTATION);
+            PsiAnnotation annotation = list.findAnnotation(BukkitConstants.HANDLER_ANNOTATION);
             if (annotation == null) {
                 return method;
             }
 
             PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
-                .createExpressionFromText(BukkitConstants.BUKKIT_EVENT_PRIORITY_CLASS + "." + bukkitData.getEventPriority(), annotation);
+                .createExpressionFromText(BukkitConstants.EVENT_PRIORITY_CLASS + "." + bukkitData.getEventPriority(), annotation);
 
             annotation.setDeclaredAttributeValue("priority", value);
         }

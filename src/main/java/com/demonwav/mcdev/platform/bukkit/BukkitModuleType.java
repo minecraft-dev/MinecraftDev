@@ -25,13 +25,13 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
 
     private BukkitModuleType() {
         super("org.bukkit", "bukkit");
-        CommonColors.applyStandardColors(this.colorMap, BukkitConstants.BUKKIT_CHAT_COLOR_CLASS);
+        CommonColors.applyStandardColors(this.colorMap, BukkitConstants.CHAT_COLOR_CLASS);
     }
 
     protected BukkitModuleType(final String groupId, final String artifactId) {
         super(groupId, artifactId);
 
-        CommonColors.applyStandardColors(this.colorMap, BukkitConstants.BUKKIT_CHAT_COLOR_CLASS);
+        CommonColors.applyStandardColors(this.colorMap, BukkitConstants.CHAT_COLOR_CLASS);
     }
 
     @NotNull
@@ -56,13 +56,13 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ImmutableList.of(BukkitConstants.BUKKIT_HANDLER_ANNOTATION);
+        return ImmutableList.of(BukkitConstants.HANDLER_ANNOTATION);
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of(BukkitConstants.BUKKIT_HANDLER_ANNOTATION);
+        return ImmutableList.of(BukkitConstants.HANDLER_ANNOTATION);
     }
 
     @NotNull
