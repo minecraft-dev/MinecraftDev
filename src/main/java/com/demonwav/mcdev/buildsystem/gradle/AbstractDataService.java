@@ -143,19 +143,19 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
 
         ApplicationManager.getApplication().runReadAction(() -> {
             final Module[] modules = modelsProvider.getModules();
-            List<Module> forgeModules = new ArrayList<>();
+            List<Module> relevantModules = new ArrayList<>();
             for (Module module : modules) {
                 if (!checkModuleText(module, modelsProvider, texts)) {
-                    // Make sure this isn't marked as a forge module
+                    // Make sure this isn't marked as this module type
                     MinecraftModuleType.removeOption(module, type.getId());
                     continue;
                 }
 
-                forgeModules.add(module);
+                relevantModules.add(module);
             }
 
             for (Module testModule : modelsProvider.getModules()) {
-                if (forgeModules.contains(testModule)) {
+                if (relevantModules.contains(testModule)) {
                     testModule.setOption("type", JavaModuleType.getModuleType().getId());
                     MinecraftModuleType.addOption(testModule, type.getId());
                     Optional.ofNullable(BuildSystem.getInstance(testModule)).ifPresent(md -> md.reImport(testModule));

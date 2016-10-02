@@ -32,12 +32,8 @@ public class McpDataService extends AbstractDataService {
         checkModule(
             modelsProvider,
             McpModuleType.getInstance(),
-            "net.minecrell.vanillagradle.server",
-            "net.minecrell.vanillagradle.client",
-            "net.minecraftforge.gradle.tweaker-server",
-            "net.minecraftforge.gradle.tweaker-client",
-            "net.minecraftforge.gradle.liteloader",
-            "net.minecraftforge.gradle.forge"
+            "gradle.plugin.net.minecrell:vanillagradle",
+            "net.minecraftforge.gradle:ForgeGradle"
         );
     }
 }
