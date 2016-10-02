@@ -463,8 +463,6 @@ public class GradleBuildSystem extends BuildSystem {
                             // TODO handle import failed
                             logger.error("GradleBuildSystem import FAILED: no content roots found");
                             importPromise.setResult(GradleBuildSystem.this);
-                            // We're done importing, don't hold a reference to the promise anymore
-                            importPromise = null;
                             return;
                         }
 
@@ -476,8 +474,6 @@ public class GradleBuildSystem extends BuildSystem {
                             logger.error("rootDirectory: " + rootDirectory);
                             logger.error("buildGradle: " + buildGradle);
                             importPromise.setResult(GradleBuildSystem.this);
-                            // We're done importing, don't hold a reference to the promise anymore
-                            importPromise = null;
                             return;
                         }
 
@@ -505,8 +501,6 @@ public class GradleBuildSystem extends BuildSystem {
                         if (project.getBasePath() == null) {
                             logger.error("GradleBuildSystem import FAILED: Project base path null");
                             importPromise.setResult(GradleBuildSystem.this);
-                            // We're done importing, don't hold a reference to the promise anymore
-                            importPromise = null;
                             return;
                         }
 
@@ -538,8 +532,6 @@ public class GradleBuildSystem extends BuildSystem {
                             if (info == null) {
                                 logger.error("GradleBuildSystem import FAILED: External project info null");
                                 importPromise.setResult(GradleBuildSystem.this);
-                                // We're done importing, don't hold a reference to the promise anymore
-                                importPromise = null;
                                 return;
                             }
 
@@ -548,8 +540,6 @@ public class GradleBuildSystem extends BuildSystem {
                             if (node == null) {
                                 logger.error("GradleBuildSystem import FAILED: Project data node null");
                                 importPromise.setResult(GradleBuildSystem.this);
-                                // We're done importing, don't hold a reference to the promise anymore
-                                importPromise = null;
                                 return;
                             }
 
