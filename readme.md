@@ -69,8 +69,10 @@ This project is licensed under [MIT](license.txt).
 Supported Platforms
 -------------------
 
-- [![Bukkit Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/Bukkit.png) **Bukkit**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse) ([![Spigot Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/Spigot.png) Spigot](https://spigotmc.org/) and [![Paper Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/Paper.png) Paper](https://paper.emc.gs))
-- [![Sponge Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/Sponge.png) **Sponge**](https://www.spongepowered.org/)
-- [![Forge Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/Forge.png) **Minecraft Forge**](http://minecraftforge.net/forum)
-- [![LiteLoader Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/LiteLoader.png) **LiteLoader**](http://www.liteloader.com/)
-- [![BungeeCord Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/BungeeCord.png) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/)
+- [![Bukkit Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Bukkit.png) **Bukkit**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse) ([![Spigot Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Spigot.png) Spigot](https://spigotmc.org/) and [![Paper Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Paper.png) Paper](https://paper.emc.gs))
+- [![Sponge Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Sponge_dark.png) **Sponge**](https://www.spongepowered.org/)
+- [![Forge Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Forge.png) **Minecraft Forge**](http://minecraftforge.net/forum)
+- [![LiteLoader Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/LiteLoader.png) **LiteLoader**](http://www.liteloader.com/)
+- [![MCP Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/MCP.png) **MCP**](http://www.modcoderpack.com/)
+- [![Mixins Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/mixin_dark.png) **Mixins**](https://github.com/SpongePowered/Mixin)
+- [![BungeeCord Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/BungeeCord.png) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/)
