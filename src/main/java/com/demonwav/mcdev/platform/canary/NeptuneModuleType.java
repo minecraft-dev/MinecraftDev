@@ -4,8 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class NeptuneModuleType extends CanaryModuleType {
 
-    private static final String ID = "NEPTUNE_MODULE_TYPE";
     private static final NeptuneModuleType instance = new NeptuneModuleType();
+
+    private static final String ID = "NEPTUNE_MODULE_TYPE";
 
     protected NeptuneModuleType() {
         super("org.neptunepowered", "NeptuneLib");

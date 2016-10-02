@@ -34,6 +34,9 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
     @NotNull public static final String SPONGE_MAIN_CLASS_TEMPLATE = "sponge_main_class.java";
     @NotNull public static final String SPONGE_POM_TEMPLATE = "sponge_pom_template.xml";
 
+    @NotNull public static final String CANARY_MAIN_CLASS_TEMPLATE = "canary_main_class.java";
+    @NotNull public static final String CANARY_POM_TEMPLATE = "canary_pom_template.xml";
+
     @NotNull public static final String FORGE_GRADLE_PROPERTIES_TEMPLATE = "forge_gradle.properties";
     @NotNull public static final String FORGE_BUILD_GRADLE_TEMPLATE = "forge_build.gradle";
     @NotNull public static final String FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE = "forge_submodule_build.gradle";

@@ -11,7 +11,7 @@ public final class CanaryLegacyColors {
     private CanaryLegacyColors() {
     }
 
-    public static void applyStandardColors(@NotNull Map<String, Color> map, @NotNull String prefix) {
+    public static void applyLegacyColors(@NotNull Map<String, Color> map, @NotNull String prefix) {
         map.put(prefix + ".RED", CommonColors.DARK_RED);
         map.put(prefix + ".LIGHT_RED", CommonColors.RED);
         map.put(prefix + ".ORANGE", CommonColors.GOLD);

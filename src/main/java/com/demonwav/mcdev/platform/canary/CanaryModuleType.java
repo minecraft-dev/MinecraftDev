@@ -15,21 +15,26 @@ import javax.swing.Icon;
 
 public class CanaryModuleType extends AbstractModuleType<CanaryModule> {
 
-    private static final String ID = "CANARY_MODULE_TYPE";
     private static final CanaryModuleType instance = new CanaryModuleType();
 
+    private static final String ID = "CANARY_MODULE_TYPE";
+    private static final List<String> IGNORED_ANNOTATIONS = ImmutableList.of(
+            CanaryConstants.HANDLER_ANNOTATION,
+            CanaryConstants.COMMAND_ANNOTATION,
+            CanaryConstants.TABCOMPLETE_ANNOTATION,
+            CanaryConstants.COLUMN_ANNOTATION
+    );
+    private static final List<String> LISTENER_ANNOTATIONS = ImmutableList.of(CanaryConstants.HANDLER_ANNOTATION);
+
     private CanaryModuleType() {
-        super("net.canarymod", "CanaryLib");
-        CommonColors.applyStandardColors(this.colorMap, CanaryConstants.CHAT_FORMAT_CLASS);
-        CanaryLegacyColors.applyStandardColors(this.colorMap, CanaryConstants.LEGACY_COLORS_CLASS);
-        CanaryLegacyColors.applyStandardColors(this.colorMap, CanaryConstants.LEGACY_TEXT_FORMAT_CLASS);
+        this("net.canarymod", "CanaryLib");
     }
 
     protected CanaryModuleType(final String groupId, final String artifactId) {
         super(groupId, artifactId);
         CommonColors.applyStandardColors(this.colorMap, CanaryConstants.CHAT_FORMAT_CLASS);
-        CanaryLegacyColors.applyStandardColors(this.colorMap, CanaryConstants.LEGACY_COLORS_CLASS);
-        CanaryLegacyColors.applyStandardColors(this.colorMap, CanaryConstants.LEGACY_TEXT_FORMAT_CLASS);
+        CanaryLegacyColors.applyLegacyColors(this.colorMap, CanaryConstants.LEGACY_COLORS_CLASS);
+        CanaryLegacyColors.applyLegacyColors(this.colorMap, CanaryConstants.LEGACY_TEXT_FORMAT_CLASS);
     }
 
     @NotNull
@@ -55,18 +60,13 @@ public class CanaryModuleType extends AbstractModuleType<CanaryModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ImmutableList.of(
-                CanaryConstants.HANDLER_ANNOTATION,
-                CanaryConstants.COMMAND_ANNOTATION,
-                CanaryConstants.TABCOMPLETE_ANNOTATION,
-                CanaryConstants.COLUMN_ANNOTATION
-        );
+        return IGNORED_ANNOTATIONS;
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of(CanaryConstants.HANDLER_ANNOTATION);
+        return LISTENER_ANNOTATIONS;
     }
 
     @NotNull

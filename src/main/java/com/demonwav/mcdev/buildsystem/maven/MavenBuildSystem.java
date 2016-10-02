@@ -20,9 +20,9 @@ import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.BukkitTemplate;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordTemplate;
+import com.demonwav.mcdev.platform.canary.CanaryTemplate;
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate;
 import com.demonwav.mcdev.util.Util;
-
 import com.google.common.base.Strings;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.execution.RunManager;
@@ -89,6 +89,8 @@ public class MavenBuildSystem extends BuildSystem {
                     text = BungeeCordTemplate.applyPomTemplate(project, buildVersion);
                 } else if (configuration.type == PlatformType.SPONGE) {
                     text = SpongeTemplate.applyPomTemplate(project, buildVersion);
+                } else if (configuration.type == PlatformType.CANARY || configuration.type == PlatformType.NEPTUNE) {
+                    text = CanaryTemplate.applyPomTemplate(project, buildVersion);
                 }
 
                 if (text != null) {
