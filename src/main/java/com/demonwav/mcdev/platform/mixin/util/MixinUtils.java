@@ -469,11 +469,10 @@ public final class MixinUtils {
     /**
      * Given a {@link PsiElement}, being either a {@link PsiMethod} or {@link PsiField}, find the corresponding field or method that is
      * being shadowed. Returns a notnull Pair of nullable values. The first value is the {@link PsiElement} that is found, or null if not
-     * found. The second value is the {@link ShadowError error} if there is an actual error in the code regarding shadow validity. If the
-     * first value is notnull, the second value is always null. If the first value is null, the second value may not be null. If both values
-     * are null, then that means this is simply not a valid shadow, there isn't a specific error in the code. This could be, for example,
-     * if this method is called on a {@link PsiElement} that isn't a {@link PsiMember} or {@link PsiField}, or it isn't in a Mixin class,
-     * or it isn't {@code @Shadow} annotated, or it is null.
+     * found. The second value is the {@link ShadowError error} if there is an actual error in the code regarding shadow validity. If both
+     * values are null, then that means this is simply not a valid shadow, there isn't a specific error in the code. This could be, for
+     * example, if this method is called on a {@link PsiElement} that isn't a {@link PsiMember} or {@link PsiField}, or it isn't in a Mixin
+     * class, or it isn't {@code @Shadow} annotated, or it is null.
      *
      * @param element The element to check.
      * @return The PsiElement that is being shadowed, or the error if there is an error in the code.
@@ -575,7 +574,7 @@ public final class MixinUtils {
                 final String neededAccessModifier = McPsiUtil.getAccessModifier(resolveField);
 
                 if (!neededAccessModifier.equals(fieldAccessModifier)) {
-                    return Pair.create(null, ShadowError.builder()
+                    return Pair.create(resolveField, ShadowError.builder()
                         .setLevel(Level.SOFT_WARNING)
                         .setError(Key.INVALID_ACCESSOR_ON_SHADOW_FIELD)
                         .addContext(fieldAccessModifier)
@@ -586,7 +585,7 @@ public final class MixinUtils {
                 }
 
                 if (!field.getType().equals(resolveField.getType())) {
-                    return Pair.create(null, ShadowError.builder()
+                    return Pair.create(resolveField, ShadowError.builder()
                         .setError(Key.INVALID_FIELD_TYPE)
                         .addContext(field.getType().getCanonicalText())
                         .addContext(resolveField.getType().getCanonicalText())
@@ -599,7 +598,7 @@ public final class MixinUtils {
                 final PsiModifierList modifierList = field.getModifierList();
                 if (resolveField.hasModifierProperty(PsiModifier.FINAL)) {
                     if (modifierList != null && modifierList.findAnnotation(MixinConstants.Annotations.FINAL) == null) {
-                        return Pair.create(null, ShadowError.builder()
+                        return Pair.create(resolveField, ShadowError.builder()
                             .setError(Key.NO_FINAL_ANNOTATION_WITH_FINAL_TARGET)
                             .addContext(field)
                             .build()
@@ -666,7 +665,8 @@ public final class MixinUtils {
                     }
                 }
                 if (validSignatureMethods.isEmpty()) {
-                    return Pair.create(null, ShadowError.builder()
+                    PsiMethod returnMethod = methodsByName.length > 0 ? methodsByName[0] : null;
+                    return Pair.create(returnMethod, ShadowError.builder()
                         .setError(Key.NO_MATCHING_METHODS_FOUND)
                         .addContext(method.getSignature(PsiSubstitutor.EMPTY).getName())
                         .addContext(entry.getValue().getName())
@@ -683,7 +683,8 @@ public final class MixinUtils {
                 if (validAccessMethods.isEmpty()) {
                     final PsiMethod psiMethod = validSignatureMethods.get(0);
                     final String probableAccessModifier = McPsiUtil.getAccessModifier(psiMethod);
-                    return Pair.create(null, ShadowError.builder()
+                    PsiMethod returnMethod = methodsByName.length > 0 ? methodsByName[0] : null;
+                    return Pair.create(returnMethod, ShadowError.builder()
                         .setLevel(Level.SOFT_WARNING)
                         .setError(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD)
                         .addContext(methodAccessModifier)
