@@ -54,7 +54,7 @@ public class PluginUpdater {
             lastUpdateStatus = updateStatus;
 
             final PluginUpdateStatus finalUpdate = updateStatus;
-            ApplicationManager.getApplication().invokeLater(() -> callback.apply(finalUpdate), ModalityState.any());
+            ApplicationManager.getApplication().invokeLater(() -> callback.apply(finalUpdate), ModalityState.NON_MODAL);
         } catch (Exception e) {
             PluginUpdateStatus.fromException("Minecraft Development plugin update check failed", e);
         }
