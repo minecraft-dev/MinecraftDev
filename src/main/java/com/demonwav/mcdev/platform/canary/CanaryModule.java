@@ -9,8 +9,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.Icon;
-
 public class CanaryModule<T extends CanaryModuleType> extends AbstractModule {
 
     private final T moduleType;
@@ -34,11 +32,6 @@ public class CanaryModule<T extends CanaryModuleType> extends AbstractModule {
     @Override
     public PlatformType getType() {
         return type;
-    }
-
-    @Override
-    public Icon getIcon() {
-        return null;
     }
 
     @Override

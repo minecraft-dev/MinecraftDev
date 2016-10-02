@@ -112,6 +112,14 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.bukkit.inspection.BukkitListenerImplementedInspection"/>
+        <!-- Canary Inspections -->
+        <localInspection displayName="Canary HookHandler in class not implementing PluginListener"
+                         groupName="Minecraft Canary"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.canary.inspection.CanaryListenerImplementedInspection"/>
         <!-- BungeeCord Inspections -->
         <localInspection displayName="BungeeCord EventHandler in class not implementing Listener"
                          groupName="Minecraft BungeeCord"

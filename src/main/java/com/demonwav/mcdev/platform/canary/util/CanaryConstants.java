@@ -13,6 +13,7 @@ public final class CanaryConstants {
     @NotNull public static final String LEGACY_COLORS_CLASS = "net.canarymod.chat.Colors";
     @NotNull public static final String LEGACY_TEXT_FORMAT_CLASS = "net.canarymod.chat.TextFormat";
     @NotNull public static final String HOOK_CLASS = "net.canarymod.hook.Hook";
+    @NotNull public static final String LISTENER_CLASS = "net.canarymod.plugin.PluginListener";
 
     private CanaryConstants() {
     }
