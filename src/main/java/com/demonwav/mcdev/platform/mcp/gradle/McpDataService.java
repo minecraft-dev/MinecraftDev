@@ -29,11 +29,6 @@ public class McpDataService extends AbstractDataService {
             return;
         }
 
-        checkModule(
-            modelsProvider,
-            McpModuleType.getInstance(),
-            "gradle.plugin.net.minecrell:vanillagradle",
-            "net.minecraftforge.gradle:ForgeGradle"
-        );
+        checkModule(toImport, modelsProvider,McpModuleType.getInstance(), "minecraftSrc", "forgeSrc", "forgeBin", "minecraft_serverSrc", "minecraft_clientSrc");
     }
 }

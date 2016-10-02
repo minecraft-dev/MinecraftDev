@@ -29,6 +29,6 @@ public class ForgeDataService extends AbstractDataService {
             return;
         }
 
-        checkModule(modelsProvider, ForgeModuleType.getInstance(), "net.minecraftforge.gradle:ForgeGradle");
+        checkModule(toImport, modelsProvider, ForgeModuleType.getInstance(), "forgeSrc", "forgeBin");
     }
 }

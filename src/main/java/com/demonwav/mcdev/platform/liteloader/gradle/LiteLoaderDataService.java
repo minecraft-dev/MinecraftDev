@@ -30,6 +30,6 @@ public class LiteLoaderDataService extends AbstractDataService {
             return;
         }
 
-        checkModule(modelsProvider, LiteLoaderModuleType.getInstance(), "net.minecraftforge.gradle.liteloader");
+        checkModule(toImport, modelsProvider, LiteLoaderModuleType.getInstance(), "deobf/com/mumfrey/liteloader");
     }
 }

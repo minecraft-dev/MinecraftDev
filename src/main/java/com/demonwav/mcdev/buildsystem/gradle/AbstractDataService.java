@@ -1,6 +1,5 @@
 package com.demonwav.mcdev.buildsystem.gradle;
 
-import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
@@ -12,6 +11,7 @@ import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
 import com.intellij.openapi.externalSystem.model.ProjectKeys;
 import com.intellij.openapi.externalSystem.model.project.LibraryDependencyData;
+import com.intellij.openapi.externalSystem.model.project.LibraryPathType;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.externalSystem.service.project.manage.AbstractProjectDataService;
@@ -20,20 +20,12 @@ import com.intellij.openapi.externalSystem.util.Order;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiManager;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
-import org.jetbrains.plugins.groovy.lang.psi.GroovyFile;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -99,27 +91,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             Set<Module> badModules = new HashSet<>();
             checkedModules.addAll(goodModules);
 
-            goodModules.forEach(m -> {
-                String[] path = modelsProvider.getModifiableModuleModel().getModuleGroupPath(m);
-                if (path == null) {
-                    // Always reset back to JavaModule
-                    m.setOption("type", JavaModuleType.getModuleType().getId());
-                    checkedModules.add(m);
-                    MinecraftModuleType.addOption(m, type.getId());
-                    MinecraftModule.getInstance(m);
-                } else {
-                    String parentName = path[0];
-                    Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
-                    if (parentModule != null) {
-                        // Always reset back to JavaModule
-                        parentModule.setOption("type", JavaModuleType.getModuleType().getId());
-                        badModules.add(m);
-                        checkedModules.add(parentModule);
-                        MinecraftModuleType.addOption(parentModule, type.getId());
-                        MinecraftModule.getInstance(parentModule);
-                    }
-                }
-            });
+            goodModules.forEach(m -> findParent(m, modelsProvider, type, checkedModules, badModules));
 
             // Reset all other modules back to JavaModule && remove the type
             for (Module module : modelsProvider.getModules()) {
@@ -137,64 +109,52 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
         }
     }
 
-    protected void checkModule(@NotNull IdeModifiableModelsProvider modelsProvider,
+    protected void checkModule(@NotNull Collection<DataNode<LibraryDependencyData>> toImport,
+                               @NotNull IdeModifiableModelsProvider modelsProvider,
                                @NotNull AbstractModuleType<?> type,
                                @NotNull String... texts) {
 
         ApplicationManager.getApplication().runReadAction(() -> {
-            final Module[] modules = modelsProvider.getModules();
-            List<Module> relevantModules = new ArrayList<>();
-            for (Module module : modules) {
-                if (!checkModuleText(module, modelsProvider, texts)) {
-                    // Make sure this isn't marked as this module type
-                    MinecraftModuleType.removeOption(module, type.getId());
-                    continue;
-                }
+            final Set<Module> relevantModules = toImport.stream()
+                .filter(n -> n.getData().getTarget().getPaths(LibraryPathType.BINARY).stream()
+                    .anyMatch(p -> {
+                        for (String text : texts) {
+                            if (p.contains(text)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }))
+                .map(n -> modelsProvider.findIdeModule(n.getData().getOwnerModule()))
+                .collect(Collectors.toSet());
 
-                relevantModules.add(module);
-            }
-
-            for (Module testModule : modelsProvider.getModules()) {
-                if (relevantModules.contains(testModule)) {
-                    testModule.setOption("type", JavaModuleType.getModuleType().getId());
-                    MinecraftModuleType.addOption(testModule, type.getId());
-                    Optional.ofNullable(BuildSystem.getInstance(testModule)).ifPresent(md -> md.reImport(testModule));
-                    MinecraftModule.getInstance(testModule);
-                } else {
-                    if (Strings.nullToEmpty(testModule.getOptionValue("type")).equals(type.getId())) {
-                        testModule.setOption("type", JavaModuleType.getModuleType().getId());
-                    }
-                }
-            }
+            setupModules(relevantModules, modelsProvider, type);
         });
     }
 
-    @Contract("null, _, _ -> false")
-    private boolean checkModuleText(Module module, IdeModifiableModelsProvider provider, String... text) {
-
-        if (module != null) {
-            VirtualFile[] roots = provider.getModifiableRootModel(module).getContentRoots();
-            if (roots.length == 0) {
-                // last ditch effort
-                roots = ModuleRootManager.getInstance(module).getContentRoots();
-                if (roots.length == 0) {
-                    return false;
-                }
-            }
-            VirtualFile file = roots[0];
-            file = file.findFileByRelativePath("build.gradle");
-
-            if (file != null) {
-                GroovyFile groovyFile = (GroovyFile) PsiManager.getInstance(module.getProject()).findFile(file);
-                if (groovyFile != null) {
-                    for (String s : text) {
-                        if (groovyFile.getText().contains(s)) {
-                            return true;
-                        }
-                    }
-                }
+    private static void findParent(@NotNull Module module,
+                                   @NotNull IdeModifiableModelsProvider modelsProvider,
+                                   @NotNull AbstractModuleType type,
+                                   @NotNull Set<Module> checkedModules,
+                                   @NotNull Set<Module> badModules) {
+        String[] path = modelsProvider.getModifiableModuleModel().getModuleGroupPath(module);
+        if (path == null) {
+            // Always reset back to JavaModule
+            module.setOption("type", JavaModuleType.getModuleType().getId());
+            checkedModules.add(module);
+            MinecraftModuleType.addOption(module, type.getId());
+            MinecraftModule.getInstance(module);
+        } else {
+            String parentName = path[0];
+            Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
+            if (parentModule != null) {
+                // Always reset back to JavaModule
+                parentModule.setOption("type", JavaModuleType.getModuleType().getId());
+                badModules.add(module);
+                checkedModules.add(parentModule);
+                MinecraftModuleType.addOption(parentModule, type.getId());
+                MinecraftModule.getInstance(parentModule);
             }
         }
-        return false;
     }
 }
