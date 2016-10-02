@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
 import com.demonwav.mcdev.platform.canary.CanaryModuleType;
+import com.demonwav.mcdev.platform.canary.NeptuneModuleType;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderModuleType;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
@@ -33,6 +34,7 @@ public enum PlatformType {
     FORGE(ForgeModuleType.getInstance(), "Forge"),
     SPONGE(SpongeModuleType.getInstance(), "Sponge"),
     CANARY(CanaryModuleType.getInstance(), "Canary"),
+    NEPTUNE(NeptuneModuleType.getInstance(), "Neptune"),
     BUNGEECORD(BungeeCordModuleType.getInstance(), "BungeeCord"),
     LITELOADER(LiteLoaderModuleType.getInstance(), "LiteLoader"),
     MIXIN(MixinModuleType.getInstance(), "Mixin"),

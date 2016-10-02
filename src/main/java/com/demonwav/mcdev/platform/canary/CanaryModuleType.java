@@ -3,6 +3,7 @@ package com.demonwav.mcdev.platform.canary;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
+import com.demonwav.mcdev.platform.canary.util.CanaryLegacyColors;
 import com.demonwav.mcdev.util.CommonColors;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
@@ -20,11 +21,15 @@ public class CanaryModuleType extends AbstractModuleType<CanaryModule> {
     private CanaryModuleType() {
         super("net.canarymod", "CanaryLib");
         CommonColors.applyStandardColors(this.colorMap, CanaryConstants.CHAT_FORMAT_CLASS);
+        CanaryLegacyColors.applyStandardColors(this.colorMap, CanaryConstants.LEGACY_COLORS_CLASS);
+        CanaryLegacyColors.applyStandardColors(this.colorMap, CanaryConstants.LEGACY_TEXT_FORMAT_CLASS);
     }
 
     protected CanaryModuleType(final String groupId, final String artifactId) {
         super(groupId, artifactId);
         CommonColors.applyStandardColors(this.colorMap, CanaryConstants.CHAT_FORMAT_CLASS);
+        CanaryLegacyColors.applyStandardColors(this.colorMap, CanaryConstants.LEGACY_COLORS_CLASS);
+        CanaryLegacyColors.applyStandardColors(this.colorMap, CanaryConstants.LEGACY_TEXT_FORMAT_CLASS);
     }
 
     @NotNull
@@ -50,7 +55,12 @@ public class CanaryModuleType extends AbstractModuleType<CanaryModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ImmutableList.of(CanaryConstants.HANDLER_ANNOTATION);
+        return ImmutableList.of(
+                CanaryConstants.HANDLER_ANNOTATION,
+                CanaryConstants.COMMAND_ANNOTATION,
+                CanaryConstants.TABCOMPLETE_ANNOTATION,
+                CanaryConstants.COLUMN_ANNOTATION
+        );
     }
 
     @NotNull
