@@ -152,7 +152,7 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
     @NotNull
     @Override
     public Icon getIcon() {
-        return PlatformAssets.MIXIN;
+        return PlatformAssets.MIXIN_ICON;
     }
 
     public static final class MixinLineMarkerInfo extends MergeableLineMarkerInfo<PsiElement> {
@@ -186,7 +186,7 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
         @Override
         @Contract(pure = true)
         public Icon getCommonIcon(@NotNull List<MergeableLineMarkerInfo> infos) {
-            return PlatformAssets.MIXIN;
+            return PlatformAssets.MIXIN_ICON;
         }
 
         @NotNull
