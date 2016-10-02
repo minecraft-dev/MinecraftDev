@@ -43,7 +43,7 @@ public class MethodCallSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        final PsiMethod method = (PsiMethod) infos[4];
+        final PsiMethod method = (PsiMethod) infos[3];
 
         if (method.isWritable()) {
             return new RemoveAnnotationInspectionGadgetsFix() {

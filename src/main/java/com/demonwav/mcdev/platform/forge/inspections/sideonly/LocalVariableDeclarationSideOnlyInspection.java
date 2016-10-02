@@ -40,7 +40,7 @@ public class LocalVariableDeclarationSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        final PsiClass variableClass = (PsiClass) infos[2];
+        final PsiClass variableClass = (PsiClass) infos[3];
 
         if (variableClass.isWritable()) {
             return new RemoveAnnotationInspectionGadgetsFix() {
