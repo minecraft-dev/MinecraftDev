@@ -56,10 +56,16 @@ public final class SrgManager {
             currentPromise = new AsyncPromise<>();
         }
 
-        ApplicationManager.getApplication().invokeLater(() -> {
+        ApplicationManager.getApplication().invokeLater(() ->
             ProgressManager.getInstance().run(new Task.Backgroundable(module.getModule().getProject(), "Gathering MCP Data", true) {
                 @Override
+                public boolean shouldStartInBackground() {
+                    return false;
+                }
+
+                @Override
                 public void run(@NotNull ProgressIndicator indicator) {
+                    indicator.setIndeterminate(true);
                     final VirtualFile buildGradle = module.getBuildSystem().getBuildGradle();
 
                     if (buildGradle == null) {
@@ -150,10 +156,8 @@ public final class SrgManager {
                     }
 
                     currentPromise.setResult(currentMap);
-
                 }
-            });
-        });
+        }));
     }
 
     /**
