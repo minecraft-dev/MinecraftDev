@@ -52,6 +52,7 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
     @NotNull public static final String LITELOADER_MAIN_CLASS_TEMPLATE = "liteloader_main_class.java";
 
     @NotNull public static final String CANARY_MAIN_CLASS_TEMPLATE = "canary_main_class.java";
+    @NotNull public static final String CANARY_INF_TEMPLATE = "canary_plugin_description_file.inf";
     @NotNull public static final String CANARY_POM_TEMPLATE = "canary_pom_template.xml";
 
     @Override
@@ -90,6 +91,7 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
         group.addTemplate(new FileTemplateDescriptor(LITELOADER_MAIN_CLASS_TEMPLATE, PlatformAssets.LITELOADER_ICON));
 
         group.addTemplate(new FileTemplateDescriptor(CANARY_MAIN_CLASS_TEMPLATE, PlatformAssets.CANARY_ICON));
+        group.addTemplate(new FileTemplateDescriptor(CANARY_INF_TEMPLATE, PlatformAssets.CANARY_ICON));
         group.addTemplate(new FileTemplateDescriptor(CANARY_POM_TEMPLATE, PlatformAssets.CANARY_ICON));
 
         return group;

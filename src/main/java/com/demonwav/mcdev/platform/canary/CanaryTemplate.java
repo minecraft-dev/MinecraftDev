@@ -1,5 +1,8 @@
 package com.demonwav.mcdev.platform.canary;
 
+import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
+import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 import com.intellij.ide.fileTemplates.FileTemplate;
@@ -43,6 +46,36 @@ public class CanaryTemplate extends AbstractTemplate {
             // TODO what to do when this fails?
             e.printStackTrace();
             return "";
+        }
+    }
+
+    public static void applyPluginDescriptionFileTemplate(@NotNull Project project,
+            @NotNull VirtualFile file,
+            @NotNull CanaryProjectConfiguration settings,
+            @NotNull BuildSystem buildSystem) {
+        Properties properties = new Properties();
+
+        properties.setProperty("NAME", settings.pluginName);
+
+        if (buildSystem instanceof GradleBuildSystem) {
+            properties.setProperty("VERSION", "@version@");
+        } else if (buildSystem instanceof MavenBuildSystem) {
+            properties.setProperty("VERSION", "${project.version}");
+        }
+
+        properties.setProperty("MAIN", settings.mainClass);
+
+        if (settings.hasAuthors()) {
+            properties.setProperty("AUTHOR_LIST", settings.authors.toString());
+            properties.setProperty("HAS_AUTHOR_LIST", "true");
+        }
+
+        // TODO: Does Canary support description?
+
+        try {
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.CANARY_INF_TEMPLATE, properties, true);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

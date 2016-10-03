@@ -1,0 +1,6 @@
+name=${NAME}
+main-class=${MAIN_CLASS}
+#if (${HAS_AUTHOR_LIST})
+author=${AUTHOR_LIST}
+#end
+version=${VERSION}
