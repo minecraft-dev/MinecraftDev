@@ -34,9 +34,6 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
     @NotNull public static final String SPONGE_MAIN_CLASS_TEMPLATE = "sponge_main_class.java";
     @NotNull public static final String SPONGE_POM_TEMPLATE = "sponge_pom_template.xml";
 
-    @NotNull public static final String CANARY_MAIN_CLASS_TEMPLATE = "canary_main_class.java";
-    @NotNull public static final String CANARY_POM_TEMPLATE = "canary_pom_template.xml";
-
     @NotNull public static final String FORGE_GRADLE_PROPERTIES_TEMPLATE = "forge_gradle.properties";
     @NotNull public static final String FORGE_BUILD_GRADLE_TEMPLATE = "forge_build.gradle";
     @NotNull public static final String FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE = "forge_submodule_build.gradle";
@@ -53,6 +50,9 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
     @NotNull public static final String LITELOADER_BUILD_GRADLE_TEMPLATE = "liteloader_build.gradle";
     @NotNull public static final String LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE = "liteloader_submodule_build.gradle";
     @NotNull public static final String LITELOADER_MAIN_CLASS_TEMPLATE = "liteloader_main_class.java";
+
+    @NotNull public static final String CANARY_MAIN_CLASS_TEMPLATE = "canary_main_class.java";
+    @NotNull public static final String CANARY_POM_TEMPLATE = "canary_pom_template.xml";
 
     @Override
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
@@ -88,6 +88,9 @@ public class MinecraftFileTemplateGroupFactory implements FileTemplateGroupDescr
         group.addTemplate(new FileTemplateDescriptor(LITELOADER_BUILD_GRADLE_TEMPLATE, PlatformAssets.LITELOADER_ICON));
         group.addTemplate(new FileTemplateDescriptor(LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.LITELOADER_ICON));
         group.addTemplate(new FileTemplateDescriptor(LITELOADER_MAIN_CLASS_TEMPLATE, PlatformAssets.LITELOADER_ICON));
+
+        group.addTemplate(new FileTemplateDescriptor(CANARY_MAIN_CLASS_TEMPLATE, PlatformAssets.CANARY_ICON));
+        group.addTemplate(new FileTemplateDescriptor(CANARY_POM_TEMPLATE, PlatformAssets.CANARY_ICON));
 
         return group;
     }

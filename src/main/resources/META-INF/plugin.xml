@@ -59,11 +59,11 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.SpigotDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.PaperDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bungeecord.gradle.BungeeCordDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.CanaryDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.NeptuneDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.liteloader.gradle.LiteLoaderDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.CanaryDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.NeptuneDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mixin.gradle.MixinDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
 
@@ -238,9 +238,9 @@
         <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
         <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
         <importer implementation="com.demonwav.mcdev.platform.bungeecord.maven.BungeeCordMavenImporter"/>
+        <importer implementation="com.demonwav.mcdev.platform.sponge.maven.SpongeMavenImporter"/>
         <importer implementation="com.demonwav.mcdev.platform.canary.maven.CanaryMavenImporter"/>
         <importer implementation="com.demonwav.mcdev.platform.canary.maven.NeptuneMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.sponge.maven.SpongeMavenImporter"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">

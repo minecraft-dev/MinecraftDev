@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.platform.canary;
 
+import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
@@ -49,7 +50,7 @@ public class CanaryModuleType extends AbstractModuleType<CanaryModule> {
 
     @Override
     public Icon getIcon() {
-        return null;
+        return PlatformAssets.CANARY_ICON;
     }
 
     @Override
