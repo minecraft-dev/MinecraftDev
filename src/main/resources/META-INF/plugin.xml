@@ -246,5 +246,10 @@
                 description="Configure automatic updates for the Minecraft Development plugin">
             <add-to-group group-id="MinecraftDevToolsGroup"/>
         </action>
+        <action class="com.demonwav.mcdev.platform.mixin.actions.FindMixinsAction" id="FindMixinsAction"
+                text="Find Mixins"
+                description="Find classes which mix into this class">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+        </action>
     </actions>
 </idea-plugin>
