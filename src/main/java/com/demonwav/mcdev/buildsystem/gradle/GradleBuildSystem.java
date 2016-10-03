@@ -101,6 +101,11 @@ public class GradleBuildSystem extends BuildSystem {
     @Nullable
     private VirtualFile buildGradle;
 
+    @Nullable
+    public VirtualFile getBuildGradle() {
+        return buildGradle;
+    }
+
     @Override
     public void create(@NotNull Project project, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
         rootDirectory.refresh(false, true);

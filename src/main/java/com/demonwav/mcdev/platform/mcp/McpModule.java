@@ -1,8 +1,10 @@
 package com.demonwav.mcdev.platform.mcp;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.mcp.srg.SrgManager;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
@@ -18,6 +20,12 @@ public class McpModule extends AbstractModule {
         if (buildSystem != null) {
             buildSystem.reImport(module);
         }
+        SrgManager.getInstance(this).recomputeSrgMap();
+    }
+
+    @Override
+    public GradleBuildSystem getBuildSystem() {
+        return (GradleBuildSystem) buildSystem;
     }
 
     @Override

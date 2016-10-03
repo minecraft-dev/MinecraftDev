@@ -140,7 +140,7 @@ public class MinecraftModule {
     }
 
     @Nullable
-    private <T extends AbstractModule> T getModuleOfType(@Nullable AbstractModuleType<T> type) {
+    public <T extends AbstractModule> T getModuleOfType(@Nullable AbstractModuleType<T> type) {
         //noinspection unchecked
         return (T) modules.get(type);
     }

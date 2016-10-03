@@ -2,12 +2,11 @@ package com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl;
 
 import com.demonwav.mcdev.platform.mcp.cfg.CfgElementFactory;
 import com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgClassNameMixin;
+import com.demonwav.mcdev.platform.mcp.util.McpUtil;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +18,7 @@ public abstract class CfgClassNameImplMixin extends ASTWrapperPsiElement impleme
 
     @Nullable
     public PsiClass getClassNameValue() {
-        return JavaPsiFacade.getInstance(getProject()).findClass(getClassNameText(), GlobalSearchScope.allScope(getProject()));
+        return McpUtil.getClassFromString(getClassNameText(), getProject());
     }
 
     @NotNull

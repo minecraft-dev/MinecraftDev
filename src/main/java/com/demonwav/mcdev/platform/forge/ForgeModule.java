@@ -3,6 +3,7 @@ package com.demonwav.mcdev.platform.forge;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
+import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
@@ -40,6 +41,12 @@ public class ForgeModule extends AbstractModule {
             buildSystem.reImport(module).done(buildSystem -> mcmod = buildSystem.findFile("mcmod.info", SourceType.RESOURCE));
         }
     }
+
+    @Override
+    public GradleBuildSystem getBuildSystem() {
+        return (GradleBuildSystem) buildSystem;
+    }
+
 
     @Override
     public ForgeModuleType getModuleType() {

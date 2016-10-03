@@ -74,5 +74,5 @@ Supported Platforms
 - [![Forge Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Forge.png) **Minecraft Forge**](http://minecraftforge.net/forum)
 - [![LiteLoader Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/LiteLoader.png) **LiteLoader**](http://www.liteloader.com/)
 - [![MCP Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/MCP.png) **MCP**](http://www.modcoderpack.com/)
-- [![Mixins Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/mixin_dark.png) **Mixins**](https://github.com/SpongePowered/Mixin)
+- [![Mixins Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Mixin_dark.png) **Mixins**](https://github.com/SpongePowered/Mixin)
 - [![BungeeCord Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/BungeeCord.png) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/)

@@ -2,6 +2,7 @@ package com.demonwav.mcdev.platform.liteloader;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 
@@ -23,6 +24,11 @@ public class LiteLoaderModule extends AbstractModule {
         if (buildSystem != null) {
             buildSystem.reImport(module);
         }
+    }
+
+    @Override
+    public GradleBuildSystem getBuildSystem() {
+        return (GradleBuildSystem) buildSystem;
     }
 
     @Override

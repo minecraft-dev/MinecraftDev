@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.platform.mixin.insight;
 
-import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.asset.MixinAssets;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.util.McEditorUtil;
 
@@ -152,7 +152,7 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
     @NotNull
     @Override
     public Icon getIcon() {
-        return PlatformAssets.MIXIN_ICON;
+        return MixinAssets.MIXIN_CLASS_ICON;
     }
 
     public static final class MixinLineMarkerInfo extends MergeableLineMarkerInfo<PsiElement> {
@@ -186,7 +186,7 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
         @Override
         @Contract(pure = true)
         public Icon getCommonIcon(@NotNull List<MergeableLineMarkerInfo> infos) {
-            return PlatformAssets.MIXIN_ICON;
+            return MixinAssets.MIXIN_CLASS_ICON;
         }
 
         @NotNull

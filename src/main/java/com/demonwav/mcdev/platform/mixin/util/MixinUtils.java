@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform.mixin.util;
 
 import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.platform.mcp.util.McpUtil;
 import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Key;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Level;
@@ -10,13 +11,9 @@ import com.demonwav.mcdev.util.McPsiUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.AnonymousElementProvider;
-import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiAnonymousClass;
@@ -42,7 +39,6 @@ import com.intellij.psi.impl.source.tree.ElementType;
 import com.intellij.psi.impl.source.tree.java.PsiArrayInitializerMemberValueImpl;
 import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.TypeConversionUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -291,81 +287,6 @@ public final class MixinUtils {
     }
 
     /**
-     * Given a Mixin target class string (the string given to the {@code targets} Mixin annotation attribute), find, if possible,
-     * the corresponding class.
-     *
-     * @param s The String to check.
-     * @return The corresponding class for the given String, or null if not found.
-     */
-    @Nullable
-    @Contract(value = "null, _ -> null", pure = true)
-    public static PsiClass getClassFromMixinTargetString(@Nullable String s, @NotNull Project project) {
-        if (s == null) {
-            return null;
-        }
-
-        final String replaced = s.replaceAll("/", ".");
-        String text = replaced;
-        if (text.contains("$")) {
-            text = text.substring(0, text.indexOf('$'));
-        }
-
-        final PsiClass psiClass = JavaPsiFacade.getInstance(project).findClass(text, GlobalSearchScope.allScope(project));
-        if (!replaced.contains("$")) {
-            return psiClass;
-        }
-
-        if (psiClass == null) {
-            return null;
-        }
-
-        // Handle anonymous classes
-        final String[] classes = replaced.substring(replaced.indexOf('$')).split("\\$");
-        List<Object> indexes = Lists.newArrayList();
-        for (String cls : classes) {
-            if (cls.isEmpty()) {
-                continue;
-            }
-
-            try {
-                indexes.add(Integer.parseInt(cls) - 1);
-            } catch (Exception e) {
-                indexes.add(cls);
-            }
-        }
-
-        PsiElement current = psiClass;
-        for (Object index : indexes) {
-            if (index instanceof Integer) {
-                PsiElement[] anonymousClasses = null;
-                for (AnonymousElementProvider provider : Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
-                    anonymousClasses = provider.getAnonymousElements(psiClass);
-                    if (anonymousClasses.length > 0) {
-                        break;
-                    }
-                }
-                if (anonymousClasses == null) {
-                    return psiClass;
-                }
-
-                if ((((Integer) index) >= 0) && (((Integer) index) < anonymousClasses.length)) {
-                    current = anonymousClasses[((Integer) index)];
-                } else {
-                    return (PsiClass) current;
-                }
-            } else {
-                final PsiClass newClass = ((PsiClass) current).findInnerClassByName((String) index, false);
-                if (newClass == null) {
-                    return ((PsiClass) current);
-                }
-                current = newClass;
-            }
-        }
-
-        return (PsiClass) current;
-    }
-
-    /**
      * Given a {@link PsiAnnotationMemberValue}, find the mapping of child PsiElements and PsiClasses that they point to. If the given
      * {@link PsiAnnotationMemberValue} is a {@link PsiArrayInitializerMemberValue}, the returned map may return more than one entry.
      * If the {@link PsiAnnotationMemberValue} is a {@link PsiClassObjectAccessExpression}, {@link PsiReferenceExpression}, or
@@ -457,10 +378,10 @@ public final class MixinUtils {
             final PsiLiteralExpressionImpl lit = (PsiLiteralExpressionImpl) psi;
 
             final String text = lit.getInnerText();
-            return MixinUtils.getClassFromMixinTargetString(text, element.getProject());
+            return McpUtil.getClassFromString(text, element.getProject());
         } else if (element instanceof PsiLiteralExpressionImpl) {
             final PsiLiteralExpressionImpl expression = (PsiLiteralExpressionImpl) element;
-            return MixinUtils.getClassFromMixinTargetString(expression.getInnerText(), element.getProject());
+            return McpUtil.getClassFromString(expression.getInnerText(), element.getProject());
         }
 
         return null;
