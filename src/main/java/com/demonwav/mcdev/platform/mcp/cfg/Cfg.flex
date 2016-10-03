@@ -8,9 +8,9 @@ import static com.intellij.psi.TokenType.*;
 %%
 
 %{
-  public CfgLexer() {
-    this((java.io.Reader)null);
-  }
+    public CfgLexer() {
+        this((java.io.Reader)null);
+    }
 %}
 
 %public

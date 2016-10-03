@@ -29,29 +29,29 @@
     // Mixins
     //
 
-    mixin       ("function")    = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgFunctionImplMixin"
-    implements  ("function")    = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgFunctionMixin"
+    mixin       ("function")        = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgFunctionImplMixin"
+    implements  ("function")        = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgFunctionMixin"
 
-    mixin       ("entry")       = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgEntryImplMixin"
-    implements  ("entry")       = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgEntryMixin"
+    mixin       ("entry")           = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgEntryImplMixin"
+    implements  ("entry")           = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgEntryMixin"
 
-    mixin       ("argument")    = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgArgumentImplMixin"
-    implements  ("argument")    = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgArgumentMixin"
+    mixin       ("argument")        = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgArgumentImplMixin"
+    implements  ("argument")        = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgArgumentMixin"
 
-    mixin       ("class_name")   = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgClassNameImplMixin"
-    implements  ("class_name")   = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgClassNameMixin"
+    mixin       ("class_name")      = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgClassNameImplMixin"
+    implements  ("class_name")      = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgClassNameMixin"
 
-    mixin       ("field_name")   = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgFieldNameImplMixin"
-    implements  ("field_name")   = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgFieldNameMixin"
+    mixin       ("field_name")      = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgFieldNameImplMixin"
+    implements  ("field_name")      = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgFieldNameMixin"
 
-    mixin       ("func_name")    = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgFuncNameImplMixin"
-    implements  ("func_name")    = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgFuncNameMixin"
+    mixin       ("func_name")       = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgFuncNameImplMixin"
+    implements  ("func_name")       = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgFuncNameMixin"
 
-    mixin       ("keyword")      = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgKeywordImplMixin"
-    implements  ("keyword")      = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgKeywordMixin"
+    mixin       ("keyword")         = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgKeywordImplMixin"
+    implements  ("keyword")         = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgKeywordMixin"
 
-    mixin       ("return_value") = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgReturnValueImplMixin"
-    implements  ("return_value") = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgReturnValueMixin"
+    mixin       ("return_value")    = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.impl.CfgReturnValueImplMixin"
+    implements  ("return_value")    = "com.demonwav.mcdev.platform.mcp.cfg.psi.mixins.CfgReturnValueMixin"
 
     consumeTokenMethod="consumeTokenFast"
 }

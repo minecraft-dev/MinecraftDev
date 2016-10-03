@@ -23,10 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 public class CfgParserDefinition implements ParserDefinition {
-    public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-    public static final TokenSet COMMENTS = TokenSet.create(CfgTypes.COMMENT);
+    private static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
+    private static final TokenSet COMMENTS = TokenSet.create(CfgTypes.COMMENT);
 
-    public static final IFileElementType FILE = new IFileElementType(Language.findInstance(CfgLanguage.class));
+    private static final IFileElementType FILE = new IFileElementType(Language.findInstance(CfgLanguage.class));
 
     @NotNull
     @Override
