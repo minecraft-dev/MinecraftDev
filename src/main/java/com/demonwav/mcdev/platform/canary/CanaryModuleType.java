@@ -8,6 +8,7 @@ import com.demonwav.mcdev.platform.canary.generation.CanaryHookGenerationPanel;
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
 import com.demonwav.mcdev.platform.canary.util.CanaryLegacyColors;
 import com.demonwav.mcdev.util.CommonColors;
+
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;

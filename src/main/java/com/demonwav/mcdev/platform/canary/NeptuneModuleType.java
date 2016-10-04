@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform.canary;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
@@ -29,5 +30,5 @@ public class NeptuneModuleType extends CanaryModuleType {
     public Icon getIcon() {
         return PlatformAssets.NEPTUNE_ICON;
     }
-    
+
 }

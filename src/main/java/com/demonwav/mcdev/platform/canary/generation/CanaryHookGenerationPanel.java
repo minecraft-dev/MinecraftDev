@@ -2,6 +2,7 @@ package com.demonwav.mcdev.platform.canary.generation;
 
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
+
 import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -5,6 +5,7 @@ import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
+
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.openapi.project.Project;
@@ -17,9 +18,9 @@ import java.util.Properties;
 public class CanaryTemplate extends AbstractTemplate {
 
     public static void applyMainClassTemplate(@NotNull Project project,
-                                              @NotNull VirtualFile file,
-                                              @NotNull String packageName,
-                                              @NotNull String className) {
+            @NotNull VirtualFile file,
+            @NotNull String packageName,
+            @NotNull String className) {
         Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
@@ -34,7 +35,7 @@ public class CanaryTemplate extends AbstractTemplate {
 
     @NotNull
     public static String applyPomTemplate(@NotNull Project project,
-                                          @NotNull String version) {
+            @NotNull String version) {
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", version);
 

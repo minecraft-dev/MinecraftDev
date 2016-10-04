@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform.canary.generation;
 
 import com.demonwav.mcdev.insight.generation.GenerationData;
+
 import org.jetbrains.annotations.NotNull;
 
 public class CanaryGenerationData implements GenerationData {

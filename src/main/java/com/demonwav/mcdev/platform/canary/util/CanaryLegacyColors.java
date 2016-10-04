@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform.canary.util;
 
 import com.demonwav.mcdev.util.CommonColors;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;

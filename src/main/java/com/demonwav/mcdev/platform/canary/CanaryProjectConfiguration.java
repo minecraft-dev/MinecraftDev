@@ -3,6 +3,7 @@ package com.demonwav.mcdev.platform.canary;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.util.Util;
+
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
