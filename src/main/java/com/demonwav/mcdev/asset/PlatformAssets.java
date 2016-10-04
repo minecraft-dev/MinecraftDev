@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.Icon;
 
 @SuppressWarnings("unused")
-public final class PlatformAssets extends Assets{
+public final class PlatformAssets extends Assets {
 
     @NotNull public static final Icon MINECRAFT_ICON = loadIcon("/assets/icons/platform/Minecraft.png");
     @NotNull public static final Icon MINECRAFT_ICON_2X = loadIcon("/assets/icons/platform/Minecraft@2x.png");
