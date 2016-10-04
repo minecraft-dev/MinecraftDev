@@ -109,7 +109,7 @@ public final class SrgManager {
                     file.delete();
 
                     final String appended = text +
-                        "\n\ntask " + TASK_NAME + " {file(\"" + FILE_NAME_BASE + r + "\") << project.tasks.genSrgs.mcpToSrg}";
+                        "\n\ntask " + TASK_NAME + " {file(\"" + file.getAbsolutePath() + "\") << project.tasks.genSrgs.mcpToSrg}";
 
                     try {
                         Files.write(buildGradleFile.toPath(), appended.getBytes(buildGradle.getCharset()));
@@ -139,6 +139,8 @@ public final class SrgManager {
                         } catch (IOException e1) {
                             e1.printStackTrace();
                         }
+                        //noinspection ResultOfMethodCallIgnored
+                        file.delete();
                         currentPromise.setError("Gradle build could not be run to gather data");
                         return;
                     } finally {

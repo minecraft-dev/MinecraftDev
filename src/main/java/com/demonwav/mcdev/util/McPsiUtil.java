@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -133,7 +134,7 @@ public final class McPsiUtil {
 
         if (psiClass.getContainingClass() == null) {
             //noinspection ConstantConditions
-            return Pair.create(psiClass.getName(), psiClass);
+            return Pair.create("", psiClass);
         }
 
         final List<String> innerStrings = Lists.newArrayList();
@@ -167,6 +168,10 @@ public final class McPsiUtil {
                 psiClass = psiClass.getContainingClass();
             }
         }
-        return Pair.create("$" + innerStrings.stream().collect(Collectors.joining("$")), baseClass);
+
+        // We started from the bottom and went up, so reverse it
+        Collections.reverse(innerStrings);
+        // Skip the base class, we are giving the base PsiClass so the user can do with it what they want
+        return Pair.create("$" + innerStrings.stream().skip(1).collect(Collectors.joining("$")), baseClass);
     }
 }

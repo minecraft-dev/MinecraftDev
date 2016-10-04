@@ -167,7 +167,8 @@ public final class SrgMap {
             params.add(McpUtil.getStringFromType(parameter.getType()));
         }
 
-        return classString + "(" + params.stream().collect(Collectors.joining()) + ")" + McpUtil.getStringFromType(method.getReturnType());
+        return classString + "/" + method.getName() + "(" + params.stream().collect(Collectors.joining()) + ")" +
+            McpUtil.getStringFromType(method.getReturnType());
     }
 
     @Nullable
