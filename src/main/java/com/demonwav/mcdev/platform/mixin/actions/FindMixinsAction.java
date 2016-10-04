@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.platform.mixin.actions;
 
-import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.asset.MixinAssets;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.util.McEditorUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
@@ -114,7 +114,7 @@ public class FindMixinsAction extends AnAction {
                             } else {
                                 ToolWindowManager.getInstance(project).unregisterToolWindow(TOOL_WINDOW_ID);
                                 ToolWindow window = ToolWindowManager.getInstance(project).registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM);
-                                window.setIcon(PlatformAssets.MIXIN_ICON);
+                                window.setIcon(MixinAssets.MIXIN_CLASS_ICON);
 
                                 // Sort the results so it appears nicer
                                 final List<PsiClass> classesList = new ArrayList<>(classes);
@@ -136,9 +136,7 @@ public class FindMixinsAction extends AnAction {
                                     return name1.compareTo(name2);
                                 });
 
-                                // We have to register this data before the constructor, due to IntelliJ's GUI builder
-                                FindMixinsComponent.classes = classesList;
-                                FindMixinsComponent component = new FindMixinsComponent();
+                                FindMixinsComponent component = new FindMixinsComponent(classesList);
 
                                 ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
                                 Content content = contentFactory.createContent(component.getPanel(), null, false);

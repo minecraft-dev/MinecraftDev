@@ -103,6 +103,10 @@ public final class SrgManager {
                     final File dir = buildGradleFile.getParentFile();
 
                     final int r = new Random().nextInt();
+                    final File file = new File(dir, FILE_NAME_BASE + r);
+
+                    //noinspection ResultOfMethodCallIgnored
+                    file.delete();
 
                     final String appended = text +
                         "\n\ntask " + TASK_NAME + " {file(\"" + FILE_NAME_BASE + r + "\") << project.tasks.genSrgs.mcpToSrg}";
@@ -148,7 +152,6 @@ public final class SrgManager {
                     }
 
                     final String path;
-                    final File file = new File(dir, FILE_NAME_BASE + r);
                     try {
                         path = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
                     } catch (IOException e) {
@@ -161,7 +164,7 @@ public final class SrgManager {
                     }
 
                     try {
-                        currentMap = new SrgMap(new File(path));
+                        currentMap = new SrgMap(new File(path.substring(0, path.indexOf("mcp-srg.srg") + "mcp-srg.srg".length())));
                     } catch (IOException e) {
                         e.printStackTrace();
                         currentPromise.setError("SrgMap instance could not be created");
