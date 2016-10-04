@@ -70,7 +70,14 @@ public class CanaryTemplate extends AbstractTemplate {
             properties.setProperty("HAS_AUTHOR_LIST", "true");
         }
 
-        // TODO: Does Canary support description?
+        if (settings.enableEarly) {
+            properties.setProperty("ENABLE_EARLY", "true");
+        }
+
+        if (settings.hasDependencies()) {
+            properties.setProperty("DEPEND", settings.dependencies.toString());
+            properties.setProperty("HAS_DEPEND", "true");
+        }
 
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.CANARY_INF_TEMPLATE, properties, true);

@@ -2,7 +2,6 @@ package com.demonwav.mcdev.platform.canary;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
-import com.demonwav.mcdev.platform.bukkit.BukkitTemplate;
 import com.demonwav.mcdev.util.Util;
 import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -13,8 +12,17 @@ import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CanaryProjectConfiguration extends ProjectConfiguration {
+
+    public final List<String> dependencies = new ArrayList<>();
+    public boolean enableEarly;
+
+    public boolean hasDependencies() {
+        return listContainsAtLeastOne(dependencies);
+    }
 
     @Override
     public void create(@NotNull Project project, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator) {
@@ -32,8 +40,8 @@ public class CanaryProjectConfiguration extends ProjectConfiguration {
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
                 CanaryTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className);
 
-                VirtualFile pluginYml = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "Canary.inf");
-                CanaryTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this, buildSystem);
+                VirtualFile canaryInf = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "Canary.inf");
+                CanaryTemplate.applyPluginDescriptionFileTemplate(project, canaryInf, this, buildSystem);
 
                 // Set the editor focus on the main class
                 PsiFile mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile);
