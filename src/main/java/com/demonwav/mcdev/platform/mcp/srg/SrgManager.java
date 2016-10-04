@@ -4,15 +4,12 @@ import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.mcp.McpModule;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
+import org.gradle.tooling.ModelBuilder;
 import org.gradle.tooling.ProjectConnection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,10 +17,14 @@ import org.jetbrains.concurrency.AsyncPromise;
 import org.jetbrains.concurrency.Promise;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.Random;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class SrgManager {
@@ -84,89 +85,54 @@ public final class SrgManager {
                         return;
                     }
 
-                    final String canonicalPath = buildGradle.getCanonicalPath();
-                    if (canonicalPath == null) {
-                        return;
-                    }
-
-                    File buildGradleFile = new File(canonicalPath);
-
-                    final String text;
-                    try {
-                        text = new String(Files.readAllBytes(buildGradleFile.toPath()), buildGradle.getCharset());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        currentPromise.setError("build.gradle file could not be read");
-                        return;
-                    }
-
-                    final File dir = buildGradleFile.getParentFile();
-
-                    final int r = new Random().nextInt();
-                    final File file = new File(dir, FILE_NAME_BASE + r);
+                    final File temp = new File(System.getProperty("java.io.tmpdir"));
+                    final File mcinit = new File(temp, "mcinit.gradle");
 
                     //noinspection ResultOfMethodCallIgnored
-                    file.delete();
+                    mcinit.delete();
 
-                    final String appended = text +
-                        "\n\ntask " + TASK_NAME + " {file(\"" + file.getAbsolutePath() + "\") << project.tasks.genSrgs.mcpToSrg}";
+                    final VirtualFile parent = buildGradle.getParent();
+                    if (parent == null || parent.getCanonicalPath() == null) {
+                        return;
+                    }
+                    final File dir = new File(parent.getCanonicalPath());
 
                     try {
-                        Files.write(buildGradleFile.toPath(), appended.getBytes(buildGradle.getCharset()));
-                    } catch (IOException e) {
+                        unpackInitGradleFile(mcinit);
+                    } catch (URISyntaxException | IOException e) {
                         e.printStackTrace();
-                        currentPromise.setError("Temporary build.gradle could not be written");
+                        currentPromise.setError("Could not create mcinit.gradle file");
                         return;
                     }
 
-                    GradleConnector connector = GradleConnector.newConnector();
+                    final GradleConnector connector = GradleConnector.newConnector();
                     connector.forProjectDirectory(dir);
-                    ProjectConnection connection = connector.connect();
-                    BuildLauncher launcher = connection.newBuild();
+                    ProjectConnection connection = null;
 
+                    Set<File> files = null;
                     try {
-                        Pair<String, Sdk> sdkPair = ExternalSystemJdkUtil.getAvailableJdk(module.getModule().getProject());
-                        if (sdkPair != null && sdkPair.getSecond() != null && sdkPair.getSecond().getHomePath() != null &&
-                            !ExternalSystemJdkUtil.USE_INTERNAL_JAVA.equals(sdkPair.getFirst())) {
-
-                            launcher.setJavaHome(new File(sdkPair.getSecond().getHomePath()));
-                        }
-
-                        launcher.forTasks(TASK_NAME).run();
+                        connection = connector.connect();
+                        final ModelBuilder<MinecraftDevModel> modelBuilder = connection.model(MinecraftDevModel.class);
+                        modelBuilder.withArguments("--init-script", mcinit.getAbsolutePath());
+                        final MinecraftDevModel model = modelBuilder.get();
+                        files = model.getMappingFiles();
                     } catch (Exception e) {
-                        try {
-                            Files.write(buildGradleFile.toPath(), text.getBytes(buildGradle.getCharset()));
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
+                        e.printStackTrace();
+                        currentPromise.setError("Gradle tooling could not be used to gather data");
+                        return;
+                    } finally {
+                        if (connection != null) {
+                            connection.close();
                         }
-                        //noinspection ResultOfMethodCallIgnored
-                        file.delete();
-                        currentPromise.setError("Gradle build could not be run to gather data");
+                    }
+
+                    if (files == null) {
+                        currentPromise.setError("Gradle tooling response was null");
                         return;
-                    } finally {
-                        connection.close();
                     }
 
                     try {
-                        Files.write(buildGradleFile.toPath(), text.getBytes(buildGradle.getCharset()));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    final String path;
-                    try {
-                        path = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        currentPromise.setError("Path could not be read from file");
-                        return;
-                    } finally {
-                        //noinspection ResultOfMethodCallIgnored
-                        file.delete();
-                    }
-
-                    try {
-                        currentMap = new SrgMap(new File(path.substring(0, path.indexOf("mcp-srg.srg") + "mcp-srg.srg".length())));
+                        currentMap = new SrgMap(files);
                     } catch (IOException e) {
                         e.printStackTrace();
                         currentPromise.setError("SrgMap instance could not be created");
@@ -176,6 +142,17 @@ public final class SrgManager {
                     currentPromise.setResult(currentMap);
                 }
         }));
+    }
+
+    private void unpackInitGradleFile(@NotNull File mcinit) throws URISyntaxException, IOException {
+        try (
+            final InputStream gradleStream = getClass().getResourceAsStream("/mcinit.gradle");
+            final FileOutputStream fileOutputStream = new FileOutputStream(mcinit);
+            final FileChannel outChannel = fileOutputStream.getChannel();
+            final ReadableByteChannel inChannel = Channels.newChannel(gradleStream)
+        ) {
+            outChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
+        }
     }
 
     /**

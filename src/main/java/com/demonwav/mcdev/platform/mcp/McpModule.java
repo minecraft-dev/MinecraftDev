@@ -19,7 +19,7 @@ public class McpModule extends AbstractModule {
         this.buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
             buildSystem.reImport(module);
-            SrgManager.getInstance(this).recomputeSrgMap();
+            SrgManager.getInstance(this).recomputeIfNullAndGetSrgMap().rejected(System.out::println);
         }
     }
 

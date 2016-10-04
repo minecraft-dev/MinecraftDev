@@ -20,13 +20,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * An immutable instance of the SrgMap API. This can be used to find mappings between
  */
 public final class SrgMap {
-    private final File mappingFile;
+    private final Set<File> mappingFiles;
 
     // Key: MCP
     // Value: SRG
@@ -34,28 +35,30 @@ public final class SrgMap {
     private final BiMap<String, String> fieldMap = HashBiMap.create();
     private final BiMap<String, String> methodMap = HashBiMap.create();
 
-    SrgMap(@NotNull File mappingFile) throws IOException {
-        if (!mappingFile.exists()) {
-            throw new IOException("Given mappingFile: " + mappingFile.getAbsolutePath() + " does not exist.");
-        }
+    SrgMap(@NotNull Set<File> mappingFiles) throws IOException {
+        this.mappingFiles = mappingFiles;
 
-        this.mappingFile = mappingFile;
-
-        final List<String> lines = Files.readAllLines(mappingFile.toPath());
-        for (String line : lines) {
-            final String[] split = line.split("\\s+");
-            switch (split[0]) {
-                case "FD:":
-                    // field
-                    fieldMap.put(split[1], split[2]);
-                    break;
-                case "MD:":
-                    // method
-                    methodMap.put(split[1] + split[2], split[3] + split[4]);
-                    break;
-                default:
-                    classMap.put(split[1], split[2]);
-                    break;
+        // currently only read mcpToSrg
+        for (File mappingFile : mappingFiles) {
+            if (mappingFile.getName().equals("mcp-srg.srg")) {
+                final List<String> lines = Files.readAllLines(mappingFile.toPath());
+                for (String line : lines) {
+                    final String[] split = line.split("\\s+");
+                    switch (split[0]) {
+                        case "FD:":
+                            // field
+                            fieldMap.put(split[1], split[2]);
+                            break;
+                        case "MD:":
+                            // method
+                            methodMap.put(split[1] + split[2], split[3] + split[4]);
+                            break;
+                        default:
+                            classMap.put(split[1], split[2]);
+                            break;
+                    }
+                }
+                break;
             }
         }
     }
