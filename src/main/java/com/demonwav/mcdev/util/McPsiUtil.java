@@ -1,7 +1,11 @@
 package com.demonwav.mcdev.util;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.intellij.navigation.AnonymousElementProvider;
+import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.PsiAnnotation;
@@ -22,6 +26,9 @@ import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class McPsiUtil {
     private McPsiUtil() {}
@@ -115,5 +122,51 @@ public final class McPsiUtil {
         }
 
         return list.findAnnotation(annotationName);
+    }
+
+    @Nullable
+    @Contract(value = "null -> null", pure = true)
+    public static Pair<String, PsiClass> getNameOfClass(@Nullable PsiClass psiClass) {
+        if (psiClass == null) {
+            return null;
+        }
+
+        if (psiClass.getContainingClass() == null) {
+            //noinspection ConstantConditions
+            return Pair.create(psiClass.getName(), psiClass);
+        }
+
+        final List<String> innerStrings = Lists.newArrayList();
+        PsiClass baseClass = psiClass;
+        while (psiClass != null) {
+            baseClass = psiClass;
+            if (psiClass.getName() == null) {
+                // anon class
+                PsiElement[] anonymousClasses = null;
+                for (AnonymousElementProvider provider : Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
+                    //noinspection ConstantConditions
+                    anonymousClasses = provider.getAnonymousElements(psiClass.getContainingClass());
+                    if (anonymousClasses.length > 0) {
+                        break;
+                    }
+                }
+
+                if (anonymousClasses == null) {
+                    // We couldn't build the proper string, so don't return anything at all
+                    return null;
+                }
+
+                for (int i = 0; i < anonymousClasses.length; i++) {
+                    if (anonymousClasses[i] == psiClass) {
+                        innerStrings.add(String.valueOf(i + 1));
+                        break;
+                    }
+                }
+            } else {
+                innerStrings.add(psiClass.getName());
+                psiClass = psiClass.getContainingClass();
+            }
+        }
+        return Pair.create("$" + innerStrings.stream().collect(Collectors.joining("$")), baseClass);
     }
 }

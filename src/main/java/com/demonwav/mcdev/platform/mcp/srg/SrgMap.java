@@ -1,15 +1,14 @@
 package com.demonwav.mcdev.platform.mcp.srg;
 
 import com.demonwav.mcdev.platform.mcp.util.McpUtil;
+import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
-import com.intellij.navigation.AnonymousElementProvider;
-import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
@@ -123,47 +122,12 @@ public final class SrgMap {
     @Nullable
     @Contract("null -> null")
     public static String toString(@Nullable PsiClass psiClass) {
-        if (psiClass == null) {
+        final Pair<String, PsiClass> nameOfClass = McPsiUtil.getNameOfClass(psiClass);
+        if (nameOfClass == null) {
             return null;
         }
 
-        if (psiClass.getContainingClass() == null) {
-            //noinspection ConstantConditions
-            return psiClass.getQualifiedName().replaceAll("\\.", "/");
-        }
-
-        final List<String> innerStrings = Lists.newArrayList();
-        PsiClass baseClass = psiClass;
-        while (psiClass != null) {
-            baseClass = psiClass;
-            if (psiClass.getName() == null) {
-                // anon class
-                PsiElement[] anonymousClasses = null;
-                for (AnonymousElementProvider provider : Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
-                    //noinspection ConstantConditions
-                    anonymousClasses = provider.getAnonymousElements(psiClass.getContainingClass());
-                    if (anonymousClasses.length > 0) {
-                        break;
-                    }
-                }
-
-                if (anonymousClasses == null) {
-                    // We couldn't build the proper string, so don't return anything at all
-                    return null;
-                }
-
-                for (int i = 0; i < anonymousClasses.length; i++) {
-                    if (anonymousClasses[i] == psiClass) {
-                        innerStrings.add(String.valueOf(i + 1));
-                        break;
-                    }
-                }
-            } else {
-                innerStrings.add(psiClass.getName());
-                psiClass = psiClass.getContainingClass();
-            }
-        }
-        return baseClass.getQualifiedName().replaceAll("\\.", "/") + "$" + innerStrings.stream().collect(Collectors.joining("$"));
+        return McpUtil.replaceDotWithSlash(nameOfClass.getSecond().getQualifiedName()) + nameOfClass.getFirst();
     }
 
     @Nullable
