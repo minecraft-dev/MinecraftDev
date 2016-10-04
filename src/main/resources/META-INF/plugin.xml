@@ -53,6 +53,7 @@
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
         <fileIconProvider implementation="com.demonwav.mcdev.platform.forge.ForgeFileIconProvider"/>
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.canary.CanaryFileIconProvider"/>
 
         <!-- External Project Data Services are for Gradle project imports -->
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.BukkitDataService"/>

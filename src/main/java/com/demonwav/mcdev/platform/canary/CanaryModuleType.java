@@ -1,13 +1,17 @@
 package com.demonwav.mcdev.platform.canary;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.canary.generation.CanaryHookGenerationPanel;
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
 import com.demonwav.mcdev.platform.canary.util.CanaryLegacyColors;
 import com.demonwav.mcdev.util.CommonColors;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
+import com.intellij.psi.PsiClass;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -74,6 +78,18 @@ public class CanaryModuleType extends AbstractModuleType<CanaryModule> {
     @Override
     public CanaryModule generateModule(Module module) {
         return new CanaryModule<>(module, this);
+    }
+
+    @Contract(pure = true)
+    @Override
+    public boolean isEventGenAvailable() {
+        return true;
+    }
+
+    @NotNull
+    @Override
+    public EventGenerationPanel getEventGenerationPanel(@NotNull PsiClass chosenClass) {
+        return new CanaryHookGenerationPanel(chosenClass);
     }
 
 }

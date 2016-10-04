@@ -1,10 +1,12 @@
 package com.demonwav.mcdev.platform.canary;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +15,7 @@ public class CanaryModule<T extends CanaryModuleType> extends AbstractModule {
 
     private final T moduleType;
     private final PlatformType type;
+    private VirtualFile canaryInf;
 
     public CanaryModule(@NotNull Module module, @NotNull T type) {
         super(module);
@@ -20,8 +23,24 @@ public class CanaryModule<T extends CanaryModuleType> extends AbstractModule {
         this.type = type.getPlatformType();
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            buildSystem.reImport(module);
+            buildSystem.reImport(module).done(b -> setup());
         }
+    }
+
+    private void setup() {
+        canaryInf = buildSystem.findFile("Canary.inf", SourceType.RESOURCE);
+    }
+
+    public VirtualFile getCanaryInf() {
+        if (buildSystem == null) {
+            buildSystem = BuildSystem.getInstance(module);
+        }
+        if (canaryInf == null && buildSystem != null) {
+            // try and find the file again if it's not already present
+            // when this object was first created it may not have been ready
+            canaryInf = buildSystem.findFile("Canary.inf", SourceType.RESOURCE);
+        }
+        return canaryInf;
     }
 
     @Override
