@@ -43,7 +43,7 @@ public class NewExpressionSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        final PsiClass psiClass = (PsiClass) infos[1];
+        final PsiClass psiClass = (PsiClass) infos[0];
 
         if (psiClass.isWritable()) {
             return new RemoveAnnotationInspectionGadgetsFix() {
