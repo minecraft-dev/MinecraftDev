@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.platform.mcp.srg;
 
+import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.mcp.McpModule;
 
 import com.intellij.openapi.application.ApplicationManager;
@@ -22,9 +23,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class SrgManager {
+    private static final String TASK_NAME = "___getMinecraftDevForIntelliJData____";
+    private static final String FILE_NAME_BASE = ".tmpMCDVIJ";
+
     private static final ConcurrentHashMap<McpModule, SrgManager> managers = new ConcurrentHashMap<>();
 
     public static SrgManager getInstance(@NotNull McpModule module) {
@@ -66,7 +71,13 @@ public final class SrgManager {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     indicator.setIndeterminate(true);
-                    final VirtualFile buildGradle = module.getBuildSystem().getBuildGradle();
+                    final GradleBuildSystem buildSystem = module.getBuildSystem();
+                    if (buildSystem == null) {
+                        currentPromise.setError("Module BuildSystem is null");
+                        return;
+                    }
+
+                    final VirtualFile buildGradle = buildSystem.getBuildGradle();
 
                     if (buildGradle == null) {
                         currentPromise.setError("build.gradle file could not be found");
@@ -91,8 +102,10 @@ public final class SrgManager {
 
                     final File dir = buildGradleFile.getParentFile();
 
+                    final int r = new Random().nextInt();
+
                     final String appended = text +
-                        "\n\ntask ___getMinecraftDevForIntelliJData____ {file(\".tmpMCDVIJ\") << project.tasks.genSrgs.mcpToSrg}";
+                        "\n\ntask " + TASK_NAME + " {file(\"" + FILE_NAME_BASE + r + "\") << project.tasks.genSrgs.mcpToSrg}";
 
                     try {
                         Files.write(buildGradleFile.toPath(), appended.getBytes(buildGradle.getCharset()));
@@ -115,7 +128,7 @@ public final class SrgManager {
                             launcher.setJavaHome(new File(sdkPair.getSecond().getHomePath()));
                         }
 
-                        launcher.forTasks("___getMinecraftDevForIntelliJData____").run();
+                        launcher.forTasks(TASK_NAME).run();
                     } catch (Exception e) {
                         try {
                             Files.write(buildGradleFile.toPath(), text.getBytes(buildGradle.getCharset()));
@@ -135,7 +148,7 @@ public final class SrgManager {
                     }
 
                     final String path;
-                    final File file = new File(dir, ".tmpMCDVIJ");
+                    final File file = new File(dir, FILE_NAME_BASE + r);
                     try {
                         path = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
                     } catch (IOException e) {

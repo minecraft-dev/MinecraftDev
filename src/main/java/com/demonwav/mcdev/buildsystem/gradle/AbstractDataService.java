@@ -3,7 +3,6 @@ package com.demonwav.mcdev.buildsystem.gradle;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
-import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
@@ -64,23 +63,9 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
         setupModules(goodModules, modelsProvider, type);
     }
 
-    /**
-     * We have two checks for Sponge, so we hold the first one here until the second one finishes. This is so hacky it hurts.
-     */
-    private static Set<Module> firstGoodModules;
-
     public static void setupModules(@NotNull Set<Module> goodModules,
                                     @NotNull IdeModifiableModelsProvider modelsProvider,
                                     @NotNull AbstractModuleType<?> type) {
-
-        if (type == SpongeModuleType.getInstance()) {
-            if (firstGoodModules == null) {
-                firstGoodModules = goodModules;
-                return;
-            }
-
-            goodModules.addAll(firstGoodModules);
-        }
 
         // So the way the Gradle plugin sets it up is with 3 modules. There's the parent module, which the Gradle
         // dependencies don't apply to, then submodules under it, normally main and test, which the Gradle dependencies
@@ -103,10 +88,6 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                 }
             }
         });
-
-        if (firstGoodModules != null && type == SpongeModuleType.getInstance()) {
-            firstGoodModules = null;
-        }
     }
 
     protected void checkModule(@NotNull Collection<DataNode<LibraryDependencyData>> toImport,
