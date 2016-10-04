@@ -11,7 +11,7 @@ public class NeptuneModuleType extends CanaryModuleType {
 
     private static final String ID = "NEPTUNE_MODULE_TYPE";
 
-    protected NeptuneModuleType() {
+    private NeptuneModuleType() {
         super("org.neptunepowered", "NeptuneLib");
     }
 

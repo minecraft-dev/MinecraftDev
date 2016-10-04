@@ -17,9 +17,9 @@ import java.util.Properties;
 public class CanaryTemplate extends AbstractTemplate {
 
     public static void applyMainClassTemplate(@NotNull Project project,
-            @NotNull VirtualFile file,
-            @NotNull String packageName,
-            @NotNull String className) {
+                                              @NotNull VirtualFile file,
+                                              @NotNull String packageName,
+                                              @NotNull String className) {
         Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
@@ -34,7 +34,7 @@ public class CanaryTemplate extends AbstractTemplate {
 
     @NotNull
     public static String applyPomTemplate(@NotNull Project project,
-            @NotNull String version) {
+                                          @NotNull String version) {
         Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", version);
 

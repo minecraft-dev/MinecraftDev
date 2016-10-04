@@ -73,7 +73,7 @@ public class CanaryModuleType extends AbstractModuleType<CanaryModule> {
     @NotNull
     @Override
     public CanaryModule generateModule(Module module) {
-        return new CanaryModule(module, this);
+        return new CanaryModule<>(module, this);
     }
 
 }
