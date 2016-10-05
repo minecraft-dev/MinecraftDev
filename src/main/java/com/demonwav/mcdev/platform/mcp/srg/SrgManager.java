@@ -63,11 +63,6 @@ public final class SrgManager {
         ApplicationManager.getApplication().invokeLater(() ->
             ProgressManager.getInstance().run(new Task.Backgroundable(module.getModule().getProject(), "Gathering MCP Data", true) {
                 @Override
-                public boolean shouldStartInBackground() {
-                    return false;
-                }
-
-                @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     indicator.setIndeterminate(true);
                     final GradleBuildSystem buildSystem = module.getBuildSystem();

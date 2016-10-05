@@ -6,10 +6,9 @@ import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
 import com.intellij.openapi.externalSystem.model.ProjectKeys;
+import com.intellij.openapi.externalSystem.model.project.AbstractDependencyData;
 import com.intellij.openapi.externalSystem.model.project.DependencyData;
-import com.intellij.openapi.externalSystem.model.project.LibraryDependencyData;
 import com.intellij.openapi.externalSystem.model.project.ModuleData;
-import com.intellij.openapi.externalSystem.model.project.ModuleDependencyData;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.externalSystem.service.project.manage.AbstractProjectDataService;
@@ -30,6 +29,8 @@ import java.util.stream.Stream;
 @Order(ExternalSystemConstants.UNORDERED)
 public class SpongeDataService extends AbstractProjectDataService<ModuleData, Module> {
 
+    private static final String spongeMatcher = SpongeModuleType.getInstance().getGroupId() + ":" + SpongeModuleType.getInstance().getArtifactId();
+
     @NotNull
     @Override
     public Key<ModuleData> getTargetDataKey() {
@@ -48,8 +49,7 @@ public class SpongeDataService extends AbstractProjectDataService<ModuleData, Mo
         Set<Module> goodModules = toImport.stream()
             .flatMap(n -> n.getChildren().stream())
             .flatMap(n -> {
-                Object d = n.getData();
-                if (d instanceof GradleSourceSetData) {
+                if (n.getData() instanceof GradleSourceSetData) {
                     return n.getChildren().stream()
                         .filter(n1 -> n1.getData() instanceof DependencyData)
                         .filter(n1 -> ((DependencyData) n1.getData()).getOwnerModule().getExternalName().contains("main"));
@@ -57,19 +57,9 @@ public class SpongeDataService extends AbstractProjectDataService<ModuleData, Mo
                     return Stream.of(n);
                 }
             })
-            .filter(n -> n.getData() instanceof DependencyData)
-            .filter(n -> {
-                final Object d = n.getData();
-                if (d instanceof LibraryDependencyData) {
-                    return ((LibraryDependencyData) d).getExternalName()
-                        .startsWith(SpongeModuleType.getInstance().getGroupId() + ":" + SpongeModuleType.getInstance().getArtifactId());
-                } else {
-                    return ((ModuleDependencyData) d).getExternalName().contains("SpongeCommon") ||
-                        ((ModuleDependencyData) d).getExternalName().contains("SpongeAPI");
-                }
-            })
-            .map(n -> ((DependencyData) n.getData()).getOwnerModule())
-            .map(modelsProvider::findIdeModule)
+            .filter(n -> n.getData() instanceof AbstractDependencyData)
+            .filter(n -> ((AbstractDependencyData) n.getData()).getExternalName().matches("(^" + spongeMatcher + "|.*Sponge(Common|API)).*"))
+            .map(n -> modelsProvider.findIdeModule(((DependencyData) n.getData()).getOwnerModule()))
             .collect(Collectors.toSet());
 
         AbstractDataService.setupModules(goodModules, modelsProvider, SpongeModuleType.getInstance());
