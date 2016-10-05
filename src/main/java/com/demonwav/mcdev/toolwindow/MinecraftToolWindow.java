@@ -5,10 +5,10 @@ import com.demonwav.mcdev.platform.MinecraftModule;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.containers.OrderedSet;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
 
 import javax.swing.JPanel;
 
@@ -16,7 +16,7 @@ public class MinecraftToolWindow {
     private JPanel panel;
 
     private Project project;
-    private Set<MinecraftModule> mcModules = new HashSet<>();
+    private OrderedSet<MinecraftModule> mcModules = new OrderedSet<>();
 
     public void setProjectAndInit(@NotNull Project project) {
         this.project = project;
@@ -28,6 +28,8 @@ public class MinecraftToolWindow {
                 mcModules.add(instance);
             }
         }
+
+        Collections.sort(mcModules, (m1, m2) -> m1.getIdeaModule().getName().compareTo(m2.getIdeaModule().getName()));
     }
 
     public JPanel getPanel() {
