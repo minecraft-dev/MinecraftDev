@@ -36,10 +36,10 @@ public final class PlatformAssets extends Assets {
     @NotNull public static final Icon LITELOADER_ICON = loadIcon("/assets/icons/platform/LiteLoader.png");
     @NotNull public static final Icon LITELOADER_ICON_2X = loadIcon("/assets/icons/platform/LiteLoader@2x.png");
 
-    @NotNull public static final Icon MIXIN_ICON = loadIcon("/assets/icons/platform/Mixin.png");
-    @NotNull public static final Icon MIXIN_ICON_2X= loadIcon("/assets/icons/platform/Mixin@2x.png");
-    @NotNull public static final Icon MIXIN_ICON_DARK = loadIcon("/assets/icons/platform/Mixin_dark.png");
-    @NotNull public static final Icon MIXIN_ICON_2X_DARK = loadIcon("/assets/icons/platform/Mixin@2x_dark.png");
+    @NotNull public static final Icon MIXIN_ICON = loadIcon("/assets/icons/platform/Mixins.png");
+    @NotNull public static final Icon MIXIN_ICON_2X= loadIcon("/assets/icons/platform/Mixins@2x.png");
+    @NotNull public static final Icon MIXIN_ICON_DARK = loadIcon("/assets/icons/platform/Mixins_dark.png");
+    @NotNull public static final Icon MIXIN_ICON_2X_DARK = loadIcon("/assets/icons/platform/Mixins@2x_dark.png");
 
     @NotNull public static final Icon MCP_ICON = loadIcon("/assets/icons/platform/MCP.png");
     @NotNull public static final Icon MCP_ICON_2X = loadIcon("/assets/icons/platform/MCP@2x.png");
