@@ -28,8 +28,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class SrgManager {
-    private static final String TASK_NAME = "___getMinecraftDevForIntelliJData____";
-    private static final String FILE_NAME_BASE = ".tmpMCDVIJ";
 
     private static final ConcurrentHashMap<McpModule, SrgManager> managers = new ConcurrentHashMap<>();
 
