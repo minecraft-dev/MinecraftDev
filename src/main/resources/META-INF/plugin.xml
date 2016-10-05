@@ -196,6 +196,8 @@
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspections.ShadowNullabilityInspectionSuppressor"/>
+
+        <toolWindow id="Minecraft Projects" icon="/assets/icons/platform/Minecraft.png" anchor="right" factoryClass="com.demonwav.mcdev.toolwindow.MinecraftToolWindowFactory"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.idea.maven">
         <!-- Maven importers for, well, Maven project importing -->

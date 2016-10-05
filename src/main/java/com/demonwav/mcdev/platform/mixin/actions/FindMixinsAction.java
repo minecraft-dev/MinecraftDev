@@ -102,18 +102,18 @@ public class FindMixinsAction extends AnAction {
                                         classes.add(psiClass);
                                     }
                                     return true;
-                                });
-
+                                }
+                            );
                         } finally {
                             token.finish();
                         }
 
                         ApplicationManager.getApplication().invokeLater(() -> {
                             if (classes.size() == 1) {
-                                    McEditorUtil.gotoTargetElement(classes.iterator().next(), editor, file);
+                                McEditorUtil.gotoTargetElement(classes.iterator().next(), editor, file);
                             } else {
                                 ToolWindowManager.getInstance(project).unregisterToolWindow(TOOL_WINDOW_ID);
-                                ToolWindow window = ToolWindowManager.getInstance(project).registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM);
+                                final ToolWindow window = ToolWindowManager.getInstance(project).registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM);
                                 window.setIcon(MixinAssets.MIXIN_CLASS_ICON);
 
                                 // Sort the results so it appears nicer
@@ -136,10 +136,10 @@ public class FindMixinsAction extends AnAction {
                                     return name1.compareTo(name2);
                                 });
 
-                                FindMixinsComponent component = new FindMixinsComponent(classesList);
+                                final FindMixinsComponent component = new FindMixinsComponent(classesList);
 
-                                ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-                                Content content = contentFactory.createContent(component.getPanel(), null, false);
+                                final ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+                                final Content content = contentFactory.createContent(component.getPanel(), null, false);
                                 window.getContentManager().addContent(content);
 
                                 window.activate(null);
