@@ -76,7 +76,9 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             Set<Module> badModules = new HashSet<>();
             checkedModules.addAll(goodModules);
 
-            goodModules.forEach(m -> findParent(m, modelsProvider, type, checkedModules, badModules));
+            goodModules.stream()
+                .filter(m -> m != null)
+                .forEach(m -> findParent(m, modelsProvider, type, checkedModules, badModules));
 
             // Reset all other modules back to JavaModule && remove the type
             for (Module module : modelsProvider.getModules()) {
