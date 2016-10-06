@@ -195,7 +195,7 @@ public abstract class BuildSystem {
     public abstract Promise<? extends BuildSystem> reImport(@NotNull Module module);
 
     protected boolean synchronize() {
-        if (importPromise != null) {
+        if (importPromise != null && importPromise.getState() != Promise.State.FULFILLED) {
             // we're in the process of importing
             return true;
         }

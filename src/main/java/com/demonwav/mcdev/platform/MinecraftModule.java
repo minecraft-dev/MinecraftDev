@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.util.Util;
 
 import com.google.common.base.Strings;
@@ -10,6 +11,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
@@ -22,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MinecraftModule {
@@ -201,5 +204,10 @@ public class MinecraftModule {
     @Contract(value = "null -> false", pure = true)
     public boolean shouldShowPluginIcon(@Nullable PsiElement element) {
         return getModules().stream().filter(m -> m.shouldShowPluginIcon(element)).findAny().isPresent();
+    }
+
+    @NotNull
+    public static Optional<VirtualFile> searchAllModulesForFile(@NotNull String path, @NotNull SourceType type) {
+        return map.values().stream().distinct().map(m -> m.getBuildSystem().findFile(path, type)).filter(f -> f != null).findFirst();
     }
 }

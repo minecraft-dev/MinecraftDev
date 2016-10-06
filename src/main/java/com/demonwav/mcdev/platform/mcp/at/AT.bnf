@@ -1,0 +1,73 @@
+{
+    parserClass="com.demonwav.mcdev.platform.mcp.at.parser.AtParser"
+
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="At"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.demonwav.mcdev.platform.mcp.at.psi"
+    psiImplPackage="com.demonwav.mcdev.platform.mcp.at.psi.impl"
+
+    elementTypeHolderClass="com.demonwav.mcdev.platform.mcp.at.psi.AtTypes"
+    elementTypeClass="com.demonwav.mcdev.platform.mcp.at.psi.AtElementType"
+    tokenTypeClass="com.demonwav.mcdev.platform.mcp.at.psi.AtTokenType"
+
+    tokens = [
+        primitive="regexp:[ZBCSIFDJV]"
+        class_value="regexp:\[*([ZBCSIFDJ]|L[^;]+;)"
+        open_paren="("
+        close_paren=")"
+        asterisk_element="*"
+        keyword_element="regexp:(public|public-f|private|private-f|protected|protected-f)"
+        name_element="regexp:[a-zA-Z0-9_]+|<init>"
+        class_name_element="regexp:[a-zA-Z_$0-9\.]*[a-zA-Z_$0-9]"
+        comment="regexp:#.*"
+        crlf="regexp:\n|\r|\r\n"
+    ]
+
+    //
+    // Mixins
+    //
+
+    mixin       ("function")        = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtFunctionImplMixin"
+    implements  ("function")        = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtFunctionMixin"
+
+    mixin       ("entry")           = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtEntryImplMixin"
+    implements  ("entry")           = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtEntryMixin"
+
+    mixin       ("argument")        = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtArgumentImplMixin"
+    implements  ("argument")        = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtArgumentMixin"
+
+    mixin       ("class_name")      = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtClassNameImplMixin"
+    implements  ("class_name")      = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtClassNameMixin"
+
+    mixin       ("field_name")      = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtFieldNameImplMixin"
+    implements  ("field_name")      = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtFieldNameMixin"
+
+    mixin       ("func_name")       = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtFuncNameImplMixin"
+    implements  ("func_name")       = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtFuncNameMixin"
+
+    mixin       ("keyword")         = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtKeywordImplMixin"
+    implements  ("keyword")         = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtKeywordMixin"
+
+    mixin       ("return_value")    = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtReturnValueImplMixin"
+    implements  ("return_value")    = "com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtReturnValueMixin"
+
+    consumeTokenMethod="consumeTokenFast"
+}
+
+at_file ::= (entry? comment? crlf)*
+
+entry ::= keyword class_name (function|field_name|asterisk)? {methods=[setEntry setKeyword setClassName setFieldName setFunction setAsterisk]}
+asterisk ::= asterisk_element
+
+keyword ::= keyword_element {methods=[getKeywordValue setKeyword]}
+class_name ::= class_name_element {methods=[getClassNameValue getClassNameText setClassName]}
+field_name ::= name_element {methods=[getFieldNameText setFieldName]}
+
+function ::= func_name open_paren argument* close_paren return_value {methods=[setFunction setArgumentList setReturnValue]}
+func_name ::= name_element {methods=[getFuncNameText setFuncName]}
+
+argument ::= primitive | class_value {methods=[getArgumentClass getArgumentText setArgument]}
+
+return_value ::= primitive | class_value {methods=[getReturnValueClass getReturnValueText setReturnValue]}

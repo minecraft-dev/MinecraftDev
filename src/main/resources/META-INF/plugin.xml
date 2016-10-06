@@ -68,13 +68,13 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.ShadowLineMarkerProvider"/>
 
         <!-- MCP CFG file type -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.platform.mcp.cfg.CfgFiletypeFactory"/>
-        <lang.parserDefinition language="cfg" implementationClass="com.demonwav.mcdev.platform.mcp.cfg.CfgParserDefinition"/>
-        <lang.syntaxHighlighterFactory language="cfg" implementationClass="com.demonwav.mcdev.platform.mcp.cfg.CfgSyntaxHighlighterFactory"/>
-        <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.cfg.CfgColorSettingsPage" />
-        <lang.commenter language="cfg" implementationClass="com.demonwav.mcdev.platform.mcp.cfg.CfgCommenter" />
-        <completion.contributor language="cfg" implementationClass="com.demonwav.mcdev.platform.mcp.cfg.CfgCompletionContributor" />
-        <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.cfg.CfgGotoDeclarationHandler" />
+        <fileTypeFactory implementation="com.demonwav.mcdev.platform.mcp.at.AtFileTypeFactory"/>
+        <lang.parserDefinition language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.at.AtColorSettingsPage" />
+        <lang.commenter language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCommenter" />
+        <completion.contributor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCompletionContributor" />
+        <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.at.AtGotoDeclarationHandler" />
 
         <!-- Project-independent Annotators-->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
@@ -197,7 +197,7 @@
 
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspections.ShadowNullabilityInspectionSuppressor"/>
 
-        <toolWindow id="Minecraft Projects" icon="/assets/icons/platform/Minecraft.png" anchor="right" factoryClass="com.demonwav.mcdev.toolwindow.MinecraftToolWindowFactory"/>
+        <toolWindow id="Minecraft" icon="/assets/icons/platform/Minecraft.png" anchor="right" factoryClass="com.demonwav.mcdev.toolwindow.MinecraftToolWindowFactory"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.idea.maven">
         <!-- Maven importers for, well, Maven project importing -->
@@ -227,6 +227,10 @@
         </component>
         <component>
             <implementation-class>com.demonwav.mcdev.transition.TransitionProjectComponent</implementation-class>
+            <loadForDefaultProject/>
+        </component>
+        <component>
+            <implementation-class>com.demonwav.mcdev.platform.mcp.McpProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>
     </project-components>

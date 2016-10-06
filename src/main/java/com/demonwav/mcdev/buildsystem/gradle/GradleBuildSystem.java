@@ -562,8 +562,6 @@ public class GradleBuildSystem extends BuildSystem {
                         }
                     });
                     importPromise.setResult(GradleBuildSystem.this);
-                    // We're done importing, don't hold a reference to the promise anymore
-                    importPromise = null;
                 }
             })
         );
@@ -885,9 +883,11 @@ public class GradleBuildSystem extends BuildSystem {
 
     private void setupDirs(@NotNull List<VirtualFile> directories, @NotNull ExternalSourceSet set, @NotNull ExternalSystemSourceType type) {
         if (set.getSources().get(type) != null) {
-            set.getSources().get(type).getSrcDirs().forEach(dir ->
-                    directories.add(LocalFileSystem.getInstance().findFileByPath(dir.getAbsolutePath()))
-            );
+            set.getSources().get(type).getSrcDirs().forEach(dir -> {
+                if (dir.exists()) {
+                    directories.add(LocalFileSystem.getInstance().findFileByIoFile(dir));
+                }
+            });
         }
     }
 
