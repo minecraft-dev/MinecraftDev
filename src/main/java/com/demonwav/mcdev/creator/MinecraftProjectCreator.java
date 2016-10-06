@@ -7,6 +7,7 @@ import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
@@ -15,6 +16,7 @@ import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -29,8 +31,6 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class MinecraftProjectCreator {
 
-    public int index = 0;
-
     private VirtualFile root = null;
     private String groupId = null;
     private String artifactId = null;
@@ -38,7 +38,7 @@ public class MinecraftProjectCreator {
     private Module module = null;
     private BuildSystem buildSystem;
 
-    private List<ProjectConfiguration> settings = new ArrayList<>();
+    private final Map<PlatformType, ProjectConfiguration> settings = Maps.newLinkedHashMap();
 
     private VirtualFile sourceDir;
     private VirtualFile resourceDir;
@@ -53,7 +53,7 @@ public class MinecraftProjectCreator {
         buildSystem.setVersion(version);
 
         //buildSystem.setPluginAuthor(settings.author); // TODO: build systems have "developer" blocks
-        buildSystem.setPluginName(settings.get(0).pluginName);
+        buildSystem.setPluginName(settings.values().iterator().next().pluginName);
 
         List<BuildRepository> buildRepositories = new ArrayList<>();
         List<BuildDependency> dependencies = new ArrayList<>();
@@ -68,7 +68,7 @@ public class MinecraftProjectCreator {
     }
 
     private void doSingleModuleCreate() {
-        ProjectConfiguration configuration = settings.get(0);
+        ProjectConfiguration configuration = settings.values().iterator().next();
         addDependencies(configuration, buildSystem);
 
         ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Setting Up Project", false) {
@@ -224,7 +224,7 @@ public class MinecraftProjectCreator {
         this.module = module;
     }
 
-    public List<ProjectConfiguration> getSettings() {
+    public Map<PlatformType, ProjectConfiguration> getSettings() {
         return settings;
     }
 
@@ -271,7 +271,6 @@ public class MinecraftProjectCreator {
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
-            .add("index", index)
             .add("root", root)
             .add("groupId", groupId)
             .add("artifactId", artifactId)
@@ -295,8 +294,7 @@ public class MinecraftProjectCreator {
             return false;
         }
         MinecraftProjectCreator that = (MinecraftProjectCreator) o;
-        return index == that.index &&
-            Objects.equal(root, that.root) &&
+        return Objects.equal(root, that.root) &&
             Objects.equal(groupId, that.groupId) &&
             Objects.equal(artifactId, that.artifactId) &&
             Objects.equal(version, that.version) &&
@@ -311,7 +309,7 @@ public class MinecraftProjectCreator {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(index, root, groupId, artifactId, version, module,
+        return Objects.hashCode(root, groupId, artifactId, version, module,
             buildSystem, settings, sourceDir, resourceDir, testDir,pomFile);
     }
 }

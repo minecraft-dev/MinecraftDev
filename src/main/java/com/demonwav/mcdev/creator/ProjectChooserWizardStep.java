@@ -27,7 +27,6 @@ import javax.swing.event.HyperlinkEvent;
 public class ProjectChooserWizardStep extends ModuleWizardStep {
 
     private final MinecraftProjectCreator creator;
-    private final ProjectSettingsWizardStep[] steps;
 
     private JPanel chooserPanel;
     private JPanel panel;
@@ -65,10 +64,9 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             "<a href=\"http://www.liteloader.com/\"> LiteLoader</a> mod, for use " +
             "on LiteLoader clients.";
 
-    public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator, @NotNull ProjectSettingsWizardStep[] steps) {
+    public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator) {
         super();
         this.creator = creator;
-        this.steps = steps;
     }
 
     @Override
@@ -181,44 +179,39 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
         if (bukkitPluginCheckBox.isSelected()) {
             BukkitProjectConfiguration configuration = new BukkitProjectConfiguration();
             configuration.type = PlatformType.BUKKIT;
-            creator.getSettings().add(configuration);
+            creator.getSettings().put(PlatformType.BUKKIT, configuration);
         }
 
         if (spigotPluginCheckBox.isSelected()) {
             BukkitProjectConfiguration configuration = new BukkitProjectConfiguration();
             configuration.type = PlatformType.SPIGOT;
-            creator.getSettings().add(configuration);
+            creator.getSettings().put(PlatformType.BUKKIT, configuration);
         }
 
         if (paperPluginCheckBox.isSelected()) {
             BukkitProjectConfiguration configuration = new BukkitProjectConfiguration();
             configuration.type = PlatformType.PAPER;
-            creator.getSettings().add(configuration);
+            creator.getSettings().put(PlatformType.BUKKIT, configuration);
         }
 
         if (spongePluginCheckBox.isSelected()) {
-            creator.getSettings().add(new SpongeProjectConfiguration());
+            creator.getSettings().put(PlatformType.SPONGE, new SpongeProjectConfiguration());
         }
 
         if (forgeModCheckBox.isSelected()) {
-            creator.getSettings().add(new ForgeProjectConfiguration());
+            creator.getSettings().put(PlatformType.FORGE, new ForgeProjectConfiguration());
         }
 
         if (liteLoaderModCheckBox.isSelected()) {
-            creator.getSettings().add(new LiteLoaderProjectConfiguration());
+            creator.getSettings().put(PlatformType.LITELOADER, new LiteLoaderProjectConfiguration());
         }
 
         if (bungeeCordPluginCheckBox.isSelected()) {
-            creator.getSettings().add(new BungeeCordProjectConfiguration());
+            creator.getSettings().put(PlatformType.BUNGEECORD, new BungeeCordProjectConfiguration());
         }
 
-        creator.index = 0;
-        for (ProjectSettingsWizardStep step : steps) {
-            step.resetIndex();
-        }
+        creator.getSettings().values().iterator().next().isFirst = true;
     }
-
-
 
     @Override
     public boolean validate() throws ConfigurationException {

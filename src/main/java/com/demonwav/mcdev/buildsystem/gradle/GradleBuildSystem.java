@@ -570,7 +570,7 @@ public class GradleBuildSystem extends BuildSystem {
 
     @NotNull
     public Map<GradleBuildSystem, ProjectConfiguration> createMultiModuleProject(@NotNull Project project,
-                                                                                 @NotNull List<ProjectConfiguration> configurations,
+                                                                                 @NotNull Map<PlatformType, ProjectConfiguration> configurations,
                                                                                  @NotNull ProgressIndicator indicator) {
 
         final Map<GradleBuildSystem, ProjectConfiguration> map = new HashMap<>();
@@ -583,7 +583,7 @@ public class GradleBuildSystem extends BuildSystem {
         // First, we add the common module that all multi-module projects will have
         String tempIncludes = "'" + pluginName.toLowerCase() + "-common', ";
         // We use an iterator because we need to know when there won't be a next entry
-        Iterator<ProjectConfiguration> configurationIterator = configurations.iterator();
+        Iterator<ProjectConfiguration> configurationIterator = configurations.values().iterator();
         while (configurationIterator.hasNext()) {
             ProjectConfiguration configuration = configurationIterator.next();
             tempIncludes += "'" + pluginName.toLowerCase() + "-" + configuration.type.name().toLowerCase() + "'";
@@ -613,7 +613,7 @@ public class GradleBuildSystem extends BuildSystem {
             }
         });
 
-        for (ProjectConfiguration configuration : configurations) {
+        for (ProjectConfiguration configuration : configurations.values()) {
             // We associate each configuration with the given build system, which we add to the map at the end of this method
             GradleBuildSystem gradleBuildSystem = new GradleBuildSystem();
             Util.runWriteTask(() -> {

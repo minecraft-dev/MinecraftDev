@@ -13,13 +13,14 @@ import javax.swing.JTextField;
 
 abstract class MinecraftModuleWizardStep extends ModuleWizardStep {
 
-    public abstract void setIndex(int index);
+    public static final String pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?";
 
     protected boolean validate(@NotNull final JTextField pluginNameField,
                                @NotNull final JTextField pluginVersionField,
                                @NotNull final JTextField mainClassField,
                                @NotNull final JTextField authorsField,
-                               @NotNull final JTextField dependField) {
+                               @NotNull final JTextField dependField,
+                               @NotNull String pattern) {
         try {
             if (pluginNameField.getText().trim().isEmpty()) {
                 throw new MinecraftSetupException("empty", pluginNameField);
@@ -32,11 +33,11 @@ abstract class MinecraftModuleWizardStep extends ModuleWizardStep {
             if (mainClassField.getText().trim().isEmpty()) {
                 throw new MinecraftSetupException("empty", mainClassField);
             }
-            if (!authorsField.getText().matches(ProjectSettingsWizardStep.pattern)) {
+            if (!authorsField.getText().matches(pattern)) {
                 throw new MinecraftSetupException("bad", authorsField);
             }
 
-            if (!dependField.getText().matches(ProjectSettingsWizardStep.pattern)) {
+            if (!dependField.getText().matches(pattern)) {
                 throw new MinecraftSetupException("bad", dependField);
             }
         } catch (MinecraftSetupException e) {

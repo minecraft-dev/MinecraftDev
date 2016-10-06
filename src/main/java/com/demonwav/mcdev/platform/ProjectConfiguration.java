@@ -27,6 +27,8 @@ public abstract class ProjectConfiguration {
 
     public Module module;
 
+    public boolean isFirst = false;
+
     public abstract void create(@NotNull Project project, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator);
 
     public boolean hasAuthors() {
