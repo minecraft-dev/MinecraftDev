@@ -1,7 +1,0 @@
-test:
-  override:
-    - ./gradlew buildPlugin
-general:
-  branches:
-    ignore:
-      - gh-pages
