@@ -1,7 +1,10 @@
 package com.demonwav.mcdev.platform;
 
+import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
+import com.demonwav.mcdev.platform.forge.ForgeModuleType;
+import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 import com.demonwav.mcdev.util.Util;
 
 import com.google.common.base.Strings;
@@ -26,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.swing.Icon;
 
 public class MinecraftModule {
 
@@ -204,6 +209,21 @@ public class MinecraftModule {
     @Contract(value = "null -> false", pure = true)
     public boolean shouldShowPluginIcon(@Nullable PsiElement element) {
         return getModules().stream().filter(m -> m.shouldShowPluginIcon(element)).findAny().isPresent();
+    }
+
+    @Nullable
+    public Icon getIcon() {
+        if (modules.keySet().stream().filter(AbstractModuleType::hasIcon).count() == 1) {
+            return modules.values().iterator().next().getIcon();
+        } else if (
+            modules.keySet().stream().filter(AbstractModuleType::hasIcon).count() == 2 &&
+            modules.containsKey(SpongeModuleType.getInstance()) &&
+            modules.containsKey(ForgeModuleType.getInstance())
+        ) {
+            return PlatformAssets.SPONGE_FORGE_ICON;
+        } else {
+            return PlatformAssets.MINECRAFT_ICON;
+        }
     }
 
     @NotNull
