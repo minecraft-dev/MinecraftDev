@@ -67,7 +67,7 @@ configure<IdeaModel> {
     }
 
     module.apply {
-        excludeDirs.add(File(".sandbox"))
+        excludeDirs.add(intellijSandboxDirectory)
     }
 }
 
