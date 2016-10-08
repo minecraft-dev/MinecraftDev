@@ -206,6 +206,13 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspections.MixinInspection"/>
+        <localInspection displayName="Public static field/method in a Mixin"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.StaticMixinMemberInspection"/>
         <localInspection displayName="Overwrite lacking @author JavaDoc tag"
                          shortName="OverwriteAuthorRequired"
                          groupName="Mixin"
