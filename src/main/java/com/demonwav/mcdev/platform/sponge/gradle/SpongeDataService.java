@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.sponge.gradle;
 import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
+import com.google.common.collect.Sets;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
 import com.intellij.openapi.externalSystem.model.ProjectKeys;
@@ -56,6 +57,8 @@ public class SpongeDataService extends AbstractProjectDataService<ModuleData, Mo
             return;
         }
 
+        final Set<Module> allModules = Sets.newHashSet();
+
         Set<Module> goodModules = toImport.stream()
             .flatMap(n -> n.getChildren().stream())
             .flatMap(n -> {
@@ -68,10 +71,11 @@ public class SpongeDataService extends AbstractProjectDataService<ModuleData, Mo
                 }
             })
             .filter(n -> n.getData() instanceof AbstractDependencyData)
+            .peek(n -> allModules.add(modelsProvider.findIdeModule(((DependencyData) n.getData()).getOwnerModule())))
             .filter(n -> ((AbstractDependencyData) n.getData()).getExternalName().matches("(^" + spongeMatcher + "|.*Sponge(Common|API)).*"))
             .map(n -> modelsProvider.findIdeModule(((DependencyData) n.getData()).getOwnerModule()))
             .collect(Collectors.toSet());
 
-        AbstractDataService.setupModules(goodModules, modelsProvider, SpongeModuleType.getInstance());
+        AbstractDataService.setupModules(goodModules, allModules, modelsProvider, SpongeModuleType.getInstance());
     }
 }

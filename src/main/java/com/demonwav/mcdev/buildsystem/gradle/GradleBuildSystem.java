@@ -495,7 +495,7 @@ public class GradleBuildSystem extends BuildSystem {
 
                         // We need to check the parent too if it's a single module project
                         ExternalProject externalRootProject = externalProjectDataCache
-                            .getRootExternalProject(GradleConstants.SYSTEM_ID, new File(project.getBasePath()));
+                            .getRootExternalProject(GradleConstants.SYSTEM_ID, new File(rootDirectory.getCanonicalPath()));
                         if (externalRootProject != null) {
                             for (Module child : children) {
                                 Map<String, ExternalSourceSet> externalSourceSets = externalProjectDataCache
@@ -517,7 +517,7 @@ public class GradleBuildSystem extends BuildSystem {
 
                             // We need to get the project info from gradle
                             ExternalProjectInfo info = ProjectDataManager.getInstance()
-                                .getExternalProjectData(project, GradleConstants.SYSTEM_ID, project.getBasePath());
+                                .getExternalProjectData(project, GradleConstants.SYSTEM_ID, rootDirectory.getCanonicalPath());
                             if (info == null) {
                                 logger.error("GradleBuildSystem import FAILED: External project info null");
                                 importPromise.setResult(GradleBuildSystem.this);

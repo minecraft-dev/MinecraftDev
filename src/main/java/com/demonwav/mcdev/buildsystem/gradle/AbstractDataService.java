@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
@@ -35,8 +36,8 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Order(ExternalSystemConstants.UNORDERED)
 public abstract class AbstractDataService extends AbstractProjectDataService<LibraryDependencyData, Module> {
@@ -64,16 +65,22 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             return;
         }
 
-        Set<Module> goodModules = toImport.stream()
-                .filter(n -> n.getData().getExternalName().startsWith(type.getGroupId() + ":" + type.getArtifactId()))
-                .map(n -> modelsProvider.findIdeModule(n.getData().getOwnerModule()))
-                .distinct()
-                .collect(Collectors.toSet());
+        Set<Module> goodModules = Sets.newHashSet();
+        Set<Module> allModules = Sets.newHashSet();
 
-        setupModules(goodModules, modelsProvider, type);
+        for (DataNode<LibraryDependencyData> node : toImport) {
+            final Module module = modelsProvider.findIdeModule(node.getData().getOwnerModule());
+            allModules.add(module);
+            if (node.getData().getExternalName().startsWith(type.getGroupId() + ":" + type.getArtifactId())) {
+                goodModules.add(module);
+            }
+        }
+
+        setupModules(goodModules, allModules, modelsProvider, type);
     }
 
     public static void setupModules(@NotNull Set<Module> goodModules,
+                                    @NotNull Set<Module> allModules,
                                     @NotNull IdeModifiableModelsProvider modelsProvider,
                                     @NotNull AbstractModuleType<?> type) {
 
@@ -91,7 +98,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                 .forEach(m -> findParent(m, modelsProvider, type, checkedModules, badModules));
 
             // Reset all other modules back to JavaModule && remove the type
-            for (Module module : modelsProvider.getModules()) {
+            for (Module module : allModules) {
                 if (!checkedModules.contains(module) || badModules.contains(module)) {
                     if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
                         module.setOption("type", JavaModuleType.getModuleType().getId());
@@ -108,20 +115,30 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                                @NotNull String... texts) {
 
         ApplicationManager.getApplication().runReadAction(() -> {
-            final Set<Module> relevantModules = toImport.stream()
-                .filter(n -> n.getData().getTarget().getPaths(LibraryPathType.BINARY).stream()
-                    .anyMatch(p -> {
-                        for (String text : texts) {
-                            if (p.contains(text)) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    }))
-                .map(n -> modelsProvider.findIdeModule(n.getData().getOwnerModule()))
-                .collect(Collectors.toSet());
 
-            setupModules(relevantModules, modelsProvider, type);
+            final Set<Module> goodModules = Sets.newHashSet();
+            final Set<Module> allModules = Sets.newHashSet();
+
+            for (DataNode<LibraryDependencyData> node : toImport) {
+                final Set<String> paths = node.getData().getTarget().getPaths(LibraryPathType.BINARY);
+                paths.addAll(node.getData().getTarget().getPaths(LibraryPathType.SOURCE));
+
+                final Module module = modelsProvider.findIdeModule(node.getData().getOwnerModule());
+                allModules.add(module);
+
+                if (paths.stream().anyMatch(p -> {
+                    for (String text : texts) {
+                        if (p.contains(text)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })) {
+                    goodModules.add(module);
+                }
+            }
+
+            setupModules(goodModules, allModules, modelsProvider, type);
         });
     }
 
@@ -136,7 +153,6 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             module.setOption("type", JavaModuleType.getModuleType().getId());
             checkedModules.add(module);
             MinecraftModuleType.addOption(module, type.getId());
-            MinecraftModule.getInstance(module);
         } else {
             String parentName = path[0];
             Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
@@ -147,7 +163,10 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                 checkedModules.add(parentModule);
                 MinecraftModuleType.addOption(parentModule, type.getId());
                 MinecraftModule.getInstance(parentModule);
+            } else {
+                return;
             }
         }
+        Optional.ofNullable(MinecraftModule.getInstance(module)).ifPresent(m -> m.getBuildSystem().reImport(m.getIdeaModule()));
     }
 }
