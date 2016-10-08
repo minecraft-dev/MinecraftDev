@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.concurrency.AsyncPromise;
 import org.jetbrains.concurrency.Promise;
+import org.jetbrains.concurrency.Promises;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -177,7 +178,7 @@ public final class SrgManager {
             if (currentMap != null) {
                 return Promise.resolve(currentMap);
             }
-            return Promise.reject("Current SrgMap instance is null");
+            return Promises.rejectedPromise("Current SrgMap instance is null");
         }
     }
 
