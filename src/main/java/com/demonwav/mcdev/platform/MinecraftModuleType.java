@@ -47,10 +47,9 @@ public class MinecraftModuleType extends JavaModuleType {
         module.setOption(OPTION, currentOption);
         MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
         if (minecraftModule != null) {
-            minecraftModule.addModuleType(option);
+            final PlatformType[] types = cleanOption(module);
+            minecraftModule.updateModules(types);
         }
-
-        cleanOption(module);
     }
 
     public static void removeOption(@NotNull Module module, @NotNull String option) {
@@ -82,16 +81,15 @@ public class MinecraftModuleType extends JavaModuleType {
 
         MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
         if (minecraftModule != null) {
-            minecraftModule.removeModuleType(option);
+            final PlatformType[] types = cleanOption(module);
+            minecraftModule.updateModules(types);
         }
-
-        cleanOption(module);
     }
 
-    private static void cleanOption(@NotNull Module module) {
+    private static PlatformType[] cleanOption(@NotNull Module module) {
         String option = module.getOptionValue(OPTION);
         if (Strings.isNullOrEmpty(option)) {
-            return;
+            return new PlatformType[0];
         }
 
         // Remove ,'s at the beginning of the text
@@ -101,7 +99,26 @@ public class MinecraftModuleType extends JavaModuleType {
         // Remove duplicate ,'s
         option = option.replaceAll(",{2,}", ",");
 
-        module.setOption(OPTION, option);
+        // Remove parent types
+        final String[] split = option.split(",");
+        PlatformType[] types = new PlatformType[split.length];
+        for (int i = 0; i < split.length; i++) {
+            types[i] = PlatformType.getTypeByName(split[i]);
+        }
+
+        final PlatformType[] finalTypes = PlatformType.removeParents(types);
+
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < finalTypes.length; i++) {
+            sb.append(finalTypes[i].getName());
+            if (i != finalTypes.length - 1) {
+                sb.append(",");
+            }
+        }
+
+        module.setOption(OPTION, sb.toString());
+
+        return finalTypes;
     }
 
     @NotNull

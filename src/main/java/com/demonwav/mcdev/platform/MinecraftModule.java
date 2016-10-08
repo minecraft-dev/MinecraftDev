@@ -33,8 +33,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -208,6 +210,27 @@ public class MinecraftModule {
         AbstractModuleType<?> type = PlatformType.getByName(moduleTypeName);
         if (type != null && modules.containsKey(type)) {
             modules.remove(type);
+        }
+        ProjectView.getInstance(module.getProject()).refresh();
+    }
+
+    /**
+     * Synchronize this module with the types given
+     *
+     * @param types Types to synchronize off of
+     */
+    public void updateModules(PlatformType[] types) {
+        final List<PlatformType> platformTypes = Arrays.asList(types);
+        for (Iterator<AbstractModuleType<?>> iter = modules.keySet().iterator(); iter.hasNext();) {
+            final AbstractModuleType<?> next = iter.next();
+            if (!platformTypes.contains(next.getPlatformType())) {
+                iter.remove();
+            }
+        }
+        for (PlatformType type : types) {
+            if (!modules.keySet().contains(type.getType())) {
+                modules.put(type.getType(), type.getType().generateModule(module));
+            }
         }
         ProjectView.getInstance(module.getProject()).refresh();
     }

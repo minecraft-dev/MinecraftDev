@@ -75,7 +75,7 @@ public abstract class AbstractMavenImporter extends MavenImporter {
 
     @Override
     public boolean isApplicable(MavenProject mavenProject) {
-        return !mavenProject.findDependencies(type.getGroupId(), type.getArtifactId()).isEmpty();
+        return true;
     }
 
     @Override
@@ -94,12 +94,16 @@ public abstract class AbstractMavenImporter extends MavenImporter {
             }
 
             if (Objects.equals(roots[0], mavenProject.getFile().getParent())) {
-                Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(buildSystem -> buildSystem.reImport(module).done(b -> {
-                    MinecraftModuleType.addOption(module, type.getId());
-                    // We want to make sure the project "knows" about this change
-
-                    MinecraftModule.getInstance(module);
-                }));
+                if (!mavenProject.findDependencies(type.getGroupId(), type.getArtifactId()).isEmpty()) {
+                    Optional.ofNullable(BuildSystem.getInstance(module)).ifPresent(buildSystem -> buildSystem.reImport(module).done(b -> {
+                        MinecraftModuleType.addOption(module, type.getId());
+                    }));
+                } else {
+                    // This isn't valid, so un-set it
+                    MinecraftModuleType.removeOption(module, type.getId());
+                    Optional.ofNullable(MinecraftModule.getInstance(module)).ifPresent(m -> m.removeModuleType(type.getId()));
+                }
+                break;
             }
         }
     }
