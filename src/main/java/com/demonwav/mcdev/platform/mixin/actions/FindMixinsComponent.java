@@ -34,7 +34,7 @@ public class FindMixinsComponent {
             @Override
             public void mouseClicked(MouseEvent e) {
                 final PsiClass psiClass = (PsiClass) classList.getSelectedValue();
-                if (psiClass.canNavigate()) {
+                if (psiClass != null && psiClass.canNavigate()) {
                     psiClass.navigate(true);
                 }
             }
