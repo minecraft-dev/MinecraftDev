@@ -34,7 +34,7 @@
     </change-notes>
 
     <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="162" until-build="162.999"/>
+    <idea-version since-build="162" until-build="162.*"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Module types are for transitions from old versions only -->
