@@ -99,6 +99,9 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
 
             // Reset all other modules back to JavaModule && remove the type
             for (Module module : allModules) {
+                if (module == null) {
+                    continue;
+                }
                 if (!checkedModules.contains(module) || badModules.contains(module)) {
                     if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
                         module.setOption("type", JavaModuleType.getModuleType().getId());
@@ -167,6 +170,10 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                 return;
             }
         }
-        Optional.ofNullable(MinecraftModule.getInstance(module)).ifPresent(m -> m.getBuildSystem().reImport(m.getIdeaModule()));
+        Optional.ofNullable(MinecraftModule.getInstance(module)).ifPresent(m -> {
+            if (m.getBuildSystem() != null && m.getIdeaModule() != null) {
+                m.getBuildSystem().reImport(m.getIdeaModule());
+            }
+        });
     }
 }
