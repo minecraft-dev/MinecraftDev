@@ -28,13 +28,13 @@
         Alpha release, not many features, may break. More features to come. Please report issues to
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p>
-        <a href="https://minecraftdev.org/changelog/">Changelog v. alpha-0.3.0</a>
+        <a href="https://minecraftdev.org/changelog/">Changelog v. 2016.2-0.3.1</a>
       </div>
     ]]>
     </change-notes>
 
     <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="145"/>
+    <idea-version since-build="162" until-build="162.999"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Module types are for transitions from old versions only -->
