@@ -14,9 +14,12 @@ import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.mcp.McpModule;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ModelBuilder;
@@ -117,6 +120,14 @@ public final class SrgManager {
                     try {
                         connection = connector.connect();
                         final ModelBuilder<MinecraftDevModel> modelBuilder = connection.model(MinecraftDevModel.class);
+
+                        Pair<String, Sdk> sdkPair = ExternalSystemJdkUtil.getAvailableJdk(module.getModule().getProject());
+                        if (sdkPair != null && sdkPair.getSecond() != null && sdkPair.getSecond().getHomePath() != null &&
+                            !ExternalSystemJdkUtil.USE_INTERNAL_JAVA.equals(sdkPair.getFirst())) {
+
+                            modelBuilder.setJavaHome(new File(sdkPair.getSecond().getHomePath()));
+                        }
+
                         modelBuilder.withArguments("--init-script", mcinit.getAbsolutePath());
                         final MinecraftDevModel model = modelBuilder.get();
                         files = model.getMappingFiles();

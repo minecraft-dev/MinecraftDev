@@ -261,6 +261,10 @@ public class MinecraftModule {
 
     @NotNull
     public static Optional<VirtualFile> searchAllModulesForFile(@NotNull String path, @NotNull SourceType type) {
-        return map.values().stream().distinct().map(m -> m.getBuildSystem().findFile(path, type)).filter(f -> f != null).findFirst();
+        return map.values().stream().distinct()
+            .filter(m -> m.getBuildSystem() != null)
+            .map(m -> m.getBuildSystem().findFile(path, type))
+            .filter(f -> f != null)
+            .findFirst();
     }
 }
