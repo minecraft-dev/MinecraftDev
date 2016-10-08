@@ -31,12 +31,13 @@ class MinecraftDevModelBuilder implements ToolingModelBuilder {
 
     @Override
     public Object buildAll(String s, Project project) {
-        return new MinecraftDevModelImpl(project.getTasks().stream()
-                .filter { it.getName() == "genSrgs" }
-                .findFirst()
-                .map { it.getOutputs().getFiles().getFiles() }
-                .orElse(HashSet.newInstance()) as Set<File>
-        );
+        Set<File> files = HashSet.newInstance()
+        for (Task task : project.getTasks()) {
+            if (task.getName() == "genSrgs") {
+                files = task.getOutputs().getFiles().getFiles()
+            }
+        }
+        return new MinecraftDevModelImpl(files)
     }
 }
 
