@@ -125,7 +125,7 @@ public final class SrgManager {
                             !ExternalSystemJdkUtil.USE_INTERNAL_JAVA.equals(sdkPair.getFirst())) {
 
                             modelBuilder.setJavaHome(new File(sdkPair.getSecond().getHomePath()));
-                        }`
+                        }
 
                         modelBuilder.withArguments("--init-script", mcinit.getAbsolutePath());
                         final MinecraftDevModel model = modelBuilder.get();
