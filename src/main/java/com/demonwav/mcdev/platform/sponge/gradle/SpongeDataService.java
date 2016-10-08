@@ -76,6 +76,11 @@ public class SpongeDataService extends AbstractProjectDataService<ModuleData, Mo
             .map(n -> modelsProvider.findIdeModule(((DependencyData) n.getData()).getOwnerModule()))
             .collect(Collectors.toSet());
 
+        goodModules.addAll(toImport.stream()
+            .filter(n -> n.getData().getId().equals("SpongeAPI"))
+            .map(n -> modelsProvider.findIdeModule(n.getData().getInternalName()))
+            .collect(Collectors.toSet()));
+
         AbstractDataService.setupModules(goodModules, allModules, modelsProvider, SpongeModuleType.getInstance());
     }
 }
