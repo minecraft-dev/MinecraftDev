@@ -12,7 +12,7 @@ package com.demonwav.mcdev.platform.mixin.insight;
 
 import com.demonwav.mcdev.asset.MixinAssets;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
-import com.demonwav.mcdev.platform.mixin.util.ShadowError;
+import com.demonwav.mcdev.platform.mixin.util.ShadowedMembers;
 import com.demonwav.mcdev.util.McEditorUtil;
 
 import com.intellij.codeHighlighting.Pass;
@@ -25,7 +25,6 @@ import com.intellij.featureStatistics.FeatureUsageTracker;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
@@ -44,9 +43,8 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
-        final Pair<PsiElement, ShadowError> shadowedElement = MixinUtils.getShadowedElement(element);
-        final PsiElement first = shadowedElement.getFirst();
-        if (first == null) {
+        final ShadowedMembers shadowedMembers = MixinUtils.getShadowedElement(element);
+        if (shadowedMembers.getTargets().isEmpty()) {
             return null;
         }
 
@@ -70,9 +68,10 @@ public class ShadowLineMarkerProvider extends LineMarkerProviderDescriptor {
                     return;
                 }
 
+                // TODO create popup and choose out of the list
                 FeatureUsageTracker.getInstance().triggerFeatureUsed("navigation.goto.declaration");
-                PsiElement navElement = shadowedElement.getFirst().getNavigationElement();
-                navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(shadowedElement.getFirst(), navElement);
+                PsiElement navElement = shadowedMembers.getTargets().get(0).getNavigationElement();
+                navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(shadowedMembers.getTargets().get(0), navElement);
                 if (navElement != null) {
                     McEditorUtil.gotoTargetElement(navElement, editor, element.getContainingFile());
                 }
