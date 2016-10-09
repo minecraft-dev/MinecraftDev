@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.liteloader;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;

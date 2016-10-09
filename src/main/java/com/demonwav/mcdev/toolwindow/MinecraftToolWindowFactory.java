@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.toolwindow;
 
 import com.intellij.openapi.project.Project;

@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.sponge.generation;
 
 import com.demonwav.mcdev.insight.generation.GenerationData;

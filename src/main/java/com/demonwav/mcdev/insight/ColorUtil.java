@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.insight;
 
 import com.demonwav.mcdev.platform.AbstractModuleType;

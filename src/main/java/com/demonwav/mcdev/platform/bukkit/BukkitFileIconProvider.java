@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.MinecraftSettings;

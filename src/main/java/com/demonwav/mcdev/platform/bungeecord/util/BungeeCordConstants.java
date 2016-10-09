@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.bungeecord.util;
 
 import org.jetbrains.annotations.NotNull;

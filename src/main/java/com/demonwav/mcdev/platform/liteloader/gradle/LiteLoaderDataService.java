@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.liteloader.gradle;
 
 import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService;

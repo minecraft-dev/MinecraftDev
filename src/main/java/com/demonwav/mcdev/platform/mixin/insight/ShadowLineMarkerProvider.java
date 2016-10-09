@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.mixin.insight;
 
 import com.demonwav.mcdev.asset.MixinAssets;

@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.buildsystem;
 
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;

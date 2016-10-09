@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.bukkit.inspection;
 
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;

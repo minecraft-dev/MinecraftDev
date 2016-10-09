@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.bukkit.yaml;
 
 import org.jetbrains.annotations.NotNull;

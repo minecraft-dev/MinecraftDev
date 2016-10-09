@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.insight.generation;
 
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationDialog;

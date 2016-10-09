@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.asset;
 
 import com.intellij.CommonBundle;

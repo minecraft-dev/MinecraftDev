@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev;
 
 import com.demonwav.mcdev.update.ConfigurePluginUpdatesDialog;

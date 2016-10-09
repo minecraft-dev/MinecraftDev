@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.mcp.at.psi.mixins;
 
 import com.demonwav.mcdev.platform.mcp.at.AtElementFactory;

@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.mcp.at.psi;
 
 import com.intellij.openapi.project.Project;

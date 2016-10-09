@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.insight;
 
 import com.intellij.openapi.ui.DialogWrapper;

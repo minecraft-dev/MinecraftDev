@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.bukkit.maven;
 
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType;

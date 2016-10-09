@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.mcp.actions;
 
 import com.demonwav.mcdev.platform.MinecraftModule;

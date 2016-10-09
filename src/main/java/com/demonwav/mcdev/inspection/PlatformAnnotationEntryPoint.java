@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.inspection;
 
 import com.google.common.collect.ImmutableList;

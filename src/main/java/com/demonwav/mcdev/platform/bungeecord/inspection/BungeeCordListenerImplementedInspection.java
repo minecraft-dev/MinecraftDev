@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.bungeecord.inspection;
 
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants;

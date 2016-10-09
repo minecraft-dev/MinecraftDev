@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.mcp.version;
 
 import com.demonwav.mcdev.util.Sorting;

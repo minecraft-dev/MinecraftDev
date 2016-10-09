@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.mixin.util;
 
 import org.jetbrains.annotations.NotNull;

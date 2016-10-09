@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.sponge.color;
 
 import com.demonwav.mcdev.insight.ColorLineMarkerProvider;

@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
 import com.intellij.openapi.util.Pair;

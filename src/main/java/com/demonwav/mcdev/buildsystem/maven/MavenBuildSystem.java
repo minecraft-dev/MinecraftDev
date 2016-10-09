@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.buildsystem.maven;
 
 import com.demonwav.mcdev.buildsystem.BuildDependency;

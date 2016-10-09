@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.transition;
 
 import com.demonwav.mcdev.platform.MinecraftModuleType;

@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.util;
 
 import com.google.common.collect.ImmutableSet;

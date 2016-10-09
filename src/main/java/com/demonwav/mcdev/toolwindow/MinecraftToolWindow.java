@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.toolwindow;
 
 import com.demonwav.mcdev.platform.MinecraftModule;

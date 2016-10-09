@@ -7,7 +7,6 @@
  *
  * MIT License
  */
-
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
