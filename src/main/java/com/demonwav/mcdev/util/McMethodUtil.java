@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.util;
 
 import com.intellij.psi.HierarchicalMethodSignature;

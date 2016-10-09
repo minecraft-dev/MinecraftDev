@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev;
 
 import com.intellij.openapi.components.PersistentStateComponent;

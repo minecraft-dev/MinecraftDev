@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.mcp.at;
 
 import com.intellij.codeInsight.completion.CompletionContributor;

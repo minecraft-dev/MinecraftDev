@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.mcp.version;
 
 public class McpVersionEntry {

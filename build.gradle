@@ -1,17 +1,6 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.12.1"
-    }
-}
-
 plugins {
     id "org.jetbrains.intellij" version "0.1.10"
+    id 'net.minecrell.licenser' version '0.3'
 }
 
 apply plugin: "idea"
@@ -116,20 +105,12 @@ task generate {
 
 compileJava.dependsOn generate
 
-apply plugin: "com.github.hierynomus.license"
-
 // License header formatting
 license {
     header = file("copyright.txt")
-    includes(["**/*.java", "**/*.gradle", "**/*.xml", "**/*.properties"])
+    include "**/*.java", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html"
 
-    ignoreFailures = false
-    strictCheck = true
-
-    mapping {
-        java = "SLASHSTAR_STYLE"
-        gradle = "SLASHSTAR_STYLE"
-    }
+    newLine = true
 }
 
 afterEvaluate {

@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev;
 
 import org.jetbrains.annotations.NotNull;

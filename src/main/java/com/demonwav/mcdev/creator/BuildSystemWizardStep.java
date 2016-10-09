@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.creator;
 
 import static com.demonwav.mcdev.platform.PlatformType.FORGE;

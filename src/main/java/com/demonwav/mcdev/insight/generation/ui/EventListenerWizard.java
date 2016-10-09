@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.insight.generation.ui;
 
 import com.intellij.ide.highlighter.JavaHighlightingColors;

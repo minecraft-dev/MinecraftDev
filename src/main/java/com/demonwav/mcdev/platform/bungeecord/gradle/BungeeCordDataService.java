@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.bungeecord.gradle;
 
 import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService;

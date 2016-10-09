@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.buildsystem;
 
 import com.google.common.base.Objects;

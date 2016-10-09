@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.bungeecord.generation;
 
 import com.demonwav.mcdev.insight.generation.GenerationData;

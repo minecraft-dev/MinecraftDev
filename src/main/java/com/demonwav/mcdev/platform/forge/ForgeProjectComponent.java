@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.forge;
 
 import com.intellij.json.JsonFileType;

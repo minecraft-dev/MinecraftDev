@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.mcp.srg;
 
 import com.demonwav.mcdev.platform.mcp.util.McpUtil;

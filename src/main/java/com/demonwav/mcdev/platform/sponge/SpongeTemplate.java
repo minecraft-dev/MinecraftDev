@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.platform.AbstractTemplate;

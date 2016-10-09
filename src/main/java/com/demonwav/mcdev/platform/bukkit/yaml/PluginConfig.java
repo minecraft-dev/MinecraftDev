@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.bukkit.yaml;
 
 import com.demonwav.mcdev.platform.bukkit.BukkitModule;

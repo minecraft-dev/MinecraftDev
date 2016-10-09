@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.update;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;

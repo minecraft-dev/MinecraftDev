@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.sponge.util;
 
 import org.jetbrains.annotations.NotNull;

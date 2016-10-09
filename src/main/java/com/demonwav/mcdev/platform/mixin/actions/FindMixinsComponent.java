@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.mixin.actions;
 
 import com.intellij.ide.util.PsiClassListCellRenderer;

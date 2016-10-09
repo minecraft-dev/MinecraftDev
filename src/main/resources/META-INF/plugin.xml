@@ -1,5 +1,4 @@
 <!--
-
     Minecraft Dev for IntelliJ
 
     https://minecraftdev.org
@@ -7,8 +6,8 @@
     Copyright (c) 2016 Kyle Wood (DemonWav)
 
     MIT License
-
 -->
+
 <idea-plugin version="2">
 
     <depends optional="false">org.jetbrains.idea.maven</depends>

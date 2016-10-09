@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.mcp.at.psi.mixins;
 
 import com.intellij.psi.PsiClass;

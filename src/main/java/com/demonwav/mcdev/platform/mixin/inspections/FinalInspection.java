@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.mixin.inspections;
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants;

@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.forge.version;
 
 import com.demonwav.mcdev.util.Sorting;

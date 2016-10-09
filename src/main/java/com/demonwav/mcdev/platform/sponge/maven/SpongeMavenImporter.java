@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.sponge.maven;
 
 import com.demonwav.mcdev.buildsystem.maven.AbstractMavenImporter;
