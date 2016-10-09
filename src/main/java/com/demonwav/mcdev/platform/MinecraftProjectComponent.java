@@ -32,6 +32,7 @@ public class MinecraftProjectComponent extends AbstractProjectComponent {
                 Optional.ofNullable(MinecraftModule.getInstance(module))
                     .ifPresent(m -> m.getTypes().forEach(t -> t.performCreationSettingSetup(myProject)));
             }
+            MinecraftModule.doReadyActions();
         });
     }
 }

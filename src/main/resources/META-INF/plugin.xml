@@ -273,5 +273,10 @@
                 description="Find the associated SRG mapping for this element">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu2"/>
         </action>
+        <action class="com.demonwav.mcdev.platform.mcp.actions.GotoAtEntryAction" id="GotoATEntry"
+                text="Go To AT Entry"
+                description="Go to the relevant Access Transformer entry, if it exists">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+        </action>
     </actions>
 </idea-plugin>

@@ -26,9 +26,11 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiExpression;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
 import com.intellij.util.Query;
 import org.jetbrains.annotations.NonNls;
@@ -53,6 +55,26 @@ public class McpProjectComponent extends AbstractProjectComponent {
         // We do this here so any other .cfg files don't get marked if they aren't in MCP projects
         Util.runWriteTask(() -> FileTypeManager.getInstance().associateExtension(AtFileType.getInstance(), "cfg"));
 
+        MinecraftModule.doWhenReady(instance -> {
+            final McpModule mcpModule = instance.getModuleOfType(McpModuleType.getInstance());
+            if (mcpModule == null) {
+                return;
+            }
+
+            final String[] fileNames = PsiShortNamesCache.getInstance(myProject).getAllFileNames();
+            for (final String fileName : fileNames) {
+                if (!fileName.endsWith(".cfg")) {
+                    continue;
+                }
+
+                final PsiFile[] filesByName = PsiShortNamesCache.getInstance(myProject).getFilesByName(fileName);
+                for (final PsiFile psiFile : filesByName) {
+                    mcpModule.addAccessTransformerFile(psiFile.getVirtualFile());
+                }
+            }
+        });
+
+
         StartupManager.getInstance(myProject).registerPostStartupActivity(() -> {
             final PsiClass aClass = JavaPsiFacade.getInstance(myProject).findClass(ACCESS_TRANSFORMER_CLASS, GlobalSearchScope.allScope(myProject));
             if (aClass == null) {
@@ -71,7 +93,8 @@ public class McpProjectComponent extends AbstractProjectComponent {
                     continue;
                 }
 
-                if (!instance.isOfType(McpModuleType.getInstance())) {
+                final McpModule mcpModule = instance.getModuleOfType(McpModuleType.getInstance());
+                if (mcpModule == null) {
                     continue;
                 }
 
@@ -102,7 +125,8 @@ public class McpProjectComponent extends AbstractProjectComponent {
 
                         final Optional<VirtualFile> file = MinecraftModule.searchAllModulesForFile(text, SourceType.RESOURCE);
 
-                        file.ifPresent(f -> Util.runWriteTask(() ->
+                        file.ifPresent(f -> Util.runWriteTask(() -> {
+                            mcpModule.addAccessTransformerFile(f);
                             FileTypeManager.getInstance().associate(AtFileType.getInstance(), new FileNameMatcher() {
                                 @Override
                                 public boolean accept(@NonNls @NotNull String fileName) {
@@ -114,8 +138,10 @@ public class McpProjectComponent extends AbstractProjectComponent {
                                 public String getPresentableString() {
                                     return "Access Transformers";
                                 }
-                            })
-                        ));
+
+                            });
+
+                        }));
                     }
                 };
                 psiClass.accept(visitor);

@@ -17,6 +17,7 @@ import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 import com.demonwav.mcdev.util.Util;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
@@ -39,13 +40,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import javax.swing.Icon;
 
 public class MinecraftModule {
 
     private static Map<Module, MinecraftModule> map = new HashMap<>();
+    private static Set<Consumer<MinecraftModule>> readyWaiters = Sets.newConcurrentHashSet();
 
     private Module module;
     private BuildSystem buildSystem;
@@ -265,5 +269,19 @@ public class MinecraftModule {
             .map(m -> m.getBuildSystem().findFile(path, type))
             .filter(f -> f != null)
             .findFirst();
+    }
+
+    public static void doWhenReady(@NotNull Consumer<MinecraftModule> consumer) {
+        readyWaiters.add(consumer);
+    }
+
+    public static void doReadyActions() {
+        for (MinecraftModule minecraftModule : map.values()) {
+            if (!minecraftModule.getIdeaModule().getProject().isDisposed()) {
+                for (Consumer<MinecraftModule> readyWaiter : readyWaiters) {
+                    readyWaiter.accept(minecraftModule);
+                }
+            }
+        }
     }
 }
