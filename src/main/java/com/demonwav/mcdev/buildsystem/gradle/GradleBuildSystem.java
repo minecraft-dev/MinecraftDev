@@ -171,14 +171,14 @@ public class GradleBuildSystem extends BuildSystem {
                     buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
 
                     LiteLoaderTemplate.applyBuildGradleTemplate(
-                            project,
-                            buildGradle,
-                            gradleProp,
-                            groupId,
-                            artifactId,
-                            settings.pluginVersion,
-                            settings.mcVersion,
-                            settings.mcpVersion
+                        project,
+                        buildGradle,
+                        gradleProp,
+                        groupId,
+                        artifactId,
+                        settings.pluginVersion,
+                        settings.mcVersion,
+                        settings.mcpVersion
                     );
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -195,12 +195,12 @@ public class GradleBuildSystem extends BuildSystem {
                     String buildGradleText;
                     if (configuration.type == PlatformType.SPONGE) {
                         buildGradleText = SpongeTemplate.applyBuildGradleTemplate(
-                                project,
-                                gradleProp,
-                                groupId,
-                                artifactId,
-                                version,
-                                buildVersion
+                            project,
+                            gradleProp,
+                            groupId,
+                            artifactId,
+                            version,
+                            buildVersion
                         );
                     } else {
                         buildGradleText = AbstractTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, version, buildVersion);
@@ -350,9 +350,9 @@ public class GradleBuildSystem extends BuildSystem {
 
                     // Client run config
                     ApplicationConfiguration runClientConfiguration = new ApplicationConfiguration(
-                            (forgeModule != null ? forgeModule : rootModule).getName() + " run client",
-                            project,
-                            ApplicationConfigurationType.getInstance()
+                        (forgeModule != null ? forgeModule : rootModule).getName() + " run client",
+                        project,
+                        ApplicationConfigurationType.getInstance()
                     );
                     File runningDir = new File(project.getBasePath(), "run");
                     if (!runningDir.exists()) {
@@ -367,9 +367,9 @@ public class GradleBuildSystem extends BuildSystem {
                         runClientConfiguration.setModule(mainModule != null ? mainModule : forgeModule != null ? forgeModule : rootModule);
                     }
                     RunnerAndConfigurationSettings clientSettings = new RunnerAndConfigurationSettingsImpl(
-                            RunManagerImpl.getInstanceImpl(project),
-                            runClientConfiguration,
-                            false
+                        RunManagerImpl.getInstanceImpl(project),
+                        runClientConfiguration,
+                        false
                     );
                     clientSettings.setActivateToolWindowBeforeRun(true);
                     clientSettings.setSingleton(true);
@@ -378,9 +378,9 @@ public class GradleBuildSystem extends BuildSystem {
 
                     // Server run config
                     ApplicationConfiguration runServerConfiguration = new ApplicationConfiguration(
-                            rootModule.getName() + " run server",
-                            project,
-                            ApplicationConfigurationType.getInstance()
+                        rootModule.getName() + " run server",
+                        project,
+                        ApplicationConfigurationType.getInstance()
                     );
                     runServerConfiguration.setMainClassName("GradleStartServer");
                     runServerConfiguration.setProgramParameters("nogui");
@@ -391,9 +391,9 @@ public class GradleBuildSystem extends BuildSystem {
                         runServerConfiguration.setModule(mainModule != null ? mainModule : forgeModule != null ? forgeModule : rootModule);
                     }
                     RunnerAndConfigurationSettings serverSettings = new RunnerAndConfigurationSettingsImpl(
-                            RunManagerImpl.getInstanceImpl(project),
-                            runServerConfiguration,
-                            false
+                        RunManagerImpl.getInstanceImpl(project),
+                        runServerConfiguration,
+                        false
                     );
                     serverSettings.setActivateToolWindowBeforeRun(true);
                     serverSettings.setSingleton(true);
@@ -402,10 +402,10 @@ public class GradleBuildSystem extends BuildSystem {
 
                 // Create a gradle external system run config
                 ExternalSystemRunConfiguration runConfiguration = new ExternalSystemRunConfiguration(
-                        GradleConstants.SYSTEM_ID,
-                        project,
-                        gradleType.getConfigurationFactories()[0],
-                        rootModule.getName() + " build"
+                    GradleConstants.SYSTEM_ID,
+                    project,
+                    gradleType.getConfigurationFactories()[0],
+                    rootModule.getName() + " build"
                 );
                 // Set relevant gradle values
                 runConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
@@ -413,9 +413,9 @@ public class GradleBuildSystem extends BuildSystem {
                 runConfiguration.getSettings().setTaskNames(Collections.singletonList("build"));
                 // Create a RunAndConfigurationSettings object, which defines general settings for the run configuration
                 RunnerAndConfigurationSettings settings = new RunnerAndConfigurationSettingsImpl(
-                        RunManagerImpl.getInstanceImpl(project),
-                        runConfiguration,
-                        false
+                    RunManagerImpl.getInstanceImpl(project),
+                    runConfiguration,
+                    false
                 );
                 // Open the tool window and set it as a singleton run types
                 settings.setActivateToolWindowBeforeRun(true);
@@ -477,15 +477,15 @@ public class GradleBuildSystem extends BuildSystem {
                         // I can't find a way to read module group children, group path only goes up
                         // So I guess check each module to see if it's a child....
                         Collection<Module> children = Arrays.stream(ModuleManager.getInstance(project).getModules())
-                                .filter(m -> {
-                                    String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(m);
-                                    if (paths != null && paths.length > 0) {
-                                        if (name.equals(paths[0])) {
-                                            return true;
-                                        }
+                            .filter(m -> {
+                                String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(m);
+                                if (paths != null && paths.length > 0) {
+                                    if (name.equals(paths[0])) {
+                                        return true;
                                     }
-                                    return false;
-                                }).collect(Collectors.toList());
+                                }
+                                return false;
+                            }).collect(Collectors.toList());
 
                         if (project.getBasePath() == null) {
                             logger.error("GradleBuildSystem import FAILED: Project base path null");
@@ -776,22 +776,22 @@ public class GradleBuildSystem extends BuildSystem {
 
                 // Add repositories
                 createRepositoriesOrDependencies(
-                        project,
-                        groovyFile,
-                        "repositories",
-                        repositories.stream()
-                                .map(r -> String.format("maven {name = '%s'\nurl = '%s'\n}", r.getId(), r.getUrl()))
-                                .collect(Collectors.toList())
+                    project,
+                    groovyFile,
+                    "repositories",
+                    repositories.stream()
+                        .map(r -> String.format("maven {name = '%s'\nurl = '%s'\n}", r.getId(), r.getUrl()))
+                        .collect(Collectors.toList())
                 );
 
                 // Add dependencies
                 createRepositoriesOrDependencies(
-                        project,
-                        groovyFile,
-                        "dependencies",
-                        dependencies.stream()
-                                .map(d -> String.format("compile '%s:%s:%s'", d.getGroupId(), d.getArtifactId(), d.getVersion()))
-                                .collect(Collectors.toList())
+                    project,
+                    groovyFile,
+                    "dependencies",
+                    dependencies.stream()
+                        .map(d -> String.format("compile '%s:%s:%s'", d.getGroupId(), d.getArtifactId(), d.getVersion()))
+                        .collect(Collectors.toList())
                 );
 
                 new ReformatCodeProcessor(file, false).run();
@@ -835,14 +835,15 @@ public class GradleBuildSystem extends BuildSystem {
 
         try {
             Pair<String, Sdk> sdkPair = ExternalSystemJdkUtil.getAvailableJdk(project);
-            if (sdkPair != null && sdkPair.getSecond() != null && sdkPair.getSecond().getHomePath() != null &&
-                !ExternalSystemJdkUtil.USE_INTERNAL_JAVA.equals(sdkPair.getFirst())) {
-
+            if (
+                sdkPair != null && sdkPair.getSecond() != null && sdkPair.getSecond().getHomePath() != null &&
+                !ExternalSystemJdkUtil.USE_INTERNAL_JAVA.equals(sdkPair.getFirst())
+            ) {
                 launcher.setJavaHome(new File(sdkPair.getSecond().getHomePath()));
             }
 
             launcher.forTasks("setupDecompWorkspace").setJvmArguments("-Xmx2G").addProgressListener((ProgressListener) progressEvent ->
-                    indicator.setText(progressEvent.getDescription())
+                indicator.setText(progressEvent.getDescription())
             ).run();
         } finally {
             connection.close();
