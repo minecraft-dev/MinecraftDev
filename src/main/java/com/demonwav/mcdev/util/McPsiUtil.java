@@ -71,6 +71,9 @@ public final class McPsiUtil {
     }
 
     public static boolean extendsOrImplementsClass(@NotNull PsiClass psiClass, @NotNull String qualifiedClassName) {
+        if (qualifiedClassName.equals(psiClass.getQualifiedName())) {
+            return true;
+        }
         final PsiClass[] supers = psiClass.getSupers();
         for (PsiClass aSuper : supers) {
             if (qualifiedClassName.equals(aSuper.getQualifiedName())) {

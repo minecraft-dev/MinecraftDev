@@ -23,7 +23,6 @@ import com.demonwav.mcdev.util.McMethodUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.base.Objects;
-import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -38,16 +37,13 @@ import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiModifierList;
-import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTypesUtil;
-import com.siyeh.ig.InspectionGadgetsFix;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -213,7 +209,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
             return null;
         }
 
-        final PsiAnnotation annotation = method.getModifierList().findAnnotation(BukkitConstants.BUKKIT_HANDLER_ANNOTATION);
+        final PsiAnnotation annotation = method.getModifierList().findAnnotation(BukkitConstants.HANDLER_ANNOTATION);
         if (annotation == null) {
             return null;
         }
@@ -247,7 +243,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         }
 
         final PsiClass psiClass = (PsiClass) context;
-        if (!McPsiUtil.extendsOrImplementsClass(psiClass, BukkitConstants.BUKKIT_CANCELLABLE_CLASS)) {
+        if (!McPsiUtil.extendsOrImplementsClass(psiClass, BukkitConstants.CANCELLABLE_CLASS)) {
             return null;
         }
 
@@ -255,7 +251,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
             return null;
         }
 
-        if (!((ClsMethodImpl) resolve).getName().equals(BukkitConstants.BUKKIT_EVENT_ISCANCELLED_METHOD_NAME)) {
+        if (!((ClsMethodImpl) resolve).getName().equals(BukkitConstants.EVENT_ISCANCELLED_METHOD_NAME)) {
             return null;
         }
 
