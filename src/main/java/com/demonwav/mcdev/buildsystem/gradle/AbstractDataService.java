@@ -157,7 +157,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             checkedModules.add(module);
             MinecraftModuleType.addOption(module, type.getId());
         } else {
-            String parentName = path[0];
+            String parentName = path[path.length - 1];
             Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
             if (parentModule != null) {
                 // Always reset back to JavaModule

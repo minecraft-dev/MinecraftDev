@@ -97,7 +97,7 @@ public class MinecraftModule {
             } else {
                 String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
                 if (paths != null && paths.length > 0) {
-                    Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[0]);
+                    Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[paths.length - 1]);
                     if (parentModule != null) {
                         if (map.containsKey(parentModule)) {
                             MinecraftModule minecraftModule = map.get(parentModule);
@@ -277,6 +277,7 @@ public class MinecraftModule {
     }
 
     public static void doReadyActions() {
+        //noinspection Convert2streamapi
         for (MinecraftModule minecraftModule : map.values()) {
             if (!minecraftModule.getIdeaModule().getProject().isDisposed()) {
                 for (Consumer<MinecraftModule> readyWaiter : readyWaiters) {

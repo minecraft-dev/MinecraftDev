@@ -480,7 +480,7 @@ public class GradleBuildSystem extends BuildSystem {
                             .filter(m -> {
                                 String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(m);
                                 if (paths != null && paths.length > 0) {
-                                    if (name.equals(paths[0])) {
+                                    if (name.equals(paths[paths.length - 1])) {
                                         return true;
                                     }
                                 }

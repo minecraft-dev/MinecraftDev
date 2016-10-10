@@ -21,14 +21,6 @@
           <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
       </hspacer>
-      <component id="71615" class="javax.swing.JRadioButton" binding="ignoreCanceledRadioButton">
-        <constraints>
-          <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Ignore if event is canceled"/>
-        </properties>
-      </component>
       <component id="59381" class="javax.swing.JComboBox" binding="eventOrderComboBox">
         <constraints>
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
@@ -43,6 +35,14 @@
           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
         </constraints>
       </vspacer>
+      <component id="4876" class="javax.swing.JCheckBox" binding="ignoreCanceledCheckBox">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Ignore if event is canceled"/>
+        </properties>
+      </component>
     </children>
   </grid>
 </form>

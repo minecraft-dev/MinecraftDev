@@ -57,7 +57,7 @@ public class McpProjectComponent extends AbstractProjectComponent {
         Util.runWriteTask(() -> FileTypeManager.getInstance().associateExtension(AtFileType.getInstance(), "cfg"));
 
         MinecraftModule.doWhenReady(instance -> {
-            if (!myProject.isDisposed()) {
+            if (myProject.isDisposed()) {
                 return;
             }
 
