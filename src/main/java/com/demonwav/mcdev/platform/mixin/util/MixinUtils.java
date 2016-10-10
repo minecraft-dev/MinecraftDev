@@ -45,7 +45,6 @@ import com.intellij.psi.PsiTypeParameter;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.impl.source.PsiImmediateClassType;
 import com.intellij.psi.impl.source.tree.ElementType;
-import com.intellij.psi.impl.source.tree.java.PsiArrayInitializerMemberValueImpl;
 import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import com.intellij.psi.util.TypeConversionUtil;
@@ -431,6 +430,11 @@ public final class MixinUtils {
 
         final PsiAnnotationMemberValue shadowPrefixValue = annotation.findDeclaredAttributeValue("prefix");
         final PsiAnnotationMemberValue shadowAliasValue = annotation.findAttributeValue("aliases");
+        if (shadowAliasValue != null && !shadowAliasValue.getText().equals("{}")) {
+            // TODO Handle aliases
+            return ShadowedMembers.EMPTY;
+        }
+
         if (shadowPrefixValue != null && !(shadowPrefixValue instanceof PsiLiteralExpression)) {
             // Don't handle case
             // TODO can we?
@@ -452,29 +456,29 @@ public final class MixinUtils {
         assert name != null;
         String shadowTargetName = name.replace(shadowPrefix, "");
 
-        List<String> aliases = Lists.newArrayList();
-        if (shadowAliasValue instanceof PsiArrayInitializerMemberValueImpl) {
-            final PsiAnnotationMemberValue[] initializers = ((PsiArrayInitializerMemberValueImpl) shadowAliasValue).getInitializers();
-            for (PsiAnnotationMemberValue initializer : initializers) {
-                if (initializer instanceof PsiLiteralExpressionImpl) {
-                    String text = ((PsiLiteralExpressionImpl) initializer).getInnerText();
-                    if (text != null) {
-                        aliases.add(text);
-                    }
-                }
-            }
-        } else if (shadowAliasValue instanceof PsiLiteralExpressionImpl) {
-            String text = ((PsiLiteralExpressionImpl) shadowAliasValue).getInnerText();
-            if (text != null) {
-                aliases.add(text);
-            }
-        } // else: Ignore aliases
+//        List<String> aliases = Lists.newArrayList();
+//        if (shadowAliasValue instanceof PsiArrayInitializerMemberValueImpl) {
+//            final PsiAnnotationMemberValue[] initializers = ((PsiArrayInitializerMemberValueImpl) shadowAliasValue).getInitializers();
+//            for (PsiAnnotationMemberValue initializer : initializers) {
+//                if (initializer instanceof PsiLiteralExpressionImpl) {
+//                    String text = ((PsiLiteralExpressionImpl) initializer).getInnerText();
+//                    if (text != null) {
+//                        aliases.add(text);
+//                    }
+//                }
+//            }
+//        } else if (shadowAliasValue instanceof PsiLiteralExpressionImpl) {
+//            String text = ((PsiLiteralExpressionImpl) shadowAliasValue).getInnerText();
+//            if (text != null) {
+//                aliases.add(text);
+//            }
+//        } // else: Ignore aliases
 
-        if (aliases.contains("this$0")) {
-            // Don't handle this case
-            // TODO can we?
-            return ShadowedMembers.EMPTY;
-        }
+//        if (aliases.contains("this$0")) {
+//            // Don't handle this case
+//            // TODO can we?
+//            return ShadowedMembers.EMPTY;
+//        }
 
         if (element instanceof PsiField) {
             final PsiField field = (PsiField) element;
@@ -484,20 +488,20 @@ public final class MixinUtils {
 
             for (Map.Entry<PsiElement, PsiClass> entry : allMixedClasses.entrySet()) {
                 PsiField resolveField = entry.getValue().findFieldByName(shadowTargetName, true);
-                if (resolveField == null) {
-                    if (!aliases.isEmpty()) {
-                        for (String alias : aliases) {
-                            resolveField = entry.getValue().findFieldByName(alias, true);
-                            if (resolveField != null) {
-                                break;
-                            }
-                        }
-                        if (resolveField == null) {
-                            continue;
-                        }
-                    }
-                    continue;
-                }
+//                if (resolveField == null) {
+//                    if (!aliases.isEmpty()) {
+//                        for (String alias : aliases) {
+//                            resolveField = entry.getValue().findFieldByName(alias, true);
+//                            if (resolveField != null) {
+//                                break;
+//                            }
+//                        }
+//                        if (resolveField == null) {
+//                            continue;
+//                        }
+//                    }
+//                    continue;
+//                }
 
                 resolveFields.add(resolveField);
                 final String fieldAccessModifier = McPsiUtil.getAccessModifier(field);
