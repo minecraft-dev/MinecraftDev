@@ -1,10 +1,19 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,14 +41,14 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
     private SpongeProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
-    public SpongeProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
+    public SpongeProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
         this.creator = creator;
-        this.settings = (SpongeProjectConfiguration) creator.getSettings().get(index);
     }
 
     @Override
     public JComponent getComponent() {
-        if (creator.getArtifactId() == null) {
+        settings = (SpongeProjectConfiguration) creator.getSettings().get(PlatformType.SPONGE);
+        if (settings == null) {
             return panel;
         }
 
@@ -47,7 +56,7 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
         pluginNameField.setText(name);
         pluginVersionField.setText(creator.getVersion());
 
-        if (creator.index != 0) {
+        if (settings != null && !settings.isFirst) {
             pluginNameField.setEditable(false);
             pluginVersionField.setEditable(false);
         }
@@ -56,13 +65,7 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
             + '.' + name);
 
         if (creator.getSettings().size() > 1) {
-            mainClassField.setText(mainClassField.getText() + creator.getSettings().get(creator.index).type.getNormalName());
-        }
-
-        if (UIUtil.isUnderDarcula()) {
-            title.setIcon(PlatformAssets.SPONGE_ICON_2X);
-        } else {
-            title.setIcon(PlatformAssets.SPONGE_ICON_DARK_2X);
+            mainClassField.setText(mainClassField.getText() + PlatformType.SPONGE.getNormalName());
         }
 
         return panel;
@@ -70,7 +73,13 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public boolean validate() throws ConfigurationException {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField);
+        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, pattern);
+    }
+
+    @Override
+    public boolean isStepVisible() {
+        settings = (SpongeProjectConfiguration) creator.getSettings().get(PlatformType.SPONGE);
+        return settings != null;
     }
 
     @Override
@@ -90,9 +99,4 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public void updateDataModel() {}
-
-    @Override
-    public void setIndex(int index) {
-        this.settings = (SpongeProjectConfiguration) creator.getSettings().get(index);
-    }
 }

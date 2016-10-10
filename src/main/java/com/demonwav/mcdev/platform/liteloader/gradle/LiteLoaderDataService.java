@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.liteloader.gradle;
 
 import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService;
@@ -30,6 +40,6 @@ public class LiteLoaderDataService extends AbstractDataService {
             return;
         }
 
-        checkModule(modelsProvider, LiteLoaderModuleType.getInstance(), "net.minecraftforge.gradle.liteloader");
+        checkModule(toImport, modelsProvider, LiteLoaderModuleType.getInstance(), "deobf/com/mumfrey/liteloader");
     }
 }

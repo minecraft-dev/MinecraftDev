@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.platform.AbstractTemplate;
@@ -11,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Properties;
 
 public class SpongeTemplate extends AbstractTemplate {
@@ -62,19 +73,22 @@ public class SpongeTemplate extends AbstractTemplate {
     public static String applyBuildGradleTemplate(@NotNull Project project,
                                                   @NotNull VirtualFile file,
                                                   @NotNull String groupId,
+                                                  @NotNull String artifactId,
                                                   @NotNull String pluginVersion,
                                                   @NotNull String buildVersion) {
 
         Properties properties = new Properties();
-        properties.setProperty("GROUP_ID", groupId);
-        properties.setProperty("PLUGIN_VERSION", pluginVersion);
-        properties.setProperty("BUILD_VERSION", buildVersion);
+        // Only set build version if it is higher/lower than 1.8 (SpongeGradle automatically sets it to 1.8)
+        if (!buildVersion.equals("1.8")) {
+            properties.setProperty("BUILD_VERSION", buildVersion);
+        }
 
         FileTemplateManager manager = FileTemplateManager.getInstance(project);
         FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SPONGE_BUILD_GRADLE_TEMPLATE);
 
         Properties gradleProps = new Properties();
         gradleProps.setProperty("GROUP_ID", groupId);
+        gradleProps.setProperty("PLUGIN_ID", artifactId.toLowerCase(Locale.ENGLISH));
         gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
 
         try {

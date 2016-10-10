@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
@@ -8,6 +18,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.JDOMExternalizableStringList;
 import com.intellij.psi.PsiClass;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -85,5 +96,13 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
     public String getDefaultListenerName(@NotNull PsiClass psiClass) {
         //noinspection ConstantConditions
         return "on" + psiClass.getName().replace("Event", "");
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("groupId", groupId)
+            .append("artifactId", artifactId)
+            .toString();
     }
 }

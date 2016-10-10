@@ -1,0 +1,59 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
+import org.gradle.tooling.provider.model.ToolingModelBuilder
+import org.gradle.tooling.provider.model.ToolingModelBuilderRegistry
+
+class MinecraftDevModelImpl implements Serializable {
+    private final Set<File> files;
+
+    public MinecraftDevModelImpl(Set<File> files) {
+        this.files = files;
+    }
+
+    public Set<File> getMappingFiles() {
+        return files;
+    }
+}
+
+class MinecraftDevModelBuilder implements ToolingModelBuilder {
+    @Override
+    public boolean canBuild(String modelName) {
+        return modelName == "com.demonwav.mcdev.platform.mcp.srg.MinecraftDevModel";
+    }
+
+    @Override
+    public Object buildAll(String s, Project project) {
+        Set<File> files = HashSet.newInstance()
+        for (Task task : project.getTasks()) {
+            if (task.getName() == "genSrgs") {
+                files = task.getOutputs().getFiles().getFiles()
+            }
+        }
+        return new MinecraftDevModelImpl(files)
+    }
+}
+
+class MinecraftDevGradlePlugin implements Plugin<Project> {
+    private final ToolingModelBuilderRegistry registry
+
+    @javax.inject.Inject
+    public MinecraftDevGradlePlugin(ToolingModelBuilderRegistry registry) {
+        this.registry = registry
+    }
+
+    public void apply(Project project) {
+        registry.register(new MinecraftDevModelBuilder())
+    }
+}
+
+allprojects {
+    apply plugin: MinecraftDevGradlePlugin
+}

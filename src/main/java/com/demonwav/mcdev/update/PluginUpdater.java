@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.update;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
@@ -16,7 +26,6 @@ import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.util.io.HttpRequests;
-import com.intellij.util.text.VersionComparatorUtil;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +64,7 @@ public class PluginUpdater {
             lastUpdateStatus = updateStatus;
 
             final PluginUpdateStatus finalUpdate = updateStatus;
-            ApplicationManager.getApplication().invokeLater(() -> callback.apply(finalUpdate), ModalityState.any());
+            ApplicationManager.getApplication().invokeLater(() -> callback.apply(finalUpdate), ModalityState.NON_MODAL);
         } catch (Exception e) {
             PluginUpdateStatus.fromException("Minecraft Development plugin update check failed", e);
         }

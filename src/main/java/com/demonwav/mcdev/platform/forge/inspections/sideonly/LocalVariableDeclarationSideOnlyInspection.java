@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
 import com.demonwav.mcdev.util.McPsiUtil;
@@ -40,7 +50,7 @@ public class LocalVariableDeclarationSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        final PsiClass variableClass = (PsiClass) infos[2];
+        final PsiClass variableClass = (PsiClass) infos[3];
 
         if (variableClass.isWritable()) {
             return new RemoveAnnotationInspectionGadgetsFix() {

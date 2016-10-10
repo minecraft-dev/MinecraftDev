@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 /**
  * This entire package was shamelessly taken from the IntelliJ Kotlin plugin, so thanks to the JetBrains folks for
  * that. Though a built-in system would be superior...

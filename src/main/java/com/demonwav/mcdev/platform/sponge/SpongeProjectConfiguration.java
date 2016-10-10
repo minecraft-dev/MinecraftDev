@@ -1,6 +1,17 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.util.Util;
@@ -111,7 +122,10 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
         String annotationString = "@Plugin(";
         annotationString += "\nid = \"" + buildSystem.getArtifactId().toLowerCase() + "\"";
         annotationString += ",\nname = \"" + pluginName + "\"";
-        annotationString += ",\nversion = \"" + buildSystem.getVersion() + "\"";
+        if (!(buildSystem instanceof GradleBuildSystem)) {
+            // SpongeGradle will automatically set the Gradle version as plugin version
+            annotationString += ",\nversion = \"" + buildSystem.getVersion() + "\"";
+        }
 
         if (!Strings.isNullOrEmpty(description)) {
             annotationString += ",\ndescription = \"" + description + "\"";

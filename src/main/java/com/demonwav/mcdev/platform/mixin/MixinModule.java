@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.mixin;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
@@ -13,13 +23,11 @@ import javax.swing.Icon;
 
 public class MixinModule extends AbstractModule {
 
-    public MixinModule(@NotNull Module module) {
+    MixinModule(@NotNull Module module) {
         super(module);
         this.buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            if (!buildSystem.isImported()) {
-                buildSystem.reImport(module);
-            }
+            buildSystem.reImport(module);
         }
     }
 
@@ -36,11 +44,6 @@ public class MixinModule extends AbstractModule {
     @Override
     public Icon getIcon() {
         return null;
-    }
-
-    @Override
-    public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
-        return true;
     }
 
     @Override

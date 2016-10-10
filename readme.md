@@ -1,6 +1,6 @@
-Minecraft Development for IntelliJ [![forthebadge](http://forthebadge.com/images/badges/made-with-crayons.svg)](http://forthebadge.com)
+<a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.svg" height="27" width="27"></img></a>Minecraft Development for IntelliJ [![forthebadge](http://forthebadge.com/images/badges/made-with-crayons.svg)](http://forthebadge.com)
 ==========================================================================================================================================
-[![GitHub Stars](https://img.shields.io/github/stars/DemonWav/MinecraftDev.svg?style=flat-square)](https://github.com/DemonWav/MinecraftDev/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/DemonWav/MinecraftDev.svg?style=flat-square)](https://github.com/DemonWav/MinecraftDev/issues) [![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build) [![Current Release](https://img.shields.io/badge/release-alpha--0.2.1-lightgrey.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+[![GitHub Stars](https://img.shields.io/github/stars/DemonWav/MinecraftDev.svg?style=flat-square)](https://github.com/DemonWav/MinecraftDev/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/DemonWav/MinecraftDev.svg?style=flat-square)](https://github.com/DemonWav/MinecraftDev/issues) [![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build) [![Current Release](https://img.shields.io/badge/release-2016.2--0.3.4-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 
 Info and Documentation
 ----------------------
@@ -56,10 +56,10 @@ Issues
 ------
 
 We have a few ambiguous labels on the issues page, so here are their definitions:
-* `platform: all` - All platforms supported by this plugin (`Bukkit`, `Sponge`, `BungeeCord`, `Forge`, and `LiteLoader`)
+* `platform: all` - An issue which applies to all supported platforms (`Bukkit`, `Sponge`, `BungeeCord`, `Forge`, and `LiteLoader`)
 * `platform: main` - Multiple platforms, containing at least `Bukkit`, `Sponge`, and `Forge`. It can contain either of the other two as
   well, as long as it doesn't contain all of them. In that case, `platform: all` would be more appropriate, of course.
-* `platform: multi` - Any issue with multiple platforms that doesn't fall under the first two categories.
+* `platform: multi` - Any issue with more than two platforms which doesn't fall under the first two categories.
 
 License
 -------
@@ -69,8 +69,10 @@ This project is licensed under [MIT](license.txt).
 Supported Platforms
 -------------------
 
-- [![Bukkit Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/Bukkit.png) **Bukkit**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse) ([![Spigot Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/Spigot.png) Spigot](https://spigotmc.org/) and [![Paper Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/Paper.png) Paper](https://paper.emc.gs))
-- [![Sponge Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/Sponge.png) **Sponge**](https://www.spongepowered.org/)
-- [![Forge Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/Forge.png) **Minecraft Forge**](http://minecraftforge.net/forum)
-- [![LiteLoader Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/LiteLoader.png) **LiteLoader**](http://www.liteloader.com/)
-- [![BungeeCord Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/platform/icons/BungeeCord.png) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/)
+- [![Bukkit Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Bukkit.png) **Bukkit**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse) ([![Spigot Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Spigot.png) Spigot](https://spigotmc.org/) and [![Paper Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Paper.png) Paper](https://paper.emc.gs))
+- [![Sponge Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Sponge_dark.png) **Sponge**](https://www.spongepowered.org/)
+- [![Forge Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Forge.png) **Minecraft Forge**](http://minecraftforge.net/forum)
+- [![LiteLoader Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/LiteLoader.png) **LiteLoader**](http://www.liteloader.com/)
+- [![MCP Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/MCP.png) **MCP**](http://www.modcoderpack.com/)
+- [![Mixins Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Mixins_dark.png) **Mixins**](https://github.com/SpongePowered/Mixin)
+- [![BungeeCord Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/BungeeCord.png) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/)

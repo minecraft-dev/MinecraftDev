@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.bukkit.inspection;
 
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
@@ -44,7 +54,7 @@ public class BukkitListenerImplementedInspection extends BaseInspection {
             @Override
             protected void doFix(Project project, ProblemDescriptor descriptor) {
                 PsiClass psiClass = (PsiClass) infos[0];
-                McPsiUtil.addImplements(psiClass, BukkitConstants.BUKKIT_LISTENER_CLASS, project);
+                McPsiUtil.addImplements(psiClass, BukkitConstants.LISTENER_CLASS, project);
             }
 
             @Nls
@@ -72,7 +82,7 @@ public class BukkitListenerImplementedInspection extends BaseInspection {
                 boolean isEventHandler = false;
                 for (PsiMethod method : methods) {
                     PsiModifierList list = method.getModifierList();
-                    PsiAnnotation annotation = list.findAnnotation(BukkitConstants.BUKKIT_HANDLER_ANNOTATION);
+                    PsiAnnotation annotation = list.findAnnotation(BukkitConstants.HANDLER_ANNOTATION);
                     if (annotation != null) {
                         isEventHandler = true;
                         break;
@@ -83,7 +93,7 @@ public class BukkitListenerImplementedInspection extends BaseInspection {
                     return;
                 }
 
-                boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, BukkitConstants.BUKKIT_LISTENER_CLASS);
+                boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, BukkitConstants.LISTENER_CLASS);
 
                 if (inError) {
                     registerClassError(aClass, aClass);

@@ -1,13 +1,22 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
-import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -33,12 +42,6 @@ public class SpongeForgeChooser extends ModuleWizardStep {
 
     @Override
     public JComponent getComponent() {
-        if (UIUtil.isUnderDarcula()) {
-            title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X);
-        } else {
-            title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_DARK_2X);
-        }
-
         return panel;
     }
 
@@ -48,9 +51,9 @@ public class SpongeForgeChooser extends ModuleWizardStep {
     @Override
     public boolean isStepVisible() {
         // Only show this if both Sponge and Forge are selected
-        return creator.getSettings().stream().filter(configuration ->
+        return creator.getSettings().values().stream().filter(configuration ->
             configuration instanceof ForgeProjectConfiguration || configuration instanceof SpongeProjectConfiguration
-        ).count() >= 2 || creator.getSettings().stream().anyMatch(conf -> conf instanceof SpongeForgeProjectConfiguration);
+        ).count() >= 2 || creator.getSettings().values().stream().anyMatch(conf -> conf instanceof SpongeForgeProjectConfiguration);
     }
 
     @Override
@@ -59,7 +62,7 @@ public class SpongeForgeChooser extends ModuleWizardStep {
 
         if (singleRadioButton.isSelected()) {
             // First remove the singular forge and sponge configurations
-            Iterator<ProjectConfiguration> configurationIterator = creator.getSettings().iterator();
+            Iterator<ProjectConfiguration> configurationIterator = creator.getSettings().values().iterator();
             while (configurationIterator.hasNext()) {
                 ProjectConfiguration configuration = configurationIterator.next();
                 if (configuration instanceof ForgeProjectConfiguration || configuration instanceof SpongeProjectConfiguration) {
@@ -68,12 +71,12 @@ public class SpongeForgeChooser extends ModuleWizardStep {
             }
 
             // Now add the combined SpongeForgeProjectConfiguration only if it's not already there
-            if (!creator.getSettings().stream().anyMatch(configuration -> configuration instanceof SpongeForgeProjectConfiguration)) {
-                creator.getSettings().add(new SpongeForgeProjectConfiguration());
+            if (!creator.getSettings().values().stream().anyMatch(configuration -> configuration instanceof SpongeForgeProjectConfiguration)) {
+                creator.getSettings().put(PlatformType.FORGE, new SpongeForgeProjectConfiguration());
             }
         } else {
             // First remove the multi sponge forge configuration
-            Iterator<ProjectConfiguration> configurationIterator = creator.getSettings().iterator();
+            Iterator<ProjectConfiguration> configurationIterator = creator.getSettings().values().iterator();
             while (configurationIterator.hasNext()) {
                 ProjectConfiguration configuration = configurationIterator.next();
                 if (configuration instanceof SpongeForgeProjectConfiguration) {
@@ -82,11 +85,11 @@ public class SpongeForgeChooser extends ModuleWizardStep {
             }
 
             // Now add Forge and Sponge configurations respectively, but only if they aren't already there
-            if (!creator.getSettings().stream().anyMatch(configuration -> configuration instanceof ForgeProjectConfiguration)) {
-                creator.getSettings().add(new ForgeProjectConfiguration());
+            if (!creator.getSettings().values().stream().anyMatch(configuration -> configuration instanceof ForgeProjectConfiguration)) {
+                creator.getSettings().put(PlatformType.FORGE, new ForgeProjectConfiguration());
             }
-            if (!creator.getSettings().stream().anyMatch(configuration -> configuration instanceof SpongeProjectConfiguration)) {
-                creator.getSettings().add(new SpongeProjectConfiguration());
+            if (!creator.getSettings().values().stream().anyMatch(configuration -> configuration instanceof SpongeProjectConfiguration)) {
+                creator.getSettings().put(PlatformType.SPONGE, new SpongeProjectConfiguration());
             }
         }
     }

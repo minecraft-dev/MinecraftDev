@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.bungeecord.inspection;
 
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants;
@@ -44,7 +54,7 @@ public class BungeeCordListenerImplementedInspection extends BaseInspection {
             @Override
             protected void doFix(Project project, ProblemDescriptor descriptor) {
                 PsiClass psiClass = (PsiClass) infos[0];
-                McPsiUtil.addImplements(psiClass, BungeeCordConstants.BUNGEECORD_LISTENER_CLASS, project);
+                McPsiUtil.addImplements(psiClass, BungeeCordConstants.LISTENER_CLASS, project);
             }
 
             @Nls
@@ -72,7 +82,7 @@ public class BungeeCordListenerImplementedInspection extends BaseInspection {
                 boolean isEventHandler = false;
                 for (PsiMethod method : methods) {
                     PsiModifierList list = method.getModifierList();
-                    PsiAnnotation annotation = list.findAnnotation(BungeeCordConstants.BUNGEECORD_HANDLER_ANNOTATION);
+                    PsiAnnotation annotation = list.findAnnotation(BungeeCordConstants.HANDLER_ANNOTATION);
                     if (annotation != null) {
                         isEventHandler = true;
                         break;
@@ -83,7 +93,7 @@ public class BungeeCordListenerImplementedInspection extends BaseInspection {
                     return;
                 }
 
-                boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, BungeeCordConstants.BUNGEECORD_LISTENER_CLASS);
+                boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, BungeeCordConstants.LISTENER_CLASS);
 
                 if (inError) {
                     registerClassError(aClass, aClass);

@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.util;
 
 import com.intellij.openapi.application.ApplicationManager;
@@ -11,12 +21,12 @@ public class Util {
 
     public static void runWriteTask(@NotNull Runnable runnable) {
         ApplicationManager.getApplication().invokeAndWait(() ->
-            ApplicationManager.getApplication().runWriteAction(runnable), ModalityState.any());
+            ApplicationManager.getApplication().runWriteAction(runnable), ModalityState.NON_MODAL);
     }
 
     public static void runWriteTaskLater(@NotNull Runnable runnable) {
         ApplicationManager.getApplication().invokeLater(() ->
-            ApplicationManager.getApplication().runWriteAction(runnable), ModalityState.any());
+            ApplicationManager.getApplication().runWriteAction(runnable), ModalityState.NON_MODAL);
     }
 
     public static void invokeLater(@NotNull Runnable runnable) {

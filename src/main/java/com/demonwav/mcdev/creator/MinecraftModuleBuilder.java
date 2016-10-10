@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
@@ -31,13 +41,6 @@ import javax.swing.Icon;
 public class MinecraftModuleBuilder extends JavaModuleBuilder {
 
     private MinecraftProjectCreator creator = new MinecraftProjectCreator();
-    private final ProjectSettingsWizardStep[] steps = new ProjectSettingsWizardStep[] {
-            new ProjectSettingsWizardStep(creator), // Bukkit, Spigot, Paper
-            new ProjectSettingsWizardStep(creator), // Sponge
-            new ProjectSettingsWizardStep(creator), // Forge
-            new ProjectSettingsWizardStep(creator), // LiteLoader
-            new ProjectSettingsWizardStep(creator)  // BungeeCord
-    };
 
     @Override
     public String getPresentableName() {
@@ -136,21 +139,20 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
     @Override
     public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
         return new ModuleWizardStep[] {
-                new SpongeForgeChooser(creator),
-                new BuildSystemWizardStep(creator),
-                // Due to this not allow dynamic steps at runtime, we just fill out all of them and skip the ones we don't use
-                steps[0], // Bukkit, Spigot, Paper
-                steps[1], // Sponge
-                steps[2], // Forge
-                steps[3], // LiteLoader
-                steps[4]  // BungeeCord
+            new SpongeForgeChooser(creator),
+            new BuildSystemWizardStep(creator),
+            new BukkitProjectSettingsWizard(creator),
+            new SpongeProjectSettingsWizard(creator),
+            new ForgeProjectSettingsWizard(creator),
+            new LiteLoaderProjectSettingsWizard(creator),
+            new BungeeCordProjectSettingsWizard(creator)
         };
     }
 
     @Nullable
     @Override
     public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
-        return new ProjectChooserWizardStep(creator, steps);
+        return new ProjectChooserWizardStep(creator);
     }
 
     @Override

@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.sponge.color;
 
 import com.demonwav.mcdev.platform.MinecraftModule;
@@ -66,7 +76,7 @@ public class SpongeColorUtil {
         Pair<Color, PsiElement> pair = null;
 
         // Single Integer Argument
-        if (types.length == 1 && types[0] == PsiType.INT) {
+        if (types.length == 1 && types[0] == PsiType.INT && expressionList.getExpressions()[0] instanceof PsiLiteralExpression) {
             pair = new Pair<>(
                 handleSingleArgument((PsiLiteralExpression) expressionList.getExpressions()[0]),
                 expressionList.getExpressions()[0]
@@ -108,6 +118,12 @@ public class SpongeColorUtil {
 
     @Nullable
     private static Color handleThreeArguments(@NotNull PsiExpressionList expressionList) {
+        if (!(expressionList.getExpressions()[0] instanceof PsiLiteralExpression) ||
+            !(expressionList.getExpressions()[1] instanceof PsiLiteralExpression) ||
+            !(expressionList.getExpressions()[2] instanceof PsiLiteralExpression)) {
+            return null;
+        }
+
         try {
             PsiLiteralExpression expressionOne = (PsiLiteralExpression) expressionList.getExpressions()[0];
             PsiLiteralExpression expressionTwo= (PsiLiteralExpression) expressionList.getExpressions()[1];

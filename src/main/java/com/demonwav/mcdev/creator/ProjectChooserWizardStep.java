@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
@@ -11,7 +21,6 @@ import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.ui.IdeBorderFactory;
-import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Desktop;
@@ -28,7 +37,6 @@ import javax.swing.event.HyperlinkEvent;
 public class ProjectChooserWizardStep extends ModuleWizardStep {
 
     private final MinecraftProjectCreator creator;
-    private final ProjectSettingsWizardStep[] steps;
 
     private JPanel chooserPanel;
     private JPanel panel;
@@ -66,10 +74,9 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             "<a href=\"http://www.liteloader.com/\"> LiteLoader</a> mod, for use " +
             "on LiteLoader clients.";
 
-    public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator, @NotNull ProjectSettingsWizardStep[] steps) {
+    public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator) {
         super();
         this.creator = creator;
-        this.steps = steps;
     }
 
     @Override
@@ -120,12 +127,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
                 fillInInfoPane()
         );
 
-        // show the right sponge icon
-        if (UIUtil.isUnderDarcula()) {
-            spongeIcon.setIcon(PlatformAssets.SPONGE_ICON_2X);
-        } else {
-            spongeIcon.setIcon(PlatformAssets.SPONGE_ICON_DARK_2X);
-        }
+        spongeIcon.setIcon(PlatformAssets.SPONGE_ICON_2X);
 
         return panel;
     }
@@ -187,44 +189,39 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
         if (bukkitPluginCheckBox.isSelected()) {
             BukkitProjectConfiguration configuration = new BukkitProjectConfiguration();
             configuration.type = PlatformType.BUKKIT;
-            creator.getSettings().add(configuration);
+            creator.getSettings().put(PlatformType.BUKKIT, configuration);
         }
 
         if (spigotPluginCheckBox.isSelected()) {
             BukkitProjectConfiguration configuration = new BukkitProjectConfiguration();
             configuration.type = PlatformType.SPIGOT;
-            creator.getSettings().add(configuration);
+            creator.getSettings().put(PlatformType.BUKKIT, configuration);
         }
 
         if (paperPluginCheckBox.isSelected()) {
             BukkitProjectConfiguration configuration = new BukkitProjectConfiguration();
             configuration.type = PlatformType.PAPER;
-            creator.getSettings().add(configuration);
+            creator.getSettings().put(PlatformType.BUKKIT, configuration);
         }
 
         if (spongePluginCheckBox.isSelected()) {
-            creator.getSettings().add(new SpongeProjectConfiguration());
+            creator.getSettings().put(PlatformType.SPONGE, new SpongeProjectConfiguration());
         }
 
         if (forgeModCheckBox.isSelected()) {
-            creator.getSettings().add(new ForgeProjectConfiguration());
+            creator.getSettings().put(PlatformType.FORGE, new ForgeProjectConfiguration());
         }
 
         if (liteLoaderModCheckBox.isSelected()) {
-            creator.getSettings().add(new LiteLoaderProjectConfiguration());
+            creator.getSettings().put(PlatformType.LITELOADER, new LiteLoaderProjectConfiguration());
         }
 
         if (bungeeCordPluginCheckBox.isSelected()) {
-            creator.getSettings().add(new BungeeCordProjectConfiguration());
+            creator.getSettings().put(PlatformType.BUNGEECORD, new BungeeCordProjectConfiguration());
         }
 
-        creator.index = 0;
-        for (ProjectSettingsWizardStep step : steps) {
-            step.resetIndex();
-        }
+        creator.getSettings().values().iterator().next().isFirst = true;
     }
-
-
 
     @Override
     public boolean validate() throws ConfigurationException {

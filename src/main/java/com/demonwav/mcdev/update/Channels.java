@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.update;
 
 import com.google.common.collect.ImmutableList;
@@ -7,8 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public enum Channels {
-    SCOTLIN("Kotlin And Scala Support", "https://plugins.jetbrains.com/plugins/kotlin%20and%20scala%20support/8327", 1),
-    MIXINS("Mixins", "https://plugins.jetbrains.com/plugins/mixins/8327", 2);
+    SCOTLIN("Kotlin And Scala Support", "https://plugins.jetbrains.com/plugins/kotlin%20and%20scala%20support/8327", 1);
 
     private final String title;
     private final String url;
@@ -44,7 +53,7 @@ public enum Channels {
     }
 
     public static List<Channels> orderedList() {
-        return ImmutableList.of(SCOTLIN, MIXINS);
+        return ImmutableList.of(SCOTLIN);
     }
 
     public boolean hasChannel() {

@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.creator;
 
 import static com.demonwav.mcdev.platform.PlatformType.BUKKIT;
@@ -5,15 +15,11 @@ import static com.demonwav.mcdev.platform.PlatformType.PAPER;
 import static com.demonwav.mcdev.platform.PlatformType.SPIGOT;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.exception.MinecraftSetupException;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,14 +49,14 @@ public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
     private BukkitProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
-    public BukkitProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
+    public BukkitProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
         this.creator = creator;
-        this.settings = (BukkitProjectConfiguration) creator.getSettings().get(index);
     }
 
     @Override
     public JComponent getComponent() {
-        if (creator.getArtifactId() == null) {
+        settings = (BukkitProjectConfiguration) creator.getSettings().get(PlatformType.BUKKIT);
+        if (settings == null) {
             return panel;
         }
 
@@ -58,7 +64,7 @@ public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
         pluginNameField.setText(name);
         pluginVersionField.setText(creator.getVersion());
 
-        if (creator.index != 0) {
+        if (settings != null && !settings.isFirst) {
             pluginNameField.setEditable(false);
             pluginVersionField.setEditable(false);
         }
@@ -67,10 +73,10 @@ public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
             + '.' + name);
 
         if (creator.getSettings().size() > 1) {
-            mainClassField.setText(mainClassField.getText() + creator.getSettings().get(creator.index).type.getNormalName());
+            mainClassField.setText(mainClassField.getText() + settings.type.getNormalName());
         }
 
-        switch (creator.getSettings().get(creator.index).type) {
+        switch (settings.type) {
             case BUKKIT:
                 title.setIcon(PlatformAssets.BUKKIT_ICON_2X);
                 title.setText("<html><font size=\"5\">Bukkit Settings</font></html>");
@@ -93,39 +99,14 @@ public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
     }
 
     @Override
+    public boolean isStepVisible() {
+        settings = (BukkitProjectConfiguration) creator.getSettings().get(PlatformType.BUKKIT);
+        return settings != null;
+    }
+
+    @Override
     public boolean validate() throws ConfigurationException {
-        try {
-            if (pluginNameField.getText().trim().isEmpty()) {
-                throw new MinecraftSetupException("empty", pluginNameField);
-            }
-
-            if (pluginVersionField.getText().trim().isEmpty()) {
-                throw new MinecraftSetupException("empty", pluginVersionField);
-            }
-
-            if (mainClassField.getText().trim().isEmpty()) {
-                throw new MinecraftSetupException("empty", mainClassField);
-            }
-            if (!loadBeforeField.getText().matches(ProjectSettingsWizardStep.pattern)) {
-                throw new MinecraftSetupException("bad", loadBeforeField);
-            }
-
-            if (!dependField.getText().matches(ProjectSettingsWizardStep.pattern)) {
-                throw new MinecraftSetupException("bad", dependField);
-            }
-
-            if (!softDependField.getText().matches(ProjectSettingsWizardStep.pattern)) {
-                throw new MinecraftSetupException("bad", softDependField);
-            }
-        } catch (MinecraftSetupException e) {
-            String message = e.getError();
-            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
-                    .setFadeoutTime(4000)
-                    .createBalloon()
-                    .show(RelativePoint.getSouthWestOf(e.getJ()), Balloon.Position.below);
-            return false;
-        }
-        return true;
+        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, pattern);
     }
 
     @Override
@@ -146,9 +127,4 @@ public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public void updateDataModel() {}
-
-    @Override
-    public void setIndex(int index) {
-        this.settings = (BukkitProjectConfiguration) creator.getSettings().get(index);
-    }
 }

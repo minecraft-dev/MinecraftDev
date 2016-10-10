@@ -1,17 +1,27 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.buildsystem.gradle;
 
-import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
-import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
 import com.intellij.openapi.externalSystem.model.ProjectKeys;
 import com.intellij.openapi.externalSystem.model.project.LibraryDependencyData;
+import com.intellij.openapi.externalSystem.model.project.LibraryPathType;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.externalSystem.service.project.manage.AbstractProjectDataService;
@@ -20,22 +30,14 @@ import com.intellij.openapi.externalSystem.util.Order;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiManager;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
-import org.jetbrains.plugins.groovy.lang.psi.GroovyFile;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Order(ExternalSystemConstants.UNORDERED)
 public abstract class AbstractDataService extends AbstractProjectDataService<LibraryDependencyData, Module> {
@@ -63,32 +65,24 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             return;
         }
 
-        Set<Module> goodModules = toImport.stream()
-                .filter(n -> n.getData().getExternalName().startsWith(type.getGroupId() + ":" + type.getArtifactId()))
-                .map(n -> modelsProvider.findIdeModule(n.getData().getOwnerModule()))
-                .distinct()
-                .collect(Collectors.toSet());
+        Set<Module> goodModules = Sets.newHashSet();
+        Set<Module> allModules = Sets.newHashSet();
 
-        setupModules(goodModules, modelsProvider, type);
+        for (DataNode<LibraryDependencyData> node : toImport) {
+            final Module module = modelsProvider.findIdeModule(node.getData().getOwnerModule());
+            allModules.add(module);
+            if (node.getData().getExternalName().startsWith(type.getGroupId() + ":" + type.getArtifactId())) {
+                goodModules.add(module);
+            }
+        }
+
+        setupModules(goodModules, allModules, modelsProvider, type);
     }
 
-    /**
-     * We have two checks for Sponge, so we hold the first one here until the second one finishes. This is so hacky it hurts.
-     */
-    private static Set<Module> firstGoodModules;
-
     public static void setupModules(@NotNull Set<Module> goodModules,
+                                    @NotNull Set<Module> allModules,
                                     @NotNull IdeModifiableModelsProvider modelsProvider,
                                     @NotNull AbstractModuleType<?> type) {
-
-        if (type == SpongeModuleType.getInstance()) {
-            if (firstGoodModules == null) {
-                firstGoodModules = goodModules;
-                return;
-            }
-
-            goodModules.addAll(firstGoodModules);
-        }
 
         // So the way the Gradle plugin sets it up is with 3 modules. There's the parent module, which the Gradle
         // dependencies don't apply to, then submodules under it, normally main and test, which the Gradle dependencies
@@ -99,33 +93,15 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             Set<Module> badModules = new HashSet<>();
             checkedModules.addAll(goodModules);
 
-            goodModules.forEach(m -> {
-                String[] path = modelsProvider.getModifiableModuleModel().getModuleGroupPath(m);
-                if (path == null) {
-                    // Always reset back to JavaModule
-                    m.setOption("type", JavaModuleType.getModuleType().getId());
-                    checkedModules.add(m);
-                    MinecraftModuleType.addOption(m, type.getId());
-                    Optional.ofNullable(BuildSystem.getInstance(m)).ifPresent(thisModule -> thisModule.reImport(m));
-                    MinecraftModule.getInstance(m);
-                } else {
-                    String parentName = path[0];
-                    Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
-                    if (parentModule != null) {
-                        // Always reset back to JavaModule
-                        parentModule.setOption("type", JavaModuleType.getModuleType().getId());
-                        badModules.add(m);
-                        checkedModules.add(parentModule);
-                        MinecraftModuleType.addOption(parentModule, type.getId());
-                        Optional.ofNullable(BuildSystem.getInstance(parentModule))
-                            .ifPresent(thisModule -> thisModule.reImport(parentModule));
-                        MinecraftModule.getInstance(parentModule);
-                    }
-                }
-            });
+            goodModules.stream()
+                .filter(m -> m != null)
+                .forEach(m -> findParent(m, modelsProvider, type, checkedModules, badModules));
 
             // Reset all other modules back to JavaModule && remove the type
-            for (Module module : modelsProvider.getModules()) {
+            for (Module module : allModules) {
+                if (module == null) {
+                    continue;
+                }
                 if (!checkedModules.contains(module) || badModules.contains(module)) {
                     if (Strings.nullToEmpty(module.getOptionValue("type")).equals(type.getId())) {
                         module.setOption("type", JavaModuleType.getModuleType().getId());
@@ -134,68 +110,70 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                 }
             }
         });
-
-        if (firstGoodModules != null && type == SpongeModuleType.getInstance()) {
-            firstGoodModules = null;
-        }
     }
 
-    protected void checkModule(@NotNull IdeModifiableModelsProvider modelsProvider,
+    protected void checkModule(@NotNull Collection<DataNode<LibraryDependencyData>> toImport,
+                               @NotNull IdeModifiableModelsProvider modelsProvider,
                                @NotNull AbstractModuleType<?> type,
-                               @NotNull String text) {
+                               @NotNull String... texts) {
 
         ApplicationManager.getApplication().runReadAction(() -> {
-            final Module[] modules = modelsProvider.getModules();
-            List<Module> forgeModules = new ArrayList<>();
-            for (Module module : modules) {
-                if (!checkModuleText(module, modelsProvider, text)) {
-                    // Make sure this isn't marked as a forge module
-                    MinecraftModuleType.removeOption(module, type.getId());
-                    continue;
-                }
 
-                forgeModules.add(module);
-            }
+            final Set<Module> goodModules = Sets.newHashSet();
+            final Set<Module> allModules = Sets.newHashSet();
 
-            for (Module testModule : modelsProvider.getModules()) {
-                if (forgeModules.contains(testModule)) {
-                    testModule.setOption("type", JavaModuleType.getModuleType().getId());
-                    MinecraftModuleType.addOption(testModule, type.getId());
-                    Optional.ofNullable(BuildSystem.getInstance(testModule)).ifPresent(md -> md.reImport(testModule));
-                    MinecraftModule.getInstance(testModule);
-                } else {
-                    if (Strings.nullToEmpty(testModule.getOptionValue("type")).equals(type.getId())) {
-                        testModule.setOption("type", JavaModuleType.getModuleType().getId());
+            for (DataNode<LibraryDependencyData> node : toImport) {
+                final Set<String> paths = node.getData().getTarget().getPaths(LibraryPathType.BINARY);
+                paths.addAll(node.getData().getTarget().getPaths(LibraryPathType.SOURCE));
+
+                final Module module = modelsProvider.findIdeModule(node.getData().getOwnerModule());
+                allModules.add(module);
+
+                if (paths.stream().anyMatch(p -> {
+                    for (String text : texts) {
+                        if (p.contains(text)) {
+                            return true;
+                        }
                     }
+                    return false;
+                })) {
+                    goodModules.add(module);
                 }
             }
+
+            setupModules(goodModules, allModules, modelsProvider, type);
         });
     }
 
-    @Contract("null, _, _ -> false")
-    private boolean checkModuleText(Module module, IdeModifiableModelsProvider provider, String text) {
-
-        if (module != null) {
-            VirtualFile[] roots = provider.getModifiableRootModel(module).getContentRoots();
-            if (roots.length == 0) {
-                // last ditch effort
-                roots = ModuleRootManager.getInstance(module).getContentRoots();
-                if (roots.length == 0) {
-                    return false;
-                }
-            }
-            VirtualFile file = roots[0];
-            file = file.findFileByRelativePath("build.gradle");
-
-            if (file != null) {
-                GroovyFile groovyFile = (GroovyFile) PsiManager.getInstance(module.getProject()).findFile(file);
-                if (groovyFile != null) {
-                    if (groovyFile.getText().contains(text)) {
-                        return true;
-                    }
-                }
+    private static void findParent(@NotNull Module module,
+                                   @NotNull IdeModifiableModelsProvider modelsProvider,
+                                   @NotNull AbstractModuleType type,
+                                   @NotNull Set<Module> checkedModules,
+                                   @NotNull Set<Module> badModules) {
+        String[] path = modelsProvider.getModifiableModuleModel().getModuleGroupPath(module);
+        if (path == null) {
+            // Always reset back to JavaModule
+            module.setOption("type", JavaModuleType.getModuleType().getId());
+            checkedModules.add(module);
+            MinecraftModuleType.addOption(module, type.getId());
+        } else {
+            String parentName = path[path.length - 1];
+            Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
+            if (parentModule != null) {
+                // Always reset back to JavaModule
+                parentModule.setOption("type", JavaModuleType.getModuleType().getId());
+                badModules.add(module);
+                checkedModules.add(parentModule);
+                MinecraftModuleType.addOption(parentModule, type.getId());
+                MinecraftModule.getInstance(parentModule);
+            } else {
+                return;
             }
         }
-        return false;
+        Optional.ofNullable(MinecraftModule.getInstance(module)).ifPresent(m -> {
+            if (m.getBuildSystem() != null && m.getIdeaModule() != null) {
+                m.getBuildSystem().reImport(m.getIdeaModule());
+            }
+        });
     }
 }

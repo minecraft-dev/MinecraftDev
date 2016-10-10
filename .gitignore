@@ -46,4 +46,4 @@ hs_err_pid*
 
 /src/main/resources/messages.MinecraftDevelopment_en.properties
 /src/main/resources/messages.MinecraftDevelopment.properties
-lib/
+/gen/

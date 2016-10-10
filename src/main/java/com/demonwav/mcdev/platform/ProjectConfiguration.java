@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
@@ -26,6 +36,8 @@ public abstract class ProjectConfiguration {
     public PlatformType type = null;
 
     public Module module;
+
+    public boolean isFirst = false;
 
     public abstract void create(@NotNull Project project, @NotNull BuildSystem buildSystem, @NotNull ProgressIndicator indicator);
 

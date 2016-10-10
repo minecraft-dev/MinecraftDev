@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.util;
 
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +21,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("WeakerAccess")
-public class Sorting {
+public final class Sorting {
+
+    private Sorting() {
+    }
 
     public static final Comparator<int[]> LEXICOGRAPHICAL_ORDER = (one, two) -> {
         int length = Math.min(one.length, two.length);

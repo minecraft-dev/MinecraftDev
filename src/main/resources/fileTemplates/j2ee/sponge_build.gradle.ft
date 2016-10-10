@@ -1,26 +1,16 @@
 plugins {
-    id "com.qixalite.spongestart" version "1.5.2"
-    id "java"
+    id 'org.spongepowered.plugin' version '0.7'
 }
 
-group pluginGroup
-version pluginVersion
+group = pluginGroup
+version = pluginVersion
 
+#if (${BUILD_VERSION})
 sourceCompatibility = ${BUILD_VERSION}
 targetCompatibility = ${BUILD_VERSION}
 
-spongestart{
-    eula true
-
-    //optional configs
-    spongeVanillaBuild 'LATEST'
-    vanillaServerFolder project.file('run/vanilla').getAbsolutePath()
-}
-
-repositories {
-    mavenCentral()
-}
-
+#end
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
 }
+
+sponge.plugin.id = pluginId

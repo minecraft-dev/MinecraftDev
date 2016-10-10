@@ -1,13 +1,8 @@
 plugins {
-    id "com.qixalite.spongestart" version "1.5.2"
-}
-
-repositories {
-    mavenCentral()
+    id 'org.spongepowered.plugin' version '0.7'
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
     compile project(':${COMMON_PROJECT_NAME}')
 }
 
@@ -15,14 +10,6 @@ processResources {
     from('src/main/resources') {
         expand 'version': project.version
     }
-}
-
-spongestart{
-    eula true
-
-    //optional configs
-    spongeVanillaBuild 'LATEST'
-    vanillaServerFolder project.file('run/vanilla').getAbsolutePath()
 }
 
 shadowJar {

@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.MinecraftSettings;
@@ -14,10 +24,7 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packageDependencies.ui.PackageDependenciesNode;
 import com.intellij.ui.ColoredTreeCellRenderer;
-import com.intellij.util.ui.UIUtil;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,11 +80,7 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
             }
             if (validTypes.size() == 2) {
                 if (validTypes.contains(SpongeModuleType.getInstance()) && validTypes.contains(ForgeModuleType.getInstance())) {
-                    if (UIUtil.isUnderDarcula()) {
-                        data.setIcon(PlatformAssets.SPONGE_FORGE_ICON);
-                    } else {
-                        data.setIcon(PlatformAssets.SPONGE_FORGE_ICON_DARK);
-                    }
+                    data.setIcon(PlatformAssets.SPONGE_FORGE_ICON);
                     continue;
                 }
             }

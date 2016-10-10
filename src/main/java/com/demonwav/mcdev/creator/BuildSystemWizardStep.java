@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.creator;
 
 import static com.demonwav.mcdev.platform.PlatformType.FORGE;
@@ -50,12 +60,12 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
             buildSystemBox.setVisible(false);
             return;
         }
-        if (creator.getSettings().stream().anyMatch(s -> s.type == FORGE) ||
-                creator.getSettings().stream().anyMatch(s -> s.type == LITELOADER) ||
-                creator.getSettings().stream().anyMatch(s -> s instanceof SpongeForgeProjectConfiguration)) {
+        if (creator.getSettings().values().stream().anyMatch(s -> s.type == FORGE) ||
+                creator.getSettings().values().stream().anyMatch(s -> s.type == LITELOADER) ||
+                creator.getSettings().values().stream().anyMatch(s -> s instanceof SpongeForgeProjectConfiguration)) {
             buildSystemBox.setSelectedIndex(1);
             buildSystemBox.setVisible(false);
-        } else if (creator.getSettings().stream().anyMatch(s -> s.type == SPONGE)) {
+        } else if (creator.getSettings().values().stream().anyMatch(s -> s.type == SPONGE)) {
             buildSystemBox.setSelectedIndex(1);
             buildSystemBox.setVisible(true);
         } else {
@@ -99,7 +109,7 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
                 throw new MinecraftSetupException("fillAll", versionField);
             }
 
-            if (creator.getSettings().stream().anyMatch(s -> s.type == FORGE) && buildSystemBox.getSelectedIndex() == 0) {
+            if (creator.getSettings().values().stream().anyMatch(s -> s.type == FORGE) && buildSystemBox.getSelectedIndex() == 0) {
                 throw new MinecraftSetupException("Forge does not support Maven", buildSystemBox);
             }
         } catch (MinecraftSetupException e) {

@@ -1,9 +1,20 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exception.MinecraftSetupException;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration;
-import com.demonwav.mcdev.platform.mcp.McpVersion;
-import com.demonwav.mcdev.platform.mcp.McpVersionEntry;
+import com.demonwav.mcdev.platform.mcp.version.McpVersion;
+import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
@@ -90,9 +101,8 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
         }
     };
 
-    public LiteLoaderProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
+    public LiteLoaderProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
         this.creator = creator;
-        this.settings = (LiteLoaderProjectConfiguration) creator.getSettings().get(index);
 
         mcpWarning.setVisible(false);
 
@@ -158,10 +168,15 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public JComponent getComponent() {
+        settings = (LiteLoaderProjectConfiguration) creator.getSettings().get(PlatformType.LITELOADER);
+        if (settings == null) {
+            return panel;
+        }
+
         pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
         pluginVersionField.setText(creator.getVersion());
 
-        if (creator.index != 0) {
+        if (settings != null && !settings.isFirst) {
             pluginNameField.setEditable(false);
             pluginVersionField.setEditable(false);
         }
@@ -203,6 +218,12 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
     }
 
     @Override
+    public boolean isStepVisible() {
+        settings = (LiteLoaderProjectConfiguration) creator.getSettings().get(PlatformType.LITELOADER);
+        return settings != null;
+    }
+
+    @Override
     public void onStepLeaving() {
         settings.pluginName = pluginNameField.getText();
         settings.pluginVersion = pluginVersionField.getText();
@@ -210,11 +231,6 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
 
         settings.mcVersion = (String) minecraftVersionBox.getSelectedItem();
         settings.mcpVersion = ((McpVersionEntry) mcpVersionBox.getSelectedItem()).getText();
-    }
-
-    @Override
-    public void setIndex(int index) {
-        this.settings = (LiteLoaderProjectConfiguration) creator.getSettings().get(index);
     }
 
     @Override

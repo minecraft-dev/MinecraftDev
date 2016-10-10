@@ -1,40 +1,56 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.util;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.JavaPsiFacade;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.intellij.navigation.AnonymousElementProvider;
+import com.intellij.openapi.extensions.Extensions;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
+import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.JavaTokenType;
-import com.intellij.psi.PsiAnnotationMemberValue;
-import com.intellij.psi.PsiArrayInitializerMemberValue;
+import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
-import com.intellij.psi.PsiReferenceList;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.PsiKeyword;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
-import com.intellij.psi.PsiSubstitutor;
-import com.intellij.psi.PsiType;
-import com.intellij.psi.PsiTypeParameter;
-import com.intellij.psi.impl.PsiManagerEx;
-import com.intellij.psi.impl.source.PsiClassReferenceType;
-import com.intellij.psi.impl.source.PsiImmediateClassType;
-import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
+import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiModifierListOwner;
+import com.intellij.psi.PsiReferenceList;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.java.IKeywordElementType;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class McPsiUtil {
+    private McPsiUtil() {}
 
     @Nullable
-    public static PsiClass getClassOfElement(@NotNull PsiElement element) {
+    @Contract(value = "null -> null", pure = true)
+    public static PsiClass getClassOfElement(@Nullable PsiElement element) {
+        if (element == null) {
+            return null;
+        }
+
         if (element instanceof PsiClass) {
             return (PsiClass) element;
         }
@@ -81,44 +97,6 @@ public final class McPsiUtil {
         }
     }
 
-    @Nullable
-    public static PsiClass resolveGenericClass(@Nullable PsiAnnotationMemberValue targetClasses) {
-        if (targetClasses instanceof PsiArrayInitializerMemberValue) {
-            final PsiAnnotationMemberValue[] initializers = ((PsiArrayInitializerMemberValue) targetClasses).getInitializers();
-            final PsiClassObjectAccessExpressionImpl targetExpression = ((PsiClassObjectAccessExpressionImpl) initializers[0]);
-            final PsiType type = targetExpression.getType();
-
-            if (!(type instanceof PsiImmediateClassType)) {
-                return null;
-            }
-            final PsiSubstitutor substitutor = ((PsiImmediateClassType) type).resolveGenerics().getSubstitutor();
-            final Map<PsiTypeParameter, PsiType> substitutionMap = substitutor.getSubstitutionMap();
-            final Set<Map.Entry<PsiTypeParameter, PsiType>> entries = substitutionMap.entrySet();
-            if (entries.size() != 1) {
-                return null;
-            }
-            final Map.Entry<PsiTypeParameter, PsiType> next = entries.iterator().next();
-            final PsiClassReferenceType value = (PsiClassReferenceType) next.getValue();
-            return value.resolve();
-        }
-        if (targetClasses instanceof PsiClassObjectAccessExpressionImpl) {
-            final PsiType type = ((PsiClassObjectAccessExpressionImpl) targetClasses).getType();
-            if (!(type instanceof PsiImmediateClassType)) {
-                return null;
-            }
-            final PsiSubstitutor substitutor = ((PsiImmediateClassType) type).resolveGenerics().getSubstitutor();
-            final Map<PsiTypeParameter, PsiType> substitutionMap = substitutor.getSubstitutionMap();
-            final Set<Map.Entry<PsiTypeParameter, PsiType>> entries = substitutionMap.entrySet();
-            if (entries.size() != 1) {
-                return null;
-            }
-            final Map.Entry<PsiTypeParameter, PsiType> next = entries.iterator().next();
-            final PsiClassReferenceType value = (PsiClassReferenceType) next.getValue();
-            return value.resolve();
-        }
-        return null;
-    }
-
     private static final ImmutableSet<String> METHOD_ACCESS_MODIFIERS = ImmutableSet.<String>builder()
             .add(PsiModifier.PUBLIC)
             .add(PsiModifier.PROTECTED)
@@ -126,9 +104,9 @@ public final class McPsiUtil {
             .add(PsiModifier.PRIVATE)
             .build();
 
-    public static String getMethodAccessModifier(PsiMethod method) {
+    public static String getAccessModifier(PsiMember member) {
         return METHOD_ACCESS_MODIFIERS.stream()
-                .filter(method::hasModifierProperty)
+                .filter(member::hasModifierProperty)
                 .findFirst()
                 .orElse(PsiModifier.PUBLIC);
     }
@@ -141,5 +119,69 @@ public final class McPsiUtil {
             }
         }
         return JavaTokenType.PUBLIC_KEYWORD;
+    }
+
+    @Nullable
+    public static PsiAnnotation getAnnotation(@Nullable PsiModifierListOwner owner, @NotNull String annotationName) {
+        if (owner == null) {
+            return null;
+        }
+
+        final PsiModifierList list = owner.getModifierList();
+        if (list == null) {
+            return null;
+        }
+
+        return list.findAnnotation(annotationName);
+    }
+
+    @Nullable
+    @Contract(value = "null -> null", pure = true)
+    public static Pair<String, PsiClass> getNameOfClass(@Nullable PsiClass psiClass) {
+        if (psiClass == null) {
+            return null;
+        }
+
+        if (psiClass.getContainingClass() == null) {
+            //noinspection ConstantConditions
+            return Pair.create("", psiClass);
+        }
+
+        final List<String> innerStrings = Lists.newArrayList();
+        PsiClass baseClass = psiClass;
+        while (psiClass != null) {
+            baseClass = psiClass;
+            if (psiClass.getName() == null) {
+                // anon class
+                PsiElement[] anonymousClasses = null;
+                for (AnonymousElementProvider provider : Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
+                    //noinspection ConstantConditions
+                    anonymousClasses = provider.getAnonymousElements(psiClass.getContainingClass());
+                    if (anonymousClasses.length > 0) {
+                        break;
+                    }
+                }
+
+                if (anonymousClasses == null) {
+                    // We couldn't build the proper string, so don't return anything at all
+                    return null;
+                }
+
+                for (int i = 0; i < anonymousClasses.length; i++) {
+                    if (anonymousClasses[i] == psiClass) {
+                        innerStrings.add(String.valueOf(i + 1));
+                        break;
+                    }
+                }
+            } else {
+                innerStrings.add(psiClass.getName());
+                psiClass = psiClass.getContainingClass();
+            }
+        }
+
+        // We started from the bottom and went up, so reverse it
+        Collections.reverse(innerStrings);
+        // Skip the base class, we are giving the base PsiClass so the user can do with it what they want
+        return Pair.create("$" + innerStrings.stream().skip(1).collect(Collectors.joining("$")), baseClass);
     }
 }

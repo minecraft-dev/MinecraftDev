@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.forge.gradle;
 
 import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService;
@@ -29,6 +39,6 @@ public class ForgeDataService extends AbstractDataService {
             return;
         }
 
-        checkModule(modelsProvider, ForgeModuleType.getInstance(), "net.minecraftforge.gradle.forge");
+        checkModule(toImport, modelsProvider, ForgeModuleType.getInstance(), "forgeSrc", "forgeBin");
     }
 }

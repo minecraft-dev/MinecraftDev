@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.buildsystem.BuildDependency;
@@ -41,7 +51,10 @@ public abstract class AbstractModule {
 
     public abstract AbstractModuleType<?> getModuleType();
     public abstract PlatformType getType();
-    public abstract Icon getIcon();
+
+    public Icon getIcon() {
+        return getModuleType().getIcon();
+    }
 
     /**
      * By default, this method is provided in the case that a specific platform has no
@@ -56,7 +69,7 @@ public abstract class AbstractModule {
      *     method as an error and prevent compiling.
      */
     public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
-        return true;
+        return false;
     }
 
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {

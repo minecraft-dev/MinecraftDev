@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.util;
 
 import com.intellij.psi.HierarchicalMethodSignature;
@@ -16,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class McMethodUtil {
 
-
+    @Contract(pure = true)
     public static boolean areSignaturesEqualLightweight(@NotNull MethodSignature sig1,
                                                         @NotNull MethodSignature sig2,
                                                         @NotNull String sig2NameReplacement) {
@@ -28,8 +38,7 @@ public class McMethodUtil {
 
         if (!isConstructor1 || !(sig1 instanceof HierarchicalMethodSignature || sig2 instanceof HierarchicalMethodSignature)) {
             final String name1 = sig1.getName();
-            final String name2 = sig2NameReplacement;
-            if (!name1.equals(name2)) {
+            if (!name1.equals(sig2NameReplacement)) {
                 return false;
             }
         }

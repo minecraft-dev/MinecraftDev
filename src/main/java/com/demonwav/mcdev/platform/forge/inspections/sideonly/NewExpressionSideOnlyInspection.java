@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
 import com.demonwav.mcdev.util.McPsiUtil;
@@ -43,7 +53,7 @@ public class NewExpressionSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        final PsiClass psiClass = (PsiClass) infos[1];
+        final PsiClass psiClass = (PsiClass) infos[0];
 
         if (psiClass.isWritable()) {
             return new RemoveAnnotationInspectionGadgetsFix() {

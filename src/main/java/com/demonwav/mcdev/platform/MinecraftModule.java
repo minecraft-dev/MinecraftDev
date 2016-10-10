@@ -1,15 +1,31 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform;
 
+import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.buildsystem.SourceType;
+import com.demonwav.mcdev.platform.forge.ForgeModuleType;
+import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 import com.demonwav.mcdev.util.Util;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
@@ -18,15 +34,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+
+import javax.swing.Icon;
 
 public class MinecraftModule {
 
     private static Map<Module, MinecraftModule> map = new HashMap<>();
+    private static Set<Consumer<MinecraftModule>> readyWaiters = Sets.newConcurrentHashSet();
 
     private Module module;
     private BuildSystem buildSystem;
@@ -36,7 +60,7 @@ public class MinecraftModule {
         MinecraftModule minecraftModule = new MinecraftModule();
         minecraftModule.module = module;
         minecraftModule.buildSystem = BuildSystem.getInstance(module);
-        if (minecraftModule.buildSystem != null && !minecraftModule.buildSystem.isImported()) {
+        if (minecraftModule.buildSystem != null) {
             minecraftModule.buildSystem.reImport(module).done(buildSystem -> types.forEach(minecraftModule::register));
         }
         return minecraftModule;
@@ -73,7 +97,7 @@ public class MinecraftModule {
             } else {
                 String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
                 if (paths != null && paths.length > 0) {
-                    Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[0]);
+                    Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[paths.length - 1]);
                     if (parentModule != null) {
                         if (map.containsKey(parentModule)) {
                             MinecraftModule minecraftModule = map.get(parentModule);
@@ -140,7 +164,7 @@ public class MinecraftModule {
     }
 
     @Nullable
-    private <T extends AbstractModule> T getModuleOfType(@Nullable AbstractModuleType<T> type) {
+    public <T extends AbstractModule> T getModuleOfType(@Nullable AbstractModuleType<T> type) {
         //noinspection unchecked
         return (T) modules.get(type);
     }
@@ -194,6 +218,27 @@ public class MinecraftModule {
         ProjectView.getInstance(module.getProject()).refresh();
     }
 
+    /**
+     * Synchronize this module with the types given
+     *
+     * @param types Types to synchronize off of
+     */
+    public void updateModules(PlatformType[] types) {
+        final List<PlatformType> platformTypes = Arrays.asList(types);
+        for (Iterator<AbstractModuleType<?>> iter = modules.keySet().iterator(); iter.hasNext();) {
+            final AbstractModuleType<?> next = iter.next();
+            if (!platformTypes.contains(next.getPlatformType())) {
+                iter.remove();
+            }
+        }
+        for (PlatformType type : types) {
+            if (!modules.keySet().contains(type.getType())) {
+                modules.put(type.getType(), type.getType().generateModule(module));
+            }
+        }
+        ProjectView.getInstance(module.getProject()).refresh();
+    }
+
     public boolean isEventGenAvailable() {
         return modules.keySet().stream().anyMatch(AbstractModuleType::isEventGenAvailable);
     }
@@ -201,5 +246,44 @@ public class MinecraftModule {
     @Contract(value = "null -> false", pure = true)
     public boolean shouldShowPluginIcon(@Nullable PsiElement element) {
         return getModules().stream().filter(m -> m.shouldShowPluginIcon(element)).findAny().isPresent();
+    }
+
+    @Nullable
+    public Icon getIcon() {
+        if (modules.keySet().stream().filter(AbstractModuleType::hasIcon).count() == 1) {
+            return modules.values().iterator().next().getIcon();
+        } else if (
+            modules.keySet().stream().filter(AbstractModuleType::hasIcon).count() == 2 &&
+            modules.containsKey(SpongeModuleType.getInstance()) &&
+            modules.containsKey(ForgeModuleType.getInstance())
+        ) {
+            return PlatformAssets.SPONGE_FORGE_ICON;
+        } else {
+            return PlatformAssets.MINECRAFT_ICON;
+        }
+    }
+
+    @NotNull
+    public static Optional<VirtualFile> searchAllModulesForFile(@NotNull String path, @NotNull SourceType type) {
+        return map.values().stream().distinct()
+            .filter(m -> m.getBuildSystem() != null)
+            .map(m -> m.getBuildSystem().findFile(path, type))
+            .filter(f -> f != null)
+            .findFirst();
+    }
+
+    public static void doWhenReady(@NotNull Consumer<MinecraftModule> consumer) {
+        readyWaiters.add(consumer);
+    }
+
+    public static void doReadyActions() {
+        //noinspection Convert2streamapi
+        for (MinecraftModule minecraftModule : map.values()) {
+            if (!minecraftModule.getIdeaModule().getProject().isDisposed()) {
+                for (Consumer<MinecraftModule> readyWaiter : readyWaiters) {
+                    readyWaiter.accept(minecraftModule);
+                }
+            }
+        }
     }
 }

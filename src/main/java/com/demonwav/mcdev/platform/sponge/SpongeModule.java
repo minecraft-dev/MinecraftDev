@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
@@ -39,9 +49,7 @@ public class SpongeModule extends AbstractModule {
         super(module);
         buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            if (!buildSystem.isImported()) {
-                buildSystem.reImport(module);
-            }
+            buildSystem.reImport(module);
         }
     }
 

@@ -1,19 +1,52 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.mixin;
 
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations;
 
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import java.util.Collections;
 import java.util.List;
+
+import javax.swing.Icon;
 
 public class MixinModuleType extends AbstractModuleType<MixinModule> {
 
     public static final String ID = "MIXIN_MODULE_TYPE";
     private static final MixinModuleType instance = new MixinModuleType();
+
+    private static final ImmutableList<String> ANNOTATIONS = ImmutableList.<String>builder()
+            .add(Annotations.DEBUG)
+            .add(Annotations.FINAL)
+            .add(Annotations.IMPLEMENTS)
+            .add(Annotations.INTERFACE)
+            .add(Annotations.INTRINSIC)
+            .add(Annotations.MIXIN)
+            .add(Annotations.MUTABLE)
+            .add(Annotations.OVERWRITE)
+            .add(Annotations.SHADOW)
+            .add(Annotations.SOFT_OVERRIDE)
+            .add(Annotations.UNIQUE)
+            .add(Annotations.INJECT)
+            .add(Annotations.MODIFY_ARG)
+            .add(Annotations.MODIFY_CONSTANT)
+            .add(Annotations.MODIFY_VARIABLE)
+            .add(Annotations.REDIRECT)
+            .add(Annotations.SURROGATE)
+            .build();
 
     private MixinModuleType() {
         super("org.spongepowered", "mixin");
@@ -44,36 +77,16 @@ public class MixinModuleType extends AbstractModuleType<MixinModule> {
         return ID;
     }
 
-    private final ImmutableList<String> annotations = ImmutableList.<String>builder()
-            .add("org.spongepowered.asm.mixin.Debug")
-            .add("org.spongepowered.asm.mixin.Final")
-            .add("org.spongepowered.asm.mixin.Implements")
-            .add("org.spongepowered.asm.mixin.Interface")
-            .add("org.spongepowered.asm.mixin.Intrinsic")
-            .add("org.spongepowered.asm.mixin.Mixin")
-            .add("org.spongepowered.asm.mixin.Mutable")
-            .add("org.spongepowered.asm.mixin.Overwrite")
-            .add("org.spongepowered.asm.mixin.Shadow")
-            .add("org.spongepowered.asm.mixin.SoftOverride")
-            .add("org.spongepowered.asm.mixin.Unique")
-            .add("org.spongepowered.asm.mixin.injection.Inject")
-            .add("org.spongepowered.asm.mixin.injection.ModifyArg")
-            .add("org.spongepowered.asm.mixin.injection.ModifyConstant")
-            .add("org.spongepowered.asm.mixin.injection.ModifyVariable")
-            .add("org.spongepowered.asm.mixin.injection.Redirect")
-            .add("org.spongepowered.asm.mixin.injection.Surrogate")
-            .build();
-
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return this.annotations;
+        return ANNOTATIONS;
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of();
+        return Collections.emptyList();
     }
 
     @NotNull

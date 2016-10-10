@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.bukkit.generation;
 
 import com.demonwav.mcdev.insight.generation.GenerationData;
@@ -7,13 +17,13 @@ import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 
 public class BukkitEventGenerationPanel extends EventGenerationPanel {
 
-    private JRadioButton ignoreCanceledRadioButton;
+    private JCheckBox ignoreCanceledCheckBox;
     private JPanel panel;
     private JComboBox<String> eventPriorityComboBox;
 
@@ -24,7 +34,7 @@ public class BukkitEventGenerationPanel extends EventGenerationPanel {
     @Nullable
     @Override
     public JPanel getPanel() {
-        ignoreCanceledRadioButton.setSelected(true);
+        ignoreCanceledCheckBox.setSelected(true);
 
         // Not static because the form builder is not reliable
         eventPriorityComboBox.addItem("MONITOR");
@@ -42,6 +52,6 @@ public class BukkitEventGenerationPanel extends EventGenerationPanel {
     @Nullable
     @Override
     public GenerationData gatherData() {
-        return new BukkitGenerationData(ignoreCanceledRadioButton.isSelected(), eventPriorityComboBox.getSelectedItem().toString());
+        return new BukkitGenerationData(ignoreCanceledCheckBox.isSelected(), eventPriorityComboBox.getSelectedItem().toString());
     }
 }

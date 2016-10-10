@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.bungeecord;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
@@ -24,7 +34,7 @@ public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
 
     private BungeeCordModuleType() {
         super("net.md-5", "bungeecord-api");
-        CommonColors.applyStandardColors(this.colorMap, BungeeCordConstants.BUNGEECORD_CHAT_COLOR_CLASS);
+        CommonColors.applyStandardColors(this.colorMap, BungeeCordConstants.CHAT_COLOR_CLASS);
     }
 
     @NotNull
@@ -50,13 +60,13 @@ public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ImmutableList.of(BungeeCordConstants.BUNGEECORD_HANDLER_ANNOTATION);
+        return ImmutableList.of(BungeeCordConstants.HANDLER_ANNOTATION);
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of(BungeeCordConstants.BUNGEECORD_HANDLER_ANNOTATION);
+        return ImmutableList.of(BungeeCordConstants.HANDLER_ANNOTATION);
     }
 
     @NotNull

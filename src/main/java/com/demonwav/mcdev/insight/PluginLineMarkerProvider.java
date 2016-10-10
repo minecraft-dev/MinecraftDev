@@ -1,6 +1,16 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.insight;
 
-import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.asset.GeneralAssets;
 import com.demonwav.mcdev.platform.MinecraftModule;
 
 import com.intellij.codeHighlighting.Pass;
@@ -45,7 +55,7 @@ public class PluginLineMarkerProvider extends LineMarkerProviderDescriptor {
         return new LineMarkerInfo<>(
             element,
             element.getTextRange(),
-            PlatformAssets.PLUGIN,
+            GeneralAssets.PLUGIN,
             Pass.UPDATE_ALL,
             FunctionUtil.nullConstant(),
             null,

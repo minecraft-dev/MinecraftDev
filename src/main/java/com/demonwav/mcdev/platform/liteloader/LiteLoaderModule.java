@@ -1,7 +1,18 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.liteloader;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 
@@ -21,10 +32,13 @@ public class LiteLoaderModule extends AbstractModule {
         super(module);
         this.buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            if (!buildSystem.isImported()) {
-                buildSystem.reImport(module);
-            }
+            buildSystem.reImport(module);
         }
+    }
+
+    @Override
+    public GradleBuildSystem getBuildSystem() {
+        return (GradleBuildSystem) buildSystem;
     }
 
     @Override

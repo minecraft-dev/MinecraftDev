@@ -1,14 +1,24 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
-import com.demonwav.mcdev.platform.forge.versionapi.ForgeVersion;
+import com.demonwav.mcdev.platform.forge.version.ForgeVersion;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
-import com.demonwav.mcdev.platform.mcp.McpVersion;
-import com.demonwav.mcdev.platform.mcp.McpVersionEntry;
+import com.demonwav.mcdev.platform.mcp.version.McpVersion;
+import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry;
 
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,11 +68,8 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         }
     };
 
-    public boolean spongeForge = false;
-
-    public ForgeProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
+    public ForgeProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
         this.creator = creator;
-        this.settings = (ForgeProjectConfiguration) creator.getSettings().get(index);
 
         generateDocsCheckbox.setVisible(false);
         mcpWarning.setVisible(false);
@@ -73,6 +80,39 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
             }
             setForgeVersion();
         });
+    }
+
+    @Override
+    public JComponent getComponent() {
+        settings = (ForgeProjectConfiguration) creator.getSettings().get(PlatformType.FORGE);
+        if (settings == null) {
+            return null;
+        }
+
+        pluginNameField.setText(WordUtils.capitalize(creator.getArtifactId()));
+        pluginVersionField.setText(creator.getVersion());
+
+        if (settings != null && !settings.isFirst) {
+            pluginNameField.setEditable(false);
+            pluginVersionField.setEditable(false);
+        }
+
+        mainClassField.setText(this.creator.getGroupId().toLowerCase() + '.' + this.creator.getArtifactId().toLowerCase()
+                + '.' + WordUtils.capitalize(this.creator.getArtifactId()));
+
+        if (creator.getSettings().size() > 1) {
+            mainClassField.setText(mainClassField.getText() + PlatformType.FORGE.getNormalName());
+        }
+
+        loadingBar.setIndeterminate(true);
+
+        if (settings instanceof SpongeForgeProjectConfiguration) {
+            title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X);
+            title.setText("<html><font size=\"5\">SpongeForge Settings</font></html>");
+            generateDocsCheckbox.setVisible(true);
+
+            minecraftVersionLabel.setText("    Sponge API");
+        }
 
         try {
             new SwingWorker() {
@@ -92,9 +132,9 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
                     minecraftVersionBox.removeAllItems();
 
                     // reverse order the versions
-                    if (!spongeForge) {
+                    if (!(settings instanceof SpongeForgeProjectConfiguration)) {
                         forgeVersion.getSortedMcVersions().forEach(minecraftVersionBox::addItem);
-                        String recommended = forgeVersion.getRecommended(mcpVersion.getVersions());
+                        final String recommended = forgeVersion.getRecommended(mcpVersion.getVersions());
 
                         int index = 0;
                         for (int i = 0; i < minecraftVersionBox.getItemCount(); i++) {
@@ -124,38 +164,6 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
             }.execute();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    @Override
-    public JComponent getComponent() {
-        pluginNameField.setText(WordUtils.capitalize(creator.getArtifactId()));
-        pluginVersionField.setText(creator.getVersion());
-
-        if (creator.index != 0) {
-            pluginNameField.setEditable(false);
-            pluginVersionField.setEditable(false);
-        }
-
-        mainClassField.setText(this.creator.getGroupId().toLowerCase() + '.' + this.creator.getArtifactId().toLowerCase()
-                + '.' + WordUtils.capitalize(this.creator.getArtifactId()));
-
-        if (creator.getSettings().size() > 1) {
-            mainClassField.setText(mainClassField.getText() + creator.getSettings().get(creator.index).type.getNormalName());
-        }
-
-        loadingBar.setIndeterminate(true);
-
-        if (spongeForge) {
-            if (UIUtil.isUnderDarcula()) {
-                title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X);
-            } else {
-                title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_DARK_2X);
-            }
-            title.setText("<html><font size=\"5\">SpongeForge Settings</font></html>");
-            generateDocsCheckbox.setVisible(true);
-
-            minecraftVersionLabel.setText("    Sponge API");
         }
 
         return panel;
@@ -196,7 +204,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     private String getVersion() {
         String version;
-        if (!spongeForge) {
+        if (!(settings instanceof SpongeForgeProjectConfiguration)) {
             version = (String) minecraftVersionBox.getSelectedItem();
         } else {
             if (minecraftVersionBox.getSelectedItem().equals("4.1.0")) {
@@ -210,7 +218,13 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public boolean validate() throws ConfigurationException {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField) && !loadingBar.isVisible();
+        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, pattern) && !loadingBar.isVisible();
+    }
+
+    @Override
+    public boolean isStepVisible() {
+        settings = (ForgeProjectConfiguration) creator.getSettings().get(PlatformType.FORGE);
+        return settings != null;
     }
 
     @Override
@@ -243,9 +257,4 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public void updateDataModel() {}
-
-    @Override
-    public void setIndex(int index) {
-        this.settings = (ForgeProjectConfiguration) creator.getSettings().get(index);
-    }
 }

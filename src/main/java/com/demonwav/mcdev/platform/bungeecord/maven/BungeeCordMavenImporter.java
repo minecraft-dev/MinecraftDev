@@ -1,4 +1,14 @@
 /*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
+/*
  * IntelliJ IDEA Bukkit Support Plugin
  *
  * Written by Kyle Wood (DemonWav)

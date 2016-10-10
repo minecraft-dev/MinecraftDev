@@ -1,13 +1,19 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.creator;
 
-import com.demonwav.mcdev.exception.MinecraftSetupException;
+import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
 
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,15 +39,15 @@ public class BungeeCordProjectSettingsWizard extends MinecraftModuleWizardStep {
     private BungeeCordProjectConfiguration settings;
     private final MinecraftProjectCreator creator;
 
-    public BungeeCordProjectSettingsWizard(@NotNull MinecraftProjectCreator creator, int index) {
+    public BungeeCordProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
         super();
         this.creator = creator;
-        this.settings = (BungeeCordProjectConfiguration) creator.getSettings().get(index);
     }
 
     @Override
     public JComponent getComponent() {
-        if (creator.getArtifactId() == null) {
+        settings = (BungeeCordProjectConfiguration) creator.getSettings().get(PlatformType.BUNGEECORD);
+        if (settings == null) {
             return panel;
         }
 
@@ -49,7 +55,7 @@ public class BungeeCordProjectSettingsWizard extends MinecraftModuleWizardStep {
         pluginNameField.setText(name);
         pluginVersionField.setText(creator.getVersion());
 
-        if (creator.index != 0) {
+        if (settings != null && !settings.isFirst) {
             pluginNameField.setEditable(false);
             pluginVersionField.setEditable(false);
         }
@@ -58,7 +64,7 @@ public class BungeeCordProjectSettingsWizard extends MinecraftModuleWizardStep {
             + '.' + name);
 
         if (creator.getSettings().size() > 1) {
-            mainClassField.setText(mainClassField.getText() + creator.getSettings().get(creator.index).type.getNormalName());
+            mainClassField.setText(mainClassField.getText() + PlatformType.BUNGEECORD.getNormalName());
         }
 
         return panel;
@@ -66,36 +72,13 @@ public class BungeeCordProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public boolean validate() throws ConfigurationException {
-        try {
-            if (pluginNameField.getText().trim().isEmpty()) {
-                throw new MinecraftSetupException("empty", pluginNameField);
-            }
+        return validate(pluginNameField, pluginVersionField, mainClassField, authorField, dependField, pattern);
+    }
 
-            if (pluginVersionField.getText().trim().isEmpty()) {
-                throw new MinecraftSetupException("empty", pluginVersionField);
-            }
-
-            if (mainClassField.getText().trim().isEmpty()) {
-                throw new MinecraftSetupException("empty", mainClassField);
-            }
-
-            if (!dependField.getText().matches(pattern)) {
-                throw new MinecraftSetupException("bad", dependField);
-            }
-
-            if (!softDependField.getText().matches(pattern)) {
-                throw new MinecraftSetupException("bad", softDependField);
-            }
-        } catch (MinecraftSetupException e) {
-            String message = e.getError();
-
-            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
-                    .setFadeoutTime(4000)
-                    .createBalloon()
-                    .show(RelativePoint.getSouthWestOf(e.getJ()), Balloon.Position.below);
-            return false;
-        }
-        return true;
+    @Override
+    public boolean isStepVisible() {
+        settings = (BungeeCordProjectConfiguration) creator.getSettings().get(PlatformType.BUNGEECORD);
+        return settings != null;
     }
 
     @Override
@@ -113,9 +96,4 @@ public class BungeeCordProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public void updateDataModel() {}
-
-    @Override
-    public void setIndex(int index) {
-        this.settings = (BungeeCordProjectConfiguration) creator.getSettings().get(index);
-    }
 }

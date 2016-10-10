@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform;
 
 import com.intellij.openapi.components.AbstractProjectComponent;
@@ -23,6 +33,7 @@ public class MinecraftProjectComponent extends AbstractProjectComponent {
                 Optional.ofNullable(MinecraftModule.getInstance(module))
                     .ifPresent(m -> m.getTypes().forEach(t -> t.performCreationSettingSetup(myProject)));
             }
+            MinecraftModule.doReadyActions();
         });
     }
 }
