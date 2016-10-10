@@ -339,7 +339,7 @@ public class GradleBuildSystem extends BuildSystem {
                 GradleExternalTaskConfigurationType gradleType = GradleExternalTaskConfigurationType.getInstance();
 
                 // Set the Forge client and server run configs
-                if (configurations.stream().anyMatch(c -> c.type == PlatformType.FORGE)) {
+                if (configurations.stream().anyMatch(c -> c.type == PlatformType.FORGE || c instanceof SpongeForgeProjectConfiguration)) {
                     Module mainModule;
                     if (configurations.size() == 1) {
                         mainModule = ModuleManager.getInstance(project).findModuleByName(rootModule.getName() + "_main");
