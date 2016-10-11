@@ -36,10 +36,10 @@ public class ForgeVersion {
     @Nullable
     public static ForgeVersion downloadData() {
         try (InputStream in = new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json").openStream()) {
-            String text = IOUtils.toString(in);
+            final String text = IOUtils.toString(in);
 
-            Map map = new Gson().fromJson(text, Map.class);
-            ForgeVersion version = new ForgeVersion();
+            final Map map = new Gson().fromJson(text, Map.class);
+            final ForgeVersion version = new ForgeVersion();
             version.map = map;
             return version;
         } catch (IOException e) {
@@ -49,7 +49,7 @@ public class ForgeVersion {
     }
 
     public List<String> getSortedMcVersions() {
-        Map mcversion = (Map) map.get("mcversion");
+        final Map mcversion = (Map) map.get("mcversion");
         return Sorting.sortVersions(mcversion.keySet());
     }
 
@@ -72,7 +72,7 @@ public class ForgeVersion {
 
     @Nullable
     public Double getPromo(String version) {
-        Map promos = (Map) map.get("promos");
+        final Map promos = (Map) map.get("promos");
         if (promos != null) {
             return (Double) promos.get(version + "-recommended");
         }
@@ -80,12 +80,12 @@ public class ForgeVersion {
     }
 
     public List<String> getForgeVersions(String version) {
-        List<String> list = new ArrayList<>();
-        Map<?, ?> numbers = (Map) map.get("number");
+        final List<String> list = new ArrayList<>();
+        final Map<?, ?> numbers = (Map) map.get("number");
         numbers.forEach((k, v) -> {
             if (v instanceof Map) {
-                Map number = (Map) v;
-                String currentVersion = (String) number.get("mcversion");
+                final Map number = (Map) v;
+                final String currentVersion = (String) number.get("mcversion");
 
                 if (Objects.equal(currentVersion, version)) {
                     list.add((String) number.get("version"));
@@ -97,17 +97,17 @@ public class ForgeVersion {
 
     @Nullable
     public String getFullVersion(String version) {
-        Map<?, ?> numbers = (Map<?, ?>) map.get("number");
-        String[] parts = version.split("\\.");
-        String versionSmall = parts[parts.length - 1];
-        Map<?, ?> number = (Map<?, ?>) numbers.get(versionSmall);
+        final Map<?, ?> numbers = (Map<?, ?>) map.get("number");
+        final String[] parts = version.split("\\.");
+        final String versionSmall = parts[parts.length - 1];
+        final Map<?, ?> number = (Map<?, ?>) numbers.get(versionSmall);
         if (number == null) {
             return null;
         }
 
-        String branch = (String) number.get("branch");
-        String mcVersion = (String) number.get("mcversion");
-        String finalVersion = (String) number.get("version");
+        final String branch = (String) number.get("branch");
+        final String mcVersion = (String) number.get("mcversion");
+        final String finalVersion = (String) number.get("version");
         if (branch == null) {
             return mcVersion + "-" + finalVersion;
         } else {

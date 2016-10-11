@@ -62,7 +62,7 @@ public class BungeeCordMavenImporter extends AbstractMavenImporter {
         for (Module module : ModuleManager.getInstance(project).getModules()) {
             // We'll make sure the project is setup
             if (Objects.equals(ModuleRootManager.getInstance(module).getContentRoots()[0], mavenProject.getFile().getParent())) {
-                BungeeCordModule bungeeCordModule = MinecraftModule.getInstance(module, BungeeCordModuleType.getInstance());
+                final BungeeCordModule bungeeCordModule = MinecraftModule.getInstance(module, BungeeCordModuleType.getInstance());
                 if (bungeeCordModule != null) {
                     bungeeCordModule.setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
                     return;

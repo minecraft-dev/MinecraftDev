@@ -149,7 +149,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         BukkitGenerationData bukkitData = (BukkitGenerationData) data;
         assert  bukkitData != null;
 
-        PsiMethod method = generateBukkitStyleEventListenerMethod(
+        final PsiMethod method = generateBukkitStyleEventListenerMethod(
             containingClass,
             chosenClass,
             chosenName,
@@ -159,13 +159,13 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         );
 
         if (!bukkitData.getEventPriority().equals("NORMAL")) {
-            PsiModifierList list = method.getModifierList();
-            PsiAnnotation annotation = list.findAnnotation(BukkitConstants.HANDLER_ANNOTATION);
+            final PsiModifierList list = method.getModifierList();
+            final PsiAnnotation annotation = list.findAnnotation(BukkitConstants.HANDLER_ANNOTATION);
             if (annotation == null) {
                 return method;
             }
 
-            PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
                 .createExpressionFromText(BukkitConstants.EVENT_PRIORITY_CLASS + "." + bukkitData.getEventPriority(), annotation);
 
             annotation.setDeclaredAttributeValue("priority", value);
@@ -180,21 +180,21 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
                                                                    @NotNull Project project,
                                                                    @NotNull String annotationName,
                                                                    boolean setIgnoreCancelled) {
-        PsiMethod newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
+        final PsiMethod newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
 
-        PsiParameterList list = newMethod.getParameterList();
-        PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
+        final PsiParameterList list = newMethod.getParameterList();
+        final PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
             .createParameter(
                 "event",
                 PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.allScope(project))
             );
         list.add(parameter);
 
-        PsiModifierList modifierList = newMethod.getModifierList();
-        PsiAnnotation annotation = modifierList.addAnnotation(annotationName);
+        final PsiModifierList modifierList = newMethod.getModifierList();
+        final PsiAnnotation annotation = modifierList.addAnnotation(annotationName);
 
         if (setIgnoreCancelled) {
-            PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project).createExpressionFromText("true", annotation);
+            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project).createExpressionFromText("true", annotation);
             annotation.setDeclaredAttributeValue("ignoreCancelled", value);
         }
 
@@ -293,7 +293,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BukkitModule<?> that = (BukkitModule<?>) o;
+        final BukkitModule<?> that = (BukkitModule<?>) o;
         return Objects.equal(pluginYml, that.pluginYml) &&
             type == that.type &&
             Objects.equal(configManager, that.configManager) &&

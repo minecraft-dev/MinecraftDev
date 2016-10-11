@@ -97,12 +97,12 @@ public class MixinCustomJavaDocTagProvider implements CustomJavadocTagProvider {
             return false;
         }
 
-        Module module = ModuleUtilCore.findModuleForPsiElement(element);
+        final Module module = ModuleUtilCore.findModuleForPsiElement(element);
         if (module == null) {
             return false;
         }
 
-        MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
+        final MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
         if (minecraftModule == null) {
             return false;
         }
@@ -111,7 +111,7 @@ public class MixinCustomJavaDocTagProvider implements CustomJavadocTagProvider {
             return false;
         }
 
-        PsiMethod method = (PsiMethod) element;
+        final PsiMethod method = (PsiMethod) element;
 
         return AuthorInspection.shouldHaveAuthorTag(method);
     }

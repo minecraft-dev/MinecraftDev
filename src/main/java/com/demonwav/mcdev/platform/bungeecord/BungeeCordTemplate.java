@@ -31,7 +31,7 @@ public class BungeeCordTemplate extends AbstractTemplate {
                                               @NotNull VirtualFile file,
                                               @NotNull String packageName,
                                               @NotNull String className) {
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
@@ -46,7 +46,7 @@ public class BungeeCordTemplate extends AbstractTemplate {
     @NotNull
     public static String applyPomTemplate(@NotNull Project project,
                                           @NotNull String version) {
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", version);
 
         FileTemplateManager manager = FileTemplateManager.getInstance(project);
@@ -64,7 +64,7 @@ public class BungeeCordTemplate extends AbstractTemplate {
                                                           @NotNull VirtualFile file,
                                                           @NotNull BungeeCordProjectConfiguration settings,
                                                           @NotNull BuildSystem buildSystem) {
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
 
         properties.setProperty("NAME", settings.pluginName);
 

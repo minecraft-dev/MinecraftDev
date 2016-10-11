@@ -129,13 +129,13 @@ public class BungeeCordModule extends AbstractModule {
             false
         );
 
-        BungeeCordGenerationData generationData = (BungeeCordGenerationData) data;
+        final BungeeCordGenerationData generationData = (BungeeCordGenerationData) data;
         if (generationData == null) {
             return method;
         }
 
-        PsiModifierList modifierList = method.getModifierList();
-        PsiAnnotation annotation = modifierList.findAnnotation(BungeeCordConstants.HANDLER_ANNOTATION);
+        final PsiModifierList modifierList = method.getModifierList();
+        final PsiAnnotation annotation = modifierList.findAnnotation(BungeeCordConstants.HANDLER_ANNOTATION);
         if (annotation == null) {
             return method;
         }
@@ -144,7 +144,7 @@ public class BungeeCordModule extends AbstractModule {
             return method;
         }
 
-        PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+        final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
             .createExpressionFromText(BungeeCordConstants.EVENT_PRIORITY_CLASS + "." + generationData.getEventPriority(), annotation);
 
         annotation.setDeclaredAttributeValue("priority", value);

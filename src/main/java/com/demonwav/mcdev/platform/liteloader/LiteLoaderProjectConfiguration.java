@@ -41,15 +41,15 @@ public class LiteLoaderProjectConfiguration extends ProjectConfiguration {
                 indicator.setText("Writing main class");
 
                 VirtualFile file = buildSystem.getSourceDirectories().get(0);
-                String[] files = this.mainClass.split("\\.");
-                String className = files[files.length - 1];
-                String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
+                final String[] files = this.mainClass.split("\\.");
+                final String className = files[files.length - 1];
+                final String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
                 file = getMainClassDirectory(files, file);
 
-                VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
+                final VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
                 LiteLoaderTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className, pluginName, pluginVersion);
 
-                PsiJavaFile mainClassPsi = (PsiJavaFile) PsiManager.getInstance(project).findFile(mainClassFile);
+                final PsiJavaFile mainClassPsi = (PsiJavaFile) PsiManager.getInstance(project).findFile(mainClassFile);
                 if (mainClassPsi == null) {
                     return;
                 }

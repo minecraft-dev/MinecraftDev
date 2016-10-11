@@ -93,7 +93,7 @@ public enum PlatformType {
 
     @NotNull
     public static PlatformType[] removeParents(@NotNull PlatformType[] types) {
-        PlatformType[] result = new PlatformType[types.length];
+        final PlatformType[] result = new PlatformType[types.length];
 
         int count = 0;
         //noinspection ForLoopReplaceableByForEach

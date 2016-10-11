@@ -10,6 +10,8 @@
 
 package com.demonwav.mcdev.platform.forge;
 
+import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
+
 import com.intellij.json.JsonFileType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.AbstractProjectComponent;
@@ -32,13 +34,13 @@ public class ForgeProjectComponent extends AbstractProjectComponent {
             FileTypeManager.getInstance().associate(JsonFileType.INSTANCE, new FileNameMatcher() {
                 @Override
                 public boolean accept(@NonNls @NotNull String fileName) {
-                    return fileName.equals("mcmod.info");
+                    return fileName.equals(ForgeConstants.MCMOD_INFO);
                 }
 
                 @NotNull
                 @Override
                 public String getPresentableString() {
-                    return "mcmod.info";
+                    return ForgeConstants.MCMOD_INFO;
                 }
             })
         );

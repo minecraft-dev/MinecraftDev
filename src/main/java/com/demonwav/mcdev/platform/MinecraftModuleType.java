@@ -45,7 +45,7 @@ public class MinecraftModuleType extends JavaModuleType {
             }
         }
         module.setOption(OPTION, currentOption);
-        MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
+        final MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
         if (minecraftModule != null) {
             final PlatformType[] types = cleanOption(module);
             minecraftModule.updateModules(types);
@@ -53,15 +53,15 @@ public class MinecraftModuleType extends JavaModuleType {
     }
 
     public static void removeOption(@NotNull Module module, @NotNull String option) {
-        String currentOption = module.getOptionValue(OPTION);
+        final String currentOption = module.getOptionValue(OPTION);
         if (Strings.isNullOrEmpty(currentOption)) {
             return;
         }
 
         if (currentOption.contains(option)) {
-            String[] parts = currentOption.split(",");
+            final String[] parts = currentOption.split(",");
             String newOption = "";
-            Iterator<String> partIterator = Arrays.asList(parts).iterator();
+            final Iterator<String> partIterator = Arrays.asList(parts).iterator();
             while (partIterator.hasNext()) {
                 String part = partIterator.next();
 
@@ -79,7 +79,7 @@ public class MinecraftModuleType extends JavaModuleType {
             module.setOption(OPTION, newOption);
         }
 
-        MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
+        final MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
         if (minecraftModule != null) {
             final PlatformType[] types = cleanOption(module);
             minecraftModule.updateModules(types);

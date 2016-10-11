@@ -78,7 +78,7 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
     public abstract T generateModule(Module module);
 
     public void performCreationSettingSetup(@NotNull Project project) {
-        JDOMExternalizableStringList annotations = ((EntryPointsManagerBase)EntryPointsManager.getInstance(project)).ADDITIONAL_ANNOTATIONS;
+        final JDOMExternalizableStringList annotations = ((EntryPointsManagerBase)EntryPointsManager.getInstance(project)).ADDITIONAL_ANNOTATIONS;
         getIgnoredAnnotations().stream().filter(annotation -> !annotations.contains(annotation)).forEach(annotations::add);
     }
 

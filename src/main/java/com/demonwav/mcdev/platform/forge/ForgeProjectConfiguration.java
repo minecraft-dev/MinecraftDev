@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.forge;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
 import com.demonwav.mcdev.util.Util;
 
 import com.intellij.ide.util.EditorHelper;
@@ -57,9 +58,9 @@ public class ForgeProjectConfiguration extends ProjectConfiguration {
             try {
                 indicator.setText("Writing main class");
                 VirtualFile file = buildSystem.getSourceDirectories().get(0);
-                String[] files = this.mainClass.split("\\.");
-                String className = files[files.length - 1];
-                String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
+                final String[] files = this.mainClass.split("\\.");
+                final String className = files[files.length - 1];
+                final String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
                 file = getMainClassDirectory(files, file);
 
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
@@ -76,7 +77,7 @@ public class ForgeProjectConfiguration extends ProjectConfiguration {
                 writeMcmodInfo(project, buildSystem);
 
                 // Set the editor focus on the main class
-                PsiFile mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile);
+                final PsiFile mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile);
                 if (mainClassPsi != null) {
                     EditorHelper.openInEditor(mainClassPsi);
                 }
@@ -88,8 +89,8 @@ public class ForgeProjectConfiguration extends ProjectConfiguration {
 
     protected void writeMcmodInfo(Project project, BuildSystem buildSystem) {
         try {
-            VirtualFile file = buildSystem.getResourceDirectories().get(0);
-            VirtualFile mcmodInfoFile = file.findOrCreateChildData(this, "mcmod.info");
+            final VirtualFile file = buildSystem.getResourceDirectories().get(0);
+            final VirtualFile mcmodInfoFile = file.findOrCreateChildData(this, ForgeConstants.MCMOD_INFO);
 
             String authorsText = "";
             if (hasAuthors()) {
@@ -107,7 +108,7 @@ public class ForgeProjectConfiguration extends ProjectConfiguration {
 
             String dependenciesText = "";
             if (hasDependencies()) {
-                Iterator<String> iterator = dependencies.iterator();
+                final Iterator<String> iterator = dependencies.iterator();
                 while (iterator.hasNext()) {
                     dependenciesText += '"' + iterator.next() + '"';
                     if (iterator.hasNext()) {

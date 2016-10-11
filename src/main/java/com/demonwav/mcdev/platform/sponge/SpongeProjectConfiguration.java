@@ -62,19 +62,19 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
             try {
                 indicator.setText("Writing main class");
                 VirtualFile file = buildSystem.getSourceDirectories().get(0);
-                String[] files = this.mainClass.split("\\.");
-                String className = files[files.length - 1];
-                String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
+                final String[] files = this.mainClass.split("\\.");
+                final String className = files[files.length - 1];
+                final String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
                 file = getMainClassDirectory(files, file);
 
-                VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
+                final VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
                 SpongeTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className, hasDependencies(), generateDocumentedListeners);
 
-                PsiJavaFile mainClassPsi = (PsiJavaFile) PsiManager.getInstance(project).findFile(mainClassFile);
+                final PsiJavaFile mainClassPsi = (PsiJavaFile) PsiManager.getInstance(project).findFile(mainClassFile);
                 if (mainClassPsi == null) {
                     return;
                 }
-                PsiClass psiClass = mainClassPsi.getClasses()[0];
+                final PsiClass psiClass = mainClassPsi.getClasses()[0];
 
                 writeMainSpongeClass(
                     project,
@@ -166,8 +166,8 @@ public class SpongeProjectConfiguration extends ProjectConfiguration {
         }
 
         annotationString += "\n)";
-        PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
-        PsiAnnotation annotation = factory.createAnnotationFromText(annotationString, null);
+        final PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
+        final PsiAnnotation annotation = factory.createAnnotationFromText(annotationString, null);
 
         new WriteCommandAction.Simple(project, mainClassPsi) {
             @Override

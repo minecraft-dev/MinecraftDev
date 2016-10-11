@@ -78,7 +78,7 @@ public class BukkitListenerImplementedInspection extends BaseInspection {
         return new BaseInspectionVisitor() {
             @Override
             public void visitClass(PsiClass aClass) {
-                PsiMethod[] methods = aClass.getMethods();
+                final PsiMethod[] methods = aClass.getMethods();
                 boolean isEventHandler = false;
                 for (PsiMethod method : methods) {
                     PsiModifierList list = method.getModifierList();
@@ -93,7 +93,7 @@ public class BukkitListenerImplementedInspection extends BaseInspection {
                     return;
                 }
 
-                boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, BukkitConstants.LISTENER_CLASS);
+                final boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, BukkitConstants.LISTENER_CLASS);
 
                 if (inError) {
                     registerClassError(aClass, aClass);

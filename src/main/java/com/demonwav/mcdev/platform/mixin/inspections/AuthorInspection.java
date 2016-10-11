@@ -72,17 +72,17 @@ public class AuthorInspection extends BaseInspection {
             return new InspectionGadgetsFix() {
                 @Override
                 protected void doFix(Project project, ProblemDescriptor descriptor) {
-                    PsiMethod method = (PsiMethod) infos[1];
+                    final PsiMethod method = (PsiMethod) infos[1];
 
-                    PsiDocComment docComment = method.getDocComment();
+                    final PsiDocComment docComment = method.getDocComment();
                     if (docComment == null) {
-                        PsiDocComment comment = JavaPsiFacade.getElementFactory(method.getProject())
+                        final PsiDocComment comment = JavaPsiFacade.getElementFactory(method.getProject())
                             .createDocCommentFromText("/**\n * @author \n */");
                         method.addBefore(comment, method.getModifierList());
                         return;
                     }
 
-                    PsiDocTag tag = JavaPsiFacade.getElementFactory(method.getProject()).createDocTagFromText("@author");
+                    final PsiDocTag tag = JavaPsiFacade.getElementFactory(method.getProject()).createDocTagFromText("@author");
 
                     if (docComment.getTags().length != 0) {
                         docComment.addBefore(tag, docComment.getTags()[0]);

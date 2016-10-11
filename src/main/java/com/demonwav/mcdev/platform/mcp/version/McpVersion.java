@@ -45,9 +45,9 @@ public class McpVersion {
         try (InputStream in = new URL("http://export.mcpbot.bspk.rs/versions.json").openStream()) {
             String text = IOUtils.toString(in);
 
-            Type tokenType = new TypeToken<Map<String, Map<String, List<Integer>>>>() {}.getType();
-            Map<String, Map<String, List<Integer>>> map = new Gson().fromJson(text, tokenType);
-            McpVersion version = new McpVersion();
+            final Type tokenType = new TypeToken<Map<String, Map<String, List<Integer>>>>() {}.getType();
+            final Map<String, Map<String, List<Integer>>> map = new Gson().fromJson(text, tokenType);
+            final McpVersion version = new McpVersion();
             version.map = map;
             return version;
         } catch (IOException e) {
@@ -73,12 +73,12 @@ public class McpVersion {
 
     @NotNull
     private Pair<List<Integer>, List<Integer>> get(String version, String type) {
-        List<Integer> good = new ArrayList<>();
-        List<Integer> bad = new ArrayList<>();
+        final List<Integer> good = new ArrayList<>();
+        final List<Integer> bad = new ArrayList<>();
 
-        Set<String> keySet = map.keySet();
+        final Set<String> keySet = map.keySet();
         for (String key : keySet) {
-            Map<String, List<Integer>> versions = map.get(key);
+            final Map<String, List<Integer>> versions = map.get(key);
             if (versions != null) {
                 if (key.equals(version)) {
                     good.addAll(versions.get(type));
@@ -95,11 +95,11 @@ public class McpVersion {
         mcpVersionBox.removeActionListener(actionListener);
         mcpVersionBox.removeAllItems();
 
-        Pair<List<Integer>, List<Integer>> stable = getStable(version);
+        final Pair<List<Integer>, List<Integer>> stable = getStable(version);
         stable.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1)
             .map(s -> new McpVersionEntry("stable_" + s)).forEach(mcpVersionBox::addItem);
 
-        Pair<List<Integer>, List<Integer>> snapshot = getSnapshot(version);
+        final Pair<List<Integer>, List<Integer>> snapshot = getSnapshot(version);
         snapshot.getFirst().stream().sorted((one, two) -> one.compareTo(two) * -1)
             .map(s -> new McpVersionEntry("snapshot_" + s)).forEach(mcpVersionBox::addItem);
 

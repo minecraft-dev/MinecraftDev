@@ -57,7 +57,7 @@ public class MinecraftModule {
     private Map<AbstractModuleType<?>, AbstractModule> modules = new ConcurrentHashMap<>();
 
     private static MinecraftModule generate(@NotNull List<AbstractModuleType<?>> types, @NotNull Module module) {
-        MinecraftModule minecraftModule = new MinecraftModule();
+        final MinecraftModule minecraftModule = new MinecraftModule();
         minecraftModule.module = module;
         minecraftModule.buildSystem = BuildSystem.getInstance(module);
         if (minecraftModule.buildSystem != null) {
@@ -71,15 +71,15 @@ public class MinecraftModule {
 
     @Nullable
     private static MinecraftModule createFromModule(@NotNull Module module) {
-        List<AbstractModuleType<?>> types = new ArrayList<>();
-        String option = module.getOptionValue(MinecraftModuleType.OPTION);
+        final List<AbstractModuleType<?>> types = new ArrayList<>();
+        final String option = module.getOptionValue(MinecraftModuleType.OPTION);
         if (Strings.isNullOrEmpty(option)) {
             return null;
         }
 
-        String[] typeStrings = option.split(",");
+        final String[] typeStrings = option.split(",");
         for (String typeString : typeStrings) {
-            AbstractModuleType<?> type = PlatformType.getByName(typeString);
+            final AbstractModuleType<?> type = PlatformType.getByName(typeString);
             if (type != null) {
                 types.add(type);
             }
@@ -94,21 +94,21 @@ public class MinecraftModule {
             return map.get(module);
         } else {
             if (isModuleApplicable(module)) {
-                MinecraftModule minecraftModule = map.put(module, createFromModule(module));
+                final MinecraftModule minecraftModule = map.put(module, createFromModule(module));
                 Util.invokeLater(ProjectView.getInstance(module.getProject())::refresh);
                 return minecraftModule;
             } else {
-                String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
+                final String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
                 if (paths != null && paths.length > 0) {
-                    Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[paths.length - 1]);
+                    final Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[paths.length - 1]);
                     if (parentModule != null) {
                         if (map.containsKey(parentModule)) {
-                            MinecraftModule minecraftModule = map.get(parentModule);
+                            final MinecraftModule minecraftModule = map.get(parentModule);
                             // Save the parent module for this MinecraftModule so we don't have to do this check next time
                             map.put(module, minecraftModule);
                             return minecraftModule;
                         } else if (isModuleApplicable(parentModule)) {
-                            MinecraftModule minecraftModule = map.put(parentModule, createFromModule(parentModule));
+                            final MinecraftModule minecraftModule = map.put(parentModule, createFromModule(parentModule));
                             Util.invokeLater(ProjectView.getInstance(module.getProject())::refresh);
                             return minecraftModule;
                         }
@@ -121,7 +121,7 @@ public class MinecraftModule {
 
     @Nullable
     public static synchronized <T extends AbstractModule> T getInstance(@NotNull Module module, @NotNull AbstractModuleType<T> type) {
-        MinecraftModule minecraftModule = getInstance(module);
+        final MinecraftModule minecraftModule = getInstance(module);
         if (minecraftModule != null) {
             return minecraftModule.getModuleOfType(type);
         }
@@ -129,9 +129,9 @@ public class MinecraftModule {
     }
 
     private static boolean isModuleApplicable(@NotNull Module module) {
-        ModuleType type = ModuleUtil.getModuleType(module);
+        final ModuleType type = ModuleUtil.getModuleType(module);
         if (type == JavaModuleType.getModuleType()) {
-            String option = module.getOptionValue(MinecraftModuleType.OPTION);
+            final String option = module.getOptionValue(MinecraftModuleType.OPTION);
             if (!Strings.isNullOrEmpty(option)) {
                 return true;
             }
@@ -206,7 +206,7 @@ public class MinecraftModule {
     }
 
     public void addModuleType(@NotNull String moduleTypeName) {
-        AbstractModuleType<?> type = PlatformType.getByName(moduleTypeName);
+        final AbstractModuleType<?> type = PlatformType.getByName(moduleTypeName);
         if (type != null && !modules.containsKey(type)) {
             modules.put(type, type.generateModule(module));
         }
@@ -214,7 +214,7 @@ public class MinecraftModule {
     }
 
     public void removeModuleType(@NotNull String moduleTypeName) {
-        AbstractModuleType<?> type = PlatformType.getByName(moduleTypeName);
+        final AbstractModuleType<?> type = PlatformType.getByName(moduleTypeName);
         if (type != null && modules.containsKey(type)) {
             modules.remove(type);
         }

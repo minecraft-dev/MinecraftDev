@@ -33,7 +33,7 @@ public class ForgeTemplate extends AbstractTemplate {
                                                 @NotNull String pluginVersion,
                                                 boolean spongeForge) {
 
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
 
         if (spongeForge) {
             properties.setProperty("SPONGE_FORGE", "true");
@@ -45,7 +45,7 @@ public class ForgeTemplate extends AbstractTemplate {
             e.printStackTrace();
         }
 
-        Properties gradleProps = new Properties();
+        final Properties gradleProps = new Properties();
         gradleProps.setProperty("GROUP_ID", groupId);
         gradleProps.setProperty("ARTIFACT_ID", artifactId);
         gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
@@ -69,7 +69,7 @@ public class ForgeTemplate extends AbstractTemplate {
                                                          @NotNull String commonProjectName,
                                                          boolean spongeForge) {
 
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
 
         if (spongeForge) {
@@ -82,7 +82,7 @@ public class ForgeTemplate extends AbstractTemplate {
             e.printStackTrace();
         }
 
-        Properties gradleProps = new Properties();
+        final Properties gradleProps = new Properties();
         gradleProps.setProperty("ARTIFACT_ID", artifactId);
         gradleProps.setProperty("FORGE_VERSION", forgeVersion);
         gradleProps.setProperty("MCP_VERSION", mcpVersion);
@@ -105,7 +105,7 @@ public class ForgeTemplate extends AbstractTemplate {
                                               @Nullable String authorList,
                                               @Nullable String dependenciesList) {
 
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("ARTIFACT_ID", artifactId);
         properties.setProperty("PLUGIN_NAME", pluginName);
         properties.setProperty("DESCRIPTION", description);
@@ -137,7 +137,7 @@ public class ForgeTemplate extends AbstractTemplate {
                                               @NotNull String pluginVersion,
                                               @NotNull String className) {
 
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("PACKAGE_NAME", packageName);
         properties.setProperty("ARTIFACT_ID", artifactId);
         properties.setProperty("PLUGIN_NAME", pluginName);
