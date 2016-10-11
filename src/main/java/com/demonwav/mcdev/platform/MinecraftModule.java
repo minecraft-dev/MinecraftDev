@@ -61,7 +61,10 @@ public class MinecraftModule {
         minecraftModule.module = module;
         minecraftModule.buildSystem = BuildSystem.getInstance(module);
         if (minecraftModule.buildSystem != null) {
-            minecraftModule.buildSystem.reImport(module).done(buildSystem -> types.forEach(minecraftModule::register));
+            minecraftModule.buildSystem.reImport(module).done(buildSystem -> {
+                types.forEach(minecraftModule::register);
+                doReadyActions(minecraftModule);
+            });
         }
         return minecraftModule;
     }
@@ -276,13 +279,14 @@ public class MinecraftModule {
         readyWaiters.add(consumer);
     }
 
-    public static void doReadyActions() {
-        //noinspection Convert2streamapi
-        for (MinecraftModule minecraftModule : map.values()) {
-            if (!minecraftModule.getIdeaModule().getProject().isDisposed()) {
-                for (Consumer<MinecraftModule> readyWaiter : readyWaiters) {
-                    readyWaiter.accept(minecraftModule);
-                }
+    public static void cleanReadyActions() {
+        readyWaiters.clear();
+    }
+
+    private static void doReadyActions(@NotNull MinecraftModule module) {
+        if (!module.getIdeaModule().getProject().isDisposed()) {
+            for (Consumer<MinecraftModule> readyWaiter : readyWaiters) {
+                readyWaiter.accept(module);
             }
         }
     }

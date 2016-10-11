@@ -36,18 +36,6 @@ public class SidedProxyAnnotator implements Annotator {
             return;
         }
 
-        final PsiField field = (PsiField) element;
-
-        final PsiModifierList modifierList = field.getModifierList();
-        if (modifierList == null) {
-            return;
-        }
-
-        final PsiAnnotation annotation = modifierList.findAnnotation(ForgeConstants.SIDED_PROXY_ANNOTATION);
-        if (annotation == null) {
-            return;
-        }
-
         final Module module = ModuleUtilCore.findModuleForPsiElement(element);
         if (module == null) {
             return;
@@ -59,6 +47,22 @@ public class SidedProxyAnnotator implements Annotator {
         }
 
         if (!instance.isOfType(ForgeModuleType.getInstance())) {
+            return;
+        }
+
+        final PsiField field = (PsiField) element;
+
+        check(field);
+    }
+
+    public static void check(@NotNull PsiField field) {
+        final PsiModifierList modifierList = field.getModifierList();
+        if (modifierList == null) {
+            return;
+        }
+
+        final PsiAnnotation annotation = modifierList.findAnnotation(ForgeConstants.SIDED_PROXY_ANNOTATION);
+        if (annotation == null) {
             return;
         }
 
@@ -74,7 +78,7 @@ public class SidedProxyAnnotator implements Annotator {
         }
     }
 
-    private void annotateClass(@NotNull PsiAnnotationMemberValue value, @NotNull Side side) {
+    private static void annotateClass(@NotNull PsiAnnotationMemberValue value, @NotNull Side side) {
         if (!(value instanceof PsiLiteralExpressionImpl)) {
             return;
         }

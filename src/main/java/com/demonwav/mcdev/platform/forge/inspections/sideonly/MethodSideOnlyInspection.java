@@ -14,8 +14,10 @@ import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
+import com.intellij.psi.PsiType;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import com.siyeh.ig.InspectionGadgetsFix;
@@ -37,8 +39,8 @@ public class MethodSideOnlyInspection extends BaseInspection {
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        return "Method annotated with " + infos[0] +
-            " cannot be declared inside a class annotated with " + infos[1] + ".";
+        final Error error = (Error) infos[0];
+        return error.getErrorString(SideOnlyUtil.getSubArray(infos));
     }
 
     @Nullable
@@ -52,9 +54,10 @@ public class MethodSideOnlyInspection extends BaseInspection {
     @Nullable
     @Override
     protected InspectionGadgetsFix buildFix(Object... infos) {
-        final PsiMethod method = (PsiMethod) infos[2];
+        final Error error = (Error) infos[0];
+        final PsiMethod method = (PsiMethod) infos[3];
 
-        if (method.isWritable()) {
+        if (method.isWritable() && error == Error.METHOD_IN_WRONG_CLASS) {
             return new RemoveAnnotationInspectionGadgetsFix() {
                 @Nullable
                 @Override
@@ -89,21 +92,79 @@ public class MethodSideOnlyInspection extends BaseInspection {
                 }
 
                 final Side methodSide = SideOnlyUtil.checkMethod(method);
-                if (methodSide == Side.INVALID || methodSide == Side.NONE) {
+
+                final PsiType returnType = method.getReturnType();
+                if (!(returnType instanceof PsiClassType)) {
                     return;
+                }
+
+                final PsiClass resolve = ((PsiClassType) returnType).resolve();
+                if (resolve == null) {
+                    return;
+                }
+
+                final Side returnSide = SideOnlyUtil.getSideForClass(resolve);
+                if (returnSide != Side.NONE && returnSide != Side.INVALID && returnSide != methodSide &&
+                    methodSide != Side.NONE && methodSide != Side.INVALID) {
+                    registerMethodError(method, Error.RETURN_TYPE_ON_WRONG_METHOD, methodSide.getName(), returnSide.getName(), method);
                 }
 
                 final List<Pair<Side, PsiClass>> classHierarchySides = SideOnlyUtil.checkClassHierarchy(psiClass);
 
                 for (Pair<Side, PsiClass> classHierarchySide : classHierarchySides) {
                     if (classHierarchySide.first != Side.NONE && classHierarchySide.first != Side.INVALID) {
-                        if (methodSide != classHierarchySide.first) {
-                            registerMethodError(method, methodSide.getName(), classHierarchySide.first, method);
+                        if (methodSide != classHierarchySide.first && methodSide != Side.NONE && methodSide != Side.INVALID) {
+
+                            registerMethodError(
+                                method,
+                                Error.METHOD_IN_WRONG_CLASS,
+                                methodSide.getName(),
+                                classHierarchySide.first.getName(),
+                                method
+                            );
+                        }
+                        if (returnSide != Side.NONE  && returnSide != Side.INVALID) {
+                            if (returnSide != classHierarchySide.first) {
+
+                                registerMethodError(
+                                    method,
+                                    Error.RETURN_TYPE_IN_WRONG_CLASS,
+                                    classHierarchySide.first.getName(),
+                                    returnSide.getName(),
+                                    method
+                                );
+                            }
                         }
                         return;
                     }
                 }
             }
         };
+    }
+
+    enum Error {
+        METHOD_IN_WRONG_CLASS() {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Method annotated with " + infos[0] +
+                    " cannot be declared inside a class annotated with " + infos[1] + ".";
+            }
+        },
+        RETURN_TYPE_ON_WRONG_METHOD() {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Method annotated with " + infos[0] +
+                    " cannot return a type annotated with " + infos[1] + ".";
+            }
+        },
+        RETURN_TYPE_IN_WRONG_CLASS() {
+            @Override
+            String getErrorString(Object... infos) {
+                return "Method in a class annotated with " + infos[0] +
+                    " cannot return a type annotated with " + infos[1] + ".";
+            }
+        };
+
+        abstract String getErrorString(Object... infos);
     }
 }
