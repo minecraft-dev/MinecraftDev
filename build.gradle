@@ -114,6 +114,5 @@ license {
 }
 
 afterEvaluate {
-    buildPlugin.dependsOn initProp
-    runIdea.dependsOn initProp
+    prepareSandbox.dependsOn initProp
 }

@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
+import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 
 public enum Side {
@@ -30,4 +31,6 @@ public enum Side {
     public String getName() {
         return name;
     }
+
+    public static final Key<Side> KEY = new Key<>("MC_DEV_SIDE");
 }

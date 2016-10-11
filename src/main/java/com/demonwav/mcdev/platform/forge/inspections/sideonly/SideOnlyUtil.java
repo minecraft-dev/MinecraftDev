@@ -130,7 +130,12 @@ public final class SideOnlyUtil {
 
     @NotNull
     public static Side getSideForClass(@NotNull PsiClass psiClass) {
-        return getFirstSide(checkClassHierarchy(psiClass));
+        final Side side = psiClass.getUserData(Side.KEY);
+        if (side == null) {
+            return getFirstSide(checkClassHierarchy(psiClass));
+        } else {
+            return side;
+        }
     }
 
     @NotNull
