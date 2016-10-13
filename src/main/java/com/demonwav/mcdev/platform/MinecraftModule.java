@@ -116,6 +116,9 @@ public class MinecraftModule {
                 }
             }
         }
+        // This is why we do a containsKey check above, we want bad module checks to run quickly as well, so
+        // store null for bad modules so we don't redo all the checks again
+        map.put(module, null);
         return null;
     }
 
