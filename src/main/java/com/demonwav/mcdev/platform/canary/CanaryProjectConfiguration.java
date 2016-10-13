@@ -14,15 +14,22 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CanaryProjectConfiguration extends ProjectConfiguration {
 
     public final List<String> dependencies = new ArrayList<>();
     public boolean enableEarly;
+    public String canaryVersion;
 
     public boolean hasDependencies() {
         return listContainsAtLeastOne(dependencies);
+    }
+
+    public void setDependencies(String string) {
+        this.dependencies.clear();
+        Collections.addAll(this.dependencies, commaSplit(string));
     }
 
     @Override
