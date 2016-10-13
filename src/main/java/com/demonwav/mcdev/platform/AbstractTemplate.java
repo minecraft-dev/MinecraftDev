@@ -42,8 +42,8 @@ public abstract class AbstractTemplate {
         final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUILD_GRADLE_TEMPLATE);
 
         final Properties gradleProps = new Properties();
-        gradleProps .setProperty("PLUGIN_VERSION", pluginVersion);
-        gradleProps .setProperty("GROUP_ID", groupId);
+        gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
+        gradleProps.setProperty("GROUP_ID", groupId);
 
         // create gradle.properties
         try {
@@ -71,8 +71,8 @@ public abstract class AbstractTemplate {
         properties.setProperty("BUILD_VERSION", buildVersion);
 
         final Properties gradleProps = new Properties();
-        gradleProps .setProperty("PLUGIN_VERSION", pluginVersion);
-        gradleProps .setProperty("GROUP_ID", groupId);
+        gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
+        gradleProps.setProperty("GROUP_ID", groupId);
 
         // create gradle.properties
         try {
