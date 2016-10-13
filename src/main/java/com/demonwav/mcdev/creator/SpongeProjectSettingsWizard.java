@@ -10,10 +10,12 @@
 
 package com.demonwav.mcdev.creator;
 
+import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,6 +68,12 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
         if (creator.getSettings().size() > 1) {
             mainClassField.setText(mainClassField.getText() + PlatformType.SPONGE.getNormalName());
+        }
+
+        if (UIUtil.isUnderDarcula()) {
+            title.setIcon(PlatformAssets.SPONGE_ICON_2X_DARK);
+        } else {
+            title.setIcon(PlatformAssets.SPONGE_ICON_2X);
         }
 
         return panel;
