@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.mcp.at.AtFileType;
 import com.demonwav.mcdev.util.Util;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.fileTypes.FileNameMatcher;
 import com.intellij.openapi.fileTypes.FileTypeManager;
@@ -66,17 +67,19 @@ public class McpProjectComponent extends AbstractProjectComponent {
                 return;
             }
 
-            final String[] fileNames = PsiShortNamesCache.getInstance(myProject).getAllFileNames();
-            for (final String fileName : fileNames) {
-                if (!fileName.endsWith(".cfg")) {
-                    continue;
-                }
+            ApplicationManager.getApplication().runReadAction(() -> {
+                final String[] fileNames = PsiShortNamesCache.getInstance(myProject).getAllFileNames();
+                for (final String fileName : fileNames) {
+                    if (!fileName.endsWith(".cfg")) {
+                        continue;
+                    }
 
-                final PsiFile[] filesByName = PsiShortNamesCache.getInstance(myProject).getFilesByName(fileName);
-                for (final PsiFile psiFile : filesByName) {
-                    mcpModule.addAccessTransformerFile(psiFile.getVirtualFile());
+                    final PsiFile[] filesByName = PsiShortNamesCache.getInstance(myProject).getFilesByName(fileName);
+                    for (final PsiFile psiFile : filesByName) {
+                        mcpModule.addAccessTransformerFile(psiFile.getVirtualFile());
+                    }
                 }
-            }
+            });
         });
 
 
