@@ -18,6 +18,7 @@ import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor;
 import com.intellij.psi.PsiField;
@@ -42,7 +43,7 @@ public class SideOnlyProjectComponent extends AbstractProjectComponent {
                 return;
             }
 
-            ApplicationManager.getApplication().invokeLater(() -> {
+            DumbService.getInstance(myProject).smartInvokeLater(() -> {
                 ProgressManager.getInstance().run(new Task.Backgroundable(myProject, "Indexing @SidedProxy", true, null) {
                     @Override
                     public void run(@NotNull ProgressIndicator indicator) {

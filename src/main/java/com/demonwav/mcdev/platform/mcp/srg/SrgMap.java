@@ -291,7 +291,7 @@ public final class SrgMap {
                     }
                 }
             }
-            // We've passed the check on ever param, this is the method we're looking for
+            // We've passed the check on every param, this is the method we're looking for
             return method;
         }
         return null;
