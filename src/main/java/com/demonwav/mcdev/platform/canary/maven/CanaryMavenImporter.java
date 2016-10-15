@@ -13,7 +13,7 @@ public class CanaryMavenImporter extends AbstractMavenImporter {
         this(CanaryModuleType.getInstance());
     }
 
-    public CanaryMavenImporter(@NotNull final CanaryModuleType type) {
+    protected CanaryMavenImporter(@NotNull final CanaryModuleType type) {
         super(type);
     }
 
