@@ -25,6 +25,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.impl.JavaConstantExpressionEvaluator;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -99,7 +100,7 @@ public class SidedProxyAnnotator implements Annotator {
 
             final PsiField field = (PsiField) resolve;
 
-            final Object o = field.computeConstantValue();
+            final Object o = JavaConstantExpressionEvaluator.computeConstantExpression(field.getInitializer(), null, false);
             if (!(o instanceof String)) {
                 return;
             }
