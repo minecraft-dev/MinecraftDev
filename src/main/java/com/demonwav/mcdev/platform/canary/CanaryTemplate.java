@@ -28,10 +28,10 @@ import java.util.Properties;
 public class CanaryTemplate extends AbstractTemplate {
 
     public static void applyMainClassTemplate(@NotNull Project project,
-            @NotNull VirtualFile file,
-            @NotNull String packageName,
-            @NotNull String className) {
-        Properties properties = new Properties();
+                                              @NotNull VirtualFile file,
+                                              @NotNull String packageName,
+                                              @NotNull String className) {
+        final Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
@@ -45,8 +45,8 @@ public class CanaryTemplate extends AbstractTemplate {
 
     @NotNull
     public static String applyPomTemplate(@NotNull Project project,
-            @NotNull String version) {
-        Properties properties = new Properties();
+                                          @NotNull String version) {
+        final Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", version);
 
         FileTemplateManager manager = FileTemplateManager.getInstance(project);
@@ -61,10 +61,10 @@ public class CanaryTemplate extends AbstractTemplate {
     }
 
     public static void applyPluginDescriptionFileTemplate(@NotNull Project project,
-            @NotNull VirtualFile file,
-            @NotNull CanaryProjectConfiguration settings,
-            @NotNull BuildSystem buildSystem) {
-        Properties properties = new Properties();
+                                                          @NotNull VirtualFile file,
+                                                          @NotNull CanaryProjectConfiguration settings,
+                                                          @NotNull BuildSystem buildSystem) {
+        final Properties properties = new Properties();
 
         properties.setProperty("NAME", settings.pluginName);
 
