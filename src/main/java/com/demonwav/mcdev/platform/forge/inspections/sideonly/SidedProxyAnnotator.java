@@ -26,6 +26,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
+import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 
@@ -79,14 +80,32 @@ public class SidedProxyAnnotator implements Annotator {
     }
 
     private static void annotateClass(@NotNull PsiAnnotationMemberValue value, @NotNull Side side) {
-        if (!(value instanceof PsiLiteralExpressionImpl)) {
-            return;
-        }
+        final String text;
+        if (value instanceof PsiLiteralExpressionImpl) {
+            final PsiLiteralExpressionImpl expression = (PsiLiteralExpressionImpl) value;
 
-        final PsiLiteralExpressionImpl expression = (PsiLiteralExpressionImpl) value;
+            text = expression.getInnerText();
+            if (text == null) {
+                return;
+            }
+        } else if (value instanceof PsiReferenceExpressionImpl) {
+            final PsiReferenceExpressionImpl expression = (PsiReferenceExpressionImpl) value;
 
-        final String text = expression.getInnerText();
-        if (text == null) {
+            final PsiElement resolve = expression.resolve();
+
+            if (!(resolve instanceof PsiField)) {
+                return;
+            }
+
+            final PsiField field = (PsiField) resolve;
+
+            final Object o = field.computeConstantValue();
+            if (!(o instanceof String)) {
+                return;
+            }
+
+            text = (String) o;
+        } else {
             return;
         }
 

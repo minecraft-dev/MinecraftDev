@@ -15,12 +15,10 @@ import com.demonwav.mcdev.util.McPsiUtil;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.impl.source.PsiFieldImpl;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
-import com.siyeh.ig.InspectionGadgetsFix;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,30 +45,6 @@ public class VariableUseSideOnlyInspection extends BaseInspection {
     @Override
     public String getStaticDescription() {
         return "Variables which are declared with a @SideOnly annotation can only be used in matching @SideOnly classes and methods.";
-    }
-
-    @Nullable
-    @Override
-    protected InspectionGadgetsFix buildFix(Object... infos) {
-        PsiFieldImpl field = (PsiFieldImpl) infos[3];
-
-        if (field.isWritable() && !(boolean) infos[4]) {
-            return new RemoveAnnotationInspectionGadgetsFix() {
-                @Nullable
-                @Override
-                public PsiModifierListOwner getListOwner() {
-                    return field;
-                }
-
-                @Nls
-                @NotNull
-                @Override
-                public String getName() {
-                    return "Remove @SideOnly annotation from field declaration";
-                }
-            };
-        }
-        return null;
     }
 
     @Override
