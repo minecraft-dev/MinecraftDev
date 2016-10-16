@@ -53,8 +53,8 @@ public final class PlatformAssets extends Assets {
 
     @NotNull public static final Icon CANARY_ICON = loadIcon("/assets/icons/platform/Canary.png");
     @NotNull public static final Icon CANARY_ICON_2X = loadIcon("/assets/icons/platform/Canary@2x.png");
-    @NotNull public static final Icon NEPTUNE_ICON = loadIcon("assets/icons/platform/Neptune.png");
-    @NotNull public static final Icon NEPTUNE_ICON_2X = loadIcon("assets/icons/platform/Neptune@2x.png");
+    @NotNull public static final Icon NEPTUNE_ICON = loadIcon("/assets/icons/platform/Neptune.png");
+    @NotNull public static final Icon NEPTUNE_ICON_2X = loadIcon("/assets/icons/platform/Neptune@2x.png");
 
     @NotNull public static final Icon MCP_ICON = loadIcon("/assets/icons/platform/MCP.png");
     @NotNull public static final Icon MCP_ICON_2X = loadIcon("/assets/icons/platform/MCP@2x.png");
