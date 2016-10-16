@@ -35,9 +35,9 @@ public final class PlatformAssets extends Assets {
     @NotNull public static final Icon SPONGE_ICON_DARK = loadIcon("/assets/icons/platform/Sponge_dark.png");
     @NotNull public static final Icon SPONGE_ICON_2X_DARK = loadIcon("/assets/icons/platform/Sponge@2x_dark.png");
 
-    @NotNull public static final Icon SPONGE_FORGE_ICON = loadIcon("/assets/icons/platform/SpongeForge.png");
-    @NotNull public static final Icon SPONGE_FORGE_ICON_2X = loadIcon("/assets/icons/platform/SpongeForge@2x.png");
-    @NotNull public static final Icon SPONGE_FORGE_ICON_DARK = loadIcon("/assets/icons/platform/SpongeForge_dark.png");
+    @NotNull public static final Icon SPONGE_FORGE_ICON = loadIcon("/assets/icons/platform/SpongeForge_dark.png");
+    @NotNull public static final Icon SPONGE_FORGE_ICON_2X = loadIcon("/assets/icons/platform/SpongeForge@2x_dark.png");
+    @NotNull public static final Icon SPONGE_FORGE_ICON_DARK = loadIcon("/assets/icons/platform/SpongeForge.png");
     @NotNull public static final Icon SPONGE_FORGE_ICON_2X_DARK = loadIcon("/assets/icons/platform/SpongeForge@2x_dark.png");
 
     @NotNull public static final Icon BUNGEECORD_ICON = loadIcon("/assets/icons/platform/BungeeCord.png");
