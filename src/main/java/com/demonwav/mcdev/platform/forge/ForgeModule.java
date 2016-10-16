@@ -15,6 +15,7 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.insight.generation.GenerationData;
+import com.demonwav.mcdev.inspection.IsCancelled;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
@@ -29,6 +30,7 @@ import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
@@ -48,7 +50,7 @@ public class ForgeModule extends AbstractModule {
         super(module);
         this.buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
-            buildSystem.reImport(module).done(buildSystem -> mcmod = buildSystem.findFile("mcmod.info", SourceType.RESOURCE));
+            buildSystem.reImport(module).done(buildSystem -> mcmod = buildSystem.findFile(ForgeConstants.MCMOD_INFO, SourceType.RESOURCE));
         }
     }
 
@@ -76,18 +78,18 @@ public class ForgeModule extends AbstractModule {
     @Override
     public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
         if (method == null ) {
-            return "net.minecraftforge.fml.common.event.FMLEvent".equals(eventClass.getQualifiedName()) ||
-                "net.minecraftforge.fml.common.eventhandler.Event".equals(eventClass.getQualifiedName());
+            return ForgeConstants.FML_EVENT.equals(eventClass.getQualifiedName()) ||
+                ForgeConstants.EVENT.equals(eventClass.getQualifiedName());
         }
 
-        PsiAnnotation annotation = method.getModifierList().findAnnotation("net.minecraftforge.fml.common.Mod.EventHandler");
+        PsiAnnotation annotation = method.getModifierList().findAnnotation(ForgeConstants.EVENT_HANDLER_ANNOTATION);
         if (annotation != null) {
-            return "net.minecraftforge.fml.common.event.FMLEvent".equals(eventClass.getQualifiedName());
+            return ForgeConstants.FML_EVENT.equals(eventClass.getQualifiedName());
         }
 
-        annotation = method.getModifierList().findAnnotation("net.minecraftforge.fml.common.eventhandler.SubscribeEvent");
+        annotation = method.getModifierList().findAnnotation(ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION);
         if (annotation != null) {
-            return "net.minecraftforge.fml.common.eventhandler.Event".equals(eventClass.getQualifiedName());
+            return ForgeConstants.EVENT.equals(eventClass.getQualifiedName());
         }
 
         // just default to true
@@ -96,7 +98,7 @@ public class ForgeModule extends AbstractModule {
 
     @Override
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
-        PsiAnnotation annotation = method.getModifierList().findAnnotation("net.minecraftforge.fml.common.Mod.EventHandler");
+        final PsiAnnotation annotation = method.getModifierList().findAnnotation(ForgeConstants.EVENT_HANDLER_ANNOTATION);
 
         if (annotation != null) {
             return "Parameter is not a subclass of net.minecraftforge.fml.common.event.FMLEvent\n" +
@@ -114,7 +116,7 @@ public class ForgeModule extends AbstractModule {
         if (mcmod == null && buildSystem != null) {
             // try and find the file again if it's not already present
             // when this object was first created it may not have been ready
-            mcmod = buildSystem.findFile("mcmod.info", SourceType.RESOURCE);
+            mcmod = buildSystem.findFile(ForgeConstants.MCMOD_INFO, SourceType.RESOURCE);
         }
         return mcmod;
     }
@@ -125,24 +127,24 @@ public class ForgeModule extends AbstractModule {
                                                  @NotNull PsiClass chosenClass,
                                                  @NotNull String chosenName,
                                                  @Nullable GenerationData data) {
-        boolean isFmlEvent = McPsiUtil.extendsOrImplementsClass(chosenClass, "net.minecraftforge.fml.common.event.FMLEvent");
+        final boolean isFmlEvent = McPsiUtil.extendsOrImplementsClass(chosenClass, ForgeConstants.FML_EVENT);
 
-        PsiMethod method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
-        PsiParameterList parameterList = method.getParameterList();
+        final PsiMethod method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
+        final PsiParameterList parameterList = method.getParameterList();
 
-        PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
+        final PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
             .createParameter(
                 "event",
                 PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.allScope(project))
             );
 
         parameterList.add(parameter);
-        PsiModifierList modifierList = method.getModifierList();
+        final PsiModifierList modifierList = method.getModifierList();
 
         if (isFmlEvent) {
-            modifierList.addAnnotation("net.minecraftforge.fml.common.Mod.EventHandler");
+            modifierList.addAnnotation(ForgeConstants.EVENT_HANDLER_ANNOTATION);
         } else {
-            modifierList.addAnnotation("net.minecraftforge.fml.common.eventhandler.SubscribeEvent");
+            modifierList.addAnnotation(ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION);
         }
 
         return method;
@@ -163,5 +165,11 @@ public class ForgeModule extends AbstractModule {
 
         final PsiModifierList modifierList = psiClass.getModifierList();
         return modifierList != null && modifierList.findAnnotation(ForgeConstants.MOD_ANNOTATION) != null;
+    }
+
+    @Nullable
+    @Override
+    public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
+        return null;
     }
 }

@@ -135,6 +135,11 @@ public final class SideOnlyUtil {
 
     @NotNull
     public static Pair<Side, PsiClass> checkClass(@NotNull PsiClass psiClass) {
+        final Side side = psiClass.getUserData(Side.KEY);
+        if (side != null) {
+            return new Pair<>(side, psiClass);
+        }
+
         final PsiModifierList modifierList = psiClass.getModifierList();
         if (modifierList == null) {
             return new Pair<>(Side.NONE, psiClass);
@@ -144,6 +149,18 @@ public final class SideOnlyUtil {
         // usually irrelevant for classes
         final PsiAnnotation annotation = modifierList.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
         if (annotation == null) {
+            if (psiClass.getSupers().length == 0) {
+                return new Pair<>(Side.NONE, psiClass);
+            }
+
+            // check the classes this class extends
+            for (PsiClass aClass : psiClass.getSupers()) {
+                final List<Pair<Side, PsiClass>> pairs = checkClassHierarchy(aClass);
+                if (pairs.size() != 0) {
+                    return new Pair<>(pairs.get(0).getFirst(), psiClass);
+                }
+            }
+
             return new Pair<>(Side.NONE, psiClass);
         }
 

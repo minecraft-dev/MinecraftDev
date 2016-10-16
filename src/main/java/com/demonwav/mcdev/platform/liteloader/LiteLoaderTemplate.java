@@ -31,7 +31,7 @@ public class LiteLoaderTemplate extends AbstractTemplate {
                                                 @NotNull String mcVersion,
                                                 @NotNull String mcpMappings) {
 
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("GROUP_ID", groupId);
         properties.setProperty("ARTIFACT_ID", artifactId);
         properties.setProperty("VERSION", modVersion);
@@ -54,7 +54,7 @@ public class LiteLoaderTemplate extends AbstractTemplate {
                                                          @NotNull String mcpMappings,
                                                          @NotNull String commonProjectName) {
 
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
 
         try {
@@ -63,7 +63,7 @@ public class LiteLoaderTemplate extends AbstractTemplate {
             e.printStackTrace();
         }
 
-        Properties gradleProps = new Properties();
+        final Properties gradleProps = new Properties();
         gradleProps .setProperty("VERSION", modVersion);
         gradleProps .setProperty("MC_VERSION", mcVersion);
         gradleProps .setProperty("MCP_MAPPINGS", mcpMappings);
@@ -82,7 +82,7 @@ public class LiteLoaderTemplate extends AbstractTemplate {
                                               @NotNull String modName,
                                               @NotNull String modVersion) {
 
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("PACKAGE_NAME", packageName);
         properties.setProperty("CLASS_NAME", className);
         properties.setProperty("MOD_NAME", modName);

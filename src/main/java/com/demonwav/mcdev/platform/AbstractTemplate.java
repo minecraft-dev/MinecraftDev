@@ -35,15 +35,15 @@ public abstract class AbstractTemplate {
                                                   @NotNull String pluginVersion,
                                                   @NotNull String buildVersion) {
 
-        Properties buildGradleProps = new Properties();
+        final Properties buildGradleProps = new Properties();
         buildGradleProps.setProperty("BUILD_VERSION", buildVersion);
 
-        FileTemplateManager manager = FileTemplateManager.getInstance(project);
-        FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUILD_GRADLE_TEMPLATE);
+        final FileTemplateManager manager = FileTemplateManager.getInstance(project);
+        final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUILD_GRADLE_TEMPLATE);
 
-        Properties gradleProps = new Properties();
-        gradleProps .setProperty("PLUGIN_VERSION", pluginVersion);
-        gradleProps .setProperty("GROUP_ID", groupId);
+        final Properties gradleProps = new Properties();
+        gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
+        gradleProps.setProperty("GROUP_ID", groupId);
 
         // create gradle.properties
         try {
@@ -67,12 +67,12 @@ public abstract class AbstractTemplate {
                                                            @NotNull String pluginVersion,
                                                            @NotNull String buildVersion) {
 
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", buildVersion);
 
-        Properties gradleProps = new Properties();
-        gradleProps .setProperty("PLUGIN_VERSION", pluginVersion);
-        gradleProps .setProperty("GROUP_ID", groupId);
+        final Properties gradleProps = new Properties();
+        gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
+        gradleProps.setProperty("GROUP_ID", groupId);
 
         // create gradle.properties
         try {
@@ -93,7 +93,7 @@ public abstract class AbstractTemplate {
                                                    @NotNull String projectName,
                                                    @NotNull String includes) {
 
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("PROJECT_NAME", projectName);
         properties.setProperty("INCLUDES", includes);
 
@@ -108,11 +108,11 @@ public abstract class AbstractTemplate {
     public static String applySubmoduleBuildGradleTemplate(@NotNull Project project,
                                                            @NotNull String commonProjectName) {
 
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
 
-        FileTemplateManager manager = FileTemplateManager.getInstance(project);
-        FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SUBMODULE_BUILD_GRADLE_TEMPLATE);
+        final FileTemplateManager manager = FileTemplateManager.getInstance(project);
+        final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SUBMODULE_BUILD_GRADLE_TEMPLATE);
 
         try {
             return template.getText(properties);
@@ -136,10 +136,10 @@ public abstract class AbstractTemplate {
                                         @NotNull Properties properties,
                                         boolean trimNewlines) throws IOException {
 
-        FileTemplateManager manager = FileTemplateManager.getInstance(project);
-        FileTemplate template = manager.getJ2eeTemplate(templateName);
+        final FileTemplateManager manager = FileTemplateManager.getInstance(project);
+        final FileTemplate template = manager.getJ2eeTemplate(templateName);
 
-        Properties allProperties = manager.getDefaultProperties();
+        final Properties allProperties = manager.getDefaultProperties();
         allProperties.putAll(properties);
 
         String text = template.getText(allProperties);
@@ -148,7 +148,7 @@ public abstract class AbstractTemplate {
         }
         VfsUtil.saveText(file, text);
 
-        PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+        final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
         if (psiFile != null) {
             new ReformatCodeProcessor(project, psiFile, null, false).run();
         }

@@ -76,7 +76,14 @@ public class AtGotoDeclarationHandler implements GotoDeclarationHandler {
             final String classSrgToMcp = srgMap.findClassSrgToMcp(McpUtil.replaceDotWithSlash(className.getClassNameText()));
             final PsiClass psiClass = SrgMap.fromClassString(classSrgToMcp, sourceElement.getProject());
             if (psiClass == null) {
-                return null;
+                final PsiClass aClass = JavaPsiFacade.getInstance(sourceElement.getProject()).findClass(className.getClassNameText(),
+                    GlobalSearchScope.allScope(sourceElement.getProject()));
+
+                if (aClass == null) {
+                    return null;
+                }
+
+                return new PsiElement[]{aClass};
             }
             return new PsiElement[]{psiClass};
         } else if (sourceElement.getNode().getTreeParent().getElementType() == AtTypes.FUNC_NAME) {
@@ -87,9 +94,14 @@ public class AtGotoDeclarationHandler implements GotoDeclarationHandler {
 
             if (funcName.getFuncNameText().equals("<init>")) {
                 final String classSrgToMcp = srgMap.findClassSrgToMcp(McpUtil.replaceDotWithSlash(className.getText()));
-                final PsiClass psiClass = SrgMap.fromClassString(classSrgToMcp, sourceElement.getProject());
+                PsiClass psiClass = SrgMap.fromClassString(classSrgToMcp, sourceElement.getProject());
                 if (psiClass == null) {
-                    return null;
+                    psiClass = JavaPsiFacade.getInstance(sourceElement.getProject()).findClass(className.getClassNameText(),
+                        GlobalSearchScope.allScope(sourceElement.getProject()));
+
+                    if (psiClass == null) {
+                        return null;
+                    }
                 }
 
                 final PsiMethod method = SrgMap.fromConstructorString(function.getText(), psiClass);

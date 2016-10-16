@@ -35,7 +35,7 @@ public class BungeeCordFileIconProvider implements FileIconProvider {
 
         if (project != null) {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
-                BungeeCordModule bungeeCordModule = MinecraftModule.getInstance(module, BungeeCordModuleType.getInstance());
+                final BungeeCordModule bungeeCordModule = MinecraftModule.getInstance(module, BungeeCordModuleType.getInstance());
                 if (bungeeCordModule != null) {
                     if (file.equals(bungeeCordModule.getPluginYml())) {
                         return bungeeCordModule.getIcon();

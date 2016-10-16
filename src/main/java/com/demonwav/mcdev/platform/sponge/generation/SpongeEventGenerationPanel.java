@@ -18,15 +18,15 @@ import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 
 public class SpongeEventGenerationPanel extends EventGenerationPanel {
 
     private JPanel panel;
-    private JRadioButton ignoreCanceledRadioButton;
     private JComboBox<String> eventOrderComboBox;
+    private JCheckBox ignoreCanceledCheckBox;
 
     public SpongeEventGenerationPanel(@NotNull PsiClass chosenClass) {
         super(chosenClass);
@@ -35,7 +35,7 @@ public class SpongeEventGenerationPanel extends EventGenerationPanel {
     @Nullable
     @Override
     public JPanel getPanel() {
-        ignoreCanceledRadioButton.setSelected(true);
+        ignoreCanceledCheckBox.setSelected(true);
 
         // Not static because the form builder is not reliable
         eventOrderComboBox.addItem("PRE");
@@ -62,6 +62,6 @@ public class SpongeEventGenerationPanel extends EventGenerationPanel {
     @Nullable
     @Override
     public GenerationData gatherData() {
-        return new SpongeGenerationData(ignoreCanceledRadioButton.isSelected(), (String) eventOrderComboBox.getSelectedItem());
+        return new SpongeGenerationData(ignoreCanceledCheckBox.isSelected(), (String) eventOrderComboBox.getSelectedItem());
     }
 }

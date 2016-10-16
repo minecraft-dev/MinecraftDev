@@ -18,26 +18,33 @@ import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.platform.mixin.util.ShadowedMembers;
 import com.demonwav.mcdev.util.ActionData;
 import com.demonwav.mcdev.util.McActionUtil;
+import com.demonwav.mcdev.util.McEditorUtil;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiIdentifier;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.search.LocalSearchScope;
+import com.intellij.psi.search.PsiSearchHelper;
+import com.intellij.psi.search.UsageSearchContext;
 import com.intellij.ui.LightColors;
 import com.intellij.ui.awt.RelativePoint;
 import org.jetbrains.annotations.NotNull;
 
-public class FindSrgMappingAction extends AnAction {
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public class GotoAtEntryAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         final ActionData data = McActionUtil.getDataFromActionEvent(e);
@@ -77,46 +84,57 @@ public class FindSrgMappingAction extends AnAction {
                     return;
                 }
 
-                final String fieldNameFinal = fieldMcpToSrg.substring(fieldMcpToSrg.lastIndexOf("/") + 1);
-
-                showSuccessBalloon(data.getEditor(), data.getElement(), fieldNameFinal);
+                searchForText(mcpModule, e, data, fieldMcpToSrg.substring(fieldMcpToSrg.lastIndexOf('/') + 1));
             } else if (parent instanceof PsiMethod) {
                 final PsiMethod method = (PsiMethod) parent;
 
                 final String s = SrgMap.toString(method);
 
-                String methodMcpToSrg = srgMap.findMethodMcpToSrg(s);
+                final String methodMcpToSrg = srgMap.findMethodMcpToSrg(s);
                 if (methodMcpToSrg == null) {
                     showBalloon(e);
                     return;
                 }
 
-                final String preParen = methodMcpToSrg.substring(0, methodMcpToSrg.indexOf('('));
-                final String methodName = preParen.substring(preParen.lastIndexOf('/') + 1);
-                final String params = methodMcpToSrg.substring(methodMcpToSrg.indexOf('('));
-
-                showSuccessBalloon(data.getEditor(), data.getElement(), methodName + params);
-            } else if (parent instanceof PsiClass) {
-                final PsiClass psiClass = (PsiClass) parent;
-
-                final String s = SrgMap.toString(psiClass);
-
-                final String classMcpToSrg = srgMap.findClassMcpToSrg(s);
-                if (classMcpToSrg == null) {
-                    showBalloon(e);
-                    return;
-                }
-
-                showSuccessBalloon(data.getEditor(), data.getElement(), classMcpToSrg);
+                final String beforeParen = methodMcpToSrg.substring(0, methodMcpToSrg.indexOf('('));
+                searchForText(mcpModule, e, data, beforeParen.substring(beforeParen.lastIndexOf('/') + 1));
             } else {
                 showBalloon(e);
             }
         });
     }
 
+    private void searchForText(@NotNull McpModule mcpModule, @NotNull AnActionEvent e, @NotNull ActionData data, @NotNull String text) {
+        for (VirtualFile virtualFile : mcpModule.getAccessTransformers()) {
+            final PsiFile file = PsiManager.getInstance(data.getProject()).findFile(virtualFile);
+            if (file == null) {
+                continue;
+            }
+
+            final AtomicBoolean found = new AtomicBoolean(false);
+            PsiSearchHelper.SERVICE.getInstance(data.getProject())
+                .processElementsWithWord(
+                    (element, offsetInElement) -> {
+                        McEditorUtil.gotoTargetElement(element, data.getEditor(), data.getFile());
+                        found.set(true);
+                        return false;
+                    },
+                    new LocalSearchScope(file),
+                    text,
+                    UsageSearchContext.ANY,
+                    true
+                );
+
+            if (found.get()) {
+                return;
+            }
+        }
+        showBalloon(e);
+    }
+
     private void showBalloon(@NotNull AnActionEvent e) {
         final Balloon balloon = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder("No mappings found", null, LightColors.YELLOW, null)
+            .createHtmlTextBalloonBuilder("No access transformer entry found", null, LightColors.YELLOW, null)
             .setHideOnAction(true)
             .setHideOnClickOutside(true)
             .setHideOnKeyOutside(true)
@@ -126,25 +144,6 @@ public class FindSrgMappingAction extends AnAction {
 
         ApplicationManager.getApplication().invokeLater(() -> {
             balloon.show(RelativePoint.getCenterOf(statusBar.getComponent()), Balloon.Position.atRight);
-        });
-    }
-
-    private void showSuccessBalloon(@NotNull Editor editor, @NotNull PsiElement element, @NotNull String text) {
-        final Balloon balloon = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder("SRG name: " + text, null, LightColors.SLIGHTLY_GREEN, null)
-            .setHideOnAction(true)
-            .setHideOnClickOutside(true)
-            .setHideOnKeyOutside(true)
-            .createBalloon();
-
-        ApplicationManager.getApplication().invokeLater(() -> {
-            balloon.show(
-                new RelativePoint(
-                    editor.getContentComponent(),
-                    editor.visualPositionToXY(editor.offsetToVisualPosition(element.getTextRange().getEndOffset()))
-                ),
-                Balloon.Position.atRight
-            );
         });
     }
 }

@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.forge;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
 import com.demonwav.mcdev.util.CommonColors;
 import com.demonwav.mcdev.util.Util;
 
@@ -59,9 +60,9 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
     @Override
     public List<String> getIgnoredAnnotations() {
         return ImmutableList.of(
-                "net.minecraftforge.fml.common.Mod",
-                "net.minecraftforge.fml.common.Mod.EventHandler",
-                "net.minecraftforge.fml.common.eventhandler.SubscribeEvent"
+            ForgeConstants.MOD_ANNOTATION,
+            ForgeConstants.EVENT_HANDLER_ANNOTATION,
+            ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION
         );
     }
 
@@ -69,8 +70,8 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
     @Override
     public List<String> getListenerAnnotations() {
         return ImmutableList.of(
-                "net.minecraftforge.fml.common.Mod.EventHandler",
-                "net.minecraftforge.fml.common.eventhandler.SubscribeEvent"
+            ForgeConstants.EVENT_HANDLER_ANNOTATION,
+            ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION
         );
     }
 

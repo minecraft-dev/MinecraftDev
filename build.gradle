@@ -1,5 +1,6 @@
 plugins {
     id "org.jetbrains.intellij" version "0.1.10"
+    id 'net.minecrell.licenser' version '0.3'
 }
 
 apply plugin: "idea"
@@ -104,7 +105,14 @@ task generate {
 
 compileJava.dependsOn generate
 
+// License header formatting
+license {
+    header = file("copyright.txt")
+    include "**/*.java", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html"
+
+    newLine = true
+}
+
 afterEvaluate {
-    buildPlugin.dependsOn initProp
-    runIdea.dependsOn initProp
+    prepareSandbox.dependsOn initProp
 }

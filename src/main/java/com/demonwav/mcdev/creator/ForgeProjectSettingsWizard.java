@@ -146,6 +146,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
                     } else {
                         minecraftVersionBox.addItem("4.1.0");
                         minecraftVersionBox.addItem("5.0.0");
+                        minecraftVersionBox.setSelectedIndex(1);
                     }
 
                     if (mcpVersion != null) {

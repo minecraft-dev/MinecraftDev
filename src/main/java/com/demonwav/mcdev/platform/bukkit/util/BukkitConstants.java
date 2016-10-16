@@ -20,6 +20,8 @@ public class BukkitConstants {
     @NotNull public static final String CHAT_COLOR_CLASS = "org.bukkit.ChatColor";
     @NotNull public static final String EVENT_CLASS = "org.bukkit.event.Event";
     @NotNull public static final String JAVA_PLUGIN = "org.bukkit.plugin.java.JavaPlugin";
+    @NotNull public static final String EVENT_ISCANCELLED_METHOD_NAME = "isCancelled";
+    @NotNull public static final String CANCELLABLE_CLASS = "org.bukkit.event.Cancellable";
 
     private BukkitConstants() {
     }

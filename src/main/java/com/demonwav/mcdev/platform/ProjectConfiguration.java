@@ -65,7 +65,7 @@ public abstract class ProjectConfiguration {
             return false;
         }
 
-        Iterator<String> it = list.iterator();
+        final Iterator<String> it = list.iterator();
         while (it.hasNext()) {
             String s = it.next();
             if (s.trim().isEmpty()) {

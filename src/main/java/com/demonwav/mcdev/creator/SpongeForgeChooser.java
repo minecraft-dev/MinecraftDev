@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator;
 
+import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
@@ -17,6 +18,7 @@ import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -42,6 +44,12 @@ public class SpongeForgeChooser extends ModuleWizardStep {
 
     @Override
     public JComponent getComponent() {
+        if (UIUtil.isUnderDarcula()) {
+            title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X_DARK);
+        } else {
+            title.setIcon(PlatformAssets.SPONGE_FORGE_ICON_2X);
+        }
+
         return panel;
     }
 

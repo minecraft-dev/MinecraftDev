@@ -13,11 +13,13 @@ package com.demonwav.mcdev.platform.bukkit;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.insight.generation.GenerationData;
+import com.demonwav.mcdev.inspection.IsCancelled;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
 import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
+import com.demonwav.mcdev.util.McMethodUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.base.Objects;
@@ -31,11 +33,14 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
+import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTypesUtil;
 import org.jetbrains.annotations.Contract;
@@ -144,7 +149,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         BukkitGenerationData bukkitData = (BukkitGenerationData) data;
         assert  bukkitData != null;
 
-        PsiMethod method = generateBukkitStyleEventListenerMethod(
+        final PsiMethod method = generateBukkitStyleEventListenerMethod(
             containingClass,
             chosenClass,
             chosenName,
@@ -154,13 +159,13 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         );
 
         if (!bukkitData.getEventPriority().equals("NORMAL")) {
-            PsiModifierList list = method.getModifierList();
-            PsiAnnotation annotation = list.findAnnotation(BukkitConstants.HANDLER_ANNOTATION);
+            final PsiModifierList list = method.getModifierList();
+            final PsiAnnotation annotation = list.findAnnotation(BukkitConstants.HANDLER_ANNOTATION);
             if (annotation == null) {
                 return method;
             }
 
-            PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
                 .createExpressionFromText(BukkitConstants.EVENT_PRIORITY_CLASS + "." + bukkitData.getEventPriority(), annotation);
 
             annotation.setDeclaredAttributeValue("priority", value);
@@ -175,25 +180,85 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
                                                                    @NotNull Project project,
                                                                    @NotNull String annotationName,
                                                                    boolean setIgnoreCancelled) {
-        PsiMethod newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
+        final PsiMethod newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
 
-        PsiParameterList list = newMethod.getParameterList();
-        PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
+        final PsiParameterList list = newMethod.getParameterList();
+        final PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
             .createParameter(
                 "event",
                 PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.allScope(project))
             );
         list.add(parameter);
 
-        PsiModifierList modifierList = newMethod.getModifierList();
-        PsiAnnotation annotation = modifierList.addAnnotation(annotationName);
+        final PsiModifierList modifierList = newMethod.getModifierList();
+        final PsiAnnotation annotation = modifierList.addAnnotation(annotationName);
 
         if (setIgnoreCancelled) {
-            PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project).createExpressionFromText("true", annotation);
+            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project).createExpressionFromText("true", annotation);
             annotation.setDeclaredAttributeValue("ignoreCancelled", value);
         }
 
         return newMethod;
+    }
+
+    @Nullable
+    @Override
+    public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
+        final PsiMethod method = McMethodUtil.getContainingMethod(expression);
+        if (method == null) {
+            return null;
+        }
+
+        final PsiAnnotation annotation = method.getModifierList().findAnnotation(BukkitConstants.HANDLER_ANNOTATION);
+        if (annotation == null) {
+            return null;
+        }
+
+        // We are in an event method
+        final PsiAnnotationMemberValue annotationMemberValue = annotation.findAttributeValue("ignoreCancelled");
+        if (!(annotationMemberValue instanceof PsiLiteralExpression)) {
+            return null;
+        }
+
+        final PsiLiteralExpression value = (PsiLiteralExpression) annotationMemberValue;
+        if (!(value.getValue() instanceof Boolean)) {
+            return null;
+        }
+
+        final boolean ignoreCancelled = (Boolean) value.getValue();
+
+        // If we aren't ignoring cancelled then any check for event being cancelled is valid
+        if (!ignoreCancelled) {
+            return null;
+        }
+
+        final PsiElement resolve = expression.getMethodExpression().resolve();
+        if (resolve == null) {
+            return null;
+        }
+
+        final PsiElement context = resolve.getContext();
+        if (!(context instanceof PsiClass)) {
+            return null;
+        }
+
+        final PsiClass psiClass = (PsiClass) context;
+        if (!McPsiUtil.extendsOrImplementsClass(psiClass, BukkitConstants.CANCELLABLE_CLASS)) {
+            return null;
+        }
+
+        if (!(resolve instanceof ClsMethodImpl)) {
+            return null;
+        }
+
+        if (!((ClsMethodImpl) resolve).getName().equals(BukkitConstants.EVENT_ISCANCELLED_METHOD_NAME)) {
+            return null;
+        }
+
+        return IsCancelled.builder()
+                .setErrorString("Cancellable.isCancelled() check is useless in a method annotated with ignoreCancelled=true.")
+                .setFix(descriptor -> expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression)))
+                .build();
     }
 
     @Override
@@ -228,7 +293,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BukkitModule<?> that = (BukkitModule<?>) o;
+        final BukkitModule<?> that = (BukkitModule<?>) o;
         return Objects.equal(pluginYml, that.pluginYml) &&
             type == that.type &&
             Objects.equal(configManager, that.configManager) &&

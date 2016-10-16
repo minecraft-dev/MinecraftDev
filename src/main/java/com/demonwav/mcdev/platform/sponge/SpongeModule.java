@@ -11,14 +11,16 @@
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.insight.generation.GenerationData;
+import com.demonwav.mcdev.inspection.IsCancelled;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData;
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants;
+import com.demonwav.mcdev.util.McMethodUtil;
+import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.JavaPsiFacade;
@@ -29,17 +31,16 @@ import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.List;
 
 import javax.swing.Icon;
 
@@ -84,53 +85,39 @@ public class SpongeModule extends AbstractModule {
         "Compiling and running this listener may result in a runtime exception";
     }
 
-    @Override
-    public List<PsiClass> getEventPossibilities(List<BuildDependency> dependencies) {
-        BuildDependency spongeDependency = null;
-        for (BuildDependency dependency : dependencies) {
-            if (dependency.getArtifactId().equals("spongeapi")) {
-                spongeDependency = dependency;
-            }
-        }
-        if (spongeDependency == null) {
-            return Collections.emptyList();
-        }
-        return super.getEventPossibilities(dependencies);
-    }
-
     @Nullable
     @Override
     public PsiMethod generateEventListenerMethod(@NotNull PsiClass containingClass,
                                                  @NotNull PsiClass chosenClass,
                                                  @NotNull String chosenName,
                                                  @Nullable GenerationData data) {
-        PsiMethod method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
-        PsiParameterList parameterList = method.getParameterList();
+        final PsiMethod method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
+        final PsiParameterList parameterList = method.getParameterList();
 
-        PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
+        final PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
             .createParameter(
                 "event",
                 PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.allScope(project))
             );
 
         parameterList.add(parameter);
-        PsiModifierList modifierList = method.getModifierList();
+        final PsiModifierList modifierList = method.getModifierList();
 
-        PsiAnnotation listenerAnnotation = modifierList.addAnnotation("org.spongepowered.api.event.Listener");
+        final PsiAnnotation listenerAnnotation = modifierList.addAnnotation("org.spongepowered.api.event.Listener");
 
-        SpongeGenerationData generationData = (SpongeGenerationData) data;
+        final SpongeGenerationData generationData = (SpongeGenerationData) data;
         assert generationData != null;
 
         if (!generationData.isIgnoreCanceled()) {
-            PsiAnnotation annotation = modifierList.addAnnotation("org.spongepowered.api.event.filter.IsCancelled");
-            PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+            final PsiAnnotation annotation = modifierList.addAnnotation("org.spongepowered.api.event.filter.IsCancelled");
+            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
                 .createExpressionFromText("org.spongepowered.api.util.Tristate.UNDEFINED", annotation);
 
             annotation.setDeclaredAttributeValue("value", value);
         }
 
         if (!generationData.getEventOrder().equals("DEFAULT")) {
-            PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
                 .createExpressionFromText("org.spongepowered.api.event.Order." + generationData.getEventOrder(), listenerAnnotation);
 
             listenerAnnotation.setDeclaredAttributeValue("order", value);
@@ -154,5 +141,83 @@ public class SpongeModule extends AbstractModule {
 
         final PsiModifierList modifierList = psiClass.getModifierList();
         return modifierList != null && modifierList.findAnnotation(SpongeConstants.PLUGIN_ANNOTATION) != null;
+    }
+
+    @Nullable
+    @Override
+    public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
+        final PsiMethod method = McMethodUtil.getContainingMethod(expression);
+        if (method == null) {
+            return null;
+        }
+
+        // Make sure this is an event listener method
+        final PsiAnnotation listenerAnnotation = method.getModifierList().findAnnotation(SpongeConstants.LISTENER_ANNOTATION);
+        if (listenerAnnotation == null) {
+            return null;
+        }
+
+        boolean isCancelled = false;
+        final PsiAnnotation annotation = method.getModifierList().findAnnotation(SpongeConstants.IS_CANCELLED_ANNOTATION);
+        if (annotation != null) {
+            final PsiAnnotationMemberValue value = annotation.findAttributeValue("value");
+            if (value == null) {
+                return null;
+            }
+
+            final String text = value.getText();
+
+            if (text.indexOf('.') == -1) {
+                return null;
+            }
+
+            final String sub = text.substring(text.lastIndexOf('.') + 1);
+            switch (sub) {
+                case "TRUE":
+                    isCancelled = true;
+                    break;
+                case "FALSE":
+                    isCancelled = false;
+                    break;
+                case "UNDEFINED":
+                default:
+                    return null;
+            }
+        }
+        final PsiElement resolve = expression.getMethodExpression().resolve();
+        if (resolve == null) {
+            return null;
+        }
+
+        final PsiElement content = resolve.getContext();
+        if (!(content instanceof PsiClass)) {
+            return null;
+        }
+
+        final PsiClass psiClass = (PsiClass) content;
+        if (!McPsiUtil.extendsOrImplementsClass(psiClass, SpongeConstants.CANCELLABLE)) {
+            return null;
+        }
+
+        if (!(resolve instanceof ClsMethodImpl)) {
+            return null;
+        }
+
+        if (!((ClsMethodImpl) resolve).getName().equals(SpongeConstants.EVENT_ISCANCELLED_METHOD_NAME)) {
+            return null;
+        }
+
+        final IsCancelled.IsCancelledBuilder isCancelledBuilder = IsCancelled.builder()
+            .setErrorString("Cancellable.isCancelled() check is useless in a method not annotated with @IsCancelled(Tristate.UNDEFINED)");
+
+        if (isCancelled) {
+            isCancelledBuilder.setFix(descriptor ->
+                expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("true", expression)));
+        } else {
+            isCancelledBuilder.setFix(descriptor ->
+                expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression)));
+        }
+
+        return isCancelledBuilder.build();
     }
 }

@@ -44,20 +44,20 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
         }
 
         for (Module module : ModuleManager.getInstance(node.getProject()).getModules()) {
-            ModuleRootManager rootManager = ModuleRootManager.getInstance(module);
+            final ModuleRootManager rootManager = ModuleRootManager.getInstance(module);
             // Make sure there is at least a root to go off of
             if (rootManager.getContentRoots().length < 1) {
                 continue;
             }
 
             // Get the root and compare it to the node
-            VirtualFile root = rootManager.getContentRoots()[0];
+            final VirtualFile root = rootManager.getContentRoots()[0];
             if (!root.equals(node.getVirtualFile())) {
                 continue;
             }
 
             // At this point we know this a module node, now check if it's a valid module for us
-            MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
+            final MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
             if (minecraftModule == null) {
                 continue;
             }
@@ -68,7 +68,7 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
                 continue;
             }
 
-            List<AbstractModuleType<?>> validTypes = minecraftModule.getTypes().stream()
+            final List<AbstractModuleType<?>> validTypes = minecraftModule.getTypes().stream()
                     .filter(AbstractModuleType::hasIcon)
                     .collect(Collectors.toList());
             if (validTypes.isEmpty()) {

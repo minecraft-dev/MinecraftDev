@@ -1,12 +1,12 @@
 <!--
-  ~ Minecraft Dev for IntelliJ
-  ~
-  ~ https://minecraftdev.org
-  ~
-  ~ Copyright (c) 2016 Kyle Wood (DemonWav)
-  ~
-  ~ MIT License
-  -->
+    Minecraft Dev for IntelliJ
+
+    https://minecraftdev.org
+
+    Copyright (c) 2016 Kyle Wood (DemonWav)
+
+    MIT License
+-->
 
 <idea-plugin version="2">
 
@@ -28,7 +28,7 @@
         Alpha release, not many features, may break. More features to come. Please report issues to
         <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
         <p>
-        <a href="https://minecraftdev.org/changelog/">Changelog v. 2016.3-0.3.4</a>
+        <a href="https://minecraftdev.org/changelog/">Changelog v. 2016.3-0.3.7</a>
       </div>
     ]]>
     </change-notes>
@@ -90,9 +90,20 @@
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ColorAnnotator"/>
 
+        <!-- Forge Annotator -->
+        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.SidedProxyAnnotator"/>
+
         <!-- Sponge Annotator -->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
 
+        <!-- IsCancelled Inspection -->
+        <localInspection displayName="Useless event is cancelled check"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="false"
+                         implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
         <!-- Bukkit Inspections -->
         <localInspection displayName="Bukkit EventHandler in class not implementing Listener"
                          groupName="Minecraft Bukkit"
@@ -114,49 +125,49 @@
                          groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="WARNING"
+                         level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NestedClassSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of @SideOnly in field declaration"
                          groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="WARNING"
+                         level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.FieldDeclarationSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of @SideOnly in method declaration"
                          groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="WARNING"
+                         level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of variable annotated with @SideOnly"
                          groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="WARNING"
+                         level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.VariableUseSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of method annotated with @SideOnly"
                          groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="WARNING"
+                         level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodCallSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of new object annotated with @SideOnly"
                          groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="WARNING"
+                         level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NewExpressionSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of local variable declaration annotated with @SideOnly"
                          groupName="Minecraft Forge"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="WARNING"
+                         level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.LocalVariableDeclarationSideOnlyInspection"/>
 
@@ -244,6 +255,10 @@
             <implementation-class>com.demonwav.mcdev.platform.mcp.McpProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>
+        <component>
+            <implementation-class>com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyProjectComponent</implementation-class>
+            <loadForDefaultProject/>
+        </component>
     </project-components>
 
     <actions>
@@ -271,6 +286,11 @@
                 text="Get SRG Name"
                 description="Find the associated SRG mapping for this element">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu2"/>
+        </action>
+        <action class="com.demonwav.mcdev.platform.mcp.actions.GotoAtEntryAction" id="GotoATEntry"
+                text="Go To AT Entry"
+                description="Go to the relevant Access Transformer entry, if it exists">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
     </actions>
 </idea-plugin>

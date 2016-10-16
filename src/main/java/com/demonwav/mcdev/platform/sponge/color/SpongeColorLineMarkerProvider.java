@@ -37,12 +37,12 @@ public class SpongeColorLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
-        Pair<Color, PsiElement> pair = SpongeColorUtil.findColorFromElement(element);
+        final Pair<Color, PsiElement> pair = SpongeColorUtil.findColorFromElement(element);
         if (pair == null) {
             return null;
         }
 
-        SpongeColorInfo info = new SpongeColorInfo(element, pair.first, pair.second);
+        final SpongeColorInfo info = new SpongeColorInfo(element, pair.first, pair.second);
         NavigateAction.setNavigateAction(info, "Change color", null);
 
         return info;

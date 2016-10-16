@@ -46,7 +46,7 @@ public class SpongeColorUtil {
             return null;
         }
 
-        MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
+        final MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
         if (minecraftModule == null) {
             return null;
         }
@@ -55,13 +55,13 @@ public class SpongeColorUtil {
             return null;
         }
 
-        PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) element;
+        final PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) element;
 
         if (!(methodCallExpression.getMethodExpression().getQualifier() instanceof PsiReferenceExpression)) {
             return null;
         }
 
-        PsiReferenceExpression qualifier = (PsiReferenceExpression) methodCallExpression.getMethodExpression().getQualifier();
+        final PsiReferenceExpression qualifier = (PsiReferenceExpression) methodCallExpression.getMethodExpression().getQualifier();
         if (qualifier == null) {
             return null;
         }
@@ -70,8 +70,8 @@ public class SpongeColorUtil {
             return null;
         }
 
-        PsiExpressionList expressionList = methodCallExpression.getArgumentList();
-        PsiType[] types = expressionList.getExpressionTypes();
+        final PsiExpressionList expressionList = methodCallExpression.getArgumentList();
+        final PsiType[] types = expressionList.getExpressionTypes();
 
         Pair<Color, PsiElement> pair = null;
 
@@ -125,13 +125,13 @@ public class SpongeColorUtil {
         }
 
         try {
-            PsiLiteralExpression expressionOne = (PsiLiteralExpression) expressionList.getExpressions()[0];
-            PsiLiteralExpression expressionTwo= (PsiLiteralExpression) expressionList.getExpressions()[1];
-            PsiLiteralExpression expressionThree = (PsiLiteralExpression) expressionList.getExpressions()[2];
+            final PsiLiteralExpression expressionOne = (PsiLiteralExpression) expressionList.getExpressions()[0];
+            final PsiLiteralExpression expressionTwo= (PsiLiteralExpression) expressionList.getExpressions()[1];
+            final PsiLiteralExpression expressionThree = (PsiLiteralExpression) expressionList.getExpressions()[2];
 
-            int one = (int) Math.round(Double.parseDouble(expressionOne.getText()));
-            int two = (int) Math.round(Double.parseDouble(expressionTwo.getText()));
-            int three = (int) Math.round(Double.parseDouble(expressionThree.getText()));
+            final int one = (int) Math.round(Double.parseDouble(expressionOne.getText()));
+            final int two = (int) Math.round(Double.parseDouble(expressionTwo.getText()));
+            final int three = (int) Math.round(Double.parseDouble(expressionThree.getText()));
 
             return new Color(one, two, three);
         } catch (Exception ignored) {}
@@ -140,7 +140,7 @@ public class SpongeColorUtil {
 
     @Nullable
     private static Color handleVectorArgument(@NotNull PsiNewExpression newExpression) {
-        PsiExpressionList expressionList = (PsiExpressionList) newExpression.getNode().findChildByType(JavaElementType.EXPRESSION_LIST);
+        final PsiExpressionList expressionList = (PsiExpressionList) newExpression.getNode().findChildByType(JavaElementType.EXPRESSION_LIST);
         if (expressionList == null) {
             return null;
         }

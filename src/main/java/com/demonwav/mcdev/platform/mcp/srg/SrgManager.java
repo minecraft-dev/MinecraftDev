@@ -67,7 +67,7 @@ public final class SrgManager {
      */
     public void recomputeSrgMap() {
         synchronized (lock) {
-            if (currentPromise != null) {
+            if (currentPromise != null && currentPromise.getState() != Promise.State.REJECTED) {
                 return;
             }
 
@@ -222,7 +222,7 @@ public final class SrgManager {
                 return Promise.resolve(currentMap);
             }
 
-            if (currentPromise != null) {
+            if (currentPromise != null && currentPromise.getState() != Promise.State.REJECTED) {
                 return currentPromise;
             }
             recomputeSrgMap();

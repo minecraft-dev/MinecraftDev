@@ -18,6 +18,9 @@ public final class SpongeConstants {
     @NotNull public static final String TEXT_COLORS = "org.spongepowered.api.text.format.TextColors";
     @NotNull public static final String TEXT_FORMATTING = "net.minecraft.util.text.TextFormatting";
     @NotNull public static final String LISTENER_ANNOTATION = "org.spongepowered.api.event.Listener";
+    @NotNull public static final String IS_CANCELLED_ANNOTATION = "org.spongepowered.api.event.filter.IsCancelled";
+    @NotNull public static final String CANCELLABLE = "org.spongepowered.api.event.Cancellable";
+    @NotNull public static final String EVENT_ISCANCELLED_METHOD_NAME = "isCancelled";
 
     private SpongeConstants() {
     }

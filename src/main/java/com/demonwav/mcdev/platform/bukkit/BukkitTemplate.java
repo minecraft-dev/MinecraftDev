@@ -32,7 +32,7 @@ public class BukkitTemplate extends AbstractTemplate {
                                               @NotNull VirtualFile file,
                                               @NotNull String packageName,
                                               @NotNull String className) {
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
 
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
@@ -47,7 +47,7 @@ public class BukkitTemplate extends AbstractTemplate {
     @NotNull
     public static String applyPomTemplate(@NotNull Project project,
                                           @NotNull String version) {
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", version);
 
         FileTemplateManager manager = FileTemplateManager.getInstance(project);
@@ -65,7 +65,7 @@ public class BukkitTemplate extends AbstractTemplate {
                                                           @NotNull VirtualFile file,
                                                           @NotNull BukkitProjectConfiguration settings,
                                                           @NotNull BuildSystem buildSystem) {
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
 
         properties.setProperty("NAME", settings.pluginName);
 

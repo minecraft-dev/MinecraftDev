@@ -63,19 +63,19 @@ public class BungeeCordProjectConfiguration extends ProjectConfiguration {
                 indicator.setText("Writing main class");
                 // Create plugin main class
                 VirtualFile file = buildSystem.getSourceDirectories().get(0);
-                String[] files = this.mainClass.split("\\.");
-                String className = files[files.length - 1];
-                String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
+                final String[] files = this.mainClass.split("\\.");
+                final String className = files[files.length - 1];
+                final String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
                 file = getMainClassDirectory(files, file);
 
-                VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
+                final VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
 
                 BungeeCordTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className);
-                VirtualFile pluginYml = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "plugin.yml");
+                final VirtualFile pluginYml = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "plugin.yml");
                 BungeeCordTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this, buildSystem);
 
                 // Set the editor focus on the main class
-                PsiFile mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile);
+                final PsiFile mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile);
                 if (mainClassPsi != null) {
                     EditorHelper.openInEditor(mainClassPsi);
                 }

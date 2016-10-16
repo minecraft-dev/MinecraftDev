@@ -10,13 +10,17 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
+import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiExpression;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
+import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiReferenceExpression;
 import com.siyeh.ig.BaseInspection;
@@ -86,6 +90,33 @@ public class MethodCallSideOnlyInspection extends BaseInspection {
                 }
 
                 final PsiReferenceExpression referenceExpression = expression.getMethodExpression();
+                final PsiExpression qualifierExpression = referenceExpression.getQualifierExpression();
+
+                // If this field is a @SidedProxy field, don't check. This is because people often are naughty and use the server impl as
+                // the base class for their @SidedProxy class, and client extends it. this messes up our checks, so we will just assume the
+                // right class is loaded for @SidedProxy's
+                label: {
+                    if (qualifierExpression instanceof PsiReferenceExpression) {
+                        final PsiReferenceExpression qualifierRefExpression = (PsiReferenceExpression) qualifierExpression;
+                        final PsiElement resolve = qualifierRefExpression.resolve();
+
+                        if (!(resolve instanceof PsiField)) {
+                            break label;
+                        }
+
+                        final PsiField resolveField = (PsiField) resolve;
+                        final PsiModifierList resolveFieldModifierList = resolveField.getModifierList();
+                        if (resolveFieldModifierList == null) {
+                            break label;
+                        }
+
+                        if (resolveFieldModifierList.findAnnotation(ForgeConstants.SIDED_PROXY_ANNOTATION) == null) {
+                            break label;
+                        }
+
+                        return;
+                    }
+                }
 
                 final PsiElement declaration = referenceExpression.resolve();
 

@@ -113,7 +113,6 @@ public final class ShadowError {
         MULTI_TARGET_CLASS_REMAPPED_TRUE,
         MULTI_TARGET_SHADOW_REMAPPED_TRUE,
         NO_SHADOW_METHOD_FOUND_WITH_REMAP,
-        NO_MATCHING_METHODS_FOUND,
         INVALID_ACCESSOR_ON_SHADOW_METHOD,
         CANNOT_FIND_MIXIN_TARGET,
         NOT_MIXIN_CLASS,
@@ -175,15 +174,6 @@ public final class ShadowError {
                 final String targetClassName = (String) args[1];
 
                 return "No method found by the name: " + methodName + " in target classes: " + targetClassName;
-            }
-        })
-        .add(new Formatter(Key.NO_MATCHING_METHODS_FOUND) {
-            @Override
-            String formatMessage(Object... args) {
-                final String methodName = (String) args[0];
-                final String targetClassName = (String) args[1];
-                final PsiMethod[] foundMethods = (PsiMethod[]) args[2];
-                return "No methods found matching signature: " + methodName + " in target classes: " + targetClassName + ".";
             }
         })
         .add(new Formatter(Key.INVALID_ACCESSOR_ON_SHADOW_METHOD) {

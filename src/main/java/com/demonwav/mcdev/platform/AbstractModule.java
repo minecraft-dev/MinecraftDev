@@ -10,21 +10,19 @@
 
 package com.demonwav.mcdev.platform;
 
-import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.insight.generation.GenerationData;
+import com.demonwav.mcdev.inspection.IsCancelled;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiMethodCallExpression;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.List;
 
 import javax.swing.Icon;
 
@@ -74,10 +72,6 @@ public abstract class AbstractModule {
         return "Parameter does not extend the proper Event Class!";
     }
 
-    public List<PsiClass> getEventPossibilities(List<BuildDependency> dependencies) {
-        return Collections.emptyList();
-    }
-
     public void doPreEventGenerate(@NotNull PsiClass psiClass, @Nullable GenerationData data) {
     }
 
@@ -92,5 +86,11 @@ public abstract class AbstractModule {
     @Contract(value = "null -> false", pure = true)
     public boolean shouldShowPluginIcon(@Nullable PsiElement element) {
         return false;
+    }
+
+    @Nullable
+    @Contract(pure = true)
+    public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
+        return null;
     }
 }

@@ -16,14 +16,20 @@ import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.mcp.srg.SrgManager;
 
+import com.google.common.collect.Sets;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
+
 import javax.swing.Icon;
 
 public class McpModule extends AbstractModule {
+    final Set<VirtualFile> accessTransformers = Sets.newHashSet();
+
     public McpModule(@NotNull Module module) {
         super(module);
         this.buildSystem = BuildSystem.getInstance(module);
@@ -61,5 +67,13 @@ public class McpModule extends AbstractModule {
     @Override
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "";
+    }
+
+    public Set<VirtualFile> getAccessTransformers() {
+        return accessTransformers;
+    }
+
+    public void addAccessTransformerFile(@NotNull VirtualFile file) {
+        accessTransformers.add(file);
     }
 }
