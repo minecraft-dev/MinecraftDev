@@ -67,8 +67,7 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
             pluginVersionField.setEditable(false);
         }
 
-        mainClassField.setText(creator.getGroupId().toLowerCase() + '.' + creator.getArtifactId().toLowerCase()
-            + '.' + name);
+        mainClassField.setText(creator.getGroupId().toLowerCase() + '.' + creator.getArtifactId().toLowerCase() + '.' + name);
 
         if (creator.getSettings().size() > 1) {
             mainClassField.setText(mainClassField.getText() + PlatformType.SPONGE.getNormalName());
