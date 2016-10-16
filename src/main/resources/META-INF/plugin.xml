@@ -292,5 +292,10 @@
                 description="Go to the relevant Access Transformer entry, if it exists">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
+        <action class="com.demonwav.mcdev.platform.mcp.actions.LookupMemberAction" id="LookupMcpMember"
+                text="Lookup MCP Member"
+                description="Lookup MCP mapping info on a SRG field or method">
+            <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
+        </action>
     </actions>
 </idea-plugin>
