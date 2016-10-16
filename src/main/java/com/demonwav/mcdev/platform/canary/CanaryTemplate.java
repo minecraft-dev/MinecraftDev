@@ -74,7 +74,7 @@ public class CanaryTemplate extends AbstractTemplate {
             properties.setProperty("VERSION", "${project.version}");
         }
 
-        properties.setProperty("MAIN", settings.mainClass);
+        properties.setProperty("MAIN_CLASS", settings.mainClass);
 
         if (settings.hasAuthors()) {
             properties.setProperty("AUTHOR_LIST", settings.authors.toString());

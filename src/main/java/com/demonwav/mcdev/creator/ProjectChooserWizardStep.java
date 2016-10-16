@@ -263,7 +263,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
         if (neptunePluginCheckBox.isSelected()) {
             CanaryProjectConfiguration configuration = new CanaryProjectConfiguration();
             configuration.type = PlatformType.NEPTUNE;
-            creator.getSettings().put(PlatformType.NEPTUNE, configuration);
+            creator.getSettings().put(PlatformType.CANARY, configuration);
         }
 
         creator.getSettings().values().iterator().next().isFirst = true;
