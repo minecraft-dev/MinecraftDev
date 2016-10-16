@@ -20,6 +20,8 @@ import com.demonwav.mcdev.util.Util;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.openapi.application.AccessToken;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -100,7 +102,10 @@ public class MinecraftModule {
             } else {
                 final String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
                 if (paths != null && paths.length > 0) {
-                    final Module parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[paths.length - 1]);
+                    final Module parentModule;
+                    try (final AccessToken ignored = ApplicationManager.getApplication().acquireReadActionLock()) {
+                        parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[paths.length - 1]);
+                    }
                     if (parentModule != null) {
                         if (map.containsKey(parentModule)) {
                             final MinecraftModule minecraftModule = map.get(parentModule);

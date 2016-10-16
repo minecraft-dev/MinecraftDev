@@ -30,6 +30,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.ResolveContext;
@@ -61,7 +62,12 @@ public class BungeeCordMavenImporter extends AbstractMavenImporter {
         super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
         for (Module module : ModuleManager.getInstance(project).getModules()) {
             // We'll make sure the project is setup
-            if (Objects.equals(ModuleRootManager.getInstance(module).getContentRoots()[0], mavenProject.getFile().getParent())) {
+            final VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+            if (contentRoots.length == 0) {
+                continue;
+            }
+
+            if (Objects.equals(contentRoots[0], mavenProject.getFile().getParent())) {
                 final BungeeCordModule bungeeCordModule = MinecraftModule.getInstance(module, BungeeCordModuleType.getInstance());
                 if (bungeeCordModule != null) {
                     bungeeCordModule.setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
