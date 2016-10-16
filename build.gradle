@@ -74,7 +74,7 @@ def lexerConfig(src, dst, lexerFileName) {
     }
 }
 
-task generateCfgLexer(type: JavaExec) {
+task generateAtLexer(type: JavaExec) {
     configure lexerConfig(
             "src/main/java/com/demonwav/mcdev/platform/mcp/at/AT.flex",
             "gen/com/demonwav/mcdev/platform/mcp/at/",
@@ -82,7 +82,7 @@ task generateCfgLexer(type: JavaExec) {
     )
 }
 
-task generateCfgPsiAndParser(type: JavaExec) {
+task generateAtPsiAndParser(type: JavaExec) {
     doFirst {
         delete file("gen/com/demonwav/mcdev/platform/mcp/at/psi/")
     }
@@ -100,7 +100,7 @@ task generateCfgPsiAndParser(type: JavaExec) {
 }
 
 task generate {
-    dependsOn generateCfgLexer, generateCfgPsiAndParser
+    dependsOn generateAtLexer, generateAtPsiAndParser
 }
 
 compileJava.dependsOn generate
