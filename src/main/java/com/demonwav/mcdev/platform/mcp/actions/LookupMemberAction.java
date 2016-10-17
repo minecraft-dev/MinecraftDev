@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.mcp.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
