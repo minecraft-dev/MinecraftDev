@@ -11,6 +11,8 @@
 package com.demonwav.mcdev.platform.canary;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
+import com.demonwav.mcdev.util.CommonColors;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +26,7 @@ public class NeptuneModuleType extends CanaryModuleType {
 
     private NeptuneModuleType() {
         super("org.neptunepowered", "NeptuneLib");
+        CommonColors.applyStandardColors(this.colorMap, CanaryConstants.MCP_CHAT_FORMATTING);
     }
 
     @NotNull
