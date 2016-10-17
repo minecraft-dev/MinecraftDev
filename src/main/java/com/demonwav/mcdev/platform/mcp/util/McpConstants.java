@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 public final class McpConstants {
 
     @NotNull public static final String TEXT_FORMATTING = "net.minecraft.util.text.TextFormatting";
-    @NotNull public static final String LEGACY_CHAT_FORMATTING = "net.minecraft.util.EnumChatFormatting";
 
     private McpConstants() {
     }

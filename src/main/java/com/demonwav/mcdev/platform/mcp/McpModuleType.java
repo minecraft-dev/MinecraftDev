@@ -35,7 +35,6 @@ public class McpModuleType extends AbstractModuleType<McpModule> {
     public McpModuleType() {
         super("", "");
         CommonColors.applyStandardColors(this.colorMap, McpConstants.TEXT_FORMATTING);
-        CommonColors.applyStandardColors(this.colorMap, McpConstants.LEGACY_CHAT_FORMATTING);
     }
 
     @Override
