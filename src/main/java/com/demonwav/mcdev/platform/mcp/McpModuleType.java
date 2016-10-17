@@ -12,6 +12,8 @@ package com.demonwav.mcdev.platform.mcp;
 
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.mcp.util.McpConstants;
+import com.demonwav.mcdev.util.CommonColors;
 
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +34,8 @@ public class McpModuleType extends AbstractModuleType<McpModule> {
 
     public McpModuleType() {
         super("", "");
+        CommonColors.applyStandardColors(this.colorMap, McpConstants.TEXT_FORMATTING);
+        CommonColors.applyStandardColors(this.colorMap, McpConstants.LEGACY_CHAT_FORMATTING);
     }
 
     @Override

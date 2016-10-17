@@ -14,7 +14,6 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
-import com.demonwav.mcdev.util.CommonColors;
 import com.demonwav.mcdev.util.Util;
 
 import com.google.common.collect.ImmutableList;
@@ -33,7 +32,6 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
 
     private ForgeModuleType() {
         super("", "");
-        CommonColors.applyStandardColors(this.colorMap, "net.minecraft.util.text.TextFormatting");
     }
 
     @NotNull
