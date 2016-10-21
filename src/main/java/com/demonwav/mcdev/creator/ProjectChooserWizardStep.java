@@ -14,6 +14,7 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
+import com.demonwav.mcdev.platform.canary.CanaryProjectConfiguration;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
@@ -51,6 +52,8 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
     private JCheckBox forgeModCheckBox;
     private JCheckBox bungeeCordPluginCheckBox;
     private JCheckBox liteLoaderModCheckBox;
+    private JCheckBox canaryPluginCheckBox;
+    private JCheckBox neptunePluginCheckBox;
 
     @NotNull private static final String bukkitInfo = "Create a standard " +
             "<a href=\"http://bukkit.org/\">Bukkit</a> plugin, for use " +
@@ -62,17 +65,23 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             "<a href=\"https://paper.emc.gs\">Paper</a> plugin, for use " +
             "on Paper servers.";
     @NotNull private static final String bungeeCordInfo = "Create a standard " +
-            "<a href=\"https://www.spigotmc.org/wiki/bungeecord/\"> BungeeCord</a> plugin, for use " +
+            "<a href=\"https://www.spigotmc.org/wiki/bungeecord/\">BungeeCord</a> plugin, for use " +
             "on BungeeCord servers.";
     @NotNull private static final String spongeInfo = "Create a standard " +
-            "<a href=\"https://www.spongepowered.org/\"> Sponge</a> plugin, for use " +
+            "<a href=\"https://www.spongepowered.org/\">Sponge</a> plugin, for use " +
             "on Sponge servers.";
     @NotNull private static final String forgeInfo = "Create a standard " +
-            "<a href=\"http://files.minecraftforge.net/\"> Forge</a> mod, for use " +
+            "<a href=\"http://files.minecraftforge.net/\">Forge</a> mod, for use " +
             "on Forge servers and clients.";
     @NotNull private static final String liteLoaderInfo = "Create a standard " +
-            "<a href=\"http://www.liteloader.com/\"> LiteLoader</a> mod, for use " +
+            "<a href=\"http://www.liteloader.com/\">LiteLoader</a> mod, for use " +
             "on LiteLoader clients.";
+    @NotNull private static final String canaryInfo = "Create a standard " +
+            "<a href=\"https://canarymod.net/\">Canary</a> plugin, for use " +
+            "on CanaryMod and Neptune servers.";
+    @NotNull private static final String neptuneInfo = "Create a standard " +
+            "<a href=\"https://www.neptunepowered.org/\">Neptune</a> plugin, for use " +
+            "on Neptune servers.";
 
     public ProjectChooserWizardStep(@NotNull MinecraftProjectCreator creator) {
         super();
@@ -127,9 +136,24 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
                 fillInInfoPane()
         );
 
+        canaryPluginCheckBox.addActionListener(e ->
+                toggle(canaryPluginCheckBox, neptunePluginCheckBox)
+        );
+
+        neptunePluginCheckBox.addActionListener(e ->
+                toggle(neptunePluginCheckBox, canaryPluginCheckBox)
+        );
+
         spongeIcon.setIcon(PlatformAssets.SPONGE_ICON_2X);
 
         return panel;
+    }
+
+    private void toggle(JCheckBox one, JCheckBox two) {
+        if (one.isSelected()) {
+            two.setSelected(false);
+            fillInInfoPane();
+        }
     }
 
     private void toggle(JCheckBox one, JCheckBox two, JCheckBox three) {
@@ -175,6 +199,16 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
 
         if (bungeeCordPluginCheckBox.isSelected()) {
             text += bungeeCordInfo;
+            text += "<p/>";
+        }
+
+        if (canaryPluginCheckBox.isSelected()) {
+            text += canaryInfo;
+            text += "<p/>";
+        }
+
+        if (neptunePluginCheckBox.isSelected()) {
+            text += neptuneInfo;
         }
 
         text += "</font></html>";
@@ -220,6 +254,18 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             creator.getSettings().put(PlatformType.BUNGEECORD, new BungeeCordProjectConfiguration());
         }
 
+        if (canaryPluginCheckBox.isSelected()) {
+            CanaryProjectConfiguration configuration = new CanaryProjectConfiguration();
+            configuration.type = PlatformType.CANARY;
+            creator.getSettings().put(PlatformType.CANARY, configuration);
+        }
+
+        if (neptunePluginCheckBox.isSelected()) {
+            CanaryProjectConfiguration configuration = new CanaryProjectConfiguration();
+            configuration.type = PlatformType.NEPTUNE;
+            creator.getSettings().put(PlatformType.CANARY, configuration);
+        }
+
         creator.getSettings().values().iterator().next().isFirst = true;
     }
 
@@ -231,6 +277,8 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             spongePluginCheckBox    .isSelected() ||
             forgeModCheckBox        .isSelected() ||
             liteLoaderModCheckBox   .isSelected() ||
-            bungeeCordPluginCheckBox.isSelected();
+            bungeeCordPluginCheckBox.isSelected() ||
+            canaryPluginCheckBox    .isSelected() ||
+            neptunePluginCheckBox   .isSelected();
     }
 }

@@ -53,6 +53,7 @@
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
         <fileIconProvider implementation="com.demonwav.mcdev.platform.forge.ForgeFileIconProvider"/>
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.canary.CanaryFileIconProvider"/>
 
         <!-- External Project Data Services are for Gradle project imports -->
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.BukkitDataService"/>
@@ -62,6 +63,8 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.liteloader.gradle.LiteLoaderDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.CanaryDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.NeptuneDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mixin.gradle.MixinDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
 
@@ -112,6 +115,14 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.bukkit.inspection.BukkitListenerImplementedInspection"/>
+        <!-- Canary Inspections -->
+        <localInspection displayName="Canary HookHandler in class not implementing PluginListener"
+                         groupName="Minecraft Canary"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.canary.inspection.CanaryListenerImplementedInspection"/>
         <!-- BungeeCord Inspections -->
         <localInspection displayName="BungeeCord EventHandler in class not implementing Listener"
                          groupName="Minecraft BungeeCord"
@@ -229,6 +240,8 @@
         <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
         <importer implementation="com.demonwav.mcdev.platform.bungeecord.maven.BungeeCordMavenImporter"/>
         <importer implementation="com.demonwav.mcdev.platform.sponge.maven.SpongeMavenImporter"/>
+        <importer implementation="com.demonwav.mcdev.platform.canary.maven.CanaryMavenImporter"/>
+        <importer implementation="com.demonwav.mcdev.platform.canary.maven.NeptuneMavenImporter"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
