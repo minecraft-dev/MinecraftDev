@@ -48,8 +48,8 @@ public class ListenerEventAnnotator implements Annotator {
         }
         // The PsiIdentifier is going to be a method of course!
         PsiMethod method = (PsiMethod) element.getParent();
-        if (method.hasModifierProperty(PsiModifier.ABSTRACT) || method.hasModifierProperty(PsiModifier.STATIC)) {
-            // I don't think any implementation allows for abstract or static method listeners.
+        if (method.hasModifierProperty(PsiModifier.ABSTRACT)) {
+            // I don't think any implementation allows for abstract
             return;
         }
         PsiModifierList modifierList = method.getModifierList();
@@ -107,6 +107,12 @@ public class ListenerEventAnnotator implements Annotator {
 
         if (instance.isEventClassValid(eventClass, method)) {
             return;
+        }
+
+        if (!instance.isStaticListenerSupported(eventClass, method) && method.hasModifierProperty(PsiModifier.STATIC)) {
+            if (method.getNameIdentifier() != null) {
+                holder.createErrorAnnotation(method.getNameIdentifier(), "Event listener method must not be static");
+            }
         }
 
         if (!isSuperEventListenerAllowed(eventClass, method, instance)) {

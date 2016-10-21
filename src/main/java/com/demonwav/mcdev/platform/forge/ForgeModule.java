@@ -109,6 +109,11 @@ public class ForgeModule extends AbstractModule {
                 "Compiling and running this listener may result in a runtime exception";
     }
 
+    @Override
+    public boolean isStaticListenerSupported(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
+        return true;
+    }
+
     public VirtualFile getMcmod() {
         if (buildSystem == null) {
             buildSystem = BuildSystem.getInstance(module);

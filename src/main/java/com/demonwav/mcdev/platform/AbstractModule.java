@@ -93,4 +93,8 @@ public abstract class AbstractModule {
     public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
         return null;
     }
+
+    public boolean isStaticListenerSupported(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
+        return false;
+    }
 }

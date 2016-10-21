@@ -210,6 +210,18 @@ public class MinecraftModule {
         return null;
     }
 
+    public boolean isStaticListenerSupported(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
+        for (AbstractModule abstractModule : modules.values()) {
+            boolean good = abstractModule.getModuleType().getListenerAnnotations().stream()
+                .anyMatch(listenerAnnotation -> method.getModifierList().findAnnotation(listenerAnnotation) != null);
+
+            if (good) {
+                return abstractModule.isStaticListenerSupported(eventClass, method);
+            }
+        }
+        return false;
+    }
+
     public void addModuleType(@NotNull String moduleTypeName) {
         final AbstractModuleType<?> type = PlatformType.getByName(moduleTypeName);
         if (type != null && !modules.containsKey(type)) {
