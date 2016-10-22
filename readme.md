@@ -56,7 +56,7 @@ Issues
 ------
 
 We have a few ambiguous labels on the issues page, so here are their definitions:
-* `platform: all` - An issue which applies to all supported platforms (`Bukkit`, `Sponge`, `BungeeCord`, `Forge`, and `LiteLoader`)
+* `platform: all` - An issue which applies to all supported platforms (`Bukkit`, `Sponge`, `BungeeCord`, `Forge`, `LiteLoader`, and `Canary`)
 * `platform: main` - Multiple platforms, containing at least `Bukkit`, `Sponge`, and `Forge`. It can contain either of the other two as
   well, as long as it doesn't contain all of them. In that case, `platform: all` would be more appropriate, of course.
 * `platform: multi` - Any issue with more than two platforms which doesn't fall under the first two categories.
@@ -76,3 +76,4 @@ Supported Platforms
 - [![MCP Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/MCP.png) **MCP**](http://www.modcoderpack.com/)
 - [![Mixins Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Mixins_dark.png) **Mixins**](https://github.com/SpongePowered/Mixin)
 - [![BungeeCord Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/BungeeCord.png) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/)
+- [![Canary Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Canary.png) **Canary**](https://canarymod.net/) ([![Neptune Icon](https://github.com/DemonWav/MinecraftDev/raw/master/src/main/resources/assets/icons/platform/Neptune.png) **Neptune**](https://www.neptunepowered.org/))
