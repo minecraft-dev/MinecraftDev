@@ -39,7 +39,7 @@ public class EntityConstructorInspection extends BaseInspection {
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        return "All Events must have a constructor that takes one " + McpConstants.WORLD + " parameter.";
+        return "All entities must have a constructor that takes one " + McpConstants.WORLD + " parameter.";
     }
 
     @Override
