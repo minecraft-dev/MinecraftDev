@@ -26,25 +26,25 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CanaryListenerImplementedInspection extends BaseInspection {
+public class CanaryCommandImplementedInspection extends BaseInspection {
 
     @Nls
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Canary HookHandler in class not implementing PluginListener";
+        return "Canary Command in class not implementing CommandListener";
     }
 
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        return "This class contains HookHandler methods but does not implement PluginListener.";
+        return "This class contains Command methods but does not implement CommandListener.";
     }
 
     @Nullable
     @Override
     public String getStaticDescription() {
-        return "All Canary HookHandler methods must reside in a class that implements PluginListener.";
+        return "All Canary Command methods must reside in a class that implements CommandListener.";
     }
 
     @Nullable
@@ -54,14 +54,14 @@ public class CanaryListenerImplementedInspection extends BaseInspection {
             @Override
             protected void doFix(Project project, ProblemDescriptor descriptor) {
                 PsiClass psiClass = (PsiClass) infos[0];
-                McPsiUtil.addImplements(psiClass, CanaryConstants.LISTENER_CLASS, project);
+                McPsiUtil.addImplements(psiClass, CanaryConstants.COMMAND_LISTENER_CLASS, project);
             }
 
             @Nls
             @NotNull
             @Override
             public String getName() {
-                return "Implement PluginListener";
+                return "Implement CommandListener";
             }
 
             @Nls
@@ -82,7 +82,7 @@ public class CanaryListenerImplementedInspection extends BaseInspection {
                 boolean isEventHandler = false;
                 for (PsiMethod method : methods) {
                     PsiModifierList list = method.getModifierList();
-                    PsiAnnotation annotation = list.findAnnotation(CanaryConstants.HOOK_HANDLER_ANNOTATION);
+                    PsiAnnotation annotation = list.findAnnotation(CanaryConstants.COMMAND_ANNOTATION);
                     if (annotation != null) {
                         isEventHandler = true;
                         break;
@@ -93,7 +93,7 @@ public class CanaryListenerImplementedInspection extends BaseInspection {
                     return;
                 }
 
-                final boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, CanaryConstants.LISTENER_CLASS);
+                final boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, CanaryConstants.COMMAND_LISTENER_CLASS);
 
                 if (inError) {
                     registerClassError(aClass, aClass);
