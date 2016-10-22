@@ -29,8 +29,11 @@ import javax.swing.Icon;
 
 public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
 
-    private static final String ID = "BUNGEECORD_MODULE_TYPE";
     private static final BungeeCordModuleType instance = new BungeeCordModuleType();
+
+    private static final String ID = "BUNGEECORD_MODULE_TYPE";
+    private static final List<String> IGNORED_ANNOTATIONS = ImmutableList.of(BungeeCordConstants.HANDLER_ANNOTATION);
+    private static final List<String> LISTENER_ANNOTATIONS = ImmutableList.of(BungeeCordConstants.HANDLER_ANNOTATION);
 
     private BungeeCordModuleType() {
         super("net.md-5", "bungeecord-api");
@@ -60,13 +63,13 @@ public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ImmutableList.of(BungeeCordConstants.HANDLER_ANNOTATION);
+        return IGNORED_ANNOTATIONS;
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of(BungeeCordConstants.HANDLER_ANNOTATION);
+        return LISTENER_ANNOTATIONS;
     }
 
     @NotNull

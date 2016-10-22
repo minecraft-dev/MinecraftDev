@@ -25,10 +25,10 @@ import javax.swing.Icon;
 
 public class MixinModuleType extends AbstractModuleType<MixinModule> {
 
-    public static final String ID = "MIXIN_MODULE_TYPE";
     private static final MixinModuleType instance = new MixinModuleType();
 
-    private static final ImmutableList<String> ANNOTATIONS = ImmutableList.<String>builder()
+    public static final String ID = "MIXIN_MODULE_TYPE";
+    private static final List<String> IGNORED_ANNOTATIONS = ImmutableList.<String>builder()
             .add(Annotations.DEBUG)
             .add(Annotations.FINAL)
             .add(Annotations.IMPLEMENTS)
@@ -47,6 +47,7 @@ public class MixinModuleType extends AbstractModuleType<MixinModule> {
             .add(Annotations.REDIRECT)
             .add(Annotations.SURROGATE)
             .build();
+    private static final List<String> LISTENER_ANNOTATIONS = Collections.emptyList();
 
     private MixinModuleType() {
         super("org.spongepowered", "mixin");
@@ -80,13 +81,13 @@ public class MixinModuleType extends AbstractModuleType<MixinModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ANNOTATIONS;
+        return IGNORED_ANNOTATIONS;
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return Collections.emptyList();
+        return LISTENER_ANNOTATIONS;
     }
 
     @NotNull

@@ -21,12 +21,12 @@ import javax.swing.Icon;
 
 public class SpigotModuleType extends BukkitModuleType {
 
-    private static final String ID = "SPIGOT_MODULE_TYPE";
     private static final SpigotModuleType instance = new SpigotModuleType();
 
+    private static final String ID = "SPIGOT_MODULE_TYPE";
+
     private SpigotModuleType() {
-        super("org.spigotmc", "spigot-api");
-        CommonColors.applyStandardColors(this.colorMap, "net.md_5.bungee.api.ChatColor");
+        this("org.spigotmc", "spigot-api");
     }
 
     protected SpigotModuleType(final String groupId, final String artifactId) {
