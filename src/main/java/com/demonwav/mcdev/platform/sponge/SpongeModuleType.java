@@ -30,14 +30,16 @@ import javax.swing.Icon;
 
 public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
 
-    private static final String ID = "SPONGE_MODULE_TYPE";
     private static final SpongeModuleType instance = new SpongeModuleType();
+
+    private static final String ID = "SPONGE_MODULE_TYPE";
+    private static final List<String> IGNORED_ANNOTATIONS = ImmutableList.of(SpongeConstants.LISTENER_ANNOTATION, SpongeConstants.PLUGIN_ANNOTATION);
+    private static final List<String> LISTENER_ANNOTATIONS = ImmutableList.of(SpongeConstants.LISTENER_ANNOTATION);
 
     private SpongeModuleType() {
         super("org.spongepowered", "spongeapi");
         CommonColors.applyStandardColors(this.colorMap, SpongeConstants.TEXT_COLORS);
     }
-
 
     public static SpongeModuleType getInstance() {
         return instance;
@@ -61,13 +63,13 @@ public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ImmutableList.of(SpongeConstants.LISTENER_ANNOTATION, SpongeConstants.PLUGIN_ANNOTATION);
+        return IGNORED_ANNOTATIONS;
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of(SpongeConstants.LISTENER_ANNOTATION);
+        return LISTENER_ANNOTATIONS;
     }
 
     @NotNull

@@ -25,8 +25,9 @@ import javax.swing.Icon;
 
 public class McpModuleType extends AbstractModuleType<McpModule> {
 
-    public static final String ID = "MCP_MODULE_TYPE";
     private static final McpModuleType instance = new McpModuleType();
+
+    public static final String ID = "MCP_MODULE_TYPE";
 
     public static McpModuleType getInstance() {
         return instance;

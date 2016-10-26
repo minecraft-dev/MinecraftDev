@@ -24,8 +24,11 @@ import javax.swing.Icon;
 
 public class LiteLoaderModuleType extends AbstractModuleType<LiteLoaderModule> {
 
-    private static final String ID = "LITELOADER_MODULE_TYPE";
     private static final LiteLoaderModuleType instance = new LiteLoaderModuleType();
+
+    private static final String ID = "LITELOADER_MODULE_TYPE";
+    private static final List<String> IGNORED_ANNOTATIONS = Collections.emptyList();
+    private static final List<String> LISTENER_ANNOTATIONS = Collections.emptyList();
 
     private LiteLoaderModuleType() {
         super("", "");
@@ -54,13 +57,13 @@ public class LiteLoaderModuleType extends AbstractModuleType<LiteLoaderModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return Collections.emptyList();
+        return IGNORED_ANNOTATIONS;
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return Collections.emptyList();
+        return LISTENER_ANNOTATIONS;
     }
 
     @NotNull
