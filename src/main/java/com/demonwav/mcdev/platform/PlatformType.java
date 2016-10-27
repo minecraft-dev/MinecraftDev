@@ -88,11 +88,11 @@ public enum PlatformType {
 
     @Nullable
     public static AbstractModuleType<?> getByName(String name) {
-        final PlatformType typebyName = getTypeByName(name);
-        if (typebyName == null) {
+        final PlatformType typeByName = getTypeByName(name);
+        if (typeByName == null) {
             return null;
         }
-        return typebyName.getType();
+        return typeByName.getType();
     }
 
     @NotNull
