@@ -155,6 +155,11 @@ public final class SideOnlyUtil {
 
             // check the classes this class extends
             for (PsiClass aClass : psiClass.getSupers()) {
+                // Prevent stack-overflow on cyclic dependencies
+                if (psiClass.equals(aClass)) {
+                    continue;
+                }
+
                 final List<Pair<Side, PsiClass>> pairs = checkClassHierarchy(aClass);
                 if (pairs.size() != 0) {
                     return new Pair<>(pairs.get(0).getFirst(), psiClass);

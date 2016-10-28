@@ -71,19 +71,10 @@ public final class McPsiUtil {
     }
 
     public static boolean extendsOrImplementsClass(@NotNull PsiClass psiClass, @NotNull String qualifiedClassName) {
-        if (qualifiedClassName.equals(psiClass.getQualifiedName())) {
-            return true;
-        }
-        final PsiClass[] supers = psiClass.getSupers();
-        for (PsiClass aSuper : supers) {
-            if (qualifiedClassName.equals(aSuper.getQualifiedName())) {
-                return true;
-            }
-            if (extendsOrImplementsClass(aSuper, qualifiedClassName)) {
-                return true;
-            }
-        }
-        return false;
+        final Project project = psiClass.getProject();
+        final PsiClass aClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, GlobalSearchScope.allScope(project));
+
+        return aClass != null && psiClass.isInheritor(aClass, true);
     }
 
     public static void addImplements(@NotNull PsiClass psiClass, @NotNull String qualifiedClassName, @NotNull Project project) {
