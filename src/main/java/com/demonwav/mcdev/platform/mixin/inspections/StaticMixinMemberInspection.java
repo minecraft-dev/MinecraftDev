@@ -3,15 +3,17 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.mixin.inspections;
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.util.McPsiUtil;
+
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMember;
@@ -58,7 +60,7 @@ public class StaticMixinMemberInspection extends BaseInspection {
     }
 
     private String getMethodMessage(PsiMember method) {
-        return String.format("Non-Overwrite static method %s is part of a Mixin, and therefore must not be public", method.getName());
+        return String.format("Non-Overwrite static method '%s' is part of a Mixin, and therefore must not be public", method.getName());
     }
 
     @Override
@@ -80,23 +82,20 @@ public class StaticMixinMemberInspection extends BaseInspection {
             }
 
             private boolean isProblematic(PsiMember member) {
-                PsiClass mixin = MixinUtils.getContainingMixinClass(member);
+                final PsiClass mixin = MixinUtils.getContainingMixinClass(member);
                 if (mixin == null) {
                     return false;
                 }
 
-                PsiModifierList modifierList = mixin.getModifierList();
+                final PsiModifierList modifierList = mixin.getModifierList();
 
                 if (modifierList == null) {
                     return false;
                 }
 
-                boolean isOverwrite = member instanceof PsiMethod && McPsiUtil.getAnnotation(member, MixinConstants.Annotations.OVERWRITE) != null;
+                final boolean isOverwrite = member instanceof PsiMethod && McPsiUtil.getAnnotation(member, MixinConstants.Annotations.OVERWRITE) != null;
 
-                if (!isOverwrite && member.hasModifierProperty(PsiModifier.PUBLIC) && member.hasModifierProperty(PsiModifier.STATIC)) {
-                    return true;
-                }
-                return false;
+                return !isOverwrite && member.hasModifierProperty(PsiModifier.PUBLIC) && member.hasModifierProperty(PsiModifier.STATIC);
             }
         };
     }
