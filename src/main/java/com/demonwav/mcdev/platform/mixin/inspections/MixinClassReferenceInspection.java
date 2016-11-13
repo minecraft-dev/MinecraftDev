@@ -41,12 +41,15 @@ public class MixinClassReferenceInspection extends BaseInspection {
 
             @Override
             public void visitTypeElement(PsiTypeElement typeElement) {
-                PsiType type = typeElement.getType();
+                final PsiType type = typeElement.getType();
                 if (!(type instanceof PsiClassReferenceType)) {
                     return;
                 }
 
-                PsiClass clazz = ((PsiClassReferenceType) type).resolve();
+                final PsiClass clazz = ((PsiClassReferenceType) type).resolve();
+                if (clazz == null) {
+                    return;
+                }
 
                 final PsiModifierList modifierList = clazz.getModifierList();
                 if (modifierList == null) {
