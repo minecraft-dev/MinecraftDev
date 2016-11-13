@@ -206,6 +206,13 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspections.MixinInspection"/>
+        <localInspection displayName="Illegal Mixin reference"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.MixinClassReferenceInspection"/>
         <localInspection displayName="Overwrite lacking @author JavaDoc tag"
                          shortName="OverwriteAuthorRequired"
                          groupName="Mixin"
