@@ -181,9 +181,9 @@ public class MinecraftProjectCreator {
                 buildDependency.setGroupId("org.spongepowered");
                 buildDependency.setArtifactId("spongeapi");
                 if (configuration instanceof SpongeProjectConfiguration) {
-                    buildDependency.setVersion(((SpongeProjectConfiguration) configuration).spongeApiVersion + "-SNAPSHOT");
+                    buildDependency.setVersion(((SpongeProjectConfiguration) configuration).spongeApiVersion);
                 } else {
-                    buildDependency.setVersion(((SpongeForgeProjectConfiguration) configuration).spongeApiVersion + "-SNAPSHOT");
+                    buildDependency.setVersion(((SpongeForgeProjectConfiguration) configuration).spongeApiVersion);
                 }
                 break;
             case CANARY:
