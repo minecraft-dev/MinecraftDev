@@ -2,9 +2,6 @@
 ==========================================================================================================================================
 [![GitHub Stars](https://img.shields.io/github/stars/minecraft-dev/MinecraftDev.svg?style=flat-square)](https://github.com/minecraft-dev/MinecraftDev/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/minecraft-dev/MinecraftDev.svg?style=flat-square)](https://github.com/minecraft-dev/MinecraftDev/issues) [![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build) [![Current Release](https://img.shields.io/badge/release-2016.2--0.4.0-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 
-[ISSUES HAVE MOVED TO JIRA](https://minecraftdev.atlassian.net/)
-===============================================================
-
 Info and Documentation
 ----------------------
 
@@ -58,7 +55,11 @@ Developers
 Issues
 ------
 
-Due to some features which were lacking from GitHub's issue tracker, we have [moved to JIRA](https://minecraftdev.atlassian.net/).
+We have a few ambiguous labels on the issues page, so here are their definitions:
+ * `platform: all` - An issue which applies to all supported platforms (`Bukkit`, `Sponge`, `BungeeCord`, `Forge`, `LiteLoader`, and `Canary`)
+ * `platform: main` - Multiple platforms, containing at least `Bukkit`, `Sponge`, and `Forge`. It can contain either of the other two as
+   well, as long as it doesn't contain all of them. In that case, `platform: all` would be more appropriate, of course.
+ * `platform: multi` - Any issue with more than two platforms which doesn't fall under the first two categories.
 
 License
 -------
