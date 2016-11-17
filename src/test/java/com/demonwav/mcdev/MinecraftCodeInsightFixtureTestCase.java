@@ -34,6 +34,7 @@ public abstract class MinecraftCodeInsightFixtureTestCase extends LightCodeInsig
         return new LightProjectDescriptor() {
             @Override
             protected void configureModule(@NotNull Module module, @NotNull ModifiableRootModel model, @NotNull ContentEntry contentEntry) {
+                super.configureModule(module, model, contentEntry);
                 // enable everything
                 MinecraftModuleType.addOption(module, PaperModuleType.getInstance().getId());
                 MinecraftModuleType.addOption(module, SpongeModuleType.getInstance().getId());

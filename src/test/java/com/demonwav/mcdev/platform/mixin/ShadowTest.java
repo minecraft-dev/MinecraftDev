@@ -15,45 +15,43 @@ import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.platform.mixin.util.ShadowedMembers;
 
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
+import org.jetbrains.annotations.Nullable;
 
 public class ShadowTest extends MinecraftCodeInsightFixtureTestCase {
 
+    private static final String path = "src/test/resources/com/demonwav/mcdev/platform/mixin/fixture";
     private PsiClass psiClass;
 
     @Override
     protected String getTestDataPath() {
-        return "src/test/resources/com/demonwav/mcdev/platform/mixin/fixture";
+        return path;
     }
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
-        myFixture.configureByFiles("src/test/ShadowData.java", "src/test/MixinBase.java");
-        final PsiFile shadowData = PsiDocumentManager.getInstance(getProject()).getPsiFile(getEditor().getDocument());
-
-        final PsiJavaFile javaFile = (PsiJavaFile) shadowData;
-        psiClass = javaFile.getClasses()[0];
-
+        final PsiFile[] psiFiles = myFixture.configureByFiles("src/test/ShadowData.java", "src/test/MixinBase.java");
+        psiClass = ((PsiJavaFile) psiFiles[0]).getClasses()[0];
     }
 
-    private void checkShadow(PsiElement element) {
+    private void checkShadow(@Nullable PsiElement element) {
         final ShadowedMembers shadowedElement = MixinUtils.getShadowedElement(element);
         assertNotNull(shadowedElement);
         assertEquals(1, shadowedElement.getTargets().size());
         assertEquals(0, shadowedElement.getErrors().size());
     }
 
-    private void checkBadShadow(PsiElement element) {
+    private void checkBadShadow(@Nullable PsiElement element) {
         final ShadowedMembers shadowedElement = MixinUtils.getShadowedElement(element);
         assertNotNull(shadowedElement);
         assertEquals(1, shadowedElement.getTargets().size());
         assertEquals(1, shadowedElement.getErrors().size());
     }
 
-    private void checkReallyBadShadow(PsiElement element) {
+    private void checkReallyBadShadow(@Nullable PsiElement element) {
         final ShadowedMembers shadowedElement = MixinUtils.getShadowedElement(element);
         assertNotNull(shadowedElement);
         assertEquals(0, shadowedElement.getTargets().size());
