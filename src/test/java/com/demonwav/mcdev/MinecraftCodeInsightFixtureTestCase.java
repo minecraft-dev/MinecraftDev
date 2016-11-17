@@ -27,7 +27,7 @@ import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import org.jetbrains.annotations.NotNull;
 
-public class MinecraftCodeInsightFixtureTestCase extends LightCodeInsightFixtureTestCase {
+public abstract class MinecraftCodeInsightFixtureTestCase extends LightCodeInsightFixtureTestCase {
     @NotNull
     @Override
     protected LightProjectDescriptor getProjectDescriptor() {
