@@ -40,4 +40,6 @@ public class MixinBase {
     // Bad shadows
     protected String wrongAccessor = "";
     protected final String noFinal = "";
+
+    public final String twoIssues = "";
 }

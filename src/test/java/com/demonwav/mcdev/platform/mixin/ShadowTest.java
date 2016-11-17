@@ -37,58 +37,56 @@ public class ShadowTest extends MinecraftCodeInsightFixtureTestCase {
         psiClass = ((PsiJavaFile) psiFiles[0]).getClasses()[0];
     }
 
-    private void checkShadow(@Nullable PsiElement element) {
+    private void checkShadow(@Nullable PsiElement element, int targets, int errors) {
         final ShadowedMembers shadowedElement = MixinUtils.getShadowedElement(element);
         assertNotNull(shadowedElement);
-        assertEquals(1, shadowedElement.getTargets().size());
-        assertEquals(0, shadowedElement.getErrors().size());
+        assertEquals(targets, shadowedElement.getTargets().size());
+        assertEquals(errors, shadowedElement.getErrors().size());
+    }
+
+    private void checkGoodShadow(@Nullable PsiElement element) {
+        checkShadow(element, 1, 0);
     }
 
     private void checkBadShadow(@Nullable PsiElement element) {
-        final ShadowedMembers shadowedElement = MixinUtils.getShadowedElement(element);
-        assertNotNull(shadowedElement);
-        assertEquals(1, shadowedElement.getTargets().size());
-        assertEquals(1, shadowedElement.getErrors().size());
+        checkShadow(element, 1, 1);
     }
 
     private void checkReallyBadShadow(@Nullable PsiElement element) {
-        final ShadowedMembers shadowedElement = MixinUtils.getShadowedElement(element);
-        assertNotNull(shadowedElement);
-        assertEquals(0, shadowedElement.getTargets().size());
-        assertEquals(1, shadowedElement.getErrors().size());
+        checkShadow(element, 0, 1);
     }
 
     // Good shadows
     public void testPrivateFinalShadow() {
-        checkShadow(psiClass.findFieldByName("privateFinalString", false));
+        checkGoodShadow(psiClass.findFieldByName("privateFinalString", false));
     }
 
     public void testPrivateShadow() {
-        checkShadow(psiClass.findFieldByName("privateString", false));
+        checkGoodShadow(psiClass.findFieldByName("privateString", false));
     }
 
     public void testProtectedFinalShadow() {
-        checkShadow(psiClass.findFieldByName("protectedFinalString", false));
+        checkGoodShadow(psiClass.findFieldByName("protectedFinalString", false));
     }
 
     public void testProtectedShadow() {
-        checkShadow(psiClass.findFieldByName("protectedString", false));
+        checkGoodShadow(psiClass.findFieldByName("protectedString", false));
     }
 
     public void testPackagePrivateFinalShadow() {
-        checkShadow(psiClass.findFieldByName("packagePrivateFinalString", false));
+        checkGoodShadow(psiClass.findFieldByName("packagePrivateFinalString", false));
     }
 
     public void testPackagePrivateShadow() {
-        checkShadow(psiClass.findFieldByName("packagePrivateString", false));
+        checkGoodShadow(psiClass.findFieldByName("packagePrivateString", false));
     }
 
     public void testPublicFinalShadow() {
-        checkShadow(psiClass.findFieldByName("publicFinalString", false));
+        checkGoodShadow(psiClass.findFieldByName("publicFinalString", false));
     }
 
     public void testPublicShadow() {
-        checkShadow(psiClass.findFieldByName("publicString", false));
+        checkGoodShadow(psiClass.findFieldByName("publicString", false));
     }
 
     // Bad shadows
@@ -98,6 +96,10 @@ public class ShadowTest extends MinecraftCodeInsightFixtureTestCase {
 
     public void testNoFinal() {
         checkBadShadow(psiClass.findFieldByName("noFinal", false));
+    }
+
+    public void testTwoIssues() {
+        checkShadow(psiClass.findFieldByName("twoIssues", false), 1, 2);
     }
 
     // Really bad shadows

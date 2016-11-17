@@ -515,7 +515,6 @@ public final class MixinUtils {
                         .addContext(neededAccessModifier)
                         .addContext(field)
                         .build());
-                    continue;
                 }
 
                 if (!field.getType().equals(resolveField.getType())) {

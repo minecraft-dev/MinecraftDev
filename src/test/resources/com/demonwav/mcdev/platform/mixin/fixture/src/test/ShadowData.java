@@ -10,7 +10,7 @@
 
 package test;
 
-@org.spongepowered.asm.mixin.Mixin(targets = "test.MixinBase")
+@org.spongepowered.asm.mixin.Mixin("test.MixinBase")
 public class ShadowData {
     @org.spongepowered.asm.mixin.Shadow @org.spongepowered.asm.mixin.Final private String privateFinalString;
     @org.spongepowered.asm.mixin.Shadow private String privateString;
@@ -25,7 +25,9 @@ public class ShadowData {
     @org.spongepowered.asm.mixin.Shadow public String publicString;
 
     @org.spongepowered.asm.mixin.Shadow public String wrongAccessor;
-    @org.spongepowered.asm.mixin.Shadow public String noFinal;
+    @org.spongepowered.asm.mixin.Shadow protected String noFinal;
 
     @org.spongepowered.asm.mixin.Shadow public String nonExistent;
+
+    @org.spongepowered.asm.mixin.Shadow protected String twoIssues;
 }
