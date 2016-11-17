@@ -23,13 +23,13 @@ public class PluginUpdateStatus {
     public PluginUpdateStatus mergeWith(PluginUpdateStatus other) {
         // Jesus wept. https://github.com/JetBrains/kotlin/blob/master/idea/src/org/jetbrains/kotlin/idea/KotlinPluginUpdater.kt#L61-L63
         if (
-                other instanceof Update &&
-                    (this instanceof LatestVersionInstalled ||
-                        (this instanceof Update && VersionComparatorUtil.compare(
-                            ((Update) other).getPluginDescriptor().getVersion(),
-                            ((Update) this).getPluginDescriptor().getVersion()) > 0
-                        )
+            other instanceof Update &&
+                (this instanceof LatestVersionInstalled ||
+                    (this instanceof Update && VersionComparatorUtil.compare(
+                        ((Update) other).getPluginDescriptor().getVersion(),
+                        ((Update) this).getPluginDescriptor().getVersion()) > 0
                     )
+                )
         ) {
             return other;
         }
