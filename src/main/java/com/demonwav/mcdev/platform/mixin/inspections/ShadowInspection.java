@@ -56,7 +56,7 @@ public class ShadowInspection extends BaseJavaBatchLocalInspectionTool {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Invalid Shadow";
+        return "Invalid @Shadow";
     }
 
     @Nullable

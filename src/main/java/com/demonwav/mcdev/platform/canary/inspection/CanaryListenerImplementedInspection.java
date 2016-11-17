@@ -32,19 +32,19 @@ public class CanaryListenerImplementedInspection extends BaseInspection {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Canary HookHandler in class not implementing PluginListener";
+        return "Canary @HookHandler in class not implementing PluginListener";
     }
 
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        return "This class contains HookHandler methods but does not implement PluginListener.";
+        return "This class contains @HookHandler methods but does not implement PluginListener.";
     }
 
     @Nullable
     @Override
     public String getStaticDescription() {
-        return "All Canary HookHandler methods must reside in a class that implements PluginListener.";
+        return "All Canary @HookHandler methods must reside in a class that implements PluginListener.";
     }
 
     @Nullable

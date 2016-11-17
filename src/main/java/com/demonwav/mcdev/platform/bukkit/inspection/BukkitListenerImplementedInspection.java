@@ -32,19 +32,19 @@ public class BukkitListenerImplementedInspection extends BaseInspection {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Bukkit EventHandler in class not implementing Listener";
+        return "Bukkit @EventHandler in class not implementing Listener";
     }
 
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        return "This class contains EventHandler methods but does not implement Listener.";
+        return "This class contains @EventHandler methods but does not implement Listener.";
     }
 
     @Nullable
     @Override
     public String getStaticDescription() {
-        return "All Bukkit EventHandler methods must reside in a class that implements Listener.";
+        return "All Bukkit @EventHandler methods must reside in a class that implements Listener.";
     }
 
     @Nullable

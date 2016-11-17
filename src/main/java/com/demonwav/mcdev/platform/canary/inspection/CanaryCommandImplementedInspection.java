@@ -32,19 +32,19 @@ public class CanaryCommandImplementedInspection extends BaseInspection {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Canary Command in class not implementing CommandListener";
+        return "Canary @Command in class not implementing CommandListener";
     }
 
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        return "This class contains Command methods but does not implement CommandListener.";
+        return "This class contains @Command methods but does not implement CommandListener.";
     }
 
     @Nullable
     @Override
     public String getStaticDescription() {
-        return "All Canary Command methods must reside in a class that implements CommandListener.";
+        return "All Canary @Command methods must reside in a class that implements CommandListener.";
     }
 
     @Nullable
