@@ -101,13 +101,13 @@ public class CanaryModule<T extends CanaryModuleType> extends AbstractModule {
                 chosenClass,
                 chosenName,
                 project,
-                CanaryConstants.HANDLER_ANNOTATION,
+                CanaryConstants.HOOK_HANDLER_ANNOTATION,
                 canaryData.isIgnoreCanceled()
         );
 
         if (!canaryData.getPriority().equals("NORMAL")) {
             final PsiModifierList list = method.getModifierList();
-            final PsiAnnotation annotation = list.findAnnotation(CanaryConstants.HANDLER_ANNOTATION);
+            final PsiAnnotation annotation = list.findAnnotation(CanaryConstants.HOOK_HANDLER_ANNOTATION);
             if (annotation == null) {
                 return method;
             }

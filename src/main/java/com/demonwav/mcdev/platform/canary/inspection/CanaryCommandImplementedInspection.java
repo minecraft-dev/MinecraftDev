@@ -3,14 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2016 Kyle Wood (DemonWav)
  *
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.bukkit.inspection;
+package com.demonwav.mcdev.platform.canary.inspection;
 
-import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
+import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.codeInspection.ProblemDescriptor;
@@ -26,25 +26,25 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BukkitListenerImplementedInspection extends BaseInspection {
+public class CanaryCommandImplementedInspection extends BaseInspection {
 
     @Nls
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Bukkit @EventHandler in class not implementing Listener";
+        return "Canary @Command in class not implementing CommandListener";
     }
 
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        return "This class contains @EventHandler methods but does not implement Listener.";
+        return "This class contains @Command methods but does not implement CommandListener.";
     }
 
     @Nullable
     @Override
     public String getStaticDescription() {
-        return "All Bukkit @EventHandler methods must reside in a class that implements Listener.";
+        return "All Canary @Command methods must reside in a class that implements CommandListener.";
     }
 
     @Nullable
@@ -54,14 +54,14 @@ public class BukkitListenerImplementedInspection extends BaseInspection {
             @Override
             protected void doFix(Project project, ProblemDescriptor descriptor) {
                 PsiClass psiClass = (PsiClass) infos[0];
-                McPsiUtil.addImplements(psiClass, BukkitConstants.LISTENER_CLASS, project);
+                McPsiUtil.addImplements(psiClass, CanaryConstants.COMMAND_LISTENER_CLASS, project);
             }
 
             @Nls
             @NotNull
             @Override
             public String getName() {
-                return "Implement Listener";
+                return "Implement CommandListener";
             }
 
             @Nls
@@ -82,7 +82,7 @@ public class BukkitListenerImplementedInspection extends BaseInspection {
                 boolean isEventHandler = false;
                 for (PsiMethod method : methods) {
                     PsiModifierList list = method.getModifierList();
-                    PsiAnnotation annotation = list.findAnnotation(BukkitConstants.HANDLER_ANNOTATION);
+                    PsiAnnotation annotation = list.findAnnotation(CanaryConstants.COMMAND_ANNOTATION);
                     if (annotation != null) {
                         isEventHandler = true;
                         break;
@@ -93,7 +93,7 @@ public class BukkitListenerImplementedInspection extends BaseInspection {
                     return;
                 }
 
-                final boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, BukkitConstants.LISTENER_CLASS);
+                final boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, CanaryConstants.COMMAND_LISTENER_CLASS);
 
                 if (inError) {
                     registerClassError(aClass, aClass);

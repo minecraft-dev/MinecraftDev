@@ -35,12 +35,12 @@ public class CanaryModuleType extends AbstractModuleType<CanaryModule> {
 
     private static final String ID = "CANARY_MODULE_TYPE";
     private static final List<String> IGNORED_ANNOTATIONS = ImmutableList.of(
-            CanaryConstants.HANDLER_ANNOTATION,
+            CanaryConstants.HOOK_HANDLER_ANNOTATION,
             CanaryConstants.COMMAND_ANNOTATION,
-            CanaryConstants.TABCOMPLETE_ANNOTATION,
+            CanaryConstants.TAB_COMPLETE_ANNOTATION,
             CanaryConstants.COLUMN_ANNOTATION
     );
-    private static final List<String> LISTENER_ANNOTATIONS = ImmutableList.of(CanaryConstants.HANDLER_ANNOTATION);
+    private static final List<String> LISTENER_ANNOTATIONS = ImmutableList.of(CanaryConstants.HOOK_HANDLER_ANNOTATION);
 
     private CanaryModuleType() {
         this("net.canarymod", "CanaryLib");
