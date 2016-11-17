@@ -30,6 +30,7 @@ import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassObjectAccessExpression;
+import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteralExpression;
@@ -43,7 +44,6 @@ import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypeParameter;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
-import com.intellij.psi.impl.source.PsiImmediateClassType;
 import com.intellij.psi.impl.source.tree.ElementType;
 import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
@@ -341,11 +341,11 @@ public final class MixinUtils {
             final PsiClassObjectAccessExpressionImpl expression = (PsiClassObjectAccessExpressionImpl) element;
 
             final PsiType type = expression.getType();
-            if (!(type instanceof PsiImmediateClassType)) {
+            if (!(type instanceof PsiClassType)) {
                 return null;
             }
 
-            final PsiSubstitutor substitutor = ((PsiImmediateClassType) type).resolveGenerics().getSubstitutor();
+            final PsiSubstitutor substitutor = ((PsiClassType) type).resolveGenerics().getSubstitutor();
             final Map<PsiTypeParameter, PsiType> substitutionMap = substitutor.getSubstitutionMap();
 
             final Set<Map.Entry<PsiTypeParameter, PsiType>> entries = substitutionMap.entrySet();
@@ -488,7 +488,7 @@ public final class MixinUtils {
 
             for (Map.Entry<PsiElement, PsiClass> entry : allMixedClasses.entrySet()) {
                 PsiField resolveField = entry.getValue().findFieldByName(shadowTargetName, true);
-//                if (resolveField == null) {
+                if (resolveField == null) {
 //                    if (!aliases.isEmpty()) {
 //                        for (String alias : aliases) {
 //                            resolveField = entry.getValue().findFieldByName(alias, true);
@@ -500,8 +500,8 @@ public final class MixinUtils {
 //                            continue;
 //                        }
 //                    }
-//                    continue;
-//                }
+                    continue;
+                }
 
                 resolveFields.add(resolveField);
                 final String fieldAccessModifier = McPsiUtil.getAccessModifier(field);

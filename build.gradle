@@ -21,7 +21,9 @@ intellij {
     // IntelliJ IDEA dependency
     version project.hasProperty("intellijVersion") ? project.getProperty("intellijVersion") : ideaVersion
     // Bundled plugin dependencies
-    plugins = ["maven", "gradle", "Groovy", "yaml"]
+    plugins = ["maven", "gradle", "Groovy", "yaml",
+                // needed dependencies for unit tests
+               "properties", "junit"]
     pluginName "Minecraft Development"
     updateSinceUntilBuild false
 
