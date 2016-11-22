@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.liteloader;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
-import com.demonwav.mcdev.util.CommonColors;
 
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
@@ -25,12 +24,14 @@ import javax.swing.Icon;
 
 public class LiteLoaderModuleType extends AbstractModuleType<LiteLoaderModule> {
 
-    private static final String ID = "LITELOADER_MODULE_TYPE";
     private static final LiteLoaderModuleType instance = new LiteLoaderModuleType();
+
+    private static final String ID = "LITELOADER_MODULE_TYPE";
+    private static final List<String> IGNORED_ANNOTATIONS = Collections.emptyList();
+    private static final List<String> LISTENER_ANNOTATIONS = Collections.emptyList();
 
     private LiteLoaderModuleType() {
         super("", "");
-        CommonColors.applyStandardColors(this.colorMap, "net.minecraft.util.text.TextFormatting");
     }
 
     @NotNull
@@ -56,13 +57,13 @@ public class LiteLoaderModuleType extends AbstractModuleType<LiteLoaderModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return Collections.emptyList();
+        return IGNORED_ANNOTATIONS;
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return Collections.emptyList();
+        return LISTENER_ANNOTATIONS;
     }
 
     @NotNull

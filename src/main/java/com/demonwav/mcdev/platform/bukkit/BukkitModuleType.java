@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -30,17 +30,18 @@ import javax.swing.Icon;
 
 public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
 
-    private static final String ID = "BUKKIT_MODULE_TYPE";
     private static final BukkitModuleType instance = new BukkitModuleType();
 
+    private static final String ID = "BUKKIT_MODULE_TYPE";
+    private static final List<String> IGNORED_ANNOTATIONS = ImmutableList.of(BukkitConstants.HANDLER_ANNOTATION);
+    private static final List<String> LISTENER_ANNOTATIONS = ImmutableList.of(BukkitConstants.HANDLER_ANNOTATION);
+
     private BukkitModuleType() {
-        super("org.bukkit", "bukkit");
-        CommonColors.applyStandardColors(this.colorMap, BukkitConstants.CHAT_COLOR_CLASS);
+        this("org.bukkit", "bukkit");
     }
 
     protected BukkitModuleType(final String groupId, final String artifactId) {
         super(groupId, artifactId);
-
         CommonColors.applyStandardColors(this.colorMap, BukkitConstants.CHAT_COLOR_CLASS);
     }
 
@@ -66,13 +67,13 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ImmutableList.of(BukkitConstants.HANDLER_ANNOTATION);
+        return IGNORED_ANNOTATIONS;
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of(BukkitConstants.HANDLER_ANNOTATION);
+        return LISTENER_ANNOTATIONS;
     }
 
     @NotNull
@@ -80,6 +81,7 @@ public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
     public BukkitModule generateModule(Module module) {
         return new BukkitModule<>(module, this);
     }
+
     @Contract(pure = true)
     @Override
     public boolean isEventGenAvailable() {

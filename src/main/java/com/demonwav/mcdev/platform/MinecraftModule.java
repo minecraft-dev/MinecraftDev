@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -208,6 +208,18 @@ public class MinecraftModule {
             }
         }
         return null;
+    }
+
+    public boolean isStaticListenerSupported(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
+        for (AbstractModule abstractModule : modules.values()) {
+            boolean good = abstractModule.getModuleType().getListenerAnnotations().stream()
+                .anyMatch(listenerAnnotation -> method.getModifierList().findAnnotation(listenerAnnotation) != null);
+
+            if (good) {
+                return abstractModule.isStaticListenerSupported(eventClass, method);
+            }
+        }
+        return false;
     }
 
     public void addModuleType(@NotNull String moduleTypeName) {

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -248,6 +248,7 @@ public final class SrgMap {
     }
 
     private static List<String> getParameterList(@NotNull String s) {
+        // find the parameters
         String params = s.substring(s.indexOf('(') + 1, s.lastIndexOf(')'));
         List<String> paramList = Lists.newArrayList();
 

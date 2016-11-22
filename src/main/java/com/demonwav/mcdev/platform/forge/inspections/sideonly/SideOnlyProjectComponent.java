@@ -3,10 +3,11 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
 import com.demonwav.mcdev.platform.MinecraftModule;

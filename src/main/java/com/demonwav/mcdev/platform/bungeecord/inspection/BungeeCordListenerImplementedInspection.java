@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -32,19 +32,19 @@ public class BungeeCordListenerImplementedInspection extends BaseInspection {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "BungeeCord EventHandler in class not implementing Listener";
+        return "BungeeCord @EventHandler in class not implementing Listener";
     }
 
     @NotNull
     @Override
     protected String buildErrorString(Object... infos) {
-        return "This class contains EventHandler methods but does not implement Listener";
+        return "This class contains @EventHandler methods but does not implement Listener";
     }
 
     @Nullable
     @Override
     public String getStaticDescription() {
-        return "All BungeeCord EventHandler methods must reside in a class that implements Listener.";
+        return "All BungeeCord @EventHandler methods must reside in a class that implements Listener.";
     }
 
     @Nullable

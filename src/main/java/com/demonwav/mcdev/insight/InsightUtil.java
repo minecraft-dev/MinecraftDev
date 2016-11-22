@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -43,9 +43,8 @@ public class InsightUtil {
         // The PsiIdentifier is going to be a method of course!
         PsiMethod method = (PsiMethod) element.getParent();
         if (method.hasModifierProperty(PsiModifier.ABSTRACT) ||
-            method.hasModifierProperty(PsiModifier.STATIC) ||
             method.hasModifierProperty(PsiModifier.PRIVATE)) {
-            // I don't think any implementation allows for abstract or static method listeners.
+            // I don't think any implementation allows for abstract method listeners.
             return null;
         }
         PsiModifierList modifierList = method.getModifierList();
@@ -97,6 +96,11 @@ public class InsightUtil {
         if (resolve == null) {
             return null;
         }
+
+        if (!instance.isStaticListenerSupported(resolve, method) && method.hasModifierProperty(PsiModifier.STATIC)) {
+            return null;
+        }
+
         return Pair.create(resolve, method);
     }
 

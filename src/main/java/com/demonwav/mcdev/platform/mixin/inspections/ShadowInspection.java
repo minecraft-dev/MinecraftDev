@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -56,7 +56,7 @@ public class ShadowInspection extends BaseJavaBatchLocalInspectionTool {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Invalid Shadow";
+        return "Invalid @Shadow";
     }
 
     @Nullable

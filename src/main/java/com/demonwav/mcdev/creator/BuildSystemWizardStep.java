@@ -3,15 +3,17 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.creator;
 
+import static com.demonwav.mcdev.platform.PlatformType.CANARY;
 import static com.demonwav.mcdev.platform.PlatformType.FORGE;
 import static com.demonwav.mcdev.platform.PlatformType.LITELOADER;
+import static com.demonwav.mcdev.platform.PlatformType.NEPTUNE;
 import static com.demonwav.mcdev.platform.PlatformType.SPONGE;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
@@ -65,7 +67,7 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
                 creator.getSettings().values().stream().anyMatch(s -> s instanceof SpongeForgeProjectConfiguration)) {
             buildSystemBox.setSelectedIndex(1);
             buildSystemBox.setVisible(false);
-        } else if (creator.getSettings().values().stream().anyMatch(s -> s.type == SPONGE)) {
+        } else if (creator.getSettings().values().stream().anyMatch(s -> s.type == SPONGE || s.type == CANARY || s.type == NEPTUNE)) {
             buildSystemBox.setSelectedIndex(1);
             buildSystemBox.setVisible(true);
         } else {

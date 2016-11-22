@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -145,7 +145,8 @@ public class MinecraftModuleBuilder extends JavaModuleBuilder {
             new SpongeProjectSettingsWizard(creator),
             new ForgeProjectSettingsWizard(creator),
             new LiteLoaderProjectSettingsWizard(creator),
-            new BungeeCordProjectSettingsWizard(creator)
+            new BungeeCordProjectSettingsWizard(creator),
+            new CanaryProjectSettingsWizard(creator)
         };
     }
 

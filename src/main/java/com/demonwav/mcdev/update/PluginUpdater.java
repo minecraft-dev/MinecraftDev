@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -64,7 +64,7 @@ public class PluginUpdater {
             lastUpdateStatus = updateStatus;
 
             final PluginUpdateStatus finalUpdate = updateStatus;
-            ApplicationManager.getApplication().invokeLater(() -> callback.apply(finalUpdate), ModalityState.NON_MODAL);
+            ApplicationManager.getApplication().invokeLater(() -> callback.apply(finalUpdate), ModalityState.current());
         } catch (Exception e) {
             PluginUpdateStatus.fromException("Minecraft Development plugin update check failed", e);
         }

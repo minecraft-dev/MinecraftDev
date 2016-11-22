@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -107,6 +107,11 @@ public class ForgeModule extends AbstractModule {
 
         return "Parameter is not a subclass of net.minecraftforge.fml.common.eventhandler.Event\n" +
                 "Compiling and running this listener may result in a runtime exception";
+    }
+
+    @Override
+    public boolean isStaticListenerSupported(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
+        return true;
     }
 
     public VirtualFile getMcmod() {

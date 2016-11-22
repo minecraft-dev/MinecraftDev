@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -21,6 +21,7 @@ import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
+import com.demonwav.mcdev.platform.canary.CanaryProjectConfiguration;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
@@ -180,10 +181,35 @@ public class MinecraftProjectCreator {
                 buildDependency.setGroupId("org.spongepowered");
                 buildDependency.setArtifactId("spongeapi");
                 if (configuration instanceof SpongeProjectConfiguration) {
-                    buildDependency.setVersion(((SpongeProjectConfiguration) configuration).spongeApiVersion + "-SNAPSHOT");
+                    buildDependency.setVersion(((SpongeProjectConfiguration) configuration).spongeApiVersion);
                 } else {
-                    buildDependency.setVersion(((SpongeForgeProjectConfiguration) configuration).spongeApiVersion + "-SNAPSHOT");
+                    buildDependency.setVersion(((SpongeForgeProjectConfiguration) configuration).spongeApiVersion);
                 }
+                break;
+            case CANARY:
+                if (!((CanaryProjectConfiguration) configuration).canaryVersion.endsWith("-SNAPSHOT")) {
+                    buildRepository.setId("vi-releases");
+                    buildRepository.setUrl("http://repo.visualillusionsent.net:8888/repository/internal/");
+                } else {
+                    buildRepository.setId("vi-snapshots");
+                    buildRepository.setUrl("http://repo.visualillusionsent.net:8888/repository/snapshots/");
+                }
+                buildDependency.setGroupId("net.canarymod");
+                buildDependency.setArtifactId("CanaryLib");
+                buildDependency.setVersion(((CanaryProjectConfiguration) configuration).canaryVersion);
+                break;
+            case NEPTUNE:
+                if (!((CanaryProjectConfiguration) configuration).canaryVersion.endsWith("-SNAPSHOT")) {
+                    buildRepository.setId("lex-releases");
+                    buildRepository.setUrl("http://repo.lexteam.xyz/maven/releases/");
+                } else {
+                    buildRepository.setId("lex-snapshots");
+                    buildRepository.setUrl("http://repo.lexteam.xyz/maven/snapshots/");
+                }
+                addVIRepo(buildSystem.getRepositories());
+                buildDependency.setGroupId("org.neptunepowered");
+                buildDependency.setArtifactId("NeptuneLib");
+                buildDependency.setVersion(((CanaryProjectConfiguration) configuration).canaryVersion);
                 break;
             default:
         }
@@ -192,6 +218,11 @@ public class MinecraftProjectCreator {
 
     private static void addSonatype(List<BuildRepository> buildRepositories) {
         buildRepositories.add(new BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/"));
+    }
+
+    private static void addVIRepo(List<BuildRepository> buildRepositories) {
+        buildRepositories.add(new BuildRepository("vi-releases", "http://repo.visualillusionsent.net:8888/repository/internal/"));
+        buildRepositories.add(new BuildRepository("vi-snapshots", "http://repo.visualillusionsent.net:8888/repository/snapshots/"));
     }
 
     public VirtualFile getRoot() {

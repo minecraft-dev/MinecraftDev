@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -92,5 +92,9 @@ public abstract class AbstractModule {
     @Contract(pure = true)
     public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
         return null;
+    }
+
+    public boolean isStaticListenerSupported(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
+        return false;
     }
 }

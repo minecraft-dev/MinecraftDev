@@ -3,7 +3,7 @@
 
     https://minecraftdev.org
 
-    Copyright (c) 2016 Kyle Wood (DemonWav)
+    Copyright (c) 2016 minecraft-dev
 
     MIT License
 -->
@@ -20,15 +20,15 @@
     <vendor>DemonWav, gabizou, and kashike</vendor>
 
     <description><![CDATA[
-      Brings support for Bukkit, Spigot, Paper, BungeeCord, Sponge, LiteLoader, and Forge Projects to Intellij IDEA.
+      Brings support for Bukkit, Spigot, Paper, BungeeCord, Sponge, LiteLoader, Forge, and Canary Projects to Intellij IDEA.
     ]]></description>
 
     <change-notes><![CDATA[
       <div>
         Alpha release, not many features, may break. More features to come. Please report issues to
-        <a href="https://github.com/DemonWav/MinecraftDevIntelliJ/issues">the issue tracker</a>!
+        <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        <a href="https://minecraftdev.org/changelog/">Changelog v. 2016.3-0.3.7</a>
+        <a href="https://minecraftdev.org/changelog/">Changelog v. 2016.3-0.4.2</a>
       </div>
     ]]>
     </change-notes>
@@ -53,6 +53,7 @@
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
         <fileIconProvider implementation="com.demonwav.mcdev.platform.forge.ForgeFileIconProvider"/>
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.canary.CanaryFileIconProvider"/>
 
         <!-- External Project Data Services are for Gradle project imports -->
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.BukkitDataService"/>
@@ -62,6 +63,8 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.liteloader.gradle.LiteLoaderDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.CanaryDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.NeptuneDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mixin.gradle.MixinDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
 
@@ -105,15 +108,37 @@
                          hasStaticDescription="false"
                          implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
         <!-- Bukkit Inspections -->
-        <localInspection displayName="Bukkit EventHandler in class not implementing Listener"
+        <localInspection displayName="Bukkit @EventHandler in class not implementing Listener"
                          groupName="Minecraft Bukkit"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.bukkit.inspection.BukkitListenerImplementedInspection"/>
+        <!-- Canary Inspections -->
+        <localInspection displayName="Canary @Command in class not implementing CommandListener"
+                         groupName="Minecraft Canary"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.canary.inspection.CanaryCommandImplementedInspection"/>
+        <localInspection displayName="Canary @HookHandler in class not implementing PluginListener"
+                         groupName="Minecraft Canary"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.canary.inspection.CanaryListenerImplementedInspection"/>
+        <localInspection displayName="Canary @TabComplete in class not implementing PluginListener"
+                         groupName="Minecraft Canary"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.canary.inspection.CanaryTabCompleteImplementedInspection"/>
         <!-- BungeeCord Inspections -->
-        <localInspection displayName="BungeeCord EventHandler in class not implementing Listener"
+        <localInspection displayName="BungeeCord @EventHandler in class not implementing Listener"
                          groupName="Minecraft BungeeCord"
                          language="JAVA"
                          enabledByDefault="true"
@@ -171,8 +196,17 @@
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.LocalVariableDeclarationSideOnlyInspection"/>
 
+        <!-- MCP inspections -->
+        <localInspection displayName="MCP Entity class missing World constructor"
+                         groupName="MCP"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.inspections.EntityConstructorInspection"/>
+
         <!-- Mixin Inspections -->
-        <localInspection displayName="Invalid Shadow"
+        <localInspection displayName="Invalid @Shadow"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
@@ -186,6 +220,20 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspections.MixinInspection"/>
+        <localInspection displayName="Illegal Mixin reference"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.MixinClassReferenceInspection"/>
+        <localInspection displayName="Public static field/method in a Mixin"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.StaticMixinMemberInspection"/>
         <localInspection displayName="Overwrite lacking @author JavaDoc tag"
                          shortName="OverwriteAuthorRequired"
                          groupName="Mixin"
@@ -229,6 +277,8 @@
         <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
         <importer implementation="com.demonwav.mcdev.platform.bungeecord.maven.BungeeCordMavenImporter"/>
         <importer implementation="com.demonwav.mcdev.platform.sponge.maven.SpongeMavenImporter"/>
+        <importer implementation="com.demonwav.mcdev.platform.canary.maven.CanaryMavenImporter"/>
+        <importer implementation="com.demonwav.mcdev.platform.canary.maven.NeptuneMavenImporter"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
@@ -291,6 +341,11 @@
                 text="Go To AT Entry"
                 description="Go to the relevant Access Transformer entry, if it exists">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+        </action>
+        <action class="com.demonwav.mcdev.platform.mcp.actions.LookupMemberAction" id="LookupMcpMember"
+                text="Lookup MCP Member"
+                description="Lookup MCP mapping info on a SRG field or method">
+            <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
         </action>
     </actions>
 </idea-plugin>

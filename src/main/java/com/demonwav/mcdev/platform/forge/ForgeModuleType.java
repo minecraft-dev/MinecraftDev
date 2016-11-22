@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -14,7 +14,6 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
-import com.demonwav.mcdev.util.CommonColors;
 import com.demonwav.mcdev.util.Util;
 
 import com.google.common.collect.ImmutableList;
@@ -28,12 +27,21 @@ import javax.swing.Icon;
 
 public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
 
-    private static final String ID = "FORGE_MODULE_TYPE";
     private static final ForgeModuleType instance = new ForgeModuleType();
+
+    private static final String ID = "FORGE_MODULE_TYPE";
+    private static final List<String> IGNORED_ANNOTATIONS = ImmutableList.of(
+            ForgeConstants.MOD_ANNOTATION,
+            ForgeConstants.EVENT_HANDLER_ANNOTATION,
+            ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION
+    );
+    private static final List<String> LISTENER_ANNOTATIONS = ImmutableList.of(
+            ForgeConstants.EVENT_HANDLER_ANNOTATION,
+            ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION
+    );
 
     private ForgeModuleType() {
         super("", "");
-        CommonColors.applyStandardColors(this.colorMap, "net.minecraft.util.text.TextFormatting");
     }
 
     @NotNull
@@ -59,20 +67,13 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
     @NotNull
     @Override
     public List<String> getIgnoredAnnotations() {
-        return ImmutableList.of(
-            ForgeConstants.MOD_ANNOTATION,
-            ForgeConstants.EVENT_HANDLER_ANNOTATION,
-            ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION
-        );
+        return IGNORED_ANNOTATIONS;
     }
 
     @NotNull
     @Override
     public List<String> getListenerAnnotations() {
-        return ImmutableList.of(
-            ForgeConstants.EVENT_HANDLER_ANNOTATION,
-            ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION
-        );
+        return LISTENER_ANNOTATIONS;
     }
 
     @NotNull

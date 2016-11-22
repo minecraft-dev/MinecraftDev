@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -50,6 +50,11 @@ public final class PlatformAssets extends Assets {
     @NotNull public static final Icon MIXIN_ICON_2X= loadIcon("/assets/icons/platform/Mixins@2x.png");
     @NotNull public static final Icon MIXIN_ICON_DARK = loadIcon("/assets/icons/platform/Mixins_dark.png");
     @NotNull public static final Icon MIXIN_ICON_2X_DARK = loadIcon("/assets/icons/platform/Mixins@2x_dark.png");
+
+    @NotNull public static final Icon CANARY_ICON = loadIcon("/assets/icons/platform/Canary.png");
+    @NotNull public static final Icon CANARY_ICON_2X = loadIcon("/assets/icons/platform/Canary@2x.png");
+    @NotNull public static final Icon NEPTUNE_ICON = loadIcon("/assets/icons/platform/Neptune.png");
+    @NotNull public static final Icon NEPTUNE_ICON_2X = loadIcon("/assets/icons/platform/Neptune@2x.png");
 
     @NotNull public static final Icon MCP_ICON = loadIcon("/assets/icons/platform/MCP.png");
     @NotNull public static final Icon MCP_ICON_2X = loadIcon("/assets/icons/platform/MCP@2x.png");

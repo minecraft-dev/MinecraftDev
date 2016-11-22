@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -14,6 +14,8 @@ import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
+import com.demonwav.mcdev.platform.canary.CanaryModuleType;
+import com.demonwav.mcdev.platform.canary.NeptuneModuleType;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderModuleType;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
@@ -31,6 +33,8 @@ public enum PlatformType {
     BUKKIT(BukkitModuleType.getInstance(), "Bukkit", new PlatformType[] {SPIGOT, PAPER}),
     FORGE(ForgeModuleType.getInstance(), "Forge"),
     SPONGE(SpongeModuleType.getInstance(), "Sponge"),
+    NEPTUNE(NeptuneModuleType.getInstance(), "Neptune"),
+    CANARY(CanaryModuleType.getInstance(), "Canary", new PlatformType[] {NEPTUNE}),
     BUNGEECORD(BungeeCordModuleType.getInstance(), "BungeeCord"),
     LITELOADER(LiteLoaderModuleType.getInstance(), "LiteLoader"),
     MIXIN(MixinModuleType.getInstance(), "Mixin"),
@@ -84,11 +88,11 @@ public enum PlatformType {
 
     @Nullable
     public static AbstractModuleType<?> getByName(String name) {
-        final PlatformType typebyName = getTypeByName(name);
-        if (typebyName == null) {
+        final PlatformType typeByName = getTypeByName(name);
+        if (typeByName == null) {
             return null;
         }
-        return typebyName.getType();
+        return typeByName.getType();
     }
 
     @NotNull

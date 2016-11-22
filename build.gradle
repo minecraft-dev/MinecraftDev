@@ -21,7 +21,9 @@ intellij {
     // IntelliJ IDEA dependency
     version project.hasProperty("intellijVersion") ? project.getProperty("intellijVersion") : ideaVersion
     // Bundled plugin dependencies
-    plugins = ["maven", "gradle", "Groovy", "yaml"]
+    plugins = ["maven", "gradle", "Groovy", "yaml",
+                // needed dependencies for unit tests
+               "properties", "junit"]
     pluginName "Minecraft Development"
     updateSinceUntilBuild false
 
@@ -82,7 +84,25 @@ task generateAtLexer(type: JavaExec) {
     )
 }
 
+/*
+ * This helps us get around the command length issues on Windows by placing the classpath in the manifest of a single
+ * jar, rather than printing them out in one looong line
+ */
+task pathingJar(type: Jar) {
+    dependsOn configurations.compile
+    appendix = 'pathing'
+
+    doFirst {
+        manifest {
+            attributes "Class-Path": configurations.compile.files.collect {
+                it.toURI().toString().replaceFirst(/file:\/+/, '/')
+            }.join(' ')
+        }
+    }
+}
+
 task generateAtPsiAndParser(type: JavaExec) {
+    dependsOn pathingJar
     doFirst {
         delete file("gen/com/demonwav/mcdev/platform/mcp/at/psi/")
     }
@@ -96,7 +116,7 @@ task generateAtPsiAndParser(type: JavaExec) {
     inputs  .file   file(src)
     outputs .dir    fileTree(dir: dstRoot + "/com/demonwav/mcdev/platform/mcp/at/", include: "**/*.java")
 
-    classpath(configurations.compile, file("libs/grammar-kit.jar"))
+    classpath("$buildDir/classes/main", "$buildDir/resources/main", pathingJar.archivePath, fileTree(dir: "libs/", include: "**/*.jar"))
 }
 
 task generate {
@@ -115,4 +135,11 @@ license {
 
 afterEvaluate {
     prepareSandbox.dependsOn initProp
+}
+
+task bootRun {
+    dependsOn pathingJar
+    doFirst {
+        classpath = files("$buildDir/classes/main", "$buildDir/resources/main", pathingJar.archivePath)
+    }
 }

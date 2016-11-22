@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -124,9 +124,8 @@ public class FindSrgMappingAction extends AnAction {
 
         final StatusBar statusBar = WindowManager.getInstance().getStatusBar(DataKeys.PROJECT.getData(e.getDataContext()));
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            balloon.show(RelativePoint.getCenterOf(statusBar.getComponent()), Balloon.Position.atRight);
-        });
+        ApplicationManager.getApplication().invokeLater(() ->
+            balloon.show(RelativePoint.getCenterOf(statusBar.getComponent()), Balloon.Position.atRight));
     }
 
     private void showSuccessBalloon(@NotNull Editor editor, @NotNull PsiElement element, @NotNull String text) {
@@ -137,14 +136,12 @@ public class FindSrgMappingAction extends AnAction {
             .setHideOnKeyOutside(true)
             .createBalloon();
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            balloon.show(
-                new RelativePoint(
-                    editor.getContentComponent(),
-                    editor.visualPositionToXY(editor.offsetToVisualPosition(element.getTextRange().getEndOffset()))
-                ),
-                Balloon.Position.atRight
-            );
-        });
+        ApplicationManager.getApplication().invokeLater(() -> balloon.show(
+            new RelativePoint(
+                editor.getContentComponent(),
+                editor.visualPositionToXY(editor.offsetToVisualPosition(element.getTextRange().getEndOffset()))
+            ),
+            Balloon.Position.atRight
+        ));
     }
 }

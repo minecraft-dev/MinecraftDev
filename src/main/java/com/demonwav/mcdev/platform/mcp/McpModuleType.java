@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -12,6 +12,8 @@ package com.demonwav.mcdev.platform.mcp;
 
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.mcp.util.McpConstants;
+import com.demonwav.mcdev.util.CommonColors;
 
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
@@ -23,8 +25,9 @@ import javax.swing.Icon;
 
 public class McpModuleType extends AbstractModuleType<McpModule> {
 
-    public static final String ID = "MCP_MODULE_TYPE";
     private static final McpModuleType instance = new McpModuleType();
+
+    public static final String ID = "MCP_MODULE_TYPE";
 
     public static McpModuleType getInstance() {
         return instance;
@@ -32,6 +35,7 @@ public class McpModuleType extends AbstractModuleType<McpModule> {
 
     public McpModuleType() {
         super("", "");
+        CommonColors.applyStandardColors(this.colorMap, McpConstants.TEXT_FORMATTING);
     }
 
     @Override

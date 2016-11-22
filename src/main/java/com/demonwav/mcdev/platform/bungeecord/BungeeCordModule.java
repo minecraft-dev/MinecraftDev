@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 Kyle Wood (DemonWav)
+ * Copyright (c) 2016 minecraft-dev
  *
  * MIT License
  */
@@ -14,12 +14,10 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.insight.generation.GenerationData;
-import com.demonwav.mcdev.inspection.IsCancelled;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.BukkitModule;
-import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
 import com.demonwav.mcdev.platform.bungeecord.generation.BungeeCordGenerationData;
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants;
 import com.demonwav.mcdev.util.McPsiUtil;
@@ -34,7 +32,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTypesUtil;
