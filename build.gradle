@@ -129,6 +129,7 @@ compileJava.dependsOn generate
 license {
     header = file("copyright.txt")
     include "**/*.java", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html"
+    exclude "gen/**", "**messages.MinecraftDevelopment.properties", "**messages.MinecraftDevelopment_en.properties"
 
     newLine = true
 }
