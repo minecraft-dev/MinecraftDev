@@ -27,7 +27,7 @@ public class CommandList {
      */
 
     @NotNull
-    private List<CommandNode> commands = new ArrayList<>();
+    private final List<CommandNode> commands = new ArrayList<>();
 
     /**
      * Searches for and returns any commands that go by the provided name or are aliased with the provided name. Returns

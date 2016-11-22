@@ -281,8 +281,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
         return javaPluginClass != null &&
             Arrays.stream(psiClass.getExtendsListTypes())
-                .filter(c -> c.equals(PsiTypesUtil.getClassType(javaPluginClass)))
-                .findAny().isPresent();
+                .anyMatch(c -> c.equals(PsiTypesUtil.getClassType(javaPluginClass)));
     }
 
     @Override

@@ -20,8 +20,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 @State(
-        name = "MinecraftSettings",
-        storages = @Storage(file = StoragePathMacros.APP_CONFIG + "/minecraft_dev.xml")
+    name = "MinecraftSettings",
+    storages = @Storage(file = StoragePathMacros.APP_CONFIG + "/minecraft_dev.xml")
 )
 public class MinecraftSettings implements PersistentStateComponent<MinecraftSettingsState> {
 

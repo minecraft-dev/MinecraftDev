@@ -12,21 +12,21 @@ import org.gradle.tooling.provider.model.ToolingModelBuilder
 import org.gradle.tooling.provider.model.ToolingModelBuilderRegistry
 
 class MinecraftDevModelImpl implements Serializable {
-    private final Set<File> files;
+    private final Set<File> files
 
     public MinecraftDevModelImpl(Set<File> files) {
-        this.files = files;
+        this.files = files
     }
 
     public Set<File> getMappingFiles() {
-        return files;
+        return files
     }
 }
 
 class MinecraftDevModelBuilder implements ToolingModelBuilder {
     @Override
     public boolean canBuild(String modelName) {
-        return modelName == "com.demonwav.mcdev.platform.mcp.srg.MinecraftDevModel";
+        return modelName == "com.demonwav.mcdev.platform.mcp.srg.MinecraftDevModel"
     }
 
     @Override

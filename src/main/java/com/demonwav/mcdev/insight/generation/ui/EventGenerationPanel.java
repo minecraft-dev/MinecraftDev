@@ -25,7 +25,7 @@ import javax.swing.JPanel;
  */
 public class EventGenerationPanel {
 
-    protected PsiClass chosenClass;
+    protected final PsiClass chosenClass;
 
     public EventGenerationPanel(@NotNull PsiClass chosenClass) {
         this.chosenClass = chosenClass;

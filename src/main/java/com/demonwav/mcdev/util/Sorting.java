@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,7 +71,7 @@ public final class Sorting {
             } catch (NumberFormatException e) {
                 return null;
             }
-        }).filter(array -> array != null).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         // Sort them correctly
         intList.sort(Sorting.REVERSE_LEXICOGRAPHICAL_ORDER);

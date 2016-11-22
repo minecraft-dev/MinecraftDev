@@ -167,10 +167,10 @@ public class ShadowInspection extends BaseJavaBatchLocalInspectionTool {
     }
 
     private static class Info {
-        public RemapStrategy strategy;
-        public PsiClass containingClass;
-        public PsiAnnotation shadowAnnotation;
-        public Map<PsiElement, PsiClass> psiClassMap;
+        public final RemapStrategy strategy;
+        public final PsiClass containingClass;
+        public final PsiAnnotation shadowAnnotation;
+        public final Map<PsiElement, PsiClass> psiClassMap;
         public Info(RemapStrategy strategy, PsiClass containingClass, PsiAnnotation shadowAnnotation, Map<PsiElement, PsiClass> psiClassMap) {
             this.strategy = strategy;
             this.containingClass = containingClass;

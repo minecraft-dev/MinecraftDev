@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class IsCancelledInspection extends BaseInspection {
@@ -63,7 +64,7 @@ public class IsCancelledInspection extends BaseInspection {
 
                 Optional<IsCancelled> useless = instance.getModules().stream()
                         .map(m -> m.checkUselessCancelCheck(expression))
-                        .filter(i -> i != null)
+                        .filter(Objects::nonNull)
                         .findAny();
                 if (!useless.isPresent()) {
                     return;

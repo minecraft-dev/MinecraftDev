@@ -36,6 +36,7 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -94,7 +95,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             checkedModules.addAll(goodModules);
 
             goodModules.stream()
-                .filter(m -> m != null)
+                .filter(Objects::nonNull)
                 .forEach(m -> findParent(m, modelsProvider, type, checkedModules, badModules));
 
             // Reset all other modules back to JavaModule && remove the type

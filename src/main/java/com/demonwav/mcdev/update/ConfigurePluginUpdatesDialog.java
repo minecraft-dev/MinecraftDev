@@ -21,7 +21,7 @@ import javax.swing.JComponent;
 
 public class ConfigurePluginUpdatesDialog extends DialogWrapper {
 
-    private ConfigurePluginUpdatesForm form = new ConfigurePluginUpdatesForm();
+    private final ConfigurePluginUpdatesForm form = new ConfigurePluginUpdatesForm();
     private PluginUpdateStatus.Update update;
     private int initialSelectedChannel;
 

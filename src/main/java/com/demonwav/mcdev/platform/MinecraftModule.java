@@ -39,9 +39,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,12 +51,12 @@ import javax.swing.Icon;
 
 public class MinecraftModule {
 
-    private static Map<Module, MinecraftModule> map = new HashMap<>();
-    private static Set<Consumer<MinecraftModule>> readyWaiters = Sets.newConcurrentHashSet();
+    private static final Map<Module, MinecraftModule> map = new HashMap<>();
+    private static final Set<Consumer<MinecraftModule>> readyWaiters = Sets.newConcurrentHashSet();
 
     private Module module;
     private BuildSystem buildSystem;
-    private Map<AbstractModuleType<?>, AbstractModule> modules = new ConcurrentHashMap<>();
+    private final Map<AbstractModuleType<?>, AbstractModule> modules = new ConcurrentHashMap<>();
 
     private static MinecraftModule generate(@NotNull List<AbstractModuleType<?>> types, @NotNull Module module) {
         final MinecraftModule minecraftModule = new MinecraftModule();
@@ -245,12 +245,7 @@ public class MinecraftModule {
      */
     public void updateModules(PlatformType[] types) {
         final List<PlatformType> platformTypes = Arrays.asList(types);
-        for (Iterator<AbstractModuleType<?>> iter = modules.keySet().iterator(); iter.hasNext();) {
-            final AbstractModuleType<?> next = iter.next();
-            if (!platformTypes.contains(next.getPlatformType())) {
-                iter.remove();
-            }
-        }
+        modules.keySet().removeIf(next -> !platformTypes.contains(next.getPlatformType()));
         for (PlatformType type : types) {
             if (!modules.keySet().contains(type.getType())) {
                 modules.put(type.getType(), type.getType().generateModule(module));
@@ -265,7 +260,7 @@ public class MinecraftModule {
 
     @Contract(value = "null -> false", pure = true)
     public boolean shouldShowPluginIcon(@Nullable PsiElement element) {
-        return getModules().stream().filter(m -> m.shouldShowPluginIcon(element)).findAny().isPresent();
+        return getModules().stream().anyMatch(m -> m.shouldShowPluginIcon(element));
     }
 
     @Nullable
@@ -288,7 +283,7 @@ public class MinecraftModule {
         return map.values().stream().distinct()
             .filter(m -> m != null && m.getBuildSystem() != null)
             .map(m -> m.getBuildSystem().findFile(path, type))
-            .filter(f -> f != null)
+            .filter(Objects::nonNull)
             .findFirst();
     }
 

@@ -27,9 +27,9 @@ public class CommandNode {
      *   back to the plugin.yml). List operations should be done with add and remove methods.
      */
 
-    @NotNull private String name;
+    @NotNull private final String name;
     @Nullable private String description;
-    @NotNull private List<String> aliases = new ArrayList<>();
+    @NotNull private final List<String> aliases = new ArrayList<>();
     @Nullable private String permission;
     @Nullable private String permissionMessage;
     @Nullable private String usage;

@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -106,7 +105,7 @@ public final class SrgManager {
 
                     try {
                         unpackInitGradleFile(mcinit);
-                    } catch (URISyntaxException | IOException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                         currentPromise.setError("Could not create mcinit.gradle file");
                         return;
@@ -159,7 +158,7 @@ public final class SrgManager {
         }));
     }
 
-    private void unpackInitGradleFile(@NotNull File mcinit) throws URISyntaxException, IOException {
+    private void unpackInitGradleFile(@NotNull File mcinit) throws IOException {
         try (
             final InputStream gradleStream = getClass().getResourceAsStream("/mcinit.gradle");
             final FileOutputStream fileOutputStream = new FileOutputStream(mcinit);

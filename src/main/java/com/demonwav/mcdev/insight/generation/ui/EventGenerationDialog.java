@@ -23,7 +23,7 @@ import javax.swing.JComponent;
 public class EventGenerationDialog extends DialogWrapper {
 
     private final EventGenerationPanel panel;
-    private EventListenerWizard wizard;
+    private final EventListenerWizard wizard;
     private GenerationData data;
 
     public EventGenerationDialog(@NotNull Editor editor,

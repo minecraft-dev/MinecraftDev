@@ -22,7 +22,7 @@ import com.intellij.util.containers.OrderedSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Insets;
-import java.util.Collections;
+import java.util.Comparator;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,7 +31,7 @@ public class MinecraftToolWindow {
     private JPanel panel;
 
     private Project project;
-    private OrderedSet<MinecraftModule> mcModules = new OrderedSet<>();
+    private final OrderedSet<MinecraftModule> mcModules = new OrderedSet<>();
 
     public void setProjectAndInit(@NotNull Project project) {
         this.project = project;
@@ -44,7 +44,7 @@ public class MinecraftToolWindow {
             }
         }
 
-        Collections.sort(mcModules, (m1, m2) -> m1.getIdeaModule().getName().compareTo(m2.getIdeaModule().getName()));
+        mcModules.sort(Comparator.comparing(m -> m.getIdeaModule().getName()));
 
         panel.setLayout(new GridLayoutManager(mcModules.size() + 1, 1));
         final GridLayoutManager layout = (GridLayoutManager) panel.getLayout();

@@ -60,11 +60,6 @@ public class McpModule extends AbstractModule {
     }
 
     @Override
-    public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
-        return super.isEventClassValid(eventClass, method);
-    }
-
-    @Override
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "";
     }

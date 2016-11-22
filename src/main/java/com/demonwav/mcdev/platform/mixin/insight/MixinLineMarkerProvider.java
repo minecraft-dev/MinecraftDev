@@ -40,7 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -122,8 +122,8 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
                     }));
                 }
 
-                Collections.sort(infos, (o1, o2) -> o1.offset - o2.offset);
-                final JBList list = new JBList(infos);
+                infos.sort(Comparator.comparingInt(o -> o.offset));
+                final JBList<Data> list = new JBList<>(infos);
                 PopupChooserBuilder builder  = JBPopupFactory.getInstance().createListPopupBuilder(list);
                 // Modified Jetbrains code
                 list.installCellRenderer(dom -> {
@@ -139,9 +139,9 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
                     return new JBLabel();
                 });
                 builder.setItemChoosenCallback(() -> {
-                    final Object value = list.getSelectedValue();
-                    if (value instanceof Data) {
-                        ((Data)value).runnable.run();
+                    final Data value = list.getSelectedValue();
+                    if (value != null) {
+                        value.runnable.run();
                     }
                 }).createPopup().show(new RelativePoint(mouseEvent));
                 // End Jetbrains code
@@ -178,12 +178,8 @@ public class MixinLineMarkerProvider extends LineMarkerProviderDescriptor {
                 updatePass,
                 (NullableFunction<PsiElement, String>) element1 -> "Go to Mixin class",
                 navHandler,
-                GutterIconRenderer.Alignment.RIGHT);
-        }
-
-        @Override
-        public boolean configurePopupAndRenderer(@NotNull PopupChooserBuilder builder, @NotNull JBList list, @NotNull List<MergeableLineMarkerInfo> markers) {
-            return super.configurePopupAndRenderer(builder, list, markers);
+                GutterIconRenderer.Alignment.RIGHT
+            );
         }
 
         @Override

@@ -53,7 +53,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -601,11 +600,7 @@ public final class MixinUtils {
                     continue;
                 }
 
-                for (Iterator<PsiMethod> iterator = validAccessMethods.iterator(); iterator.hasNext();) {
-                    if (!validSignatureMethods.contains(iterator.next())) {
-                        iterator.remove();
-                    }
-                }
+                validAccessMethods.removeIf(psiMethod -> !validSignatureMethods.contains(psiMethod));
                 if (validAccessMethods.isEmpty()) {
                     final PsiMethod psiMethod = validSignatureMethods.get(0);
                     final String probableAccessModifier = McPsiUtil.getAccessModifier(psiMethod);

@@ -66,7 +66,7 @@ public final class ShadowError {
 
     public static final class Builder {
         private  Key key;
-        private List<Object> errorContextInfos = Lists.newArrayList();
+        private final List<Object> errorContextInfos = Lists.newArrayList();
         private Level level = Level.ERROR;
 
         public ShadowError build() {

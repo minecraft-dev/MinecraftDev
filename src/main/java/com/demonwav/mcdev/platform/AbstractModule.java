@@ -28,8 +28,8 @@ import javax.swing.Icon;
 
 public abstract class AbstractModule {
 
-    protected Project project;
-    protected Module module;
+    protected final Project project;
+    protected final Module module;
     protected BuildSystem buildSystem;
 
     public AbstractModule(@NotNull Module module) {

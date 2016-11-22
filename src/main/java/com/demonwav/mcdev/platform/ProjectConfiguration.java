@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public abstract class ProjectConfiguration {
@@ -56,7 +55,7 @@ public abstract class ProjectConfiguration {
 
     @NotNull
     protected static String[] commaSplit(@NotNull String string) {
-        return string.trim().replaceAll("\\[|\\]", "").split("\\s*,\\s*");
+        return string.trim().replaceAll("\\[|]", "").split("\\s*,\\s*");
     }
 
     @Contract("null -> false")
@@ -65,13 +64,7 @@ public abstract class ProjectConfiguration {
             return false;
         }
 
-        final Iterator<String> it = list.iterator();
-        while (it.hasNext()) {
-            String s = it.next();
-            if (s.trim().isEmpty()) {
-                it.remove();
-            }
-        }
+        list.removeIf(s -> s.trim().isEmpty());
 
         return list.size() != 0;
     }

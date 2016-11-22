@@ -169,7 +169,6 @@ public class BungeeCordModule extends AbstractModule {
 
         return pluginClass != null &&
             Arrays.stream(psiClass.getExtendsListTypes())
-                .filter(c -> c.equals(PsiTypesUtil.getClassType(pluginClass)))
-                .findAny().isPresent();
+                .anyMatch(c -> c.equals(PsiTypesUtil.getClassType(pluginClass)));
     }
 }

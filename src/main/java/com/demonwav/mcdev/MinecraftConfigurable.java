@@ -73,9 +73,7 @@ public class MinecraftConfigurable implements Configurable {
 
         enableSideOnlyChecksCheckBox.setSelected(settings.isEnableSideOnlyChecks());
 
-        changePluginUpdateChannelButton.addActionListener(e -> {
-            new ConfigurePluginUpdatesDialog().show();
-        });
+        changePluginUpdateChannelButton.addActionListener(e -> new ConfigurePluginUpdatesDialog().show());
     }
 
     private void setUnderlineBox() {

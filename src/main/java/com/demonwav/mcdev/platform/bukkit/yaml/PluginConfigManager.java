@@ -37,8 +37,8 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public class PluginConfigManager {
 
-    @NotNull private BukkitModule module;
-    @NotNull private PluginConfig config;
+    @NotNull private final BukkitModule module;
+    @NotNull private final PluginConfig config;
 
     public PluginConfigManager(@NotNull BukkitModule module) {
         this.module = module;
@@ -215,11 +215,7 @@ public class PluginConfigManager {
             } else {
                 field.set(config, value);
             }
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IllegalAccessException e) {
-            // This shouldn't happen, as we are setting it to accessible before doing anything
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
             return false;
         }

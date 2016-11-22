@@ -142,8 +142,7 @@ public class GotoAtEntryAction extends AnAction {
 
         final StatusBar statusBar = WindowManager.getInstance().getStatusBar(DataKeys.PROJECT.getData(e.getDataContext()));
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            balloon.show(RelativePoint.getCenterOf(statusBar.getComponent()), Balloon.Position.atRight);
-        });
+        ApplicationManager.getApplication()
+                          .invokeLater(() -> balloon.show(RelativePoint.getCenterOf(statusBar.getComponent()), Balloon.Position.atRight));
     }
 }

@@ -41,7 +41,6 @@ import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +124,7 @@ public class FindMixinsAction extends AnAction {
 
                                 // Sort the results so it appears nicer
                                 final List<PsiClass> classesList = new ArrayList<>(classes);
-                                Collections.sort(classesList, (c1, c2) -> {
+                                classesList.sort((c1, c2) -> {
                                     final Pair<String, PsiClass> pair1 = McPsiUtil.getNameOfClass(c1);
                                     final Pair<String, PsiClass> pair2 = McPsiUtil.getNameOfClass(c2);
 

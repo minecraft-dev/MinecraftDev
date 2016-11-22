@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.JComponent;
 
 public class MinecraftSetupException extends Exception {
-    private JComponent j;
+    private final JComponent j;
 
     public MinecraftSetupException(@NotNull String msg, @NotNull JComponent j) {
         super(msg);

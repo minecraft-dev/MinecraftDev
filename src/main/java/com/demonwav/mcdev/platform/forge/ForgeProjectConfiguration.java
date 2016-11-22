@@ -33,7 +33,7 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 public class ForgeProjectConfiguration extends ProjectConfiguration {
 
-    public List<String> dependencies = new ArrayList<>();
+    public final List<String> dependencies = new ArrayList<>();
     public String updateUrl;
 
     public String mcpVersion;

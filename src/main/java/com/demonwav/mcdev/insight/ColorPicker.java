@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 public class ColorPicker {
 
     @NotNull
-    private JPanel panel = new JPanel(new GridBagLayout());
+    private final JPanel panel = new JPanel(new GridBagLayout());
 
     private String chosenColor;
 

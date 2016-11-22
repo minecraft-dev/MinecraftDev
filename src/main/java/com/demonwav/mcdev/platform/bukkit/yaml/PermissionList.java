@@ -29,7 +29,7 @@ public class PermissionList {
      */
 
     @NotNull
-    private List<PermissionNode> permissions = new ArrayList<>();
+    private final List<PermissionNode> permissions = new ArrayList<>();
 
     /**
      * Searches for and returns any permissions which go by the provided name. Returns an empty list if none are

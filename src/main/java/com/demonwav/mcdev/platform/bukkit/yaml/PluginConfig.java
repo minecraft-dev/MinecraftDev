@@ -30,26 +30,26 @@ public class PluginConfig {
      *   back to the plugin.yml). List operations should be done with add and remove methods.
      */
 
-    @NotNull private BukkitModule project;
+    @NotNull private final BukkitModule project;
 
     /**
      * The name of the plugin.
      */
-    @NotNull private String name = "";
+    @NotNull private final String name = "";
     /**
      * The fully qualified name of the main class for the plugin.
      */
-    @NotNull private String main = "";
+    @NotNull private final String main = "";
     /**
      * The version of the plugin.
      */
-    @NotNull private String version = "";
+    @NotNull private final String version = "";
     /**
      * The order in which the plugin should be loaded.
      *
      * @see LoadOrder
      */
-    @NotNull private LoadOrder load = LoadOrder.POSTWORLD;
+    @NotNull private final LoadOrder load = LoadOrder.POSTWORLD;
     /**
      * A list of plugins the plugin should load before.
      *
@@ -57,13 +57,13 @@ public class PluginConfig {
      */
     @NotNull
     @SuppressWarnings("SpellCheckingInspection")
-    private List<String> loadbefore = new ArrayList<>();
+    private final List<String> loadbefore = new ArrayList<>();
     /**
      * A list of plugins that the plugin has a hard dependency on.
      *
      * <p>The plugin will be loaded <b>after</b> plugins specified in this list.</p>
      */
-    @NotNull private List<String> depend = new ArrayList<>();
+    @NotNull private final List<String> depend = new ArrayList<>();
     /**
      * A list of plugins that the plugin has a soft dependency on.
      *
@@ -71,7 +71,7 @@ public class PluginConfig {
      */
     @NotNull
     @SuppressWarnings("SpellCheckingInspection")
-    private List<String> softdepend = new ArrayList<>();
+    private final List<String> softdepend = new ArrayList<>();
     /**
      * The name of a single author.
      *
@@ -83,7 +83,7 @@ public class PluginConfig {
      *
      * @see #author
      */
-    @NotNull private List<String> authors = new ArrayList<>();
+    @NotNull private final List<String> authors = new ArrayList<>();
     /**
      * A human-friendly description of the functionality the plugin provides.
      */
@@ -96,8 +96,8 @@ public class PluginConfig {
      * The token to prefix plugin-specific logging messages with.
      */
     @Nullable private String prefix;
-    @NotNull private CommandList commands = new CommandList();
-    @NotNull private PermissionList permissions = new PermissionList();
+    @NotNull private final CommandList commands = new CommandList();
+    @NotNull private final PermissionList permissions = new PermissionList();
     private boolean database;
 
     public PluginConfig(@NotNull BukkitModule project) {

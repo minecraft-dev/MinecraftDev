@@ -29,10 +29,10 @@ public class PermissionNode {
 
     public enum DefaultPermission { TRUE, FALSE, OP, NOT_OP }
 
-    @NotNull private String name;
+    @NotNull private final String name;
     @Nullable private String description;
-    @NotNull private DefaultPermission defaultPermission = DefaultPermission.OP;
-    @NotNull private Map<String, Boolean> children = new HashMap<>();
+    @NotNull private final DefaultPermission defaultPermission = DefaultPermission.OP;
+    @NotNull private final Map<String, Boolean> children = new HashMap<>();
 
     public PermissionNode(@NotNull String name) {
         this.name = name;

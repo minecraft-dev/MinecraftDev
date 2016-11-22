@@ -39,7 +39,7 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 public class SpongeProjectConfiguration extends ProjectConfiguration {
 
-    public List<String> dependencies = new ArrayList<>();
+    public final List<String> dependencies = new ArrayList<>();
     public boolean generateDocumentedListeners;
     public String spongeApiVersion;
 

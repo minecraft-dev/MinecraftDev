@@ -303,8 +303,7 @@ public class GradleBuildSystem extends BuildSystem {
             .filter(c -> {
                 // We want to find the child which has a GrReferenceExpression with the right name
                 return Arrays.stream(c.getChildren())
-                    .filter(g -> g instanceof GrReferenceExpression && g.getText().equals(name))
-                    .findAny().isPresent();
+                             .anyMatch(g -> g instanceof GrReferenceExpression && g.getText().equals(name));
             }).map(c -> {
                 // We want to find the grandchild which is a GrCloseableBlock, this is the
                 // basis for the method block

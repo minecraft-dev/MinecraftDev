@@ -39,7 +39,7 @@ idea {
 
     module {
         generatedSourceDirs += file("gen")
-        excludeDirs += file(".sandbox");
+        excludeDirs += file(".sandbox")
     }
 }
 

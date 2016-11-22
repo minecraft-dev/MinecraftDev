@@ -40,7 +40,7 @@ import javax.swing.Icon;
 
 public class MinecraftModuleBuilder extends JavaModuleBuilder {
 
-    private MinecraftProjectCreator creator = new MinecraftProjectCreator();
+    private final MinecraftProjectCreator creator = new MinecraftProjectCreator();
 
     @Override
     public String getPresentableName() {
