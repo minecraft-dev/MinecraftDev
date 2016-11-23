@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Minecraft Dev for IntelliJ
+  ~
+  ~ https://minecraftdev.org
+  ~
+  ~ Copyright (c) 2016 minecraft-dev
+  ~
+  ~ MIT License
+  -->
 <code_scheme name="DemonWavStyle">
     <option name="JAVA_INDENT_OPTIONS">
         <value>
