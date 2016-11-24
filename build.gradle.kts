@@ -103,7 +103,7 @@ val initPropTask = task("initProp") {
 // Credit for this intellij-rust https://github.com/intellij-rust/intellij-rust/blob/master/build.gradle#L114
 val generateAtLexer = task<JavaExec>("generateAtLexer") {
     val src = "src/main/java/com/demonwav/mcdev/platform/mcp/at/AT.flex"
-    val dst = "gen/com/demonwav/mcdev/platform/mcp/at/"
+    val dst = "gen/com/demonwav/mcdev/platform/mcp/at/gen/"
     val lexerFileName = "AtLexer.java"
 
     classpath = files("libs/jflex-1.7.0-SNAPSHOT.jar")
@@ -121,7 +121,7 @@ val generateAtLexer = task<JavaExec>("generateAtLexer") {
 
 /*
  * This helps us get around the command length issues on Windows by placing the classpath in the manifest of a single
- * jar, rather than printing them out in one looong line
+ * jar, rather than printing them out in one long line
  */
 val pathingJar = task<Jar>("pathingJar") {
     dependsOn(configurations.compile)
@@ -139,7 +139,7 @@ val pathingJar = task<Jar>("pathingJar") {
 val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
     dependsOn(pathingJar)
     doFirst {
-        delete(file("gen/com/demonwav/mcdev/platform/mcp/at/psi/"))
+        delete(file("gen/com/demonwav/mcdev/platform/mcp/at/gen/psi/"))
     }
 
     val src = "src/main/java/com/demonwav/mcdev/platform/mcp/at/AT.bnf"
@@ -151,7 +151,7 @@ val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
 
     inputs.file(file(src))
     outputs.dir(fileTree(mapOf(
-        "dir" to dstRoot + "/com/demonwav/mcdev/platform/mcp/at/",
+        "dir" to dstRoot + "/com/demonwav/mcdev/platform/mcp/at/gen/",
         "include" to "**/*.java"
     )))
 
@@ -176,7 +176,11 @@ tasks.withType<JavaCompile> {
 configure<LicenseExtension> {
     header = file("copyright.txt")
     include("**/*.java", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
-    exclude("gen/**", "**messages.MinecraftDevelopment.properties", "**messages.MinecraftDevelopment_en.properties")
+    exclude(
+        "com/demonwav/mcdev/platform/mcp/at/gen/**",
+        "**messages.MinecraftDevelopment.properties",
+        "**messages.MinecraftDevelopment_en.properties"
+    )
 
     newLine = true
 }

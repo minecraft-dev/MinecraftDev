@@ -24,7 +24,7 @@ Make sure you have Java 8 installed.
 
 Build the plugin with:
 
-`./gradlew buildPlugin`
+`./gradlew build`
 
 The output .zip file for the plugin will be in `build/distributions`.
 

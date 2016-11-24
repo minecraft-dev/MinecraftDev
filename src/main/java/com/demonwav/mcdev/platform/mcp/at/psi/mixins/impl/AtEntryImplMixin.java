@@ -11,9 +11,9 @@
 package com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl;
 
 import com.demonwav.mcdev.platform.mcp.at.AtElementFactory;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtAsterisk;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtFieldName;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtFunction;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtAsterisk;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction;
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtEntryMixin;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;

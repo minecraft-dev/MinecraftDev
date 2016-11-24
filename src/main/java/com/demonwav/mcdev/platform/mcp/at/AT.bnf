@@ -9,16 +9,16 @@
  *
  */
 {
-    parserClass="com.demonwav.mcdev.platform.mcp.at.parser.AtParser"
+    parserClass="com.demonwav.mcdev.platform.mcp.at.gen.parser.AtParser"
 
     extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
     psiClassPrefix="At"
     psiImplClassSuffix="Impl"
-    psiPackage="com.demonwav.mcdev.platform.mcp.at.psi"
-    psiImplPackage="com.demonwav.mcdev.platform.mcp.at.psi.impl"
+    psiPackage="com.demonwav.mcdev.platform.mcp.at.gen.psi"
+    psiImplPackage="com.demonwav.mcdev.platform.mcp.at.gen.psi.impl"
 
-    elementTypeHolderClass="com.demonwav.mcdev.platform.mcp.at.psi.AtTypes"
+    elementTypeHolderClass="com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes"
     elementTypeClass="com.demonwav.mcdev.platform.mcp.at.psi.AtElementType"
     tokenTypeClass="com.demonwav.mcdev.platform.mcp.at.psi.AtTokenType"
 

@@ -11,11 +11,11 @@
 package com.demonwav.mcdev.platform.mcp.at.psi.mixins;
 
 import com.demonwav.mcdev.platform.mcp.at.AtElementFactory;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtAsterisk;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtClassName;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtFieldName;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtFunction;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtKeyword;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtAsterisk;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtClassName;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtKeyword;
 
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;

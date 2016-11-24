@@ -10,9 +10,9 @@
 
 package com.demonwav.mcdev.platform.mcp.at.psi.mixins;
 
-import com.demonwav.mcdev.platform.mcp.at.psi.AtArgument;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtFuncName;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtReturnValue;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtArgument;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFuncName;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtReturnValue;
 
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;

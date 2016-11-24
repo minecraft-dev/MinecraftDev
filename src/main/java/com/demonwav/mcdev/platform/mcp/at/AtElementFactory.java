@@ -10,16 +10,16 @@
 
 package com.demonwav.mcdev.platform.mcp.at;
 
-import com.demonwav.mcdev.platform.mcp.at.psi.AtArgument;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtAsterisk;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtClassName;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtEntry;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtFieldName;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtFuncName;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtFunction;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtKeyword;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtReturnValue;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtTypes;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtArgument;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtAsterisk;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtClassName;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFuncName;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtKeyword;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtReturnValue;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiComment;

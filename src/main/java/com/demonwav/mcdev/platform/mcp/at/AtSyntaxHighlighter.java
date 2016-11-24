@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mcp.at;
 
-import com.demonwav.mcdev.platform.mcp.at.psi.AtTypes;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;

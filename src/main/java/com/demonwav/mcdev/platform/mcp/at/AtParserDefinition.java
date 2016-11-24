@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.platform.mcp.at;
 
-import com.demonwav.mcdev.platform.mcp.at.parser.AtParser;
-import com.demonwav.mcdev.platform.mcp.at.psi.AtTypes;
+import com.demonwav.mcdev.platform.mcp.at.gen.parser.AtParser;
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes;
 
 import com.google.common.collect.ImmutableMap;
 import com.intellij.lang.ASTNode;

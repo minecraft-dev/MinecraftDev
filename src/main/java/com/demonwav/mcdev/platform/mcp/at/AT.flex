@@ -1,8 +1,8 @@
-package com.demonwav.mcdev.platform.mcp.at;
+package com.demonwav.mcdev.platform.mcp.at.gen;
 
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
-import static com.demonwav.mcdev.platform.mcp.at.psi.AtTypes.*;
+import static com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes.*;
 import static com.intellij.psi.TokenType.*;
 
 %%
