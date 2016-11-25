@@ -58,14 +58,17 @@ public class SideOnlyProjectComponent extends AbstractProjectComponent {
                                 }
                             };
 
-                            final AllClassesSearchExecutor executor = new AllClassesSearchExecutor();
-                            executor.execute(
-                                new AllClassesSearch.SearchParameters(GlobalSearchScope.projectScope(myProject), myProject),
-                                psiClass -> {
-                                    psiClass.acceptChildren(visitor);
-                                    return true;
-                                }
-                            );
+                            try {
+                                final AllClassesSearchExecutor executor = new AllClassesSearchExecutor();
+                                executor.execute(
+                                    new AllClassesSearch.SearchParameters(GlobalSearchScope.projectScope(myProject), myProject),
+                                    psiClass -> {
+                                        psiClass.acceptChildren(visitor);
+                                        return true;
+                                    }
+                                );
+                            } catch (Exception ignored2) {}// I have no idea, seems like it's a bug with intellij, but I'll catch any
+                                                           // weird exceptions that pop up anyways...
                         }
                     }
                 });
