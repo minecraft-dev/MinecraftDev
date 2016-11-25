@@ -42,8 +42,6 @@ public class PluginUpdater {
         return instance;
     }
 
-    private PluginUpdateStatus lastUpdateStatus;
-
     public void runUpdateCheck(final Function<PluginUpdateStatus, Boolean> callback) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> updateCheck(callback));
     }
@@ -61,8 +59,6 @@ public class PluginUpdater {
                 updateStatus = updateStatus.mergeWith(checkUpdatesInCustomRepo(host));
             }
 
-            lastUpdateStatus = updateStatus;
-
             final PluginUpdateStatus finalUpdate = updateStatus;
             ApplicationManager.getApplication().invokeLater(() -> callback.apply(finalUpdate), ModalityState.current());
         } catch (Exception e) {
@@ -78,7 +74,7 @@ public class PluginUpdater {
         final String url = "https://plugins.jetbrains.com/plugins/list?pluginId=8327&build="
                 + buildNumber + "&pluginVersion=" + currentVersion + "&os=" + os;
 
-        Element responseDoc = HttpRequests.request(url).connect(request -> {
+        final Element responseDoc = HttpRequests.request(url).connect(request -> {
             try {
                 return JDOMUtil.load(request.getInputStream());
             } catch (JDOMException e) {
