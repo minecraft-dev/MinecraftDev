@@ -95,10 +95,10 @@ public final class McPsiUtil {
             .build();
 
     public static String getAccessModifier(PsiMember member) {
-        return MEMBER_ACCESS_MODIFIERS.stream()
+        return member != null ? MEMBER_ACCESS_MODIFIERS.stream()
                 .filter(member::hasModifierProperty)
                 .findFirst()
-                .orElse(PsiModifier.PUBLIC);
+                .orElse(PsiModifier.PUBLIC) : PsiModifier.PUBLIC;
     }
 
     @Nullable
@@ -123,7 +123,6 @@ public final class McPsiUtil {
         }
 
         if (psiClass.getContainingClass() == null) {
-            //noinspection ConstantConditions
             return Pair.create("", psiClass);
         }
 
