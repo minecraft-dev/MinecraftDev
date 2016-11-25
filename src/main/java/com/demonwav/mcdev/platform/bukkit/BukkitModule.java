@@ -18,7 +18,6 @@ import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
-import com.demonwav.mcdev.platform.bukkit.yaml.PluginConfigManager;
 import com.demonwav.mcdev.util.McMethodUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
 
@@ -56,7 +55,6 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
     private VirtualFile pluginYml;
     private PlatformType type;
-    private PluginConfigManager configManager;
     private T moduleType;
 
     BukkitModule(@NotNull Module module, @NotNull T type) {
@@ -71,20 +69,6 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
     private void setup() {
         pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
-
-        if (pluginYml != null) {
-            this.configManager = new PluginConfigManager(this);
-        }
-    }
-
-    @Nullable
-    public PluginConfigManager getConfigManager() {
-        if (configManager == null) {
-            if (pluginYml != null) {
-                configManager = new PluginConfigManager(this);
-            }
-        }
-        return configManager;
     }
 
     public VirtualFile getPluginYml() {
@@ -295,12 +279,11 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         final BukkitModule<?> that = (BukkitModule<?>) o;
         return Objects.equal(pluginYml, that.pluginYml) &&
             type == that.type &&
-            Objects.equal(configManager, that.configManager) &&
             Objects.equal(moduleType, that.moduleType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(pluginYml, type, configManager, moduleType);
+        return Objects.hashCode(pluginYml, type, moduleType);
     }
 }
