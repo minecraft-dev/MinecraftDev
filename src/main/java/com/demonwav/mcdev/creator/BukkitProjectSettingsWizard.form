@@ -94,6 +94,7 @@
                 </constraints>
                 <properties>
                   <model>
+                    <item value="1.11"/>
                     <item value="1.10.2"/>
                     <item value="1.10"/>
                     <item value="1.9.4"/>

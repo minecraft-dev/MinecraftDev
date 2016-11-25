@@ -99,6 +99,8 @@
                     </constraints>
                     <properties>
                       <model>
+                        <item value="1.11"/>
+                        <item value="1.10"/>
                         <item value="1.9"/>
                         <item value="1.8"/>
                       </model>
