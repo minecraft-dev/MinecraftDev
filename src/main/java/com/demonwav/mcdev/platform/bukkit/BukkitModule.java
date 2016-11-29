@@ -112,6 +112,11 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
     }
 
     @Override
+    public boolean isStaticListenerSupported(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
+        return true;
+    }
+
+    @Override
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "Parameter is not a subclass of org.bukkit.event.Event\n" +
                 "Compiling and running this listener may result in a runtime exception";
