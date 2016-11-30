@@ -23,6 +23,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypeElement;
+import com.intellij.psi.PsiTypeParameter;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import org.jetbrains.annotations.Nls;
@@ -47,6 +48,10 @@ public class EntityConstructorInspection extends BaseInspection {
         return new BaseInspectionVisitor() {
             @Override
             public void visitClass(PsiClass aClass) {
+                if (aClass instanceof PsiTypeParameter) {
+                    return;
+                }
+
                 if (!McPsiUtil.extendsOrImplementsClass(aClass, McpConstants.ENTITY)) {
                     return;
                 }
