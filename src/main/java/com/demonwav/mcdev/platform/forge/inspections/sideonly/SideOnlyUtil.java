@@ -37,7 +37,7 @@ public final class SideOnlyUtil {
 
     public static boolean beginningCheck(@NotNull PsiElement element) {
         // Don't check if this is disabled
-        if (!MinecraftSettings.getInstance().isEnableSideOnlyChecks()) {
+        if (!MinecraftSettings.Companion.getInstance().isEnableSideOnlyChecks()) {
             return false;
         }
 

@@ -40,7 +40,7 @@ public class ForgeTemplate extends AbstractTemplate {
         }
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_BUILD_GRADLE_TEMPLATE, properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getFORGE_BUILD_GRADLE_TEMPLATE(), properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,7 +54,7 @@ public class ForgeTemplate extends AbstractTemplate {
 
         // create gradle.properties
         try {
-            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
+            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.Companion.getFORGE_GRADLE_PROPERTIES_TEMPLATE(), gradleProps);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,7 +77,7 @@ public class ForgeTemplate extends AbstractTemplate {
         }
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getFORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE(), properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -89,7 +89,7 @@ public class ForgeTemplate extends AbstractTemplate {
 
         // create gradle.properties
         try {
-            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
+            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.Companion.getFORGE_GRADLE_PROPERTIES_TEMPLATE(), gradleProps);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,7 +123,7 @@ public class ForgeTemplate extends AbstractTemplate {
         }
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MCMOD_INFO_TEMPLATE, properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getMCMOD_INFO_TEMPLATE(), properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -145,7 +145,7 @@ public class ForgeTemplate extends AbstractTemplate {
         properties.setProperty("CLASS_NAME", className);
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_MAIN_CLASS_TEMPLATE, properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getFORGE_MAIN_CLASS_TEMPLATE(), properties);
         } catch (IOException e) {
             e.printStackTrace();
         }

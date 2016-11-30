@@ -29,7 +29,7 @@ public class ForgeFileIconProvider implements FileIconProvider {
     @Nullable
     @Override
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {
-        if (!MinecraftSettings.getInstance().isShowProjectPlatformIcons()) {
+        if (!MinecraftSettings.Companion.getInstance().isShowProjectPlatformIcons()) {
             return null;
         }
 

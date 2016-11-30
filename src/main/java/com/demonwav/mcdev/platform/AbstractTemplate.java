@@ -39,7 +39,7 @@ public abstract class AbstractTemplate {
         buildGradleProps.setProperty("BUILD_VERSION", buildVersion);
 
         final FileTemplateManager manager = FileTemplateManager.getInstance(project);
-        final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUILD_GRADLE_TEMPLATE);
+        final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.Companion.getBUILD_GRADLE_TEMPLATE());
 
         final Properties gradleProps = new Properties();
         gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
@@ -47,7 +47,7 @@ public abstract class AbstractTemplate {
 
         // create gradle.properties
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.GRADLE_PROPERTIES_TEMPLATE, gradleProps);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getGRADLE_PROPERTIES_TEMPLATE(), gradleProps);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,13 +76,13 @@ public abstract class AbstractTemplate {
 
         // create gradle.properties
         try {
-            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.GRADLE_PROPERTIES_TEMPLATE, gradleProps);
+            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.Companion.getGRADLE_PROPERTIES_TEMPLATE(), gradleProps);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MULTI_MODULE_BUILD_GRADLE_TEMPLATE, properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getMULTI_MODULE_BUILD_GRADLE_TEMPLATE(), properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,7 +98,7 @@ public abstract class AbstractTemplate {
         properties.setProperty("INCLUDES", includes);
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.SETTINGS_GRADLE_TEMPLATE, properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getSETTINGS_GRADLE_TEMPLATE(), properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -112,7 +112,7 @@ public abstract class AbstractTemplate {
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
 
         final FileTemplateManager manager = FileTemplateManager.getInstance(project);
-        final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SUBMODULE_BUILD_GRADLE_TEMPLATE);
+        final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.Companion.getSUBMODULE_BUILD_GRADLE_TEMPLATE());
 
         try {
             return template.getText(properties);

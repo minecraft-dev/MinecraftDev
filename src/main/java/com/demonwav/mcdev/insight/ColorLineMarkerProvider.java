@@ -42,7 +42,7 @@ public class ColorLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
-        if (!MinecraftSettings.getInstance().isShowChatColorGutterIcons()) {
+        if (!MinecraftSettings.Companion.getInstance().isShowChatColorGutterIcons()) {
             return null;
         }
 
