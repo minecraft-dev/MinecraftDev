@@ -11,7 +11,10 @@
 package com.demonwav.mcdev.platform.mcp.srg;
 
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
+import com.demonwav.mcdev.platform.mcp.McpBuildSystemData;
+import com.demonwav.mcdev.platform.mcp.McpBuildSystemDataKey;
 import com.demonwav.mcdev.platform.mcp.McpModule;
+import com.demonwav.mcdev.platform.mcp.MinecraftDevModel;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil;
@@ -115,7 +118,9 @@ public final class SrgManager {
                     connector.forProjectDirectory(dir);
                     ProjectConnection connection = null;
 
-                    Set<File> files = null;
+                    final Set<File> files;
+                    final String minecraftVersion;
+                    final String mcpVersion;
                     try {
                         connection = connector.connect();
                         final ModelBuilder<MinecraftDevModel> modelBuilder = connection.model(MinecraftDevModel.class);
@@ -130,6 +135,8 @@ public final class SrgManager {
                         modelBuilder.withArguments("--init-script", mcinit.getAbsolutePath());
                         final MinecraftDevModel model = modelBuilder.get();
                         files = model.getMappingFiles();
+                        minecraftVersion = model.getMinecraftVersion();
+                        mcpVersion = model.getMcpVersion();
                     } catch (Exception e) {
                         e.printStackTrace();
                         currentPromise.setError("Gradle tooling could not be used to gather data");
@@ -139,6 +146,9 @@ public final class SrgManager {
                             connection.close();
                         }
                     }
+
+                    module.getBuildSystem().setData(McpBuildSystemDataKey.INSTANCE, new McpBuildSystemData(minecraftVersion, mcpVersion));
+                    System.out.println(module.getBuildSystem().getData(McpBuildSystemDataKey.INSTANCE));
 
                     if (files == null) {
                         currentPromise.setError("Gradle tooling response was null");

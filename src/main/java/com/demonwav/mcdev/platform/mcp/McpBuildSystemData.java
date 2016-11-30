@@ -19,6 +19,13 @@ public class McpBuildSystemData {
     private String minecraftVersion;
     private String mcpVersion;
 
+    public McpBuildSystemData() {}
+
+    public McpBuildSystemData(String minecraftVersion, String mcpVersion) {
+        this.minecraftVersion = minecraftVersion;
+        this.mcpVersion = mcpVersion;
+    }
+
     public String getMinecraftVersion() {
         return minecraftVersion;
     }
