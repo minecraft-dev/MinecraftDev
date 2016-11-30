@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.buildsystem;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,9 +62,9 @@ public class BuildRepository {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-            .add("id", id)
-            .add("url", url)
-            .toString();
+        return MoreObjects.toStringHelper(this)
+                          .add("id", id)
+                          .add("url", url)
+                          .toString();
     }
 }

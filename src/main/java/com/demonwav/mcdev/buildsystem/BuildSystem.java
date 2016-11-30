@@ -13,9 +13,12 @@ package com.demonwav.mcdev.buildsystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.platform.ProjectConfiguration;
+import com.demonwav.mcdev.util.Key;
 import com.demonwav.mcdev.util.Util;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -32,9 +35,9 @@ import org.jetbrains.concurrency.Promise;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Base class for Maven and Gradle build systems. The general contract of any class which implements this is any
@@ -44,9 +47,11 @@ import java.util.Map;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class BuildSystem {
 
-    private final static Object lock = new Object();
+    private static final Object lock = new Object();
 
-    private static final Map<Module, BuildSystem> map = new HashMap<>();
+    private static final Map<Module, BuildSystem> map = Maps.newHashMap();
+
+    private final Map<Key<?>, Object> extraData = Maps.newHashMap();
 
     protected String artifactId;
     protected String groupId;
@@ -314,22 +319,35 @@ public abstract class BuildSystem {
         });
     }
 
+    public <T> void setData(@NotNull Key<T> key, @NotNull T data) {
+        extraData.put(key, data);
+    }
+
+    @NotNull
+    @Contract(pure = true)
+    public <T> Optional<T> getData(@Nullable Key<T> key) {
+        //noinspection unchecked
+        return Optional.ofNullable((T) extraData.get(key));
+    }
+
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-            .add("artifactId", artifactId)
-            .add("groupId", groupId)
-            .add("version", version)
-            .add("dependencies", dependencies)
-            .add("repositories", repositories)
-            .add("rootDirectory", rootDirectory)
-            .add("sourceDirectories", sourceDirectories)
-            .add("resourceDirectories", resourceDirectories)
-            .add("testSourcesDirectories", testSourcesDirectories)
-            .add("testResourceDirectories", testResourceDirectories)
-            .add("pluginName", pluginName)
-            .add("buildVersion", buildVersion)
-            .toString();
+        return MoreObjects.toStringHelper(this)
+                          .add("extraData", extraData)
+                          .add("artifactId", artifactId)
+                          .add("groupId", groupId)
+                          .add("version", version)
+                          .add("dependencies", dependencies)
+                          .add("repositories", repositories)
+                          .add("rootDirectory", rootDirectory)
+                          .add("sourceDirectories", sourceDirectories)
+                          .add("resourceDirectories", resourceDirectories)
+                          .add("testSourcesDirectories", testSourcesDirectories)
+                          .add("testResourceDirectories", testResourceDirectories)
+                          .add("importPromise", importPromise)
+                          .add("pluginName", pluginName)
+                          .add("buildVersion", buildVersion)
+                          .toString();
     }
 
     @Override
@@ -340,7 +358,7 @@ public abstract class BuildSystem {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BuildSystem that = (BuildSystem) o;
+        final BuildSystem that = (BuildSystem) o;
         return Objects.equal(artifactId, that.artifactId) &&
             Objects.equal(groupId, that.groupId) &&
             Objects.equal(version, that.version) &&
@@ -358,6 +376,7 @@ public abstract class BuildSystem {
     @Override
     public int hashCode() {
         return Objects.hashCode(artifactId, groupId, version, dependencies, repositories, rootDirectory, sourceDirectories,
-            resourceDirectories, testSourcesDirectories, testResourceDirectories, pluginName, buildVersion);
+                                resourceDirectories, testSourcesDirectories, testResourceDirectories, pluginName, buildVersion
+        );
     }
 }

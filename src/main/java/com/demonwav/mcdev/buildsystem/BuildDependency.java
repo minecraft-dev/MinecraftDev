@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.buildsystem;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 public class BuildDependency {
@@ -62,12 +63,12 @@ public class BuildDependency {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-            .add("artifactId", artifactId)
-            .add("groupId", groupId)
-            .add("version", version)
-            .add("scope", scope)
-            .toString();
+        return MoreObjects.toStringHelper(this)
+                          .add("artifactId", artifactId)
+                          .add("groupId", groupId)
+                          .add("version", version)
+                          .add("scope", scope)
+                          .toString();
     }
 
     @Override

@@ -25,6 +25,7 @@ import com.demonwav.mcdev.platform.canary.CanaryProjectConfiguration;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -311,19 +312,19 @@ public class MinecraftProjectCreator {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-            .add("root", root)
-            .add("groupId", groupId)
-            .add("artifactId", artifactId)
-            .add("version", version)
-            .add("module", module)
-            .add("buildSystem", buildSystem)
-            .add("settings", settings)
-            .add("sourceDir", sourceDir)
-            .add("resourceDir", resourceDir)
-            .add("testDir", testDir)
-            .add("pomFile", pomFile)
-            .toString();
+        return MoreObjects.toStringHelper(this)
+                          .add("root", root)
+                          .add("groupId", groupId)
+                          .add("artifactId", artifactId)
+                          .add("version", version)
+                          .add("module", module)
+                          .add("buildSystem", buildSystem)
+                          .add("settings", settings)
+                          .add("sourceDir", sourceDir)
+                          .add("resourceDir", resourceDir)
+                          .add("testDir", testDir)
+                          .add("pomFile", pomFile)
+                          .toString();
     }
 
     @Override
