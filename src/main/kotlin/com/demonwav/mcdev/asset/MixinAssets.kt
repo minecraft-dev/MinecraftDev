@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.asset
 
+@Suppress("unused")
 object MixinAssets {
     @JvmField val SHADOW = Assets.loadIcon("/assets/icons/mixin/shadow.png")
     @JvmField val SHADOW_DARK = Assets.loadIcon("/assets/icons/mixin/shadow_dark.png")

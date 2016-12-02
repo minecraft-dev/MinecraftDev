@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.asset
 
+@Suppress("unused")
 object PlatformAssets {
     @JvmField val MINECRAFT_ICON = Assets.loadIcon("/assets/icons/platform/Minecraft.png")
     @JvmField val MINECRAFT_ICON_2X = Assets.loadIcon("/assets/icons/platform/Minecraft@2x.png")

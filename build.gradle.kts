@@ -100,7 +100,7 @@ configure<IdeaModel> {
 // License header formatting
 configure<LicenseExtension> {
     header = file("copyright.txt")
-    include("**/*.java", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
+    include("**/*.java", "**/*.kt", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
     exclude(
         "com/demonwav/mcdev/platform/mcp/at/gen/**",
         "**messages.MinecraftDevelopment.properties",
