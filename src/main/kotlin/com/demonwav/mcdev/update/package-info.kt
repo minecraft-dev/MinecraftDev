@@ -13,4 +13,4 @@
  * that. Though a built-in system would be superior...
  * https://github.com/JetBrains/kotlin/blob/master/idea/src/org/jetbrains/kotlin/idea/actions/ConfigurePluginUpdatesAction.kt
  */
-package com.demonwav.mcdev.update;
+package com.demonwav.mcdev.update

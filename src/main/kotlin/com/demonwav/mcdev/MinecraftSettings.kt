@@ -79,7 +79,7 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettingsState> {
             state.isEnableSideOnlyChecks = enableSideOnlyChecks
         }
 
-    enum class UnderlineType constructor(private val regular: String, val effectType: EffectType) {
+    enum class UnderlineType(private val regular: String, val effectType: EffectType) {
 
         NORMAL("Normal", EffectType.LINE_UNDERSCORE),
         BOLD("Bold", EffectType.BOLD_LINE_UNDERSCORE),
