@@ -34,7 +34,7 @@ public class SpongeTemplate extends AbstractTemplate {
         properties.setProperty("BUILD_VERSION", version);
 
         final FileTemplateManager manager = FileTemplateManager.getInstance(project);
-        final FileTemplate fileTemplate = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.Companion.getSPONGE_POM_TEMPLATE());
+        final FileTemplate fileTemplate = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SPONGE_POM_TEMPLATE);
         try {
             return fileTemplate.getText(properties);
         } catch (IOException e) {
@@ -63,7 +63,7 @@ public class SpongeTemplate extends AbstractTemplate {
         }
 
         try {
-            applyTemplate(project, mainClassFile, MinecraftFileTemplateGroupFactory.Companion.getSPONGE_MAIN_CLASS_TEMPLATE(), properties);
+            applyTemplate(project, mainClassFile, MinecraftFileTemplateGroupFactory.SPONGE_MAIN_CLASS_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,7 +84,7 @@ public class SpongeTemplate extends AbstractTemplate {
         }
 
         final FileTemplateManager manager = FileTemplateManager.getInstance(project);
-        final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.Companion.getSPONGE_BUILD_GRADLE_TEMPLATE());
+        final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SPONGE_BUILD_GRADLE_TEMPLATE);
 
         final Properties gradleProps = new Properties();
         gradleProps.setProperty("GROUP_ID", groupId);
@@ -92,7 +92,7 @@ public class SpongeTemplate extends AbstractTemplate {
         gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getSPONGE_GRADLE_PROPERTIES_TEMPLATE(), gradleProps);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.SPONGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -113,7 +113,7 @@ public class SpongeTemplate extends AbstractTemplate {
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
 
         final FileTemplateManager manager = FileTemplateManager.getInstance(project);
-        final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.Companion.getSPONGE_SUBMODULE_BUILD_GRADLE_TEMPLATE());
+        final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SPONGE_SUBMODULE_BUILD_GRADLE_TEMPLATE);
 
         try {
             return template.getText(properties);

@@ -38,7 +38,7 @@ public class BukkitTemplate extends AbstractTemplate {
         properties.setProperty("CLASS_NAME", className);
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getBUKKIT_MAIN_CLASS_TEMPLATE(), properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_MAIN_CLASS_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,7 +51,7 @@ public class BukkitTemplate extends AbstractTemplate {
         properties.setProperty("BUILD_VERSION", version);
 
         FileTemplateManager manager = FileTemplateManager.getInstance(project);
-        FileTemplate fileTemplate = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.Companion.getBUKKIT_POM_TEMPLATE());
+        FileTemplate fileTemplate = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUKKIT_POM_TEMPLATE);
         try {
             return fileTemplate.getText(properties);
         } catch (IOException e) {
@@ -118,7 +118,7 @@ public class BukkitTemplate extends AbstractTemplate {
         }
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getBUKKIT_PLUGIN_YML_TEMPLATE(), properties, true);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties, true);
         } catch (IOException e) {
             e.printStackTrace();
         }

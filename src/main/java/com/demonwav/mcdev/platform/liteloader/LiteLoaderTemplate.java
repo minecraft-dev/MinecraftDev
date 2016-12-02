@@ -39,8 +39,8 @@ public class LiteLoaderTemplate extends AbstractTemplate {
         properties.setProperty("MCP_MAPPINGS", mcpMappings);
 
         try {
-            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.Companion.getLITELOADER_GRADLE_PROPERTIES_TEMPLATE(), properties);
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getLITELOADER_BUILD_GRADLE_TEMPLATE(), new Properties());
+            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE, properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_BUILD_GRADLE_TEMPLATE, new Properties());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,7 +59,7 @@ public class LiteLoaderTemplate extends AbstractTemplate {
 
         try {
             applyTemplate(project, file,
-                          MinecraftFileTemplateGroupFactory.Companion.getLITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE(), properties);
+                          MinecraftFileTemplateGroupFactory.LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -70,7 +70,7 @@ public class LiteLoaderTemplate extends AbstractTemplate {
         gradleProps .setProperty("MCP_MAPPINGS", mcpMappings);
 
         try {
-            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.Companion.getLITELOADER_GRADLE_PROPERTIES_TEMPLATE(), gradleProps);
+            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -90,7 +90,7 @@ public class LiteLoaderTemplate extends AbstractTemplate {
         properties.setProperty("MOD_VERSION", modVersion);
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getLITELOADER_MAIN_CLASS_TEMPLATE(), properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_MAIN_CLASS_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -37,7 +37,7 @@ public class CanaryTemplate extends AbstractTemplate {
         properties.setProperty("CLASS_NAME", className);
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getCANARY_MAIN_CLASS_TEMPLATE(), properties);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.CANARY_MAIN_CLASS_TEMPLATE, properties);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -50,7 +50,7 @@ public class CanaryTemplate extends AbstractTemplate {
         properties.setProperty("BUILD_VERSION", version);
 
         FileTemplateManager manager = FileTemplateManager.getInstance(project);
-        FileTemplate fileTemplate = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.Companion.getCANARY_POM_TEMPLATE());
+        FileTemplate fileTemplate = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.CANARY_POM_TEMPLATE);
         try {
             return fileTemplate.getText(properties);
         } catch (IOException e) {
@@ -91,7 +91,7 @@ public class CanaryTemplate extends AbstractTemplate {
         }
 
         try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.Companion.getCANARY_INF_TEMPLATE(), properties, true);
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.CANARY_INF_TEMPLATE, properties, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
