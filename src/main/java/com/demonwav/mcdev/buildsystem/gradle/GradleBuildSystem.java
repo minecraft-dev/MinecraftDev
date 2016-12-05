@@ -74,6 +74,7 @@ import org.gradle.tooling.ProgressListener;
 import org.gradle.tooling.ProjectConnection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.concurrency.AsyncPromise;
 import org.jetbrains.concurrency.Promise;
 import org.jetbrains.plugins.gradle.model.ExternalProject;
 import org.jetbrains.plugins.gradle.model.ExternalSourceSet;
@@ -118,7 +119,7 @@ public class GradleBuildSystem extends BuildSystem {
 
     @Override
     public void create(@NotNull Project project, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
-        rootDirectory.refresh(false, true);
+        getRootDirectory().refresh(false, true);
         createDirectories();
 
         if (configuration.type == PlatformType.FORGE || configuration instanceof SpongeForgeProjectConfiguration) {
@@ -129,19 +130,19 @@ public class GradleBuildSystem extends BuildSystem {
             ForgeProjectConfiguration settings = (ForgeProjectConfiguration) configuration;
             Util.runWriteTask(() -> {
                 try {
-                    final VirtualFile gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
+                    final VirtualFile gradleProp = getRootDirectory().findOrCreateChildData(this, "gradle.properties");
 
-                    buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
+                    buildGradle = getRootDirectory().findOrCreateChildData(this, "build.gradle");
 
                     ForgeTemplate.applyBuildGradleTemplate(
                         project,
                         buildGradle,
                         gradleProp,
-                        groupId,
-                        artifactId,
+                        getGroupId(),
+                        getArtifactId(),
                         settings.forgeVersion,
                         settings.mcpVersion,
-                        version,
+                        getVersion(),
                         configuration instanceof SpongeForgeProjectConfiguration
                     );
 
@@ -166,16 +167,16 @@ public class GradleBuildSystem extends BuildSystem {
             LiteLoaderProjectConfiguration settings = (LiteLoaderProjectConfiguration) configuration;
             Util.runWriteTask(() -> {
                 try {
-                    final VirtualFile gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
+                    final VirtualFile gradleProp = getRootDirectory().findOrCreateChildData(this, "gradle.properties");
 
-                    buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
+                    buildGradle = getRootDirectory().findOrCreateChildData(this, "build.gradle");
 
                     LiteLoaderTemplate.applyBuildGradleTemplate(
                         project,
                         buildGradle,
                         gradleProp,
-                        groupId,
-                        artifactId,
+                        getGroupId(),
+                        getArtifactId(),
                         settings.pluginVersion,
                         settings.mcVersion,
                         settings.mcpVersion
@@ -190,20 +191,24 @@ public class GradleBuildSystem extends BuildSystem {
         } else {
             Util.runWriteTask(() -> {
                 try {
-                    final VirtualFile gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
+                    final VirtualFile gradleProp = getRootDirectory().findOrCreateChildData(this, "gradle.properties");
 
                     String buildGradleText;
                     if (configuration.type == PlatformType.SPONGE) {
                         buildGradleText = SpongeTemplate.applyBuildGradleTemplate(
                             project,
                             gradleProp,
-                            groupId,
-                            artifactId,
-                            version,
-                            buildVersion
+                            getGroupId(),
+                            getArtifactId(),
+                            getVersion(),
+                            getBuildVersion()
                         );
                     } else {
-                        buildGradleText = AbstractTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, version, buildVersion);
+                        buildGradleText = AbstractTemplate.applyBuildGradleTemplate(project, gradleProp,
+                                                                                    getGroupId(),
+                                                                                    getVersion(),
+                                                                                    getBuildVersion()
+                        );
                     }
 
                     if (buildGradleText == null) {
@@ -234,7 +239,7 @@ public class GradleBuildSystem extends BuildSystem {
         // We'll write the properties file to ensure it sets up with the right version
         Util.runWriteTask(() -> {
             try {
-                String wrapperDirPath = rootDirectory.createChildDirectory(this, "gradle").createChildDirectory(this, "wrapper").getPath();
+                String wrapperDirPath = getRootDirectory().createChildDirectory(this, "gradle").createChildDirectory(this, "wrapper").getPath();
                 FileUtils.writeLines(new File(wrapperDirPath, "gradle-wrapper.properties"), Collections.singletonList(
                     "distributionUrl=https\\://services.gradle.org/distributions/gradle-2.14.1-bin.zip"
                 ));
@@ -245,7 +250,7 @@ public class GradleBuildSystem extends BuildSystem {
 
         // Use gradle tooling to run the wrapper task
         GradleConnector connector = GradleConnector.newConnector();
-        connector.forProjectDirectory(new File(rootDirectory.getPath()));
+        connector.forProjectDirectory(new File(getRootDirectory().getPath()));
         ProjectConnection connection = connector.connect();
         BuildLauncher launcher = connection.newBuild();
         try {
@@ -318,7 +323,7 @@ public class GradleBuildSystem extends BuildSystem {
     }
 
     @Override
-    public void finishSetup(@NotNull Module rootModule, @NotNull Collection<ProjectConfiguration> configurations, @NotNull ProgressIndicator indicator) {
+    public void finishSetup(@NotNull Module rootModule, @NotNull Collection<? extends ProjectConfiguration> configurations, @NotNull ProgressIndicator indicator) {
         Project project = rootModule.getProject();
 
         // Tell Gradle to import this project
@@ -407,7 +412,7 @@ public class GradleBuildSystem extends BuildSystem {
                     rootModule.getName() + " build"
                 );
                 // Set relevant gradle values
-                runConfiguration.getSettings().setExternalProjectPath(rootDirectory.getPath());
+                runConfiguration.getSettings().setExternalProjectPath(getRootDirectory().getPath());
                 runConfiguration.getSettings().setExecutionName(rootModule.getName() + " build");
                 runConfiguration.getSettings().setTaskNames(Collections.singletonList("build"));
                 // Create a RunAndConfigurationSettings object, which defines general settings for the run configuration
@@ -430,11 +435,13 @@ public class GradleBuildSystem extends BuildSystem {
     @NotNull
     @Override
     public Promise<BuildSystem> reImport(@NotNull Module module) {
-        synchronized(this) {
-            if (synchronize()) {
-                return importPromise;
-            }
+        if (synchronize()) {
+            final AsyncPromise<BuildSystem> importPromise = getImportPromise();
+            assert importPromise != null;
+            return importPromise;
         }
+        final AsyncPromise<BuildSystem> importPromise = getImportPromise();
+        assert importPromise != null;
 
         // We must be on the event dispatch thread to run a backgroundable task
         ApplicationManager.getApplication().invokeLater(() ->
@@ -454,21 +461,21 @@ public class GradleBuildSystem extends BuildSystem {
                             return;
                         }
 
-                        rootDirectory = manager.getContentRoots()[0];
-                        buildGradle = rootDirectory.findChild("build.gradle");
+                        setRootDirectory(manager.getContentRoots()[0]);
+                        buildGradle = getRootDirectory().findChild("build.gradle");
 
-                        if (rootDirectory.getCanonicalPath() == null || buildGradle == null) {
+                        if (getRootDirectory().getCanonicalPath() == null || buildGradle == null) {
                             logger.error("GradleBuildSystem import FAILED: Root Directory or Build Gradle paths null");
-                            logger.error("rootDirectory: " + rootDirectory);
+                            logger.error("rootDirectory: " + getRootDirectory());
                             logger.error("buildGradle: " + buildGradle);
                             importPromise.setResult(GradleBuildSystem.this);
                             return;
                         }
 
-                        sourceDirectories = new ArrayList<>();
-                        resourceDirectories = new ArrayList<>();
-                        testSourcesDirectories = new ArrayList<>();
-                        testResourceDirectories = new ArrayList<>();
+                        setSourceDirectories(new ArrayList<>());
+                        setResourceDirectories(new ArrayList<>());
+                        setTestSourcesDirectories(new ArrayList<>());
+                        setTestResourceDirectories(new ArrayList<>());
 
                         ExternalProjectDataCache externalProjectDataCache = ExternalProjectDataCache.getInstance(project);
 
@@ -494,29 +501,29 @@ public class GradleBuildSystem extends BuildSystem {
 
                         // We need to check the parent too if it's a single module project
                         ExternalProject externalRootProject = externalProjectDataCache
-                            .getRootExternalProject(GradleConstants.SYSTEM_ID, new File(rootDirectory.getCanonicalPath()));
+                            .getRootExternalProject(GradleConstants.SYSTEM_ID, new File(getRootDirectory().getCanonicalPath()));
                         if (externalRootProject != null) {
                             for (Module child : children) {
                                 Map<String, ExternalSourceSet> externalSourceSets = externalProjectDataCache
                                     .findExternalProject(externalRootProject, child);
 
                                 for (ExternalSourceSet sourceSet : externalSourceSets.values()) {
-                                    setupDirs(sourceDirectories, sourceSet, ExternalSystemSourceType.SOURCE);
-                                    setupDirs(resourceDirectories, sourceSet, ExternalSystemSourceType.RESOURCE);
-                                    setupDirs(testSourcesDirectories, sourceSet, ExternalSystemSourceType.TEST);
-                                    setupDirs(testResourceDirectories, sourceSet, ExternalSystemSourceType.TEST_RESOURCE);
+                                    setupDirs(getSourceDirectories(), sourceSet, ExternalSystemSourceType.SOURCE);
+                                    setupDirs(getResourceDirectories(), sourceSet, ExternalSystemSourceType.RESOURCE);
+                                    setupDirs(getTestSourcesDirectories(), sourceSet, ExternalSystemSourceType.TEST);
+                                    setupDirs(getTestResourceDirectories(), sourceSet, ExternalSystemSourceType.TEST_RESOURCE);
                                 }
                             }
 
-                            groupId = externalRootProject.getGroup();
-                            artifactId = externalRootProject.getName();
-                            version = externalRootProject.getVersion();
+                            setGroupId(externalRootProject.getGroup());
+                            setArtifactId(externalRootProject.getName());
+                            setVersion(externalRootProject.getVersion());
 
-                            pluginName = externalRootProject.getName();
+                            setPluginName(externalRootProject.getName());
 
                             // We need to get the project info from gradle
                             ExternalProjectInfo info = ProjectDataManager.getInstance()
-                                .getExternalProjectData(project, GradleConstants.SYSTEM_ID, rootDirectory.getCanonicalPath());
+                                .getExternalProjectData(project, GradleConstants.SYSTEM_ID, getRootDirectory().getCanonicalPath());
                             if (info == null) {
                                 logger.error("GradleBuildSystem import FAILED: External project info null");
                                 importPromise.setResult(GradleBuildSystem.this);
@@ -531,7 +538,7 @@ public class GradleBuildSystem extends BuildSystem {
                                 return;
                             }
 
-                            dependencies = new ArrayList<>();
+                            setDependencies(new ArrayList<>());
                             node.getChildren().forEach(child -> {
                                 if (child.getData() instanceof LibraryData) {
                                     LibraryData data = (LibraryData) child.getData();
@@ -544,15 +551,15 @@ public class GradleBuildSystem extends BuildSystem {
                                     String artifactId = parts[1];
                                     String version = parts[2];
                                     // I should probably remove scope, as I'm not even using it here...
-                                    dependencies.add(new BuildDependency(groupId, artifactId, version, "provided"));
+                                    getDependencies().add(new BuildDependency(groupId, artifactId, version, "provided"));
                                 } else if (child.getData() instanceof JavaProjectData) {
                                     // kashike guilt tripped me into this
                                     JavaProjectData data = (JavaProjectData) child.getData();
                                     String languageLevelName = data.getLanguageLevel().name();
                                     int index = languageLevelName.lastIndexOf('_') - 1;
                                     if (index != -1) {
-                                        buildVersion = languageLevelName
-                                            .substring(index, languageLevelName.length()).replace("_", ".");
+                                        setBuildVersion(languageLevelName
+                                                            .substring(index, languageLevelName.length()).replace("_", "."));
                                     }
                                 }
                             });
@@ -561,7 +568,7 @@ public class GradleBuildSystem extends BuildSystem {
                         GroovyFile groovyFile = (GroovyFile) PsiManager.getInstance(project).findFile(buildGradle);
                         if (groovyFile != null) {
                             // get repositories
-                            repositories = new ArrayList<>();
+                            setRepositories(new ArrayList<>());
                             // We need to climb the tree to get to the repositories
 
                             GrClosableBlock block = getClosableBlockByName(groovyFile, "repositories");
@@ -586,16 +593,16 @@ public class GradleBuildSystem extends BuildSystem {
 
         setupWrapper(project, indicator);
 
-        rootDirectory.refresh(false, true);
+        getRootDirectory().refresh(false, true);
 
         // Create the includes string for settings.gradle
         // First, we add the common module that all multi-module projects will have
-        String tempIncludes = "'" + pluginName.toLowerCase() + "-common', ";
+        String tempIncludes = "'" + getPluginName().toLowerCase() + "-common', ";
         // We use an iterator because we need to know when there won't be a next entry
         Iterator<ProjectConfiguration> configurationIterator = configurations.values().iterator();
         while (configurationIterator.hasNext()) {
             ProjectConfiguration configuration = configurationIterator.next();
-            tempIncludes += "'" + pluginName.toLowerCase() + "-" + configuration.type.name().toLowerCase() + "'";
+            tempIncludes += "'" + getPluginName().toLowerCase() + "-" + configuration.type.name().toLowerCase() + "'";
             // Only add the ending comma after the entry when there is another entry to add
             if (configurationIterator.hasNext()) {
                 tempIncludes += ", ";
@@ -606,16 +613,20 @@ public class GradleBuildSystem extends BuildSystem {
         Util.runWriteTask(() -> {
             try {
                 // Write the parent files to disk so the children modules can import correctly
-                buildGradle = rootDirectory.createChildData(this, "build.gradle");
-                final VirtualFile gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
-                final VirtualFile settingsGradle = rootDirectory.createChildData(this, "settings.gradle");
+                buildGradle = getRootDirectory().createChildData(this, "build.gradle");
+                final VirtualFile gradleProp = getRootDirectory().findOrCreateChildData(this, "gradle.properties");
+                final VirtualFile settingsGradle = getRootDirectory().createChildData(this, "settings.gradle");
 
-                AbstractTemplate.applyMultiModuleBuildGradleTemplate(project, buildGradle, gradleProp, groupId, version, buildVersion);
+                AbstractTemplate.applyMultiModuleBuildGradleTemplate(project, buildGradle, gradleProp,
+                                                                     getGroupId(),
+                                                                     getVersion(),
+                                                                     getBuildVersion()
+                );
 
-                AbstractTemplate.applySettingsGradleTemplate(project, settingsGradle, artifactId.toLowerCase(), includes);
+                AbstractTemplate.applySettingsGradleTemplate(project, settingsGradle, getArtifactId().toLowerCase(), includes);
 
                 // Common will be empty, it's for the developer to fill in with common classes
-                VirtualFile common = rootDirectory.createChildDirectory(this, artifactId.toLowerCase() + "-common");
+                VirtualFile common = getRootDirectory().createChildDirectory(this, getArtifactId().toLowerCase() + "-common");
                 createDirectories(common);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -628,18 +639,21 @@ public class GradleBuildSystem extends BuildSystem {
             Util.runWriteTask(() -> {
                 try {
                     // Add settings for the new build system before it creates the module
-                    gradleBuildSystem.rootDirectory = rootDirectory
-                        .createChildDirectory(this, artifactId.toLowerCase() + "-" + configuration.type.name().toLowerCase());
+                    gradleBuildSystem.setRootDirectory(getRootDirectory()
+                                                           .createChildDirectory(this,
+                                                                                 getArtifactId().toLowerCase() + "-" + configuration.type.name()
+                                                                                                                                         .toLowerCase()
+                                                           ));
 
-                    gradleBuildSystem.artifactId = artifactId;
-                    gradleBuildSystem.groupId = groupId;
-                    gradleBuildSystem.version = version;
+                    gradleBuildSystem.setArtifactId(getArtifactId());
+                    gradleBuildSystem.setGroupId(getGroupId());
+                    gradleBuildSystem.setVersion(getVersion());
 
-                    gradleBuildSystem.dependencies = new ArrayList<>();
-                    gradleBuildSystem.repositories = new ArrayList<>();
+                    gradleBuildSystem.setDependencies(new ArrayList<>());
+                    gradleBuildSystem.setRepositories(new ArrayList<>());
 
-                    gradleBuildSystem.pluginName = pluginName;
-                    gradleBuildSystem.buildVersion = buildVersion;
+                    gradleBuildSystem.setPluginName(getPluginName());
+                    gradleBuildSystem.setBuildVersion(getBuildVersion());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -650,7 +664,7 @@ public class GradleBuildSystem extends BuildSystem {
 
             // For each build system we initialize it, but not the same as a normal create. We need to know the common
             // project name, as we automatically add it as a dependency too
-            gradleBuildSystem.createSubModule(project, configuration, artifactId.toLowerCase() + "-common", indicator);
+            gradleBuildSystem.createSubModule(project, configuration, getArtifactId().toLowerCase() + "-common", indicator);
             map.put(gradleBuildSystem, configuration);
         }
 
@@ -661,7 +675,7 @@ public class GradleBuildSystem extends BuildSystem {
                                  @NotNull ProjectConfiguration configuration,
                                  @NotNull String commonProjectName,
                                  @NotNull ProgressIndicator indicator) {
-        rootDirectory.refresh(false, true);
+        getRootDirectory().refresh(false, true);
         createDirectories();
 
         // This is mostly the same as a normal create, but we use different files and don't setup the wrapper
@@ -674,19 +688,19 @@ public class GradleBuildSystem extends BuildSystem {
             Util.runWriteTask(() -> {
                 final VirtualFile gradleProp;
                 try {
-                    gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
+                    gradleProp = getRootDirectory().findOrCreateChildData(this, "gradle.properties");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
                 try {
-                    buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
+                    buildGradle = getRootDirectory().findOrCreateChildData(this, "build.gradle");
 
                     ForgeTemplate.applySubmoduleBuildGradleTemplate(
                         project,
                         buildGradle,
                         gradleProp,
-                        artifactId,
+                        getArtifactId(),
                         settings.forgeVersion,
                         settings.mcpVersion,
                         commonProjectName,
@@ -715,13 +729,13 @@ public class GradleBuildSystem extends BuildSystem {
             Util.runWriteTask(() -> {
                 final VirtualFile gradleProp;
                 try {
-                    gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties");
+                    gradleProp = getRootDirectory().findOrCreateChildData(this, "gradle.properties");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
                 try {
-                    buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
+                    buildGradle = getRootDirectory().findOrCreateChildData(this, "build.gradle");
 
                     LiteLoaderTemplate.applySubmoduleBuildGradleTemplate(
                         project,
@@ -768,7 +782,7 @@ public class GradleBuildSystem extends BuildSystem {
         new WriteCommandAction.Simple(project, file) {
             @Override
             protected void run() throws Throwable {
-                final VirtualFile buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle");
+                final VirtualFile buildGradle = getRootDirectory().findOrCreateChildData(this, "build.gradle");
 
                 file.setName("build.gradle");
                 final GroovyFile groovyFile = (GroovyFile) file;
@@ -778,9 +792,9 @@ public class GradleBuildSystem extends BuildSystem {
                     project,
                     groovyFile,
                     "repositories",
-                    repositories.stream()
-                        .map(r -> String.format("maven {name = '%s'\nurl = '%s'\n}", r.getId(), r.getUrl()))
-                        .collect(Collectors.toList())
+                    getRepositories().stream()
+                                     .map(r -> String.format("maven {name = '%s'\nurl = '%s'\n}", r.getId(), r.getUrl()))
+                                     .collect(Collectors.toList())
                 );
 
                 // Add dependencies
@@ -788,14 +802,14 @@ public class GradleBuildSystem extends BuildSystem {
                     project,
                     groovyFile,
                     "dependencies",
-                    dependencies.stream()
-                        .map(d -> String.format("compile '%s:%s:%s'", d.getGroupId(), d.getArtifactId(), d.getVersion()))
-                        .collect(Collectors.toList())
+                    getDependencies().stream()
+                                     .map(d -> String.format("compile '%s:%s:%s'", d.getGroupId(), d.getArtifactId(), d.getVersion()))
+                                     .collect(Collectors.toList())
                 );
 
                 new ReformatCodeProcessor(file, false).run();
                 if (addToDirectory) {
-                    PsiDirectory rootDirectoryPsi = PsiManager.getInstance(project).findDirectory(rootDirectory);
+                    PsiDirectory rootDirectoryPsi = PsiManager.getInstance(project).findDirectory(getRootDirectory());
                     if (rootDirectoryPsi != null) {
                         buildGradle.delete(this);
 
@@ -803,7 +817,7 @@ public class GradleBuildSystem extends BuildSystem {
                     }
                 }
 
-                GradleBuildSystem.this.buildGradle = rootDirectory.findChild("build.gradle");
+                GradleBuildSystem.this.buildGradle = getRootDirectory().findChild("build.gradle");
                 if (GradleBuildSystem.this.buildGradle == null) {
                     return;
                 }
@@ -828,7 +842,7 @@ public class GradleBuildSystem extends BuildSystem {
         // We need to setup decomp workspace first
         // We'll use gradle tooling to run it
         GradleConnector connector = GradleConnector.newConnector();
-        connector.forProjectDirectory(new File(rootDirectory.getPath()));
+        connector.forProjectDirectory(new File(getRootDirectory().getPath()));
         ProjectConnection connection = connector.connect();
         BuildLauncher launcher = connection.newBuild();
 
@@ -864,7 +878,7 @@ public class GradleBuildSystem extends BuildSystem {
                     handleAssignmentExpression((GrAssignmentExpression) child, repository);
                 }
             }
-            repositories.add(repository);
+            getRepositories().add(repository);
         });
     }
 

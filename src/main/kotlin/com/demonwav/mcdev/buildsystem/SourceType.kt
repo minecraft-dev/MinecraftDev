@@ -8,9 +8,9 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.buildsystem;
+package com.demonwav.mcdev.buildsystem
 
-public enum SourceType {
+enum class SourceType {
     SOURCE,
     RESOURCE,
     TEST_SOURCE,
