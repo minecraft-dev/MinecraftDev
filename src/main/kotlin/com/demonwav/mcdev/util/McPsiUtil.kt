@@ -26,33 +26,31 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.PsiReference
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.annotations.Contract
 import java.util.Collections
 import java.util.stream.Collectors
 
 @Contract(value = "null -> null", pure = true)
-fun getClassOfElement(element: PsiElement?): PsiClass? {
-    if (element == null) {
-        return null
-    }
-
-    if (element is PsiClass) {
-        return element
-    }
-
+fun getClassOfElement(element: PsiElement?, resolveReferences: Boolean = false): PsiClass? {
     var el = element
-    while (el?.parent != null) {
-        if (el.parent is PsiClass) {
-            return el.parent as PsiClass
+    while (el != null) {
+        if (resolveReferences && el is PsiReference) {
+            el = el.resolve()
         }
 
-        if (el.parent is PsiFile || el.parent is PsiDirectory) {
+        if (el is PsiClass) {
+            return el
+        }
+
+        if (el is PsiFile || el is PsiDirectory) {
             return null
         }
 
-        el = el.parent
+        el = el?.parent
     }
+
     return null
 }
 
