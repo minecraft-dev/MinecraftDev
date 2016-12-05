@@ -52,7 +52,7 @@ public class McpProjectComponent extends AbstractProjectComponent {
         // Generally the "standard" file extension for access transformers
         // We'll also check for other below
         // We do this here so any other .cfg files don't get marked if they aren't in MCP projects
-//        Util.runWriteTask(() -> FileTypeManager.getInstance().associateExtension(AtFileType.getInstance(), "cfg"));
+        Util.runWriteTask(() -> FileTypeManager.getInstance().associatePattern(AtFileType.getInstance(), "*_at.cfg"));
 
 //        MinecraftModule.doWhenReady(instance -> {
 //            if (myProject.isDisposed()) {
