@@ -72,7 +72,7 @@ public class FindMixinsAction extends AnAction {
         }
 
         final PsiElement element = file.findElementAt(caret.getOffset());
-        final PsiClass classOfElement = McPsiUtil.getClassOfElement(element);
+        final PsiClass classOfElement = McPsiUtil.getClassOfElement(element, true);
 
         if (classOfElement == null) {
             return;
