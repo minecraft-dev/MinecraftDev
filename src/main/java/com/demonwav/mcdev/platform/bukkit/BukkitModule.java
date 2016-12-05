@@ -245,9 +245,10 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         }
 
         return IsCancelled.builder()
-                .setErrorString("Cancellable.isCancelled() check is useless in a method annotated with ignoreCancelled=true.")
-                .setFix(descriptor -> expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression)))
-                .build();
+                          .setErrorString("Cancellable.isCancelled() check is useless in a method annotated with ignoreCancelled=true.")
+                          .setFix(descriptor -> expression
+                              .replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression)))
+                          .build();
     }
 
     @Override

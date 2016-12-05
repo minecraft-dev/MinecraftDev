@@ -207,8 +207,11 @@ public class SpongeModule extends AbstractModule {
             return null;
         }
 
-        final IsCancelled.IsCancelledBuilder isCancelledBuilder = IsCancelled.builder()
-            .setErrorString("Cancellable.isCancelled() check is useless in a method not annotated with @IsCancelled(Tristate.UNDEFINED)");
+        final IsCancelled.IsCancelledBuilder isCancelledBuilder =
+            IsCancelled.builder()
+                       .setErrorString(
+                           "Cancellable.isCancelled() check is useless in a method not annotated with @IsCancelled(Tristate.UNDEFINED)"
+                       );
 
         if (isCancelled) {
             isCancelledBuilder.setFix(descriptor ->
