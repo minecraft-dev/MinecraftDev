@@ -204,6 +204,13 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mcp.inspections.EntityConstructorInspection"/>
+        <localInspection displayName="Unused access transformer"
+                         groupName="MCP"
+                         language="Access Transformers"
+                         enabledByDefault="true"
+                         level="Unused"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.at.AtUsageInspection"/>
 
         <!-- Mixin Inspections -->
         <localInspection displayName="Invalid @Shadow"
