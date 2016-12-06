@@ -208,7 +208,7 @@
                          groupName="MCP"
                          language="Access Transformers"
                          enabledByDefault="true"
-                         level="Unused"
+                         level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mcp.at.AtUsageInspection"/>
 

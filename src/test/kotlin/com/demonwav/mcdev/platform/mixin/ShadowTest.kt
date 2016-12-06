@@ -26,7 +26,6 @@ class ShadowTest : MinecraftCodeInsightFixtureTestCase() {
         return path
     }
 
-    @Throws(Exception::class)
     public override fun setUp() {
         super.setUp()
         val psiFiles = myFixture.configureByFiles("src/test/ShadowData.java", "src/test/MixinBase.java")
