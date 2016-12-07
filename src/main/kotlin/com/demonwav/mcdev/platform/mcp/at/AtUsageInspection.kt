@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.mcp.at
 
 import com.demonwav.mcdev.platform.MinecraftModule
-import com.demonwav.mcdev.platform.mcp.McpModule
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtAsterisk
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
@@ -20,15 +19,10 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
 import com.demonwav.mcdev.platform.mcp.srg.SrgManager
 import com.demonwav.mcdev.platform.mcp.srg.SrgMap
 import com.demonwav.mcdev.platform.mcp.util.McpUtil
-import com.intellij.codeHighlighting.HighlightDisplayLevel
-
 import com.intellij.codeInspection.LocalInspectionTool
-import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.search.GlobalSearchScope
@@ -66,33 +60,27 @@ class AtUsageInspection : LocalInspectionTool() {
                     return
                 }
 
-                if (member is AtFunction) {
-                    val methodMcp = srgMap.findMethodSrgToMcp("${McpUtil.replaceDotWithSlash(element.className.classNameText)}/${member.text}") ?:
-                        "${McpUtil.replaceDotWithSlash(element.className.classNameText)}/${member.text}"
+                val string = "${McpUtil.replaceDotWithSlash(element.className.classNameText)}/${member?.text}"
 
-                    val psiMethod = SrgMap.fromMethodString(methodMcp, element.project) ?: return
+                val psi = if (member is AtFunction) {
+                    val methodMcp = srgMap.findMethodSrgToMcp(string) ?: string
 
-                    val query = ReferencesSearch.search(psiMethod, GlobalSearchScope.projectScope(element.project))
-                    query.findFirst() ?:
-                        holder.registerProblem(
-                            element,
-                            "Access Transformer entry is never used",
-                            ProblemHighlightType.LIKE_UNUSED_SYMBOL
-                        )
+                    SrgMap.fromMethodString(methodMcp, element.project) as? PsiElement ?: return
                 } else if (member is AtFieldName) {
-                    val fieldMcp = srgMap.findFieldSrgToMcp("${McpUtil.replaceDotWithSlash(element.className.classNameText)}/${member.text}") ?:
-                        "${McpUtil.replaceDotWithSlash(element.className.classNameText)}/${member.text}"
+                    val fieldMcp = srgMap.findFieldSrgToMcp(string) ?: string
 
-                    val psiField = SrgMap.fromFieldString(fieldMcp, element.project) ?: return
-
-                    val query = ReferencesSearch.search(psiField, GlobalSearchScope.projectScope(element.project))
-                    query.findFirst() ?:
-                        holder.registerProblem(
-                            element,
-                            "Access Transformer entry is never used",
-                            ProblemHighlightType.LIKE_UNUSED_SYMBOL
-                        )
+                    SrgMap.fromFieldString(fieldMcp, element.project) as? PsiElement ?: return
+                } else {
+                    return
                 }
+
+                val query = ReferencesSearch.search(psi, GlobalSearchScope.projectScope(element.project))
+                query.findFirst() ?:
+                    holder.registerProblem(
+                        element,
+                        "Access Transformer entry is never used",
+                        ProblemHighlightType.LIKE_UNUSED_SYMBOL
+                    )
             }
         }
     }
