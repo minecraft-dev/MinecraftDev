@@ -65,12 +65,7 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettingsState> {
     val underlineTypeIndex: Int
         get() {
             val type = underlineType
-            for (i in 0..UnderlineType.values().size - 1) {
-                if (type == UnderlineType.values()[i]) {
-                    return i
-                }
-            }
-            return 0
+            return (0..UnderlineType.values().size - 1).firstOrNull { type == UnderlineType.values()[it] } ?: 0
         }
 
     var isEnableSideOnlyChecks: Boolean
