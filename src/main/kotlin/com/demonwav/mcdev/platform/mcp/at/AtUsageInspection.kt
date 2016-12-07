@@ -18,6 +18,8 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
 import com.demonwav.mcdev.platform.mcp.srg.SrgManager
+import com.demonwav.mcdev.platform.mcp.srg.SrgMap
+import com.demonwav.mcdev.platform.mcp.util.McpUtil
 import com.intellij.codeHighlighting.HighlightDisplayLevel
 
 import com.intellij.codeInspection.LocalInspectionTool
@@ -51,38 +53,45 @@ class AtUsageInspection : LocalInspectionTool() {
 
                 val mcpModule = instance.getModuleOfType(McpModuleType.getInstance()) ?: return
 
-                val psiClass = element.className.classNameValue ?: // Ignore here, we'll flag this as an error in another inspection
+                val srgMap = SrgManager.getInstance(mcpModule).srgMapNow ?: return
+                val member = if (element.function != null) {
+                    element.function
+                } else if (element.fieldName != null) {
+                    element.fieldName
+                } else {
+                    element.asterisk
+                }
+
+                if (member is AtAsterisk) {
                     return
+                }
 
-                SrgManager.getInstance(mcpModule).srgMap.done { srgMap ->
-                    val member = if (element.function != null) {
-                        element.function
-                    } else if (element.fieldName != null) {
-                        element.fieldName
-                    } else {
-                        element.asterisk
-                    }
+                if (member is AtFunction) {
+                    val methodMcp = srgMap.findMethodSrgToMcp("${McpUtil.replaceDotWithSlash(element.className.classNameText)}/${member.text}") ?:
+                        "${McpUtil.replaceDotWithSlash(element.className.classNameText)}/${member.text}"
 
-                    if (member is AtAsterisk) {
-                        return@done
-                    }
+                    val psiMethod = SrgMap.fromMethodString(methodMcp, element.project) ?: return
 
-                    if (member is AtFunction) {
-                        val methodMcp = srgMap.findMethodSrgToMcp("${element.className.classNameText}/${member.text}") ?:
-                            "${element.className.classNameText}/${member.text}"
-                    } else if (member is AtFieldName) {
-                        val fieldMcp = srgMap.findFieldSrgToMcp("${element.className.classNameText}/${member.text}") ?:
-                            "${element.className.classNameText}/${member.text}"
+                    val query = ReferencesSearch.search(psiMethod, GlobalSearchScope.projectScope(element.project))
+                    query.findFirst() ?:
+                        holder.registerProblem(
+                            element,
+                            "Access Transformer entry is never used",
+                            ProblemHighlightType.LIKE_UNUSED_SYMBOL
+                        )
+                } else if (member is AtFieldName) {
+                    val fieldMcp = srgMap.findFieldSrgToMcp("${McpUtil.replaceDotWithSlash(element.className.classNameText)}/${member.text}") ?:
+                        "${McpUtil.replaceDotWithSlash(element.className.classNameText)}/${member.text}"
 
-                        val fieldName = fieldMcp.substring(fieldMcp.lastIndexOf('/'))
+                    val psiField = SrgMap.fromFieldString(fieldMcp, element.project) ?: return
 
-                        val psiField = psiClass.findFieldByName(fieldName, false) ?: return@done
-
-                        val query = ReferencesSearch.search(psiField, GlobalSearchScope.projectScope(element.project))
-                        query.findFirst() ?: return@done
-
-                        holder.registerProblem(element, "Access Transformer entry is never used", ProblemHighlightType.LIKE_UNUSED_SYMBOL)
-                    }
+                    val query = ReferencesSearch.search(psiField, GlobalSearchScope.projectScope(element.project))
+                    query.findFirst() ?:
+                        holder.registerProblem(
+                            element,
+                            "Access Transformer entry is never used",
+                            ProblemHighlightType.LIKE_UNUSED_SYMBOL
+                        )
                 }
             }
         }
