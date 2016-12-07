@@ -194,8 +194,7 @@ public class ShadowInspection extends BaseJavaBatchLocalInspectionTool {
                 if (mixedClasses.size() > 1) {
                     SrgMap srgMap = null;
                     if (mcpModule != null) {
-                        final SrgManager instance = SrgManager.getInstance(mcpModule);
-                        srgMap = instance.getSrgMapNow();
+                        srgMap = mcpModule.getSrgManager().getSrgMapNow();
                     }
 
                     if (srgMap == null) {

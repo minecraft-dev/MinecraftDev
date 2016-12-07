@@ -270,6 +270,7 @@
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
+        <moduleService serviceImplementation="com.demonwav.mcdev.platform.mcp.McpModuleSettings"/>
 
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspections.ShadowNullabilityInspectionSuppressor"/>
 
@@ -289,6 +290,7 @@
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
+        <projectResolve implementation="com.demonwav.mcdev.buildsystem.gradle.MinecraftProjectResolverExtension"/>
     </extensions>
 
     <application-components>

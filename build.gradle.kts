@@ -52,6 +52,7 @@ apply {
     plugin<IntelliJPlugin>()
     plugin<KotlinPluginWrapper>()
     plugin<JavaPlugin>()
+    plugin<GroovyPlugin>()
     plugin<Licenser>()
 }
 
@@ -100,7 +101,7 @@ configure<IdeaModel> {
 // License header formatting
 configure<LicenseExtension> {
     header = file("copyright.txt")
-    include("**/*.java", "**/*.kt", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
+    include("**/*.java", "**/*.kt", "**/*.groovy", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
     exclude(
         "com/demonwav/mcdev/platform/mcp/at/gen/**",
         "**messages.MinecraftDevelopment.properties",

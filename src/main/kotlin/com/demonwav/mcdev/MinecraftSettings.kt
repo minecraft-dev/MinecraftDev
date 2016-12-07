@@ -14,20 +14,28 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.intellij.openapi.components.StoragePathMacros
 import com.intellij.openapi.editor.markup.EffectType
 import org.jetbrains.annotations.Contract
 
-@State(name = "MinecraftSettings", storages = arrayOf(Storage(file = StoragePathMacros.APP_CONFIG + "/minecraft_dev.xml")))
-class MinecraftSettings : PersistentStateComponent<MinecraftSettingsState> {
+@State(name = "MinecraftSettings", storages = arrayOf(Storage("minecraft_dev.xml")))
+class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
 
-    private var state = MinecraftSettingsState()
+    data class State(
+            var isShowProjectPlatformIcons: Boolean = true,
+            var isShowEventListenerGutterIcons: Boolean = true,
+            var isShowChatColorGutterIcons: Boolean = true,
+            var isShowChatColorUnderlines: Boolean = false,
+            var isEnableSideOnlyChecks: Boolean = true,
+            var underlineType: MinecraftSettings.UnderlineType = MinecraftSettings.UnderlineType.DOTTED
+    )
 
-    override fun getState(): MinecraftSettingsState {
+    private var state = State()
+
+    override fun getState(): State {
         return state
     }
 
-    override fun loadState(state: MinecraftSettingsState) {
+    override fun loadState(state: State) {
         this.state = state
     }
 
