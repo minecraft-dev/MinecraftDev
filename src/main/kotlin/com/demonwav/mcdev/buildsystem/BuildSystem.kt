@@ -153,7 +153,7 @@ abstract class BuildSystem {
 
     @JvmOverloads
     protected fun createDirectories(root: VirtualFile = rootDirectory) {
-        runWriteTask(Runnable {
+        runWriteTask {
             try {
                 sourceDirectories = arrayListOf(VfsUtil.createDirectories(root.path + "/src/main/java"))
                 resourceDirectories = arrayListOf(VfsUtil.createDirectories(root.path + "/src/main/resources"))
@@ -162,7 +162,7 @@ abstract class BuildSystem {
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-        })
+        }
     }
 
     fun <T> setData(key: Key<T>, data: T) {
