@@ -1,5 +1,5 @@
 plugins {
-    id 'org.spongepowered.plugin' version '0.7'
+    id 'org.spongepowered.plugin' version '0.8.1'
 }
 
 dependencies {
