@@ -7,7 +7,7 @@ public final class ${CLASS_NAME} extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        this.getServer().getPluginManager().registerEvents(this, this);
+
     }
 
     @Override
