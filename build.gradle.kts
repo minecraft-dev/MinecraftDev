@@ -75,6 +75,9 @@ dependencies {
         exclude(group = "org.jetbrains", module = "annotations")
     }
 
+    // Add tools.jar for the JDI API
+    compile(files(org.gradle.internal.jvm.Jvm.current().toolsJar))
+
     // Add an additional dependency on kotlin-runtime. It is essentially useless
     // (since kotlin-runtime is a transitive dependency of kotlin-stdlib-jre8)
     // but without kotlin-stdlib or kotlin-runtime on the classpath,

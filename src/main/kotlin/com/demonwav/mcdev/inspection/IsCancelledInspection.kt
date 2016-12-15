@@ -11,6 +11,8 @@
 package com.demonwav.mcdev.inspection
 
 import com.demonwav.mcdev.platform.MinecraftModule
+import com.demonwav.mcdev.util.filterNotNull
+import com.demonwav.mcdev.util.mapNotNull
 
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
@@ -45,9 +47,8 @@ class IsCancelledInspection : BaseInspection() {
                 val instance = MinecraftModule.getInstance(module) ?: return
 
                 val useless = instance.modules.stream()
-                    .map { m -> m.checkUselessCancelCheck(expression) }
-                    .filter { Objects.nonNull(it) }
-                    .findAny()
+                        .mapNotNull { m -> m.checkUselessCancelCheck(expression) }
+                        .findAny()
 
                 if (!useless.isPresent) {
                     return

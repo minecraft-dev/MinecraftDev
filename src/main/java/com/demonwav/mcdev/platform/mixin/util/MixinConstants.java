@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 public final class MixinConstants {
     private MixinConstants() {}
 
+    @NotNull public static final String SMAP_STRATUM = "Mixin";
+
     public static final class Annotations {
         private Annotations() {}
 
