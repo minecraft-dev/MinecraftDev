@@ -35,21 +35,31 @@ import java.util.stream.Collectors
 @JvmOverloads
 @Contract(value = "null, _ -> null", pure = true)
 fun getClassOfElement(element: PsiElement?, resolveReferences: Boolean = false): PsiClass? {
+    return findElement(element, { it as? PsiClass }, resolveReferences)
+}
+
+fun findReferencedMember(element: PsiElement?): PsiMember? {
+    return findElement(element, { it as? PsiMember }, true)
+}
+
+@Contract(value = "null -> null", pure = true)
+private inline fun <T : PsiElement> findElement(element: PsiElement?, func: (PsiElement) -> T?, resolveReferences: Boolean): T? {
     var el = element
     while (el != null) {
         if (resolveReferences && el is PsiReference) {
-            el = el.resolve()
+            el = el.resolve() ?: return null
         }
 
-        if (el is PsiClass) {
-            return el
+        val result = func(el)
+        if (result != null) {
+            return result
         }
 
         if (el is PsiFile || el is PsiDirectory) {
             return null
         }
 
-        el = el?.parent
+        el = el.parent
     }
 
     return null
