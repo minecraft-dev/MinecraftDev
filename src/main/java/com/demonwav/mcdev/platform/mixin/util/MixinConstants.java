@@ -16,6 +16,7 @@ public final class MixinConstants {
     private MixinConstants() {}
 
     @NotNull public static final String PACKAGE = "org.spongepowered.asm.mixin.";
+    @NotNull public static final String INJECTION_POINT_CLASS = "org.spongepowered.asm.mixin.injection.InjectionPoint";
 
     public static final class Annotations {
         private Annotations() {}

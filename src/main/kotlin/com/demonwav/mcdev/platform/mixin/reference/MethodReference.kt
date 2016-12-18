@@ -10,20 +10,41 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.demonwav.mcdev.util.createResolveResults
 import com.demonwav.mcdev.util.findMethodsByInternalNameAndDescriptor
+import com.demonwav.mcdev.util.getClassOfElement
 import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.internalNameAndDescriptor
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceBase
+import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.ResolveResult
+import com.intellij.util.ProcessingContext
 import com.intellij.util.containers.stream
 import java.util.stream.Collectors
 import java.util.stream.Stream
+
+internal class MixinMethodReferenceProvider : PsiReferenceProvider() {
+
+    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
+        val mixinClass = getClassOfElement(element) ?: return PsiReference.EMPTY_ARRAY
+        val targets = MixinUtils.getAllMixedClasses(mixinClass).values
+
+        return when (targets.size) {
+            0 -> PsiReference.EMPTY_ARRAY
+            1 -> arrayOf(MethodReferenceSingleTarget(element as PsiLiteral, targets.single()))
+            else -> arrayOf(MethodReferenceMultipleTargets(element as PsiLiteral, targets))
+        }
+    }
+
+}
 
 private fun createLookup(methods: Stream<PsiMethod>, uniqueMethods: Set<String>): Array<Any> {
     return methods
@@ -40,7 +61,7 @@ private fun createLookup(methods: Stream<PsiMethod>, uniqueMethods: Set<String>)
             }.toArray()
 }
 
-internal class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiClass) : PsiReferenceBase.Poly<PsiLiteral>(element) {
+private class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiClass) : PsiReferenceBase.Poly<PsiLiteral>(element) {
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         return createResolveResults(target.findMethodsByInternalNameAndDescriptor(value))
@@ -67,7 +88,7 @@ internal class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiC
 
 }
 
-internal class MethodReferenceMultipleTargets(element: PsiLiteral, val targets: Collection<PsiClass>) :
+private class MethodReferenceMultipleTargets(element: PsiLiteral, val targets: Collection<PsiClass>) :
         PsiReferenceBase.Poly<PsiLiteral>(element) {
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
