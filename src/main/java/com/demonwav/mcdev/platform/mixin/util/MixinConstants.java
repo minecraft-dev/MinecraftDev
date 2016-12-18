@@ -15,9 +15,12 @@ import org.jetbrains.annotations.NotNull;
 public final class MixinConstants {
     private MixinConstants() {}
 
+    @NotNull public static final String PACKAGE = "org.spongepowered.asm.mixin.";
+
     public static final class Annotations {
         private Annotations() {}
 
+        @NotNull public static final String AT = "org.spongepowered.asm.mixin.injection.At";
         @NotNull public static final String DEBUG = "org.spongepowered.asm.mixin.Debug";
         @NotNull public static final String FINAL = "org.spongepowered.asm.mixin.Final";
         @NotNull public static final String IMPLEMENTS = "org.spongepowered.asm.mixin.Implements";
