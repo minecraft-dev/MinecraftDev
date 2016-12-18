@@ -24,18 +24,20 @@ import java.io.File
 
 buildscript {
     repositories {
-        mavenCentral()
-        gradleScriptKotlin()
         maven {
             setUrl("https://plugins.gradle.org/m2/")
         }
         maven {
-            setUrl("http://dl.bintray.com/jetbrains/intellij-plugin-service")
+            name = "kotlin-eap-1.1"
+            setUrl("https://dl.bintray.com/kotlin/kotlin-eap-1.1")
+        }
+        maven {
+            setUrl("https://dl.bintray.com/jetbrains/intellij-plugin-service")
         }
     }
 
     dependencies {
-        classpath(kotlinModule("gradle-plugin"))
+        classpath(kotlinModule("gradle-plugin", project.properties["kotlinVersion"] as String))
         classpath("gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.1.10")
         classpath("gradle.plugin.net.minecrell:licenser:0.3")
     }
@@ -43,6 +45,7 @@ buildscript {
 
 val ideaVersion by project
 val javaVersion by project
+val kotlinVersion by project
 val pluginVersion by project
 val pluginGroup by project
 val downloadIdeaSources by project
@@ -60,11 +63,14 @@ group = pluginGroup
 version = pluginVersion
 
 repositories {
-    gradleScriptKotlin()
+    maven {
+        name = "kotlin-eap-1.1"
+        setUrl("https://dl.bintray.com/kotlin/kotlin-eap-1.1")
+    }
 }
 
 dependencies {
-    compile(kotlinModule("stdlib-jre8"))
+    compile(kotlinModule("stdlib-jre8", kotlinVersion as String))
 }
 
 configure<IntelliJPluginExtension> {
@@ -202,6 +208,12 @@ tasks.withType<JavaCompile> {
 tasks.withType<KotlinCompile> {
     dependsOn(generate)
     kotlinOptions.jvmTarget = javaVersion as String
+}
+
+if (project.hasProperty("intellijJre")) {
+    tasks.withType<JavaExec> {
+        executable(project.properties["intellijJre"] as String)
+    }
 }
 
 afterEvaluate {
