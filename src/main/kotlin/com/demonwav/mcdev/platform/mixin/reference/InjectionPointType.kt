@@ -35,7 +35,11 @@ internal class MixinInjectionPointTypeReferenceProvider : PsiReferenceProvider()
 
 }
 
-private class InjectionPointTypeReference(element: PsiLiteral, val baseClass: PsiClass) : PsiReferenceBase<PsiLiteral>(element) {
+private class InjectionPointTypeReference(element: PsiLiteral, val baseClass: PsiClass) :
+        PsiReferenceBase<PsiLiteral>(element), MixinReference {
+
+    override val description: String
+        get() = "injection point type '$value'"
 
     val injectionPointTypes: Map<String, PsiClass> by lazy {
         val map = hashMapOf<String, PsiClass>()

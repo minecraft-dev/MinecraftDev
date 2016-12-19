@@ -61,7 +61,12 @@ private fun createLookup(methods: Stream<PsiMethod>, uniqueMethods: Set<String>)
             }.toArray()
 }
 
-private class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiClass) : PsiReferenceBase.Poly<PsiLiteral>(element) {
+
+private class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiClass) :
+        PsiReferenceBase.Poly<PsiLiteral>(element), MixinReference {
+
+    override val description: String
+        get() = "method '$value' in target class"
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         return createResolveResults(target.findMethodsByInternalNameAndDescriptor(value))
@@ -89,7 +94,10 @@ private class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiCl
 }
 
 private class MethodReferenceMultipleTargets(element: PsiLiteral, val targets: Collection<PsiClass>) :
-        PsiReferenceBase.Poly<PsiLiteral>(element) {
+        PsiReferenceBase.Poly<PsiLiteral>(element), MixinReference {
+
+    override val description: String
+        get() = "method '$value' in target classes"
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         return createResolveResults(targets.stream()

@@ -260,6 +260,13 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspections.FinalInspection"/>
+        <localInspection displayName="Unresolved Mixin references"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinContributedReferenceInspection"/>
 
         <customJavadocTagProvider implementation="com.demonwav.mcdev.platform.mixin.MixinCustomJavaDocTagProvider"/>
 
