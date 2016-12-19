@@ -44,6 +44,4 @@ hs_err_pid*
 .gradle/
 .sandbox/
 
-/src/main/resources/messages.MinecraftDevelopment_en.properties
-/src/main/resources/messages.MinecraftDevelopment.properties
 /gen/
