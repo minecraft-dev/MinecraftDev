@@ -40,7 +40,7 @@ val PsiPrimitiveType.internalName: String?
     }
 
 val PsiClassType.internalName: String
-    get() = canonicalText.replace('.', '/')
+    get() = if (parameterCount == 0) canonicalText.replace('.', '/') else rawType().internalName
 
 val PsiType.descriptor: String
     get() = appendDescriptor(StringBuilder()).toString()
