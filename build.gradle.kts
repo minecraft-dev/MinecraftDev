@@ -69,7 +69,19 @@ repositories {
 }
 
 dependencies {
-    compile(kotlinModule("stdlib-jre8", kotlinVersion as String))
+    compile(kotlinModule("stdlib-jre8", kotlinVersion as String) as String) {
+        // JetBrains annotations are already bundled with IntelliJ IDEA
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
+
+    // Add an additional dependency on kotlin-runtime. It is essentially useless
+    // (since kotlin-runtime is a transitive dependency of kotlin-stdlib-jre8)
+    // but without kotlin-stdlib or kotlin-runtime on the classpath,
+    // gradle-intellij-plugin will add IntelliJ IDEA's Kotlin version to the
+    // dependencies which conflicts with our newer version.
+    compile(kotlinModule("runtime", kotlinVersion as String) as String) {
+        isTransitive = false
+    }
 }
 
 configure<IntelliJPluginExtension> {
