@@ -39,7 +39,7 @@ private class MethodReferenceVisitor(val holder: ProblemsHolder) : JavaElementVi
 
         for (reference in expression.references) {
             if (reference is MixinReference) {
-                when (reference.validate) {
+                when (reference.validate()) {
                     MixinReference.State.UNRESOLVED ->
                         holder.registerProblem(reference, "Cannot resolve ${reference.description}" , ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
                     MixinReference.State.AMBIGUOUS ->

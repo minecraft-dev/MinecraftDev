@@ -40,7 +40,7 @@ internal class MixinMethodReferenceProvider : PsiReferenceProvider() {
 
 }
 
-fun createMethodReference(element: PsiElement): PsiReference? {
+fun createMethodReference(element: PsiElement): MixinReference? {
     val mixinClass = getClassOfElement(element) ?: return null
     val targets = MixinUtils.getAllMixedClasses(mixinClass).values
 
@@ -109,13 +109,12 @@ private class MethodReferenceMultipleTargets(element: PsiLiteral, val targets: C
                 .flatMap { it.findMethodsByInternalNameAndDescriptor(value) })
     }
 
-    override val validate
-        get() = when (multiResolve(false).size) {
-            0 -> MixinReference.State.UNRESOLVED
-            targets.size -> MixinReference.State.VALID
-            else -> MixinReference.State.UNRESOLVED
-            // TODO: Handle ambiguous references for Mixins with multiple targets
-        }
+    override fun validate(results: Array<ResolveResult>) = when (results.size) {
+        0 -> MixinReference.State.UNRESOLVED
+        targets.size -> MixinReference.State.VALID
+        else -> MixinReference.State.UNRESOLVED
+        // TODO: Handle ambiguous references for Mixins with multiple targets
+    }
 
     override fun getVariants(): Array<Any> {
         val methodMap = targets.stream()

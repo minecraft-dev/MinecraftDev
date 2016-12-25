@@ -23,13 +23,10 @@ import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiParameterList
-import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.psi.PsiReference
 
 class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool() {
 
@@ -45,7 +42,7 @@ class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool(
 
         for ((type, annotation) in findInjectionPointAnnotations(modifiers)) {
             val methodAttribute = annotation.findDeclaredAttributeValue("method") as? PsiLiteral ?: continue
-            val targetMethod = resolveFirst(createMethodReference(methodAttribute)) as? PsiMethod ?: continue
+            val targetMethod = createMethodReference(methodAttribute)?.resolveFirstIfValid() as? PsiMethod ?: continue
 
             val static = targetMethod.hasModifierProperty(PsiModifier.STATIC)
             if (static != modifiers.hasModifierProperty(PsiModifier.STATIC)) {
@@ -62,7 +59,8 @@ class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool(
             val strict = type.isStrict(annotation, targetMethod)
 
             if (!checkParameters(parameters, expectedParameters, strict)) {
-                problems.add(manager.createProblemDescriptor(parameters, "ERROR",
+                problems.add(manager.createProblemDescriptor(parameters,
+                        "Method parameters do not match expected parameters for ${type.annotationName}",
                         MixinInjectorUpdateMethodParametersQuickFix(expectedParameters), ProblemHighlightType.GENERIC_ERROR, isOnTheFly))
             }
         }
@@ -108,14 +106,5 @@ private fun checkParameterCount(parameters: PsiParameterList, expected: List<Any
     } else {
         // Allow more parameters than expected
         parameters.parametersCount >= expected.size
-    }
-}
-
-private fun resolveFirst(reference: PsiReference?): PsiElement? {
-    reference ?: return null
-    if (reference is PsiPolyVariantReference) {
-        return reference.multiResolve(false).firstOrNull()?.element
-    } else {
-        return reference.resolve()
     }
 }

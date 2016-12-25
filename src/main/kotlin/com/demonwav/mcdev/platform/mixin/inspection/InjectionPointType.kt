@@ -17,6 +17,7 @@ import com.demonwav.mcdev.util.Parameter
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationOwner
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiNameHelper
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiType
 
@@ -55,6 +56,8 @@ internal enum class InjectionPointType(val annotation: String) {
     MODIFY_CONSTANT(MixinConstants.Annotations.MODIFY_CONSTANT),
     MODIFY_VARIABLE(MixinConstants.Annotations.MODIFY_VARIABLE),
     REDIRECT(MixinConstants.Annotations.REDIRECT);
+
+    val annotationName = "@${PsiNameHelper.getShortClassName(annotation)}"
 
     open fun isStrict(annotation: PsiAnnotation, targetMethod: PsiMethod) = true
 

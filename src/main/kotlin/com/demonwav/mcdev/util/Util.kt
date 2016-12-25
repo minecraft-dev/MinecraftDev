@@ -36,7 +36,7 @@ fun invokeLater(func: () -> Unit) {
     ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.current())
 }
 
-inline fun<A, B> Iterable<A>.elementsEqual(other: Iterable<B>, equal: (A, B) -> Boolean): Boolean {
+inline fun <A, B> Iterable<A>.elementsEqual(other: Iterable<B>, equal: (A, B) -> Boolean): Boolean {
     val itr1 = iterator()
     val itr2 = other.iterator()
 
