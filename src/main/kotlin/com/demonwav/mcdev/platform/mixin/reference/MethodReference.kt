@@ -127,10 +127,7 @@ private class MethodReferenceMultipleTargets(element: PsiLiteral, val targets: C
 
         val allMethods = mutableListOf<PsiMethod>()
 
-        val itr = methodMap.iterator()
-        while (itr.hasNext()) {
-            val (_, methods) = itr.next()
-
+        for ((_, methods) in methodMap) {
             val firstMethod = methods.first()
             val name = firstMethod.internalName
             if (visitedMethods.add(name)) {
@@ -142,9 +139,7 @@ private class MethodReferenceMultipleTargets(element: PsiLiteral, val targets: C
             // If we have a method with the same name and descriptor in at least
             // as many classes as targets it should be present in all of them.
             // Not sure how you would have more methods than targets but who cares.
-            if (methods.size < targets.size) {
-                itr.remove()
-            } else {
+            if (methods.size >= targets.size) {
                 allMethods.add(firstMethod)
             }
         }

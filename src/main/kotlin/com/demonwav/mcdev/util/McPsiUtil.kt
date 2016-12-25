@@ -168,7 +168,7 @@ fun getNameOfClass(psiClass: PsiClass?): Pair<String, PsiClass>? {
 fun createResolveResults(elements: Stream<out PsiElement>): Array<ResolveResult> {
     return elements
             .map(::PsiElementResolveResult)
-            .toArray({ size -> arrayOfNulls<ResolveResult>(size) })
+            .toTypedArray()
 }
 
 fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {

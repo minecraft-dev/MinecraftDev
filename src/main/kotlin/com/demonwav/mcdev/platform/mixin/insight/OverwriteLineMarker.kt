@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.demonwav.mcdev.util.findMethodsByInternalNameAndDescriptor
 import com.demonwav.mcdev.util.getClassOfElement
 import com.demonwav.mcdev.util.internalNameAndDescriptor
+import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -55,7 +56,7 @@ class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNa
         val descriptor = method.internalNameAndDescriptor
         val targetMethods = MixinUtils.getAllMixedClasses(psiClass).values.stream()
                 .flatMap { it.findMethodsByInternalNameAndDescriptor(descriptor) }
-                .toArray({size -> arrayOfNulls<PsiMethod>(size)})
+                .toTypedArray()
         PsiElementListNavigator.openTargets(e, targetMethods,
                 "Choose target method of ${method.name}", null, MethodCellRenderer(false))
     }
