@@ -18,6 +18,7 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationOwner
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiNameHelper
+import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiType
 
@@ -29,14 +30,16 @@ internal enum class InjectionPointType(val annotation: String) {
 
         override fun expectedMethodParameters(annotation: PsiAnnotation, targetMethod: PsiMethod): List<Parameter> {
             val targetParameters = targetMethod.parameterList
+            val returnType = targetMethod.returnType
 
             val result = ArrayList<Parameter>(targetParameters.parametersCount + 1)
             targetParameters.parameters.mapTo(result, {Parameter(it.name, it.type)})
 
-            if (targetMethod.returnType == PsiType.VOID) {
+            if (returnType == null || returnType == PsiType.VOID) {
                 result.add(Parameter("ci", callbackInfoType(targetMethod.project)!!))
             } else {
-                result.add(Parameter("cir", callbackInfoReturnableType(targetMethod.project, targetMethod.returnType!!)!!))
+                result.add(Parameter("cir", callbackInfoReturnableType(targetMethod.project,
+                        if (returnType is PsiPrimitiveType) returnType.getBoxedType(targetMethod)!! else returnType)!!))
             }
 
             return result
