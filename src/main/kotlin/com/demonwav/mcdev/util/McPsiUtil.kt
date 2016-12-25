@@ -41,16 +41,16 @@ import java.util.stream.Stream
 @JvmOverloads
 @Contract(value = "null, _ -> null", pure = true)
 fun getClassOfElement(element: PsiElement?, resolveReferences: Boolean = false): PsiClass? {
-    return findElement(element, resolveReferences)
+    return findParent(element, resolveReferences)
 }
 
 @Contract(value = "null -> null", pure = true)
 fun findReferencedMember(element: PsiElement?): PsiMember? {
-    return findElement(element, true)
+    return findParent(element, true)
 }
 
 @Contract(value = "null -> null", pure = true)
-private inline fun <reified T : PsiElement> findElement(element: PsiElement?, resolveReferences: Boolean): T? {
+inline fun <reified T : PsiElement> findParent(element: PsiElement?, resolveReferences: Boolean = false): T? {
     var el = element
     while (el != null) {
         if (resolveReferences && el is PsiReference) {

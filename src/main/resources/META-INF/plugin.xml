@@ -85,6 +85,8 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.ShadowLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.OverwriteLineMarkerProvider"/>
 
+        <copyPastePostProcessor order="first" implementation="com.demonwav.mcdev.platform.mixin.editor.MixinCopyPasteReferenceProcessor"/>
+
         <!-- MCP CFG file type -->
         <fileTypeFactory implementation="com.demonwav.mcdev.platform.mcp.at.AtFileTypeFactory"/>
         <lang.parserDefinition language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtParserDefinition"/>
@@ -371,8 +373,8 @@
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateShadowAction" id="GenerateShadowAction"
-                text="Shadow Fields..."
-                description="Add a @Shadow for the selected fields">
+                text="Shadow Members..."
+                description="Add a @Shadow for the selected members">
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateOverwriteAction" id="GenerateOverwriteAction"

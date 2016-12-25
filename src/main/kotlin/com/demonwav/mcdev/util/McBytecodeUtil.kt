@@ -91,7 +91,7 @@ fun PsiClass.findFieldByNameAndDescriptor(nad: String, checkBases: Boolean = fal
     val pos = nad.indexOf(':')
     return if (pos >= 0) {
         val field = findFieldByName(nad.substring(0, pos), checkBases)
-        if (field?.descriptor == nad.substring(pos)) field else null
+        if (field?.descriptor == nad.substring(pos + 1)) field else null
     } else {
         findFieldByName(nad, checkBases)
     }
