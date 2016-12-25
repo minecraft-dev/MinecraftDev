@@ -68,7 +68,7 @@ private fun createLookup(methods: Stream<PsiMethod>, uniqueMethods: Set<String>)
 
 
 private class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiClass) :
-        PsiReferenceBase.Poly<PsiLiteral>(element), MixinReference {
+        PsiReferenceBase.Poly<PsiLiteral>(element), MixinReference.Poly {
 
     override val description: String
         get() = "method '$value' in target class"
@@ -99,15 +99,23 @@ private class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiCl
 }
 
 private class MethodReferenceMultipleTargets(element: PsiLiteral, val targets: Collection<PsiClass>) :
-        PsiReferenceBase.Poly<PsiLiteral>(element), MixinReference {
+        PsiReferenceBase.Poly<PsiLiteral>(element), MixinReference.Poly {
 
     override val description: String
-        get() = "method '$value' in target classes"
+        get() = "method '$value' in all target classes"
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         return createResolveResults(targets.stream()
                 .flatMap { it.findMethodsByInternalNameAndDescriptor(value) })
     }
+
+    override val validate
+        get() = when (multiResolve(false).size) {
+            0 -> MixinReference.State.UNRESOLVED
+            targets.size -> MixinReference.State.VALID
+            else -> MixinReference.State.UNRESOLVED
+            // TODO: Handle ambiguous references for Mixins with multiple targets
+        }
 
     override fun getVariants(): Array<Any> {
         val methodMap = targets.stream()

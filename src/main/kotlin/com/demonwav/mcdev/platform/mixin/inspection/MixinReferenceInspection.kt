@@ -17,10 +17,8 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiLiteralExpression
-import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.psi.PsiReference
 
-class MixinContributedReferenceInspection : BaseJavaBatchLocalInspectionTool() {
+class MixinReferenceInspection : BaseJavaBatchLocalInspectionTool() {
 
     override fun getStaticDescription(): String? {
         return "Reports references to unresolved Mixin elements. These will likely fail at runtime."
@@ -41,19 +39,16 @@ private class MethodReferenceVisitor(val holder: ProblemsHolder) : JavaElementVi
 
         for (reference in expression.references) {
             if (reference is MixinReference) {
-                if (cannotResolve(reference)) {
-                    holder.registerProblem(reference, "Cannot resolve ${reference.description}" , ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
+                when (reference.validate) {
+                    MixinReference.State.UNRESOLVED ->
+                        holder.registerProblem(reference, "Cannot resolve ${reference.description}" , ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
+                    MixinReference.State.AMBIGUOUS ->
+                        holder.registerProblem(reference, "Ambiguous reference to ${reference.description}", ProblemHighlightType.GENERIC_ERROR)
+                    // Reference is valid
+                    MixinReference.State.VALID -> {}
                 }
             }
         }
     }
 
-}
-
-private fun cannotResolve(reference: PsiReference): Boolean {
-    if (reference is PsiPolyVariantReference) {
-        return reference.multiResolve(false).isEmpty()
-    } else {
-        return reference.resolve() == null
-    }
 }

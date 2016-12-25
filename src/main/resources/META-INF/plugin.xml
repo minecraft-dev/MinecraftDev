@@ -266,7 +266,7 @@
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinContributedReferenceInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinReferenceInspection"/>
         <localInspection displayName="Method signature"
                          groupName="Mixin"
                          language="JAVA"
