@@ -34,16 +34,21 @@ import java.util.stream.Stream
 internal class MixinMethodReferenceProvider : PsiReferenceProvider() {
 
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
-        val mixinClass = getClassOfElement(element) ?: return PsiReference.EMPTY_ARRAY
-        val targets = MixinUtils.getAllMixedClasses(mixinClass).values
-
-        return when (targets.size) {
-            0 -> PsiReference.EMPTY_ARRAY
-            1 -> arrayOf(MethodReferenceSingleTarget(element as PsiLiteral, targets.single()))
-            else -> arrayOf(MethodReferenceMultipleTargets(element as PsiLiteral, targets))
-        }
+        val reference = createMethodReference(element) ?: return PsiReference.EMPTY_ARRAY
+        return arrayOf(reference)
     }
 
+}
+
+fun createMethodReference(element: PsiElement): PsiReference? {
+    val mixinClass = getClassOfElement(element) ?: return null
+    val targets = MixinUtils.getAllMixedClasses(mixinClass).values
+
+    return when (targets.size) {
+        0 -> null
+        1 -> MethodReferenceSingleTarget(element as PsiLiteral, targets.single())
+        else -> MethodReferenceMultipleTargets(element as PsiLiteral, targets)
+    }
 }
 
 private fun createLookup(methods: Stream<PsiMethod>, uniqueMethods: Set<String>): Array<Any> {

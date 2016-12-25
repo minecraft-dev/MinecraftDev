@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.INJECTION_POINT
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -29,7 +29,7 @@ internal class MixinInjectionPointTypeReferenceProvider : PsiReferenceProvider()
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
         val project = element.project
         val baseClass = JavaPsiFacade.getInstance(project)
-                .findClass(MixinConstants.INJECTION_POINT_CLASS, GlobalSearchScope.allScope(project)) ?: return PsiReference.EMPTY_ARRAY
+                .findClass(INJECTION_POINT, GlobalSearchScope.allScope(project)) ?: return PsiReference.EMPTY_ARRAY
         return arrayOf(InjectionPointTypeReference(element as PsiLiteral, baseClass))
     }
 

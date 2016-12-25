@@ -27,9 +27,12 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.PsiParameter
+import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiReference
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import org.jetbrains.annotations.Contract
 import java.util.Collections
 import java.util.stream.Collectors
@@ -166,4 +169,8 @@ fun createResolveResults(elements: Stream<out PsiElement>): Array<ResolveResult>
     return elements
             .map(::PsiElementResolveResult)
             .toArray({ size -> arrayOfNulls<ResolveResult>(size) })
+}
+
+fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
+    ChangeSignatureUtil.synchronizeList(this, newParams, {it.parameters.asList()}, BooleanArray(newParams.size))
 }
