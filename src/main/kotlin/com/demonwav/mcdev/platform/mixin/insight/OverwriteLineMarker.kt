@@ -63,7 +63,7 @@ class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNa
 
 }
 
-class OverwriteLineMarker(identifier: PsiIdentifier, navHandler: GutterIconNavigationHandler<PsiIdentifier>)
+private class OverwriteLineMarker(identifier: PsiIdentifier, navHandler: GutterIconNavigationHandler<PsiIdentifier>)
     : MergeableLineMarkerInfo<PsiIdentifier>(identifier, identifier.textRange, AllIcons.Gutter.OverridingMethod,
         Pass.LINE_MARKERS, TOOLTIP_FUNCTION, navHandler, GutterIconRenderer.Alignment.LEFT) {
 
@@ -72,8 +72,8 @@ class OverwriteLineMarker(identifier: PsiIdentifier, navHandler: GutterIconNavig
     override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<PsiElement>>) = ICON
 
     companion object {
-        val ICON: Icon = AllIcons.Gutter.OverridingMethod
-        val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to target method")
+        @JvmField val ICON: Icon = AllIcons.Gutter.OverridingMethod
+        @JvmField val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to target method")
     }
 
 }

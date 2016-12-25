@@ -370,6 +370,11 @@
                 description="Copy the reference to the element for use in an injector">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
+        <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateShadowAction" id="GenerateShadowAction"
+                text="Shadow Fields..."
+                description="Add a @Shadow for the selected fields">
+            <add-to-group group-id="GenerateGroup" anchor="last" />
+        </action>
         <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateOverwriteAction" id="GenerateOverwriteAction"
                 text="Overwrite Methods..."
                 description="Add an @Overwrite for the selected methods">

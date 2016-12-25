@@ -87,6 +87,16 @@ fun PsiClass.findMethodsByInternalNameAndDescriptor(inad: String, checkBases: Bo
     }
 }
 
+fun PsiClass.findFieldByNameAndDescriptor(nad: String, checkBases: Boolean = false): PsiField? {
+    val pos = nad.indexOf(':')
+    return if (pos >= 0) {
+        val field = findFieldByName(nad.substring(0, pos), checkBases)
+        if (field?.descriptor == nad.substring(pos)) field else null
+    } else {
+        findFieldByName(nad, checkBases)
+    }
+}
+
 // Method
 
 val PsiMethod.internalName: String
@@ -109,6 +119,9 @@ fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
 }
 
 // Field
+
+val PsiField.nameAndDescriptor: String
+    get() = appendDescriptor(StringBuilder(name).append(':')).toString()
 
 val PsiField.descriptor: String
     get() = appendDescriptor(StringBuilder()).toString()

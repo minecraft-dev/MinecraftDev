@@ -69,7 +69,7 @@ class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool(
 
 }
 
-class MixinInjectorUpdateMethodParametersQuickFix(val expected: List<Parameter>) : LocalQuickFix {
+private class MixinInjectorUpdateMethodParametersQuickFix(val expected: List<Parameter>) : LocalQuickFix {
 
     override fun getFamilyName() = "Fix method parameters"
 
@@ -81,7 +81,7 @@ class MixinInjectorUpdateMethodParametersQuickFix(val expected: List<Parameter>)
 
 }
 
-private fun checkParameters(parameters: PsiParameterList, expected: List<Parameter>, strict: Boolean): Boolean {
+internal fun checkParameters(parameters: PsiParameterList, expected: List<Parameter>, strict: Boolean): Boolean {
     // Fail fast by checking if the count matches
     if (!checkParameterCount(parameters, expected, strict)) {
         return false
