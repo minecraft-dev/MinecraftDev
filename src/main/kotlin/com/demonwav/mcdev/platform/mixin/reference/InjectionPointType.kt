@@ -38,7 +38,7 @@ internal class MixinInjectionPointTypeReferenceProvider : PsiReferenceProvider()
 private class InjectionPointTypeReference(element: PsiLiteral, val baseClass: PsiClass) :
         PsiReferenceBase<PsiLiteral>(element), MixinReference {
 
-    override val description: String
+    override val description
         get() = "injection point type '$value'"
 
     val injectionPointTypes: Map<String, PsiClass> by lazy {
@@ -53,13 +53,9 @@ private class InjectionPointTypeReference(element: PsiLiteral, val baseClass: Ps
         map
     }
 
-    override fun resolve(): PsiElement? {
-        return injectionPointTypes[value]
-    }
+    override fun resolve() = injectionPointTypes[value]
 
-    override fun getVariants(): Array<Any> {
-        // TODO: Why is there no .toArray()? We don't need the typed array here
-        return injectionPointTypes.keys.toTypedArray()
-    }
+    // TODO: Why is there no .toArray()? We don't need the typed array here
+    override fun getVariants() = injectionPointTypes.keys.toTypedArray()
 
 }

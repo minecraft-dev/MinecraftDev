@@ -27,12 +27,11 @@ import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiParameterList
+import com.intellij.util.containers.nullize
 
 class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool() {
 
-    override fun getStaticDescription(): String? {
-        return "Reports problems related to the method signature of Mixin injectors"
-    }
+    override fun getStaticDescription() = "Reports problems related to the method signature of Mixin injectors"
 
     override fun checkMethod(method: PsiMethod, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor>? {
         val identifier = method.nameIdentifier ?: return null
@@ -40,7 +39,7 @@ class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool(
 
         val problems = arrayListOf<ProblemDescriptor>()
 
-        for ((type, annotation) in findInjectionPointAnnotations(modifiers)) {
+        for ((type, annotation) in InjectionPointType.findAnnotations(modifiers)) {
             val methodAttribute = annotation.findDeclaredAttributeValue("method") as? PsiLiteral ?: continue
             val targetMethod = createMethodReference(methodAttribute)?.resolveFirstIfValid() as? PsiMethod ?: continue
 
@@ -65,16 +64,14 @@ class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool(
             }
         }
 
-        return if (problems.isEmpty()) ProblemDescriptor.EMPTY_ARRAY else problems.toTypedArray()
+        return problems.nullize()?.toTypedArray()
     }
 
 }
 
 class MixinInjectorUpdateMethodParametersQuickFix(val expected: List<Parameter>) : LocalQuickFix {
 
-    override fun getFamilyName(): String {
-        return "Fix method parameters"
-    }
+    override fun getFamilyName() = "Fix method parameters"
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         val parameters = descriptor.psiElement as PsiParameterList

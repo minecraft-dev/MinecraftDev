@@ -25,8 +25,8 @@ import java.awt.datatransfer.StringSelection
 
 class CopyMixinTargetReferenceAction : AnAction() {
 
-    override fun actionPerformed(e: AnActionEvent?) {
-        val project = e!!.project ?: return
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.project ?: return
         val file = e.getData(PSI_FILE) ?: return
         val caret = e.getData(CARET) ?: return
 

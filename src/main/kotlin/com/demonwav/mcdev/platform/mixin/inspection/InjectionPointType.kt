@@ -21,16 +21,6 @@ import com.intellij.psi.PsiNameHelper
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiType
 
-private val injectionPointAnnotations = InjectionPointType.values().associateBy { it.annotation }
-
-internal fun findInjectionPointAnnotations(element: PsiAnnotationOwner): List<Pair<InjectionPointType, PsiAnnotation>> {
-    return element.annotations.mapNotNull {
-        val name = it.qualifiedName ?: return@mapNotNull null
-        val type = injectionPointAnnotations[name] ?: return@mapNotNull null
-        Pair(type, it)
-    }
-}
-
 internal enum class InjectionPointType(val annotation: String) {
     INJECT(MixinConstants.Annotations.INJECT) {
         override fun isStrict(annotation: PsiAnnotation, targetMethod: PsiMethod): Boolean {
@@ -63,4 +53,17 @@ internal enum class InjectionPointType(val annotation: String) {
 
     open fun expectedMethodParameters(annotation: PsiAnnotation, targetMethod: PsiMethod): List<Parameter>? = null
 
+    companion object {
+
+        private val injectionPointAnnotations = InjectionPointType.values().associateBy { it.annotation }
+
+        internal fun findAnnotations(element: PsiAnnotationOwner): List<Pair<InjectionPointType, PsiAnnotation>> {
+            return element.annotations.mapNotNull {
+                val name = it.qualifiedName ?: return@mapNotNull null
+                val type = injectionPointAnnotations[name] ?: return@mapNotNull null
+                Pair(type, it)
+            }
+        }
+
+    }
 }

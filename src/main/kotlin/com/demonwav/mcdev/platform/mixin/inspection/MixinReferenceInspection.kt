@@ -20,9 +20,7 @@ import com.intellij.psi.PsiLiteralExpression
 
 class MixinReferenceInspection : BaseJavaBatchLocalInspectionTool() {
 
-    override fun getStaticDescription(): String? {
-        return "Reports references to unresolved Mixin elements. These will likely fail at runtime."
-    }
+    override fun getStaticDescription() = "Reports references to unresolved Mixin elements. These will likely fail at runtime."
 
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         return MethodReferenceVisitor(holder)
@@ -31,8 +29,7 @@ class MixinReferenceInspection : BaseJavaBatchLocalInspectionTool() {
 
 private class MethodReferenceVisitor(val holder: ProblemsHolder) : JavaElementVisitor() {
 
-    override fun visitLiteralExpression(expression: PsiLiteralExpression?) {
-        expression ?: return
+    override fun visitLiteralExpression(expression: PsiLiteralExpression) {
         if (expression.value !is String) {
             return
         }
