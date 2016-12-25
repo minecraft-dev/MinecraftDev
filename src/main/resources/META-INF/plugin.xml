@@ -238,7 +238,7 @@
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.MixinClassReferenceInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
         <localInspection displayName="Public static field/method in a Mixin"
                          groupName="Mixin"
                          language="JAVA"
