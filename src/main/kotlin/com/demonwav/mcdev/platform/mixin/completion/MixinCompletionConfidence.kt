@@ -22,7 +22,7 @@ import com.intellij.util.ThreeState
 
 class MixinCompletionConfidence : CompletionConfidence() {
 
-    val mixinAnnotation = PlatformPatterns.psiElement()
+    private val mixinAnnotation = PlatformPatterns.psiElement()
             .inside(false, PsiJavaPatterns.psiAnnotation().qName(StandardPatterns.string().startsWith(MixinConstants.PACKAGE)),
                     PlatformPatterns.psiFile())!!
 

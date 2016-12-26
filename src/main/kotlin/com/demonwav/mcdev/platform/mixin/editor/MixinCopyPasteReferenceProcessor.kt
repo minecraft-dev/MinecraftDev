@@ -58,7 +58,7 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
 
         val resolvedOwner = resolved.containingClass ?: return
         val qualifiedName = resolvedOwner.qualifiedName ?: return
-        to.add(createReferenceData(element, startOffset, qualifiedName, name))
+        to.add(MixinReferenceData.create(element, startOffset, qualifiedName, name))
     }
 
     override fun findReferencesToRestore(file: PsiFile, bounds: RangeMarker, referenceData: Array<out ReferenceData>)
@@ -152,7 +152,7 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
 
         // Create @Shadows
         if (psiClass != null) {
-            GenerateMembersUtil.insertMembersBeforeAnchor(psiClass, null, createShadowMembers(psiClass.project, psiClass, members))
+            GenerateMembersUtil.insertMembersBeforeAnchor(psiClass, null, createShadowMembers(psiClass.project, psiClass, members.stream()))
         }
 
         super.restoreReferences(referenceData, refs)

@@ -17,9 +17,9 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 
-fun callbackInfoType(project: Project): PsiType? = PsiType.getTypeByName(CALLBACK_INFO, project, GlobalSearchScope.allScope(project))
+internal fun callbackInfoType(project: Project): PsiType? = PsiType.getTypeByName(CALLBACK_INFO, project, GlobalSearchScope.allScope(project))
 
-fun callbackInfoReturnableType(project: Project, returnType: PsiType): PsiType? {
+internal fun callbackInfoReturnableType(project: Project, returnType: PsiType): PsiType? {
     // TODO: Can we do this without looking up the PsiClass?
     val psiClass = JavaPsiFacade.getInstance(project).findClass(CALLBACK_INFO_RETURNABLE, GlobalSearchScope.allScope(project)) ?: return null
     return JavaPsiFacade.getElementFactory(project).createType(psiClass, returnType)
