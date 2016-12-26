@@ -8,9 +8,8 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.actions
+package com.demonwav.mcdev.platform.mixin.util
 
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.demonwav.mcdev.util.findMethodsByInternalNameAndDescriptor
 import com.demonwav.mcdev.util.internalNameAndDescriptor
 import com.demonwav.mcdev.util.nameAndDescriptor
@@ -22,8 +21,7 @@ import com.intellij.util.containers.stream
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
-internal fun findMethods(psiClass: PsiClass): Stream<PsiMethod>? {
-    val targets = MixinUtils.getAllMixedClasses(psiClass).values
+internal fun findMethods(psiClass: PsiClass, targets: Collection<PsiClass>): Stream<PsiMethod>? {
     return when (targets.size) {
         0 -> null
         1 -> targets.single().methods.stream()
@@ -41,8 +39,7 @@ internal fun findMethods(psiClass: PsiClass): Stream<PsiMethod>? {
     }
 }
 
-internal fun findFields(psiClass: PsiClass): Stream<PsiField>? {
-    val targets = MixinUtils.getAllMixedClasses(psiClass).values
+internal fun findFields(psiClass: PsiClass, targets: Collection<PsiClass>): Stream<PsiField>? {
     return when (targets.size) {
         0 -> null
         1 -> targets.single().fields.stream()

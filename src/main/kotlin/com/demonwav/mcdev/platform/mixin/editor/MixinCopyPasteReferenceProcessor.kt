@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.editor
 
-import com.demonwav.mcdev.platform.mixin.actions.createShadowMembers
+import com.demonwav.mcdev.platform.mixin.actions.insertShadows
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.demonwav.mcdev.util.findFieldByNameAndDescriptor
 import com.demonwav.mcdev.util.findMethodsByInternalNameAndDescriptor
@@ -20,7 +20,6 @@ import com.demonwav.mcdev.util.internalNameAndDescriptor
 import com.demonwav.mcdev.util.nameAndDescriptor
 import com.intellij.codeInsight.editorActions.JavaCopyPasteReferenceProcessor
 import com.intellij.codeInsight.editorActions.ReferenceData
-import com.intellij.codeInsight.generation.GenerateMembersUtil
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -152,7 +151,7 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
 
         // Create @Shadows
         if (psiClass != null) {
-            GenerateMembersUtil.insertMembersBeforeAnchor(psiClass, null, createShadowMembers(psiClass.project, psiClass, members.stream()))
+            insertShadows(psiClass.project, psiClass, members.stream())
         }
 
         super.restoreReferences(referenceData, refs)

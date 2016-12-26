@@ -11,9 +11,16 @@
 package com.demonwav.mcdev.platform.mixin.actions
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.util.findFields
+import com.demonwav.mcdev.platform.mixin.util.findMethods
+import com.demonwav.mcdev.util.findChild
+import com.demonwav.mcdev.util.findLastChild
+import com.demonwav.mcdev.util.findSibling
 import com.demonwav.mcdev.util.getClassOfElement
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.generation.GenerateMembersUtil
+import com.intellij.codeInsight.generation.GenerationInfo
 import com.intellij.codeInsight.generation.OverrideImplementUtil
 import com.intellij.codeInsight.generation.OverrideImplementsAnnotationsHandler
 import com.intellij.codeInsight.generation.PsiElementClassMember
@@ -34,6 +41,7 @@ import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierList
+import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.PsiSubstitutor
 import java.util.stream.Stream
 import kotlin.streams.toList
@@ -43,11 +51,12 @@ class GenerateShadowAction : MixinCodeInsightAction() {
     override fun invoke(project: Project, editor: Editor, file: PsiFile) {
         val offset = editor.caretModel.offset
         val psiClass = getClassOfElement(file.findElementAt(offset)) ?: return
+        val targets = MixinUtils.getAllMixedClasses(psiClass).values
 
-        val fields = (findFields(psiClass) ?: Stream.empty())
+        val fields = (findFields(psiClass, targets) ?: Stream.empty())
                 .map(::PsiFieldMember)
 
-        val methods = (findMethods(psiClass) ?: Stream.empty())
+        val methods = (findMethods(psiClass, targets) ?: Stream.empty())
                 .map(::PsiMethodMember)
 
         val members = Stream.concat(fields, methods).toTypedArray()
@@ -76,6 +85,28 @@ class GenerateShadowAction : MixinCodeInsightAction() {
         }
     }
 
+}
+
+internal fun insertShadows(project: Project, psiClass: PsiClass, members: Stream<PsiMember>) {
+    insertShadows(psiClass, createShadowMembers(project, psiClass, members))
+}
+
+internal fun insertShadows(psiClass: PsiClass, shadows: List<GenerationInfo>) {
+    // Find first element after shadow
+    val lastShadow = findLastChild(psiClass, {
+        (it as? PsiModifierListOwner)?.modifierList?.findAnnotation(MixinConstants.Annotations.SHADOW) != null
+    })
+
+    val anchor: PsiMember?
+
+    if (lastShadow != null) {
+        anchor = findSibling(lastShadow.nextSibling)
+    } else {
+        anchor = findChild(psiClass)
+    }
+
+    // Insert new shadows after last shadow (or at the top of the class)
+    GenerateMembersUtil.insertMembersBeforeAnchor(psiClass, anchor, shadows)
 }
 
 internal fun createShadowMembers(project: Project, psiClass: PsiClass, members: Stream<PsiMember>): List<PsiGenerationInfo<PsiMember>> {
@@ -112,7 +143,11 @@ private fun shadowMethod(project: Project, psiClass: PsiClass, method: PsiMethod
     OverrideImplementUtil.deleteDocComment(newMethod)
 
     val newModifiers = newMethod.modifierList
-    shadowMemberModifiers(project, method.modifierList, newModifiers)
+
+    // Relevant modifiers are copied by GenerateMembersUtil.substituteGenericMethod
+
+    // Copy annotations
+    copyAnnotations(project, method.modifierList, newModifiers)
 
     // If the method was original private, make it protected now
     if (newModifiers.hasModifierProperty(PsiModifier.PRIVATE)) {
@@ -132,7 +167,13 @@ private fun shadowField(project: Project, field: PsiField): PsiField {
     val newField = JavaPsiFacade.getElementFactory(project).createField(field.name!!, field.type)
     val newModifiers = newField.modifierList!!
 
-    shadowMemberModifiers(project, field.modifierList!!, newModifiers)
+    val modifiers = field.modifierList!!
+
+    // Copy modifiers
+    copyModifiers(modifiers, newModifiers)
+
+    // Copy annotations
+    copyAnnotations(project, modifiers, newModifiers)
 
     if (newModifiers.hasModifierProperty(PsiModifier.FINAL)) {
         // If original field was final, add the @Final annotation instead
@@ -141,14 +182,6 @@ private fun shadowField(project: Project, field: PsiField): PsiField {
     }
 
     return newField
-}
-
-private fun shadowMemberModifiers(project: Project, modifiers: PsiModifierList, newModifiers: PsiModifierList) {
-    // Copy modifiers
-    copyModifiers(modifiers, newModifiers)
-
-    // Copy annotations
-    copyAnnotations(project, modifiers, newModifiers)
 }
 
 private fun copyModifiers(modifiers: PsiModifierList, newModifiers: PsiModifierList) {
@@ -160,14 +193,20 @@ private fun copyModifiers(modifiers: PsiModifierList, newModifiers: PsiModifierL
 }
 
 private fun copyAnnotations(project: Project, modifiers: PsiModifierList, newModifiers: PsiModifierList) {
-    // Copy @Nullable annotations, based on OverrideImplementUtil.annotateOnOverrideImplement
+    // Copy annotations registered by extensions (e.g. @Nullable), based on OverrideImplementUtil.annotateOnOverrideImplement
     for (ext in Extensions.getExtensions(OverrideImplementsAnnotationsHandler.EP_NAME)) {
         for (annotation in ext.getAnnotations(project)) {
-            // Check if annotation exists
-            val psiAnnotation = modifiers.findAnnotation(annotation) ?: continue
-
-            // Copy annotation
-            newModifiers.addAfter(psiAnnotation, null)
+            copyAnnotation(modifiers, newModifiers, annotation)
         }
     }
+
+    // Copy @Deprecated annotation
+    copyAnnotation(modifiers, newModifiers, "java.lang.Deprecated")
+}
+
+private fun copyAnnotation(modifiers: PsiModifierList, newModifiers: PsiModifierList, annotation: String) {
+    // Check if annotation exists
+    val psiAnnotation = modifiers.findAnnotation(annotation) ?: return
+    // Have we already added this annotation? If not, copy it
+    newModifiers.findAnnotation(annotation) ?: newModifiers.addAfter(psiAnnotation, null)
 }

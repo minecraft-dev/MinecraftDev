@@ -71,6 +71,40 @@ inline fun <reified T : PsiElement> findParent(element: PsiElement?, resolveRefe
     return null
 }
 
+inline fun <reified T : PsiElement> findChild(element: PsiElement): T? {
+    val firstChild = element.firstChild ?: return null
+    return findSibling(firstChild, false)
+}
+
+inline fun <reified T : PsiElement> findSibling(element: PsiElement, strict: Boolean = true): T? {
+    var sibling = if (strict) element.nextSibling else element
+
+    while (sibling != null) {
+        if (sibling is T) {
+            return sibling
+        }
+
+        sibling = sibling.nextSibling
+    }
+
+    return null
+}
+
+inline fun findLastChild(element: PsiElement, condition: (PsiElement) -> Boolean): PsiElement? {
+    var child = element.firstChild
+    var lastChild: PsiElement? = null
+
+    while (child != null) {
+        if (condition.invoke(child)) {
+            lastChild = child
+        }
+
+        child = child.nextSibling
+    }
+
+    return lastChild
+}
+
 fun extendsOrImplementsClass(psiClass: PsiClass, qualifiedClassName: String): Boolean {
     val project = psiClass.project
     val aClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, GlobalSearchScope.allScope(project))
