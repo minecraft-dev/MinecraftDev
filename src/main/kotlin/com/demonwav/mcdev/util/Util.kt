@@ -36,30 +36,12 @@ fun invokeLater(func: () -> Unit) {
     ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.current())
 }
 
-inline fun <A, B> Iterable<A>.elementsEqual(other: Iterable<B>, equal: (A, B) -> Boolean): Boolean {
-    val itr1 = iterator()
-    val itr2 = other.iterator()
-
-    while (itr2.hasNext()) {
-        if (!itr1.hasNext() || !equal(itr1.next(), itr2.next())) {
-            return false
-        }
-    }
-
-    return !itr1.hasNext()
-}
-
-inline fun <A, B> Iterable<A>.startsWith(other: Iterable<B>, equal: (A, B) -> Boolean): Boolean {
-    val itr1 = iterator()
-    val itr2 = other.iterator()
-
-    while (itr2.hasNext()) {
-        if (!itr1.hasNext() || !equal(itr1.next(), itr2.next())) {
-            return false
-        }
-    }
-
-    return true
+/**
+ * Returns an untyped array for the specified [Collection].
+ */
+fun Collection<*>.toArray(): Array<Any> {
+    @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
+    return (this as java.util.Collection<*>).toArray()
 }
 
 object Util {

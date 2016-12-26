@@ -15,9 +15,9 @@ import com.demonwav.mcdev.util.getClassOfElement
 import com.intellij.codeInspection.BaseJavaBatchLocalInspectionTool
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiTypeElement
-import com.intellij.psi.impl.source.PsiClassReferenceType
 
 class MixinClassReferenceInspection : BaseJavaBatchLocalInspectionTool() {
 
@@ -31,7 +31,7 @@ class MixinClassReferenceInspection : BaseJavaBatchLocalInspectionTool() {
 private class MixinClassReferenceVisitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
 
     override fun visitTypeElement(type: PsiTypeElement) {
-        val classType = type.type as? PsiClassReferenceType ?: return
+        val classType = type.type as? PsiClassType ?: return
         val referencedClass = classType.resolve() ?: return
 
         if (MixinUtils.getMixinAnnotation(referencedClass) == null) {

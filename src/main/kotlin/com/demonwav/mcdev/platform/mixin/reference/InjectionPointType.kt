@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.reference
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.INJECTION_POINT
+import com.demonwav.mcdev.util.toArray
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -55,7 +56,6 @@ private class InjectionPointTypeReference(element: PsiLiteral, val baseClass: Ps
 
     override fun resolve() = injectionPointTypes[value]
 
-    // TODO: Why is there no .toArray()? We don't need the typed array here
-    override fun getVariants() = injectionPointTypes.keys.toTypedArray()
+    override fun getVariants() = injectionPointTypes.keys.toArray()
 
 }

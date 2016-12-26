@@ -22,17 +22,13 @@ import com.intellij.codeInsight.completion.JavaCompletionContributor
 import com.intellij.codeInsight.completion.JavaCompletionSorting
 import com.intellij.codeInsight.completion.LegacyCompletionContributor
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
-import com.intellij.codeInsight.completion.scope.JavaCompletionProcessor
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiExpression
-import com.intellij.psi.PsiField
-import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiQualifiedReference
-import com.intellij.psi.ResolveState
+import java.util.stream.Stream
 
 class MixinCompletionContributor : CompletionContributor() {
-
-    private val COMPLETION_OPTIONS: JavaCompletionProcessor.Options = JavaCompletionProcessor.Options.DEFAULT_OPTIONS.withCheckAccess(false)
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         if (parameters.completionType != CompletionType.BASIC) {
@@ -55,7 +51,6 @@ class MixinCompletionContributor : CompletionContributor() {
 
         val targetType = JavaPsiFacade.getElementFactory(psiClass.project).createType(psiClass)
         val prefixMatcher = result.prefixMatcher
-        val filter = JavaCompletionContributor.getReferenceFilter(position) ?: return
         LegacyCompletionContributor.processReferences(parameters, javaResult, { reference, result ->
             // Check if referenced element is our Mixin class
             val qualified = if (reference is PsiQualifiedReference && reference.qualifier != null) {
@@ -70,27 +65,13 @@ class MixinCompletionContributor : CompletionContributor() {
                 false
             }
 
-            // Collect completions from target class(es)
-            val processor = JavaCompletionProcessor(position, filter, COMPLETION_OPTIONS, prefixMatcher::prefixMatches)
-
             // Process methods and fields from target class
-            findMethods(psiClass, targets)?.forEach {
-                processor.execute(it, ResolveState.initial())
-            }
-            findFields(psiClass, targets)?.forEach {
-                processor.execute(it, ResolveState.initial())
-            }
-
-            // Add lookups for processed completions
-            for (completion in processor.results) {
-                val element = completion.element
-
-                result.addElement(PrioritizedLookupElement.withExplicitProximity(when (element) {
-                    is PsiMethod -> MixinMethodLookupItem(element)
-                    is PsiField -> MixinFieldLookupItem(element, qualified)
-                    else -> throw AssertionError("Member is not PsiMethod or PsiField")
-                }, 1))
-            }
+            Stream.concat(
+                    findMethods(psiClass, targets)?.map(::MixinMethodLookupItem) ?: Stream.empty<LookupElement>(),
+                    findFields(psiClass, targets)?.map({ MixinFieldLookupItem(it, qualified) }) ?: Stream.empty<LookupElement>())
+                    .filter(prefixMatcher::prefixMatches)
+                    .map { PrioritizedLookupElement.withExplicitProximity(it, 1) }
+                    .forEach(result::addElement)
         })
     }
 

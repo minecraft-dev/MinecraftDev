@@ -24,26 +24,35 @@ import com.intellij.psi.PsiType
 
 internal enum class InjectionPointType(val annotation: String) {
     INJECT(MixinConstants.Annotations.INJECT) {
-        override fun isStrict(annotation: PsiAnnotation, targetMethod: PsiMethod): Boolean {
-            return ((annotation.findDeclaredAttributeValue("locals") as? PsiQualifiedReference)?.referenceName ?: "NO_CAPTURE") == "NO_CAPTURE"
-        }
 
-        override fun expectedMethodParameters(annotation: PsiAnnotation, targetMethod: PsiMethod): List<Parameter> {
+        override fun expectedMethodParameters(annotation: PsiAnnotation, targetMethod: PsiMethod): List<ParameterGroup> {
             val targetParameters = targetMethod.parameterList
             val returnType = targetMethod.returnType
 
-            val result = ArrayList<Parameter>(targetParameters.parametersCount + 1)
-            targetParameters.parameters.mapTo(result, {Parameter(it.name, it.type)})
+            val result = ArrayList<ParameterGroup>()
 
-            if (returnType == null || returnType == PsiType.VOID) {
-                result.add(Parameter("ci", callbackInfoType(targetMethod.project)!!))
+            // Parameters from injected method (optional)
+            result.add(ParameterGroup(targetParameters.parameters.map(::Parameter), required = false, default = true))
+
+            // Callback info (required)
+            result.add(ParameterGroup(listOf(if (returnType == null || returnType == PsiType.VOID) {
+                Parameter("ci", callbackInfoType(targetMethod.project)!!)
             } else {
-                result.add(Parameter("cir", callbackInfoReturnableType(targetMethod.project,
-                        if (returnType is PsiPrimitiveType) returnType.getBoxedType(targetMethod)!! else returnType)!!))
+                Parameter("cir", callbackInfoReturnableType(targetMethod.project,
+                        if (returnType is PsiPrimitiveType) returnType.getBoxedType(targetMethod)!! else returnType)!!)
+            })))
+
+            // Captured locals (only if local capture is enabled)
+            // Right now we allow any parameters here since we can't easily
+            // detect the local variables that can be captured
+            if (((annotation.findDeclaredAttributeValue("locals") as? PsiQualifiedReference)
+                    ?.referenceName ?: "NO_CAPTURE") != "NO_CAPTURE") {
+                result.add(ParameterGroup(null))
             }
 
             return result
         }
+
     },
     MODIFY_ARG(MixinConstants.Annotations.MODIFY_ARG),
     MODIFY_CONSTANT(MixinConstants.Annotations.MODIFY_CONSTANT),
@@ -52,9 +61,7 @@ internal enum class InjectionPointType(val annotation: String) {
 
     val annotationName = "@${PsiNameHelper.getShortClassName(annotation)}"
 
-    open fun isStrict(annotation: PsiAnnotation, targetMethod: PsiMethod) = true
-
-    open fun expectedMethodParameters(annotation: PsiAnnotation, targetMethod: PsiMethod): List<Parameter>? = null
+    open fun expectedMethodParameters(annotation: PsiAnnotation, targetMethod: PsiMethod): List<ParameterGroup>? = null
 
     companion object {
 

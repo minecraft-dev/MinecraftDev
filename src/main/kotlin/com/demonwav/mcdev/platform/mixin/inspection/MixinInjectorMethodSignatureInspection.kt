@@ -11,9 +11,6 @@
 package com.demonwav.mcdev.platform.mixin.inspection
 
 import com.demonwav.mcdev.platform.mixin.reference.createMethodReference
-import com.demonwav.mcdev.util.Parameter
-import com.demonwav.mcdev.util.elementsEqual
-import com.demonwav.mcdev.util.startsWith
 import com.demonwav.mcdev.util.synchronize
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.BaseJavaBatchLocalInspectionTool
@@ -27,6 +24,8 @@ import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiParameterList
+import com.intellij.psi.codeStyle.JavaCodeStyleManager
+import com.intellij.psi.codeStyle.VariableKind
 import com.intellij.util.containers.nullize
 
 class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool() {
@@ -55,12 +54,11 @@ class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool(
             val parameters = method.parameterList
 
             val expectedParameters = type.expectedMethodParameters(annotation, targetMethod) ?: continue
-            val strict = type.isStrict(annotation, targetMethod)
 
-            if (!checkParameters(parameters, expectedParameters, strict)) {
+            if (!checkParameters(parameters, expectedParameters)) {
                 problems.add(manager.createProblemDescriptor(parameters,
                         "Method parameters do not match expected parameters for ${type.annotationName}",
-                        MixinInjectorUpdateMethodParametersQuickFix(expectedParameters), ProblemHighlightType.GENERIC_ERROR, isOnTheFly))
+                        createMethodParametersFix(parameters, expectedParameters), ProblemHighlightType.GENERIC_ERROR, isOnTheFly))
             }
         }
 
@@ -69,39 +67,54 @@ class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool(
 
 }
 
-private class MixinInjectorUpdateMethodParametersQuickFix(val expected: List<Parameter>) : LocalQuickFix {
+internal fun createMethodParametersFix(parameters: PsiParameterList, expected: List<ParameterGroup>): LocalQuickFix? {
+    // TODO: Someone should improve this: Right now we can only automatically fix if the parameters are empty
+    return if (parameters.parametersCount == 0) MixinInjectorUpdateMethodParametersQuickFix(expected) else null
+}
+
+private class MixinInjectorUpdateMethodParametersQuickFix(val expected: List<ParameterGroup>) : LocalQuickFix {
 
     override fun getFamilyName() = "Fix method parameters"
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         val parameters = descriptor.psiElement as PsiParameterList
-        // TODO: Merge method parameters (keep existing parameter names)
-        parameters.synchronize(expected.map { JavaPsiFacade.getElementFactory(project).createParameter(it.name ?: "", it.type) })
+        parameters.synchronize(expected.flatMap {
+            if (it.default) {
+                it.parameters?.map { JavaPsiFacade.getElementFactory(project).createParameter(
+                        it.name ?: JavaCodeStyleManager.getInstance(project)
+                        .suggestVariableName(VariableKind.PARAMETER, null, null, it.type).names
+                                .firstOrNull() ?: "unknown", it.type) } ?: listOf()
+            } else {
+                listOf()
+            }
+        })
     }
 
 }
 
-internal fun checkParameters(parameters: PsiParameterList, expected: List<Parameter>, strict: Boolean): Boolean {
-    // Fail fast by checking if the count matches
-    if (!checkParameterCount(parameters, expected, strict)) {
-        return false
+internal fun checkParameters(parameterList: PsiParameterList, expected: List<ParameterGroup>): Boolean {
+    val parameters = parameterList.parameters
+    var pos = 0
+
+    for (group in expected) {
+        // No parameters left in current method signature
+        if (pos >= parameters.size) {
+            // If the group is required some method parameters are missing
+            if (group.required) {
+                return false
+            }
+
+            // Continue to check for required parameter groups
+            continue
+        }
+
+        // Check if parameter group matches
+        if (group.match(parameters, pos)) {
+            pos += group.size
+        } else if (group.required) {
+            return false
+        }
     }
 
-    val currentParameters = parameters.parameters.asList()
-
-    // Check if the types are equal
-    return if (strict) {
-        currentParameters.elementsEqual(expected, { c, (_, type) -> c.type == type })
-    } else {
-        currentParameters.startsWith(expected, { c, (_, type) -> c.type == type })
-    }
-}
-
-private fun checkParameterCount(parameters: PsiParameterList, expected: List<Any>, strict: Boolean): Boolean {
-    return if (strict) {
-        parameters.parametersCount == expected.size
-    } else {
-        // Allow more parameters than expected
-        parameters.parametersCount >= expected.size
-    }
+    return pos >= parameters.size || expected.last().wildcard
 }
