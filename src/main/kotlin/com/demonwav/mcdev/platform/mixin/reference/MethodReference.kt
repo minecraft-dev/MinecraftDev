@@ -77,7 +77,7 @@ private class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiCl
         return createResolveResults(target.findMethodsByInternalNameAndDescriptor(value))
     }
 
-    override fun getVariants(): Array<out Any> {
+    override fun getVariants(): Array<Any> {
         val methods = target.methods
 
         // All methods which are not unique by their name need to be qualified with the descriptor

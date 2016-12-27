@@ -38,7 +38,7 @@ class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool(
 
         val problems = arrayListOf<ProblemDescriptor>()
 
-        for ((type, annotation) in InjectionPointType.findAnnotations(modifiers)) {
+        for ((type, annotation) in InjectorType.findAnnotations(modifiers)) {
             val methodAttribute = annotation.findDeclaredAttributeValue("method") as? PsiLiteral ?: continue
             val targetMethod = createMethodReference(methodAttribute)?.resolveFirstIfValid() as? PsiMethod ?: continue
 

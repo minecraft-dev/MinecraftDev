@@ -109,6 +109,9 @@ val PsiMethod.internalNameAndDescriptor: String
 val PsiMethod.descriptor: String
     get() = appendDescriptor(StringBuilder()).toString()
 
+val PsiMethod.qualifiedInternalNameAndDescriptor: String
+    get() = appendDescriptor(containingClass!!.appendDescriptor(StringBuilder()).append(internalName)).toString()
+
 fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
     builder.append('(')
     for (parameter in parameterList.parameters) {
@@ -125,5 +128,8 @@ val PsiField.nameAndDescriptor: String
 
 val PsiField.descriptor: String
     get() = appendDescriptor(StringBuilder()).toString()
+
+val PsiField.qualifiedNameAndDescriptor: String
+    get() = appendDescriptor(containingClass!!.appendDescriptor(StringBuilder()).append(name).append(':')).toString()
 
 fun PsiField.appendDescriptor(builder: StringBuilder): StringBuilder = type.appendDescriptor(builder)

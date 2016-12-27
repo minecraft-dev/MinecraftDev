@@ -22,7 +22,7 @@ import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiType
 
-internal enum class InjectionPointType(val annotation: String) {
+internal enum class InjectorType(val annotation: String) {
     INJECT(MixinConstants.Annotations.INJECT) {
 
         override fun expectedMethodParameters(annotation: PsiAnnotation, targetMethod: PsiMethod): List<ParameterGroup> {
@@ -65,9 +65,9 @@ internal enum class InjectionPointType(val annotation: String) {
 
     companion object {
 
-        private val injectionPointAnnotations = InjectionPointType.values().associateBy { it.annotation }
+        private val injectionPointAnnotations = InjectorType.values().associateBy { it.annotation }
 
-        internal fun findAnnotations(element: PsiAnnotationOwner): List<Pair<InjectionPointType, PsiAnnotation>> {
+        internal fun findAnnotations(element: PsiAnnotationOwner): List<Pair<InjectorType, PsiAnnotation>> {
             return element.annotations.mapNotNull {
                 val name = it.qualifiedName ?: return@mapNotNull null
                 val type = injectionPointAnnotations[name] ?: return@mapNotNull null

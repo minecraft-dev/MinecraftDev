@@ -44,6 +44,10 @@ fun Collection<*>.toArray(): Array<Any> {
     return (this as java.util.Collection<*>).toArray()
 }
 
+inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
+    return Array(size, { i -> transform(this[i]) })
+}
+
 object Util {
     // Java static methods
     @JvmStatic

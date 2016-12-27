@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.actions
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.demonwav.mcdev.platform.mixin.util.findMethods
+import com.demonwav.mcdev.platform.mixin.util.findSource
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory.Companion.MIXIN_OVERWRITE_FALLBACK
 import com.demonwav.mcdev.util.getClassOfElement
 import com.demonwav.mcdev.util.toTypedArray
@@ -31,7 +32,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.codeStyle.CodeStyleManager
-import com.intellij.psi.impl.compiled.ClsMethodImpl
 
 class GenerateOverwriteAction : MixinCodeInsightAction() {
 
@@ -60,7 +60,7 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
             val requiredMembers = LinkedHashSet<PsiMember>()
 
             val newMethods = elements.map {
-                val method = findMethodWithCodeBlock(it.element)
+                val method = it.element.findSource()
                 val sourceClass = method.containingClass
                 val codeBlock = method.body
 
@@ -108,16 +108,6 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
             // Insert shadows
             insertShadows(psiClass, newShadows)
         }
-    }
-
-    private fun findMethodWithCodeBlock(method: PsiMethod): PsiMethod {
-        val body = method.body
-        if (body != null) {
-            return method
-        }
-
-        // Attempt to find the source if we have a compiled method
-        return (method as? ClsMethodImpl)?.sourceMirrorMethod ?: method
     }
 
 }

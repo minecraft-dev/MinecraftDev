@@ -31,6 +31,7 @@ import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiReference
 import com.intellij.psi.ResolveResult
+import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import org.jetbrains.annotations.Contract
@@ -203,6 +204,11 @@ fun createResolveResults(elements: Stream<out PsiElement>): Array<ResolveResult>
     return elements
             .map(::PsiElementResolveResult)
             .toTypedArray()
+}
+
+fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement?): Stream<T> {
+    filter ?: return this
+    return filter { filter.isClassAcceptable(it.javaClass) && filter.isAcceptable(it, context) }
 }
 
 fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {

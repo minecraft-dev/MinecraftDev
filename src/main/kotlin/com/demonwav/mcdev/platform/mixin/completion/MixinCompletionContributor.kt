@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.completion
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.demonwav.mcdev.platform.mixin.util.findFields
 import com.demonwav.mcdev.platform.mixin.util.findMethods
+import com.demonwav.mcdev.util.filter
 import com.demonwav.mcdev.util.getClassOfElement
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionParameters
@@ -25,6 +26,7 @@ import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiExpression
+import com.intellij.psi.PsiJavaReference
 import com.intellij.psi.PsiQualifiedReference
 import java.util.stream.Stream
 
@@ -50,8 +52,14 @@ class MixinCompletionContributor : CompletionContributor() {
         val javaResult = JavaCompletionSorting.addJavaSorting(parameters, result)
 
         val targetType = JavaPsiFacade.getElementFactory(psiClass.project).createType(psiClass)
+        val filter = JavaCompletionContributor.getReferenceFilter(position)
         val prefixMatcher = result.prefixMatcher
         LegacyCompletionContributor.processReferences(parameters, javaResult, { reference, result ->
+            if (reference !is PsiJavaReference) {
+                // Only process references to Java elements
+                return@processReferences
+            }
+
             // Check if referenced element is our Mixin class
             val qualified = if (reference is PsiQualifiedReference && reference.qualifier != null) {
                 val qualifierExpression = reference.qualifier as? PsiExpression ?: return@processReferences
@@ -67,9 +75,10 @@ class MixinCompletionContributor : CompletionContributor() {
 
             // Process methods and fields from target class
             Stream.concat(
-                    findMethods(psiClass, targets)?.map(::MixinMethodLookupItem) ?: Stream.empty<LookupElement>(),
-                    findFields(psiClass, targets)?.map({ MixinFieldLookupItem(it, qualified) }) ?: Stream.empty<LookupElement>())
+                    findMethods(psiClass, targets, checkBases = true)?.map(::MixinMethodLookupItem) ?: Stream.empty<LookupElement>(),
+                    findFields(psiClass, targets, checkBases = true)?.map({ MixinFieldLookupItem(it, qualified) }) ?: Stream.empty<LookupElement>())
                     .filter(prefixMatcher::prefixMatches)
+                    .filter(filter, position)
                     .map { PrioritizedLookupElement.withExplicitProximity(it, 1) }
                     .forEach(result::addElement)
         })

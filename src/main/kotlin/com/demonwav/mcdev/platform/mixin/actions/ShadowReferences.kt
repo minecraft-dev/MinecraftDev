@@ -31,7 +31,7 @@ internal fun collectRequiredMembers(element: PsiElement, psiClass: PsiClass): Li
 
 private class CollectRequiredClassMembersVisitor(val psiClass: PsiClass) : JavaRecursiveElementWalkingVisitor() {
 
-    internal val members: ArrayList<PsiMember> = ArrayList()
+    internal val members = ArrayList<PsiMember>()
 
     override fun visitReferenceElement(reference: PsiJavaCodeReferenceElement) {
         val resolved = reference.advancedResolve(false).element as? PsiMember ?: return
@@ -45,6 +45,8 @@ private class CollectRequiredClassMembersVisitor(val psiClass: PsiClass) : JavaR
             // Reference points to the owning class
             members.add(resolved)
         }
+
+        super.visitReferenceElement(reference)
     }
 
 }
