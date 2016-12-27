@@ -18,6 +18,7 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
+import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.util.containers.stream
 import java.util.stream.Stream
 
@@ -40,7 +41,7 @@ val PsiPrimitiveType.internalName: String?
     }
 
 val PsiClassType.internalName: String
-    get() = if (parameterCount == 0) canonicalText.replace('.', '/') else rawType().internalName
+    get() = TypeConversionUtil.erasure(this).canonicalText.replace('.', '/')
 
 val PsiType.descriptor: String
     get() = appendDescriptor(StringBuilder()).toString()
@@ -109,8 +110,10 @@ val PsiMethod.internalNameAndDescriptor: String
 val PsiMethod.descriptor: String
     get() = appendDescriptor(StringBuilder()).toString()
 
-val PsiMethod.qualifiedInternalNameAndDescriptor: String
-    get() = appendDescriptor(containingClass!!.appendDescriptor(StringBuilder()).append(internalName)).toString()
+fun PsiMethod.getQualifiedInternalNameAndDescriptor(qualifier: PsiClassType?): String {
+    return appendDescriptor((qualifier?.appendDescriptor(StringBuilder()) ?: containingClass!!.appendDescriptor(StringBuilder()))
+            .append(internalName)).toString()
+}
 
 fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
     builder.append('(')
@@ -129,7 +132,9 @@ val PsiField.nameAndDescriptor: String
 val PsiField.descriptor: String
     get() = appendDescriptor(StringBuilder()).toString()
 
-val PsiField.qualifiedNameAndDescriptor: String
-    get() = appendDescriptor(containingClass!!.appendDescriptor(StringBuilder()).append(name).append(':')).toString()
+fun PsiField.getQualifiedInternalNameAndDescriptor(qualifier: PsiClassType?): String {
+    return appendDescriptor((qualifier?.appendDescriptor(StringBuilder()) ?: containingClass!!.appendDescriptor(StringBuilder()))
+            .append(name).append(':')).toString()
+}
 
 fun PsiField.appendDescriptor(builder: StringBuilder): StringBuilder = type.appendDescriptor(builder)

@@ -17,13 +17,17 @@ import com.demonwav.mcdev.util.findParent
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.PsiReferenceProvider
+import com.intellij.psi.PsiTypeElement
 import com.intellij.util.ProcessingContext
 
 internal class MixinTargetReferenceProvider : PsiReferenceProvider() {
@@ -99,6 +103,19 @@ internal abstract class TargetReference(element: PsiLiteral, val methodReference
 
     override fun validate() = if (multiResolve(false).isNotEmpty()) MixinReference.State.VALID else MixinReference.State.UNRESOLVED
 
+}
+
+internal fun findQualifierType(reference: PsiQualifiedReference): PsiClassType? {
+    val qualifier = reference.qualifier ?: return null
+    return when (qualifier) {
+        is PsiTypeElement -> qualifier.type as? PsiClassType
+        is PsiExpression -> qualifier.type as? PsiClassType
+        else -> null
+    }
+}
+
+internal data class QualifiedMember<out T>(val member: T, val qualifier: PsiClassType?) {
+    constructor(member: T, reference: PsiQualifiedReference) : this(member, findQualifierType(reference))
 }
 
 internal fun qualifyLookup(builder: LookupElementBuilder, targetClass: PsiClass, m: PsiMember): LookupElementBuilder {

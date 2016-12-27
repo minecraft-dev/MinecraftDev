@@ -11,7 +11,8 @@
 package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
-import com.demonwav.mcdev.util.qualifiedInternalNameAndDescriptor
+import com.demonwav.mcdev.util.getQualifiedInternalNameAndDescriptor
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiNewExpression
 
@@ -30,7 +31,7 @@ private class FindConstructorUsagesVisitor(val qinad: String) : FindUsagesVisito
 
     override fun visitNewExpression(expression: PsiNewExpression) {
         val constructor = expression.resolveConstructor()
-        if (constructor != null && constructor.qualifiedInternalNameAndDescriptor == this.qinad) {
+        if (constructor != null && constructor.getQualifiedInternalNameAndDescriptor(null) == this.qinad) {
             usages.add(expression)
         }
 
@@ -44,7 +45,7 @@ private class CollectCalledConstructorsVisitor : CollectMethodsVisitor() {
     override fun visitNewExpression(expression: PsiNewExpression) {
         val constructor = expression.resolveConstructor()
         if (constructor != null) {
-            methods.add(constructor)
+            methods.add(QualifiedMember(constructor, null as PsiClassType?))
         }
 
         super.visitNewExpression(expression)

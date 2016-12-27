@@ -11,8 +11,8 @@
 package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
+import com.demonwav.mcdev.util.getQualifiedInternalNameAndDescriptor
 import com.demonwav.mcdev.util.mapToArray
-import com.demonwav.mcdev.util.qualifiedNameAndDescriptor
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor
@@ -47,28 +47,11 @@ internal class FieldTargetReference(element: PsiLiteral, methodReference: MixinR
         val targetClass = target.containingClass!!
 
         return visitor.fields
-                .mapToArray { f ->
-                    qualifyLookup(JavaLookupElementBuilder.forField(f, f.qualifiedNameAndDescriptor, targetClass)
+                .mapToArray { (f, qualifier) ->
+                    qualifyLookup(JavaLookupElementBuilder.forField(f, f.getQualifiedInternalNameAndDescriptor(qualifier), targetClass)
                             .withPresentableText(f.name!!)
                             .withLookupString(f.name!!), targetClass, f)
                 }
-    }
-
-}
-
-private class CollectReferencedFieldsVisitor : JavaRecursiveElementWalkingVisitor() {
-
-    val fields = ArrayList<PsiField>()
-
-    override fun visitReferenceExpression(expression: PsiReferenceExpression) {
-        if (expression !is PsiMethodReferenceExpression) {
-            val resolved = expression.resolve()
-            if (resolved is PsiField) {
-                fields.add(resolved)
-            }
-        }
-
-        super.visitReferenceExpression(expression)
     }
 
 }
@@ -81,8 +64,25 @@ private class FindFieldUsagesVisitor(val qnad: String) : JavaRecursiveElementWal
         if (expression !is PsiMethodReferenceExpression) {
             // TODO: Optimize this so we don't need to resolve all fields to find a reference
             val resolved = expression.resolve()
-            if (resolved is PsiField && resolved.qualifiedNameAndDescriptor == this.qnad) {
+            if (resolved is PsiField && resolved.getQualifiedInternalNameAndDescriptor(findQualifierType(expression)) == this.qnad) {
                 usages.add(expression)
+            }
+        }
+
+        super.visitReferenceExpression(expression)
+    }
+
+}
+
+private class CollectReferencedFieldsVisitor : JavaRecursiveElementWalkingVisitor() {
+
+    val fields = ArrayList<QualifiedMember<PsiField>>()
+
+    override fun visitReferenceExpression(expression: PsiReferenceExpression) {
+        if (expression !is PsiMethodReferenceExpression) {
+            val resolved = expression.resolve()
+            if (resolved is PsiField) {
+                fields.add(QualifiedMember(resolved, expression))
             }
         }
 

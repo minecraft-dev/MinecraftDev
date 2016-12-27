@@ -60,4 +60,3 @@ internal fun filterNewShadows(requiredMembers: Collection<PsiMember>, psiClass: 
         }
     }
 }
-

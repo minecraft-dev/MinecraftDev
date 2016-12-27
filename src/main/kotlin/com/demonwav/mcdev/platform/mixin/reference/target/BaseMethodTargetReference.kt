@@ -11,8 +11,8 @@
 package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
+import com.demonwav.mcdev.util.getQualifiedInternalNameAndDescriptor
 import com.demonwav.mcdev.util.mapToArray
-import com.demonwav.mcdev.util.qualifiedInternalNameAndDescriptor
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor
@@ -50,8 +50,8 @@ internal abstract class BaseMethodTargetReference(element: PsiLiteral, methodRef
         val targetClass = target.containingClass!!
 
         return visitor.methods
-                .mapToArray { m ->
-                    qualifyLookup(JavaLookupElementBuilder.forMethod(m, m.qualifiedInternalNameAndDescriptor,
+                .mapToArray { (m, qualifier) ->
+                    qualifyLookup(JavaLookupElementBuilder.forMethod(m, m.getQualifiedInternalNameAndDescriptor(qualifier),
                             PsiSubstitutor.EMPTY, targetClass)
                             .withLookupString(m.name), // Allow looking up targets by their method name
                             targetClass, m)
@@ -60,7 +60,7 @@ internal abstract class BaseMethodTargetReference(element: PsiLiteral, methodRef
 }
 
 internal abstract class CollectMethodsVisitor : JavaRecursiveElementWalkingVisitor() {
-    val methods = ArrayList<PsiMethod>()
+    val methods = ArrayList<QualifiedMember<PsiMethod>>()
 }
 
 internal abstract class FindUsagesVisitor : JavaRecursiveElementWalkingVisitor() {

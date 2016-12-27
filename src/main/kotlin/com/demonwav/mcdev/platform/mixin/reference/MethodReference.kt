@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.mixin.reference
 
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.demonwav.mcdev.util.createResolveResults
+import com.demonwav.mcdev.util.findMethodsByInternalName
 import com.demonwav.mcdev.util.findMethodsByInternalNameAndDescriptor
 import com.demonwav.mcdev.util.getClassOfElement
 import com.demonwav.mcdev.util.internalName
@@ -66,6 +67,13 @@ private fun createLookup(methods: Stream<PsiMethod>, uniqueMethods: Set<String>)
             }.toArray()
 }
 
+private fun PsiClass.findMethodsForValue(value: String): Stream<PsiMethod> {
+    if (value.endsWith('*')) {
+        return findMethodsByInternalName(value.substring(0, value.length - 1))
+    } else {
+        return findMethodsByInternalNameAndDescriptor(value)
+    }
+}
 
 private class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiClass) :
         PsiReferenceBase.Poly<PsiLiteral>(element), MixinReference.Poly {
@@ -73,8 +81,17 @@ private class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiCl
     override val description: String
         get() = "method '$value' in target class"
 
+    override fun validate(results: Array<ResolveResult>): MixinReference.State {
+        val result = super.validate(results)
+        return if (result == MixinReference.State.AMBIGUOUS && value.endsWith('*')) {
+            MixinReference.State.VALID
+        } else {
+            result
+        }
+    }
+
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-        return createResolveResults(target.findMethodsByInternalNameAndDescriptor(value))
+        return createResolveResults(target.findMethodsForValue(value))
     }
 
     override fun getVariants(): Array<Any> {
@@ -106,7 +123,7 @@ private class MethodReferenceMultipleTargets(element: PsiLiteral, val targets: C
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         return createResolveResults(targets.stream()
-                .flatMap { it.findMethodsByInternalNameAndDescriptor(value) })
+                .flatMap { it.findMethodsForValue(value) })
     }
 
     override fun validate(results: Array<ResolveResult>) = when (results.size) {

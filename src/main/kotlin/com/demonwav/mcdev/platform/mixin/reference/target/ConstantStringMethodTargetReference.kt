@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
-import com.demonwav.mcdev.util.qualifiedInternalNameAndDescriptor
+import com.demonwav.mcdev.util.getQualifiedInternalNameAndDescriptor
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiReference
@@ -56,7 +56,7 @@ private class FindConstantStringMethodUsagesVisitor(val qinad: String): FindUsag
     override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
         if (isConstantStringMethodCall(expression)) {
             val method = expression.resolveMethod()
-            if (method != null && method.qualifiedInternalNameAndDescriptor == this.qinad) {
+            if (method != null && method.getQualifiedInternalNameAndDescriptor(findQualifierType(expression.methodExpression)) == this.qinad) {
                 usages.add(expression)
             }
         }
@@ -70,7 +70,7 @@ private class CollectConstantStringMethodUsagesVisitor : CollectMethodsVisitor()
         if (isConstantStringMethodCall(expression)) {
             val method = expression.resolveMethod()
             if (method != null) {
-                methods.add(method)
+                methods.add(QualifiedMember(method, expression.methodExpression))
             }
         }
 
