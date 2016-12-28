@@ -12,60 +12,40 @@ package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.util.getQualifiedInternalNameAndDescriptor
-import com.demonwav.mcdev.util.mapToArray
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.psi.JavaRecursiveElementWalkingVisitor
-import com.intellij.psi.PsiElementResolveResult
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReferenceExpression
-import com.intellij.psi.ResolveResult
 
-internal class FieldTargetReference(element: PsiLiteral, methodReference: MixinReference) : TargetReference(element, methodReference) {
+internal class FieldTargetReference(element: PsiLiteral, methodReference: MixinReference)
+    : QualifiedTargetReference<PsiField>(element, methodReference) {
 
     override val description: String
-        get() = "field target '$value' in target method"
+        get() = "field '$value' in target method"
 
-    override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-        val codeBlock = targetMethod?.body ?: return ResolveResult.EMPTY_ARRAY
+    override fun createFindUsagesVisitor(): CollectVisitor<PsiReferenceExpression> = FindFieldUsagesVisitor(value)
+    override fun createCollectMethodsVisitor(): CollectVisitor<QualifiedMember<PsiField>> = CollectReferencedFieldsVisitor()
 
-        val visitor = FindFieldUsagesVisitor(value)
-        codeBlock.accept(visitor)
-        return visitor.usages.mapToArray(::PsiElementResolveResult)
-    }
-
-    override fun getVariants(): Array<out Any> {
-        val target = this.targetMethod ?: return LookupElementBuilder.EMPTY_ARRAY
-        val codeBlock = target.body ?: return LookupElementBuilder.EMPTY_ARRAY
-
-        // Collect all field references
-        val visitor = CollectReferencedFieldsVisitor()
-        codeBlock.accept(visitor)
-
-        val targetClass = target.containingClass!!
-
-        return visitor.fields
-                .mapToArray { (f, qualifier) ->
-                    qualifyLookup(JavaLookupElementBuilder.forField(f, f.getQualifiedInternalNameAndDescriptor(qualifier), targetClass)
-                            .withPresentableText(f.name!!)
-                            .withLookupString(f.name!!), targetClass, f)
-                }
+    override fun createLookup(targetClass: PsiClass, m: PsiField, qualifier: PsiClassType?): LookupElementBuilder {
+        return JavaLookupElementBuilder.forField(m, m.getQualifiedInternalNameAndDescriptor(qualifier), targetClass)
+                .withPresentableText(m.name!!)
+                .withLookupString(m.name!!)
     }
 
 }
 
-private class FindFieldUsagesVisitor(val qnad: String) : JavaRecursiveElementWalkingVisitor() {
-
-    val usages = ArrayList<PsiReferenceExpression>()
+private class FindFieldUsagesVisitor(val qnad: String) : CollectVisitor<PsiReferenceExpression>() {
 
     override fun visitReferenceExpression(expression: PsiReferenceExpression) {
         if (expression !is PsiMethodReferenceExpression) {
             // TODO: Optimize this so we don't need to resolve all fields to find a reference
             val resolved = expression.resolve()
             if (resolved is PsiField && resolved.getQualifiedInternalNameAndDescriptor(findQualifierType(expression)) == this.qnad) {
-                usages.add(expression)
+                result.add(expression)
             }
         }
 
@@ -74,15 +54,13 @@ private class FindFieldUsagesVisitor(val qnad: String) : JavaRecursiveElementWal
 
 }
 
-private class CollectReferencedFieldsVisitor : JavaRecursiveElementWalkingVisitor() {
-
-    val fields = ArrayList<QualifiedMember<PsiField>>()
+private class CollectReferencedFieldsVisitor : CollectVisitor<QualifiedMember<PsiField>>() {
 
     override fun visitReferenceExpression(expression: PsiReferenceExpression) {
         if (expression !is PsiMethodReferenceExpression) {
             val resolved = expression.resolve()
             if (resolved is PsiField) {
-                fields.add(QualifiedMember(resolved, expression))
+                result.add(QualifiedMember(resolved, expression))
             }
         }
 

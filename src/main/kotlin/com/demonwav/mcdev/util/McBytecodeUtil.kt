@@ -22,51 +22,57 @@ import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.util.containers.stream
 import java.util.stream.Stream
 
-private val INTERNAL_CONSTRUCTOR_NAME = "<init>"
+private const val INTERNAL_CONSTRUCTOR_NAME = "<init>"
+private const val INTERNAL_CLASS_SEPARATOR = '/'
 
 // Type
 
-val PsiPrimitiveType.internalName: String?
+val PsiPrimitiveType.internalName: Char
     get() = when (this) {
-        PsiType.BYTE -> "B"
-        PsiType.CHAR -> "C"
-        PsiType.DOUBLE -> "D"
-        PsiType.FLOAT -> "F"
-        PsiType.INT -> "I"
-        PsiType.LONG -> "J"
-        PsiType.SHORT -> "S"
-        PsiType.BOOLEAN -> "Z"
-        PsiType.VOID -> "V"
-        else -> null
+        PsiType.BYTE -> 'B'
+        PsiType.CHAR -> 'C'
+        PsiType.DOUBLE -> 'D'
+        PsiType.FLOAT -> 'F'
+        PsiType.INT -> 'I'
+        PsiType.LONG -> 'J'
+        PsiType.SHORT -> 'S'
+        PsiType.BOOLEAN -> 'Z'
+        PsiType.VOID -> 'V'
+        else -> throw IllegalArgumentException("Unsupported primitive type: $this")
     }
 
-val PsiClassType.internalName: String
-    get() = TypeConversionUtil.erasure(this).canonicalText.replace('.', '/')
+private fun PsiClassType.erasure() = TypeConversionUtil.erasure(this) as PsiClassType
+
+val PsiClassType.internalName
+    get() = erasure().resolve()!!.internalName
+
+fun PsiClassType.appendInternalName(builder: StringBuilder): StringBuilder = erasure().resolve()!!.appendInternalName(builder)
 
 val PsiType.descriptor: String
     get() = appendDescriptor(StringBuilder()).toString()
 
 fun PsiType.appendDescriptor(builder: StringBuilder): StringBuilder {
     return when (this) {
-        is PsiPrimitiveType -> builder.append(internalName!!)
+        is PsiPrimitiveType -> builder.append(internalName)
         is PsiArrayType -> componentType.appendDescriptor(builder.append('['))
-        is PsiClassType -> builder.append('L').append(internalName).append(';')
+        is PsiClassType -> appendInternalName(builder.append('L')).append(';')
         else -> throw IllegalArgumentException("Unsupported PsiType: $this")
     }
 }
 
 // Class
 
-val PsiClass.internalName: String?
-    get() = qualifiedName?.replace('.', '/')
+val PsiClass.internalName: String
+    get() = getQualifiedJavaName(INTERNAL_CLASS_SEPARATOR)
+
+fun PsiClass.appendInternalName(builder: StringBuilder): StringBuilder {
+    return appendQualifiedJavaName(builder, INTERNAL_CLASS_SEPARATOR)
+}
 
 val PsiClass.descriptor: String?
-    get() {
-        val internalName = internalName ?: return null
-        return "L$internalName;"
-    }
+    get() = appendInternalName(StringBuilder().append('L')).append(';').toString()
 
-fun PsiClass.appendDescriptor(builder: StringBuilder): StringBuilder = builder.append('L').append(internalName!!).append(';')
+fun PsiClass.appendDescriptor(builder: StringBuilder): StringBuilder = appendInternalName(builder.append('L')).append(';')
 
 fun PsiClass.findMethodsByInternalName(internalName: String, checkBases: Boolean = false): Stream<PsiMethod> {
     return (if (internalName == INTERNAL_CONSTRUCTOR_NAME) {

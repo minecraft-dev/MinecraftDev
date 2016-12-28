@@ -14,11 +14,14 @@ import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.platform.mixin.reference.createMethodReference
 import com.demonwav.mcdev.platform.mixin.util.findSource
 import com.demonwav.mcdev.util.findParent
+import com.demonwav.mcdev.util.mapToArray
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.psi.JavaRecursiveElementWalkingVisitor
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMember
@@ -28,14 +31,15 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.PsiTypeElement
+import com.intellij.psi.ResolveResult
 import com.intellij.util.ProcessingContext
 
 internal class MixinTargetReferenceProvider : PsiReferenceProvider() {
 
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
         val at = findParent<PsiAnnotation>(element, false)!!
-        val injectionPointTypeValue = at.findAttributeValue("value") ?: return PsiReference.EMPTY_ARRAY
-        val type = TargetReferenceInjectionPointType.find((injectionPointTypeValue as PsiLiteral).value as String)
+        val injectionPointTypeValue = at.findAttributeValue("value") as? PsiLiteral ?: return PsiReference.EMPTY_ARRAY
+        val type = TargetReferenceInjectionPointType.find(injectionPointTypeValue.value as String)
                 ?: return PsiReference.EMPTY_ARRAY
         val reference = type.createReference(element, at) ?: return PsiReference.EMPTY_ARRAY
         return arrayOf(reference)
@@ -70,7 +74,8 @@ private enum class TargetReferenceInjectionPointType(vararg val types: String) {
 
     fun createReference(element: PsiElement, at: PsiAnnotation): MixinReference? {
         val injectorAnnotation = findParent<PsiAnnotation>(at.parent, false)
-        val methodReference = createMethodReference(injectorAnnotation!!.findAttributeValue("method")!!) ?: return null
+        val methodValue = injectorAnnotation!!.findAttributeValue("method")!! as? PsiLiteral ?: return null
+        val methodReference = createMethodReference(methodValue) ?: return null
         return createReferenceForMethod(element as PsiLiteral, methodReference)
     }
 
@@ -95,7 +100,7 @@ private enum class TargetReferenceInjectionPointType(vararg val types: String) {
 
 }
 
-internal abstract class TargetReference(element: PsiLiteral, val methodReference: MixinReference)
+internal abstract class TargetReference<T>(element: PsiLiteral, val methodReference: MixinReference)
     : PsiReferenceBase.Poly<PsiLiteral>(element), MixinReference {
 
     protected val targetMethod
@@ -103,6 +108,49 @@ internal abstract class TargetReference(element: PsiLiteral, val methodReference
 
     override fun validate() = if (multiResolve(false).isNotEmpty()) MixinReference.State.VALID else MixinReference.State.UNRESOLVED
 
+    protected abstract fun createFindUsagesVisitor(): CollectVisitor<out PsiElement>
+    protected abstract fun createCollectMethodsVisitor(): CollectVisitor<T>
+
+    protected abstract fun createLookup(targetClass: PsiClass, element: T): LookupElementBuilder
+
+    override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
+        val codeBlock = targetMethod?.body ?: return ResolveResult.EMPTY_ARRAY
+
+        val visitor = createFindUsagesVisitor()
+        codeBlock.accept(visitor)
+
+        return visitor.result.mapToArray(::PsiElementResolveResult)
+    }
+
+    override fun getVariants(): Array<out Any> {
+        // TODO: Right now this will only work for Mixins with a single target class
+        val target = this.targetMethod ?: return LookupElementBuilder.EMPTY_ARRAY
+        val codeBlock = target.body ?: return LookupElementBuilder.EMPTY_ARRAY
+
+        // Collect all possible targets
+        val visitor = createCollectMethodsVisitor()
+        codeBlock.accept(visitor)
+
+        val targetClass = target.containingClass!!
+        return visitor.result
+                .mapToArray { createLookup(targetClass, it) }
+    }
+
+}
+
+internal abstract class QualifiedTargetReference<T : PsiMember>(element: PsiLiteral, methodReference: MixinReference)
+    : TargetReference<QualifiedMember<T>>(element, methodReference) {
+
+    protected abstract fun createLookup(targetClass: PsiClass, m: T, qualifier: PsiClassType?): LookupElementBuilder
+
+    override fun createLookup(targetClass: PsiClass, element: QualifiedMember<T>): LookupElementBuilder {
+        return qualifyLookup(createLookup(targetClass, element.member, element.qualifier), targetClass, element.member)
+    }
+
+}
+
+internal abstract class CollectVisitor<T> : JavaRecursiveElementWalkingVisitor() {
+    val result = ArrayList<T>()
 }
 
 internal fun findQualifierType(reference: PsiQualifiedReference): PsiClassType? {
@@ -114,7 +162,7 @@ internal fun findQualifierType(reference: PsiQualifiedReference): PsiClassType? 
     }
 }
 
-internal data class QualifiedMember<out T>(val member: T, val qualifier: PsiClassType?) {
+internal data class QualifiedMember<T : PsiMember>(val member: T, val qualifier: PsiClassType?) {
     constructor(member: T, reference: PsiQualifiedReference) : this(member, findQualifierType(reference))
 }
 

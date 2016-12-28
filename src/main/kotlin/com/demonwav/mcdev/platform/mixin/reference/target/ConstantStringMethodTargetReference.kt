@@ -12,7 +12,9 @@ package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.util.getQualifiedInternalNameAndDescriptor
+import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteral
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiType
@@ -22,10 +24,10 @@ internal class ConstantStringMethodTargetReference(element: PsiLiteral, methodRe
     : BaseMethodTargetReference(element, methodReference) {
 
     override val description: String
-        get() = "method target '$value' in target method"
+        get() = "method '$value' in target method"
 
-    override fun createFindUsagesVisitor(): FindUsagesVisitor = FindConstantStringMethodUsagesVisitor(value)
-    override fun createCollectMethodsVisitor(): CollectMethodsVisitor = CollectConstantStringMethodUsagesVisitor()
+    override fun createFindUsagesVisitor(): CollectVisitor<PsiExpression> = FindConstantStringMethodUsagesVisitor(value)
+    override fun createCollectMethodsVisitor(): CollectVisitor<QualifiedMember<PsiMethod>> = CollectConstantStringMethodUsagesVisitor()
 
 }
 
@@ -51,26 +53,28 @@ private fun isConstantStringMethodCall(expression: PsiMethodCallExpression): Boo
     }
 }
 
-private class FindConstantStringMethodUsagesVisitor(val qinad: String): FindUsagesVisitor() {
+private class FindConstantStringMethodUsagesVisitor(val qinad: String): CollectVisitor<PsiExpression>() {
 
     override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
         if (isConstantStringMethodCall(expression)) {
             val method = expression.resolveMethod()
             if (method != null && method.getQualifiedInternalNameAndDescriptor(findQualifierType(expression.methodExpression)) == this.qinad) {
-                usages.add(expression)
+                result.add(expression)
             }
         }
+
+        super.visitMethodCallExpression(expression)
     }
 
 }
 
-private class CollectConstantStringMethodUsagesVisitor : CollectMethodsVisitor() {
+private class CollectConstantStringMethodUsagesVisitor : CollectVisitor<QualifiedMember<PsiMethod>>() {
 
     override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
         if (isConstantStringMethodCall(expression)) {
             val method = expression.resolveMethod()
             if (method != null) {
-                methods.add(QualifiedMember(method, expression.methodExpression))
+                result.add(QualifiedMember(method, expression.methodExpression))
             }
         }
 
