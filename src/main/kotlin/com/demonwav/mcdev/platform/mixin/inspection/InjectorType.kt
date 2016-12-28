@@ -26,13 +26,12 @@ internal enum class InjectorType(val annotation: String) {
     INJECT(MixinConstants.Annotations.INJECT) {
 
         override fun expectedMethodParameters(annotation: PsiAnnotation, targetMethod: PsiMethod): List<ParameterGroup> {
-            val targetParameters = targetMethod.parameterList
             val returnType = targetMethod.returnType
 
             val result = ArrayList<ParameterGroup>()
 
             // Parameters from injected method (optional)
-            result.add(ParameterGroup(targetParameters.parameters.map(::Parameter), required = false, default = true))
+            result.add(ParameterGroup(collectMethodParameters(targetMethod), required = false, default = true))
 
             // Callback info (required)
             result.add(ParameterGroup(listOf(if (returnType == null || returnType == PsiType.VOID) {
@@ -66,6 +65,25 @@ internal enum class InjectorType(val annotation: String) {
     companion object {
 
         private val injectionPointAnnotations = InjectorType.values().associateBy { it.annotation }
+
+        internal fun collectMethodParameters(targetMethod: PsiMethod): List<Parameter> {
+            val parameters = targetMethod.parameterList.parameters
+            val list = ArrayList<Parameter>(parameters.size)
+
+            // Special handling for enums: When compiled, the Java compiler
+            // prepends the name and the ordinal to the constructor
+            if (targetMethod.isConstructor) {
+                val containingClass = targetMethod.containingClass
+                if (containingClass != null && containingClass.isEnum) {
+                    list.add(Parameter("enumName", PsiType.getJavaLangString(targetMethod.manager, targetMethod.resolveScope)))
+                    list.add(Parameter("ordinal", PsiType.INT))
+                }
+            }
+
+            // Add method parameters to list
+            parameters.mapTo(list, ::Parameter)
+            return list
+        }
 
         internal fun findAnnotations(element: PsiAnnotationOwner): List<Pair<InjectorType, PsiAnnotation>> {
             return element.annotations.mapNotNull {
