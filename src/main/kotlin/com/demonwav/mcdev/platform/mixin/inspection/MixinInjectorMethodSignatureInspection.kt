@@ -43,9 +43,9 @@ class MixinInjectorMethodSignatureInspection : BaseJavaBatchLocalInspectionTool(
             val targetMethod = createMethodReference(methodAttribute)?.resolveFirstIfValid() as? PsiMethod ?: continue
 
             val static = targetMethod.hasModifierProperty(PsiModifier.STATIC)
-            if (static != modifiers.hasModifierProperty(PsiModifier.STATIC)) {
+            if (static &&! modifiers.hasModifierProperty(PsiModifier.STATIC)) {
                 problems.add(manager.createProblemDescriptor(identifier,
-                        if (static) "Method should be static" else "Method should not be static",
+                        "Method must be be static",
                         QuickFixFactory.getInstance().createModifierListFix(modifiers, PsiModifier.STATIC, static, false),
                         ProblemHighlightType.GENERIC_ERROR, isOnTheFly))
             }

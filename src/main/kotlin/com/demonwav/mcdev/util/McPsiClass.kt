@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2016 minecraft-dev
+ *
+ * MIT License
+ */
+
 @file:JvmName("McPsiClass")
 package com.demonwav.mcdev.util
 

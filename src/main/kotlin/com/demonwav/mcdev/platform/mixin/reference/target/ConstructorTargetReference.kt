@@ -15,10 +15,10 @@ import com.demonwav.mcdev.util.internalName
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiLiteral
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNewExpression
 
-internal class ConstructorTargetReference(element: PsiLiteral, methodReference: MixinReference)
+internal class ConstructorTargetReference(element: PsiElement, methodReference: MixinReference)
     : TargetReference<PsiClass>(element, methodReference) {
 
     override val description: String

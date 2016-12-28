@@ -16,12 +16,12 @@ import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
-import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReferenceExpression
 
-internal class FieldTargetReference(element: PsiLiteral, methodReference: MixinReference)
+internal class FieldTargetReference(element: PsiElement, methodReference: MixinReference)
     : QualifiedTargetReference<PsiField>(element, methodReference) {
 
     override val description: String

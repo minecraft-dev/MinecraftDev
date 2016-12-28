@@ -11,13 +11,12 @@
 package com.demonwav.mcdev.platform.mixin.reference
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.INJECTION_POINT
-import com.demonwav.mcdev.util.toArray
+import com.demonwav.mcdev.util.mapToArray
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiReference
-import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ClassInheritorsSearch
@@ -31,13 +30,12 @@ internal class MixinInjectionPointTypeReferenceProvider : PsiReferenceProvider()
         val project = element.project
         val baseClass = JavaPsiFacade.getInstance(project)
                 .findClass(INJECTION_POINT, GlobalSearchScope.allScope(project)) ?: return PsiReference.EMPTY_ARRAY
-        return arrayOf(InjectionPointTypeReference(element as PsiLiteral, baseClass))
+        return arrayOf(InjectionPointTypeReference(element, baseClass))
     }
 
 }
 
-private class InjectionPointTypeReference(element: PsiLiteral, val baseClass: PsiClass) :
-        PsiReferenceBase<PsiLiteral>(element), MixinReference {
+private class InjectionPointTypeReference(element: PsiElement, val baseClass: PsiClass) : ConstantLiteralReference(element) {
 
     override val description
         get() = "injection point type '$value'"
@@ -56,6 +54,9 @@ private class InjectionPointTypeReference(element: PsiLiteral, val baseClass: Ps
 
     override fun resolve() = injectionPointTypes[value]
 
-    override fun getVariants() = injectionPointTypes.keys.toArray()
+    override fun getVariants() = injectionPointTypes.keys
+            .mapToArray {
+                patchLookup(LookupElementBuilder.create(it))
+            }
 
 }

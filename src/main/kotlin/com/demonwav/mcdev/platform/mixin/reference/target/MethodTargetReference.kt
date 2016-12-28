@@ -14,13 +14,13 @@ import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.util.getQualifiedInternalNameAndDescriptor
 import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
-import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiNewExpression
 
-internal class MethodTargetReference(element: PsiLiteral, methodReference: MixinReference)
+internal class MethodTargetReference(element: PsiElement, methodReference: MixinReference)
     : BaseMethodTargetReference(element, methodReference) {
 
     override val description: String

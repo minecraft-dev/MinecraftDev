@@ -10,10 +10,13 @@
 
 package com.demonwav.mcdev.platform.mixin.reference.target
 
+import com.demonwav.mcdev.platform.mixin.reference.ConstantLiteralReference
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
+import com.demonwav.mcdev.platform.mixin.reference.constantValue
 import com.demonwav.mcdev.platform.mixin.reference.createMethodReference
 import com.demonwav.mcdev.platform.mixin.util.findSource
 import com.demonwav.mcdev.util.findParent
+import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.mapToArray
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor
@@ -23,12 +26,10 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiExpression
-import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiReference
-import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.PsiTypeElement
 import com.intellij.psi.ResolveResult
@@ -38,9 +39,8 @@ internal class MixinTargetReferenceProvider : PsiReferenceProvider() {
 
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
         val at = findParent<PsiAnnotation>(element, false)!!
-        val injectionPointTypeValue = at.findAttributeValue("value") as? PsiLiteral ?: return PsiReference.EMPTY_ARRAY
-        val type = TargetReferenceInjectionPointType.find(injectionPointTypeValue.value as String)
-                ?: return PsiReference.EMPTY_ARRAY
+        val injectionPointTypeValue = at.findAttributeValue("value")?.constantValue ?: return PsiReference.EMPTY_ARRAY
+        val type = TargetReferenceInjectionPointType.find(injectionPointTypeValue) ?: return PsiReference.EMPTY_ARRAY
         val reference = type.createReference(element, at) ?: return PsiReference.EMPTY_ARRAY
         return arrayOf(reference)
     }
@@ -49,34 +49,33 @@ internal class MixinTargetReferenceProvider : PsiReferenceProvider() {
 
 private enum class TargetReferenceInjectionPointType(vararg val types: String) {
     INVOKE("INVOKE", "INVOKE_ASSIGN") {
-        override fun createReferenceForMethod(element: PsiLiteral, methodReference: MixinReference): MixinReference {
+        override fun createReferenceForMethod(element: PsiElement, methodReference: MixinReference): MixinReference {
             return MethodTargetReference(element, methodReference)
         }
     },
     INVOKE_STRING("INVOKE_STRING") {
-        override fun createReferenceForMethod(element: PsiLiteral, methodReference: MixinReference): MixinReference {
+        override fun createReferenceForMethod(element: PsiElement, methodReference: MixinReference): MixinReference {
             return ConstantStringMethodTargetReference(element, methodReference)
         }
 
     },
     FIELD("FIELD") {
-        override fun createReferenceForMethod(element: PsiLiteral, methodReference: MixinReference): MixinReference {
+        override fun createReferenceForMethod(element: PsiElement, methodReference: MixinReference): MixinReference {
             return FieldTargetReference(element, methodReference)
         }
     },
     NEW("NEW") {
-        override fun createReferenceForMethod(element: PsiLiteral, methodReference: MixinReference): MixinReference {
+        override fun createReferenceForMethod(element: PsiElement, methodReference: MixinReference): MixinReference {
             return ConstructorTargetReference(element, methodReference)
         }
     };
 
-    abstract fun createReferenceForMethod(element: PsiLiteral, methodReference: MixinReference): MixinReference
+    abstract fun createReferenceForMethod(element: PsiElement, methodReference: MixinReference): MixinReference
 
     fun createReference(element: PsiElement, at: PsiAnnotation): MixinReference? {
-        val injectorAnnotation = findParent<PsiAnnotation>(at.parent, false)
-        val methodValue = injectorAnnotation!!.findAttributeValue("method")!! as? PsiLiteral ?: return null
+        val methodValue = findParent<PsiAnnotation>(at.parent, false)!!.findAttributeValue("method")!!
         val methodReference = createMethodReference(methodValue) ?: return null
-        return createReferenceForMethod(element as PsiLiteral, methodReference)
+        return createReferenceForMethod(element, methodReference)
     }
 
     companion object {
@@ -100,8 +99,8 @@ private enum class TargetReferenceInjectionPointType(vararg val types: String) {
 
 }
 
-internal abstract class TargetReference<T>(element: PsiLiteral, val methodReference: MixinReference)
-    : PsiReferenceBase.Poly<PsiLiteral>(element), MixinReference {
+internal abstract class TargetReference<T>(element: PsiElement, val methodReference: MixinReference)
+    : ConstantLiteralReference.Poly(element) {
 
     protected val targetMethod
         get() = (methodReference.resolve() as? PsiMethod)?.findSource()
@@ -133,12 +132,12 @@ internal abstract class TargetReference<T>(element: PsiLiteral, val methodRefere
 
         val targetClass = target.containingClass!!
         return visitor.result
-                .mapToArray { createLookup(targetClass, it) }
+                .mapToArray { patchLookup(createLookup(targetClass, it)) }
     }
 
 }
 
-internal abstract class QualifiedTargetReference<T : PsiMember>(element: PsiLiteral, methodReference: MixinReference)
+internal abstract class QualifiedTargetReference<T : PsiMember>(element: PsiElement, methodReference: MixinReference)
     : TargetReference<QualifiedMember<T>>(element, methodReference) {
 
     protected abstract fun createLookup(targetClass: PsiClass, m: T, qualifier: PsiClassType?): LookupElementBuilder
@@ -172,6 +171,6 @@ internal fun qualifyLookup(builder: LookupElementBuilder, targetClass: PsiClass,
         builder
     } else {
         // Qualify member with name of owning class
-        builder.withPresentableText(owner.name + '.' + m.name)
+        builder.withPresentableText(owner.name + '.' + ((m as? PsiMethod)?.internalName ?: m.name!!))
     }
 }

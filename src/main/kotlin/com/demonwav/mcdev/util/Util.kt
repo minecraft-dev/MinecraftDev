@@ -44,6 +44,16 @@ fun Collection<*>.toArray(): Array<Any> {
     return (this as java.util.Collection<*>).toArray()
 }
 
+@Suppress("UNCHECKED_CAST")
+inline fun <T, reified R> Collection<T>.mapToArray(transform: (T) -> R): Array<R> {
+    val result = arrayOfNulls<R>(size)
+    var i = 0
+    for (e in this) {
+        result[i++] = transform(e)
+    }
+    return result as Array<R>
+}
+
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size, { i -> transform(this[i]) })
 }

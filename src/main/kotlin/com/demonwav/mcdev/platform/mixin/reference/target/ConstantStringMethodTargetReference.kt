@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.util.getQualifiedInternalNameAndDescriptor
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
@@ -20,7 +21,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiVariable
 
-internal class ConstantStringMethodTargetReference(element: PsiLiteral, methodReference: MixinReference)
+internal class ConstantStringMethodTargetReference(element: PsiElement, methodReference: MixinReference)
     : BaseMethodTargetReference(element, methodReference) {
 
     override val description: String

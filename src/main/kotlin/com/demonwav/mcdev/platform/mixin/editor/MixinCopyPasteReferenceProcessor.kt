@@ -77,7 +77,7 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
         val targetNames = targets.mapNotNull { it.qualifiedName }
 
         for ((i, data) in referenceData.withIndex()) {
-            if (data !is MixinReferenceData || !targetNames.contains(data.qClassName)) {
+            if (data !is MixinReferenceData || data.qClassName !in targetNames) {
                 continue
             }
 
@@ -94,7 +94,7 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
 
             // Check if reference already exists in Mixin class
             val name = data.staticMemberName!!
-            if (name.contains('(')) {
+            if ('(' in name) {
                 // Check if method does not already exist in target class
                 if (psiClass.findMethodsByInternalNameAndDescriptor(name).findAny().isPresent) {
                     continue
@@ -135,7 +135,7 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
 
                 val name = data.staticMemberName!!
 
-                if (name.contains('(')) {
+                if ('(' in name) {
                     // Add target method
                     val targetMethod = targetClass.findMethodsByInternalNameAndDescriptor(name).findAny().orElse(null) ?: continue
                     members.add(targetMethod)

@@ -20,10 +20,8 @@ import com.demonwav.mcdev.util.internalNameAndDescriptor
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiReference
-import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.ResolveResult
@@ -47,26 +45,10 @@ fun createMethodReference(element: PsiElement): MixinReference? {
 
     return when (targets.size) {
         0 -> null
-        1 -> MethodReferenceSingleTarget(element as PsiLiteral, targets.single())
-        else -> MethodReferenceMultipleTargets(element as PsiLiteral, targets)
+        1 -> MethodReferenceSingleTarget(element, targets.single())
+        else -> MethodReferenceMultipleTargets(element, targets)
     }
 }
-
-private fun createLookup(methods: Stream<PsiMethod>, uniqueMethods: Set<String>): Array<Any> {
-    return methods
-            .map { m ->
-                val name = if (uniqueMethods.contains(m.internalName)) {
-                    m.internalName
-                } else {
-                    // We need to qualify the name with the descriptor
-                    m.internalNameAndDescriptor
-                }
-
-                JavaLookupElementBuilder.forMethod(m, name, PsiSubstitutor.EMPTY, null)
-                        .withPresentableText(m.internalName)
-            }.toArray()
-}
-
 private fun PsiClass.findMethodsForValue(value: String): Stream<PsiMethod> {
     if (value.endsWith('*')) {
         return findMethodsByInternalName(value.substring(0, value.length - 1))
@@ -75,8 +57,26 @@ private fun PsiClass.findMethodsForValue(value: String): Stream<PsiMethod> {
     }
 }
 
-private class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiClass) :
-        PsiReferenceBase.Poly<PsiLiteral>(element), MixinReference.Poly {
+private abstract class MethodReference(element: PsiElement) : ConstantLiteralReference.Poly(element) {
+
+    protected fun createLookup(methods: Stream<PsiMethod>, uniqueMethods: Set<String>): Array<Any> {
+        return methods
+                .map { m ->
+                    val name = if (m.internalName in uniqueMethods) {
+                        m.internalName
+                    } else {
+                        // We need to qualify the name with the descriptor
+                        m.internalNameAndDescriptor
+                    }
+
+                    patchLookup(JavaLookupElementBuilder.forMethod(m, name, PsiSubstitutor.EMPTY, null)
+                            .withPresentableText(m.internalName))
+                }.toArray()
+    }
+
+}
+
+private class MethodReferenceSingleTarget(element: PsiElement, val target: PsiClass) : MethodReference(element) {
 
     override val description: String
         get() = "method '$value' in target class"
@@ -115,8 +115,7 @@ private class MethodReferenceSingleTarget(element: PsiLiteral, val target: PsiCl
 
 }
 
-private class MethodReferenceMultipleTargets(element: PsiLiteral, val targets: Collection<PsiClass>) :
-        PsiReferenceBase.Poly<PsiLiteral>(element), MixinReference.Poly {
+private class MethodReferenceMultipleTargets(element: PsiElement, val targets: Collection<PsiClass>) : MethodReference(element) {
 
     override val description: String
         get() = "method '$value' in all target classes"
