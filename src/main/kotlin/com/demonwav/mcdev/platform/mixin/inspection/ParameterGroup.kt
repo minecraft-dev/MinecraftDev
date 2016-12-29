@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.mixin.inspection
 
 import com.demonwav.mcdev.util.Parameter
 import com.intellij.psi.PsiParameter
+import com.intellij.psi.util.TypeConversionUtil
 
 internal data class ParameterGroup(val parameters: List<Parameter>?, val required: Boolean = true, val default: Boolean = required) {
 
@@ -36,7 +37,8 @@ internal data class ParameterGroup(val parameters: List<Parameter>?, val require
 
         // Check parameter types
         for ((_, type) in this.parameters) {
-            if (type != parameters[pos++].type) {
+            // TODO: Do more checks for generics
+            if (TypeConversionUtil.erasure(type) != TypeConversionUtil.erasure(parameters[pos++].type)) {
                 return false
             }
         }

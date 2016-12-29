@@ -106,7 +106,15 @@ internal abstract class TargetReference<T>(element: PsiElement, val methodRefere
     protected val targetMethod
         get() = (methodReference.resolve() as? PsiMethod)?.findSource()
 
-    override fun validate() = if (multiResolve(false).isNotEmpty()) MixinReference.State.VALID else MixinReference.State.UNRESOLVED
+    override fun validate(): MixinReference.State {
+        // If we couldn't even resolve the method reference, the issue
+        // is probably not in the target reference
+        return if (multiResolve(false).isEmpty() && targetMethod != null) {
+            MixinReference.State.UNRESOLVED
+        } else {
+            MixinReference.State.VALID
+        }
+    }
 
     protected abstract fun createFindUsagesVisitor(): CollectVisitor<out PsiElement>?
     protected abstract fun createCollectMethodsVisitor(): CollectVisitor<T>
