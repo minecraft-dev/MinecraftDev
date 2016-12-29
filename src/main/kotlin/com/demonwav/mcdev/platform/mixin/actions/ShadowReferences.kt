@@ -10,10 +10,9 @@
 
 package com.demonwav.mcdev.platform.mixin.actions
 
-import com.demonwav.mcdev.util.findFieldByNameAndDescriptor
-import com.demonwav.mcdev.util.findMethodsByInternalNameAndDescriptor
-import com.demonwav.mcdev.util.internalNameAndDescriptor
-import com.demonwav.mcdev.util.nameAndDescriptor
+import com.demonwav.mcdev.util.findField
+import com.demonwav.mcdev.util.findMethods
+import com.demonwav.mcdev.util.memberDescriptor
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -21,6 +20,7 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiJavaCodeReferenceElement
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.util.containers.isEmpty
 import java.util.stream.Stream
 
 internal fun collectRequiredMembers(element: PsiElement, psiClass: PsiClass): List<PsiMember> {
@@ -54,8 +54,8 @@ private class CollectRequiredClassMembersVisitor(val psiClass: PsiClass) : JavaR
 internal fun filterNewShadows(requiredMembers: Collection<PsiMember>, psiClass: PsiClass): Stream<PsiMember> {
     return requiredMembers.stream().filter { m ->
         when(m) {
-            is PsiMethod -> !psiClass.findMethodsByInternalNameAndDescriptor(m.internalNameAndDescriptor).findAny().isPresent
-            is PsiField -> psiClass.findFieldByNameAndDescriptor(m.nameAndDescriptor) == null
+            is PsiMethod -> psiClass.findMethods(m.memberDescriptor).isEmpty()
+            is PsiField -> psiClass.findField(m.memberDescriptor) == null
             else -> throw UnsupportedOperationException("Unsupported member type: ${m.javaClass.name}")
         }
     }

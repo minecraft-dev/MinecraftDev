@@ -33,6 +33,7 @@ import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.project.Project
+import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
@@ -201,7 +202,7 @@ private fun copyAnnotations(project: Project, modifiers: PsiModifierList, newMod
     }
 
     // Copy @Deprecated annotation
-    copyAnnotation(modifiers, newModifiers, "java.lang.Deprecated")
+    copyAnnotation(modifiers, newModifiers, CommonClassNames.JAVA_LANG_DEPRECATED)
 }
 
 private fun copyAnnotation(modifiers: PsiModifierList, newModifiers: PsiModifierList, annotation: String) {

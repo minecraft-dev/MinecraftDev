@@ -206,7 +206,7 @@ fun createResolveResults(elements: Stream<out PsiElement>): Array<ResolveResult>
             .toTypedArray()
 }
 
-fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement?): Stream<T> {
+fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement): Stream<T> {
     filter ?: return this
     return filter { filter.isClassAcceptable(it.javaClass) && filter.isAcceptable(it, context) }
 }

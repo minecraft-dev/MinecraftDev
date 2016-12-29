@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
-import com.demonwav.mcdev.util.getQualifiedInternalNameAndDescriptor
+import com.demonwav.mcdev.util.MemberDescriptor
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClassType
@@ -27,12 +27,16 @@ internal class MethodTargetReference(element: PsiElement, methodReference: Mixin
     override val description: String
         get() = "method '$value' in target method"
 
-    override fun createFindUsagesVisitor(): CollectVisitor<PsiElement> = FindMethodUsagesVisitor(value)
+    override fun createFindUsagesVisitor(): CollectVisitor<PsiElement>? {
+        val descriptor = MemberDescriptor.parse(value) ?: return null
+        return FindMethodUsagesVisitor(descriptor)
+    }
+
     override fun createCollectMethodsVisitor(): CollectVisitor<QualifiedMember<PsiMethod>> = CollectCalledMethodsVisitor()
 
 }
 
-private abstract class CollectMethodsVisitor<T>  : CollectVisitor<T>() {
+private abstract class CollectMethodsVisitor<T> : CollectVisitor<T>() {
 
     protected abstract fun visitMethodUsage(method: PsiMethod, qualifier: PsiClassType?, source: PsiElement)
 
@@ -90,10 +94,10 @@ private abstract class CollectMethodsVisitor<T>  : CollectVisitor<T>() {
 
 }
 
-private class FindMethodUsagesVisitor(val qinad: String) : CollectMethodsVisitor<PsiElement>() {
+private class FindMethodUsagesVisitor(val descriptor: MemberDescriptor) : CollectMethodsVisitor<PsiElement>() {
 
     override fun visitMethodUsage(method: PsiMethod, qualifier: PsiClassType?, source: PsiElement) {
-        if (method.getQualifiedInternalNameAndDescriptor(qualifier) == this.qinad) {
+        if (descriptor.match(method, qualifier)) {
             result.add(source)
         }
     }

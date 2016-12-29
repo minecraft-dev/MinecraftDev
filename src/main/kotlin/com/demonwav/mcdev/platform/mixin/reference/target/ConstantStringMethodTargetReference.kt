@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
-import com.demonwav.mcdev.util.getQualifiedInternalNameAndDescriptor
+import com.demonwav.mcdev.util.MemberDescriptor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteral
@@ -27,7 +27,11 @@ internal class ConstantStringMethodTargetReference(element: PsiElement, methodRe
     override val description: String
         get() = "method '$value' in target method"
 
-    override fun createFindUsagesVisitor(): CollectVisitor<PsiExpression> = FindConstantStringMethodUsagesVisitor(value)
+    override fun createFindUsagesVisitor(): CollectVisitor<PsiExpression>? {
+        val descriptor = MemberDescriptor.parse(value) ?: return null
+        return FindConstantStringMethodUsagesVisitor(descriptor)
+    }
+
     override fun createCollectMethodsVisitor(): CollectVisitor<QualifiedMember<PsiMethod>> = CollectConstantStringMethodUsagesVisitor()
 
 }
@@ -54,12 +58,12 @@ private fun isConstantStringMethodCall(expression: PsiMethodCallExpression): Boo
     }
 }
 
-private class FindConstantStringMethodUsagesVisitor(val qinad: String): CollectVisitor<PsiExpression>() {
+private class FindConstantStringMethodUsagesVisitor(val descriptor: MemberDescriptor): CollectVisitor<PsiExpression>() {
 
     override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
         if (isConstantStringMethodCall(expression)) {
             val method = expression.resolveMethod()
-            if (method != null && method.getQualifiedInternalNameAndDescriptor(findQualifierType(expression.methodExpression)) == this.qinad) {
+            if (method != null && descriptor.match(method, findQualifierType(expression.methodExpression))) {
                 result.add(expression)
             }
         }

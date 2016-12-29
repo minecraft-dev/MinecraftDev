@@ -11,7 +11,8 @@
 package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
-import com.demonwav.mcdev.util.getQualifiedInternalNameAndDescriptor
+import com.demonwav.mcdev.util.MemberDescriptor
+import com.demonwav.mcdev.util.getQualifiedMemberDescriptor
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiClass
@@ -27,24 +28,27 @@ internal class FieldTargetReference(element: PsiElement, methodReference: MixinR
     override val description: String
         get() = "field '$value' in target method"
 
-    override fun createFindUsagesVisitor(): CollectVisitor<PsiReferenceExpression> = FindFieldUsagesVisitor(value)
+    override fun createFindUsagesVisitor(): CollectVisitor<PsiReferenceExpression>? {
+        val descriptor = MemberDescriptor.parse(value) ?: return null
+        return FindFieldUsagesVisitor(descriptor)
+    }
     override fun createCollectMethodsVisitor(): CollectVisitor<QualifiedMember<PsiField>> = CollectReferencedFieldsVisitor()
 
     override fun createLookup(targetClass: PsiClass, m: PsiField, qualifier: PsiClassType?): LookupElementBuilder {
-        return JavaLookupElementBuilder.forField(m, m.getQualifiedInternalNameAndDescriptor(qualifier), targetClass)
+        return JavaLookupElementBuilder.forField(m, m.getQualifiedMemberDescriptor(qualifier).toString(), targetClass)
                 .withPresentableText(m.name!!)
                 .withLookupString(m.name!!)
     }
 
 }
 
-private class FindFieldUsagesVisitor(val qnad: String) : CollectVisitor<PsiReferenceExpression>() {
+private class FindFieldUsagesVisitor(val descriptor: MemberDescriptor) : CollectVisitor<PsiReferenceExpression>() {
 
     override fun visitReferenceExpression(expression: PsiReferenceExpression) {
         if (expression !is PsiMethodReferenceExpression) {
             // TODO: Optimize this so we don't need to resolve all fields to find a reference
             val resolved = expression.resolve()
-            if (resolved is PsiField && resolved.getQualifiedInternalNameAndDescriptor(findQualifierType(expression)) == this.qnad) {
+            if (resolved is PsiField && descriptor.match(resolved, findQualifierType(expression))) {
                 result.add(expression)
             }
         }

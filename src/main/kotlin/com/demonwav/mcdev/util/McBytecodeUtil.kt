@@ -23,7 +23,6 @@ import com.intellij.util.containers.stream
 import java.util.stream.Stream
 
 private const val INTERNAL_CONSTRUCTOR_NAME = "<init>"
-private const val INTERNAL_CLASS_SEPARATOR = '/'
 
 // Type
 
@@ -63,10 +62,19 @@ fun PsiType.appendDescriptor(builder: StringBuilder): StringBuilder {
 // Class
 
 val PsiClass.internalName: String
-    get() = getQualifiedJavaName(INTERNAL_CLASS_SEPARATOR)
+    get() {
+        val parentClass = containingClass ?: return qualifiedName!!.replace('.', '/')
+        return buildInternalName(StringBuilder(), parentClass).toString()
+    }
 
 fun PsiClass.appendInternalName(builder: StringBuilder): StringBuilder {
-    return appendQualifiedJavaName(builder, INTERNAL_CLASS_SEPARATOR)
+    val parentClass = containingClass ?: return builder.append(qualifiedName!!.replace('.', '/'))
+    return buildInternalName(builder, parentClass)
+}
+
+private fun PsiClass.buildInternalName(builder: StringBuilder, parentClass: PsiClass): StringBuilder {
+    buildInnerName(builder, parentClass, { builder.append(it.qualifiedName!!.replace('.', '/')) })
+    return builder
 }
 
 val PsiClass.descriptor: String?
@@ -82,26 +90,30 @@ fun PsiClass.findMethodsByInternalName(internalName: String, checkBases: Boolean
     }).stream()
 }
 
-fun PsiClass.findMethodsByInternalNameAndDescriptor(inad: String, checkBases: Boolean = false): Stream<PsiMethod> {
-    val pos = inad.indexOf('(')
+fun PsiClass.findMethods(member: MemberDescriptor, checkBases: Boolean = false): Stream<PsiMethod> {
+    if (!member.matchOwner(this)) {
+        return Stream.empty()
+    }
 
-    return if (pos >= 0) {
-        val descriptor = inad.substring(pos)
-        findMethodsByInternalName(inad.substring(0, pos), checkBases)
-                .filter { descriptor == it.descriptor }
+    val result = findMethodsByInternalName(member.name, checkBases)
+    return if (member.descriptor != null) {
+        result.filter { it.descriptor == member.descriptor }
     } else {
-        findMethodsByInternalName(inad, checkBases)
+        result
     }
 }
 
-fun PsiClass.findFieldByNameAndDescriptor(nad: String, checkBases: Boolean = false): PsiField? {
-    val pos = nad.indexOf(':')
-    return if (pos >= 0) {
-        val field = findFieldByName(nad.substring(0, pos), checkBases)
-        if (field?.descriptor == nad.substring(pos + 1)) field else null
-    } else {
-        findFieldByName(nad, checkBases)
+fun PsiClass.findField(member: MemberDescriptor, checkBases: Boolean = false): PsiField? {
+    if (!member.matchOwner(this)) {
+        return null
     }
+
+    val field = findFieldByName(member.name, checkBases) ?: return null
+    if (member.descriptor != null && member.descriptor != field.descriptor) {
+        return null
+    }
+
+    return field
 }
 
 // Method
@@ -109,17 +121,8 @@ fun PsiClass.findFieldByNameAndDescriptor(nad: String, checkBases: Boolean = fal
 val PsiMethod.internalName: String
     get() = if (isConstructor) INTERNAL_CONSTRUCTOR_NAME else name
 
-
-val PsiMethod.internalNameAndDescriptor: String
-    get() = appendDescriptor(StringBuilder(internalName)).toString()
-
 val PsiMethod.descriptor: String
     get() = appendDescriptor(StringBuilder()).toString()
-
-fun PsiMethod.getQualifiedInternalNameAndDescriptor(qualifier: PsiClassType?): String {
-    return appendDescriptor((qualifier?.appendDescriptor(StringBuilder()) ?: containingClass!!.appendDescriptor(StringBuilder()))
-            .append(internalName)).toString()
-}
 
 fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
     builder.append('(')
@@ -130,17 +133,30 @@ fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
     return (returnType ?: PsiType.VOID).appendDescriptor(builder)
 }
 
+val PsiMethod.memberDescriptor
+    get() = MemberDescriptor(internalName, descriptor)
+
+val PsiMethod.qualifiedMemberDescriptor
+    get() = MemberDescriptor(internalName, descriptor, containingClass!!.fullQualifiedName)
+
+fun PsiMethod.getQualifiedMemberDescriptor(qualifier: PsiClassType?): MemberDescriptor {
+    qualifier ?: return qualifiedMemberDescriptor
+    return MemberDescriptor(internalName, descriptor, qualifier.fullQualifiedName)
+}
+
 // Field
-
-val PsiField.nameAndDescriptor: String
-    get() = appendDescriptor(StringBuilder(name).append(':')).toString()
-
 val PsiField.descriptor: String
     get() = appendDescriptor(StringBuilder()).toString()
 
-fun PsiField.getQualifiedInternalNameAndDescriptor(qualifier: PsiClassType?): String {
-    return appendDescriptor((qualifier?.appendDescriptor(StringBuilder()) ?: containingClass!!.appendDescriptor(StringBuilder()))
-            .append(name).append(':')).toString()
-}
-
 fun PsiField.appendDescriptor(builder: StringBuilder): StringBuilder = type.appendDescriptor(builder)
+
+val PsiField.memberDescriptor
+    get() = MemberDescriptor(name!!, descriptor)
+
+val PsiField.qualifiedMemberDescriptor
+    get() = MemberDescriptor(name!!, descriptor, containingClass!!.fullQualifiedName)
+
+fun PsiField.getQualifiedMemberDescriptor(qualifier: PsiClassType?): MemberDescriptor {
+    qualifier ?: return qualifiedMemberDescriptor
+    return MemberDescriptor(name!!, descriptor, qualifier.fullQualifiedName)
+}

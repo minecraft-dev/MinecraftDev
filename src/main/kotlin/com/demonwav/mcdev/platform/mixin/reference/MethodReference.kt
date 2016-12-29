@@ -11,12 +11,12 @@
 package com.demonwav.mcdev.platform.mixin.reference
 
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.util.MemberDescriptor
 import com.demonwav.mcdev.util.createResolveResults
-import com.demonwav.mcdev.util.findMethodsByInternalName
-import com.demonwav.mcdev.util.findMethodsByInternalNameAndDescriptor
+import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.getClassOfElement
 import com.demonwav.mcdev.util.internalName
-import com.demonwav.mcdev.util.internalNameAndDescriptor
+import com.demonwav.mcdev.util.memberDescriptor
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -49,27 +49,19 @@ fun createMethodReference(element: PsiElement): MixinReference? {
         else -> MethodReferenceMultipleTargets(element, targets)
     }
 }
-private fun PsiClass.findMethodsForValue(value: String): Stream<PsiMethod> {
-    if (value.endsWith('*')) {
-        return findMethodsByInternalName(value.substring(0, value.length - 1))
-    } else {
-        return findMethodsByInternalNameAndDescriptor(value)
-    }
-}
 
 private abstract class MethodReference(element: PsiElement) : ConstantLiteralReference.Poly(element) {
 
     protected fun createLookup(methods: Stream<PsiMethod>, uniqueMethods: Set<String>): Array<Any> {
         return methods
                 .map { m ->
-                    val name = if (m.internalName in uniqueMethods) {
-                        m.internalName
+                    val descriptor = if (m.internalName in uniqueMethods) {
+                        MemberDescriptor(m.internalName)
                     } else {
-                        // We need to qualify the name with the descriptor
-                        m.internalNameAndDescriptor
+                        m.memberDescriptor
                     }
 
-                    patchLookup(JavaLookupElementBuilder.forMethod(m, name, PsiSubstitutor.EMPTY, null)
+                    patchLookup(JavaLookupElementBuilder.forMethod(m, descriptor.toString(), PsiSubstitutor.EMPTY, null)
                             .withPresentableText(m.internalName))
                 }.toArray()
     }
@@ -91,7 +83,8 @@ private class MethodReferenceSingleTarget(element: PsiElement, val target: PsiCl
     }
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-        return createResolveResults(target.findMethodsForValue(value))
+        val member = MemberDescriptor.parse(value) ?: return ResolveResult.EMPTY_ARRAY
+        return createResolveResults(target.findMethods(member))
     }
 
     override fun getVariants(): Array<Any> {
@@ -121,21 +114,20 @@ private class MethodReferenceMultipleTargets(element: PsiElement, val targets: C
         get() = "method '$value' in all target classes"
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
+        val member = MemberDescriptor.parse(value) ?: return ResolveResult.EMPTY_ARRAY
         return createResolveResults(targets.stream()
-                .flatMap { it.findMethodsForValue(value) })
+                .flatMap { it.findMethods(member) })
     }
 
-    override fun validate(results: Array<ResolveResult>) = when (results.size) {
-        0 -> MixinReference.State.UNRESOLVED
-        targets.size -> MixinReference.State.VALID
-        else -> MixinReference.State.UNRESOLVED
-        // TODO: Handle ambiguous references for Mixins with multiple targets
+    override fun validate(results: Array<ResolveResult>): MixinReference.State {
+        // TODO: Verify if target method is present it all targets?
+        return if (multiResolve(false).isEmpty()) MixinReference.State.UNRESOLVED else MixinReference.State.VALID
     }
 
     override fun getVariants(): Array<Any> {
         val methodMap = targets.stream()
                 .flatMap { target -> target.methods.stream() }
-                .collect(Collectors.groupingBy(PsiMethod::internalNameAndDescriptor))
+                .collect(Collectors.groupingBy(PsiMethod::memberDescriptor))
 
         // All methods which are not unique by their name need to be qualified with the descriptor
         val visitedMethods = hashSetOf<String>()

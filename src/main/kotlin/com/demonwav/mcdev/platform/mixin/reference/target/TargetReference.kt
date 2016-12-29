@@ -18,6 +18,7 @@ import com.demonwav.mcdev.platform.mixin.util.findSource
 import com.demonwav.mcdev.util.findParent
 import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.mapToArray
+import com.demonwav.mcdev.util.shortName
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor
 import com.intellij.psi.PsiAnnotation
@@ -107,15 +108,14 @@ internal abstract class TargetReference<T>(element: PsiElement, val methodRefere
 
     override fun validate() = if (multiResolve(false).isNotEmpty()) MixinReference.State.VALID else MixinReference.State.UNRESOLVED
 
-    protected abstract fun createFindUsagesVisitor(): CollectVisitor<out PsiElement>
+    protected abstract fun createFindUsagesVisitor(): CollectVisitor<out PsiElement>?
     protected abstract fun createCollectMethodsVisitor(): CollectVisitor<T>
 
     protected abstract fun createLookup(targetClass: PsiClass, element: T): LookupElementBuilder
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
+        val visitor = createFindUsagesVisitor() ?: return ResolveResult.EMPTY_ARRAY
         val codeBlock = targetMethod?.body ?: return ResolveResult.EMPTY_ARRAY
-
-        val visitor = createFindUsagesVisitor()
         codeBlock.accept(visitor)
 
         return visitor.result.mapToArray(::PsiElementResolveResult)
@@ -171,6 +171,6 @@ internal fun qualifyLookup(builder: LookupElementBuilder, targetClass: PsiClass,
         builder
     } else {
         // Qualify member with name of owning class
-        builder.withPresentableText(owner.name + '.' + ((m as? PsiMethod)?.internalName ?: m.name!!))
+        builder.withPresentableText(owner.shortName + '.' + ((m as? PsiMethod)?.internalName ?: m.name!!))
     }
 }

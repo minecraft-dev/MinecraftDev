@@ -14,54 +14,75 @@ package com.demonwav.mcdev.util
 import com.intellij.navigation.AnonymousElementProvider
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 
-private const val CLASS_SEPARATOR = '.'
-private const val INNER_CLASS_SEPARATOR = '$'
+// Type
 
-val PsiClass.qualifiedJavaName: String
-    get() = getQualifiedJavaName()
+val PsiClassType.fullQualifiedName
+    get() = resolve()!!.fullQualifiedName
 
-fun PsiClass.getQualifiedJavaName(separator: Char = CLASS_SEPARATOR): String {
-    // Check if class is an inner class, otherwise just return the qualified name (replace separator if needed)
-    val parentClass = containingClass ?:
-            return if (separator == '.') qualifiedName!! else qualifiedName!!.replace(CLASS_SEPARATOR, separator)
+// Class
 
-    // Build the name for the inner class
-    return buildQualifiedInnerName(StringBuilder(), parentClass, separator).toString()
-}
-
-fun PsiClass.appendQualifiedJavaName(builder: StringBuilder, separator: Char = CLASS_SEPARATOR): StringBuilder {
-    // Check if class is an inner class, otherwise just append the qualified name (replace separator if needed)
-    val parentClass = containingClass ?:
-            return if (separator == '.') builder.append(qualifiedName!!) else builder.append(qualifiedName!!.replace(CLASS_SEPARATOR, separator))
-
-    // Build the name for the inner class
-    return buildQualifiedInnerName(builder, parentClass, separator)
-}
-
-private fun PsiClass.buildQualifiedInnerName(builder: StringBuilder, parentClass: PsiClass, separator: Char): StringBuilder {
-    // Recursively append parent class names
-    parentClass.appendQualifiedJavaName(builder, separator)
-
-    val name = name
-    if (name != null) {
-        return builder.append(INNER_CLASS_SEPARATOR).append(name)
+val PsiClass.fullQualifiedName: String
+    get() {
+        val parentClass = containingClass ?: return qualifiedName!!
+        return buildFullQualifiedName(StringBuilder(), parentClass).toString()
     }
 
-    // Attempt to find name for anonymous class
-    for ((i, element) in anonymousElements!!.withIndex()) {
-        if (manager.areElementsEquivalent(this, element)) {
-            return builder.append(INNER_CLASS_SEPARATOR).append(i + 1)
+fun PsiClass.appendFullQualifiedName(builder: StringBuilder): StringBuilder {
+    val parentClass = containingClass ?: return builder.append(qualifiedName!!)
+    return buildFullQualifiedName(builder, parentClass)
+}
+
+private fun PsiClass.buildFullQualifiedName(builder: StringBuilder, parentClass: PsiClass): StringBuilder {
+    buildInnerName(builder, parentClass, { builder.append(it.qualifiedName!!) })
+    return builder
+}
+
+val PsiClass.shortName: String
+    get() {
+        val parentClass = containingClass ?: return name!!
+        val builder = StringBuilder()
+        buildInnerName(builder, parentClass, { builder.append(it.name!!) }, '.')
+        return builder.toString()
+    }
+
+inline fun PsiClass.buildInnerName(builder: StringBuilder, firstParentClass: PsiClass,
+                                   outer: (PsiClass) -> Unit, separator: Char = '$') {
+    var parentClass: PsiClass? = firstParentClass
+    var currentClass: PsiClass = this
+    val list = ArrayList<String>()
+
+    while (parentClass != null) {
+        val name = currentClass.name
+        if (name != null) {
+            // Named inner class
+            list.add(name)
+        } else {
+            // Attempt to find name for anonymous class
+            for ((i, element) in currentClass.anonymousElements!!.withIndex()) {
+                if (currentClass.manager.areElementsEquivalent(this, element)) {
+                    list.add((i + 1).toString())
+                    break
+                }
+            }
+
+            throw IllegalStateException("Failed to determine anonymous class for $currentClass")
         }
+
+        currentClass = parentClass
+        parentClass = currentClass.containingClass
     }
 
-    throw IllegalStateException("Failed to determine anonymous class for $this")
+    outer(currentClass)
+
+    for (i in list.lastIndex downTo 0) {
+        builder.append(separator).append(list[i])
+    }
 }
 
-
-
-private val PsiElement.anonymousElements: Array<PsiElement>?
+val PsiElement.anonymousElements: Array<PsiElement>?
     get() {
         for (provider in Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
             val elements = provider.getAnonymousElements(this)

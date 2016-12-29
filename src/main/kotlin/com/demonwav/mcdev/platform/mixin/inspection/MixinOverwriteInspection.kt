@@ -12,9 +12,9 @@ package com.demonwav.mcdev.platform.mixin.inspection
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
-import com.demonwav.mcdev.util.findMethodsByInternalNameAndDescriptor
+import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.getClassOfElement
-import com.demonwav.mcdev.util.internalNameAndDescriptor
+import com.demonwav.mcdev.util.memberDescriptor
 import com.intellij.codeInspection.BaseJavaBatchLocalInspectionTool
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.LocalQuickFix
@@ -38,18 +38,21 @@ class MixinOverwriteInspection : BaseJavaBatchLocalInspectionTool() {
 
         val psiClass = getClassOfElement(method) ?: return null
         val targets = MixinUtils.getAllMixedClasses(psiClass).values
+        if (targets.isEmpty()) {
+            return null
+        }
 
-        val inad = method.internalNameAndDescriptor
+        val descriptor = method.memberDescriptor
 
         when (targets.size) {
             0 -> return null
-            1 -> targets.single().findMethodsByInternalNameAndDescriptor(inad).findAny().orElse(null)
-            else -> {
+            1 -> targets.single().findMethods(descriptor).findAny().orElse(null)
+            else ->
                 // TODO: Improve detection of valid target methods in Mixins with multiple targets
                 targets.stream()
-                        .flatMap { it.findMethodsByInternalNameAndDescriptor(inad) }
+                        .flatMap { it.findMethods(descriptor) }
                         .findAny().orElse(null)
-            }
+
         } ?: return arrayOf(manager.createProblemDescriptor(identifier, "Cannot resolve method '${method.name}' in target class",
                 null as LocalQuickFix?, ProblemHighlightType.GENERIC_ERROR, isOnTheFly))
 

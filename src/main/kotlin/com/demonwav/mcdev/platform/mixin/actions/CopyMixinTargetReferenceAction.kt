@@ -10,9 +10,8 @@
 
 package com.demonwav.mcdev.platform.mixin.actions
 
-import com.demonwav.mcdev.util.appendDescriptor
 import com.demonwav.mcdev.util.findReferencedMember
-import com.demonwav.mcdev.util.getClassOfElement
+import com.demonwav.mcdev.util.qualifiedMemberDescriptor
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys.CARET
@@ -32,22 +31,14 @@ class CopyMixinTargetReferenceAction : AnAction() {
 
         val element = file.findElementAt(caret.offset) ?: return
         val member = findReferencedMember(element) ?: return
-        val classElement = getClassOfElement(member) ?: return
-        classElement.qualifiedName ?: return
 
-        val builder = StringBuilder()
-        classElement.appendDescriptor(builder).append(member.name)
-
-        when (member) {
-            is PsiField -> {
-                member.appendDescriptor(builder.append(':'))
-            }
-            is PsiMethod -> {
-                member.appendDescriptor(builder)
-            }
+        val descriptor = when (member) {
+            is PsiMethod -> member.qualifiedMemberDescriptor
+            is PsiField -> member.qualifiedMemberDescriptor
+            else -> return
         }
 
-        CopyPasteManager.getInstance().setContents(StringSelection(builder.toString()))
+        CopyPasteManager.getInstance().setContents(StringSelection(descriptor.toString()))
         WindowManager.getInstance().getStatusBar(project).info = "Mixin target reference has been copied."
     }
 

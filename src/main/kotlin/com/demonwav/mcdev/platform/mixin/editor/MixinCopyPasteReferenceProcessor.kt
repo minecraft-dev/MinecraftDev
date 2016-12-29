@@ -12,12 +12,11 @@ package com.demonwav.mcdev.platform.mixin.editor
 
 import com.demonwav.mcdev.platform.mixin.actions.insertShadows
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
-import com.demonwav.mcdev.util.findFieldByNameAndDescriptor
-import com.demonwav.mcdev.util.findMethodsByInternalNameAndDescriptor
+import com.demonwav.mcdev.util.findField
+import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.findParent
 import com.demonwav.mcdev.util.getClassOfElement
-import com.demonwav.mcdev.util.internalNameAndDescriptor
-import com.demonwav.mcdev.util.nameAndDescriptor
+import com.demonwav.mcdev.util.qualifiedMemberDescriptor
 import com.intellij.codeInsight.editorActions.JavaCopyPasteReferenceProcessor
 import com.intellij.codeInsight.editorActions.ReferenceData
 import com.intellij.openapi.editor.RangeMarker
@@ -29,6 +28,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiJavaCodeReferenceElement
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.util.containers.isEmpty
 import java.util.ArrayList
 
 /**
@@ -43,21 +43,19 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
         val reference = element as? PsiJavaCodeReferenceElement ?: return
         val resolved = reference.advancedResolve(false).element as? PsiMember ?: return
 
-        val name = when (resolved) {
+        val descriptor = when (resolved) {
             is PsiMethod -> {
                 if (resolved.isConstructor) {
                     return
                 }
 
-                resolved.internalNameAndDescriptor
+                resolved.qualifiedMemberDescriptor
             }
-            is PsiField -> resolved.nameAndDescriptor
+            is PsiField -> resolved.qualifiedMemberDescriptor
             else -> return
         }
 
-        val resolvedOwner = resolved.containingClass ?: return
-        val qualifiedName = resolvedOwner.qualifiedName ?: return
-        to.add(MixinReferenceData.create(element, startOffset, qualifiedName, name))
+        to.add(MixinReferenceData.create(element, startOffset, descriptor))
     }
 
     override fun findReferencesToRestore(file: PsiFile, bounds: RangeMarker, referenceData: Array<out ReferenceData>)
@@ -96,12 +94,12 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
             val name = data.staticMemberName!!
             if ('(' in name) {
                 // Check if method does not already exist in target class
-                if (psiClass.findMethodsByInternalNameAndDescriptor(name).findAny().isPresent) {
+                if (!psiClass.findMethods(data.descriptor).isEmpty()) {
                     continue
                 }
             } else {
                 // Field
-                if (psiClass.findFieldByNameAndDescriptor(name, false) != null) {
+                if (psiClass.findField(data.descriptor) != null) {
                     continue
                 }
             }
@@ -137,11 +135,11 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
 
                 if ('(' in name) {
                     // Add target method
-                    val targetMethod = targetClass.findMethodsByInternalNameAndDescriptor(name).findAny().orElse(null) ?: continue
+                    val targetMethod = targetClass.findMethods(data.descriptor).findAny().orElse(null) ?: continue
                     members.add(targetMethod)
                 } else {
                     // Add target field
-                    val targetField = targetClass.findFieldByNameAndDescriptor(name) ?: continue
+                    val targetField = targetClass.findField(data.descriptor) ?: continue
                     members.add(targetField)
                 }
             } finally {
