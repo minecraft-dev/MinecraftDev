@@ -37,8 +37,7 @@ internal enum class InjectorType(val annotation: String) {
             result.add(ParameterGroup(listOf(if (returnType == null || returnType == PsiType.VOID) {
                 Parameter("ci", callbackInfoType(targetMethod.project)!!)
             } else {
-                Parameter("cir", callbackInfoReturnableType(targetMethod.project,
-                        if (returnType is PsiPrimitiveType) returnType.getBoxedType(targetMethod)!! else returnType)!!)
+                Parameter("cir", callbackInfoReturnableType(targetMethod.project, targetMethod, returnType)!!)
             })))
 
             // Captured locals (only if local capture is enabled)
