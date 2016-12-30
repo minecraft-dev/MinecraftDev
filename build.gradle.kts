@@ -10,6 +10,7 @@
 
 import net.minecrell.gradle.licenser.LicenseExtension
 import net.minecrell.gradle.licenser.Licenser
+import org.gradle.api.file.CopySpec
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
@@ -20,7 +21,6 @@ import org.jetbrains.intellij.IntelliJPlugin
 import org.jetbrains.intellij.IntelliJPluginExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.File
 
 buildscript {
     repositories {
@@ -58,7 +58,6 @@ apply {
     plugin<Licenser>()
 }
 
-
 group = pluginGroup
 version = pluginVersion
 
@@ -70,7 +69,19 @@ repositories {
 }
 
 dependencies {
-    compile(kotlinModule("stdlib-jre8", kotlinVersion as String))
+    compile(kotlinModule("stdlib-jre8", kotlinVersion as String) as String) {
+        // JetBrains annotations are already bundled with IntelliJ IDEA
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
+
+    // Add an additional dependency on kotlin-runtime. It is essentially useless
+    // (since kotlin-runtime is a transitive dependency of kotlin-stdlib-jre8)
+    // but without kotlin-stdlib or kotlin-runtime on the classpath,
+    // gradle-intellij-plugin will add IntelliJ IDEA's Kotlin version to the
+    // dependencies which conflicts with our newer version.
+    compile(kotlinModule("runtime", kotlinVersion as String) as String) {
+        isTransitive = false
+    }
 }
 
 configure<IntelliJPluginExtension> {
@@ -92,13 +103,14 @@ configure<IntelliJPluginExtension> {
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
-configure<IdeaModel> {
-    project.apply {
-        jdkName = "1.8"
-        setLanguageLevel("1.8")
-    }
+configure<JavaPluginConvention> {
+    setSourceCompatibility(javaVersion)
+    setTargetCompatibility(javaVersion)
+}
 
+configure<IdeaModel> {
     module.apply {
+        generatedSourceDirs.add(file("gen"))
         excludeDirs.add(file(the<IntelliJPluginExtension>().sandboxDirectory))
     }
 }
@@ -116,18 +128,12 @@ configure<LicenseExtension> {
     newLine = true
 }
 
-val initPropTask = task("initProp") {
-    val baseProp = File("src/main/resources/messages.MinecraftDevelopment_en.properties")
-    val baseEnglishProp = File("src/main/resources/messages.MinecraftDevelopment.properties")
-
-    val comment =
-        "# Do not manually edit this file\n" +
-        "# This file is automatically copied from messages.MinecraftDevelopment_en_US.properties at build time\n"
-
-    val baseUsEnglish = File("src/main/resources/messages.MinecraftDevelopment_en_US.properties")
-
-    baseProp.writeText(comment + baseUsEnglish.readText())
-    baseEnglishProp.writeText(comment + baseUsEnglish.readText())
+(tasks.getByName("processResources") as CopySpec).apply {
+    for (lang in arrayOf("", "_en")) {
+        from("src/main/resources/messages.MinecraftDevelopment_en_US.properties") {
+            rename { "messages.MinecraftDevelopment$lang.properties" }
+        }
+    }
 }
 
 // Credit for this intellij-rust https://github.com/intellij-rust/intellij-rust/blob/master/build.gradle#L114
@@ -145,8 +151,8 @@ val generateAtLexer = task<JavaExec>("generateAtLexer") {
         src
     )
 
-    inputs.file(file(src))
-    inputs.dir(file(dst + lexerFileName))
+    inputs.file(src)
+    outputs.file(dst + lexerFileName)
 }
 
 /*
@@ -182,27 +188,22 @@ val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
     inputs.file(file(src))
     outputs.dir(fileTree(mapOf(
         "dir" to dstRoot + "/com/demonwav/mcdev/platform/mcp/at/gen/",
-        "include" to "**/*.java"
+        "include" to "**/*.java",
+        "exclude" to "AtLexer.java"
     )))
 
-    classpath("$buildDir/classes/main", "$buildDir/resources/main", pathingJar.archivePath, fileTree(mapOf(
-        "dir" to "libs/",
-        "include" to "**/*.jar"
-    )))
+    classpath(pathingJar.archivePath, file("libs/grammar-kit-1.5.0.jar"))
 }
 
 val generate = task("generate") {
     dependsOn(generateAtLexer, generateAtPsiAndParser)
 }
 
-val java = the<JavaPluginConvention>().sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME).java
-java.setSrcDirs(arrayListOf(java.srcDirs, file("gen")))
+the<JavaPluginConvention>().sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME).java.srcDir("gen")
 
 tasks.withType<JavaCompile> {
     dependsOn(generate)
     options.encoding = "UTF-8"
-    sourceCompatibility = javaVersion as String
-    targetCompatibility = javaVersion as String
 }
 
 tasks.withType<KotlinCompile> {
@@ -211,13 +212,11 @@ tasks.withType<KotlinCompile> {
 }
 
 if (project.hasProperty("intellijJre")) {
-    tasks.withType<JavaExec> {
-        executable(project.properties["intellijJre"] as String)
+    afterEvaluate {
+        (tasks.getByName("runIdea") as JavaExec).apply {
+            executable(project.properties["intellijJre"] as String)
+        }
     }
-}
-
-afterEvaluate {
-    getTasksByName("prepareSandbox", false).forEach { it.dependsOn("initProp") }
 }
 
 defaultTasks("build")
