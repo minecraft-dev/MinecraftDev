@@ -95,4 +95,5 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
         const val CANARY_INF_TEMPLATE = "canary_plugin_description_file.inf"
         const val CANARY_POM_TEMPLATE = "canary_pom_template.xml"
     }
+
 }
