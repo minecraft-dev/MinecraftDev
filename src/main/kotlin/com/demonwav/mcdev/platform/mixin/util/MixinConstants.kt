@@ -15,13 +15,14 @@ internal object MixinConstants {
     const val SMAP_STRATUM = "Mixin"
 
     object Classes {
-        const val INJECTION_POINT = "org.spongepowered.asm.mixin.injection.InjectionPoint"
         const val CALLBACK_INFO = "org.spongepowered.asm.mixin.injection.callback.CallbackInfo"
         const val CALLBACK_INFO_RETURNABLE = "org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable"
+        const val INJECTION_POINT = "org.spongepowered.asm.mixin.injection.InjectionPoint"
     }
 
     object Annotations {
         const val AT = "org.spongepowered.asm.mixin.injection.At"
+        const val AT_CODE = "org.spongepowered.asm.mixin.injection.InjectionPoint.AtCode"
         const val DEBUG = "org.spongepowered.asm.mixin.Debug"
         const val FINAL = "org.spongepowered.asm.mixin.Final"
         const val IMPLEMENTS = "org.spongepowered.asm.mixin.Implements"
