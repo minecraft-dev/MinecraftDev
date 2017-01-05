@@ -64,9 +64,7 @@ public class AtGotoDeclarationHandler implements GotoDeclarationHandler {
             return null;
         }
 
-        // Recompute if we don't already have it just in case
-        SrgManager.getInstance(mcpModule).recomputeIfNullAndGetSrgMap();
-        final SrgMap srgMap = SrgManager.getInstance(mcpModule).getSrgMapNow();
+        final SrgMap srgMap = mcpModule.getSrgManager().getSrgMapNow();
         if (srgMap == null) {
             return null;
         }

@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.mcp.actions;
 
 import com.demonwav.mcdev.platform.mcp.McpModule;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
-import com.demonwav.mcdev.platform.mcp.srg.SrgManager;
 import com.demonwav.mcdev.platform.mcp.srg.SrgMap;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.platform.mixin.util.ShadowedMembers;
@@ -64,8 +63,7 @@ public class GotoAtEntryAction extends AnAction {
             return;
         }
 
-        final SrgManager srgManager = SrgManager.getInstance(mcpModule);
-        srgManager.recomputeIfNullAndGetSrgMap().done(srgMap -> {
+        mcpModule.getSrgManager().getSrgMap().done(srgMap -> {
             PsiElement parent = data.getElement().getParent();
 
             final ShadowedMembers shadowedMembers = MixinUtils.getShadowedElement(parent);

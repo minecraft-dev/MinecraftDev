@@ -16,7 +16,6 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtAsterisk
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
-import com.demonwav.mcdev.platform.mcp.srg.SrgManager
 import com.demonwav.mcdev.platform.mcp.srg.SrgMap
 import com.demonwav.mcdev.platform.mcp.util.McpUtil
 import com.intellij.codeInspection.LocalInspectionTool
@@ -47,7 +46,7 @@ class AtUsageInspection : LocalInspectionTool() {
 
                 val mcpModule = instance.getModuleOfType(McpModuleType.getInstance()) ?: return
 
-                val srgMap = SrgManager.getInstance(mcpModule).srgMapNow ?: return
+                val srgMap = mcpModule.srgManager.srgMapNow ?: return
                 val member = if (element.function != null) {
                     element.function
                 } else if (element.fieldName != null) {

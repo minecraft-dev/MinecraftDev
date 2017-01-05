@@ -28,14 +28,20 @@ import java.util.Set;
 import javax.swing.Icon;
 
 public class McpModule extends AbstractModule {
+
+    private final McpModuleSettings settings;
     final Set<VirtualFile> accessTransformers = Sets.newHashSet();
+    private SrgManager srgManager = new SrgManager();
 
     public McpModule(@NotNull Module module) {
         super(module);
+
+        this.settings = McpModuleSettings.getInstance(module);
+        srgManager.parse(getSettings().getMappingFiles());
+
         this.buildSystem = BuildSystem.getInstance(module);
         if (buildSystem != null) {
             buildSystem.reImport(module);
-            SrgManager.getInstance(this).recomputeIfNullAndGetSrgMap().rejected(System.out::println);
         }
     }
 
@@ -62,6 +68,19 @@ public class McpModule extends AbstractModule {
     @Override
     public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
         return "";
+    }
+
+    public McpModuleSettings.State getSettings() {
+        return settings.getState();
+    }
+
+    public SrgManager getSrgManager() {
+        return srgManager;
+    }
+
+    public void updateSettings(McpModuleSettings.State data) {
+        this.settings.loadState(data);
+        srgManager.parse(data.getMappingFiles());
     }
 
     public Set<VirtualFile> getAccessTransformers() {

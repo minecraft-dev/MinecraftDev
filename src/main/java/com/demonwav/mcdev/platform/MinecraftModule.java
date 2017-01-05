@@ -49,19 +49,22 @@ import java.util.function.Consumer;
 
 import javax.swing.Icon;
 
-public class MinecraftModule {
+public final class MinecraftModule {
 
     private static final Map<Module, MinecraftModule> map = new HashMap<>();
     private static final Set<Consumer<MinecraftModule>> readyWaiters = Sets.newConcurrentHashSet();
 
-    private Module module;
-    private BuildSystem buildSystem;
+    private final Module module;
+    private final BuildSystem buildSystem;
     private final Map<AbstractModuleType<?>, AbstractModule> modules = new ConcurrentHashMap<>();
 
+    private MinecraftModule(Module module, BuildSystem buildSystem) {
+        this.module = module;
+        this.buildSystem = buildSystem;
+    }
+
     private static MinecraftModule generate(@NotNull List<AbstractModuleType<?>> types, @NotNull Module module) {
-        final MinecraftModule minecraftModule = new MinecraftModule();
-        minecraftModule.module = module;
-        minecraftModule.buildSystem = BuildSystem.getInstance(module);
+        final MinecraftModule minecraftModule = new MinecraftModule(module, BuildSystem.getInstance(module));
         if (minecraftModule.buildSystem != null) {
             minecraftModule.buildSystem.reImport(module).done(buildSystem -> {
                 types.forEach(minecraftModule::register);

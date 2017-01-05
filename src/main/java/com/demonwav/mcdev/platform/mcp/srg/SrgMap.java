@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
  * An immutable instance of the SrgMap API. This can be used to find mappings between
  */
 public final class SrgMap {
-    private final Set<File> mappingFiles;
 
     // Key: MCP
     // Value: SRG
@@ -45,11 +44,10 @@ public final class SrgMap {
     private final BiMap<String, String> fieldMap = HashBiMap.create();
     private final BiMap<String, String> methodMap = HashBiMap.create();
 
-    SrgMap(@NotNull Set<File> mappingFiles) throws IOException {
-        this.mappingFiles = mappingFiles;
-
+    public SrgMap(@NotNull Set<String> mappingFiles) throws IOException {
         // currently only read mcpToSrg
-        for (File mappingFile : mappingFiles) {
+        for (String mappingPath : mappingFiles) {
+            File mappingFile = new File(mappingPath);
             if (mappingFile.getName().equals("mcp-srg.srg")) {
                 final List<String> lines = Files.readAllLines(mappingFile.toPath());
                 for (String line : lines) {

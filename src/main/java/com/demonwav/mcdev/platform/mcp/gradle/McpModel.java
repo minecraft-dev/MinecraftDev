@@ -8,15 +8,16 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mcp;
+package com.demonwav.mcdev.platform.mcp.gradle;
 
-import java.io.File;
 import java.util.Set;
 
-public interface MinecraftDevModel {
-    Set<File> getMappingFiles();
+public interface McpModel {
 
     String getMinecraftVersion();
 
     String getMcpVersion();
+
+    Set<String> getMappingFiles();
+
 }
