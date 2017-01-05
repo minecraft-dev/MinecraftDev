@@ -22,26 +22,43 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.PsiParameter
+import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiReference
+import com.intellij.psi.ResolveResult
+import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import org.jetbrains.annotations.Contract
 import java.util.Collections
 import java.util.stream.Collectors
+import java.util.stream.Stream
 
 @JvmOverloads
 @Contract(value = "null, _ -> null", pure = true)
 fun getClassOfElement(element: PsiElement?, resolveReferences: Boolean = false): PsiClass? {
+    return findParent(element, resolveReferences)
+}
+
+@Contract(value = "null -> null", pure = true)
+fun findReferencedMember(element: PsiElement?): PsiMember? {
+    return findParent(element, true)
+}
+
+@Contract(value = "null -> null", pure = true)
+inline fun <reified T : PsiElement> findParent(element: PsiElement?, resolveReferences: Boolean = false): T? {
     var el = element
     while (el != null) {
         if (resolveReferences && el is PsiReference) {
-            el = el.resolve()
+            el = el.resolve() ?: return null
         }
 
-        if (el is PsiClass) {
+        if (el is T) {
             return el
         }
 
@@ -49,10 +66,44 @@ fun getClassOfElement(element: PsiElement?, resolveReferences: Boolean = false):
             return null
         }
 
-        el = el?.parent
+        el = el.parent
     }
 
     return null
+}
+
+inline fun <reified T : PsiElement> findChild(element: PsiElement): T? {
+    val firstChild = element.firstChild ?: return null
+    return findSibling(firstChild, false)
+}
+
+inline fun <reified T : PsiElement> findSibling(element: PsiElement, strict: Boolean = true): T? {
+    var sibling = if (strict) element.nextSibling else element
+
+    while (sibling != null) {
+        if (sibling is T) {
+            return sibling
+        }
+
+        sibling = sibling.nextSibling
+    }
+
+    return null
+}
+
+inline fun findLastChild(element: PsiElement, condition: (PsiElement) -> Boolean): PsiElement? {
+    var child = element.firstChild
+    var lastChild: PsiElement? = null
+
+    while (child != null) {
+        if (condition.invoke(child)) {
+            lastChild = child
+        }
+
+        child = child.nextSibling
+    }
+
+    return lastChild
 }
 
 fun extendsOrImplementsClass(psiClass: PsiClass, qualifiedClassName: String): Boolean {
@@ -147,4 +198,19 @@ fun getNameOfClass(psiClass: PsiClass?): Pair<String, PsiClass>? {
     Collections.reverse(innerStrings)
     // Skip the base class, we are giving the base PsiClass so the user can do with it what they want
     return Pair.create("$" + innerStrings.stream().skip(1).collect(Collectors.joining("$")), baseClass)
+}
+
+fun createResolveResults(elements: Stream<out PsiElement>): Array<ResolveResult> {
+    return elements
+            .map(::PsiElementResolveResult)
+            .toTypedArray()
+}
+
+fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement): Stream<T> {
+    filter ?: return this
+    return filter { filter.isClassAcceptable(it.javaClass) && filter.isAcceptable(it, context) }
+}
+
+fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
+    ChangeSignatureUtil.synchronizeList(this, newParams, {it.parameters.asList()}, BooleanArray(newParams.size))
 }

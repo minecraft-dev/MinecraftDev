@@ -87,15 +87,16 @@ public class StaticMixinMemberInspection extends BaseInspection {
                     return false;
                 }
 
-                final PsiModifierList modifierList = mixin.getModifierList();
+                final PsiModifierList modifierList = member.getModifierList();
 
                 if (modifierList == null) {
                     return false;
                 }
 
                 final boolean isOverwrite = member instanceof PsiMethod && McPsiUtil.getAnnotation(member, MixinConstants.Annotations.OVERWRITE) != null;
+                final boolean isShadow = modifierList.findAnnotation(MixinConstants.Annotations.SHADOW) != null;
 
-                return !isOverwrite && member.hasModifierProperty(PsiModifier.PUBLIC) && member.hasModifierProperty(PsiModifier.STATIC);
+                return !isOverwrite && !isShadow && member.hasModifierProperty(PsiModifier.PUBLIC) && member.hasModifierProperty(PsiModifier.STATIC);
             }
         };
     }

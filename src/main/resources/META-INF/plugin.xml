@@ -68,6 +68,12 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mixin.gradle.MixinDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
 
+        <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinReferenceContributor"/>
+        <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionContributor"
+                                order="last, before javaLegacy"/>
+        <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionConfidence"
+                               order="before javaSkipAutopopupInStrings"/>
+
         <!-- Project-independent Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ColorLineMarkerProvider"/>
@@ -79,6 +85,9 @@
         <!-- Mixin Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.MixinLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.ShadowLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.OverwriteLineMarkerProvider"/>
+
+        <copyPastePostProcessor order="first" implementation="com.demonwav.mcdev.platform.mixin.editor.MixinCopyPasteReferenceProcessor"/>
 
         <!-- MCP CFG file type -->
         <fileTypeFactory implementation="com.demonwav.mcdev.platform.mcp.at.AtFileTypeFactory"/>
@@ -233,7 +242,7 @@
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.MixinClassReferenceInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
         <localInspection displayName="Public static field/method in a Mixin"
                          groupName="Mixin"
                          language="JAVA"
@@ -256,6 +265,27 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspections.FinalInspection"/>
+        <localInspection displayName="Unresolved references"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinReferenceInspection"/>
+        <localInspection displayName="Method signature"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinInjectorMethodSignatureInspection"/>
+        <localInspection displayName="@Overwrite method target"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinOverwriteInspection"/>
 
         <customJavadocTagProvider implementation="com.demonwav.mcdev.platform.mixin.MixinCustomJavaDocTagProvider"/>
 
@@ -340,6 +370,21 @@
                 text="Find Mixins"
                 description="Find classes which mix into this class">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+        </action>
+        <action class="com.demonwav.mcdev.platform.mixin.actions.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
+                text="Copy Mixin target reference"
+                description="Copy the reference to the element for use in an injector">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+        </action>
+        <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateShadowAction" id="GenerateShadowAction"
+                text="Shadow Members..."
+                description="Add a @Shadow for the selected members">
+            <add-to-group group-id="GenerateGroup" anchor="last" />
+        </action>
+        <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateOverwriteAction" id="GenerateOverwriteAction"
+                text="Overwrite Methods..."
+                description="Add an @Overwrite for the selected methods">
+            <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.FindSrgMappingAction" id="FindSrgMappingAction"
                 text="Get SRG Name"

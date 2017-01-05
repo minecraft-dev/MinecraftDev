@@ -11,6 +11,8 @@
 package com.demonwav.mcdev.platform.mcp.srg;
 
 import com.demonwav.mcdev.platform.mcp.util.McpUtil;
+import com.demonwav.mcdev.util.McBytecodeUtil;
+import com.demonwav.mcdev.util.McPsiClass;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.collect.BiMap;
@@ -133,12 +135,7 @@ public final class SrgMap {
     @Nullable
     @Contract("null -> null")
     public static String toString(@Nullable PsiClass psiClass) {
-        final Pair<String, PsiClass> nameOfClass = McPsiUtil.getNameOfClass(psiClass);
-        if (nameOfClass == null) {
-            return null;
-        }
-
-        return McpUtil.replaceDotWithSlash(nameOfClass.getSecond().getQualifiedName()) + nameOfClass.getFirst();
+        return psiClass != null ? McBytecodeUtil.getInternalName(psiClass) : null;
     }
 
     @Nullable

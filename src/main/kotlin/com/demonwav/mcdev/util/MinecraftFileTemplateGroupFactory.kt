@@ -56,6 +56,8 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
         group.addTemplate(FileTemplateDescriptor(CANARY_INF_TEMPLATE, PlatformAssets.CANARY_ICON))
         group.addTemplate(FileTemplateDescriptor(CANARY_POM_TEMPLATE, PlatformAssets.CANARY_ICON))
 
+        group.addTemplate(FileTemplateDescriptor(MIXIN_OVERWRITE_FALLBACK, PlatformAssets.MIXIN_ICON))
+
         return group
     }
 
@@ -94,5 +96,8 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
         const val CANARY_MAIN_CLASS_TEMPLATE = "canary_main_class.java"
         const val CANARY_INF_TEMPLATE = "canary_plugin_description_file.inf"
         const val CANARY_POM_TEMPLATE = "canary_pom_template.xml"
+
+        const val MIXIN_OVERWRITE_FALLBACK = "Mixin Overwrite Fallback.java"
     }
+
 }
