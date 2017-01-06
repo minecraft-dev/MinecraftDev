@@ -274,6 +274,10 @@
 
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspections.ShadowNullabilityInspectionSuppressor"/>
 
+        <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mixin.debug.MixinRunConfigurationExtension"/>
+        <debugger.positionManagerFactory implementation="com.demonwav.mcdev.platform.mixin.debug.MixinPositionManagerFactory"/>
+        <debuggerClassFilterProvider implementation="com.demonwav.mcdev.platform.mixin.debug.MixinDebuggerClassFilterProvider"/>
+        
         <!-- Not ready -->
         <!--<toolWindow id="Minecraft" icon="/assets/icons/platform/Minecraft.png" anchor="right" factoryClass="com.demonwav.mcdev.toolwindow.MinecraftToolWindowFactory"/>-->
     </extensions>
