@@ -29,11 +29,11 @@ fun runWriteTaskLater(func: () -> Unit) {
 }
 
 fun invokeAndWait(func: () -> Unit) {
-    ApplicationManager.getApplication().invokeAndWait({ func() }, ModalityState.current())
+    ApplicationManager.getApplication().invokeAndWait { func() }
 }
 
 fun invokeLater(func: () -> Unit) {
-    ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.current())
+    ApplicationManager.getApplication().invokeLater { func() }
 }
 
 object Util {
