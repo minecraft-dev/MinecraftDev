@@ -11,17 +11,12 @@
 package com.demonwav.mcdev.inspection
 
 import com.demonwav.mcdev.platform.MinecraftModule
-
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiMethodCallExpression
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
 import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
-
-import java.util.Objects
-import java.util.Optional
 
 class IsCancelledInspection : BaseInspection() {
     @Nls
@@ -46,7 +41,7 @@ class IsCancelledInspection : BaseInspection() {
 
                 val useless = instance.modules.stream()
                     .map { m -> m.checkUselessCancelCheck(expression) }
-                    .filter { Objects.nonNull(it) }
+                    .filter { it != null }
                     .findAny()
 
                 if (!useless.isPresent) {

@@ -14,7 +14,6 @@ package com.demonwav.mcdev.util
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.Comparator
-import java.util.Objects
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
@@ -62,7 +61,7 @@ fun sortVersions(versions: Collection<*>): List<String> {
         } catch (e: NumberFormatException) {
             return@map null
         }
-    }.filter(Objects::nonNull).collect(Collectors.toCollection { ArrayList<IntArray>() })
+    }.filter { it != null }.collect(Collectors.toCollection { ArrayList<IntArray>() })
 
     // Sort them correctly
     intList.sortWith(REVERSE_LEXICOGRAPHICAL_ORDER)
