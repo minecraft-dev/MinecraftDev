@@ -54,14 +54,14 @@ fun sortVersions(versions: Collection<*>): List<String> {
 
     // We map each version string (1.2, 1.9.4, 1.10, etc) to an array of integers {1, 2}, {1, 9, 4}, {1, 10} so we
     // can lexicographically order them. We throw out the odd-balls in the process (like 1.10-pre4)
-    val intList = list.stream().distinct().map { s ->
+    val intList = list.stream().distinct().mapNotNull { s ->
         try {
-            return@map Stream.of(*s.split("\\.".toRegex()).dropLastWhile(String::isEmpty).toTypedArray())
+            return@mapNotNull Stream.of(*s.split("\\.".toRegex()).dropLastWhile(String::isEmpty).toTypedArray())
                 .mapToInt { Integer.parseInt(it) }.toArray()
         } catch (e: NumberFormatException) {
-            return@map null
+            return@mapNotNull null
         }
-    }.filter { it != null }.collect(Collectors.toCollection { ArrayList<IntArray>() })
+    }.collect(Collectors.toCollection { ArrayList<IntArray>() })
 
     // Sort them correctly
     intList.sortWith(REVERSE_LEXICOGRAPHICAL_ORDER)
