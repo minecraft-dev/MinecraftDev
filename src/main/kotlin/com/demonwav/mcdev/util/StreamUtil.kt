@@ -16,7 +16,7 @@ import java.util.stream.Stream
  * Filters all `null` elements from the [Stream].
  */
 @Suppress("UNCHECKED_CAST")
-fun <T> Stream<T?>.filterNotNull(): Stream<T> = filter({ it != null }) as Stream<T>
+fun <T> Stream<T?>.filterNotNull(): Stream<T> = filter { it != null } as Stream<T>
 
 /**
  * Maps all elements with the specified mapper function and excludes all
