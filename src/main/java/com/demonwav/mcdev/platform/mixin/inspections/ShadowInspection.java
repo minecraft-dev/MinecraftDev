@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.mixin.inspections;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.mcp.McpModule;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
-import com.demonwav.mcdev.platform.mcp.srg.SrgManager;
 import com.demonwav.mcdev.platform.mcp.srg.SrgMap;
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;

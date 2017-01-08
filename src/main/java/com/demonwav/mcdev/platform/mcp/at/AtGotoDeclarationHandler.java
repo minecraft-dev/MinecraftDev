@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -19,7 +19,6 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFuncName;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes;
-import com.demonwav.mcdev.platform.mcp.srg.SrgManager;
 import com.demonwav.mcdev.platform.mcp.srg.SrgMap;
 import com.demonwav.mcdev.platform.mcp.util.McpUtil;
 

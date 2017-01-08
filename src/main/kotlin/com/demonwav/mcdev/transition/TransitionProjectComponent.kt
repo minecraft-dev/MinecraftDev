@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -11,14 +11,10 @@
 package com.demonwav.mcdev.transition
 
 import com.demonwav.mcdev.platform.MinecraftModuleType
-
 import com.intellij.openapi.components.AbstractProjectComponent
 import com.intellij.openapi.module.JavaModuleType
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
-
-import java.util.Objects
 
 class TransitionProjectComponent(project: Project) : AbstractProjectComponent(project) {
 
