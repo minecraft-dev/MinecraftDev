@@ -345,6 +345,11 @@
                 description="Find classes which mix into this class">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
+        <action class="com.demonwav.mcdev.platform.mixin.actions.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
+                text="Copy Mixin target reference"
+                description="Copy the reference to the element for use in an injector">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+        </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.FindSrgMappingAction" id="FindSrgMappingAction"
                 text="Get SRG Name"
                 description="Find the associated SRG mapping for this element">
