@@ -84,13 +84,10 @@ private val MEMBER_ACCESS_MODIFIERS = ImmutableSet.builder<String>()
     .build()
 
 fun getAccessModifier(member: PsiMember?): String {
-    return if (member != null)
-        MEMBER_ACCESS_MODIFIERS.stream()
-            .filter { member.hasModifierProperty(it) }
-            .findFirst()
-            .orElse(PsiModifier.PUBLIC)
-    else
-        PsiModifier.PUBLIC
+    return MEMBER_ACCESS_MODIFIERS.stream()
+        .filter { member?.hasModifierProperty(it) == true }
+        .findFirst()
+        .orElse(PsiModifier.PUBLIC)
 }
 
 fun getAnnotation(owner: PsiModifierListOwner?, annotationName: String): PsiAnnotation? {
