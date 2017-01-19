@@ -35,6 +35,32 @@ fun invokeLater(func: () -> Unit) {
     ApplicationManager.getApplication().invokeLater { func() }
 }
 
+/**
+ * Returns an untyped array for the specified [Collection].
+ */
+internal fun Collection<*>.toArray(): Array<Any?> {
+    @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
+    return (this as java.util.Collection<*>).toArray()
+}
+
+@Suppress("UNCHECKED_CAST")
+internal inline fun <T, reified R> Collection<T>.mapToArray(transform: (T) -> R): Array<R> {
+    if (this is List) {
+        return this.mapToArray(transform)
+    }
+
+    val result = arrayOfNulls<R>(size)
+    var i = 0
+    for (e in this) {
+        result[i++] = transform(e)
+    }
+    return result as Array<R>
+}
+
+internal inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
+    return Array(size, { i -> transform(this[i]) })
+}
+
 object Util {
     // Java static methods
     @JvmStatic
