@@ -205,9 +205,10 @@ public class GradleBuildSystem extends BuildSystem {
                         );
                     } else {
                         buildGradleText = AbstractTemplate.applyBuildGradleTemplate(project, gradleProp,
-                                                                                    getGroupId(),
-                                                                                    getVersion(),
-                                                                                    getBuildVersion()
+                                getGroupId(),
+                                getArtifactId(),
+                                getVersion(),
+                                getBuildVersion()
                         );
                     }
 
@@ -619,8 +620,10 @@ public class GradleBuildSystem extends BuildSystem {
 
                 AbstractTemplate.applyMultiModuleBuildGradleTemplate(project, buildGradle, gradleProp,
                                                                      getGroupId(),
+                                                                     getArtifactId(),
                                                                      getVersion(),
-                                                                     getBuildVersion()
+                                                                     getBuildVersion(),
+                                                                     configurations.containsKey(PlatformType.SPONGE)
                 );
 
                 AbstractTemplate.applySettingsGradleTemplate(project, settingsGradle, getArtifactId().toLowerCase(), includes);

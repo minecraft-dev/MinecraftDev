@@ -1,11 +1,10 @@
 buildscript {
     repositories {
-        mavenCentral()
         jcenter()
     }
 
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
     }
 }
 
@@ -14,14 +13,13 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'com.github.johnrengelman.shadow'
 
-    group project.pluginGroup
-    version project.pluginVersion
+    group = project.pluginGroup
+    version = project.pluginVersion
 
     sourceCompatibility = '${BUILD_VERSION}'
     targetCompatibility = '${BUILD_VERSION}'
 
     repositories {
         mavenCentral()
-        jcenter()
     }
 }

@@ -6,11 +6,7 @@ dependencies {
     compile project(':${COMMON_PROJECT_NAME}')
 }
 
-processResources {
-    from('src/main/resources') {
-        expand 'version': project.version
-    }
-}
+sponge.plugin.id = pluginId
 
 shadowJar {
     dependencies {
