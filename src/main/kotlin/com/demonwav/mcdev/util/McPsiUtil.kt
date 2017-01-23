@@ -27,10 +27,12 @@ import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.PsiReference
+import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.annotations.Contract
 import java.util.Collections
 import java.util.stream.Collectors
+import java.util.stream.Stream
 
 @JvmOverloads
 @Contract(value = "null, _ -> null", pure = true)
@@ -188,4 +190,9 @@ fun getNameOfClass(psiClass: PsiClass?): Pair<String, PsiClass>? {
     Collections.reverse(innerStrings)
     // Skip the base class, we are giving the base PsiClass so the user can do with it what they want
     return Pair.create("$" + innerStrings.stream().skip(1).collect(Collectors.joining("$")), baseClass)
+}
+
+internal fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement): Stream<T> {
+    filter ?: return this
+    return filter { filter.isClassAcceptable(it.javaClass) && filter.isAcceptable(it, context) }
 }
