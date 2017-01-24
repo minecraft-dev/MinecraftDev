@@ -29,7 +29,6 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
         group.addTemplate(FileTemplateDescriptor(BUNGEECORD_PLUGIN_YML_TEMPLATE, PlatformAssets.BUNGEECORD_ICON))
         group.addTemplate(FileTemplateDescriptor(BUNGEECORD_POM_TEMPLATE, PlatformAssets.BUNGEECORD_ICON))
 
-        group.addTemplate(FileTemplateDescriptor(SPONGE_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.SPONGE_ICON))
         group.addTemplate(FileTemplateDescriptor(SPONGE_BUILD_GRADLE_TEMPLATE, PlatformAssets.SPONGE_ICON))
         group.addTemplate(FileTemplateDescriptor(SPONGE_SUBMODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.SPONGE_ICON))
         group.addTemplate(FileTemplateDescriptor(SPONGE_MAIN_CLASS_TEMPLATE, PlatformAssets.SPONGE_ICON))
@@ -70,7 +69,6 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
         const val BUNGEECORD_PLUGIN_YML_TEMPLATE = "bungeecord_plugin_description_file.yml"
         const val BUNGEECORD_POM_TEMPLATE = "bungeecord_pom_template.xml"
 
-        const val SPONGE_GRADLE_PROPERTIES_TEMPLATE = "sponge_gradle.properties"
         const val SPONGE_BUILD_GRADLE_TEMPLATE = "sponge_build.gradle"
         const val SPONGE_SUBMODULE_BUILD_GRADLE_TEMPLATE = "sponge_submodule_build.gradle"
         const val SPONGE_MAIN_CLASS_TEMPLATE = "sponge_main_class.java"

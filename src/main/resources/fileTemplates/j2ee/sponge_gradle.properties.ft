@@ -1,3 +1,0 @@
-pluginGroup = ${GROUP_ID}
-pluginId = ${PLUGIN_ID}
-pluginVersion = ${PLUGIN_VERSION}
