@@ -70,6 +70,9 @@
 
         <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionContributor"
                                 order="last, before javaLegacy"/>
+        <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinReferenceContributor"/>
+        <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionConfidence"
+                               order="before javaSkipAutopopupInStrings"/>
 
         <!-- Project-independent Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
@@ -271,6 +274,60 @@
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.OverwriteInspection"/>
 
+        <!-- Mixin injectors -->
+        <localInspection displayName="Invalid Mixin member reference"
+                         shortName="InvalidMemberReference"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.InvalidMemberReferenceInspection"/>
+
+        <localInspection displayName="Unresolved reference"
+                         shortName="UnresolvedMixinReference"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnresolvedReferenceInspection"/>
+        <localInspection displayName="Ambiguous reference"
+                         shortName="AmbiguousMixinReference"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.AmbiguousReferenceInspection"/>
+        <localInspection displayName="Unqualified member reference"
+                         shortName="UnqualifiedMemberReference"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnqualifiedMemberReferenceInspection" />
+
+        <localInspection displayName="Unnecessary qualified member reference"
+                         shortName="UnnecessaryQualifiedMemberReference"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WEAK WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnnecessaryQualifiedMemberReferenceInspection"/>
+
+
+        <localInspection displayName="Invalid injector method signature"
+                         shortName="InvalidInjectorMethodSignature"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.signature.InvalidInjectorMethodSignatureInspection"/>
+
         <customJavadocTagProvider implementation="com.demonwav.mcdev.platform.mixin.MixinCustomJavaDocTagProvider"/>
 
         <!-- Project View Node Decorators provide the project icons -->
@@ -368,6 +425,11 @@
                 text="Overwrite Methods..."
                 description="Add an @Overwrite for the selected methods">
             <add-to-group group-id="GenerateGroup" anchor="last" />
+        </action>
+        <action class="com.demonwav.mcdev.platform.mixin.actions.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
+                text="Copy Mixin target reference"
+                description="Copy the reference to the element for use in an injector">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.FindSrgMappingAction" id="FindSrgMappingAction"
                 text="Get SRG Name"

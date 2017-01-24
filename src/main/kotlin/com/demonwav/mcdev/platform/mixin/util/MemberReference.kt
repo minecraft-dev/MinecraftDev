@@ -13,9 +13,13 @@ package com.demonwav.mcdev.platform.mixin.util
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.internalName
+import com.intellij.openapi.project.Project
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
+import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.search.GlobalSearchScope
 import java.io.Serializable
 
 /**
@@ -44,6 +48,20 @@ internal data class MemberReference(internal val name: String, internal val desc
     internal fun match(field: PsiField, qualifier: PsiClass): Boolean {
         return this.name == field.name && matchOwner(qualifier)
                 && (this.descriptor == null || this.descriptor == field.descriptor)
+    }
+
+    internal fun resolve(project: Project, scope: GlobalSearchScope): Pair<PsiClass, PsiMember>? {
+        val psiClass = JavaPsiFacade.getInstance(project).findClass(this.owner!!, scope) ?: return null
+
+        val member: PsiMember? = if (descriptor!!.startsWith('(')) {
+            // Method, we assume there is only one (since this member descriptor is full qualified)
+            psiClass.findMethods(this, checkBases = true).findAny().orElse(null)
+        } else {
+            // Field
+            psiClass.findField(this, checkBases = true)
+        }
+
+        return member?.let { Pair(psiClass, member) }
     }
 
     override fun toString(): String {
