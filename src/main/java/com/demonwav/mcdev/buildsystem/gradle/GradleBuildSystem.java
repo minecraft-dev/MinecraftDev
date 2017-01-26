@@ -444,11 +444,21 @@ public class GradleBuildSystem extends BuildSystem {
         final AsyncPromise<BuildSystem> importPromise = getImportPromise();
         assert importPromise != null;
 
+        if (module.isDisposed()) {
+            importPromise.setResult(this);
+            return importPromise;
+        }
+
         // We must be on the event dispatch thread to run a backgroundable task
         ApplicationManager.getApplication().invokeLater(() ->
             ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Importing Gradle Module", false) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
+                    if (module.isDisposed()) {
+                        importPromise.setResult(GradleBuildSystem.this);
+                        return;
+                    }
+
                     // We will need to request read access, which we can do from async
                     ApplicationManager.getApplication().runReadAction(() -> {
                         Project project = module.getProject();
