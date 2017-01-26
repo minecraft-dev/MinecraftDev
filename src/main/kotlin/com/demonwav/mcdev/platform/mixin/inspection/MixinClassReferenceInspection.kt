@@ -41,6 +41,11 @@ class MixinClassReferenceInspection : MixinInspection() {
                 return
             }
 
+            // Check if the reference is an accessor Mixin
+            if (MixinUtils.isAccessorMixin(classType)) {
+                return
+            }
+
             holder.registerProblem(type, "Mixin class cannot be referenced directly")
         }
 

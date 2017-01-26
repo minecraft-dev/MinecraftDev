@@ -21,6 +21,7 @@ internal object MixinConstants {
     }
 
     object Annotations {
+        const val ACCESSOR = "org.spongepowered.asm.mixin.gen.Accessor"
         const val AT = "org.spongepowered.asm.mixin.injection.At"
         const val AT_CODE = "org.spongepowered.asm.mixin.injection.InjectionPoint.AtCode"
         const val DEBUG = "org.spongepowered.asm.mixin.Debug"
@@ -35,6 +36,7 @@ internal object MixinConstants {
         const val SOFT_OVERRIDE = "org.spongepowered.asm.mixin.SoftOverride"
         const val UNIQUE = "org.spongepowered.asm.mixin.Unique"
         const val INJECT = "org.spongepowered.asm.mixin.injection.Inject"
+        const val INVOKER = "org.spongepowered.asm.mixin.gen.Invoker"
         const val MODIFY_ARG = "org.spongepowered.asm.mixin.injection.ModifyArg"
         const val MODIFY_CONSTANT = "org.spongepowered.asm.mixin.injection.ModifyConstant"
         const val MODIFY_VARIABLE = "org.spongepowered.asm.mixin.injection.ModifyVariable"
