@@ -92,7 +92,7 @@ public class BungeeCordModule extends AbstractModule {
     }
 
     @Override
-    public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
+    public boolean isEventClassValid(@NotNull PsiClass eventClass, @Nullable PsiMethod method) {
         return BungeeCordConstants.EVENT_CLASS.equals(eventClass.getQualifiedName());
     }
 

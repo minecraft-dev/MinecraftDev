@@ -15,8 +15,6 @@ import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
@@ -44,10 +42,5 @@ public class MixinModule extends AbstractModule {
     @Override
     public Icon getIcon() {
         return null;
-    }
-
-    @Override
-    public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
-        return "";
     }
 }

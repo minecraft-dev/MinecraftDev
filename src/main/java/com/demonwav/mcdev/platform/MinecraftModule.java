@@ -63,6 +63,7 @@ public final class MinecraftModule {
         this.buildSystem = buildSystem;
     }
 
+    @NotNull
     private static MinecraftModule generate(@NotNull List<AbstractModuleType<?>> types, @NotNull Module module) {
         final MinecraftModule minecraftModule = new MinecraftModule(module, BuildSystem.getInstance(module));
         if (minecraftModule.buildSystem != null) {
@@ -136,6 +137,7 @@ public final class MinecraftModule {
         return null;
     }
 
+    @Contract(pure = true)
     private static boolean isModuleApplicable(@NotNull Module module) {
         final ModuleType type = ModuleUtil.getModuleType(module);
         if (type == JavaModuleType.getModuleType()) {
@@ -147,10 +149,12 @@ public final class MinecraftModule {
         return false;
     }
 
+    @Contract(pure = true)
     public Module getIdeaModule() {
         return module;
     }
 
+    @Contract(pure = true)
     public BuildSystem getBuildSystem() {
         return buildSystem;
     }
@@ -161,26 +165,35 @@ public final class MinecraftModule {
     }
 
     @NotNull
+    @Contract(pure = true)
     public Collection<AbstractModule> getModules() {
         return modules.values();
     }
 
     @NotNull
+    @Contract(pure = true)
     public Collection<AbstractModuleType<?>> getTypes() {
         return modules.keySet();
     }
 
+    @Contract(value = "null -> false", pure = true)
     public boolean isOfType(@Nullable AbstractModuleType<?> type) {
         return modules.containsKey(type);
     }
 
     @Nullable
+    @Contract(value = "null -> null", pure = true)
     public <T extends AbstractModule> T getModuleOfType(@Nullable AbstractModuleType<T> type) {
         //noinspection unchecked
         return (T) modules.get(type);
     }
 
-    public boolean isEventClassValidForModule(@NotNull PsiClass eventClass) {
+    @Contract(value = "null -> false", pure = true)
+    public boolean isEventClassValidForModule(@Nullable PsiClass eventClass) {
+        if (eventClass == null) {
+            return false;
+        }
+
         for (AbstractModule abstractModule : modules.values()) {
             if (abstractModule.isEventClassValid(eventClass, null)) {
                 return true;
@@ -189,6 +202,7 @@ public final class MinecraftModule {
         return false;
     }
 
+    @Contract(pure = true)
     public boolean isEventClassValid(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
         for (AbstractModule abstractModule : modules.values()) {
             boolean good = abstractModule.getModuleType().getListenerAnnotations().stream()
@@ -257,6 +271,7 @@ public final class MinecraftModule {
         ProjectView.getInstance(module.getProject()).refresh();
     }
 
+    @Contract(pure = true)
     public boolean isEventGenAvailable() {
         return modules.keySet().stream().anyMatch(AbstractModuleType::isEventGenAvailable);
     }
@@ -267,6 +282,7 @@ public final class MinecraftModule {
     }
 
     @Nullable
+    @Contract(pure = true)
     public Icon getIcon() {
         if (modules.keySet().stream().filter(AbstractModuleType::hasIcon).count() == 1) {
             return modules.values().iterator().next().getIcon();

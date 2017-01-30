@@ -37,17 +37,23 @@ public abstract class AbstractModule {
         this.project = module.getProject();
     }
 
+    @Contract(pure = true)
     public Module getModule() {
         return module;
     }
 
+    @Contract(pure = true)
     public BuildSystem getBuildSystem() {
         return buildSystem;
     }
 
+    @Contract(pure = true)
     public abstract AbstractModuleType<?> getModuleType();
+
+    @Contract(pure = true)
     public abstract PlatformType getType();
 
+    @Contract(pure = true)
     public Icon getIcon() {
         return getModuleType().getIcon();
     }
@@ -64,7 +70,7 @@ public abstract class AbstractModule {
      * @return True if the class is valid or ignored. Returning false may highlight the
      *     method as an error and prevent compiling.
      */
-    public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
+    public boolean isEventClassValid(@NotNull PsiClass eventClass, @Nullable PsiMethod method) {
         return false;
     }
 

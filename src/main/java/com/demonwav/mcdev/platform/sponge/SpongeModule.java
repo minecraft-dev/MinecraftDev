@@ -75,7 +75,7 @@ public class SpongeModule extends AbstractModule {
     }
 
     @Override
-    public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
+    public boolean isEventClassValid(@NotNull PsiClass eventClass, @Nullable PsiMethod method) {
         return "org.spongepowered.api.event.Event".equals(eventClass.getQualifiedName());
     }
 

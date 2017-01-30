@@ -57,7 +57,7 @@ public class LiteLoaderModule extends AbstractModule {
     }
 
     @Override
-    public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
+    public boolean isEventClassValid(@NotNull PsiClass eventClass, @Nullable PsiMethod method) {
         return true;
     }
 

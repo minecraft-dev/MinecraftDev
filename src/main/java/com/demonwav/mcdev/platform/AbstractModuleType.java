@@ -44,38 +44,47 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
     }
 
     @NotNull
+    @Contract(pure = true)
     public String getGroupId() {
         return groupId;
     }
 
     @NotNull
+    @Contract(pure = true)
     public String getArtifactId() {
         return artifactId;
     }
 
+    @Contract(pure = true)
     public abstract PlatformType getPlatformType();
 
+    @Contract(pure = true)
     public abstract Icon getIcon();
 
+    @Contract(pure = true)
     public boolean hasIcon() {
         return true;
     }
 
+    @Contract(pure = true)
     public abstract String getId();
 
     @NotNull
+    @Contract(pure = true)
     public abstract List<String> getIgnoredAnnotations();
 
     @NotNull
+    @Contract(pure = true)
     public abstract List<String> getListenerAnnotations();
 
     @NotNull
+    @Contract(pure = true)
     public Map<String, Color> getClassToColorMappings() {
         return this.colorMap;
     }
 
     @NotNull
-    public abstract T generateModule(Module module);
+    public abstract T generateModule(@NotNull Module module);
 
     public void performCreationSettingSetup(@NotNull Project project) {
         final JDOMExternalizableStringList annotations = ((EntryPointsManagerBase)EntryPointsManager.getInstance(project)).ADDITIONAL_ANNOTATIONS;
@@ -83,6 +92,7 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
     }
 
     @NotNull
+    @Contract(pure = true)
     public EventGenerationPanel getEventGenerationPanel(@NotNull PsiClass chosenClass) {
         return new EventGenerationPanel(chosenClass);
     }
@@ -93,6 +103,7 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
     }
 
     @NotNull
+    @Contract(pure = true)
     public String getDefaultListenerName(@NotNull PsiClass psiClass) {
         //noinspection ConstantConditions
         return "on" + psiClass.getName().replace("Event", "");
