@@ -242,9 +242,9 @@ abstract class BuildSystem {
                             var gradle = root.findChild("build.gradle")
 
                             if (pom != null) {
-                                return@computeIfAbsent MavenBuildSystem ()
+                                return@computeIfAbsent MavenBuildSystem()
                             } else if (gradle != null) {
-                                return@computeIfAbsent GradleBuildSystem ()
+                                return@computeIfAbsent GradleBuildSystem()
                             } else {
                                 // We need to check if this is a multi-module gradle project
                                 val project = module.project
@@ -260,9 +260,9 @@ abstract class BuildSystem {
                                         gradle = root.findChild("build.gradle")
 
                                         if (pom != null) {
-                                            return@computeIfAbsent MavenBuildSystem ()
+                                            return@computeIfAbsent MavenBuildSystem()
                                         } else if (gradle != null) {
-                                            return@computeIfAbsent GradleBuildSystem ()
+                                            return@computeIfAbsent GradleBuildSystem()
                                         }
                                     }
                                 }

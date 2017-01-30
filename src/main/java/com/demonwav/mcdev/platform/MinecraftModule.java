@@ -299,7 +299,7 @@ public final class MinecraftModule {
     }
 
     private static void doReadyActions(@NotNull MinecraftModule module) {
-        if (!module.getIdeaModule().getProject().isDisposed()) {
+        if (!module.getIdeaModule().isDisposed() && !module.getIdeaModule().getProject().isDisposed()) {
             for (Consumer<MinecraftModule> readyWaiter : readyWaiters) {
                 readyWaiter.accept(module);
             }
