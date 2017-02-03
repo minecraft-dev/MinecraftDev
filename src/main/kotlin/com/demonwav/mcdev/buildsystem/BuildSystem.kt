@@ -239,7 +239,8 @@ abstract class BuildSystem {
                         var root: VirtualFile? = roots[0]
                         if (root != null) {
                             var pom = root.findChild("pom.xml")
-                            var gradle = root.findChild("build.gradle")
+                            var gradle = root.findChild("build.gradle") ?:
+                                root.findChild("settings.gradle") ?: root.findChild("build.gradle.kts")
 
                             if (pom != null) {
                                 return@computeIfAbsent MavenBuildSystem()
@@ -257,7 +258,8 @@ abstract class BuildSystem {
                                     if (parentModule != null) {
                                         root = ModuleRootManager.getInstance(parentModule).contentRoots[0]
                                         pom = root!!.findChild("pom.xml")
-                                        gradle = root.findChild("build.gradle")
+                                        gradle = root.findChild("build.gradle") ?:
+                                            root.findChild("settings.gradle") ?: root.findChild("build.gradle.kts")
 
                                         if (pom != null) {
                                             return@computeIfAbsent MavenBuildSystem()
