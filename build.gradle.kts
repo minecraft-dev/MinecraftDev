@@ -77,6 +77,7 @@ version = pluginVersion
 configurations.create("mixin").isTransitive = false
 
 repositories {
+    mavenCentral()
     maven {
         name = "kotlin-eap-1.1"
         setUrl("https://dl.bintray.com/kotlin/kotlin-eap-1.1")
@@ -106,6 +107,9 @@ dependencies {
     }
 
     add("mixin", "org.spongepowered:mixin:0.6.8-SNAPSHOT:thin")
+
+    // Used for the injection point viewer action
+    compile("org.spongepowered:mixin:0.6.8-SNAPSHOT:thin")
 }
 
 tasks.withType<Test> {
