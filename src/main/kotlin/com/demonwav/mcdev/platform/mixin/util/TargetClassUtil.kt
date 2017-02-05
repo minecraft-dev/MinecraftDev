@@ -14,7 +14,8 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.compiled.ClsMethodImpl
-import com.intellij.util.containers.isEmpty
+import com.intellij.psi.util.MethodSignatureUtil
+import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.util.containers.stream
 import java.util.stream.Collectors
 import java.util.stream.Stream
@@ -31,9 +32,12 @@ internal fun findMethods(psiClass: PsiClass, targets: Collection<PsiClass>, chec
                 .values.stream()
                 .filter { it.size >= targets.size }
                 .map { it.first() }
-    }?.filter {
+    }?.filter { m ->
         // Filter methods which are already in the Mixin class
-        psiClass.findMethods(it.memberReference, checkBases).isEmpty()
+        !psiClass.findMethodsByName(m.name, checkBases).any {
+            MethodSignatureUtil.areParametersErasureEqual(m, it) &&
+                TypeConversionUtil.erasure(m.returnType) == TypeConversionUtil.erasure(it.returnType)
+        }
     }
 }
 
