@@ -59,19 +59,15 @@ internal fun PsiType.appendDescriptor(builder: StringBuilder): StringBuilder {
 
 // Class
 
-internal val PsiClass.internalName: String
-    get() {
-        val parentClass = containingClass ?: return qualifiedName!!.replace('.', '/')
-        return buildInternalName(StringBuilder(), parentClass).toString()
-    }
+internal val PsiClass.internalName
+    get() = qualifiedName?.replace('.', '/') ?: buildInternalName(StringBuilder()).toString()
 
 internal fun PsiClass.appendInternalName(builder: StringBuilder): StringBuilder {
-    val parentClass = containingClass ?: return builder.append(qualifiedName!!.replace('.', '/'))
-    return buildInternalName(builder, parentClass)
+    return qualifiedName?.let { builder.append(it.replace('.', '/')) } ?: buildInternalName(builder)
 }
 
-private fun PsiClass.buildInternalName(builder: StringBuilder, parentClass: PsiClass): StringBuilder {
-    buildInnerName(builder, parentClass, { builder.append(it.qualifiedName!!.replace('.', '/')) })
+private fun PsiClass.buildInternalName(builder: StringBuilder): StringBuilder {
+    buildInnerName(builder, { it.qualifiedName?.replace('.', '/') })
     return builder
 }
 
