@@ -38,7 +38,7 @@ buildscript {
 
     dependencies {
         classpath(kotlinModule("gradle-plugin", project.properties["kotlinVersion"] as String))
-        classpath("gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.1.10")
+        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.0")
         classpath("gradle.plugin.net.minecrell:licenser:0.3")
     }
 }
@@ -178,23 +178,26 @@ val pathingJar = task<Jar>("pathingJar") {
 
 val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
     dependsOn(pathingJar)
-    doFirst {
-        delete(file("gen/com/demonwav/mcdev/platform/mcp/at/gen/psi/"))
-    }
 
     val src = "src/main/java/com/demonwav/mcdev/platform/mcp/at/AT.bnf"
     val dstRoot = "gen"
+    val dst = "$dstRoot/com/demonwav/mcdev/platform/mcp/at/gen"
+    val psiDir = "$dst/psi/"
+    val parserDir = "$dst/parser/"
+
+    doFirst {
+        delete(psiDir, parserDir)
+    }
 
     main = "org.intellij.grammar.Main"
 
     args(dstRoot, src)
 
-    inputs.file(file(src))
-    outputs.dir(fileTree(mapOf(
-        "dir" to dstRoot + "/com/demonwav/mcdev/platform/mcp/at/gen/",
-        "include" to "**/*.java",
-        "exclude" to "AtLexer.java"
-    )))
+    inputs.file(src)
+    outputs.dirs(mapOf(
+            "psi" to psiDir,
+            "parser" to parserDir
+    ))
 
     classpath(pathingJar.archivePath, file("libs/grammar-kit-1.5.0.jar"))
 }
