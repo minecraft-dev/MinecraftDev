@@ -197,8 +197,8 @@ val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
 
     inputs.file(src)
     outputs.dirs(mapOf(
-            "psi" to psiDir,
-            "parser" to parserDir
+        "psi" to psiDir,
+        "parser" to parserDir
     ))
 
     classpath(pathingJar.archivePath, file("libs/grammar-kit-1.5.0.jar"))
