@@ -10,10 +10,12 @@
 
 import net.minecrell.gradle.licenser.LicenseExtension
 import net.minecrell.gradle.licenser.Licenser
+import org.gradle.api.Task
 import org.gradle.api.file.CopySpec
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.plugins.ide.idea.model.IdeaModel
@@ -216,6 +218,26 @@ tasks.withType<JavaCompile> {
 tasks.withType<KotlinCompile> {
     dependsOn(generate)
     kotlinOptions.jvmTarget = javaVersion as String
+}
+
+fun Task.instrumentCode(state: Boolean) {
+    doLast {
+        configure<IntelliJPluginExtension> {
+            instrumentCode = state
+        }
+    }
+}
+
+// Ugly hack to disable instrumentCode feature of gradle-intellij-plugin
+// for Groovy sources. No idea why it fails but it is certainly not needed.
+tasks.withType<GroovyCompile> {
+    // Disable instrumentCode before gradle-intellij-plugin runs its task
+    instrumentCode(false)
+
+    afterEvaluate {
+        // ... enable it again after it has run
+        instrumentCode(true)
+    }
 }
 
 if (project.hasProperty("intellijJre")) {
