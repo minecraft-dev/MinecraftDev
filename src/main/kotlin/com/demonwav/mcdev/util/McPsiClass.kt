@@ -24,62 +24,69 @@ internal val PsiClassType.fullQualifiedName
 
 // Class
 
-internal val PsiClass.fullQualifiedName: String
-    get() {
-        val parentClass = containingClass ?: return qualifiedName!!
-        return buildFullQualifiedName(StringBuilder(), parentClass).toString()
-    }
+internal val PsiClass.fullQualifiedName
+    get() = qualifiedName ?: buildQualifiedName(StringBuilder()).toString()
 
 internal fun PsiClass.appendFullQualifiedName(builder: StringBuilder): StringBuilder {
-    val parentClass = containingClass ?: return builder.append(qualifiedName!!)
-    return buildFullQualifiedName(builder, parentClass)
+    return qualifiedName?.let { builder.append(it) } ?: buildQualifiedName(builder)
 }
 
-private fun PsiClass.buildFullQualifiedName(builder: StringBuilder, parentClass: PsiClass): StringBuilder {
-    buildInnerName(builder, parentClass, { builder.append(it.qualifiedName!!) })
+private fun PsiClass.buildQualifiedName(builder: StringBuilder): StringBuilder {
+    buildInnerName(builder, PsiClass::getQualifiedName)
     return builder
 }
 
+private val PsiClass.outerShortName
+    get() = name?.takeIf { containingClass == null }
+
 internal val PsiClass.shortName: String
     get() {
-        val parentClass = containingClass ?: return name!!
+        outerShortName?.let { return it }
         val builder = StringBuilder()
-        buildInnerName(builder, parentClass, { builder.append(it.name!!) }, '.')
+        buildInnerName(builder, PsiClass::outerShortName, '.')
         return builder.toString()
     }
 
-internal inline fun PsiClass.buildInnerName(builder: StringBuilder, firstParentClass: PsiClass,
-                                   outer: (PsiClass) -> Unit, separator: Char = '$') {
-    var parentClass: PsiClass? = firstParentClass
+internal inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (PsiClass) -> String?, separator: Char = '$') {
     var currentClass: PsiClass = this
+    var parentClass: PsiClass?
+    var name: String?
     val list = ArrayList<String>()
 
-    while (parentClass != null) {
-        val name = currentClass.name
-        if (name != null) {
-            // Named inner class
-            list.add(name)
+    do {
+        parentClass = currentClass.containingClass
+        if (parentClass != null) {
+            // Add named inner class
+            list.add(currentClass.name!!)
         } else {
-            // Attempt to find name for anonymous class
-            for ((i, element) in currentClass.anonymousElements!!.withIndex()) {
-                if (currentClass.manager.areElementsEquivalent(this, element)) {
-                    list.add((i + 1).toString())
-                    break
-                }
-            }
+            parentClass = getClassOfElement(currentClass.parent)!!
 
-            throw IllegalStateException("Failed to determine anonymous class for $currentClass")
+            // Add index of anonymous class to list
+            list.add(parentClass.getAnonymousIndex(currentClass).toString())
         }
 
         currentClass = parentClass
-        parentClass = currentClass.containingClass
-    }
+        name = getName(currentClass)
+    } while (name == null)
 
-    outer(currentClass)
+    // Append name of outer class
+    builder.append(name)
 
+    // Append names for all inner classes
     for (i in list.lastIndex downTo 0) {
         builder.append(separator).append(list[i])
     }
+}
+
+internal fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
+    // Attempt to find name for anonymous class
+    for ((i, element) in anonymousElements!!.withIndex()) {
+        if (manager.areElementsEquivalent(element, anonymousElement)) {
+            return i + 1
+        }
+    }
+
+    throw IllegalStateException("Failed to determine anonymous class for $anonymousElement")
 }
 
 internal val PsiElement.anonymousElements: Array<PsiElement>?
