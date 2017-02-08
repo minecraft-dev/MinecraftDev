@@ -143,7 +143,8 @@ configure<LicenseExtension> {
     }
 }
 
-// Credit for this intellij-rust https://github.com/intellij-rust/intellij-rust/blob/master/build.gradle#L114
+// Credit for this intellij-rust
+// https://github.com/intellij-rust/intellij-rust/blob/d6b82e6aa2f64b877a95afdd86ec7b84394678c3/build.gradle#L131-L181
 val generateAtLexer = task<JavaExec>("generateAtLexer") {
     val src = "src/main/java/com/demonwav/mcdev/platform/mcp/at/AT.flex"
     val dst = "gen/com/demonwav/mcdev/platform/mcp/at/gen/"
