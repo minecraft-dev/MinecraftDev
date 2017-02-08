@@ -17,6 +17,7 @@ import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.internal.jvm.Jvm
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.jetbrains.intellij.IntelliJPlugin
@@ -78,7 +79,7 @@ dependencies {
     }
 
     // Add tools.jar for the JDI API
-    compile(files(org.gradle.internal.jvm.Jvm.current().toolsJar))
+    compile(files(Jvm.current().toolsJar))
 
     // Add an additional dependency on kotlin-runtime. It is essentially useless
     // (since kotlin-runtime is a transitive dependency of kotlin-stdlib-jre8)
