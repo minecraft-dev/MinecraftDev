@@ -13,8 +13,8 @@ package com.demonwav.mcdev.platform.mixin.actions
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.getClassOfElement
-import com.demonwav.mcdev.util.getNameOfClass
 import com.demonwav.mcdev.util.gotoTargetElement
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.openapi.actionSystem.AnAction
@@ -28,6 +28,7 @@ import com.intellij.openapi.progress.runBackgroundableTask
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiClass
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedElementsSearch
 import com.intellij.ui.content.ContentFactory
@@ -71,10 +72,7 @@ class FindMixinsAction : AnAction() {
                         1 -> classes
                         else ->
                             // Sort classes
-                            classes.sortedBy {
-                                val pair = getNameOfClass(it)?: return@sortedBy null
-                                pair.second.name + pair.first
-                            }
+                            classes.sortedBy(PsiClass::fullQualifiedName)
                     }
                 } ?: return@run
 

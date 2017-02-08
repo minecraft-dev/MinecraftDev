@@ -12,11 +12,7 @@
 package com.demonwav.mcdev.util
 
 import com.google.common.collect.ImmutableSet
-import com.google.common.collect.Lists
-import com.intellij.navigation.AnonymousElementProvider
-import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Pair
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiArrayInitializerMemberValue
@@ -44,8 +40,6 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import org.jetbrains.annotations.Contract
-import java.util.Collections
-import java.util.stream.Collectors
 import java.util.stream.Stream
 
 @JvmOverloads
@@ -158,52 +152,6 @@ fun getAnnotation(owner: PsiModifierListOwner?, annotationName: String): PsiAnno
     val list = owner.modifierList ?: return null
 
     return list.findAnnotation(annotationName)
-}
-
-@Contract(value = "null -> null", pure = true)
-fun getNameOfClass(psiClass: PsiClass?): Pair<String, PsiClass>? {
-    var aClass = psiClass ?: return null
-
-    if (aClass.containingClass == null) {
-        return Pair.create<String, PsiClass>("", psiClass)
-    }
-
-    val innerStrings = Lists.newArrayList<String>()
-    var baseClass: PsiClass = psiClass
-    while (aClass != null) {
-        baseClass = aClass
-        if (aClass.name == null) {
-            // anon class
-            var anonymousClasses: Array<PsiElement>? = null
-            for (provider in Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
-
-                anonymousClasses = provider.getAnonymousElements(psiClass.containingClass!!)
-                if (anonymousClasses.isNotEmpty()) {
-                    break
-                }
-            }
-
-            if (anonymousClasses == null) {
-                // We couldn't build the proper string, so don't return anything at all
-                return null
-            }
-
-            for (i in anonymousClasses.indices) {
-                if (anonymousClasses[i] === psiClass) {
-                    innerStrings.add((i + 1).toString())
-                    break
-                }
-            }
-        } else {
-            innerStrings.add(aClass.name)
-            aClass = aClass.containingClass as PsiClass
-        }
-    }
-
-    // We started from the bottom and went up, so reverse it
-    Collections.reverse(innerStrings)
-    // Skip the base class, we are giving the base PsiClass so the user can do with it what they want
-    return Pair.create("$" + innerStrings.stream().skip(1).collect(Collectors.joining("$")), baseClass)
 }
 
 internal fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement): Stream<T> {
