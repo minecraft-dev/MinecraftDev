@@ -87,7 +87,8 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.ShadowLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.OverwriteLineMarkerProvider"/>
 
-        <copyPastePostProcessor order="first" implementation="com.demonwav.mcdev.platform.mixin.editor.MixinCopyPasteReferenceProcessor"/>
+        <!-- Temporarily disabled, broken ATM. TODO: fix this -> minecrell -->
+        <!--<copyPastePostProcessor order="first" implementation="com.demonwav.mcdev.platform.mixin.editor.MixinCopyPasteReferenceProcessor"/>-->
 
         <!-- MCP CFG file type -->
         <fileTypeFactory implementation="com.demonwav.mcdev.platform.mcp.at.AtFileTypeFactory"/>
