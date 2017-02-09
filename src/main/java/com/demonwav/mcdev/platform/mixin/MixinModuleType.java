@@ -92,7 +92,7 @@ public class MixinModuleType extends AbstractModuleType<MixinModule> {
 
     @NotNull
     @Override
-    public MixinModule generateModule(Module module) {
+    public MixinModule generateModule(@NotNull Module module) {
         return new MixinModule(module);
     }
 }

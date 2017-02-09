@@ -74,7 +74,7 @@ public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
 
     @NotNull
     @Override
-    public BungeeCordModule generateModule(Module module) {
+    public BungeeCordModule generateModule(@NotNull Module module) {
         return new BungeeCordModule(module);
     }
 

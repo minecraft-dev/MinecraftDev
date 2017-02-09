@@ -72,7 +72,7 @@ public class McpModuleType extends AbstractModuleType<McpModule> {
 
     @NotNull
     @Override
-    public McpModule generateModule(Module module) {
+    public McpModule generateModule(@NotNull Module module) {
         return new McpModule(module);
     }
 }

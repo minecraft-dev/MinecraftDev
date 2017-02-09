@@ -68,7 +68,7 @@ public class LiteLoaderModuleType extends AbstractModuleType<LiteLoaderModule> {
 
     @NotNull
     @Override
-    public LiteLoaderModule generateModule(Module module) {
+    public LiteLoaderModule generateModule(@NotNull Module module) {
         return new LiteLoaderModule(module);
     }
 }

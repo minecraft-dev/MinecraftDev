@@ -50,7 +50,7 @@ public class PaperModuleType extends SpigotModuleType {
 
     @NotNull
     @Override
-    public BukkitModule generateModule(Module module) {
+    public BukkitModule generateModule(@NotNull Module module) {
         return new BukkitModule<>(module, this);
     }
 }

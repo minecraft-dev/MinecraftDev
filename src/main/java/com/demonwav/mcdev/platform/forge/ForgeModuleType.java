@@ -78,7 +78,7 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
 
     @NotNull
     @Override
-    public ForgeModule generateModule(Module module) {
+    public ForgeModule generateModule(@NotNull Module module) {
         return new ForgeModule(module);
     }
 
