@@ -25,10 +25,10 @@
 
     <change-notes><![CDATA[
       <div>
-        Alpha release, not many features, may break. More features to come. Please report issues to
+        Alpha release, may break. More features to come. Please report issues to
         <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        <a href="https://minecraftdev.org/changelog/">Changelog v. 2016.3-0.5.2</a>
+        v. 2016.3-0.5.3
       </div>
     ]]>
     </change-notes>
