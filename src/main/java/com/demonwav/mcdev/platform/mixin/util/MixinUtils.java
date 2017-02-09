@@ -94,7 +94,7 @@ public final class MixinUtils {
      */
     @Contract(value = "null -> false", pure = true)
     public static boolean isMixinModule(@Nullable MinecraftModule instance) {
-        return instance != null && instance.isOfType(MixinModuleType.getInstance());
+        return instance != null && instance.isOfType(MixinModuleType.INSTANCE);
     }
 
     /**

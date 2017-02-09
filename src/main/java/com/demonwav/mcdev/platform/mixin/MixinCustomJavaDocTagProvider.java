@@ -107,7 +107,7 @@ public class MixinCustomJavaDocTagProvider implements CustomJavadocTagProvider {
             return false;
         }
 
-        if (!minecraftModule.isOfType(MixinModuleType.getInstance())) {
+        if (!minecraftModule.isOfType(MixinModuleType.INSTANCE)) {
             return false;
         }
 

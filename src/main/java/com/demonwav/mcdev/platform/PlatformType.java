@@ -37,7 +37,7 @@ public enum PlatformType {
     CANARY(CanaryModuleType.getInstance(), "Canary", new PlatformType[] {NEPTUNE}),
     BUNGEECORD(BungeeCordModuleType.getInstance(), "BungeeCord"),
     LITELOADER(LiteLoaderModuleType.getInstance(), "LiteLoader"),
-    MIXIN(MixinModuleType.getInstance(), "Mixin"),
+    MIXIN(MixinModuleType.INSTANCE, "Mixin"),
     MCP(McpModuleType.getInstance(), "MCP")
     ;
 

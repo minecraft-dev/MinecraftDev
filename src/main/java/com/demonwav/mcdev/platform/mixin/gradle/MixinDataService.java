@@ -16,6 +16,6 @@ import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 public class MixinDataService extends AbstractDataService {
 
     public MixinDataService() {
-        super(MixinModuleType.getInstance());
+        super(MixinModuleType.INSTANCE);
     }
 }

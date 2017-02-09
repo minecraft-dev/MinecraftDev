@@ -45,7 +45,7 @@ public class ShadowNullabilityInspectionSuppressor implements InspectionSuppress
             return false;
         }
 
-        if (!instance.isOfType(MixinModuleType.getInstance())) {
+        if (!instance.isOfType(MixinModuleType.INSTANCE)) {
             return false;
         }
 

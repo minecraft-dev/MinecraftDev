@@ -128,7 +128,7 @@ public class AuthorInspection extends BaseInspection {
                     return;
                 }
 
-                if (!minecraftModule.isOfType(MixinModuleType.getInstance())) {
+                if (!minecraftModule.isOfType(MixinModuleType.INSTANCE)) {
                     return;
                 }
 
