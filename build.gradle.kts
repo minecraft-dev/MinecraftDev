@@ -3,18 +3,21 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
 
 import net.minecrell.gradle.licenser.LicenseExtension
 import net.minecrell.gradle.licenser.Licenser
+import org.gradle.api.Task
 import org.gradle.api.file.CopySpec
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.internal.jvm.Jvm
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.jetbrains.intellij.IntelliJPlugin
@@ -38,7 +41,7 @@ buildscript {
 
     dependencies {
         classpath(kotlinModule("gradle-plugin", project.properties["kotlinVersion"] as String))
-        classpath("gradle.plugin.org.jetbrains:gradle-intellij-plugin:0.1.10")
+        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.0")
         classpath("gradle.plugin.net.minecrell:licenser:0.3")
     }
 }
@@ -76,7 +79,7 @@ dependencies {
     }
 
     // Add tools.jar for the JDI API
-    compile(files(org.gradle.internal.jvm.Jvm.current().toolsJar))
+    compile(files(Jvm.current().toolsJar))
 
     // Add an additional dependency on kotlin-runtime. It is essentially useless
     // (since kotlin-runtime is a transitive dependency of kotlin-stdlib-jre8)
@@ -140,7 +143,8 @@ configure<LicenseExtension> {
     }
 }
 
-// Credit for this intellij-rust https://github.com/intellij-rust/intellij-rust/blob/master/build.gradle#L114
+// Credit for this intellij-rust
+// https://github.com/intellij-rust/intellij-rust/blob/d6b82e6aa2f64b877a95afdd86ec7b84394678c3/build.gradle#L131-L181
 val generateAtLexer = task<JavaExec>("generateAtLexer") {
     val src = "src/main/java/com/demonwav/mcdev/platform/mcp/at/AT.flex"
     val dst = "gen/com/demonwav/mcdev/platform/mcp/at/gen/"
@@ -178,25 +182,28 @@ val pathingJar = task<Jar>("pathingJar") {
 
 val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
     dependsOn(pathingJar)
-    doFirst {
-        delete(file("gen/com/demonwav/mcdev/platform/mcp/at/gen/psi/"))
-    }
 
     val src = "src/main/java/com/demonwav/mcdev/platform/mcp/at/AT.bnf"
     val dstRoot = "gen"
+    val dst = "$dstRoot/com/demonwav/mcdev/platform/mcp/at/gen"
+    val psiDir = "$dst/psi/"
+    val parserDir = "$dst/parser/"
+
+    doFirst {
+        delete(psiDir, parserDir)
+    }
 
     main = "org.intellij.grammar.Main"
 
     args(dstRoot, src)
 
-    inputs.file(file(src))
-    outputs.dir(fileTree(mapOf(
-        "dir" to dstRoot + "/com/demonwav/mcdev/platform/mcp/at/gen/",
-        "include" to "**/*.java",
-        "exclude" to "AtLexer.java"
-    )))
+    inputs.file(src)
+    outputs.dirs(mapOf(
+        "psi" to psiDir,
+        "parser" to parserDir
+    ))
 
-    classpath(pathingJar.archivePath, file("libs/grammar-kit-1.5.0.jar"))
+    classpath(pathingJar.archivePath, file("libs/grammar-kit-1.5.1-SNAPSHOT.jar"))
 }
 
 val generate = task("generate") {
@@ -213,6 +220,26 @@ tasks.withType<JavaCompile> {
 tasks.withType<KotlinCompile> {
     dependsOn(generate)
     kotlinOptions.jvmTarget = javaVersion as String
+}
+
+fun Task.instrumentCode(state: Boolean) {
+    doLast {
+        configure<IntelliJPluginExtension> {
+            instrumentCode = state
+        }
+    }
+}
+
+// Ugly hack to disable instrumentCode feature of gradle-intellij-plugin
+// for Groovy sources. No idea why it fails but it is certainly not needed.
+tasks.withType<GroovyCompile> {
+    // Disable instrumentCode before gradle-intellij-plugin runs its task
+    instrumentCode(false)
+
+    afterEvaluate {
+        // ... enable it again after it has run
+        instrumentCode(true)
+    }
 }
 
 if (project.hasProperty("intellijJre")) {

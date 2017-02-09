@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -76,7 +76,7 @@ public class ForgeModule extends AbstractModule {
     }
 
     @Override
-    public boolean isEventClassValid(PsiClass eventClass, PsiMethod method) {
+    public boolean isEventClassValid(@NotNull PsiClass eventClass, @Nullable PsiMethod method) {
         if (method == null ) {
             return ForgeConstants.FML_EVENT.equals(eventClass.getQualifiedName()) ||
                 ForgeConstants.EVENT.equals(eventClass.getQualifiedName());

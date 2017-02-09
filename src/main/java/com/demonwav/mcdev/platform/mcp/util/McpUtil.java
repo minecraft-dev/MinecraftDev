@@ -3,12 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mcp.util;
+
+import com.demonwav.mcdev.util.McBytecodeUtil;
 
 import com.google.common.collect.Lists;
 import com.intellij.navigation.AnonymousElementProvider;
@@ -174,30 +176,6 @@ public final class McpUtil {
     @Nullable
     @Contract(value = "null -> null", pure = true)
     public static String getStringFromType(@Nullable PsiType type) {
-        if (type == null) {
-            return null;
-        }
-
-        if (type == PsiType.BYTE) {
-            return "B";
-        } else if (type == PsiType.CHAR) {
-            return "C";
-        } else if (type == PsiType.DOUBLE) {
-            return "D";
-        } else if (type == PsiType.FLOAT) {
-            return "F";
-        } else if (type == PsiType.INT) {
-            return "I";
-        } else if (type == PsiType.LONG) {
-            return "J";
-        } else if (type == PsiType.SHORT) {
-            return "S";
-        } else if (type == PsiType.BOOLEAN) {
-            return "Z";
-        } else if (type == PsiType.VOID) {
-            return "V";
-        } else {
-            return "L" + type.getCanonicalText(false).replaceAll("\\.", "/") + ";";
-        }
+        return type != null ? McBytecodeUtil.getDescriptor(type) : null;
     }
 }

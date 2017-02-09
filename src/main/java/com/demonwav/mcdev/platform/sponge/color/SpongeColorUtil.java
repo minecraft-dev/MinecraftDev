@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -85,10 +85,12 @@ public class SpongeColorUtil {
 
         // Triple Integer Argument
         } else if (types.length == 3 && types[0] == PsiType.INT && types[1] == PsiType.INT && types[2] == PsiType.INT) {
-            pair = new Pair<>(
-                handleThreeArguments(expressionList),
-                expressionList
-            );
+            try {
+                pair = new Pair<>(
+                    handleThreeArguments(expressionList),
+                    expressionList
+                );
+            } catch (Exception ignored) {}
 
         // Single Vector3* Argument
         } else if (types.length == 1 &&
@@ -117,32 +119,29 @@ public class SpongeColorUtil {
     }
 
     @Nullable
-    private static Color handleThreeArguments(@NotNull PsiExpressionList expressionList) {
+    private static Color handleThreeArguments(@NotNull PsiExpressionList expressionList) throws Exception {
         if (!(expressionList.getExpressions()[0] instanceof PsiLiteralExpression) ||
             !(expressionList.getExpressions()[1] instanceof PsiLiteralExpression) ||
             !(expressionList.getExpressions()[2] instanceof PsiLiteralExpression)) {
-            return null;
+            throw new Exception();
         }
 
-        try {
-            final PsiLiteralExpression expressionOne = (PsiLiteralExpression) expressionList.getExpressions()[0];
-            final PsiLiteralExpression expressionTwo= (PsiLiteralExpression) expressionList.getExpressions()[1];
-            final PsiLiteralExpression expressionThree = (PsiLiteralExpression) expressionList.getExpressions()[2];
+        final PsiLiteralExpression expressionOne = (PsiLiteralExpression) expressionList.getExpressions()[0];
+        final PsiLiteralExpression expressionTwo= (PsiLiteralExpression) expressionList.getExpressions()[1];
+        final PsiLiteralExpression expressionThree = (PsiLiteralExpression) expressionList.getExpressions()[2];
 
-            final int one = (int) Math.round(Double.parseDouble(expressionOne.getText()));
-            final int two = (int) Math.round(Double.parseDouble(expressionTwo.getText()));
-            final int three = (int) Math.round(Double.parseDouble(expressionThree.getText()));
+        final int one = (int) Math.round(Double.parseDouble(expressionOne.getText()));
+        final int two = (int) Math.round(Double.parseDouble(expressionTwo.getText()));
+        final int three = (int) Math.round(Double.parseDouble(expressionThree.getText()));
 
-            return new Color(one, two, three);
-        } catch (Exception ignored) {}
-        return null;
+        return new Color(one, two, three);
     }
 
     @Nullable
-    private static Color handleVectorArgument(@NotNull PsiNewExpression newExpression) {
+    private static Color handleVectorArgument(@NotNull PsiNewExpression newExpression) throws Exception {
         final PsiExpressionList expressionList = (PsiExpressionList) newExpression.getNode().findChildByType(JavaElementType.EXPRESSION_LIST);
         if (expressionList == null) {
-            return null;
+            throw new Exception();
         }
 
         return handleThreeArguments(expressionList);

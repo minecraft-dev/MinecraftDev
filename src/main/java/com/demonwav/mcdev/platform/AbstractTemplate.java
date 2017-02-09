@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Properties;
 
 public abstract class AbstractTemplate {
@@ -32,6 +33,7 @@ public abstract class AbstractTemplate {
     public static String applyBuildGradleTemplate(@NotNull Project project,
                                                   @NotNull VirtualFile file,
                                                   @NotNull String groupId,
+                                                  @NotNull String artifactId,
                                                   @NotNull String pluginVersion,
                                                   @NotNull String buildVersion) {
 
@@ -41,16 +43,8 @@ public abstract class AbstractTemplate {
         final FileTemplateManager manager = FileTemplateManager.getInstance(project);
         final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUILD_GRADLE_TEMPLATE);
 
-        final Properties gradleProps = new Properties();
-        gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
-        gradleProps.setProperty("GROUP_ID", groupId);
-
-        // create gradle.properties
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.GRADLE_PROPERTIES_TEMPLATE, gradleProps);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // This method should be never used for Sponge projects so we just pass false
+        applyGradlePropertiesTemplate(project, file, groupId, artifactId, pluginVersion, false);
 
         try {
             return template.getText(buildGradleProps);
@@ -64,25 +58,42 @@ public abstract class AbstractTemplate {
                                                            @NotNull VirtualFile file,
                                                            @NotNull VirtualFile prop,
                                                            @NotNull String groupId,
+                                                           @NotNull String artifactId,
                                                            @NotNull String pluginVersion,
-                                                           @NotNull String buildVersion) {
+                                                           @NotNull String buildVersion,
+                                                           boolean hasSponge) {
 
         final Properties properties = new Properties();
         properties.setProperty("BUILD_VERSION", buildVersion);
 
-        final Properties gradleProps = new Properties();
-        gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
-        gradleProps.setProperty("GROUP_ID", groupId);
-
-        // create gradle.properties
-        try {
-            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.GRADLE_PROPERTIES_TEMPLATE, gradleProps);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        applyGradlePropertiesTemplate(project, prop, groupId, artifactId, pluginVersion, hasSponge);
 
         try {
             applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MULTI_MODULE_BUILD_GRADLE_TEMPLATE, properties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void applyGradlePropertiesTemplate(@NotNull Project project,
+                                                     @NotNull VirtualFile file,
+                                                     @NotNull String groupId,
+                                                     @NotNull String artifactId,
+                                                     @NotNull String pluginVersion,
+                                                     boolean hasSponge) {
+
+        Properties gradleProps = new Properties();
+
+        gradleProps.setProperty("GROUP_ID", groupId);
+        gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
+
+        if (hasSponge) {
+            gradleProps.setProperty("PLUGIN_ID", artifactId.toLowerCase(Locale.ENGLISH));
+        }
+
+        // create gradle.properties
+        try {
+            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.GRADLE_PROPERTIES_TEMPLATE, gradleProps);
         } catch (IOException e) {
             e.printStackTrace();
         }

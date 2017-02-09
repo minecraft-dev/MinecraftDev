@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -72,7 +72,8 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
         for (DataNode<LibraryDependencyData> node : toImport) {
             final Module module = modelsProvider.findIdeModule(node.getData().getOwnerModule());
             allModules.add(module);
-            if (node.getData().getExternalName().startsWith(type.getGroupId() + ":" + type.getArtifactId())) {
+            if (node.getData().getExternalName().toLowerCase()
+                    .startsWith(type.getGroupId().toLowerCase() + ":" + type.getArtifactId().toLowerCase())) {
                 goodModules.add(module);
             }
         }

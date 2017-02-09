@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -80,7 +80,7 @@ public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
 
     @NotNull
     @Override
-    public SpongeModule generateModule(Module module) {
+    public SpongeModule generateModule(@NotNull Module module) {
         return new SpongeModule(module);
     }
 

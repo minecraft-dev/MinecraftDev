@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Locale;
 import java.util.Properties;
 
 public class SpongeTemplate extends AbstractTemplate {
@@ -86,16 +85,8 @@ public class SpongeTemplate extends AbstractTemplate {
         final FileTemplateManager manager = FileTemplateManager.getInstance(project);
         final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SPONGE_BUILD_GRADLE_TEMPLATE);
 
-        final Properties gradleProps = new Properties();
-        gradleProps.setProperty("GROUP_ID", groupId);
-        gradleProps.setProperty("PLUGIN_ID", artifactId.toLowerCase(Locale.ENGLISH));
-        gradleProps.setProperty("PLUGIN_VERSION", pluginVersion);
-
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.SPONGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // Sponge \o/
+        AbstractTemplate.applyGradlePropertiesTemplate(project, file, groupId, artifactId, pluginVersion, true);
 
         try {
             return template.getText(properties);

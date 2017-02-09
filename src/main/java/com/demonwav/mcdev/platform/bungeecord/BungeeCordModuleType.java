@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -74,7 +74,7 @@ public class BungeeCordModuleType extends AbstractModuleType<BungeeCordModule> {
 
     @NotNull
     @Override
-    public BungeeCordModule generateModule(Module module) {
+    public BungeeCordModule generateModule(@NotNull Module module) {
         return new BungeeCordModule(module);
     }
 

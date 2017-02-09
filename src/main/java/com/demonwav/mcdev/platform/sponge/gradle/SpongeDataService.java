@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -72,12 +72,12 @@ public class SpongeDataService extends AbstractProjectDataService<ModuleData, Mo
             })
             .filter(n -> n.getData() instanceof AbstractDependencyData)
             .peek(n -> allModules.add(modelsProvider.findIdeModule(((DependencyData) n.getData()).getOwnerModule())))
-            .filter(n -> ((AbstractDependencyData) n.getData()).getExternalName().matches("(^" + spongeMatcher + "|.*Sponge(Common|API)).*"))
+            .filter(n -> ((AbstractDependencyData) n.getData()).getExternalName().toLowerCase().matches("(^" + spongeMatcher + "|.*sponge(common|api)).*"))
             .map(n -> modelsProvider.findIdeModule(((DependencyData) n.getData()).getOwnerModule()))
             .collect(Collectors.toSet());
 
         goodModules.addAll(toImport.stream()
-            .filter(n -> n.getData().getId().contains("SpongeAPI"))
+            .filter(n -> n.getData().getId().toLowerCase().contains("spongeapi"))
             .map(n -> modelsProvider.findIdeModule(n.getData().getInternalName()))
             .collect(Collectors.toSet()));
 

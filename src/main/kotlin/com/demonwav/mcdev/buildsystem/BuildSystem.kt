@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -239,12 +239,13 @@ abstract class BuildSystem {
                         var root: VirtualFile? = roots[0]
                         if (root != null) {
                             var pom = root.findChild("pom.xml")
-                            var gradle = root.findChild("build.gradle")
+                            var gradle = root.findChild("build.gradle") ?:
+                                root.findChild("settings.gradle") ?: root.findChild("build.gradle.kts")
 
                             if (pom != null) {
-                                return@computeIfAbsent MavenBuildSystem ()
+                                return@computeIfAbsent MavenBuildSystem()
                             } else if (gradle != null) {
-                                return@computeIfAbsent GradleBuildSystem ()
+                                return@computeIfAbsent GradleBuildSystem()
                             } else {
                                 // We need to check if this is a multi-module gradle project
                                 val project = module.project
@@ -257,12 +258,13 @@ abstract class BuildSystem {
                                     if (parentModule != null) {
                                         root = ModuleRootManager.getInstance(parentModule).contentRoots[0]
                                         pom = root!!.findChild("pom.xml")
-                                        gradle = root.findChild("build.gradle")
+                                        gradle = root.findChild("build.gradle") ?:
+                                            root.findChild("settings.gradle") ?: root.findChild("build.gradle.kts")
 
                                         if (pom != null) {
-                                            return@computeIfAbsent MavenBuildSystem ()
+                                            return@computeIfAbsent MavenBuildSystem()
                                         } else if (gradle != null) {
-                                            return@computeIfAbsent GradleBuildSystem ()
+                                            return@computeIfAbsent GradleBuildSystem()
                                         }
                                     }
                                 }

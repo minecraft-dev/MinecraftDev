@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -68,6 +68,8 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         }
     };
 
+    private ForgeWorker apiWorker = new ForgeWorker();
+
     public ForgeProjectSettingsWizard(@NotNull MinecraftProjectCreator creator) {
         this.creator = creator;
 
@@ -114,60 +116,18 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
             minecraftVersionLabel.setText("    Sponge API");
         }
 
-        try {
-            new SwingWorker() {
-                @Override
-                protected Object doInBackground() throws Exception {
-                    mcpVersion = McpVersion.downloadData();
-                    forgeVersion = ForgeVersion.downloadData();
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    if (mcpVersion == null) {
-                        return;
-                    }
-
-                    minecraftVersionBox.removeAllItems();
-
-                    // reverse order the versions
-                    if (!(settings instanceof SpongeForgeProjectConfiguration)) {
-                        forgeVersion.getSortedMcVersions().forEach(minecraftVersionBox::addItem);
-                        final String recommended = forgeVersion.getRecommended(mcpVersion.getVersions());
-
-                        int index = 0;
-                        for (int i = 0; i < minecraftVersionBox.getItemCount(); i++) {
-                            if (minecraftVersionBox.getItemAt(i).equals(recommended)) {
-                                index = i;
-                            }
-                        }
-                        minecraftVersionBox.setSelectedIndex(index);
-                    } else {
-                        minecraftVersionBox.addItem("4.1.0");
-                        minecraftVersionBox.addItem("5.0.0");
-                        minecraftVersionBox.setSelectedIndex(1);
-                    }
-
-                    if (mcpVersion != null) {
-                        mcpVersion.setMcpVersion(mcpVersionBox, getVersion(), mcpBoxActionListener);
-                    }
-
-                    if (forgeVersion == null) {
-                        return;
-                    }
-
-                    setForgeVersion();
-
-                    loadingBar.setIndeterminate(false);
-                    loadingBar.setVisible(false);
-                }
-            }.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        apiWorker.execute();
 
         return panel;
+    }
+
+    @Override
+    public void updateStep() {
+        if ((forgeVersion == null || mcpVersion == null) && (apiWorker.isCancelled() || apiWorker.isDone())) {
+            // A SwingWorker will only run once, so we need to create a new instance
+            apiWorker = new ForgeWorker();
+            apiWorker.execute();
+        }
     }
 
     private void setForgeVersion() {
@@ -230,6 +190,12 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public void onStepLeaving() {
+        if (loadingBar.isVisible()) {
+            // we're in a cancel state
+            apiWorker.cancel(true);
+            return;
+        }
+
         settings.pluginName = pluginNameField.getText();
         settings.pluginVersion = pluginVersionField.getText();
         settings.mainClass = mainClassField.getText();
@@ -258,4 +224,54 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
     @Override
     public void updateDataModel() {}
+
+    private class ForgeWorker extends SwingWorker<Object, Object> {
+
+        @Override
+        protected Object doInBackground() throws Exception {
+            mcpVersion = McpVersion.downloadData();
+            forgeVersion = ForgeVersion.downloadData();
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            if (mcpVersion == null) {
+                return;
+            }
+
+            minecraftVersionBox.removeAllItems();
+
+            // reverse order the versions
+            if (!(settings instanceof SpongeForgeProjectConfiguration)) {
+                forgeVersion.getSortedMcVersions().forEach(minecraftVersionBox::addItem);
+                final String recommended = forgeVersion.getRecommended(mcpVersion.getVersions());
+
+                int index = 0;
+                for (int i = 0; i < minecraftVersionBox.getItemCount(); i++) {
+                    if (minecraftVersionBox.getItemAt(i).equals(recommended)) {
+                        index = i;
+                    }
+                }
+                minecraftVersionBox.setSelectedIndex(index);
+            } else {
+                minecraftVersionBox.addItem("4.1.0");
+                minecraftVersionBox.addItem("5.0.0");
+                minecraftVersionBox.setSelectedIndex(1);
+            }
+
+            if (mcpVersion != null) {
+                mcpVersion.setMcpVersion(mcpVersionBox, getVersion(), mcpBoxActionListener);
+            }
+
+            if (forgeVersion == null) {
+                return;
+            }
+
+            setForgeVersion();
+
+            loadingBar.setIndeterminate(false);
+            loadingBar.setVisible(false);
+        }
+    }
 }

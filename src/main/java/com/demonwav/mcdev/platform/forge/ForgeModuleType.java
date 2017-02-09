@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -78,7 +78,7 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
 
     @NotNull
     @Override
-    public ForgeModule generateModule(Module module) {
+    public ForgeModule generateModule(@NotNull Module module) {
         return new ForgeModule(module);
     }
 

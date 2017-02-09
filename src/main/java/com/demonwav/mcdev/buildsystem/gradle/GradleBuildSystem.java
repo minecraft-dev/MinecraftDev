@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -205,9 +205,10 @@ public class GradleBuildSystem extends BuildSystem {
                         );
                     } else {
                         buildGradleText = AbstractTemplate.applyBuildGradleTemplate(project, gradleProp,
-                                                                                    getGroupId(),
-                                                                                    getVersion(),
-                                                                                    getBuildVersion()
+                                getGroupId(),
+                                getArtifactId(),
+                                getVersion(),
+                                getBuildVersion()
                         );
                     }
 
@@ -443,11 +444,21 @@ public class GradleBuildSystem extends BuildSystem {
         final AsyncPromise<BuildSystem> importPromise = getImportPromise();
         assert importPromise != null;
 
+        if (module.isDisposed()) {
+            importPromise.setResult(this);
+            return importPromise;
+        }
+
         // We must be on the event dispatch thread to run a backgroundable task
         ApplicationManager.getApplication().invokeLater(() ->
             ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Importing Gradle Module", false) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
+                    if (module.isDisposed()) {
+                        importPromise.setResult(GradleBuildSystem.this);
+                        return;
+                    }
+
                     // We will need to request read access, which we can do from async
                     ApplicationManager.getApplication().runReadAction(() -> {
                         Project project = module.getProject();
@@ -619,8 +630,10 @@ public class GradleBuildSystem extends BuildSystem {
 
                 AbstractTemplate.applyMultiModuleBuildGradleTemplate(project, buildGradle, gradleProp,
                                                                      getGroupId(),
+                                                                     getArtifactId(),
                                                                      getVersion(),
-                                                                     getBuildVersion()
+                                                                     getBuildVersion(),
+                                                                     configurations.containsKey(PlatformType.SPONGE)
                 );
 
                 AbstractTemplate.applySettingsGradleTemplate(project, settingsGradle, getArtifactId().toLowerCase(), includes);

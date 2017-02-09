@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -92,7 +92,7 @@ public class MixinModuleType extends AbstractModuleType<MixinModule> {
 
     @NotNull
     @Override
-    public MixinModule generateModule(Module module) {
+    public MixinModule generateModule(@NotNull Module module) {
         return new MixinModule(module);
     }
 }

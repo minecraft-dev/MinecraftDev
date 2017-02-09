@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  */
@@ -43,6 +43,7 @@ import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypeParameter;
+import com.intellij.psi.impl.source.PsiClassImpl;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.impl.source.tree.ElementType;
 import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
@@ -631,5 +632,63 @@ public final class MixinUtils {
         }
 
         return ShadowedMembers.EMPTY;
+    }
+
+    /**
+     * Checks if the given {@link PsiClass} is an accessor Mixin. Returns true if and only if:
+     * <ol>
+     *     <li>The given parameter, {@code psiClassType}, is not null.</li>
+     *     <li>The class given is a Mixin.</li>
+     *     <li>The class given is an interface.</li>
+     *     <li>All Mixin targets are classes.</li>
+     *     <li>All member methods are decorated with either {@code @Accessor} or {@code @Invoker}.</li>
+     * </ol>
+     *
+     * @param psiClassType The {@link PsiClass} to check.
+     * @return True if the above checks is satisfied.
+     */
+    @Contract(pure = true)
+    public static boolean isAccessorMixin(@Nullable final PsiClassType psiClassType) {
+        if (psiClassType == null) {
+            return false;
+        }
+
+        final PsiClass psiClass = psiClassType.resolve();
+        if (psiClass == null) {
+            return false;
+        }
+
+        if (!psiClass.isInterface()) {
+            return false;
+        }
+
+        if (!(psiClass instanceof PsiClassImpl)) {
+            return false;
+        }
+
+        final Map<PsiElement, PsiClass> mixedClasses = getAllMixedClasses(psiClass);
+        if (mixedClasses.isEmpty()) {
+            return false;
+        }
+
+        for (Map.Entry<PsiElement, PsiClass> entries : mixedClasses.entrySet()) {
+            if (entries.getValue().isInterface()) {
+                return false;
+            }
+        }
+
+        for (PsiMethod method : ((PsiClassImpl) psiClass).getOwnMethods()) {
+            if (method.getModifierList().findAnnotation(MixinConstants.Annotations.ACCESSOR) != null) {
+                continue;
+            }
+
+            if (method.getModifierList().findAnnotation(MixinConstants.Annotations.INVOKER) != null) {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 }
