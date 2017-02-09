@@ -37,10 +37,13 @@ class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNa
     override fun getName() = "Mixin @Overwrite line marker"
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiIdentifier>? {
-        val method = element as? PsiMethod ?: return null
-        val identifier = method.nameIdentifier ?: return null
-        return if (method.modifierList.findAnnotation(MixinConstants.Annotations.OVERWRITE) != null) {
-            OverwriteLineMarker(identifier, this)
+        if (element !is PsiMethod) {
+            return null
+        }
+
+        val identifier = element.nameIdentifier ?: return null
+        return if (element.modifierList.findAnnotation(MixinConstants.Annotations.OVERWRITE) != null) {
+            LineMarker(identifier, this)
         } else {
             null
         }
@@ -53,27 +56,32 @@ class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNa
         val method = elt.parent as? PsiMethod ?: return
         val psiClass = getClassOfElement(method) ?: return
 
+        // TODO: Implement without member reference
         val reference = method.memberReference
         val targetMethods = MixinUtils.getAllMixedClasses(psiClass).values.stream()
                 .flatMap { it.findMethods(reference) }
                 .toTypedArray()
-        PsiElementListNavigator.openTargets(e, targetMethods,
-                "Choose target method of ${method.name}", null, MethodCellRenderer(false))
+        if (targetMethods.isNotEmpty()) {
+            PsiElementListNavigator.openTargets(e, targetMethods,
+                    "Choose target method of ${method.name}", null, MethodCellRenderer(false))
+        }
     }
+
+    private class LineMarker(identifier: PsiIdentifier, navHandler: GutterIconNavigationHandler<PsiIdentifier>)
+        : MergeableLineMarkerInfo<PsiIdentifier>(identifier, identifier.textRange, ICON,
+            Pass.LINE_MARKERS, TOOLTIP_FUNCTION, navHandler, GutterIconRenderer.Alignment.LEFT) {
+
+        override fun canMergeWith(info: MergeableLineMarkerInfo<*>) = info is LineMarker
+        override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<PsiElement>>) = TOOLTIP_FUNCTION
+        override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<PsiElement>>) = ICON
+
+        private companion object {
+            @JvmField val ICON: Icon = AllIcons.Gutter.OverridingMethod
+            @JvmField val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to target method")
+        }
+
+    }
+
 
 }
 
-private class OverwriteLineMarker(identifier: PsiIdentifier, navHandler: GutterIconNavigationHandler<PsiIdentifier>)
-    : MergeableLineMarkerInfo<PsiIdentifier>(identifier, identifier.textRange, AllIcons.Gutter.OverridingMethod,
-        Pass.LINE_MARKERS, TOOLTIP_FUNCTION, navHandler, GutterIconRenderer.Alignment.LEFT) {
-
-    override fun canMergeWith(info: MergeableLineMarkerInfo<*>) = info is OverwriteLineMarker
-    override fun getCommonTooltip(infos: MutableList<MergeableLineMarkerInfo<PsiElement>>) = TOOLTIP_FUNCTION
-    override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<PsiElement>>) = ICON
-
-    private companion object {
-        @JvmField val ICON: Icon = AllIcons.Gutter.OverridingMethod
-        @JvmField val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to target method")
-    }
-
-}
