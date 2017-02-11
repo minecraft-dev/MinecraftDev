@@ -99,16 +99,24 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
     @Override
     public boolean validate() throws ConfigurationException {
         try {
-            if (groupIdField.getText().trim().isEmpty()) {
+            if (groupIdField.getText().isEmpty()) {
                 throw new MinecraftSetupException("fillAll", groupIdField);
             }
 
-            if (artifactIdField.getText().trim().isEmpty()) {
+            if (artifactIdField.getText().isEmpty()) {
                 throw new MinecraftSetupException("fillAll", artifactIdField);
             }
 
             if (versionField.getText().trim().isEmpty()) {
                 throw new MinecraftSetupException("fillAll", versionField);
+            }
+
+            if (!groupIdField.getText().matches("\\S+")) {
+                throw new MinecraftSetupException("The GroupId field cannot contain any whitespace", groupIdField);
+            }
+
+            if (!artifactIdField.getText().matches("\\S+")) {
+                throw new MinecraftSetupException("The ArtifactId field cannot contain any whitespace", artifactIdField);
             }
 
             if (creator.getSettings().values().stream().anyMatch(s -> s.type == FORGE) && buildSystemBox.getSelectedIndex() == 0) {
