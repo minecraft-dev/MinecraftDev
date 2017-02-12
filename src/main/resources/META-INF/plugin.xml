@@ -37,6 +37,9 @@
     <idea-version since-build="163" until-build="163.*"/>
 
     <extensions defaultExtensionNs="com.intellij">
+        <!-- Allows using multiple inspection suppressors -->
+        <lang.inspectionSuppressor order="first" language="JAVA" implementationClass="com.demonwav.mcdev.util.MultiInspectionSuppressor"/>
+
         <!-- Module types are for transitions from old versions only -->
         <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
         <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BukkitModuleTypeTransition"/>
@@ -68,6 +71,9 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mixin.gradle.MixinDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
 
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.ShadowNullableInspectionSuppressor"/>
+
+        <!-- Mixin completion -->
         <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionContributor"
                                 order="last, before javaLegacy"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinReferenceContributor"/>
@@ -349,8 +355,6 @@
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
         <moduleService serviceImplementation="com.demonwav.mcdev.platform.mcp.McpModuleSettings"/>
-
-        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspections.ShadowNullabilityInspectionSuppressor"/>
 
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mixin.debug.MixinRunConfigurationExtension"/>
         <debugger.positionManagerFactory implementation="com.demonwav.mcdev.platform.mixin.debug.MixinPositionManagerFactory"/>
