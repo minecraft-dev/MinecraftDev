@@ -20,9 +20,9 @@ import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiMethod
 
-class OverwriteInspection : MixinInspection() {
+class OverwriteTargetInspection : MixinInspection() {
 
-    override fun getStaticDescription() = "Reports related to Mixin @Overwrites"
+    override fun getStaticDescription() = "Verifies target method of @Overwrites"
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 

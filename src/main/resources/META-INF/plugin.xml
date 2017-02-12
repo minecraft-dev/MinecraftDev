@@ -224,6 +224,7 @@
 
         <!-- Mixin Inspections -->
         <localInspection displayName="Invalid @Shadow"
+                         shortName="InvalidShadow"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
@@ -231,13 +232,15 @@
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspections.ShadowInspection"/>
         <localInspection displayName="Invalid Mixin Target"
+                         shortName="InvalidMixinTarget"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.MixinInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinTargetInspection"/>
         <localInspection displayName="Reference to Mixin class"
+                         shortName="ReferenceToMixin"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
@@ -245,12 +248,13 @@
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
         <localInspection displayName="Public static field/method in a Mixin"
+                         shortName="PublicStaticMixinMembers"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.StaticMixinMemberInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.StaticMemberInspection"/>
         <localInspection displayName="Overwrite lacking @author JavaDoc tag"
                          shortName="OverwriteAuthorRequired"
                          groupName="Mixin"
@@ -258,22 +262,24 @@
                          enabledByDefault="true"
                          level="WEAK WARNING"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.AuthorInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.OverwriteAuthorInspection"/>
         <localInspection displayName="@Final inspection"
+                         shortName="ShadowFinalModification"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.FinalInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.ShadowFinalInspection"/>
 
         <localInspection displayName="@Overwrite method target"
+                         shortName="OverwriteTarget"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.OverwriteInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.OverwriteTargetInspection"/>
 
         <!-- Mixin injectors -->
         <localInspection displayName="Invalid Mixin member reference"
