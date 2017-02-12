@@ -12,12 +12,6 @@
 package com.demonwav.mcdev.util
 
 import com.intellij.psi.HierarchicalMethodSignature
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiDirectory
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiMember
-import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.util.MethodSignature
 import org.jetbrains.annotations.Contract
@@ -56,24 +50,4 @@ fun areSignaturesEqualLightweight(sig1: MethodSignature,
     }
 
     return true
-}
-
-@Contract(value = "null -> null", pure = true)
-fun getContainingMethod(element: PsiElement?): PsiMethod? {
-    if (element == null) {
-        return null
-    }
-
-    if (element is PsiMethod) {
-        return element
-    }
-
-    // Class, File, and Directory, if we've hit that, we're not in a method
-    // Member, if we've hit that immediately after failing the "are we a method" check, then we
-    // aren't in a method
-    if (element is PsiClass || element is PsiMember || element is PsiFile || element is PsiDirectory) {
-        return null
-    }
-
-    return getContainingMethod(element.parent ?: return null)
 }

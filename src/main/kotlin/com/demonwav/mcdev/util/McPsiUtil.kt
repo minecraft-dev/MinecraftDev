@@ -53,7 +53,34 @@ fun findReferencedMember(element: PsiElement?): PsiMember? {
     return findParent(element, true)
 }
 
-@Contract(value = "null -> null", pure = true)
+/**
+ * Non-inline / non-reified method for Java
+ */
+@JvmOverloads
+@Suppress("UNCHECKED_CAST")
+@Contract(value = "null, _, _ -> null", pure = true)
+fun <T : PsiElement> findParent(element: PsiElement?, type: Class<T>, resolveReferences: Boolean = false) : T? {
+    var el = element
+    while (el != null) {
+        if (resolveReferences && el is PsiReference) {
+            el = el.resolve() ?: return null
+        }
+
+        if (type.isAssignableFrom(el.javaClass)) {
+            return el as? T
+        }
+
+        if (el is PsiFile || el is PsiDirectory) {
+            return null
+        }
+
+        el = el.parent
+    }
+
+    return null
+}
+
+@Contract(value = "null, _ -> null", pure = true)
 inline fun <reified T : PsiElement> findParent(element: PsiElement?, resolveReferences: Boolean = false): T? {
     var el = element
     while (el != null) {
@@ -113,7 +140,7 @@ fun extendsOrImplementsClass(psiClass: PsiClass, qualifiedClassName: String): Bo
     val project = psiClass.project
     val aClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, GlobalSearchScope.allScope(project))
 
-    return aClass != null && psiClass.isInheritor(aClass, true)
+    return psiClass == aClass || (aClass != null && psiClass.isInheritor(aClass, true))
 }
 
 fun addImplements(psiClass: PsiClass, qualifiedClassName: String, project: Project) {

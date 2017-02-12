@@ -95,23 +95,23 @@ public class MethodCallSideOnlyInspection extends BaseInspection {
                 // If this field is a @SidedProxy field, don't check. This is because people often are naughty and use the server impl as
                 // the base class for their @SidedProxy class, and client extends it. this messes up our checks, so we will just assume the
                 // right class is loaded for @SidedProxy's
-                label: {
+                skip: {
                     if (qualifierExpression instanceof PsiReferenceExpression) {
                         final PsiReferenceExpression qualifierRefExpression = (PsiReferenceExpression) qualifierExpression;
                         final PsiElement resolve = qualifierRefExpression.resolve();
 
                         if (!(resolve instanceof PsiField)) {
-                            break label;
+                            break skip;
                         }
 
                         final PsiField resolveField = (PsiField) resolve;
                         final PsiModifierList resolveFieldModifierList = resolveField.getModifierList();
                         if (resolveFieldModifierList == null) {
-                            break label;
+                            break skip;
                         }
 
                         if (resolveFieldModifierList.findAnnotation(ForgeConstants.SIDED_PROXY_ANNOTATION) == null) {
-                            break label;
+                            break skip;
                         }
 
                         return;

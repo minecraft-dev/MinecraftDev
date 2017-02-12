@@ -19,7 +19,6 @@ import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData;
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants;
-import com.demonwav.mcdev.util.McMethodUtil;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
@@ -29,12 +28,14 @@ import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiExpression;
 import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
+import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -146,7 +147,7 @@ public class SpongeModule extends AbstractModule {
     @Nullable
     @Override
     public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
-        final PsiMethod method = McMethodUtil.getContainingMethod(expression);
+        final PsiMethod method = McPsiUtil.findParent(expression, PsiMethod.class);
         if (method == null) {
             return null;
         }
@@ -184,8 +185,19 @@ public class SpongeModule extends AbstractModule {
                     return null;
             }
         }
-        final PsiElement resolve = expression.getMethodExpression().resolve();
+
+        final PsiReferenceExpression methodExpression = expression.getMethodExpression();
+        final PsiExpression qualifierExpression = methodExpression.getQualifierExpression();
+        final PsiElement resolve = methodExpression.resolve();
+
+        if (qualifierExpression == null) {
+            return null;
+        }
         if (resolve == null) {
+            return null;
+        }
+
+        if (standardSkip(method, qualifierExpression)) {
             return null;
         }
 
