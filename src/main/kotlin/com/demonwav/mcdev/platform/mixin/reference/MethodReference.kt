@@ -18,7 +18,7 @@ import com.demonwav.mcdev.platform.mixin.util.memberReference
 import com.demonwav.mcdev.util.PolyReferenceResolver
 import com.demonwav.mcdev.util.completeToLiteral
 import com.demonwav.mcdev.util.constantStringValue
-import com.demonwav.mcdev.util.getClassOfElement
+import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.toResolveResults
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
@@ -41,7 +41,7 @@ internal object MethodReference : PolyReferenceResolver(), MixinReference {
     override fun isValidAnnotation(name: String) = name in METHOD_INJECTORS
 
     private fun getTargets(context: PsiElement): Collection<PsiClass>? {
-        val psiClass = getClassOfElement(context) ?: return null
+        val psiClass = context.findContainingClass() ?: return null
         val targets = MixinUtils.getAllMixedClasses(psiClass).values
         return if (targets.isEmpty()) null else targets
     }

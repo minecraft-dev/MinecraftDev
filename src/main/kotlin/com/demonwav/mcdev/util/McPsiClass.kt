@@ -13,9 +13,14 @@ package com.demonwav.mcdev.util
 
 import com.intellij.navigation.AnonymousElementProvider
 import com.intellij.openapi.extensions.Extensions
+import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiMember
+import com.intellij.psi.PsiModifier
+import com.intellij.psi.PsiModifierListOwner
 
 // Type
 
@@ -59,7 +64,7 @@ internal inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (Ps
             // Add named inner class
             list.add(currentClass.name!!)
         } else {
-            parentClass = getClassOfElement(currentClass.parent)!!
+            parentClass = currentClass.parent.findContainingClass()!!
 
             // Add index of anonymous class to list
             list.add(parentClass.getAnonymousIndex(currentClass).toString())
@@ -99,4 +104,43 @@ internal val PsiElement.anonymousElements: Array<PsiElement>?
         }
 
         return null
+    }
+
+// Inheritance
+
+internal fun PsiClass.extendsOrImplements(qualifiedClassName: String): Boolean {
+    val aClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, resolveScope) ?: return false
+    return manager.areElementsEquivalent(this, aClass) || this.isInheritor(aClass, true)
+}
+
+internal fun PsiClass.addImplements(qualifiedClassName: String) {
+    val project = project
+    val listenerClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, resolveScope) ?: return
+
+    val elementFactory = JavaPsiFacade.getElementFactory(project)
+    val element = elementFactory.createClassReferenceElement(listenerClass)
+
+    val referenceList = implementsList
+    if (referenceList != null) {
+        referenceList.add(element)
+    } else {
+        add(elementFactory.createReferenceList(arrayOf(element)))
+    }
+}
+
+// Modifier list
+
+internal fun PsiModifierListOwner.findAnnotation(qualifiedName: String): PsiAnnotation? {
+    return modifierList?.findAnnotation(qualifiedName)
+}
+
+// Member
+
+internal val PsiMember.accessModifier
+    get() = when {
+        hasModifierProperty(PsiModifier.PUBLIC) -> PsiModifier.PUBLIC
+        hasModifierProperty(PsiModifier.PROTECTED) -> PsiModifier.PROTECTED
+        hasModifierProperty(PsiModifier.PACKAGE_LOCAL) -> PsiModifier.PACKAGE_LOCAL
+        hasModifierProperty(PsiModifier.PRIVATE) -> PsiModifier.PRIVATE
+        else -> PsiModifier.PUBLIC
     }

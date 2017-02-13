@@ -68,7 +68,7 @@ public class VariableUseSideOnlyInspection extends BaseInspection {
                 Side elementSide = SideOnlyUtil.checkField(field);
 
                 // Check the class(es) the element is declared in
-                final PsiClass declarationContainingClass = McPsiUtil.getClassOfElement(declaration);
+                final PsiClass declarationContainingClass = field.getContainingClass();
                 if (declarationContainingClass == null) {
                     return;
                 }
@@ -89,7 +89,7 @@ public class VariableUseSideOnlyInspection extends BaseInspection {
                 }
 
                 // Check the class(es) the element is in
-                final PsiClass containingClass = McPsiUtil.getClassOfElement(expression);
+                final PsiClass containingClass = McPsiUtil.findContainingClass(expression);
                 if (containingClass == null) {
                     return;
                 }

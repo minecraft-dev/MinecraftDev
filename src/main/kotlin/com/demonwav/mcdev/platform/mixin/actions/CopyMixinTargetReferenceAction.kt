@@ -30,7 +30,7 @@ class CopyMixinTargetReferenceAction : AnAction() {
         val caret = e.getData(CARET) ?: return
 
         val element = file.findElementAt(caret.offset) ?: return
-        val member = findReferencedMember(element) ?: return
+        val member = element.findReferencedMember() ?: return
 
         val targetReference = when (member) {
             is PsiMethod -> member.qualifiedMemberReference

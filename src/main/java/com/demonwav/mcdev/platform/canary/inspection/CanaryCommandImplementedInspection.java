@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.canary.inspection;
 
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
+import com.demonwav.mcdev.util.McPsiClass;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.codeInspection.ProblemDescriptor;
@@ -54,7 +55,7 @@ public class CanaryCommandImplementedInspection extends BaseInspection {
             @Override
             protected void doFix(Project project, ProblemDescriptor descriptor) {
                 PsiClass psiClass = (PsiClass) infos[0];
-                McPsiUtil.addImplements(psiClass, CanaryConstants.COMMAND_LISTENER_CLASS, project);
+                McPsiClass.addImplements(psiClass, CanaryConstants.COMMAND_LISTENER_CLASS);
             }
 
             @Nls
@@ -93,7 +94,7 @@ public class CanaryCommandImplementedInspection extends BaseInspection {
                     return;
                 }
 
-                final boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, CanaryConstants.COMMAND_LISTENER_CLASS);
+                final boolean inError = !McPsiClass.extendsOrImplements(aClass, CanaryConstants.COMMAND_LISTENER_CLASS);
 
                 if (inError) {
                     registerClassError(aClass, aClass);

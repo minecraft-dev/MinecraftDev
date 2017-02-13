@@ -13,8 +13,8 @@ package com.demonwav.mcdev.platform.mixin.actions
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.util.findReferencedClass
 import com.demonwav.mcdev.util.fullQualifiedName
-import com.demonwav.mcdev.util.getClassOfElement
 import com.demonwav.mcdev.util.gotoTargetElement
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.openapi.actionSystem.AnAction
@@ -46,7 +46,7 @@ class FindMixinsAction : AnAction() {
         val editor = e.getData(EDITOR) ?: return
 
         val element = file.findElementAt(caret.offset) ?: return
-        val classOfElement = getClassOfElement(element, true)?.qualifiedName ?: return
+        val classOfElement = element.findReferencedClass()?.qualifiedName ?: return
 
         invokeLater {
             runBackgroundableTask("Searching for Mixins", project, true) run@ { indicator ->

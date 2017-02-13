@@ -14,7 +14,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.demonwav.mcdev.platform.mixin.util.findFields
 import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.util.filter
-import com.demonwav.mcdev.util.getClassOfElement
+import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
@@ -43,7 +43,7 @@ class MixinCompletionContributor : CompletionContributor() {
         }
 
         // Check if completing inside Mixin class
-        val psiClass = getClassOfElement(position) ?: return
+        val psiClass = position.findContainingClass() ?: return
         val targets = MixinUtils.getAllMixedClasses(psiClass).values
         if (targets.isEmpty()) {
             return

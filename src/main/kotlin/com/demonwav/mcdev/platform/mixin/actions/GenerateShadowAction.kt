@@ -14,10 +14,10 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.demonwav.mcdev.platform.mixin.util.findFields
 import com.demonwav.mcdev.platform.mixin.util.findMethods
-import com.demonwav.mcdev.util.findChild
+import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.findFirstMember
 import com.demonwav.mcdev.util.findLastChild
-import com.demonwav.mcdev.util.findSibling
-import com.demonwav.mcdev.util.getClassOfElement
+import com.demonwav.mcdev.util.findNextMember
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.generation.GenerateMembersUtil
 import com.intellij.codeInsight.generation.GenerationInfo
@@ -51,7 +51,7 @@ class GenerateShadowAction : MixinCodeInsightAction() {
 
     override fun invoke(project: Project, editor: Editor, file: PsiFile) {
         val offset = editor.caretModel.offset
-        val psiClass = getClassOfElement(file.findElementAt(offset)) ?: return
+        val psiClass = file.findElementAt(offset)?.findContainingClass() ?: return
         val targets = MixinUtils.getAllMixedClasses(psiClass).values
 
         val fields = (findFields(psiClass, targets) ?: Stream.empty())
@@ -94,17 +94,11 @@ internal fun insertShadows(project: Project, psiClass: PsiClass, members: Stream
 
 internal fun insertShadows(psiClass: PsiClass, shadows: List<GenerationInfo>) {
     // Find first element after shadow
-    val lastShadow = findLastChild(psiClass, {
+    val lastShadow = psiClass.findLastChild {
         (it as? PsiModifierListOwner)?.modifierList?.findAnnotation(MixinConstants.Annotations.SHADOW) != null
-    })
-
-    val anchor: PsiMember?
-
-    if (lastShadow != null) {
-        anchor = findSibling(lastShadow.nextSibling)
-    } else {
-        anchor = findChild(psiClass)
     }
+
+    val anchor = lastShadow?.findNextMember() ?: psiClass.findFirstMember()
 
     // Insert new shadows after last shadow (or at the top of the class)
     GenerateMembersUtil.insertMembersBeforeAnchor(psiClass, anchor, shadows)

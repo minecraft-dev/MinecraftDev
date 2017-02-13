@@ -118,7 +118,7 @@ public class NewExpressionSideOnlyInspection extends BaseInspection {
                 }
 
                 // Check the class(es) the element is in
-                final PsiClass containingClass = McPsiUtil.getClassOfElement(expression);
+                final PsiClass containingClass = McPsiUtil.findContainingClass(expression);
                 if (containingClass == null) {
                     return;
                 }

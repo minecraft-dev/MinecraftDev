@@ -77,7 +77,7 @@ public class LocalVariableDeclarationSideOnlyInspection extends BaseInspection {
         return new BaseInspectionVisitor() {
             @Override
             public void visitLocalVariable(PsiLocalVariable variable) {
-                final PsiClass psiClass = McPsiUtil.getClassOfElement(variable);
+                final PsiClass psiClass = McPsiUtil.findContainingClass(variable);
                 if (psiClass == null) {
                     return;
                 }

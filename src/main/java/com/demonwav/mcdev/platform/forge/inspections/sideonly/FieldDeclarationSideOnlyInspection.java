@@ -82,7 +82,7 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                final PsiClass psiClass = McPsiUtil.getClassOfElement(field);
+                final PsiClass psiClass = field.getContainingClass();
                 if (psiClass == null) {
                     return;
                 }

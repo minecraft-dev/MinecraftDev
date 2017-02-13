@@ -16,6 +16,7 @@ import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Key;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Level;
 import com.demonwav.mcdev.util.McMethodUtil;
+import com.demonwav.mcdev.util.McPsiClass;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.collect.Lists;
@@ -111,7 +112,7 @@ public final class MixinUtils {
             return null;
         }
 
-        final PsiClass classOfElement = McPsiUtil.getClassOfElement(element);
+        final PsiClass classOfElement = McPsiUtil.findContainingClass(element);
         if (classOfElement == null) {
             return null;
         }
@@ -133,7 +134,7 @@ public final class MixinUtils {
     @Nullable
     @Contract(value = "null -> null", pure = true)
     public static PsiAnnotation getMixinAnnotationOfContainingClass(@Nullable PsiElement element) {
-        return getMixinAnnotation(McPsiUtil.getClassOfElement(element));
+        return element != null ? getMixinAnnotation(McPsiUtil.findContainingClass(element)) : null;
     }
 
     /**
@@ -146,7 +147,7 @@ public final class MixinUtils {
     @Nullable
     @Contract(value = "null -> null", pure = true)
     public static PsiAnnotation getMixinAnnotation(@Nullable PsiClass psiClass) {
-        return McPsiUtil.getAnnotation(psiClass, MixinConstants.Annotations.MIXIN);
+        return psiClass != null ? McPsiClass.findAnnotation(psiClass, MixinConstants.Annotations.MIXIN) : null;
     }
 
     /**
@@ -413,7 +414,7 @@ public final class MixinUtils {
             return ShadowedMembers.EMPTY;
         }
 
-        final PsiAnnotation annotation = McPsiUtil.getAnnotation((PsiModifierListOwner) element, MixinConstants.Annotations.SHADOW);
+        final PsiAnnotation annotation = McPsiClass.findAnnotation((PsiModifierListOwner) element, MixinConstants.Annotations.SHADOW);
         if (annotation == null) {
             return ShadowedMembers.EMPTY;
         }
@@ -504,8 +505,8 @@ public final class MixinUtils {
                 }
 
                 resolveFields.add(resolveField);
-                final String fieldAccessModifier = McPsiUtil.getAccessModifier(field);
-                final String neededAccessModifier = McPsiUtil.getAccessModifier(resolveField);
+                final String fieldAccessModifier = McPsiClass.getAccessModifier(field);
+                final String neededAccessModifier = McPsiClass.getAccessModifier(resolveField);
 
                 if (!neededAccessModifier.equals(fieldAccessModifier)) {
                     errors.add(ShadowError.builder()
@@ -563,11 +564,11 @@ public final class MixinUtils {
                     continue;
                 }
 
-                final String methodAccessModifier = McPsiUtil.getAccessModifier(method);
+                final String methodAccessModifier = McPsiClass.getAccessModifier(method);
                 // There are multiple
                 final ArrayList<PsiMethod> validAccessMethods = new ArrayList<>(methodsByName.length);
                 for (PsiMethod psiMethod : methodsByName) {
-                    final String targetMethodAccessModifier = McPsiUtil.getAccessModifier(psiMethod);
+                    final String targetMethodAccessModifier = McPsiClass.getAccessModifier(psiMethod);
                     if (Objects.equals(targetMethodAccessModifier, PsiModifier.PRIVATE) && Objects.equals(methodAccessModifier, PsiModifier.PROTECTED)) {
                         validAccessMethods.add(psiMethod);
                     } else if (Objects.equals(targetMethodAccessModifier, methodAccessModifier)) {
@@ -604,7 +605,7 @@ public final class MixinUtils {
                 validAccessMethods.removeIf(psiMethod -> !validSignatureMethods.contains(psiMethod));
                 if (validAccessMethods.isEmpty()) {
                     final PsiMethod psiMethod = validSignatureMethods.get(0);
-                    final String probableAccessModifier = McPsiUtil.getAccessModifier(psiMethod);
+                    final String probableAccessModifier = McPsiClass.getAccessModifier(psiMethod);
                     PsiMethod returnMethod = methodsByName.length > 0 ? methodsByName[0] : null;
                     errors.add(ShadowError.builder()
                         .setLevel(Level.SOFT_WARNING)

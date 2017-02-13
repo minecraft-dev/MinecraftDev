@@ -14,7 +14,6 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.platform.mixin.util.memberReference
-import com.demonwav.mcdev.util.getClassOfElement
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
@@ -54,7 +53,7 @@ class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNa
 
     override fun navigate(e: MouseEvent, elt: PsiIdentifier) {
         val method = elt.parent as? PsiMethod ?: return
-        val psiClass = getClassOfElement(method) ?: return
+        val psiClass = method.containingClass ?: return
 
         // TODO: Implement without member reference
         val reference = method.memberReference

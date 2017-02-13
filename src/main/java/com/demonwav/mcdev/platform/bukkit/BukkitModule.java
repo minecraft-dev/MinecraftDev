@@ -18,6 +18,7 @@ import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
+import com.demonwav.mcdev.util.McPsiClass;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.base.Objects;
@@ -125,8 +126,8 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
 
     @Override
     public void doPreEventGenerate(@NotNull PsiClass psiClass, @Nullable GenerationData data) {
-        if (!McPsiUtil.extendsOrImplementsClass(psiClass, BukkitConstants.LISTENER_CLASS)) {
-            McPsiUtil.addImplements(psiClass, BukkitConstants.LISTENER_CLASS, project);
+        if (!McPsiClass.extendsOrImplements(psiClass, BukkitConstants.LISTENER_CLASS)) {
+            McPsiClass.addImplements(psiClass, BukkitConstants.LISTENER_CLASS);
         }
     }
 
@@ -194,7 +195,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
     @Nullable
     @Override
     public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
-        final PsiMethod method = McPsiUtil.findParent(expression, PsiMethod.class);
+        final PsiMethod method = McPsiUtil.findContainingMethod(expression);
         if (method == null) {
             return null;
         }
@@ -243,7 +244,7 @@ public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
         }
 
         final PsiClass psiClass = (PsiClass) context;
-        if (!McPsiUtil.extendsOrImplementsClass(psiClass, BukkitConstants.CANCELLABLE_CLASS)) {
+        if (!McPsiClass.extendsOrImplements(psiClass, BukkitConstants.CANCELLABLE_CLASS)) {
             return null;
         }
 
