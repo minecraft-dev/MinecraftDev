@@ -26,9 +26,9 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.impl.JavaConstantExpressionEvaluator;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
-import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 
@@ -90,8 +90,8 @@ public class SidedProxyAnnotator implements Annotator {
             if (text == null) {
                 return;
             }
-        } else if (value instanceof PsiReferenceExpressionImpl) {
-            final PsiReferenceExpressionImpl expression = (PsiReferenceExpressionImpl) value;
+        } else if (value instanceof PsiReferenceExpression) {
+            final PsiReferenceExpression expression = (PsiReferenceExpression) value;
 
             final PsiElement resolve = expression.resolve();
 

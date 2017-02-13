@@ -29,7 +29,7 @@ public class CanaryFileIconProvider implements FileIconProvider {
     @Nullable
     @Override
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {
-        if (!MinecraftSettings.Companion.getInstance().isShowProjectPlatformIcons()) {
+        if (!MinecraftSettings.getInstance().isShowProjectPlatformIcons()) {
             return null;
         }
 

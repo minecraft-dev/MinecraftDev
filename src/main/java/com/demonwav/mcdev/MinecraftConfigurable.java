@@ -61,7 +61,7 @@ public class MinecraftConfigurable implements Configurable {
             chatColorUnderlinesComboBox.addItem(type);
         }
 
-        final MinecraftSettings settings = MinecraftSettings.Companion.getInstance();
+        final MinecraftSettings settings = MinecraftSettings.getInstance();
 
         showProjectPlatformIconsCheckBox.setSelected(settings.isShowProjectPlatformIcons());
         showEventListenerGutterCheckBox.setSelected(settings.isShowEventListenerGutterIcons());
@@ -86,7 +86,7 @@ public class MinecraftConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        final MinecraftSettings settings = MinecraftSettings.Companion.getInstance();
+        final MinecraftSettings settings = MinecraftSettings.getInstance();
 
         return showProjectPlatformIconsCheckBox.isSelected() != settings.isShowProjectPlatformIcons() ||
             showEventListenerGutterCheckBox.isSelected() != settings.isShowEventListenerGutterIcons() ||
@@ -98,7 +98,7 @@ public class MinecraftConfigurable implements Configurable {
 
     @Override
     public void apply() throws ConfigurationException {
-        final MinecraftSettings settings = MinecraftSettings.Companion.getInstance();
+        final MinecraftSettings settings = MinecraftSettings.getInstance();
 
         settings.setShowProjectPlatformIcons(showProjectPlatformIconsCheckBox.isSelected());
         settings.setShowEventListenerGutterIcons(showEventListenerGutterCheckBox.isSelected());

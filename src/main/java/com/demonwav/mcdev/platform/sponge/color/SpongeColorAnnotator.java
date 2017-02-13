@@ -25,7 +25,7 @@ public class SpongeColorAnnotator implements Annotator {
 
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        if (!MinecraftSettings.Companion.getInstance().isShowChatColorUnderlines()) {
+        if (!MinecraftSettings.getInstance().isShowChatColorUnderlines()) {
             return;
         }
 

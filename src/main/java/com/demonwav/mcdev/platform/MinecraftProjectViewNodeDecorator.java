@@ -35,7 +35,7 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
 
     @Override
     public void decorate(ProjectViewNode node, PresentationData data) {
-        if (!MinecraftSettings.Companion.getInstance().isShowProjectPlatformIcons()) {
+        if (!MinecraftSettings.getInstance().isShowProjectPlatformIcons()) {
             return;
         }
 

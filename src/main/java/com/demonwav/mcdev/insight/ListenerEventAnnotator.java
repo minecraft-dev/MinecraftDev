@@ -37,7 +37,7 @@ public class ListenerEventAnnotator implements Annotator {
 
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        if (!MinecraftSettings.Companion.getInstance().isShowEventListenerGutterIcons()) {
+        if (!MinecraftSettings.getInstance().isShowEventListenerGutterIcons()) {
             return;
         }
 

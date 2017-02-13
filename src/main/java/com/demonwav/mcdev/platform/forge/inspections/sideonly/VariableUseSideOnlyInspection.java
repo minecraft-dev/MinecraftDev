@@ -15,6 +15,7 @@ import com.demonwav.mcdev.util.McPsiUtil;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.impl.source.PsiFieldImpl;
 import com.siyeh.ig.BaseInspection;
@@ -64,7 +65,7 @@ public class VariableUseSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                final PsiFieldImpl field = (PsiFieldImpl) declaration;
+                final PsiField field = (PsiField) declaration;
                 Side elementSide = SideOnlyUtil.checkField(field);
 
                 // Check the class(es) the element is declared in

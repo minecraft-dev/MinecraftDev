@@ -63,7 +63,7 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
     @Override
     @Nullable
     public LineMarkerInfo getLineMarkerInfo(@NotNull final PsiElement element) {
-        if (!MinecraftSettings.Companion.getInstance().isShowEventListenerGutterIcons()) {
+        if (!MinecraftSettings.getInstance().isShowEventListenerGutterIcons()) {
             return null;
         }
 
