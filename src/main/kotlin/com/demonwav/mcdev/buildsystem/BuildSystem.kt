@@ -13,11 +13,9 @@ package com.demonwav.mcdev.buildsystem
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.platform.ProjectConfiguration
-import com.demonwav.mcdev.util.Key
 import com.demonwav.mcdev.util.runWriteTask
 import com.google.common.base.MoreObjects
 import com.google.common.base.Objects
-import com.google.common.collect.Maps
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
@@ -31,7 +29,6 @@ import org.jetbrains.concurrency.Promise
 import java.io.IOException
 import java.util.ArrayList
 import java.util.HashMap
-import java.util.Optional
 
 /**
  * Base class for Maven and Gradle build systems. The general contract of any class which implements this is any
@@ -39,8 +36,6 @@ import java.util.Optional
  * represent changes in the project itself.
  */
 abstract class BuildSystem {
-
-    private val extraData = Maps.newHashMap<Key<*>, Any>()
 
     lateinit var artifactId: String
     lateinit var groupId: String
@@ -155,29 +150,18 @@ abstract class BuildSystem {
     protected fun createDirectories(root: VirtualFile = rootDirectory) {
         runWriteTask {
             try {
-                sourceDirectories = arrayListOf(VfsUtil.createDirectories(root.path + "/src/main/java"))
-                resourceDirectories = arrayListOf(VfsUtil.createDirectories(root.path + "/src/main/resources"))
-                testSourcesDirectories = arrayListOf(VfsUtil.createDirectories(root.path + "/src/test/java"))
-                testResourceDirectories = arrayListOf(VfsUtil.createDirectories(root.path + "/src/test/resources"))
+                sourceDirectories = arrayListOf(VfsUtil.createDirectories("${root.path}/src/main/java"))
+                resourceDirectories = arrayListOf(VfsUtil.createDirectories("${root.path}/src/main/resources"))
+                testSourcesDirectories = arrayListOf(VfsUtil.createDirectories("${root.path}/src/test/java"))
+                testResourceDirectories = arrayListOf(VfsUtil.createDirectories("${root.path}/src/test/resources"))
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
     }
 
-    fun <T> setData(key: Key<T>, data: T) {
-        extraData.put(key, data)
-    }
-
-    @Contract(pure = true)
-    fun <T> getData(key: Key<T>?): Optional<T> {
-        @Suppress("UNCHECKED_CAST")
-        return Optional.ofNullable(extraData[key] as T)
-    }
-
     override fun toString(): String {
         return MoreObjects.toStringHelper(this)
-            .add("extraData", extraData)
             .add("artifactId", artifactId)
             .add("groupId", groupId)
             .add("version", version)
