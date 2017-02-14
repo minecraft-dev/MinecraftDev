@@ -41,7 +41,7 @@ buildscript {
 
     dependencies {
         classpath(kotlinModule("gradle-plugin", project.properties["kotlinVersion"] as String))
-        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.0")
+        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.1")
         classpath("gradle.plugin.net.minecrell:licenser:0.3")
     }
 }
@@ -221,6 +221,10 @@ tasks.withType<KotlinCompile> {
     dependsOn(generate)
     kotlinOptions.jvmTarget = javaVersion as String
 }
+
+// Define dependency on compileKotlin so gradle-intellij-plugin configures
+// form class instrumentation
+tasks.getByName("classes").dependsOn("compileKotlin")
 
 fun Task.instrumentCode(state: Boolean) {
     doLast {

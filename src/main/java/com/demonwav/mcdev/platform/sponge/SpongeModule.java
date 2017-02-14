@@ -19,6 +19,7 @@ import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData;
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants;
+import com.demonwav.mcdev.util.McPsiClass;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
@@ -147,7 +148,7 @@ public class SpongeModule extends AbstractModule {
     @Nullable
     @Override
     public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
-        final PsiMethod method = McPsiUtil.findParent(expression, PsiMethod.class);
+        final PsiMethod method = McPsiUtil.findContainingMethod(expression);
         if (method == null) {
             return null;
         }
@@ -207,7 +208,7 @@ public class SpongeModule extends AbstractModule {
         }
 
         final PsiClass psiClass = (PsiClass) content;
-        if (!McPsiUtil.extendsOrImplementsClass(psiClass, SpongeConstants.CANCELLABLE)) {
+        if (!McPsiClass.extendsOrImplements(psiClass, SpongeConstants.CANCELLABLE)) {
             return null;
         }
 

@@ -130,7 +130,7 @@ public class MethodCallSideOnlyInspection extends BaseInspection {
                 Side elementSide = SideOnlyUtil.checkMethod(method);
 
                 // Check the class(es) the element is declared in
-                final PsiClass declarationContainingClass = McPsiUtil.getClassOfElement(declaration);
+                final PsiClass declarationContainingClass = method.getContainingClass();
                 if (declarationContainingClass == null) {
                     return;
                 }
@@ -151,7 +151,7 @@ public class MethodCallSideOnlyInspection extends BaseInspection {
                 }
 
                 // Check the class(es) the element is in
-                final PsiClass containingClass = McPsiUtil.getClassOfElement(expression);
+                final PsiClass containingClass = McPsiUtil.findContainingClass(expression);
                 if (containingClass == null) {
                     return;
                 }

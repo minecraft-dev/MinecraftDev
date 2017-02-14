@@ -11,8 +11,6 @@
 @file:JvmName("McPsiUtil")
 package com.demonwav.mcdev.util
 
-import com.google.common.collect.ImmutableSet
-import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiArrayInitializerMemberValue
@@ -21,10 +19,10 @@ import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiJavaCodeReferenceElement
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMember
-import com.intellij.psi.PsiModifier
-import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiParenthesizedExpression
@@ -36,54 +34,28 @@ import com.intellij.psi.PsiTypeCastExpression
 import com.intellij.psi.PsiVariable
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.filters.ElementFilter
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
-import org.jetbrains.annotations.Contract
 import java.util.stream.Stream
 
-@JvmOverloads
-@Contract(value = "null, _ -> null", pure = true)
-fun getClassOfElement(element: PsiElement?, resolveReferences: Boolean = false): PsiClass? {
-    return findParent(element, resolveReferences)
+// Parent
+
+internal fun PsiElement.findContainingClass(): PsiClass? = findParent(resolveReferences = false)
+internal fun PsiElement.findReferencedClass(): PsiClass? = findParent(resolveReferences = true)
+internal fun PsiElement.findReferencedMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = true)
+internal fun PsiElement.findContainingMethod(): PsiMethod? = findParent({ it is PsiClass }, resolveReferences = false)
+internal fun PsiElement.findJavaCodeReferenceElement(): PsiJavaCodeReferenceElement? {
+    return findParent({ it is PsiMethod || it is PsiClass }, resolveReferences = false)
 }
 
-@Contract(value = "null -> null", pure = true)
-fun findReferencedMember(element: PsiElement?): PsiMember? {
-    return findParent(element, true)
+private inline fun <reified T : PsiElement> PsiElement.findParent(resolveReferences: Boolean): T? {
+    return findParent({false}, resolveReferences)
 }
 
-/**
- * Non-inline / non-reified method for Java
- */
-@JvmOverloads
-@Suppress("UNCHECKED_CAST")
-@Contract(value = "null, _, _ -> null", pure = true)
-fun <T : PsiElement> findParent(element: PsiElement?, type: Class<T>, resolveReferences: Boolean = false) : T? {
-    var el = element
-    while (el != null) {
-        if (resolveReferences && el is PsiReference) {
-            el = el.resolve() ?: return null
-        }
+private inline fun <reified T : PsiElement> PsiElement.findParent(stop: (PsiElement) -> Boolean, resolveReferences: Boolean): T? {
+    var el: PsiElement = this
 
-        if (type.isAssignableFrom(el.javaClass)) {
-            return el as? T
-        }
-
-        if (el is PsiFile || el is PsiDirectory) {
-            return null
-        }
-
-        el = el.parent
-    }
-
-    return null
-}
-
-@Contract(value = "null, _ -> null", pure = true)
-inline fun <reified T : PsiElement> findParent(element: PsiElement?, resolveReferences: Boolean = false): T? {
-    var el = element
-    while (el != null) {
+    while (true) {
         if (resolveReferences && el is PsiReference) {
             el = el.resolve() ?: return null
         }
@@ -92,93 +64,44 @@ inline fun <reified T : PsiElement> findParent(element: PsiElement?, resolveRefe
             return el
         }
 
-        if (el is PsiFile || el is PsiDirectory) {
+        if (el is PsiFile || el is PsiDirectory || stop(el)) {
             return null
         }
 
-        el = el.parent
+        el = el.parent ?: return null
     }
-
-    return null
 }
 
-inline fun <reified T : PsiElement> findChild(element: PsiElement): T? {
-    val firstChild = element.firstChild ?: return null
-    return findSibling(firstChild, false)
+// Children
+internal fun PsiClass.findFirstMember(): PsiMember? = findChild()
+internal fun PsiElement.findNextMember(): PsiMember? = findSibling(true)
+
+private inline fun <reified T : PsiElement> PsiElement.findChild(): T? {
+    return firstChild?.findSibling(strict = false)
 }
 
-inline fun <reified T : PsiElement> findSibling(element: PsiElement, strict: Boolean = true): T? {
-    var sibling = if (strict) element.nextSibling else element
-
-    while (sibling != null) {
+private inline fun <reified T : PsiElement> PsiElement.findSibling(strict: Boolean): T? {
+    var sibling = if (strict) nextSibling ?: return null else this
+    while (true) {
         if (sibling is T) {
             return sibling
         }
 
-        sibling = sibling.nextSibling
+        sibling = sibling.nextSibling ?: return null
     }
-
-    return null
 }
 
-inline fun findLastChild(element: PsiElement, condition: (PsiElement) -> Boolean): PsiElement? {
-    var child = element.firstChild
+internal inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElement? {
+    var child = firstChild ?: return null
     var lastChild: PsiElement? = null
 
-    while (child != null) {
+    while (true) {
         if (condition(child)) {
             lastChild = child
         }
 
-        child = child.nextSibling
+        child = child.nextSibling ?: return lastChild
     }
-
-    return lastChild
-}
-
-fun extendsOrImplementsClass(psiClass: PsiClass, qualifiedClassName: String): Boolean {
-    val project = psiClass.project
-    val aClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, GlobalSearchScope.allScope(project))
-
-    return psiClass == aClass || (aClass != null && psiClass.isInheritor(aClass, true))
-}
-
-fun addImplements(psiClass: PsiClass, qualifiedClassName: String, project: Project) {
-    val referenceList = psiClass.implementsList
-    val listenerClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, GlobalSearchScope.allScope(project))
-    if (listenerClass != null) {
-        val element = JavaPsiFacade.getElementFactory(project).createClassReferenceElement(listenerClass)
-        if (referenceList != null) {
-            referenceList.add(element)
-        } else {
-            val list = JavaPsiFacade.getElementFactory(project).createReferenceList(arrayOf(element))
-            psiClass.add(list)
-        }
-    }
-}
-
-private val MEMBER_ACCESS_MODIFIERS = ImmutableSet.builder<String>()
-    .add(PsiModifier.PUBLIC)
-    .add(PsiModifier.PROTECTED)
-    .add(PsiModifier.PACKAGE_LOCAL)
-    .add(PsiModifier.PRIVATE)
-    .build()
-
-fun getAccessModifier(member: PsiMember?): String {
-    return MEMBER_ACCESS_MODIFIERS.stream()
-        .filter { member?.hasModifierProperty(it) == true }
-        .findFirst()
-        .orElse(PsiModifier.PUBLIC)
-}
-
-fun getAnnotation(owner: PsiModifierListOwner?, annotationName: String): PsiAnnotation? {
-    if (owner == null) {
-        return null
-    }
-
-    val list = owner.modifierList ?: return null
-
-    return list.findAnnotation(annotationName)
 }
 
 internal fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement): Stream<T> {

@@ -20,6 +20,7 @@ import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.BukkitModule;
 import com.demonwav.mcdev.platform.bungeecord.generation.BungeeCordGenerationData;
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants;
+import com.demonwav.mcdev.util.McPsiClass;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.intellij.openapi.module.Module;
@@ -106,8 +107,8 @@ public class BungeeCordModule extends AbstractModule {
     public void doPreEventGenerate(@NotNull PsiClass psiClass, @Nullable GenerationData data) {
         final String bungeeCordListenerClass = BungeeCordConstants.LISTENER_CLASS;
 
-        if (!McPsiUtil.extendsOrImplementsClass(psiClass, bungeeCordListenerClass)) {
-            McPsiUtil.addImplements(psiClass, bungeeCordListenerClass, project);
+        if (!McPsiClass.extendsOrImplements(psiClass, bungeeCordListenerClass)) {
+            McPsiClass.addImplements(psiClass, bungeeCordListenerClass);
         }
     }
 

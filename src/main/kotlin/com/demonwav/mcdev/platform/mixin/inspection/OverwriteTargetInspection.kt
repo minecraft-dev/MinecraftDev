@@ -14,15 +14,14 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.platform.mixin.util.memberReference
-import com.demonwav.mcdev.util.getClassOfElement
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiMethod
 
-class OverwriteInspection : MixinInspection() {
+class OverwriteTargetInspection : MixinInspection() {
 
-    override fun getStaticDescription() = "Reports related to Mixin @Overwrites"
+    override fun getStaticDescription() = "Verifies target method of @Overwrites"
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
@@ -36,7 +35,7 @@ class OverwriteInspection : MixinInspection() {
 
             val identifier = method.nameIdentifier ?: return
 
-            val psiClass = getClassOfElement(method) ?: return
+            val psiClass = method.containingClass ?: return
             val targets = MixinUtils.getAllMixedClasses(psiClass).values
             if (targets.isEmpty()) {
                 return

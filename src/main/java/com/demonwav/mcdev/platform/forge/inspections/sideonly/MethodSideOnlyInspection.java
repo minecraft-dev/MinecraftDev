@@ -82,7 +82,7 @@ public class MethodSideOnlyInspection extends BaseInspection {
         return new BaseInspectionVisitor() {
             @Override
             public void visitMethod(PsiMethod method) {
-                final PsiClass psiClass = McPsiUtil.getClassOfElement(method);
+                final PsiClass psiClass = method.getContainingClass();
                 if (psiClass == null) {
                     return;
                 }

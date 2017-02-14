@@ -77,7 +77,7 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
         return new BaseInspectionVisitor() {
             @Override
             public void visitField(PsiField field) {
-                final PsiClass psiClass = McPsiUtil.getClassOfElement(field);
+                final PsiClass psiClass = field.getContainingClass();
                 if (psiClass == null) {
                     return;
                 }

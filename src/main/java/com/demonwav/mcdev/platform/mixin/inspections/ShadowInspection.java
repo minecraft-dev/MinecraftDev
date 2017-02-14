@@ -19,6 +19,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Key;
 import com.demonwav.mcdev.platform.mixin.util.ShadowedMembers;
+import com.demonwav.mcdev.util.McPsiClass;
 import com.demonwav.mcdev.util.McPsiUtil;
 
 import com.google.common.collect.Lists;
@@ -129,7 +130,7 @@ public class ShadowInspection extends BaseJavaBatchLocalInspectionTool {
             return null;
         }
 
-        final PsiAnnotation shadowAnnotation = McPsiUtil.getAnnotation(owner, Annotations.SHADOW);
+        final PsiAnnotation shadowAnnotation = McPsiClass.findAnnotation(owner, Annotations.SHADOW);
         if (shadowAnnotation == null) {
             return null;
         }

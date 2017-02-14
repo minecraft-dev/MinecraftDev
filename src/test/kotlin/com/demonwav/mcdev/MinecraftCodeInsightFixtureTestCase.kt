@@ -36,7 +36,7 @@ abstract class MinecraftCodeInsightFixtureTestCase : LightCodeInsightFixtureTest
                 MinecraftModuleType.addOption(module, ForgeModuleType.getInstance().id)
                 MinecraftModuleType.addOption(module, LiteLoaderModuleType.getInstance().id)
                 MinecraftModuleType.addOption(module, BungeeCordModuleType.getInstance().id)
-                MinecraftModuleType.addOption(module, MixinModuleType.getInstance().id)
+                MinecraftModuleType.addOption(module, MixinModuleType.id)
                 MinecraftModuleType.addOption(module, McpModuleType.getInstance().id)
                 MinecraftModuleType.addOption(module, NeptuneModuleType.getInstance().id)
             }

@@ -14,7 +14,7 @@ import com.demonwav.mcdev.platform.MinecraftModule
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.util.McpConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
-import com.demonwav.mcdev.util.extendsOrImplementsClass
+import com.demonwav.mcdev.util.extendsOrImplements
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
@@ -40,7 +40,7 @@ class EntityConstructorInspection : BaseInspection() {
                     return
                 }
 
-                if (!extendsOrImplementsClass(aClass, McpConstants.ENTITY)) {
+                if (!aClass.extendsOrImplements(McpConstants.ENTITY)) {
                     return
                 }
 
