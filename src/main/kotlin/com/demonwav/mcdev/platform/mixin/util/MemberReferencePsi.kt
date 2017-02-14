@@ -18,10 +18,12 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.intellij.util.containers.stream
+import org.jetbrains.annotations.Contract
 import java.util.stream.Stream
 
 // Class
 
+@Contract(pure = true)
 internal fun PsiClass.findMethods(member: MemberReference, checkBases: Boolean = false): Stream<PsiMethod> {
     if (!member.matchOwner(this)) {
         return Stream.empty()
@@ -35,6 +37,7 @@ internal fun PsiClass.findMethods(member: MemberReference, checkBases: Boolean =
     }
 }
 
+@Contract(pure = true)
 internal fun PsiClass.findField(member: MemberReference, checkBases: Boolean = false): PsiField? {
     if (!member.matchOwner(this)) {
         return null
@@ -50,12 +53,15 @@ internal fun PsiClass.findField(member: MemberReference, checkBases: Boolean = f
 
 // Method
 
+@get:Contract(pure = true)
 internal val PsiMethod.memberReference
     get() = MemberReference(internalName, descriptor)
 
+@get:Contract(pure = true)
 internal val PsiMethod.qualifiedMemberReference
     get() = MemberReference(internalName, descriptor, containingClass!!.fullQualifiedName)
 
+@Contract(pure = true)
 internal fun PsiMethod.getQualifiedMemberReference(owner: PsiClass): MemberReference {
     return MemberReference(internalName, descriptor, owner.fullQualifiedName)
 }
@@ -63,12 +69,15 @@ internal fun PsiMethod.getQualifiedMemberReference(owner: PsiClass): MemberRefer
 
 // Field
 
+@get:Contract(pure = true)
 internal val PsiField.memberReference
     get() = MemberReference(name!!, descriptor)
 
+@get:Contract(pure = true)
 internal val PsiField.qualifiedMemberReference
     get() = MemberReference(name!!, descriptor, containingClass!!.fullQualifiedName)
 
+@Contract(pure = true)
 internal fun PsiField.getQualifiedMemberReference(owner: PsiClass): MemberReference {
     return MemberReference(name!!, descriptor, owner.fullQualifiedName)
 }

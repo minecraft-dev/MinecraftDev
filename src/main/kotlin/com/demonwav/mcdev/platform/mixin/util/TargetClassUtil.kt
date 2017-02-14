@@ -17,9 +17,11 @@ import com.intellij.psi.impl.compiled.ClsMethodImpl
 import com.intellij.psi.util.MethodSignatureUtil
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.util.containers.stream
+import org.jetbrains.annotations.Contract
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
+@Contract(pure = true)
 internal fun findMethods(psiClass: PsiClass, targets: Collection<PsiClass>, checkBases: Boolean = false): Stream<PsiMethod>? {
     return when (targets.size) {
         0 -> null
@@ -41,6 +43,7 @@ internal fun findMethods(psiClass: PsiClass, targets: Collection<PsiClass>, chec
     }
 }
 
+@Contract(pure = true)
 internal fun findFields(psiClass: PsiClass, targets: Collection<PsiClass>, checkBases: Boolean = false): Stream<PsiField>? {
     return when (targets.size) {
         0 -> null
@@ -57,6 +60,7 @@ internal fun findFields(psiClass: PsiClass, targets: Collection<PsiClass>, check
     }
 }
 
+@Contract(pure = true)
 internal fun PsiMethod.findSource(): PsiMethod {
     val body = body
     if (body != null) {

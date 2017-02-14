@@ -15,6 +15,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiFile
+import org.jetbrains.annotations.Contract
 import org.jetbrains.plugins.groovy.lang.psi.util.PsiUtil
 
 // Kotlin functions
@@ -38,12 +39,14 @@ fun invokeLater(func: () -> Unit) {
 /**
  * Returns an untyped array for the specified [Collection].
  */
+@Contract(pure = true)
 internal fun Collection<*>.toArray(): Array<Any?> {
     @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
     return (this as java.util.Collection<*>).toArray()
 }
 
 @Suppress("UNCHECKED_CAST")
+@Contract(pure = true)
 internal inline fun <T, reified R> Collection<T>.mapToArray(transform: (T) -> R): Array<R> {
     if (this is List) {
         return this.mapToArray(transform)

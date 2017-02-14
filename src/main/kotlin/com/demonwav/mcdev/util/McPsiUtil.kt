@@ -36,22 +36,34 @@ import com.intellij.psi.ResolveResult
 import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
+import org.jetbrains.annotations.Contract
 import java.util.stream.Stream
 
 // Parent
 
+@Contract(pure = true)
 internal fun PsiElement.findContainingClass(): PsiClass? = findParent(resolveReferences = false)
+
+@Contract(pure = true)
 internal fun PsiElement.findReferencedClass(): PsiClass? = findParent(resolveReferences = true)
+
+@Contract(pure = true)
 internal fun PsiElement.findReferencedMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = true)
+
+@Contract(pure = true)
 internal fun PsiElement.findContainingMethod(): PsiMethod? = findParent({ it is PsiClass }, resolveReferences = false)
+
+@Contract(pure = true)
 internal fun PsiElement.findJavaCodeReferenceElement(): PsiJavaCodeReferenceElement? {
     return findParent({ it is PsiMethod || it is PsiClass }, resolveReferences = false)
 }
 
+@Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findParent(resolveReferences: Boolean): T? {
     return findParent({false}, resolveReferences)
 }
 
+@Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findParent(stop: (PsiElement) -> Boolean, resolveReferences: Boolean): T? {
     var el: PsiElement = this
 
@@ -73,13 +85,18 @@ private inline fun <reified T : PsiElement> PsiElement.findParent(stop: (PsiElem
 }
 
 // Children
+@Contract(pure = true)
 internal fun PsiClass.findFirstMember(): PsiMember? = findChild()
+
+@Contract(pure = true)
 internal fun PsiElement.findNextMember(): PsiMember? = findSibling(true)
 
+@Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findChild(): T? {
     return firstChild?.findSibling(strict = false)
 }
 
+@Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findSibling(strict: Boolean): T? {
     var sibling = if (strict) nextSibling ?: return null else this
     while (true) {
@@ -91,6 +108,7 @@ private inline fun <reified T : PsiElement> PsiElement.findSibling(strict: Boole
     }
 }
 
+@Contract(pure = true)
 internal inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElement? {
     var child = firstChild ?: return null
     var lastChild: PsiElement? = null
@@ -104,11 +122,13 @@ internal inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean)
     }
 }
 
+@Contract(pure = true)
 internal fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement): Stream<T> {
     filter ?: return this
     return filter { filter.isClassAcceptable(it.javaClass) && filter.isAcceptable(it, context) }
 }
 
+@Contract(pure = true)
 fun Stream<out PsiElement>.toResolveResults(): Array<ResolveResult> = map(::PsiElementResolveResult).toTypedArray()
 
 internal fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
@@ -116,14 +136,17 @@ internal fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
 }
 
 // PsiNameValuePair -> PsiAnnotationParameterList -> PsiAnnotation
+@get:Contract(pure = true)
 internal val PsiElement.annotationFromNameValuePair
     get() = parent?.parent as? PsiAnnotation
 
 // value -> PsiNameValuePair -> see above
+@get:Contract(pure = true)
 internal val PsiElement.annotationFromValue
     get() = parent?.annotationFromNameValuePair
 
 // value -> PsiArrayInitializerMemberValue -> PsiNameValuePair -> see above
+@get:Contract(pure = true)
 internal val PsiElement.annotationFromArrayValue: PsiAnnotation?
     get() {
         val parent = parent ?: return null
@@ -134,9 +157,11 @@ internal val PsiElement.annotationFromArrayValue: PsiAnnotation?
         }
     }
 
+@get:Contract(pure = true)
 internal val PsiElement.constantValue: Any
     get() = JavaPsiFacade.getInstance(project).constantEvaluationHelper.computeConstantExpression(this, true)
 
+@get:Contract(pure = true)
 internal val PsiElement.constantStringValue: String
     get() = when (this) {
         is PsiLiteral -> value?.toString() ?: ""
@@ -155,6 +180,7 @@ internal val PsiElement.constantStringValue: String
         else -> throw UnsupportedOperationException("Unsupported expression type: $this")
     }
 
+@Contract(pure = true)
 internal fun PsiType.isErasureEquivalentTo(other: PsiType): Boolean {
     // TODO: Do more checks for generics instead
     return TypeConversionUtil.erasure(this) == TypeConversionUtil.erasure(other)

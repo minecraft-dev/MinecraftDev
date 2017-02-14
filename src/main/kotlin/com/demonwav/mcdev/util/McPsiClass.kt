@@ -21,14 +21,17 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierListOwner
+import org.jetbrains.annotations.Contract
 
 // Type
 
+@get:Contract(pure = true)
 internal val PsiClassType.fullQualifiedName
     get() = resolve()!!.fullQualifiedName
 
 // Class
 
+@get:Contract(pure = true)
 internal val PsiClass.fullQualifiedName
     get() = qualifiedName ?: buildQualifiedName(StringBuilder()).toString()
 
@@ -41,9 +44,11 @@ private fun PsiClass.buildQualifiedName(builder: StringBuilder): StringBuilder {
     return builder
 }
 
+@get:Contract(pure = true)
 private val PsiClass.outerShortName
     get() = name?.takeIf { containingClass == null }
 
+@get:Contract(pure = true)
 internal val PsiClass.shortName: String
     get() {
         outerShortName?.let { return it }
@@ -83,6 +88,7 @@ internal inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (Ps
     }
 }
 
+@Contract(pure = true)
 internal fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
     // Attempt to find name for anonymous class
     for ((i, element) in anonymousElements!!.withIndex()) {
@@ -94,6 +100,7 @@ internal fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
     throw IllegalStateException("Failed to determine anonymous class for $anonymousElement")
 }
 
+@get:Contract(pure = true)
 internal val PsiElement.anonymousElements: Array<PsiElement>?
     get() {
         for (provider in Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
@@ -108,6 +115,7 @@ internal val PsiElement.anonymousElements: Array<PsiElement>?
 
 // Inheritance
 
+@Contract(pure = true)
 internal fun PsiClass.extendsOrImplements(qualifiedClassName: String): Boolean {
     val aClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, resolveScope) ?: return false
     return manager.areElementsEquivalent(this, aClass) || this.isInheritor(aClass, true)
@@ -130,12 +138,14 @@ internal fun PsiClass.addImplements(qualifiedClassName: String) {
 
 // Modifier list
 
+@Contract(pure = true)
 internal fun PsiModifierListOwner.findAnnotation(qualifiedName: String): PsiAnnotation? {
     return modifierList?.findAnnotation(qualifiedName)
 }
 
 // Member
 
+@get:Contract(pure = true)
 internal val PsiMember.accessModifier
     get() = when {
         hasModifierProperty(PsiModifier.PUBLIC) -> PsiModifier.PUBLIC

@@ -20,6 +20,7 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.GlobalSearchScope
+import org.jetbrains.annotations.Contract
 import java.io.Serializable
 
 /**
@@ -30,26 +31,32 @@ import java.io.Serializable
 internal data class MemberReference(internal val name: String, internal val descriptor: String? = null,
                                     internal val owner: String? = null, internal val matchAll: Boolean = false) : Serializable {
 
+    @get:Contract(pure = true)
     internal val qualified
         get() = this.owner != null
 
+    @get:Contract(pure = true)
     internal val withoutOwner
         get() = if (this.owner == null) this else MemberReference(this.name, this.descriptor, null, this.matchAll)
 
+    @Contract(pure = true)
     internal fun matchOwner(psiClass: PsiClass): Boolean {
         return this.owner == null || this.owner == psiClass.fullQualifiedName
     }
 
+    @Contract(pure = true)
     internal fun match(method: PsiMethod, qualifier: PsiClass): Boolean {
         return this.name == method.internalName && matchOwner(qualifier)
                 && (this.descriptor == null || this.descriptor == method.descriptor)
     }
 
+    @Contract(pure = true)
     internal fun match(field: PsiField, qualifier: PsiClass): Boolean {
         return this.name == field.name && matchOwner(qualifier)
                 && (this.descriptor == null || this.descriptor == field.descriptor)
     }
 
+    @Contract(pure = true)
     internal fun resolve(project: Project, scope: GlobalSearchScope): Pair<PsiClass, PsiMember>? {
         val psiClass = JavaPsiFacade.getInstance(project).findClass(this.owner!!, scope) ?: return null
 
@@ -64,6 +71,7 @@ internal data class MemberReference(internal val name: String, internal val desc
         return member?.let { Pair(psiClass, member) }
     }
 
+    @Contract(pure = true)
     override fun toString(): String {
         val builder = StringBuilder()
         if (owner != null) {
@@ -93,6 +101,7 @@ internal data class MemberReference(internal val name: String, internal val desc
          * the formats, so it should either use the dot separate full qualified
          * class name OR the internal class descriptor.
          */
+        @Contract(pure = true)
         internal fun parse(reference: String): MemberReference? {
             val owner: String?
 

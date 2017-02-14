@@ -19,9 +19,12 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
+import org.jetbrains.annotations.Contract
 
+@Contract(pure = true)
 internal fun callbackInfoType(project: Project): PsiType? = PsiType.getTypeByName(CALLBACK_INFO, project, GlobalSearchScope.allScope(project))
 
+@Contract(pure = true)
 internal fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType: PsiType): PsiType? {
     val boxedType = if (returnType is PsiPrimitiveType) returnType.getBoxedType(context)!! else returnType
 
