@@ -85,15 +85,19 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
         creator.setGroupId(groupIdField.getText());
         creator.setArtifactId(artifactIdField.getText());
         creator.setVersion(versionField.getText());
-        BuildSystem buildSystem;
-        if (buildSystemBox.getSelectedIndex() == 0) {
-            buildSystem = new MavenBuildSystem();
-        } else {
-            buildSystem = new GradleBuildSystem();
-        }
+        BuildSystem buildSystem = createBuildSystem();
+
         // Java 8 always
         buildSystem.setBuildVersion("1.8");
         creator.setBuildSystem(buildSystem);
+    }
+
+    private BuildSystem createBuildSystem() {
+        if (buildSystemBox.getSelectedIndex() == 0) {
+            return new MavenBuildSystem();
+        } else {
+            return new GradleBuildSystem();
+        }
     }
 
     @Override

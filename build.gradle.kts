@@ -41,7 +41,7 @@ buildscript {
 
     dependencies {
         classpath(kotlinModule("gradle-plugin", project.properties["kotlinVersion"] as String))
-        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.1")
+        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.2")
         classpath("gradle.plugin.net.minecrell:licenser:0.3")
     }
 }
@@ -54,11 +54,11 @@ val pluginGroup by project
 val downloadIdeaSources by project
 
 apply {
+    plugin<JavaPlugin>()
+    plugin<KotlinPluginWrapper>()
+    plugin<GroovyPlugin>()
     plugin<IdeaPlugin>()
     plugin<IntelliJPlugin>()
-    plugin<KotlinPluginWrapper>()
-    plugin<JavaPlugin>()
-    plugin<GroovyPlugin>()
     plugin<Licenser>()
 }
 
@@ -220,30 +220,6 @@ tasks.withType<JavaCompile> {
 tasks.withType<KotlinCompile> {
     dependsOn(generate)
     kotlinOptions.jvmTarget = javaVersion as String
-}
-
-// Define dependency on compileKotlin so gradle-intellij-plugin configures
-// form class instrumentation
-tasks.getByName("classes").dependsOn("compileKotlin")
-
-fun Task.instrumentCode(state: Boolean) {
-    doLast {
-        configure<IntelliJPluginExtension> {
-            instrumentCode = state
-        }
-    }
-}
-
-// Ugly hack to disable instrumentCode feature of gradle-intellij-plugin
-// for Groovy sources. No idea why it fails but it is certainly not needed.
-tasks.withType<GroovyCompile> {
-    // Disable instrumentCode before gradle-intellij-plugin runs its task
-    instrumentCode(false)
-
-    afterEvaluate {
-        // ... enable it again after it has run
-        instrumentCode(true)
-    }
 }
 
 if (project.hasProperty("intellijJre")) {
