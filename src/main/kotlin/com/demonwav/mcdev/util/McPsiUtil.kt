@@ -42,19 +42,19 @@ import java.util.stream.Stream
 // Parent
 
 @Contract(pure = true)
-internal fun PsiElement.findContainingClass(): PsiClass? = findParent(resolveReferences = false)
+fun PsiElement.findContainingClass(): PsiClass? = findParent(resolveReferences = false)
 
 @Contract(pure = true)
-internal fun PsiElement.findReferencedClass(): PsiClass? = findParent(resolveReferences = true)
+fun PsiElement.findReferencedClass(): PsiClass? = findParent(resolveReferences = true)
 
 @Contract(pure = true)
-internal fun PsiElement.findReferencedMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = true)
+fun PsiElement.findReferencedMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = true)
 
 @Contract(pure = true)
-internal fun PsiElement.findContainingMethod(): PsiMethod? = findParent({ it is PsiClass }, resolveReferences = false)
+fun PsiElement.findContainingMethod(): PsiMethod? = findParent({ it is PsiClass }, resolveReferences = false)
 
 @Contract(pure = true)
-internal fun PsiElement.findJavaCodeReferenceElement(): PsiJavaCodeReferenceElement? {
+fun PsiElement.findJavaCodeReferenceElement(): PsiJavaCodeReferenceElement? {
     return findParent({ it is PsiMethod || it is PsiClass }, resolveReferences = false)
 }
 
@@ -86,10 +86,10 @@ private inline fun <reified T : PsiElement> PsiElement.findParent(stop: (PsiElem
 
 // Children
 @Contract(pure = true)
-internal fun PsiClass.findFirstMember(): PsiMember? = findChild()
+fun PsiClass.findFirstMember(): PsiMember? = findChild()
 
 @Contract(pure = true)
-internal fun PsiElement.findNextMember(): PsiMember? = findSibling(true)
+fun PsiElement.findNextMember(): PsiMember? = findSibling(true)
 
 @Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findChild(): T? {
@@ -109,7 +109,7 @@ private inline fun <reified T : PsiElement> PsiElement.findSibling(strict: Boole
 }
 
 @Contract(pure = true)
-internal inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElement? {
+inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElement? {
     var child = firstChild ?: return null
     var lastChild: PsiElement? = null
 
@@ -123,7 +123,7 @@ internal inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean)
 }
 
 @Contract(pure = true)
-internal fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement): Stream<T> {
+fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement): Stream<T> {
     filter ?: return this
     return filter { filter.isClassAcceptable(it.javaClass) && filter.isAcceptable(it, context) }
 }
@@ -131,23 +131,23 @@ internal fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElem
 @Contract(pure = true)
 fun Stream<out PsiElement>.toResolveResults(): Array<ResolveResult> = map(::PsiElementResolveResult).toTypedArray()
 
-internal fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
+fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
     ChangeSignatureUtil.synchronizeList(this, newParams, {it.parameters.asList()}, BooleanArray(newParams.size))
 }
 
 // PsiNameValuePair -> PsiAnnotationParameterList -> PsiAnnotation
 @get:Contract(pure = true)
-internal val PsiElement.annotationFromNameValuePair
+val PsiElement.annotationFromNameValuePair
     get() = parent?.parent as? PsiAnnotation
 
 // value -> PsiNameValuePair -> see above
 @get:Contract(pure = true)
-internal val PsiElement.annotationFromValue
+val PsiElement.annotationFromValue
     get() = parent?.annotationFromNameValuePair
 
 // value -> PsiArrayInitializerMemberValue -> PsiNameValuePair -> see above
 @get:Contract(pure = true)
-internal val PsiElement.annotationFromArrayValue: PsiAnnotation?
+val PsiElement.annotationFromArrayValue: PsiAnnotation?
     get() {
         val parent = parent ?: return null
         return if (parent is PsiArrayInitializerMemberValue) {
@@ -158,11 +158,11 @@ internal val PsiElement.annotationFromArrayValue: PsiAnnotation?
     }
 
 @get:Contract(pure = true)
-internal val PsiElement.constantValue: Any
+val PsiElement.constantValue: Any
     get() = JavaPsiFacade.getInstance(project).constantEvaluationHelper.computeConstantExpression(this, true)
 
 @get:Contract(pure = true)
-internal val PsiElement.constantStringValue: String
+val PsiElement.constantStringValue: String
     get() = when (this) {
         is PsiLiteral -> value?.toString() ?: ""
         is PsiPolyadicExpression ->
@@ -181,7 +181,7 @@ internal val PsiElement.constantStringValue: String
     }
 
 @Contract(pure = true)
-internal fun PsiType.isErasureEquivalentTo(other: PsiType): Boolean {
+fun PsiType.isErasureEquivalentTo(other: PsiType): Boolean {
     // TODO: Do more checks for generics instead
     return TypeConversionUtil.erasure(this) == TypeConversionUtil.erasure(other)
 }

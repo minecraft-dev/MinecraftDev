@@ -31,7 +31,7 @@ import com.intellij.util.ProcessingContext
  * Provides a simple [PsiReference] implementation for a global
  * [ReferenceResolver].
  */
-internal abstract class ReferenceResolver : PsiReferenceProvider() {
+abstract class ReferenceResolver : PsiReferenceProvider() {
 
     protected abstract fun resolveReference(context: PsiElement): PsiElement?
     protected abstract fun collectVariants(context: PsiElement): Array<Any>
@@ -45,14 +45,13 @@ internal abstract class ReferenceResolver : PsiReferenceProvider() {
         override fun getVariants() = resolver.collectVariants(element.findContextElement())
 
     }
-
 }
 
 /**
  * Provides a simple [com.intellij.psi.PsiPolyVariantReference] implementation
  * for a global [ReferenceResolver].
  */
-internal abstract class PolyReferenceResolver : PsiReferenceProvider() {
+abstract class PolyReferenceResolver : PsiReferenceProvider() {
 
     protected abstract fun resolveReference(context: PsiElement): Array<ResolveResult>
     protected abstract fun collectVariants(context: PsiElement): Array<Any>
@@ -66,7 +65,6 @@ internal abstract class PolyReferenceResolver : PsiReferenceProvider() {
         override fun getVariants() = resolver.collectVariants(element.findContextElement())
 
     }
-
 }
 
 private fun PsiElement.findContextElement(): PsiElement {
@@ -88,7 +86,7 @@ private fun PsiElement.findContextElement(): PsiElement {
  * Patches the [LookupElementBuilder] to replace the element with a single
  * [PsiLiteral] when using code completion.
  */
-internal fun LookupElementBuilder.completeToLiteral(context: PsiElement): LookupElementBuilder {
+fun LookupElementBuilder.completeToLiteral(context: PsiElement): LookupElementBuilder {
     if (context is PsiLiteral) {
         // Context is already a literal
         return this
@@ -115,5 +113,4 @@ private class ReplaceElementWithLiteral(private val editor: Editor, private val 
             }
         }
     }
-
 }

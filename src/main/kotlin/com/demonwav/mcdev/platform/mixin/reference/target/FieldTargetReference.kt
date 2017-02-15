@@ -21,7 +21,7 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReferenceExpression
 
-internal object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
+object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
 
     override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass,
                                          checkOnly: Boolean): CollectVisitor<PsiReferenceExpression>? {
@@ -64,7 +64,5 @@ internal object FieldTargetReference : TargetReference.QualifiedHandler<PsiField
 
             super.visitReferenceExpression(expression)
         }
-
     }
-
 }

@@ -22,7 +22,7 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 
 @Contract(pure = true)
-internal fun findMethods(psiClass: PsiClass, targets: Collection<PsiClass>, checkBases: Boolean = false): Stream<PsiMethod>? {
+fun findMethods(psiClass: PsiClass, targets: Collection<PsiClass>, checkBases: Boolean = false): Stream<PsiMethod>? {
     return when (targets.size) {
         0 -> null
         1 -> targets.single().methods.stream()
@@ -44,7 +44,7 @@ internal fun findMethods(psiClass: PsiClass, targets: Collection<PsiClass>, chec
 }
 
 @Contract(pure = true)
-internal fun findFields(psiClass: PsiClass, targets: Collection<PsiClass>, checkBases: Boolean = false): Stream<PsiField>? {
+fun findFields(psiClass: PsiClass, targets: Collection<PsiClass>, checkBases: Boolean = false): Stream<PsiField>? {
     return when (targets.size) {
         0 -> null
         1 -> targets.single().fields.stream()
@@ -61,7 +61,7 @@ internal fun findFields(psiClass: PsiClass, targets: Collection<PsiClass>, check
 }
 
 @Contract(pure = true)
-internal fun PsiMethod.findSource(): PsiMethod {
+fun PsiMethod.findSource(): PsiMethod {
     val body = body
     if (body != null) {
         return this

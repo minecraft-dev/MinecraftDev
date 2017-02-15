@@ -24,7 +24,7 @@ private val ANNOTATION_ATTRIBUTE_STOP = PlatformPatterns.not(PsiJavaPatterns.psi
 // PsiJavaElementPattern.insideAnnotationParam checks for the parameter list only up to 3 levels
 // It can be more if the value is for example enclosed in parentheses
 @Contract(pure = true)
-internal fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPattern<T, Self>
+fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPattern<T, Self>
         .insideAnnotationAttribute(annotation: PsiAnnotationPattern, attribute: String): Self {
     return inside(true, PsiJavaPatterns.psiNameValuePair().withName(attribute)
             .withParent(PlatformPatterns.psiElement(PsiAnnotationParameterList::class.java)
@@ -32,13 +32,13 @@ internal fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElem
 }
 
 @Contract(pure = true)
-internal fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPattern<T, Self>
+fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPattern<T, Self>
         .insideAnnotationAttribute(annotation: ElementPattern<String>, attribute: String): Self {
     return insideAnnotationAttribute(PsiJavaPatterns.psiAnnotation().qName(annotation), attribute)
 }
 
 @Contract(pure = true)
-internal fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPattern<T, Self>
+fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPattern<T, Self>
         .insideAnnotationAttribute(annotation: String, attribute: String = "value"): Self {
     return insideAnnotationAttribute(PsiJavaPatterns.psiAnnotation().qName(annotation), attribute)
 }

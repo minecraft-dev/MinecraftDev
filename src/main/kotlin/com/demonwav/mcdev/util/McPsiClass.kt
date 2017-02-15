@@ -26,19 +26,19 @@ import org.jetbrains.annotations.Contract
 // Type
 
 @get:Contract(pure = true)
-internal val PsiClassType.fullQualifiedName
+val PsiClassType.fullQualifiedName
     get() = resolve()!!.fullQualifiedName
 
 // Class
 
-internal val PsiClass.outerQualifiedName
+val PsiClass.outerQualifiedName
     get() = if (containingClass == null) qualifiedName else null
 
 @get:Contract(pure = true)
-internal val PsiClass.fullQualifiedName
+val PsiClass.fullQualifiedName
     get() = outerQualifiedName ?: buildQualifiedName(StringBuilder()).toString()
 
-internal fun PsiClass.appendFullQualifiedName(builder: StringBuilder): StringBuilder {
+fun PsiClass.appendFullQualifiedName(builder: StringBuilder): StringBuilder {
     return outerQualifiedName?.let { builder.append(it) } ?: buildQualifiedName(builder)
 }
 
@@ -52,7 +52,7 @@ private val PsiClass.outerShortName
     get() = if (containingClass == null) name else null
 
 @get:Contract(pure = true)
-internal val PsiClass.shortName: String
+val PsiClass.shortName: String
     get() {
         outerShortName?.let { return it }
         val builder = StringBuilder()
@@ -60,7 +60,7 @@ internal val PsiClass.shortName: String
         return builder.toString()
     }
 
-internal inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (PsiClass) -> String?, separator: Char = '$') {
+inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (PsiClass) -> String?, separator: Char = '$') {
     var currentClass: PsiClass = this
     var parentClass: PsiClass?
     var name: String?
@@ -92,7 +92,7 @@ internal inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (Ps
 }
 
 @Contract(pure = true)
-internal fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
+fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
     // Attempt to find name for anonymous class
     for ((i, element) in anonymousElements!!.withIndex()) {
         if (manager.areElementsEquivalent(element, anonymousElement)) {
@@ -104,7 +104,7 @@ internal fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
 }
 
 @get:Contract(pure = true)
-internal val PsiElement.anonymousElements: Array<PsiElement>?
+val PsiElement.anonymousElements: Array<PsiElement>?
     get() {
         for (provider in Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
             val elements = provider.getAnonymousElements(this)
@@ -119,12 +119,12 @@ internal val PsiElement.anonymousElements: Array<PsiElement>?
 // Inheritance
 
 @Contract(pure = true)
-internal fun PsiClass.extendsOrImplements(qualifiedClassName: String): Boolean {
+fun PsiClass.extendsOrImplements(qualifiedClassName: String): Boolean {
     val aClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, resolveScope) ?: return false
     return manager.areElementsEquivalent(this, aClass) || this.isInheritor(aClass, true)
 }
 
-internal fun PsiClass.addImplements(qualifiedClassName: String) {
+fun PsiClass.addImplements(qualifiedClassName: String) {
     val project = project
     val listenerClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, resolveScope) ?: return
 
@@ -142,14 +142,14 @@ internal fun PsiClass.addImplements(qualifiedClassName: String) {
 // Modifier list
 
 @Contract(pure = true)
-internal fun PsiModifierListOwner.findAnnotation(qualifiedName: String): PsiAnnotation? {
+fun PsiModifierListOwner.findAnnotation(qualifiedName: String): PsiAnnotation? {
     return modifierList?.findAnnotation(qualifiedName)
 }
 
 // Member
 
 @get:Contract(pure = true)
-internal val PsiMember.accessModifier
+val PsiMember.accessModifier
     get() = when {
         hasModifierProperty(PsiModifier.PUBLIC) -> PsiModifier.PUBLIC
         hasModifierProperty(PsiModifier.PROTECTED) -> PsiModifier.PROTECTED

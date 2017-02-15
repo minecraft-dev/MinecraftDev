@@ -23,7 +23,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.util.containers.isEmpty
 import java.util.stream.Stream
 
-internal fun collectRequiredMembers(element: PsiElement, psiClass: PsiClass): List<PsiMember> {
+fun collectRequiredMembers(element: PsiElement, psiClass: PsiClass): List<PsiMember> {
     val visitor = CollectRequiredClassMembersVisitor(psiClass)
     element.accept(visitor)
     return visitor.members
@@ -31,7 +31,7 @@ internal fun collectRequiredMembers(element: PsiElement, psiClass: PsiClass): Li
 
 private class CollectRequiredClassMembersVisitor(private val psiClass: PsiClass) : JavaRecursiveElementWalkingVisitor() {
 
-    internal val members = ArrayList<PsiMember>()
+    val members = ArrayList<PsiMember>()
 
     override fun visitReferenceElement(reference: PsiJavaCodeReferenceElement) {
         val resolved = reference.advancedResolve(false).element as? PsiMember ?: return
@@ -51,7 +51,7 @@ private class CollectRequiredClassMembersVisitor(private val psiClass: PsiClass)
 
 }
 
-internal fun filterNewShadows(requiredMembers: Collection<PsiMember>, psiClass: PsiClass): Stream<PsiMember> {
+fun filterNewShadows(requiredMembers: Collection<PsiMember>, psiClass: PsiClass): Stream<PsiMember> {
     return requiredMembers.stream().filter { m ->
         when(m) {
             is PsiMethod -> psiClass.findMethods(m.memberReference).isEmpty()

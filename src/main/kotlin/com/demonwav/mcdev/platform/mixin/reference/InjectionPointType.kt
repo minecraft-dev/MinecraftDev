@@ -23,7 +23,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.search.searches.AnnotatedElementsSearch
 import com.intellij.psi.search.searches.ClassInheritorsSearch
 
-internal object InjectionPointType : ReferenceResolver(), MixinReference {
+object InjectionPointType : ReferenceResolver(), MixinReference {
 
     override val description: String
         get() = "injection point type '%s'"
@@ -72,5 +72,4 @@ internal object InjectionPointType : ReferenceResolver(), MixinReference {
             }
         }
     }
-
 }

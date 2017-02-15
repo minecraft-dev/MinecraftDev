@@ -14,17 +14,17 @@ import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.isErasureEquivalentTo
 import com.intellij.psi.PsiParameter
 
-internal data class ParameterGroup(internal val parameters: List<Parameter>?,
-                                   internal val required: Boolean = parameters != null,
-                                   internal val default: Boolean = required) {
+data class ParameterGroup(val parameters: List<Parameter>?,
+                          val required: Boolean = parameters != null,
+                          val default: Boolean = required) {
 
-    internal val size
+    val size
         get() = this.parameters?.size ?: 0
 
-    internal val wildcard
+    val wildcard
         get() = this.parameters == null
 
-    internal fun match(parameters: Array<PsiParameter>, currentPosition: Int): Boolean {
+    fun match(parameters: Array<PsiParameter>, currentPosition: Int): Boolean {
         if (this.parameters == null) {
             // Wildcard parameter groups always match
             return true
@@ -46,5 +46,4 @@ internal data class ParameterGroup(internal val parameters: List<Parameter>?,
 
         return true
     }
-
 }

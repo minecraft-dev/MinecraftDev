@@ -12,12 +12,11 @@ package com.demonwav.mcdev.platform.mixin.reference
 
 import com.intellij.psi.PsiElement
 
-internal interface MixinReference {
+interface MixinReference {
 
     val description: String
 
     fun isUnresolved(context: PsiElement): Boolean
 
     fun isValidAnnotation(name: String): Boolean
-
 }

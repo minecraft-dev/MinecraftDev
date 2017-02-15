@@ -17,11 +17,11 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations
 import com.google.common.collect.ImmutableList
 import com.intellij.openapi.module.Module
 
-internal object MixinModuleType : AbstractModuleType<MixinModule>("org.spongepowered", "mixin") {
+object MixinModuleType : AbstractModuleType<MixinModule>("org.spongepowered", "mixin") {
 
     const val ID = "MIXIN_MODULE_TYPE"
 
-    private val IGNORED_ANNOTATIONS = ImmutableList.builder<String>()
+    private val IGNORED_ANNOTATIONS: List<String> = ImmutableList.builder<String>()
             .add(Annotations.DEBUG)
             .add(Annotations.FINAL)
             .add(Annotations.IMPLEMENTS)
@@ -53,5 +53,4 @@ internal object MixinModuleType : AbstractModuleType<MixinModule>("org.spongepow
     override fun getListenerAnnotations() = LISTENER_ANNOTATIONS
 
     override fun generateModule(module: Module) = MixinModule(module)
-
 }

@@ -41,7 +41,7 @@ import com.intellij.psi.PsiThisExpression
 import com.intellij.psi.ResolveResult
 import com.intellij.util.ArrayUtil
 
-internal object TargetReference : PolyReferenceResolver(), MixinReference {
+object TargetReference : PolyReferenceResolver(), MixinReference {
 
     override val description: String
         get() = "target reference '%s'"
@@ -60,7 +60,7 @@ internal object TargetReference : PolyReferenceResolver(), MixinReference {
         }
     }
 
-    internal fun usesMemberReference(context: PsiElement): Boolean {
+    fun usesMemberReference(context: PsiElement): Boolean {
         val handler = getHandler(context.annotationFromArrayValue!!) ?: return false
         return handler.usesMemberReference()
     }
@@ -110,19 +110,18 @@ internal object TargetReference : PolyReferenceResolver(), MixinReference {
         return visitor.result.mapToArray { handler.createLookup(targetClass, it).completeToLiteral(context) }
     }
 
-    internal abstract class Handler<T> {
+    abstract class Handler<T> {
 
-        internal open fun usesMemberReference() = false
+        open fun usesMemberReference() = false
 
-        internal abstract fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass,
+        abstract fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass,
                                                       checkOnly: Boolean): CollectVisitor<out PsiElement>?
-        internal abstract fun createCollectUsagesVisitor(): CollectVisitor<T>
+        abstract fun createCollectUsagesVisitor(): CollectVisitor<T>
 
-        internal abstract fun createLookup(targetClass: PsiClass, element: T): LookupElementBuilder
-
+        abstract fun createLookup(targetClass: PsiClass, element: T): LookupElementBuilder
     }
 
-    internal abstract class QualifiedHandler<T : PsiMember> : Handler<QualifiedMember<T>>() {
+    abstract class QualifiedHandler<T : PsiMember> : Handler<QualifiedMember<T>>() {
 
         override final fun usesMemberReference() = true
 
@@ -145,10 +144,9 @@ internal object TargetReference : PolyReferenceResolver(), MixinReference {
                 builder.withPresentableText(owner.shortName + '.' + getInternalName(m))
             }
         }
-
     }
 
-    internal abstract class MethodHandler : QualifiedHandler<PsiMethod>() {
+    abstract class MethodHandler : QualifiedHandler<PsiMethod>() {
 
         override fun createLookup(targetClass: PsiClass, m: PsiMethod, owner: PsiClass): LookupElementBuilder {
             return JavaLookupElementBuilder.forMethod(m, m.getQualifiedMemberReference(owner).toString(),
@@ -161,15 +159,14 @@ internal object TargetReference : PolyReferenceResolver(), MixinReference {
             return m.member.internalName
         }
     }
-
 }
 
-internal data class QualifiedMember<T : PsiMember>(internal val member: T, internal val qualifier: PsiClass?) {
+data class QualifiedMember<T : PsiMember>(val member: T, val qualifier: PsiClass?) {
     constructor(member: T, reference: PsiQualifiedReference) : this(member, resolveQualifier(reference))
 
-    internal companion object {
+    companion object {
 
-        internal fun resolveQualifier(reference: PsiQualifiedReference): PsiClass? {
+        fun resolveQualifier(reference: PsiQualifiedReference): PsiClass? {
             val qualifier = reference.qualifier ?: return null
             if (qualifier is PsiThisExpression) {
                 return null
@@ -179,14 +176,12 @@ internal data class QualifiedMember<T : PsiMember>(internal val member: T, inter
             ((qualifier as? PsiExpression)?.type as? PsiClassType)?.resolve()?.let { return it }
             return null
         }
-
     }
-
 }
 
-internal abstract class CollectVisitor<T>(private val checkOnly: Boolean) : JavaRecursiveElementWalkingVisitor() {
+abstract class CollectVisitor<T>(private val checkOnly: Boolean) : JavaRecursiveElementWalkingVisitor() {
 
-    internal val result = ArrayList<T>()
+    val result = ArrayList<T>()
 
     protected fun addResult(element: T) {
         this.result.add(element)
@@ -194,5 +189,4 @@ internal abstract class CollectVisitor<T>(private val checkOnly: Boolean) : Java
             stopWalking()
         }
     }
-
 }

@@ -22,10 +22,10 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiNewExpression
 
-internal object MethodTargetReference : TargetReference.MethodHandler() {
+object MethodTargetReference : TargetReference.MethodHandler() {
 
     override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass, checkOnly: Boolean): CollectVisitor<out PsiElement>? {
-        return MemberReference.parse(context.constantStringValue)?.let({ FindUsagesVisitor(targetClass, it, checkOnly) })
+        return MemberReference.parse(context.constantStringValue)?.let { FindUsagesVisitor(targetClass, it, checkOnly) }
     }
 
     override fun createCollectUsagesVisitor(): CollectVisitor<QualifiedMember<PsiMethod>> = CollectUsagesVisitor()
@@ -38,7 +38,6 @@ internal object MethodTargetReference : TargetReference.MethodHandler() {
                 addResult(source)
             }
         }
-
     }
 
     private class CollectUsagesVisitor : CompiledMethodsVisitor<QualifiedMember<PsiMethod>>(false) {
@@ -46,7 +45,6 @@ internal object MethodTargetReference : TargetReference.MethodHandler() {
         override fun visitMethodUsage(method: PsiMethod, qualifier: PsiClass?, source: PsiElement) {
             addResult(QualifiedMember(method, qualifier))
         }
-
     }
 
     private abstract class CompiledMethodsVisitor<T>(checkOnly: Boolean) : CollectVisitor<T>(checkOnly) {
@@ -97,7 +95,7 @@ internal object MethodTargetReference : TargetReference.MethodHandler() {
 
             // Get Iterator class to resolve next and hasNext
             val iteratorClass = JavaPsiFacade.getInstance(statement.project)
-                    .findClass(CommonClassNames.JAVA_UTIL_ITERATOR, statement.resolveScope)
+                .findClass(CommonClassNames.JAVA_UTIL_ITERATOR, statement.resolveScope)
 
             if (iteratorClass != null) {
                 val hasNext = iteratorClass.findMethodsByName("hasNext", false).first { it.parameterList.parametersCount == 0 }
@@ -113,7 +111,5 @@ internal object MethodTargetReference : TargetReference.MethodHandler() {
 
             super.visitForeachStatement(statement)
         }
-
     }
-
 }

@@ -30,7 +30,7 @@ import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiType
 import org.objectweb.asm.Opcodes
 
-internal enum class InjectorType(private val annotation: String) {
+enum class InjectorType(private val annotation: String) {
     INJECT(MixinConstants.Annotations.INJECT) {
 
         override fun expectedMethodSignature(annotation: PsiAnnotation, targetMethod: PsiMethod): MethodSignature? {
@@ -149,11 +149,11 @@ internal enum class InjectorType(private val annotation: String) {
     MODIFY_CONSTANT(MixinConstants.Annotations.MODIFY_CONSTANT),
     MODIFY_VARIABLE(MixinConstants.Annotations.MODIFY_VARIABLE);
 
-    internal val annotationName = "@${PsiNameHelper.getShortClassName(annotation)}"
+    val annotationName = "@${PsiNameHelper.getShortClassName(annotation)}"
 
-    internal open fun expectedMethodSignature(annotation: PsiAnnotation, targetMethod: PsiMethod): MethodSignature? = null
+    open fun expectedMethodSignature(annotation: PsiAnnotation, targetMethod: PsiMethod): MethodSignature? = null
 
-    internal companion object {
+    companion object {
 
         private val injectionPointAnnotations = InjectorType.values().associateBy { it.annotation }
 
@@ -176,13 +176,12 @@ internal enum class InjectorType(private val annotation: String) {
             return list
         }
 
-        internal fun findAnnotations(element: PsiAnnotationOwner): List<Pair<InjectorType, PsiAnnotation>> {
+        fun findAnnotations(element: PsiAnnotationOwner): List<Pair<InjectorType, PsiAnnotation>> {
             return element.annotations.mapNotNull {
                 val name = it.qualifiedName ?: return@mapNotNull null
                 val type = injectionPointAnnotations[name] ?: return@mapNotNull null
                 Pair(type, it)
             }
         }
-
     }
 }

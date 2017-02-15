@@ -33,7 +33,7 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 import kotlin.streams.toList
 
-internal object MethodReference : PolyReferenceResolver(), MixinReference {
+object MethodReference : PolyReferenceResolver(), MixinReference {
 
     override val description: String
         get() = "method '%s' in target class"
@@ -52,7 +52,7 @@ internal object MethodReference : PolyReferenceResolver(), MixinReference {
         return !targets.stream().flatMap { it.findMethods(targetMethodInfo) }.findAny().isPresent
     }
 
-    internal fun getReferenceIfAmbiguous(context: PsiElement): MemberReference? {
+    fun getReferenceIfAmbiguous(context: PsiElement): MemberReference? {
         val targetReference = MemberReference.parse(context.constantStringValue) ?: return null
         if (targetReference.descriptor != null) {
             return null
@@ -77,11 +77,11 @@ internal object MethodReference : PolyReferenceResolver(), MixinReference {
                 .flatMap { it.findMethods(targetReference) }
     }
 
-    internal fun resolveIfUnique(context: PsiElement): PsiMethod? {
-        return resolve(context)?.collect(Collectors.reducing<PsiMethod>({ _, _ -> null }))?.orElse(null)
+    fun resolveIfUnique(context: PsiElement): PsiMethod? {
+        return resolve(context)?.collect(Collectors.reducing<PsiMethod> { _, _ -> null })?.orElse(null)
     }
 
-    internal fun resolveAllIfNotAmbiguous(context: PsiElement): List<PsiMethod>? {
+    fun resolveAllIfNotAmbiguous(context: PsiElement): List<PsiMethod>? {
         val targetReference = MemberReference.parse(context.constantStringValue) ?: return null
         val targets = getTargets(context) ?: return null
 
@@ -166,5 +166,4 @@ internal object MethodReference : PolyReferenceResolver(), MixinReference {
                             .completeToLiteral(context)
                 }.toArray()
     }
-
 }

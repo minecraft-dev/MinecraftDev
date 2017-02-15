@@ -19,7 +19,7 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNewExpression
 
-internal object ConstructorTargetReference : TargetReference.Handler<PsiClass>() {
+object ConstructorTargetReference : TargetReference.Handler<PsiClass>() {
 
     override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass, checkOnly: Boolean): CollectVisitor<out PsiElement>? {
         val name = context.constantStringValue.replace('/', '.')
@@ -60,7 +60,5 @@ internal object ConstructorTargetReference : TargetReference.Handler<PsiClass>()
 
             super.visitNewExpression(expression)
         }
-
     }
-
 }

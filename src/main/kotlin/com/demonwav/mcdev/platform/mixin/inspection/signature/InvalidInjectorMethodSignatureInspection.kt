@@ -102,7 +102,6 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
             return true
         }
-
     }
 
     private class ParametersQuickFix(private val expected: List<ParameterGroup>) : LocalQuickFix {
@@ -122,8 +121,6 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                 }
             })
         }
-
     }
-
 }
 

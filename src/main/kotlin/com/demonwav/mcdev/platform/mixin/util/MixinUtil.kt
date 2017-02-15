@@ -22,10 +22,10 @@ import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.annotations.Contract
 
 @Contract(pure = true)
-internal fun callbackInfoType(project: Project): PsiType? = PsiType.getTypeByName(CALLBACK_INFO, project, GlobalSearchScope.allScope(project))
+fun callbackInfoType(project: Project): PsiType? = PsiType.getTypeByName(CALLBACK_INFO, project, GlobalSearchScope.allScope(project))
 
 @Contract(pure = true)
-internal fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType: PsiType): PsiType? {
+fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType: PsiType): PsiType? {
     val boxedType = if (returnType is PsiPrimitiveType) returnType.getBoxedType(context)!! else returnType
 
     // TODO: Can we do this without looking up the PsiClass?

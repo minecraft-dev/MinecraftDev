@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.util
 
-internal object MixinConstants {
+object MixinConstants {
     const val PACKAGE = "org.spongepowered.asm.mixin."
     const val SMAP_STRATUM = "Mixin"
 
@@ -45,5 +45,4 @@ internal object MixinConstants {
 
         @JvmField val METHOD_INJECTORS = listOf(INJECT, MODIFY_ARG, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT)
     }
-
 }

@@ -12,4 +12,4 @@ package com.demonwav.mcdev.platform.mixin.inspection.signature
 
 import com.intellij.psi.PsiType
 
-internal data class MethodSignature(internal val parameters: List<ParameterGroup>, internal val returnType: PsiType)
+data class MethodSignature(val parameters: List<ParameterGroup>, val returnType: PsiType)

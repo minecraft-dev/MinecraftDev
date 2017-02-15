@@ -88,11 +88,11 @@ class GenerateShadowAction : MixinCodeInsightAction() {
 
 }
 
-internal fun insertShadows(project: Project, psiClass: PsiClass, members: Stream<PsiMember>) {
+fun insertShadows(project: Project, psiClass: PsiClass, members: Stream<PsiMember>) {
     insertShadows(psiClass, createShadowMembers(project, psiClass, members))
 }
 
-internal fun insertShadows(psiClass: PsiClass, shadows: List<GenerationInfo>) {
+fun insertShadows(psiClass: PsiClass, shadows: List<GenerationInfo>) {
     // Find first element after shadow
     val lastShadow = psiClass.findLastChild {
         (it as? PsiModifierListOwner)?.modifierList?.findAnnotation(MixinConstants.Annotations.SHADOW) != null
@@ -104,7 +104,7 @@ internal fun insertShadows(psiClass: PsiClass, shadows: List<GenerationInfo>) {
     GenerateMembersUtil.insertMembersBeforeAnchor(psiClass, anchor, shadows)
 }
 
-internal fun createShadowMembers(project: Project, psiClass: PsiClass, members: Stream<PsiMember>): List<PsiGenerationInfo<PsiMember>> {
+fun createShadowMembers(project: Project, psiClass: PsiClass, members: Stream<PsiMember>): List<PsiGenerationInfo<PsiMember>> {
     var methodAdded = false
 
     val result = members.map { m ->

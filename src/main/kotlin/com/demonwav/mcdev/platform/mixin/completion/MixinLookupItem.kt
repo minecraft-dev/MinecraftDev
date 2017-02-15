@@ -21,7 +21,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.source.PostprocessReformattingAspect
 import java.util.stream.Stream
 
-internal class MixinMethodLookupItem(method: PsiMethod) : JavaMethodCallElement(method) {
+class MixinMethodLookupItem(method: PsiMethod) : JavaMethodCallElement(method) {
 
     override fun handleInsert(context: InsertionContext) {
         insertShadow(context, `object`)
@@ -30,7 +30,7 @@ internal class MixinMethodLookupItem(method: PsiMethod) : JavaMethodCallElement(
 
 }
 
-internal class MixinFieldLookupItem(field: PsiField, private val qualified: Boolean) : VariableLookupItem(field) {
+class MixinFieldLookupItem(field: PsiField, private val qualified: Boolean) : VariableLookupItem(field) {
 
     override fun handleInsert(context: InsertionContext) {
         insertShadow(context, `object` as PsiMember)
@@ -43,7 +43,6 @@ internal class MixinFieldLookupItem(field: PsiField, private val qualified: Bool
             context.commitDocument()
         }
     }
-
 }
 
 private fun insertShadow(context: InsertionContext, member: PsiMember) {

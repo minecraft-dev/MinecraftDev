@@ -22,10 +22,10 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiVariable
 
-internal object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
+object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
 
     override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass, checkOnly: Boolean): CollectVisitor<out PsiElement>? {
-        return MemberReference.parse(context.constantStringValue)?.let({ FindUsagesVisitor(targetClass, it, checkOnly) })
+        return MemberReference.parse(context.constantStringValue)?.let { FindUsagesVisitor(targetClass, it, checkOnly) }
     }
 
     override fun createCollectUsagesVisitor(): CollectVisitor<QualifiedMember<PsiMethod>> = CollectUsagesVisitor()
@@ -66,7 +66,6 @@ internal object ConstantStringMethodTargetReference : TargetReference.MethodHand
 
             super.visitMethodCallExpression(expression)
         }
-
     }
 
     private class CollectUsagesVisitor : CollectVisitor<QualifiedMember<PsiMethod>>(false) {
@@ -81,7 +80,5 @@ internal object ConstantStringMethodTargetReference : TargetReference.MethodHand
 
             super.visitMethodCallExpression(expression)
         }
-
     }
-
 }
