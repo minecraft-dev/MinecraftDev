@@ -10,12 +10,10 @@
 
 import net.minecrell.gradle.licenser.LicenseExtension
 import net.minecrell.gradle.licenser.Licenser
-import org.gradle.api.Task
 import org.gradle.api.file.CopySpec
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.internal.jvm.Jvm
 import org.gradle.plugins.ide.idea.IdeaPlugin
@@ -24,6 +22,7 @@ import org.jetbrains.intellij.IntelliJPlugin
 import org.jetbrains.intellij.IntelliJPluginExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlin.reflect.KProperty
 
 buildscript {
     repositories {
@@ -40,18 +39,25 @@ buildscript {
     }
 
     dependencies {
-        classpath(kotlinModule("gradle-plugin", project.properties["kotlinVersion"] as String))
+        classpath(kotlinModule("gradle-plugin", properties["kotlinVersion"]))
         classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.2")
         classpath("gradle.plugin.net.minecrell:licenser:0.3")
     }
 }
 
-val ideaVersion by project
-val javaVersion by project
-val kotlinVersion by project
-val pluginVersion by project
-val pluginGroup by project
-val downloadIdeaSources by project
+// Get rid of pointless casts to String - Start
+operator fun getValue(thisRef: Any, property: KProperty<*>) = project.getValue(thisRef, property) as String
+class StringMap(val map: Map<String, *>) : HashMap<String, String>() { operator override fun get(key: String) = map[key] as String }
+val properties = StringMap(project.properties)
+fun KotlinDependencyHandler.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
+// End
+
+val ideaVersion by this
+val javaVersion by this
+val kotlinVersion by this
+val pluginVersion by this
+val pluginGroup by this
+val downloadIdeaSources by this
 
 apply {
     plugin<JavaPlugin>()
@@ -73,7 +79,7 @@ repositories {
 }
 
 dependencies {
-    compile(kotlinModule("stdlib-jre8", kotlinVersion as String) as String) {
+    compile(kotlinModule("stdlib-jre8")) {
         // JetBrains annotations are already bundled with IntelliJ IDEA
         exclude(group = "org.jetbrains", module = "annotations")
     }
@@ -86,7 +92,7 @@ dependencies {
     // but without kotlin-stdlib or kotlin-runtime on the classpath,
     // gradle-intellij-plugin will add IntelliJ IDEA's Kotlin version to the
     // dependencies which conflicts with our newer version.
-    compile(kotlinModule("runtime", kotlinVersion as String) as String) {
+    compile(kotlinModule("runtime")) {
         isTransitive = false
     }
 }
@@ -94,9 +100,9 @@ dependencies {
 configure<IntelliJPluginExtension> {
     // IntelliJ IDEA dependency
     version =  if (project.hasProperty("intellijVersion")) {
-        project.properties["intellijVersion"] as String
+        properties["intellijVersion"]
     } else {
-        ideaVersion as String
+        ideaVersion
     }
     // Bundled plugin dependencies
     setPlugins("maven", "gradle", "Groovy", "yaml",
@@ -106,7 +112,7 @@ configure<IntelliJPluginExtension> {
     pluginName = "Minecraft Development"
     updateSinceUntilBuild = false
 
-    downloadSources = (downloadIdeaSources as String).toBoolean()
+    downloadSources = downloadIdeaSources.toBoolean()
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
@@ -219,13 +225,18 @@ tasks.withType<JavaCompile> {
 
 tasks.withType<KotlinCompile> {
     dependsOn(generate)
-    kotlinOptions.jvmTarget = javaVersion as String
+    kotlinOptions.jvmTarget = javaVersion
+}
+
+// Remove gen directory on clean
+tasks.getByName("clean").doLast {
+    delete(file("gen"))
 }
 
 if (project.hasProperty("intellijJre")) {
     afterEvaluate {
         (tasks.getByName("runIdea") as JavaExec).apply {
-            executable(project.properties["intellijJre"] as String)
+            executable(properties["intellijJre"])
         }
     }
 }

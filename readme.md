@@ -30,7 +30,13 @@ The output .zip file for the plugin will be in `build/distributions`.
 
 Test the plugin in IntelliJ with:
 
-`./gradlew runIdea`
+`./gradlew runIde`
+
+Code is generated during the build task, to run the generation task without building use:
+
+`./gradlew generate`
+
+This task is necessary to work on the code without errors before the initial build.
 
 The [Gradle IntelliJ Plugin](https://github.com/JetBrains/gradle-intellij-plugin)
 will handle downloading the IntelliJ dependencies and packaging the
