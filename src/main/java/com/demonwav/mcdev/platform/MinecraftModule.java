@@ -52,6 +52,7 @@ import javax.swing.Icon;
 public final class MinecraftModule {
 
     private static final Map<Module, MinecraftModule> map = new HashMap<>();
+    private static final Set<MinecraftModule> pendingModules = Sets.newHashSet();
     private static final Set<Consumer<MinecraftModule>> readyWaiters = Sets.newConcurrentHashSet();
 
     private final Module module;
@@ -66,9 +67,12 @@ public final class MinecraftModule {
     @NotNull
     private static MinecraftModule generate(@NotNull List<AbstractModuleType<?>> types, @NotNull Module module) {
         final MinecraftModule minecraftModule = new MinecraftModule(module, BuildSystem.getInstance(module));
+        pendingModules.add(minecraftModule);
         if (minecraftModule.buildSystem != null) {
             minecraftModule.buildSystem.reImport(module).done(buildSystem -> {
                 types.forEach(minecraftModule::register);
+                // Startup actions
+                pendingModules.remove(minecraftModule);
                 doReadyActions(minecraftModule);
             });
         }
@@ -310,15 +314,16 @@ public final class MinecraftModule {
         readyWaiters.add(consumer);
     }
 
-    public static void cleanReadyActions() {
-        readyWaiters.clear();
-    }
-
     private static void doReadyActions(@NotNull MinecraftModule module) {
         if (!module.getIdeaModule().isDisposed() && !module.getIdeaModule().getProject().isDisposed()) {
             for (Consumer<MinecraftModule> readyWaiter : readyWaiters) {
                 readyWaiter.accept(module);
             }
+        }
+
+        // We don't want to hold on to the actions after we've finished setting up
+        if (pendingModules.isEmpty()) {
+            readyWaiters.clear();
         }
     }
 }

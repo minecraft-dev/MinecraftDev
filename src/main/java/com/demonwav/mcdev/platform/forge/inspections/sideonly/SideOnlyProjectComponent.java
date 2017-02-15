@@ -36,6 +36,10 @@ public class SideOnlyProjectComponent extends AbstractProjectComponent {
     @Override
     public void projectOpened() {
         MinecraftModule.doWhenReady(instance -> {
+            if (myProject.isDisposed()) {
+                return;
+            }
+
             if (instance.getIdeaModule().isDisposed()) {
                 return;
             }

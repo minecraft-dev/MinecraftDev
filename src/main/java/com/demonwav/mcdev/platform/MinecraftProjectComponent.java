@@ -30,18 +30,6 @@ public class MinecraftProjectComponent extends AbstractProjectComponent {
             for (Module module : ModuleManager.getInstance(myProject).getModules()) {
                 MinecraftModule.getInstance(module);
             }
-            new Thread(() -> {
-                // Wait 10 seconds (should be PLENTY of time)
-                for (int i = 0; i < 1000; i++) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                // Clear out the ready actions
-                MinecraftModule.cleanReadyActions();
-            }).start();
         });
     }
 }
