@@ -10,9 +10,9 @@
 
 package com.demonwav.mcdev.platform.mixin.actions
 
-import com.demonwav.mcdev.platform.mixin.util.findField
-import com.demonwav.mcdev.platform.mixin.util.findMethods
-import com.demonwav.mcdev.platform.mixin.util.memberReference
+import com.demonwav.mcdev.util.findField
+import com.demonwav.mcdev.util.findMethods
+import com.demonwav.mcdev.util.memberReference
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement

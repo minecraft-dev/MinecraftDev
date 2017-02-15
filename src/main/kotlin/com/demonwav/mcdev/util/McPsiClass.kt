@@ -13,6 +13,7 @@ package com.demonwav.mcdev.util
 
 import com.intellij.navigation.AnonymousElementProvider
 import com.intellij.openapi.extensions.Extensions
+import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
@@ -21,6 +22,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.annotations.Contract
 
 // Type
@@ -31,6 +33,7 @@ val PsiClassType.fullQualifiedName
 
 // Class
 
+@get:Contract(pure = true)
 val PsiClass.outerQualifiedName
     get() = if (containingClass == null) qualifiedName else null
 
@@ -88,6 +91,50 @@ inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (PsiClass) -
     // Append names for all inner classes
     for (i in list.lastIndex downTo 0) {
         builder.append(separator).append(list[i])
+    }
+}
+
+@Contract(pure = true)
+fun findQualifiedClass(fullQualifiedName: String, context: PsiElement): PsiClass? {
+    return findQualifiedClass(context.project, fullQualifiedName, context.resolveScope)
+}
+
+@Contract(pure = true)
+@JvmOverloads
+fun findQualifiedClass(project: Project, fullQualifiedName: String,
+                                scope: GlobalSearchScope = GlobalSearchScope.allScope(project)): PsiClass? {
+    var innerPos = fullQualifiedName.indexOf('$')
+    if (innerPos == -1) {
+        return JavaPsiFacade.getInstance(project).findClass(fullQualifiedName, scope)
+    }
+
+    var currentClass = JavaPsiFacade.getInstance(project).findClass(fullQualifiedName.substring(0, innerPos), scope) ?: return null
+    var outerPos: Int
+
+    while (true) {
+        outerPos = innerPos + 1
+        innerPos = fullQualifiedName.indexOf('$', outerPos)
+
+        if (innerPos == -1) {
+            return currentClass.findInnerClass(fullQualifiedName.substring(outerPos))
+        } else {
+            currentClass = currentClass.findInnerClass(fullQualifiedName.substring(outerPos, innerPos)) ?: return null
+        }
+    }
+}
+
+private fun PsiClass.findInnerClass(name: String): PsiClass? {
+    val anonymousIndex = name.toIntOrNull()
+    return if (anonymousIndex == null) {
+        // Named inner class
+        findInnerClassByName(name, false)
+    } else {
+        val anonymousElements = anonymousElements ?: return null
+        if (anonymousIndex <= anonymousElements.size) {
+            anonymousElements[anonymousIndex - 1] as PsiClass
+        } else {
+            null
+        }
     }
 }
 

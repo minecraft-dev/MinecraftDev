@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.util
 
+import com.demonwav.mcdev.util.memberReference
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod

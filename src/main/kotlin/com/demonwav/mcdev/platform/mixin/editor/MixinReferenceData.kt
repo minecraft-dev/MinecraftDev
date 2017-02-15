@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.editor
 
-import com.demonwav.mcdev.platform.mixin.util.MemberReference
+import com.demonwav.mcdev.util.MemberReference
 import com.intellij.codeInsight.editorActions.ReferenceData
 import com.intellij.psi.PsiElement
 

@@ -12,8 +12,8 @@ package com.demonwav.mcdev.platform.mixin.inspection
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
-import com.demonwav.mcdev.platform.mixin.util.findMethods
-import com.demonwav.mcdev.platform.mixin.util.memberReference
+import com.demonwav.mcdev.util.findMethods
+import com.demonwav.mcdev.util.memberReference
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiElementVisitor

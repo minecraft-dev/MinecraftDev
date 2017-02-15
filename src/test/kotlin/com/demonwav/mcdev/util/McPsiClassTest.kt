@@ -50,4 +50,15 @@ class McPsiClassTest : LightCodeInsightFixtureTestCase() {
             assertEquals("com.example.test.OuterClass\$InnerClass$1\$AnonymousInnerClass", innerAnonymousInnerClass.fullQualifiedName)
     fun testInnerAnonymousInnerShortName() = assertEquals("OuterClass.InnerClass.1.AnonymousInnerClass", innerAnonymousInnerClass.shortName)
 
+    private fun findQualifiedClass(fullQualifiedName: String): PsiClass? {
+        return findQualifiedClass(project, fullQualifiedName)
+    }
+
+    fun testFindOuter() = assertSame(outerClass, findQualifiedClass("com.example.test.OuterClass"))
+    fun testFindOuterAnonymous() = assertSame(outerAnonymousClass, findQualifiedClass("com.example.test.OuterClass$1"))
+    fun testFindInner() = assertSame(innerClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass"))
+    fun testFindInnerAnonymous() = assertSame(innerAnonymousClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass$1"))
+    fun testFindInnerAnonymousInner() =
+            assertSame(innerAnonymousInnerClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass$1\$AnonymousInnerClass"))
+
 }

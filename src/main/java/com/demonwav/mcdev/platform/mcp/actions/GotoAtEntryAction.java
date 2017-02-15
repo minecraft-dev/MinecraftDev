@@ -12,12 +12,12 @@ package com.demonwav.mcdev.platform.mcp.actions;
 
 import com.demonwav.mcdev.platform.mcp.McpModule;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
-import com.demonwav.mcdev.platform.mcp.srg.SrgMap;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.platform.mixin.util.ShadowedMembers;
 import com.demonwav.mcdev.util.ActionData;
 import com.demonwav.mcdev.util.McActionUtil;
 import com.demonwav.mcdev.util.McEditorUtil;
+import com.demonwav.mcdev.util.MemberReference;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
@@ -70,30 +70,21 @@ public class GotoAtEntryAction extends AnAction {
             }
 
             if (parent instanceof PsiField) {
-                final PsiField field = (PsiField) parent;
-
-                final String s = SrgMap.toString(field);
-
-                final String fieldMcpToSrg = srgMap.findFieldMcpToSrg(s);
-                if (fieldMcpToSrg == null) {
+                final MemberReference reference = srgMap.findSrgField((PsiField) parent);
+                if (reference == null) {
                     showBalloon(e);
                     return;
                 }
 
-                searchForText(mcpModule, e, data, fieldMcpToSrg.substring(fieldMcpToSrg.lastIndexOf('/') + 1));
+                searchForText(mcpModule, e, data, reference.getName());
             } else if (parent instanceof PsiMethod) {
-                final PsiMethod method = (PsiMethod) parent;
-
-                final String s = SrgMap.toString(method);
-
-                final String methodMcpToSrg = srgMap.findMethodMcpToSrg(s);
-                if (methodMcpToSrg == null) {
+                MemberReference reference = srgMap.findSrgMethod((PsiMethod) parent);
+                if (reference == null) {
                     showBalloon(e);
                     return;
                 }
 
-                final String beforeParen = methodMcpToSrg.substring(0, methodMcpToSrg.indexOf('('));
-                searchForText(mcpModule, e, data, beforeParen.substring(beforeParen.lastIndexOf('/') + 1));
+                searchForText(mcpModule, e, data, reference.getName() + reference.getDescriptor());
             } else {
                 showBalloon(e);
             }

@@ -11,8 +11,8 @@
 package com.demonwav.mcdev.platform.mixin.inspection.signature
 
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
-import com.demonwav.mcdev.platform.mixin.util.MemberReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoReturnableType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoType
 import com.demonwav.mcdev.util.Parameter
@@ -74,7 +74,7 @@ enum class InjectorType(private val annotation: String) {
             // we don't actually have to resolve the target reference in the
             // target method. Everything needed to get the method parameters
             // is included in the reference.
-            val reference = MemberReference.parse(target.constantStringValue) ?: return null
+            val reference = MixinMemberReference.parse(target.constantStringValue) ?: return null
 
             if (!reference.qualified || reference.descriptor == null) {
                 // Invalid anyway and we need the qualified reference

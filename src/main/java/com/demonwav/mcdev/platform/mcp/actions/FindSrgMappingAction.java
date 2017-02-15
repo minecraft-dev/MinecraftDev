@@ -12,11 +12,11 @@ package com.demonwav.mcdev.platform.mcp.actions;
 
 import com.demonwav.mcdev.platform.mcp.McpModule;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
-import com.demonwav.mcdev.platform.mcp.srg.SrgMap;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.platform.mixin.util.ShadowedMembers;
 import com.demonwav.mcdev.util.ActionData;
 import com.demonwav.mcdev.util.McActionUtil;
+import com.demonwav.mcdev.util.MemberReference;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
@@ -64,41 +64,23 @@ public class FindSrgMappingAction extends AnAction {
             }
 
             if (parent instanceof PsiField) {
-                final PsiField field = (PsiField) parent;
-
-                final String s = SrgMap.toString(field);
-
-                final String fieldMcpToSrg = srgMap.findFieldMcpToSrg(s);
-                if (fieldMcpToSrg == null) {
+                final MemberReference srg = srgMap.findSrgField((PsiField) parent);
+                if (srg == null) {
                     showBalloon(e);
                     return;
                 }
 
-                final String fieldNameFinal = fieldMcpToSrg.substring(fieldMcpToSrg.lastIndexOf("/") + 1);
-
-                showSuccessBalloon(data.getEditor(), data.getElement(), fieldNameFinal);
+                showSuccessBalloon(data.getEditor(), data.getElement(), srg.getName());
             } else if (parent instanceof PsiMethod) {
-                final PsiMethod method = (PsiMethod) parent;
-
-                final String s = SrgMap.toString(method);
-
-                String methodMcpToSrg = srgMap.findMethodMcpToSrg(s);
-                if (methodMcpToSrg == null) {
+                MemberReference srg = srgMap.findSrgMethod((PsiMethod) parent);
+                if (srg == null) {
                     showBalloon(e);
                     return;
                 }
 
-                final String preParen = methodMcpToSrg.substring(0, methodMcpToSrg.indexOf('('));
-                final String methodName = preParen.substring(preParen.lastIndexOf('/') + 1);
-                final String params = methodMcpToSrg.substring(methodMcpToSrg.indexOf('('));
-
-                showSuccessBalloon(data.getEditor(), data.getElement(), methodName + params);
+                showSuccessBalloon(data.getEditor(), data.getElement(), srg.getName() + srg.getDescriptor());
             } else if (parent instanceof PsiClass) {
-                final PsiClass psiClass = (PsiClass) parent;
-
-                final String s = SrgMap.toString(psiClass);
-
-                final String classMcpToSrg = srgMap.findClassMcpToSrg(s);
+                final String classMcpToSrg = srgMap.findSrgClass((PsiClass) parent);
                 if (classMcpToSrg == null) {
                     showBalloon(e);
                     return;

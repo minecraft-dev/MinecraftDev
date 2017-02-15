@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.mixin.util;
 
 import com.demonwav.mcdev.platform.MinecraftModule;
-import com.demonwav.mcdev.platform.mcp.util.McpUtil;
 import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Key;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Level;
@@ -385,10 +384,10 @@ public final class MixinUtils {
             final PsiLiteralExpressionImpl lit = (PsiLiteralExpressionImpl) psi;
 
             final String text = lit.getInnerText();
-            return McpUtil.getClassFromString(text, element.getProject());
+            return text != null ? McPsiClass.findQualifiedClass(element.getProject(), text) : null;
         } else if (element instanceof PsiLiteralExpressionImpl) {
             final PsiLiteralExpressionImpl expression = (PsiLiteralExpressionImpl) element;
-            return McpUtil.getClassFromString(expression.getInnerText(), element.getProject());
+            return McPsiClass.findQualifiedClass(element.getProject(), expression.getInnerText());
         }
 
         return null;

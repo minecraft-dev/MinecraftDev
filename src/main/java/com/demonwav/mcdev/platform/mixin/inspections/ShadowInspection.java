@@ -13,13 +13,14 @@ package com.demonwav.mcdev.platform.mixin.inspections;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.mcp.McpModule;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
-import com.demonwav.mcdev.platform.mcp.srg.SrgMap;
+import com.demonwav.mcdev.platform.mcp.srg.McpSrgMap;
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Key;
 import com.demonwav.mcdev.platform.mixin.util.ShadowedMembers;
 import com.demonwav.mcdev.util.McPsiClass;
+import com.demonwav.mcdev.util.MemberReference;
 import com.google.common.collect.Lists;
 import com.intellij.codeInspection.BaseJavaBatchLocalInspectionTool;
 import com.intellij.codeInspection.InspectionManager;
@@ -189,7 +190,7 @@ public class ShadowInspection extends BaseJavaBatchLocalInspectionTool {
                 errors.addAll(shadowedMembers.getErrors());
 
                 if (mixedClasses.size() > 1) {
-                    SrgMap srgMap = null;
+                    McpSrgMap srgMap = null;
                     if (mcpModule != null) {
                         srgMap = mcpModule.getSrgManager().getSrgMapNow();
                     }
@@ -206,23 +207,23 @@ public class ShadowInspection extends BaseJavaBatchLocalInspectionTool {
                     }
 
                     boolean isGood = true;
-                    String lastName = null;
+                    MemberReference lastReference = null;
                     for (PsiElement element : shadowedMembers.getTargets()) {
-                        final String name;
+                        final MemberReference reference;
                         if (element instanceof PsiMethod) {
-                            name = srgMap.findMethodMcpToSrg(SrgMap.toString((PsiMethod) element));
+                            reference = srgMap.findSrgMethod((PsiMethod) element);
                         } else {
-                            name = srgMap.findFieldMcpToSrg(SrgMap.toString((PsiField) element));
+                            reference = srgMap.findSrgField((PsiField) element);
                         }
 
-                        if (name != null) {
+                        if (reference != null) {
                             isGood = false;
                         }
 
-                        if (lastName == null) {
-                            lastName = name;
+                        if (lastReference == null) {
+                            lastReference = reference;
                         } else {
-                            if (!lastName.equals(name)) {
+                            if (!lastReference.equals(reference)) {
                                 isGood = false;
                             }
                         }

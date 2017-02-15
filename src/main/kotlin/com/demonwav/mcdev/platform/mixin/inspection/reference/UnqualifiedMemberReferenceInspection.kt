@@ -11,8 +11,8 @@
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
-import com.demonwav.mcdev.platform.mixin.util.MemberReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
+import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiAnnotation
@@ -30,7 +30,7 @@ class UnqualifiedMemberReferenceInspection : AnnotationAttributeInspection(AT, "
 
         // TODO: Quick fix
 
-        val reference = MemberReference.parse(value.constantStringValue) ?: return
+        val reference = MixinMemberReference.parse(value.constantStringValue) ?: return
         if (!reference.qualified) {
             holder.registerProblem(value, "Unqualified member reference in @At target")
             return

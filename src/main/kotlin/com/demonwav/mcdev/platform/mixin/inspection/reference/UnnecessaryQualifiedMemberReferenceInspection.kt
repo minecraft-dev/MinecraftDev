@@ -10,8 +10,9 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
-import com.demonwav.mcdev.platform.mixin.util.MemberReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
+import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
@@ -26,7 +27,7 @@ class UnnecessaryQualifiedMemberReferenceInspection : AnnotationAttributeInspect
     override fun getStaticDescription() = "Reports unnecessary qualified member references in @Inject annotations"
 
     override fun visitAnnotationAttribute(annotation: PsiAnnotation, value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
-        val reference = MemberReference.parse(value.constantStringValue) ?: return
+        val reference = MixinMemberReference.parse(value.constantStringValue) ?: return
         if (reference.qualified) {
             holder.registerProblem(value, "Unnecessary qualified reference to '${reference.name}' in target class", QuickFix(reference))
         }

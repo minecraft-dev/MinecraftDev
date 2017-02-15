@@ -10,8 +10,9 @@
 
 package com.demonwav.mcdev.platform.mixin.actions
 
-import com.demonwav.mcdev.platform.mixin.util.qualifiedMemberReference
+import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.util.findReferencedMember
+import com.demonwav.mcdev.util.qualifiedMemberReference
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys.CARET
@@ -38,7 +39,7 @@ class CopyMixinTargetReferenceAction : AnAction() {
             else -> return
         }
 
-        CopyPasteManager.getInstance().setContents(StringSelection(targetReference.toString()))
+        CopyPasteManager.getInstance().setContents(StringSelection(MixinMemberReference.toString(targetReference)))
         WindowManager.getInstance().getStatusBar(project).info = "Mixin target reference has been copied."
     }
 

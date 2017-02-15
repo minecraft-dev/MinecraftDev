@@ -14,7 +14,7 @@ import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
-import com.demonwav.mcdev.platform.mixin.util.MemberReference
+import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.util.annotationFromNameValuePair
 import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.codeInspection.ProblemsHolder
@@ -52,7 +52,7 @@ class InvalidMemberReferenceInspection : MixinInspection() {
             val value = pair.value ?: return
 
             // Attempt to parse the reference
-            if (MemberReference.parse(value.constantStringValue) == null) {
+            if (MixinMemberReference.parse(value.constantStringValue) == null) {
                 holder.registerProblem(value, "Invalid member reference")
             }
         }

@@ -40,6 +40,21 @@ val PsiPrimitiveType.internalName: Char
         else -> throw IllegalArgumentException("Unsupported primitive type: $this")
     }
 
+fun getPrimitiveType(internalName: Char): PsiPrimitiveType? {
+    return when (internalName) {
+        'B' -> PsiType.BYTE
+        'C' -> PsiType.CHAR
+        'D' -> PsiType.DOUBLE
+        'F' -> PsiType.FLOAT
+        'I' -> PsiType.INT
+        'J' -> PsiType.LONG
+        'S' -> PsiType.SHORT
+        'Z' -> PsiType.BOOLEAN
+        'V' -> PsiType.VOID
+        else -> null
+    }
+}
+
 @Contract(pure = true)
 private fun PsiClassType.erasure() = TypeConversionUtil.erasure(this) as PsiClassType
 
@@ -60,6 +75,11 @@ fun PsiType.appendDescriptor(builder: StringBuilder): StringBuilder {
         is PsiClassType -> appendInternalName(builder.append('L')).append(';')
         else -> throw IllegalArgumentException("Unsupported PsiType: $this")
     }
+}
+
+fun parseClassDescriptor(descriptor: String): String {
+    val internalName = descriptor.substring(1, descriptor.length - 1)
+    return internalName.replace('/', '.')
 }
 
 // Class

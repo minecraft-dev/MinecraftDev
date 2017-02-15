@@ -12,11 +12,11 @@ package com.demonwav.mcdev.platform.mixin.editor
 
 import com.demonwav.mcdev.platform.mixin.actions.insertShadows
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
-import com.demonwav.mcdev.platform.mixin.util.findField
-import com.demonwav.mcdev.platform.mixin.util.findMethods
-import com.demonwav.mcdev.platform.mixin.util.qualifiedMemberReference
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.findField
 import com.demonwav.mcdev.util.findJavaCodeReferenceElement
+import com.demonwav.mcdev.util.findMethods
+import com.demonwav.mcdev.util.qualifiedMemberReference
 import com.intellij.codeInsight.editorActions.JavaCopyPasteReferenceProcessor
 import com.intellij.codeInsight.editorActions.ReferenceData
 import com.intellij.openapi.editor.RangeMarker
