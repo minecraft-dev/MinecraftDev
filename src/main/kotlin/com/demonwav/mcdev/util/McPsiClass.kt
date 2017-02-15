@@ -31,22 +31,25 @@ internal val PsiClassType.fullQualifiedName
 
 // Class
 
+internal val PsiClass.outerQualifiedName
+    get() = if (containingClass == null) qualifiedName else null
+
 @get:Contract(pure = true)
 internal val PsiClass.fullQualifiedName
-    get() = qualifiedName ?: buildQualifiedName(StringBuilder()).toString()
+    get() = outerQualifiedName ?: buildQualifiedName(StringBuilder()).toString()
 
 internal fun PsiClass.appendFullQualifiedName(builder: StringBuilder): StringBuilder {
-    return qualifiedName?.let { builder.append(it) } ?: buildQualifiedName(builder)
+    return outerQualifiedName?.let { builder.append(it) } ?: buildQualifiedName(builder)
 }
 
 private fun PsiClass.buildQualifiedName(builder: StringBuilder): StringBuilder {
-    buildInnerName(builder, PsiClass::getQualifiedName)
+    buildInnerName(builder, PsiClass::outerQualifiedName)
     return builder
 }
 
 @get:Contract(pure = true)
 private val PsiClass.outerShortName
-    get() = name?.takeIf { containingClass == null }
+    get() = if (containingClass == null) name else null
 
 @get:Contract(pure = true)
 internal val PsiClass.shortName: String

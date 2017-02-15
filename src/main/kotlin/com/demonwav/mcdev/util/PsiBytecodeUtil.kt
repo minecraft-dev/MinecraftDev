@@ -8,7 +8,7 @@
  * MIT License
  */
 
-@file:JvmName("McBytecodeUtil")
+@file:JvmName("PsiBytecodeUtil")
 package com.demonwav.mcdev.util
 
 import com.intellij.psi.PsiArrayType
@@ -66,14 +66,14 @@ internal fun PsiType.appendDescriptor(builder: StringBuilder): StringBuilder {
 
 @get:Contract(pure = true)
 internal val PsiClass.internalName
-    get() = qualifiedName?.replace('.', '/') ?: buildInternalName(StringBuilder()).toString()
+    get() = outerQualifiedName?.replace('.', '/') ?: buildInternalName(StringBuilder()).toString()
 
 internal fun PsiClass.appendInternalName(builder: StringBuilder): StringBuilder {
-    return qualifiedName?.let { builder.append(it.replace('.', '/')) } ?: buildInternalName(builder)
+    return outerQualifiedName?.let { builder.append(it.replace('.', '/')) } ?: buildInternalName(builder)
 }
 
 private fun PsiClass.buildInternalName(builder: StringBuilder): StringBuilder {
-    buildInnerName(builder, { it.qualifiedName?.replace('.', '/') })
+    buildInnerName(builder, { it.outerQualifiedName?.replace('.', '/') })
     return builder
 }
 

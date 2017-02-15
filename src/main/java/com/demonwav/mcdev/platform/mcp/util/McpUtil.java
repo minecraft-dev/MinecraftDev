@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mcp.util;
 
-import com.demonwav.mcdev.util.McBytecodeUtil;
+import com.demonwav.mcdev.util.PsiBytecodeUtil;
 
 import com.google.common.collect.Lists;
 import com.intellij.navigation.AnonymousElementProvider;
@@ -176,6 +176,6 @@ public final class McpUtil {
     @Nullable
     @Contract(value = "null -> null", pure = true)
     public static String getStringFromType(@Nullable PsiType type) {
-        return type != null ? McBytecodeUtil.getDescriptor(type) : null;
+        return type != null ? PsiBytecodeUtil.getDescriptor(type) : null;
     }
 }
