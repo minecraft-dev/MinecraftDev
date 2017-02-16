@@ -33,7 +33,7 @@ object InjectionPointType : ReferenceResolver(), MixinReference {
     override fun resolveReference(context: PsiElement): PsiElement? {
         // Remove selectors from the injection point type for now
         // TODO: Remove this when we have full support for @Slices
-        val value = context.constantStringValue.substringBefore(':')
+        val value = context.constantStringValue?.substringBefore(':') ?: return null
         findTypes(context, { code, psiClass ->
             if (value == code) {
                 return psiClass

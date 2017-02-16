@@ -42,8 +42,9 @@ object MixinMemberReference {
      * the formats, so it should either use the dot separate full qualified
      * class name OR the internal class descriptor.
      */
-    @Contract(pure = true)
-    fun parse(reference: String): MemberReference? {
+    @Contract(value = "null -> null", pure = true)
+    fun parse(reference: String?): MemberReference? {
+        reference ?: return null
         val owner: String?
 
         var pos = reference.lastIndexOf('.')

@@ -22,7 +22,7 @@ import com.intellij.psi.PsiNewExpression
 object ConstructorTargetReference : TargetReference.Handler<PsiClass>() {
 
     override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass, checkOnly: Boolean): CollectVisitor<out PsiElement>? {
-        val name = context.constantStringValue.replace('/', '.')
+        val name = context.constantStringValue?.replace('/', '.') ?: return null
         return FindUsagesVisitor(name, checkOnly)
     }
 

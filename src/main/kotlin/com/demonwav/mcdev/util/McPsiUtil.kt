@@ -12,26 +12,18 @@
 package com.demonwav.mcdev.util
 
 import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiArrayInitializerMemberValue
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiJavaCodeReferenceElement
-import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
-import com.intellij.psi.PsiParenthesizedExpression
-import com.intellij.psi.PsiPolyadicExpression
 import com.intellij.psi.PsiReference
-import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiType
-import com.intellij.psi.PsiTypeCastExpression
-import com.intellij.psi.PsiVariable
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.util.TypeConversionUtil
@@ -135,50 +127,13 @@ fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
     ChangeSignatureUtil.synchronizeList(this, newParams, {it.parameters.asList()}, BooleanArray(newParams.size))
 }
 
-// PsiNameValuePair -> PsiAnnotationParameterList -> PsiAnnotation
 @get:Contract(pure = true)
-val PsiElement.annotationFromNameValuePair
-    get() = parent?.parent as? PsiAnnotation
-
-// value -> PsiNameValuePair -> see above
-@get:Contract(pure = true)
-val PsiElement.annotationFromValue
-    get() = parent?.annotationFromNameValuePair
-
-// value -> PsiArrayInitializerMemberValue -> PsiNameValuePair -> see above
-@get:Contract(pure = true)
-val PsiElement.annotationFromArrayValue: PsiAnnotation?
-    get() {
-        val parent = parent ?: return null
-        return if (parent is PsiArrayInitializerMemberValue) {
-            parent.parent?.annotationFromNameValuePair
-        } else {
-            parent.annotationFromNameValuePair
-        }
-    }
+val PsiElement.constantValue: Any?
+    get() = JavaPsiFacade.getInstance(project).constantEvaluationHelper.computeConstantExpression(this)
 
 @get:Contract(pure = true)
-val PsiElement.constantValue: Any
-    get() = JavaPsiFacade.getInstance(project).constantEvaluationHelper.computeConstantExpression(this, true)
-
-@get:Contract(pure = true)
-val PsiElement.constantStringValue: String
-    get() = when (this) {
-        is PsiLiteral -> value?.toString() ?: ""
-        is PsiPolyadicExpression ->
-            // We assume that the expression uses the '+' operator since that is the only valid one for constant expressions (of strings)
-            operands.joinToString(separator = "", transform = PsiElement::constantStringValue)
-        is PsiReferenceExpression ->
-            // Possibly a reference to a constant field, attempt to resolve
-            (resolve() as? PsiVariable)?.computeConstantValue()?.toString() ?: ""
-        is PsiParenthesizedExpression ->
-            // Useless parentheses? Fine with me!
-            expression?.constantStringValue ?: ""
-        is PsiTypeCastExpression ->
-            // Useless type cast? Pfff.
-            operand?.constantStringValue ?: ""
-        else -> throw UnsupportedOperationException("Unsupported expression type: $this")
-    }
+val PsiElement.constantStringValue: String?
+    get() = constantValue as? String
 
 @Contract(pure = true)
 fun PsiType.isErasureEquivalentTo(other: PsiType): Boolean {
