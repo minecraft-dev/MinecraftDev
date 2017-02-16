@@ -95,13 +95,13 @@ inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (PsiClass) -
 }
 
 @Contract(pure = true)
-fun findQualifiedClass(fullQualifiedName: String, context: PsiElement): PsiClass? {
+internal fun findQualifiedClass(fullQualifiedName: String, context: PsiElement): PsiClass? {
     return findQualifiedClass(context.project, fullQualifiedName, context.resolveScope)
 }
 
 @Contract(pure = true)
 @JvmOverloads
-fun findQualifiedClass(project: Project, fullQualifiedName: String,
+internal fun findQualifiedClass(project: Project, fullQualifiedName: String,
                                 scope: GlobalSearchScope = GlobalSearchScope.allScope(project)): PsiClass? {
     var innerPos = fullQualifiedName.indexOf('$')
     if (innerPos == -1) {

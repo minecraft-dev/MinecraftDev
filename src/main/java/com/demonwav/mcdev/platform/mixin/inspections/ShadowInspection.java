@@ -14,7 +14,9 @@ import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.mcp.McpModule;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
 import com.demonwav.mcdev.platform.mcp.srg.McpSrgMap;
+import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations;
+import com.demonwav.mcdev.platform.mixin.util.MixinUtil;
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Key;
@@ -38,7 +40,6 @@ import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiModifierListOwner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -123,8 +124,8 @@ public class ShadowInspection extends BaseJavaBatchLocalInspectionTool {
 
     @Nullable
     @Contract(value = "null -> null", pure = true)
-    private Info getInfo(@Nullable PsiModifierListOwner owner) {
-        if (!MixinUtils.isMixinModule(owner)) {
+    private Info getInfo(@Nullable PsiMember owner) {
+        if (!MixinModuleType.INSTANCE.isInModule(owner)) {
             return null;
         }
 
@@ -133,8 +134,8 @@ public class ShadowInspection extends BaseJavaBatchLocalInspectionTool {
             return null;
         }
 
-        final PsiClass containingClass = MixinUtils.getContainingMixinClass(owner);
-        if (containingClass == null) {
+        final PsiClass containingClass = owner.getContainingClass();
+        if (containingClass == null || !MixinUtil.isMixin(containingClass)) {
             return null;
         }
 

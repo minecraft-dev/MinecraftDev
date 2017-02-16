@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.editor
 
 import com.demonwav.mcdev.platform.mixin.actions.insertShadows
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findField
 import com.demonwav.mcdev.util.findJavaCodeReferenceElement
@@ -66,7 +66,7 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
         val elementInTargetClass = file.findElementAt(bounds.startOffset) ?: return refs
         val psiClass = elementInTargetClass.findContainingClass() ?: return refs
 
-        val targets = MixinUtils.getAllMixedClasses(psiClass).values
+        val targets = psiClass.mixinTargets
         if (targets.isEmpty()) {
             // Not a Mixin, so there is no need to add @Shadow members
             return refs

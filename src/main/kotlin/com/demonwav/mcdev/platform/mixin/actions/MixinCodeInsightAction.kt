@@ -10,7 +10,8 @@
 
 package com.demonwav.mcdev.platform.mixin.actions
 
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.util.isMixin
+import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInsight.actions.SimpleCodeInsightAction
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.editor.Editor
@@ -28,7 +29,8 @@ abstract class MixinCodeInsightAction : SimpleCodeInsightAction() {
         }
 
         val element = file.findElementAt(editor.caretModel.offset) ?: return false
-        return MixinUtils.getContainingMixinClass(element) != null
+        val containingClass = element.findContainingClass() ?: return false
+        return containingClass.isMixin
     }
 
 }

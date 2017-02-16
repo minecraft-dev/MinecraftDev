@@ -12,7 +12,7 @@ package com.demonwav.mcdev.platform.mixin.actions
 
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findReferencedClass
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.gotoTargetElement
@@ -62,7 +62,7 @@ class FindMixinsAction : AnAction() {
                             .filter {
                                 indicator.text = "Checking ${it.name}..."
 
-                                MixinUtils.getAllMixedClasses(it).values.any { c ->
+                                it.mixinTargets.any { c ->
                                     c.qualifiedName == classOfElement
                                 }
                             }

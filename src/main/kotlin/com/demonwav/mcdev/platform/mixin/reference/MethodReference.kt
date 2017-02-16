@@ -12,7 +12,7 @@ package com.demonwav.mcdev.platform.mixin.reference
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.PolyReferenceResolver
 import com.demonwav.mcdev.util.completeToLiteral
@@ -43,7 +43,7 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
 
     private fun getTargets(context: PsiElement): Collection<PsiClass>? {
         val psiClass = context.findContainingClass() ?: return null
-        val targets = MixinUtils.getAllMixedClasses(psiClass).values
+        val targets = psiClass.mixinTargets
         return if (targets.isEmpty()) null else targets
     }
 

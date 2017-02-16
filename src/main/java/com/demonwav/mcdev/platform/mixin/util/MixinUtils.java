@@ -10,18 +10,13 @@
 
 package com.demonwav.mcdev.platform.mixin.util;
 
-import com.demonwav.mcdev.platform.MinecraftModule;
-import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Key;
 import com.demonwav.mcdev.platform.mixin.util.ShadowError.Level;
 import com.demonwav.mcdev.util.McMethodUtil;
 import com.demonwav.mcdev.util.McPsiClass;
-import com.demonwav.mcdev.util.McPsiUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
@@ -33,6 +28,7 @@ import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteralExpression;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
@@ -42,7 +38,6 @@ import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypeParameter;
-import com.intellij.psi.impl.source.PsiClassImpl;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.impl.source.tree.ElementType;
 import com.intellij.psi.impl.source.tree.java.PsiClassObjectAccessExpressionImpl;
@@ -61,78 +56,6 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public final class MixinUtils {
     private MixinUtils() {}
-
-    /**
-     * Given any PsiElement, determine if it resides in a {@link com.demonwav.mcdev.platform.mixin.MixinModule MixinModule}.
-     *
-     * @param element The element to check.
-     * @return True if this element resides in a {@link com.demonwav.mcdev.platform.mixin.MixinModule MixinModule}.
-     */
-    @Contract(value = "null -> false", pure = true)
-    public static boolean isMixinModule(@Nullable PsiElement element) {
-        return element != null && isMixinModule(ModuleUtilCore.findModuleForPsiElement(element));
-    }
-
-    /**
-     * Given any Module, determine if it is a {@link com.demonwav.mcdev.platform.mixin.MixinModule MixinModule}.
-     *
-     * @param module The module to check.
-     * @return True if this module is a {@link com.demonwav.mcdev.platform.mixin.MixinModule MixinModule}.
-     */
-    @Contract(value = "null -> false", pure = true)
-    public static boolean isMixinModule(@Nullable Module module) {
-        return module != null && isMixinModule(MinecraftModule.getInstance(module));
-    }
-
-    /**
-     * Given any MinecraftModule instance, determine if it contains a {@link com.demonwav.mcdev.platform.mixin.MixinModule MixinModule}.
-     *
-     * @param instance The instance to check.
-     * @return True if this instance contains a {@link com.demonwav.mcdev.platform.mixin.MixinModule MixinModule}.
-     */
-    @Contract(value = "null -> false", pure = true)
-    public static boolean isMixinModule(@Nullable MinecraftModule instance) {
-        return instance != null && instance.isOfType(MixinModuleType.INSTANCE);
-    }
-
-    /**
-     * Given a PsiElement, return the PsiClass it is in, if and only if this PsiClass it a Mixin class. If this class is not a Mixin class,
-     * or the given element is null, return null.
-     *
-     * @param element The element to check.
-     * @return The PsiClass the element is in if and only if that class is a Mixin class, otherwise null.
-     */
-    @Nullable
-    @Contract(value = "null -> null", pure = true)
-    public static PsiClass getContainingMixinClass(@Nullable PsiElement element) {
-        if (element == null) {
-            return null;
-        }
-
-        final PsiClass classOfElement = McPsiUtil.findContainingClass(element);
-        if (classOfElement == null) {
-            return null;
-        }
-
-        if (getMixinAnnotation(classOfElement) == null) {
-            return null;
-        }
-
-        return classOfElement;
-    }
-
-    /**
-     * Get the Mixin PsiAnnotation for the Mixin class which contains the given PsiElement. Returns null if the provided element is null or
-     * the element is not in a Mixin class.
-     *
-     * @param element The PsiElement to check.
-     * @return The Mixin PsiAnnotation for the Mixin class which contains the given PsiElement.
-     */
-    @Nullable
-    @Contract(value = "null -> null", pure = true)
-    public static PsiAnnotation getMixinAnnotationOfContainingClass(@Nullable PsiElement element) {
-        return element != null ? getMixinAnnotation(McPsiUtil.findContainingClass(element)) : null;
-    }
 
     /**
      * Get the Mixin PsiAnnotation for the provided Mixin PsiClass. Returns null if the provided class is null or the class is not a
@@ -407,7 +330,7 @@ public final class MixinUtils {
             return ShadowedMembers.EMPTY;
         }
 
-        if (!(element instanceof PsiModifierListOwner)) {
+        if (!(element instanceof PsiMember)) {
             return ShadowedMembers.EMPTY;
         }
 
@@ -416,12 +339,12 @@ public final class MixinUtils {
             return ShadowedMembers.EMPTY;
         }
 
-        final PsiClass containingClass = MixinUtils.getContainingMixinClass(element);
+        final PsiClass containingClass = ((PsiMember) element).getContainingClass();
         if (containingClass == null) {
             return ShadowedMembers.create().addError(ShadowError.builder().setError(Key.CANNOT_FIND_MIXIN_TARGET).build());
         }
 
-        final Map<PsiElement, PsiClass> allMixedClasses = MixinUtils.getAllMixedClasses(containingClass);
+        final Map<PsiElement, PsiClass> allMixedClasses = getAllMixedClasses(containingClass);
         if (allMixedClasses.isEmpty()) {
             return ShadowedMembers.create().addError(ShadowError.builder().setError(Key.NO_MIXIN_CLASS_TARGETS).build());
         }
@@ -630,63 +553,5 @@ public final class MixinUtils {
         }
 
         return ShadowedMembers.EMPTY;
-    }
-
-    /**
-     * Checks if the given {@link PsiClass} is an accessor Mixin. Returns true if and only if:
-     * <ol>
-     *     <li>The given parameter, {@code psiClassType}, is not null.</li>
-     *     <li>The class given is a Mixin.</li>
-     *     <li>The class given is an interface.</li>
-     *     <li>All Mixin targets are classes.</li>
-     *     <li>All member methods are decorated with either {@code @Accessor} or {@code @Invoker}.</li>
-     * </ol>
-     *
-     * @param psiClassType The {@link PsiClass} to check.
-     * @return True if the above checks is satisfied.
-     */
-    @Contract(pure = true)
-    public static boolean isAccessorMixin(@Nullable final PsiClassType psiClassType) {
-        if (psiClassType == null) {
-            return false;
-        }
-
-        final PsiClass psiClass = psiClassType.resolve();
-        if (psiClass == null) {
-            return false;
-        }
-
-        if (!psiClass.isInterface()) {
-            return false;
-        }
-
-        if (!(psiClass instanceof PsiClassImpl)) {
-            return false;
-        }
-
-        final Map<PsiElement, PsiClass> mixedClasses = getAllMixedClasses(psiClass);
-        if (mixedClasses.isEmpty()) {
-            return false;
-        }
-
-        for (Map.Entry<PsiElement, PsiClass> entries : mixedClasses.entrySet()) {
-            if (entries.getValue().isInterface()) {
-                return false;
-            }
-        }
-
-        for (PsiMethod method : ((PsiClassImpl) psiClass).getOwnMethods()) {
-            if (method.getModifierList().findAnnotation(MixinConstants.Annotations.ACCESSOR) != null) {
-                continue;
-            }
-
-            if (method.getModifierList().findAnnotation(MixinConstants.Annotations.INVOKER) != null) {
-                continue;
-            }
-
-            return false;
-        }
-
-        return true;
     }
 }

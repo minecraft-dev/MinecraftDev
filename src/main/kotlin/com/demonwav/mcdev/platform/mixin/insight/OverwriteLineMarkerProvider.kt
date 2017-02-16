@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.insight
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.memberReference
 import com.demonwav.mcdev.util.toTypedArray
@@ -57,7 +57,7 @@ class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNa
 
         // TODO: Implement without member reference
         val reference = method.memberReference
-        val targetMethods = MixinUtils.getAllMixedClasses(psiClass).values.stream()
+        val targetMethods = psiClass.mixinTargets.stream()
                 .flatMap { it.findMethods(reference) }
                 .toTypedArray()
         if (targetMethods.isNotEmpty()) {

@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.inspection
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.memberReference
 import com.intellij.codeInspection.ProblemsHolder
@@ -36,7 +36,7 @@ class OverwriteTargetInspection : MixinInspection() {
             val identifier = method.nameIdentifier ?: return
 
             val psiClass = method.containingClass ?: return
-            val targets = MixinUtils.getAllMixedClasses(psiClass).values
+            val targets = psiClass.mixinTargets
             if (targets.isEmpty()) {
                 return
             }

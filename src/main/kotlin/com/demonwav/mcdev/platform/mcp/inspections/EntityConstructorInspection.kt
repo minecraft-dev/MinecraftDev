@@ -13,7 +13,7 @@ package com.demonwav.mcdev.platform.mcp.inspections
 import com.demonwav.mcdev.platform.MinecraftModule
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.util.McpConstants
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiClass
@@ -52,7 +52,7 @@ class EntityConstructorInspection : BaseInspection() {
                     return
                 }
 
-                if (!MixinUtils.getAllMixedClasses(aClass).isEmpty()) {
+                if (aClass.isMixin) {
                     return
                 }
 

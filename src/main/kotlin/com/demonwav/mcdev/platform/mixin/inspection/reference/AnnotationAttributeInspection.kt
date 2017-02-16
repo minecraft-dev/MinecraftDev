@@ -11,7 +11,9 @@
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MIXIN
 import com.demonwav.mcdev.util.annotationFromNameValuePair
+import com.demonwav.mcdev.util.resolveClassArray
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiAnnotation
@@ -30,11 +32,17 @@ abstract class AnnotationAttributeInspection(private val annotation: List<String
     private inner class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
 
         override fun visitNameValuePair(pair: PsiNameValuePair) {
+            val psiAnnotation = pair.annotationFromNameValuePair ?: return
+
+            if (psiAnnotation.qualifiedName == MIXIN && pair.name == null) {
+                pair.value?.resolveClassArray()
+                return
+            }
+
             if (pair.name != attribute) {
                 return
             }
 
-            val psiAnnotation = pair.annotationFromNameValuePair ?: return
             if (psiAnnotation.qualifiedName !in annotation) {
                 return
             }

@@ -12,7 +12,7 @@ package com.demonwav.mcdev.platform.mixin.inspection
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SHADOW
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
@@ -47,7 +47,11 @@ class StaticMemberInspection : MixinInspection() {
         }
 
         private fun isProblematic(member: PsiMember): Boolean {
-            MixinUtils.getContainingMixinClass(member) ?: return false
+            val containingClass = member.containingClass ?: return false
+            if (!containingClass.isMixin) {
+                return false
+            }
+
             val modifiers = member.modifierList!!
 
             return modifiers.hasModifierProperty(PsiModifier.PUBLIC)

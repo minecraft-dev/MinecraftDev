@@ -11,7 +11,8 @@
 package com.demonwav.mcdev.platform.mixin.insight
 
 import com.demonwav.mcdev.asset.MixinAssets
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.util.isMixin
+import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -37,7 +38,7 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
         }
 
         val identifier = element.nameIdentifier ?: return null
-        return if (MixinUtils.getMixinAnnotation(element) != null) {
+        return if (element.isMixin) {
             LineMarker(identifier, this)
         } else {
             null
@@ -49,7 +50,7 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
 
     override fun navigate(e: MouseEvent, elt: PsiIdentifier) {
         val psiClass = elt.parent as? PsiClass ?: return
-        val targets = MixinUtils.getAllMixedClasses(psiClass).values
+        val targets = psiClass.mixinTargets
         if (targets.isNotEmpty()) {
             PsiElementListNavigator.openTargets(e, targets.toTypedArray(),
                     "Choose target class of ${psiClass.name!!}", null, PsiClassListCellRenderer.INSTANCE)
