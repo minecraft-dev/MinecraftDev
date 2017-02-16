@@ -235,6 +235,6 @@ tasks.getByName("clean").doLast {
 }
 
 project.findProperty("intellijJre")
-    ?.let { (tasks.getByName("runIdea") as JavaExec).setExecutable(it) }
+    ?.let { (tasks.getByName("runIde") as JavaExec).setExecutable(it) }
 
 defaultTasks("build")

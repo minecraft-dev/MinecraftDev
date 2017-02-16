@@ -10,7 +10,7 @@ Visit [https://minecraftdev.org](https://minecraftdev.org) for information about
 Installation
 ------------
 
-This plugin is available on the [Jetbrains IntelliJ plugin repository](https://plugins.jetbrains.com/plugin/8327).
+This plugin is available on the [JetBrains IntelliJ plugin repository](https://plugins.jetbrains.com/plugin/8327).
 
 Because of this, you can install the plugin through IntelliJ's internal plugin browser. Navigate to
 `File -> Settings -> Plugins` and click the `Browser Repositories...` button at the bottom of the window. In the search
