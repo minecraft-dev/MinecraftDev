@@ -40,7 +40,7 @@ buildscript {
 
     dependencies {
         classpath(kotlinModule("gradle-plugin", properties["kotlinVersion"]))
-        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.2")
+        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.5")
         classpath("gradle.plugin.net.minecrell:licenser:0.3")
     }
 }
@@ -99,11 +99,7 @@ dependencies {
 
 configure<IntelliJPluginExtension> {
     // IntelliJ IDEA dependency
-    version =  if (project.hasProperty("intellijVersion")) {
-        properties["intellijVersion"]
-    } else {
-        ideaVersion
-    }
+    version = ideaVersion
     // Bundled plugin dependencies
     setPlugins("maven", "gradle", "Groovy", "yaml",
         // needed dependencies for unit tests
@@ -153,20 +149,25 @@ configure<LicenseExtension> {
 // https://github.com/intellij-rust/intellij-rust/blob/d6b82e6aa2f64b877a95afdd86ec7b84394678c3/build.gradle#L131-L181
 val generateAtLexer = task<JavaExec>("generateAtLexer") {
     val src = "src/main/java/com/demonwav/mcdev/platform/mcp/at/AT.flex"
+    val skeleton = "libs/idea-flex.skeleton"
     val dst = "gen/com/demonwav/mcdev/platform/mcp/at/gen/"
-    val lexerFileName = "AtLexer.java"
+    val output = "$dst/AtLexer.java"
+
+    doFirst {
+        delete(output)
+    }
 
     classpath = files("libs/jflex-1.7.0-SNAPSHOT.jar")
     main = "jflex.Main"
 
     args(
-        "--skel", "libs/idea-flex.skeleton",
+        "--skel", skeleton,
         "-d", dst,
         src
     )
 
-    inputs.file(src)
-    outputs.file(dst + lexerFileName)
+    inputs.files(src, skeleton)
+    outputs.file(output)
 }
 
 /*
@@ -233,12 +234,7 @@ tasks.getByName("clean").doLast {
     delete(file("gen"))
 }
 
-if (project.hasProperty("intellijJre")) {
-    afterEvaluate {
-        (tasks.getByName("runIdea") as JavaExec).apply {
-            executable(properties["intellijJre"])
-        }
-    }
-}
+project.findProperty("intellijJre")
+    ?.let { (tasks.getByName("runIdea") as JavaExec).setExecutable(it) }
 
 defaultTasks("build")

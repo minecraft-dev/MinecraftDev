@@ -8,8 +8,6 @@
  * MIT License
  */
 
-
-
 @file:JvmName("MixinUtil")
 package com.demonwav.mcdev.platform.mixin.util
 
