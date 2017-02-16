@@ -13,11 +13,9 @@ package com.demonwav.mcdev.platform.bukkit;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.util.CommonColors;
-
 import com.intellij.openapi.module.Module;
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
 
 public class SpigotModuleType extends BukkitModuleType {
 

@@ -17,14 +17,9 @@ import com.demonwav.mcdev.platform.forge.version.ForgeVersion;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.mcp.version.McpVersion;
 import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry;
-
 import com.intellij.openapi.options.ConfigurationException;
-import org.apache.commons.lang.WordUtils;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.event.ActionListener;
 import java.util.List;
-
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -33,6 +28,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
+import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
 

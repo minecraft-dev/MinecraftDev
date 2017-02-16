@@ -18,22 +18,19 @@ import com.demonwav.mcdev.platform.canary.CanaryProjectConfiguration;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
-
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.ui.IdeBorderFactory;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URISyntaxException;
-
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class ProjectChooserWizardStep extends ModuleWizardStep {
 

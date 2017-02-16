@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.insight;
 
 import com.demonwav.mcdev.MinecraftSettings;
-
 import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
@@ -27,15 +26,13 @@ import com.intellij.util.Function;
 import com.intellij.util.FunctionUtil;
 import com.intellij.util.ui.ColorIcon;
 import com.intellij.util.ui.TwoColorsIcon;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.Color;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ColorLineMarkerProvider implements LineMarkerProvider {
 

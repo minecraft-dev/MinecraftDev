@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.sponge.color;
 
 import com.demonwav.mcdev.insight.ColorLineMarkerProvider;
 import com.demonwav.mcdev.insight.ColorUtil;
-
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.daemon.NavigateAction;
@@ -25,12 +24,11 @@ import com.intellij.psi.PsiNewExpression;
 import com.intellij.psi.impl.source.tree.JavaElementType;
 import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.ui.ColorChooser;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.Color;
 import java.util.Collection;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SpongeColorLineMarkerProvider implements LineMarkerProvider {
 

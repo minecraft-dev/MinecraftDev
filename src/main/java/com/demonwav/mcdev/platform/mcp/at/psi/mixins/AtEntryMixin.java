@@ -16,7 +16,6 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtClassName;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtKeyword;
-
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -12,17 +12,15 @@ package com.demonwav.mcdev.platform.forge.gradle;
 
 import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
-
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.project.LibraryDependencyData;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.project.Project;
+import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
-
-import java.util.Collection;
 
 public class ForgeDataService extends AbstractDataService {
 

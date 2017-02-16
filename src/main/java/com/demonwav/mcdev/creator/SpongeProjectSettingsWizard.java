@@ -13,18 +13,16 @@ package com.demonwav.mcdev.creator;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
-
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.util.ui.UIUtil;
-import org.apache.commons.lang.WordUtils;
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
 

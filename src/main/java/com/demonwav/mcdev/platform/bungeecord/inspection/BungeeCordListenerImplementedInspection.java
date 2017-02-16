@@ -12,8 +12,6 @@ package com.demonwav.mcdev.platform.bungeecord.inspection;
 
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants;
 import com.demonwav.mcdev.util.McPsiClass;
-import com.demonwav.mcdev.util.McPsiUtil;
-
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiAnnotation;

@@ -18,7 +18,6 @@ import com.demonwav.mcdev.platform.mixin.util.ShadowedMembers;
 import com.demonwav.mcdev.util.ActionData;
 import com.demonwav.mcdev.util.McActionUtil;
 import com.demonwav.mcdev.util.McEditorUtil;
-
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
@@ -39,9 +38,8 @@ import com.intellij.psi.search.PsiSearchHelper;
 import com.intellij.psi.search.UsageSearchContext;
 import com.intellij.ui.LightColors;
 import com.intellij.ui.awt.RelativePoint;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.jetbrains.annotations.NotNull;
 
 public class GotoAtEntryAction extends AnAction {
     @Override

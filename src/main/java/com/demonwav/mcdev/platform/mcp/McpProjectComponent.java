@@ -14,7 +14,6 @@ import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.mcp.at.AtFileType;
 import com.demonwav.mcdev.util.Util;
-
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.fileTypes.FileNameMatcher;
 import com.intellij.openapi.fileTypes.FileTypeManager;
@@ -32,10 +31,9 @@ import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
 import com.intellij.util.Query;
+import java.util.Optional;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
 
 public class McpProjectComponent extends AbstractProjectComponent {
     private static final String ACCESS_TRANSFORMER_CLASS =

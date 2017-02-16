@@ -21,7 +21,6 @@ import com.demonwav.mcdev.platform.liteloader.LiteLoaderModuleType;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
 import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
-
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

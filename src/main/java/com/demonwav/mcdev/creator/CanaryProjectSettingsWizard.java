@@ -13,16 +13,14 @@ package com.demonwav.mcdev.creator;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.canary.CanaryProjectConfiguration;
-
 import com.intellij.openapi.options.ConfigurationException;
-import org.apache.commons.lang.WordUtils;
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class CanaryProjectSettingsWizard extends MinecraftModuleWizardStep {
 

@@ -15,15 +15,12 @@ import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
 import com.demonwav.mcdev.util.Util;
-
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
-
 import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
 
 public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
 

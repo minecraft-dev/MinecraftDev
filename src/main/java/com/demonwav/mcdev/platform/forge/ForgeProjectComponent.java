@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
-
 import com.intellij.json.JsonFileType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.AbstractProjectComponent;

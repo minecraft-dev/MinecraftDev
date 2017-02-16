@@ -15,17 +15,14 @@ import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.mcp.srg.SrgManager;
-
 import com.google.common.collect.Sets;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Set;
-
 import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
 
 public class McpModule extends AbstractModule {
 

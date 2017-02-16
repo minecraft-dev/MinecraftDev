@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.toolwindow;
 
 import com.demonwav.mcdev.platform.MinecraftModule;
-
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -19,13 +18,11 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.intellij.util.containers.OrderedSet;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.Insets;
 import java.util.Comparator;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.jetbrains.annotations.NotNull;
 
 public class MinecraftToolWindow {
     private JPanel panel;

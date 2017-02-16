@@ -21,7 +21,6 @@ import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData;
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants;
 import com.demonwav.mcdev.util.McPsiClass;
 import com.demonwav.mcdev.util.McPsiUtil;
-
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
@@ -40,11 +39,10 @@ import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.search.GlobalSearchScope;
+import javax.swing.Icon;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.Icon;
 
 public class SpongeModule extends AbstractModule {
 

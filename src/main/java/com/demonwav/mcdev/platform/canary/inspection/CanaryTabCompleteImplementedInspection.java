@@ -12,8 +12,6 @@ package com.demonwav.mcdev.platform.canary.inspection;
 
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
 import com.demonwav.mcdev.util.McPsiClass;
-import com.demonwav.mcdev.util.McPsiUtil;
-
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiAnnotation;

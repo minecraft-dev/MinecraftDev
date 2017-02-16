@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.bukkit.generation;
 
 import com.demonwav.mcdev.insight.generation.GenerationData;
-
 import org.jetbrains.annotations.NotNull;
 
 public class BukkitGenerationData implements GenerationData {

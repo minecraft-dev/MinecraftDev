@@ -17,16 +17,13 @@ import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitEventGenerationPanel;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
 import com.demonwav.mcdev.util.CommonColors;
-
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
+import java.util.List;
+import javax.swing.Icon;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-
-import javax.swing.Icon;
 
 public class BukkitModuleType extends AbstractModuleType<BukkitModule<?>> {
 

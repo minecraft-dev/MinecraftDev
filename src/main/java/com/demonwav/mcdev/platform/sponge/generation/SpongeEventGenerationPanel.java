@@ -12,15 +12,13 @@ package com.demonwav.mcdev.platform.sponge.generation;
 
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
-
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.psi.PsiClass;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SpongeEventGenerationPanel extends EventGenerationPanel {
 

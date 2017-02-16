@@ -12,17 +12,15 @@ package com.demonwav.mcdev.platform.canary;
 
 import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.platform.MinecraftModule;
-
 import com.intellij.ide.FileIconProvider;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.vfs.VirtualFile;
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.Icon;
 
 public class CanaryFileIconProvider implements FileIconProvider {
 

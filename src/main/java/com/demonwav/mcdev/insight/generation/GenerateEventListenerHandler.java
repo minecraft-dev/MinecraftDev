@@ -13,7 +13,6 @@ package com.demonwav.mcdev.insight.generation;
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationDialog;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.MinecraftModule;
-
 import com.intellij.codeInsight.generation.ClassMember;
 import com.intellij.codeInsight.generation.GenerateMembersHandlerBase;
 import com.intellij.codeInsight.generation.GenerationInfo;
@@ -34,9 +33,8 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.refactoring.RefactoringBundle;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The standard handler to generate a new event listener as a method.

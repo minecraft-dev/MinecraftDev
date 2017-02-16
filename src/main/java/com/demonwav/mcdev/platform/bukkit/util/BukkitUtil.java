@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.bukkit.util;
 
 import com.demonwav.mcdev.platform.bukkit.BukkitModule;
-
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 

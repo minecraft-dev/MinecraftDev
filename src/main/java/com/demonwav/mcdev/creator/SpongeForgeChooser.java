@@ -15,15 +15,13 @@ import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
-
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.util.ui.UIUtil;
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import org.jetbrains.annotations.NotNull;
 
 public class SpongeForgeChooser extends ModuleWizardStep {
 

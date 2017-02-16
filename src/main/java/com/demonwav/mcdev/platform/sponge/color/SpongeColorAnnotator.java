@@ -12,14 +12,12 @@ package com.demonwav.mcdev.platform.sponge.color;
 
 import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.insight.ColorAnnotator;
-
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.Color;
+import org.jetbrains.annotations.NotNull;
 
 public class SpongeColorAnnotator implements Annotator {
 

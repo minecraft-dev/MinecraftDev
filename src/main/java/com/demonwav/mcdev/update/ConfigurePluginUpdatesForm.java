@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.update;
 
 import com.intellij.util.ui.AsyncProcessIcon;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;

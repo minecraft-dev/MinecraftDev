@@ -14,7 +14,6 @@ import static com.demonwav.mcdev.platform.mcp.at.psi.AtMixinUtil.getClassFromStr
 
 import com.demonwav.mcdev.platform.mcp.at.AtElementFactory;
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtReturnValueMixin;
-
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiClass;

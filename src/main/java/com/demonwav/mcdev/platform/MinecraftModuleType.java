@@ -12,17 +12,14 @@ package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.creator.MinecraftModuleBuilder;
-
 import com.google.common.base.Strings;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleTypeManager;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Arrays;
 import java.util.Iterator;
-
 import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
 
 public class MinecraftModuleType extends JavaModuleType {
 

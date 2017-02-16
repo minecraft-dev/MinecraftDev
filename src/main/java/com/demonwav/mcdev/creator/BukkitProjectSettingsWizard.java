@@ -18,16 +18,14 @@ import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
-
 import com.intellij.openapi.options.ConfigurationException;
-import org.apache.commons.lang.WordUtils;
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
 

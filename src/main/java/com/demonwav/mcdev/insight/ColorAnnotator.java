@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.insight;
 
 import com.demonwav.mcdev.MinecraftSettings;
-
 import com.intellij.codeInsight.daemon.impl.AnnotationHolderImpl;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
@@ -20,10 +19,9 @@ import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.Color;
 import java.awt.Font;
+import org.jetbrains.annotations.NotNull;
 
 public class ColorAnnotator implements Annotator {
 

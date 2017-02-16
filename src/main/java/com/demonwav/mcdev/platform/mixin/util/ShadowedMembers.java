@@ -12,10 +12,9 @@ package com.demonwav.mcdev.platform.mixin.util;
 
 import com.google.common.collect.Lists;
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class ShadowedMembers {
 

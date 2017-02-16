@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.mcp.util;
 
 import com.demonwav.mcdev.util.PsiBytecodeUtil;
-
 import com.google.common.collect.Lists;
 import com.intellij.navigation.AnonymousElementProvider;
 import com.intellij.openapi.extensions.Extensions;
@@ -21,11 +20,10 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.search.GlobalSearchScope;
+import java.util.List;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public final class McpUtil {
     private McpUtil() {

@@ -15,7 +15,6 @@ import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration;
 import com.demonwav.mcdev.platform.mcp.version.McpVersion;
 import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry;
-
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
@@ -23,14 +22,10 @@ import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.awt.RelativePoint;
-import org.apache.commons.lang.WordUtils;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -41,6 +36,8 @@ import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
+import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
 

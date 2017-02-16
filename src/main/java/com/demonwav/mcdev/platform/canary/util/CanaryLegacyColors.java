@@ -11,11 +11,9 @@
 package com.demonwav.mcdev.platform.canary.util;
 
 import com.demonwav.mcdev.util.CommonColors;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.Color;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 public final class CanaryLegacyColors {
 

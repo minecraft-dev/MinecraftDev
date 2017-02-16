@@ -20,7 +20,6 @@ import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
 import com.demonwav.mcdev.util.McPsiClass;
 import com.demonwav.mcdev.util.McPsiUtil;
-
 import com.google.common.base.Objects;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -44,13 +43,11 @@ import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTypesUtil;
+import java.util.Arrays;
+import javax.swing.Icon;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
-
-import javax.swing.Icon;
 
 @SuppressWarnings("unused")
 public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
