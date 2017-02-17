@@ -56,7 +56,7 @@ fun filterNewShadows(requiredMembers: Collection<PsiMember>, psiClass: PsiClass)
         when(m) {
             is PsiMethod -> psiClass.findMethods(m.memberReference).isEmpty()
             is PsiField -> psiClass.findField(m.memberReference) == null
-            else -> throw UnsupportedOperationException("Unsupported member type: ${m.javaClass.name}")
+            else -> throw UnsupportedOperationException("Unsupported member type: ${m::class.java.name}")
         }
     }
 }

@@ -182,7 +182,7 @@ abstract class BuildSystem {
         if (this === other) {
             return true
         }
-        if (other == null || javaClass != other.javaClass) {
+        if (other == null || this::class.java != other::class.java) {
             return false
         }
         val that = other as BuildSystem

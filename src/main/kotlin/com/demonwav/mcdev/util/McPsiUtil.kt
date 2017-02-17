@@ -117,7 +117,7 @@ inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElem
 @Contract(pure = true)
 fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement): Stream<T> {
     filter ?: return this
-    return filter { filter.isClassAcceptable(it.javaClass) && filter.isAcceptable(it, context) }
+    return filter { filter.isClassAcceptable(it::class.java) && filter.isAcceptable(it, context) }
 }
 
 @Contract(pure = true)

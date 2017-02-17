@@ -114,7 +114,7 @@ fun createShadowMembers(project: Project, psiClass: PsiClass, members: Stream<Ps
                 shadowMethod(project, psiClass, m)
             }
             is PsiField -> shadowField(project, m)
-            else -> throw UnsupportedOperationException("Unsupported member type: ${m.javaClass.name}")
+            else -> throw UnsupportedOperationException("Unsupported member type: ${m::class.java.name}")
         }
 
         // Add @Shadow annotation
