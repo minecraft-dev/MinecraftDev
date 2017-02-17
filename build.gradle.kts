@@ -99,7 +99,7 @@ dependencies {
 
 configure<IntelliJPluginExtension> {
     // IntelliJ IDEA dependency
-    version = if (project.hasProperty("intellijVersion")) properties["intellijVersion"] else ideaVersion
+    version = ideaVersion
     // Bundled plugin dependencies
     setPlugins("maven", "gradle", "Groovy", "yaml",
         // needed dependencies for unit tests
