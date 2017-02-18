@@ -15,13 +15,13 @@ import com.intellij.navigation.AnonymousElementProvider
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiMember
-import com.intellij.psi.PsiModifier
-import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.PsiField
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiParameterList
+import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.annotations.Contract
 
@@ -186,21 +186,45 @@ fun PsiClass.addImplements(qualifiedClassName: String) {
     }
 }
 
-// Modifier list
-
-@Contract(pure = true)
-fun PsiModifierListOwner.findAnnotation(qualifiedName: String): PsiAnnotation? {
-    return modifierList?.findAnnotation(qualifiedName)
-}
-
 // Member
 
-@get:Contract(pure = true)
-val PsiMember.accessModifier
-    get() = when {
-        hasModifierProperty(PsiModifier.PUBLIC) -> PsiModifier.PUBLIC
-        hasModifierProperty(PsiModifier.PROTECTED) -> PsiModifier.PROTECTED
-        hasModifierProperty(PsiModifier.PACKAGE_LOCAL) -> PsiModifier.PACKAGE_LOCAL
-        hasModifierProperty(PsiModifier.PRIVATE) -> PsiModifier.PRIVATE
-        else -> PsiModifier.PUBLIC
+fun PsiClass.findMatchingMethod(pattern: PsiMethod, checkBases: Boolean, name: String = pattern.name): PsiMethod? {
+    return findMethodsByName(name, checkBases).first { it.isMatchingMethod(pattern) }
+}
+
+fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean, name: String = pattern.name): List<PsiMethod> {
+    return findMethodsByName(name, checkBases).filter { it.isMatchingMethod(pattern) }
+}
+
+private fun PsiMethod.isMatchingMethod(pattern: PsiMethod): Boolean {
+    return areReallyOnlyParametersErasureEqual(this.parameterList, pattern.parameterList)
+        && this.returnType.isErasureEquivalentTo(pattern.returnType)
+}
+
+fun PsiClass.findMatchingField(pattern: PsiField, checkBases: Boolean, name: String = pattern.name!!): PsiField? {
+    return findFieldByName(name, checkBases)?.takeIf { it.type.isErasureEquivalentTo(pattern.type) }
+}
+
+private fun areReallyOnlyParametersErasureEqual(parameterList1: PsiParameterList, parameterList2: PsiParameterList): Boolean {
+    // Similar to MethodSignatureUtil.areParametersErasureEqual, but doesn't check method name
+    if (parameterList1.parametersCount != parameterList2.parametersCount) {
+        return false
     }
+
+    val parameters1 = parameterList1.parameters
+    val parameters2 = parameterList2.parameters
+    for (i in parameters1.indices) {
+        val type1 = parameters1[i].type
+        val type2 = parameters2[i].type
+
+        if (type1 is PsiPrimitiveType && (type2 !is PsiPrimitiveType || type1 != type2)) {
+            return false
+        }
+
+        if (!type1.isErasureEquivalentTo(type2)) {
+            return false
+        }
+    }
+
+    return true
+}

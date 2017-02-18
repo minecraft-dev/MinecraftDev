@@ -12,8 +12,7 @@ package com.demonwav.mcdev.platform.mcp.actions;
 
 import com.demonwav.mcdev.platform.mcp.McpModule;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
-import com.demonwav.mcdev.platform.mixin.util.ShadowedMembers;
+import com.demonwav.mcdev.platform.mixin.util.Shadow;
 import com.demonwav.mcdev.util.ActionData;
 import com.demonwav.mcdev.util.McActionUtil;
 import com.demonwav.mcdev.util.MemberReference;
@@ -30,6 +29,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiIdentifier;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.ui.LightColors;
 import com.intellij.ui.awt.RelativePoint;
@@ -58,9 +58,11 @@ public class FindSrgMappingAction extends AnAction {
         mcpModule.getSrgManager().getSrgMap().done(srgMap -> {
             PsiElement parent = data.getElement().getParent();
 
-            final ShadowedMembers shadowedMembers = MixinUtils.getShadowedElement(parent);
-            if (!shadowedMembers.getTargets().isEmpty()) {
-                parent = shadowedMembers.getTargets().get(0);
+            if (parent instanceof PsiMember) {
+                PsiMember shadowTarget = Shadow.findFirstShadowTarget((PsiMember) parent);
+                if (shadowTarget != null) {
+                    parent = shadowTarget;
+                }
             }
 
             if (parent instanceof PsiField) {

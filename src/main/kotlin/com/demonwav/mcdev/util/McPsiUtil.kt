@@ -20,6 +20,8 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiJavaCodeReferenceElement
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiModifier
+import com.intellij.psi.PsiModifier.ModifierConstant
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiReference
@@ -135,8 +137,14 @@ val PsiElement.constantValue: Any?
 val PsiElement.constantStringValue: String?
     get() = constantValue as? String
 
+private val ACCESS_MODIFIERS = listOf(PsiModifier.PUBLIC, PsiModifier.PROTECTED, PsiModifier.PRIVATE, PsiModifier.PACKAGE_LOCAL)
+
+fun isAccessModifier(@ModifierConstant modifier: String): Boolean {
+    return modifier in ACCESS_MODIFIERS
+}
+
 @Contract(pure = true)
-fun PsiType.isErasureEquivalentTo(other: PsiType): Boolean {
+fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
     // TODO: Do more checks for generics instead
     return TypeConversionUtil.erasure(this) == TypeConversionUtil.erasure(other)
 }

@@ -15,6 +15,7 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.plugins.ide.idea.model.IdeaModel
@@ -71,10 +72,16 @@ apply {
 group = pluginGroup
 version = pluginVersion
 
+configurations.create("mixin").isTransitive = false
+
 repositories {
     maven {
         name = "kotlin-eap-1.1"
         setUrl("https://dl.bintray.com/kotlin/kotlin-eap-1.1")
+    }
+    maven {
+        name = "sponge"
+        setUrl("https://repo.spongepowered.org/maven")
     }
 }
 
@@ -94,6 +101,14 @@ dependencies {
     // dependencies which conflicts with our newer version.
     compile(kotlinModule("runtime")) {
         isTransitive = false
+    }
+
+    add("mixin", "org.spongepowered:mixin:0.6.8-SNAPSHOT:thin")
+}
+
+tasks.withType<Test> {
+    doFirst {
+        systemProperty("mixinUrl", configurations.getByName("mixin").files.first().absolutePath)
     }
 }
 

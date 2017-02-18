@@ -45,6 +45,12 @@ fun Collection<*>.toArray(): Array<Any?> {
     return (this as java.util.Collection<*>).toArray()
 }
 
+@Contract(pure = true)
+inline fun <T, R> Collection<T>.mapFirstNotNull(transform: (T) -> R?): R? {
+    forEach { transform(it)?.let { return it } }
+    return null
+}
+
 @Suppress("UNCHECKED_CAST")
 @Contract(pure = true)
 inline fun <T, reified R> Collection<T>.mapToArray(transform: (T) -> R): Array<R> {

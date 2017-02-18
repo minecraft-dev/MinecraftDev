@@ -8,7 +8,7 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.inspection
+package com.demonwav.mcdev.platform.mixin.inspection.shadow
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SHADOW
 import com.intellij.codeInspection.InspectionSuppressor

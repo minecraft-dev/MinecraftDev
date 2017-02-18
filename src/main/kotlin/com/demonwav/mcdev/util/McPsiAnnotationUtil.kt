@@ -17,7 +17,13 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassObjectAccessExpression
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiModifierListOwner
 import org.jetbrains.annotations.Contract
+
+@Contract(pure = true)
+fun PsiModifierListOwner.findAnnotation(qualifiedName: String): PsiAnnotation? {
+    return modifierList?.findAnnotation(qualifiedName)
+}
 
 @Contract(pure = true)
 fun PsiAnnotationMemberValue.computeStringArray(): List<String> {

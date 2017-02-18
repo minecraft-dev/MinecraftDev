@@ -10,13 +10,12 @@
 
 package com.demonwav.mcdev.platform.mixin.util
 
+import com.demonwav.mcdev.util.findMatchingMethods
 import com.demonwav.mcdev.util.memberReference
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.compiled.ClsMethodImpl
-import com.intellij.psi.util.MethodSignatureUtil
-import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.util.containers.stream
 import org.jetbrains.annotations.Contract
 import java.util.stream.Collectors
@@ -37,10 +36,7 @@ fun findMethods(psiClass: PsiClass, targets: Collection<PsiClass>, checkBases: B
                 .map { it.first() }
     }?.filter { m ->
         // Filter methods which are already in the Mixin class
-        !psiClass.findMethodsByName(m.name, checkBases).any {
-            MethodSignatureUtil.areParametersErasureEqual(m, it) &&
-                TypeConversionUtil.erasure(m.returnType) == TypeConversionUtil.erasure(it.returnType)
-        }
+        psiClass.findMatchingMethods(m, checkBases).isEmpty()
     }
 }
 

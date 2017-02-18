@@ -11,8 +11,8 @@
 package com.demonwav.mcdev.platform.mixin.insight
 
 import com.demonwav.mcdev.asset.MixinAssets
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.util.findFirstShadowTarget
+import com.demonwav.mcdev.platform.mixin.util.findShadowTargets
 import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -22,7 +22,6 @@ import com.intellij.codeInsight.daemon.impl.PsiElementListNavigator
 import com.intellij.ide.util.DefaultPsiElementCellRenderer
 import com.intellij.ide.util.MethodCellRenderer
 import com.intellij.openapi.editor.markup.GutterIconRenderer
-import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiIdentifier
@@ -47,19 +46,17 @@ class ShadowLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavig
             else -> null
         } ?: return null
 
-        return if (element.modifierList?.findAnnotation(MixinConstants.Annotations.SHADOW) != null) {
-            LineMarker(identifier, this)
-        } else {
-            null
-        }
+        // Check if @Shadow actually has a target
+        element.findFirstShadowTarget() ?: return null
+        return LineMarker(identifier, this)
     }
 
     override fun collectSlowLineMarkers(elements: List<PsiElement>, result: Collection<LineMarkerInfo<PsiElement>>) {
     }
 
     override fun navigate(e: MouseEvent, elt: PsiIdentifier) {
-        val member = elt.parent ?: return
-        val targets = MixinUtils.getShadowedElement(member).targets
+        val member = elt.parent as? PsiMember ?: return
+        val targets = member.findShadowTargets()
         if (targets.isEmpty()) {
             return
         }
@@ -71,10 +68,8 @@ class ShadowLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavig
             else -> return
         }
 
-        // TODO: Make this nicer when porting ShadowedMembers
-        @Suppress("UNCHECKED_CAST")
-        PsiElementListNavigator.openTargets(e, (targets as List<NavigatablePsiElement>).toTypedArray(),
-                "Choose target class of ${(member as PsiMember).name!!}", null, renderer)
+        PsiElementListNavigator.openTargets(e, targets.toTypedArray(),
+            "Choose target class of ${member.name!!}", null, renderer)
     }
 
     private class LineMarker(identifier: PsiIdentifier, navHandler: GutterIconNavigationHandler<PsiIdentifier>)

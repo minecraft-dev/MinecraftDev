@@ -8,51 +8,38 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.inspection
+package com.demonwav.mcdev.platform.mixin.inspection.overwrite
 
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
-import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.javadoc.PsiDocComment
 
-class OverwriteAuthorInspection : MixinInspection() {
+class OverwriteAuthorInspection : OverwriteInspection() {
 
     override fun getStaticDescription() =
             "For maintainability reasons, the Sponge project requires @Overwrite methods to declare an @author JavaDoc tag."
 
-    override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
-
-    private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
-
-        override fun visitMethod(method: PsiMethod) {
-            // Check if method is an @Overwrite
-            if (method.modifierList.findAnnotation(OVERWRITE) == null) {
-                return
-            }
-
-            val javadoc = method.docComment
-            if (javadoc == null) {
-                registerMissingTag(method)
-                return
-            }
-
-            val tag = javadoc.findTagByName("author")
-            if (tag == null) {
-                registerMissingTag(javadoc)
-            }
+    override fun visitOverwrite(holder: ProblemsHolder, method: PsiMethod, overwrite: PsiAnnotation) {
+        val javadoc = method.docComment
+        if (javadoc == null) {
+            registerMissingTag(holder, method)
+            return
         }
 
-        private fun registerMissingTag(element: PsiElement) {
-            holder.registerProblem(element, "@Overwrite methods must have an associated JavaDoc with a filled in @author tag", QuickFix)
+        val tag = javadoc.findTagByName("author")
+        if (tag == null) {
+            registerMissingTag(holder, javadoc)
         }
+    }
 
+    private fun registerMissingTag(holder: ProblemsHolder, element: PsiElement) {
+        holder.registerProblem(element, "@Overwrite methods must have an associated JavaDoc with a filled in @author tag", QuickFix)
     }
 
     private object QuickFix : LocalQuickFix {
@@ -75,7 +62,5 @@ class OverwriteAuthorInspection : MixinInspection() {
             val tag = JavaPsiFacade.getElementFactory(project).createDocTagFromText("@author")
             javadoc.addAfter(tag, null)
         }
-
     }
-
 }

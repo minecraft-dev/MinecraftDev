@@ -10,11 +10,8 @@
 
 package com.demonwav.mcdev.platform.mixin.insight
 
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-import com.demonwav.mcdev.platform.mixin.util.mixinTargets
-import com.demonwav.mcdev.util.findMethods
-import com.demonwav.mcdev.util.memberReference
-import com.demonwav.mcdev.util.toTypedArray
+import com.demonwav.mcdev.platform.mixin.util.findFirstOverwriteTarget
+import com.demonwav.mcdev.platform.mixin.util.findOverwriteTargets
 import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -41,11 +38,10 @@ class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNa
         }
 
         val identifier = element.nameIdentifier ?: return null
-        return if (element.modifierList.findAnnotation(MixinConstants.Annotations.OVERWRITE) != null) {
-            LineMarker(identifier, this)
-        } else {
-            null
-        }
+
+        // Check if @Overwrite actually has a target
+        element.findFirstOverwriteTarget() ?: return null
+        return LineMarker(identifier, this)
     }
 
     override fun collectSlowLineMarkers(elements: List<PsiElement>, result: Collection<LineMarkerInfo<PsiElement>>) {
@@ -53,16 +49,10 @@ class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNa
 
     override fun navigate(e: MouseEvent, elt: PsiIdentifier) {
         val method = elt.parent as? PsiMethod ?: return
-        val psiClass = method.containingClass ?: return
-
-        // TODO: Implement without member reference
-        val reference = method.memberReference
-        val targetMethods = psiClass.mixinTargets.stream()
-                .flatMap { it.findMethods(reference) }
-                .toTypedArray()
-        if (targetMethods.isNotEmpty()) {
-            PsiElementListNavigator.openTargets(e, targetMethods,
-                    "Choose target method of ${method.name}", null, MethodCellRenderer(false))
+        val targets = method.findOverwriteTargets() ?: return
+        if (targets.isNotEmpty()) {
+            PsiElementListNavigator.openTargets(e, targets.toTypedArray(),
+                "Choose target method of ${method.name}", null, MethodCellRenderer(false))
         }
     }
 

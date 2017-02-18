@@ -11,47 +11,31 @@
 package com.demonwav.mcdev.platform.mixin
 
 import com.demonwav.mcdev.BaseMinecraftTestCase
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
+import com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowModifiersInspection
+import com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowTargetInspection
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.roots.ModifiableRootModel
+import com.intellij.openapi.roots.OrderRootType
+import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
+import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.vfs.JarFileSystem
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiJavaFile
-import org.junit.Assert
 
 class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
 
-    private lateinit var psiClass: PsiClass
-
     override fun setUp() {
         super.setUp()
-        psiClass = buildProject<PsiJavaFile> {
-            java("src/test/ShadowData.java", """
-                package test;
 
-                @org.spongepowered.asm.mixin.Mixin("test.MixinBase")
-                public class ShadowData {
-                    @org.spongepowered.asm.mixin.Shadow @org.spongepowered.asm.mixin.Final private String privateFinalString;
-                    @org.spongepowered.asm.mixin.Shadow private String privateString;
+        buildProject<PsiJavaFile> {
 
-                    @org.spongepowered.asm.mixin.Shadow @org.spongepowered.asm.mixin.Final protected String protectedFinalString;
-                    @org.spongepowered.asm.mixin.Shadow protected String protectedString;
-
-                    @org.spongepowered.asm.mixin.Shadow @org.spongepowered.asm.mixin.Final String packagePrivateFinalString;
-                    @org.spongepowered.asm.mixin.Shadow String packagePrivateString;
-
-                    @org.spongepowered.asm.mixin.Shadow @org.spongepowered.asm.mixin.Final public String publicFinalString;
-                    @org.spongepowered.asm.mixin.Shadow public String publicString;
-
-                    @org.spongepowered.asm.mixin.Shadow public String wrongAccessor;
-                    @org.spongepowered.asm.mixin.Shadow protected String noFinal;
-
-                    @org.spongepowered.asm.mixin.Shadow public String nonExistent;
-
-                    @org.spongepowered.asm.mixin.Shadow protected String twoIssues;
-                }
-            """)
+            // TODO: Figure out why MixinBase can't be resolved if we use separate files
 
             java("src/test/MixinBase.java", """
                 package test;
+
+                import org.spongepowered.asm.mixin.Shadow;
+                import org.spongepowered.asm.mixin.Final;
 
                 public class MixinBase {
                     // Static
@@ -86,77 +70,52 @@ class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
 
                     public final String twoIssues = "";
                 }
+
+                @org.spongepowered.asm.mixin.Mixin(MixinBase.class)
+                class ShadowData {
+                    @Shadow @Final private String privateFinalString;
+                    @Shadow private String privateString;
+
+                    @Shadow @Final protected String protectedFinalString;
+                    @Shadow protected String protectedString;
+
+                    @Shadow @Final String packagePrivateFinalString;
+                    @Shadow String packagePrivateString;
+
+                    @Shadow @Final public String publicFinalString;
+                    @Shadow public String publicString;
+
+                    <warning descr="Invalid access modifiers, has: public, but target member has: protected">@Shadow public</warning> String wrongAccessor;
+                    <warning descr="@Shadow for final member should be annotated as @Final">@Shadow protected</warning> String noFinal;
+
+                    <error descr="Cannot resolve member 'nonExistent' in target class">@Shadow</error> public String nonExistent;
+
+                    <warning descr="@Shadow for final member should be annotated as @Final"><warning descr="Invalid access modifiers, has: protected, but target member has: public">@Shadow protected</warning></warning> String twoIssues;
+                }
             """)
-        }[0].classes.single()
+        }
     }
 
-    private fun checkShadow(element: PsiElement?, targets: Int, errors: Int) {
-        val shadowedElement = MixinUtils.getShadowedElement(element)
-        Assert.assertNotNull(shadowedElement)
-        Assert.assertEquals(targets, shadowedElement.targets.size)
-        Assert.assertEquals(errors, shadowedElement.errors.size)
+    override fun configureModule(module: Module, model: ModifiableRootModel) {
+        // If we're lucky, the following code adds the Mixin library to the project
+        val mixinPath = FileUtil.toSystemIndependentName(System.getProperty("mixinUrl")!!)
+
+        val project = module.project
+        val table = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        val library = table.createLibrary("Mixin")
+        val libraryModel = library.modifiableModel
+        libraryModel.addRoot(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, mixinPath) + JarFileSystem.JAR_SEPARATOR,
+            OrderRootType.CLASSES)
+        libraryModel.commit()
+        model.addLibraryEntry(library)
     }
 
-    private fun checkGoodShadow(element: PsiElement?) {
-        checkShadow(element, 1, 0)
+    // TODO: Split up in separate tests
+    fun test() {
+        myFixture.enableInspections(ShadowTargetInspection::class.java, ShadowModifiersInspection::class.java)
+        myFixture.checkHighlighting(true, false, false)
     }
 
-    private fun checkBadShadow(element: PsiElement?) {
-        checkShadow(element, 1, 1)
-    }
 
-    private fun checkReallyBadShadow(element: PsiElement?) {
-        checkShadow(element, 0, 1)
-    }
-
-    // Good shadows
-    fun testPrivateFinalShadow() {
-        checkGoodShadow(psiClass.findFieldByName("privateFinalString", false))
-    }
-
-    fun testPrivateShadow() {
-        checkGoodShadow(psiClass.findFieldByName("privateString", false))
-    }
-
-    fun testProtectedFinalShadow() {
-        checkGoodShadow(psiClass.findFieldByName("protectedFinalString", false))
-    }
-
-    fun testProtectedShadow() {
-        checkGoodShadow(psiClass.findFieldByName("protectedString", false))
-    }
-
-    fun testPackagePrivateFinalShadow() {
-        checkGoodShadow(psiClass.findFieldByName("packagePrivateFinalString", false))
-    }
-
-    fun testPackagePrivateShadow() {
-        checkGoodShadow(psiClass.findFieldByName("packagePrivateString", false))
-    }
-
-    fun testPublicFinalShadow() {
-        checkGoodShadow(psiClass.findFieldByName("publicFinalString", false))
-    }
-
-    fun testPublicShadow() {
-        checkGoodShadow(psiClass.findFieldByName("publicString", false))
-    }
-
-    // Bad shadows
-    fun testWrongAccessor() {
-        checkBadShadow(psiClass.findFieldByName("wrongAccessor", false))
-    }
-
-    fun testNoFinal() {
-        checkBadShadow(psiClass.findFieldByName("noFinal", false))
-    }
-
-    fun testTwoIssues() {
-        checkShadow(psiClass.findFieldByName("twoIssues", false), 1, 2)
-    }
-
-    // Really bad shadows
-    fun testNonExistent() {
-        checkReallyBadShadow(psiClass.findFieldByName("nonExistent", false))
-    }
 }

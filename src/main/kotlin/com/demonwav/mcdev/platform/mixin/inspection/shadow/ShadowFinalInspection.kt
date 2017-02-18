@@ -8,10 +8,12 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.inspection
+package com.demonwav.mcdev.platform.mixin.inspection.shadow
 
+import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.FINAL
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MUTABLE
+import com.intellij.codeInsight.intention.AddAnnotationFix
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiAssignmentExpression
@@ -34,7 +36,8 @@ class ShadowFinalInspection : MixinInspection() {
             val modifiers = resolved.modifierList ?: return
 
             if (modifiers.findAnnotation(FINAL) != null && modifiers.findAnnotation(MUTABLE) == null) {
-                holder.registerProblem(expression, "@Final fields cannot be modified")
+                holder.registerProblem(expression, "@Final fields cannot be modified",
+                    AddAnnotationFix(MUTABLE, resolved))
             }
         }
 

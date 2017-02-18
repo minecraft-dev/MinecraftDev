@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.util
 object MixinConstants {
     const val PACKAGE = "org.spongepowered.asm.mixin."
     const val SMAP_STRATUM = "Mixin"
+    const val DEFAULT_SHADOW_PREFIX = "shadow$"
 
     object Classes {
         const val CALLBACK_INFO = "org.spongepowered.asm.mixin.injection.callback.CallbackInfo"
@@ -44,5 +45,9 @@ object MixinConstants {
         const val SURROGATE = "org.spongepowered.asm.mixin.injection.Surrogate"
 
         @JvmField val METHOD_INJECTORS = listOf(INJECT, MODIFY_ARG, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT)
+        @JvmField val MIXIN_ANNOTATIONS = setOf(
+            ACCESSOR, AT, DEBUG, FINAL, IMPLEMENTS, INTERFACE, INTRINSIC, MIXIN, MUTABLE, OVERWRITE, SHADOW, SOFT_OVERRIDE, UNIQUE, INJECT,
+            INVOKER, MODIFY_ARG, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE)
+
     }
 }
