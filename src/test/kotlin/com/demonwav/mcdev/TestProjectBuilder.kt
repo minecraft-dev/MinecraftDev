@@ -29,16 +29,27 @@ class TestProjectBuilder(
     private val root: VirtualFile = project.baseDir
 ) {
     private val fileList = mutableListOf<PsiFile>()
+    private var intermediatePath = ""
 
     fun java(path: String, @Language("JAVA") code: String) = file(path, code, ".java")
 
     fun at(path: String, @Language("Access Transformers") code: String) = file(path, code, "_at.cfg")
 
+    fun dir(path: String, block: TestProjectBuilder.() -> Unit) {
+        val oldIntermediatePath = intermediatePath
+        intermediatePath += "/$path"
+        block()
+        intermediatePath = oldIntermediatePath
+    }
+
     private fun file(path: String, code: String, ext: String): PsiFile {
         check(path.endsWith(ext))
-        val dir = PathUtil.getParentPath(path)
+
+        val fullPath = "$intermediatePath/$path"
+
+        val dir = PathUtil.getParentPath(fullPath)
         val vDir = VfsUtil.createDirectoryIfMissing(root, dir)
-        val vFile = vDir.createChildData(this, PathUtil.getFileName(path))
+        val vFile = vDir.createChildData(this, PathUtil.getFileName(fullPath))
         VfsUtil.saveText(vFile, code.trimIndent())
 
         val psiFile = fixture.configureByFile(vFile.path)!!
