@@ -26,7 +26,7 @@ abstract class OuterClassTest : ProjectBuilderTestCase() {
     override fun setUp() {
         super.setUp()
 
-        this.outerClass = (buildProject {
+        this.outerClass = buildProject<PsiJavaFile> {
             java("src/com/example/test/OuterClass.java", """
                 package com.example.test;
 
@@ -46,7 +46,7 @@ abstract class OuterClassTest : ProjectBuilderTestCase() {
                     }
                 }
             """)
-        }.single() as PsiJavaFile).classes.single()
+        }.single().classes.single()
 
         this.outerAnonymousClass = outerClass.anonymousElements!!.single() as PsiAnonymousClass
 

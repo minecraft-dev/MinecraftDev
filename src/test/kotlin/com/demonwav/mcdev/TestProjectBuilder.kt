@@ -58,11 +58,12 @@ class TestProjectBuilder(
         return psiFile
     }
 
-    fun build(builder: TestProjectBuilder.() -> Unit): List<PsiFile> {
+    fun <T : PsiFile> build(builder: TestProjectBuilder.() -> Unit): List<T> {
         runWriteAction {
             VfsUtil.markDirtyAndRefresh(false, true, true, root)
             builder()
         }
-        return fileList
+        @Suppress("UNCHECKED_CAST")
+        return fileList as List<T>
     }
 }

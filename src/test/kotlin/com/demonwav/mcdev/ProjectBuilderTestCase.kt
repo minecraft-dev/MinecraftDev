@@ -10,9 +10,10 @@
 
 package com.demonwav.mcdev
 
+import com.intellij.psi.PsiFile
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 
 abstract class ProjectBuilderTestCase : LightCodeInsightFixtureTestCase() {
 
-    fun buildProject(builder: TestProjectBuilder.() -> Unit) = TestProjectBuilder(myFixture).build(builder)
+    protected fun <T : PsiFile> buildProject(builder: TestProjectBuilder.() -> Unit) = TestProjectBuilder(myFixture).build<T>(builder)
 }

@@ -23,7 +23,7 @@ class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
 
     override fun setUp() {
         super.setUp()
-        psiClass = (buildProject {
+        psiClass = buildProject<PsiJavaFile> {
             java("src/test/ShadowData.java", """
                 package test;
 
@@ -87,7 +87,7 @@ class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
                     public final String twoIssues = "";
                 }
             """)
-        }[0] as PsiJavaFile).classes.single()
+        }[0].classes.single()
     }
 
     private fun checkShadow(element: PsiElement?, targets: Int, errors: Int) {
