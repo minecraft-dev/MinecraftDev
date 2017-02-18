@@ -10,12 +10,12 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.MinecraftCodeInsightFixtureTestCase
+import com.demonwav.mcdev.ProjectBuilderTestCase
 import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
 
-abstract class OuterClassTest : MinecraftCodeInsightFixtureTestCase() {
+abstract class OuterClassTest : ProjectBuilderTestCase() {
 
     protected lateinit var outerClass: PsiClass
     protected lateinit var outerAnonymousClass: PsiAnonymousClass
@@ -46,7 +46,7 @@ abstract class OuterClassTest : MinecraftCodeInsightFixtureTestCase() {
                     }
                 }
             """)
-        }.files.single() as PsiJavaFile).classes.single()
+        }.single() as PsiJavaFile).classes.single()
 
         this.outerAnonymousClass = outerClass.anonymousElements!!.single() as PsiAnonymousClass
 

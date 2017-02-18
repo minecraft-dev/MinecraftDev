@@ -49,7 +49,7 @@ class TestProjectBuilder(
 
         val dir = PathUtil.getParentPath(fullPath)
         val vDir = VfsUtil.createDirectoryIfMissing(root, dir)
-        val vFile = vDir.createChildData(this, PathUtil.getFileName(fullPath))
+        val vFile = vDir.findOrCreateChildData(this, PathUtil.getFileName(fullPath))
         VfsUtil.saveText(vFile, code.trimIndent())
 
         val psiFile = fixture.configureByFile(vFile.path)!!
@@ -58,13 +58,11 @@ class TestProjectBuilder(
         return psiFile
     }
 
-    fun build(builder: TestProjectBuilder.() -> Unit): TestProject {
+    fun build(builder: TestProjectBuilder.() -> Unit): List<PsiFile> {
         runWriteAction {
             VfsUtil.markDirtyAndRefresh(false, true, true, root)
             builder()
         }
-        return TestProject(project, root, fileList)
+        return fileList
     }
 }
-
-class TestProject(val project: Project, val root: VirtualFile, val files: List<PsiFile>)

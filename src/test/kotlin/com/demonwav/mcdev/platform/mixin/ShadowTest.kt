@@ -10,14 +10,14 @@
 
 package com.demonwav.mcdev.platform.mixin
 
-import com.demonwav.mcdev.MinecraftCodeInsightFixtureTestCase
+import com.demonwav.mcdev.BaseMinecraftTestCase
 import com.demonwav.mcdev.platform.mixin.util.MixinUtils
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiJavaFile
 import org.junit.Assert
 
-class ShadowTest : MinecraftCodeInsightFixtureTestCase() {
+class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
 
     private lateinit var psiClass: PsiClass
 
@@ -87,7 +87,7 @@ class ShadowTest : MinecraftCodeInsightFixtureTestCase() {
                     public final String twoIssues = "";
                 }
             """)
-        }.files[0] as PsiJavaFile).classes.single()
+        }[0] as PsiJavaFile).classes.single()
     }
 
     private fun checkShadow(element: PsiElement?, targets: Int, errors: Int) {
