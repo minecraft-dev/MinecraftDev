@@ -19,17 +19,75 @@ import org.junit.Assert
 
 class ShadowTest : MinecraftCodeInsightFixtureTestCase() {
 
-    private val path = "src/test/resources/com/demonwav/mcdev/platform/mixin/fixture"
     private lateinit var psiClass: PsiClass
 
-    override fun getTestDataPath(): String {
-        return path
-    }
-
-    public override fun setUp() {
+    override fun setUp() {
         super.setUp()
-        val psiFiles = myFixture.configureByFiles("src/test/ShadowData.java", "src/test/MixinBase.java")
-        psiClass = (psiFiles[0] as PsiJavaFile).classes[0]
+        psiClass = (buildProject {
+            java("src/test/ShadowData.java", """
+                package test;
+
+                @org.spongepowered.asm.mixin.Mixin("test.MixinBase")
+                public class ShadowData {
+                    @org.spongepowered.asm.mixin.Shadow @org.spongepowered.asm.mixin.Final private String privateFinalString;
+                    @org.spongepowered.asm.mixin.Shadow private String privateString;
+
+                    @org.spongepowered.asm.mixin.Shadow @org.spongepowered.asm.mixin.Final protected String protectedFinalString;
+                    @org.spongepowered.asm.mixin.Shadow protected String protectedString;
+
+                    @org.spongepowered.asm.mixin.Shadow @org.spongepowered.asm.mixin.Final String packagePrivateFinalString;
+                    @org.spongepowered.asm.mixin.Shadow String packagePrivateString;
+
+                    @org.spongepowered.asm.mixin.Shadow @org.spongepowered.asm.mixin.Final public String publicFinalString;
+                    @org.spongepowered.asm.mixin.Shadow public String publicString;
+
+                    @org.spongepowered.asm.mixin.Shadow public String wrongAccessor;
+                    @org.spongepowered.asm.mixin.Shadow protected String noFinal;
+
+                    @org.spongepowered.asm.mixin.Shadow public String nonExistent;
+
+                    @org.spongepowered.asm.mixin.Shadow protected String twoIssues;
+                }
+            """)
+
+            java("src/test/MixinBase.java", """
+                package test;
+
+                public class MixinBase {
+                    // Static
+                    private static final String privateStaticFinalString = "";
+                    private static String privateStaticString = "";
+
+                    protected static final String protectedStaticFinalString = "";
+                    protected static String protectedStaticString = "";
+
+                    static final String packagePrivateStaticFinalString = "";
+                    static String packagePrivateStaticString = "";
+
+                    public static final String publicStaticFinalString = "";
+                    public static String publicStaticString = "";
+
+                    // Non-static
+                    private final String privateFinalString = "";
+                    private String privateString = "";
+
+                    protected final String protectedFinalString = "";
+                    protected String protectedString = "";
+
+                    final String packagePrivateFinalString = "";
+                    String packagePrivateString = "";
+
+                    public final String publicFinalString = "";
+                    public String publicString = "";
+
+                    // Bad shadows
+                    protected String wrongAccessor = "";
+                    protected final String noFinal = "";
+
+                    public final String twoIssues = "";
+                }
+            """)
+        }.files[0] as PsiJavaFile).classes.single()
     }
 
     private fun checkShadow(element: PsiElement?, targets: Int, errors: Int) {
@@ -101,5 +159,4 @@ class ShadowTest : MinecraftCodeInsightFixtureTestCase() {
     fun testNonExistent() {
         checkReallyBadShadow(psiClass.findFieldByName("nonExistent", false))
     }
-
 }

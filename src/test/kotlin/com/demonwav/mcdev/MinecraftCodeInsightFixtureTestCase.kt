@@ -26,6 +26,8 @@ import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 
 abstract class MinecraftCodeInsightFixtureTestCase : LightCodeInsightFixtureTestCase() {
+    fun buildProject(builder: TestProjectBuilder.() -> Unit): TestProject = TestProjectBuilder(myFixture).build(builder)
+
     override fun getProjectDescriptor(): LightProjectDescriptor {
         return object : LightProjectDescriptor() {
             override fun configureModule(module: Module, model: ModifiableRootModel, contentEntry: ContentEntry) {

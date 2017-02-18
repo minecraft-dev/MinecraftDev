@@ -10,28 +10,9 @@
 
 package com.demonwav.mcdev.util
 
-import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiJavaFile
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 
-class McPsiClassTest : LightCodeInsightFixtureTestCase() {
-
-    private lateinit var outerClass: PsiClass
-    private lateinit var outerAnonymousClass: PsiAnonymousClass
-    private lateinit var innerClass: PsiClass
-    private lateinit var innerAnonymousClass: PsiAnonymousClass
-    private lateinit var innerAnonymousInnerClass: PsiClass
-
-    override fun setUp() {
-        super.setUp()
-        this.outerClass = (myFixture.configureByFile("src/test/resources/com/demonwav/mcdev/util/OuterClass.java") as PsiJavaFile).classes.single()
-        this.outerAnonymousClass = outerClass.anonymousElements!!.single() as PsiAnonymousClass
-
-        this.innerClass = outerClass.innerClasses.single()
-        this.innerAnonymousClass = innerClass.anonymousElements!!.single() as PsiAnonymousClass
-        this.innerAnonymousInnerClass = innerAnonymousClass.innerClasses.single()
-    }
+class McPsiClassTest : OuterClassTest() {
 
     fun testOuterFullQualifiedName() = assertEquals("com.example.test.OuterClass", outerClass.fullQualifiedName)
     fun testOuterShortName() = assertEquals("OuterClass", outerClass.shortName)
