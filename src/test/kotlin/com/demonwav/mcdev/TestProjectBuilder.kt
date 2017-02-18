@@ -51,7 +51,6 @@ class TestProjectBuilder(
         runWriteAction {
             VfsUtil.markDirtyAndRefresh(false, true, true, root)
             builder()
-            VfsUtil.markDirtyAndRefresh(false, true, true, root)
         }
         return TestProject(project, root, fileList)
     }
