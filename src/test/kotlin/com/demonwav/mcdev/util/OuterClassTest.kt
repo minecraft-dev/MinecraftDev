@@ -10,10 +10,9 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.ProjectBuilderTestCase
+import com.demonwav.mcdev.framework.ProjectBuilderTestCase
 import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiJavaFile
 
 abstract class OuterClassTest : ProjectBuilderTestCase() {
 
@@ -26,8 +25,8 @@ abstract class OuterClassTest : ProjectBuilderTestCase() {
     override fun setUp() {
         super.setUp()
 
-        this.outerClass = buildProject<PsiJavaFile> {
-            java("src/com/example/test/OuterClass.java", """
+        buildProject {
+            outerClass = java("src/com/example/test/OuterClass.java", """
                 package com.example.test;
 
                 class OuterClass {
@@ -45,8 +44,8 @@ abstract class OuterClassTest : ProjectBuilderTestCase() {
                         }
                     }
                 }
-            """)
-        }.single().classes.single()
+            """).classes.single()
+        }
 
         this.outerAnonymousClass = outerClass.anonymousElements!!.single() as PsiAnonymousClass
 

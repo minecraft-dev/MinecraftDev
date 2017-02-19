@@ -7,11 +7,11 @@
  *
  * MIT License
  */
-
-package com.demonwav.mcdev
+package com.demonwav.mcdev.framework
 
 import com.demonwav.mcdev.buildsystem.BuildSystem
-import com.demonwav.mcdev.buildsystem.test.TestBuildSystemInstanceManager
+import com.demonwav.mcdev.buildsystem.BuildSystemInstanceManager
+import com.demonwav.mcdev.framework.buildsystem.TestBuildSystemInstanceManager
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.intellij.JavaTestUtil
@@ -25,20 +25,24 @@ abstract class BaseMinecraftTestCase(
     private vararg val moduleTypes: AbstractModuleType<*>
 ) : ProjectBuilderTestCase() {
 
-    protected open fun configureModule(module: Module, model: ModifiableRootModel) {
-    }
+    var buildSystemInstanceManager: BuildSystemInstanceManager = TestBuildSystemInstanceManager
+
+    protected open fun preConfigureModule(module: Module, model: ModifiableRootModel) {}
+    protected open fun postConfigureModule(module: Module, model: ModifiableRootModel) {}
 
     override fun getProjectDescriptor(): LightProjectDescriptor {
         return object : DefaultLightProjectDescriptor() {
             override fun configureModule(module: Module, model: ModifiableRootModel, contentEntry: ContentEntry) {
                 super.configureModule(module, model, contentEntry)
 
-                BuildSystem.instanceManager = TestBuildSystemInstanceManager
+                preConfigureModule(module, model)
+
+                BuildSystem.instanceManager = buildSystemInstanceManager
 
                 moduleTypes.forEach {
-                    MinecraftModuleType.addOption(module, it.id)
+                    MinecraftModuleType.addOption(module, it.id, false)
                 }
-                configureModule(module, model)
+                postConfigureModule(module, model)
             }
 
             // TODO: Figure out how to package Mock JDK to speed up builds

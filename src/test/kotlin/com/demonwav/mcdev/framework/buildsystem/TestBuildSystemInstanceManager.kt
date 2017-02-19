@@ -7,8 +7,7 @@
  *
  * MIT License
  */
-
-package com.demonwav.mcdev.buildsystem.test
+package com.demonwav.mcdev.framework.buildsystem
 
 import com.demonwav.mcdev.buildsystem.BuildSystemInstanceManager
 import com.intellij.openapi.module.Module

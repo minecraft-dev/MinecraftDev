@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin
 
-import com.demonwav.mcdev.BaseMinecraftTestCase
+import com.demonwav.mcdev.framework.BaseMinecraftTestCase
 import com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowModifiersInspection
 import com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowTargetInspection
 import com.intellij.openapi.module.Module
@@ -20,23 +20,15 @@ import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.JarFileSystem
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.psi.PsiJavaFile
 
 class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
 
     override fun setUp() {
         super.setUp()
 
-        buildProject<PsiJavaFile> {
-
-            // TODO: Figure out why MixinBase can't be resolved if we use separate files
-
+        buildProject {
             java("src/test/MixinBase.java", """
                 package test;
-
-                import org.spongepowered.asm.mixin.Mixin;
-                import org.spongepowered.asm.mixin.Shadow;
-                import org.spongepowered.asm.mixin.Final;
 
                 public class MixinBase {
                     // Static
@@ -71,9 +63,18 @@ class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
 
                     public final String twoIssues = "";
                 }
+            """)
 
-                @Mixin(MixinBase.class)
-                class ShadowData {
+            java("src/test/ShadowData.java", """
+                package test;
+
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.Shadow;
+                import org.spongepowered.asm.mixin.Final;
+
+                // TODO: figure out why in test environments resolving value here doesn't work for multiple files
+                @Mixin(targets = "test.MixinBase")
+                public class ShadowData {
                     @Shadow @Final private String privateFinalString;
                     @Shadow private String privateString;
 
@@ -97,11 +98,10 @@ class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
         }
     }
 
-    override fun configureModule(module: Module, model: ModifiableRootModel) {
+    override fun postConfigureModule(module: Module, model: ModifiableRootModel) {
         // If we're lucky, the following code adds the Mixin library to the project
         val mixinPath = FileUtil.toSystemIndependentName(System.getProperty("mixinUrl")!!)
 
-        val project = module.project
         val table = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
         val library = table.createLibrary("Mixin")
@@ -113,7 +113,7 @@ class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
     }
 
     // TODO: Split up in separate tests
-    fun test() {
+    fun testInspections() {
         myFixture.enableInspections(ShadowTargetInspection::class.java, ShadowModifiersInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }

@@ -33,6 +33,10 @@ public class MinecraftModuleType extends JavaModuleType {
     }
 
     public static void addOption(@NotNull Module module, @NotNull String option) {
+        addOption(module, option, true);
+    }
+
+    public static void addOption(@NotNull Module module, @NotNull String option, boolean updateModule) {
         String currentOption = module.getOptionValue(OPTION);
         if (Strings.isNullOrEmpty(currentOption)) {
             currentOption = option;
@@ -41,52 +45,71 @@ public class MinecraftModuleType extends JavaModuleType {
                 currentOption += "," + option;
             }
         }
-        module.setOption(OPTION, currentOption);
+
+        final String finalOption = cleanOption(currentOption);
+        module.setOption(OPTION, finalOption);
+
+        if (!updateModule) {
+            return;
+        }
+
         final MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
         if (minecraftModule != null) {
-            final PlatformType[] types = cleanOption(module);
+            final PlatformType[] types = getTypes(finalOption);
             minecraftModule.updateModules(types);
         }
     }
 
     public static void removeOption(@NotNull Module module, @NotNull String option) {
+        removeOption(module, option, true);
+    }
+
+    public static void removeOption(@NotNull Module module, @NotNull String option, boolean updateModule) {
         final String currentOption = module.getOptionValue(OPTION);
         if (Strings.isNullOrEmpty(currentOption)) {
             return;
         }
 
-        if (currentOption.contains(option)) {
-            final String[] parts = currentOption.split(",");
-            String newOption = "";
-            final Iterator<String> partIterator = Arrays.asList(parts).iterator();
-            while (partIterator.hasNext()) {
-                String part = partIterator.next();
+        if (!currentOption.contains(option)) {
+            return;
+        }
 
-                if (part.equals(option)) {
-                    continue;
-                }
+        final String[] parts = currentOption.split(",");
+        String newOption = "";
+        final Iterator<String> partIterator = Arrays.asList(parts).iterator();
+        while (partIterator.hasNext()) {
+            String part = partIterator.next();
 
-                newOption += part;
-
-                if (partIterator.hasNext()) {
-                    newOption += ",";
-                }
+            if (part.equals(option)) {
+                continue;
             }
 
-            module.setOption(OPTION, newOption);
+            newOption += part;
+
+            if (partIterator.hasNext()) {
+                newOption += ",";
+            }
+        }
+
+        final String finalOption = cleanOption(newOption);
+        module.setOption(OPTION, finalOption);
+
+
+        if (!updateModule) {
+            return;
         }
 
         final MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
         if (minecraftModule != null) {
-            final PlatformType[] types = cleanOption(module);
+            final PlatformType[] types = getTypes(finalOption);
             minecraftModule.updateModules(types);
         }
     }
 
-    private static PlatformType[] cleanOption(@NotNull Module module) {
-        String option = module.getOptionValue(OPTION);
+    @NotNull
+    private static String cleanOption(@NotNull String option) {
         if (Strings.isNullOrEmpty(option)) {
-            return new PlatformType[0];
+            return "";
         }
 
         // Remove ,'s at the beginning of the text
@@ -97,25 +120,27 @@ public class MinecraftModuleType extends JavaModuleType {
         option = option.replaceAll(",{2,}", ",");
 
         // Remove parent types
-        final String[] split = option.split(",");
-        PlatformType[] types = new PlatformType[split.length];
-        for (int i = 0; i < split.length; i++) {
-            types[i] = PlatformType.getTypeByName(split[i]);
-        }
-
-        final PlatformType[] finalTypes = PlatformType.removeParents(types);
+        final PlatformType[] types = PlatformType.removeParents(getTypes(option));
 
         final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < finalTypes.length; i++) {
-            sb.append(finalTypes[i].getName());
-            if (i != finalTypes.length - 1) {
+        for (int i = 0; i < types.length; i++) {
+            sb.append(types[i].getName());
+            if (i != types.length - 1) {
                 sb.append(",");
             }
         }
 
-        module.setOption(OPTION, sb.toString());
+        return sb.toString();
+    }
 
-        return finalTypes;
+    private static PlatformType[] getTypes(@NotNull String option) {
+        final String[] split = option.split(",");
+        final PlatformType[] types = new PlatformType[split.length];
+        for (int i = 0; i < split.length; i++) {
+            types[i] = PlatformType.getTypeByName(split[i]);
+        }
+
+        return types;
     }
 
     @NotNull

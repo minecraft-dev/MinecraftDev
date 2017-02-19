@@ -7,8 +7,7 @@
  *
  * MIT License
  */
-
-package com.demonwav.mcdev.buildsystem.test
+package com.demonwav.mcdev.framework.buildsystem
 
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.ProjectConfiguration
