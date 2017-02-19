@@ -10,17 +10,13 @@
 
 package com.demonwav.mcdev.buildsystem
 
-import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem
-import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.util.runWriteTask
 import com.google.common.base.MoreObjects
 import com.google.common.base.Objects
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.annotations.Contract
@@ -28,7 +24,6 @@ import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
 import java.io.IOException
 import java.util.ArrayList
-import java.util.HashMap
 
 /**
  * Base class for Maven and Gradle build systems. The general contract of any class which implements this is any
@@ -36,6 +31,8 @@ import java.util.HashMap
  * represent changes in the project itself.
  */
 abstract class BuildSystem {
+
+    private val lock = Any()
 
     lateinit var artifactId: String
     lateinit var groupId: String
@@ -207,57 +204,9 @@ abstract class BuildSystem {
     }
 
     companion object {
-        private val lock = Any()
-
-        private val map = HashMap<Module, BuildSystem?>()
+        var instanceManager: BuildSystemInstanceManager = DefaultBuildSystemInstanceManager
 
         @JvmStatic
-        fun getInstance(module: Module): BuildSystem? {
-            // generally the other way around, by synchronizing this block and the reImport for GradleBuildSystem and
-            // MavenBuildSystem, performance is significantly increased, as it dramatically decreases the number of times
-            // the module will be reimported.
-            synchronized(lock) {
-                return map.computeIfAbsent(module) {
-                    val roots = ModuleRootManager.getInstance(module).contentRoots
-                    if (roots.isNotEmpty()) {
-                        var root: VirtualFile? = roots[0]
-                        if (root != null) {
-                            var pom = root.findChild("pom.xml")
-                            var gradle = root.findChild("build.gradle") ?:
-                                root.findChild("settings.gradle") ?: root.findChild("build.gradle.kts")
-
-                            if (pom != null) {
-                                return@computeIfAbsent MavenBuildSystem()
-                            } else if (gradle != null) {
-                                return@computeIfAbsent GradleBuildSystem()
-                            } else {
-                                // We need to check if this is a multi-module gradle project
-                                val project = module.project
-                                val paths = ModuleManager.getInstance(project).getModuleGroupPath(module)
-                                if (paths != null && paths.isNotEmpty()) {
-                                    // The first element is the parent
-                                    val parentName = paths[0]
-                                    val parentModule = ModuleManager.getInstance(project).findModuleByName(parentName)
-
-                                    if (parentModule != null) {
-                                        root = ModuleRootManager.getInstance(parentModule).contentRoots[0]
-                                        pom = root!!.findChild("pom.xml")
-                                        gradle = root.findChild("build.gradle") ?:
-                                            root.findChild("settings.gradle") ?: root.findChild("build.gradle.kts")
-
-                                        if (pom != null) {
-                                            return@computeIfAbsent MavenBuildSystem()
-                                        } else if (gradle != null) {
-                                            return@computeIfAbsent GradleBuildSystem()
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    null
-                }
-            }
-        }
+        fun getInstance(module: Module) = instanceManager.getBuildSystem(module)
     }
 }

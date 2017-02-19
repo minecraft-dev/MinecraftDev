@@ -10,8 +10,9 @@
 
 package com.demonwav.mcdev
 
+import com.demonwav.mcdev.buildsystem.BuildSystem
+import com.demonwav.mcdev.buildsystem.test.TestBuildSystemInstanceManager
 import com.demonwav.mcdev.platform.AbstractModuleType
-import com.demonwav.mcdev.platform.MinecraftModule
 import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.intellij.JavaTestUtil
 import com.intellij.openapi.module.Module
@@ -31,10 +32,11 @@ abstract class BaseMinecraftTestCase(
         return object : DefaultLightProjectDescriptor() {
             override fun configureModule(module: Module, model: ModifiableRootModel, contentEntry: ContentEntry) {
                 super.configureModule(module, model, contentEntry)
+
+                BuildSystem.instanceManager = TestBuildSystemInstanceManager
+
                 moduleTypes.forEach {
                     MinecraftModuleType.addOption(module, it.id)
-                    // TODO: DemonWav: Why do we need this? Module type isn't added properly otherwise
-                    MinecraftModule.getInstance(module)!!.addModuleType(it.id)
                 }
                 configureModule(module, model)
             }

@@ -34,6 +34,7 @@ class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
             java("src/test/MixinBase.java", """
                 package test;
 
+                import org.spongepowered.asm.mixin.Mixin;
                 import org.spongepowered.asm.mixin.Shadow;
                 import org.spongepowered.asm.mixin.Final;
 
@@ -71,7 +72,7 @@ class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
                     public final String twoIssues = "";
                 }
 
-                @org.spongepowered.asm.mixin.Mixin(MixinBase.class)
+                @Mixin(MixinBase.class)
                 class ShadowData {
                     @Shadow @Final private String privateFinalString;
                     @Shadow private String privateString;
@@ -116,6 +117,4 @@ class ShadowTest : BaseMinecraftTestCase(MixinModuleType) {
         myFixture.enableInspections(ShadowTargetInspection::class.java, ShadowModifiersInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }
-
-
 }
