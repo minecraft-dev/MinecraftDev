@@ -24,44 +24,46 @@ object DefaultBuildSystemInstanceManager : BuildSystemInstanceManager {
     override fun getBuildSystem(module: Module): BuildSystem? {
         return map.computeIfAbsent(module) {
             val roots = ModuleRootManager.getInstance(module).contentRoots
-            if (roots.isNotEmpty()) {
-                var root: VirtualFile? = roots[0]
+            if (roots.isEmpty()) {
+                return@computeIfAbsent null
+            }
 
-                if (root != null) {
-                    var pom = root.findChild("pom.xml")
-                    var gradle = root.findChild("build.gradle") ?:
-                        root.findChild("settings.gradle") ?: root.findChild("build.gradle.kts")
+            var root: VirtualFile? = roots[0]
 
-                    if (pom != null) {
-                        return@computeIfAbsent MavenBuildSystem()
-                    } else if (gradle != null) {
-                        return@computeIfAbsent GradleBuildSystem()
-                    } else {
-                        // We need to check if this is a multi-module gradle project
-                        val project = module.project
-                        val paths = ModuleManager.getInstance(project).getModuleGroupPath(module)
+            root ?: return@computeIfAbsent null
 
-                        if (paths != null && paths.isNotEmpty()) {
-                            // The first element is the parent
-                            val parentName = paths[0]
-                            val parentModule = ModuleManager.getInstance(project).findModuleByName(parentName)
+            var pom = root.findChild("pom.xml")
+            var gradle = root.findChild("build.gradle") ?:
+                root.findChild("settings.gradle") ?: root.findChild("build.gradle.kts")
 
-                            if (parentModule != null) {
-                                root = ModuleRootManager.getInstance(parentModule).contentRoots[0]
-                                pom = root!!.findChild("pom.xml")
+            if (pom != null) {
+                return@computeIfAbsent MavenBuildSystem()
+            } else if (gradle != null) {
+                return@computeIfAbsent GradleBuildSystem()
+            }
 
-                                gradle = root.findChild("build.gradle") ?:
-                                    root.findChild("settings.gradle") ?: root.findChild("build.gradle.kts")
+            // We need to check if this is a multi-module gradle project
+            val project = module.project
+            val paths = ModuleManager.getInstance(project).getModuleGroupPath(module)
 
-                                if (pom != null) {
-                                    return@computeIfAbsent MavenBuildSystem()
-                                } else if (gradle != null) {
-                                    return@computeIfAbsent GradleBuildSystem()
-                                }
-                            }
-                        }
-                    }
-                }
+            if (paths == null || paths.isEmpty()) {
+                return@computeIfAbsent null
+            }
+
+            // The first element is the parent
+            val parentName = paths[0]
+            val parentModule = ModuleManager.getInstance(project).findModuleByName(parentName) ?: return@computeIfAbsent null
+
+            root = ModuleRootManager.getInstance(parentModule).contentRoots[0]
+            pom = root!!.findChild("pom.xml")
+
+            gradle = root.findChild("build.gradle") ?:
+                root.findChild("settings.gradle") ?: root.findChild("build.gradle.kts")
+
+            if (pom != null) {
+                return@computeIfAbsent MavenBuildSystem()
+            } else if (gradle != null) {
+                return@computeIfAbsent GradleBuildSystem()
             }
             null
         }
