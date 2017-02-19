@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.framework
 
 import com.demonwav.mcdev.platform.mcp.at.AtFile

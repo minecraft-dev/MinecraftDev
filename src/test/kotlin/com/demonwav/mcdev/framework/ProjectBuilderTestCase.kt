@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.framework
 
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
