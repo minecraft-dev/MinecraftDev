@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.framework
 
+import com.demonwav.mcdev.ProjectComponentHandler
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.buildsystem.BuildSystemInstanceManager
 import com.demonwav.mcdev.framework.buildsystem.TestBuildSystemInstanceManager
@@ -27,7 +28,8 @@ abstract class BaseMinecraftTest(
     private vararg val moduleTypes: AbstractModuleType<*>
 ) : ProjectBuilderTest() {
 
-    var buildSystemInstanceManager: BuildSystemInstanceManager = TestBuildSystemInstanceManager
+    protected var buildSystemInstanceManager: BuildSystemInstanceManager = TestBuildSystemInstanceManager
+    protected var projectComponentHandler: ProjectComponentHandler = TestProjectComponentHandler
 
     protected open fun preConfigureModule(module: Module, model: ModifiableRootModel) {}
     protected open fun postConfigureModule(module: Module, model: ModifiableRootModel) {}
@@ -40,7 +42,7 @@ abstract class BaseMinecraftTest(
                 preConfigureModule(module, model)
 
                 BuildSystem.instanceManager = buildSystemInstanceManager
-                ProjectComponentManager.handler = TestProjectComponentHandler
+                ProjectComponentManager.handler = projectComponentHandler
 
                 moduleTypes.forEach {
                     MinecraftModuleType.addOption(module, it.id, false)
