@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module com.demonwav.mcdev.MinecraftModuleTypes="" external.linked.project.id="MinecraftDev" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="com.demonwav.minecraft-dev" external.system.module.version="2016.3-0.5.3" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="JRebel" name="JRebel">
+      <configuration>
+        <option name="deleteUnindexed" value="true" />
+        <option name="httpAuthEnabled" value="false" />
+        <option name="httpPassword" />
+        <option name="httpUsername" />
+        <option name="ideModuleStorage">
+          <map>
+            <entry key="com.zeroturnaround.jrebel.FormatVersion" value="7.0.0" />
+            <entry key="com.zeroturnaround.jrebel.remoting.DeleteUnindexedFiles" value="true" />
+            <entry key="com.zeroturnaround.jrebel.remoting.ModuleRemoteServerSelection" value="off" />
+          </map>
+        </option>
+        <option name="manualXML" value="false" />
+        <option name="masterModuleName" />
+        <option name="remotingEnabled" value="false" />
+        <option name="secure" value="true" />
+        <option name="url" />
+        <option name="xmlDir" />
+      </configuration>
+    </facet>
+    <facet type="kotlin-language" name="Kotlin">
+      <configuration version="1">
+        <option name="compilerInfo">
+          <KotlinCompilerInfo>
+            <option name="compilerSettings">
+              <CompilerSettings />
+            </option>
+            <option name="k2jsCompilerArguments">
+              <K2JSCompilerArguments />
+            </option>
+            <option name="k2jvmCompilerArguments">
+              <K2JVMCompilerArguments />
+            </option>
+            <option name="_commonCompilerArguments">
+              <DummyImpl>
+                <option name="pluginClasspaths">
+                  <array />
+                </option>
+                <option name="coroutinesWarn" value="true" />
+                <option name="pluginOptions">
+                  <array />
+                </option>
+              </DummyImpl>
+            </option>
+          </KotlinCompilerInfo>
+        </option>
+        <option name="useProjectSettings" value="false" />
+        <option name="versionInfo">
+          <KotlinVersionInfo>
+            <option name="apiLevel" value="1.1" />
+            <option name="languageLevel" value="1.1" />
+            <option name="targetPlatformName" value="JVM 1.8" />
+          </KotlinVersionInfo>
+        </option>
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../..">
+      <excludeFolder url="file://$MODULE_DIR$/../../.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../.sandbox" />
+      <excludeFolder url="file://$MODULE_DIR$/../../build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../lib" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

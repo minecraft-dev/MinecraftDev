@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Statistic">
+    <option name="excludedDirectories">
+      <list>
+        <option value="$PROJECT_DIR$/build" />
+        <option value="$PROJECT_DIR$/classes" />
+        <option value="$PROJECT_DIR$/gradle" />
+        <option value="$PROJECT_DIR$/libs" />
+        <option value="$PROJECT_DIR$/.gradle" />
+        <option value="$PROJECT_DIR$/.idea" />
+        <option value="$PROJECT_DIR$/.sandbox" />
+      </list>
+    </option>
+  </component>
+</project>

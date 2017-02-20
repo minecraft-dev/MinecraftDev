@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="EntryPointsManager">
+    <list size="17">
+      <item index="0" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.Debug" />
+      <item index="1" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.Final" />
+      <item index="2" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.Implements" />
+      <item index="3" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.Interface" />
+      <item index="4" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.Intrinsic" />
+      <item index="5" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.Mixin" />
+      <item index="6" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.Mutable" />
+      <item index="7" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.Overwrite" />
+      <item index="8" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.Shadow" />
+      <item index="9" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.SoftOverride" />
+      <item index="10" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.Unique" />
+      <item index="11" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.injection.Inject" />
+      <item index="12" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.injection.ModifyArg" />
+      <item index="13" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.injection.ModifyConstant" />
+      <item index="14" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.injection.ModifyVariable" />
+      <item index="15" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.injection.Redirect" />
+      <item index="16" class="java.lang.String" itemvalue="org.spongepowered.asm.mixin.injection.Surrogate" />
+    </list>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/classes" />
+  </component>
+</project>

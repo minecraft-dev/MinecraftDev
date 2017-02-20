@@ -1,0 +1,8 @@
+<component name="CopyrightManager">
+  <settings default="Minecraft Dev">
+    <LanguageOptions name="JAVA">
+      <option name="fileTypeOverride" value="3" />
+    </LanguageOptions>
+    <LanguageOptions name="__TEMPLATE__" />
+  </settings>
+</component>
