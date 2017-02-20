@@ -10,11 +10,12 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.framework.ProjectBuilderTestCase
+import com.demonwav.mcdev.framework.ProjectBuilderTest
 import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiJavaFile
 
-abstract class OuterClassTest : ProjectBuilderTestCase() {
+abstract class OuterClassTest : ProjectBuilderTest() {
 
     protected lateinit var outerClass: PsiClass
     protected lateinit var outerAnonymousClass: PsiAnonymousClass
@@ -26,25 +27,27 @@ abstract class OuterClassTest : ProjectBuilderTestCase() {
         super.setUp()
 
         buildProject {
-            outerClass = java("src/com/example/test/OuterClass.java", """
-                package com.example.test;
+            src {
+                outerClass = java("com/example/test/OuterClass.java", """
+                    package com.example.test;
 
-                class OuterClass {
+                    class OuterClass {
 
-                    private static final Object ANONYMOUS_CLASS = new Object() {
-                    };
+                        private static final Object ANONYMOUS_CLASS = new Object() {
+                        };
 
-                    class InnerClass {
-                        public void test() {
-                            new Object() {
-                                class AnonymousInnerClass {
+                        class InnerClass {
+                            public void test() {
+                                new Object() {
+                                    class AnonymousInnerClass {
 
-                                }
-                            };
+                                    }
+                                };
+                            }
                         }
                     }
-                }
-            """).classes.single()
+                """).toPsiFile<PsiJavaFile>().classes.single()
+            }
         }
 
         this.outerAnonymousClass = outerClass.anonymousElements!!.single() as PsiAnonymousClass

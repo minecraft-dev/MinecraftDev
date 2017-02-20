@@ -10,12 +10,12 @@
 
 package com.demonwav.mcdev.buildsystem
 
-import com.demonwav.mcdev.framework.BaseMinecraftTestCase
+import com.demonwav.mcdev.framework.BaseMinecraftTest
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.roots.ModifiableRootModel
 
-abstract class BaseBuildSystemTest : BaseMinecraftTestCase(MixinModuleType) {
+abstract class BaseBuildSystemTest : BaseMinecraftTest(MixinModuleType) {
 
     init {
         buildSystemInstanceManager = DefaultBuildSystemInstanceManager

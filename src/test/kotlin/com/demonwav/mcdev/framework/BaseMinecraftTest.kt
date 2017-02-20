@@ -22,9 +22,9 @@ import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
 
-abstract class BaseMinecraftTestCase(
+abstract class BaseMinecraftTest(
     private vararg val moduleTypes: AbstractModuleType<*>
-) : ProjectBuilderTestCase() {
+) : ProjectBuilderTest() {
 
     var buildSystemInstanceManager: BuildSystemInstanceManager = TestBuildSystemInstanceManager
 
