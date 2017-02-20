@@ -36,5 +36,4 @@ class FindMixinsComponent(classes: List<PsiClass>) : MouseAdapter() {
     override fun mouseClicked(e: MouseEvent) {
         classList.selectedValue?.takeIf(PsiClass::canNavigate)?.navigate(true)
     }
-
 }

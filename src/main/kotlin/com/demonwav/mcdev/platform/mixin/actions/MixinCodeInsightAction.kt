@@ -32,5 +32,4 @@ abstract class MixinCodeInsightAction : SimpleCodeInsightAction() {
         val containingClass = element.findContainingClass() ?: return false
         return containingClass.isMixin
     }
-
 }

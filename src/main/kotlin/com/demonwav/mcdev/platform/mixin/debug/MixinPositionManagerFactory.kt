@@ -23,5 +23,4 @@ class MixinPositionManagerFactory : PositionManagerFactory() {
             null
         }
     }
-
 }

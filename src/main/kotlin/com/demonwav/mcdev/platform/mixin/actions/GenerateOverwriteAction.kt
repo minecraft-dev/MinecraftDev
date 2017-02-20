@@ -90,7 +90,7 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
                             FileTemplateManager.getInstance(project).getCodeTemplate(MIXIN_OVERWRITE_FALLBACK))
                 }
 
-                // TODO: Automatically add Javadoc comment for @Overwrite?
+                // TODO: Automatically add Javadoc comment for @Overwrite? - yes please
 
                 // Add @Overwrite annotation
                 newMethod.modifierList.addAnnotation(MixinConstants.Annotations.OVERWRITE)
@@ -109,5 +109,4 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
             insertShadows(psiClass, newShadows)
         }
     }
-
 }

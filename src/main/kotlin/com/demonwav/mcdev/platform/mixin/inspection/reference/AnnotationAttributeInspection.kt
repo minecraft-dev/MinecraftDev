@@ -42,7 +42,5 @@ abstract class AnnotationAttributeInspection(private val annotation: List<String
             val value = pair.value ?: return
             visitAnnotationAttribute(psiAnnotation, value, this.holder)
         }
-
     }
-
 }

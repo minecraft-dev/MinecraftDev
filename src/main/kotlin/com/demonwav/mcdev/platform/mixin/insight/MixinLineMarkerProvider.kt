@@ -69,8 +69,5 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
             @JvmField val ICON: Icon = MixinAssets.MIXIN_CLASS_ICON
             @JvmField val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to target class")
         }
-
     }
-
-
 }

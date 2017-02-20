@@ -42,5 +42,4 @@ class CopyMixinTargetReferenceAction : AnAction() {
         CopyPasteManager.getInstance().setContents(StringSelection(MixinMemberReference.toString(targetReference)))
         WindowManager.getInstance().getStatusBar(project).info = "Mixin target reference has been copied."
     }
-
 }

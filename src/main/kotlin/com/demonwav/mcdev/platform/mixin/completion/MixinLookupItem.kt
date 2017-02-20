@@ -27,7 +27,6 @@ class MixinMethodLookupItem(method: PsiMethod) : JavaMethodCallElement(method) {
         insertShadow(context, `object`)
         super.handleInsert(context)
     }
-
 }
 
 class MixinFieldLookupItem(field: PsiField, private val qualified: Boolean) : VariableLookupItem(field) {

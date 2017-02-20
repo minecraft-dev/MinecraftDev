@@ -56,7 +56,5 @@ class InvalidMemberReferenceInspection : MixinInspection() {
                 holder.registerProblem(value, "Invalid member reference")
             }
         }
-
     }
-
 }

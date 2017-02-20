@@ -49,7 +49,5 @@ class MixinClassReferenceInspection : MixinInspection() {
 
             holder.registerProblem(type, "Mixin class cannot be referenced directly")
         }
-
     }
-
 }

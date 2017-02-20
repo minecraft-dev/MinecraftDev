@@ -58,7 +58,6 @@ enum class InjectorType(private val annotation: String) {
 
             return MethodSignature(result, PsiType.VOID)
         }
-
     },
     REDIRECT(MixinConstants.Annotations.REDIRECT) {
 
@@ -143,7 +142,6 @@ enum class InjectorType(private val annotation: String) {
 
             return Pair(parameters, returnType)
         }
-
     },
     MODIFY_ARG(MixinConstants.Annotations.MODIFY_ARG),
     MODIFY_CONSTANT(MixinConstants.Annotations.MODIFY_CONSTANT),

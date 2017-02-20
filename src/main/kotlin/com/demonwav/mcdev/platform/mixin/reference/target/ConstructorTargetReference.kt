@@ -47,7 +47,6 @@ object ConstructorTargetReference : TargetReference.Handler<PsiClass>() {
 
             super.visitNewExpression(expression)
         }
-
     }
 
     private class CollectUsagesVisitor : CollectVisitor<PsiClass>(false) {

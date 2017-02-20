@@ -20,9 +20,9 @@ import com.intellij.openapi.module.Module
 class McpModuleSettings : PersistentStateComponent<McpModuleSettings.State> {
 
     data class State(
-            var minecraftVersion: String? = null,
-            var mcpVersion: String? = null,
-            var mappingFiles: Set<String> = mutableSetOf()
+        var minecraftVersion: String? = null,
+        var mcpVersion: String? = null,
+        var mappingFiles: Set<String> = mutableSetOf()
     )
 
     private var state: State = State()
@@ -35,9 +35,9 @@ class McpModuleSettings : PersistentStateComponent<McpModuleSettings.State> {
 
     companion object {
         @JvmStatic fun getInstance(module: Module) =
-                // Normally this should use the ServiceManager but that doesn't support getting a service for a module
-                // This is based on ServiceManager.doGetService with the module as component manager
-                module.picoContainer.getComponentInstanceOfType(McpModuleSettings::class.java) as McpModuleSettings
+            // Normally this should use the ServiceManager but that doesn't support getting a service for a module
+            // This is based on ServiceManager.doGetService with the module as component manager
+            module.picoContainer.getComponentInstanceOfType(McpModuleSettings::class.java) as McpModuleSettings
     }
 
 }

@@ -23,8 +23,8 @@ import com.intellij.util.ThreeState
 class MixinCompletionConfidence : CompletionConfidence() {
 
     private val mixinAnnotation = PlatformPatterns.psiElement()
-            .inside(false, PsiJavaPatterns.psiAnnotation().qName(StandardPatterns.string().startsWith(MixinConstants.PACKAGE)),
-                    PlatformPatterns.psiFile())!!
+        .inside(false, PsiJavaPatterns.psiAnnotation().qName(StandardPatterns.string().startsWith(MixinConstants.PACKAGE)),
+                PlatformPatterns.psiFile())!!
 
     override fun shouldSkipAutopopup(element: PsiElement, psiFile: PsiFile, offset: Int): ThreeState {
         // Enable auto complete for all string literals which are children of one of the annotations in Mixin
@@ -35,5 +35,4 @@ class MixinCompletionConfidence : CompletionConfidence() {
             ThreeState.UNSURE
         }
     }
-
 }

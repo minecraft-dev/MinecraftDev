@@ -54,7 +54,8 @@ class MixinCompletionContributor : CompletionContributor() {
         val targetType = JavaPsiFacade.getElementFactory(psiClass.project).createType(psiClass)
         val filter = JavaCompletionContributor.getReferenceFilter(position)
         val prefixMatcher = result.prefixMatcher
-        LegacyCompletionContributor.processReferences(parameters, javaResult, { reference, result ->
+        
+        LegacyCompletionContributor.processReferences(parameters, javaResult) { reference, result ->
             if (reference !is PsiJavaReference) {
                 // Only process references to Java elements
                 return@processReferences
@@ -75,13 +76,12 @@ class MixinCompletionContributor : CompletionContributor() {
 
             // Process methods and fields from target class
             Stream.concat(
-                    findMethods(psiClass, targets, checkBases = true)?.map(::MixinMethodLookupItem) ?: Stream.empty<LookupElement>(),
-                    findFields(psiClass, targets, checkBases = true)?.map({ MixinFieldLookupItem(it, qualified) }) ?: Stream.empty<LookupElement>())
-                    .filter(prefixMatcher::prefixMatches)
-                    .filter(filter, position)
-                    .map { PrioritizedLookupElement.withExplicitProximity(it, 1) }
-                    .forEach(result::addElement)
-        })
+                findMethods(psiClass, targets, checkBases = true)?.map(::MixinMethodLookupItem) ?: Stream.empty<LookupElement>(),
+                findFields(psiClass, targets, checkBases = true)?.map { MixinFieldLookupItem(it, qualified) } ?: Stream.empty<LookupElement>()
+            ).filter(prefixMatcher::prefixMatches)
+                .filter(filter, position)
+                .map { PrioritizedLookupElement.withExplicitProximity(it, 1) }
+                .forEach(result::addElement)
+        }
     }
-
 }

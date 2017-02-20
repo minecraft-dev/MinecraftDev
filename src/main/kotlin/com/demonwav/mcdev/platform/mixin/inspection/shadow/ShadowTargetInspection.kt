@@ -54,6 +54,5 @@ class ShadowTargetInspection : MixinInspection() {
             holder.registerProblem(annotation, "Cannot resolve member '${member.name}' in target class",
                 RemoveAnnotationQuickFix(annotation, member))
         }
-
     }
 }

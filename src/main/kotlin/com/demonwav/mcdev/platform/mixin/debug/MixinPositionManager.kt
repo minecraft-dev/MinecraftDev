@@ -106,5 +106,4 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
             // TODO: Support for anonymous classes
             .mapNotNull(JVMNameUtil::getNonAnonymousClassName)
     }
-
 }

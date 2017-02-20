@@ -44,5 +44,4 @@ class McpDataService : AbstractProjectDataService<McpModelData, Module>() {
             mcpModule.updateSettings(data.settings)
         }
     }
-
 }

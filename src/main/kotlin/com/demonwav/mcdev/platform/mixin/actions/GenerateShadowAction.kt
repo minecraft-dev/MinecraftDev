@@ -78,14 +78,18 @@ class GenerateShadowAction : MixinCodeInsightAction() {
         }
 
         runWriteAction {
-            GenerateMembersUtil.insertMembersAtOffset(file, offset, createShadowMembers(project, psiClass,
-                    elements.stream().map(PsiElementClassMember<*>::getElement)))
-
-                    // Select first element in editor
-                    .firstOrNull()?.positionCaret(editor, false)
+            GenerateMembersUtil.insertMembersAtOffset(
+                file,
+                offset,
+                createShadowMembers(
+                    project,
+                    psiClass,
+                    elements.stream().map(PsiElementClassMember<*>::getElement)
+                )
+                // Select first element in editor
+            ).firstOrNull()?.positionCaret(editor, false)
         }
     }
-
 }
 
 fun insertShadows(project: Project, psiClass: PsiClass, members: Stream<PsiMember>) {

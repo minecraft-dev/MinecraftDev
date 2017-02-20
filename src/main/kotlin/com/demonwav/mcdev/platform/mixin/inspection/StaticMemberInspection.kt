@@ -59,7 +59,5 @@ class StaticMemberInspection : MixinInspection() {
                 && modifiers.findAnnotation(SHADOW) == null
                 && modifiers.findAnnotation(OVERWRITE) == null
         }
-
     }
-
 }

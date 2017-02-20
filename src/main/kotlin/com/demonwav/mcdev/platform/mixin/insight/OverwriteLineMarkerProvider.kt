@@ -68,9 +68,6 @@ class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNa
             @JvmField val ICON: Icon = AllIcons.Gutter.OverridingMethod
             @JvmField val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to target method")
         }
-
     }
-
-
 }
 
