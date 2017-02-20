@@ -14,14 +14,11 @@ import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.mcp.util.McpConstants;
 import com.demonwav.mcdev.util.CommonColors;
-
 import com.intellij.openapi.module.Module;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collections;
 import java.util.List;
-
 import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
 
 public class McpModuleType extends AbstractModuleType<McpModule> {
 

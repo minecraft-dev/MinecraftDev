@@ -12,16 +12,14 @@ package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
-
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SpongeTemplate extends AbstractTemplate {
 

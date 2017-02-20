@@ -10,9 +10,10 @@
 
 package com.demonwav.mcdev.platform.mixin.reference.target
 
-import com.demonwav.mcdev.platform.mixin.util.MemberReference
-import com.demonwav.mcdev.platform.mixin.util.getQualifiedMemberReference
+import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiClass
@@ -21,17 +22,17 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReferenceExpression
 
-internal object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
+object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
 
     override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass,
                                          checkOnly: Boolean): CollectVisitor<PsiReferenceExpression>? {
-        return MemberReference.parse(context.constantStringValue)?.let({ FindUsagesVisitor(targetClass, it, checkOnly) })
+        return MixinMemberReference.parse(context.constantStringValue)?.let({ FindUsagesVisitor(targetClass, it, checkOnly) })
     }
 
     override fun createCollectUsagesVisitor(): CollectVisitor<QualifiedMember<PsiField>> = CollectUsagesVisitor()
 
     override fun createLookup(targetClass: PsiClass, m: PsiField, owner: PsiClass): LookupElementBuilder {
-        return JavaLookupElementBuilder.forField(m, m.getQualifiedMemberReference(owner).toString(), targetClass)
+        return JavaLookupElementBuilder.forField(m, MixinMemberReference.toString(m.getQualifiedMemberReference(owner)), targetClass)
                 .withPresentableText(m.name!!)
                 .withLookupString(m.name!!)
     }
@@ -64,7 +65,5 @@ internal object FieldTargetReference : TargetReference.QualifiedHandler<PsiField
 
             super.visitReferenceExpression(expression)
         }
-
     }
-
 }

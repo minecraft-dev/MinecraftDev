@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
-
 import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.AbstractProjectComponent;
@@ -36,6 +35,10 @@ public class SideOnlyProjectComponent extends AbstractProjectComponent {
     @Override
     public void projectOpened() {
         MinecraftModule.doWhenReady(instance -> {
+            if (myProject.isDisposed()) {
+                return;
+            }
+
             if (instance.getIdeaModule().isDisposed()) {
                 return;
             }

@@ -21,7 +21,6 @@ import com.demonwav.mcdev.platform.liteloader.LiteLoaderModuleType;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
 import com.demonwav.mcdev.platform.mixin.MixinModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
-
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +36,7 @@ public enum PlatformType {
     CANARY(CanaryModuleType.getInstance(), "Canary", new PlatformType[] {NEPTUNE}),
     BUNGEECORD(BungeeCordModuleType.getInstance(), "BungeeCord"),
     LITELOADER(LiteLoaderModuleType.getInstance(), "LiteLoader"),
-    MIXIN(MixinModuleType.getInstance(), "Mixin"),
+    MIXIN(MixinModuleType.INSTANCE, "Mixin"),
     MCP(McpModuleType.getInstance(), "MCP")
     ;
 

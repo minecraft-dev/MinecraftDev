@@ -11,14 +11,12 @@
 package com.demonwav.mcdev.insight.generation.ui;
 
 import com.demonwav.mcdev.insight.generation.GenerationData;
-
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
+import javax.swing.JComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.JComponent;
 
 public class EventGenerationDialog extends DialogWrapper {
 

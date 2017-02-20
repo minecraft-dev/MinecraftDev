@@ -14,7 +14,6 @@ import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
-
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.ProjectViewNodeDecorator;
@@ -24,7 +23,6 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packageDependencies.ui.PackageDependenciesNode;
 import com.intellij.ui.ColoredTreeCellRenderer;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +33,7 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
 
     @Override
     public void decorate(ProjectViewNode node, PresentationData data) {
-        if (!MinecraftSettings.Companion.getInstance().isShowProjectPlatformIcons()) {
+        if (!MinecraftSettings.getInstance().isShowProjectPlatformIcons()) {
             return;
         }
 

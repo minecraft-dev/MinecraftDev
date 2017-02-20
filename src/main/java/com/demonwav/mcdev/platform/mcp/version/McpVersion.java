@@ -11,14 +11,9 @@
 package com.demonwav.mcdev.platform.mcp.version;
 
 import com.demonwav.mcdev.util.Sorting;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.intellij.openapi.util.Pair;
-import org.apache.commons.io.IOUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.swing.JComboBox;
+import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("WeakerAccess")
 public class McpVersion {

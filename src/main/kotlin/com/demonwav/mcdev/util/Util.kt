@@ -15,6 +15,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiFile
+import org.jetbrains.annotations.Contract
 import org.jetbrains.plugins.groovy.lang.psi.util.PsiUtil
 
 // Kotlin functions
@@ -38,13 +39,21 @@ fun invokeLater(func: () -> Unit) {
 /**
  * Returns an untyped array for the specified [Collection].
  */
-internal fun Collection<*>.toArray(): Array<Any?> {
+@Contract(pure = true)
+fun Collection<*>.toArray(): Array<Any?> {
     @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
     return (this as java.util.Collection<*>).toArray()
 }
 
+@Contract(pure = true)
+inline fun <T, R> Collection<T>.mapFirstNotNull(transform: (T) -> R?): R? {
+    forEach { transform(it)?.let { return it } }
+    return null
+}
+
 @Suppress("UNCHECKED_CAST")
-internal inline fun <T, reified R> Collection<T>.mapToArray(transform: (T) -> R): Array<R> {
+@Contract(pure = true)
+inline fun <T, reified R> Collection<T>.mapToArray(transform: (T) -> R): Array<R> {
     if (this is List) {
         return this.mapToArray(transform)
     }
@@ -57,7 +66,7 @@ internal inline fun <T, reified R> Collection<T>.mapToArray(transform: (T) -> R)
     return result as Array<R>
 }
 
-internal inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
+inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size, { i -> transform(this[i]) })
 }
 

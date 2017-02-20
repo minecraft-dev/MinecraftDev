@@ -12,12 +12,9 @@ package com.demonwav.mcdev.platform.mcp.at
 
 import com.demonwav.mcdev.platform.MinecraftModule
 import com.demonwav.mcdev.platform.mcp.McpModuleType
-import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtAsterisk
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
-import com.demonwav.mcdev.platform.mcp.srg.SrgMap
-import com.demonwav.mcdev.platform.mcp.util.McpUtil
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
@@ -47,28 +44,13 @@ class AtUsageInspection : LocalInspectionTool() {
                 val mcpModule = instance.getModuleOfType(McpModuleType.getInstance()) ?: return
 
                 val srgMap = mcpModule.srgManager.srgMapNow ?: return
-                val member = if (element.function != null) {
-                    element.function
-                } else if (element.fieldName != null) {
-                    element.fieldName
-                } else {
-                    element.asterisk
-                }
-
-                if (member is AtAsterisk) {
-                    return
-                }
-
-                val string = "${McpUtil.replaceDotWithSlash(element.className.classNameText)}/${member?.text}"
+                val member = element.function ?: element.fieldName ?: return
+                val reference = AtMemberReference.get(element, member)
 
                 val psi = if (member is AtFunction) {
-                    val methodMcp = srgMap.findMethodSrgToMcp(string) ?: string
-
-                    SrgMap.fromMethodString(methodMcp, element.project) as? PsiElement ?: return
+                    srgMap.getSrgMethod(reference)?.resolveMember(element.project) ?: return
                 } else if (member is AtFieldName) {
-                    val fieldMcp = srgMap.findFieldSrgToMcp(string) ?: string
-
-                    SrgMap.fromFieldString(fieldMcp, element.project) as? PsiElement ?: return
+                    srgMap.getSrgField(reference)?.resolveMember(element.project) ?: return
                 } else {
                     return
                 }

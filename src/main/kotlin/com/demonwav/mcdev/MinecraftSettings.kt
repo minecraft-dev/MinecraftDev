@@ -21,12 +21,12 @@ import org.jetbrains.annotations.Contract
 class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
 
     data class State(
-            var isShowProjectPlatformIcons: Boolean = true,
-            var isShowEventListenerGutterIcons: Boolean = true,
-            var isShowChatColorGutterIcons: Boolean = true,
-            var isShowChatColorUnderlines: Boolean = false,
-            var isEnableSideOnlyChecks: Boolean = true,
-            var underlineType: MinecraftSettings.UnderlineType = MinecraftSettings.UnderlineType.DOTTED
+        var isShowProjectPlatformIcons: Boolean = true,
+        var isShowEventListenerGutterIcons: Boolean = true,
+        var isShowChatColorGutterIcons: Boolean = true,
+        var isShowChatColorUnderlines: Boolean = false,
+        var isEnableSideOnlyChecks: Boolean = true,
+        var underlineType: MinecraftSettings.UnderlineType = MinecraftSettings.UnderlineType.DOTTED
     )
 
     private var state = State()
@@ -98,6 +98,7 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
     }
 
     companion object {
+        @JvmStatic
         val instance: MinecraftSettings
             get() = ServiceManager.getService(MinecraftSettings::class.java)
     }

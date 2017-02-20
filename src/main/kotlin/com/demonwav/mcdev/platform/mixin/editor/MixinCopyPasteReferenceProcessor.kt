@@ -11,12 +11,12 @@
 package com.demonwav.mcdev.platform.mixin.editor
 
 import com.demonwav.mcdev.platform.mixin.actions.insertShadows
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
-import com.demonwav.mcdev.platform.mixin.util.findField
-import com.demonwav.mcdev.platform.mixin.util.findMethods
-import com.demonwav.mcdev.platform.mixin.util.qualifiedMemberReference
-import com.demonwav.mcdev.util.findParent
-import com.demonwav.mcdev.util.getClassOfElement
+import com.demonwav.mcdev.platform.mixin.util.mixinTargets
+import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.findField
+import com.demonwav.mcdev.util.findJavaCodeReferenceElement
+import com.demonwav.mcdev.util.findMethods
+import com.demonwav.mcdev.util.qualifiedMemberReference
 import com.intellij.codeInsight.editorActions.JavaCopyPasteReferenceProcessor
 import com.intellij.codeInsight.editorActions.ReferenceData
 import com.intellij.openapi.editor.RangeMarker
@@ -64,9 +64,9 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
 
         // Check if pasting to Mixin class
         val elementInTargetClass = file.findElementAt(bounds.startOffset) ?: return refs
-        val psiClass = getClassOfElement(elementInTargetClass) ?: return refs
+        val psiClass = elementInTargetClass.findContainingClass() ?: return refs
 
-        val targets = MixinUtils.getAllMixedClasses(psiClass).values
+        val targets = psiClass.mixinTargets
         if (targets.isEmpty()) {
             // Not a Mixin, so there is no need to add @Shadow members
             return refs
@@ -82,7 +82,7 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
             val startOffset = data.startOffset + bounds.startOffset
 
             val element = file.findElementAt(startOffset) ?: continue
-            val reference = findParent<PsiJavaCodeReferenceElement>(element) ?: continue
+            val reference = element.findJavaCodeReferenceElement() ?: continue
 
             val endOffset = data.endOffset + bounds.startOffset
 
@@ -125,7 +125,7 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
             try {
                 // Store Mixin class so we can use it later
                 if (psiClass == null) {
-                    psiClass = (getClassOfElement(reference) ?: return)
+                    psiClass = reference.findContainingClass() ?: return
                 }
 
                 // Lookup target class

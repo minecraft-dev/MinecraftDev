@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
+import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.intellij.codeInspection.BaseJavaBatchLocalInspectionTool
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.ProblemDescriptor
@@ -24,7 +24,7 @@ abstract class MixinInspection : BaseJavaBatchLocalInspectionTool() {
 
     override final fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         // TODO: Check if file is actually a Mixin file?
-        if (MixinUtils.isMixinModule(holder.file)) {
+        if (MixinModuleType.isInModule(holder.file)) {
             return buildVisitor(holder)
         }
 
@@ -32,7 +32,7 @@ abstract class MixinInspection : BaseJavaBatchLocalInspectionTool() {
     }
 
     override final fun processFile(file: PsiFile, manager: InspectionManager): List<ProblemDescriptor> {
-        return if (MixinUtils.isMixinModule(file)) {
+        return if (MixinModuleType.isInModule(file)) {
             super.processFile(file, manager)
         } else {
             listOf()

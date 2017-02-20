@@ -10,7 +10,8 @@
 
 package com.demonwav.mcdev.platform.mixin.reference.target
 
-import com.demonwav.mcdev.platform.mixin.util.MemberReference
+import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -22,10 +23,10 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiVariable
 
-internal object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
+object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
 
     override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass, checkOnly: Boolean): CollectVisitor<out PsiElement>? {
-        return MemberReference.parse(context.constantStringValue)?.let({ FindUsagesVisitor(targetClass, it, checkOnly) })
+        return MixinMemberReference.parse(context.constantStringValue)?.let { FindUsagesVisitor(targetClass, it, checkOnly) }
     }
 
     override fun createCollectUsagesVisitor(): CollectVisitor<QualifiedMember<PsiMethod>> = CollectUsagesVisitor()
@@ -66,7 +67,6 @@ internal object ConstantStringMethodTargetReference : TargetReference.MethodHand
 
             super.visitMethodCallExpression(expression)
         }
-
     }
 
     private class CollectUsagesVisitor : CollectVisitor<QualifiedMember<PsiMethod>>(false) {
@@ -81,7 +81,5 @@ internal object ConstantStringMethodTargetReference : TargetReference.MethodHand
 
             super.visitMethodCallExpression(expression)
         }
-
     }
-
 }

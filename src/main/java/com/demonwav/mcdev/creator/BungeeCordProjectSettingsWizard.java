@@ -12,15 +12,13 @@ package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
-
 import com.intellij.openapi.options.ConfigurationException;
-import org.apache.commons.lang.WordUtils;
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.apache.commons.lang.WordUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class BungeeCordProjectSettingsWizard extends MinecraftModuleWizardStep {
 

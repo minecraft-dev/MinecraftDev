@@ -13,7 +13,6 @@ package com.demonwav.mcdev.insight;
 import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.asset.GeneralAssets;
 import com.demonwav.mcdev.util.McEditorUtil;
-
 import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
@@ -39,14 +38,12 @@ import com.intellij.psi.util.PsiExpressionTrimRenderer;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.Function;
 import com.intellij.util.NullableFunction;
+import java.util.Collection;
+import java.util.List;
+import javax.swing.Icon;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.List;
-
-import javax.swing.Icon;
 
 /**
  * A {@link LineMarkerProviderDescriptor} that will provide a line marker info icon
@@ -63,7 +60,7 @@ public class ListenerLineMarkerProvider extends LineMarkerProviderDescriptor {
     @Override
     @Nullable
     public LineMarkerInfo getLineMarkerInfo(@NotNull final PsiElement element) {
-        if (!MinecraftSettings.Companion.getInstance().isShowEventListenerGutterIcons()) {
+        if (!MinecraftSettings.getInstance().isShowEventListenerGutterIcons()) {
             return null;
         }
 

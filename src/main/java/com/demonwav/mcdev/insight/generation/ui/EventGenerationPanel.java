@@ -11,13 +11,11 @@
 package com.demonwav.mcdev.insight.generation.ui;
 
 import com.demonwav.mcdev.insight.generation.GenerationData;
-
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.psi.PsiClass;
+import javax.swing.JPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.JPanel;
 
 /**
  * Base class for the more-info event generation panel, to be overridden by the platforms. By default this class does nothing, shows no

@@ -20,7 +20,6 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtKeyword;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtReturnValue;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes;
-
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiFileFactory;

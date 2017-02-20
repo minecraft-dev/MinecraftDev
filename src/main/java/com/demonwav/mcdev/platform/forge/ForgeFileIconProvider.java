@@ -12,24 +12,22 @@ package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.platform.MinecraftModule;
-
 import com.intellij.ide.FileIconProvider;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.vfs.VirtualFile;
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.Icon;
 
 public class ForgeFileIconProvider implements FileIconProvider {
 
     @Nullable
     @Override
     public Icon getIcon(@NotNull VirtualFile file, @Iconable.IconFlags int flags, @Nullable Project project) {
-        if (!MinecraftSettings.Companion.getInstance().isShowProjectPlatformIcons()) {
+        if (!MinecraftSettings.getInstance().isShowProjectPlatformIcons()) {
             return null;
         }
 

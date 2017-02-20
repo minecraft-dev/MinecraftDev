@@ -11,15 +11,13 @@
 package com.demonwav.mcdev.creator;
 
 import com.demonwav.mcdev.exception.MinecraftSetupException;
-
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.JTextField;
+import org.jetbrains.annotations.NotNull;
 
 abstract class MinecraftModuleWizardStep extends ModuleWizardStep {
 

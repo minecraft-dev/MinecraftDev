@@ -10,16 +10,17 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
-import com.demonwav.mcdev.platform.mixin.util.MemberReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
-import com.demonwav.mcdev.platform.mixin.util.findMethods
-import com.demonwav.mcdev.platform.mixin.util.memberReference
+import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.platform.mixin.util.mixinTargets
+import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.PolyReferenceResolver
 import com.demonwav.mcdev.util.completeToLiteral
 import com.demonwav.mcdev.util.constantStringValue
-import com.demonwav.mcdev.util.getClassOfElement
+import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.internalName
+import com.demonwav.mcdev.util.memberReference
 import com.demonwav.mcdev.util.toResolveResults
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.psi.PsiClass
@@ -33,7 +34,7 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 import kotlin.streams.toList
 
-internal object MethodReference : PolyReferenceResolver(), MixinReference {
+object MethodReference : PolyReferenceResolver(), MixinReference {
 
     override val description: String
         get() = "method '%s' in target class"
@@ -41,19 +42,19 @@ internal object MethodReference : PolyReferenceResolver(), MixinReference {
     override fun isValidAnnotation(name: String) = name in METHOD_INJECTORS
 
     private fun getTargets(context: PsiElement): Collection<PsiClass>? {
-        val psiClass = getClassOfElement(context) ?: return null
-        val targets = MixinUtils.getAllMixedClasses(psiClass).values
+        val psiClass = context.findContainingClass() ?: return null
+        val targets = psiClass.mixinTargets
         return if (targets.isEmpty()) null else targets
     }
 
     override fun isUnresolved(context: PsiElement): Boolean {
-        val targetMethodInfo = MemberReference.parse(context.constantStringValue) ?: return false
+        val targetMethodInfo = MixinMemberReference.parse(context.constantStringValue) ?: return false
         val targets = getTargets(context) ?: return false
         return !targets.stream().flatMap { it.findMethods(targetMethodInfo) }.findAny().isPresent
     }
 
-    internal fun getReferenceIfAmbiguous(context: PsiElement): MemberReference? {
-        val targetReference = MemberReference.parse(context.constantStringValue) ?: return null
+    fun getReferenceIfAmbiguous(context: PsiElement): MemberReference? {
+        val targetReference = MixinMemberReference.parse(context.constantStringValue) ?: return null
         if (targetReference.descriptor != null) {
             return null
         }
@@ -67,7 +68,7 @@ internal object MethodReference : PolyReferenceResolver(), MixinReference {
     }
 
     private fun resolve(context: PsiElement): Stream<PsiMethod>? {
-        val targetReference = MemberReference.parse(context.constantStringValue) ?: return null
+        val targetReference = MixinMemberReference.parse(context.constantStringValue) ?: return null
         val targets = getTargets(context) ?: return null
         return resolve(targets, targetReference)
     }
@@ -77,12 +78,12 @@ internal object MethodReference : PolyReferenceResolver(), MixinReference {
                 .flatMap { it.findMethods(targetReference) }
     }
 
-    internal fun resolveIfUnique(context: PsiElement): PsiMethod? {
-        return resolve(context)?.collect(Collectors.reducing<PsiMethod>({ _, _ -> null }))?.orElse(null)
+    fun resolveIfUnique(context: PsiElement): PsiMethod? {
+        return resolve(context)?.collect(Collectors.reducing<PsiMethod> { _, _ -> null })?.orElse(null)
     }
 
-    internal fun resolveAllIfNotAmbiguous(context: PsiElement): List<PsiMethod>? {
-        val targetReference = MemberReference.parse(context.constantStringValue) ?: return null
+    fun resolveAllIfNotAmbiguous(context: PsiElement): List<PsiMethod>? {
+        val targetReference = MixinMemberReference.parse(context.constantStringValue) ?: return null
         val targets = getTargets(context) ?: return null
 
         if (targetReference.descriptor == null && isAmbiguous(targets, targetReference)) {
@@ -161,10 +162,9 @@ internal object MethodReference : PolyReferenceResolver(), MixinReference {
                         m.memberReference
                     }
 
-                    JavaLookupElementBuilder.forMethod(m, targetMethodInfo.toString(), PsiSubstitutor.EMPTY, null)
+                    JavaLookupElementBuilder.forMethod(m, MixinMemberReference.toString(targetMethodInfo), PsiSubstitutor.EMPTY, null)
                             .withPresentableText(m.internalName)
                             .completeToLiteral(context)
                 }.toArray()
     }
-
 }

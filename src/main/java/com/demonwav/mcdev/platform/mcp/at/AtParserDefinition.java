@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.mcp.at;
 
 import com.demonwav.mcdev.platform.mcp.at.gen.parser.AtParser;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes;
-
 import com.google.common.collect.ImmutableMap;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
@@ -28,9 +27,8 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 public class AtParserDefinition implements ParserDefinition {
     private static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);

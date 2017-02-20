@@ -15,7 +15,6 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtAsterisk;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction;
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtEntryMixin;
-
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;

@@ -16,7 +16,6 @@ import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 import com.demonwav.mcdev.util.Util;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.intellij.ide.projectView.ProjectView;
@@ -31,10 +30,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,12 +41,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-
 import javax.swing.Icon;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class MinecraftModule {
 
     private static final Map<Module, MinecraftModule> map = new HashMap<>();
+    private static final Set<MinecraftModule> pendingModules = Sets.newHashSet();
     private static final Set<Consumer<MinecraftModule>> readyWaiters = Sets.newConcurrentHashSet();
 
     private final Module module;
@@ -66,9 +64,12 @@ public final class MinecraftModule {
     @NotNull
     private static MinecraftModule generate(@NotNull List<AbstractModuleType<?>> types, @NotNull Module module) {
         final MinecraftModule minecraftModule = new MinecraftModule(module, BuildSystem.getInstance(module));
+        pendingModules.add(minecraftModule);
         if (minecraftModule.buildSystem != null) {
             minecraftModule.buildSystem.reImport(module).done(buildSystem -> {
                 types.forEach(minecraftModule::register);
+                // Startup actions
+                pendingModules.remove(minecraftModule);
                 doReadyActions(minecraftModule);
             });
         }
@@ -91,39 +92,43 @@ public final class MinecraftModule {
             }
         }
 
-        return generate(types, module);
+        final MinecraftModule minecraftModule = generate(types, module);
+        map.put(module, minecraftModule);
+        Util.invokeLater(ProjectView.getInstance(module.getProject())::refresh);
+        return minecraftModule;
     }
 
     @Nullable
     public static synchronized MinecraftModule getInstance(@NotNull Module module) {
         if (map.containsKey(module)) {
             return map.get(module);
-        } else {
-            if (isModuleApplicable(module)) {
-                final MinecraftModule minecraftModule = map.put(module, createFromModule(module));
-                Util.invokeLater(ProjectView.getInstance(module.getProject())::refresh);
-                return minecraftModule;
-            } else {
-                final String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
-                if (paths != null && paths.length > 0) {
-                    final Module parentModule;
-                    try (final AccessToken ignored = ApplicationManager.getApplication().acquireReadActionLock()) {
-                        parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[paths.length - 1]);
-                    }
-                    if (parentModule != null) {
-                        if (map.containsKey(parentModule)) {
-                            final MinecraftModule minecraftModule = map.get(parentModule);
-                            // Save the parent module for this MinecraftModule so we don't have to do this check next time
-                            map.put(module, minecraftModule);
-                            return minecraftModule;
-                        } else if (isModuleApplicable(parentModule)) {
-                            final MinecraftModule minecraftModule = map.put(parentModule, createFromModule(parentModule));
-                            Util.invokeLater(ProjectView.getInstance(module.getProject())::refresh);
-                            return minecraftModule;
-                        }
-                    }
-                }
-            }
+        }
+
+        if (isModuleApplicable(module)) {
+            return createFromModule(module);
+        }
+
+        final String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
+        if (paths == null || paths.length == 0) {
+            return null;
+        }
+
+        final Module parentModule;
+        try (final AccessToken ignored = ApplicationManager.getApplication().acquireReadActionLock()) {
+            parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[paths.length - 1]);
+        }
+
+        if (parentModule == null) {
+            return null;
+        }
+
+        if (map.containsKey(parentModule)) {
+            final MinecraftModule minecraftModule = map.get(parentModule);
+            // Save the parent module for this MinecraftModule so we don't have to do this check next time
+            map.put(module, minecraftModule);
+            return minecraftModule;
+        } else if (isModuleApplicable(parentModule)) {
+            return createFromModule(parentModule);
         }
         return null;
     }
@@ -310,15 +315,16 @@ public final class MinecraftModule {
         readyWaiters.add(consumer);
     }
 
-    public static void cleanReadyActions() {
-        readyWaiters.clear();
-    }
-
     private static void doReadyActions(@NotNull MinecraftModule module) {
         if (!module.getIdeaModule().isDisposed() && !module.getIdeaModule().getProject().isDisposed()) {
             for (Consumer<MinecraftModule> readyWaiter : readyWaiters) {
                 readyWaiter.accept(module);
             }
+        }
+
+        // We don't want to hold on to the actions after we've finished setting up
+        if (pendingModules.isEmpty()) {
+            readyWaiters.clear();
         }
     }
 }

@@ -21,19 +21,17 @@ import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
 import com.demonwav.mcdev.exception.MinecraftSetupException;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
-
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.jetbrains.annotations.NotNull;
 
 public class BuildSystemWizardStep extends ModuleWizardStep {
 
@@ -85,30 +83,42 @@ public class BuildSystemWizardStep extends ModuleWizardStep {
         creator.setGroupId(groupIdField.getText());
         creator.setArtifactId(artifactIdField.getText());
         creator.setVersion(versionField.getText());
-        BuildSystem buildSystem;
-        if (buildSystemBox.getSelectedIndex() == 0) {
-            buildSystem = new MavenBuildSystem();
-        } else {
-            buildSystem = new GradleBuildSystem();
-        }
+        BuildSystem buildSystem = createBuildSystem();
+
         // Java 8 always
         buildSystem.setBuildVersion("1.8");
         creator.setBuildSystem(buildSystem);
     }
 
+    private BuildSystem createBuildSystem() {
+        if (buildSystemBox.getSelectedIndex() == 0) {
+            return new MavenBuildSystem();
+        } else {
+            return new GradleBuildSystem();
+        }
+    }
+
     @Override
     public boolean validate() throws ConfigurationException {
         try {
-            if (groupIdField.getText().trim().isEmpty()) {
+            if (groupIdField.getText().isEmpty()) {
                 throw new MinecraftSetupException("fillAll", groupIdField);
             }
 
-            if (artifactIdField.getText().trim().isEmpty()) {
+            if (artifactIdField.getText().isEmpty()) {
                 throw new MinecraftSetupException("fillAll", artifactIdField);
             }
 
             if (versionField.getText().trim().isEmpty()) {
                 throw new MinecraftSetupException("fillAll", versionField);
+            }
+
+            if (!groupIdField.getText().matches("\\S+")) {
+                throw new MinecraftSetupException("The GroupId field cannot contain any whitespace", groupIdField);
+            }
+
+            if (!artifactIdField.getText().matches("\\S+")) {
+                throw new MinecraftSetupException("The ArtifactId field cannot contain any whitespace", artifactIdField);
             }
 
             if (creator.getSettings().values().stream().anyMatch(s -> s.type == FORGE) && buildSystemBox.getSelectedIndex() == 0) {

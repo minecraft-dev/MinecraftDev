@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
 import com.demonwav.mcdev.util.McPsiUtil;
-
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -21,11 +20,10 @@ import com.intellij.psi.PsiNewExpression;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import com.siyeh.ig.InspectionGadgetsFix;
+import java.util.List;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class NewExpressionSideOnlyInspection extends BaseInspection {
 
@@ -118,7 +116,7 @@ public class NewExpressionSideOnlyInspection extends BaseInspection {
                 }
 
                 // Check the class(es) the element is in
-                final PsiClass containingClass = McPsiUtil.getClassOfElement(expression);
+                final PsiClass containingClass = McPsiUtil.findContainingClass(expression);
                 if (containingClass == null) {
                     return;
                 }

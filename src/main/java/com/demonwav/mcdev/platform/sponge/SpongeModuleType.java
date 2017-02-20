@@ -18,15 +18,12 @@ import com.demonwav.mcdev.platform.sponge.generation.SpongeEventGenerationPanel;
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants;
 import com.demonwav.mcdev.util.CommonColors;
 import com.demonwav.mcdev.util.Util;
-
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
-
 import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
 
 public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
 

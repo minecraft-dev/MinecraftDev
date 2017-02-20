@@ -11,8 +11,7 @@
 package com.demonwav.mcdev.platform.bukkit.inspection;
 
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
-import com.demonwav.mcdev.util.McPsiUtil;
-
+import com.demonwav.mcdev.util.McPsiClass;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiAnnotation;
@@ -54,7 +53,7 @@ public class BukkitListenerImplementedInspection extends BaseInspection {
             @Override
             protected void doFix(Project project, ProblemDescriptor descriptor) {
                 PsiClass psiClass = (PsiClass) infos[0];
-                McPsiUtil.addImplements(psiClass, BukkitConstants.LISTENER_CLASS, project);
+                McPsiClass.addImplements(psiClass, BukkitConstants.LISTENER_CLASS);
             }
 
             @Nls
@@ -93,7 +92,7 @@ public class BukkitListenerImplementedInspection extends BaseInspection {
                     return;
                 }
 
-                final boolean inError = !McPsiUtil.extendsOrImplementsClass(aClass, BukkitConstants.LISTENER_CLASS);
+                final boolean inError = !McPsiClass.extendsOrImplements(aClass, BukkitConstants.LISTENER_CLASS);
 
                 if (inError) {
                     registerClassError(aClass, aClass);

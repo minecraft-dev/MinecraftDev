@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.bukkit.gradle;
 import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
-
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")

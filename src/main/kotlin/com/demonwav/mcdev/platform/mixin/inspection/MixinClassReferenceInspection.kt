@@ -10,8 +10,9 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils
-import com.demonwav.mcdev.util.getClassOfElement
+import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
+import com.demonwav.mcdev.platform.mixin.util.isMixin
+import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiClassType
@@ -30,19 +31,19 @@ class MixinClassReferenceInspection : MixinInspection() {
             val classType = type.type as? PsiClassType ?: return
             val referencedClass = classType.resolve() ?: return
 
-            if (MixinUtils.getMixinAnnotation(referencedClass) == null) {
+            if (!referencedClass.isMixin) {
                 return
             }
 
             // Check if the the reference is a super Mixin
-            val psiClass = getClassOfElement(type) ?: return
+            val psiClass = type.findContainingClass() ?: return
             if (psiClass.isEquivalentTo(referencedClass) || psiClass.isInheritor(referencedClass, true)) {
                 // Mixin class is part of the hierarchy
                 return
             }
 
             // Check if the reference is an accessor Mixin
-            if (MixinUtils.isAccessorMixin(classType)) {
+            if (referencedClass.isAccessorMixin) {
                 return
             }
 

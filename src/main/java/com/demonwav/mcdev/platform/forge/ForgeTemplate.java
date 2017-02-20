@@ -12,14 +12,12 @@ package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.platform.AbstractTemplate;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
-
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ForgeTemplate extends AbstractTemplate {
 

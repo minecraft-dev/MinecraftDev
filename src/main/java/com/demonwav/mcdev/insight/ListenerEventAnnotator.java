@@ -13,7 +13,6 @@ package com.demonwav.mcdev.insight;
 import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.MinecraftModule;
-
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.module.Module;
@@ -28,16 +27,15 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypeElement;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class ListenerEventAnnotator implements Annotator {
 
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        if (!MinecraftSettings.Companion.getInstance().isShowEventListenerGutterIcons()) {
+        if (!MinecraftSettings.getInstance().isShowEventListenerGutterIcons()) {
             return;
         }
 

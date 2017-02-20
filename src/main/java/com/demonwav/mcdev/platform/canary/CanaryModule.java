@@ -17,7 +17,6 @@ import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.canary.generation.CanaryGenerationData;
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
-
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;

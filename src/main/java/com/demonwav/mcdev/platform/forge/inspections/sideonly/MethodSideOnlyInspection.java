@@ -10,8 +10,6 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
-import com.demonwav.mcdev.util.McPsiUtil;
-
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
@@ -21,11 +19,10 @@ import com.intellij.psi.PsiType;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import com.siyeh.ig.InspectionGadgetsFix;
+import java.util.List;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class MethodSideOnlyInspection extends BaseInspection {
 
@@ -82,7 +79,7 @@ public class MethodSideOnlyInspection extends BaseInspection {
         return new BaseInspectionVisitor() {
             @Override
             public void visitMethod(PsiMethod method) {
-                final PsiClass psiClass = McPsiUtil.getClassOfElement(method);
+                final PsiClass psiClass = method.getContainingClass();
                 if (psiClass == null) {
                     return;
                 }

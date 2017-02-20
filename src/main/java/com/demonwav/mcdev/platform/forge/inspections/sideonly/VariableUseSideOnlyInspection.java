@@ -11,19 +11,18 @@
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
 import com.demonwav.mcdev.util.McPsiUtil;
-
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.impl.source.PsiFieldImpl;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
+import java.util.List;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class VariableUseSideOnlyInspection extends BaseInspection {
 
@@ -64,11 +63,11 @@ public class VariableUseSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                final PsiFieldImpl field = (PsiFieldImpl) declaration;
+                final PsiField field = (PsiField) declaration;
                 Side elementSide = SideOnlyUtil.checkField(field);
 
                 // Check the class(es) the element is declared in
-                final PsiClass declarationContainingClass = McPsiUtil.getClassOfElement(declaration);
+                final PsiClass declarationContainingClass = field.getContainingClass();
                 if (declarationContainingClass == null) {
                     return;
                 }
@@ -89,7 +88,7 @@ public class VariableUseSideOnlyInspection extends BaseInspection {
                 }
 
                 // Check the class(es) the element is in
-                final PsiClass containingClass = McPsiUtil.getClassOfElement(expression);
+                final PsiClass containingClass = McPsiUtil.findContainingClass(expression);
                 if (containingClass == null) {
                     return;
                 }

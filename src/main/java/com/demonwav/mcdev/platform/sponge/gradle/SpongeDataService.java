@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.sponge.gradle;
 
 import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
-
 import com.google.common.collect.Sets;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
@@ -27,15 +26,14 @@ import com.intellij.openapi.externalSystem.util.ExternalSystemConstants;
 import com.intellij.openapi.externalSystem.util.Order;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.gradle.model.data.GradleSourceSetData;
-import org.jetbrains.plugins.gradle.util.GradleConstants;
-
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.plugins.gradle.model.data.GradleSourceSetData;
+import org.jetbrains.plugins.gradle.util.GradleConstants;
 
 @Order(ExternalSystemConstants.UNORDERED)
 public class SpongeDataService extends AbstractProjectDataService<ModuleData, Module> {

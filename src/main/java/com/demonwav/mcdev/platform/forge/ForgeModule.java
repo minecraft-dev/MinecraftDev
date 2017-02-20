@@ -19,8 +19,7 @@ import com.demonwav.mcdev.inspection.IsCancelled;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
-import com.demonwav.mcdev.util.McPsiUtil;
-
+import com.demonwav.mcdev.util.McPsiClass;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
@@ -36,11 +35,10 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.search.GlobalSearchScope;
+import javax.swing.Icon;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.Icon;
 
 public class ForgeModule extends AbstractModule {
 
@@ -132,7 +130,7 @@ public class ForgeModule extends AbstractModule {
                                                  @NotNull PsiClass chosenClass,
                                                  @NotNull String chosenName,
                                                  @Nullable GenerationData data) {
-        final boolean isFmlEvent = McPsiUtil.extendsOrImplementsClass(chosenClass, ForgeConstants.FML_EVENT);
+        final boolean isFmlEvent = McPsiClass.extendsOrImplements(chosenClass, ForgeConstants.FML_EVENT);
 
         final PsiMethod method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
         final PsiParameterList parameterList = method.getParameterList();

@@ -18,16 +18,13 @@ import com.demonwav.mcdev.platform.canary.generation.CanaryHookGenerationPanel;
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
 import com.demonwav.mcdev.platform.canary.util.CanaryLegacyColors;
 import com.demonwav.mcdev.util.CommonColors;
-
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
+import java.util.List;
+import javax.swing.Icon;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-
-import javax.swing.Icon;
 
 public class CanaryModuleType extends AbstractModuleType<CanaryModule> {
 

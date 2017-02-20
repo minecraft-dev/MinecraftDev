@@ -24,7 +24,6 @@ import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration;
 import com.demonwav.mcdev.platform.canary.CanaryProjectConfiguration;
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration;
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
-
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
@@ -34,11 +33,10 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public class MinecraftProjectCreator {

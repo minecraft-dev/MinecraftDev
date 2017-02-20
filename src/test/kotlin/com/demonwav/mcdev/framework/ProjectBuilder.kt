@@ -1,0 +1,82 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2017 minecraft-dev
+ *
+ * MIT License
+ */
+
+package com.demonwav.mcdev.framework
+
+import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ModuleRootModificationUtil
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
+import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture
+import com.intellij.util.PathUtil
+import org.intellij.lang.annotations.Language
+
+/**
+ * Like most things in this project at this point, taken from the intellij-rust folks
+ * https://github.com/intellij-rust/intellij-rust/blob/master/src/test/kotlin/org/rust/ProjectBuilder.kt
+ */
+class ProjectBuilder(
+    private val fixture: JavaCodeInsightTestFixture,
+    private val project: Project = fixture.project,
+    private val root: VirtualFile = project.baseDir
+) {
+    var intermediatePath = ""
+
+    fun java(path: String, @Language("JAVA") code: String, configure: Boolean = true) = file(path, code, ".java", configure)
+    fun at(path: String, @Language("Access Transformers") code: String, configure: Boolean = true) = file(path, code, "_at.cfg", configure)
+    fun gradle(path: String, @Language("Groovy") code: String, configure: Boolean = true) = file(path, code, ".gradle", configure)
+    fun xml(path: String, @Language("XML") code: String, configure: Boolean = true) = file(path, code, ".xml", configure)
+
+    fun dir(path: String, block: ProjectBuilder.() -> Unit) {
+        val oldIntermediatePath = intermediatePath
+        if (intermediatePath.isEmpty()) {
+            intermediatePath = path
+        } else {
+            intermediatePath += "/$path"
+        }
+        block()
+        intermediatePath = oldIntermediatePath
+    }
+
+    private fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
+        check(path.endsWith(ext))
+
+        val fullPath = if (intermediatePath.isEmpty()) path else "$intermediatePath/$path"
+
+        val dir = PathUtil.getParentPath(fullPath)
+        val vDir = VfsUtil.createDirectoryIfMissing(root, dir)
+        val vFile = vDir.findOrCreateChildData(this, PathUtil.getFileName(fullPath))
+        VfsUtil.saveText(vFile, code.trimIndent())
+
+        if (configure) {
+            fixture.configureFromExistingVirtualFile(vFile)
+        }
+        return vFile
+    }
+
+    fun <T : PsiFile> VirtualFile.toPsiFile(): T {
+        @Suppress("UNCHECKED_CAST")
+        return PsiManager.getInstance(project).findFile(this) as T
+    }
+
+    fun build(builder: ProjectBuilder.() -> Unit) {
+        runWriteAction {
+            VfsUtil.markDirtyAndRefresh(false, true, true, root)
+            // Make sure to always add the module content root
+            ModuleRootModificationUtil.updateModel(fixture.module) { model ->
+                model.addContentEntry(root)
+            }
+            builder()
+        }
+    }
+}

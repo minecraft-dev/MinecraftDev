@@ -38,7 +38,7 @@ class MixinRunConfigurationExtension : RunConfigurationExtension() {
 
         val config = configuration as ModuleBasedConfiguration<*>
         val module = config.configurationModule.module ?: return
-        if (MinecraftModule.getInstance(module)?.isOfType(MixinModuleType.getInstance()) == true) {
+        if (MinecraftModule.getInstance(module)?.isOfType(MixinModuleType) == true) {
             // Add marker data to enable Mixin debugger
             handler.putUserData(MIXIN_DEBUG_KEY, true)
         }

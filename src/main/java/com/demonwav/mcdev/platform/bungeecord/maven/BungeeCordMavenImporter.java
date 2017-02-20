@@ -23,7 +23,6 @@ import com.demonwav.mcdev.buildsystem.maven.AbstractMavenImporter;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModule;
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType;
-
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -31,14 +30,13 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.ResolveContext;
 import org.jetbrains.idea.maven.server.MavenEmbedderWrapper;
 import org.jetbrains.idea.maven.server.NativeMavenProjectHolder;
 import org.jetbrains.idea.maven.utils.MavenProcessCanceledException;
-
-import java.util.Objects;
 
 public class BungeeCordMavenImporter extends AbstractMavenImporter {
 

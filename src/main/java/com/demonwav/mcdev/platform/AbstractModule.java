@@ -13,18 +13,19 @@ package com.demonwav.mcdev.platform;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.inspection.IsCancelled;
-
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiReferenceExpression;
+import javax.swing.Icon;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.Icon;
 
 public abstract class AbstractModule {
 
@@ -102,5 +103,20 @@ public abstract class AbstractModule {
 
     public boolean isStaticListenerSupported(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
         return false;
+    }
+
+    @Contract(pure = true)
+    protected boolean standardSkip(@NotNull PsiMethod method, @NotNull PsiExpression qualifierExpression) {
+        if (!(qualifierExpression instanceof PsiReferenceExpression)) {
+            return false;
+        }
+
+        final PsiElement refResolve = ((PsiReferenceExpression) qualifierExpression).resolve();
+        if (refResolve == null) {
+            return false;
+        }
+
+        final PsiParameter[] parameters = method.getParameterList().getParameters();
+        return parameters.length != 0 && !refResolve.equals(parameters[0]);
     }
 }

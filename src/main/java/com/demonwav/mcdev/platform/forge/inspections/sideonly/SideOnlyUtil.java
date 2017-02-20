@@ -14,7 +14,6 @@ import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
-
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.Pair;
@@ -22,22 +21,21 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
-import com.intellij.psi.impl.source.PsiFieldImpl;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("WeakerAccess")
 public final class SideOnlyUtil {
 
     public static boolean beginningCheck(@NotNull PsiElement element) {
         // Don't check if this is disabled
-        if (!MinecraftSettings.Companion.getInstance().isEnableSideOnlyChecks()) {
+        if (!MinecraftSettings.getInstance().isEnableSideOnlyChecks()) {
             return false;
         }
 
@@ -180,10 +178,14 @@ public final class SideOnlyUtil {
     }
 
     @NotNull
-    public static Side checkField(@NotNull PsiFieldImpl field) {
+    public static Side checkField(@NotNull PsiField field) {
         // We check if this field has the @SideOnly annotation we are looking for
         // If it doesn't, we aren't worried about it
-        final PsiAnnotation annotation = field.getModifierList().findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
+        final PsiModifierList modifierList = field.getModifierList();
+        if (modifierList == null) {
+            return Side.NONE;
+        }
+        final PsiAnnotation annotation = modifierList.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION);
         if (annotation == null) {
             return Side.NONE;
         }

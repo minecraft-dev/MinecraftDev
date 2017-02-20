@@ -11,12 +11,10 @@
 package com.demonwav.mcdev.platform.mcp.at;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-
 import com.intellij.openapi.fileTypes.LanguageFileType;
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.Icon;
 
 public class AtFileType extends LanguageFileType {
     private static final AtFileType instance = new AtFileType();

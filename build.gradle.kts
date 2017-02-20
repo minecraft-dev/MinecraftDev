@@ -10,13 +10,12 @@
 
 import net.minecrell.gradle.licenser.LicenseExtension
 import net.minecrell.gradle.licenser.Licenser
-import org.gradle.api.Task
 import org.gradle.api.file.CopySpec
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.plugins.ide.idea.model.IdeaModel
@@ -24,6 +23,7 @@ import org.jetbrains.intellij.IntelliJPlugin
 import org.jetbrains.intellij.IntelliJPluginExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlin.reflect.KProperty
 
 buildscript {
     repositories {
@@ -40,40 +40,53 @@ buildscript {
     }
 
     dependencies {
-        classpath(kotlinModule("gradle-plugin", project.properties["kotlinVersion"] as String))
-        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.0")
+        classpath(kotlinModule("gradle-plugin", properties["kotlinVersion"]))
+        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.5")
         classpath("gradle.plugin.net.minecrell:licenser:0.3")
     }
 }
 
-val ideaVersion by project
-val javaVersion by project
-val kotlinVersion by project
-val pluginVersion by project
-val pluginGroup by project
-val downloadIdeaSources by project
+// Get rid of pointless casts to String - Start
+operator fun getValue(thisRef: Any, property: KProperty<*>) = project.getValue(thisRef, property) as String
+class StringMap(val map: Map<String, *>) : HashMap<String, String>() { operator override fun get(key: String) = map[key] as String }
+val properties = StringMap(project.properties)
+fun KotlinDependencyHandler.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
+// End
+
+val ideaVersion by this
+val javaVersion by this
+val kotlinVersion by this
+val pluginVersion by this
+val pluginGroup by this
+val downloadIdeaSources by this
 
 apply {
+    plugin<JavaPlugin>()
+    plugin<KotlinPluginWrapper>()
+    plugin<GroovyPlugin>()
     plugin<IdeaPlugin>()
     plugin<IntelliJPlugin>()
-    plugin<KotlinPluginWrapper>()
-    plugin<JavaPlugin>()
-    plugin<GroovyPlugin>()
     plugin<Licenser>()
 }
 
 group = pluginGroup
 version = pluginVersion
 
+configurations.create("mixin").isTransitive = false
+
 repositories {
     maven {
         name = "kotlin-eap-1.1"
         setUrl("https://dl.bintray.com/kotlin/kotlin-eap-1.1")
     }
+    maven {
+        name = "sponge"
+        setUrl("https://repo.spongepowered.org/maven")
+    }
 }
 
 dependencies {
-    compile(kotlinModule("stdlib-jre8", kotlinVersion as String) as String) {
+    compile(kotlinModule("stdlib-jre8")) {
         // JetBrains annotations are already bundled with IntelliJ IDEA
         exclude(group = "org.jetbrains", module = "annotations")
     }
@@ -86,18 +99,22 @@ dependencies {
     // but without kotlin-stdlib or kotlin-runtime on the classpath,
     // gradle-intellij-plugin will add IntelliJ IDEA's Kotlin version to the
     // dependencies which conflicts with our newer version.
-    compile(kotlinModule("runtime", kotlinVersion as String) as String) {
+    compile(kotlinModule("runtime")) {
         isTransitive = false
+    }
+
+    add("mixin", "org.spongepowered:mixin:0.6.8-SNAPSHOT:thin")
+}
+
+tasks.withType<Test> {
+    doFirst {
+        systemProperty("mixinUrl", configurations.getByName("mixin").files.first().absolutePath)
     }
 }
 
 configure<IntelliJPluginExtension> {
     // IntelliJ IDEA dependency
-    version =  if (project.hasProperty("intellijVersion")) {
-        project.properties["intellijVersion"] as String
-    } else {
-        ideaVersion as String
-    }
+    version = ideaVersion
     // Bundled plugin dependencies
     setPlugins("maven", "gradle", "Groovy", "yaml",
         // needed dependencies for unit tests
@@ -106,7 +123,7 @@ configure<IntelliJPluginExtension> {
     pluginName = "Minecraft Development"
     updateSinceUntilBuild = false
 
-    downloadSources = (downloadIdeaSources as String).toBoolean()
+    downloadSources = downloadIdeaSources.toBoolean()
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
@@ -147,20 +164,25 @@ configure<LicenseExtension> {
 // https://github.com/intellij-rust/intellij-rust/blob/d6b82e6aa2f64b877a95afdd86ec7b84394678c3/build.gradle#L131-L181
 val generateAtLexer = task<JavaExec>("generateAtLexer") {
     val src = "src/main/java/com/demonwav/mcdev/platform/mcp/at/AT.flex"
+    val skeleton = "libs/idea-flex.skeleton"
     val dst = "gen/com/demonwav/mcdev/platform/mcp/at/gen/"
-    val lexerFileName = "AtLexer.java"
+    val output = "$dst/AtLexer.java"
+
+    doFirst {
+        delete(output)
+    }
 
     classpath = files("libs/jflex-1.7.0-SNAPSHOT.jar")
     main = "jflex.Main"
 
     args(
-        "--skel", "libs/idea-flex.skeleton",
+        "--skel", skeleton,
         "-d", dst,
         src
     )
 
-    inputs.file(src)
-    outputs.file(dst + lexerFileName)
+    inputs.files(src, skeleton)
+    outputs.file(output)
 }
 
 /*
@@ -219,35 +241,15 @@ tasks.withType<JavaCompile> {
 
 tasks.withType<KotlinCompile> {
     dependsOn(generate)
-    kotlinOptions.jvmTarget = javaVersion as String
+    kotlinOptions.jvmTarget = javaVersion
 }
 
-fun Task.instrumentCode(state: Boolean) {
-    doLast {
-        configure<IntelliJPluginExtension> {
-            instrumentCode = state
-        }
-    }
+// Remove gen directory on clean
+tasks.getByName("clean").doLast {
+    delete(file("gen"))
 }
 
-// Ugly hack to disable instrumentCode feature of gradle-intellij-plugin
-// for Groovy sources. No idea why it fails but it is certainly not needed.
-tasks.withType<GroovyCompile> {
-    // Disable instrumentCode before gradle-intellij-plugin runs its task
-    instrumentCode(false)
-
-    afterEvaluate {
-        // ... enable it again after it has run
-        instrumentCode(true)
-    }
-}
-
-if (project.hasProperty("intellijJre")) {
-    afterEvaluate {
-        (tasks.getByName("runIdea") as JavaExec).apply {
-            executable(project.properties["intellijJre"] as String)
-        }
-    }
-}
+project.findProperty("intellijJre")
+    ?.let { (tasks.getByName("runIde") as JavaExec).setExecutable(it) }
 
 defaultTasks("build")

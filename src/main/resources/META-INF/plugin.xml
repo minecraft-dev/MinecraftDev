@@ -28,7 +28,7 @@
         Alpha release, may break. More features to come. Please report issues to
         <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2017.1-0.5.3
+        v. 2017.1-0.5.4
       </div>
     ]]>
     </change-notes>
@@ -37,6 +37,9 @@
     <idea-version since-build="171" until-build="171.*"/>
 
     <extensions defaultExtensionNs="com.intellij">
+        <!-- Allows using multiple inspection suppressors -->
+        <lang.inspectionSuppressor order="first" language="JAVA" implementationClass="com.demonwav.mcdev.util.MultiInspectionSuppressor"/>
+
         <!-- Module types are for transitions from old versions only -->
         <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
         <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BukkitModuleTypeTransition"/>
@@ -68,6 +71,9 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mixin.gradle.MixinDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
 
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowNullableInspectionSuppressor"/>
+
+        <!-- Mixin completion -->
         <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionContributor"
                                 order="last, before javaLegacy"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinReferenceContributor"/>
@@ -223,34 +229,66 @@
                          implementationClass="com.demonwav.mcdev.platform.mcp.at.AtUsageInspection"/>
 
         <!-- Mixin Inspections -->
-        <localInspection displayName="Invalid @Shadow"
+        <localInspection displayName="Mixin annotation outside of @Mixin class"
+                         shortName="AnnotationOutsideOfMixin"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.ShadowInspection"/>
-        <localInspection displayName="Invalid Mixin Target"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationsInspection"/>
+        <localInspection displayName="Invalid @Mixin Target"
+                         shortName="InvalidMixinTarget"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.MixinInspection"/>
-        <localInspection displayName="Reference to Mixin class"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinTargetInspection"/>
+        <localInspection displayName="Reference to @Mixin class"
+                         shortName="ReferenceToMixin"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
-        <localInspection displayName="Public static field/method in a Mixin"
+        <localInspection displayName="Public static member in @Mixin class"
+                         shortName="PublicStaticMixinMember"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.StaticMixinMemberInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.StaticMemberInspection"/>
+
+        <!-- Mixin Injector Inspections -->
+        <localInspection displayName="Invalid injector method signature"
+                         shortName="InvalidInjectorMethodSignature"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InvalidInjectorMethodSignatureInspection"/>
+
+        <!-- Mixin Overwrite Inspections -->
+        <localInspection displayName="Unresolved @Overwrite method target"
+                         shortName="OverwriteTarget"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.overwrite.OverwriteTargetInspection"/>
+        <localInspection displayName="Invalid @Overwrite method modifiers"
+                         shortName="OverwriteModifiers"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.overwrite.OverwriteModifiersInspection"/>
         <localInspection displayName="Overwrite lacking @author JavaDoc tag"
                          shortName="OverwriteAuthorRequired"
                          groupName="Mixin"
@@ -258,24 +296,9 @@
                          enabledByDefault="true"
                          level="WEAK WARNING"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.AuthorInspection"/>
-        <localInspection displayName="@Final inspection"
-                         groupName="Mixin"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspections.FinalInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.overwrite.OverwriteAuthorInspection"/>
 
-        <localInspection displayName="@Overwrite method target"
-                         groupName="Mixin"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.OverwriteInspection"/>
-
-        <!-- Mixin injectors -->
+        <!-- Mixin Reference Inspections -->
         <localInspection displayName="Invalid Mixin member reference"
                          shortName="InvalidMemberReference"
                          groupName="Mixin"
@@ -284,7 +307,6 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.InvalidMemberReferenceInspection"/>
-
         <localInspection displayName="Unresolved reference"
                          shortName="UnresolvedMixinReference"
                          groupName="Mixin"
@@ -309,7 +331,6 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnqualifiedMemberReferenceInspection" />
-
         <localInspection displayName="Unnecessary qualified member reference"
                          shortName="UnnecessaryQualifiedMemberReference"
                          groupName="Mixin"
@@ -319,15 +340,47 @@
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnnecessaryQualifiedMemberReferenceInspection"/>
 
-
-        <localInspection displayName="Invalid injector method signature"
-                         shortName="InvalidInjectorMethodSignature"
+        <!-- Mixin Shadow Inspections -->
+        <localInspection displayName="Unresolved @Shadow target"
+                         shortName="ShadowTarget"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.signature.InvalidInjectorMethodSignatureInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowTargetInspection"/>
+        <localInspection displayName="Invalid @Shadow modifiers"
+                         shortName="ShadowModifiers"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowModifiersInspection"/>
+        <localInspection displayName="@Shadow field with prefix"
+                         shortName="ShadowFieldPrefix"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFieldPrefixInspection"/>
+        <localInspection displayName="Unused @Shadow method prefix"
+                         shortName="UnusedShadowMethodPrefix"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.UnusedShadowMethodPrefixInspection"/>
+        <localInspection displayName="Modification of @Final field"
+                         shortName="ShadowFinalModification"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFinalInspection"/>
 
         <customJavadocTagProvider implementation="com.demonwav.mcdev.platform.mixin.MixinCustomJavaDocTagProvider"/>
 
@@ -343,8 +396,6 @@
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
         <moduleService serviceImplementation="com.demonwav.mcdev.platform.mcp.McpModuleSettings"/>
-
-        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspections.ShadowNullabilityInspectionSuppressor"/>
 
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mixin.debug.MixinRunConfigurationExtension"/>
         <debugger.positionManagerFactory implementation="com.demonwav.mcdev.platform.mixin.debug.MixinPositionManagerFactory"/>

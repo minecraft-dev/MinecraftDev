@@ -1,6 +1,6 @@
 <a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.svg" height="27" width="27"></img></a>Minecraft Development for IntelliJ [![forthebadge](http://forthebadge.com/images/badges/made-with-crayons.svg)](http://forthebadge.com)
 ==========================================================================================================================================
-[![GitHub Stars](https://img.shields.io/github/stars/minecraft-dev/MinecraftDev.svg?style=flat-square)](https://github.com/minecraft-dev/MinecraftDev/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/minecraft-dev/MinecraftDev.svg?style=flat-square)](https://github.com/minecraft-dev/MinecraftDev/issues) [![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build) [![Current Release](https://img.shields.io/badge/release-2017.1--0.5.3-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+[![GitHub Stars](https://img.shields.io/github/stars/minecraft-dev/MinecraftDev.svg?style=flat-square)](https://github.com/minecraft-dev/MinecraftDev/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/minecraft-dev/MinecraftDev.svg?style=flat-square)](https://github.com/minecraft-dev/MinecraftDev/issues) [![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build) [![Current Release](https://img.shields.io/badge/release-2017.1--0.5.4-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 
 Info and Documentation
 ----------------------
@@ -10,7 +10,7 @@ Visit [https://minecraftdev.org](https://minecraftdev.org) for information about
 Installation
 ------------
 
-This plugin is available on the [Jetbrains IntelliJ plugin repository](https://plugins.jetbrains.com/plugin/8327).
+This plugin is available on the [JetBrains IntelliJ plugin repository](https://plugins.jetbrains.com/plugin/8327).
 
 Because of this, you can install the plugin through IntelliJ's internal plugin browser. Navigate to
 `File -> Settings -> Plugins` and click the `Browser Repositories...` button at the bottom of the window. In the search
@@ -30,7 +30,13 @@ The output .zip file for the plugin will be in `build/distributions`.
 
 Test the plugin in IntelliJ with:
 
-`./gradlew runIdea`
+`./gradlew runIde`
+
+Code is generated during the build task, to run the generation task without building use:
+
+`./gradlew generate`
+
+This task is necessary to work on the code without errors before the initial build.
 
 The [Gradle IntelliJ Plugin](https://github.com/JetBrains/gradle-intellij-plugin)
 will handle downloading the IntelliJ dependencies and packaging the
@@ -51,8 +57,8 @@ Developers
 
 - [**@gabizou** - Gabriel Harris-Rouquette](https://github.com/gabizou)
 - [**@kashike**](https://github.com/kashike)
-- [**@jamierocks** - Jamie Mansfield](https://github.com/jamierocks)
 - [**@Minecrell**](https://github.com/Minecrell)
+- [**@jamierocks** - Jamie Mansfield](https://github.com/jamierocks)
 
 Issues
 ------

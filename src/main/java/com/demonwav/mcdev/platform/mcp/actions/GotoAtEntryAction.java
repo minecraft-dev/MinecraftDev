@@ -12,13 +12,11 @@ package com.demonwav.mcdev.platform.mcp.actions;
 
 import com.demonwav.mcdev.platform.mcp.McpModule;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
-import com.demonwav.mcdev.platform.mcp.srg.SrgMap;
-import com.demonwav.mcdev.platform.mixin.util.MixinUtils;
-import com.demonwav.mcdev.platform.mixin.util.ShadowedMembers;
+import com.demonwav.mcdev.platform.mixin.util.Shadow;
 import com.demonwav.mcdev.util.ActionData;
 import com.demonwav.mcdev.util.McActionUtil;
 import com.demonwav.mcdev.util.McEditorUtil;
-
+import com.demonwav.mcdev.util.MemberReference;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
@@ -33,15 +31,15 @@ import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.PsiSearchHelper;
 import com.intellij.psi.search.UsageSearchContext;
 import com.intellij.ui.LightColors;
 import com.intellij.ui.awt.RelativePoint;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.jetbrains.annotations.NotNull;
 
 public class GotoAtEntryAction extends AnAction {
     @Override
@@ -66,36 +64,29 @@ public class GotoAtEntryAction extends AnAction {
         mcpModule.getSrgManager().getSrgMap().done(srgMap -> {
             PsiElement parent = data.getElement().getParent();
 
-            final ShadowedMembers shadowedMembers = MixinUtils.getShadowedElement(parent);
-            if (!shadowedMembers.getTargets().isEmpty()) {
-                parent = shadowedMembers.getTargets().get(0);
+            if (parent instanceof PsiMember) {
+                PsiMember shadowTarget = Shadow.findFirstShadowTarget((PsiMember) parent);
+                if (shadowTarget != null) {
+                    parent = shadowTarget;
+                }
             }
 
             if (parent instanceof PsiField) {
-                final PsiField field = (PsiField) parent;
-
-                final String s = SrgMap.toString(field);
-
-                final String fieldMcpToSrg = srgMap.findFieldMcpToSrg(s);
-                if (fieldMcpToSrg == null) {
+                final MemberReference reference = srgMap.findSrgField((PsiField) parent);
+                if (reference == null) {
                     showBalloon(e);
                     return;
                 }
 
-                searchForText(mcpModule, e, data, fieldMcpToSrg.substring(fieldMcpToSrg.lastIndexOf('/') + 1));
+                searchForText(mcpModule, e, data, reference.getName());
             } else if (parent instanceof PsiMethod) {
-                final PsiMethod method = (PsiMethod) parent;
-
-                final String s = SrgMap.toString(method);
-
-                final String methodMcpToSrg = srgMap.findMethodMcpToSrg(s);
-                if (methodMcpToSrg == null) {
+                MemberReference reference = srgMap.findSrgMethod((PsiMethod) parent);
+                if (reference == null) {
                     showBalloon(e);
                     return;
                 }
 
-                final String beforeParen = methodMcpToSrg.substring(0, methodMcpToSrg.indexOf('('));
-                searchForText(mcpModule, e, data, beforeParen.substring(beforeParen.lastIndexOf('/') + 1));
+                searchForText(mcpModule, e, data, reference.getName() + reference.getDescriptor());
             } else {
                 showBalloon(e);
             }

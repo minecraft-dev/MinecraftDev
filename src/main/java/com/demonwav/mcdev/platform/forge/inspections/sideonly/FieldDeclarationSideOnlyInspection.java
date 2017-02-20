@@ -10,13 +10,10 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
-import com.demonwav.mcdev.util.McPsiUtil;
-
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiModifierListOwner;
-import com.intellij.psi.impl.source.PsiFieldImpl;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import com.siyeh.ig.InspectionGadgetsFix;
@@ -78,11 +75,7 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
         return new BaseInspectionVisitor() {
             @Override
             public void visitField(PsiField field) {
-                if (!(field instanceof PsiFieldImpl)) {
-                    return;
-                }
-
-                final PsiClass psiClass = McPsiUtil.getClassOfElement(field);
+                final PsiClass psiClass = field.getContainingClass();
                 if (psiClass == null) {
                     return;
                 }
@@ -91,7 +84,7 @@ public class FieldDeclarationSideOnlyInspection extends BaseInspection {
                     return;
                 }
 
-                final Side fieldSide = SideOnlyUtil.checkField((PsiFieldImpl) field);
+                final Side fieldSide = SideOnlyUtil.checkField(field);
                 if (fieldSide == Side.INVALID) {
                     return;
                 }

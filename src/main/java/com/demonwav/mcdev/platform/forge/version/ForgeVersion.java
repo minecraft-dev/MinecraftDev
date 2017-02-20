@@ -11,13 +11,8 @@
 package com.demonwav.mcdev.platform.forge.version;
 
 import com.demonwav.mcdev.util.Sorting;
-
 import com.google.common.base.Objects;
 import com.google.gson.Gson;
-import org.apache.commons.io.IOUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -25,6 +20,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ForgeVersion {
 

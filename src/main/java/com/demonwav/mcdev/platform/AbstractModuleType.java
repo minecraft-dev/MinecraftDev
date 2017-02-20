@@ -11,23 +11,22 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
-
 import com.intellij.codeInspection.ex.EntryPointsManager;
 import com.intellij.codeInspection.ex.EntryPointsManagerBase;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.JDOMExternalizableStringList;
 import com.intellij.psi.PsiClass;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
+import com.intellij.psi.PsiElement;
 import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.swing.Icon;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractModuleType<T extends AbstractModule> {
 
@@ -115,5 +114,21 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
             .append("groupId", groupId)
             .append("artifactId", artifactId)
             .toString();
+    }
+
+    /**
+     * Given any PsiElement, determine if it resides in a module of this {@link AbstractModuleType}.
+     *
+     * @param element The element to check.
+     * @return True if this element resides in a module of this type
+     */
+    public boolean isInModule(PsiElement element) {
+        Module module = ModuleUtilCore.findModuleForPsiElement(element);
+        if (module == null) {
+            return false;
+        }
+
+        MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
+        return minecraftModule != null && minecraftModule.isOfType(this);
     }
 }

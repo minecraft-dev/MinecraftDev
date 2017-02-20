@@ -13,11 +13,9 @@ package com.demonwav.mcdev.platform.mcp.at.psi.mixins;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtArgument;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFuncName;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtReturnValue;
-
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public interface AtFunctionMixin extends PsiElement {
 
