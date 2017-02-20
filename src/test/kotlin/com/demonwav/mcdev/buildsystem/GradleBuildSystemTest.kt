@@ -29,6 +29,6 @@ class GradleBuildSystemTest : BaseBuildSystemTest() {
     }
 
     fun testDetectGradle() {
-        assertTrue(MinecraftModule.getInstance(myModule)?.buildSystem is GradleBuildSystem)
+        assertInstanceOf(MinecraftModule.getInstance(myModule)?.buildSystem, GradleBuildSystem::class.java)
     }
 }

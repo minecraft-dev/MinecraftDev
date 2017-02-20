@@ -35,6 +35,6 @@ class MavenBuildSystemTest : BaseBuildSystemTest() {
     }
 
     fun testDetectMaven() {
-        assertTrue(MinecraftModule.getInstance(myModule)?.buildSystem is MavenBuildSystem)
+        assertInstanceOf(MinecraftModule.getInstance(myModule)?.buildSystem, MavenBuildSystem::class.java)
     }
 }
