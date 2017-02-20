@@ -32,7 +32,5 @@ class MixinTargetInspection : MixinInspection() {
                 holder.registerProblem(mixin, "@Mixin is missing a valid target class")
             }
         }
-
     }
-
 }

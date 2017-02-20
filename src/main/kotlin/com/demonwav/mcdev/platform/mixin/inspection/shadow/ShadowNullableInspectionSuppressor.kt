@@ -30,5 +30,4 @@ class ShadowNullableInspectionSuppressor : InspectionSuppressor {
     }
 
     override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> = SuppressQuickFix.EMPTY_ARRAY
-
 }

@@ -48,7 +48,6 @@ private class CollectRequiredClassMembersVisitor(private val psiClass: PsiClass)
 
         super.visitReferenceElement(reference)
     }
-
 }
 
 fun filterNewShadows(requiredMembers: Collection<PsiMember>, psiClass: PsiClass): Stream<PsiMember> {

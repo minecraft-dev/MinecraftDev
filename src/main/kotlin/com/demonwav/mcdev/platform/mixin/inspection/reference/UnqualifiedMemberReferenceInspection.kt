@@ -40,5 +40,4 @@ class UnqualifiedMemberReferenceInspection : AnnotationAttributeInspection(AT, "
             holder.registerProblem(value, "Method/field descriptor is required for member reference in @At target")
         }
     }
-
 }

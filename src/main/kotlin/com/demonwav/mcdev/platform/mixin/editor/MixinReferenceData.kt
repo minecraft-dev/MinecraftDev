@@ -22,9 +22,10 @@ class MixinReferenceData(startOffset: Int, endOffset: Int, val reference: Member
         fun create(element: PsiElement, startOffset: Int, reference: MemberReference): MixinReferenceData {
             val range = element.textRange
             return MixinReferenceData(
-                    range.startOffset - startOffset,
-                    range.endOffset - startOffset,
-                    reference)
+                range.startOffset - startOffset,
+                range.endOffset - startOffset,
+                reference
+            )
         }
     }
 }

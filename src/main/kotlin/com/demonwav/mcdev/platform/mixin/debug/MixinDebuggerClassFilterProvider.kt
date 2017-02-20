@@ -25,5 +25,4 @@ class MixinDebuggerClassFilterProvider : DebuggerClassFilterProvider {
     override fun getFilters(): List<ClassFilter> {
         return filters
     }
-
 }

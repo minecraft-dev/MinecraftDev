@@ -16,5 +16,4 @@ object McpConstants {
     const val ENTITY = "net.minecraft.entity.Entity"
     const val WORLD = "net.minecraft.world.World"
     const val ITEM_STACK = "net.minecraft.item.ItemStack"
-
 }

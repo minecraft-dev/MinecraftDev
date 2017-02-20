@@ -26,5 +26,4 @@ class AmbiguousReferenceInspection : AnnotationAttributeInspection(METHOD_INJECT
         // TODO: Quick fix
         holder.registerProblem(value, "Ambiguous reference to method '${ambiguousReference.name}' in target class")
     }
-
 }

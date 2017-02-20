@@ -48,5 +48,4 @@ class MixinRunConfigurationExtension : RunConfigurationExtension() {
 
     override fun getEditorTitle(): String? = null
     override fun <P : RunConfigurationBase?> createEditor(configuration: P): SettingsEditor<P>? = null
-
 }

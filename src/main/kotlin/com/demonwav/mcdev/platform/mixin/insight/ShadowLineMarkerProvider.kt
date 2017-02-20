@@ -84,8 +84,5 @@ class ShadowLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavig
             @JvmField val ICON: Icon = MixinAssets.SHADOW
             @JvmField val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to Shadow element")
         }
-
     }
-
-
 }

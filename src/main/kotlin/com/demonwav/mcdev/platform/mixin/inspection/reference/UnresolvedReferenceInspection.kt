@@ -65,7 +65,5 @@ class UnresolvedReferenceInspection : MixinInspection() {
                         ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
             }
         }
-
     }
-
 }

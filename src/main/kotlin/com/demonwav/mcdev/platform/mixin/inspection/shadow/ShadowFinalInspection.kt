@@ -40,7 +40,5 @@ class ShadowFinalInspection : MixinInspection() {
                     AddAnnotationFix(MUTABLE, resolved))
             }
         }
-
     }
-
 }

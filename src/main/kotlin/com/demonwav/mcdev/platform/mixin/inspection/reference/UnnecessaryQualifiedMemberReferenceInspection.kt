@@ -42,7 +42,5 @@ class UnnecessaryQualifiedMemberReferenceInspection : AnnotationAttributeInspect
             element.replace(JavaPsiFacade.getElementFactory(project)
                     .createExpressionFromText("\"${reference.withoutOwner}\"", element))
         }
-
     }
-
 }

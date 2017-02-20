@@ -38,5 +38,4 @@ abstract class MixinInspection : BaseJavaBatchLocalInspectionTool() {
             listOf()
         }
     }
-
 }

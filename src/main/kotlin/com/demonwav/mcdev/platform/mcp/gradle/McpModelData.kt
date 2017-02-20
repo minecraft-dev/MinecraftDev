@@ -19,7 +19,7 @@ import com.intellij.openapi.externalSystem.model.project.ModuleData
 class McpModelData(val module: ModuleData, val settings: McpModuleSettings.State) : AbstractExternalEntityData(module.owner) {
 
     companion object {
-        // Process MCPModelData after builtin services (e.g. dependency or module data)
+        // Process McpModelData after builtin services (e.g. dependency or module data)
         val KEY = Key.create(McpModelData::class.java, ProjectKeys.TASK.processingWeight + 1)
     }
 
@@ -50,5 +50,4 @@ class McpModelData(val module: ModuleData, val settings: McpModuleSettings.State
         result = 31 * result + settings.hashCode()
         return result
     }
-
 }
