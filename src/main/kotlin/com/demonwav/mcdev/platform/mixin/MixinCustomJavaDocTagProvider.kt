@@ -26,27 +26,24 @@ class MixinCustomJavaDocTagProvider : CustomJavadocTagProvider {
 
         override fun isInline() = false
 
-        override fun isValidInContext(element: PsiElement): Boolean {
+        override fun isValidInContext(element: PsiElement?): Boolean {
             return element is PsiMethod && element.modifierList.findAnnotation(OVERWRITE) != null
         }
 
-        override fun checkTagValue(value: PsiDocTagValue): String? = null
-        override fun getReference(value: PsiDocTagValue) = null
+        override fun checkTagValue(value: PsiDocTagValue?): String? = null
+        override fun getReference(value: PsiDocTagValue?) = null
 
         object Author : OverwriteTag() {
 
             override fun getName() = "author"
 
-            override fun checkTagValue(value: PsiDocTagValue): String? {
-                return "The @author JavaDoc tag on @Overwrite methods must be filled in.".takeIf { value.text.trim().isEmpty() }
+            override fun checkTagValue(value: PsiDocTagValue?): String? {
+                return "The @author JavaDoc tag on @Overwrite methods must be filled in.".takeIf { value?.text?.trim().isNullOrEmpty() }
             }
-
         }
 
         object Reason : OverwriteTag() {
             override fun getName() = "reason"
         }
-
     }
-
 }
