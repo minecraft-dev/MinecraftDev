@@ -32,10 +32,10 @@ class ProjectBuilder(
 ) {
     var intermediatePath = ""
 
-    fun java(path: String, @Language("JAVA") code: String) = file(path, code, ".java")
-    fun at(path: String, @Language("Access Transformers") code: String) = file(path, code, "_at.cfg")
-    fun gradle(path: String, @Language("Groovy") code: String) = file(path, code, ".gradle")
-    fun xml(path: String, @Language("XML") code: String) = file(path, code, ".xml")
+    fun java(path: String, @Language("JAVA") code: String, configure: Boolean = true) = file(path, code, ".java", configure)
+    fun at(path: String, @Language("Access Transformers") code: String, configure: Boolean = true) = file(path, code, "_at.cfg", configure)
+    fun gradle(path: String, @Language("Groovy") code: String, configure: Boolean = true) = file(path, code, ".gradle", configure)
+    fun xml(path: String, @Language("XML") code: String, configure: Boolean = true) = file(path, code, ".xml", configure)
 
     fun dir(path: String, block: ProjectBuilder.() -> Unit) {
         val oldIntermediatePath = intermediatePath
@@ -48,7 +48,7 @@ class ProjectBuilder(
         intermediatePath = oldIntermediatePath
     }
 
-    private fun file(path: String, code: String, ext: String): VirtualFile {
+    private fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
         check(path.endsWith(ext))
 
         val fullPath = if (intermediatePath.isEmpty()) path else "$intermediatePath/$path"
@@ -58,7 +58,9 @@ class ProjectBuilder(
         val vFile = vDir.findOrCreateChildData(this, PathUtil.getFileName(fullPath))
         VfsUtil.saveText(vFile, code.trimIndent())
 
-        fixture.configureFromExistingVirtualFile(vFile)
+        if (configure) {
+            fixture.configureFromExistingVirtualFile(vFile)
+        }
         return vFile
     }
 
