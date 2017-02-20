@@ -15,6 +15,7 @@ import com.demonwav.mcdev.buildsystem.BuildSystemInstanceManager
 import com.demonwav.mcdev.framework.buildsystem.TestBuildSystemInstanceManager
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.MinecraftModuleType
+import com.demonwav.mcdev.platform.ProjectComponentManager
 import com.intellij.JavaTestUtil
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.roots.ContentEntry
@@ -39,6 +40,7 @@ abstract class BaseMinecraftTest(
                 preConfigureModule(module, model)
 
                 BuildSystem.instanceManager = buildSystemInstanceManager
+                ProjectComponentManager.handler = TestProjectComponentHandler
 
                 moduleTypes.forEach {
                     MinecraftModuleType.addOption(module, it.id, false)

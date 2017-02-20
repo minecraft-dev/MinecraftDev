@@ -12,6 +12,7 @@ package com.demonwav.mcdev.framework
 
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
@@ -38,7 +39,11 @@ class ProjectBuilder(
 
     fun dir(path: String, block: ProjectBuilder.() -> Unit) {
         val oldIntermediatePath = intermediatePath
-        intermediatePath += "/$path"
+        if (intermediatePath.isEmpty()) {
+            intermediatePath = path
+        } else {
+            intermediatePath += "/$path"
+        }
         block()
         intermediatePath = oldIntermediatePath
     }
@@ -46,7 +51,7 @@ class ProjectBuilder(
     private fun file(path: String, code: String, ext: String): VirtualFile {
         check(path.endsWith(ext))
 
-        val fullPath = "$intermediatePath/$path"
+        val fullPath = if (intermediatePath.isEmpty()) path else "$intermediatePath/$path"
 
         val dir = PathUtil.getParentPath(fullPath)
         val vDir = VfsUtil.createDirectoryIfMissing(root, dir)
@@ -65,6 +70,10 @@ class ProjectBuilder(
     fun build(builder: ProjectBuilder.() -> Unit) {
         runWriteAction {
             VfsUtil.markDirtyAndRefresh(false, true, true, root)
+            // Make sure to always add the module content root
+            ModuleRootModificationUtil.updateModel(fixture.module) { model ->
+                model.addContentEntry(root)
+            }
             builder()
         }
     }

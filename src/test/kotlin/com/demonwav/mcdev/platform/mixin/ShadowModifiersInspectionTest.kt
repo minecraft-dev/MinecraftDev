@@ -48,7 +48,7 @@ class ShadowModifiersInspectionTest : BaseShadowTest() {
         }
     }
 
-    fun testShadowTargetInspection() {
+    fun testShadowModifiersInspection() {
         myFixture.enableInspections(ShadowModifiersInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }

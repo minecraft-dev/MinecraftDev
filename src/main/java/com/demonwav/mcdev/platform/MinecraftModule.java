@@ -92,39 +92,43 @@ public final class MinecraftModule {
             }
         }
 
-        return generate(types, module);
+        final MinecraftModule minecraftModule = generate(types, module);
+        map.put(module, minecraftModule);
+        Util.invokeLater(ProjectView.getInstance(module.getProject())::refresh);
+        return minecraftModule;
     }
 
     @Nullable
     public static synchronized MinecraftModule getInstance(@NotNull Module module) {
         if (map.containsKey(module)) {
             return map.get(module);
-        } else {
-            if (isModuleApplicable(module)) {
-                final MinecraftModule minecraftModule = map.put(module, createFromModule(module));
-                Util.invokeLater(ProjectView.getInstance(module.getProject())::refresh);
-                return minecraftModule;
-            } else {
-                final String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
-                if (paths != null && paths.length > 0) {
-                    final Module parentModule;
-                    try (final AccessToken ignored = ApplicationManager.getApplication().acquireReadActionLock()) {
-                        parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[paths.length - 1]);
-                    }
-                    if (parentModule != null) {
-                        if (map.containsKey(parentModule)) {
-                            final MinecraftModule minecraftModule = map.get(parentModule);
-                            // Save the parent module for this MinecraftModule so we don't have to do this check next time
-                            map.put(module, minecraftModule);
-                            return minecraftModule;
-                        } else if (isModuleApplicable(parentModule)) {
-                            final MinecraftModule minecraftModule = map.put(parentModule, createFromModule(parentModule));
-                            Util.invokeLater(ProjectView.getInstance(module.getProject())::refresh);
-                            return minecraftModule;
-                        }
-                    }
-                }
-            }
+        }
+
+        if (isModuleApplicable(module)) {
+            return createFromModule(module);
+        }
+
+        final String[] paths = ModuleManager.getInstance(module.getProject()).getModuleGroupPath(module);
+        if (paths == null || paths.length == 0) {
+            return null;
+        }
+
+        final Module parentModule;
+        try (final AccessToken ignored = ApplicationManager.getApplication().acquireReadActionLock()) {
+            parentModule = ModuleManager.getInstance(module.getProject()).findModuleByName(paths[paths.length - 1]);
+        }
+
+        if (parentModule == null) {
+            return null;
+        }
+
+        if (map.containsKey(parentModule)) {
+            final MinecraftModule minecraftModule = map.get(parentModule);
+            // Save the parent module for this MinecraftModule so we don't have to do this check next time
+            map.put(module, minecraftModule);
+            return minecraftModule;
+        } else if (isModuleApplicable(parentModule)) {
+            return createFromModule(parentModule);
         }
         return null;
     }
