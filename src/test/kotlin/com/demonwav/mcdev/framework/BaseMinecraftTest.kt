@@ -32,6 +32,12 @@ abstract class BaseMinecraftTest(protected vararg val moduleTypes: AbstractModul
     protected open fun preConfigureModule(module: Module, model: ModifiableRootModel) {}
     protected open fun postConfigureModule(module: Module, model: ModifiableRootModel) {}
 
+    protected open val resourcePath = "src/test/resources"
+    protected open val packagePath = "com/demonwav/mcdev"
+    protected open val dataPath = ""
+
+    override fun getTestDataPath() = "$resourcePath/$packagePath/$dataPath"
+
     override fun getProjectDescriptor(): LightProjectDescriptor {
         return object : DefaultLightProjectDescriptor() {
             override fun configureModule(module: Module, model: ModifiableRootModel, contentEntry: ContentEntry) {
