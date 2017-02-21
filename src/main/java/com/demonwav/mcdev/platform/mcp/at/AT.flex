@@ -43,7 +43,7 @@ WHITE_SPACE=\s
 %%
 
 <YYINITIAL> {
-//    {CRLF}                                      { return CRLF; }
+    {CRLF}                                      { return CRLF; }
     {WHITE_SPACE}                               { return WHITE_SPACE; }
 
     "("                                         { return OPEN_PAREN; }

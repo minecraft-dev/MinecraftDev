@@ -69,7 +69,7 @@
 
 at_file ::= line*
 
-private line ::= entry? comment? end_line
+private line ::= !<<eof>> entry? comment? end_line
 private end_line ::= crlf | <<eof>>
 entry ::= keyword class_name line_value? {
     methods=[setEntry setKeyword setClassName setFieldName setFunction setAsterisk]
