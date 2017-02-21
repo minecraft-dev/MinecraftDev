@@ -23,6 +23,7 @@ import org.jetbrains.intellij.IntelliJPlugin
 import org.jetbrains.intellij.IntelliJPluginExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.File
 import kotlin.reflect.KProperty
 
 buildscript {
@@ -209,11 +210,11 @@ val pathingJar = task<Jar>("pathingJar") {
 val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
     dependsOn(pathingJar)
 
-    val src = "src/main/grammars/AtParser.bnf"
+    val src = "src/main/grammars/AtParser.bnf".replace("/", File.separator)
     val dstRoot = "gen"
-    val dst = "$dstRoot/com/demonwav/mcdev/platform/mcp/at/gen"
-    val psiDir = "$dst/psi/"
-    val parserDir = "$dst/parser/"
+    val dst = "$dstRoot/com/demonwav/mcdev/platform/mcp/at/gen".replace("/", File.separator)
+    val psiDir = "$dst/psi/".replace("/", File.separator)
+    val parserDir = "$dst/parser/".replace("/", File.separator)
 
     doFirst {
         delete(psiDir, parserDir)

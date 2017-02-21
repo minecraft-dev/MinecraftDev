@@ -18,10 +18,10 @@ class AtParsingTest : ParsingTestCase("com/demonwav/mcdev/platform/mcp/at/parser
     override fun getTestDataPath() = "src/test/resources"
     override fun getTestName(lowercaseFirstLetter: Boolean) = super.getTestName(lowercaseFirstLetter).toSnakeCase("_at")
 
+    fun testAsterisks() = doTest(true)
     fun testComments() = doTest(true)
-    fun testKeywords() = doTest(true)
     fun testFields() = doTest(true)
     fun testFuncs() = doTest(true)
+    fun testKeywords() = doTest(true)
     fun testNoValue() = doTest(true)
-    fun testAsterisks() = doTest(true)
 }
