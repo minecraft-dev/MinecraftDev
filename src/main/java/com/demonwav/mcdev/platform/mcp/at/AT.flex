@@ -1,3 +1,14 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2017 minecraft-dev
+ *
+ * MIT License
+ *
+ */
+
 package com.demonwav.mcdev.platform.mcp.at.gen;
 
 import com.intellij.lexer.*;
@@ -32,7 +43,7 @@ WHITE_SPACE=\s
 %%
 
 <YYINITIAL> {
-    {CRLF}                                      { return CRLF; }
+//    {CRLF}                                      { return CRLF; }
     {WHITE_SPACE}                               { return WHITE_SPACE; }
 
     "("                                         { return OPEN_PAREN; }
