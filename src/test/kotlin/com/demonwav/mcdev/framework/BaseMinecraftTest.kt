@@ -24,9 +24,7 @@ import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
 
-abstract class BaseMinecraftTest(
-    private vararg val moduleTypes: AbstractModuleType<*>
-) : ProjectBuilderTest() {
+abstract class BaseMinecraftTest(protected vararg val moduleTypes: AbstractModuleType<*>) : ProjectBuilderTest() {
 
     protected var buildSystemInstanceManager: BuildSystemInstanceManager = TestBuildSystemInstanceManager
     protected var projectComponentHandler: ProjectComponentHandler = TestProjectComponentHandler

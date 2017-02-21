@@ -48,7 +48,7 @@ buildscript {
 
 // Get rid of pointless casts to String - Start
 operator fun getValue(thisRef: Any, property: KProperty<*>) = project.getValue(thisRef, property) as String
-class StringMap(val map: Map<String, *>) : HashMap<String, String>() { operator override fun get(key: String) = map[key] as String }
+class StringMap(val map: Map<String, *>) : HashMap<String, String>() { operator override fun get(key: String) = map[key] as String? }
 val properties = StringMap(project.properties)
 fun KotlinDependencyHandler.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
 // End
@@ -108,6 +108,10 @@ dependencies {
 
 tasks.withType<Test> {
     doFirst {
+        if (properties["slowCI"] == "true") {
+            systemProperty("slowCI", "true")
+        }
+
         systemProperty("mixinUrl", configurations.getByName("mixin").files.first().absolutePath)
     }
 }

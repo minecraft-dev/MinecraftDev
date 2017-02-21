@@ -10,13 +10,13 @@
 
 package com.demonwav.mcdev.platform.mcp.at
 
-import com.demonwav.mcdev.framework.BaseMinecraftTest
+import com.demonwav.mcdev.framework.BasePerformanceTest
 
-class AtParserPerformanceTest : BaseMinecraftTest() {
+class AtParserPerformanceTest : BasePerformanceTest() {
 
     override fun getTestDataPath() = "src/test/resources/com/demonwav/mcdev/platform/mcp/at/performance/fixtures"
 
-    fun testHighlightingPerformance() {
+    fun testHighlightingPerformance() = doTest {
         myFixture.configureByFile("big_at.cfg")
         val elapsed = myFixture.checkHighlighting()
         // elapsed is milliseconds, file is 10,000 lines long
