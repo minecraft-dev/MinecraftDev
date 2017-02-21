@@ -163,7 +163,7 @@ configure<LicenseExtension> {
 // Credit for this intellij-rust
 // https://github.com/intellij-rust/intellij-rust/blob/d6b82e6aa2f64b877a95afdd86ec7b84394678c3/build.gradle#L131-L181
 val generateAtLexer = task<JavaExec>("generateAtLexer") {
-    val src = "src/main/java/com/demonwav/mcdev/platform/mcp/at/AT.flex"
+    val src = "src/main/grammars/AtLexer.flex"
     val skeleton = "libs/idea-flex.skeleton"
     val dst = "gen/com/demonwav/mcdev/platform/mcp/at/gen/"
     val output = "$dst/AtLexer.java"
@@ -205,7 +205,7 @@ val pathingJar = task<Jar>("pathingJar") {
 val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
     dependsOn(pathingJar)
 
-    val src = "src/main/java/com/demonwav/mcdev/platform/mcp/at/AT.bnf"
+    val src = "src/main/grammars/AtParser.bnf"
     val dstRoot = "gen"
     val dst = "$dstRoot/com/demonwav/mcdev/platform/mcp/at/gen"
     val psiDir = "$dst/psi/"
