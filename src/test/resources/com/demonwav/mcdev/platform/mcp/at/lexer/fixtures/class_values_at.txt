@@ -1,0 +1,6 @@
+class_value ('Lcom/mojang/authlib/GameProfile;')
+crlf ('\n')
+class_value ('Lnet/minecraft/entity/Entity;')
+crlf ('\n')
+class_value ('Ljava/lang/String;')
+class_value ('Lnet/minecraft/world/storage/ISaveHandler;')

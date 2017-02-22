@@ -24,15 +24,19 @@ import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
 
-abstract class BaseMinecraftTest(
-    private vararg val moduleTypes: AbstractModuleType<*>
-) : ProjectBuilderTest() {
+abstract class BaseMinecraftTest(protected vararg val moduleTypes: AbstractModuleType<*>) : ProjectBuilderTest() {
 
     protected var buildSystemInstanceManager: BuildSystemInstanceManager = TestBuildSystemInstanceManager
     protected var projectComponentHandler: ProjectComponentHandler = TestProjectComponentHandler
 
     protected open fun preConfigureModule(module: Module, model: ModifiableRootModel) {}
     protected open fun postConfigureModule(module: Module, model: ModifiableRootModel) {}
+
+    protected open val resourcePath = "src/test/resources"
+    protected open val packagePath = "com/demonwav/mcdev"
+    protected open val dataPath = ""
+
+    override fun getTestDataPath() = "$resourcePath/$packagePath/$dataPath"
 
     override fun getProjectDescriptor(): LightProjectDescriptor {
         return object : DefaultLightProjectDescriptor() {

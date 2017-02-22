@@ -3,11 +3,12 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2016 minecraft-dev
+ * Copyright (c) 2017 minecraft-dev
  *
  * MIT License
  *
  */
+
 {
     parserClass="com.demonwav.mcdev.platform.mcp.at.gen.parser.AtParser"
 
@@ -66,9 +67,18 @@
     consumeTokenMethod="consumeTokenFast"
 }
 
-at_file ::= (entry? comment? crlf)*
+at_file ::= line*
 
-entry ::= keyword class_name (function|field_name|asterisk)? {methods=[setEntry setKeyword setClassName setFieldName setFunction setAsterisk]}
+private line ::= !<<eof>> entry? comment? end_line
+private end_line ::= crlf | <<eof>>
+entry ::= keyword class_name line_value? {
+    methods=[setEntry setKeyword setClassName setFieldName setFunction setAsterisk]
+    pin = 1
+    recoverWhile = line_recover
+}
+private line_recover ::= !(end_line | comment)
+private line_value ::= function | field_name | asterisk
+
 asterisk ::= asterisk_element
 
 keyword ::= keyword_element {methods=[getKeywordValue setKeyword]}

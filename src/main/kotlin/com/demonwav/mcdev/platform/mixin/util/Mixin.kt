@@ -85,11 +85,10 @@ val PsiClass.mixinTargets: List<PsiClass>
 @get:Contract(pure = true)
 val PsiClass.isAccessorMixin: Boolean
     get() {
-        if (!isInterface) return false
-        if (methods.any {
-            val modifiers = modifierList
-            modifiers != null && modifiers.findAnnotation(ACCESSOR) == null && modifiers.findAnnotation(INVOKER) == null
-        }) {
+        if (!isInterface){
+            return false
+        }
+        if (methods.any { modifierList?.run { findAnnotation(ACCESSOR) == null || findAnnotation(INVOKER) == null } != true }) {
             return false
         }
 

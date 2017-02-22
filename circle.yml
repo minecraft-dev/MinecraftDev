@@ -1,3 +1,3 @@
 test:
   override:
-    - ./gradlew clean build
+    - ./gradlew clean build -PslowCI=true
