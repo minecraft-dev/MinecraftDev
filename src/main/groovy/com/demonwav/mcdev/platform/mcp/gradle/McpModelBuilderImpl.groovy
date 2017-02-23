@@ -41,5 +41,4 @@ final class McpModelBuilderImpl implements ModelBuilderService {
                 project, e, "MinecraftDev import errors"
         ).withDescription("Unable to build MinecraftDev MCP project configuration")
     }
-
 }

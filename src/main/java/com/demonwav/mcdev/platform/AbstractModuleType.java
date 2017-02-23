@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
+import com.demonwav.mcdev.util.McPsiUtil;
 import com.intellij.codeInspection.ex.EntryPointsManager;
 import com.intellij.codeInspection.ex.EntryPointsManagerBase;
 import com.intellij.openapi.module.Module;
@@ -19,6 +20,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.JDOMExternalizableStringList;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiUtil;
 import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -130,5 +133,26 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
 
         MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
         return minecraftModule != null && minecraftModule.isOfType(this);
+    }
+
+    protected String defaultNameForSubClassEvents(@NotNull PsiClass psiClass) {
+        final boolean isInnerClass = !(psiClass.getParent() instanceof PsiFile);
+
+        final StringBuilder name = new StringBuilder();
+        if (isInnerClass) {
+            final PsiClass containingClass = McPsiUtil.findContainingClass(psiClass.getParent());
+            if (containingClass != null && containingClass.getName() != null) {
+                name.append(containingClass.getName().replace("Event", ""));
+            }
+        }
+
+        String className = psiClass.getName();
+        if (className.startsWith(name.toString())) {
+            className = className.substring(name.length());
+        }
+        name.append(className.replace("Event", ""));
+
+        name.insert(0, "on");
+        return name.toString();
     }
 }

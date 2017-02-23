@@ -82,7 +82,7 @@ public class ForgeModuleType extends AbstractModuleType<ForgeModule> {
     @NotNull
     @Override
     public String getDefaultListenerName(@NotNull PsiClass psiClass) {
-        return Util.defaultNameForSubClassEvents(psiClass);
+        return defaultNameForSubClassEvents(psiClass);
     }
 
     @Override

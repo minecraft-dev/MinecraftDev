@@ -72,7 +72,7 @@ public class SpongeModuleType extends AbstractModuleType<SpongeModule> {
     @NotNull
     @Override
     public String getDefaultListenerName(@NotNull PsiClass psiClass) {
-        return Util.defaultNameForSubClassEvents(psiClass);
+        return defaultNameForSubClassEvents(psiClass);
     }
 
     @NotNull

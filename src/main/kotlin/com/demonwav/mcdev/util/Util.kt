@@ -12,28 +12,25 @@
 package com.demonwav.mcdev.util
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.runWriteAction
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiFile
 import org.jetbrains.annotations.Contract
-import org.jetbrains.plugins.groovy.lang.psi.util.PsiUtil
 
 // Kotlin functions
-// can't inline them due to a bug in the compiler
-fun runWriteTask(func: () -> Unit) {
-    invokeAndWait { runWriteAction(func) }
+inline fun runWriteTask(crossinline func: () -> Unit) {
+    invokeAndWait { runWriteAction { func() } }
 }
 
-fun runWriteTaskLater(func: () -> Unit) {
-    invokeLater { runWriteAction(func) }
+inline fun runWriteTaskLater(crossinline func: () -> Unit) {
+    invokeLater { runWriteAction { func() } }
 }
 
-fun invokeAndWait(func: () -> Unit) {
-    ApplicationManager.getApplication().invokeAndWait { func() }
+inline fun invokeAndWait(crossinline func: () -> Unit) {
+    ApplicationManager.getApplication().invokeAndWait({ func() }, ModalityState.any())
 }
 
-fun invokeLater(func: () -> Unit) {
-    ApplicationManager.getApplication().invokeLater { func() }
+inline fun invokeLater(crossinline func: () -> Unit) {
+    ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.any())
 }
 
 /**
@@ -51,27 +48,13 @@ inline fun <T, R> Collection<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     return null
 }
 
-@Suppress("UNCHECKED_CAST")
-@Contract(pure = true)
-inline fun <T, reified R> Collection<T>.mapToArray(transform: (T) -> R): Array<R> {
-    if (this is List) {
-        return this.mapToArray(transform)
-    }
-
-    val result = arrayOfNulls<R>(size)
-    var i = 0
-    for (e in this) {
-        result[i++] = transform(e)
-    }
-    return result as Array<R>
-}
-
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
-    return Array(size, { i -> transform(this[i]) })
+    return Array(size) { i -> transform(this[i]) }
 }
 
 object Util {
     // Java static methods
+    // Can't call inlined stuff from java
     @JvmStatic
     fun runWriteTask(func: Runnable) {
         runWriteTask { func.run() }
@@ -90,29 +73,5 @@ object Util {
     @JvmStatic
     fun invokeLater(func: Runnable) {
         invokeLater { func.run() }
-    }
-
-    @JvmStatic
-    fun defaultNameForSubClassEvents(psiClass: PsiClass): String {
-        val isInnerClass = psiClass.parent !is PsiFile
-
-        val name = StringBuilder()
-        if (isInnerClass) {
-            val containingClass = PsiUtil.getContainingNotInnerClass(psiClass)
-            if (containingClass != null) {
-                if (containingClass.name != null) {
-                    name.append(containingClass.name!!.replace("Event".toRegex(), ""))
-                }
-            }
-        }
-
-        var className = psiClass.name!!
-        if (className.startsWith(name.toString())) {
-            className = className.substring(name.length)
-        }
-        name.append(className.replace("Event".toRegex(), ""))
-
-        name.insert(0, "on")
-        return name.toString()
     }
 }
