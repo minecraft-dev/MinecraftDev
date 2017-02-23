@@ -38,7 +38,7 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 @Order(ExternalSystemConstants.UNORDERED)
 public class SpongeDataService extends AbstractProjectDataService<ModuleData, Module> {
 
-    private static final String spongeMatcher = SpongeModuleType.getInstance().getGroupId() + ":" + SpongeModuleType.getInstance().getArtifactId();
+    private static final String spongeMatcher = SpongeModuleType.INSTANCE.getGroupId() + ":" + SpongeModuleType.INSTANCE.getArtifactId();
 
     @NotNull
     @Override
@@ -79,6 +79,6 @@ public class SpongeDataService extends AbstractProjectDataService<ModuleData, Mo
             .map(n -> modelsProvider.findIdeModule(n.getData().getInternalName()))
             .collect(Collectors.toSet()));
 
-        AbstractDataService.setupModules(goodModules, allModules, modelsProvider, SpongeModuleType.getInstance());
+        AbstractDataService.setupModules(goodModules, allModules, modelsProvider, SpongeModuleType.INSTANCE);
     }
 }

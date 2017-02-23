@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public class PaperMavenImporter extends SpigotMavenImporter {
 
     public PaperMavenImporter() {
-        super(PaperModuleType.getInstance());
+        super(PaperModuleType.INSTANCE);
     }
 
     @NotNull

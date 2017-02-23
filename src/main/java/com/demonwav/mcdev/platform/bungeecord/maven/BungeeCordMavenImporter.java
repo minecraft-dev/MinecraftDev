@@ -41,7 +41,7 @@ import org.jetbrains.idea.maven.utils.MavenProcessCanceledException;
 public class BungeeCordMavenImporter extends AbstractMavenImporter {
 
     public BungeeCordMavenImporter() {
-        super(BungeeCordModuleType.getInstance());
+        super(BungeeCordModuleType.INSTANCE);
     }
 
     @NotNull
@@ -66,7 +66,7 @@ public class BungeeCordMavenImporter extends AbstractMavenImporter {
             }
 
             if (Objects.equals(contentRoots[0], mavenProject.getFile().getParent())) {
-                final BungeeCordModule bungeeCordModule = MinecraftModule.getInstance(module, BungeeCordModuleType.getInstance());
+                final BungeeCordModule bungeeCordModule = MinecraftModule.getInstance(module, BungeeCordModuleType.INSTANCE);
                 if (bungeeCordModule != null) {
                     bungeeCordModule.setPluginYml(project.getBaseDir().findFileByRelativePath("/src/main/resources/plugin.yml"));
                     return;

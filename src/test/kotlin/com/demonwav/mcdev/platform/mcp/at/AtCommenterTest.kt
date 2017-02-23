@@ -15,7 +15,7 @@ import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.intellij.openapi.actionSystem.IdeActions
 import org.intellij.lang.annotations.Language
 
-class AtCommenterTest : BaseMinecraftTest(McpModuleType.getInstance()) {
+class AtCommenterTest : BaseMinecraftTest(McpModuleType) {
 
     private val fileName: String
         get() = getTestName(true)

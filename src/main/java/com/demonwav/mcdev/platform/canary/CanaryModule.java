@@ -14,6 +14,7 @@ import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.platform.AbstractModule;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.canary.generation.CanaryGenerationData;
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
@@ -34,7 +35,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CanaryModule<T extends CanaryModuleType> extends AbstractModule {
+public class CanaryModule<T extends AbstractModuleType> extends AbstractModule {
 
     private final T moduleType;
     private final PlatformType type;

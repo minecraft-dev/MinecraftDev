@@ -133,12 +133,30 @@ public final class MinecraftModule {
         return null;
     }
 
-    @Nullable
-    public static synchronized <T extends AbstractModule> T getInstance(@NotNull Module module, @NotNull AbstractModuleType<T> type) {
-        final MinecraftModule minecraftModule = getInstance(module);
-        if (minecraftModule != null) {
-            return minecraftModule.getModuleOfType(type);
+    public static synchronized <T extends AbstractModule, R extends AbstractModuleType<T>> T getInstance(@NotNull Module module, @NotNull R type) {
+        final MinecraftModule instance = getInstance(module);
+        if (instance == null) {
+            return null;
         }
+
+        return instance.getModuleOfType(type);
+    }
+
+    @Nullable
+    public static synchronized <T extends AbstractModule> T getInstance(@NotNull Module module, @NotNull AbstractModuleType<?>... type) {
+        final MinecraftModule instance = getInstance(module);
+        if (instance == null) {
+            return null;
+        }
+
+        for (AbstractModuleType<?> moduleType : type) {
+            final AbstractModule moduleOfType = instance.getModuleOfType(moduleType);
+            if (moduleOfType != null) {
+                //noinspection unchecked
+                return (T) moduleOfType;
+            }
+        }
+
         return null;
     }
 
@@ -293,8 +311,8 @@ public final class MinecraftModule {
             return modules.values().iterator().next().getIcon();
         } else if (
             modules.keySet().stream().filter(AbstractModuleType::hasIcon).count() == 2 &&
-            modules.containsKey(SpongeModuleType.getInstance()) &&
-            modules.containsKey(ForgeModuleType.getInstance())
+            modules.containsKey(SpongeModuleType.INSTANCE) &&
+            modules.containsKey(ForgeModuleType.INSTANCE)
         ) {
             return PlatformAssets.SPONGE_FORGE_ICON;
         } else {

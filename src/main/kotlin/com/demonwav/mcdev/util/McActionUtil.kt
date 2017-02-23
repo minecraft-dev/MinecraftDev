@@ -33,7 +33,7 @@ fun getDataFromActionEvent(e: AnActionEvent): ActionData? {
     var instance: MinecraftModule? = null
     for (module in modules) {
         instance = MinecraftModule.getInstance(module)
-        if (instance != null && instance.isOfType(McpModuleType.getInstance())) {
+        if (instance != null && instance.isOfType(McpModuleType)) {
             break
         }
     }

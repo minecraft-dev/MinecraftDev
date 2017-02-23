@@ -25,7 +25,7 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 public class LiteLoaderDataService extends AbstractDataService {
 
     public LiteLoaderDataService() {
-        super(LiteLoaderModuleType.getInstance());
+        super(LiteLoaderModuleType.INSTANCE);
     }
 
     @Override
@@ -38,6 +38,6 @@ public class LiteLoaderDataService extends AbstractDataService {
             return;
         }
 
-        checkModule(toImport, modelsProvider, LiteLoaderModuleType.getInstance(), "deobf/com/mumfrey/liteloader");
+        checkModule(toImport, modelsProvider, LiteLoaderModuleType.INSTANCE, "deobf/com/mumfrey/liteloader");
     }
 }

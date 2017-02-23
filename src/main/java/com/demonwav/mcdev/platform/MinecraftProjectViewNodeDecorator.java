@@ -67,8 +67,9 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
             }
 
             final List<AbstractModuleType<?>> validTypes = minecraftModule.getTypes().stream()
-                    .filter(AbstractModuleType::hasIcon)
-                    .collect(Collectors.toList());
+                .filter(AbstractModuleType::hasIcon)
+                .collect(Collectors.toList());
+
             if (validTypes.isEmpty()) {
                 continue;
             }
@@ -77,7 +78,7 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
                 continue;
             }
             if (validTypes.size() == 2) {
-                if (validTypes.contains(SpongeModuleType.getInstance()) && validTypes.contains(ForgeModuleType.getInstance())) {
+                if (validTypes.contains(SpongeModuleType.INSTANCE) && validTypes.contains(ForgeModuleType.INSTANCE)) {
                     data.setIcon(PlatformAssets.SPONGE_FORGE_ICON);
                     continue;
                 }

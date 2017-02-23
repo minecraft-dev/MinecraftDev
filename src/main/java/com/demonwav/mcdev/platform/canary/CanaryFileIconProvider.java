@@ -33,9 +33,9 @@ public class CanaryFileIconProvider implements FileIconProvider {
 
         if (project != null) {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
-                CanaryModule canaryModule = MinecraftModule.getInstance(module, CanaryModuleType.getInstance());
+                CanaryModule canaryModule = MinecraftModule.getInstance(module, CanaryModuleType.INSTANCE);
                 if (canaryModule == null) {
-                    canaryModule = MinecraftModule.getInstance(module, NeptuneModuleType.getInstance());
+                    canaryModule = MinecraftModule.getInstance(module, NeptuneModuleType.INSTANCE);
                 }
 
                 if (canaryModule != null) {

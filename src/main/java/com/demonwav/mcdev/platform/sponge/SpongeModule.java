@@ -61,7 +61,7 @@ public class SpongeModule extends AbstractModule {
 
     @Override
     public AbstractModuleType<SpongeModule> getModuleType() {
-        return SpongeModuleType.getInstance();
+        return SpongeModuleType.INSTANCE;
     }
 
     @Override

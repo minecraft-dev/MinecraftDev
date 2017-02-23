@@ -15,6 +15,7 @@ import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.inspection.IsCancelled;
 import com.demonwav.mcdev.platform.AbstractModule;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
@@ -50,7 +51,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("unused")
-public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
+public class BukkitModule<T extends AbstractModuleType<?>> extends AbstractModule {
 
     private VirtualFile pluginYml;
     private PlatformType type;

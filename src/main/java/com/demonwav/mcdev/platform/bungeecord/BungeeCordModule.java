@@ -59,7 +59,7 @@ public class BungeeCordModule extends AbstractModule {
 
     @Override
     public AbstractModuleType<BungeeCordModule> getModuleType() {
-        return BungeeCordModuleType.getInstance();
+        return BungeeCordModuleType.INSTANCE;
     }
 
     public VirtualFile getPluginYml() {

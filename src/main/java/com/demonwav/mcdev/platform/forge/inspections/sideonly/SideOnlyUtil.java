@@ -49,7 +49,7 @@ public final class SideOnlyUtil {
         //   1. Exists
         //   2. Is a ForgeModuleType
         final MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
-        return minecraftModule != null && minecraftModule.isOfType(ForgeModuleType.getInstance());
+        return minecraftModule != null && minecraftModule.isOfType(ForgeModuleType.INSTANCE);
     }
 
     @NotNull

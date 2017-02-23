@@ -60,7 +60,7 @@ public class ForgeModule extends AbstractModule {
 
     @Override
     public ForgeModuleType getModuleType() {
-        return ForgeModuleType.getInstance();
+        return ForgeModuleType.INSTANCE;
     }
 
     @Override

@@ -43,7 +43,7 @@ public class SideOnlyProjectComponent extends AbstractProjectComponent {
                 return;
             }
 
-            if (!instance.isOfType(ForgeModuleType.getInstance())) {
+            if (!instance.isOfType(ForgeModuleType.INSTANCE)) {
                 return;
             }
 

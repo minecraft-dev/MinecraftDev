@@ -49,7 +49,7 @@ public class SpongeColorUtil {
             return null;
         }
 
-        if (!minecraftModule.isOfType(SpongeModuleType.getInstance())) {
+        if (!minecraftModule.isOfType(SpongeModuleType.INSTANCE)) {
             return null;
         }
 

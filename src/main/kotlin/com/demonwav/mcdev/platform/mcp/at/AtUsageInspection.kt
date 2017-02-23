@@ -41,7 +41,7 @@ class AtUsageInspection : LocalInspectionTool() {
 
                 val instance = MinecraftModule.getInstance(module) ?: return
 
-                val mcpModule = instance.getModuleOfType(McpModuleType.getInstance()) ?: return
+                val mcpModule = instance.getModuleOfType(McpModuleType) ?: return
 
                 val srgMap = mcpModule.srgManager.srgMapNow ?: return
                 val member = element.function ?: element.fieldName ?: return

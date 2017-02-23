@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public class SpongeMavenImporter extends AbstractMavenImporter {
 
     public SpongeMavenImporter() {
-        super(SpongeModuleType.getInstance());
+        super(SpongeModuleType.INSTANCE);
     }
 
     @NotNull

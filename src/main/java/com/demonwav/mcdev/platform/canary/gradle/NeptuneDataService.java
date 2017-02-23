@@ -15,7 +15,7 @@ import com.demonwav.mcdev.platform.canary.NeptuneModuleType;
 public class NeptuneDataService extends CanaryDataService {
 
     public NeptuneDataService() {
-        super(NeptuneModuleType.getInstance());
+        super(NeptuneModuleType.INSTANCE);
     }
 
 }

@@ -48,7 +48,7 @@ public class SidedProxyAnnotator implements Annotator {
             return;
         }
 
-        if (!instance.isOfType(ForgeModuleType.getInstance())) {
+        if (!instance.isOfType(ForgeModuleType.INSTANCE)) {
             return;
         }
 

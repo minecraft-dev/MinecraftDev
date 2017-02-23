@@ -18,11 +18,11 @@ import org.jetbrains.annotations.Contract
 
 // Kotlin functions
 inline fun runWriteTask(crossinline func: () -> Unit) {
-    invokeAndWait { runWriteAction { func() } }
+    invokeAndWait { ApplicationManager.getApplication().runWriteAction { func() } }
 }
 
 inline fun runWriteTaskLater(crossinline func: () -> Unit) {
-    invokeLater { runWriteAction { func() } }
+    invokeLater { ApplicationManager.getApplication().runWriteAction { func() } }
 }
 
 inline fun invokeAndWait(crossinline func: () -> Unit) {

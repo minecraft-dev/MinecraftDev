@@ -48,7 +48,7 @@ class EntityConstructorInspection : BaseInspection() {
 
                 val instance = MinecraftModule.getInstance(module) ?: return
 
-                if (!instance.isOfType(McpModuleType.getInstance())) {
+                if (!instance.isOfType(McpModuleType)) {
                     return
                 }
 

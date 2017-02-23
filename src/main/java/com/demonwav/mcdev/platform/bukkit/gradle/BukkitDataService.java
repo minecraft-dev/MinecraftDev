@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public class BukkitDataService extends AbstractDataService {
 
     public BukkitDataService() {
-        super(BukkitModuleType.getInstance());
+        super(BukkitModuleType.INSTANCE);
     }
 
     public BukkitDataService(@NotNull final AbstractModuleType abstractModuleType) {

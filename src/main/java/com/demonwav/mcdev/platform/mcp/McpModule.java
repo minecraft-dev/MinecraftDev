@@ -49,7 +49,7 @@ public class McpModule extends AbstractModule {
 
     @Override
     public McpModuleType getModuleType() {
-        return McpModuleType.getInstance();
+        return McpModuleType.INSTANCE;
     }
 
     @Override

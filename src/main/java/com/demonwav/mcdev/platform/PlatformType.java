@@ -27,17 +27,17 @@ import org.jetbrains.annotations.Nullable;
 
 public enum PlatformType {
 
-    PAPER(PaperModuleType.getInstance(), "Paper"),
-    SPIGOT(SpigotModuleType.getInstance(), "Spigot", new PlatformType[] {PAPER}),
-    BUKKIT(BukkitModuleType.getInstance(), "Bukkit", new PlatformType[] {SPIGOT, PAPER}),
-    FORGE(ForgeModuleType.getInstance(), "Forge"),
-    SPONGE(SpongeModuleType.getInstance(), "Sponge"),
-    NEPTUNE(NeptuneModuleType.getInstance(), "Neptune"),
-    CANARY(CanaryModuleType.getInstance(), "Canary", new PlatformType[] {NEPTUNE}),
-    BUNGEECORD(BungeeCordModuleType.getInstance(), "BungeeCord"),
-    LITELOADER(LiteLoaderModuleType.getInstance(), "LiteLoader"),
+    PAPER(PaperModuleType.INSTANCE, "Paper"),
+    SPIGOT(SpigotModuleType.INSTANCE, "Spigot", new PlatformType[] {PAPER}),
+    BUKKIT(BukkitModuleType.INSTANCE, "Bukkit", new PlatformType[] {SPIGOT, PAPER}),
+    FORGE(ForgeModuleType.INSTANCE, "Forge"),
+    SPONGE(SpongeModuleType.INSTANCE, "Sponge"),
+    NEPTUNE(NeptuneModuleType.INSTANCE, "Neptune"),
+    CANARY(CanaryModuleType.INSTANCE, "Canary", new PlatformType[] {NEPTUNE}),
+    BUNGEECORD(BungeeCordModuleType.INSTANCE, "BungeeCord"),
+    LITELOADER(LiteLoaderModuleType.INSTANCE, "LiteLoader"),
     MIXIN(MixinModuleType.INSTANCE, "Mixin"),
-    MCP(McpModuleType.getInstance(), "MCP")
+    MCP(McpModuleType.INSTANCE, "MCP")
     ;
 
     private final AbstractModuleType<?> type;

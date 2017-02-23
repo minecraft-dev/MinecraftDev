@@ -33,7 +33,7 @@ public class ForgeFileIconProvider implements FileIconProvider {
 
         if (project != null) {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
-                final ForgeModule forgeModule = MinecraftModule.getInstance(module, ForgeModuleType.getInstance());
+                final ForgeModule forgeModule = MinecraftModule.getInstance(module, ForgeModuleType.INSTANCE);
                 if (forgeModule != null) {
                     if (file.equals(forgeModule.getMcmod())) {
                         return forgeModule.getIcon();

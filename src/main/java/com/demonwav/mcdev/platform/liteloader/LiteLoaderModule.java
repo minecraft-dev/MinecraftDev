@@ -41,7 +41,7 @@ public class LiteLoaderModule extends AbstractModule {
 
     @Override
     public LiteLoaderModuleType getModuleType() {
-        return LiteLoaderModuleType.getInstance();
+        return LiteLoaderModuleType.INSTANCE;
     }
 
     @Override

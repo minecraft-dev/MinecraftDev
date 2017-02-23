@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public class SpigotDataService extends BukkitDataService {
 
     public SpigotDataService() {
-        super(SpigotModuleType.getInstance());
+        super(SpigotModuleType.INSTANCE);
     }
 
     public SpigotDataService(@NotNull final AbstractModuleType abstractModuleType) {

@@ -37,8 +37,8 @@ class McpDataService : AbstractProjectDataService<McpModelData, Module>() {
             val data = node.data
             val module = modelsProvider.findIdeModule(data.module) ?: continue
 
-            MinecraftModuleType.addOption(module, McpModuleType.getInstance().id)
-            val mcpModule = MinecraftModule.getInstance(module, McpModuleType.getInstance()) ?: continue
+            MinecraftModuleType.addOption(module, McpModuleType.id)
+            val mcpModule = MinecraftModule.getInstance(module, McpModuleType) ?: continue
 
             // Update the local settings and recompute the SRG map
             mcpModule.updateSettings(data.settings)

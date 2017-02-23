@@ -135,6 +135,10 @@ public class MinecraftModuleType extends JavaModuleType {
 
     private static PlatformType[] getTypes(@NotNull String option) {
         final String[] split = option.split(",");
+        if (split.length == 1 && split[0].isEmpty()) {
+            return new PlatformType[0];
+        }
+
         final PlatformType[] types = new PlatformType[split.length];
         for (int i = 0; i < split.length; i++) {
             types[i] = PlatformType.getTypeByName(split[i]);

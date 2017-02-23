@@ -25,7 +25,7 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
 public class ForgeDataService extends AbstractDataService {
 
     public ForgeDataService() {
-        super(ForgeModuleType.getInstance());
+        super(ForgeModuleType.INSTANCE);
     }
 
     @Override
@@ -37,6 +37,6 @@ public class ForgeDataService extends AbstractDataService {
             return;
         }
 
-        checkModule(toImport, modelsProvider, ForgeModuleType.getInstance(), "forgeSrc", "forgeBin");
+        checkModule(toImport, modelsProvider, ForgeModuleType.INSTANCE, "forgeSrc", "forgeBin");
     }
 }

@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.canary.maven;
 
 import com.demonwav.mcdev.buildsystem.maven.AbstractMavenImporter;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.canary.CanaryModuleType;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.ModuleType;
@@ -19,10 +20,10 @@ import org.jetbrains.annotations.NotNull;
 public class CanaryMavenImporter extends AbstractMavenImporter {
 
     public CanaryMavenImporter() {
-        this(CanaryModuleType.getInstance());
+        this(CanaryModuleType.INSTANCE);
     }
 
-    protected CanaryMavenImporter(@NotNull final CanaryModuleType type) {
+    protected CanaryMavenImporter(@NotNull final AbstractModuleType type) {
         super(type);
     }
 

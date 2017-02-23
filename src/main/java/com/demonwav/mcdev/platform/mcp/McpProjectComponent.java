@@ -95,7 +95,7 @@ public class McpProjectComponent extends AbstractProjectComponent {
                     continue;
                 }
 
-                final McpModule mcpModule = instance.getModuleOfType(McpModuleType.getInstance());
+                final McpModule mcpModule = instance.getModuleOfType(McpModuleType.INSTANCE);
                 if (mcpModule == null) {
                     continue;
                 }

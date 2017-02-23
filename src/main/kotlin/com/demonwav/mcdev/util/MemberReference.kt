@@ -26,7 +26,7 @@ import java.io.Serializable
  * not full qualified.
  */
 data class MemberReference(val name: String, val descriptor: String? = null,
-                                    val owner: String? = null, val matchAll: Boolean = false) : Serializable {
+                           val owner: String? = null, val matchAll: Boolean = false) : Serializable {
 
     @get:Contract(pure = true)
     val qualified
