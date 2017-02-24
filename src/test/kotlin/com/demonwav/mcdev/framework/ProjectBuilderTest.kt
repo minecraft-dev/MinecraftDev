@@ -20,8 +20,13 @@ abstract class ProjectBuilderTest : LightCodeInsightFixtureTestCase() {
     fun ProjectBuilder.src(block: ProjectBuilder.() -> Unit) {
         dir("src", block)
         ModuleRootModificationUtil.updateModel(myFixture.module) { model ->
-            (model.contentEntries.filter { it.file == project.baseDir }.firstOrNull() ?:
-                model.addContentEntry(project.baseDir)).addSourceFolder(project.baseDir.findChild("src")!!, false)
+            val contentEntry = model.contentEntries.filter { it.file == project.baseDir }.firstOrNull() ?:
+                model.addContentEntry(project.baseDir)
+
+            val srcFolder = project.baseDir.findChild("src")!!
+            if (!contentEntry.sourceFolderFiles.contains(srcFolder)) {
+                contentEntry.addSourceFolder(srcFolder, false)
+            }
         }
     }
 }
