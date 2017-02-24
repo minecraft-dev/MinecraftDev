@@ -245,14 +245,6 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinTargetInspection"/>
-        <localInspection displayName="Reference to @Mixin class"
-                         shortName="ReferenceToMixin"
-                         groupName="Mixin"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
         <localInspection displayName="Public static member in @Mixin class"
                          shortName="PublicStaticMixinMember"
                          groupName="Mixin"
@@ -261,6 +253,22 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.StaticMemberInspection"/>
+        <localInspection displayName="Inner classes in Mixins"
+                         shortName="MixinInnerClass"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinInnerClassInspection"/>
+        <localInspection displayName="Reference to @Mixin class"
+                         shortName="ReferenceToMixin"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
 
         <!-- Mixin Injector Inspections -->
         <localInspection displayName="Invalid injector method signature"
