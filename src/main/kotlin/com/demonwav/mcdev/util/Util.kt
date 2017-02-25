@@ -17,6 +17,10 @@ import com.intellij.openapi.application.runWriteAction
 import org.jetbrains.annotations.Contract
 
 // Kotlin functions
+inline fun <T> runInlineReadAction(func: () -> T): T {
+    return ApplicationManager.getApplication().acquireReadActionLock().use { func() }
+}
+
 inline fun runWriteTask(crossinline func: () -> Unit) {
     invokeAndWait { ApplicationManager.getApplication().runWriteAction { func() } }
 }

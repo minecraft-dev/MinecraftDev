@@ -74,6 +74,7 @@
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowNullableInspectionSuppressor"/>
 
         <!-- Mixin completion -->
+        <superMethodsSearch implementation="com.demonwav.mcdev.platform.mixin.search.MixinImplementsMethodSuperSearcher"/>
         <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionContributor"
                                 order="last, before javaLegacy"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinReferenceContributor"/>
