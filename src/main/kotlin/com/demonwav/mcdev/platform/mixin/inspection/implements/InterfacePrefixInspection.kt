@@ -28,5 +28,4 @@ class InterfacePrefixInspection : MixinAnnotationAttributeInspection(INTERFACE, 
             holder.registerProblem(value, "@Interface prefix must end with a dollar sign ($)")
         }
     }
-
 }

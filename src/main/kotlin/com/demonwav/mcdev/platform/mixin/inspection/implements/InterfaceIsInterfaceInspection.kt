@@ -27,5 +27,4 @@ class InterfaceIsInterfaceInspection : MixinAnnotationAttributeInspection(INTERF
             holder.registerProblem(value, "Interface expected here")
         }
     }
-
 }

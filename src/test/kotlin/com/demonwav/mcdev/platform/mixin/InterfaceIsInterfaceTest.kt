@@ -35,7 +35,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
                     }
                 """)
 
-                java("test/InterfacePrefixMixin.java", """
+                java("test/InterfaceIsInterfaceMixin.java", """
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -47,7 +47,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
                         @Interface(iface = DummyFace.class, prefix = "good$"),
                         @Interface(iface = <error descr="Interface expected here">DummyClass.class</error>, prefix = "bad$"),
                     })
-                    class InterfacePrefixMixin {
+                    class InterfaceIsInterfaceMixin {
 
                     }
                 """)
