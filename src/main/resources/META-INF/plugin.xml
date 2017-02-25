@@ -74,7 +74,7 @@
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowNullableInspectionSuppressor"/>
 
         <!-- Mixin completion -->
-        <superMethodsSearch implementation="com.demonwav.mcdev.platform.mixin.search.MixinImplementsMethodSuperSearcher"/>
+        <superMethodsSearch implementation="com.demonwav.mcdev.platform.mixin.search.MixinSoftImplementMethodSuperSearcher"/>
         <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionContributor"
                                 order="last, before javaLegacy"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinReferenceContributor"/>
@@ -272,6 +272,14 @@
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
 
         <!-- Mixin Implements Inspections -->
+        <localInspection displayName="Soft-implemented method does not override a method in the target interfaces"
+                         shortName="SoftImplementOverrides"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.SoftImplementOverridesInspection"/>
         <localInspection displayName="Empty @Implements"
                          shortName="EmptyImplements"
                          groupName="Mixin"

@@ -29,7 +29,7 @@ abstract class MixinAnnotationAttributeInspection(private val annotation: List<S
     private inner class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
 
         override fun visitNameValuePair(pair: PsiNameValuePair) {
-            if (pair.name != attribute && (attribute == null && pair.name != PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME)) {
+            if (pair.name != attribute && (attribute != null || pair.name != PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME)) {
                 return
             }
 

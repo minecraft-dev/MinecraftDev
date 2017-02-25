@@ -196,7 +196,15 @@ fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean, name: 
     return findMethodsByName(name, checkBases).filter { it.isMatchingMethod(pattern) }
 }
 
-private fun PsiMethod.isMatchingMethod(pattern: PsiMethod): Boolean {
+inline fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean, name: String, func: (PsiMethod) -> Unit) {
+    for (method in findMethodsByName(name, checkBases)) {
+        if (method.isMatchingMethod(pattern)) {
+            func(method)
+        }
+    }
+}
+
+fun PsiMethod.isMatchingMethod(pattern: PsiMethod): Boolean {
     return areReallyOnlyParametersErasureEqual(this.parameterList, pattern.parameterList)
         && this.returnType.isErasureEquivalentTo(pattern.returnType)
 }
