@@ -189,7 +189,7 @@ fun PsiClass.addImplements(qualifiedClassName: String) {
 // Member
 
 fun PsiClass.findMatchingMethod(pattern: PsiMethod, checkBases: Boolean, name: String = pattern.name): PsiMethod? {
-    return findMethodsByName(name, checkBases).first { it.isMatchingMethod(pattern) }
+    return findMethodsByName(name, checkBases).firstOrNull { it.isMatchingMethod(pattern) }
 }
 
 fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean, name: String = pattern.name): List<PsiMethod> {

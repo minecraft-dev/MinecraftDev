@@ -40,7 +40,7 @@ class UnnecessaryQualifiedMemberReferenceInspection : AnnotationAttributeInspect
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val element = descriptor.psiElement
             element.replace(JavaPsiFacade.getElementFactory(project)
-                    .createExpressionFromText("\"${reference.withoutOwner}\"", element))
+                    .createExpressionFromText("\"${MixinMemberReference.toString(reference.withoutOwner)}\"", element))
         }
     }
 }
