@@ -272,6 +272,14 @@
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
 
         <!-- Mixin Implements Inspections -->
+        <localInspection displayName="@Interface is interface"
+                         shortName="InterfaceIsInterface"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.InterfaceIsInterfaceInspection"/>
         <localInspection displayName="Invalid prefix on @Interface"
                          shortName="InvalidInterfacePrefix"
                          groupName="Mixin"
@@ -279,7 +287,7 @@
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.InterfacePrefixInspection" />
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.InterfacePrefixInspection"/>
 
         <!-- Mixin Injector Inspections -->
         <localInspection displayName="Invalid injector method signature"

@@ -10,9 +10,9 @@
 
 package com.demonwav.mcdev.platform.mixin
 
-import com.demonwav.mcdev.platform.mixin.inspection.implements.InterfacePrefixInspection
+import com.demonwav.mcdev.platform.mixin.inspection.implements.InterfaceIsInterfaceInspection
 
-class InterfacePrefixTest : BaseMixinTest() {
+class InterfaceIsInterfaceTest : BaseMixinTest() {
 
     override fun setUp() {
         super.setUp()
@@ -27,6 +27,14 @@ class InterfacePrefixTest : BaseMixinTest() {
                     }
                 """)
 
+                java("test/DummyClass.java", """
+                    package test;
+
+                    class DummyClass {
+
+                    }
+                """)
+
                 java("test/InterfacePrefixMixin.java", """
                     package test;
 
@@ -37,7 +45,7 @@ class InterfacePrefixTest : BaseMixinTest() {
                     @Mixin
                     @Implements({
                         @Interface(iface = DummyFace.class, prefix = "good$"),
-                        @Interface(iface = DummyFace.class, prefix = <error descr="@Interface prefix must end with a dollar sign ($)">"bad"</error>),
+                        @Interface(iface = <error descr="Interface expected here">DummyClass.class</error>, prefix = "bad$"),
                     })
                     class InterfacePrefixMixin {
 
@@ -47,8 +55,8 @@ class InterfacePrefixTest : BaseMixinTest() {
         }
     }
 
-    fun testInterfacePrefixInspection() {
-        myFixture.enableInspections(InterfacePrefixInspection::class.java)
+    fun testIfInterfaceIsInterface() {
+        myFixture.enableInspections(InterfaceIsInterfaceInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }
 
