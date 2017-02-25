@@ -8,9 +8,8 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.inspection.reference
+package com.demonwav.mcdev.platform.mixin.inspection
 
-import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.util.annotationFromNameValuePair
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
@@ -19,7 +18,7 @@ import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiNameValuePair
 
-abstract class AnnotationAttributeInspection(private val annotation: List<String>, private val attribute: String) : MixinInspection() {
+abstract class MixinAnnotationAttributeInspection(private val annotation: List<String>, private val attribute: String) : MixinInspection() {
 
     constructor(annotation: String, attribute: String) : this(listOf(annotation), attribute)
 

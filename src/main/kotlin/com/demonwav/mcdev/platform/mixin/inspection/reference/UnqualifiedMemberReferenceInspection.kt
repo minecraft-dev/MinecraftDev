@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
+import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
@@ -18,7 +19,7 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationMemberValue
 
-class UnqualifiedMemberReferenceInspection : AnnotationAttributeInspection(AT, "target") {
+class UnqualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection(AT, "target") {
 
     override fun getStaticDescription() = "Reports unqualified member references in @At targets"
 
