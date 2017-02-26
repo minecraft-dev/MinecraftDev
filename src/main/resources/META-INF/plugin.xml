@@ -537,6 +537,11 @@
                 description="Add an @Overwrite for the selected methods">
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
+        <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateSoftImplementsAction" id="GenerateSoftImplementsAction"
+                text="Soft-implement Methods..."
+                description="Add a soft implementation for the selected methods">
+            <add-to-group group-id="GenerateGroup" anchor="last" />
+        </action>
         <action class="com.demonwav.mcdev.platform.mixin.actions.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
                 text="Copy Mixin target reference"
                 description="Copy the reference to the element for use in an injector">
