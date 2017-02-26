@@ -58,5 +58,4 @@ class SoftImplementTest : BaseMixinTest() {
         myFixture.enableInspections(SoftImplementOverridesInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }
-
 }

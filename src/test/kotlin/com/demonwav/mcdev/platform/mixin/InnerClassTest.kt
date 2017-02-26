@@ -57,5 +57,4 @@ class InnerClassTest : BaseMixinTest() {
         myFixture.enableInspections(MixinInnerClassInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }
-
 }

@@ -51,5 +51,4 @@ class InterfacePrefixTest : BaseMixinTest() {
         myFixture.enableInspections(InterfacePrefixInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }
-
 }
