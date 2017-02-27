@@ -23,7 +23,7 @@ class MinecraftFacetType : FacetType<MinecraftFacet, MinecraftFacetConfiguration
                              name: String,
                              configuration: MinecraftFacetConfiguration,
                              underlyingFacet: Facet<*>?): MinecraftFacet {
-        return MinecraftFacet(module, name, configuration)
+        return MinecraftFacet(module, name, configuration, underlyingFacet)
     }
 
     override fun createDefaultConfiguration() = MinecraftFacetConfiguration()

@@ -31,8 +31,8 @@ import org.jetbrains.annotations.Contract
 import java.util.concurrent.ConcurrentHashMap
 import javax.swing.Icon
 
-class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacetConfiguration) :
-    Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, null) {
+class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacetConfiguration, underlyingFacet: Facet<*>?) :
+    Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, underlyingFacet) {
 
     val modules = ConcurrentHashMap<AbstractModuleType<*>, AbstractModule>()
     val buildSystem by lazy {
@@ -144,7 +144,9 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     }
 
     companion object {
+        @JvmField
         val ID = FacetTypeId<MinecraftFacet>("minecraft")
+        @JvmStatic
         val facetType
             get() = FacetTypeRegistry.getInstance().findFacetType(ID) as MinecraftFacetType
 

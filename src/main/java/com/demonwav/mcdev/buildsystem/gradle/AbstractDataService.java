@@ -11,10 +11,13 @@
 package com.demonwav.mcdev.buildsystem.gradle;
 
 import com.demonwav.mcdev.platform.AbstractModuleType;
+import com.demonwav.mcdev.platform.MinecraftFacet;
+import com.demonwav.mcdev.platform.MinecraftFacetConfiguration;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
@@ -107,6 +110,7 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                         module.setOption("type", JavaModuleType.getModuleType().getId());
                     }
                     MinecraftModuleType.removeOption(module, type.getId());
+                    removeFromFacetState(module, type);
                 }
             }
         });
@@ -156,6 +160,8 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             module.setOption("type", JavaModuleType.getModuleType().getId());
             checkedModules.add(module);
             MinecraftModuleType.addOption(module, type.getId());
+
+            addToFacetState(module, type);
         } else {
             String parentName = path[path.length - 1];
             Module parentModule = modelsProvider.getModifiableModuleModel().findModuleByName(parentName);
@@ -166,6 +172,8 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                 checkedModules.add(parentModule);
                 MinecraftModuleType.addOption(parentModule, type.getId());
                 MinecraftModule.getInstance(parentModule);
+
+                addToFacetState(parentModule, type);
             } else {
                 return;
             }
@@ -175,5 +183,32 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
                 m.getBuildSystem().reImport(m.getIdeaModule());
             }
         });
+    }
+
+    public static void addToFacetState(Module module, AbstractModuleType<?> type) {
+        final FacetManager facetManager = FacetManager.getInstance(module);
+        final MinecraftFacet minecraftFacet = facetManager.getFacetByType(MinecraftFacet.ID);
+
+        if (minecraftFacet == null) {
+            final MinecraftFacetConfiguration configuration = new MinecraftFacetConfiguration();
+            configuration.getState().getTypes().add(type.getPlatformType());
+
+            final MinecraftFacet facet = facetManager.createFacet(MinecraftFacet.getFacetType(), "Minecraft", configuration, null);
+            facetManager.addFacet(MinecraftFacet.getFacetType(), "Minecraft", facet);
+        } else {
+            final MinecraftFacetConfiguration configuration = minecraftFacet.getConfiguration();
+            configuration.getState().getTypes().add(type.getPlatformType());
+        }
+    }
+
+    public static void removeFromFacetState(Module module, AbstractModuleType<?> type) {
+        final FacetManager facetManager = FacetManager.getInstance(module);
+        final MinecraftFacet minecraftFacet = facetManager.getFacetByType(MinecraftFacet.ID);
+
+        if (minecraftFacet == null) {
+            return;
+        }
+
+        minecraftFacet.getConfiguration().getState().getTypes().remove(type.getPlatformType());
     }
 }
