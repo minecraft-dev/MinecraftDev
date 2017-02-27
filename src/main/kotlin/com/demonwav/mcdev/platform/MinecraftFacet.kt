@@ -46,7 +46,7 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     override fun initFacet() {
         buildSystem?.apply {
             reImport(module).done {
-                val types = configuration.state?.types ?: setOf()
+                val types = configuration.state.types
                 types.forEach { type -> register(type.type) }
             }
         }

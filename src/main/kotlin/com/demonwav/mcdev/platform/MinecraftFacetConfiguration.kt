@@ -20,26 +20,26 @@ import com.intellij.util.xmlb.annotations.Tag
 import org.jdom.Element
 
 class MinecraftFacetConfiguration :
-    FacetConfiguration, PersistentStateComponent<MinecraftFacetConfiguration.MinecraftFacetConfigurationData> {
-
-    data class MinecraftFacetConfigurationData(
-        @Tag("platformTypes")
-        @AbstractCollection(surroundWithTag = false, elementTag = "platformType", elementValueAttribute = "")
-        var types: Set<PlatformType>
-    )
+    FacetConfiguration, PersistentStateComponent<MinecraftFacetConfigurationData> {
 
     var facet: MinecraftFacet? = null
-    private var state: MinecraftFacetConfigurationData? = null
+    private var state = MinecraftFacetConfigurationData()
 
     override fun createEditorTabs(editorContext: FacetEditorContext?, validatorsManager: FacetValidatorsManager?): Array<FacetEditorTab> {
-        TODO("not implemented")
+        return arrayOf(MinecraftFacetEditorTab(this))
     }
 
     override fun getState() = state
-    override fun loadState(state: MinecraftFacetConfigurationData?) {
+    override fun loadState(state: MinecraftFacetConfigurationData) {
         this.state = state
     }
 
     @Deprecated(message = "Deprecated in super") override fun readExternal(element: Element?) {}
     @Deprecated(message = "Deprecated in super") override fun writeExternal(element: Element?) {}
 }
+
+data class MinecraftFacetConfigurationData(
+    @Tag("platformTypes")
+    @AbstractCollection(surroundWithTag = false, elementTag = "platformType", elementValueAttribute = "")
+    var types: MutableSet<PlatformType> = mutableSetOf()
+)
