@@ -18,7 +18,6 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.util.xmlb.annotations.AbstractCollection
 import com.intellij.util.xmlb.annotations.Tag
 import org.jdom.Element
-import java.util.concurrent.ConcurrentHashMap
 
 class MinecraftFacetConfiguration :
     FacetConfiguration, PersistentStateComponent<MinecraftFacetConfiguration.MinecraftFacetConfigurationData> {
@@ -29,7 +28,6 @@ class MinecraftFacetConfiguration :
         var types: Set<PlatformType>
     )
 
-    val modules: Map<AbstractModuleType<*>, AbstractModule> = ConcurrentHashMap()
     var facet: MinecraftFacet? = null
     private var state: MinecraftFacetConfigurationData? = null
 
