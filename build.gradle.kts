@@ -24,6 +24,7 @@ import org.jetbrains.intellij.IntelliJPluginExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
+import java.util.HashMap
 import kotlin.reflect.KProperty
 
 buildscript {
@@ -234,6 +235,8 @@ val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
 }
 
 val generate = task("generate") {
+    group = "minecraft"
+    description = "Generates sources needed to compile the plugin."
     dependsOn(generateAtLexer, generateAtPsiAndParser)
 }
 
