@@ -42,6 +42,12 @@ The [Gradle IntelliJ Plugin](https://github.com/JetBrains/gradle-intellij-plugin
 will handle downloading the IntelliJ dependencies and packaging the
 plugin.
 
+IDE Setup
+---------
+
+Copy the contents of the `idea-configs` directory into your `.idea` directory to quickly setup useful
+run configurations and copyright settings.
+
 Style Guide
 -----------
 
