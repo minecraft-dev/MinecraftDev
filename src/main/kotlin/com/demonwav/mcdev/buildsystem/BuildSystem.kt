@@ -19,6 +19,8 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.xmlb.annotations.Attribute
+import com.intellij.util.xmlb.annotations.Tag
 import org.jetbrains.annotations.Contract
 import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
@@ -30,22 +32,23 @@ import java.util.ArrayList
  * change in a setter in this class will reflect back on the actual files that these classes represent, and in turn
  * represent changes in the project itself.
  */
+@Tag("buildSystem")
 abstract class BuildSystem {
 
     private val lock = Any()
 
-    lateinit var artifactId: String
-    lateinit var groupId: String
-    lateinit var version: String
+    @Attribute lateinit var artifactId: String
+    @Attribute lateinit var groupId: String
+    @Attribute lateinit var version: String
 
-    var dependencies: List<BuildDependency> = ArrayList()
-    var repositories: List<BuildRepository> = ArrayList()
-    lateinit var rootDirectory: VirtualFile
+    @Attribute var dependencies: List<BuildDependency> = ArrayList()
+    @Attribute var repositories: List<BuildRepository> = ArrayList()
+    @Attribute lateinit var rootDirectory: VirtualFile
 
-    var sourceDirectories: List<VirtualFile?> = ArrayList()
-    var resourceDirectories: List<VirtualFile?> = ArrayList()
-    var testSourcesDirectories: List<VirtualFile?> = ArrayList()
-    var testResourceDirectories: List<VirtualFile?> = ArrayList()
+    @Attribute var sourceDirectories: List<VirtualFile?> = ArrayList()
+    @Attribute var resourceDirectories: List<VirtualFile?> = ArrayList()
+    @Attribute var testSourcesDirectories: List<VirtualFile?> = ArrayList()
+    @Attribute var testResourceDirectories: List<VirtualFile?> = ArrayList()
 
     var importPromise: AsyncPromise<BuildSystem>? = null
 
@@ -54,9 +57,9 @@ abstract class BuildSystem {
      * system's configuration. This is not the actual plugin name, which would be stated in the plugin's description
      * file, or the main class file, depending on the project. This field is null if this value is missing.
      */
-    lateinit var pluginName: String
+    @Attribute lateinit var pluginName: String
 
-    lateinit var buildVersion: String
+    @Attribute lateinit var buildVersion: String
 
     /**
      * Assuming the artifact ID, group ID, and  version are set, along with whatever dependencies and repositories and

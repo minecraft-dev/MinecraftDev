@@ -10,7 +10,11 @@
 
 package com.demonwav.mcdev.buildsystem
 
+import com.intellij.util.xmlb.annotations.Attribute
+import com.intellij.util.xmlb.annotations.Tag
+
+@Tag("buildRepository")
 data class BuildRepository(
-    var id: String? = null,
-    var url: String? = null
+    @Attribute var id: String? = null,
+    @Attribute var url: String? = null
 )

@@ -110,8 +110,4 @@ public class MinecraftConfigurable implements Configurable {
     public void reset() {
         init();
     }
-
-    @Override
-    public void disposeUIResources() {
-    }
 }

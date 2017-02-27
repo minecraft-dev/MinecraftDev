@@ -48,6 +48,8 @@
         <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BungeeCordModuleTypeTransition"/>
         <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.SpongeModuleTypeTransition"/>
         <moduleType id="FORGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.ForgeModuleTypeTransition"/>
+        
+        <facetType implementation="com.demonwav.mcdev.platform.MinecraftFacetType" />
 
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
