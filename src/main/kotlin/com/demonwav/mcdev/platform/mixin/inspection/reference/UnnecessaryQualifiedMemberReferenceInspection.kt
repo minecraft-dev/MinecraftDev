@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
+import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.util.MemberReference
@@ -22,7 +23,7 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationMemberValue
 
-class UnnecessaryQualifiedMemberReferenceInspection : AnnotationAttributeInspection(METHOD_INJECTORS, "method") {
+class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection(METHOD_INJECTORS, "method") {
 
     override fun getStaticDescription() = "Reports unnecessary qualified member references in @Inject annotations"
 

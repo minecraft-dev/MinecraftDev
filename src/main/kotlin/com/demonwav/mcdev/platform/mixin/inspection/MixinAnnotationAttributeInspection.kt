@@ -8,9 +8,8 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.inspection.reference
+package com.demonwav.mcdev.platform.mixin.inspection
 
-import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.util.annotationFromNameValuePair
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
@@ -19,9 +18,9 @@ import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiNameValuePair
 
-abstract class AnnotationAttributeInspection(private val annotation: List<String>, private val attribute: String) : MixinInspection() {
+abstract class MixinAnnotationAttributeInspection(private val annotation: List<String>, private val attribute: String?) : MixinInspection() {
 
-    constructor(annotation: String, attribute: String) : this(listOf(annotation), attribute)
+    constructor(annotation: String, attribute: String?) : this(listOf(annotation), attribute)
 
     protected abstract fun visitAnnotationAttribute(annotation: PsiAnnotation, value: PsiAnnotationMemberValue, holder: ProblemsHolder)
 
@@ -30,7 +29,7 @@ abstract class AnnotationAttributeInspection(private val annotation: List<String
     private inner class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
 
         override fun visitNameValuePair(pair: PsiNameValuePair) {
-            if (pair.name != attribute) {
+            if (pair.name != attribute && (attribute != null || pair.name != PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME)) {
                 return
             }
 

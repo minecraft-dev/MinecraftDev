@@ -74,6 +74,7 @@
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowNullableInspectionSuppressor"/>
 
         <!-- Mixin completion -->
+        <superMethodsSearch implementation="com.demonwav.mcdev.platform.mixin.search.MixinSoftImplementMethodSuperSearcher"/>
         <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionContributor"
                                 order="last, before javaLegacy"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinReferenceContributor"/>
@@ -269,6 +270,56 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
+
+        <!-- Mixin Implements Inspections -->
+        <localInspection displayName="Soft-implemented method does not override a method in the target interfaces"
+                         shortName="SoftImplementOverrides"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.SoftImplementOverridesInspection"/>
+        <localInspection displayName="Empty @Implements"
+                         shortName="EmptyImplements"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.EmptyImplementsInspection"/>
+        <localInspection displayName="@Interface is interface"
+                         shortName="InterfaceIsInterface"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.InterfaceIsInterfaceInspection"/>
+        <localInspection displayName="Invalid prefix on @Interface"
+                         shortName="InvalidInterfacePrefix"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.InterfacePrefixInspection"/>
+        <localInspection displayName="Duplicate @Interface in @Implements"
+                         shortName="DuplicateInterface"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.DuplicateInterfaceInspection"/>
+        <localInspection displayName="Duplicate @Interface prefix in @Implements"
+                         shortName="DuplicateInterfacePrefix"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.DuplicateInterfacePrefixInspection"/>
 
         <!-- Mixin Injector Inspections -->
         <localInspection displayName="Invalid injector method signature"
@@ -484,6 +535,11 @@
         <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateOverwriteAction" id="GenerateOverwriteAction"
                 text="Overwrite Methods..."
                 description="Add an @Overwrite for the selected methods">
+            <add-to-group group-id="GenerateGroup" anchor="last" />
+        </action>
+        <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateSoftImplementsAction" id="GenerateSoftImplementsAction"
+                text="Soft-implement Methods..."
+                description="Add a soft implementation for the selected methods">
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.actions.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
