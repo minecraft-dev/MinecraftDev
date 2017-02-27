@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform
 
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.intellij.facet.Facet
+import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetTypeId
 import com.intellij.facet.FacetTypeRegistry
 import com.intellij.ide.projectView.ProjectView
@@ -34,7 +35,17 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     }
 
     override fun initFacet() {
-        // TODO
+        buildSystem?.apply {
+            reImport(module).done {
+                val types = configuration.state?.types ?: setOf()
+                types.forEach { type -> register(type.type) }
+            }
+        }
+    }
+
+    private fun register(type: AbstractModuleType<*>) {
+        type.performCreationSettingSetup(module.project)
+        modules.put(type, type.generateModule(module))
     }
 
     @Contract(pure = true)
@@ -106,5 +117,8 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         val ID = FacetTypeId<MinecraftFacet>("minecraft")
         val facetType
             get() = FacetTypeRegistry.getInstance().findFacetType(ID) as MinecraftFacetType
+
+        @JvmStatic
+        fun getInstance(module: Module) = FacetManager.getInstance(module).getFacetByType(MinecraftFacet.ID)
     }
 }
