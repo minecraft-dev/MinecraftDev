@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform
 
+import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.intellij.facet.Facet
 import com.intellij.facet.FacetTypeId
 import com.intellij.facet.FacetTypeRegistry
@@ -24,8 +25,9 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, null) {
 
     val modules = ConcurrentHashMap<AbstractModuleType<*>, AbstractModule>()
-    val buildSystem
-        get() = configuration.state!!.buildSystem
+    val buildSystem by lazy {
+        BuildSystem.getInstance(module)
+    }
 
     init {
         configuration.facet = this
@@ -35,8 +37,10 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         // TODO
     }
 
-    @Contract(pure = true) fun getModules(): Collection<AbstractModule> = modules.values
-    @Contract(pure = true) fun getTypes(): Collection<AbstractModuleType<*>> = modules.keys
+    @Contract(pure = true)
+    fun getModules(): Collection<AbstractModule> = modules.values
+    @Contract(pure = true)
+    fun getTypes(): Collection<AbstractModuleType<*>> = modules.keys
 
     @Contract(value = "null -> false", pure = true)
     fun isOfType(type: AbstractModuleType<*>?) = modules.containsKey(type)
@@ -63,12 +67,14 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         } ?: false
     }
 
+    @Contract(pure = true)
     fun writeErrorMessageForEvent(eventClass: PsiClass, method: PsiMethod): String? {
         return doIfGood(method) {
             it.writeErrorMessageForEventParameter(eventClass, method)
         }
     }
 
+    @Contract(pure = true)
     fun isStaticListenerSupported(eventClass: PsiClass, method: PsiMethod): Boolean {
         return doIfGood(method) {
             it.isStaticListenerSupported(eventClass, method)

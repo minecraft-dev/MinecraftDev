@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.platform
 
-import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.intellij.facet.FacetConfiguration
 import com.intellij.facet.ui.FacetEditorContext
 import com.intellij.facet.ui.FacetEditorTab
@@ -27,8 +26,7 @@ class MinecraftFacetConfiguration :
     data class MinecraftFacetConfigurationData(
         @Tag("platformTypes")
         @AbstractCollection(surroundWithTag = false, elementTag = "platformType", elementValueAttribute = "")
-        var types: Set<PlatformType>,
-        var buildSystem: BuildSystem
+        var types: Set<PlatformType>
     )
 
     val modules: Map<AbstractModuleType<*>, AbstractModule> = ConcurrentHashMap()

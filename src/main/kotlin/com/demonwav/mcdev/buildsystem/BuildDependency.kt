@@ -10,13 +10,9 @@
 
 package com.demonwav.mcdev.buildsystem
 
-import com.intellij.util.xmlb.annotations.Attribute
-import com.intellij.util.xmlb.annotations.Tag
-
-@Tag("buildDependency")
 data class BuildDependency(
-    @Attribute var artifactId: String? = null,
-    @Attribute var groupId: String? = null,
-    @Attribute var version: String? = null,
-    @Attribute var scope: String? = null
+    var artifactId: String? = null,
+    var groupId: String? = null,
+    var version: String? = null,
+    var scope: String? = null
 )
