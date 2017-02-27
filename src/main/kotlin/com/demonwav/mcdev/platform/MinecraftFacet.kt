@@ -10,17 +10,26 @@
 
 package com.demonwav.mcdev.platform
 
+import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.buildsystem.BuildSystem
+import com.demonwav.mcdev.buildsystem.SourceType
+import com.demonwav.mcdev.platform.forge.ForgeModuleType
+import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetTypeId
 import com.intellij.facet.FacetTypeRegistry
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import org.jetbrains.annotations.Contract
 import java.util.concurrent.ConcurrentHashMap
+import javax.swing.Icon
 
 class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacetConfiguration) :
     Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, null) {
@@ -113,6 +122,27 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         return null
     }
 
+    @Contract(pure = true)
+    fun isEventGenAvailable() = modules.keys.any { it.isEventGenAvailable }
+
+    @Contract(pure = true)
+    fun shouldShowPluginIcon(element: PsiElement?) = modules.values.any { it.shouldShowPluginIcon(element) }
+
+    @Contract(pure = true)
+    fun getIcon(): Icon? {
+        if (modules.keys.count { it.hasIcon() } == 1) {
+            return modules.values.iterator().next().icon
+        } else if (
+            modules.keys.count { it.hasIcon() } == 2 &&
+            modules.containsKey(SpongeModuleType) &&
+            modules.containsKey(ForgeModuleType)
+        ) {
+            return PlatformAssets.SPONGE_FORGE_ICON
+        } else {
+            return PlatformAssets.MINECRAFT_ICON
+        }
+    }
+
     companion object {
         val ID = FacetTypeId<MinecraftFacet>("minecraft")
         val facetType
@@ -120,5 +150,26 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
         @JvmStatic
         fun getInstance(module: Module) = FacetManager.getInstance(module).getFacetByType(MinecraftFacet.ID)
+        @JvmStatic
+        fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>): T? {
+            val instance = getInstance(module) ?: return null
+            return instance.getModuleType(type)
+        }
+        @JvmStatic
+        fun <T : AbstractModule> getInstance(module: Module, vararg types: AbstractModuleType<*>): T? {
+            val instance = getInstance(module) ?: return null
+            @Suppress("UNCHECKED_CAST")
+            return types.asSequence().mapNotNull { instance.getModuleType(it) }.firstOrNull() as? T
+        }
+
+        @Contract(pure = true)
+        fun searchAllModulesForFile(project: Project, path: String, type: SourceType): VirtualFile? {
+            val modules = ModuleManager.getInstance(project).modules
+            return modules.asSequence()
+                .mapNotNull(this::getInstance)
+                .filter { it.buildSystem != null }
+                .mapNotNull { it.buildSystem!!.findFile(path, type) }
+                .firstOrNull()
+        }
     }
 }
