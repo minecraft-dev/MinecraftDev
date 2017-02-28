@@ -5,9 +5,9 @@ Minecraft Development for IntelliJ [![forthebadge](http://forthebadge.com/images
 
 |  Service   |Status|
 |------------|------|
-|**TeamCity**|[![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build) 
-|**CircleCI**  |[![Travis Build Status](https://img.shields.io/circleci/project/github/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)]()
-|**Travis**|[![CircleCI Build Status](https://img.shields.io/travis/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)](https://travis-ci.org/minecraft-dev/MinecraftDev/)
+|**TeamCity**|[![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
+|**CircleCI**|[![Travis Build Status](https://img.shields.io/circleci/project/github/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)](https://circleci.com/gh/minecraft-dev/MinecraftDev)|
+|**Travis**  |[![CircleCI Build Status](https://img.shields.io/travis/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
 
 Info and Documentation [![Current Release](https://img.shields.io/badge/release-2016.3--0.5.6-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
