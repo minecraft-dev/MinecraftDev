@@ -1,17 +1,15 @@
-<p align="center"><a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.svg" height="80" width="80"></img></a></p>
+<p align="center"><a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.svg" height="120" width="120"></img></a></p>
 
-Minecraft Development for IntelliJ
+Minecraft Development for IntelliJ [![forthebadge](http://forthebadge.com/images/badges/made-with-crayons.svg)](http://forthebadge.com)
 ==================================
-
-[![Current Release](https://img.shields.io/badge/release-2016.3--0.5.6-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 
 |  Service   |Status|
 |------------|------|
-|**Teamcity**|[![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
-|**CircleCI**  |[![Travis Build Status](https://img.shields.io/circleci/project/github/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)](https://travis-ci.org/minecraft-dev/MinecraftDev/)
-|**Travis**|[![CircleCI Build Status](https://img.shields.io/travis/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)]()
+|**TeamCity**|[![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build) 
+|**CircleCI**  |[![Travis Build Status](https://img.shields.io/circleci/project/github/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)]()
+|**Travis**|[![CircleCI Build Status](https://img.shields.io/travis/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)](https://travis-ci.org/minecraft-dev/MinecraftDev/)
 
-Info and Documentation
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-2016.3--0.5.6-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 Visit [https://minecraftdev.org](https://minecraftdev.org) for information about the project, change logs, features, FAQs, and chat.
