@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.buildsystem.SourceType
+import com.demonwav.mcdev.platform.MinecraftFacetType.Companion.TYPE_ID
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.intellij.facet.Facet
@@ -101,14 +102,6 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         } ?: false
     }
 
-    fun addModuleType(moduleTypeName: String) {
-        val type = PlatformType.getByName(moduleTypeName)
-        if (type != null && !modules.containsKey(type)) {
-            modules[type] = type.generateModule(module)
-        }
-        ProjectView.getInstance(module.project).refresh()
-    }
-
     private inline fun <T> doIfGood(method: PsiMethod, action: (AbstractModule) -> T): T? {
         for (abstractModule in modules.values) {
             val good = abstractModule.moduleType.listenerAnnotations.any {
@@ -120,6 +113,14 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
             }
         }
         return null
+    }
+
+    fun addModuleType(moduleTypeName: String) {
+        val type = PlatformType.getByName(moduleTypeName)
+        if (type != null && !modules.containsKey(type)) {
+            modules[type] = type.generateModule(module)
+        }
+        ProjectView.getInstance(module.project).refresh()
     }
 
     @Contract(pure = true)
@@ -145,18 +146,21 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
     companion object {
         @JvmField
-        val ID = FacetTypeId<MinecraftFacet>("minecraft")
+        val ID = FacetTypeId<MinecraftFacet>(TYPE_ID)
+        
         @JvmStatic
         val facetType
             get() = FacetTypeRegistry.getInstance().findFacetType(ID) as MinecraftFacetType
 
         @JvmStatic
         fun getInstance(module: Module) = FacetManager.getInstance(module).getFacetByType(MinecraftFacet.ID)
+
         @JvmStatic
         fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>): T? {
             val instance = getInstance(module) ?: return null
             return instance.getModuleType(type)
         }
+
         @JvmStatic
         fun <T : AbstractModule> getInstance(module: Module, vararg types: AbstractModuleType<*>): T? {
             val instance = getInstance(module) ?: return null
