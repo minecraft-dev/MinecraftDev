@@ -29,12 +29,9 @@ import kotlin.reflect.KProperty
 
 buildscript {
     repositories {
+        gradleScriptKotlin()
         maven {
             setUrl("https://plugins.gradle.org/m2/")
-        }
-        maven {
-            name = "kotlin-eap-1.1"
-            setUrl("https://dl.bintray.com/kotlin/kotlin-eap-1.1")
         }
         maven {
             setUrl("https://dl.bintray.com/jetbrains/intellij-plugin-service")
@@ -77,10 +74,7 @@ version = pluginVersion
 configurations.create("mixin").isTransitive = false
 
 repositories {
-    maven {
-        name = "kotlin-eap-1.1"
-        setUrl("https://dl.bintray.com/kotlin/kotlin-eap-1.1")
-    }
+    gradleScriptKotlin()
     maven {
         name = "sponge"
         setUrl("https://repo.spongepowered.org/maven")
@@ -110,7 +104,7 @@ dependencies {
 
 tasks.withType<Test> {
     doFirst {
-        if (properties["slowCI"] == "true") {
+        if (System.getenv()["CI"] != null) {
             systemProperty("slowCI", "true")
         }
 
@@ -124,12 +118,13 @@ configure<IntelliJPluginExtension> {
     // Bundled plugin dependencies
     setPlugins("maven", "gradle", "Groovy", "yaml",
         // needed dependencies for unit tests
-        "properties", "junit")
+               "properties", "junit")
 
     pluginName = "Minecraft Development"
     updateSinceUntilBuild = false
 
-    downloadSources = downloadIdeaSources.toBoolean()
+    downloadSources = if (System.getenv()["CI"] != null) false else downloadIdeaSources.toBoolean()
+
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
