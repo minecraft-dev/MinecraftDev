@@ -117,13 +117,13 @@ configure<IntelliJPluginExtension> {
     version = ideaVersion
     // Bundled plugin dependencies
     setPlugins("maven", "gradle", "Groovy", "yaml",
-        // needed dependencies for unit tests
+               // needed dependencies for unit tests
                "properties", "junit")
 
     pluginName = "Minecraft Development"
     updateSinceUntilBuild = false
 
-    downloadSources = if (System.getenv()["CI"] != null) false else downloadIdeaSources.toBoolean()
+    downloadSources = System.getenv()["CI"] != null && downloadIdeaSources.toBoolean()
 
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
