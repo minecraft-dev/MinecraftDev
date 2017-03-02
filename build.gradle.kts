@@ -122,7 +122,7 @@ configure<IntelliJPluginExtension> {
     pluginName = "Minecraft Development"
     updateSinceUntilBuild = false
 
-    downloadSources = System.getenv()["CI"] != null && downloadIdeaSources.toBoolean()
+    downloadSources = System.getenv()["CI"] == null && downloadIdeaSources.toBoolean()
 
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
