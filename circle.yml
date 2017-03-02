@@ -1,3 +1,9 @@
+machine:
+  java:
+    version: openjdk8
+  environment:
+    TERM: dumb
+
 test:
   override:
-    - ./gradlew clean build
+    - ./gradlew build
