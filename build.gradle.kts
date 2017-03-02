@@ -29,7 +29,6 @@ import kotlin.reflect.KProperty
 
 buildscript {
     repositories {
-        gradleScriptKotlin()
         maven {
             setUrl("https://plugins.gradle.org/m2/")
         }
@@ -74,7 +73,7 @@ version = pluginVersion
 configurations.create("mixin").isTransitive = false
 
 repositories {
-    gradleScriptKotlin()
+    mavenCentral()
     maven {
         name = "sponge"
         setUrl("https://repo.spongepowered.org/maven")
