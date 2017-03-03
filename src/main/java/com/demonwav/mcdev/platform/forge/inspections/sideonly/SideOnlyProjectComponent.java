@@ -60,7 +60,7 @@ public class SideOnlyProjectComponent extends AbstractProjectComponent {
                             if (sidedProxy == null) {
                                 return;
                             }
-                            Collection<PsiField> annotatedFields = AnnotatedElementsSearch.searchElements(sidedProxy, scope, PsiField.class).findAll();
+                            Collection<PsiField> annotatedFields = AnnotatedElementsSearch.searchPsiFields(sidedProxy, scope).findAll();
                             indicator.setIndeterminate(false);
                             double index = 0;
                             for (PsiField field : annotatedFields) {
