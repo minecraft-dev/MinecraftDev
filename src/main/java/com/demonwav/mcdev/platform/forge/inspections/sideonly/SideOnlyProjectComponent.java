@@ -55,12 +55,12 @@ public class SideOnlyProjectComponent extends AbstractProjectComponent {
                     public void run(@NotNull ProgressIndicator indicator) {
                         try (final AccessToken ignored = ApplicationManager.getApplication().acquireReadActionLock()) {
                             indicator.setIndeterminate(true);
-                            GlobalSearchScope scope = GlobalSearchScope.projectScope(myProject);
-                            PsiClass sidedProxy = JavaPsiFacade.getInstance(myProject).findClass(ForgeConstants.SIDED_PROXY_ANNOTATION, scope);
+                            final GlobalSearchScope scope = GlobalSearchScope.projectScope(myProject);
+                            final PsiClass sidedProxy = JavaPsiFacade.getInstance(myProject).findClass(ForgeConstants.SIDED_PROXY_ANNOTATION, scope);
                             if (sidedProxy == null) {
                                 return;
                             }
-                            Collection<PsiField> annotatedFields = AnnotatedElementsSearch.searchPsiFields(sidedProxy, scope).findAll();
+                            final Collection<PsiField> annotatedFields = AnnotatedElementsSearch.searchPsiFields(sidedProxy, scope).findAll();
                             indicator.setIndeterminate(false);
                             double index = 0;
                             for (PsiField field : annotatedFields) {
