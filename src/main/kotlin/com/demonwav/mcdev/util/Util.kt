@@ -13,7 +13,6 @@ package com.demonwav.mcdev.util
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.application.runWriteAction
 import org.jetbrains.annotations.Contract
 
 // Kotlin functions

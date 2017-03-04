@@ -19,8 +19,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.util.xmlb.annotations.Attribute
-import com.intellij.util.xmlb.annotations.Tag
+import com.intellij.util.xmlb.annotations.AbstractCollection
 import org.jetbrains.annotations.Contract
 import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
@@ -40,16 +39,22 @@ abstract class BuildSystem {
     lateinit var groupId: String
     lateinit var version: String
 
+    @AbstractCollection(surroundWithTag = false, elementTag = "dependency", elementValueAttribute = "")
     var dependencies: List<BuildDependency> = ArrayList()
+    @AbstractCollection(surroundWithTag = false, elementTag = "repository", elementValueAttribute = "")
     var repositories: List<BuildRepository> = ArrayList()
     lateinit var rootDirectory: VirtualFile
 
-    var sourceDirectories: List<VirtualFile?> = ArrayList()
+    @AbstractCollection(surroundWithTag = false, elementTag = "resourceDirectory", elementValueAttribute = "")
     var resourceDirectories: List<VirtualFile?> = ArrayList()
+    @AbstractCollection(surroundWithTag = false, elementTag = "sourceDirectory", elementValueAttribute = "")
+    var sourceDirectories: List<VirtualFile?> = ArrayList()
+    @AbstractCollection(surroundWithTag = false, elementTag = "testSourceDirectory", elementValueAttribute = "")
     var testSourcesDirectories: List<VirtualFile?> = ArrayList()
+    @AbstractCollection(surroundWithTag = false, elementTag = "testResourceDirectory", elementValueAttribute = "")
     var testResourceDirectories: List<VirtualFile?> = ArrayList()
 
-    var importPromise: AsyncPromise<BuildSystem>? = null
+    @Transient var importPromise: AsyncPromise<BuildSystem>? = null
 
     /**
      * This refers to the plugin name from the perspective of the build system, that being a name field in the build

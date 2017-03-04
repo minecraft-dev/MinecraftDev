@@ -20,6 +20,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.ExceptionUtil;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +83,8 @@ public abstract class AbstractMavenImporter extends MavenImporter {
                         NativeMavenProjectHolder nativeMavenProject,
                         MavenEmbedderWrapper embedder,
                         ResolveContext context) throws MavenProcessCanceledException {
+
+        ExceptionUtil.rethrow(new UnsupportedOperationException("TODO: IMPLEMENT FACETS"));
 
         super.resolve(project, mavenProject, nativeMavenProject, embedder, context);
         for (Module module : ModuleManager.getInstance(project).getModules()) {

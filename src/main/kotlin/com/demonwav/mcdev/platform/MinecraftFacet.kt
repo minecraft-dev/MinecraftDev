@@ -16,11 +16,13 @@ import com.demonwav.mcdev.buildsystem.SourceType
 import com.demonwav.mcdev.platform.MinecraftFacetType.Companion.TYPE_ID
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
+import com.google.common.collect.Maps
 import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetTypeId
 import com.intellij.facet.FacetTypeRegistry
 import com.intellij.ide.projectView.ProjectView
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
@@ -36,20 +38,25 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, underlyingFacet) {
 
     val modules = ConcurrentHashMap<AbstractModuleType<*>, AbstractModule>()
-    val buildSystem by lazy {
-        BuildSystem.getInstance(module)
-    }
+    var buildSystem: BuildSystem? = null
 
     init {
         configuration.facet = this
     }
 
     override fun initFacet() {
-        buildSystem?.apply {
-            reImport(module).done {
-                val types = configuration.state.types
-                types.forEach { type -> register(type.type) }
-            }
+        if (buildSystem == null) {
+            buildSystem = BuildSystem.getInstance(module)
+        }
+        buildSystem?.reImport(module)?.done {
+            configuration.state.autoDetectTypes
+                .filter { configuration.state.userChosenTypes[it] ?: true }
+                .forEach { register(it.type) }
+
+            configuration.state.userChosenTypes
+                .filter { it.value }
+                .filter { !configuration.state.autoDetectTypes.contains(it.key) }
+                .forEach { k, _ -> register(k.type) }
         }
     }
 
@@ -145,15 +152,45 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     }
 
     companion object {
+        private val instanceMap = Maps.newHashMap<Module, MinecraftFacet>()
+
         @JvmField
         val ID = FacetTypeId<MinecraftFacet>(TYPE_ID)
-        
+
         @JvmStatic
         val facetType
             get() = FacetTypeRegistry.getInstance().findFacetType(ID) as MinecraftFacetType
 
         @JvmStatic
-        fun getInstance(module: Module) = FacetManager.getInstance(module).getFacetByType(MinecraftFacet.ID)
+        fun getInstance(module: Module): MinecraftFacet? {
+            val testInstance = instanceMap[module]
+            if (testInstance != null) {
+                return testInstance
+            }
+
+            var facet = FacetManager.getInstance(module).getFacetByType(MinecraftFacet.ID)
+            if (facet != null) {
+                instanceMap[module] = facet
+                return facet
+            }
+
+            val paths = ModuleManager.getInstance(module.project).getModuleGroupPath(module)
+            if (paths == null || paths.isEmpty()) {
+                return null
+            }
+
+            val parentModule = ApplicationManager.getApplication().acquireReadActionLock().use {
+                ModuleManager.getInstance(module.project).findModuleByName(paths.last())
+            } ?: return null
+
+            facet = FacetManager.getInstance(parentModule).getFacetByType(ID)
+
+            if (facet != null) {
+                instanceMap[parentModule] = facet
+                return facet
+            }
+            return null
+        }
 
         @JvmStatic
         fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>): T? {

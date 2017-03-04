@@ -46,6 +46,8 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.xml.DomManager;
+import com.intellij.util.xmlb.annotations.Attribute;
+import com.intellij.util.xmlb.annotations.Tag;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,8 +63,10 @@ import org.jetbrains.idea.maven.model.MavenResource;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
+@Tag("mavenBuildSystem")
 public class MavenBuildSystem extends BuildSystem {
 
+    @Attribute
     private VirtualFile pomFile;
 
     @Override

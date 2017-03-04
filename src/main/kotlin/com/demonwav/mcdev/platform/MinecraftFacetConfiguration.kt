@@ -19,8 +19,7 @@ import com.intellij.util.xmlb.annotations.AbstractCollection
 import com.intellij.util.xmlb.annotations.Tag
 import org.jdom.Element
 
-class MinecraftFacetConfiguration :
-    FacetConfiguration, PersistentStateComponent<MinecraftFacetConfigurationData> {
+class MinecraftFacetConfiguration : FacetConfiguration, PersistentStateComponent<MinecraftFacetConfigurationData> {
 
     var facet: MinecraftFacet? = null
     private var state = MinecraftFacetConfigurationData()
@@ -39,7 +38,9 @@ class MinecraftFacetConfiguration :
 }
 
 data class MinecraftFacetConfigurationData(
-    @Tag("platformTypes")
+    @Tag("userChosenTypes")
+    var userChosenTypes: MutableMap<PlatformType, Boolean> = mutableMapOf(),
+    @Tag("autoDetectTypes")
     @AbstractCollection(surroundWithTag = false, elementTag = "platformType", elementValueAttribute = "")
-    var types: MutableSet<PlatformType> = mutableSetOf()
+    var autoDetectTypes: MutableSet<PlatformType> = mutableSetOf()
 )

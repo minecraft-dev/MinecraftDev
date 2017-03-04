@@ -22,21 +22,90 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
 
     private lateinit var panel: JPanel
 
-    private lateinit var bukkitCheckBox: JCheckBox
-    private lateinit var spigotCheckBox: JCheckBox
-    private lateinit var paperCheckBox: JCheckBox
-    private lateinit var spongeCheckBox: JCheckBox
-    private lateinit var forgeCheckBox: JCheckBox
-    private lateinit var liteloaderCheckBox: JCheckBox
-    private lateinit var mcpCheckBox: JCheckBox
-    private lateinit var mixinsCheckBox: JCheckBox
-    private lateinit var bungeecordCheckBox: JCheckBox
-    private lateinit var neptuneCheckBox: JCheckBox
-    private lateinit var canaryCheckBox: JCheckBox
+    private lateinit var bukkitEnabledCheckBox: JCheckBox
+    private lateinit var bukkitAutoCheckBox: JCheckBox
+    private lateinit var spigotEnabledCheckBox: JCheckBox
+    private lateinit var spigotAutoCheckBox: JCheckBox
+    private lateinit var paperEnabledCheckBox: JCheckBox
+    private lateinit var paperAutoCheckBox: JCheckBox
+    private lateinit var spongeEnabledCheckBox: JCheckBox
+    private lateinit var spongeAutoCheckBox: JCheckBox
+    private lateinit var forgeEnabledCheckBox: JCheckBox
+    private lateinit var forgeAutoCheckBox: JCheckBox
+    private lateinit var liteloaderEnabledCheckBox: JCheckBox
+    private lateinit var liteloaderAutoCheckBox: JCheckBox
+    private lateinit var mcpEnabledCheckBox: JCheckBox
+    private lateinit var mcpAutoCheckBox: JCheckBox
+    private lateinit var mixinEnabledCheckBox: JCheckBox
+    private lateinit var mixinAutoCheckBox: JCheckBox
+    private lateinit var bungeecordEnabledCheckBox: JCheckBox
+    private lateinit var bungeecordAutoCheckBox: JCheckBox
+    private lateinit var canaryEnabledCheckBox: JCheckBox
+    private lateinit var canaryAutoCheckBox: JCheckBox
+    private lateinit var neptuneEnabledCheckBox: JCheckBox
+    private lateinit var neptuneAutoCheckBox: JCheckBox
 
     private lateinit var spongeIcon: JLabel
     private lateinit var mcpIcon: JLabel
     private lateinit var mixinIcon: JLabel
+
+    private val enableCheckBoxArray: Array<JCheckBox> by lazy {
+        arrayOf(
+            bukkitEnabledCheckBox,
+            spigotEnabledCheckBox,
+            paperEnabledCheckBox,
+            spongeEnabledCheckBox,
+            forgeEnabledCheckBox,
+            liteloaderEnabledCheckBox,
+            mcpEnabledCheckBox,
+            mixinEnabledCheckBox,
+            bungeecordEnabledCheckBox,
+            canaryEnabledCheckBox,
+            neptuneEnabledCheckBox
+        )
+    }
+    private val autoCheckBoxArray: Array<JCheckBox> by lazy {
+        arrayOf(
+            bukkitAutoCheckBox,
+            spigotAutoCheckBox,
+            paperAutoCheckBox,
+            spongeAutoCheckBox,
+            forgeAutoCheckBox,
+            liteloaderAutoCheckBox,
+            mcpAutoCheckBox,
+            mixinAutoCheckBox,
+            bungeecordAutoCheckBox,
+            canaryAutoCheckBox,
+            neptuneAutoCheckBox
+        )
+    }
+
+    private val BUKKIT = 0
+    private val SPIGOT = BUKKIT + 1
+    private val PAPER = SPIGOT + 1
+    private val SPONGE = PAPER + 1
+    private val FORGE = SPONGE + 1
+    private val LITELOADER  = FORGE + 1
+    private val MCP = LITELOADER + 1
+    private val MIXIN = MCP + 1
+    private val BUNGEECORD = MIXIN + 1
+    private val CANARY = BUNGEECORD + 1
+    private val NEPTUNE = CANARY + 1
+
+    private val platformTypes = arrayOf(
+        PlatformType.BUKKIT,
+        PlatformType.SPIGOT,
+        PlatformType.PAPER,
+        PlatformType.SPONGE,
+        PlatformType.FORGE,
+        PlatformType.LITELOADER,
+        PlatformType.MCP,
+        PlatformType.MIXIN,
+        PlatformType.BUNGEECORD,
+        PlatformType.CANARY,
+        PlatformType.NEPTUNE
+    )
+    private val indexes = intArrayOf(BUKKIT, SPIGOT, PAPER, SPONGE, FORGE, LITELOADER, MCP, MIXIN, BUNGEECORD, CANARY, NEPTUNE)
 
     override fun createComponent(): JComponent {
         if (UIUtil.isUnderDarcula()) {
@@ -45,16 +114,27 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             mixinIcon.icon = PlatformAssets.MIXIN_ICON_2X_DARK
         }
 
-        bukkitCheckBox.addActionListener { unique(bukkitCheckBox, spigotCheckBox, paperCheckBox) }
-        spigotCheckBox.addActionListener { unique(spigotCheckBox, bukkitCheckBox, paperCheckBox) }
-        paperCheckBox.addActionListener { unique(paperCheckBox, bukkitCheckBox, spigotCheckBox) }
+        runOnAll { enabled, auto, platformType, _, _ ->
+            auto.addActionListener { checkAuto(auto, enabled, platformType) }
+        }
 
-        canaryCheckBox.addActionListener { unique(canaryCheckBox, neptuneCheckBox) }
-        neptuneCheckBox.addActionListener { unique(neptuneCheckBox, canaryCheckBox) }
+        bukkitEnabledCheckBox.addActionListener { unique(bukkitEnabledCheckBox, spigotEnabledCheckBox, paperEnabledCheckBox) }
+        spigotEnabledCheckBox.addActionListener { unique(spigotEnabledCheckBox, bukkitEnabledCheckBox, paperEnabledCheckBox) }
+        paperEnabledCheckBox.addActionListener { unique(paperEnabledCheckBox, bukkitEnabledCheckBox, spigotEnabledCheckBox) }
 
-        forgeCheckBox.addActionListener { also(forgeCheckBox, mcpCheckBox) }
-        liteloaderCheckBox.addActionListener { also(liteloaderCheckBox, mcpCheckBox) }
-        mixinsCheckBox.addActionListener { also(mixinsCheckBox, mcpCheckBox) }
+        canaryEnabledCheckBox.addActionListener { unique(canaryEnabledCheckBox, neptuneEnabledCheckBox) }
+        neptuneEnabledCheckBox.addActionListener { unique(neptuneEnabledCheckBox, canaryEnabledCheckBox) }
+
+        bukkitAutoCheckBox.addActionListener { all(bukkitAutoCheckBox, spigotAutoCheckBox, paperAutoCheckBox)(SPIGOT, PAPER) }
+        spigotAutoCheckBox.addActionListener { all(spigotAutoCheckBox, bukkitAutoCheckBox, paperAutoCheckBox)(BUKKIT, PAPER) }
+        paperAutoCheckBox.addActionListener { all(paperAutoCheckBox, bukkitAutoCheckBox, spigotAutoCheckBox)(BUKKIT, SPIGOT) }
+
+        canaryAutoCheckBox.addActionListener { all(canaryAutoCheckBox, neptuneAutoCheckBox)(NEPTUNE) }
+        neptuneAutoCheckBox.addActionListener { all(neptuneAutoCheckBox, canaryAutoCheckBox)(CANARY) }
+
+        forgeEnabledCheckBox.addActionListener { also(forgeEnabledCheckBox, mcpEnabledCheckBox) }
+        liteloaderEnabledCheckBox.addActionListener { also(liteloaderEnabledCheckBox, mcpEnabledCheckBox) }
+        mixinEnabledCheckBox.addActionListener { also(mixinEnabledCheckBox, mcpEnabledCheckBox) }
 
         return panel
     }
@@ -62,70 +142,40 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     override fun getDisplayName() = "Minecraft Module Settings"
 
     override fun isModified(): Boolean {
-        val state = configuration.state
-        return bukkitCheckBox.isSelected != state.types.contains(PlatformType.BUKKIT) ||
-            spigotCheckBox.isSelected != state.types.contains(PlatformType.SPIGOT) ||
-            paperCheckBox.isSelected != state.types.contains(PlatformType.PAPER) ||
-            spongeCheckBox.isSelected != state.types.contains(PlatformType.SPONGE) ||
-            forgeCheckBox.isSelected != state.types.contains(PlatformType.FORGE) ||
-            liteloaderCheckBox.isSelected != state.types.contains(PlatformType.LITELOADER) ||
-            mcpCheckBox.isSelected != state.types.contains(PlatformType.MCP) ||
-            mixinsCheckBox.isSelected != state.types.contains(PlatformType.MIXIN) ||
-            bungeecordCheckBox.isSelected != state.types.contains(PlatformType.BUNGEECORD) ||
-            neptuneCheckBox.isSelected != state.types.contains(PlatformType.NEPTUNE) ||
-            canaryCheckBox.isSelected != state.types.contains(PlatformType.CANARY)
+        var modified = false
+
+        runOnAll { enabled, auto, platformType, userTypes, _ ->
+            modified += auto.isSelected == platformType in userTypes
+            modified += !auto.isSelected && enabled.isSelected != platformType in userTypes
+        }
+
+        return modified
     }
 
     override fun reset() {
-        val state = configuration.state
-        bukkitCheckBox.isSelected = state.types.contains(PlatformType.BUKKIT) == true
-        spigotCheckBox.isSelected = state.types.contains(PlatformType.SPIGOT) == true
-        paperCheckBox.isSelected = state.types.contains(PlatformType.PAPER) == true
-        spongeCheckBox.isSelected = state.types.contains(PlatformType.SPONGE) == true
-        forgeCheckBox.isSelected = state.types.contains(PlatformType.FORGE) == true
-        liteloaderCheckBox.isSelected = state.types.contains(PlatformType.LITELOADER) == true
-        mcpCheckBox.isSelected = state.types.contains(PlatformType.MCP) == true
-        mixinsCheckBox.isSelected = state.types.contains(PlatformType.MIXIN) == true
-        bungeecordCheckBox.isSelected = state.types.contains(PlatformType.BUNGEECORD) == true
-        neptuneCheckBox.isSelected = state.types.contains(PlatformType.NEPTUNE) == true
-        canaryCheckBox.isSelected = state.types.contains(PlatformType.CANARY) == true
+        runOnAll { enabled, auto, platformType, userTypes, autoTypes ->
+            auto.isSelected = platformType !in userTypes
+            enabled.isSelected = userTypes[platformType] ?: (platformType in autoTypes)
+
+            if (auto.isSelected) {
+                enabled.isEnabled = false
+            }
+        }
     }
 
     override fun apply() {
+        configuration.state.userChosenTypes.clear()
+        runOnAll { enabled, auto, platformType, userTypes, _ ->
+            if (!auto.isSelected) {
+                userTypes[platformType] = enabled.isSelected
+            }
+        }
+    }
+
+    private inline fun runOnAll(run: (JCheckBox, JCheckBox, PlatformType, MutableMap<PlatformType, Boolean>, Set<PlatformType>) -> Unit) {
         val state = configuration.state
-        state.types.clear()
-        if (bukkitCheckBox.isSelected) {
-            state.types.add(PlatformType.BUKKIT)
-        }
-        if (spigotCheckBox.isSelected) {
-            state.types.add(PlatformType.SPIGOT)
-        }
-        if (paperCheckBox.isSelected) {
-            state.types.add(PlatformType.PAPER)
-        }
-        if (spongeCheckBox.isSelected) {
-            state.types.add(PlatformType.SPONGE)
-        }
-        if (forgeCheckBox.isSelected) {
-            state.types.add(PlatformType.FORGE)
-        }
-        if (liteloaderCheckBox.isSelected) {
-            state.types.add(PlatformType.LITELOADER)
-        }
-        if (mcpCheckBox.isSelected) {
-            state.types.add(PlatformType.MCP)
-        }
-        if (mixinsCheckBox.isSelected) {
-            state.types.add(PlatformType.MIXIN)
-        }
-        if (bungeecordCheckBox.isSelected) {
-            state.types.add(PlatformType.BUNGEECORD)
-        }
-        if (neptuneCheckBox.isSelected) {
-            state.types.add(PlatformType.NEPTUNE)
-        }
-        if (canaryCheckBox.isSelected) {
-            state.types.add(PlatformType.CANARY)
+        for (i in indexes) {
+            run(enableCheckBoxArray[i], autoCheckBoxArray[i], platformTypes[i], state.userChosenTypes, state.autoDetectTypes)
         }
     }
 
@@ -152,4 +202,35 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             }
         }
     }
+
+    private fun all(vararg checkBoxes: JCheckBox): Invoker {
+        if (checkBoxes.size <= 1) {
+            return Invoker()
+        }
+
+        for (i in 1 until checkBoxes.size) {
+            checkBoxes[i].isSelected = checkBoxes[0].isSelected
+        }
+
+        return object : Invoker() {
+            override fun invoke(vararg indexes: Int) {
+                for (i in indexes) {
+                    checkAuto(autoCheckBoxArray[i], enableCheckBoxArray[i], platformTypes[i])
+                }
+            }
+        }
+    }
+
+    private fun checkAuto(auto: JCheckBox, enabled: JCheckBox, type: PlatformType) {
+        if (auto.isSelected){
+            enabled.isEnabled = false
+            enabled.isSelected = type in configuration.state.autoDetectTypes
+        } else {
+            enabled.isEnabled = true
+        }
+    }
+
+    private operator fun Boolean.plus(n: Boolean) = this || n
+    // This is here so we can use vararg. Can't use parameter modifiers in function type definitions for some reason
+    open class Invoker { open operator fun invoke(vararg indexes: Int) {} }
 }

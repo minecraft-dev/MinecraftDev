@@ -65,6 +65,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
+import com.intellij.util.xmlb.annotations.Attribute;
+import com.intellij.util.xmlb.annotations.Tag;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -103,11 +105,13 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrComman
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression;
 import org.jetbrains.plugins.groovy.lang.psi.impl.GroovyPsiElementFactoryImpl;
 
+@Tag("gradleBuildSystem")
 public class GradleBuildSystem extends BuildSystem {
 
     private final static Logger logger = Logger.getLogger(GradleBuildSystem.class);
 
     @Nullable
+    @Attribute
     private VirtualFile buildGradle;
 
     @Nullable

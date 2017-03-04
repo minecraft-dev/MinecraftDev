@@ -15,9 +15,11 @@ import com.demonwav.mcdev.platform.MinecraftFacet;
 import com.demonwav.mcdev.platform.MinecraftFacetConfiguration;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
+import com.demonwav.mcdev.util.Util;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.intellij.facet.FacetManager;
+import com.intellij.facet.ModifiableFacetModel;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
@@ -191,13 +193,17 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
 
         if (minecraftFacet == null) {
             final MinecraftFacetConfiguration configuration = new MinecraftFacetConfiguration();
-            configuration.getState().getTypes().add(type.getPlatformType());
+            configuration.getState().getAutoDetectTypes().add(type.getPlatformType());
 
             final MinecraftFacet facet = facetManager.createFacet(MinecraftFacet.getFacetType(), "Minecraft", configuration, null);
-            facetManager.addFacet(MinecraftFacet.getFacetType(), "Minecraft", facet);
+            Util.runWriteTaskLater(() -> {
+                final ModifiableFacetModel modifiableModel = facetManager.createModifiableModel();
+                modifiableModel.addFacet(facet);
+                modifiableModel.commit();
+            });
         } else {
             final MinecraftFacetConfiguration configuration = minecraftFacet.getConfiguration();
-            configuration.getState().getTypes().add(type.getPlatformType());
+            configuration.getState().getAutoDetectTypes().add(type.getPlatformType());
         }
     }
 
@@ -209,6 +215,6 @@ public abstract class AbstractDataService extends AbstractProjectDataService<Lib
             return;
         }
 
-        minecraftFacet.getConfiguration().getState().getTypes().remove(type.getPlatformType());
+        minecraftFacet.getConfiguration().getState().getAutoDetectTypes().remove(type.getPlatformType());
     }
 }

@@ -42,5 +42,4 @@ class MinecraftProjectResolverExtension : AbstractProjectResolverExtension() {
         // Process the other resolver extensions
         super.populateModuleExtraModels(gradleModule, ideModule)
     }
-
 }
