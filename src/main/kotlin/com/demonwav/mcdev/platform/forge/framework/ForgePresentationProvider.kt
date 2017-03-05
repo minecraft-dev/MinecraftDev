@@ -24,11 +24,12 @@ class ForgePresentationProvider : LibraryPresentationProvider<LibraryVersionProp
     override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.FORGE_ICON
 
     override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        if (classesRoots.asSequence()
-            .map { VfsUtilCore.virtualToIoFile(it) }
-            .filter { JarUtil.containsClass(it, ForgeConstants.MOD_ANNOTATION) }
-            .any()) {
-            return LibraryVersionProperties()
+        for (classesRoot in classesRoots) {
+            val file = VfsUtilCore.virtualToIoFile(classesRoot)
+
+            if (JarUtil.containsClass(file, ForgeConstants.MOD_ANNOTATION)) {
+                return LibraryVersionProperties()
+            }
         }
         return null
     }

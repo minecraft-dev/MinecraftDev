@@ -23,11 +23,18 @@ class NeptunePresentationProvider : LibraryPresentationProvider<LibraryVersionPr
 
     override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.NEPTUNE_ICON
 
-    override fun detect(classesRoots: List<VirtualFile>) =
-        classesRoots.asSequence()
-            .map { VfsUtilCore.virtualToIoFile(it) }
-            .filter { JarUtil.getJarAttribute(it, Attributes.Name.IMPLEMENTATION_TITLE) == "NeptuneLib" }
-            .mapNotNull { JarUtil.getJarAttribute(it, Attributes.Name.IMPLEMENTATION_VERSION) }
-            .map(::LibraryVersionProperties)
-            .firstOrNull()
+    override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
+        for (classesRoot in classesRoots) {
+            val file = VfsUtilCore.virtualToIoFile(classesRoot)
+            val title = JarUtil.getJarAttribute(file, Attributes.Name.IMPLEMENTATION_TITLE) ?: continue
+
+            if (title != "NeptuneLib") {
+                continue
+            }
+
+            val version = JarUtil.getJarAttribute(file, Attributes.Name.IMPLEMENTATION_VERSION) ?: continue
+            return LibraryVersionProperties(version)
+        }
+        return null
+    }
 }

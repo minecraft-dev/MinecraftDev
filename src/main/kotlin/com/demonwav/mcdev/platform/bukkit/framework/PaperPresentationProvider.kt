@@ -22,12 +22,19 @@ class PaperPresentationProvider : LibraryPresentationProvider<LibraryVersionProp
 
     override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.PAPER_ICON
 
-    override fun detect(classesRoots: List<VirtualFile>) =
-        classesRoots.asSequence()
-            .map { VfsUtilCore.virtualToIoFile(it) }
-            .mapNotNull { JarUtil.loadProperties(it, "META-INF/maven/com.destroystokyo.paper/paper-api/pom.properties") }
-            .filter { it["groupId"] == "com.destroystokyo.paper" && it["artifactId"] == "paper-api" }
-            .mapNotNull { it["version"] as? String }
-            .map(::LibraryVersionProperties)
-            .firstOrNull()
+    override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
+        for (classesRoot in classesRoots) {
+            val file = VfsUtilCore.virtualToIoFile(classesRoot)
+
+            val properties = JarUtil.loadProperties(file, "META-INF/maven/com.destroystokyo.paper/paper-api/pom.properties") ?: continue
+
+            if (properties["groupId"] != "com.destroystokyo.paper" || properties["artifactId"] != "paper-api") {
+                continue
+            }
+
+            val version = properties["version"] as? String ?: continue
+            return LibraryVersionProperties(version)
+        }
+        return null
+    }
 }

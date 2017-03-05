@@ -11,8 +11,8 @@
 package com.demonwav.mcdev.platform.mcp.framework
 
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.platform.forge.util.ForgeConstants.MOD_ANNOTATION
-import com.demonwav.mcdev.platform.mcp.util.McpConstants.MINECRAFT_SERVER
+import com.demonwav.mcdev.platform.forge.util.ForgeConstants
+import com.demonwav.mcdev.platform.mcp.util.McpConstants
 import com.intellij.framework.library.LibraryVersionProperties
 import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
 import com.intellij.openapi.roots.libraries.LibraryProperties
@@ -25,11 +25,12 @@ class McpPresentationProvider : LibraryPresentationProvider<LibraryVersionProper
     override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.MCP_ICON
 
     override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        if (classesRoots.asSequence()
-            .map { VfsUtilCore.virtualToIoFile(it) }
-            .filter { JarUtil.containsClass(it, MINECRAFT_SERVER) && !JarUtil.containsClass(it, MOD_ANNOTATION) }
-            .any()) {
-            return LibraryVersionProperties()
+        for (classesRoot in classesRoots) {
+            val file = VfsUtilCore.virtualToIoFile(classesRoot)
+
+            if (JarUtil.containsClass(file, McpConstants.MINECRAFT_SERVER) && !JarUtil.containsClass(file, ForgeConstants.MOD_ANNOTATION)) {
+                return LibraryVersionProperties()
+            }
         }
         return null
     }
