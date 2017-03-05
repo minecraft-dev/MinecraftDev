@@ -10,9 +10,7 @@
 
 package com.demonwav.mcdev.platform.mcp.gradle
 
-import com.demonwav.mcdev.buildsystem.gradle.AbstractDataService
-import com.demonwav.mcdev.platform.MinecraftModule
-import com.demonwav.mcdev.platform.MinecraftModuleType
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.Key
@@ -38,9 +36,7 @@ class McpDataService : AbstractProjectDataService<McpModelData, Module>() {
             val data = node.data
             val module = modelsProvider.findIdeModule(data.module) ?: continue
 
-            AbstractDataService.addToFacetState(module, McpModuleType)
-            MinecraftModuleType.addOption(module, McpModuleType.id)
-            val mcpModule = MinecraftModule.getInstance(module, McpModuleType) ?: continue
+            val mcpModule = MinecraftFacet.getInstance(module, McpModuleType) ?: continue
 
             // Update the local settings and recompute the SRG map
             mcpModule.updateSettings(data.settings)

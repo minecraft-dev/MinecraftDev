@@ -35,7 +35,7 @@ import javax.swing.Icon
 class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacetConfiguration, underlyingFacet: Facet<*>?) :
     Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, underlyingFacet) {
 
-    val modules = ConcurrentHashMap<AbstractModuleType<*>, AbstractModule>()
+    private val modules = ConcurrentHashMap<AbstractModuleType<*>, AbstractModule>()
 
     init {
         configuration.facet = this
@@ -87,7 +87,7 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     fun isOfType(type: AbstractModuleType<*>?) = modules.containsKey(type)
 
     @Contract(value = "null -> null", pure = true)
-    fun <T : AbstractModule> getModuleType(type: AbstractModuleType<T>?): T? {
+    fun <T : AbstractModule> getModuleOfType(type: AbstractModuleType<T>?): T? {
         @Suppress("UNCHECKED_CAST")
         return modules[type as AbstractModuleType<*>] as? T
     }
@@ -178,14 +178,14 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         @JvmStatic
         fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>): T? {
             val instance = getInstance(module) ?: return null
-            return instance.getModuleType(type)
+            return instance.getModuleOfType(type)
         }
 
         @JvmStatic
         fun <T : AbstractModule> getInstance(module: Module, vararg types: AbstractModuleType<*>): T? {
             val instance = getInstance(module) ?: return null
             @Suppress("UNCHECKED_CAST")
-            return types.asSequence().mapNotNull { instance.getModuleType(it) }.firstOrNull() as? T
+            return types.asSequence().mapNotNull { instance.getModuleOfType(it) }.firstOrNull() as? T
         }
     }
 }

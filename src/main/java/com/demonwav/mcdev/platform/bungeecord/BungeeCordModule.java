@@ -46,10 +46,6 @@ public class BungeeCordModule extends AbstractModule {
 
     BungeeCordModule(@NotNull Module module) {
         super(module);
-        buildSystem = BuildSystem.getInstance(module);
-        if (buildSystem != null) {
-            buildSystem.reImport(module).done(buildSystem -> pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE));
-        }
     }
 
     @NotNull

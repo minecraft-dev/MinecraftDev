@@ -61,16 +61,6 @@
         <fileIconProvider implementation="com.demonwav.mcdev.platform.canary.CanaryFileIconProvider"/>
 
         <!-- External Project Data Services are for Gradle project imports -->
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.BukkitDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.SpigotDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.PaperDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bungeecord.gradle.BungeeCordDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.liteloader.gradle.LiteLoaderDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.CanaryDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.NeptuneDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.mixin.gradle.MixinDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
 
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowNullableInspectionSuppressor"/>
@@ -474,17 +464,6 @@
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.canary.framework.CanaryPresentationProvider" />
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.canary.framework.NeptunePresentationProvider" />
     </extensions>
-    <extensions defaultExtensionNs="org.jetbrains.idea.maven">
-        <!-- Maven importers for, well, Maven project importing -->
-        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.BukkitMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.SpigotMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.bungeecord.maven.BungeeCordMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.sponge.maven.SpongeMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.canary.maven.CanaryMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.canary.maven.NeptuneMavenImporter"/>
-    </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
         <projectResolve implementation="com.demonwav.mcdev.buildsystem.gradle.MinecraftProjectResolverExtension"/>
@@ -495,10 +474,6 @@
 
     <project-components>
         <!-- Application components for Project open listeners -->
-        <component>
-            <implementation-class>com.demonwav.mcdev.platform.MinecraftProjectComponent</implementation-class>
-            <loadForDefaultProject/>
-        </component>
         <component>
             <implementation-class>com.demonwav.mcdev.platform.forge.ForgeProjectComponent</implementation-class>
             <loadForDefaultProject/>

@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.sponge;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.inspection.IsCancelled;
 import com.demonwav.mcdev.platform.AbstractModule;
@@ -48,10 +47,6 @@ public class SpongeModule extends AbstractModule {
 
     SpongeModule(@NotNull Module module) {
         super(module);
-        buildSystem = BuildSystem.getInstance(module);
-        if (buildSystem != null) {
-            buildSystem.reImport(module);
-        }
     }
 
     @NotNull

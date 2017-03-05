@@ -61,10 +61,6 @@ public class BukkitModule<T extends AbstractModuleType<?>> extends AbstractModul
         super(module);
         this.moduleType = type;
         this.type = type.getPlatformType();
-        buildSystem = BuildSystem.getInstance(module);
-        if (buildSystem != null) {
-            buildSystem.reImport(module).done(buildSystem -> setup());
-        }
     }
 
     private void setup() {

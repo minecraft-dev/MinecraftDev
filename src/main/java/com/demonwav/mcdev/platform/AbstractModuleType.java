@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform;
 
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel;
 import com.demonwav.mcdev.util.McPsiUtil;
 import com.intellij.codeInspection.ex.EntryPointsManager;
@@ -21,7 +22,6 @@ import com.intellij.openapi.util.JDOMExternalizableStringList;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiUtil;
 import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -131,8 +131,8 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
             return false;
         }
 
-        MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
-        return minecraftModule != null && minecraftModule.isOfType(this);
+        MinecraftFacet facet = MinecraftFacet.getInstance(module);
+        return facet != null && facet.isOfType(this);
     }
 
     protected String defaultNameForSubClassEvents(@NotNull PsiClass psiClass) {

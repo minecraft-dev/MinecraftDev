@@ -45,10 +45,6 @@ public class CanaryModule<T extends AbstractModuleType> extends AbstractModule {
         super(module);
         this.moduleType = type;
         this.type = type.getPlatformType();
-        buildSystem = BuildSystem.getInstance(module);
-        if (buildSystem != null) {
-            buildSystem.reImport(module).done(b -> setup());
-        }
     }
 
     private void setup() {

@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.mcp;
 
 import com.demonwav.mcdev.buildsystem.SourceType;
-import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.platform.mcp.at.AtFileType;
 import com.demonwav.mcdev.util.Util;
 import com.intellij.openapi.components.AbstractProjectComponent;
@@ -90,7 +90,7 @@ public class McpProjectComponent extends AbstractProjectComponent {
                     continue;
                 }
 
-                final MinecraftModule instance = MinecraftModule.getInstance(module);
+                final MinecraftFacet instance = MinecraftFacet.getInstance(module);
                 if (instance == null) {
                     continue;
                 }
@@ -125,7 +125,7 @@ public class McpProjectComponent extends AbstractProjectComponent {
                             return;
                         }
 
-                        final Optional<VirtualFile> file = MinecraftModule.searchAllModulesForFile(text, SourceType.RESOURCE);
+                        final Optional<VirtualFile> file = MinecraftFacet.searchAllModulesForFile(text, SourceType.RESOURCE);
 
                         file.ifPresent(f -> Util.runWriteTask(() -> {
                             mcpModule.addAccessTransformerFile(f);

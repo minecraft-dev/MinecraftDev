@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.platform.mcp;
 
-import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
@@ -35,11 +34,6 @@ public class McpModule extends AbstractModule {
 
         this.settings = McpModuleSettings.getInstance(module);
         srgManager.parse(getSettings().getMappingFiles());
-
-        this.buildSystem = BuildSystem.getInstance(module);
-        if (buildSystem != null) {
-            buildSystem.reImport(module);
-        }
     }
 
     @Override

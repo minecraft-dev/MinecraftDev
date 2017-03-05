@@ -11,8 +11,8 @@
 package com.demonwav.mcdev.insight;
 
 import com.demonwav.mcdev.MinecraftSettings;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.platform.AbstractModuleType;
-import com.demonwav.mcdev.platform.MinecraftModule;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.module.Module;
@@ -55,7 +55,7 @@ public class ListenerEventAnnotator implements Annotator {
         if (module == null) {
             return;
         }
-        MinecraftModule instance = MinecraftModule.getInstance(module);
+        MinecraftFacet instance = MinecraftFacet.getInstance(module);
         if (instance == null) {
             return;
         }
@@ -118,13 +118,13 @@ public class ListenerEventAnnotator implements Annotator {
         }
     }
 
-    private static boolean isSuperEventListenerAllowed(PsiClass eventClass, PsiMethod method, MinecraftModule module) {
+    private static boolean isSuperEventListenerAllowed(PsiClass eventClass, PsiMethod method, MinecraftFacet facet) {
         final PsiClass[] supers = eventClass.getSupers();
         for (PsiClass aSuper : supers) {
-            if (module.isEventClassValid(aSuper, method)) {
+            if (facet.isEventClassValid(aSuper, method)) {
                 return true;
             }
-            if (isSuperEventListenerAllowed(aSuper, method, module)) {
+            if (isSuperEventListenerAllowed(aSuper, method, facet)) {
                 return true;
             }
         }

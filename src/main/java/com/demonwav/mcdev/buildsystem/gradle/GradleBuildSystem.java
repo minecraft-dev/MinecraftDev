@@ -10,8 +10,6 @@
 
 package com.demonwav.mcdev.buildsystem.gradle;
 
-import com.demonwav.mcdev.buildsystem.BuildDependency;
-import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.creator.MinecraftProjectCreator;
 import com.demonwav.mcdev.platform.AbstractTemplate;
@@ -31,7 +29,6 @@ import com.intellij.execution.application.ApplicationConfiguration;
 import com.intellij.execution.application.ApplicationConfigurationType;
 import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
-import com.intellij.externalSystem.JavaProjectData;
 import com.intellij.ide.actions.ImportModuleAction;
 import com.intellij.ide.util.newProjectWizard.AddModuleWizard;
 import com.intellij.openapi.application.ApplicationManager;
@@ -39,11 +36,6 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.externalSystem.model.DataNode;
-import com.intellij.openapi.externalSystem.model.ExternalProjectInfo;
-import com.intellij.openapi.externalSystem.model.project.ExternalSystemSourceType;
-import com.intellij.openapi.externalSystem.model.project.LibraryData;
-import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration;
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager;
@@ -51,13 +43,9 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Pair;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiDirectory;
@@ -69,7 +57,6 @@ import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.Tag;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -80,44 +67,28 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProgressListener;
 import org.gradle.tooling.ProjectConnection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.concurrency.AsyncPromise;
-import org.jetbrains.concurrency.Promise;
-import org.jetbrains.plugins.gradle.model.ExternalProject;
-import org.jetbrains.plugins.gradle.model.ExternalSourceSet;
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType;
-import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportBuilder;
 import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportProvider;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.jetbrains.plugins.groovy.GroovyLanguage;
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlock;
-import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrApplicationStatement;
-import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrAssignmentExpression;
-import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrCommandArgumentList;
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression;
 import org.jetbrains.plugins.groovy.lang.psi.impl.GroovyPsiElementFactoryImpl;
 
 @Tag("gradleBuildSystem")
 public class GradleBuildSystem extends BuildSystem {
 
-    private final static Logger logger = Logger.getLogger(GradleBuildSystem.class);
-
     @Nullable
     @Attribute
     private VirtualFile buildGradle;
-
-    @Nullable
-    public VirtualFile getBuildGradle() {
-        return buildGradle;
-    }
 
     @Override
     public void create(@NotNull Project project, @NotNull ProjectConfiguration configuration, @NotNull ProgressIndicator indicator) {
@@ -434,169 +405,6 @@ public class GradleBuildSystem extends BuildSystem {
         }
     }
 
-
-    @NotNull
-    @Override
-    public Promise<BuildSystem> reImport(@NotNull Module module) {
-        if (synchronize()) {
-            final AsyncPromise<BuildSystem> importPromise = getImportPromise();
-            assert importPromise != null;
-            return importPromise;
-        }
-        final AsyncPromise<BuildSystem> importPromise = getImportPromise();
-        assert importPromise != null;
-
-        if (module.isDisposed()) {
-            importPromise.setResult(this);
-            return importPromise;
-        }
-
-        // We must be on the event dispatch thread to run a backgroundable task
-        ApplicationManager.getApplication().invokeLater(() ->
-            ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Importing Gradle Module", false) {
-                @Override
-                public void run(@NotNull ProgressIndicator indicator) {
-                    if (module.isDisposed()) {
-                        importPromise.setResult(GradleBuildSystem.this);
-                        return;
-                    }
-
-                    // We will need to request read access, which we can do from async
-                    ApplicationManager.getApplication().runReadAction(() -> {
-                        Project project = module.getProject();
-
-                        // root directory is the first content root
-                        ModuleRootManager manager = ModuleRootManager.getInstance(module);
-                        if (manager.getContentRoots().length == 0) {
-                            // TODO handle import failed
-                            logger.error("GradleBuildSystem import FAILED: no content roots found");
-                            importPromise.setResult(GradleBuildSystem.this);
-                            return;
-                        }
-
-                        setRootDirectory(manager.getContentRoots()[0]);
-                        buildGradle = getRootDirectory().findChild("build.gradle");
-
-                        if (getRootDirectory().getCanonicalPath() == null || buildGradle == null) {
-                            logger.error("GradleBuildSystem import FAILED: Root Directory or Build Gradle paths null");
-                            logger.error("rootDirectory: " + getRootDirectory());
-                            logger.error("buildGradle: " + buildGradle);
-                            importPromise.setResult(GradleBuildSystem.this);
-                            return;
-                        }
-
-                        setSourceDirectories(new ArrayList<>());
-                        setResourceDirectories(new ArrayList<>());
-                        setTestSourcesDirectories(new ArrayList<>());
-                        setTestResourceDirectories(new ArrayList<>());
-
-                        ExternalProjectDataCache externalProjectDataCache = ExternalProjectDataCache.getInstance(project);
-
-                        String name = module.getName();
-                        // I can't find a way to read module group children, group path only goes up
-                        // So I guess check each module to see if it's a child....
-                        Collection<Module> children = Arrays.stream(ModuleManager.getInstance(project).getModules())
-                            .filter(m -> {
-                                String[] paths = ModuleManager.getInstance(project).getModuleGroupPath(m);
-                                if (paths != null && paths.length > 0) {
-                                    if (name.equals(paths[paths.length - 1])) {
-                                        return true;
-                                    }
-                                }
-                                return false;
-                            }).collect(Collectors.toList());
-
-                        if (project.getBasePath() == null) {
-                            logger.error("GradleBuildSystem import FAILED: Project base path null");
-                            importPromise.setResult(GradleBuildSystem.this);
-                            return;
-                        }
-
-                        // We need to check the parent too if it's a single module project
-                        ExternalProject externalRootProject = externalProjectDataCache
-                            .getRootExternalProject(GradleConstants.SYSTEM_ID, new File(getRootDirectory().getCanonicalPath()));
-                        if (externalRootProject != null) {
-                            for (Module child : children) {
-                                Map<String, ExternalSourceSet> externalSourceSets = externalProjectDataCache
-                                    .findExternalProject(externalRootProject, child);
-
-                                for (ExternalSourceSet sourceSet : externalSourceSets.values()) {
-                                    setupDirs(getSourceDirectories(), sourceSet, ExternalSystemSourceType.SOURCE);
-                                    setupDirs(getResourceDirectories(), sourceSet, ExternalSystemSourceType.RESOURCE);
-                                    setupDirs(getTestSourcesDirectories(), sourceSet, ExternalSystemSourceType.TEST);
-                                    setupDirs(getTestResourceDirectories(), sourceSet, ExternalSystemSourceType.TEST_RESOURCE);
-                                }
-                            }
-
-                            setGroupId(externalRootProject.getGroup());
-                            setArtifactId(externalRootProject.getName());
-                            setVersion(externalRootProject.getVersion());
-
-                            setPluginName(externalRootProject.getName());
-
-                            // We need to get the project info from gradle
-                            ExternalProjectInfo info = ProjectDataManager.getInstance()
-                                .getExternalProjectData(project, GradleConstants.SYSTEM_ID, getRootDirectory().getCanonicalPath());
-                            if (info == null) {
-                                logger.error("GradleBuildSystem import FAILED: External project info null");
-                                importPromise.setResult(GradleBuildSystem.this);
-                                return;
-                            }
-
-                            DataNode<ProjectData> node = info.getExternalProjectStructure();
-
-                            if (node == null) {
-                                logger.error("GradleBuildSystem import FAILED: Project data node null");
-                                importPromise.setResult(GradleBuildSystem.this);
-                                return;
-                            }
-
-                            setDependencies(new ArrayList<>());
-                            node.getChildren().forEach(child -> {
-                                if (child.getData() instanceof LibraryData) {
-                                    LibraryData data = (LibraryData) child.getData();
-                                    String[] parts = data.getExternalName().split(":");
-                                    if (parts.length < 3) {
-                                        logger.warn("LibraryData held incompatible data: " + data.getExternalName());
-                                        return;
-                                    }
-                                    String groupId = parts[0];
-                                    String artifactId = parts[1];
-                                    String version = parts[2];
-                                    // I should probably remove scope, as I'm not even using it here...
-                                    getDependencies().add(new BuildDependency(groupId, artifactId, version, "provided"));
-                                } else if (child.getData() instanceof JavaProjectData) {
-                                    // kashike guilt tripped me into this
-                                    JavaProjectData data = (JavaProjectData) child.getData();
-                                    String languageLevelName = data.getLanguageLevel().name();
-                                    int index = languageLevelName.lastIndexOf('_') - 1;
-                                    if (index != -1) {
-                                        setBuildVersion(languageLevelName
-                                                            .substring(index, languageLevelName.length()).replace("_", "."));
-                                    }
-                                }
-                            });
-                        }
-
-                        GroovyFile groovyFile = (GroovyFile) PsiManager.getInstance(project).findFile(buildGradle);
-                        if (groovyFile != null) {
-                            // get repositories
-                            setRepositories(new ArrayList<>());
-                            // We need to climb the tree to get to the repositories
-
-                            GrClosableBlock block = getClosableBlockByName(groovyFile, "repositories");
-                            if (block != null) {
-                                addRepositories(block);
-                            }
-                        }
-                    });
-                    importPromise.setResult(GradleBuildSystem.this);
-                }
-            })
-        );
-        return importPromise;
-    }
-
     @NotNull
     public Map<GradleBuildSystem, ProjectConfiguration> createMultiModuleProject(@NotNull Project project,
                                                                                  @NotNull Map<PlatformType, ProjectConfiguration> configurations,
@@ -663,9 +471,6 @@ public class GradleBuildSystem extends BuildSystem {
                     gradleBuildSystem.setArtifactId(getArtifactId());
                     gradleBuildSystem.setGroupId(getGroupId());
                     gradleBuildSystem.setVersion(getVersion());
-
-                    gradleBuildSystem.setDependencies(new ArrayList<>());
-                    gradleBuildSystem.setRepositories(new ArrayList<>());
 
                     gradleBuildSystem.setPluginName(getPluginName());
                     gradleBuildSystem.setBuildVersion(getBuildVersion());
@@ -875,58 +680,6 @@ public class GradleBuildSystem extends BuildSystem {
             ).run();
         } finally {
             connection.close();
-        }
-    }
-
-    private void addRepositories(@NotNull GrClosableBlock block) {
-        List<GrClosableBlock> mavenBlocks = getClosableBlocksByName(block, "maven");
-        if (mavenBlocks.isEmpty()) {
-            return;
-        }
-
-        mavenBlocks.forEach(mavenBlock -> {
-            BuildRepository repository = new BuildRepository();
-            for (PsiElement child : mavenBlock.getChildren()) {
-                if (child instanceof GrApplicationStatement) {
-                    handleApplicationStatement((GrApplicationStatement) child, repository);
-                } else if (child instanceof GrAssignmentExpression) {
-                    handleAssignmentExpression((GrAssignmentExpression) child, repository);
-                }
-            }
-            getRepositories().add(repository);
-        });
-    }
-
-    private void handleApplicationStatement(@NotNull GrApplicationStatement statement, @NotNull BuildRepository repository) {
-        GrCommandArgumentList list = statement.getArgumentList();
-        if (list.getChildren().length > 0) {
-            if (statement.getInvokedExpression().getText().equals("name")) {
-                repository.setId(list.getChildren()[0].getText().replaceAll("'", ""));
-            } else if (statement.getInvokedExpression().getText().equals("url")) {
-                repository.setUrl(list.getChildren()[0].getText().replaceAll("'", ""));
-            }
-        }
-    }
-
-    private void handleAssignmentExpression(@NotNull GrAssignmentExpression expression, @NotNull BuildRepository repository) {
-        if (expression.getLValue().getText().equals("name")) {
-            if (expression.getRValue() != null) {
-                repository.setId(expression.getRValue().getText().replaceAll("'", ""));
-            }
-        } else if (expression.getLValue().getText().equals("url")) {
-            if (expression.getRValue() != null) {
-                repository.setUrl(expression.getRValue().getText().replaceAll("'", ""));
-            }
-        }
-    }
-
-    private void setupDirs(@NotNull List<VirtualFile> directories, @NotNull ExternalSourceSet set, @NotNull ExternalSystemSourceType type) {
-        if (set.getSources().get(type) != null) {
-            set.getSources().get(type).getSrcDirs().forEach(dir -> {
-                if (dir.exists()) {
-                    directories.add(LocalFileSystem.getInstance().findFileByIoFile(dir));
-                }
-            });
         }
     }
 
