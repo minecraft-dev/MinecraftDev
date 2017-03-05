@@ -8,8 +8,10 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform
+package com.demonwav.mcdev.facet
 
+import com.demonwav.mcdev.platform.MinecraftFacetEditorTab
+import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.facet.FacetConfiguration
 import com.intellij.facet.ui.FacetEditorContext
 import com.intellij.facet.ui.FacetEditorTab
@@ -33,8 +35,8 @@ class MinecraftFacetConfiguration : FacetConfiguration, PersistentStateComponent
         this.state = state
     }
 
-    @Deprecated(message = "Deprecated in super") override fun readExternal(element: Element?) {}
-    @Deprecated(message = "Deprecated in super") override fun writeExternal(element: Element?) {}
+    override fun readExternal(element: Element?) {}
+    override fun writeExternal(element: Element?) {}
 }
 
 data class MinecraftFacetConfigurationData(

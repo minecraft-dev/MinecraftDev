@@ -136,6 +136,7 @@ configure<IdeaModel> {
     module.apply {
         generatedSourceDirs.add(file("gen"))
         excludeDirs.add(file(the<IntelliJPluginExtension>().sandboxDirectory))
+        isDownloadSources = true
     }
 }
 

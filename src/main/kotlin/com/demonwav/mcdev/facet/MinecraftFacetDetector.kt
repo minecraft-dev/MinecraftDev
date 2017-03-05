@@ -1,0 +1,144 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2017 minecraft-dev
+ *
+ * MIT License
+ */
+
+package com.demonwav.mcdev.facet
+
+import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
+import com.demonwav.mcdev.util.runWriteTaskLater
+import com.intellij.ProjectTopics
+import com.intellij.facet.FacetManager
+import com.intellij.facet.impl.ui.libraries.LibrariesValidatorContextImpl
+import com.intellij.openapi.components.AbstractProjectComponent
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ModuleRootEvent
+import com.intellij.openapi.roots.ModuleRootListener
+import com.intellij.openapi.roots.libraries.LibraryKind
+import com.intellij.openapi.roots.ui.configuration.libraries.LibraryPresentationManager
+import com.intellij.openapi.startup.StartupManager
+
+class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(project) {
+
+    override fun projectOpened() {
+        val manager = StartupManager.getInstance(myProject)
+        val connection = myProject.messageBus.connect()
+
+        manager.registerStartupActivity {
+            MinecraftModuleRootListener.doCheck(myProject)
+        }
+
+        // Register a module root listener to check when things change
+        manager.registerPostStartupActivity {
+            connection.subscribe(ProjectTopics.PROJECT_ROOTS, MinecraftModuleRootListener)
+        }
+    }
+
+    private object MinecraftModuleRootListener : ModuleRootListener {
+        override fun rootsChanged(event: ModuleRootEvent) {
+            if (event.isCausedByFileTypesChange) {
+                return
+            }
+
+            val project = event.source as? Project ?: return
+            doCheck(project)
+        }
+
+        fun doCheck(project: Project) {
+            val moduleManager = ModuleManager.getInstance(project)
+            for (module in moduleManager.modules) {
+                val facetManager = FacetManager.getInstance(module)
+                val minecraftFacet = facetManager.getFacetByType(MinecraftFacet.ID)
+
+                if (minecraftFacet == null) {
+                    checkNoFacet(module)
+                } else {
+                    checkExistingFacet(module, minecraftFacet)
+                }
+            }
+        }
+
+        private fun checkNoFacet(module: Module) {
+            val platforms = autoDetectTypes(module)
+            if (platforms.isEmpty()) {
+                return
+            }
+
+            val facetManager = FacetManager.getInstance(module)
+            val configuration = MinecraftFacetConfiguration()
+            configuration.state.autoDetectTypes.addAll(platforms)
+
+            val facet = facetManager.createFacet(MinecraftFacet.facetType, "Minecraft", configuration, null)
+            runWriteTaskLater {
+                val modifiableModel = facetManager.createModifiableModel()
+                modifiableModel.addFacet(facet)
+                modifiableModel.commit()
+            }
+        }
+
+        private fun checkExistingFacet(module: Module, facet: MinecraftFacet) {
+            val platforms = autoDetectTypes(module)
+
+            val types = facet.configuration.state.autoDetectTypes
+            types.clear()
+            types.addAll(platforms)
+            facet.refresh()
+        }
+
+        private fun autoDetectTypes(module: Module): Set<PlatformType> {
+            val presentationManager = LibraryPresentationManager.getInstance()
+            val context = LibrariesValidatorContextImpl(module)
+
+            val platformKinds = mutableSetOf<LibraryKind>()
+            context.rootModel
+                .orderEntries()
+                .using(context.modulesProvider)
+                .recursively()
+                .librariesOnly()
+                .forEachLibrary { library ->
+                    MINECRAFT_LIBRARY_KINDS.forEach { kind ->
+                        if (presentationManager.isLibraryOfKind(library, context.librariesContainer, setOf(kind))) {
+                            platformKinds.add(kind)
+                        }
+                    }
+                    true
+                }
+
+            context.rootModel
+                .orderEntries()
+                .using(context.modulesProvider)
+                .recursively()
+                .withoutLibraries()
+                .withoutSdk()
+                .forEachModule { module ->
+                    if (module.name.startsWith("SpongeAPI")) {
+                        // We don't want want to add parent modules in module groups
+                        val moduleManager = ModuleManager.getInstance(module.project)
+                        val groupPath = moduleManager.getModuleGroupPath(module)
+                        if (groupPath == null) {
+                            platformKinds.add(SPONGE_LIBRARY_KIND)
+                            return@forEachModule true
+                        }
+
+                        val name = groupPath.lastOrNull() ?: return@forEachModule true
+                        if (module.name == name) {
+                            return@forEachModule true
+                        }
+
+                        platformKinds.add(SPONGE_LIBRARY_KIND)
+                    }
+                    true
+                }
+
+            return platformKinds.mapNotNull { kind -> PlatformType.fromLibraryKind(kind) }.toSet()
+        }
+    }
+}

@@ -119,4 +119,6 @@ public abstract class AbstractModule {
         final PsiParameter[] parameters = method.getParameterList().getParameters();
         return parameters.length != 0 && !refResolve.equals(parameters[0]);
     }
+
+    public void dispose() {}
 }

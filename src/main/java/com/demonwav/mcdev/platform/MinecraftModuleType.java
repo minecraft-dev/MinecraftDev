@@ -13,11 +13,13 @@ package com.demonwav.mcdev.platform;
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.creator.MinecraftModuleBuilder;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleTypeManager;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Set;
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 
@@ -120,7 +122,8 @@ public class MinecraftModuleType extends JavaModuleType {
         option = option.replaceAll(",{2,}", ",");
 
         // Remove parent types
-        final PlatformType[] types = PlatformType.removeParents(getTypes(option));
+        final Set<PlatformType> typesSet = PlatformType.removeParents(Sets.newHashSet(getTypes(option)));
+        final PlatformType[] types = typesSet.toArray(new PlatformType[typesSet.size()]);
 
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < types.length; i++) {

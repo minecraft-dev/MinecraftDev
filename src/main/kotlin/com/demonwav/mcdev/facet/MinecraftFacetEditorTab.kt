@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.facet.MinecraftFacetConfiguration
 import com.intellij.facet.ui.FacetEditorTab
 import com.intellij.util.ui.UIUtil
 import javax.swing.JCheckBox

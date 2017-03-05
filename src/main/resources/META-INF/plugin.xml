@@ -10,17 +10,17 @@
 
 <idea-plugin version="2">
 
-    <depends optional="false">org.jetbrains.idea.maven</depends>
-    <depends optional="false">org.jetbrains.plugins.gradle</depends>
-    <depends optional="false">org.intellij.groovy</depends>
-    <depends optional="false">org.jetbrains.plugins.yaml</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends>org.jetbrains.idea.maven</depends>
+    <depends>org.jetbrains.plugins.gradle</depends>
+    <depends>org.intellij.groovy</depends>
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
     <vendor>DemonWav</vendor>
 
     <description><![CDATA[
-      Brings support for Bukkit, Spigot, Paper, BungeeCord, Sponge, LiteLoader, Forge, and Canary Projects to Intellij IDEA.
+      Brings support for Bukkit, Spigot, Paper, BungeeCord, Sponge, LiteLoader, Forge, and Canary projects to Intellij IDEA.
     ]]></description>
 
     <change-notes><![CDATA[
@@ -49,7 +49,7 @@
         <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.SpongeModuleTypeTransition"/>
         <moduleType id="FORGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.ForgeModuleTypeTransition"/>
         
-        <facetType implementation="com.demonwav.mcdev.platform.MinecraftFacetType" />
+        <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
 
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
@@ -461,9 +461,18 @@
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mixin.debug.MixinRunConfigurationExtension"/>
         <debugger.positionManagerFactory implementation="com.demonwav.mcdev.platform.mixin.debug.MixinPositionManagerFactory"/>
         <debuggerClassFilterProvider implementation="com.demonwav.mcdev.platform.mixin.debug.MixinDebuggerClassFilterProvider"/>
-        
-        <!-- Not ready -->
-        <!--<toolWindow id="Minecraft" icon="/assets/icons/platform/Minecraft.png" anchor="right" factoryClass="com.demonwav.mcdev.toolwindow.MinecraftToolWindowFactory"/>-->
+
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.BukkitPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.SpigotPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.PaperPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.sponge.framework.SpongePresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.forge.framework.ForgePresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.liteloader.framework.LiteLoaderPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.mcp.framework.McpPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.mixin.framework.MixinPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.bungeecord.framework.BungeeCordPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.canary.framework.CanaryPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.canary.framework.NeptunePresentationProvider" />
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.idea.maven">
         <!-- Maven importers for, well, Maven project importing -->
@@ -504,6 +513,10 @@
         </component>
         <component>
             <implementation-class>com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyProjectComponent</implementation-class>
+            <loadForDefaultProject/>
+        </component>
+        <component>
+            <implementation-class>com.demonwav.mcdev.facet.MinecraftFacetDetector</implementation-class>
             <loadForDefaultProject/>
         </component>
     </project-components>

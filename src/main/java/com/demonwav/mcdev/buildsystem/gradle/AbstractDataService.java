@@ -10,9 +10,9 @@
 
 package com.demonwav.mcdev.buildsystem.gradle;
 
+import com.demonwav.mcdev.facet.MinecraftFacet;
+import com.demonwav.mcdev.facet.MinecraftFacetConfiguration;
 import com.demonwav.mcdev.platform.AbstractModuleType;
-import com.demonwav.mcdev.platform.MinecraftFacet;
-import com.demonwav.mcdev.platform.MinecraftFacetConfiguration;
 import com.demonwav.mcdev.platform.MinecraftModule;
 import com.demonwav.mcdev.platform.MinecraftModuleType;
 import com.demonwav.mcdev.util.Util;

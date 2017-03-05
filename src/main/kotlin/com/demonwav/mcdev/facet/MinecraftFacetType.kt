@@ -8,7 +8,7 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform
+package com.demonwav.mcdev.facet
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.facet.Facet
