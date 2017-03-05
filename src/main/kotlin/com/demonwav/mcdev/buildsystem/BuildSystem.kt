@@ -31,7 +31,7 @@ import java.util.ArrayList
  * change in a setter in this class will reflect back on the actual files that these classes represent, and in turn
  * represent changes in the project itself.
  */
-abstract class  BuildSystem {
+abstract class BuildSystem {
 
     private val lock = Any()
 

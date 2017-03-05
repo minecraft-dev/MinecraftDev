@@ -23,18 +23,11 @@ class CanaryPresentationProvider : LibraryPresentationProvider<LibraryVersionPro
 
     override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.CANARY_ICON
 
-    override fun detect(classesRoots: MutableList<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
-            val file = VfsUtilCore.virtualToIoFile(classesRoot)
-            val title = JarUtil.getJarAttribute(file, Attributes.Name.IMPLEMENTATION_TITLE) ?: continue
-
-            if (title != "CanaryLib") {
-                continue
-            }
-
-            val version = JarUtil.getJarAttribute(file, Attributes.Name.IMPLEMENTATION_VERSION) ?: continue
-            return LibraryVersionProperties(version)
-        }
-        return null
-    }
+    override fun detect(classesRoots: List<VirtualFile>) =
+        classesRoots.asSequence()
+            .map { VfsUtilCore.virtualToIoFile(it) }
+            .filter { JarUtil.getJarAttribute(it, Attributes.Name.IMPLEMENTATION_TITLE) == "CanaryLib" }
+            .mapNotNull { JarUtil.getJarAttribute(it, Attributes.Name.IMPLEMENTATION_VERSION) }
+            .map(::LibraryVersionProperties)
+            .firstOrNull()
 }

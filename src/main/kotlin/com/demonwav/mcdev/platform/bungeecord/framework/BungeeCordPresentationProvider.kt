@@ -22,18 +22,12 @@ class BungeeCordPresentationProvider : LibraryPresentationProvider<LibraryVersio
 
     override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.BUNGEECORD_ICON
 
-    override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
-            val file = VfsUtilCore.virtualToIoFile(classesRoot)
-            val properties = JarUtil.loadProperties(file, "META-INF/maven/net.md-5/bungeecord-api/pom.properties") ?: continue
-
-            if (properties["groupId"] == "net.md-5" && properties["artifactId"] == "bungeecord-api") {
-                continue
-            }
-
-            val version = properties["version"] as? String ?: continue
-            return LibraryVersionProperties(version)
-        }
-        return null
-    }
+    override fun detect(classesRoots: List<VirtualFile>) =
+        classesRoots.asSequence()
+            .map { VfsUtilCore.virtualToIoFile(it) }
+            .mapNotNull { JarUtil.loadProperties(it, "META-INF/maven/net.md-5/bungeecord-api/pom.properties") }
+            .filter { it["groupId"] == "net.md-5" && it["artifactId"] == "bungeecord-api" }
+            .mapNotNull { it["version"] as? String }
+            .map(::LibraryVersionProperties)
+            .firstOrNull()
 }

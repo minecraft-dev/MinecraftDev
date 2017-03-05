@@ -22,18 +22,12 @@ class BukkitPresentationProvider : LibraryPresentationProvider<LibraryVersionPro
 
     override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.BUKKIT_ICON
 
-    override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
-            val file = VfsUtilCore.virtualToIoFile(classesRoot)
-            val properties = JarUtil.loadProperties(file, "META-INF/maven/org.bukkit/bukkit/pom.properties") ?: continue
-
-            if (properties["groupId"] != "org.bukkit" || properties["artifactId"] != "bukkit") {
-                continue
-            }
-
-            val version = properties["version"] as? String ?: continue
-            return LibraryVersionProperties(version)
-        }
-        return null
-    }
+    override fun detect(classesRoots: List<VirtualFile>) =
+        classesRoots.asSequence()
+            .map { VfsUtilCore.virtualToIoFile(it) }
+            .mapNotNull { JarUtil.loadProperties(it, "META-INF/maven/org.bukkit/bukkit/pom.properties") }
+            .filter { it["groupId"] == "org.bukkit" && it["artifactId"] == "bukkit" }
+            .mapNotNull { it["version"] as? String }
+            .map(::LibraryVersionProperties)
+            .firstOrNull()
 }

@@ -22,18 +22,12 @@ class SpigotPresentationProvider : LibraryPresentationProvider<LibraryVersionPro
 
     override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.SPIGOT_ICON
 
-    override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
-            val file = VfsUtilCore.virtualToIoFile(classesRoot)
-            val properties = JarUtil.loadProperties(file, "META-INF/maven/org.spigotmc/spigot-api/pom.properties") ?: continue
-
-            if (properties["groupId"] != "org.spigotmc" || properties["artifactId"] != "spigot-api") {
-                continue
-            }
-
-            val version = properties["version"] as? String ?: continue
-            return LibraryVersionProperties(version)
-        }
-        return null
-    }
+    override fun detect(classesRoots: List<VirtualFile>) =
+        classesRoots.asSequence()
+            .map { VfsUtilCore.virtualToIoFile(it) }
+            .mapNotNull { JarUtil.loadProperties(it, "META-INF/maven/org.spigotmc/spigot-api/pom.properties") }
+            .filter { it["groupId"] == "org.spigotmc" && it["artifactId"] == "spigot-api" }
+            .mapNotNull { it["version"] as? String }
+            .map(::LibraryVersionProperties)
+            .firstOrNull()
 }

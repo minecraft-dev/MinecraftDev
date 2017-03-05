@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.framework
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.intellij.framework.library.LibraryVersionProperties
 import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
 import com.intellij.openapi.roots.libraries.LibraryProperties
@@ -23,18 +24,11 @@ class MixinPresentationProvider : LibraryPresentationProvider<LibraryVersionProp
 
     override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.MIXIN_ICON
 
-    override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
-            val file = VfsUtilCore.virtualToIoFile(classesRoot)
-            val agent = JarUtil.getJarAttribute(file, Attributes.Name("Agent-Class")) ?: continue
-
-            if (agent != "org.spongepowered.tools.agent.MixinAgent") {
-                continue
-            }
-
-            val version = JarUtil.getJarAttribute(file, Attributes.Name.IMPLEMENTATION_VERSION) ?: continue
-            return LibraryVersionProperties(version)
-        }
-        return null
-    }
+    override fun detect(classesRoots: List<VirtualFile>) =
+        classesRoots.asSequence()
+            .map { VfsUtilCore.virtualToIoFile(it) }
+            .filter { JarUtil.getJarAttribute(it, Attributes.Name("Agent-Class")) == MixinConstants.Classes.AGENT }
+            .mapNotNull { JarUtil.getJarAttribute(it, Attributes.Name.IMPLEMENTATION_VERSION) }
+            .map(::LibraryVersionProperties)
+            .firstOrNull()
 }
