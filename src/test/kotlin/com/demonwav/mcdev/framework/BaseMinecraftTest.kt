@@ -24,8 +24,7 @@ import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
 
 abstract class BaseMinecraftTest(protected vararg val platformTypes: PlatformType) : ProjectBuilderTest() {
 
-    protected open fun preConfigureModule(module: Module, model: ModifiableRootModel) {}
-    protected open fun postConfigureModule(module: Module, model: ModifiableRootModel) {}
+    protected open fun configureModule(module: Module, model: ModifiableRootModel) {}
 
     protected open val resourcePath = "src/test/resources"
     protected open val packagePath = "com/demonwav/mcdev"
@@ -33,25 +32,29 @@ abstract class BaseMinecraftTest(protected vararg val platformTypes: PlatformTyp
 
     override fun getTestDataPath() = "$resourcePath/$packagePath/$dataPath"
 
+    override fun runTest() {
+        // I have no idea why, but for some reason the facet's configuration doesn't properly get setup if we do this in setUp...
+        // So do it here and it works ¯\_(ツ)_/¯
+        val facetManager = FacetManager.getInstance(myModule)
+        val configuration = MinecraftFacetConfiguration()
+        configuration.state.autoDetectTypes.addAll(platformTypes)
+
+        val facet = facetManager.createFacet(MinecraftFacet.facetType, "Minecraft", configuration, null)
+        runWriteTask {
+            val modifiableModel = facetManager.createModifiableModel()
+            modifiableModel.addFacet(facet)
+            modifiableModel.commit()
+        }
+
+        super.runTest()
+    }
+
     override fun getProjectDescriptor(): LightProjectDescriptor {
         return object : DefaultLightProjectDescriptor() {
             override fun configureModule(module: Module, model: ModifiableRootModel, contentEntry: ContentEntry) {
                 super.configureModule(module, model, contentEntry)
 
-                preConfigureModule(module, model)
-
-                val facetManager = FacetManager.getInstance(module)
-                val configuration = MinecraftFacetConfiguration()
-                configuration.state.autoDetectTypes.addAll(platformTypes)
-
-                val facet = facetManager.createFacet(MinecraftFacet.facetType, "Minecraft", configuration, null)
-                runWriteTask {
-                    val modifiableModel = facetManager.createModifiableModel()
-                    modifiableModel.addFacet(facet)
-                    modifiableModel.commit()
-                }
-
-                postConfigureModule(module, model)
+                configureModule(module, model)
             }
 
             // TODO: Figure out how to package Mock JDK to speed up builds

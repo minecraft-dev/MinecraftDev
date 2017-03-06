@@ -22,7 +22,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 
 abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
 
-    override fun postConfigureModule(module: Module, model: ModifiableRootModel) {
+    override fun configureModule(module: Module, model: ModifiableRootModel) {
         // If we're lucky, the following code adds the Mixin library to the project
         val mixinPath = FileUtil.toSystemIndependentName(System.getProperty("mixinUrl")!!)
 
