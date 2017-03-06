@@ -46,7 +46,7 @@ class SrgManager(val files: Set<String>) {
     }
 
     companion object {
-        val map = HashMap<Set<String>, SrgManager>()
+        private val map = HashMap<Set<String>, SrgManager>()
 
         @JvmStatic fun getInstance(files: Set<String>) = map.computeIfAbsent(files, ::SrgManager)
     }

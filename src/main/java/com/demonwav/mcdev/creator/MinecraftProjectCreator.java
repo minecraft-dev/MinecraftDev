@@ -33,8 +33,8 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.vfs.VirtualFile;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
@@ -63,8 +63,8 @@ public class MinecraftProjectCreator {
 
         buildSystem.setPluginName(settings.values().iterator().next().pluginName);
 
-        Set<BuildRepository> buildRepositories = buildSystem.getRepositories();
-        Set<BuildDependency> dependencies = buildSystem.getDependencies();
+        List<BuildRepository> buildRepositories = buildSystem.getRepositories();
+        List<BuildDependency> dependencies = buildSystem.getDependencies();
 
         if (settings.size() == 1) {
             doSingleModuleCreate();
@@ -211,11 +211,11 @@ public class MinecraftProjectCreator {
         buildDependency.setScope("provided");
     }
 
-    private static void addSonatype(Set<BuildRepository> buildRepositories) {
+    private static void addSonatype(List<BuildRepository> buildRepositories) {
         buildRepositories.add(new BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/"));
     }
 
-    private static void addVIRepo(Set<BuildRepository> buildRepositories) {
+    private static void addVIRepo(List<BuildRepository> buildRepositories) {
         buildRepositories.add(new BuildRepository("vi-releases", "http://repo.visualillusionsent.net:8888/repository/internal/"));
         buildRepositories.add(new BuildRepository("vi-snapshots", "http://repo.visualillusionsent.net:8888/repository/snapshots/"));
     }

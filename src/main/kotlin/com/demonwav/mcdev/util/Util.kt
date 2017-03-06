@@ -46,9 +46,14 @@ fun Collection<*>.toArray(): Array<Any?> {
 }
 
 @Contract(pure = true)
-inline fun <T, R> Collection<T>.mapFirstNotNull(transform: (T) -> R?): R? {
+inline fun <T, R> Iterable<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     forEach { transform(it)?.let { return it } }
     return null
+}
+
+@Contract(pure = true)
+inline fun <T, R> Array<T>.mapFirstNotNull(transform: (T) -> R?): R? {
+    return asIterable().mapFirstNotNull(transform)
 }
 
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {

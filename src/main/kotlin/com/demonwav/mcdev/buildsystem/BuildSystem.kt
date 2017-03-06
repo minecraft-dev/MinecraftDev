@@ -18,14 +18,12 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 
 /**
- * Base class for Maven and Gradle build systems. The general contract of any class which implements this is any
- * change in a setter in this class will reflect back on the actual files that these classes represent, and in turn
- * represent changes in the project itself.
+ * Base class for build system project creation.
  */
 abstract class BuildSystem {
 
-    val dependencies = mutableSetOf<BuildDependency>()
-    val repositories = mutableSetOf<BuildRepository>()
+    val dependencies = mutableListOf<BuildDependency>()
+    val repositories = mutableListOf<BuildRepository>()
 
     lateinit var artifactId: String
     lateinit var groupId: String
@@ -62,12 +60,10 @@ abstract class BuildSystem {
      * *
      * @param configurations The configuration objects for the project
      */
-    abstract fun create(project: Project,
-                        configurations: ProjectConfiguration,
-                        indicator: ProgressIndicator)
+    abstract fun create(project: Project, configurations: ProjectConfiguration, indicator: ProgressIndicator)
 
     /**
-     * This is called after [.create], and after the module has set
+     * This is called after [create], and after the module has set
      * itself up. This is when the build system should make whatever calls are necessary to enable the build system's
      * plugin, and setup whatever run configs should be setup for this build system.
      *
@@ -79,9 +75,7 @@ abstract class BuildSystem {
      * *
      * @param configurations The configuration object for the project
      */
-    abstract fun finishSetup(module: Module,
-                             configurations: Collection<ProjectConfiguration>,
-                             indicator: ProgressIndicator)
+    abstract fun finishSetup(module: Module, configurations: Collection<ProjectConfiguration>, indicator: ProgressIndicator)
 
     @JvmOverloads
     fun createDirectories(dir: VirtualFile = rootDirectory) {

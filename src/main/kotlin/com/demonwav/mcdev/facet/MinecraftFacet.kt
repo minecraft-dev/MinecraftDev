@@ -18,6 +18,7 @@ import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
+import com.demonwav.mcdev.util.mapFirstNotNull
 import com.google.common.collect.HashMultimap
 import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
@@ -110,22 +111,18 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     @Contract(pure = true)
     fun getTypes(): Collection<AbstractModuleType<*>> = modules.keys
 
-    @Contract(value = "null -> false", pure = true)
-    fun isOfType(type: AbstractModuleType<*>?) = modules.containsKey(type)
+    @Contract(pure = true)
+    fun isOfType(type: AbstractModuleType<*>) = modules.containsKey(type)
 
-    @Contract(value = "null -> null", pure = true)
-    fun <T : AbstractModule> getModuleOfType(type: AbstractModuleType<T>?): T? {
+    @Contract(pure = true)
+    fun <T : AbstractModule> getModuleOfType(type: AbstractModuleType<T>): T? {
         @Suppress("UNCHECKED_CAST")
-        return modules[type as AbstractModuleType<*>] as? T
+        return modules[type] as? T
     }
 
     @Contract(value = "null -> false", pure = true)
     fun isEventClassValidForModule(eventClass: PsiClass?): Boolean {
-        if (eventClass == null) {
-            return false
-        }
-
-        return modules.values.any { it.isEventClassValid(eventClass, null) }
+        return eventClass != null && modules.values.any { it.isEventClassValid(eventClass, null) }
     }
 
     @Contract(pure = true)
@@ -171,20 +168,14 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     @Contract(pure = true)
     fun getIcon(): Icon? {
         val iconCount = modules.keys.count { it.hasIcon() }
-        if (iconCount == 0) {
-            return null
-        } else if (iconCount == 1) {
-            return modules.keys.firstOrNull { it.hasIcon() }?.icon
-        } else if (
-            iconCount == 2 &&
-            modules.containsKey(SpongeModuleType) &&
-            modules.containsKey(ForgeModuleType)
-        ) {
-            return PlatformAssets.SPONGE_FORGE_ICON
-        } else if (modules.size > 0) {
-            return PlatformAssets.MINECRAFT_ICON
-        } else {
-            return null
+        return when {
+            iconCount == 0 -> null
+            iconCount == 1 -> modules.keys.firstOrNull { it.hasIcon() }?.icon
+            iconCount == 2 && modules.containsKey(SpongeModuleType) && modules.containsKey(ForgeModuleType) ->
+                PlatformAssets.SPONGE_FORGE_ICON
+            modules.size > 0 ->
+                PlatformAssets.MINECRAFT_ICON
+            else -> null
         }
     }
 
@@ -232,16 +223,13 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         }
 
         @JvmStatic
-        fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>): T? {
-            val instance = getInstance(module) ?: return null
-            return instance.getModuleOfType(type)
-        }
+        fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>) = getInstance(module)?.getModuleOfType(type)
 
         @JvmStatic
         fun <T : AbstractModule> getInstance(module: Module, vararg types: AbstractModuleType<*>): T? {
             val instance = getInstance(module) ?: return null
             @Suppress("UNCHECKED_CAST")
-            return types.asSequence().mapNotNull { instance.getModuleOfType(it) }.firstOrNull() as? T
+            return types.mapFirstNotNull { instance.getModuleOfType(it) } as? T
         }
     }
 }
