@@ -86,7 +86,7 @@ public abstract class AbstractModuleType<T extends AbstractModule> {
     }
 
     @NotNull
-    public abstract T generateModule(@NotNull Module module);
+    public abstract T generateModule(@NotNull MinecraftFacet facet);
 
     public void performCreationSettingSetup(@NotNull Project project) {
         final JDOMExternalizableStringList annotations = ((EntryPointsManagerBase)EntryPointsManager.getInstance(project)).ADDITIONAL_ANNOTATIONS;

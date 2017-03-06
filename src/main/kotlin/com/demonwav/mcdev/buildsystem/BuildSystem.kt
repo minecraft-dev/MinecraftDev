@@ -24,8 +24,6 @@ import com.intellij.openapi.vfs.VirtualFile
  */
 abstract class BuildSystem {
 
-    private val lock = Any()
-
     val dependencies = mutableSetOf<BuildDependency>()
     val repositories = mutableSetOf<BuildRepository>()
 
@@ -34,6 +32,11 @@ abstract class BuildSystem {
     lateinit var version: String
 
     lateinit var rootDirectory: VirtualFile
+
+    lateinit var sourceDirectory: VirtualFile
+    lateinit var resourceDirectory: VirtualFile
+    lateinit var testSourceDirectory: VirtualFile
+    lateinit var testResourceDirectory: VirtualFile
 
     /**
      * This refers to the plugin name from the perspective of the build system, that being a name field in the build
@@ -82,16 +85,9 @@ abstract class BuildSystem {
 
     @JvmOverloads
     fun createDirectories(dir: VirtualFile = rootDirectory) {
-        VfsUtil.createDirectories(dir.path + "/src/main/java")
-        VfsUtil.createDirectories(dir.path + "/src/main/resources")
-        VfsUtil.createDirectories(dir.path + "/src/test/java")
-        VfsUtil.createDirectories(dir.path + "/src/test/resources")
-    }
-
-    companion object {
-        var instanceManager: BuildSystemInstanceManager = DefaultBuildSystemInstanceManager
-
-        @JvmStatic
-        fun getInstance(module: Module) = instanceManager.getBuildSystem(module)
+        sourceDirectory = VfsUtil.createDirectories(dir.path + "/src/main/java")
+        resourceDirectory = VfsUtil.createDirectories(dir.path + "/src/main/resources")
+        testSourceDirectory = VfsUtil.createDirectories(dir.path + "/src/test/java")
+        testResourceDirectory = VfsUtil.createDirectories(dir.path + "/src/test/resources")
     }
 }

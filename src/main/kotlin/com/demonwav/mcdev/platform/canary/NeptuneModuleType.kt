@@ -11,13 +11,13 @@
 package com.demonwav.mcdev.platform.canary
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.canary.generation.CanaryHookGenerationPanel
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants
 import com.demonwav.mcdev.platform.canary.util.CanaryLegacyColors
 import com.demonwav.mcdev.util.CommonColors
-import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiClass
 
 object NeptuneModuleType : AbstractModuleType<CanaryModule<NeptuneModuleType>>("org.neptunepowered", "NeptuneLib") {
@@ -35,7 +35,7 @@ object NeptuneModuleType : AbstractModuleType<CanaryModule<NeptuneModuleType>>("
     override fun getId() = ID
     override fun getIgnoredAnnotations() = CanaryModuleType.IGNORED_ANNOTATIONS
     override fun getListenerAnnotations() = CanaryModuleType.LISTENER_ANNOTATIONS
-    override fun generateModule(module: Module) = CanaryModule(module, this)
+    override fun generateModule(facet: MinecraftFacet) = CanaryModule(facet, this)
     override fun isEventGenAvailable() = true
     override fun getEventGenerationPanel(chosenClass: PsiClass) = CanaryHookGenerationPanel(chosenClass)
 }

@@ -11,11 +11,11 @@
 package com.demonwav.mcdev.platform.mcp.at
 
 import com.demonwav.mcdev.framework.BaseMinecraftTest
-import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.openapi.actionSystem.IdeActions
 import org.intellij.lang.annotations.Language
 
-class AtCommenterTest : BaseMinecraftTest(McpModuleType) {
+class AtCommenterTest : BaseMinecraftTest(PlatformType.MCP) {
 
     private val fileName: String
         get() = getTestName(true)

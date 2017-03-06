@@ -11,11 +11,11 @@
 package com.demonwav.mcdev.platform.sponge
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.generation.SpongeEventGenerationPanel
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
-import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiClass
 
 object SpongeModuleType : AbstractModuleType<SpongeModule>("org.spongepowered", "spongeapi") {
@@ -31,7 +31,7 @@ object SpongeModuleType : AbstractModuleType<SpongeModule>("org.spongepowered", 
     override fun getIgnoredAnnotations() = IGNORED_ANNOTATIONS
     override fun getListenerAnnotations() = LISTENER_ANNOTATIONS
     override fun getDefaultListenerName(psiClass: PsiClass): String = defaultNameForSubClassEvents(psiClass)
-    override fun generateModule(module: Module) = SpongeModule(module)
+    override fun generateModule(facet: MinecraftFacet) = SpongeModule(facet)
     override fun isEventGenAvailable() = true
     override fun getEventGenerationPanel(chosenClass: PsiClass) = SpongeEventGenerationPanel(chosenClass)
 }

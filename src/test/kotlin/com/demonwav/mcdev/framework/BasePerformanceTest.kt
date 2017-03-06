@@ -10,9 +10,9 @@
 
 package com.demonwav.mcdev.framework
 
-import com.demonwav.mcdev.platform.AbstractModuleType
+import com.demonwav.mcdev.platform.PlatformType
 
-abstract class BasePerformanceTest(vararg moduleTypes: AbstractModuleType<*>) : BaseMinecraftTest(*moduleTypes) {
+abstract class BasePerformanceTest(vararg platformTypes: PlatformType) : BaseMinecraftTest(*platformTypes) {
 
     protected var enabled = true
 

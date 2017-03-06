@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.facet
 
+import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.util.runWriteTaskLater
@@ -31,6 +32,10 @@ class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(projec
     override fun projectOpened() {
         val manager = StartupManager.getInstance(myProject)
         val connection = myProject.messageBus.connect()
+
+        for (module in ModuleManager.getInstance(myProject).modules) {
+            module.clearOption(MinecraftModuleType.OPTION)
+        }
 
         manager.registerStartupActivity {
             MinecraftModuleRootListener.doCheck(myProject)

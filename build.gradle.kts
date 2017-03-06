@@ -115,7 +115,7 @@ configure<IntelliJPluginExtension> {
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies
-    setPlugins("maven", "gradle", "Groovy", "yaml",
+    setPlugins("maven", "gradle", "Groovy",
                // needed dependencies for unit tests
                "properties", "junit")
 

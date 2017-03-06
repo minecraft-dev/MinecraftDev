@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
+import com.intellij.facet.ProjectFacetManager;
 import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.AbstractProjectComponent;
@@ -21,12 +22,14 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.startup.StartupManager;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.AnnotatedElementsSearch;
 import java.util.Collection;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class SideOnlyProjectComponent extends AbstractProjectComponent {
@@ -36,19 +39,12 @@ public class SideOnlyProjectComponent extends AbstractProjectComponent {
 
     @Override
     public void projectOpened() {
-        MinecraftFacet.doWhenReady(instance -> {
-            if (myProject.isDisposed()) {
-                return;
-            }
+        final List<MinecraftFacet> facets = ProjectFacetManager.getInstance(myProject).getFacets(MinecraftFacet.ID);
+        if (facets.stream().noneMatch(f -> f.isOfType(ForgeModuleType.INSTANCE))) {
+            return;
+        }
 
-            if (instance.getIdeaModule().isDisposed()) {
-                return;
-            }
-
-            if (!instance.isOfType(ForgeModuleType.INSTANCE)) {
-                return;
-            }
-
+        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> {
             DumbService.getInstance(myProject).smartInvokeLater(() -> {
                 ProgressManager.getInstance().run(new Task.Backgroundable(myProject, "Indexing @SidedProxy", true, null) {
                     @Override

@@ -10,24 +10,19 @@
 
 package com.demonwav.mcdev.framework
 
-import com.demonwav.mcdev.ProjectComponentHandler
-import com.demonwav.mcdev.buildsystem.BuildSystem
-import com.demonwav.mcdev.buildsystem.BuildSystemInstanceManager
-import com.demonwav.mcdev.framework.buildsystem.TestBuildSystemInstanceManager
-import com.demonwav.mcdev.platform.AbstractModuleType
-import com.demonwav.mcdev.platform.MinecraftModuleType
-import com.demonwav.mcdev.platform.ProjectComponentManager
+import com.demonwav.mcdev.facet.MinecraftFacet
+import com.demonwav.mcdev.facet.MinecraftFacetConfiguration
+import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.JavaTestUtil
+import com.intellij.facet.FacetManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
 
-abstract class BaseMinecraftTest(protected vararg val moduleTypes: AbstractModuleType<*>) : ProjectBuilderTest() {
-
-    protected var buildSystemInstanceManager: BuildSystemInstanceManager = TestBuildSystemInstanceManager
-    protected var projectComponentHandler: ProjectComponentHandler = TestProjectComponentHandler
+abstract class BaseMinecraftTest(protected vararg val platformTypes: PlatformType) : ProjectBuilderTest() {
 
     protected open fun preConfigureModule(module: Module, model: ModifiableRootModel) {}
     protected open fun postConfigureModule(module: Module, model: ModifiableRootModel) {}
@@ -45,12 +40,17 @@ abstract class BaseMinecraftTest(protected vararg val moduleTypes: AbstractModul
 
                 preConfigureModule(module, model)
 
-                BuildSystem.instanceManager = buildSystemInstanceManager
-                ProjectComponentManager.handler = projectComponentHandler
+                val facetManager = FacetManager.getInstance(module)
+                val configuration = MinecraftFacetConfiguration()
+                configuration.state.autoDetectTypes.addAll(platformTypes)
 
-                moduleTypes.forEach {
-                    MinecraftModuleType.addOption(module, it.id, false)
+                val facet = facetManager.createFacet(MinecraftFacet.facetType, "Minecraft", configuration, null)
+                runWriteTaskLater {
+                    val modifiableModel = facetManager.createModifiableModel()
+                    modifiableModel.addFacet(facet)
+                    modifiableModel.commit()
                 }
+
                 postConfigureModule(module, model)
             }
 

@@ -11,20 +11,22 @@
 package com.demonwav.mcdev.platform;
 
 import com.demonwav.mcdev.MinecraftSettings;
-import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.platform.forge.ForgeModuleType;
-import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.ProjectViewNodeDecorator;
+import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packageDependencies.ui.PackageDependenciesNode;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.ColoredTreeCellRenderer;
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This class sets the icons for the modules in the project view.
@@ -37,53 +39,90 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
             return;
         }
 
-        if (node.getProject() == null) {
+        final Project project = node.getProject();
+        if (project == null) {
             return;
         }
 
-        for (Module module : ModuleManager.getInstance(node.getProject()).getModules()) {
-            final ModuleRootManager rootManager = ModuleRootManager.getInstance(module);
-            // Make sure there is at least a root to go off of
-            if (rootManager.getContentRoots().length < 1) {
+        if (!(node instanceof PsiDirectoryNode)) {
+            return;
+        }
+
+        final PsiDirectory directory = ((PsiDirectoryNode) node).getValue();
+        final Module module = ModuleUtilCore.findModuleForPsiElement(directory);
+        if (module == null) {
+            return;
+        }
+
+        final ModuleRootManager rootManager = ModuleRootManager.getInstance(module);
+        // Make sure there is at least a root to go off of
+        if (rootManager.getContentRoots().length < 1) {
+            return;
+        }
+
+        // Get the root and compare it to the node
+        final VirtualFile root = rootManager.getContentRoots()[0];
+        if (!root.equals(node.getVirtualFile())) {
+            return;
+        }
+
+        final ModuleManager moduleManager = ModuleManager.getInstance(project);
+        final String[] path = moduleManager.getModuleGroupPath(module);
+
+        if (path == null) {
+            handleNoGroup(project, data, module);
+        } else {
+            handleGroup(data, module, moduleManager);
+        }
+    }
+
+    private void handleNoGroup(@NotNull Project project, @NotNull PresentationData data, @NotNull Module module) {
+        final MinecraftFacet facet = MinecraftFacet.getInstance(module);
+        if (facet == null) {
+            // One last attempt for top level nodes
+            handleGroup(data, module, ModuleManager.getInstance(project));
+            return;
+        }
+
+        final Icon icon = facet.getIcon();
+        if (icon == null) {
+            return;
+        }
+
+        data.setIcon(icon);
+    }
+
+    private void handleGroup(@NotNull PresentationData data, @NotNull Module module, @NotNull ModuleManager manager) {
+        final Module[] modules = manager.getModules();
+        for (Module m : modules) {
+            if (m.equals(module)) {
                 continue;
             }
 
-            // Get the root and compare it to the node
-            final VirtualFile root = rootManager.getContentRoots()[0];
-            if (!root.equals(node.getVirtualFile())) {
+            final String[] path = manager.getModuleGroupPath(m);
+            if (path == null || path.length == 0) {
                 continue;
             }
 
-            // At this point we know this a module node, now check if it's a valid module for us
-            final MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
-            if (minecraftModule == null) {
+            final String moduleName = path[path.length - 1];
+            final Module intermediateModule = manager.findModuleByName(moduleName);
+
+            if (!module.equals(intermediateModule)) {
                 continue;
             }
 
-            // MinecraftModule.getInstance() does us a solid and returns the right module even if we gave it a child
-            // module. We don't want that here, so verify that the module we gave it is the module we get back
-            if (!minecraftModule.getIdeaModule().equals(module)) {
+            final MinecraftFacet facet = MinecraftFacet.getInstance(m);
+            if (facet == null) {
                 continue;
             }
 
-            final List<AbstractModuleType<?>> validTypes = minecraftModule.getTypes().stream()
-                .filter(AbstractModuleType::hasIcon)
-                .collect(Collectors.toList());
+            final Icon icon = facet.getIcon();
+            if (icon == null) {
+                continue;
+            }
 
-            if (validTypes.isEmpty()) {
-                continue;
-            }
-            if (validTypes.size() == 1) {
-                data.setIcon(validTypes.get(0).getIcon());
-                continue;
-            }
-            if (validTypes.size() == 2) {
-                if (validTypes.contains(SpongeModuleType.INSTANCE) && validTypes.contains(ForgeModuleType.INSTANCE)) {
-                    data.setIcon(PlatformAssets.SPONGE_FORGE_ICON);
-                    continue;
-                }
-            }
-            data.setIcon(PlatformAssets.MINECRAFT_ICON);
+            data.setIcon(icon);
+            return;
         }
     }
 

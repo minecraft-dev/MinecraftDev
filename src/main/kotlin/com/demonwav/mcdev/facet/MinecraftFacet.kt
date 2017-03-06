@@ -11,22 +11,28 @@
 package com.demonwav.mcdev.facet
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.buildsystem.SourceType
 import com.demonwav.mcdev.facet.MinecraftFacetType.Companion.TYPE_ID
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
+import com.google.common.collect.HashMultimap
 import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetTypeId
 import com.intellij.facet.FacetTypeRegistry
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import org.jetbrains.annotations.Contract
+import org.jetbrains.jps.model.java.JavaResourceRootType
+import org.jetbrains.jps.model.java.JavaSourceRootType
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Collectors
 import java.util.stream.Stream
@@ -36,6 +42,7 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, underlyingFacet) {
 
     private val modules = ConcurrentHashMap<AbstractModuleType<*>, AbstractModule>()
+    private val roots: HashMultimap<SourceType, VirtualFile> = HashMultimap.create()
 
     init {
         configuration.facet = this
@@ -54,7 +61,7 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
             .map { it.key }
 
         val autoEnabled = configuration.state.autoDetectTypes.stream()
-            .filter { configuration.state.userChosenTypes[it] != null }
+            .filter { configuration.state.userChosenTypes[it] == null }
 
         val allEnabled = Stream.concat(userEnabled, autoEnabled).collect(Collectors.toSet())
 
@@ -71,11 +78,30 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
             .map { it.type }
             .filter { !modules.containsKey(it) }
             .forEach { register(it) }
+
+        updateRoots()
+
+        ProjectView.getInstance(module.project).refresh()
+    }
+
+    private fun updateRoots() {
+        roots.clear()
+        val rootManager = ModuleRootManager.getInstance(module)
+        for (entry in rootManager.contentEntries) {
+            for (sourceFolder in entry.sourceFolders) {
+                when (sourceFolder.rootType) {
+                    JavaSourceRootType.SOURCE -> roots.put(SourceType.SOURCE, sourceFolder.file)
+                    JavaSourceRootType.TEST_SOURCE -> roots.put(SourceType.TEST_SOURCE, sourceFolder.file)
+                    JavaResourceRootType.RESOURCE -> roots.put(SourceType.RESOURCE, sourceFolder.file)
+                    JavaResourceRootType.TEST_RESOURCE -> roots.put(SourceType.TEST_RESOURCE, sourceFolder.file)
+                }
+            }
+        }
     }
 
     private fun register(type: AbstractModuleType<*>) {
         type.performCreationSettingSetup(module.project)
-        modules.put(type, type.generateModule(module))
+        modules[type] = type.generateModule(this)
     }
 
     @Contract(pure = true)
@@ -135,14 +161,6 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         return null
     }
 
-    fun addModuleType(moduleTypeName: String) {
-        val type = PlatformType.getByName(moduleTypeName)
-        if (type != null && !modules.containsKey(type)) {
-            modules[type] = type.generateModule(module)
-        }
-        ProjectView.getInstance(module.project).refresh()
-    }
-
     @Contract(pure = true)
     fun isEventGenAvailable() = modules.keys.any { it.isEventGenAvailable }
 
@@ -151,17 +169,30 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
     @Contract(pure = true)
     fun getIcon(): Icon? {
-        if (modules.keys.count { it.hasIcon() } == 1) {
-            return modules.values.iterator().next().icon
+        val iconCount = modules.keys.count { it.hasIcon() }
+        if (iconCount == 0) {
+            return null
+        } else if (iconCount == 1) {
+            return modules.keys.firstOrNull { it.hasIcon() }?.icon
         } else if (
-        modules.keys.count { it.hasIcon() } == 2 &&
+            iconCount == 2 &&
             modules.containsKey(SpongeModuleType) &&
             modules.containsKey(ForgeModuleType)
-                   ) {
+        ) {
             return PlatformAssets.SPONGE_FORGE_ICON
-        } else {
+        } else if (modules.size > 0) {
             return PlatformAssets.MINECRAFT_ICON
+        } else {
+            return null
         }
+    }
+
+    fun findFile(path: String, type: SourceType): VirtualFile? {
+        val roots = roots[type]
+        for (root in roots) {
+            return root.findFileByRelativePath(path) ?: continue
+        }
+        return null
     }
 
     companion object {

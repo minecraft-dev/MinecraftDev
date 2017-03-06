@@ -11,10 +11,9 @@
 package com.demonwav.mcdev.platform.liteloader;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
-import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
@@ -25,13 +24,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class LiteLoaderModule extends AbstractModule {
 
-    LiteLoaderModule(@NotNull Module module) {
-        super(module);
-    }
-
-    @Override
-    public GradleBuildSystem getBuildSystem() {
-        return (GradleBuildSystem) buildSystem;
+    LiteLoaderModule(@NotNull MinecraftFacet facet) {
+        super(facet);
     }
 
     @Override

@@ -10,12 +10,11 @@
 
 package com.demonwav.mcdev.platform.mixin
 
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 
-import com.intellij.openapi.module.Module
-
-class MixinModule(module: Module) : AbstractModule(module) {
+class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
     override fun getModuleType() = MixinModuleType
     override fun getType() = PlatformType.MIXIN

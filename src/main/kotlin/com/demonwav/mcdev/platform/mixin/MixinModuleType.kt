@@ -10,10 +10,10 @@
 
 package com.demonwav.mcdev.platform.mixin
 
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations
-import com.intellij.openapi.module.Module
 
 object MixinModuleType : AbstractModuleType<MixinModule>("org.spongepowered", "mixin") {
 
@@ -50,5 +50,5 @@ object MixinModuleType : AbstractModuleType<MixinModule>("org.spongepowered", "m
     override fun getIgnoredAnnotations() = IGNORED_ANNOTATIONS
     override fun getListenerAnnotations() = LISTENER_ANNOTATIONS
 
-    override fun generateModule(module: Module) = MixinModule(module)
+    override fun generateModule(facet: MinecraftFacet) = MixinModule(facet)
 }

@@ -12,7 +12,6 @@ package com.demonwav.mcdev.inspection
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.util.mapNotNull
-
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiMethodCallExpression
 import com.siyeh.ig.BaseInspection
@@ -41,7 +40,7 @@ class IsCancelledInspection : BaseInspection() {
 
                 val instance = MinecraftFacet.getInstance(module) ?: return
 
-                val useless = instance.modules.values.stream()
+                val useless = instance.getModules().stream()
                     .mapNotNull { m -> m.checkUselessCancelCheck(expression) }
                     .findAny()
 

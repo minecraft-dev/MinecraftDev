@@ -10,12 +10,11 @@
 
 package com.demonwav.mcdev.platform.mcp;
 
-import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.mcp.srg.SrgManager;
 import com.google.common.collect.Sets;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
@@ -26,19 +25,14 @@ import org.jetbrains.annotations.NotNull;
 public class McpModule extends AbstractModule {
 
     private final McpModuleSettings settings;
-    final Set<VirtualFile> accessTransformers = Sets.newHashSet();
+    private final Set<VirtualFile> accessTransformers = Sets.newHashSet();
     private SrgManager srgManager = new SrgManager();
 
-    public McpModule(@NotNull Module module) {
-        super(module);
+    public McpModule(@NotNull MinecraftFacet facet) {
+        super(facet);
 
         this.settings = McpModuleSettings.getInstance(module);
         srgManager.parse(getSettings().getMappingFiles());
-    }
-
-    @Override
-    public GradleBuildSystem getBuildSystem() {
-        return (GradleBuildSystem) buildSystem;
     }
 
     @Override

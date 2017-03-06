@@ -483,10 +483,6 @@
             <loadForDefaultProject/>
         </component>
         <component>
-            <implementation-class>com.demonwav.mcdev.platform.mcp.McpProjectComponent</implementation-class>
-            <loadForDefaultProject/>
-        </component>
-        <component>
             <implementation-class>com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>

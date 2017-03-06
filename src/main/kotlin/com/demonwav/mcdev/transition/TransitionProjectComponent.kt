@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.transition
 
-import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.intellij.openapi.components.AbstractProjectComponent
 import com.intellij.openapi.module.JavaModuleType
 import com.intellij.openapi.module.ModuleManager
@@ -25,7 +24,6 @@ class TransitionProjectComponent(project: Project) : AbstractProjectComponent(pr
             for (type in types) {
                 if (module.getOptionValue("type") == type) {
                     module.setOption("type", JavaModuleType.getModuleType().id)
-                    MinecraftModuleType.addOption(module, type)
                 }
             }
         }

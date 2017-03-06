@@ -11,8 +11,8 @@
 package com.demonwav.mcdev.platform.bungeecord;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
@@ -44,8 +44,13 @@ public class BungeeCordModule extends AbstractModule {
 
     private VirtualFile pluginYml;
 
-    BungeeCordModule(@NotNull Module module) {
-        super(module);
+    BungeeCordModule(@NotNull MinecraftFacet facet) {
+        super(facet);
+        setup();
+    }
+
+    private void setup() {
+        pluginYml = facet.findFile("plugin.yml", SourceType.RESOURCE);
     }
 
     @NotNull
@@ -58,14 +63,12 @@ public class BungeeCordModule extends AbstractModule {
         return BungeeCordModuleType.INSTANCE;
     }
 
+    @Nullable
     public VirtualFile getPluginYml() {
-        if (buildSystem == null) {
-            buildSystem = BuildSystem.getInstance(module);
-        }
-        if (pluginYml == null && buildSystem != null) {
+        if (pluginYml == null) {
             // try and find the file again if it's not already present
             // when this object was first created it may not have been ready
-            pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
+            setup();
         }
         return pluginYml;
     }
