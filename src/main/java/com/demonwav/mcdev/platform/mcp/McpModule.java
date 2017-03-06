@@ -26,13 +26,17 @@ public class McpModule extends AbstractModule {
 
     private final McpModuleSettings settings;
     private final Set<VirtualFile> accessTransformers = Sets.newHashSet();
-    private SrgManager srgManager = new SrgManager();
+    private SrgManager srgManager;
 
     public McpModule(@NotNull MinecraftFacet facet) {
         super(facet);
 
         this.settings = McpModuleSettings.getInstance(module);
-        srgManager.parse(getSettings().getMappingFiles());
+        final Set<String> files = getSettings().getMappingFiles();
+        if (!files.isEmpty()) {
+            srgManager = SrgManager.getInstance(files);
+            srgManager.parse();
+        }
     }
 
     @Override
@@ -65,7 +69,8 @@ public class McpModule extends AbstractModule {
 
     public void updateSettings(McpModuleSettings.State data) {
         this.settings.loadState(data);
-        srgManager.parse(data.getMappingFiles());
+        srgManager = SrgManager.getInstance(data.getMappingFiles());
+        srgManager.parse();
     }
 
     public Set<VirtualFile> getAccessTransformers() {

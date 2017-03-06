@@ -36,10 +36,17 @@ class McpDataService : AbstractProjectDataService<McpModelData, Module>() {
             val data = node.data
             val module = modelsProvider.findIdeModule(data.module) ?: continue
 
-            val mcpModule = MinecraftFacet.getInstance(module, McpModuleType) ?: continue
+            val mcpModule = MinecraftFacet.getInstance(module, McpModuleType)
+            if (mcpModule != null) {
+                // Update the local settings and recompute the SRG map
+                mcpModule.updateSettings(data.settings)
+                continue
+            }
 
-            // Update the local settings and recompute the SRG map
-            mcpModule.updateSettings(data.settings)
+            val children = MinecraftFacet.getChildInstances(module)
+            for (child in children) {
+                child.getModuleOfType(McpModuleType)?.updateSettings(data.settings)
+            }
         }
     }
 }

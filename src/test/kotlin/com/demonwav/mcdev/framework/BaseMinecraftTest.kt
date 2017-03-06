@@ -13,7 +13,7 @@ package com.demonwav.mcdev.framework
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.facet.MinecraftFacetConfiguration
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.util.runWriteTaskLater
+import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.JavaTestUtil
 import com.intellij.facet.FacetManager
 import com.intellij.openapi.module.Module
@@ -45,7 +45,7 @@ abstract class BaseMinecraftTest(protected vararg val platformTypes: PlatformTyp
                 configuration.state.autoDetectTypes.addAll(platformTypes)
 
                 val facet = facetManager.createFacet(MinecraftFacet.facetType, "Minecraft", configuration, null)
-                runWriteTaskLater {
+                runWriteTask {
                     val modifiableModel = facetManager.createModifiableModel()
                     modifiableModel.addFacet(facet)
                     modifiableModel.commit()

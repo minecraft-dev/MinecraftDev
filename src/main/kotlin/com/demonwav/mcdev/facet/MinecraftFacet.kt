@@ -25,6 +25,7 @@ import com.intellij.facet.FacetTypeId
 import com.intellij.facet.FacetTypeRegistry
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
@@ -205,6 +206,30 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
         @JvmStatic
         fun getInstance(module: Module) = FacetManager.getInstance(module).getFacetByType(ID)
+
+        @JvmStatic
+        fun getChildInstances(module: Module): Set<MinecraftFacet> {
+            val instance = getInstance(module)
+            if (instance != null) {
+                return setOf(instance)
+            }
+
+            val manager = ModuleManager.getInstance(module.project)
+            val result = mutableSetOf<MinecraftFacet>()
+
+            for (m in manager.modules) {
+                val path = manager.getModuleGroupPath(m) ?: continue
+                val namedModule = manager.findModuleByName(path.last()) ?: continue
+
+                if (namedModule != module) {
+                    continue
+                }
+
+                val facet = getInstance(m) ?: continue
+                result.add(facet)
+            }
+            return result
+        }
 
         @JvmStatic
         fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>): T? {

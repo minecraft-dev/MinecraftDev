@@ -25,8 +25,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packageDependencies.ui.PackageDependenciesNode;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.ColoredTreeCellRenderer;
-import javax.swing.Icon;
-import org.jetbrains.annotations.NotNull;
+import java.util.Set;
 
 /**
  * This class sets the icons for the modules in the project view.
@@ -66,64 +65,24 @@ public class MinecraftProjectViewNodeDecorator implements ProjectViewNodeDecorat
             return;
         }
 
-        final ModuleManager moduleManager = ModuleManager.getInstance(project);
-        final String[] path = moduleManager.getModuleGroupPath(module);
+        final Set<MinecraftFacet> children = MinecraftFacet.getChildInstances(module);
+        if (children.isEmpty()) {
+            return;
+        }
 
+        final ModuleManager manager = ModuleManager.getInstance(project);
+        final String[] path = manager.getModuleGroupPath(module);
         if (path == null) {
-            handleNoGroup(project, data, module);
-        } else {
-            handleGroup(data, module, moduleManager);
-        }
-    }
-
-    private void handleNoGroup(@NotNull Project project, @NotNull PresentationData data, @NotNull Module module) {
-        final MinecraftFacet facet = MinecraftFacet.getInstance(module);
-        if (facet == null) {
-            // One last attempt for top level nodes
-            handleGroup(data, module, ModuleManager.getInstance(project));
+            data.setIcon(children.iterator().next().getIcon());
             return;
         }
 
-        final Icon icon = facet.getIcon();
-        if (icon == null) {
+        final Module testModule = manager.findModuleByName(path[path.length - 1]);
+        if (module != testModule) {
             return;
         }
 
-        data.setIcon(icon);
-    }
-
-    private void handleGroup(@NotNull PresentationData data, @NotNull Module module, @NotNull ModuleManager manager) {
-        final Module[] modules = manager.getModules();
-        for (Module m : modules) {
-            if (m.equals(module)) {
-                continue;
-            }
-
-            final String[] path = manager.getModuleGroupPath(m);
-            if (path == null || path.length == 0) {
-                continue;
-            }
-
-            final String moduleName = path[path.length - 1];
-            final Module intermediateModule = manager.findModuleByName(moduleName);
-
-            if (!module.equals(intermediateModule)) {
-                continue;
-            }
-
-            final MinecraftFacet facet = MinecraftFacet.getInstance(m);
-            if (facet == null) {
-                continue;
-            }
-
-            final Icon icon = facet.getIcon();
-            if (icon == null) {
-                continue;
-            }
-
-            data.setIcon(icon);
-            return;
-        }
+        data.setIcon(children.iterator().next().getIcon());
     }
 
     @Override
