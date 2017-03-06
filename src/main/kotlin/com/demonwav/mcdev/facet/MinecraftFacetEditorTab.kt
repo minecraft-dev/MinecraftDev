@@ -147,7 +147,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
 
         runOnAll { enabled, auto, platformType, userTypes, _ ->
             modified += auto.isSelected == platformType in userTypes
-            modified += !auto.isSelected && enabled.isSelected != platformType in userTypes
+            modified += !auto.isSelected && enabled.isSelected != userTypes[platformType]
         }
 
         return modified
