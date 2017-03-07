@@ -53,7 +53,8 @@ inline fun <T, R> Iterable<T>.mapFirstNotNull(transform: (T) -> R?): R? {
 
 @Contract(pure = true)
 inline fun <T, R> Array<T>.mapFirstNotNull(transform: (T) -> R?): R? {
-    return asIterable().mapFirstNotNull(transform)
+    forEach { transform(it)?.let { return it } }
+    return null
 }
 
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
