@@ -29,7 +29,7 @@ class MixinPresentationProvider : LibraryPresentationProvider<LibraryVersionProp
             val file = VfsUtilCore.virtualToIoFile(classesRoot)
             val agent = JarUtil.getJarAttribute(file, Attributes.Name("Agent-Class")) ?: continue
 
-            if (agent != MixinConstants.Classes.AGENT) {
+            if (agent != MixinConstants.Classes.MIXIN_AGENT) {
                 continue
             }
 
