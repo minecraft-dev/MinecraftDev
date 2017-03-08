@@ -24,12 +24,13 @@ class SpongePresentationProvider : LibraryPresentationProvider<LibraryVersionPro
     override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.SPONGE_ICON
 
     override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
+        loop@ for (classesRoot in classesRoots) {
             val file = VfsUtilCore.virtualToIoFile(classesRoot)
-            val title = JarUtil.getJarAttribute(file, Attributes.Name.IMPLEMENTATION_TITLE) ?: continue
 
-            if (title != "SpongeAPI") {
-                continue
+            when ("SpongeAPI") {
+                JarUtil.getJarAttribute(file, Attributes.Name.IMPLEMENTATION_TITLE) -> {}
+                JarUtil.getJarAttribute(file, Attributes.Name.SPECIFICATION_TITLE) -> {}
+                else -> continue@loop
             }
 
             val version = JarUtil.getJarAttribute(file, Attributes.Name.IMPLEMENTATION_VERSION) ?: continue
