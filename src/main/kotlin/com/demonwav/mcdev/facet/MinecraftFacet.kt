@@ -19,6 +19,7 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.util.mapFirstNotNull
+import com.demonwav.mcdev.util.runInlineReadAction
 import com.google.common.collect.HashMultimap
 import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
@@ -200,26 +201,28 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
         @JvmStatic
         fun getChildInstances(module: Module): Set<MinecraftFacet> {
-            val instance = getInstance(module)
-            if (instance != null) {
-                return setOf(instance)
-            }
-
-            val manager = ModuleManager.getInstance(module.project)
-            val result = mutableSetOf<MinecraftFacet>()
-
-            for (m in manager.modules) {
-                val path = manager.getModuleGroupPath(m) ?: continue
-                val namedModule = manager.findModuleByName(path.last()) ?: continue
-
-                if (namedModule != module) {
-                    continue
+            runInlineReadAction {
+                val instance = getInstance(module)
+                if (instance != null) {
+                    return setOf(instance)
                 }
 
-                val facet = getInstance(m) ?: continue
-                result.add(facet)
+                val manager = ModuleManager.getInstance(module.project)
+                val result = mutableSetOf<MinecraftFacet>()
+
+                for (m in manager.modules) {
+                    val path = manager.getModuleGroupPath(m) ?: continue
+                    val namedModule = manager.findModuleByName(path.last()) ?: continue
+
+                    if (namedModule != module) {
+                        continue
+                    }
+
+                    val facet = getInstance(m) ?: continue
+                    result.add(facet)
+                }
+                return result
             }
-            return result
         }
 
         @JvmStatic

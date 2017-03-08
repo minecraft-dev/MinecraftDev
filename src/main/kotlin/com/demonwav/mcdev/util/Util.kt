@@ -29,11 +29,11 @@ inline fun runWriteTaskLater(crossinline func: () -> Unit) {
 }
 
 inline fun invokeAndWait(crossinline func: () -> Unit) {
-    ApplicationManager.getApplication().invokeAndWait({ func() }, ModalityState.any())
+    ApplicationManager.getApplication().invokeAndWait({ func() }, ModalityState.defaultModalityState())
 }
 
 inline fun invokeLater(crossinline func: () -> Unit) {
-    ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.any())
+    ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.defaultModalityState())
 }
 
 /**

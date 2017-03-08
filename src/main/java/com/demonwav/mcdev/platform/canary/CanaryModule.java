@@ -48,7 +48,7 @@ public class CanaryModule<T extends AbstractModuleType> extends AbstractModule {
     }
 
     private void setup() {
-        canaryInf = facet.findFile("Canary.inf", SourceType.RESOURCE);
+        canaryInf = facet.findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE);
     }
 
     @NotNull

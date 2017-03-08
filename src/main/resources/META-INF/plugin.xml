@@ -479,6 +479,10 @@
             <loadForDefaultProject/>
         </component>
         <component>
+            <implementation-class>com.demonwav.mcdev.platform.canary.CanaryProjectComponent</implementation-class>
+            <loadForDefaultProject/>
+        </component>
+        <component>
             <implementation-class>com.demonwav.mcdev.transition.TransitionProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>

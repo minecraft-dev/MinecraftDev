@@ -35,29 +35,31 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
 
     override fun getAcceptedFileTypes(): Set<FileType> = setOf(JavaFileType.INSTANCE)
 
+    @Throws(NoDataException::class)
     override fun getSourcePosition(location: Location?): SourcePosition? {
-        if (location != null) {
-            val type = location.declaringType()
+        location ?: throw NoDataException.INSTANCE
 
-            // Check if mixin source map is present (Mixin sets the default stratum to Mixin)
-            if (type.defaultStratum() == MixinConstants.SMAP_STRATUM) {
-                // Return the correct PsiFile based on the source path in the SMAP
-                try {
-                    val path = location.sourcePath()
+        val type = location.declaringType()
 
-                    // The source path is the package (separated by slashes) and class name with the ".java" file extension
-                    val className = path.removeSuffix(".java").replace('/', '.')
-
-                    // Lookup class based on its qualified name (TODO: Support for anonymous classes)
-                    val psiClass = DebuggerUtils.findClass(className, debugProcess.project, debugProcess.searchScope)
-                    if (psiClass != null) {
-                        // Mixin class found, return correct source file
-                        return SourcePosition.createFromLine(psiClass.navigationElement.containingFile, location.lineNumber() - 1)
-                    }
-                } catch (ignored: AbsentInformationException) {
-                }
-            }
+        // Check if mixin source map is present (Mixin sets the default stratum to Mixin)
+        if (type.defaultStratum() != MixinConstants.SMAP_STRATUM) {
+            throw NoDataException.INSTANCE
         }
+
+        // Return the correct PsiFile based on the source path in the SMAP
+        try {
+            val path = location.sourcePath()
+
+            // The source path is the package (separated by slashes) and class name with the ".java" file extension
+            val className = path.removeSuffix(".java").replace('/', '.')
+
+            // Lookup class based on its qualified name (TODO: Support for anonymous classes)
+            val psiClass = DebuggerUtils.findClass(className, debugProcess.project, debugProcess.searchScope)
+            if (psiClass != null) {
+                // Mixin class found, return correct source file
+                return SourcePosition.createFromLine(psiClass.navigationElement.containingFile, location.lineNumber() - 1)
+            }
+        } catch (ignored: AbsentInformationException) {}
 
         throw NoDataException.INSTANCE
     }
@@ -76,8 +78,7 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
             try {
                 // Return the line numbers from the correct source file
                 return type.locationsOfLine(MixinConstants.SMAP_STRATUM, position.file.name, position.line + 1)
-            } catch (ignored: AbsentInformationException) {
-            }
+            } catch (ignored: AbsentInformationException) {}
         }
 
         throw NoDataException.INSTANCE
