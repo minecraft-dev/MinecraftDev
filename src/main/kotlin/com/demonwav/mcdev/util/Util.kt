@@ -13,7 +13,6 @@ package com.demonwav.mcdev.util
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.application.runWriteAction
 import org.jetbrains.annotations.Contract
 
 // Kotlin functions
@@ -30,11 +29,11 @@ inline fun runWriteTaskLater(crossinline func: () -> Unit) {
 }
 
 inline fun invokeAndWait(crossinline func: () -> Unit) {
-    ApplicationManager.getApplication().invokeAndWait({ func() }, ModalityState.any())
+    ApplicationManager.getApplication().invokeAndWait({ func() }, ModalityState.defaultModalityState())
 }
 
 inline fun invokeLater(crossinline func: () -> Unit) {
-    ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.any())
+    ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.defaultModalityState())
 }
 
 /**
@@ -47,7 +46,13 @@ fun Collection<*>.toArray(): Array<Any?> {
 }
 
 @Contract(pure = true)
-inline fun <T, R> Collection<T>.mapFirstNotNull(transform: (T) -> R?): R? {
+inline fun <T, R> Iterable<T>.mapFirstNotNull(transform: (T) -> R?): R? {
+    forEach { transform(it)?.let { return it } }
+    return null
+}
+
+@Contract(pure = true)
+inline fun <T, R> Array<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     forEach { transform(it)?.let { return it } }
     return null
 }

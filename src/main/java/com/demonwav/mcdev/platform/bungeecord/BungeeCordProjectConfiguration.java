@@ -60,7 +60,7 @@ public class BungeeCordProjectConfiguration extends ProjectConfiguration {
             try {
                 indicator.setText("Writing main class");
                 // Create plugin main class
-                VirtualFile file = buildSystem.getSourceDirectories().get(0);
+                VirtualFile file = buildSystem.getSourceDirectory();
                 final String[] files = this.mainClass.split("\\.");
                 final String className = files[files.length - 1];
                 final String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
@@ -69,7 +69,7 @@ public class BungeeCordProjectConfiguration extends ProjectConfiguration {
                 final VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
 
                 BungeeCordTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className);
-                final VirtualFile pluginYml = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "plugin.yml");
+                final VirtualFile pluginYml = buildSystem.getResourceDirectory().findOrCreateChildData(this, "plugin.yml");
                 BungeeCordTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this, buildSystem);
 
                 // Set the editor focus on the main class

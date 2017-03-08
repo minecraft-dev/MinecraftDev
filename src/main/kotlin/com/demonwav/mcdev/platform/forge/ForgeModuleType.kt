@@ -11,10 +11,10 @@
 package com.demonwav.mcdev.platform.forge
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
-import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiClass
 
 object ForgeModuleType : AbstractModuleType<ForgeModule>("", "") {
@@ -36,7 +36,7 @@ object ForgeModuleType : AbstractModuleType<ForgeModule>("", "") {
     override fun getId() = ID
     override fun getIgnoredAnnotations() = IGNORED_ANNOTATIONS
     override fun getListenerAnnotations() = LISTENER_ANNOTATIONS
-    override fun generateModule(module: Module) = ForgeModule(module)
+    override fun generateModule(facet: MinecraftFacet) = ForgeModule(facet)
     override fun getDefaultListenerName(psiClass: PsiClass): String = defaultNameForSubClassEvents(psiClass)
     override fun isEventGenAvailable() = true
 }

@@ -11,12 +11,12 @@
 package com.demonwav.mcdev.platform.bukkit
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitEventGenerationPanel
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
 import com.demonwav.mcdev.util.CommonColors
-import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiClass
 
 object BukkitModuleType : AbstractModuleType<BukkitModule<BukkitModuleType>>("org.bukkit", "bukkit") {
@@ -35,7 +35,7 @@ object BukkitModuleType : AbstractModuleType<BukkitModule<BukkitModuleType>>("or
     override fun getId() = ID
     override fun getIgnoredAnnotations() = IGNORED_ANNOTATIONS
     override fun getListenerAnnotations() = LISTENER_ANNOTATIONS
-    override fun generateModule(module: Module): BukkitModule<BukkitModuleType> = BukkitModule(module, this)
+    override fun generateModule(facet: MinecraftFacet): BukkitModule<BukkitModuleType> = BukkitModule(facet, this)
     override fun isEventGenAvailable() = true
     override fun getEventGenerationPanel(chosenClass: PsiClass) = BukkitEventGenerationPanel(chosenClass)
 }

@@ -10,8 +10,7 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.platform.MinecraftModule
-
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -24,5 +23,5 @@ class ActionData(
     val file: PsiFile,
     val element: PsiElement,
     val caret: Caret,
-    val instance: MinecraftModule
+    val instance: MinecraftFacet
 )

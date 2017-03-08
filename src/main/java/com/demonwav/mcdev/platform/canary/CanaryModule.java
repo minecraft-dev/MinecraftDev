@@ -10,15 +10,14 @@
 
 package com.demonwav.mcdev.platform.canary;
 
-import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.canary.generation.CanaryGenerationData;
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
@@ -41,28 +40,23 @@ public class CanaryModule<T extends AbstractModuleType> extends AbstractModule {
     private final PlatformType type;
     private VirtualFile canaryInf;
 
-    public CanaryModule(@NotNull Module module, @NotNull T type) {
-        super(module);
+    public CanaryModule(@NotNull MinecraftFacet facet, @NotNull T type) {
+        super(facet);
         this.moduleType = type;
         this.type = type.getPlatformType();
-        buildSystem = BuildSystem.getInstance(module);
-        if (buildSystem != null) {
-            buildSystem.reImport(module).done(b -> setup());
-        }
+        setup();
     }
 
     private void setup() {
-        canaryInf = buildSystem.findFile("Canary.inf", SourceType.RESOURCE);
+        canaryInf = facet.findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE);
     }
 
+    @NotNull
     public VirtualFile getCanaryInf() {
-        if (buildSystem == null) {
-            buildSystem = BuildSystem.getInstance(module);
-        }
-        if (canaryInf == null && buildSystem != null) {
+        if (canaryInf == null) {
             // try and find the file again if it's not already present
             // when this object was first created it may not have been ready
-            canaryInf = buildSystem.findFile("Canary.inf", SourceType.RESOURCE);
+            setup();
         }
         return canaryInf;
     }

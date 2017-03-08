@@ -10,17 +10,17 @@
 
 <idea-plugin version="2">
 
-    <depends optional="false">org.jetbrains.idea.maven</depends>
-    <depends optional="false">org.jetbrains.plugins.gradle</depends>
-    <depends optional="false">org.intellij.groovy</depends>
-    <depends optional="false">org.jetbrains.plugins.yaml</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends>org.jetbrains.idea.maven</depends>
+    <depends>org.jetbrains.plugins.gradle</depends>
+    <depends>org.intellij.groovy</depends>
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
     <vendor>DemonWav</vendor>
 
     <description><![CDATA[
-      Brings support for Bukkit, Spigot, Paper, BungeeCord, Sponge, LiteLoader, Forge, and Canary Projects to Intellij IDEA.
+      Brings support for Bukkit, Spigot, Paper, BungeeCord, Sponge, LiteLoader, Forge, and Canary projects to Intellij IDEA.
     ]]></description>
 
     <change-notes><![CDATA[
@@ -48,6 +48,8 @@
         <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BungeeCordModuleTypeTransition"/>
         <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.SpongeModuleTypeTransition"/>
         <moduleType id="FORGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.ForgeModuleTypeTransition"/>
+        
+        <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
 
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
@@ -59,16 +61,6 @@
         <fileIconProvider implementation="com.demonwav.mcdev.platform.canary.CanaryFileIconProvider"/>
 
         <!-- External Project Data Services are for Gradle project imports -->
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.BukkitDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.SpigotDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bukkit.gradle.PaperDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.bungeecord.gradle.BungeeCordDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.sponge.gradle.SpongeDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.liteloader.gradle.LiteLoaderDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.CanaryDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.canary.gradle.NeptuneDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.mixin.gradle.MixinDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
 
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowNullableInspectionSuppressor"/>
@@ -459,20 +451,18 @@
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mixin.debug.MixinRunConfigurationExtension"/>
         <debugger.positionManagerFactory implementation="com.demonwav.mcdev.platform.mixin.debug.MixinPositionManagerFactory"/>
         <debuggerClassFilterProvider implementation="com.demonwav.mcdev.platform.mixin.debug.MixinDebuggerClassFilterProvider"/>
-        
-        <!-- Not ready -->
-        <!--<toolWindow id="Minecraft" icon="/assets/icons/platform/Minecraft.png" anchor="right" factoryClass="com.demonwav.mcdev.toolwindow.MinecraftToolWindowFactory"/>-->
-    </extensions>
-    <extensions defaultExtensionNs="org.jetbrains.idea.maven">
-        <!-- Maven importers for, well, Maven project importing -->
-        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.BukkitMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.SpigotMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.bukkit.maven.PaperMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.bungeecord.maven.BungeeCordMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.sponge.maven.SpongeMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.canary.maven.CanaryMavenImporter"/>
-        <importer implementation="com.demonwav.mcdev.platform.canary.maven.NeptuneMavenImporter"/>
+
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.BukkitPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.SpigotPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.PaperPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.sponge.framework.SpongePresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.forge.framework.ForgePresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.liteloader.framework.LiteLoaderPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.mcp.framework.McpPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.mixin.framework.MixinPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.bungeecord.framework.BungeeCordPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.canary.framework.CanaryPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.canary.framework.NeptunePresentationProvider" />
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
@@ -485,11 +475,11 @@
     <project-components>
         <!-- Application components for Project open listeners -->
         <component>
-            <implementation-class>com.demonwav.mcdev.platform.MinecraftProjectComponent</implementation-class>
+            <implementation-class>com.demonwav.mcdev.platform.forge.ForgeProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>
         <component>
-            <implementation-class>com.demonwav.mcdev.platform.forge.ForgeProjectComponent</implementation-class>
+            <implementation-class>com.demonwav.mcdev.platform.canary.CanaryProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>
         <component>
@@ -497,11 +487,11 @@
             <loadForDefaultProject/>
         </component>
         <component>
-            <implementation-class>com.demonwav.mcdev.platform.mcp.McpProjectComponent</implementation-class>
+            <implementation-class>com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>
         <component>
-            <implementation-class>com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyProjectComponent</implementation-class>
+            <implementation-class>com.demonwav.mcdev.facet.MinecraftFacetDetector</implementation-class>
             <loadForDefaultProject/>
         </component>
     </project-components>

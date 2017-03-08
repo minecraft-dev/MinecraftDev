@@ -55,7 +55,7 @@ public class ForgeProjectConfiguration extends ProjectConfiguration {
         Util.runWriteTask(() -> {
             try {
                 indicator.setText("Writing main class");
-                VirtualFile file = buildSystem.getSourceDirectories().get(0);
+                VirtualFile file = buildSystem.getSourceDirectory();
                 final String[] files = this.mainClass.split("\\.");
                 final String className = files[files.length - 1];
                 final String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);
@@ -87,7 +87,7 @@ public class ForgeProjectConfiguration extends ProjectConfiguration {
 
     protected void writeMcmodInfo(Project project, BuildSystem buildSystem) {
         try {
-            final VirtualFile file = buildSystem.getResourceDirectories().get(0);
+            final VirtualFile file = buildSystem.getResourceDirectory();
             final VirtualFile mcmodInfoFile = file.findOrCreateChildData(this, ForgeConstants.MCMOD_INFO);
 
             String authorsText = "";

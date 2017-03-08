@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mcp.inspections
 
-import com.demonwav.mcdev.platform.MinecraftModule
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.util.McpConstants
 import com.demonwav.mcdev.platform.mixin.util.isMixin
@@ -46,7 +46,7 @@ class EntityConstructorInspection : BaseInspection() {
 
                 val module = ModuleUtilCore.findModuleForPsiElement(aClass) ?: return
 
-                val instance = MinecraftModule.getInstance(module) ?: return
+                val instance = MinecraftFacet.getInstance(module) ?: return
 
                 if (!instance.isOfType(McpModuleType)) {
                     return

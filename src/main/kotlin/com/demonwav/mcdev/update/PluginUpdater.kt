@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.update
 
-import com.demonwav.mcdev.util.filterNotNull
 import com.demonwav.mcdev.util.forEachNotNull
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.ide.plugins.IdeaPluginDescriptor
@@ -30,7 +29,6 @@ import com.intellij.openapi.vfs.CharsetToolkit
 import com.intellij.util.io.HttpRequests
 import org.jdom.Element
 import org.jdom.JDOMException
-
 import java.io.IOException
 import java.net.URLEncoder
 

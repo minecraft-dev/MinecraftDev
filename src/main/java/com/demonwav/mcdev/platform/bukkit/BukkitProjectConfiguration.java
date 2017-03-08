@@ -86,7 +86,7 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
             try {
                 indicator.setText("Writing main class");
                 // Create plugin main class
-                VirtualFile file = buildSystem.getSourceDirectories().get(0);
+                VirtualFile file = buildSystem.getSourceDirectory();
                 final String[] files = this.mainClass.split("\\.");
                 final String className = files[files.length - 1];
 
@@ -96,7 +96,7 @@ public class BukkitProjectConfiguration extends ProjectConfiguration {
                 final VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
 
                 BukkitTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className);
-                final VirtualFile pluginYml = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "plugin.yml");
+                final VirtualFile pluginYml = buildSystem.getResourceDirectory().findOrCreateChildData(this, "plugin.yml");
                 BukkitTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this, buildSystem);
 
                 // Set the editor focus on the main class

@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform;
 
-import com.demonwav.mcdev.buildsystem.BuildSystem;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.inspection.IsCancelled;
 import com.intellij.openapi.module.Module;
@@ -31,21 +31,17 @@ public abstract class AbstractModule {
 
     protected final Project project;
     protected final Module module;
-    protected BuildSystem buildSystem;
+    protected final MinecraftFacet facet;
 
-    public AbstractModule(@NotNull Module module) {
-        this.module = module;
+    public AbstractModule(@NotNull MinecraftFacet facet) {
+        this.facet = facet;
+        this.module = facet.getModule();
         this.project = module.getProject();
     }
 
     @Contract(pure = true)
     public Module getModule() {
         return module;
-    }
-
-    @Contract(pure = true)
-    public BuildSystem getBuildSystem() {
-        return buildSystem;
     }
 
     @Contract(pure = true)
@@ -119,4 +115,6 @@ public abstract class AbstractModule {
         final PsiParameter[] parameters = method.getParameterList().getParameters();
         return parameters.length != 0 && !refResolve.equals(parameters[0]);
     }
+
+    public void dispose() {}
 }

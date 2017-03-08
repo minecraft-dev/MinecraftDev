@@ -15,6 +15,7 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.StoragePathMacros
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleManager
 
 @State(name = "McpModuleSettings", storages = arrayOf(Storage(StoragePathMacros.MODULE_FILE)))
 class McpModuleSettings : PersistentStateComponent<McpModuleSettings.State> {
@@ -34,10 +35,28 @@ class McpModuleSettings : PersistentStateComponent<McpModuleSettings.State> {
     }
 
     companion object {
-        @JvmStatic fun getInstance(module: Module) =
+        @JvmStatic
+        fun getInstance(module: Module): McpModuleSettings {
+            // TODO: Migrate these to the facet's settings
+
             // Normally this should use the ServiceManager but that doesn't support getting a service for a module
             // This is based on ServiceManager.doGetService with the module as component manager
-            module.picoContainer.getComponentInstanceOfType(McpModuleSettings::class.java) as McpModuleSettings
+            val settings = module.picoContainer.getComponentInstanceOfType(McpModuleSettings::class.java) as McpModuleSettings
+            if (settings.getState().minecraftVersion != null) {
+                return settings
+            }
+
+            // Attempt to find settings on the parent module
+            val manager = ModuleManager.getInstance(module.project)
+            val path = manager.getModuleGroupPath(module) ?: return settings
+            val parent = manager.findModuleByName(path.last()) ?: return settings
+
+            val newSettings = parent.picoContainer.getComponentInstanceOfType(McpModuleSettings::class.java) as McpModuleSettings
+            if (newSettings.getState().minecraftVersion == null) {
+                return settings
+            }
+            return newSettings
+        }
     }
 
 }

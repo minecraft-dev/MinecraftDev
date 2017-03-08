@@ -38,7 +38,7 @@ public class LiteLoaderProjectConfiguration extends ProjectConfiguration {
             try {
                 indicator.setText("Writing main class");
 
-                VirtualFile file = buildSystem.getSourceDirectories().get(0);
+                VirtualFile file = buildSystem.getSourceDirectory();
                 final String[] files = this.mainClass.split("\\.");
                 final String className = files[files.length - 1];
                 final String packageName = this.mainClass.substring(0, this.mainClass.length() - className.length() - 1);

@@ -12,10 +12,7 @@ package com.demonwav.mcdev.update
 
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
-
 import java.io.IOException
-import java.util.function.Function
-
 import javax.swing.JComponent
 
 class ConfigurePluginUpdatesDialog : DialogWrapper(true) {

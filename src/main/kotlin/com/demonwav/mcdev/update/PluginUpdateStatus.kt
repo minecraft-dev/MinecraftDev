@@ -13,9 +13,6 @@ package com.demonwav.mcdev.update
 import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.util.text.VersionComparatorUtil
 
-import java.io.PrintWriter
-import java.io.StringWriter
-
 sealed class PluginUpdateStatus {
 
     fun mergeWith(other: PluginUpdateStatus): PluginUpdateStatus {

@@ -17,7 +17,7 @@ import org.jetbrains.concurrency.rejectedPromise
 import org.jetbrains.concurrency.runAsync
 import java.nio.file.Paths
 
-class SrgManager {
+class SrgManager(val files: Set<String>) {
 
     var srgMap: Promise<McpSrgMap> = rejectedPromise("SRG map not loaded")
         @Synchronized get
@@ -27,7 +27,11 @@ class SrgManager {
         @Synchronized get() = (srgMap as? Getter<*>)?.get() as McpSrgMap?
 
     @Synchronized
-    fun parse(files: Set<String>) {
+    fun parse() {
+        if (srgMap.state == Promise.State.PENDING)  {
+            return
+        }
+
         srgMap = if (files.isNotEmpty()) {
             runAsync {
                 // Load SRG map from files
@@ -39,5 +43,11 @@ class SrgManager {
             // Path to SRG files is unknown
             rejectedPromise("No mapping data available")
         }
+    }
+
+    companion object {
+        private val map = HashMap<Set<String>, SrgManager>()
+
+        @JvmStatic fun getInstance(files: Set<String>) = map.computeIfAbsent(files, ::SrgManager)
     }
 }

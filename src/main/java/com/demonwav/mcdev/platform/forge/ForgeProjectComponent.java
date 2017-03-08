@@ -11,8 +11,8 @@
 package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
+import com.demonwav.mcdev.util.Util;
 import com.intellij.json.JsonFileType;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.fileTypes.FileNameMatcher;
 import com.intellij.openapi.fileTypes.FileTypeManager;
@@ -29,7 +29,7 @@ public class ForgeProjectComponent extends AbstractProjectComponent {
     @Override
     public void projectOpened() {
         // assign mcmod.info json thing
-        ApplicationManager.getApplication().runWriteAction(() ->
+        Util.runWriteTaskLater(() -> {
             FileTypeManager.getInstance().associate(JsonFileType.INSTANCE, new FileNameMatcher() {
                 @Override
                 public boolean accept(@NonNls @NotNull String fileName) {
@@ -41,7 +41,7 @@ public class ForgeProjectComponent extends AbstractProjectComponent {
                 public String getPresentableString() {
                     return ForgeConstants.MCMOD_INFO;
                 }
-            })
-        );
+            });
+        });
     }
 }
