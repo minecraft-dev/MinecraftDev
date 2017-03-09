@@ -20,10 +20,4 @@ cache:
     - $HOME/.gradle/wrapper/
 
 notifications:
-  irc:
-    nick: MinecraftDev
-    channels:
-      - "ircs://irc.esper.net:6697/#mcdev"
-    on_success: change
-    skip_join: true
   email: false

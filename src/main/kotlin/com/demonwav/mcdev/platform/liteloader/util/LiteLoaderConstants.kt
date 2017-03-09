@@ -1,0 +1,14 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2017 minecraft-dev
+ *
+ * MIT License
+ */
+
+@file:JvmName("LiteLoaderConstants")
+package com.demonwav.mcdev.platform.liteloader.util
+
+const val LITEMOD_JSON = "litemod.json"
