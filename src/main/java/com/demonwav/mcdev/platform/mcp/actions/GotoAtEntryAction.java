@@ -55,7 +55,7 @@ public class GotoAtEntryAction extends AnAction {
             return;
         }
 
-        final McpModule mcpModule = data.getInstance().getModuleOfType(McpModuleType.getInstance());
+        final McpModule mcpModule = data.getInstance().getModuleOfType(McpModuleType.INSTANCE);
         if (mcpModule == null) {
             showBalloon(e);
             return;

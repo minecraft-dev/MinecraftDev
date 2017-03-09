@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.canary;
 
 import com.demonwav.mcdev.MinecraftSettings;
-import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.intellij.ide.FileIconProvider;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -33,9 +33,9 @@ public class CanaryFileIconProvider implements FileIconProvider {
 
         if (project != null) {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
-                CanaryModule canaryModule = MinecraftModule.getInstance(module, CanaryModuleType.getInstance());
+                CanaryModule canaryModule = MinecraftFacet.getInstance(module, CanaryModuleType.INSTANCE);
                 if (canaryModule == null) {
-                    canaryModule = MinecraftModule.getInstance(module, NeptuneModuleType.getInstance());
+                    canaryModule = MinecraftFacet.getInstance(module, NeptuneModuleType.INSTANCE);
                 }
 
                 if (canaryModule != null) {

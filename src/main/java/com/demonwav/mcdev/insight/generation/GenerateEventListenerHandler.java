@@ -10,9 +10,9 @@
 
 package com.demonwav.mcdev.insight.generation;
 
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationDialog;
 import com.demonwav.mcdev.platform.AbstractModule;
-import com.demonwav.mcdev.platform.MinecraftModule;
 import com.intellij.codeInsight.generation.ClassMember;
 import com.intellij.codeInsight.generation.GenerateMembersHandlerBase;
 import com.intellij.codeInsight.generation.GenerationInfo;
@@ -74,8 +74,8 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
             return null;
         }
 
-        final MinecraftModule minecraftModule = MinecraftModule.getInstance(moduleForPsiElement);
-        if (minecraftModule == null) {
+        final MinecraftFacet facet = MinecraftFacet.getInstance(moduleForPsiElement);
+        if (facet == null) {
             return null;
         }
 
@@ -83,7 +83,7 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
                 .createWithInnerClassesScopeChooser(RefactoringBundle.message("choose.destination.class"),
                         GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(moduleForPsiElement, false),
                         aClass1 ->
-                                isSuperEventListenerAllowed(aClass1, minecraftModule),
+                                isSuperEventListenerAllowed(aClass1, facet),
                         null
                 );
 
@@ -93,7 +93,7 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
             return null;
         }
 
-        Optional<AbstractModule> relevantModule = minecraftModule.getModules().stream()
+        Optional<AbstractModule> relevantModule = facet.getModules().stream()
             .filter(m -> isSuperEventListenerAllowed(chosenClass, m))
             .findFirst();
 
@@ -163,13 +163,13 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
         return null;
     }
 
-    private static boolean isSuperEventListenerAllowed(PsiClass eventClass, MinecraftModule module) {
+    private static boolean isSuperEventListenerAllowed(PsiClass eventClass, MinecraftFacet facet) {
         final PsiClass[] supers = eventClass.getSupers();
         for (PsiClass aSuper : supers) {
-            if (module.isEventClassValidForModule(aSuper)) {
+            if (facet.isEventClassValidForModule(aSuper)) {
                 return true;
             }
-            if (isSuperEventListenerAllowed(aSuper, module)) {
+            if (isSuperEventListenerAllowed(aSuper, facet)) {
                 return true;
             }
         }
@@ -196,7 +196,7 @@ public class GenerateEventListenerHandler extends GenerateMembersHandlerBase {
             return false;
         }
 
-        MinecraftModule instance = MinecraftModule.getInstance(module);
+        MinecraftFacet instance = MinecraftFacet.getInstance(module);
         return instance != null && instance.isEventGenAvailable();
     }
 }

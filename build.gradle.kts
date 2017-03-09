@@ -24,16 +24,13 @@ import org.jetbrains.intellij.IntelliJPluginExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
+import java.util.HashMap
 import kotlin.reflect.KProperty
 
 buildscript {
     repositories {
         maven {
             setUrl("https://plugins.gradle.org/m2/")
-        }
-        maven {
-            name = "kotlin-eap-1.1"
-            setUrl("https://dl.bintray.com/kotlin/kotlin-eap-1.1")
         }
         maven {
             setUrl("https://dl.bintray.com/jetbrains/intellij-plugin-service")
@@ -76,10 +73,7 @@ version = pluginVersion
 configurations.create("mixin").isTransitive = false
 
 repositories {
-    maven {
-        name = "kotlin-eap-1.1"
-        setUrl("https://dl.bintray.com/kotlin/kotlin-eap-1.1")
-    }
+    mavenCentral()
     maven {
         name = "sponge"
         setUrl("https://repo.spongepowered.org/maven")
@@ -109,7 +103,7 @@ dependencies {
 
 tasks.withType<Test> {
     doFirst {
-        if (properties["slowCI"] == "true") {
+        if (System.getenv()["CI"] != null) {
             systemProperty("slowCI", "true")
         }
 
@@ -121,14 +115,15 @@ configure<IntelliJPluginExtension> {
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies
-    setPlugins("maven", "gradle", "Groovy", "yaml",
-        // needed dependencies for unit tests
-        "properties", "junit")
+    setPlugins("maven", "gradle", "Groovy",
+               // needed dependencies for unit tests
+               "properties", "junit")
 
     pluginName = "Minecraft Development"
     updateSinceUntilBuild = false
 
-    downloadSources = downloadIdeaSources.toBoolean()
+    downloadSources = System.getenv()["CI"] == null && downloadIdeaSources.toBoolean()
+
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
@@ -230,10 +225,12 @@ val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
         "parser" to parserDir
     ))
 
-    classpath(pathingJar.archivePath, file("libs/grammar-kit-1.5.1-SNAPSHOT.jar"))
+    classpath(pathingJar.archivePath, file("libs/grammar-kit-1.5.1.jar"))
 }
 
 val generate = task("generate") {
+    group = "minecraft"
+    description = "Generates sources needed to compile the plugin."
     dependsOn(generateAtLexer, generateAtPsiAndParser)
 }
 

@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.insight;
 
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.platform.AbstractModuleType;
-import com.demonwav.mcdev.platform.MinecraftModule;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
@@ -45,8 +45,8 @@ public class ColorUtil {
             return null;
         }
 
-        MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
-        if (minecraftModule == null) {
+        MinecraftFacet facet = MinecraftFacet.getInstance(module);
+        if (facet == null) {
             return null;
         }
 
@@ -56,7 +56,7 @@ public class ColorUtil {
             return null;
         }
 
-        for (AbstractModuleType<?> abstractModuleType : minecraftModule.getTypes()) {
+        for (AbstractModuleType<?> abstractModuleType : facet.getTypes()) {
             Map<String, Color> map = abstractModuleType.getClassToColorMappings();
             for (Map.Entry<String, Color> entry : map.entrySet()) {
                 // This is such a hack

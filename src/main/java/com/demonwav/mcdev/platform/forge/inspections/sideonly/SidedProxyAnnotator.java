@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 
-import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
 import com.google.common.base.Strings;
@@ -43,12 +43,12 @@ public class SidedProxyAnnotator implements Annotator {
             return;
         }
 
-        final MinecraftModule instance = MinecraftModule.getInstance(module);
+        final MinecraftFacet instance = MinecraftFacet.getInstance(module);
         if (instance == null) {
             return;
         }
 
-        if (!instance.isOfType(ForgeModuleType.getInstance())) {
+        if (!instance.isOfType(ForgeModuleType.INSTANCE)) {
             return;
         }
 

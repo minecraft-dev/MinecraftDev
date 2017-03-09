@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mcp.at;
 
-import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.platform.mcp.McpModule;
 import com.demonwav.mcdev.platform.mcp.McpModuleType;
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtClassName;
@@ -53,12 +53,12 @@ public class AtGotoDeclarationHandler implements GotoDeclarationHandler {
             return null;
         }
 
-        final MinecraftModule instance = MinecraftModule.getInstance(module);
+        final MinecraftFacet instance = MinecraftFacet.getInstance(module);
         if (instance == null) {
             return null;
         }
 
-        final McpModule mcpModule = instance.getModuleOfType(McpModuleType.getInstance());
+        final McpModule mcpModule = instance.getModuleOfType(McpModuleType.INSTANCE);
         if (mcpModule == null) {
             return null;
         }

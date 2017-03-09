@@ -10,18 +10,18 @@
 
 package com.demonwav.mcdev.platform.bukkit;
 
-import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.inspection.IsCancelled;
 import com.demonwav.mcdev.platform.AbstractModule;
+import com.demonwav.mcdev.platform.AbstractModuleType;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData;
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants;
 import com.demonwav.mcdev.util.McPsiClass;
 import com.demonwav.mcdev.util.McPsiUtil;
 import com.google.common.base.Objects;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
@@ -50,34 +50,29 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("unused")
-public class BukkitModule<T extends BukkitModuleType> extends AbstractModule {
+public class BukkitModule<T extends AbstractModuleType<?>> extends AbstractModule {
 
     private VirtualFile pluginYml;
     private PlatformType type;
     private T moduleType;
 
-    BukkitModule(@NotNull Module module, @NotNull T type) {
-        super(module);
+    BukkitModule(@NotNull MinecraftFacet facet, @NotNull T type) {
+        super(facet);
         this.moduleType = type;
         this.type = type.getPlatformType();
-        buildSystem = BuildSystem.getInstance(module);
-        if (buildSystem != null) {
-            buildSystem.reImport(module).done(buildSystem -> setup());
-        }
+        setup();
     }
 
     private void setup() {
-        pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
+        pluginYml = facet.findFile("plugin.yml", SourceType.RESOURCE);
     }
 
+    @Nullable
     public VirtualFile getPluginYml() {
-        if (buildSystem == null) {
-            buildSystem = BuildSystem.getInstance(module);
-        }
-        if (pluginYml == null && buildSystem != null) {
+        if (pluginYml == null) {
             // try and find the file again if it's not already present
             // when this object was first created it may not have been ready
-            pluginYml = buildSystem.findFile("plugin.yml", SourceType.RESOURCE);
+            setup();
         }
         return pluginYml;
     }

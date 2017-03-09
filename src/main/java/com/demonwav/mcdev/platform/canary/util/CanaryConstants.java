@@ -14,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 
 public final class CanaryConstants {
 
+    @NotNull public static final String CANARY_INF = "Canary.inf";
+
     /* Hooks */
     @NotNull public static final String HOOK_HANDLER_ANNOTATION = "net.canarymod.hook.HookHandler";
     @NotNull public static final String HOOK_CLASS = "net.canarymod.hook.Hook";

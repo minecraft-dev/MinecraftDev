@@ -1,8 +1,15 @@
-<a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.svg" height="27" width="27"></img></a>Minecraft Development for IntelliJ [![forthebadge](http://forthebadge.com/images/badges/made-with-crayons.svg)](http://forthebadge.com)
-==========================================================================================================================================
-[![GitHub Stars](https://img.shields.io/github/stars/minecraft-dev/MinecraftDev.svg?style=flat-square)](https://github.com/minecraft-dev/MinecraftDev/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/minecraft-dev/MinecraftDev.svg?style=flat-square)](https://github.com/minecraft-dev/MinecraftDev/issues) [![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build) [![Current Release](https://img.shields.io/badge/release-2017.1--0.5.6-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+<p align="center"><a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.svg" height="120" width="120"></img></a></p>
 
-Info and Documentation
+Minecraft Development for IntelliJ [![forthebadge](http://forthebadge.com/images/badges/made-with-crayons.svg)](http://forthebadge.com)
+==================================
+
+|  Service   |Status|
+|------------|------|
+|**TeamCity**|[![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
+|**CircleCI**|[![Travis Build Status](https://img.shields.io/circleci/project/github/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)](https://circleci.com/gh/minecraft-dev/MinecraftDev)|
+|**Travis**  |[![CircleCI Build Status](https://img.shields.io/travis/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
+
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-2017.1--0.5.7-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 Visit [https://minecraftdev.org](https://minecraftdev.org) for information about the project, change logs, features, FAQs, and chat.
@@ -41,6 +48,12 @@ This task is necessary to work on the code without errors before the initial bui
 The [Gradle IntelliJ Plugin](https://github.com/JetBrains/gradle-intellij-plugin)
 will handle downloading the IntelliJ dependencies and packaging the
 plugin.
+
+IDE Setup
+---------
+
+Copy the contents of the `idea-configs` directory into your `.idea` directory to quickly setup useful
+run configurations and copyright settings.
 
 Style Guide
 -----------

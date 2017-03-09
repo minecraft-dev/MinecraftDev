@@ -21,6 +21,6 @@ enum class Channels(val title: String, val url: String, val index: Int) {
 
     companion object {
         fun getChannel(index: Int) = values().firstOrNull { it.index == index }
-        fun orderedList(): List<Channels> = listOf()
+        fun orderedList() = listOf<Channels>()
     }
 }

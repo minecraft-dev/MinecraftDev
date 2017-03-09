@@ -12,10 +12,7 @@ package com.demonwav.mcdev.update
 
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
-
 import java.io.IOException
-import java.util.function.Function
-
 import javax.swing.JComponent
 
 class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
@@ -38,22 +35,22 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
             saveSettings()
             form.updateCheckInProgressIcon.resume()
             resetUpdateStatus()
-            PluginUpdater.runUpdateCheck(Function<PluginUpdateStatus, Boolean> { pluginUpdateStatus ->
+            PluginUpdater.runUpdateCheck { pluginUpdateStatus ->
                 form.updateCheckInProgressIcon.suspend()
 
                 if (pluginUpdateStatus is PluginUpdateStatus.LatestVersionInstalled) {
-                    form.updateStatusLabel.text = "You have the latest version of the plugin (" + PluginUtil.pluginVersion + ") installed."
+                    form.updateStatusLabel.text = "You have the latest version of the plugin (${PluginUtil.pluginVersion}) installed."
                 } else if (pluginUpdateStatus is PluginUpdateStatus.Update) {
                     update = pluginUpdateStatus
                     form.installButton.isVisible = true
-                    form.updateStatusLabel.text = "A new version (" + pluginUpdateStatus.pluginDescriptor.version + ") is available"
+                    form.updateStatusLabel.text = "A new version (${pluginUpdateStatus.pluginDescriptor.version}) is available"
                 } else {
                     // CheckFailed
                     form.updateStatusLabel.text = "Update check failed: " + (pluginUpdateStatus as PluginUpdateStatus.CheckFailed).message
                 }
 
                 false
-            })
+            }
         }
 
         form.installButton.isVisible = false

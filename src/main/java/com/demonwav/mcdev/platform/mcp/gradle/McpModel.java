@@ -19,5 +19,4 @@ public interface McpModel {
     String getMcpVersion();
 
     Set<String> getMappingFiles();
-
 }

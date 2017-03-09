@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.MinecraftSettings;
-import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.intellij.ide.FileIconProvider;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -33,7 +33,7 @@ public class ForgeFileIconProvider implements FileIconProvider {
 
         if (project != null) {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
-                final ForgeModule forgeModule = MinecraftModule.getInstance(module, ForgeModuleType.getInstance());
+                final ForgeModule forgeModule = MinecraftFacet.getInstance(module, ForgeModuleType.INSTANCE);
                 if (forgeModule != null) {
                     if (file.equals(forgeModule.getMcmod())) {
                         return forgeModule.getIcon();

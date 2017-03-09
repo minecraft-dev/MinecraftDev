@@ -33,7 +33,6 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.vfs.VirtualFile;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
@@ -62,13 +61,10 @@ public class MinecraftProjectCreator {
         buildSystem.setArtifactId(artifactId);
         buildSystem.setVersion(version);
 
-        //buildSystem.setPluginAuthor(settings.author); // TODO: build systems have "developer" blocks
         buildSystem.setPluginName(settings.values().iterator().next().pluginName);
 
-        List<BuildRepository> buildRepositories = new ArrayList<>();
-        List<BuildDependency> dependencies = new ArrayList<>();
-        buildSystem.setRepositories(buildRepositories);
-        buildSystem.setDependencies(dependencies);
+        List<BuildRepository> buildRepositories = buildSystem.getRepositories();
+        List<BuildDependency> dependencies = buildSystem.getDependencies();
 
         if (settings.size() == 1) {
             doSingleModuleCreate();

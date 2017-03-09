@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.sponge.color;
 
-import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
@@ -44,12 +44,12 @@ public class SpongeColorUtil {
             return null;
         }
 
-        final MinecraftModule minecraftModule = MinecraftModule.getInstance(module);
-        if (minecraftModule == null) {
+        final MinecraftFacet facet = MinecraftFacet.getInstance(module);
+        if (facet == null) {
             return null;
         }
 
-        if (!minecraftModule.isOfType(SpongeModuleType.getInstance())) {
+        if (!facet.isOfType(SpongeModuleType.INSTANCE)) {
             return null;
         }
 

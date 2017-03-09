@@ -19,6 +19,7 @@ object MixinConstants {
         const val CALLBACK_INFO = "org.spongepowered.asm.mixin.injection.callback.CallbackInfo"
         const val CALLBACK_INFO_RETURNABLE = "org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable"
         const val INJECTION_POINT = "org.spongepowered.asm.mixin.injection.InjectionPoint"
+        const val MIXIN_AGENT = "org.spongepowered.tools.agent.MixinAgent"
     }
 
     object Annotations {

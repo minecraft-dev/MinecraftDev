@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.insight;
 
-import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.Pair;
@@ -50,7 +50,7 @@ public class InsightUtil {
         if (module == null) {
             return null;
         }
-        MinecraftModule instance = MinecraftModule.getInstance(module);
+        MinecraftFacet instance = MinecraftFacet.getInstance(module);
         if (instance == null) {
             return null;
         }

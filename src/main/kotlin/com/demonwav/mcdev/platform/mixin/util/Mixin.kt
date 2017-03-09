@@ -88,7 +88,7 @@ val PsiClass.isAccessorMixin: Boolean
         if (!isInterface){
             return false
         }
-        if (methods.any { modifierList?.run { findAnnotation(ACCESSOR) == null || findAnnotation(INVOKER) == null } != true }) {
+        if (methods.any { it.modifierList.findAnnotation(ACCESSOR) == null && it.modifierList.findAnnotation(INVOKER) == null }) {
             return false
         }
 

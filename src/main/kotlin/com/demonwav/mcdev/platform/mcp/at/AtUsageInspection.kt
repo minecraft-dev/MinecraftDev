@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mcp.at
 
-import com.demonwav.mcdev.platform.MinecraftModule
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
@@ -39,9 +39,9 @@ class AtUsageInspection : LocalInspectionTool() {
 
                 val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return
 
-                val instance = MinecraftModule.getInstance(module) ?: return
+                val instance = MinecraftFacet.getInstance(module) ?: return
 
-                val mcpModule = instance.getModuleOfType(McpModuleType.getInstance()) ?: return
+                val mcpModule = instance.getModuleOfType(McpModuleType) ?: return
 
                 val srgMap = mcpModule.srgManager.srgMapNow ?: return
                 val member = element.function ?: element.fieldName ?: return

@@ -46,7 +46,7 @@ public class CanaryProjectConfiguration extends ProjectConfiguration {
             try {
                 indicator.setText("Writing main class");
                 // Create plugin main class
-                VirtualFile file = buildSystem.getSourceDirectories().get(0);
+                VirtualFile file = buildSystem.getSourceDirectory();
                 String[] files = this.mainClass.split("\\.");
                 String className = files[files.length - 1];
 
@@ -56,7 +56,7 @@ public class CanaryProjectConfiguration extends ProjectConfiguration {
                 VirtualFile mainClassFile = file.findOrCreateChildData(this, className + ".java");
                 CanaryTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className);
 
-                VirtualFile canaryInf = buildSystem.getResourceDirectories().get(0).findOrCreateChildData(this, "Canary.inf");
+                VirtualFile canaryInf = buildSystem.getResourceDirectory().findOrCreateChildData(this, "Canary.inf");
                 CanaryTemplate.applyPluginDescriptionFileTemplate(project, canaryInf, this, buildSystem);
 
                 // Set the editor focus on the main class

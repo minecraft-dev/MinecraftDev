@@ -189,14 +189,22 @@ fun PsiClass.addImplements(qualifiedClassName: String) {
 // Member
 
 fun PsiClass.findMatchingMethod(pattern: PsiMethod, checkBases: Boolean, name: String = pattern.name): PsiMethod? {
-    return findMethodsByName(name, checkBases).first { it.isMatchingMethod(pattern) }
+    return findMethodsByName(name, checkBases).firstOrNull { it.isMatchingMethod(pattern) }
 }
 
 fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean, name: String = pattern.name): List<PsiMethod> {
     return findMethodsByName(name, checkBases).filter { it.isMatchingMethod(pattern) }
 }
 
-private fun PsiMethod.isMatchingMethod(pattern: PsiMethod): Boolean {
+inline fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean, name: String, func: (PsiMethod) -> Unit) {
+    for (method in findMethodsByName(name, checkBases)) {
+        if (method.isMatchingMethod(pattern)) {
+            func(method)
+        }
+    }
+}
+
+fun PsiMethod.isMatchingMethod(pattern: PsiMethod): Boolean {
     return areReallyOnlyParametersErasureEqual(this.parameterList, pattern.parameterList)
         && this.returnType.isErasureEquivalentTo(pattern.returnType)
 }

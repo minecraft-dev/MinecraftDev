@@ -26,6 +26,11 @@ fun PsiModifierListOwner.findAnnotation(qualifiedName: String): PsiAnnotation? {
 }
 
 @Contract(pure = true)
+fun PsiAnnotationMemberValue.findAnnotations(): List<PsiAnnotation> {
+    return parseArray { it as? PsiAnnotation }
+}
+
+@Contract(pure = true)
 fun PsiAnnotationMemberValue.computeStringArray(): List<String> {
     return parseArray { it.constantStringValue }
 }
@@ -36,7 +41,7 @@ fun PsiAnnotationMemberValue.resolveClassArray(): List<PsiClass> {
 }
 
 @Contract(pure = true)
-private fun PsiAnnotationMemberValue.resolveClass(): PsiClass? {
+fun PsiAnnotationMemberValue.resolveClass(): PsiClass? {
     if (this !is PsiClassObjectAccessExpression) {
         return null
     }

@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.insight;
 
 import com.demonwav.mcdev.asset.GeneralAssets;
-import com.demonwav.mcdev.platform.MinecraftModule;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor;
@@ -41,7 +41,7 @@ public class PluginLineMarkerProvider extends LineMarkerProviderDescriptor {
             return null;
         }
 
-        final MinecraftModule instance = MinecraftModule.getInstance(module);
+        final MinecraftFacet instance = MinecraftFacet.getInstance(module);
         if (instance == null) {
             return null;
         }

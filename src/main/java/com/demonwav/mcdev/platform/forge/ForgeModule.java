@@ -11,16 +11,14 @@
 package com.demonwav.mcdev.platform.forge;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
-import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.SourceType;
-import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
+import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.insight.generation.GenerationData;
 import com.demonwav.mcdev.inspection.IsCancelled;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
 import com.demonwav.mcdev.util.McPsiClass;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
@@ -44,23 +42,18 @@ public class ForgeModule extends AbstractModule {
 
     private VirtualFile mcmod;
 
-    ForgeModule(@NotNull Module module) {
-        super(module);
-        this.buildSystem = BuildSystem.getInstance(module);
-        if (buildSystem != null) {
-            buildSystem.reImport(module).done(buildSystem -> mcmod = buildSystem.findFile(ForgeConstants.MCMOD_INFO, SourceType.RESOURCE));
-        }
+    ForgeModule(@NotNull MinecraftFacet facet) {
+        super(facet);
+        setup();
     }
 
-    @Override
-    public GradleBuildSystem getBuildSystem() {
-        return (GradleBuildSystem) buildSystem;
+    private void setup() {
+        mcmod = facet.findFile(ForgeConstants.MCMOD_INFO, SourceType.RESOURCE);
     }
-
 
     @Override
     public ForgeModuleType getModuleType() {
-        return ForgeModuleType.getInstance();
+        return ForgeModuleType.INSTANCE;
     }
 
     @Override
@@ -112,14 +105,12 @@ public class ForgeModule extends AbstractModule {
         return true;
     }
 
+    @NotNull
     public VirtualFile getMcmod() {
-        if (buildSystem == null) {
-            buildSystem = BuildSystem.getInstance(module);
-        }
-        if (mcmod == null && buildSystem != null) {
+        if (mcmod == null) {
             // try and find the file again if it's not already present
             // when this object was first created it may not have been ready
-            mcmod = buildSystem.findFile(ForgeConstants.MCMOD_INFO, SourceType.RESOURCE);
+            setup();
         }
         return mcmod;
     }

@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.debug
 
-import com.demonwav.mcdev.platform.MinecraftModule
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.intellij.execution.RunConfigurationExtension
 import com.intellij.execution.configurations.DebuggingRunnerData
@@ -38,7 +38,7 @@ class MixinRunConfigurationExtension : RunConfigurationExtension() {
 
         val config = configuration as ModuleBasedConfiguration<*>
         val module = config.configurationModule.module ?: return
-        if (MinecraftModule.getInstance(module)?.isOfType(MixinModuleType) == true) {
+        if (MinecraftFacet.getInstance(module)?.isOfType(MixinModuleType) == true) {
             // Add marker data to enable Mixin debugger
             handler.putUserData(MIXIN_DEBUG_KEY, true)
         }

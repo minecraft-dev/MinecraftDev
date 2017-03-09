@@ -24,5 +24,4 @@ final class McpModelImpl implements McpModel, Serializable {
         this.mcpVersion = mcpVersion
         this.mappingFiles = mappingFiles
     }
-
 }

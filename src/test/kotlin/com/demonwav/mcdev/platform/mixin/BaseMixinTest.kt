@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.mixin
 
 import com.demonwav.mcdev.framework.BaseMinecraftTest
+import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.OrderRootType
@@ -19,7 +20,7 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.JarFileSystem
 import com.intellij.openapi.vfs.VirtualFileManager
 
-abstract class BaseMixinTest : BaseMinecraftTest(MixinModuleType) {
+abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
 
     override fun postConfigureModule(module: Module, model: ModifiableRootModel) {
         // If we're lucky, the following code adds the Mixin library to the project
