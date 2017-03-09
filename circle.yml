@@ -6,4 +6,5 @@ machine:
 
 test:
   override:
-    - ./gradlew build
+    - ./gradlew generate -PideaVersion=2016.3
+    - ./gradlew build -x generate
