@@ -12,7 +12,6 @@ import org.gradle.api.tasks.AbstractCopyTask
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
@@ -61,10 +60,19 @@ configurations {
     "mixin" {
         isTransitive = false
     }
+    "jflex"()
+    "jflex-skeleton"()
+    "grammar-kit" {
+        extendsFrom("compile"())
+    }
 }
 
 repositories {
     mavenCentral()
+    maven {
+        name = "minecraft-dev"
+        setUrl("https://dl.bintray.com/minecraft-dev/maven")
+    }
     maven {
         name = "sponge"
         setUrl("https://repo.spongepowered.org/maven")
@@ -88,6 +96,10 @@ dependencies {
     compile(kotlinModule("runtime")) {
         isTransitive = false
     }
+
+    "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
+    "jflex-skeleton"("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
+    "grammar-kit"("org.jetbrains.idea:grammar-kit:1.5.1")
 
     "mixin"("org.spongepowered:mixin:0.6.8-SNAPSHOT:thin")
 }
@@ -130,6 +142,7 @@ processResources {
 }
 
 tasks.withType<Test> {
+    dependsOn(configurations["mixin"])
     if (CI) systemProperty("slowCI", "true")
 
     doFirst {
@@ -155,42 +168,25 @@ license {
 // https://github.com/intellij-rust/intellij-rust/blob/d6b82e6aa2f64b877a95afdd86ec7b84394678c3/build.gradle#L131-L181
 val generateAtLexer = task<JavaExec>("generateAtLexer") {
     val src = "src/main/grammars/AtLexer.flex"
-    val skeleton = "libs/idea-flex.skeleton"
     val dst = "gen/com/demonwav/mcdev/platform/mcp/at/gen/"
     val output = "$dst/AtLexer.java"
 
+    classpath = configurations["jflex"]
+    main = "jflex.Main"
+
     doFirst {
+        args(
+            "--skel", configurations["jflex-skeleton"].singleFile,
+            "-d", dst,
+            src
+        )
+
+        // Delete current lexer
         delete(output)
     }
 
-    classpath = files("libs/jflex-1.7.0-SNAPSHOT.jar")
-    main = "jflex.Main"
-
-    args(
-        "--skel", skeleton,
-        "-d", dst,
-        src
-    )
-
-    inputs.files(src, skeleton)
+    inputs.files(src, configurations["jflex-skeleton"])
     outputs.file(output)
-}
-
-/*
- * This helps us get around the command length issues on Windows by placing the classpath in the manifest of a single
- * jar, rather than printing them out in one long line
- */
-val pathingJar = task<Jar>("pathingJar") {
-    dependsOn(configurations.compile)
-    appendix = "pathing"
-
-    doFirst {
-        manifest.apply {
-            attributes["Class-Path"] = configurations.compile.files.map { file ->
-                file.toURI().toString().replaceFirst("file:/+".toRegex(), "/")
-            }.joinToString(" ")
-        }
-    }
 }
 
 val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
@@ -204,6 +200,7 @@ val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
         delete(psiDir, parserDir)
     }
 
+    classpath = configurations["grammar-kit"]
     main = "org.intellij.grammar.Main"
 
     args(dstRoot, src)
@@ -213,8 +210,6 @@ val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
         "psi" to psiDir,
         "parser" to parserDir
     ))
-
-    classpath(pathingJar, file("libs/grammar-kit-1.5.1.jar"))
 }
 
 val generate = task("generate") {
@@ -225,9 +220,6 @@ val generate = task("generate") {
 }
 
 java().sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
-
-// Remove gen directory on clean
-clean.delete(generate)
 
 // Workaround for KT-16764
 compileKotlin.inputs.dir(generate)
