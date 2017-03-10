@@ -13,14 +13,13 @@ package com.demonwav.mcdev.platform.bukkit.framework
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.framework.library.LibraryVersionProperties
 import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
-import com.intellij.openapi.roots.libraries.LibraryProperties
 import com.intellij.openapi.util.io.JarUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 
 class SpigotPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(SPIGOT_LIBRARY_KIND) {
 
-    override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.SPIGOT_ICON
+    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.SPIGOT_ICON
 
     override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
         for (classesRoot in classesRoots) {

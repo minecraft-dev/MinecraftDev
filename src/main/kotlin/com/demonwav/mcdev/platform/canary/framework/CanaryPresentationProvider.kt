@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.canary.framework
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.framework.library.LibraryVersionProperties
 import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
-import com.intellij.openapi.roots.libraries.LibraryProperties
 import com.intellij.openapi.util.io.JarUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
@@ -21,7 +20,7 @@ import java.util.jar.Attributes
 
 class CanaryPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(CANARY_LIBRARY_KIND) {
 
-    override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.CANARY_ICON
+    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.CANARY_ICON
 
     override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
         for (classesRoot in classesRoots) {

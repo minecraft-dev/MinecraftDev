@@ -15,14 +15,13 @@ import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.mcp.util.McpConstants
 import com.intellij.framework.library.LibraryVersionProperties
 import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
-import com.intellij.openapi.roots.libraries.LibraryProperties
 import com.intellij.openapi.util.io.JarUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 
 class McpPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(MCP_LIBRARY_KIND) {
 
-    override fun getIcon(properties: LibraryProperties<*>?) = PlatformAssets.MCP_ICON
+    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.MCP_ICON
 
     override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
         for (classesRoot in classesRoots) {
