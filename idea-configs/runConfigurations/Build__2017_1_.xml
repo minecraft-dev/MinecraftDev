@@ -4,7 +4,7 @@
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-PideaVersion=LATEST-EAP-SNAPSHOT" />
+      <option name="scriptParameters" value="-PideaVersion=171-SNAPSHOT -x generate" />
       <option name="taskDescriptions">
         <list />
       </option>
@@ -16,6 +16,8 @@
       </option>
       <option name="vmOptions" value="" />
     </ExternalSystemSettings>
-    <method />
+    <method>
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Generate" run_configuration_type="GradleRunConfiguration" />
+    </method>
   </configuration>
 </component>
