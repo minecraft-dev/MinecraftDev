@@ -8,69 +8,60 @@
  * MIT License
  */
 
-import net.minecrell.gradle.licenser.LicenseExtension
-import net.minecrell.gradle.licenser.Licenser
-import org.gradle.api.file.CopySpec
+import org.gradle.api.tasks.AbstractCopyTask
+import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
-import org.gradle.plugins.ide.idea.IdeaPlugin
-import org.gradle.plugins.ide.idea.model.IdeaModel
-import org.jetbrains.intellij.IntelliJPlugin
-import org.jetbrains.intellij.IntelliJPluginExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
-import java.util.HashMap
-import kotlin.reflect.KProperty
 
 buildscript {
     repositories {
         maven {
-            setUrl("https://plugins.gradle.org/m2/")
-        }
-        maven {
+            name = "intellij-plugin-service"
             setUrl("https://dl.bintray.com/jetbrains/intellij-plugin-service")
         }
     }
 
     dependencies {
-        classpath(kotlinModule("gradle-plugin", properties["kotlinVersion"]))
-        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.5")
-        classpath("gradle.plugin.net.minecrell:licenser:0.3")
+        classpath(kotlinModule("gradle-plugin", properties["kotlinVersion"] as String))
     }
 }
 
-// Get rid of pointless casts to String - Start
-operator fun getValue(thisRef: Any, property: KProperty<*>) = project.getValue(thisRef, property) as String
-class StringMap(val map: Map<String, *>) : HashMap<String, String>() { operator override fun get(key: String) = map[key] as String? }
-val properties = StringMap(project.properties)
-fun KotlinDependencyHandler.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
-// End
+val CI = System.getenv("CI") != null
 
-val ideaVersion by this
-val javaVersion by this
-val kotlinVersion by this
-val pluginVersion by this
-val pluginGroup by this
-val downloadIdeaSources by this
+val ideaVersion: String by extra
+val javaVersion: String by extra
+val kotlinVersion: String by extra
+val downloadIdeaSources: String by extra
+
+defaultTasks("build")
 
 apply {
-    plugin<JavaPlugin>()
-    plugin<KotlinPluginWrapper>()
-    plugin<GroovyPlugin>()
-    plugin<IdeaPlugin>()
-    plugin<IntelliJPlugin>()
-    plugin<Licenser>()
+    plugin("kotlin")
 }
 
-group = pluginGroup
-version = pluginVersion
+plugins {
+    groovy
+    idea
+    id("org.jetbrains.intellij") version "0.2.5"
+    id("net.minecrell.licenser") version "0.3"
+}
 
-configurations.create("mixin").isTransitive = false
+val clean: Delete by tasks
+val processResources: AbstractCopyTask by tasks
+val runIde: JavaExec by tasks
+val compileKotlin by tasks
+
+configurations {
+    "mixin" {
+        isTransitive = false
+    }
+}
 
 repositories {
     mavenCentral()
@@ -98,66 +89,66 @@ dependencies {
         isTransitive = false
     }
 
-    add("mixin", "org.spongepowered:mixin:0.6.8-SNAPSHOT:thin")
+    "mixin"("org.spongepowered:mixin:0.6.8-SNAPSHOT:thin")
 }
 
-tasks.withType<Test> {
-    doFirst {
-        if (System.getenv()["CI"] != null) {
-            systemProperty("slowCI", "true")
-        }
-
-        systemProperty("mixinUrl", configurations.getByName("mixin").files.first().absolutePath)
-    }
-}
-
-configure<IntelliJPluginExtension> {
+intellij {
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies
     setPlugins("maven", "gradle", "Groovy",
-               // needed dependencies for unit tests
-               "properties", "junit")
+        // needed dependencies for unit tests
+        "properties", "junit")
 
     pluginName = "Minecraft Development"
     updateSinceUntilBuild = false
 
-    downloadSources = System.getenv()["CI"] == null && downloadIdeaSources.toBoolean()
+    downloadSources = !CI && downloadIdeaSources.toBoolean()
 
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
-configure<JavaPluginConvention> {
+java {
     setSourceCompatibility(javaVersion)
     setTargetCompatibility(javaVersion)
 }
 
-configure<IdeaModel> {
-    module.apply {
-        generatedSourceDirs.add(file("gen"))
-        excludeDirs.add(file(the<IntelliJPluginExtension>().sandboxDirectory))
-    }
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
 }
 
-// License header formatting
-configure<LicenseExtension> {
-    header = file("copyright.txt")
-    include("**/*.java", "**/*.kt", "**/*.groovy", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
-    exclude(
-        "com/demonwav/mcdev/platform/mcp/at/gen/**",
-        "**messages.MinecraftDevelopment.properties",
-        "**messages.MinecraftDevelopment_en.properties"
-    )
-
-    newLine = true
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = javaVersion
 }
 
-(tasks.getByName("processResources") as CopySpec).apply {
+processResources {
     for (lang in arrayOf("", "_en")) {
         from("src/main/resources/messages.MinecraftDevelopment_en_US.properties") {
             rename { "messages.MinecraftDevelopment$lang.properties" }
         }
     }
+}
+
+tasks.withType<Test> {
+    if (CI) systemProperty("slowCI", "true")
+
+    doFirst {
+        systemProperty("mixinUrl", configurations["mixin"].files.single().absolutePath)
+    }
+}
+
+idea {
+    module.apply {
+        generatedSourceDirs.add(file("gen"))
+        excludeDirs.add(file(intellij().sandboxDirectory))
+    }
+}
+
+// License header formatting
+license {
+    header = file("copyright.txt")
+    include("**/*.java", "**/*.kt", "**/*.groovy", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
+    exclude("com/demonwav/mcdev/platform/mcp/at/gen/**")
 }
 
 // Credit for this intellij-rust
@@ -203,8 +194,6 @@ val pathingJar = task<Jar>("pathingJar") {
 }
 
 val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
-    dependsOn(pathingJar)
-
     val src = "src/main/grammars/AtParser.bnf".replace("/", File.separator)
     val dstRoot = "gen"
     val dst = "$dstRoot/com/demonwav/mcdev/platform/mcp/at/gen".replace("/", File.separator)
@@ -225,33 +214,26 @@ val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
         "parser" to parserDir
     ))
 
-    classpath(pathingJar.archivePath, file("libs/grammar-kit-1.5.1.jar"))
+    classpath(pathingJar, file("libs/grammar-kit-1.5.1.jar"))
 }
 
 val generate = task("generate") {
     group = "minecraft"
     description = "Generates sources needed to compile the plugin."
     dependsOn(generateAtLexer, generateAtPsiAndParser)
+    outputs.dir("gen")
 }
 
-the<JavaPluginConvention>().sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME).java.srcDir("gen")
-
-tasks.withType<JavaCompile> {
-    dependsOn(generate)
-    options.encoding = "UTF-8"
-}
-
-tasks.withType<KotlinCompile> {
-    dependsOn(generate)
-    kotlinOptions.jvmTarget = javaVersion
-}
+java().sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 
 // Remove gen directory on clean
-tasks.getByName("clean").doLast {
-    delete(file("gen"))
-}
+clean.delete(generate)
 
-project.findProperty("intellijJre")
-    ?.let { (tasks.getByName("runIde") as JavaExec).setExecutable(it) }
+// Workaround for KT-16764
+compileKotlin.inputs.dir(generate)
 
-defaultTasks("build")
+// Use custom JRE for running IntelliJ IDEA when configured
+findProperty("intellijJre")?.let(runIde::setExecutable)
+
+inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
+fun KotlinDependencyHandler.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String

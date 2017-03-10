@@ -8,11 +8,12 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin
+package com.demonwav.mcdev.platform.mixin.implements
 
-import com.demonwav.mcdev.platform.mixin.inspection.implements.InterfaceIsInterfaceInspection
+import com.demonwav.mcdev.platform.mixin.BaseMixinTest
+import com.demonwav.mcdev.platform.mixin.inspection.implements.InterfacePrefixInspection
 
-class InterfaceIsInterfaceTest : BaseMixinTest() {
+class InterfacePrefixTest : BaseMixinTest() {
 
     override fun setUp() {
         super.setUp()
@@ -27,15 +28,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
                     }
                 """)
 
-                java("test/DummyClass.java", """
-                    package test;
-
-                    class DummyClass {
-
-                    }
-                """)
-
-                java("test/InterfaceIsInterfaceMixin.java", """
+                java("test/InterfacePrefixMixin.java", """
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -45,9 +38,9 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
                     @Mixin
                     @Implements({
                         @Interface(iface = DummyFace.class, prefix = "good$"),
-                        @Interface(iface = <error descr="Interface expected here">DummyClass.class</error>, prefix = "bad$"),
+                        @Interface(iface = DummyFace.class, prefix = <error descr="@Interface prefix must end with a dollar sign ($)">"bad"</error>),
                     })
-                    class InterfaceIsInterfaceMixin {
+                    class InterfacePrefixMixin {
 
                     }
                 """)
@@ -55,8 +48,8 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
         }
     }
 
-    fun testIfInterfaceIsInterface() {
-        myFixture.enableInspections(InterfaceIsInterfaceInspection::class.java)
+    fun testInterfacePrefixInspection() {
+        myFixture.enableInspections(InterfacePrefixInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }
 }

@@ -8,7 +8,7 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin
+package com.demonwav.mcdev.platform.mixin.shadow
 
 import com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowTargetInspection
 

@@ -14,7 +14,7 @@ import com.demonwav.mcdev.MinecraftSettings;
 import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.intellij.ide.FileIconProvider;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -31,15 +31,22 @@ public class BungeeCordFileIconProvider implements FileIconProvider {
             return null;
         }
 
-        if (project != null) {
-            for (Module module : ModuleManager.getInstance(project).getModules()) {
-                final BungeeCordModule bungeeCordModule = MinecraftFacet.getInstance(module, BungeeCordModuleType.INSTANCE);
-                if (bungeeCordModule != null) {
-                    if (file.equals(bungeeCordModule.getPluginYml())) {
-                        return bungeeCordModule.getIcon();
-                    }
-                }
-            }
+        if (project == null) {
+            return null;
+        }
+
+        final Module module = ModuleUtilCore.findModuleForFile(file, project);
+        if (module == null) {
+            return null;
+        }
+
+        final BungeeCordModule bungeecordModule = MinecraftFacet.getInstance(module, BungeeCordModuleType.INSTANCE);
+        if (bungeecordModule == null) {
+            return null;
+        }
+
+        if (file.equals(bungeecordModule.getPluginYml())) {
+            return bungeecordModule.getIcon();
         }
         return null;
     }

@@ -9,21 +9,17 @@ env:
     - TERM=dumb
 
 install: true
-script: ./gradlew build
+script:
+  - ./gradlew generate -PideaVersion=2016.3
+  - ./gradlew build -x generate
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -rf $HOME/.gradle/caches/*/{file-changes,fileHashes,plugin-resolution,scripts,scripts-remapped}/
+  - rm -rf $HOME/.gradle/caches/*/{file-changes,fileHashes,plugin-resolution,scripts,scripts-remapped,gradle-script-kotlin}/
 cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
 notifications:
-  irc:
-    nick: MinecraftDev
-    channels:
-      - "ircs://irc.esper.net:6697/#mcdev"
-    on_success: change
-    skip_join: true
   email: false

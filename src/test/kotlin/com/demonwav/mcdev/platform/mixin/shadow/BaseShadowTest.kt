@@ -8,9 +8,10 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin
+package com.demonwav.mcdev.platform.mixin.shadow
 
 import com.demonwav.mcdev.framework.ProjectBuilder
+import com.demonwav.mcdev.platform.mixin.BaseMixinTest
 
 abstract class BaseShadowTest : BaseMixinTest() {
 

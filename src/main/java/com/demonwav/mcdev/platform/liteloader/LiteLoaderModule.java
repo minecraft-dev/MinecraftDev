@@ -11,9 +11,12 @@
 package com.demonwav.mcdev.platform.liteloader;
 
 import com.demonwav.mcdev.asset.PlatformAssets;
+import com.demonwav.mcdev.buildsystem.SourceType;
 import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.platform.AbstractModule;
 import com.demonwav.mcdev.platform.PlatformType;
+import com.demonwav.mcdev.platform.liteloader.util.LiteLoaderConstants;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
@@ -24,8 +27,22 @@ import org.jetbrains.annotations.Nullable;
 
 public class LiteLoaderModule extends AbstractModule {
 
+    private VirtualFile litemodJson;
+
     LiteLoaderModule(@NotNull MinecraftFacet facet) {
         super(facet);
+        setup();
+    }
+
+    private void setup() {
+        litemodJson = facet.findFile(LiteLoaderConstants.LITEMOD_JSON, SourceType.RESOURCE);
+    }
+
+    public VirtualFile getLitemodJson() {
+        if (litemodJson == null) {
+            setup();
+        }
+        return litemodJson;
     }
 
     @Override

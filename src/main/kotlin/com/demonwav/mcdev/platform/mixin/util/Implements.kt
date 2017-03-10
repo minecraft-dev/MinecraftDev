@@ -15,12 +15,9 @@ import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.findMatchingMethods
 import com.demonwav.mcdev.util.resolveClass
-import com.intellij.psi.HierarchicalMethodSignature
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
-import com.intellij.psi.util.MethodSignature
-import com.intellij.psi.util.MethodSignatureUtil
 import org.jetbrains.annotations.Contract
 
 @Contract(pure = true)

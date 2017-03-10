@@ -8,8 +8,9 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin
+package com.demonwav.mcdev.platform.mixin.implements
 
+import com.demonwav.mcdev.platform.mixin.BaseMixinTest
 import com.demonwav.mcdev.platform.mixin.inspection.implements.EmptyImplementsInspection
 import org.intellij.lang.annotations.Language
 

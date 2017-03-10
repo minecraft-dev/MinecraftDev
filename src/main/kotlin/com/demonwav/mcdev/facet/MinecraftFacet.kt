@@ -76,13 +76,14 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
             .collect(Collectors.toSet())
         toBeRemoved.forEach { modules.remove(it) }
 
+        // Do this before we register the new modules
+        updateRoots()
+
         // Add modules which are new
         allEnabled.stream()
             .map { it.type }
             .filter { !modules.containsKey(it) }
             .forEach { register(it) }
-
-        updateRoots()
 
         ProjectView.getInstance(module.project).refresh()
     }
@@ -92,6 +93,10 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         val rootManager = ModuleRootManager.getInstance(module)
         for (entry in rootManager.contentEntries) {
             for (sourceFolder in entry.sourceFolders) {
+                if (sourceFolder.file == null) {
+                    continue
+                }
+
                 when (sourceFolder.rootType) {
                     JavaSourceRootType.SOURCE -> roots.put(SourceType.SOURCE, sourceFolder.file)
                     JavaSourceRootType.TEST_SOURCE -> roots.put(SourceType.TEST_SOURCE, sourceFolder.file)

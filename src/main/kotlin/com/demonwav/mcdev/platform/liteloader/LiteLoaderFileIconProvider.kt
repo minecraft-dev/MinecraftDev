@@ -8,7 +8,7 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.bukkit
+package com.demonwav.mcdev.platform.liteloader
 
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.facet.MinecraftFacet
@@ -18,8 +18,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import javax.swing.Icon
 
-class BukkitFileIconProvider : FileIconProvider {
-
+class LiteLoaderFileIconProvider : FileIconProvider {
     override fun getIcon(file: VirtualFile, flags: Int, project: Project?): Icon? {
         if (!MinecraftSettings.instance.isShowProjectPlatformIcons) {
             return null
@@ -28,11 +27,10 @@ class BukkitFileIconProvider : FileIconProvider {
         project ?: return null
 
         val module = ModuleUtilCore.findModuleForFile(file, project) ?: return null
-        val bukkitModule = MinecraftFacet.getInstance<BukkitModule<*>>(module, BukkitModuleType, SpigotModuleType, PaperModuleType) ?:
-            return null
+        val liteloaderModule = MinecraftFacet.getInstance(module, LiteLoaderModuleType) ?: return null
 
-        if (file == bukkitModule.pluginYml) {
-            return bukkitModule.icon
+        if (file == liteloaderModule.litemodJson) {
+            return liteloaderModule.icon
         }
         return null
     }
