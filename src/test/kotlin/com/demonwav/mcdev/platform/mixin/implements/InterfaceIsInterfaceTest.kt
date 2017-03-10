@@ -8,11 +8,12 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin
+package com.demonwav.mcdev.platform.mixin.implements
 
-import com.demonwav.mcdev.platform.mixin.inspection.implements.InterfacePrefixInspection
+import com.demonwav.mcdev.platform.mixin.BaseMixinTest
+import com.demonwav.mcdev.platform.mixin.inspection.implements.InterfaceIsInterfaceInspection
 
-class InterfacePrefixTest : BaseMixinTest() {
+class InterfaceIsInterfaceTest : BaseMixinTest() {
 
     override fun setUp() {
         super.setUp()
@@ -27,7 +28,15 @@ class InterfacePrefixTest : BaseMixinTest() {
                     }
                 """)
 
-                java("test/InterfacePrefixMixin.java", """
+                java("test/DummyClass.java", """
+                    package test;
+
+                    class DummyClass {
+
+                    }
+                """)
+
+                java("test/InterfaceIsInterfaceMixin.java", """
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -37,9 +46,9 @@ class InterfacePrefixTest : BaseMixinTest() {
                     @Mixin
                     @Implements({
                         @Interface(iface = DummyFace.class, prefix = "good$"),
-                        @Interface(iface = DummyFace.class, prefix = <error descr="@Interface prefix must end with a dollar sign ($)">"bad"</error>),
+                        @Interface(iface = <error descr="Interface expected here">DummyClass.class</error>, prefix = "bad$"),
                     })
-                    class InterfacePrefixMixin {
+                    class InterfaceIsInterfaceMixin {
 
                     }
                 """)
@@ -47,8 +56,8 @@ class InterfacePrefixTest : BaseMixinTest() {
         }
     }
 
-    fun testInterfacePrefixInspection() {
-        myFixture.enableInspections(InterfacePrefixInspection::class.java)
+    fun testIfInterfaceIsInterface() {
+        myFixture.enableInspections(InterfaceIsInterfaceInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }
 }
