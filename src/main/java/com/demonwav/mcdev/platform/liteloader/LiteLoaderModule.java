@@ -75,4 +75,11 @@ public class LiteLoaderModule extends AbstractModule {
             element.getParent() instanceof PsiClass &&
             element.getText().startsWith("LiteMod");
     }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        litemodJson = null;
+    }
 }

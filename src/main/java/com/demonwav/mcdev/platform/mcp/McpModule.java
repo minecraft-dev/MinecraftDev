@@ -80,4 +80,12 @@ public class McpModule extends AbstractModule {
     public void addAccessTransformerFile(@NotNull VirtualFile file) {
         accessTransformers.add(file);
     }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        accessTransformers.clear();
+        srgManager = null;
+    }
 }

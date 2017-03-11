@@ -166,4 +166,11 @@ public class ForgeModule extends AbstractModule {
     public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
         return null;
     }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        mcmod = null;
+    }
 }

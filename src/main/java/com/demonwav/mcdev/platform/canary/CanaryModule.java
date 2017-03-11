@@ -142,4 +142,10 @@ public class CanaryModule<T extends AbstractModuleType> extends AbstractModule {
         return newMethod;
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        canaryInf = null;
+    }
 }
