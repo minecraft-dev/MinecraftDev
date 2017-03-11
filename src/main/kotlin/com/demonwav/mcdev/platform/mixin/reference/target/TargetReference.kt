@@ -20,6 +20,7 @@ import com.demonwav.mcdev.util.annotationFromArrayValue
 import com.demonwav.mcdev.util.annotationFromValue
 import com.demonwav.mcdev.util.completeToLiteral
 import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.mapToArray
@@ -138,7 +139,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
         private fun qualifyLookup(builder: LookupElementBuilder, targetClass: PsiClass, m: QualifiedMember<T>): LookupElementBuilder {
             val owner = m.member.containingClass!!
-            return if (targetClass.manager.areElementsEquivalent(targetClass, owner)) {
+            return if (targetClass equivalentTo owner) {
                 builder
             } else {
                 // Qualify member with name of owning class

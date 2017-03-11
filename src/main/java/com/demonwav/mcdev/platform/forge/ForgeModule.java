@@ -105,7 +105,7 @@ public class ForgeModule extends AbstractModule {
         return true;
     }
 
-    @NotNull
+    @Nullable
     public VirtualFile getMcmod() {
         if (mcmod == null) {
             // try and find the file again if it's not already present
@@ -165,5 +165,12 @@ public class ForgeModule extends AbstractModule {
     @Override
     public IsCancelled checkUselessCancelCheck(@NotNull PsiMethodCallExpression expression) {
         return null;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        mcmod = null;
     }
 }

@@ -55,6 +55,14 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         refresh()
     }
 
+    override fun disposeFacet() {
+        modules.forEach { (_, m) ->
+            m.dispose()
+        }
+        modules.clear()
+        roots.clear()
+    }
+
     fun refresh() {
         // Don't allow parent types with child types in auto detected set
         configuration.state.autoDetectTypes = PlatformType.removeParents(configuration.state.autoDetectTypes)

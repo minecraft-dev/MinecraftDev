@@ -38,6 +38,7 @@ public class LiteLoaderModule extends AbstractModule {
         litemodJson = facet.findFile(LiteLoaderConstants.LITEMOD_JSON, SourceType.RESOURCE);
     }
 
+    @Nullable
     public VirtualFile getLitemodJson() {
         if (litemodJson == null) {
             setup();
@@ -74,5 +75,12 @@ public class LiteLoaderModule extends AbstractModule {
         return element instanceof PsiIdentifier &&
             element.getParent() instanceof PsiClass &&
             element.getText().startsWith("LiteMod");
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        litemodJson = null;
     }
 }

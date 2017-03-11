@@ -51,7 +51,7 @@ public class CanaryModule<T extends AbstractModuleType> extends AbstractModule {
         canaryInf = facet.findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE);
     }
 
-    @NotNull
+    @Nullable
     public VirtualFile getCanaryInf() {
         if (canaryInf == null) {
             // try and find the file again if it's not already present
@@ -142,4 +142,10 @@ public class CanaryModule<T extends AbstractModuleType> extends AbstractModule {
         return newMethod;
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        canaryInf = null;
+    }
 }

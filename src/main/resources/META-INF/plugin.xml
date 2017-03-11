@@ -28,7 +28,7 @@
         Alpha release, may break. More features to come. Please report issues to
         <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2017.1-0.5.7
+        v. 2017.1-0.5.8
       </div>
     ]]>
     </change-notes>
@@ -239,6 +239,14 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinTargetInspection"/>
+        <localInspection displayName="Invalid @Mixin super class"
+                         shortName="MixinSuperClass"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinSuperClassInspection"/>
         <localInspection displayName="Public static member in @Mixin class"
                          shortName="PublicStaticMixinMember"
                          groupName="Mixin"

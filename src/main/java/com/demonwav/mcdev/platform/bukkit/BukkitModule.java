@@ -279,6 +279,13 @@ public class BukkitModule<T extends AbstractModuleType<?>> extends AbstractModul
     }
 
     @Override
+    public void dispose() {
+        super.dispose();
+
+        pluginYml = null;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
