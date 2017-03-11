@@ -14,7 +14,6 @@ import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.facet.MinecraftFacetConfiguration
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.runWriteTask
-import com.intellij.JavaTestUtil
 import com.intellij.facet.FacetManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.roots.ContentEntry
@@ -56,8 +55,7 @@ abstract class BaseMinecraftTest(protected vararg val platformTypes: PlatformTyp
                 postConfigureModule(module, model)
             }
 
-            // TODO: Figure out how to package Mock JDK to speed up builds
-            override fun getSdk() = JavaTestUtil.getTestJdk()
+            override fun getSdk() = mockJdk
         }
     }
 }

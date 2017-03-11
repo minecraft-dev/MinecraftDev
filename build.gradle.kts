@@ -57,13 +57,13 @@ val runIde: JavaExec by tasks
 val compileKotlin by tasks
 
 configurations {
-    "mixin" {
-        isTransitive = false
-    }
     "jflex"()
     "jflex-skeleton"()
     "grammar-kit" {
         extendsFrom("compile"())
+    }
+    "testLibs" {
+        isTransitive = false
     }
 }
 
@@ -101,7 +101,8 @@ dependencies {
     "jflex-skeleton"("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
     "grammar-kit"("org.jetbrains.idea:grammar-kit:1.5.1")
 
-    "mixin"("org.spongepowered:mixin:0.6.8-SNAPSHOT:thin")
+    "testLibs"("org.jetbrains.idea:mockJDK:1.7-4d76c50")
+    "testLibs"("org.spongepowered:mixin:0.6.8-SNAPSHOT:thin")
 }
 
 intellij {
@@ -142,11 +143,13 @@ processResources {
 }
 
 tasks.withType<Test> {
-    dependsOn(configurations["mixin"])
     if (CI) systemProperty("slowCI", "true")
 
+    dependsOn(configurations["testLibs"])
     doFirst {
-        systemProperty("mixinUrl", configurations["mixin"].files.single().absolutePath)
+        configurations["testLibs"].resolvedConfiguration.resolvedArtifacts.forEach {
+            systemProperty("testLibs.${it.name}", it.file.absolutePath)
+        }
     }
 }
 
@@ -176,7 +179,7 @@ val generateAtLexer = task<JavaExec>("generateAtLexer") {
 
     doFirst {
         args(
-            "--skel", configurations["jflex-skeleton"].singleFile,
+            "--skel", configurations["jflex-skeleton"].singleFile.absolutePath,
             "-d", dst,
             src
         )
