@@ -33,7 +33,7 @@ public class ForgeVersion {
 
     @Nullable
     public static ForgeVersion downloadData() {
-        try (InputStream in = new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json").openStream()) {
+        try (InputStream in = new URL("https://files.minecraftforge.net/maven/net/minecraftforge/forge/json").openStream()) {
             final String text = IOUtils.toString(in);
 
             final Map map = new Gson().fromJson(text, Map.class);
