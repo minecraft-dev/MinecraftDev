@@ -142,7 +142,7 @@ private fun PsiClass.findInnerClass(name: String): PsiClass? {
 fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
     // Attempt to find name for anonymous class
     for ((i, element) in anonymousElements!!.withIndex()) {
-        if (manager.areElementsEquivalent(element, anonymousElement)) {
+        if (element equivalentTo anonymousElement) {
             return i + 1
         }
     }
@@ -168,7 +168,7 @@ val PsiElement.anonymousElements: Array<PsiElement>?
 @Contract(pure = true)
 fun PsiClass.extendsOrImplements(qualifiedClassName: String): Boolean {
     val aClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, resolveScope) ?: return false
-    return manager.areElementsEquivalent(this, aClass) || this.isInheritor(aClass, true)
+    return equivalentTo(aClass) || this.isInheritor(aClass, true)
 }
 
 fun PsiClass.addImplements(qualifiedClassName: String) {

@@ -239,6 +239,14 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinTargetInspection"/>
+        <localInspection displayName="Invalid @Mixin super class"
+                         shortName="MixinSuperClass"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinSuperClassInspection"/>
         <localInspection displayName="Public static member in @Mixin class"
                          shortName="PublicStaticMixinMember"
                          groupName="Mixin"

@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.implements
 
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.resolveClass
 import com.intellij.codeInspection.ProblemsHolder
@@ -35,7 +36,7 @@ class DuplicateInterfaceInspection : MixinAnnotationAttributeInspection(MixinCon
             // TODO: Can we check this without resolving the class?
             val psiClass = iface.findDeclaredAttributeValue("iface")?.resolveClass() ?: continue
 
-            if (classes.any { psiClass.manager.areElementsEquivalent(it, psiClass) }) {
+            if (classes.any { it equivalentTo psiClass }) {
                 holder.registerProblem(iface, "Interface is already implemented", RemoveAnnotationQuickFix(iface, null))
             } else {
                 classes.add(psiClass)

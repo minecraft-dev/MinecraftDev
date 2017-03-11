@@ -144,6 +144,11 @@ fun isAccessModifier(@ModifierConstant modifier: String): Boolean {
 }
 
 @Contract(pure = true)
+infix fun PsiElement.equivalentTo(other: PsiElement): Boolean {
+    return manager.areElementsEquivalent(this, other)
+}
+
+@Contract(pure = true)
 fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
     // TODO: Do more checks for generics instead
     return TypeConversionUtil.erasure(this) == TypeConversionUtil.erasure(other)
