@@ -59,9 +59,7 @@ val compileKotlin by tasks
 configurations {
     "jflex"()
     "jflex-skeleton"()
-    "grammar-kit" {
-        extendsFrom("compile"())
-    }
+    "grammar-kit"()
     "testLibs" {
         isTransitive = false
     }
