@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.framework
 
 import com.intellij.openapi.application.runWriteAction
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -20,22 +19,34 @@ import com.intellij.psi.PsiManager
 import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture
 import com.intellij.util.PathUtil
 import org.intellij.lang.annotations.Language
+import java.lang.ref.WeakReference
 
 /**
  * Like most things in this project at this point, taken from the intellij-rust folks
  * https://github.com/intellij-rust/intellij-rust/blob/master/src/test/kotlin/org/rust/ProjectBuilder.kt
  */
-class ProjectBuilder(
-    private val fixture: JavaCodeInsightTestFixture,
-    private val project: Project = fixture.project,
-    private val root: VirtualFile = project.baseDir
-) {
+class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
+    private val fixtureRef = WeakReference(fixture)
+
+    private val fixture: JavaCodeInsightTestFixture
+        get() {
+            if (fixtureRef.get() == null) {
+                throw Exception("Reference collected")
+            }
+            if (fixtureRef.get()!!.project.isDisposed) {
+                throw Exception("Project disposed")
+            }
+            return fixtureRef.get()!!
+        }
+    private val project
+        get() = fixture.project
+    private val root
+        get() = fixture.project.baseDir
+
     var intermediatePath = ""
 
     fun java(path: String, @Language("JAVA") code: String, configure: Boolean = true) = file(path, code, ".java", configure)
     fun at(path: String, @Language("Access Transformers") code: String, configure: Boolean = true) = file(path, code, "_at.cfg", configure)
-    fun gradle(path: String, @Language("Groovy") code: String, configure: Boolean = true) = file(path, code, ".gradle", configure)
-    fun xml(path: String, @Language("XML") code: String, configure: Boolean = true) = file(path, code, ".xml", configure)
 
     fun dir(path: String, block: ProjectBuilder.() -> Unit) {
         val oldIntermediatePath = intermediatePath
@@ -74,7 +85,8 @@ class ProjectBuilder(
             VfsUtil.markDirtyAndRefresh(false, true, true, root)
             // Make sure to always add the module content root
             ModuleRootModificationUtil.updateModel(fixture.module) { model ->
-                model.addContentEntry(root)
+                model.contentEntries.firstOrNull { it.file == project.baseDir } ?:
+                    model.addContentEntry(project.baseDir)
             }
             builder()
         }

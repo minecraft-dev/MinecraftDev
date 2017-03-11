@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.transition
 
-import com.intellij.openapi.components.AbstractProjectComponent
+import com.demonwav.mcdev.util.AbstractProjectComponent
 import com.intellij.openapi.module.JavaModuleType
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
@@ -20,7 +20,7 @@ class TransitionProjectComponent(project: Project) : AbstractProjectComponent(pr
     override fun projectOpened() {
         super.projectOpened()
         // Reset all Modules back to JavaModuleType
-        for (module in ModuleManager.getInstance(myProject).modules) {
+        for (module in ModuleManager.getInstance(project).modules) {
             for (type in types) {
                 if (module.getOptionValue("type") == type) {
                     module.setOption("type", JavaModuleType.getModuleType().id)

@@ -13,7 +13,6 @@ package com.demonwav.mcdev.creator;
 import static com.demonwav.mcdev.platform.PlatformType.BUKKIT;
 import static com.demonwav.mcdev.platform.PlatformType.PAPER;
 import static com.demonwav.mcdev.platform.PlatformType.SPIGOT;
-
 import com.demonwav.mcdev.asset.PlatformAssets;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration;

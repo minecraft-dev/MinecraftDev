@@ -21,7 +21,6 @@ import static com.demonwav.mcdev.platform.liteloader.framework.LiteLoaderLibrary
 import static com.demonwav.mcdev.platform.mcp.framework.McpLibraryKindKt.MCP_LIBRARY_KIND;
 import static com.demonwav.mcdev.platform.mixin.framework.MixinLibraryKindKt.MIXIN_LIBRARY_KIND;
 import static com.demonwav.mcdev.platform.sponge.framework.SpongeLibraryKindKt.SPONGE_LIBRARY_KIND;
-
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType;
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType;
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType;

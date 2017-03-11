@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl;
 
 import static com.demonwav.mcdev.platform.mcp.at.psi.AtMixinUtil.getClassFromString;
-
 import com.demonwav.mcdev.platform.mcp.at.AtElementFactory;
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtReturnValueMixin;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
