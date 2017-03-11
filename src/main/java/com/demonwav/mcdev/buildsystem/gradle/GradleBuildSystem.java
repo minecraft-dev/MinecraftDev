@@ -215,7 +215,7 @@ public class GradleBuildSystem extends BuildSystem {
             try {
                 String wrapperDirPath = getRootDirectory().createChildDirectory(this, "gradle").createChildDirectory(this, "wrapper").getPath();
                 FileUtils.writeLines(new File(wrapperDirPath, "gradle-wrapper.properties"), Collections.singletonList(
-                    "distributionUrl=https\\://services.gradle.org/distributions/gradle-3.4.1-bin.zip"
+                    "distributionUrl=https\\://services.gradle.org/distributions/gradle-3.3-bin.zip"
                 ));
             } catch (IOException e) {
                 e.printStackTrace();
