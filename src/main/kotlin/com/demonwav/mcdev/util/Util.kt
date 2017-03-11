@@ -21,19 +21,43 @@ inline fun <T> runInlineReadAction(func: () -> T): T {
 }
 
 inline fun runWriteTask(crossinline func: () -> Unit) {
-    invokeAndWait { ApplicationManager.getApplication().runWriteAction { func() } }
+    if (ApplicationManager.getApplication().isWriteAccessAllowed) {
+        func()
+    } else {
+        invokeAndWait {
+            ApplicationManager.getApplication().runWriteAction {
+                func()
+            }
+        }
+    }
 }
 
 inline fun runWriteTaskLater(crossinline func: () -> Unit) {
-    invokeLater { ApplicationManager.getApplication().runWriteAction { func() } }
+    if (ApplicationManager.getApplication().isWriteAccessAllowed) {
+        func()
+    } else {
+        invokeLater {
+            ApplicationManager.getApplication().runWriteAction {
+                func()
+            }
+        }
+    }
 }
 
 inline fun invokeAndWait(crossinline func: () -> Unit) {
-    ApplicationManager.getApplication().invokeAndWait({ func() }, ModalityState.defaultModalityState())
+    if (ApplicationManager.getApplication().isDispatchThread) {
+        func()
+    } else {
+        ApplicationManager.getApplication().invokeAndWait({ func() }, ModalityState.defaultModalityState())
+    }
 }
 
 inline fun invokeLater(crossinline func: () -> Unit) {
-    ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.defaultModalityState())
+    if (ApplicationManager.getApplication().isDispatchThread) {
+        func()
+    } else {
+        ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.defaultModalityState())
+    }
 }
 
 /**

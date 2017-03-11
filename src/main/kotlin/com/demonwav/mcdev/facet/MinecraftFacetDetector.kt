@@ -13,11 +13,11 @@ package com.demonwav.mcdev.facet
 import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
+import com.demonwav.mcdev.util.AbstractProjectComponent
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.ProjectTopics
 import com.intellij.facet.FacetManager
 import com.intellij.facet.impl.ui.libraries.LibrariesValidatorContextImpl
-import com.intellij.openapi.components.AbstractProjectComponent
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
@@ -30,15 +30,15 @@ import com.intellij.openapi.startup.StartupManager
 class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(project) {
 
     override fun projectOpened() {
-        val manager = StartupManager.getInstance(myProject)
-        val connection = myProject.messageBus.connect()
+        val manager = StartupManager.getInstance(project)
+        val connection = project.messageBus.connect()
 
-        for (module in ModuleManager.getInstance(myProject).modules) {
+        for (module in ModuleManager.getInstance(project).modules) {
             module.clearOption(MinecraftModuleType.OPTION)
         }
 
         manager.registerStartupActivity {
-            MinecraftModuleRootListener.doCheck(myProject)
+            MinecraftModuleRootListener.doCheck(project)
         }
 
         // Register a module root listener to check when things change

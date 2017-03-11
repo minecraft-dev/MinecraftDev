@@ -13,10 +13,10 @@ package com.demonwav.mcdev.platform.forge.inspections.sideonly;
 import com.demonwav.mcdev.facet.MinecraftFacet;
 import com.demonwav.mcdev.platform.forge.ForgeModuleType;
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants;
+import com.demonwav.mcdev.util.AbstractProjectComponent;
 import com.intellij.facet.ProjectFacetManager;
 import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -39,14 +39,14 @@ public class SideOnlyProjectComponent extends AbstractProjectComponent {
 
     @Override
     public void projectOpened() {
-        final List<MinecraftFacet> facets = ProjectFacetManager.getInstance(myProject).getFacets(MinecraftFacet.ID);
+        final List<MinecraftFacet> facets = ProjectFacetManager.getInstance(getProject()).getFacets(MinecraftFacet.ID);
         if (facets.stream().noneMatch(f -> f.isOfType(ForgeModuleType.INSTANCE))) {
             return;
         }
 
-        StartupManager.getInstance(myProject).registerPostStartupActivity(() -> {
-            DumbService.getInstance(myProject).smartInvokeLater(() -> {
-                ProgressManager.getInstance().run(new Task.Backgroundable(myProject, "Indexing @SidedProxy", true, null) {
+        StartupManager.getInstance(getProject()).registerPostStartupActivity(() -> {
+            DumbService.getInstance(getProject()).smartInvokeLater(() -> {
+                ProgressManager.getInstance().run(new Task.Backgroundable(getProject(), "Indexing @SidedProxy", true, null) {
                     @Override
                     public void run(@NotNull ProgressIndicator indicator) {
                         try (final AccessToken ignored = ApplicationManager.getApplication().acquireReadActionLock()) {

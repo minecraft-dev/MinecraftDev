@@ -12,7 +12,6 @@ package com.demonwav.mcdev.creator;
 
 import static com.demonwav.mcdev.platform.PlatformType.FORGE;
 import static com.demonwav.mcdev.platform.PlatformType.SPONGE;
-
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;

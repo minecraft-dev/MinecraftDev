@@ -15,7 +15,6 @@ import static com.demonwav.mcdev.platform.PlatformType.FORGE;
 import static com.demonwav.mcdev.platform.PlatformType.LITELOADER;
 import static com.demonwav.mcdev.platform.PlatformType.NEPTUNE;
 import static com.demonwav.mcdev.platform.PlatformType.SPONGE;
-
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
