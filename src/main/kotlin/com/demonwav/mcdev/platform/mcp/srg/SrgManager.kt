@@ -10,11 +10,12 @@
 
 package com.demonwav.mcdev.platform.mcp.srg
 
-import com.intellij.ide.plugins.PluginManager
 import com.intellij.openapi.util.Getter
 import org.jetbrains.concurrency.Promise
+import org.jetbrains.concurrency.createError
 import org.jetbrains.concurrency.rejectedPromise
 import org.jetbrains.concurrency.runAsync
+import java.nio.file.NoSuchFileException
 import java.nio.file.Paths
 
 class SrgManager(val files: Set<String>) {
@@ -34,10 +35,12 @@ class SrgManager(val files: Set<String>) {
 
         srgMap = if (files.isNotEmpty()) {
             runAsync {
-                // Load SRG map from files
-                McpSrgMap.parse(Paths.get(files.find { it.endsWith("mcp-srg.srg") }))
-            }.rejected {
-                PluginManager.processException(it)
+                try {
+                    // Load SRG map from files
+                    McpSrgMap.parse(Paths.get(files.find { it.endsWith("mcp-srg.srg") }))
+                } catch (e: NoSuchFileException) {
+                    throw createError("SRG mapping file does not exist")
+                }
             }
         } else {
             // Path to SRG files is unknown
