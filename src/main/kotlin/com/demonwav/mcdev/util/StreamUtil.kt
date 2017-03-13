@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.util
 
 import org.jetbrains.annotations.Contract
+import java.util.function.Function
 import java.util.stream.Stream
 
 /**
@@ -25,12 +26,12 @@ fun <T> Stream<T?>.filterNotNull(): Stream<T> = filter { it != null } as Stream<
  * returned `null` elements from the [Stream].
  */
 @Contract(pure = true)
-fun <T, R> Stream<T>.mapNotNull(mapper: (T) -> R?): Stream<R> = map(mapper).filterNotNull()
+inline fun <T, R> Stream<T>.mapNotNull(crossinline transform: (T) -> R?): Stream<R> = map { transform(it) }.filterNotNull()
 
 /**
  * Runs the given function on each non-null element in the stream.
  */
-fun <T> Stream<T?>.forEachNotNull(function: (T) -> Unit) = filterNotNull().forEach(function)
+inline fun <T> Stream<T?>.forEachNotNull(crossinline consume: (T) -> Unit) = filterNotNull().forEach { consume(it) }
 
 /**
  * Creates a typed [Array] of [T] for the elements in the [Stream].
