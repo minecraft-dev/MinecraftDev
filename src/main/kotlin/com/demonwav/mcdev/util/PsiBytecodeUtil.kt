@@ -11,6 +11,8 @@
 @file:JvmName("PsiBytecodeUtil")
 package com.demonwav.mcdev.util
 
+import com.intellij.openapi.project.Project
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
@@ -18,6 +20,7 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.TypeConversionUtil
 import org.jetbrains.annotations.Contract
 
@@ -40,6 +43,7 @@ val PsiPrimitiveType.internalName: Char
         else -> throw IllegalArgumentException("Unsupported primitive type: $this")
     }
 
+@Contract(pure = true)
 fun getPrimitiveType(internalName: Char): PsiPrimitiveType? {
     return when (internalName) {
         'B' -> PsiType.BYTE
@@ -53,6 +57,12 @@ fun getPrimitiveType(internalName: Char): PsiPrimitiveType? {
         'V' -> PsiType.VOID
         else -> null
     }
+}
+
+@Contract(pure = true)
+fun getPrimitiveWrapperClass(internalName: Char, project: Project): PsiClass? {
+    val type = getPrimitiveType(internalName) ?: return null
+    return JavaPsiFacade.getInstance(project).findClass(type.boxedTypeName, GlobalSearchScope.allScope(project))
 }
 
 @Contract(pure = true)
