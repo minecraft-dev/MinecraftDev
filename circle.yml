@@ -4,6 +4,11 @@ machine:
   environment:
     TERM: dumb
 
+dependencies:
+  cache_directories:
+    - "~/.m2"
+    - "~/.gradle"
+
 test:
   override:
     - ./gradlew build
