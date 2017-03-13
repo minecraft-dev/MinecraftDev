@@ -8,15 +8,6 @@
  * MIT License
  */
 
-/*
- * IntelliJ IDEA Bukkit Support Plugin
- *
- * Written by Kyle Wood (DemonWav)
- * http://demonwav.com
- *
- * MIT License
- */
-
 package com.demonwav.mcdev.platform.bukkit;
 
 import com.demonwav.mcdev.buildsystem.BuildSystem;
