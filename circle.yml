@@ -5,9 +5,12 @@ machine:
     TERM: dumb
 
 dependencies:
+  pre:
+    - rm -f ~/.gradle/caches/modules-2/modules-2.lock
+    - rm -rf ~/.gradle/caches/*/{file-changes,fileHashes,plugin-resolution,scripts,scripts-remapped,gradle-script-kotlin}/
   cache_directories:
-    - "~/.m2"
-    - "~/.gradle"
+    - "~/.gradle/caches/"
+    - "~/.gradle/wrapper/"
 
 test:
   override:
