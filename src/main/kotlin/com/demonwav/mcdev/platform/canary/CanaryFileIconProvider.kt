@@ -8,19 +8,20 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.bukkit
+package com.demonwav.mcdev.platform.canary
 
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.intellij.ide.FileIconProvider
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Iconable
 import com.intellij.openapi.vfs.VirtualFile
 import javax.swing.Icon
 
-class BukkitFileIconProvider : FileIconProvider {
+class CanaryFileIconProvider : FileIconProvider {
 
-    override fun getIcon(file: VirtualFile, flags: Int, project: Project?): Icon? {
+    override fun getIcon(file: VirtualFile, @Iconable.IconFlags flags: Int, project: Project?): Icon? {
         project ?: return null
 
         if (!MinecraftSettings.instance.isShowProjectPlatformIcons) {
@@ -28,11 +29,10 @@ class BukkitFileIconProvider : FileIconProvider {
         }
 
         val module = ModuleUtilCore.findModuleForFile(file, project) ?: return null
-        val bukkitModule = MinecraftFacet.getInstance<BukkitModule<*>>(module, BukkitModuleType, SpigotModuleType, PaperModuleType) ?:
-            return null
+        val canaryModule = MinecraftFacet.getInstance<CanaryModule<*>>(module, CanaryModuleType, NeptuneModuleType) ?: return null
 
-        if (file == bukkitModule.pluginYml) {
-            return bukkitModule.icon
+        if (file == canaryModule.canaryInf) {
+            return canaryModule.icon
         }
         return null
     }

@@ -20,11 +20,11 @@ import javax.swing.Icon
 
 class LiteLoaderFileIconProvider : FileIconProvider {
     override fun getIcon(file: VirtualFile, flags: Int, project: Project?): Icon? {
+        project ?: return null
+
         if (!MinecraftSettings.instance.isShowProjectPlatformIcons) {
             return null
         }
-
-        project ?: return null
 
         val module = ModuleUtilCore.findModuleForFile(file, project) ?: return null
         val liteloaderModule = MinecraftFacet.getInstance(module, LiteLoaderModuleType) ?: return null
