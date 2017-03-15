@@ -27,15 +27,6 @@ buildscript {
     }
 }
 
-val CI = System.getenv("CI") != null
-
-val ideaVersion: String by extra
-val javaVersion: String by extra
-val kotlinVersion: String by extra
-val downloadIdeaSources: String by extra
-
-defaultTasks("build")
-
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.1.1"
     groovy
@@ -43,6 +34,15 @@ plugins {
     id("org.jetbrains.intellij") version "0.2.5"
     id("net.minecrell.licenser") version "0.3"
 }
+
+defaultTasks("build")
+
+val CI = System.getenv("CI") != null
+
+val ideaVersion: String by extra
+val javaVersion: String by extra
+val kotlinVersion: String by extra
+val downloadIdeaSources: String by extra
 
 val clean: Delete by tasks
 val processResources: AbstractCopyTask by tasks
