@@ -4,7 +4,16 @@ machine:
   environment:
     TERM: dumb
 
+dependencies:
+  pre:
+    - rm -f ~/.gradle/caches/modules-2/modules-2.lock
+    - rm -rf ~/.gradle/caches/*/{file-changes,fileHashes,plugin-resolution,scripts,scripts-remapped,gradle-script-kotlin}/
+  cache_directories:
+    - "~/.gradle/caches/"
+    - "~/.gradle/wrapper/"
+  override:
+    - ./gradlew dependencies
+
 test:
   override:
-    - ./gradlew generate -PideaVersion=2016.3
-    - ./gradlew build -x generate
+    - ./gradlew test

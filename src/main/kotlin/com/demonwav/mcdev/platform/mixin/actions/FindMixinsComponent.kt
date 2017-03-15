@@ -28,7 +28,7 @@ class FindMixinsComponent(classes: List<PsiClass>) : MouseAdapter() {
     init {
         @Suppress("UNCHECKED_CAST")
         classList.model = JBList.createDefaultListModel(*classes.toArray()) as ListModel<PsiClass>
-        classList.cellRenderer = PsiClassListCellRenderer.INSTANCE
+        classList.cellRenderer = PsiClassListCellRenderer()
 
         classList.addMouseListener(this)
     }

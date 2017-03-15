@@ -48,9 +48,9 @@ class AtUsageInspection : LocalInspectionTool() {
                 val reference = AtMemberReference.get(element, member)
 
                 val psi = if (member is AtFunction) {
-                    srgMap.getSrgMethod(reference)?.resolveMember(element.project) ?: return
+                    srgMap.getMcpMethod(reference)?.resolveMember(element.project) ?: return
                 } else if (member is AtFieldName) {
-                    srgMap.getSrgField(reference)?.resolveMember(element.project) ?: return
+                    srgMap.getMcpField(reference)?.resolveMember(element.project) ?: return
                 } else {
                     return
                 }

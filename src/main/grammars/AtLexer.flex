@@ -33,7 +33,7 @@ import static com.intellij.psi.TokenType.*;
 
 PRIMITIVE=[ZBCSIFDJV]
 CLASS_VALUE=\[*([ZBCSIFDJ]|L[^;]+;)
-KEYWORD_ELEMENT=(public|public-f|private|private-f|protected|protected-f)
+KEYWORD_ELEMENT=(public|private|protected|default)([-+]f)?
 NAME_ELEMENT=[a-zA-Z0-9_]+|<init>
 CLASS_NAME_ELEMENT=[a-zA-Z_$0-9\.]*[a-zA-Z_$0-9]
 COMMENT=#.*
@@ -48,7 +48,7 @@ WHITE_SPACE=\s
 
     "("                                         { return OPEN_PAREN; }
     ")"                                         { return CLOSE_PAREN; }
-    "*"                                         { return ASTERISK_ELEMENT; }
+    "*" | "*()"                                 { return ASTERISK_ELEMENT; }
 
     {PRIMITIVE} ({PRIMITIVE}|{CLASS_VALUE})*    { zzMarkedPos = zzStartRead + 1; return PRIMITIVE; }
 

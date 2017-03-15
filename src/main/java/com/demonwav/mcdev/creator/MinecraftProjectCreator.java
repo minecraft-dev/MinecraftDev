@@ -171,7 +171,7 @@ public class MinecraftProjectCreator {
                 break;
             case SPONGE:
                 buildRepository.setId("spongepowered-repo");
-                buildRepository.setUrl("http://repo.spongepowered.org/maven/");
+                buildRepository.setUrl("https://repo.spongepowered.org/maven/");
                 buildDependency.setGroupId("org.spongepowered");
                 buildDependency.setArtifactId("spongeapi");
                 if (configuration instanceof SpongeProjectConfiguration) {
@@ -195,10 +195,10 @@ public class MinecraftProjectCreator {
             case NEPTUNE:
                 if (!((CanaryProjectConfiguration) configuration).canaryVersion.endsWith("-SNAPSHOT")) {
                     buildRepository.setId("lex-releases");
-                    buildRepository.setUrl("http://repo.lexteam.xyz/maven/releases/");
+                    buildRepository.setUrl("https://repo.lexteam.xyz/maven/releases/");
                 } else {
                     buildRepository.setId("lex-snapshots");
-                    buildRepository.setUrl("http://repo.lexteam.xyz/maven/snapshots/");
+                    buildRepository.setUrl("https://repo.lexteam.xyz/maven/snapshots/");
                 }
                 addVIRepo(buildSystem.getRepositories());
                 buildDependency.setGroupId("org.neptunepowered");

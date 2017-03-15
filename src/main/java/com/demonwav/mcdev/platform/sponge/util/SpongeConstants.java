@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 public final class SpongeConstants {
 
     @NotNull public static final String PLUGIN_ANNOTATION = "org.spongepowered.api.plugin.Plugin";
+    @NotNull public static final String DEPENDENCY_ANNOTATION = "org.spongepowered.api.plugin.Dependency";
     @NotNull public static final String TEXT_COLORS = "org.spongepowered.api.text.format.TextColors";
     @NotNull public static final String LISTENER_ANNOTATION = "org.spongepowered.api.event.Listener";
     @NotNull public static final String IS_CANCELLED_ANNOTATION = "org.spongepowered.api.event.filter.IsCancelled";

@@ -13,7 +13,7 @@ package com.demonwav.mcdev.platform.hybrid;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.platform.PlatformType;
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration;
-import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration;
+import com.demonwav.mcdev.platform.sponge.SpongeProjectConfigurationKt;
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate;
 import com.demonwav.mcdev.util.Util;
 import com.intellij.ide.util.EditorHelper;
@@ -66,7 +66,7 @@ public class SpongeForgeProjectConfiguration extends ForgeProjectConfiguration {
                 }
                 final PsiClass psiClass = mainClassPsi.getClasses()[0];
 
-                SpongeProjectConfiguration.writeMainSpongeClass(
+                SpongeProjectConfigurationKt.writeMainSpongeClass(
                     project,
                     mainClassPsi,
                     psiClass,

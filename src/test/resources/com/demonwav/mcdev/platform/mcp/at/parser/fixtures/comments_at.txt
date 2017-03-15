@@ -32,7 +32,7 @@ Access Transformer File
       PsiElement(class_name_element)('net.minecraft.network.play.client.CPacketPlayer')
     PsiWhiteSpace(' ')
     AtAsteriskImpl(ASTERISK)
-      PsiElement(*)('*')
+      PsiElement(asterisk_element)('*')
   PsiWhiteSpace(' ')
   PsiComment(comment)('# Comment after asterisk')
   PsiElement(crlf)('\n')

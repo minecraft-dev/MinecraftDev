@@ -53,7 +53,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
     private JCheckBox neptunePluginCheckBox;
 
     @NotNull private static final String bukkitInfo = "Create a standard " +
-            "<a href=\"http://bukkit.org/\">Bukkit</a> plugin, for use " +
+            "<a href=\"https://bukkit.org/\">Bukkit</a> plugin, for use " +
             "on CraftBukkit, Spigot, and Paper servers.";
     @NotNull private static final String spigotInfo = "Create a standard " +
             "<a href=\"https://www.spigotmc.org/\">Spigot</a> plugin, for use " +
@@ -68,7 +68,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             "<a href=\"https://www.spongepowered.org/\">Sponge</a> plugin, for use " +
             "on Sponge servers.";
     @NotNull private static final String forgeInfo = "Create a standard " +
-            "<a href=\"http://files.minecraftforge.net/\">Forge</a> mod, for use " +
+            "<a href=\"https://files.minecraftforge.net/\">Forge</a> mod, for use " +
             "on Forge servers and clients.";
     @NotNull private static final String liteLoaderInfo = "Create a standard " +
             "<a href=\"http://www.liteloader.com/\">LiteLoader</a> mod, for use " +
