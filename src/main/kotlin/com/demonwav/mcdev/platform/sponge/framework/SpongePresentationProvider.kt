@@ -16,6 +16,7 @@ import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
 import com.intellij.openapi.roots.libraries.LibraryProperties
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
+import java.io.IOException
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 
@@ -26,7 +27,11 @@ class SpongePresentationProvider : LibraryPresentationProvider<LibraryVersionPro
     override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
         loop@ for (classesRoot in classesRoots) {
             val file = VfsUtilCore.virtualToIoFile(classesRoot)
-            val manifest = JarFile(file).manifest ?: continue
+            val manifest = try {
+                JarFile(file).manifest ?: continue
+            } catch (e: IOException) {
+                continue
+            }
 
             val mainAttributes = manifest.mainAttributes
 
