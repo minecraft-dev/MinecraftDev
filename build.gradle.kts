@@ -25,10 +25,6 @@ buildscript {
             setUrl("https://dl.bintray.com/jetbrains/intellij-plugin-service")
         }
     }
-
-    dependencies {
-        classpath(kotlinModule("gradle-plugin", properties["kotlinVersion"] as String))
-    }
 }
 
 val CI = System.getenv("CI") != null
@@ -40,11 +36,8 @@ val downloadIdeaSources: String by extra
 
 defaultTasks("build")
 
-apply {
-    plugin("kotlin")
-}
-
 plugins {
+    id("org.jetbrains.kotlin.jvm") version "1.1.1"
     groovy
     idea
     id("org.jetbrains.intellij") version "0.2.5"
