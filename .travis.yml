@@ -4,10 +4,6 @@ dist: trusty
 language: java
 jdk: openjdk8
 
-env:
-  global:
-    - TERM=dumb
-
 install: true
 script: ./gradlew build
 
