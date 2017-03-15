@@ -14,6 +14,7 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
@@ -134,7 +135,9 @@ processResources {
 }
 
 tasks.withType<Test> {
-    if (CI) systemProperty("slowCI", "true")
+    if (CI) {
+        systemProperty("slowCI", "true")
+    }
 
     dependsOn(configurations["testLibs"])
     doFirst {
@@ -145,7 +148,7 @@ tasks.withType<Test> {
 }
 
 idea {
-    module.apply {
+    module {
         generatedSourceDirs.add(file("gen"))
         excludeDirs.add(file(intellij().sandboxDirectory))
     }
