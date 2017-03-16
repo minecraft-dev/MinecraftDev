@@ -96,7 +96,7 @@
         <lang.syntaxHighlighterFactory language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.at.AtColorSettingsPage" />
         <lang.commenter language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCommenter" />
-        <completion.contributor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCompletionContributor" />
+        <completion.contributor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.completion.AtCompletionContributor" />
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.at.AtGotoDeclarationHandler" />
 
         <!-- Project-independent Annotators-->

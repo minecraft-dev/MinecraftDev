@@ -8,14 +8,12 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mcp.at
+package com.demonwav.mcdev.platform.mcp.at.completion
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModuleType
-import com.demonwav.mcdev.platform.mcp.at.completion.AtFieldNameLookupItem
-import com.demonwav.mcdev.platform.mcp.at.completion.AtFuncLookupItem
-import com.demonwav.mcdev.platform.mcp.at.completion.AtGenericLookupItem
-import com.demonwav.mcdev.platform.mcp.at.completion.SrgPrefixMatcher
+import com.demonwav.mcdev.platform.mcp.at.AtElementFactory
+import com.demonwav.mcdev.platform.mcp.at.AtLanguage
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes
