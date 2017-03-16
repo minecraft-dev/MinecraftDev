@@ -16,6 +16,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 import org.gradle.internal.jvm.Jvm
+import org.jetbrains.intellij.tasks.RunIdeaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 
@@ -214,6 +215,14 @@ val generate = task("generate") {
     description = "Generates sources needed to compile the plugin."
     dependsOn(generateAtLexer, generateAtPsiAndParser)
     outputs.dir("gen")
+}
+
+tasks.withType<RunIdeaTask> {
+    if (System.getProperty("debug") != null) {
+        systemProperty("idea.ProcessCanceledException", "disabled")
+        systemProperty("idea.is.internal", "true")
+        systemProperty("idea.debug.mode", "true")
+    }
 }
 
 java().sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)

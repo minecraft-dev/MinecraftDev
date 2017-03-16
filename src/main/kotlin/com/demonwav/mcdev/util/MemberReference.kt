@@ -33,6 +33,14 @@ data class MemberReference(val name: String, val descriptor: String? = null,
         get() = this.owner != null
 
     @get:Contract(pure = true)
+    val text
+        get() = if (descriptor == null) {
+            name
+        } else {
+            name + descriptor
+        }
+
+    @get:Contract(pure = true)
     val withoutOwner
         get() = if (this.owner == null) this else MemberReference(this.name, this.descriptor, null, this.matchAll)
 

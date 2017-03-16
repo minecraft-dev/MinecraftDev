@@ -17,10 +17,10 @@ import com.intellij.psi.PsiElement
 object AtMemberReference {
 
     @JvmStatic
-    fun get(entry: AtEntry, member: PsiElement): MemberReference {
+    fun get(entry: AtEntry, member: PsiElement): MemberReference? {
         val memberText = member.text
 
-        val owner = entry.className.classNameText
+        val owner = entry.className?.text ?: return null
 
         val pos = memberText.indexOf('(')
         return if (pos != -1) {

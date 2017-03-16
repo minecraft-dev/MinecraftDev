@@ -153,3 +153,11 @@ fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
     // TODO: Do more checks for generics instead
     return TypeConversionUtil.erasure(this) == TypeConversionUtil.erasure(other)
 }
+
+@get:Contract(pure = true)
+val PsiMethod.nameAndParameterTypes: String
+    get() {
+        val name = this.name
+
+        return "$name(${this.parameterList.parameters.map { it.type }.map { it.presentableText }.joinToString(", ")})"
+    }

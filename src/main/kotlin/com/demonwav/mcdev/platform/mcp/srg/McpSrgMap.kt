@@ -44,9 +44,11 @@ class McpSrgMap private constructor(
 
     @Contract(pure = true) fun getMcpField(reference: MemberReference) = fieldMap.inverse()[reference]
     @Contract(pure = true) fun mapToMcpField(reference: MemberReference) = getMcpField(reference) ?: reference
+    @Contract(pure = true) fun findMcpField(field: PsiField) = getMcpField(field.qualifiedMemberReference)
 
     @Contract(pure = true) fun getMcpMethod(reference: MemberReference) = methodMap.inverse()[reference]
     @Contract(pure = true) fun mapToMcpMethod(reference: MemberReference) = getMcpMethod(reference) ?: reference
+    @Contract(pure = true) fun findMcpMethod(method: PsiMethod) = getMcpMethod(method.qualifiedMemberReference)
 
     companion object {
 
