@@ -13,9 +13,9 @@ package com.demonwav.mcdev.platform.mcp.at.psi.mixins
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtArgument
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFuncName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtReturnValue
-import com.intellij.psi.PsiElement
+import com.demonwav.mcdev.platform.mcp.at.psi.AtElement
 
-interface AtFunctionMixin : PsiElement {
+interface AtFunctionMixin : AtElement {
 
     val argumentList: List<AtArgument>
     val funcName: AtFuncName

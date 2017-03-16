@@ -16,9 +16,9 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtClassName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtKeyword
-import com.intellij.psi.PsiElement
+import com.demonwav.mcdev.platform.mcp.at.psi.AtElement
 
-interface AtEntryMixin : PsiElement {
+interface AtEntryMixin : AtElement {
 
     val asterisk: AtAsterisk?
     val className: AtClassName

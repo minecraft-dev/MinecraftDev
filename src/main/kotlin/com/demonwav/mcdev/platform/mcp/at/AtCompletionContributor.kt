@@ -12,10 +12,9 @@ package com.demonwav.mcdev.platform.mcp.at
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModuleType
-import com.demonwav.mcdev.platform.mcp.at.completion.AtClassNameLookupItem
 import com.demonwav.mcdev.platform.mcp.at.completion.AtFieldNameLookupItem
 import com.demonwav.mcdev.platform.mcp.at.completion.AtFuncLookupItem
-import com.demonwav.mcdev.platform.mcp.at.completion.AtKeywordLookupItem
+import com.demonwav.mcdev.platform.mcp.at.completion.AtGenericLookupItem
 import com.demonwav.mcdev.platform.mcp.at.completion.SrgPrefixMatcher
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
@@ -36,6 +35,7 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiUtilCore
+import com.intellij.util.PlatformIcons
 
 class AtCompletionContributor : CompletionContributor() {
 
@@ -74,14 +74,14 @@ class AtCompletionContributor : CompletionContributor() {
             .filter { it.name?.toLowerCase()?.contains(beginning) == true && it.name != "package-info" }
             .distinctBy { it.name }
             .map { AtElementFactory.createClassName(project, it.fullQualifiedName) }
-            .map(::AtClassNameLookupItem)
+            .map { AtGenericLookupItem(it, PlatformIcons.CLASS_ICON) }
             .onEach { it.priority = 1.0 }
             .forEach(result::addElement)
 
         psiPackage.subPackages.asSequence()
             .filter { it.name?.toLowerCase()?.contains(beginning) == true }
             .map { AtElementFactory.createClassName(project, it.qualifiedName) }
-            .map(::AtClassNameLookupItem)
+            .map { AtGenericLookupItem(it, PlatformIcons.PACKAGE_ICON) }
             .onEach { it.priority = 0.0 }
             .forEach(result::addElement)
     }
@@ -127,7 +127,7 @@ class AtCompletionContributor : CompletionContributor() {
 
         AtElementFactory.Keyword.softMatch(text).asSequence()
             .map { AtElementFactory.createKeyword(project, it) }
-            .map(::AtKeywordLookupItem)
+            .map { AtGenericLookupItem(it) }
             .forEach(result::addElement)
     }
 

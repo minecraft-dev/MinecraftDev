@@ -1,3 +1,4 @@
+
 /*
  * Minecraft Dev for IntelliJ
  *
@@ -10,19 +11,21 @@
 
 package com.demonwav.mcdev.platform.mcp.at.completion
 
-import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtKeyword
+import com.demonwav.mcdev.platform.mcp.at.psi.AtElement
 import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.intellij.codeInsight.lookup.LookupItem
+import javax.swing.Icon
 
-class AtKeywordLookupItem(private val keyword: AtKeyword) : LookupItem<AtKeyword>(keyword, keyword.text) {
+class AtGenericLookupItem<T : AtElement>(private val element: T, private val icon: Icon? = null) : LookupItem<T>(element, element.text) {
 
     override fun renderElement(presentation: LookupElementPresentation) {
-        presentation.itemText = keyword.text
+        presentation.icon = icon
+        presentation.itemText = element.text
     }
 
     override fun handleInsert(context: InsertionContext) {
         val currentElement = context.file.findElementAt(context.startOffset) ?: return
-        currentElement.replace(keyword)
+        currentElement.replace(element)
     }
 }
