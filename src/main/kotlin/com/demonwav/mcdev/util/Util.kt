@@ -74,6 +74,11 @@ fun Collection<*>.toArray(): Array<Any?> {
     return (this as java.util.Collection<*>).toArray()
 }
 
+inline fun <T : Collection<*>> T.ifEmpty(func: () -> Unit): T {
+    if (isEmpty()) func()
+    return this
+}
+
 @Contract(pure = true)
 inline fun <T, R> Iterable<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     forEach { transform(it)?.let { return it } }

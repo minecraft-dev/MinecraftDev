@@ -14,6 +14,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRI
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findMatchingMethod
 import com.demonwav.mcdev.util.findMatchingMethods
+import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
@@ -23,11 +24,7 @@ import org.jetbrains.annotations.Contract
 fun PsiMethod.findFirstOverwriteTarget(): PsiMethod? {
     findAnnotation(OVERWRITE) ?: return null
     val containingClass = containingClass ?: return null
-    val targetClasses = containingClass.mixinTargets
-    if (targetClasses.isEmpty()) {
-        return null
-    }
-
+    val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
     return resolveFirstOverwriteTarget(targetClasses, this)
 }
 
@@ -38,11 +35,7 @@ fun resolveFirstOverwriteTarget(targetClasses: Collection<PsiClass>, method: Psi
 fun PsiMethod.findOverwriteTargets(): List<PsiMethod>? {
     findAnnotation(OVERWRITE) ?: return null
     val containingClass = containingClass ?: return null
-    val targetClasses = containingClass.mixinTargets
-    if (targetClasses.isEmpty()) {
-        return null
-    }
-
+    val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
     return resolveOverwriteTargets(targetClasses, this)
 }
 

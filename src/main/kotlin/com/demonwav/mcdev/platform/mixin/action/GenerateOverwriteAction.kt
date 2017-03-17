@@ -16,6 +16,7 @@ import com.demonwav.mcdev.platform.mixin.util.findSource
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory.Companion.MIXIN_OVERWRITE_FALLBACK
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.generation.GenerateMembersUtil
 import com.intellij.codeInsight.generation.OverrideImplementUtil
@@ -51,10 +52,7 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
         chooser.setCopyJavadocVisible(false)
         chooser.show()
 
-        val elements = chooser.selectedElements ?: return
-        if (elements.isEmpty()) {
-            return
-        }
+        val elements = (chooser.selectedElements ?: return).ifEmpty { return }
 
         runWriteAction {
             val requiredMembers = LinkedHashSet<PsiMember>()

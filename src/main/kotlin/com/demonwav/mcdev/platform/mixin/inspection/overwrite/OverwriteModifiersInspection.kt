@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.overwrite
 
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.platform.mixin.util.resolveFirstOverwriteTarget
+import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.isAccessModifier
 import com.intellij.codeInsight.intention.AddAnnotationFix
 import com.intellij.codeInsight.intention.QuickFixFactory
@@ -26,10 +27,7 @@ class OverwriteModifiersInspection : OverwriteInspection() {
 
     override fun visitOverwrite(holder: ProblemsHolder, method: PsiMethod, overwrite: PsiAnnotation) {
         val psiClass = method.containingClass ?: return
-        val targetClasses = psiClass.mixinTargets
-        if (targetClasses.isEmpty()) {
-            return
-        }
+        val targetClasses = psiClass.mixinTargets.ifEmpty { return }
 
         val target = resolveFirstOverwriteTarget(targetClasses, method)?.modifierList ?: return
         val modifierList = method.modifierList

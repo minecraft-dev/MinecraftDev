@@ -14,6 +14,7 @@ import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInsp
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.findAnnotations
+import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.resolveClass
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.codeInspection.RemoveAnnotationQuickFix
@@ -26,10 +27,7 @@ class DuplicateInterfaceInspection : MixinAnnotationAttributeInspection(MixinCon
     override fun getStaticDescription() = "Reports duplicate @Interface classes in an @Implements annotation."
 
     override fun visitAnnotationAttribute(annotation: PsiAnnotation, value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
-        val interfaces = value.findAnnotations()
-        if (interfaces.isEmpty()) {
-            return
-        }
+        val interfaces = value.findAnnotations().ifEmpty { return }
 
         val classes = ArrayList<PsiClass>()
         for (iface in interfaces) {

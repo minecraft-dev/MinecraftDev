@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.inspection
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.equivalentTo
+import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.shortName
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.CommonClassNames
@@ -38,10 +39,7 @@ class MixinSuperClassInspection : MixinInspection() {
                 return
             }
 
-            val targetClasses = psiClass.mixinTargets
-            if (targetClasses.isEmpty()) {
-                return
-            }
+            val targetClasses = psiClass.mixinTargets.ifEmpty { return }
 
             val superTargets = superClass.mixinTargets
             if (superTargets.isEmpty()) {

@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.action
 import com.demonwav.mcdev.platform.mixin.util.findSoftImplements
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findMatchingMethod
+import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInsight.generation.GenerateMembersUtil
 import com.intellij.codeInsight.generation.OverrideImplementUtil
 import com.intellij.codeInsight.generation.PsiMethodMember
@@ -67,10 +68,7 @@ class GenerateSoftImplementsAction : MixinCodeInsightAction() {
         chooser.title = "Select Methods to Soft-implement"
         chooser.show()
 
-        val elements = chooser.selectedElements ?: return
-        if (elements.isEmpty()) {
-            return
-        }
+        val elements = (chooser.selectedElements ?: return).ifEmpty { return }
 
         runWriteAction {
             GenerateMembersUtil.insertMembersAtOffset(

@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.FINAL
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.platform.mixin.util.resolveFirstShadowTarget
+import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInsight.intention.AddAnnotationFix
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.ProblemHighlightType
@@ -47,11 +48,7 @@ class ShadowModifiersInspection : MixinInspection() {
             val shadowModifierList = annotation.owner as? PsiModifierList ?: return
             val member = shadowModifierList.parent as? PsiMember ?: return
             val psiClass = member.containingClass ?: return
-            val targetClasses = psiClass.mixinTargets
-            if (targetClasses.isEmpty()) {
-                return
-            }
-
+            val targetClasses = psiClass.mixinTargets.ifEmpty { return }
             val target = resolveFirstShadowTarget(annotation, targetClasses, member)?.modifierList ?: return
 
             // Check static modifier

@@ -18,6 +18,7 @@ import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findFirstMember
 import com.demonwav.mcdev.util.findLastChild
 import com.demonwav.mcdev.util.findNextMember
+import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.generation.GenerateMembersUtil
 import com.intellij.codeInsight.generation.GenerationInfo
@@ -72,10 +73,7 @@ class GenerateShadowAction : MixinCodeInsightAction() {
         chooser.setCopyJavadocVisible(false)
         chooser.show()
 
-        val elements = chooser.selectedElements ?: return
-        if (elements.isEmpty()) {
-            return
-        }
+        val elements = (chooser.selectedElements ?: return).ifEmpty { return }
 
         runWriteAction {
             GenerateMembersUtil.insertMembersAtOffset(

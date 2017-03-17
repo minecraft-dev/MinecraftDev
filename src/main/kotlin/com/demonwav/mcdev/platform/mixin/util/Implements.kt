@@ -14,6 +14,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.IMPLEME
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.findMatchingMethods
+import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.resolveClass
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
@@ -23,10 +24,7 @@ import org.jetbrains.annotations.Contract
 @Contract(pure = true)
 fun PsiClass.findSoftImplements(): Map<String, PsiClass>? {
     val implements = modifierList?.findAnnotation(IMPLEMENTS) ?: return null
-    val interfaces = implements.findDeclaredAttributeValue(null)?.findAnnotations() ?: return null
-    if (interfaces.isEmpty()) {
-        return null
-    }
+    val interfaces = (implements.findDeclaredAttributeValue(null) ?: return null).findAnnotations().ifEmpty { return null }
 
     val result = HashMap<String, PsiClass>()
     for (iface in interfaces) {

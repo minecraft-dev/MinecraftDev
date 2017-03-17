@@ -16,6 +16,7 @@ import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findField
 import com.demonwav.mcdev.util.findJavaCodeReferenceElement
 import com.demonwav.mcdev.util.findMethods
+import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.qualifiedMemberReference
 import com.intellij.codeInsight.editorActions.JavaCopyPasteReferenceProcessor
 import com.intellij.codeInsight.editorActions.ReferenceData
@@ -66,8 +67,7 @@ class MixinCopyPasteReferenceProcessor : JavaCopyPasteReferenceProcessor() {
         val elementInTargetClass = file.findElementAt(bounds.startOffset) ?: return refs
         val psiClass = elementInTargetClass.findContainingClass() ?: return refs
 
-        val targets = psiClass.mixinTargets
-        if (targets.isEmpty()) {
+        val targets = psiClass.mixinTargets.ifEmpty {
             // Not a Mixin, so there is no need to add @Shadow members
             return refs
         }
