@@ -1,4 +1,3 @@
-
 /*
  * Minecraft Dev for IntelliJ
  *
