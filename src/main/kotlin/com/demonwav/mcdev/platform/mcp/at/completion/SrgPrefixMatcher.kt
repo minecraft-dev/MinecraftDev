@@ -22,6 +22,6 @@ class SrgPrefixMatcher(prefix: String) : PrefixMatcher(prefix) {
             return false
         }
 
-        return element.getPrettyText().toLowerCase().contains(myPrefix.toLowerCase())
+        return element.getPrettyText().contains(myPrefix, ignoreCase = true)
     }
 }

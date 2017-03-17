@@ -156,4 +156,4 @@ fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
 
 @get:Contract(pure = true)
 val PsiMethod.nameAndParameterTypes: String
-    get() = "$name(${parameterList.parameters.map { it.type.presentableText }.joinToString(", ")})"
+    get() = "$name(${parameterList.parameters.joinToString(", ") { it.type.presentableText }})"

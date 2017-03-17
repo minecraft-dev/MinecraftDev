@@ -18,5 +18,5 @@ class KindPrefixMatcher(prefix: String) : PrefixMatcher(prefix) {
     override fun cloneWithPrefix(prefix: String) = KindPrefixMatcher(prefix)
 
     override fun prefixMatches(element: LookupElement) =
-        element.lookupString.toLowerCase().contains(prefix.toLowerCase())
+        element.lookupString.contains(prefix, ignoreCase = true)
 }

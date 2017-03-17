@@ -60,23 +60,24 @@ class AtCompletionContributor : CompletionContributor() {
 
         val parent = position.parent
 
+        val text = parent.text.let { it.substring(0, it.length - intellijPlz) }
+
         if (AFTER_KEYWORD.accepts(parent)) {
-            handleAtClassName(parent, result)
+            handleAtClassName(text, parent, result)
         } else if (AFTER_CLASS_NAME.accepts(parent)) {
-            handleAtName(parent, result)
+            handleAtName(text, parent, result)
         } else if (AFTER_NEWLINE.accepts(parent)) {
-            handleNewLine(parent, result)
+            handleNewLine(text, parent, result)
         }
     }
 
-    private fun handleAtClassName(element: PsiElement, result: CompletionResultSet) {
-        val text = element.text.let { it.substring(0, it.length - 19) }
+    private fun handleAtClassName(text: String, element: PsiElement, result: CompletionResultSet) {
         if (text.isEmpty()) {
             return
         }
 
         val currentPackage = text.substringBeforeLast('.')
-        val beginning = text.substringAfterLast('.').toLowerCase()
+        val beginning = text.substringAfterLast('.')
 
         val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return
         val scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module)
@@ -89,7 +90,7 @@ class AtCompletionContributor : CompletionContributor() {
 
             var counter = 0
             for (className in cache.allClassNames) {
-                if (!className.toLowerCase().startsWith(beginning)) {
+                if (!className.startsWith(beginning, ignoreCase = true)) {
                     continue
                 }
 
@@ -113,7 +114,7 @@ class AtCompletionContributor : CompletionContributor() {
             val currentClass = JavaPsiFacade.getInstance(project).findClass(text.substringBeforeLast('$'), scope) ?: return
 
             for (innerClass in currentClass.allInnerClasses) {
-                if (innerClass.name?.toLowerCase()?.contains(beginning.substringAfterLast('$')) != true) {
+                if (innerClass.name?.contains(beginning.substringAfterLast('$'), ignoreCase = true) != true) {
                     continue
                 }
 
@@ -146,7 +147,7 @@ class AtCompletionContributor : CompletionContributor() {
                 continue
             }
 
-            if (!psiClass.name!!.toLowerCase().contains(beginning) || psiClass.name == "package-info") {
+            if (!psiClass.name!!.contains(beginning, ignoreCase = true) || psiClass.name == "package-info") {
                 continue
             }
 
@@ -168,7 +169,7 @@ class AtCompletionContributor : CompletionContributor() {
                 continue
             }
 
-            if (!subPackage.name!!.toLowerCase().contains(beginning)) {
+            if (!subPackage.name!!.contains(beginning, ignoreCase = true)) {
                 continue
             }
 
@@ -180,12 +181,10 @@ class AtCompletionContributor : CompletionContributor() {
         }
     }
 
-    private fun handleAtName(memberName: PsiElement, result: CompletionResultSet) {
+    private fun handleAtName(text: String, memberName: PsiElement, result: CompletionResultSet) {
         if (memberName !is AtFieldName) {
             return
         }
-
-        val text = memberName.text.let { it.substring(0, it.length - 19) }.toLowerCase()
 
         val entry = memberName.parent as? AtEntry ?: return
 
@@ -205,7 +204,7 @@ class AtCompletionContributor : CompletionContributor() {
                 continue
             }
 
-            if (!field.name!!.toLowerCase().contains(text)) {
+            if (!field.name!!.contains(text, ignoreCase = true)) {
                 continue
             }
 
@@ -217,7 +216,7 @@ class AtCompletionContributor : CompletionContributor() {
         }
 
         for (method in entryClass.methods) {
-            if (!method.name.toLowerCase().contains(text)) {
+            if (!method.name.contains(text, ignoreCase = true)) {
                 continue
             }
 
@@ -229,9 +228,7 @@ class AtCompletionContributor : CompletionContributor() {
         }
     }
 
-    fun handleNewLine(element: PsiElement, result: CompletionResultSet) {
-        val text = element.text.let { it.substring(0, it.length - 19) }.toLowerCase()
-
+    fun handleNewLine(text: String, element: PsiElement, result: CompletionResultSet) {
         val project = element.project
 
         for (keyword in AtElementFactory.Keyword.softMatch(text)) {
@@ -281,5 +278,8 @@ class AtCompletionContributor : CompletionContributor() {
         val AFTER_KEYWORD = after(AtTypes.KEYWORD)
         val AFTER_CLASS_NAME = after(AtTypes.CLASS_NAME)
         val AFTER_NEWLINE = after(AtTypes.CRLF)
+
+        // https://intellij-support.jetbrains.com/hc/en-us/community/posts/206752355-The-dreaded-IntellijIdeaRulezzz-string
+        const val intellijPlz = "IntellijIdeaRulezzz".length
     }
 }
