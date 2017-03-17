@@ -22,6 +22,7 @@ class AtGenericLookupItem<T : AtElement>(private val element: T, private val ico
     override fun renderElement(presentation: LookupElementPresentation) {
         presentation.icon = icon
         presentation.itemText = element.text
+        presentation.itemTextForeground
     }
 
     override fun handleInsert(context: InsertionContext) {

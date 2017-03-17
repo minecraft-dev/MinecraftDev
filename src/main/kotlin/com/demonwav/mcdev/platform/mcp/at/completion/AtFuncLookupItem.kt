@@ -29,6 +29,7 @@ class AtFuncLookupItem(private val function: AtFunction, private val prettyText:
     override fun renderElement(presentation: LookupElementPresentation) {
         presentation.icon = PlatformIcons.METHOD_ICON
         presentation.itemText = prettyText
+        presentation.setTailText(" (${function.funcName.text})", true)
     }
 
     override fun handleInsert(context: InsertionContext) {

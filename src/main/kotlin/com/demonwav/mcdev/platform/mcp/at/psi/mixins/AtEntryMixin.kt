@@ -32,4 +32,17 @@ interface AtEntryMixin : AtElement {
     fun setFieldName(fieldName: String)
     fun setFunction(function: String)
     fun setAsterisk()
+
+    fun replaceMember(element: AtElement) {
+        // One of these must be true
+        if (fieldName != null) {
+            fieldName!!.replace(element)
+        } else if (function != null) {
+            function!!.replace(element)
+        } else if (asterisk != null) {
+            asterisk!!.replace(element)
+        } else {
+            addAfter(className, element)
+        }
+    }
 }

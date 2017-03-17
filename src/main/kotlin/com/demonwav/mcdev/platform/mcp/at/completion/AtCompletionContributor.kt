@@ -17,6 +17,7 @@ import com.demonwav.mcdev.platform.mcp.at.AtLanguage
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes
+import com.demonwav.mcdev.util.anonymousElements
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.nameAndParameterTypes
 import com.demonwav.mcdev.util.qualifiedMemberReference
@@ -30,12 +31,22 @@ import com.intellij.patterns.PlatformPatterns.elementType
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.patterns.PsiElementPattern
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.PsiShortNamesCache
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiUtilCore
 import com.intellij.util.PlatformIcons
 
 class AtCompletionContributor : CompletionContributor() {
+
+    override fun invokeAutoPopup(position: PsiElement, typeChar: Char): Boolean {
+        if (typeChar == '$') {
+            return true
+        }
+        return super.invokeAutoPopup(position, typeChar)
+    }
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         if (parameters.completionType != CompletionType.BASIC) {
@@ -60,28 +71,113 @@ class AtCompletionContributor : CompletionContributor() {
 
     private fun handleAtClassName(element: PsiElement, result: CompletionResultSet) {
         val text = element.text.let { it.substring(0, it.length - 19) }
+        if (text.isEmpty()) {
+            return
+        }
+
         val currentPackage = text.substringBeforeLast('.')
         val beginning = text.substringAfterLast('.').toLowerCase()
 
         val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return
+        val scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module)
         val project = module.project
 
-        val psiPackage = JavaPsiFacade.getInstance(project).findPackage(currentPackage) ?: return
-        // TODO: add support for anonymous classes
-        psiPackage.classes.asSequence()
-            .filter { it.name?.toLowerCase()?.contains(beginning) == true && it.name != "package-info" }
-            .distinctBy { it.name }
-            .map { AtElementFactory.createClassName(project, it.fullQualifiedName) }
-            .map { AtGenericLookupItem(it, PlatformIcons.CLASS_ICON) }
-            .onEach { it.priority = 1.0 }
-            .forEach(result::addElement)
+        // Short name completion
+        if (!text.contains('.')) {
+            val kindResult = result.withPrefixMatcher(KindPrefixMatcher(text))
+            val cache = PsiShortNamesCache.getInstance(project)
 
-        psiPackage.subPackages.asSequence()
-            .filter { it.name?.toLowerCase()?.contains(beginning) == true }
-            .map { AtElementFactory.createClassName(project, it.qualifiedName) }
-            .map { AtGenericLookupItem(it, PlatformIcons.PACKAGE_ICON) }
-            .onEach { it.priority = 0.0 }
-            .forEach(result::addElement)
+            var counter = 0
+            for (className in cache.allClassNames) {
+                if (!className.toLowerCase().startsWith(beginning)) {
+                    continue
+                }
+
+                if (counter++ > 1000) {
+                    break // Prevent insane CPU usage
+                }
+
+                val classesByName = cache.getClassesByName(className, scope)
+                for (classByName in classesByName) {
+                    val classNameAtElement = AtElementFactory.createClassName(project, classByName.fullQualifiedName)
+                    val lookupItem = AtGenericLookupItem(classNameAtElement, PlatformIcons.CLASS_ICON)
+                    lookupItem.priority = 1.0 + classNameAtElement.text.getValue(beginning)
+
+                    kindResult.addElement(lookupItem)
+                }
+            }
+        }
+
+        // Anonymous and inner class completion
+        if (text.contains('$')) {
+            val currentClass = JavaPsiFacade.getInstance(project).findClass(text.substringBeforeLast('$'), scope) ?: return
+
+            for (innerClass in currentClass.allInnerClasses) {
+                if (innerClass.name?.toLowerCase()?.contains(beginning.substringAfterLast('$')) != true) {
+                    continue
+                }
+
+                val classNameAtElement = AtElementFactory.createClassName(project, innerClass.fullQualifiedName)
+                val lookupItem = AtGenericLookupItem(classNameAtElement, PlatformIcons.CLASS_ICON)
+                lookupItem.priority = 1.0
+
+                result.addElement(lookupItem)
+            }
+
+            val anonymousElements = currentClass.anonymousElements ?: arrayOf()
+            for (anonymousElement in anonymousElements) {
+                val anonClass = anonymousElement as? PsiClass ?: continue
+
+                val classNameAtElement = AtElementFactory.createClassName(project, anonClass.fullQualifiedName)
+                val lookupItem = AtGenericLookupItem(classNameAtElement, PlatformIcons.CLASS_ICON)
+                lookupItem.priority = 1.0
+
+                result.addElement(lookupItem)
+            }
+            return
+        }
+
+        val psiPackage = JavaPsiFacade.getInstance(project).findPackage(currentPackage) ?: return
+
+        // Classes in package completion
+        val used = mutableSetOf<String>()
+        for (psiClass in psiPackage.classes) {
+            if (psiClass.name == null) {
+                continue
+            }
+
+            if (!psiClass.name!!.toLowerCase().contains(beginning) || psiClass.name == "package-info") {
+                continue
+            }
+
+            if (!used.add(psiClass.name!!)) {
+                continue
+            }
+
+            val classNameAtElement = AtElementFactory.createClassName(project, psiClass.fullQualifiedName)
+            val lookupItem = AtGenericLookupItem(classNameAtElement, PlatformIcons.CLASS_ICON)
+            lookupItem.priority = 1.0
+
+            result.addElement(lookupItem)
+        }
+        used.clear() // help GC
+
+        // Packages in package completion
+        for (subPackage in psiPackage.subPackages) {
+            if (subPackage.name == null) {
+                continue
+            }
+
+            if (!subPackage.name!!.toLowerCase().contains(beginning)) {
+                continue
+            }
+
+            val classNameAtElement = AtElementFactory.createClassName(project, subPackage.qualifiedName)
+            val lookupItem = AtGenericLookupItem(classNameAtElement, PlatformIcons.PACKAGE_ICON)
+            lookupItem.priority = 0.0
+
+            result.addElement(lookupItem)
+        }
     }
 
     private fun handleAtName(memberName: PsiElement, result: CompletionResultSet) {
@@ -102,20 +198,35 @@ class AtCompletionContributor : CompletionContributor() {
 
         val srgMap = mcpModule.srgManager.srgMapNow ?: return
 
-        val kindResult = result.withPrefixMatcher(SrgPrefixMatcher(text))
-        entryClass.fields.asSequence()
-            .filter { it.name?.toLowerCase()?.contains(text) == true }
-            .map { (srgMap.findSrgField(it) ?: it.simpleQualifiedMemberReference) to it.name!! }
-            .map { AtElementFactory.createFieldName(project, it.first.text) to it.second }
-            .map { AtFieldNameLookupItem(it.first, it.second) }
-            .forEach(kindResult::addElement)
+        val srgResult = result.withPrefixMatcher(SrgPrefixMatcher(text))
 
-        entryClass.methods.asSequence()
-            .filter { it.name.toLowerCase().contains(text) }
-            .map { (srgMap.findSrgMethod(it) ?: it.qualifiedMemberReference) to it.nameAndParameterTypes }
-            .map { AtElementFactory.createFunction(project, it.first.text) to it.second }
-            .map { AtFuncLookupItem(it.first, it.second) }
-            .forEach(kindResult::addElement)
+        for (field in entryClass.fields) {
+            if (field.name == null) {
+                continue
+            }
+
+            if (!field.name!!.toLowerCase().contains(text)) {
+                continue
+            }
+
+            val memberReference = srgMap.findSrgField(field) ?: field.simpleQualifiedMemberReference
+            val fieldName = AtElementFactory.createFieldName(project, memberReference.name)
+            val lookupItem = AtFieldNameLookupItem(fieldName, field.name!!)
+
+            srgResult.addElement(lookupItem)
+        }
+
+        for (method in entryClass.methods) {
+            if (!method.name.toLowerCase().contains(text)) {
+                continue
+            }
+
+            val memberReference = srgMap.findSrgMethod(method) ?: method.qualifiedMemberReference
+            val function = AtElementFactory.createFunction(project, memberReference.name + memberReference.descriptor)
+            val lookupItem = AtFuncLookupItem(function, method.nameAndParameterTypes)
+
+            srgResult.addElement(lookupItem)
+        }
     }
 
     fun handleNewLine(element: PsiElement, result: CompletionResultSet) {
@@ -123,10 +234,44 @@ class AtCompletionContributor : CompletionContributor() {
 
         val project = element.project
 
-        AtElementFactory.Keyword.softMatch(text).asSequence()
-            .map { AtElementFactory.createKeyword(project, it) }
-            .map { AtGenericLookupItem(it) }
-            .forEach(result::addElement)
+        for (keyword in AtElementFactory.Keyword.softMatch(text)) {
+            val atKeyword = AtElementFactory.createKeyword(project, keyword)
+            val lookupItem = AtGenericLookupItem(atKeyword)
+            result.addElement(lookupItem)
+        }
+    }
+
+    /**
+     * This helps order the (hopefully) most relevant entries in the short name completion
+     */
+    private fun String?.getValue(text: String): Int {
+        if (this == null) {
+            return 0
+        }
+
+        // Push net.minecraft{forge} classes up to the top
+        val packageBonus = if (this.startsWith("net.minecraft")) 10_000 else 0
+
+        val thisName = this.substringAfterLast('.')
+
+        if (thisName == text) {
+            return 1_000_000 + packageBonus // exact match
+        }
+
+        val lowerCaseThis = thisName.toLowerCase()
+        val lowerCaseText = text.toLowerCase()
+
+        if (lowerCaseThis == lowerCaseText) {
+            return 100_000 + packageBonus // lowercase exact match
+        }
+
+        val distance = Math.min(lowerCaseThis.length, lowerCaseText.length)
+        for (i in 0 until distance) {
+            if (lowerCaseThis[i] != lowerCaseText[i]) {
+                return i + packageBonus
+            }
+        }
+        return distance + packageBonus
     }
 
     companion object {
