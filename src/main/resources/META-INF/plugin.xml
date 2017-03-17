@@ -521,27 +521,27 @@
                 description="Configure automatic updates for the Minecraft Development plugin">
             <add-to-group group-id="MinecraftDevToolsGroup"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.actions.FindMixinsAction" id="FindMixinsAction"
+        <action class="com.demonwav.mcdev.platform.mixin.action.FindMixinsAction" id="FindMixinsAction"
                 text="Find Mixins"
                 description="Find classes which mix into this class">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateShadowAction" id="GenerateShadowAction"
+        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateShadowAction" id="GenerateShadowAction"
                 text="Shadow Members..."
                 description="Add a @Shadow for the selected members">
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateOverwriteAction" id="GenerateOverwriteAction"
+        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateOverwriteAction" id="GenerateOverwriteAction"
                 text="Overwrite Methods..."
                 description="Add an @Overwrite for the selected methods">
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateSoftImplementsAction" id="GenerateSoftImplementsAction"
+        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateSoftImplementsAction" id="GenerateSoftImplementsAction"
                 text="Soft-implement Methods..."
                 description="Add a soft implementation for the selected methods">
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.actions.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
+        <action class="com.demonwav.mcdev.platform.mixin.action.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
                 text="Copy Mixin target reference"
                 description="Copy the reference to the element for use in an injector">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>

@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.completion
 
-import com.demonwav.mcdev.platform.mixin.actions.insertShadows
+import com.demonwav.mcdev.platform.mixin.action.insertShadows
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.completion.JavaMethodCallElement

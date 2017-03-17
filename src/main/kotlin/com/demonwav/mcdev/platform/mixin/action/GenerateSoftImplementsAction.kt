@@ -8,7 +8,7 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.actions
+package com.demonwav.mcdev.platform.mixin.action
 
 import com.demonwav.mcdev.platform.mixin.util.findSoftImplements
 import com.demonwav.mcdev.util.findContainingClass

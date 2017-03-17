@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.editor
 
-import com.demonwav.mcdev.platform.mixin.actions.insertShadows
+import com.demonwav.mcdev.platform.mixin.action.insertShadows
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findField
