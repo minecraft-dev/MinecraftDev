@@ -12,11 +12,11 @@ package com.demonwav.mcdev.platform.forge.framework
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
+import com.demonwav.mcdev.util.localFile
 import com.intellij.framework.library.LibraryVersionProperties
 import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
 import com.intellij.openapi.roots.libraries.LibraryProperties
 import com.intellij.openapi.util.io.JarUtil
-import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 
 class ForgePresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(FORGE_LIBRARY_KIND) {
@@ -25,9 +25,7 @@ class ForgePresentationProvider : LibraryPresentationProvider<LibraryVersionProp
 
     override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
         for (classesRoot in classesRoots) {
-            val file = VfsUtilCore.virtualToIoFile(classesRoot)
-
-            if (JarUtil.containsClass(file, ForgeConstants.MOD_ANNOTATION)) {
+            if (JarUtil.containsClass(classesRoot.localFile, ForgeConstants.MOD_ANNOTATION)) {
                 return LibraryVersionProperties()
             }
         }

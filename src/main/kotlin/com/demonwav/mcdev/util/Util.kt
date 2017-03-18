@@ -13,12 +13,7 @@ package com.demonwav.mcdev.util
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.vfs.VfsUtilCore
-import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.annotations.Contract
-import java.io.IOException
-import java.util.jar.JarFile
-import java.util.jar.Manifest
 
 // Kotlin functions
 inline fun <T> runInlineReadAction(func: () -> T): T {
@@ -94,18 +89,6 @@ inline fun <T, R> Array<T>.mapFirstNotNull(transform: (T) -> R?): R? {
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size) { i -> transform(this[i]) }
 }
-
-val VirtualFile.manifest: Manifest?
-    get() {
-        val file = VfsUtilCore.virtualToIoFile(this)
-        try {
-            JarFile(file).use {
-                return it.manifest
-            }
-        } catch (e: IOException) {
-            return null
-        }
-    }
 
 object Util {
     // Java static methods
