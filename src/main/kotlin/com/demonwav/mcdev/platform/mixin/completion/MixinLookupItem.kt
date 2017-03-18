@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.completion
 
+import com.demonwav.mcdev.platform.mixin.action.disableAnnotationWrapping
 import com.demonwav.mcdev.platform.mixin.action.insertShadows
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInsight.completion.InsertionContext
@@ -48,5 +49,8 @@ private fun insertShadow(context: InsertionContext, member: PsiMember) {
     // Insert @Shadow element
     val psiClass = context.file.findElementAt(context.startOffset)?.findContainingClass() ?: return
     insertShadows(context.project, psiClass, Stream.of(member))
-    PostprocessReformattingAspect.getInstance(context.project).doPostponedFormatting()
+
+    disableAnnotationWrapping(context.project) {
+        PostprocessReformattingAspect.getInstance(context.project).doPostponedFormatting()
+    }
 }

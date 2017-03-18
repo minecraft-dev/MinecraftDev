@@ -30,6 +30,7 @@ import com.intellij.codeInsight.generation.PsiGenerationInfo
 import com.intellij.codeInsight.generation.PsiMethodMember
 import com.intellij.codeInsight.hint.HintManager
 import com.intellij.ide.util.MemberChooser
+import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.extensions.Extensions
@@ -45,6 +46,8 @@ import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.PsiSubstitutor
+import com.intellij.psi.codeStyle.CodeStyleSettings
+import com.intellij.psi.codeStyle.CodeStyleSettingsManager
 import java.util.stream.Stream
 import kotlin.streams.toList
 
@@ -74,18 +77,19 @@ class GenerateShadowAction : MixinCodeInsightAction() {
         chooser.show()
 
         val elements = (chooser.selectedElements ?: return).ifEmpty { return }
-
-        runWriteAction {
-            GenerateMembersUtil.insertMembersAtOffset(
-                file,
-                offset,
-                createShadowMembers(
-                    project,
-                    psiClass,
-                    elements.stream().map(PsiElementClassMember<*>::getElement)
-                )
-                // Select first element in editor
-            ).firstOrNull()?.positionCaret(editor, false)
+        disableAnnotationWrapping(project) {
+            runWriteAction {
+                GenerateMembersUtil.insertMembersAtOffset(
+                    file,
+                    offset,
+                    createShadowMembers(
+                        project,
+                        psiClass,
+                        elements.stream().map(PsiElementClassMember<*>::getElement)
+                    )
+                    // Select first element in editor
+                ).firstOrNull()?.positionCaret(editor, false)
+            }
         }
     }
 }
@@ -206,4 +210,19 @@ private fun copyAnnotation(modifiers: PsiModifierList, newModifiers: PsiModifier
     val psiAnnotation = modifiers.findAnnotation(annotation) ?: return
     // Have we already added this annotation? If not, copy it
     newModifiers.findAnnotation(annotation) ?: newModifiers.addAfter(psiAnnotation, null)
+}
+
+inline fun disableAnnotationWrapping(project: Project, func: () -> Unit) {
+    val settings = CodeStyleSettingsManager.getSettings(project).getCommonSettings(JavaLanguage.INSTANCE)
+    val methodWrap = settings.METHOD_ANNOTATION_WRAP
+    val fieldWrap = settings.FIELD_ANNOTATION_WRAP
+    settings.METHOD_ANNOTATION_WRAP = CodeStyleSettings.DO_NOT_WRAP
+    settings.FIELD_ANNOTATION_WRAP = CodeStyleSettings.DO_NOT_WRAP
+
+    try {
+        func()
+    } finally {
+        settings.METHOD_ANNOTATION_WRAP = methodWrap
+        settings.FIELD_ANNOTATION_WRAP = fieldWrap
+    }
 }

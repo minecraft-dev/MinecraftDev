@@ -54,9 +54,9 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
 
         val elements = (chooser.selectedElements ?: return).ifEmpty { return }
 
-        runWriteAction {
-            val requiredMembers = LinkedHashSet<PsiMember>()
+        val requiredMembers = LinkedHashSet<PsiMember>()
 
+        runWriteAction {
             val newMethods = elements.map {
                 val method = it.element.findSource()
                 val sourceClass = method.containingClass
@@ -85,7 +85,7 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
                 if (codeBlock == null) {
                     // Generate fallback method body if source is not available
                     OverrideImplementUtil.setupMethodBody(newMethod, method, psiClass,
-                            FileTemplateManager.getInstance(project).getCodeTemplate(MIXIN_OVERWRITE_FALLBACK))
+                        FileTemplateManager.getInstance(project).getCodeTemplate(MIXIN_OVERWRITE_FALLBACK))
                 }
 
                 // TODO: Automatically add Javadoc comment for @Overwrite? - yes please
@@ -95,16 +95,20 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
                 PsiGenerationInfo(newMethod)
             }
 
-            // Generate needed shadows
-            val newShadows = createShadowMembers(project, psiClass, filterNewShadows(requiredMembers, psiClass))
-
             // Insert new methods
             GenerateMembersUtil.insertMembersAtOffset(file, offset, newMethods)
-                    // Select first element in editor
-                    .first().positionCaret(editor, true)
+                // Select first element in editor
+                .first().positionCaret(editor, true)
+        }
 
-            // Insert shadows
-            insertShadows(psiClass, newShadows)
+        // Generate needed shadows
+        val newShadows = createShadowMembers(project, psiClass, filterNewShadows(requiredMembers, psiClass))
+
+        disableAnnotationWrapping(project) {
+            runWriteAction {
+                // Insert shadows
+                insertShadows(psiClass, newShadows)
+            }
         }
     }
 }
