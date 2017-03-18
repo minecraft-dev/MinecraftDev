@@ -90,7 +90,7 @@ class AtCompletionContributor : CompletionContributor() {
 
             var counter = 0
             for (className in cache.allClassNames) {
-                if (!className.startsWith(beginning, ignoreCase = true)) {
+                if (!className.contains(beginning, ignoreCase = true)) {
                     continue
                 }
 
