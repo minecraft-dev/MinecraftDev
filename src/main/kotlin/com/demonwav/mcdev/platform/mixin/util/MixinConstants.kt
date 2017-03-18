@@ -18,8 +18,13 @@ object MixinConstants {
     object Classes {
         const val CALLBACK_INFO = "org.spongepowered.asm.mixin.injection.callback.CallbackInfo"
         const val CALLBACK_INFO_RETURNABLE = "org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable"
+        const val COMPATIBILITY_LEVEL = "org.spongepowered.asm.mixin.MixinEnvironment.CompatibilityLevel"
         const val INJECTION_POINT = "org.spongepowered.asm.mixin.injection.InjectionPoint"
         const val MIXIN_AGENT = "org.spongepowered.tools.agent.MixinAgent"
+        const val MIXIN_CONFIG = "org.spongepowered.asm.mixin.transformer.MixinConfig"
+        const val MIXIN_PLUGIN = "org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin"
+
+        const val SERIALIZED_NAME = "com.google.gson.annotations.SerializedName"
     }
 
     object Annotations {

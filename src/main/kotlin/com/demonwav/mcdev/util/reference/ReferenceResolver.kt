@@ -8,7 +8,7 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.util
+package com.demonwav.mcdev.util.reference
 
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.application.runWriteAction
@@ -94,9 +94,9 @@ fun LookupElementBuilder.completeToLiteral(context: PsiElement): LookupElementBu
 
     // TODO: Currently we replace everything with a single PsiLiteral,
     // not sure how you would keep line breaks after completion
-    return withInsertHandler({ context, item ->
-                context.laterRunnable = ReplaceElementWithLiteral(context.editor, context.file, item.lookupString)
-            })
+    return withInsertHandler { context, item ->
+        context.laterRunnable = ReplaceElementWithLiteral(context.editor, context.file, item.lookupString)
+    }
 }
 
 private class ReplaceElementWithLiteral(private val editor: Editor, private val file: PsiFile, private val text: String) : Runnable {

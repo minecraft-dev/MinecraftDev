@@ -74,6 +74,10 @@
         <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionConfidence"
                                order="before javaSkipAutopopupInStrings"/>
 
+        <!-- Mixin configuration -->
+        <fileTypeFactory implementation="com.demonwav.mcdev.platform.mixin.config.MixinConfigFileTypeFactory"/>
+        <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.mixin.config.reference.MixinConfigReferenceContributor" />
+
         <!-- Project-independent Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ColorLineMarkerProvider"/>
@@ -441,6 +445,40 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFinalInspection"/>
+
+        <!-- Mixin Configuration -->
+        <localInspection displayName="Unresolved config reference"
+                         shortName="UnresolvedConfigReference"
+                         groupName="Mixin"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.UnresolvedReferenceInspection"/>
+        <localInspection displayName="Invalid config value"
+                         shortName="InvalidConfigValue"
+                         groupName="Mixin"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.ConfigValueInspection"/>
+        <localInspection displayName="Invalid Mixin registration"
+                         shortName="InvalidMixinRegistration"
+                         groupName="Mixin"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.MixinRegistrationInspection"/>
+        <localInspection displayName="Invalid Mixin plugin registration"
+                         shortName="InvalidMixinPluginRegistration"
+                         groupName="Mixin"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.MixinPluginInspection"/>
 
         <customJavadocTagProvider implementation="com.demonwav.mcdev.platform.mixin.MixinCustomJavaDocTagProvider"/>
 
