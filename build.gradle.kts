@@ -215,17 +215,19 @@ val generate = task("generate") {
     outputs.dir("gen")
 }
 
-runIde {
-    if (System.getProperty("debug") != null) {
-        systemProperty("idea.ProcessCanceledException", "disabled")
-        systemProperty("idea.debug.mode", "true")
-    }
-}
-
 java().sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 
 // Workaround for KT-16764
 compileKotlin.inputs.dir(generate)
+
+runIde {
+    findProperty("intellijJre")?.let(this::setExecutable)
+
+    System.getProperty("debug")?.let {
+        systemProperty("idea.ProcessCanceledException", "disabled")
+        systemProperty("idea.debug.mode", "true")
+    }
+}
 
 // Use custom JRE for running IntelliJ IDEA when configured
 findProperty("intellijJre")?.let(runIde::setExecutable)
