@@ -229,8 +229,5 @@ runIde {
     }
 }
 
-// Use custom JRE for running IntelliJ IDEA when configured
-findProperty("intellijJre")?.let(runIde::setExecutable)
-
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
 fun KotlinDependencyHandler.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
