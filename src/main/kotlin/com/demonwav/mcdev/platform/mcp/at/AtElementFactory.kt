@@ -114,6 +114,7 @@ object AtElementFactory {
         
         companion object {
             fun match(s: String) = values().firstOrNull { it.text == s }
+            fun softMatch(s: String) = values().filter { it.text.contains(s) }
         }
     }
 }

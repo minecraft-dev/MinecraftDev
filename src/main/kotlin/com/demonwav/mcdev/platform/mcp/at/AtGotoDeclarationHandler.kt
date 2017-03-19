@@ -53,14 +53,14 @@ class AtGotoDeclarationHandler : GotoDeclarationHandler {
             val function = funcName.parent as AtFunction
             val entry = function.parent as AtEntry
 
-            val reference = srgMap.mapToMcpMethod(AtMemberReference.get(entry, function))
+            val reference = srgMap.mapToMcpMethod(AtMemberReference.get(entry, function) ?: return null)
             val member = reference.resolveMember(sourceElement.project) ?: return null
             return arrayOf(member)
         } else if (sourceElement.node.treeParent.elementType === AtTypes.FIELD_NAME) {
             val fieldName = sourceElement.parent as AtFieldName
             val entry = fieldName.parent as AtEntry
 
-            val reference = srgMap.mapToMcpField(AtMemberReference.get(entry, fieldName))
+            val reference = srgMap.mapToMcpField(AtMemberReference.get(entry, fieldName) ?: return null)
             val member = reference.resolveMember(sourceElement.project) ?: return null
             return arrayOf(member)
         } else if (sourceElement.node.elementType === AtTypes.CLASS_VALUE) {
