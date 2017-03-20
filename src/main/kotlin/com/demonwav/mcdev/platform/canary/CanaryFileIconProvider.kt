@@ -29,7 +29,7 @@ class CanaryFileIconProvider : FileIconProvider {
         }
 
         val module = ModuleUtilCore.findModuleForFile(file, project) ?: return null
-        val canaryModule = MinecraftFacet.getInstance<CanaryModule<*>>(module, CanaryModuleType, NeptuneModuleType) ?: return null
+        val canaryModule = MinecraftFacet.getInstance(module, CanaryModuleType, NeptuneModuleType) ?: return null
 
         if (file == canaryModule.canaryInf) {
             return canaryModule.icon
