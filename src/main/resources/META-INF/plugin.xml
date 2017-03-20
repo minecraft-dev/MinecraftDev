@@ -98,6 +98,7 @@
         <lang.commenter language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCommenter" />
         <completion.contributor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.completion.AtCompletionContributor" />
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.at.AtGotoDeclarationHandler" />
+        <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
 
         <!-- Project-independent Annotators-->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>

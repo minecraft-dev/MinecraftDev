@@ -38,19 +38,17 @@ class AtUsageInspection : LocalInspectionTool() {
                 }
 
                 val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return
-
                 val instance = MinecraftFacet.getInstance(module) ?: return
-
                 val mcpModule = instance.getModuleOfType(McpModuleType) ?: return
-
                 val srgMap = mcpModule.srgManager.srgMapNow ?: return
+
                 val member = element.function ?: element.fieldName ?: return
                 val reference = AtMemberReference.get(element, member) ?: return
 
                 val psi = if (member is AtFunction) {
-                    srgMap.getMcpMethod(reference)?.resolveMember(element.project) ?: return
+                    reference.resolveMember(element.project) ?: srgMap.getMcpMethod(reference)?.resolveMember(element.project) ?: return
                 } else if (member is AtFieldName) {
-                    srgMap.getMcpField(reference)?.resolveMember(element.project) ?: return
+                    reference.resolveMember(element.project) ?: srgMap.getMcpField(reference)?.resolveMember(element.project) ?: return
                 } else {
                     return
                 }
