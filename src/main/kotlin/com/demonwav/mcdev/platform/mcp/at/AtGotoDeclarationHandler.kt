@@ -41,7 +41,7 @@ class AtGotoDeclarationHandler : GotoDeclarationHandler {
 
         val mcpModule = instance.getModuleOfType(McpModuleType) ?: return null
 
-        val srgMap = mcpModule.srgManager.srgMapNow ?: return null
+        val srgMap = mcpModule.srgManager?.srgMapNow ?: return null
 
         if (sourceElement.node.treeParent.elementType === AtTypes.CLASS_NAME) {
             val className = sourceElement.parent as AtClassName

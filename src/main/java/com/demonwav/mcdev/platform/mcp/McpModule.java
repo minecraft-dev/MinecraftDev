@@ -21,6 +21,7 @@ import com.intellij.psi.PsiMethod;
 import java.util.Set;
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class McpModule extends AbstractModule {
 
@@ -63,6 +64,7 @@ public class McpModule extends AbstractModule {
         return settings.getState();
     }
 
+    @Nullable
     public SrgManager getSrgManager() {
         return srgManager;
     }

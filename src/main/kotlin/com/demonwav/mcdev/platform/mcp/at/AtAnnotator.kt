@@ -38,7 +38,7 @@ class AtAnnotator : Annotator {
         val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return
         val facet = MinecraftFacet.getInstance(module) ?: return
         val mcpModule = facet.getModuleOfType(McpModuleType) ?: return
-        val srgMap = mcpModule.srgManager.srgMapNow ?: return
+        val srgMap = mcpModule.srgManager?.srgMapNow ?: return
 
         val reference = AtMemberReference.get(element, member) ?: return
 

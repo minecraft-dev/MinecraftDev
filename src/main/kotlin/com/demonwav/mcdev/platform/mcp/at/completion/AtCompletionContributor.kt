@@ -195,7 +195,7 @@ class AtCompletionContributor : CompletionContributor() {
 
         val mcpModule = MinecraftFacet.getInstance(module)?.getModuleOfType(McpModuleType) ?: return
 
-        val srgMap = mcpModule.srgManager.srgMapNow ?: return
+        val srgMap = mcpModule.srgManager?.srgMapNow ?: return
 
         val srgResult = result.withPrefixMatcher(SrgPrefixMatcher(text))
 
