@@ -11,6 +11,8 @@
 @file:JvmName("McPsiUtil")
 package com.demonwav.mcdev.util
 
+import com.intellij.psi.ElementManipulator
+import com.intellij.psi.ElementManipulators
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
@@ -153,3 +155,11 @@ fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
     // TODO: Do more checks for generics instead
     return TypeConversionUtil.erasure(this) == TypeConversionUtil.erasure(other)
 }
+
+@get:Contract(pure = true)
+val PsiMethod.nameAndParameterTypes: String
+    get() = "$name(${parameterList.parameters.joinToString(", ") { it.type.presentableText }})"
+
+@get:Contract(pure = true)
+val <T : PsiElement> T.manipulator: ElementManipulator<T>?
+    get() = ElementManipulators.getManipulator(this)

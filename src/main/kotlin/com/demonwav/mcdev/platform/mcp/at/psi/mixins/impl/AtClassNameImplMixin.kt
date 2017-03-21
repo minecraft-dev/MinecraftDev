@@ -12,10 +12,9 @@ package com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mcp.at.AtElementFactory
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtClassNameMixin
-import com.demonwav.mcdev.util.*
+import com.demonwav.mcdev.util.findQualifiedClass
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
-import com.intellij.psi.PsiClass
 
 abstract class AtClassNameImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AtClassNameMixin {
 

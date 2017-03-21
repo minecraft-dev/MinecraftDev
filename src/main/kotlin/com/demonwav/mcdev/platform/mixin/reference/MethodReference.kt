@@ -14,13 +14,13 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MemberReference
-import com.demonwav.mcdev.util.PolyReferenceResolver
-import com.demonwav.mcdev.util.completeToLiteral
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.memberReference
+import com.demonwav.mcdev.util.reference.PolyReferenceResolver
+import com.demonwav.mcdev.util.reference.completeToLiteral
 import com.demonwav.mcdev.util.toResolveResults
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.psi.PsiClass

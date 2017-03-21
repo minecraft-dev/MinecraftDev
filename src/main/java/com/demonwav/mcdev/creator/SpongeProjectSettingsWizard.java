@@ -46,9 +46,10 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
 
         spongeApiVersionBox.addItem("4.1.0");
         spongeApiVersionBox.addItem("5.0.0");
-        spongeApiVersionBox.addItem("5.1.0-SNAPSHOT");
+        spongeApiVersionBox.addItem("5.1.0");
+        spongeApiVersionBox.addItem("5.2.0-SNAPSHOT");
         spongeApiVersionBox.addItem("6.0.0-SNAPSHOT");
-        spongeApiVersionBox.setSelectedIndex(1);
+        spongeApiVersionBox.setSelectedIndex(2);
     }
 
     @Override

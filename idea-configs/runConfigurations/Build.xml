@@ -4,7 +4,7 @@
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-x generate" />
+      <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
         <list />
       </option>
@@ -16,8 +16,6 @@
       </option>
       <option name="vmOptions" value="" />
     </ExternalSystemSettings>
-    <method>
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Generate" run_configuration_type="GradleRunConfiguration" />
-    </method>
+    <method />
   </configuration>
 </component>

@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.mcp.at
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.mcp.McpModule
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtClassName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
@@ -19,19 +18,15 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFuncName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes
-import com.demonwav.mcdev.platform.mcp.srg.McpSrgMap
-import com.demonwav.mcdev.util.*
-import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.findQualifiedClass
+import com.demonwav.mcdev.util.getPrimitiveType
+import com.demonwav.mcdev.util.parseClassDescriptor
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiMember
-import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.search.GlobalSearchScope
 
 class AtGotoDeclarationHandler : GotoDeclarationHandler {
@@ -46,7 +41,7 @@ class AtGotoDeclarationHandler : GotoDeclarationHandler {
 
         val mcpModule = instance.getModuleOfType(McpModuleType) ?: return null
 
-        val srgMap = mcpModule.srgManager.srgMapNow ?: return null
+        val srgMap = mcpModule.srgManager?.srgMapNow ?: return null
 
         if (sourceElement.node.treeParent.elementType === AtTypes.CLASS_NAME) {
             val className = sourceElement.parent as AtClassName
@@ -58,14 +53,14 @@ class AtGotoDeclarationHandler : GotoDeclarationHandler {
             val function = funcName.parent as AtFunction
             val entry = function.parent as AtEntry
 
-            val reference = srgMap.mapToMcpMethod(AtMemberReference.get(entry, function))
+            val reference = srgMap.mapToMcpMethod(AtMemberReference.get(entry, function) ?: return null)
             val member = reference.resolveMember(sourceElement.project) ?: return null
             return arrayOf(member)
         } else if (sourceElement.node.treeParent.elementType === AtTypes.FIELD_NAME) {
             val fieldName = sourceElement.parent as AtFieldName
             val entry = fieldName.parent as AtEntry
 
-            val reference = srgMap.mapToMcpField(AtMemberReference.get(entry, fieldName))
+            val reference = srgMap.mapToMcpField(AtMemberReference.get(entry, fieldName) ?: return null)
             val member = reference.resolveMember(sourceElement.project) ?: return null
             return arrayOf(member)
         } else if (sourceElement.node.elementType === AtTypes.CLASS_VALUE) {

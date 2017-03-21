@@ -11,12 +11,9 @@
 package com.demonwav.mcdev.platform.mcp.at
 
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.intellij.openapi.editor.colors.TextAttributesKey
-import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.options.colors.AttributesDescriptor
 import com.intellij.openapi.options.colors.ColorDescriptor
 import com.intellij.openapi.options.colors.ColorSettingsPage
-import javax.swing.Icon
 
 class AtColorSettingsPage : ColorSettingsPage {
 

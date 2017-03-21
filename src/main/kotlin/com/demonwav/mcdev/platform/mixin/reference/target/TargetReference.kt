@@ -15,15 +15,15 @@ import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.platform.mixin.util.findSource
-import com.demonwav.mcdev.util.PolyReferenceResolver
 import com.demonwav.mcdev.util.annotationFromArrayValue
 import com.demonwav.mcdev.util.annotationFromValue
-import com.demonwav.mcdev.util.completeToLiteral
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.mapToArray
+import com.demonwav.mcdev.util.reference.PolyReferenceResolver
+import com.demonwav.mcdev.util.reference.completeToLiteral
 import com.demonwav.mcdev.util.shortName
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder

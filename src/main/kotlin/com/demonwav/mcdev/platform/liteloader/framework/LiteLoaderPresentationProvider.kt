@@ -11,29 +11,9 @@
 package com.demonwav.mcdev.platform.liteloader.framework
 
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.intellij.framework.library.LibraryVersionProperties
+import com.demonwav.mcdev.facet.ManifestLibraryPresentationProvider
 import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
-import com.intellij.openapi.util.io.JarUtil
-import com.intellij.openapi.vfs.VfsUtilCore
-import com.intellij.openapi.vfs.VirtualFile
-import java.util.jar.Attributes
 
-class LiteLoaderPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(LITELOADER_LIBRARY_KIND) {
-
-    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.LITELOADER_ICON
-
-    override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
-            val file = VfsUtilCore.virtualToIoFile(classesRoot)
-            val title = JarUtil.getJarAttribute(file, Attributes.Name.IMPLEMENTATION_TITLE) ?: continue
-
-            if (!title.startsWith("LiteLoader")) {
-                continue
-            }
-
-            val version = JarUtil.getJarAttribute(file, Attributes.Name.IMPLEMENTATION_VERSION) ?: continue
-            return LibraryVersionProperties(version)
-        }
-        return null
-    }
+class LiteLoaderPresentationProvider : ManifestLibraryPresentationProvider(LITELOADER_LIBRARY_KIND, "LiteLoader") {
+    override fun getIcon(properties: LibraryPresentationProvider?) = PlatformAssets.LITELOADER_ICON
 }

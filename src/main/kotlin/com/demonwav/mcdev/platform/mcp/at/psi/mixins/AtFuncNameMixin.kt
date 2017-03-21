@@ -10,9 +10,10 @@
 
 package com.demonwav.mcdev.platform.mcp.at.psi.mixins
 
+import com.demonwav.mcdev.platform.mcp.at.psi.AtElement
 import com.intellij.psi.PsiElement
 
-interface AtFuncNameMixin : PsiElement {
+interface AtFuncNameMixin : AtElement {
 
     val nameElement: PsiElement
     val funcNameText: String

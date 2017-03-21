@@ -10,10 +10,11 @@
 
 package com.demonwav.mcdev.platform.mcp.at.psi.mixins
 
+import com.demonwav.mcdev.platform.mcp.at.psi.AtElement
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 
-interface AtReturnValueMixin : PsiElement {
+interface AtReturnValueMixin : AtElement {
 
     val classValue: PsiElement?
     val primitive: PsiElement?

@@ -13,10 +13,8 @@ package com.demonwav.mcdev.platform.mixin.search
 import com.demonwav.mcdev.platform.mixin.util.findSoftImplementedMethods
 import com.demonwav.mcdev.util.runInlineReadAction
 import com.intellij.psi.CommonClassNames
-import com.intellij.psi.HierarchicalMethodSignature
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.search.searches.SuperMethodsSearch
-import com.intellij.psi.util.MethodSignature
 import com.intellij.psi.util.MethodSignatureBackedByPsiMethod
 import com.intellij.util.Processor
 import com.intellij.util.QueryExecutor
@@ -54,9 +52,5 @@ class MixinSoftImplementMethodSuperSearcher : QueryExecutor<MethodSignatureBacke
         }
 
         return true
-    }
-
-    private class PrefixedMethodSignature(private val name: String, signature: HierarchicalMethodSignature) : MethodSignature by signature {
-        override fun getName() = name
     }
 }

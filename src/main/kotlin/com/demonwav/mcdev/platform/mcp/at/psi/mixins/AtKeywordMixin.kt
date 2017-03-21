@@ -11,9 +11,10 @@
 package com.demonwav.mcdev.platform.mcp.at.psi.mixins
 
 import com.demonwav.mcdev.platform.mcp.at.AtElementFactory
+import com.demonwav.mcdev.platform.mcp.at.psi.AtElement
 import com.intellij.psi.PsiElement
 
-interface AtKeywordMixin : PsiElement {
+interface AtKeywordMixin : AtElement {
 
     val keywordElement: PsiElement
     val keywordValue: AtElementFactory.Keyword

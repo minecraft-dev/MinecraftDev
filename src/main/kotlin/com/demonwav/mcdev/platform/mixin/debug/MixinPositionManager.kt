@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.debug
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.mapNotNull
 import com.intellij.debugger.MultiRequestPositionManager
 import com.intellij.debugger.NoDataException
@@ -98,12 +99,9 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
 
     private fun findMatchingClasses(position: SourcePosition): Stream<String> {
         val classElement = position.elementAt?.findContainingClass() ?: throw NoDataException.INSTANCE
-        val targets = classElement.mixinTargets
-        if (targets.isEmpty()) {
-            throw NoDataException.INSTANCE
-        }
-
-        return targets.stream()
+        return classElement.mixinTargets
+            .ifEmpty { throw NoDataException.INSTANCE }
+            .stream()
             // TODO: Support for anonymous classes
             .mapNotNull(JVMNameUtil::getNonAnonymousClassName)
     }

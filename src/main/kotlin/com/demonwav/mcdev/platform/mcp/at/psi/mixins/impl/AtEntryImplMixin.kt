@@ -14,7 +14,6 @@ import com.demonwav.mcdev.platform.mcp.at.AtElementFactory
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtEntryMixin
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
-import com.intellij.psi.PsiElement
 
 abstract class AtEntryImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AtEntryMixin {
 
@@ -43,16 +42,5 @@ abstract class AtEntryImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AtE
     override fun setAsterisk() {
         val asterisk = AtElementFactory.createAsterisk(project)
         replaceMember(asterisk)
-    }
-
-    private fun replaceMember(element: PsiElement) {
-        // One of these must be true
-        if (fieldName != null) {
-            fieldName!!.replace(element)
-        } else if (function != null) {
-            function!!.replace(element)
-        } else if (asterisk != null) {
-            asterisk!!.replace(element)
-        }
     }
 }

@@ -14,6 +14,7 @@ import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInsp
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.IMPLEMENTS
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findAnnotations
+import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationMemberValue
@@ -23,10 +24,7 @@ class DuplicateInterfacePrefixInspection : MixinAnnotationAttributeInspection(IM
     override fun getStaticDescription() = "Reports duplicate @Interface prefixes in an @Implements annotation."
 
     override fun visitAnnotationAttribute(annotation: PsiAnnotation, value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
-        val interfaces = value.findAnnotations()
-        if (interfaces.isEmpty()) {
-            return
-        }
+        val interfaces = value.findAnnotations().ifEmpty { return }
 
         val prefixes = ArrayList<String>()
         for (iface in interfaces) {

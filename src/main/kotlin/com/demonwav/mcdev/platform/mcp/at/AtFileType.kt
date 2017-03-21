@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.mcp.at
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.openapi.fileTypes.LanguageFileType
-import javax.swing.Icon
 
 object AtFileType : LanguageFileType(AtLanguage) {
 

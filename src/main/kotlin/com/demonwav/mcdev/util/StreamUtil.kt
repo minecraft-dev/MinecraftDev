@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.util
 
 import org.jetbrains.annotations.Contract
-import java.util.function.Function
 import java.util.stream.Stream
 
 /**

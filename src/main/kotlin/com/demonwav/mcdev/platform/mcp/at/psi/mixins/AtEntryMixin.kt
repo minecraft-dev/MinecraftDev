@@ -16,9 +16,9 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtClassName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtKeyword
-import com.intellij.psi.PsiElement
+import com.demonwav.mcdev.platform.mcp.at.psi.AtElement
 
-interface AtEntryMixin : PsiElement {
+interface AtEntryMixin : AtElement {
 
     val asterisk: AtAsterisk?
     val className: AtClassName
@@ -32,4 +32,17 @@ interface AtEntryMixin : PsiElement {
     fun setFieldName(fieldName: String)
     fun setFunction(function: String)
     fun setAsterisk()
+
+    fun replaceMember(element: AtElement) {
+        // One of these must be true
+        if (fieldName != null) {
+            fieldName!!.replace(element)
+        } else if (function != null) {
+            function!!.replace(element)
+        } else if (asterisk != null) {
+            asterisk!!.replace(element)
+        } else {
+            addAfter(className, element)
+        }
+    }
 }

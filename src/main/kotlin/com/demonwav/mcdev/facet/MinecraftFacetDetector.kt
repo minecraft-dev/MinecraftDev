@@ -14,6 +14,7 @@ import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.util.AbstractProjectComponent
+import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.ProjectTopics
 import com.intellij.facet.FacetManager
@@ -72,10 +73,7 @@ class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(projec
         }
 
         private fun checkNoFacet(module: Module) {
-            val platforms = autoDetectTypes(module)
-            if (platforms.isEmpty()) {
-                return
-            }
+            val platforms = autoDetectTypes(module).ifEmpty { return }
 
             val facetManager = FacetManager.getInstance(module)
             val configuration = MinecraftFacetConfiguration()

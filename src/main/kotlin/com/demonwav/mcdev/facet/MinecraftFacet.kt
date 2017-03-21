@@ -242,9 +242,8 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>) = getInstance(module)?.getModuleOfType(type)
 
         @JvmStatic
-        fun <T : AbstractModule> getInstance(module: Module, vararg types: AbstractModuleType<*>): T? {
+        fun <T : AbstractModule> getInstance(module: Module, vararg types: AbstractModuleType<out T>): T? {
             val instance = getInstance(module) ?: return null
-            @Suppress("UNCHECKED_CAST")
             return types.mapFirstNotNull { instance.getModuleOfType(it) } as? T
         }
     }

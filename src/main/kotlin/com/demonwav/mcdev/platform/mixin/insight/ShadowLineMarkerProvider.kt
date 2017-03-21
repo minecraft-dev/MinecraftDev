@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.insight
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.util.findFirstShadowTarget
 import com.demonwav.mcdev.platform.mixin.util.findShadowTargets
+import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -56,10 +57,7 @@ class ShadowLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavig
 
     override fun navigate(e: MouseEvent, elt: PsiIdentifier) {
         val member = elt.parent as? PsiMember ?: return
-        val targets = member.findShadowTargets()
-        if (targets.isEmpty()) {
-            return
-        }
+        val targets = member.findShadowTargets().ifEmpty { return }
 
         // Create correct renderer for element type
         val renderer = when (member) {

@@ -18,6 +18,7 @@ import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findMatchingField
 import com.demonwav.mcdev.util.findMatchingMethod
 import com.demonwav.mcdev.util.findMatchingMethods
+import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiArrayInitializerMemberValue
@@ -31,11 +32,7 @@ import org.jetbrains.annotations.Contract
 fun PsiMember.findFirstShadowTarget(): PsiMember? {
     val shadow = findAnnotation(SHADOW) ?: return null
     val containingClass = containingClass ?: return null
-    val targetClasses = containingClass.mixinTargets
-    if (targetClasses.isEmpty()) {
-        return null
-    }
-
+    val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
     return resolveFirstShadowTarget(shadow, targetClasses, this)
 }
 
@@ -54,11 +51,7 @@ fun resolveFirstShadowTarget(shadow: PsiAnnotation, targetClasses: Collection<Ps
 fun PsiMember.findShadowTargets(): List<PsiMember> {
     val shadow = findAnnotation(SHADOW) ?: return emptyList()
     val containingClass = containingClass ?: return emptyList()
-    val targetClasses = containingClass.mixinTargets
-    if (targetClasses.isEmpty()) {
-        return emptyList()
-    }
-
+    val targetClasses = containingClass.mixinTargets.ifEmpty { return emptyList() }
     return resolveShadowTargets(shadow, targetClasses, this) ?: emptyList()
 }
 

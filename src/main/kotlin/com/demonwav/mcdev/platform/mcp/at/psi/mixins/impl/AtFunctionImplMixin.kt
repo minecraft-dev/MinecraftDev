@@ -14,7 +14,6 @@ import com.demonwav.mcdev.platform.mcp.at.AtElementFactory
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtFunctionMixin
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
-import com.intellij.psi.PsiElement
 
 abstract class AtFunctionImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AtFunctionMixin {
 

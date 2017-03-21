@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.util
 
 import com.intellij.openapi.project.Project
-import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
@@ -64,7 +63,7 @@ data class MemberReference(val name: String, val descriptor: String? = null,
 
     @Contract(pure = true)
     private inline fun <R> resolve(project: Project, scope: GlobalSearchScope, ret: (PsiClass, PsiMember) -> R): R? {
-        val psiClass = JavaPsiFacade.getInstance(project).findClass(this.owner!!, scope) ?: return null
+        val psiClass = findQualifiedClass(project, this.owner!!, scope) ?: return null
 
         val member: PsiMember? = if (descriptor != null && descriptor.startsWith('(')) {
             // Method, we assume there is only one (since this member descriptor is full qualified)

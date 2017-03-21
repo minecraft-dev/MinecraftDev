@@ -21,15 +21,14 @@ import javax.swing.Icon
 class BukkitFileIconProvider : FileIconProvider {
 
     override fun getIcon(file: VirtualFile, flags: Int, project: Project?): Icon? {
+        project ?: return null
+
         if (!MinecraftSettings.instance.isShowProjectPlatformIcons) {
             return null
         }
 
-        project ?: return null
-
         val module = ModuleUtilCore.findModuleForFile(file, project) ?: return null
-        val bukkitModule = MinecraftFacet.getInstance<BukkitModule<*>>(module, BukkitModuleType, SpigotModuleType, PaperModuleType) ?:
-            return null
+        val bukkitModule = MinecraftFacet.getInstance(module, BukkitModuleType, SpigotModuleType, PaperModuleType) ?: return null
 
         if (file == bukkitModule.pluginYml) {
             return bukkitModule.icon

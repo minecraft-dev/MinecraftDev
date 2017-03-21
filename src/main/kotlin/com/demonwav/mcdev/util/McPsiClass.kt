@@ -19,11 +19,16 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
+import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.annotations.Contract
+
+@get:Contract(pure = true)
+val PsiClass.packageName
+    get() = (containingFile as? PsiJavaFile)?.packageName
 
 // Type
 

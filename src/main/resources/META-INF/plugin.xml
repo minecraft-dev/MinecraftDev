@@ -28,7 +28,7 @@
         Alpha release, may break. More features to come. Please report issues to
         <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2017.1-0.6.0
+        v. 2017.1-0.6.1
       </div>
     ]]>
     </change-notes>
@@ -74,6 +74,10 @@
         <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionConfidence"
                                order="before javaSkipAutopopupInStrings"/>
 
+        <!-- Mixin configuration -->
+        <fileTypeFactory implementation="com.demonwav.mcdev.platform.mixin.config.MixinConfigFileTypeFactory"/>
+        <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.mixin.config.reference.MixinConfigReferenceContributor" />
+
         <!-- Project-independent Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ColorLineMarkerProvider"/>
@@ -96,8 +100,9 @@
         <lang.syntaxHighlighterFactory language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.at.AtColorSettingsPage" />
         <lang.commenter language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCommenter" />
-        <completion.contributor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCompletionContributor" />
+        <completion.contributor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.completion.AtCompletionContributor" />
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.at.AtGotoDeclarationHandler" />
+        <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
 
         <!-- Project-independent Annotators-->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
@@ -442,6 +447,40 @@
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFinalInspection"/>
 
+        <!-- Mixin Configuration -->
+        <localInspection displayName="Unresolved config reference"
+                         shortName="UnresolvedConfigReference"
+                         groupName="Mixin"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.UnresolvedReferenceInspection"/>
+        <localInspection displayName="Invalid config value"
+                         shortName="InvalidConfigValue"
+                         groupName="Mixin"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.ConfigValueInspection"/>
+        <localInspection displayName="Invalid Mixin registration"
+                         shortName="InvalidMixinRegistration"
+                         groupName="Mixin"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.MixinRegistrationInspection"/>
+        <localInspection displayName="Invalid Mixin plugin registration"
+                         shortName="InvalidMixinPluginRegistration"
+                         groupName="Mixin"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.MixinPluginInspection"/>
+
         <customJavadocTagProvider implementation="com.demonwav.mcdev.platform.mixin.MixinCustomJavaDocTagProvider"/>
 
         <!-- Project View Node Decorators provide the project icons -->
@@ -521,27 +560,27 @@
                 description="Configure automatic updates for the Minecraft Development plugin">
             <add-to-group group-id="MinecraftDevToolsGroup"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.actions.FindMixinsAction" id="FindMixinsAction"
+        <action class="com.demonwav.mcdev.platform.mixin.action.FindMixinsAction" id="FindMixinsAction"
                 text="Find Mixins"
                 description="Find classes which mix into this class">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateShadowAction" id="GenerateShadowAction"
+        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateShadowAction" id="GenerateShadowAction"
                 text="Shadow Members..."
                 description="Add a @Shadow for the selected members">
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateOverwriteAction" id="GenerateOverwriteAction"
+        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateOverwriteAction" id="GenerateOverwriteAction"
                 text="Overwrite Methods..."
                 description="Add an @Overwrite for the selected methods">
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.actions.GenerateSoftImplementsAction" id="GenerateSoftImplementsAction"
+        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateSoftImplementsAction" id="GenerateSoftImplementsAction"
                 text="Soft-implement Methods..."
                 description="Add a soft implementation for the selected methods">
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.actions.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
+        <action class="com.demonwav.mcdev.platform.mixin.action.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
                 text="Copy Mixin target reference"
                 description="Copy the reference to the element for use in an injector">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>

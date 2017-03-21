@@ -13,7 +13,7 @@
           <option value="runIde" />
         </list>
       </option>
-      <option name="vmOptions" value="-Didea.ProcessCanceledException=disabled" />
+      <option name="vmOptions" value="" />
     </ExternalSystemSettings>
     <method />
   </configuration>

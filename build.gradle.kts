@@ -25,11 +25,17 @@ buildscript {
             setUrl("https://dl.bintray.com/jetbrains/intellij-plugin-service")
         }
     }
-
-    dependencies {
-        classpath(kotlinModule("gradle-plugin", properties["kotlinVersion"] as String))
-    }
 }
+
+plugins {
+    id("org.jetbrains.kotlin.jvm") version "1.1.1"
+    groovy
+    idea
+    id("org.jetbrains.intellij") version "0.2.5"
+    id("net.minecrell.licenser") version "0.3"
+}
+
+defaultTasks("build")
 
 val CI = System.getenv("CI") != null
 
@@ -37,19 +43,6 @@ val ideaVersion: String by extra
 val javaVersion: String by extra
 val kotlinVersion: String by extra
 val downloadIdeaSources: String by extra
-
-defaultTasks("build")
-
-apply {
-    plugin("kotlin")
-}
-
-plugins {
-    groovy
-    idea
-    id("org.jetbrains.intellij") version "0.2.5"
-    id("net.minecrell.licenser") version "0.3"
-}
 
 val clean: Delete by tasks
 val processResources: AbstractCopyTask by tasks
@@ -141,7 +134,9 @@ processResources {
 }
 
 tasks.withType<Test> {
-    if (CI) systemProperty("slowCI", "true")
+    if (CI) {
+        systemProperty("slowCI", "true")
+    }
 
     dependsOn(configurations["testLibs"])
     doFirst {
@@ -152,7 +147,7 @@ tasks.withType<Test> {
 }
 
 idea {
-    module.apply {
+    module {
         generatedSourceDirs.add(file("gen"))
         excludeDirs.add(file(intellij().sandboxDirectory))
     }
@@ -225,8 +220,14 @@ java().sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 // Workaround for KT-16764
 compileKotlin.inputs.dir(generate)
 
-// Use custom JRE for running IntelliJ IDEA when configured
-findProperty("intellijJre")?.let(runIde::setExecutable)
+runIde {
+    findProperty("intellijJre")?.let(this::setExecutable)
+
+    System.getProperty("debug")?.let {
+        systemProperty("idea.ProcessCanceledException", "disabled")
+        systemProperty("idea.debug.mode", "true")
+    }
+}
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
 fun KotlinDependencyHandler.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
