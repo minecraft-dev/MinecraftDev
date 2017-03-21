@@ -86,6 +86,10 @@ inline fun <T, R> Array<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     return null
 }
 
+inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R): Array<R> {
+    return Array(size) { i -> transform(this[i]) }
+}
+
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size) { i -> transform(this[i]) }
 }
