@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.mcp.framework
 
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.mcp.util.McpConstants
 import com.demonwav.mcdev.util.localFile
 import com.intellij.framework.library.LibraryVersionProperties
@@ -28,7 +27,7 @@ class McpPresentationProvider : LibraryPresentationProvider<LibraryVersionProper
         for (classesRoot in classesRoots) {
             val file = classesRoot.localFile
 
-            if (JarUtil.containsClass(file, McpConstants.MINECRAFT_SERVER) && !JarUtil.containsClass(file, ForgeConstants.MOD_ANNOTATION)) {
+            if (JarUtil.containsClass(file, McpConstants.MINECRAFT_SERVER)) {
                 return LibraryVersionProperties()
             }
         }
