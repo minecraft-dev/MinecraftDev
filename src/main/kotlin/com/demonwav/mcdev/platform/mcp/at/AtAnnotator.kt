@@ -23,8 +23,10 @@ import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.editor.markup.EffectType
+import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiElement
+import java.awt.Font
 
 class AtAnnotator : Annotator {
 
@@ -78,11 +80,15 @@ class AtAnnotator : Annotator {
     }
 
     companion object {
-        val key = TextAttributesKey.createTextAttributesKey("AT_UNDERLINE")
-
-        init {
-            key.defaultAttributes.effectType = EffectType.LINE_UNDERSCORE
-            key.defaultAttributes.effectColor = AtSyntaxHighlighter.ELEMENT_NAME.defaultAttributes.foregroundColor
-        }
+        val key = TextAttributesKey.createTextAttributesKey(
+            "AT_UNDERLINE",
+            TextAttributes(
+                null,
+                null,
+                AtSyntaxHighlighter.ELEMENT_NAME.defaultAttributes.foregroundColor,
+                EffectType.LINE_UNDERSCORE,
+                Font.PLAIN
+            )
+        )
     }
 }
