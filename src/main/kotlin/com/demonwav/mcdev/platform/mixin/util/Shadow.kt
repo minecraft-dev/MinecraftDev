@@ -28,6 +28,10 @@ import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import org.jetbrains.annotations.Contract
 
+@get:Contract(pure = true)
+val PsiMember.isShadow
+    get() = findAnnotation(SHADOW) != null
+
 @Contract(pure = true)
 fun PsiMember.findFirstShadowTarget(): PsiMember? {
     val shadow = findAnnotation(SHADOW) ?: return null
