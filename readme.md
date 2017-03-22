@@ -9,7 +9,7 @@ Minecraft Development for IntelliJ [![forthebadge](http://forthebadge.com/images
 |**CircleCI**|[![Travis Build Status](https://img.shields.io/circleci/project/github/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)](https://circleci.com/gh/minecraft-dev/MinecraftDev)|
 |**Travis**  |[![CircleCI Build Status](https://img.shields.io/travis/minecraft-dev/MinecraftDev/2016.3.svg?style=flat-square)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-2017.1--0.6.1-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-2017.1--0.6.2-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 Visit [https://minecraftdev.org](https://minecraftdev.org) for information about the project, change logs, features, FAQs, and chat.
