@@ -8,7 +8,7 @@
     MIT License
 -->
 
-<idea-plugin version="2">
+<idea-plugin>
 
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.idea.maven</depends>
@@ -28,13 +28,13 @@
         Alpha release, may break. More features to come. Please report issues to
         <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2017.1-0.6.2
+        v. 2017.2-0.6.2
       </div>
     ]]>
     </change-notes>
 
     <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="171" until-build="171.*"/>
+    <idea-version since-build="172" until-build="172.*"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Allows using multiple inspection suppressors -->

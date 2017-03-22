@@ -35,11 +35,6 @@ public class MinecraftModuleType extends JavaModuleType {
     }
 
     @Override
-    public Icon getBigIcon() {
-        return PlatformAssets.MINECRAFT_ICON_2X;
-    }
-
-    @Override
     public Icon getIcon() {
         return PlatformAssets.MINECRAFT_ICON;
     }
