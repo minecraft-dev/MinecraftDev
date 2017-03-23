@@ -60,7 +60,7 @@ abstract class BuildSystem {
      * *
      * @param configurations The configuration objects for the project
      */
-    abstract fun create(project: Project, configurations: ProjectConfiguration, indicator: ProgressIndicator)
+    abstract fun create(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator)
 
     /**
      * This is called after [create], and after the module has set
@@ -75,7 +75,7 @@ abstract class BuildSystem {
      * *
      * @param configurations The configuration object for the project
      */
-    abstract fun finishSetup(module: Module, configurations: Collection<ProjectConfiguration>, indicator: ProgressIndicator)
+    abstract fun finishSetup(rootModule: Module, configurations: Collection<ProjectConfiguration>, indicator: ProgressIndicator)
 
     @JvmOverloads
     fun createDirectories(dir: VirtualFile = rootDirectory) {
