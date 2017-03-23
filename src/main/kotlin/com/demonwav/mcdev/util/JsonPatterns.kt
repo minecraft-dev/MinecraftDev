@@ -18,7 +18,7 @@ import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.PsiElementPattern
 import com.intellij.util.ProcessingContext
 
-fun PsiElementPattern.Capture<out JsonValue>.isPropertyKey() = with(PropertyKeyCondition)!!
+fun PsiElementPattern.Capture<out JsonValue>.isPropertyKey() = with(PropertyKeyCondition)
 
 fun PsiElementPattern.Capture<out JsonValue>.isPropertyValue(property: String) = with(
     object : PatternCondition<JsonElement>("isPropertyValue") {
@@ -27,7 +27,7 @@ fun PsiElementPattern.Capture<out JsonValue>.isPropertyValue(property: String) =
             return parent.value == t && parent.name == property
         }
     }
-)!!
+)
 
 private object PropertyKeyCondition : PatternCondition<JsonElement>("isPropertyKey") {
     override fun accepts(t: JsonElement, context: ProcessingContext?) = JsonPsiUtil.isPropertyKey(t)
