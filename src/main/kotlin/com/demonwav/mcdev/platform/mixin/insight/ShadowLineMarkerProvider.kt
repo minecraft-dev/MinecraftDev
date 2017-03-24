@@ -34,7 +34,13 @@ import javax.swing.Icon
 
 class ShadowLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavigationHandler<PsiIdentifier> {
 
+    companion object {
+        private val ICON: Icon = MixinAssets.SHADOW
+        private val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to Shadow element")
+    }
+
     override fun getName() = "@Shadow line marker"
+    override fun getIcon() = ICON
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiIdentifier>? {
         if (element !is PsiMember) {
@@ -77,10 +83,5 @@ class ShadowLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavig
         override fun canMergeWith(info: MergeableLineMarkerInfo<*>) = info is LineMarker
         override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<PsiElement>>) = TOOLTIP_FUNCTION
         override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<PsiElement>>) = ICON
-
-        private companion object {
-            @JvmField val ICON: Icon = MixinAssets.SHADOW
-            @JvmField val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to Shadow element")
-        }
     }
 }

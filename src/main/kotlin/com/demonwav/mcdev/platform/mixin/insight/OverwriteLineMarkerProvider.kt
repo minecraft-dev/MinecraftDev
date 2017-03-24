@@ -26,11 +26,16 @@ import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMethod
 import com.intellij.util.FunctionUtil
 import java.awt.event.MouseEvent
-import javax.swing.Icon
 
 class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavigationHandler<PsiIdentifier> {
 
+    companion object {
+        private val ICON = AllIcons.Gutter.OverridingMethod!!
+        private val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to target method")
+    }
+
     override fun getName() = "Mixin @Overwrite line marker"
+    override fun getIcon() = ICON
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiIdentifier>? {
         if (element !is PsiMethod) {
@@ -63,11 +68,5 @@ class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNa
         override fun canMergeWith(info: MergeableLineMarkerInfo<*>) = info is LineMarker
         override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<PsiElement>>) = TOOLTIP_FUNCTION
         override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<PsiElement>>) = ICON
-
-        private companion object {
-            @JvmField val ICON: Icon = AllIcons.Gutter.OverridingMethod
-            @JvmField val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to target method")
-        }
     }
 }
-

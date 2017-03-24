@@ -24,7 +24,6 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.codeStyle.CodeStyleManager
-import java.util.Collections
 
 class SpongeProjectConfiguration : ProjectConfiguration() {
 
