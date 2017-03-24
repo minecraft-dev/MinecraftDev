@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.sponge;
 
-import com.demonwav.mcdev.platform.AbstractTemplate;
+import com.demonwav.mcdev.platform.BaseTemplate;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
@@ -21,7 +21,7 @@ import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class SpongeTemplate extends AbstractTemplate {
+public class SpongeTemplate {
 
     @NotNull
     public static String applyPomTemplate(@NotNull Project project,
@@ -59,11 +59,7 @@ public class SpongeTemplate extends AbstractTemplate {
             properties.setProperty("GENERATE_DOCUMENTATION", "true");
         }
 
-        try {
-            applyTemplate(project, mainClassFile, MinecraftFileTemplateGroupFactory.SPONGE_MAIN_CLASS_TEMPLATE, properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, mainClassFile, MinecraftFileTemplateGroupFactory.SPONGE_MAIN_CLASS_TEMPLATE, properties);
     }
 
     @Nullable
@@ -84,7 +80,7 @@ public class SpongeTemplate extends AbstractTemplate {
         final FileTemplate template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SPONGE_BUILD_GRADLE_TEMPLATE);
 
         // Sponge \o/
-        AbstractTemplate.applyGradlePropertiesTemplate(project, file, groupId, artifactId, pluginVersion, true);
+        BaseTemplate.applyGradlePropertiesTemplate(project, file, groupId, artifactId, pluginVersion, true);
 
         try {
             return template.getText(properties);

@@ -10,16 +10,15 @@
 
 package com.demonwav.mcdev.platform.forge;
 
-import com.demonwav.mcdev.platform.AbstractTemplate;
+import com.demonwav.mcdev.platform.BaseTemplate;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import java.io.IOException;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ForgeTemplate extends AbstractTemplate {
+public class ForgeTemplate {
 
     public static void applyBuildGradleTemplate(@NotNull Project project,
                                                 @NotNull VirtualFile file,
@@ -37,11 +36,7 @@ public class ForgeTemplate extends AbstractTemplate {
             properties.setProperty("SPONGE_FORGE", "true");
         }
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_BUILD_GRADLE_TEMPLATE, properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_BUILD_GRADLE_TEMPLATE, properties);
 
         final Properties gradleProps = new Properties();
         gradleProps.setProperty("GROUP_ID", groupId);
@@ -51,11 +46,7 @@ public class ForgeTemplate extends AbstractTemplate {
         gradleProps.setProperty("MCP_VERSION", mcpVersion);
 
         // create gradle.properties
-        try {
-            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
     }
 
     public static void applySubmoduleBuildGradleTemplate(@NotNull Project project,
@@ -74,11 +65,7 @@ public class ForgeTemplate extends AbstractTemplate {
             properties.setProperty("SPONGE_FORGE", "true");
         }
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties);
 
         final Properties gradleProps = new Properties();
         gradleProps.setProperty("ARTIFACT_ID", artifactId);
@@ -86,11 +73,7 @@ public class ForgeTemplate extends AbstractTemplate {
         gradleProps.setProperty("MCP_VERSION", mcpVersion);
 
         // create gradle.properties
-        try {
-            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
     }
 
     public static void applyMcmodInfoTemplate(@NotNull Project project,
@@ -120,11 +103,7 @@ public class ForgeTemplate extends AbstractTemplate {
             properties.setProperty("DEPENDENCIES_LIST", dependenciesList);
         }
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MCMOD_INFO_TEMPLATE, properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MCMOD_INFO_TEMPLATE, properties);
     }
 
     public static void applyMainClassTemplate(@NotNull Project project,
@@ -142,10 +121,6 @@ public class ForgeTemplate extends AbstractTemplate {
         properties.setProperty("PLUGIN_VERSION", pluginVersion);
         properties.setProperty("CLASS_NAME", className);
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_MAIN_CLASS_TEMPLATE, properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_MAIN_CLASS_TEMPLATE, properties);
     }
 }

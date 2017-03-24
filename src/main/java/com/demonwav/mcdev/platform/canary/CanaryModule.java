@@ -48,7 +48,7 @@ public class CanaryModule<T extends AbstractModuleType> extends AbstractModule {
     }
 
     private void setup() {
-        canaryInf = facet.findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE);
+        canaryInf = getFacet().findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE);
     }
 
     @Nullable
@@ -94,7 +94,7 @@ public class CanaryModule<T extends AbstractModuleType> extends AbstractModule {
                 containingClass,
                 chosenClass,
                 chosenName,
-                project,
+                getProject(),
                 CanaryConstants.HOOK_HANDLER_ANNOTATION,
                 canaryData.isIgnoreCanceled()
         );
@@ -106,7 +106,7 @@ public class CanaryModule<T extends AbstractModuleType> extends AbstractModule {
                 return method;
             }
 
-            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(getProject())
                     .createExpressionFromText(CanaryConstants.PRIORITY_CLASS + "." + canaryData.getPriority(), annotation);
 
             annotation.setDeclaredAttributeValue("priority", value);

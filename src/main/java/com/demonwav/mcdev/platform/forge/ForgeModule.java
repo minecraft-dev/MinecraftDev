@@ -48,7 +48,7 @@ public class ForgeModule extends AbstractModule {
     }
 
     private void setup() {
-        mcmod = facet.findFile(ForgeConstants.MCMOD_INFO, SourceType.RESOURCE);
+        mcmod = getFacet().findFile(ForgeConstants.MCMOD_INFO, SourceType.RESOURCE);
     }
 
     @Override
@@ -123,13 +123,13 @@ public class ForgeModule extends AbstractModule {
                                                  @Nullable GenerationData data) {
         final boolean isFmlEvent = McPsiClass.extendsOrImplements(chosenClass, ForgeConstants.FML_EVENT);
 
-        final PsiMethod method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
+        final PsiMethod method = JavaPsiFacade.getElementFactory(getProject()).createMethod(chosenName, PsiType.VOID);
         final PsiParameterList parameterList = method.getParameterList();
 
-        final PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
+        final PsiParameter parameter = JavaPsiFacade.getElementFactory(getProject())
             .createParameter(
                 "event",
-                PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.allScope(project))
+                PsiClassType.getTypeByName(chosenClass.getQualifiedName(), getProject(), GlobalSearchScope.allScope(getProject()))
             );
 
         parameterList.add(parameter);

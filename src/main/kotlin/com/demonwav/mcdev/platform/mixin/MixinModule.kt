@@ -16,7 +16,7 @@ import com.demonwav.mcdev.platform.PlatformType
 
 class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
-    override fun getModuleType() = MixinModuleType
-    override fun getType() = PlatformType.MIXIN
-    override fun getIcon() = null
+    override val moduleType = MixinModuleType
+    override val type = PlatformType.MIXIN
+    override val icon = null
 }

@@ -21,7 +21,6 @@ import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData;
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants;
 import com.demonwav.mcdev.util.McPsiClass;
 import com.demonwav.mcdev.util.McPsiUtil;
-import com.intellij.openapi.module.Module;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
@@ -51,15 +50,12 @@ public class SpongeModule extends AbstractModule {
     }
 
     @NotNull
-    public Module getModule() {
-        return module;
-    }
-
     @Override
     public AbstractModuleType<SpongeModule> getModuleType() {
         return SpongeModuleType.INSTANCE;
     }
 
+    @NotNull
     @Override
     public PlatformType getType() {
         return PlatformType.SPONGE;
@@ -75,8 +71,9 @@ public class SpongeModule extends AbstractModule {
         return "org.spongepowered.api.event.Event".equals(eventClass.getQualifiedName());
     }
 
+    @NotNull
     @Override
-    public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
+    public String writeErrorMessageForEventParameter(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
         return "Parameter is not an instance of org.spongepowered.api.event.Event\n" +
         "Compiling and running this listener may result in a runtime exception";
     }
@@ -87,13 +84,13 @@ public class SpongeModule extends AbstractModule {
                                                  @NotNull PsiClass chosenClass,
                                                  @NotNull String chosenName,
                                                  @Nullable GenerationData data) {
-        final PsiMethod method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID);
+        final PsiMethod method = JavaPsiFacade.getElementFactory(getProject()).createMethod(chosenName, PsiType.VOID);
         final PsiParameterList parameterList = method.getParameterList();
 
-        final PsiParameter parameter = JavaPsiFacade.getElementFactory(project)
+        final PsiParameter parameter = JavaPsiFacade.getElementFactory(getProject())
             .createParameter(
                 "event",
-                PsiClassType.getTypeByName(chosenClass.getQualifiedName(), project, GlobalSearchScope.allScope(project))
+                PsiClassType.getTypeByName(chosenClass.getQualifiedName(), getProject(), GlobalSearchScope.allScope(getProject()))
             );
 
         parameterList.add(parameter);
@@ -106,14 +103,14 @@ public class SpongeModule extends AbstractModule {
 
         if (!generationData.isIgnoreCanceled()) {
             final PsiAnnotation annotation = modifierList.addAnnotation("org.spongepowered.api.event.filter.IsCancelled");
-            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(getProject())
                 .createExpressionFromText("org.spongepowered.api.util.Tristate.UNDEFINED", annotation);
 
             annotation.setDeclaredAttributeValue("value", value);
         }
 
         if (!generationData.getEventOrder().equals("DEFAULT")) {
-            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(getProject())
                 .createExpressionFromText("org.spongepowered.api.event.Order." + generationData.getEventOrder(), listenerAnnotation);
 
             listenerAnnotation.setDeclaredAttributeValue("order", value);
@@ -222,10 +219,10 @@ public class SpongeModule extends AbstractModule {
 
         if (isCancelled) {
             isCancelledBuilder.setFix(descriptor ->
-                expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("true", expression)));
+                expression.replace(JavaPsiFacade.getElementFactory(getProject()).createExpressionFromText("true", expression)));
         } else {
             isCancelledBuilder.setFix(descriptor ->
-                expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression)));
+                expression.replace(JavaPsiFacade.getElementFactory(getProject()).createExpressionFromText("false", expression)));
         }
 
         return isCancelledBuilder.build();

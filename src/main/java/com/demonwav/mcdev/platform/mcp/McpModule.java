@@ -32,7 +32,7 @@ public class McpModule extends AbstractModule {
     public McpModule(@NotNull MinecraftFacet facet) {
         super(facet);
 
-        this.settings = McpModuleSettings.getInstance(module);
+        this.settings = McpModuleSettings.getInstance(getModule());
         final Set<String> files = getSettings().getMappingFiles();
         if (!files.isEmpty()) {
             srgManager = SrgManager.getInstance(files);

@@ -35,7 +35,7 @@ public class LiteLoaderModule extends AbstractModule {
     }
 
     private void setup() {
-        litemodJson = facet.findFile(LiteLoaderConstants.LITEMOD_JSON, SourceType.RESOURCE);
+        litemodJson = getFacet().findFile(LiteLoaderConstants.LITEMOD_JSON, SourceType.RESOURCE);
     }
 
     @Nullable

@@ -13,7 +13,7 @@ package com.demonwav.mcdev.platform.canary;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
-import com.demonwav.mcdev.platform.AbstractTemplate;
+import com.demonwav.mcdev.platform.BaseTemplate;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class CanaryTemplate extends AbstractTemplate {
+public class CanaryTemplate {
 
     public static void applyMainClassTemplate(@NotNull Project project,
                                               @NotNull VirtualFile file,
@@ -34,11 +34,7 @@ public class CanaryTemplate extends AbstractTemplate {
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.CANARY_MAIN_CLASS_TEMPLATE, properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.CANARY_MAIN_CLASS_TEMPLATE, properties);
     }
 
     @NotNull
@@ -88,11 +84,7 @@ public class CanaryTemplate extends AbstractTemplate {
             properties.setProperty("HAS_DEPEND", "true");
         }
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.CANARY_INF_TEMPLATE, properties, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.CANARY_INF_TEMPLATE, properties, true);
     }
 
 }

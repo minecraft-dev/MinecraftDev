@@ -24,11 +24,12 @@ object McpModuleType : AbstractModuleType<McpModule>("", "") {
         CommonColors.applyStandardColors(colorMap, McpConstants.TEXT_FORMATTING)
     }
 
-    override fun getPlatformType() = PlatformType.MCP
-    override fun getIcon() = null
-    override fun getId() = ID
-    override fun getIgnoredAnnotations() = emptyList<String>()
-    override fun getListenerAnnotations() = emptyList<String>()
+    override val platformType = PlatformType.MCP
+    override val icon = null
+    override val id = ID
+    override val ignoredAnnotations = emptyList<String>()
+    override val listenerAnnotations = emptyList<String>()
+
     override fun generateModule(facet: MinecraftFacet) = McpModule(facet)
     override fun hasIcon() = false
 }

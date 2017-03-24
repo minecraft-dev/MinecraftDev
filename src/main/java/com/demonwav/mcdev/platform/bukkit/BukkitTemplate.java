@@ -13,7 +13,7 @@ package com.demonwav.mcdev.platform.bukkit;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
-import com.demonwav.mcdev.platform.AbstractTemplate;
+import com.demonwav.mcdev.platform.BaseTemplate;
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 import com.intellij.ide.fileTemplates.FileTemplate;
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class BukkitTemplate extends AbstractTemplate {
+public class BukkitTemplate {
 
     public static void applyMainClassTemplate(@NotNull Project project,
                                               @NotNull VirtualFile file,
@@ -35,11 +35,7 @@ public class BukkitTemplate extends AbstractTemplate {
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_MAIN_CLASS_TEMPLATE, properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_MAIN_CLASS_TEMPLATE, properties);
     }
 
     @NotNull
@@ -115,11 +111,7 @@ public class BukkitTemplate extends AbstractTemplate {
             properties.setProperty("HAS_WEBSITE", "true");
         }
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties, true);
     }
 
 }

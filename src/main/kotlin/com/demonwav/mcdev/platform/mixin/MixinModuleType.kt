@@ -18,14 +18,12 @@ object MixinModuleType : AbstractModuleType<MixinModule>("org.spongepowered", "m
 
     const val ID = "MIXIN_MODULE_TYPE"
 
-    override fun getPlatformType() = PlatformType.MIXIN
-    override fun getIcon() = null
+    override val platformType = PlatformType.MIXIN
+    override val icon = null
+    override val id = ID
+    override val ignoredAnnotations = emptyList<String>()
+    override val listenerAnnotations = emptyList<String>()
+
     override fun hasIcon() = false
-
-    override fun getId(): String = ID
-
-    override fun getIgnoredAnnotations() = emptyList<String>()
-    override fun getListenerAnnotations() = emptyList<String>()
-
     override fun generateModule(facet: MinecraftFacet) = MixinModule(facet)
 }

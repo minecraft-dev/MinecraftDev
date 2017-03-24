@@ -10,15 +10,14 @@
 
 package com.demonwav.mcdev.platform.liteloader;
 
-import com.demonwav.mcdev.platform.AbstractTemplate;
+import com.demonwav.mcdev.platform.BaseTemplate;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import java.io.IOException;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class LiteLoaderTemplate extends AbstractTemplate {
+public class LiteLoaderTemplate {
 
     public static void applyBuildGradleTemplate(@NotNull Project project,
                                                 @NotNull VirtualFile file,
@@ -36,12 +35,8 @@ public class LiteLoaderTemplate extends AbstractTemplate {
         properties.setProperty("MC_VERSION", mcVersion);
         properties.setProperty("MCP_MAPPINGS", mcpMappings);
 
-        try {
-            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE, properties);
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_BUILD_GRADLE_TEMPLATE, new Properties());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE, properties);
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_BUILD_GRADLE_TEMPLATE, new Properties());
     }
 
     public static void applySubmoduleBuildGradleTemplate(@NotNull Project project,
@@ -55,23 +50,14 @@ public class LiteLoaderTemplate extends AbstractTemplate {
         final Properties properties = new Properties();
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
 
-        try {
-            applyTemplate(project, file,
-                          MinecraftFileTemplateGroupFactory.LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties);
 
         final Properties gradleProps = new Properties();
         gradleProps .setProperty("VERSION", modVersion);
         gradleProps .setProperty("MC_VERSION", mcVersion);
         gradleProps .setProperty("MCP_MAPPINGS", mcpMappings);
 
-        try {
-            applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE, gradleProps);
     }
 
     public static void applyMainClassTemplate(@NotNull Project project,
@@ -87,10 +73,6 @@ public class LiteLoaderTemplate extends AbstractTemplate {
         properties.setProperty("MOD_NAME", modName);
         properties.setProperty("MOD_VERSION", modVersion);
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_MAIN_CLASS_TEMPLATE, properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_MAIN_CLASS_TEMPLATE, properties);
     }
 }

@@ -12,7 +12,7 @@ package com.demonwav.mcdev.buildsystem.gradle
 
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.MinecraftProjectCreator
-import com.demonwav.mcdev.platform.AbstractTemplate
+import com.demonwav.mcdev.platform.BaseTemplate
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration
@@ -154,7 +154,7 @@ class GradleBuildSystem : BuildSystem() {
                     buildVersion
                 )
             } else {
-                AbstractTemplate.applyBuildGradleTemplate(
+                BaseTemplate.applyBuildGradleTemplate(
                     project,
                     gradleProp,
                     groupId,
@@ -393,7 +393,7 @@ class GradleBuildSystem : BuildSystem() {
             val gradleProp = setupGradleFiles()
             val settingsGradle = rootDirectory.createChildData(this, "settings.gradle")
 
-            AbstractTemplate.applyMultiModuleBuildGradleTemplate(
+            BaseTemplate.applyMultiModuleBuildGradleTemplate(
                 project,
                 buildGradle!!,
                 gradleProp,
@@ -404,7 +404,7 @@ class GradleBuildSystem : BuildSystem() {
                 configurations.containsKey(PlatformType.SPONGE)
             )
 
-            AbstractTemplate.applySettingsGradleTemplate(project, settingsGradle, artifactId.toLowerCase(), includes)
+            BaseTemplate.applySettingsGradleTemplate(project, settingsGradle, artifactId.toLowerCase(), includes)
 
             // Common will be empty, it's for the developers to fill in with common classes
             val common = rootDirectory.createChildData(this, artifactId.toLowerCase() + "-common")
@@ -518,7 +518,7 @@ class GradleBuildSystem : BuildSystem() {
             val buildGradleText = if (configuration.type == PlatformType.SPONGE) {
                 SpongeTemplate.applySubmoduleBuildGradleTemplate(project, commonProjectName)
             } else {
-                AbstractTemplate.applySubmoduleBuildGradleTemplate(project, commonProjectName)
+                BaseTemplate.applySubmoduleBuildGradleTemplate(project, commonProjectName)
             } ?: return@runWriteTask
 
             addBuildGradleDependencies(project, buildGradleText)

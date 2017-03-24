@@ -21,7 +21,6 @@ import com.demonwav.mcdev.platform.bukkit.BukkitModule;
 import com.demonwav.mcdev.platform.bungeecord.generation.BungeeCordGenerationData;
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants;
 import com.demonwav.mcdev.util.McPsiClass;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
@@ -50,14 +49,10 @@ public class BungeeCordModule extends AbstractModule {
     }
 
     private void setup() {
-        pluginYml = facet.findFile("plugin.yml", SourceType.RESOURCE);
+        pluginYml = getFacet().findFile("plugin.yml", SourceType.RESOURCE);
     }
 
     @NotNull
-    public Module getModule() {
-        return module;
-    }
-
     @Override
     public AbstractModuleType<BungeeCordModule> getModuleType() {
         return BungeeCordModuleType.INSTANCE;
@@ -73,10 +68,7 @@ public class BungeeCordModule extends AbstractModule {
         return pluginYml;
     }
 
-    public void setPluginYml(VirtualFile pluginYml) {
-        this.pluginYml = pluginYml;
-    }
-
+    @NotNull
     @Override
     public PlatformType getType() {
         return PlatformType.BUNGEECORD;
@@ -92,8 +84,9 @@ public class BungeeCordModule extends AbstractModule {
         return BungeeCordConstants.EVENT_CLASS.equals(eventClass.getQualifiedName());
     }
 
+    @NotNull
     @Override
-    public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
+    public String writeErrorMessageForEventParameter(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
         return "Parameter is not a subclass of net.md_5.bungee.api.plugin.Event\n" +
                 "Compiling and running this listener may result in a runtime exception";
     }
@@ -117,7 +110,7 @@ public class BungeeCordModule extends AbstractModule {
             containingClass,
             chosenClass,
             chosenName,
-            project,
+            getProject(),
             BungeeCordConstants.HANDLER_ANNOTATION,
             false
         );
@@ -137,7 +130,7 @@ public class BungeeCordModule extends AbstractModule {
             return method;
         }
 
-        final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+        final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(getProject())
             .createExpressionFromText(BungeeCordConstants.EVENT_PRIORITY_CLASS + "." + generationData.getEventPriority(), annotation);
 
         annotation.setDeclaredAttributeValue("priority", value);

@@ -64,7 +64,7 @@ public class BukkitModule<T extends AbstractModuleType<?>> extends AbstractModul
     }
 
     private void setup() {
-        pluginYml = facet.findFile("plugin.yml", SourceType.RESOURCE);
+        pluginYml = getFacet().findFile("plugin.yml", SourceType.RESOURCE);
     }
 
     @Nullable
@@ -136,7 +136,7 @@ public class BukkitModule<T extends AbstractModuleType<?>> extends AbstractModul
             containingClass,
             chosenClass,
             chosenName,
-            project,
+            getProject(),
             BukkitConstants.HANDLER_ANNOTATION,
             bukkitData.isIgnoreCanceled()
         );
@@ -148,7 +148,7 @@ public class BukkitModule<T extends AbstractModuleType<?>> extends AbstractModul
                 return method;
             }
 
-            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(project)
+            final PsiAnnotationMemberValue value = JavaPsiFacade.getElementFactory(getProject())
                 .createExpressionFromText(BukkitConstants.EVENT_PRIORITY_CLASS + "." + bukkitData.getEventPriority(), annotation);
 
             annotation.setDeclaredAttributeValue("priority", value);
@@ -251,7 +251,7 @@ public class BukkitModule<T extends AbstractModuleType<?>> extends AbstractModul
         return IsCancelled.builder()
                           .setErrorString("Cancellable.isCancelled() check is useless in a method annotated with ignoreCancelled=true.")
                           .setFix(descriptor -> expression
-                              .replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression)))
+                              .replace(JavaPsiFacade.getElementFactory(getProject()).createExpressionFromText("false", expression)))
                           .build();
     }
 

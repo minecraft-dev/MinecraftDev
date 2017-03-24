@@ -93,3 +93,8 @@ inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R): Array<R> {
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size) { i -> transform(this[i]) }
 }
+
+fun <T : Any> Array<T?>.castNotNull(): Array<T> {
+    @Suppress("UNCHECKED_CAST")
+    return this as Array<T>
+}

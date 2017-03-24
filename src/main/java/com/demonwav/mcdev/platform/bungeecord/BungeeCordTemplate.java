@@ -13,7 +13,7 @@ package com.demonwav.mcdev.platform.bungeecord;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem;
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem;
-import com.demonwav.mcdev.platform.AbstractTemplate;
+import com.demonwav.mcdev.platform.BaseTemplate;
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class BungeeCordTemplate extends AbstractTemplate {
+public class BungeeCordTemplate {
 
     public static void applyMainClassTemplate(@NotNull Project project,
                                               @NotNull VirtualFile file,
@@ -34,11 +34,7 @@ public class BungeeCordTemplate extends AbstractTemplate {
         properties.setProperty("PACKAGE", packageName);
         properties.setProperty("CLASS_NAME", className);
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUNGEECORD_MAIN_CLASS_TEMPLATE, properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUNGEECORD_MAIN_CLASS_TEMPLATE, properties);
     }
 
     @NotNull
@@ -95,11 +91,6 @@ public class BungeeCordTemplate extends AbstractTemplate {
             properties.setProperty("HAS_DESCRIPTION", "true");
         }
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties, true);
     }
-
 }
