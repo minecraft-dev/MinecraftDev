@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.buildsystem.maven
 
 import com.demonwav.mcdev.buildsystem.BuildSystem
-import com.demonwav.mcdev.buildsystem.maven.pom.MavenProjectXml
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.bukkit.BukkitTemplate
@@ -31,6 +30,7 @@ import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.xml.XmlFile
 import com.intellij.util.xml.DomManager
+import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters
 import org.jetbrains.idea.maven.project.MavenProjectsManager
@@ -64,7 +64,7 @@ class MavenBuildSystem : BuildSystem() {
                 override fun run() {
 
                     val manager = DomManager.getDomManager(project)
-                    val mavenProjectXml = manager.getFileElement(pomXmlPsi, MavenProjectXml::class.java, "project").rootElement
+                    val mavenProjectXml = manager.getFileElement(pomXmlPsi, MavenDomProjectModel::class.java)!!.rootElement
 
                     mavenProjectXml.groupId.value = groupId
                     mavenProjectXml.artifactId.value = artifactId
