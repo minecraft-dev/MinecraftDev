@@ -12,6 +12,7 @@ package com.demonwav.mcdev.creator;
 
 import static com.demonwav.mcdev.platform.PlatformType.FORGE;
 import static com.demonwav.mcdev.platform.PlatformType.SPONGE;
+
 import com.demonwav.mcdev.buildsystem.BuildDependency;
 import com.demonwav.mcdev.buildsystem.BuildRepository;
 import com.demonwav.mcdev.buildsystem.BuildSystem;
@@ -129,8 +130,8 @@ public class MinecraftProjectCreator {
             return;
         }
 
-        BuildRepository buildRepository = new BuildRepository();
-        BuildDependency buildDependency = new BuildDependency();
+        final BuildRepository buildRepository = new BuildRepository();
+        final BuildDependency buildDependency = new BuildDependency();
 
         // Sponge projects using Gradle use SpongeGradle which automatically adds the required repositories
         if (configuration.type != SPONGE || !(buildSystem instanceof GradleBuildSystem)) {

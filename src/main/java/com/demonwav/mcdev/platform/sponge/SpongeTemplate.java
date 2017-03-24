@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class SpongeTemplate extends AbstractTemplate {
 
-    @Nullable
+    @NotNull
     public static String applyPomTemplate(@NotNull Project project,
                                           @NotNull String version) {
 
@@ -37,7 +37,7 @@ public class SpongeTemplate extends AbstractTemplate {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return "";
     }
 
     public static void applyMainClassTemplate(@NotNull Project project,

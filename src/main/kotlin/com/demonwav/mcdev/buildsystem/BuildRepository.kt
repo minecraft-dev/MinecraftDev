@@ -11,6 +11,6 @@
 package com.demonwav.mcdev.buildsystem
 
 data class BuildRepository(
-    var id: String? = null,
-    var url: String? = null
+    var id: String = "",
+    var url: String = ""
 )
