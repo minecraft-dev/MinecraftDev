@@ -8,7 +8,7 @@
  * MIT License
  */
 
-@file:JvmName("UtilKt")
+@file:JvmName("Util")
 package com.demonwav.mcdev.util
 
 import com.intellij.openapi.application.ApplicationManager
@@ -92,28 +92,4 @@ inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R): Array<R> {
 
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size) { i -> transform(this[i]) }
-}
-
-object Util {
-    // Java static methods
-    // Can't call inlined stuff from java
-    @JvmStatic
-    fun runWriteTask(func: Runnable) {
-        runWriteTask { func.run() }
-    }
-
-    @JvmStatic
-    fun runWriteTaskLater(func: Runnable) {
-        runWriteTaskLater { func.run() }
-    }
-
-    @JvmStatic
-    fun invokeAndWait(func: Runnable) {
-        invokeAndWait { func.run() }
-    }
-
-    @JvmStatic
-    fun invokeLater(func: Runnable) {
-        invokeLater { func.run() }
-    }
 }

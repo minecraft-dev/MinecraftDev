@@ -145,14 +145,14 @@ public class MinecraftProjectCreator {
                 buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
                 buildDependency.setGroupId("org.bukkit");
                 buildDependency.setArtifactId("bukkit");
-                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
+                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).getMinecraftVersion() + "-R0.1-SNAPSHOT");
                 break;
             case SPIGOT:
                 buildRepository.setId("spigotmc-repo");
                 buildRepository.setUrl("https://hub.spigotmc.org/nexus/content/groups/public/");
                 buildDependency.setGroupId("org.spigotmc");
                 buildDependency.setArtifactId("spigot-api");
-                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
+                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).getMinecraftVersion() + "-R0.1-SNAPSHOT");
                 addSonatype(buildSystem.getRepositories());
                 break;
             case PAPER:
@@ -160,7 +160,7 @@ public class MinecraftProjectCreator {
                 buildRepository.setUrl("https://repo.destroystokyo.com/repository/maven-public/");
                 buildDependency.setGroupId("com.destroystokyo.paper");
                 buildDependency.setArtifactId("paper-api");
-                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).minecraftVersion + "-R0.1-SNAPSHOT");
+                buildDependency.setVersion(((BukkitProjectConfiguration) configuration).getMinecraftVersion() + "-R0.1-SNAPSHOT");
                 addSonatype(buildSystem.getRepositories());
                 break;
             case BUNGEECORD:
@@ -168,7 +168,7 @@ public class MinecraftProjectCreator {
                 buildRepository.setUrl("https://oss.sonatype.org/content/groups/public/");
                 buildDependency.setGroupId("net.md-5");
                 buildDependency.setArtifactId("bungeecord-api");
-                buildDependency.setVersion(((BungeeCordProjectConfiguration) configuration).minecraftVersion + "-SNAPSHOT");
+                buildDependency.setVersion(((BungeeCordProjectConfiguration) configuration).getMinecraftVersion() + "-SNAPSHOT");
                 break;
             case SPONGE:
                 buildRepository.setId("spongepowered-repo");
@@ -176,13 +176,13 @@ public class MinecraftProjectCreator {
                 buildDependency.setGroupId("org.spongepowered");
                 buildDependency.setArtifactId("spongeapi");
                 if (configuration instanceof SpongeProjectConfiguration) {
-                    buildDependency.setVersion(((SpongeProjectConfiguration) configuration).spongeApiVersion);
+                    buildDependency.setVersion(((SpongeProjectConfiguration) configuration).getSpongeApiVersion());
                 } else {
-                    buildDependency.setVersion(((SpongeForgeProjectConfiguration) configuration).spongeApiVersion);
+                    buildDependency.setVersion(((SpongeForgeProjectConfiguration) configuration).getSpongeApiVersion());
                 }
                 break;
             case CANARY:
-                if (!((CanaryProjectConfiguration) configuration).canaryVersion.endsWith("-SNAPSHOT")) {
+                if (!((CanaryProjectConfiguration) configuration).getCanaryVersion().endsWith("-SNAPSHOT")) {
                     buildRepository.setId("vi-releases");
                     buildRepository.setUrl("http://repo.visualillusionsent.net:8888/repository/internal/");
                 } else {
@@ -191,10 +191,10 @@ public class MinecraftProjectCreator {
                 }
                 buildDependency.setGroupId("net.canarymod");
                 buildDependency.setArtifactId("CanaryLib");
-                buildDependency.setVersion(((CanaryProjectConfiguration) configuration).canaryVersion);
+                buildDependency.setVersion(((CanaryProjectConfiguration) configuration).getCanaryVersion());
                 break;
             case NEPTUNE:
-                if (!((CanaryProjectConfiguration) configuration).canaryVersion.endsWith("-SNAPSHOT")) {
+                if (!((CanaryProjectConfiguration) configuration).getCanaryVersion().endsWith("-SNAPSHOT")) {
                     buildRepository.setId("lex-releases");
                     buildRepository.setUrl("https://repo.lexteam.xyz/maven/releases/");
                 } else {
@@ -204,7 +204,7 @@ public class MinecraftProjectCreator {
                 addVIRepo(buildSystem.getRepositories());
                 buildDependency.setGroupId("org.neptunepowered");
                 buildDependency.setArtifactId("NeptuneLib");
-                buildDependency.setVersion(((CanaryProjectConfiguration) configuration).canaryVersion);
+                buildDependency.setVersion(((CanaryProjectConfiguration) configuration).getCanaryVersion());
                 break;
             default:
         }

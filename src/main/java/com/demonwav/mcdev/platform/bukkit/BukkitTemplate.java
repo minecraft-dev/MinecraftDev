@@ -76,32 +76,32 @@ public class BukkitTemplate extends AbstractTemplate {
         properties.setProperty("MAIN", settings.mainClass);
 
         if (settings.hasPrefix()) {
-            properties.setProperty("PREFIX", settings.prefix);
+            properties.setProperty("PREFIX", settings.getPrefix());
             properties.setProperty("HAS_PREFIX", "true");
         }
 
-        if (settings.loadOrder != LoadOrder.POSTWORLD) {
+        if (settings.getLoadOrder() != LoadOrder.POSTWORLD) {
             properties.setProperty("LOAD", LoadOrder.STARTUP.name());
             properties.setProperty("HAS_LOAD", "true");
         }
 
         if (settings.hasLoadBefore()) {
-            properties.setProperty("LOAD_BEFORE", settings.loadBefore.toString());
+            properties.setProperty("LOAD_BEFORE", settings.getLoadBefore().toString());
             properties.setProperty("HAS_LOAD_BEFORE", "true");
         }
 
         if (settings.hasDependencies()) {
-            properties.setProperty("DEPEND", settings.dependencies.toString());
+            properties.setProperty("DEPEND", settings.getDependencies().toString());
             properties.setProperty("HAS_DEPEND", "true");
         }
 
         if (settings.hasSoftDependencies()) {
-            properties.setProperty("SOFT_DEPEND", settings.softDependencies.toString());
+            properties.setProperty("SOFT_DEPEND", settings.getSoftDependencies().toString());
             properties.setProperty("HAS_SOFT_DEPEND", "true");
         }
 
         if (settings.hasAuthors()) {
-            properties.setProperty("AUTHOR_LIST", settings.authors.toString());
+            properties.setProperty("AUTHOR_LIST", settings.getAuthors().toString());
             properties.setProperty("HAS_AUTHOR_LIST", "true");
         }
 

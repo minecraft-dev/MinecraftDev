@@ -63,7 +63,7 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
         pluginNameField.setText(name);
         pluginVersionField.setText(creator.getVersion());
 
-        if (settings != null && !settings.isFirst) {
+        if (settings != null && !settings.isFirst()) {
             pluginNameField.setEditable(false);
             pluginVersionField.setEditable(false);
         }
@@ -105,8 +105,8 @@ public class SpongeProjectSettingsWizard extends MinecraftModuleWizardStep {
         settings.description = descriptionField.getText();
         settings.website = websiteField.getText();
 
-        settings.generateDocumentedListeners = this.generateDocumentedListenersCheckBox.isSelected();
-        settings.spongeApiVersion = (String) spongeApiVersionBox.getSelectedItem();
+        settings.setGenerateDocumentedListeners(this.generateDocumentedListenersCheckBox.isSelected());
+        settings.setSpongeApiVersion((String) spongeApiVersionBox.getSelectedItem());
     }
 
     @Override

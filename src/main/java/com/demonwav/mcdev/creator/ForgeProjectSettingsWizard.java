@@ -91,7 +91,7 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         pluginNameField.setText(WordUtils.capitalize(creator.getArtifactId()));
         pluginVersionField.setText(creator.getVersion());
 
-        if (settings != null && !settings.isFirst) {
+        if (settings != null && !settings.isFirst()) {
             pluginNameField.setEditable(false);
             pluginVersionField.setEditable(false);
         }
@@ -201,19 +201,19 @@ public class ForgeProjectSettingsWizard extends MinecraftModuleWizardStep {
         settings.setDependencies(dependField.getText());
         settings.description = descriptionField.getText();
         settings.website = websiteField.getText();
-        settings.updateUrl = updateUrlField.getText();
+        settings.setUpdateUrl(updateUrlField.getText());
 
-        settings.mcpVersion = ((McpVersionEntry) mcpVersionBox.getSelectedItem()).getText();
+        settings.setMcpVersion(((McpVersionEntry) mcpVersionBox.getSelectedItem()).getText());
 
         if (settings instanceof SpongeForgeProjectConfiguration) {
             SpongeForgeProjectConfiguration configuration = (SpongeForgeProjectConfiguration) settings;
-            configuration.generateDocumentation = generateDocsCheckbox.isSelected();
-            configuration.spongeApiVersion = (String) minecraftVersionBox.getSelectedItem();
+            configuration.setGenerateDocumentation(generateDocsCheckbox.isSelected());
+            configuration.setSpongeApiVersion((String) minecraftVersionBox.getSelectedItem());
         }
 
         // If an error occurs while fetching the API, this may prevent the user from closing the dialog.
         try {
-            settings.forgeVersion = forgeVersion.getFullVersion((String) forgeVersionBox.getSelectedItem());
+            settings.setForgeVersion(forgeVersion.getFullVersion((String) forgeVersionBox.getSelectedItem()));
         } catch (NullPointerException e) {
             e.printStackTrace();
         }

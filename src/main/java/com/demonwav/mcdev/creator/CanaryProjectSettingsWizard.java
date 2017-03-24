@@ -52,7 +52,7 @@ public class CanaryProjectSettingsWizard extends MinecraftModuleWizardStep {
         pluginNameField.setText(name);
         pluginVersionField.setText(creator.getVersion());
 
-        if (settings != null && !settings.isFirst) {
+        if (settings != null && !settings.isFirst()) {
             pluginNameField.setEditable(false);
             pluginVersionField.setEditable(false);
         }
@@ -96,9 +96,9 @@ public class CanaryProjectSettingsWizard extends MinecraftModuleWizardStep {
         this.settings.pluginVersion = pluginVersionField.getText();
         this.settings.mainClass = mainClassField.getText();
         this.settings.setAuthors(this.authorsField.getText());
-        this.settings.enableEarly = this.loadOrderBox.getSelectedIndex() == 0 ? false : true;
+        this.settings.setEnableEarly(this.loadOrderBox.getSelectedIndex() != 0);
         this.settings.setDependencies(this.dependField.getText());
-        this.settings.canaryVersion = (String) canaryVersionBox.getSelectedItem();
+        this.settings.setCanaryVersion((String) canaryVersionBox.getSelectedItem());
     }
 
     @Override

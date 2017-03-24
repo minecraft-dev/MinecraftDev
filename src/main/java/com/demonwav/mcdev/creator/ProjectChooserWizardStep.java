@@ -263,7 +263,7 @@ public class ProjectChooserWizardStep extends ModuleWizardStep {
             creator.getSettings().put(PlatformType.CANARY, configuration);
         }
 
-        creator.getSettings().values().iterator().next().isFirst = true;
+        creator.getSettings().values().iterator().next().setFirst(true);
     }
 
     @Override

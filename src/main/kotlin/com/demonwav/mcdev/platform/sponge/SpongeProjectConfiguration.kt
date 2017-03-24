@@ -28,19 +28,18 @@ import java.util.Collections
 
 class SpongeProjectConfiguration : ProjectConfiguration() {
 
-    @JvmField val dependencies = mutableListOf<String>()
-    @JvmField var generateDocumentedListeners = false
-    @JvmField var spongeApiVersion = ""
+    val dependencies = mutableListOf<String>()
+    var generateDocumentedListeners = false
+    var spongeApiVersion = ""
 
     init {
         type = PlatformType.SPONGE
     }
 
     fun hasDependencies() = listContainsAtLeastOne(dependencies)
-
     fun setDependencies(string: String) {
         dependencies.clear()
-        Collections.addAll(dependencies, *commaSplit(string))
+        dependencies.addAll(commaSplit(string))
     }
 
     override fun create(project: Project, buildSystem: BuildSystem, indicator: ProgressIndicator) {

@@ -61,7 +61,7 @@ public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
         pluginNameField.setText(name);
         pluginVersionField.setText(creator.getVersion());
 
-        if (settings != null && !settings.isFirst) {
+        if (settings != null && !settings.isFirst()) {
             pluginNameField.setEditable(false);
             pluginVersionField.setEditable(false);
         }
@@ -113,12 +113,12 @@ public class BukkitProjectSettingsWizard extends MinecraftModuleWizardStep {
         this.settings.description = descriptionField.getText();
         this.settings.setAuthors(this.authorsField.getText());
         this.settings.website = websiteField.getText();
-        this.settings.prefix = prefixField.getText();
-        this.settings.loadOrder = this.loadOrderBox.getSelectedIndex() == 0 ? LoadOrder.POSTWORLD : LoadOrder.STARTUP;
+        this.settings.setPrefix(prefixField.getText());
+        this.settings.setLoadOrder(this.loadOrderBox.getSelectedIndex() == 0 ? LoadOrder.POSTWORLD : LoadOrder.STARTUP);
         this.settings.setLoadBefore(this.loadBeforeField.getText());
         this.settings.setDependencies(this.dependField.getText());
         this.settings.setSoftDependencies(this.softDependField.getText());
-        this.settings.minecraftVersion = (String) minecraftVersionBox.getSelectedItem();
+        this.settings.setMinecraftVersion((String) minecraftVersionBox.getSelectedItem());
     }
 
     @Override

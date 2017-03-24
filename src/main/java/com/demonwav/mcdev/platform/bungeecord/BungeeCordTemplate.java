@@ -75,18 +75,18 @@ public class BungeeCordTemplate extends AbstractTemplate {
         properties.setProperty("MAIN", settings.mainClass);
 
         if (settings.hasDependencies()) {
-            properties.setProperty("DEPEND", settings.dependencies.toString());
+            properties.setProperty("DEPEND", settings.getDependencies().toString());
             properties.setProperty("HAS_DEPEND", "true");
         }
 
         if (settings.hasSoftDependencies()) {
-            properties.setProperty("SOFT_DEPEND", settings.softDependencies.toString());
+            properties.setProperty("SOFT_DEPEND", settings.getSoftDependencies().toString());
             properties.setProperty("HAS_SOFT_DEPEND", "true");
         }
 
         if (settings.hasAuthors()) {
             // BungeeCord only supports one author
-            properties.setProperty("AUTHOR", settings.authors.get(0));
+            properties.setProperty("AUTHOR", settings.getAuthors().get(0));
             properties.setProperty("HAS_AUTHOR", "true");
         }
 

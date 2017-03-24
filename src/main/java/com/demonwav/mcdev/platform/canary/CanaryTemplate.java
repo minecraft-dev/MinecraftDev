@@ -75,16 +75,16 @@ public class CanaryTemplate extends AbstractTemplate {
         properties.setProperty("MAIN_CLASS", settings.mainClass);
 
         if (settings.hasAuthors()) {
-            properties.setProperty("AUTHOR_LIST", settings.authors.toString());
+            properties.setProperty("AUTHOR_LIST", settings.getAuthors().toString());
             properties.setProperty("HAS_AUTHOR_LIST", "true");
         }
 
-        if (settings.enableEarly) {
+        if (settings.isEnableEarly()) {
             properties.setProperty("ENABLE_EARLY", "true");
         }
 
         if (settings.hasDependencies()) {
-            properties.setProperty("DEPEND", settings.dependencies.toString());
+            properties.setProperty("DEPEND", settings.getDependencies().toString());
             properties.setProperty("HAS_DEPEND", "true");
         }
 

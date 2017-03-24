@@ -173,7 +173,7 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
         pluginNameField.setText(WordUtils.capitalizeFully(creator.getArtifactId()));
         pluginVersionField.setText(creator.getVersion());
 
-        if (settings != null && !settings.isFirst) {
+        if (settings != null && !settings.isFirst()) {
             pluginNameField.setEditable(false);
             pluginVersionField.setEditable(false);
         }
@@ -226,8 +226,8 @@ public class LiteLoaderProjectSettingsWizard extends MinecraftModuleWizardStep {
         settings.pluginVersion = pluginVersionField.getText();
         settings.mainClass = mainClassField.getText();
 
-        settings.mcVersion = (String) minecraftVersionBox.getSelectedItem();
-        settings.mcpVersion = ((McpVersionEntry) mcpVersionBox.getSelectedItem()).getText();
+        settings.setMcVersion((String) minecraftVersionBox.getSelectedItem());
+        settings.setMcpVersion(((McpVersionEntry) mcpVersionBox.getSelectedItem()).getText());
     }
 
     @Override

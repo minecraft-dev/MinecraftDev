@@ -53,7 +53,7 @@ public class BungeeCordProjectSettingsWizard extends MinecraftModuleWizardStep {
         pluginNameField.setText(name);
         pluginVersionField.setText(creator.getVersion());
 
-        if (settings != null && !settings.isFirst) {
+        if (settings != null && !settings.isFirst()) {
             pluginNameField.setEditable(false);
             pluginVersionField.setEditable(false);
         }
@@ -88,7 +88,7 @@ public class BungeeCordProjectSettingsWizard extends MinecraftModuleWizardStep {
         this.settings.setAuthors(this.authorField.getText());
         this.settings.setDependencies(this.dependField.getText());
         this.settings.setSoftDependencies(this.softDependField.getText());
-        this.settings.minecraftVersion = (String) minecraftVersionBox.getSelectedItem();
+        this.settings.setMinecraftVersion((String) minecraftVersionBox.getSelectedItem());
     }
 
     @Override
