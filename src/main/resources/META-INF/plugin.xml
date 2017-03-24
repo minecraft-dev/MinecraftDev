@@ -170,9 +170,6 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.ShadowLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.OverwriteLineMarkerProvider"/>
 
-        <!-- Temporarily disabled, broken ATM. TODO: fix this -> minecrell -->
-        <!--<copyPastePostProcessor order="first" implementation="com.demonwav.mcdev.platform.mixin.editor.MixinCopyPasteReferenceProcessor"/>-->
-
         <customJavadocTagProvider implementation="com.demonwav.mcdev.platform.mixin.MixinCustomJavaDocTagProvider"/>
 
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mixin.debug.MixinRunConfigurationExtension"/>
