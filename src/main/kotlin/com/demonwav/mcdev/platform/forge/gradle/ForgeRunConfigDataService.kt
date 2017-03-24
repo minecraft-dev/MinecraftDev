@@ -48,14 +48,16 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             return
         }
 
-        val (moduleName, sizeText) = runInlineReadAction {
-            hello.inputStream.bufferedReader().use { it.readText() }.split("\n")
-        }
-
-        // Request this file be deleted
-        // We only want to do this action one time
-        runWriteTaskLater {
-            hello.delete(this)
+        val (moduleName, sizeText) = try {
+            runInlineReadAction {
+                hello.inputStream.bufferedReader().use { it.readText() }.split("\n")
+            }
+        } finally {
+            // Request this file be deleted
+            // We only want to do this action one time
+            runWriteTaskLater {
+                hello.delete(this)
+            }
         }
 
         val size = sizeText.toIntOrNull() ?: return
