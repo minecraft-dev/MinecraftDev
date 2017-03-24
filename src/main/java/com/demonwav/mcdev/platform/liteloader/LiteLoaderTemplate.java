@@ -50,7 +50,7 @@ public class LiteLoaderTemplate {
         final Properties properties = new Properties();
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName);
 
-            BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties);
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties);
 
         final Properties gradleProps = new Properties();
         gradleProps .setProperty("VERSION", modVersion);
