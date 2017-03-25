@@ -12,11 +12,13 @@ import org.gradle.api.tasks.AbstractCopyTask
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
+import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 buildscript {
     repositories {
@@ -45,9 +47,14 @@ val kotlinVersion: String by extra
 val downloadIdeaSources: String by extra
 
 val clean: Delete by tasks
+val test: Test by tasks
+val classes by tasks
 val processResources: AbstractCopyTask by tasks
 val runIde: JavaExec by tasks
-val compileKotlin by tasks
+val compileKotlin: KotlinCompile by tasks
+val compileTestKotlin: KotlinCompile by tasks
+val compileJava: JavaCompile by tasks
+val compileGroovy: GroovyCompile by tasks
 
 configurations {
     "jflex"()
@@ -117,13 +124,23 @@ java {
     setTargetCompatibility(javaVersion)
 }
 
-tasks.withType<JavaCompile> {
+compileJava {
     options.encoding = "UTF-8"
 }
 
-tasks.withType<KotlinCompile> {
+// This group of config lets Groovy see Kotlin code
+compileKotlin {
+    setDependsOn(taskDependencies.getDependencies(this) - compileJava)
     kotlinOptions.jvmTarget = javaVersion
 }
+compileTestKotlin.kotlinOptions.jvmTarget = javaVersion
+
+compileGroovy {
+    dependsOn(compileKotlin, compileJava)
+    classpath += files(compileKotlin.destinationDir, compileJava.destinationDir)
+}
+
+classes.dependsOn(compileGroovy)
 
 processResources {
     for (lang in arrayOf("", "_en")) {
@@ -133,7 +150,7 @@ processResources {
     }
 }
 
-tasks.withType<Test> {
+test {
     if (CI) {
         systemProperty("slowCI", "true")
     }
@@ -219,6 +236,7 @@ java().sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 
 // Workaround for KT-16764
 compileKotlin.inputs.dir(generate)
+compileKotlin.dependsOn(generate)
 
 runIde {
     findProperty("intellijJre")?.let(this::setExecutable)
