@@ -35,7 +35,6 @@ class McpModuleSettings : PersistentStateComponent<McpModuleSettings.State> {
     }
 
     companion object {
-        @JvmStatic
         fun getInstance(module: Module): McpModuleSettings {
             // TODO: Migrate these to the facet's settings
 

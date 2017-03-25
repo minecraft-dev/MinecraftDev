@@ -31,7 +31,7 @@ class ForgeVersion private constructor() {
     fun getRecommended(versions: List<String>): String? {
         var recommended = "1.7"
         for (version in versions) {
-            val promo = getPromo(version) ?: continue
+            getPromo(version) ?: continue
 
             if (recommended < version) {
                 recommended = version

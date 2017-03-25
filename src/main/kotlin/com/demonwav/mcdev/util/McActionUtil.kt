@@ -8,7 +8,6 @@
  * MIT License
  */
 
-@file:JvmName("McActionUtil")
 package com.demonwav.mcdev.util
 
 import com.demonwav.mcdev.facet.MinecraftFacet

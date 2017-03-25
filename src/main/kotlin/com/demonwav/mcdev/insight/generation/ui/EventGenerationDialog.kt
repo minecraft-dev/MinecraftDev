@@ -38,7 +38,7 @@ class EventGenerationDialog(editor: Editor,
         super.doOKAction()
     }
 
-    override fun createCenterPanel() = wizard.panel!!
+    override fun createCenterPanel() = wizard.panel
 
     override fun doValidate(): ValidationInfo? {
         return panel.doValidate()

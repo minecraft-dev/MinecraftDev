@@ -8,7 +8,6 @@
  * MIT License
  */
 
-@file:JvmName("McPsiClass")
 package com.demonwav.mcdev.util
 
 import com.intellij.navigation.AnonymousElementProvider
@@ -105,7 +104,6 @@ fun findQualifiedClass(fullQualifiedName: String, context: PsiElement): PsiClass
 }
 
 @Contract(pure = true)
-@JvmOverloads
 fun findQualifiedClass(project: Project, fullQualifiedName: String,
                                 scope: GlobalSearchScope = GlobalSearchScope.allScope(project)): PsiClass? {
     var innerPos = fullQualifiedName.indexOf('$')

@@ -23,7 +23,6 @@ import java.util.Properties
 
 object BaseTemplate {
 
-    @JvmStatic
     fun applyBuildGradleTemplate(project: Project,
                                  file: VirtualFile,
                                  groupId: String,
@@ -49,7 +48,6 @@ object BaseTemplate {
         return null
     }
 
-    @JvmStatic
     fun applyMultiModuleBuildGradleTemplate(project: Project,
                                             file: VirtualFile,
                                             prop: VirtualFile,
@@ -72,7 +70,6 @@ object BaseTemplate {
 
     }
 
-    @JvmStatic
     fun applyGradlePropertiesTemplate(project: Project,
                                       file: VirtualFile,
                                       groupId: String,
@@ -98,7 +95,6 @@ object BaseTemplate {
 
     }
 
-    @JvmStatic
     fun applySettingsGradleTemplate(project: Project,
                                     file: VirtualFile,
                                     projectName: String,
@@ -116,7 +112,6 @@ object BaseTemplate {
 
     }
 
-    @JvmStatic
     fun applySubmoduleBuildGradleTemplate(project: Project,
                                           commonProjectName: String): String? {
 
@@ -135,8 +130,6 @@ object BaseTemplate {
         return null
     }
 
-    @JvmStatic
-    @JvmOverloads
     fun applyTemplate(project: Project, file: VirtualFile, templateName: String, properties: Properties, trimNewlines: Boolean = false) {
 
         val manager = FileTemplateManager.getInstance(project)

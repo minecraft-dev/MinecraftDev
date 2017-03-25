@@ -77,7 +77,6 @@ abstract class BuildSystem {
      */
     abstract fun finishSetup(rootModule: Module, configurations: Collection<ProjectConfiguration>, indicator: ProgressIndicator)
 
-    @JvmOverloads
     fun createDirectories(dir: VirtualFile = rootDirectory) {
         sourceDirectory = VfsUtil.createDirectories(dir.path + "/src/main/java")
         resourceDirectory = VfsUtil.createDirectories(dir.path + "/src/main/resources")

@@ -37,11 +37,6 @@ import javax.swing.Icon
  * A [LineMarkerProviderDescriptor] that will provide a line marker info icon
  * in the gutter for annotated event listeners. This is intended to be written to be
  * platform independent of which Minecraft Platform API is being used.
-
- * It is unknown whether other JVM languages will function, but there shouldn't be anything
- * broken here.
-
- * @author gabizou
  */
 class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
 

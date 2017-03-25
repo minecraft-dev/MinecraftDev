@@ -12,5 +12,4 @@ package com.demonwav.mcdev.platform.forge.framework
 
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-@JvmField
 val FORGE_LIBRARY_KIND: LibraryKind = LibraryKind.create("forge-library")

@@ -58,8 +58,7 @@ val PsiElement.eventListener: Pair<PsiClass, PsiMethod>?
         // Get the type of the parameter so we can start resolving it
         val psiEventElement = psiParameter.typeElement ?: return null
         val type = psiEventElement.type as? PsiClassReferenceType ?: return null
-        // Validate that it is a class reference type, I don't know if this will work with
-        // other JVM languages such as Kotlin or Scala, but it might!
+        // Validate that it is a class reference type
         // And again, make sure that we can at least resolve the type, otherwise it's not a valid
         // class reference.
         val resolve = type.resolve() ?: return null

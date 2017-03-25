@@ -45,7 +45,6 @@ class IsCancelled(val buildFix: InspectionGadgetsFix, val errorString: String) {
     }
 
     companion object {
-        @JvmStatic
         fun builder(): IsCancelledBuilder {
             return IsCancelledBuilder()
         }

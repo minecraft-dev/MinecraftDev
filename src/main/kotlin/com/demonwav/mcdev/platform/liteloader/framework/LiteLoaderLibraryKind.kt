@@ -12,5 +12,4 @@ package com.demonwav.mcdev.platform.liteloader.framework
 
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-@JvmField
 val LITELOADER_LIBRARY_KIND: LibraryKind = LibraryKind.create("liteloader-library")

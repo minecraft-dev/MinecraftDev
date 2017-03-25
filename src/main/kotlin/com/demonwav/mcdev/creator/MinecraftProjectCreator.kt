@@ -230,6 +230,7 @@ class MinecraftProjectCreator {
                     buildDependency.artifactId = "NeptuneLib"
                     buildDependency.version = configuration.canaryVersion
                 }
+                else -> {}
             }
             buildDependency.scope = "provided"
         }

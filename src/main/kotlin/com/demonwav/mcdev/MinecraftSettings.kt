@@ -98,7 +98,6 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
     }
 
     companion object {
-        @JvmStatic
         val instance: MinecraftSettings
             get() = ServiceManager.getService(MinecraftSettings::class.java)
     }

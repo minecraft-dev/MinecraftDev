@@ -12,5 +12,4 @@ package com.demonwav.mcdev.platform.mcp.framework
 
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-@JvmField
 val MCP_LIBRARY_KIND: LibraryKind = LibraryKind.create("mcp-library")

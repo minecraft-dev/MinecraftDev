@@ -16,7 +16,6 @@ import com.intellij.psi.PsiElement
 
 object AtMemberReference {
 
-    @JvmStatic
     fun get(entry: AtEntry, member: PsiElement): MemberReference? {
         val memberText = member.text
 

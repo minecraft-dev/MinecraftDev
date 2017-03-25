@@ -8,7 +8,6 @@
  * MIT License
  */
 
-@file:JvmName("Util")
 package com.demonwav.mcdev.util
 
 import com.intellij.openapi.application.ApplicationManager

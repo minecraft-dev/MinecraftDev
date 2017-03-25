@@ -202,17 +202,13 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     }
 
     companion object {
-        @JvmField
         val ID = FacetTypeId<MinecraftFacet>(TYPE_ID)
 
-        @JvmStatic
         val facetType
             get() = FacetTypeRegistry.getInstance().findFacetType(ID) as MinecraftFacetType
 
-        @JvmStatic
         fun getInstance(module: Module) = FacetManager.getInstance(module).getFacetByType(ID)
 
-        @JvmStatic
         fun getChildInstances(module: Module): Set<MinecraftFacet> {
             runInlineReadAction {
                 val instance = getInstance(module)
@@ -238,11 +234,9 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
             }
         }
 
-        @JvmStatic
         fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>) = getInstance(module)?.getModuleOfType(type)
 
-        @JvmStatic
-        fun <T : AbstractModule> getInstance(module: Module, vararg types: AbstractModuleType<out T>): T? {
+        fun <T : AbstractModule> getInstance(module: Module, vararg types: AbstractModuleType<T>): T? {
             val instance = getInstance(module) ?: return null
             return types.mapFirstNotNull { instance.getModuleOfType(it) } as? T
         }

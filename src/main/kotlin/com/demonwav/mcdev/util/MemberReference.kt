@@ -56,7 +56,6 @@ data class MemberReference(val name: String, val descriptor: String? = null,
         return resolve(project, scope, ::Pair)
     }
 
-    @JvmOverloads
     fun resolveMember(project: Project, scope: GlobalSearchScope = GlobalSearchScope.allScope(project)): PsiMember? {
         return resolve(project, scope) { _, member -> member }
     }

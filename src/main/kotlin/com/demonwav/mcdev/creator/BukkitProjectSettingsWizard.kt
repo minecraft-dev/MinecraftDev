@@ -77,6 +77,7 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
                 title.text = "<html><font size=\"5\">Paper Settings</font></html>"
                 settings!!.type = PlatformType.PAPER
             }
+            else -> {}
         }
 
         return panel

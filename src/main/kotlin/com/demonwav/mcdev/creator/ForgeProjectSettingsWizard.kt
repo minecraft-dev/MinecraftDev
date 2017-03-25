@@ -123,7 +123,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         val version = version ?: return
 
         forgeVersionBox.removeAllItems()
-        val versions = forgeVersion!!.getForgeVersions(version) ?: return
+        val versions = forgeVersion!!.getForgeVersions(version)
 
         versions.stream().sorted { one, two -> one.compareTo(two) * -1 }.forEach { forgeVersionBox.addItem(it) }
 

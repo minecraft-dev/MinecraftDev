@@ -8,7 +8,6 @@
  * MIT License
  */
 
-@file:JvmName("PsiBytecodeUtil")
 package com.demonwav.mcdev.util
 
 import com.intellij.openapi.project.Project

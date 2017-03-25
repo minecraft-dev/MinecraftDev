@@ -8,7 +8,6 @@
  * MIT License
  */
 
-@file:JvmName("McEditorUtil")
 package com.demonwav.mcdev.util
 
 import com.intellij.ide.util.EditSourceUtil

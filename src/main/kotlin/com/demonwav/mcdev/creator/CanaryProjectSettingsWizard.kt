@@ -64,6 +64,7 @@ class CanaryProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
                 title.icon = PlatformAssets.NEPTUNE_ICON_2X
                 title.text = "<html><font size=\"5\">Neptune Settings</font></html>"
             }
+            else -> {}
         }
 
         return panel
