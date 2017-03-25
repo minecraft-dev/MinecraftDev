@@ -9,7 +9,6 @@
  */
 
 import org.gradle.api.tasks.AbstractCopyTask
-import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
@@ -51,13 +50,15 @@ val test: Test by tasks
 val runIde: JavaExec by tasks
 
 configurations {
+    "kotlin"()
+    "compileOnly" { extendsFrom("kotlin"()) }
+    "testCompile" { extendsFrom("kotlin"()) }
+
     "gradle-tooling-extension"()
     "jflex"()
     "jflex-skeleton"()
     "grammar-kit"()
-    "testLibs" {
-        isTransitive = false
-    }
+    "testLibs" { isTransitive = false }
 }
 
 repositories {
@@ -90,10 +91,10 @@ val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
 }
 
 dependencies {
-    compile(kotlinModule("stdlib-jre8")) {
-        // JetBrains annotations are already bundled with IntelliJ IDEA
-        exclude(group = "org.jetbrains", module = "annotations")
-    }
+    "kotlin"(kotlinModule("runtime")) { isTransitive = false }
+    "kotlin"(kotlinModule("stdlib")) { isTransitive = false }
+    compile(kotlinModule("stdlib-jre7")) { isTransitive = false }
+    compile(kotlinModule("stdlib-jre8")) { isTransitive = false }
 
     // Add tools.jar for the JDI API
     compile(files(Jvm.current().toolsJar))
@@ -113,15 +114,6 @@ dependencies {
         "version" to ideaVersion,
         "configuration" to "compile"
     ))
-
-    // Add an additional dependency on kotlin-runtime. It is essentially useless
-    // (since kotlin-runtime is a transitive dependency of kotlin-stdlib-jre8)
-    // but without kotlin-stdlib or kotlin-runtime on the classpath,
-    // gradle-intellij-plugin will add IntelliJ IDEA's Kotlin version to the
-    // dependencies which conflicts with our newer version.
-    compile(kotlinModule("runtime")) {
-        isTransitive = false
-    }
 
     "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
     "jflex-skeleton"("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
