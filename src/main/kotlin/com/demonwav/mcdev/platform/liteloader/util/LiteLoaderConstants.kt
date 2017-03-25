@@ -8,7 +8,8 @@
  * MIT License
  */
 
-@file:JvmName("LiteLoaderConstants")
 package com.demonwav.mcdev.platform.liteloader.util
 
-const val LITEMOD_JSON = "litemod.json"
+object LiteLoaderConstants {
+    const val LITEMOD_JSON = "litemod.json"
+}
