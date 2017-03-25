@@ -592,7 +592,7 @@
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
-        <projectResolve implementation="com.demonwav.mcdev.buildsystem.gradle.MinecraftProjectResolverExtension"/>
+        <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
     </extensions>
 
     <application-components>

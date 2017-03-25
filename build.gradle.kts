@@ -12,7 +12,7 @@ import org.gradle.api.tasks.AbstractCopyTask
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.compile.GroovyCompile
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
@@ -45,17 +45,13 @@ val javaVersion: String by extra
 val kotlinVersion: String by extra
 val downloadIdeaSources: String by extra
 
-val clean: Delete by tasks
-val test: Test by tasks
-val classes by tasks
+val compileKotlin by tasks
 val processResources: AbstractCopyTask by tasks
+val test: Test by tasks
 val runIde: JavaExec by tasks
-val compileKotlin: KotlinCompile by tasks
-val compileTestKotlin: KotlinCompile by tasks
-val compileJava: JavaCompile by tasks
-val compileGroovy: GroovyCompile by tasks
 
 configurations {
+    "gradle-tooling-extension"()
     "jflex"()
     "jflex-skeleton"()
     "grammar-kit"()
@@ -76,6 +72,23 @@ repositories {
     }
 }
 
+java {
+    setSourceCompatibility(javaVersion)
+    setTargetCompatibility(javaVersion)
+
+    sourceSets {
+        "gradle-tooling-extension" {
+            configurations[compileOnlyConfigurationName].extendsFrom(configurations["gradle-tooling-extension"])
+        }
+    }
+}
+
+val gradleToolingExtension = java().sourceSets["gradle-tooling-extension"]
+val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
+    from(gradleToolingExtension.output)
+    classifier = "gradle-tooling-extension"
+}
+
 dependencies {
     compile(kotlinModule("stdlib-jre8")) {
         // JetBrains annotations are already bundled with IntelliJ IDEA
@@ -84,6 +97,22 @@ dependencies {
 
     // Add tools.jar for the JDI API
     compile(files(Jvm.current().toolsJar))
+
+    compile(files(gradleToolingExtensionJar))
+
+    // TODO: Replace with idea configuration (https://github.com/JetBrains/gradle-intellij-plugin/pull/185)
+    "gradle-tooling-extension"(mapOf(
+        "group" to "com.jetbrains",
+        "name" to "ideaIC",
+        "version" to ideaVersion,
+        "configuration" to "compile"
+    ))
+    "gradle-tooling-extension"(mapOf(
+        "group" to "org.jetbrains.plugins",
+        "name" to "gradle",
+        "version" to ideaVersion,
+        "configuration" to "compile"
+    ))
 
     // Add an additional dependency on kotlin-runtime. It is essentially useless
     // (since kotlin-runtime is a transitive dependency of kotlin-stdlib-jre8)
@@ -118,28 +147,13 @@ intellij {
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
-java {
-    setSourceCompatibility(javaVersion)
-    setTargetCompatibility(javaVersion)
-}
-
-compileJava {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
-// This group of config lets Groovy see Kotlin code
-compileKotlin {
-    setDependsOn(taskDependencies.getDependencies(this) - compileJava)
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = javaVersion
 }
-compileTestKotlin.kotlinOptions.jvmTarget = javaVersion
-
-compileGroovy {
-    dependsOn(compileKotlin, compileJava)
-    classpath += files(compileKotlin.destinationDir, compileJava.destinationDir)
-}
-
-classes.dependsOn(compileGroovy)
 
 processResources {
     for (lang in arrayOf("", "_en")) {
@@ -235,7 +249,6 @@ java().sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 
 // Workaround for KT-16764
 compileKotlin.inputs.dir(generate)
-compileKotlin.dependsOn(generate)
 
 runIde {
     findProperty("intellijJre")?.let(this::setExecutable)
