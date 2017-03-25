@@ -21,7 +21,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import java.util.jar.Attributes.Name.IMPLEMENTATION_TITLE
 import java.util.jar.Attributes.Name.IMPLEMENTATION_VERSION
 
-abstract class ManifestLibraryPresentationProvider(kind: LibraryKind, private val title: String)
+abstract class ManifestLibraryPresentationProvider(kind: LibraryKind, private val title: String, private val startsWith: Boolean = false)
     : LibraryPresentationProvider<LibraryVersionProperties>(kind) {
 
     override final fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
@@ -29,8 +29,14 @@ abstract class ManifestLibraryPresentationProvider(kind: LibraryKind, private va
             val manifest = classesRoot.manifest ?: continue
 
             val title = manifest[IMPLEMENTATION_TITLE] ?: continue
-            if (title != this.title) {
-                continue
+            if (startsWith) {
+                if (!title.startsWith(this.title)) {
+                    continue
+                }
+            } else {
+                if (title != this.title) {
+                    continue
+                }
             }
 
             val version = manifest[IMPLEMENTATION_VERSION] ?: continue

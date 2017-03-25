@@ -14,6 +14,6 @@ import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.facet.ManifestLibraryPresentationProvider
 import com.intellij.framework.library.LibraryVersionProperties
 
-class LiteLoaderPresentationProvider : ManifestLibraryPresentationProvider(LITELOADER_LIBRARY_KIND, "LiteLoader") {
+class LiteLoaderPresentationProvider : ManifestLibraryPresentationProvider(LITELOADER_LIBRARY_KIND, "LiteLoader", true) {
     override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.LITELOADER_ICON
 }

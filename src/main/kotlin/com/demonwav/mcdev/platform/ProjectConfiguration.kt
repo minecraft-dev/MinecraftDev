@@ -59,7 +59,7 @@ abstract class ProjectConfiguration {
 
     protected fun getMainClassDirectory(files: Array<String>, file: VirtualFile): VirtualFile {
         var movingFile = file
-        for (i in 0 until files.size) {
+        for (i in 0 until (files.size - 1)) {
             val s = files[i]
             val temp = movingFile.findChild(s)
             if (temp != null && temp.isDirectory) {

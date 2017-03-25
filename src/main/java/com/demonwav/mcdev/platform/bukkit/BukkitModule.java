@@ -44,7 +44,6 @@ import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTypesUtil;
 import java.util.Arrays;
-import javax.swing.Icon;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -77,11 +76,7 @@ public class BukkitModule<T extends AbstractModuleType<?>> extends AbstractModul
         return pluginYml;
     }
 
-    @Override
-    public Icon getIcon() {
-        return type.getType().getIcon();
-    }
-
+    @NotNull
     @Override
     public T getModuleType() {
         return moduleType;
@@ -91,6 +86,7 @@ public class BukkitModule<T extends AbstractModuleType<?>> extends AbstractModul
         this.moduleType = moduleType;
     }
 
+    @NotNull
     @Override
     public PlatformType getType() {
         return type;
@@ -110,8 +106,9 @@ public class BukkitModule<T extends AbstractModuleType<?>> extends AbstractModul
         return true;
     }
 
+    @NotNull
     @Override
-    public String writeErrorMessageForEventParameter(PsiClass eventClass, PsiMethod method) {
+    public String writeErrorMessageForEventParameter(@NotNull PsiClass eventClass, @NotNull PsiMethod method) {
         return "Parameter is not a subclass of org.bukkit.event.Event\n" +
                 "Compiling and running this listener may result in a runtime exception";
     }

@@ -407,7 +407,7 @@ class GradleBuildSystem : BuildSystem() {
             BaseTemplate.applySettingsGradleTemplate(project, settingsGradle, artifactId.toLowerCase(), includes)
 
             // Common will be empty, it's for the developers to fill in with common classes
-            val common = rootDirectory.createChildData(this, artifactId.toLowerCase() + "-common")
+            val common = rootDirectory.createChildDirectory(this, artifactId.toLowerCase() + "-common")
             createDirectories(common)
         }
 
