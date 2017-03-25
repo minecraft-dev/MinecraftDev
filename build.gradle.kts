@@ -18,7 +18,6 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
-import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 buildscript {
     repositories {
