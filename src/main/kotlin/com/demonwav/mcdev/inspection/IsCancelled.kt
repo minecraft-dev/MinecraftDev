@@ -21,9 +21,9 @@ class IsCancelled(val buildFix: InspectionGadgetsFix, val errorString: String) {
         private var fix: InspectionGadgetsFix? = null
         private var errorString: String? = null
 
-        fun setFix(fix: DoFix): IsCancelledBuilder {
+        fun setFix(fix: (ProblemDescriptor) -> Unit): IsCancelledBuilder {
             this.fix = object : InspectionGadgetsFix() {
-                override fun doFix(project: Project, descriptor: ProblemDescriptor) = fix.doFix(descriptor)
+                override fun doFix(project: Project, descriptor: ProblemDescriptor) = fix(descriptor)
 
                 @Nls
                 override fun getName() = "Simplify"
@@ -42,10 +42,6 @@ class IsCancelled(val buildFix: InspectionGadgetsFix, val errorString: String) {
         fun build(): IsCancelled {
             return IsCancelled(fix!!, errorString!!)
         }
-    }
-
-    interface DoFix {
-        fun doFix(descriptor: ProblemDescriptor)
     }
 
     companion object {
