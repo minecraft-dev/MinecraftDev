@@ -65,7 +65,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
 
         minecraftVersionBox.addActionListener {
             if (mcpVersion != null) {
-                mcpVersion!!.setMcpVersion(mcpVersionBox, version, mcpBoxActionListener)
+                mcpVersion!!.setMcpVersion(mcpVersionBox, version!!, mcpBoxActionListener)
             }
             setForgeVersion()
         }
@@ -234,7 +234,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
             }
 
             if (mcpVersion != null) {
-                mcpVersion!!.setMcpVersion(mcpVersionBox, version, mcpBoxActionListener)
+                mcpVersion!!.setMcpVersion(mcpVersionBox, version!!, mcpBoxActionListener)
             }
 
             if (forgeVersion == null) {
