@@ -8,17 +8,16 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.buildsystem.gradle
+package com.demonwav.mcdev.platform.mcp.gradle
 
 import com.demonwav.mcdev.platform.mcp.McpModuleSettings
-import com.demonwav.mcdev.platform.mcp.gradle.McpModel
-import com.demonwav.mcdev.platform.mcp.gradle.McpModelData
+import com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModel
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ModuleData
 import org.gradle.tooling.model.idea.IdeaModule
 import org.jetbrains.plugins.gradle.service.project.AbstractProjectResolverExtension
 
-class MinecraftProjectResolverExtension : AbstractProjectResolverExtension() {
+class McpProjectResolverExtension : AbstractProjectResolverExtension() {
 
     // Register our custom Gradle tooling API model in IntelliJ's project resolver
     override fun getExtraProjectModelClasses(): Set<Class<out Any>> = setOf(McpModel::class.java)

@@ -8,7 +8,7 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mcp.gradle
+package com.demonwav.mcdev.platform.mcp.gradle.tooling
 
 import org.gradle.api.Project
 import org.jetbrains.annotations.NotNull

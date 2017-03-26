@@ -9,10 +9,9 @@
  */
 
 import org.gradle.api.tasks.AbstractCopyTask
-import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.compile.GroovyCompile
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
@@ -45,23 +44,21 @@ val javaVersion: String by extra
 val kotlinVersion: String by extra
 val downloadIdeaSources: String by extra
 
-val clean: Delete by tasks
-val test: Test by tasks
-val classes by tasks
+val compileKotlin by tasks
 val processResources: AbstractCopyTask by tasks
+val test: Test by tasks
 val runIde: JavaExec by tasks
-val compileKotlin: KotlinCompile by tasks
-val compileTestKotlin: KotlinCompile by tasks
-val compileJava: JavaCompile by tasks
-val compileGroovy: GroovyCompile by tasks
 
 configurations {
+    "kotlin"()
+    "compileOnly" { extendsFrom("kotlin"()) }
+    "testCompile" { extendsFrom("kotlin"()) }
+
+    "gradle-tooling-extension"()
     "jflex"()
     "jflex-skeleton"()
     "grammar-kit"()
-    "testLibs" {
-        isTransitive = false
-    }
+    "testLibs" { isTransitive = false }
 }
 
 repositories {
@@ -76,23 +73,47 @@ repositories {
     }
 }
 
-dependencies {
-    compile(kotlinModule("stdlib-jre8")) {
-        // JetBrains annotations are already bundled with IntelliJ IDEA
-        exclude(group = "org.jetbrains", module = "annotations")
+java {
+    setSourceCompatibility(javaVersion)
+    setTargetCompatibility(javaVersion)
+
+    sourceSets {
+        "gradle-tooling-extension" {
+            configurations[compileOnlyConfigurationName].extendsFrom(configurations["gradle-tooling-extension"])
+        }
     }
+}
+
+val gradleToolingExtension = java().sourceSets["gradle-tooling-extension"]
+val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
+    from(gradleToolingExtension.output)
+    classifier = "gradle-tooling-extension"
+}
+
+dependencies {
+    "kotlin"(kotlinModule("runtime")) { isTransitive = false }
+    "kotlin"(kotlinModule("stdlib")) { isTransitive = false }
+    compile(kotlinModule("stdlib-jre7")) { isTransitive = false }
+    compile(kotlinModule("stdlib-jre8")) { isTransitive = false }
 
     // Add tools.jar for the JDI API
     compile(files(Jvm.current().toolsJar))
 
-    // Add an additional dependency on kotlin-runtime. It is essentially useless
-    // (since kotlin-runtime is a transitive dependency of kotlin-stdlib-jre8)
-    // but without kotlin-stdlib or kotlin-runtime on the classpath,
-    // gradle-intellij-plugin will add IntelliJ IDEA's Kotlin version to the
-    // dependencies which conflicts with our newer version.
-    compile(kotlinModule("runtime")) {
-        isTransitive = false
-    }
+    compile(files(gradleToolingExtensionJar))
+
+    // TODO: Replace with idea configuration (https://github.com/JetBrains/gradle-intellij-plugin/pull/185)
+    "gradle-tooling-extension"(mapOf(
+        "group" to "com.jetbrains",
+        "name" to "ideaIC",
+        "version" to ideaVersion,
+        "configuration" to "compile"
+    ))
+    "gradle-tooling-extension"(mapOf(
+        "group" to "org.jetbrains.plugins",
+        "name" to "gradle",
+        "version" to ideaVersion,
+        "configuration" to "compile"
+    ))
 
     "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
     "jflex-skeleton"("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
@@ -118,28 +139,13 @@ intellij {
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
-java {
-    setSourceCompatibility(javaVersion)
-    setTargetCompatibility(javaVersion)
-}
-
-compileJava {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
-// This group of config lets Groovy see Kotlin code
-compileKotlin {
-    setDependsOn(taskDependencies.getDependencies(this) - compileJava)
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = javaVersion
 }
-compileTestKotlin.kotlinOptions.jvmTarget = javaVersion
-
-compileGroovy {
-    dependsOn(compileKotlin, compileJava)
-    classpath += files(compileKotlin.destinationDir, compileJava.destinationDir)
-}
-
-classes.dependsOn(compileGroovy)
 
 processResources {
     for (lang in arrayOf("", "_en")) {
@@ -235,7 +241,6 @@ java().sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 
 // Workaround for KT-16764
 compileKotlin.inputs.dir(generate)
-compileKotlin.dependsOn(generate)
 
 runIde {
     findProperty("intellijJre")?.let(this::setExecutable)
