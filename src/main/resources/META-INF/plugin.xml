@@ -129,7 +129,6 @@
         <!--region MCP-->
         <!---->
 
-        <!-- External Project Data Services are for Gradle project imports -->
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.mcp.framework.McpPresentationProvider" />

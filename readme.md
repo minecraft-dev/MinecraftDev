@@ -1,6 +1,6 @@
-<p align="center"><a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.min.svg" height="120"></img></a></p>
+<p align="center"><a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.svg" height="120"></img></a></p>
 
-Minecraft Development for IntelliJ [![forthebadge](http://forthebadge.com/images/badges/made-with-crayons.svg)](http://forthebadge.com)
+Minecraft Development for IntelliJ
 ==================================
 
 |  Service   |Status|
