@@ -35,9 +35,9 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
 
     private val creator = MinecraftProjectCreator()
 
-    override fun getPresentableName() = "Minecraft Plugin"
+    override fun getPresentableName() = "Minecraft"
     override fun getNodeIcon() = PlatformAssets.MINECRAFT_ICON
-    override fun getGroupName() = "Minecraft Plugin"
+    override fun getGroupName() = "Minecraft"
     override fun getWeight() = JavaModuleBuilder.BUILD_SYSTEM_WEIGHT - 1
     override fun getBuilderId() = "MINECRAFT_MODULE"
     override fun isSuitableSdkType(sdk: SdkTypeId?) = sdk === JavaSdk.getInstance()
@@ -87,7 +87,7 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
     }
 
     override fun getModuleType(): ModuleType<*> = JavaModuleType.getModuleType()
-    override fun getParentGroup() = "Minecraft Project"
+    override fun getParentGroup() = "Minecraft"
 
     override fun createWizardSteps(wizardContext: WizardContext, modulesProvider: ModulesProvider): Array<ModuleWizardStep> {
         return arrayOf(
