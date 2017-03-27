@@ -37,8 +37,6 @@ import org.jetbrains.annotations.Contract
 import org.jetbrains.jps.model.java.JavaResourceRootType
 import org.jetbrains.jps.model.java.JavaSourceRootType
 import java.util.concurrent.ConcurrentHashMap
-import java.util.stream.Collectors
-import java.util.stream.Stream
 import javax.swing.Icon
 
 class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacetConfiguration, underlyingFacet: Facet<*>?) :
@@ -67,28 +65,28 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         // Don't allow parent types with child types in auto detected set
         configuration.state.autoDetectTypes = PlatformType.removeParents(configuration.state.autoDetectTypes)
 
-        val userEnabled = configuration.state.userChosenTypes.entries.stream()
+        val userEnabled = configuration.state.userChosenTypes.entries.asSequence()
             .filter { it.value }
             .map { it.key }
 
-        val autoEnabled = configuration.state.autoDetectTypes.stream()
-            .filter { configuration.state.userChosenTypes[it] == null }
+        val autoEnabled = configuration.state.autoDetectTypes.asSequence()
+            .filter { configuration.state.userChosenTypes[it] != null }
 
-        val allEnabled = Stream.concat(userEnabled, autoEnabled).collect(Collectors.toSet())
+        val allEnabled = userEnabled + autoEnabled
 
         // Remove modules that aren't registered anymore
-        val toBeRemoved = modules.entries.stream()
+        val toBeRemoved = modules.entries.asSequence()
             .filter { !allEnabled.contains(it.key.platformType) }
-            .peek { it.value.dispose() }
+            .onEach { it.value.dispose() }
             .map { it.key }
-            .collect(Collectors.toSet())
+            .toHashSet() // CME defense
         toBeRemoved.forEach { modules.remove(it) }
 
         // Do this before we register the new modules
         updateRoots()
 
         // Add modules which are new
-        allEnabled.stream()
+        allEnabled
             .map { it.type }
             .filter { !modules.containsKey(it) }
             .forEach { register(it) }
