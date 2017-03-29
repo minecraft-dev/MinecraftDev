@@ -12,6 +12,8 @@ package com.demonwav.mcdev.platform.mixin.inspection.injector
 
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.isErasureEquivalentTo
+import com.intellij.psi.PsiArrayType
+import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiParameter
 
 data class ParameterGroup(val parameters: List<Parameter>?,
@@ -20,9 +22,6 @@ data class ParameterGroup(val parameters: List<Parameter>?,
 
     val size
         get() = this.parameters?.size ?: 0
-
-    val wildcard
-        get() = this.parameters == null
 
     fun match(parameters: Array<PsiParameter>, currentPosition: Int): Boolean {
         if (this.parameters == null) {
@@ -39,8 +38,12 @@ data class ParameterGroup(val parameters: List<Parameter>?,
 
         // Check parameter types
         for ((_, type) in this.parameters) {
-            if (!type.isErasureEquivalentTo(parameters[pos++].type)) {
-                return false
+            val expectedType = parameters[pos++].type
+            if (!type.isErasureEquivalentTo(expectedType)) {
+                // Allow using array instead of varargs
+                if (expectedType !is PsiEllipsisType || type !is PsiArrayType || type != expectedType.toArrayType()) {
+                    return false
+                }
             }
         }
 
