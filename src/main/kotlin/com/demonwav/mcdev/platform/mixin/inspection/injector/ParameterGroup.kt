@@ -37,8 +37,8 @@ data class ParameterGroup(val parameters: List<Parameter>?,
         var pos = currentPosition
 
         // Check parameter types
-        for ((_, type) in this.parameters) {
-            val expectedType = parameters[pos++].type
+        for ((_, expectedType) in this.parameters) {
+            val type = parameters[pos++].type
             if (!type.isErasureEquivalentTo(expectedType)) {
                 // Allow using array instead of varargs
                 if (expectedType !is PsiEllipsisType || type !is PsiArrayType || type != expectedType.toArrayType()) {
