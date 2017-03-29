@@ -37,10 +37,7 @@ object MixinMemberReference {
 
     /**
      * Parses a [MemberReference] based on the specifications of Mixin's
-     * MemberInfo. Unlike the parser integrated into Mixin, this method
-     * more strict: The specified [String] must strictly match one of
-     * the formats, so it should either use the dot separate full qualified
-     * class name OR the internal class descriptor.
+     * MemberInfo.
      */
     @Contract(value = "null -> null", pure = true)
     fun parse(reference: String?): MemberReference? {
@@ -50,11 +47,7 @@ object MixinMemberReference {
         var pos = reference.lastIndexOf('.')
         if (pos != -1) {
             // Everything before the dot is the qualifier/owner
-            owner = reference.substring(0, pos)
-            if (owner.contains('/')) {
-                // Invalid: Qualifier should only contain dots
-                return null
-            }
+            owner = reference.substring(0, pos).replace('/', '.')
         } else {
             pos = reference.indexOf(';')
             if (pos != -1 && reference.startsWith('L')) {
