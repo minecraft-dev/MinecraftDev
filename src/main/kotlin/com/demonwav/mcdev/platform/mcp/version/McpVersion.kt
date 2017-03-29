@@ -46,9 +46,9 @@ class McpVersion private constructor() {
             val versions = map[key]
             if (versions != null) {
                 if (key == version) {
-                    good.addAll(versions[type]!!)
+                    good.addAll(versions[type]!!.map(Int::toInt))
                 } else {
-                    bad.addAll(versions[type]!!)
+                    bad.addAll(versions[type]!!.map(Int::toInt))
                 }
             }
         }

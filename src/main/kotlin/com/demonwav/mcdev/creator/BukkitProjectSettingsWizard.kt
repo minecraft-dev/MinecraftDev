@@ -37,6 +37,7 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     private lateinit var softDependField: JTextField
     private lateinit var title: JLabel
     private lateinit var minecraftVersionBox: JComboBox<String>
+    private lateinit var errorLabel: JLabel
 
     private var settings: BukkitProjectConfiguration? = null
 
@@ -65,20 +66,21 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             PlatformType.BUKKIT -> {
                 title.icon = PlatformAssets.BUKKIT_ICON_2X
                 title.text = "<html><font size=\"5\">Bukkit Settings</font></html>"
-                settings!!.type = PlatformType.BUKKIT
             }
             PlatformType.SPIGOT -> {
                 title.icon = PlatformAssets.SPIGOT_ICON_2X
                 title.text = "<html><font size=\"5\">Spigot Settings</font></html>"
-                settings!!.type = PlatformType.SPIGOT
             }
             PlatformType.PAPER -> {
                 title.icon = PlatformAssets.PAPER_ICON_2X
                 title.text = "<html><font size=\"5\">Paper Settings</font></html>"
-                settings!!.type = PlatformType.PAPER
             }
             else -> {}
         }
+
+        getVersionSelector(settings!!.type)
+            .done { it.set(minecraftVersionBox) }
+            .rejected { errorLabel.isVisible = true }
 
         return panel
     }
@@ -89,7 +91,8 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun validate(): Boolean {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern)
+        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) &&
+            minecraftVersionBox.selectedItem != null
     }
 
     override fun onStepLeaving() {
@@ -104,7 +107,7 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         this.settings!!.setLoadBefore(this.loadBeforeField.text)
         this.settings!!.setDependencies(this.dependField.text)
         this.settings!!.setSoftDependencies(this.softDependField.text)
-        this.settings!!.minecraftVersion = minecraftVersionBox.selectedItem as String
+        this.settings!!.minecraftVersion = minecraftVersionBox.selectedItem as? String ?: ""
     }
 
     override fun updateDataModel() {}
