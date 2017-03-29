@@ -70,7 +70,7 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
             .map { it.key }
 
         val autoEnabled = configuration.state.autoDetectTypes.asSequence()
-            .filter { configuration.state.userChosenTypes[it] != null }
+            .filter { configuration.state.userChosenTypes[it] == null }
 
         val allEnabled = userEnabled + autoEnabled
 
