@@ -31,7 +31,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.1.1"
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.2.5"
+    id("org.jetbrains.intellij") version "0.2.7"
     id("net.minecrell.licenser") version "0.3"
 }
 
@@ -54,7 +54,7 @@ configurations {
     "compileOnly" { extendsFrom("kotlin"()) }
     "testCompile" { extendsFrom("kotlin"()) }
 
-    "gradle-tooling-extension"()
+    "gradle-tooling-extension" { extendsFrom("idea"()) }
     "jflex"()
     "jflex-skeleton"()
     "grammar-kit"()
@@ -100,20 +100,7 @@ dependencies {
     compile(files(Jvm.current().toolsJar))
 
     compile(files(gradleToolingExtensionJar))
-
-    // TODO: Replace with idea configuration (https://github.com/JetBrains/gradle-intellij-plugin/pull/185)
-    "gradle-tooling-extension"(mapOf(
-        "group" to "com.jetbrains",
-        "name" to "ideaIC",
-        "version" to ideaVersion,
-        "configuration" to "compile"
-    ))
-    "gradle-tooling-extension"(mapOf(
-        "group" to "org.jetbrains.plugins",
-        "name" to "gradle",
-        "version" to ideaVersion,
-        "configuration" to "compile"
-    ))
+    "gradle-tooling-extension"(intellijPlugin("gradle"))
 
     "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
     "jflex-skeleton"("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
@@ -253,3 +240,9 @@ runIde {
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
 fun KotlinDependencyHandler.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
+fun intellijPlugin(name: String) = mapOf(
+    "group" to "org.jetbrains.plugins",
+    "name" to name,
+    "version" to ideaVersion,
+    "configuration" to "compile"
+)
