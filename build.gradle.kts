@@ -46,6 +46,7 @@ val kotlinVersion: String by extra
 val downloadIdeaSources: String by extra
 
 val test_this: String by extra
+println("test_this: $test_this")
 
 val repoUsername: String by extra
 val repoPassword: String by extra
@@ -260,5 +261,3 @@ fun intellijPlugin(name: String) = mapOf(
     "version" to ideaVersion,
     "configuration" to "compile"
 )
-
-println("test_this: $test_this")
