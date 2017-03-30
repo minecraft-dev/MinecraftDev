@@ -134,7 +134,7 @@ intellij {
 }
 
 publishPlugin {
-    beforeEvaluate {
+    if (extra["publish"] != null) {
         username(repoUsername)
         password(repoPassword)
         channels(repoChannel)
