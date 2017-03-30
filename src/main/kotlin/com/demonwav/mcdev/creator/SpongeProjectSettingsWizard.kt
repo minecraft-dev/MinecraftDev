@@ -35,17 +35,9 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     private lateinit var dependField: JTextField
     private lateinit var generateDocumentedListenersCheckBox: JCheckBox
     private lateinit var spongeApiVersionBox: JComboBox<String>
+    private lateinit var errorLabel: JLabel
 
     private var settings: SpongeProjectConfiguration? = null
-
-    init {
-        spongeApiVersionBox.addItem("4.1.0")
-        spongeApiVersionBox.addItem("5.0.0")
-        spongeApiVersionBox.addItem("5.1.0")
-        spongeApiVersionBox.addItem("5.2.0-SNAPSHOT")
-        spongeApiVersionBox.addItem("6.0.0-SNAPSHOT")
-        spongeApiVersionBox.selectedIndex = 2
-    }
 
     override fun getComponent(): JComponent {
         settings = creator.settings[PlatformType.SPONGE] as? SpongeProjectConfiguration
@@ -74,11 +66,16 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             title.icon = PlatformAssets.SPONGE_ICON_2X
         }
 
+        getVersionSelector(PlatformType.SPONGE)
+            .done { it.set(spongeApiVersionBox) }
+            .rejected { errorLabel.isVisible = true }
+
         return panel
     }
 
     override fun validate(): Boolean {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern)
+        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) &&
+            spongeApiVersionBox.selectedItem != null
     }
 
     override fun isStepVisible(): Boolean {
@@ -97,7 +94,7 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         settings!!.website = websiteField.text
 
         settings!!.generateDocumentedListeners = this.generateDocumentedListenersCheckBox.isSelected
-        settings!!.spongeApiVersion = spongeApiVersionBox.selectedItem as String
+        settings!!.spongeApiVersion = spongeApiVersionBox.selectedItem as? String ?: ""
     }
 
     override fun updateDataModel() {}

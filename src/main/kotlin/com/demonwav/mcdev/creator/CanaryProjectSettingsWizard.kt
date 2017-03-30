@@ -31,6 +31,7 @@ class CanaryProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     private lateinit var dependField: JTextField
     private lateinit var title: JLabel
     private lateinit var canaryVersionBox: JComboBox<String>
+    private lateinit var errorLabel: JLabel
 
     private var settings: CanaryProjectConfiguration? = null
 
@@ -67,6 +68,10 @@ class CanaryProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             else -> {}
         }
 
+        getVersionSelector(settings!!.type)
+            .done { it.set(canaryVersionBox) }
+            .rejected { errorLabel.isVisible = true }
+
         return panel
     }
 
@@ -76,7 +81,8 @@ class CanaryProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun validate(): Boolean {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern)
+        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) &&
+            canaryVersionBox.selectedItem != null
     }
 
     override fun onStepLeaving() {
@@ -86,7 +92,7 @@ class CanaryProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         this.settings!!.setAuthors(this.authorsField.text)
         this.settings!!.isEnableEarly = this.loadOrderBox.selectedIndex != 0
         this.settings!!.setDependencies(this.dependField.text)
-        this.settings!!.canaryVersion = canaryVersionBox.selectedItem as String
+        this.settings!!.canaryVersion = canaryVersionBox.selectedItem as? String ?: ""
     }
 
     override fun updateDataModel() {}

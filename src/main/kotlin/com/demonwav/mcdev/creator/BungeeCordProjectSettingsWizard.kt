@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration
 import org.apache.commons.lang.WordUtils
 import javax.swing.JComboBox
 import javax.swing.JComponent
+import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextField
 
@@ -29,6 +30,7 @@ class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreat
     private lateinit var dependField: JTextField
     private lateinit var softDependField: JTextField
     private lateinit var minecraftVersionBox: JComboBox<String>
+    private lateinit var errorLabel: JLabel
 
     private var settings: BungeeCordProjectConfiguration? = null
 
@@ -53,11 +55,16 @@ class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreat
             mainClassField.text = mainClassField.text + PlatformType.BUNGEECORD.normalName
         }
 
+        getVersionSelector(PlatformType.BUNGEECORD)
+            .done { it.set(minecraftVersionBox) }
+            .rejected { errorLabel.isVisible = true }
+
         return panel
     }
 
     override fun validate(): Boolean {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorField, dependField, pattern)
+        return validate(pluginNameField, pluginVersionField, mainClassField, authorField, dependField, pattern) &&
+            minecraftVersionBox.selectedItem != null
     }
 
     override fun isStepVisible(): Boolean {
@@ -74,7 +81,7 @@ class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreat
         this.settings!!.setAuthors(this.authorField.text)
         this.settings!!.setDependencies(this.dependField.text)
         this.settings!!.setSoftDependencies(this.softDependField.text)
-        this.settings!!.minecraftVersion = minecraftVersionBox.selectedItem as String
+        this.settings!!.minecraftVersion = minecraftVersionBox.selectedItem as? String ?: ""
     }
 
     override fun updateDataModel() {}
