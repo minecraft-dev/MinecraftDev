@@ -15,6 +15,7 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
+import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 
@@ -44,10 +45,17 @@ val javaVersion: String by extra
 val kotlinVersion: String by extra
 val downloadIdeaSources: String by extra
 
+val test_this: String by extra
+
+val repoUsername: String by extra
+val repoPassword: String by extra
+val repoChannel: String by extra
+
 val compileKotlin by tasks
 val processResources: AbstractCopyTask by tasks
 val test: Test by tasks
 val runIde: JavaExec by tasks
+val publishPlugin: PublishTask by tasks
 
 configurations {
     "kotlin"()
@@ -124,6 +132,12 @@ intellij {
     downloadSources = !CI && downloadIdeaSources.toBoolean()
 
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
+}
+
+publishPlugin {
+    username(repoUsername)
+    password(repoPassword)
+    channels(repoChannel)
 }
 
 tasks.withType<JavaCompile> {
@@ -246,3 +260,5 @@ fun intellijPlugin(name: String) = mapOf(
     "version" to ideaVersion,
     "configuration" to "compile"
 )
+
+println("test_this: $test_this")
