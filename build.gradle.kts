@@ -134,7 +134,7 @@ intellij {
 }
 
 publishPlugin {
-    if (extra["publish"] != null) {
+    if (properties["publish"] != null) {
         username(repoUsername)
         password(repoPassword)
         channels(repoChannel)
