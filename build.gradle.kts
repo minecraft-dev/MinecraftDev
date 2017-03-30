@@ -45,9 +45,7 @@ val javaVersion: String by extra
 val kotlinVersion: String by extra
 val downloadIdeaSources: String by extra
 
-val test_that: String by extra
-println("test_that: $test_that")
-
+// for publishing nightlies
 val repoUsername: String by extra
 val repoPassword: String by extra
 val repoChannel: String by extra
@@ -136,9 +134,11 @@ intellij {
 }
 
 publishPlugin {
-    username(repoUsername)
-    password(repoPassword)
-    channels(repoChannel)
+    beforeEvaluate {
+        username(repoUsername)
+        password(repoPassword)
+        channels(repoChannel)
+    }
 }
 
 tasks.withType<JavaCompile> {
