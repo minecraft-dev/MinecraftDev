@@ -45,8 +45,8 @@ val javaVersion: String by extra
 val kotlinVersion: String by extra
 val downloadIdeaSources: String by extra
 
-val test_this: String by extra
-println("test_this: $test_this")
+val test_that: String by extra
+println("test_that: $test_that")
 
 val repoUsername: String by extra
 val repoPassword: String by extra
@@ -121,7 +121,7 @@ dependencies {
 
 intellij {
     // IntelliJ IDEA dependency
-    version = ideaVersion
+    version = "IC-$ideaVersion"
     // Bundled plugin dependencies
     setPlugins("maven", "gradle", "Groovy",
         // needed dependencies for unit tests
