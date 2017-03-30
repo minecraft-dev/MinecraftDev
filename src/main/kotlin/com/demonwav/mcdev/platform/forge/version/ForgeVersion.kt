@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.forge.version
 
 import com.demonwav.mcdev.util.sortVersions
-import com.google.common.base.Objects
 import com.google.gson.Gson
 import org.apache.commons.io.IOUtils
 import java.io.IOException
@@ -44,7 +43,7 @@ class ForgeVersion private constructor() {
     fun getPromo(version: String): Double? {
         val promos = map["promos"] as? Map<*, *>
         if (promos != null) {
-            return promos[version + "-recommended"] as Double
+            return promos[version + "-recommended"] as? Double
         }
         return null
     }
@@ -55,10 +54,10 @@ class ForgeVersion private constructor() {
         numbers?.forEach { _, v ->
             if (v is Map<*, *>) {
                 val number = v
-                val currentVersion = number["mcversion"] as String
+                val currentVersion = number["mcversion"] as? String
 
-                if (Objects.equal(currentVersion, version)) {
-                    list.add(number["version"] as String)
+                if (currentVersion == version) {
+                    list.add(number["version"] as? String ?: return@forEach)
                 }
             }
         }
