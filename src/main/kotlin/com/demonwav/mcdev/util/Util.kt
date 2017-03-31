@@ -59,6 +59,14 @@ inline fun invokeLater(crossinline func: () -> Unit) {
     }
 }
 
+inline fun invokeLaterAny(crossinline func: () -> Unit) {
+    if (ApplicationManager.getApplication().isDispatchThread) {
+        func()
+    } else {
+        ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.any())
+    }
+}
+
 /**
  * Returns an untyped array for the specified [Collection].
  */
