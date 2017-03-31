@@ -135,6 +135,8 @@ intellij {
 
 publishPlugin {
     if (properties["publish"] != null) {
+        project.version = "${project.version}-${properties["buildNumber"]}"
+
         username(repoUsername)
         password(repoPassword)
         channels(repoChannel)
