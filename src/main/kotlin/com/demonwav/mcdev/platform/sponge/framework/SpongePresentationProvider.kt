@@ -15,8 +15,6 @@ import com.demonwav.mcdev.util.get
 import com.demonwav.mcdev.util.manifest
 import com.intellij.framework.library.LibraryVersionProperties
 import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
-import com.intellij.openapi.roots.libraries.LibraryProperties
-import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import java.util.jar.Attributes.Name.IMPLEMENTATION_TITLE
 import java.util.jar.Attributes.Name.IMPLEMENTATION_VERSION

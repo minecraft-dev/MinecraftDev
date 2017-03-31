@@ -31,12 +31,13 @@ object ForgeModuleType : AbstractModuleType<ForgeModule>("", "") {
         ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION
     )
 
-    override fun getPlatformType() = PlatformType.FORGE
-    override fun getIcon() = PlatformAssets.FORGE_ICON
-    override fun getId() = ID
-    override fun getIgnoredAnnotations() = IGNORED_ANNOTATIONS
-    override fun getListenerAnnotations() = LISTENER_ANNOTATIONS
+    override val platformType = PlatformType.FORGE
+    override val icon = PlatformAssets.FORGE_ICON
+    override val id = ID
+    override val ignoredAnnotations = IGNORED_ANNOTATIONS
+    override val listenerAnnotations = LISTENER_ANNOTATIONS
+    override val isEventGenAvailable = true
+
     override fun generateModule(facet: MinecraftFacet) = ForgeModule(facet)
     override fun getDefaultListenerName(psiClass: PsiClass): String = defaultNameForSubClassEvents(psiClass)
-    override fun isEventGenAvailable() = true
 }

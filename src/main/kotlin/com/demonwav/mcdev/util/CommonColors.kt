@@ -14,24 +14,23 @@ import java.awt.Color
 
 object CommonColors {
 
-    @JvmField val DARK_RED = Color(0xAA0000)
-    @JvmField val RED = Color(0xFF5555)
-    @JvmField val GOLD = Color(0xFFAA00)
-    @JvmField val YELLOW = Color(0xFFFF55)
-    @JvmField val DARK_GREEN = Color(0x00AA00)
-    @JvmField val GREEN = Color(0x55FF55)
-    @JvmField val AQUA = Color(0x55FFFF)
-    @JvmField val DARK_AQUA = Color(0x00AAAA)
-    @JvmField val DARK_BLUE = Color(0x0000AA)
-    @JvmField val BLUE = Color(0x5555FF)
-    @JvmField val LIGHT_PURPLE = Color(0xFF55FF)
-    @JvmField val DARK_PURPLE = Color(0xAA00AA)
-    @JvmField val WHITE = Color(0xFFFFFF)
-    @JvmField val GRAY = Color(0xAAAAAA)
-    @JvmField val DARK_GRAY = Color(0x555555)
-    @JvmField val BLACK = Color(0x000000)
+    val DARK_RED = Color(0xAA0000)
+    val RED = Color(0xFF5555)
+    val GOLD = Color(0xFFAA00)
+    val YELLOW = Color(0xFFFF55)
+    val DARK_GREEN = Color(0x00AA00)
+    val GREEN = Color(0x55FF55)
+    val AQUA = Color(0x55FFFF)
+    val DARK_AQUA = Color(0x00AAAA)
+    val DARK_BLUE = Color(0x0000AA)
+    val BLUE = Color(0x5555FF)
+    val LIGHT_PURPLE = Color(0xFF55FF)
+    val DARK_PURPLE = Color(0xAA00AA)
+    val WHITE = Color(0xFFFFFF)
+    val GRAY = Color(0xAAAAAA)
+    val DARK_GRAY = Color(0x555555)
+    val BLACK = Color(0x000000)
 
-    @JvmStatic
     fun applyStandardColors(map: MutableMap<String, Color>, prefix: String) {
         map.apply {
             put("$prefix.DARK_RED", DARK_RED)

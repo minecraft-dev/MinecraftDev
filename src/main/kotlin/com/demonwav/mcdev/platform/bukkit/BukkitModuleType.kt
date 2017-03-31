@@ -30,12 +30,13 @@ object BukkitModuleType : AbstractModuleType<BukkitModule<BukkitModuleType>>("or
         CommonColors.applyStandardColors(colorMap, BukkitConstants.CHAT_COLOR_CLASS)
     }
 
-    override fun getPlatformType() = PlatformType.BUKKIT
-    override fun getIcon() = PlatformAssets.BUKKIT_ICON
-    override fun getId() = ID
-    override fun getIgnoredAnnotations() = IGNORED_ANNOTATIONS
-    override fun getListenerAnnotations() = LISTENER_ANNOTATIONS
+    override val platformType = PlatformType.BUKKIT
+    override val icon = PlatformAssets.BUKKIT_ICON
+    override val id = ID
+    override val ignoredAnnotations = IGNORED_ANNOTATIONS
+    override val listenerAnnotations = LISTENER_ANNOTATIONS
+    override val isEventGenAvailable = true
+
     override fun generateModule(facet: MinecraftFacet): BukkitModule<BukkitModuleType> = BukkitModule(facet, this)
-    override fun isEventGenAvailable() = true
     override fun getEventGenerationPanel(chosenClass: PsiClass) = BukkitEventGenerationPanel(chosenClass)
 }

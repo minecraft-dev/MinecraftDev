@@ -8,7 +8,6 @@
  * MIT License
  */
 
-@file:JvmName("Shadow")
 package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SHADOW

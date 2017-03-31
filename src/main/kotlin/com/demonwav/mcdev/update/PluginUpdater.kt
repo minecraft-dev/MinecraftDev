@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.update
 
 import com.demonwav.mcdev.util.forEachNotNull
-import com.demonwav.mcdev.util.invokeLater
+import com.demonwav.mcdev.util.invokeLaterAny
 import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.ide.plugins.PluginManagerMain
@@ -47,11 +47,10 @@ object PluginUpdater {
                 .forEachNotNull { updateStatus = updateStatus.mergeWith(checkUpdatesInCustomRepo(it)) }
 
             val finalUpdate = updateStatus
-            invokeLater { callback(finalUpdate) }
+            invokeLaterAny { callback(finalUpdate) }
         } catch (e: Exception) {
             PluginUpdateStatus.CheckFailed("Minecraft Development plugin update check failed")
         }
-
     }
 
     private fun checkUpdatesInMainRepo(): PluginUpdateStatus {

@@ -27,7 +27,7 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
         form.updateCheckInProgressIcon.setPaintPassiveIcon(false)
 
         form.channelBox.addItem("Stable")
-        for (channels in Channels.orderedList()) {
+        for (channels in Channels.values()) {
             form.channelBox.addItem(channels.title)
         }
 
@@ -67,10 +67,10 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
 
         form.channelBox.addActionListener { resetUpdateStatus() }
 
-        for (channels in Channels.values()) {
-            if (channels.hasChannel()) {
-                initialSelectedChannel = channels.index
-                break
+        Channels.values().forEachIndexed { i, channel ->
+            if (channel.hasChannel()) {
+                initialSelectedChannel = i + 1
+                return@forEachIndexed
             }
         }
 
@@ -78,20 +78,18 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
         init()
     }
 
-    override fun createCenterPanel(): JComponent? {
-        return form.panel
-    }
+    override fun createCenterPanel() = form.panel
 
-    private fun saveSelectedChannel(channel: Int) {
+    private fun saveSelectedChannel(index: Int) {
         val hosts = UpdateSettings.getInstance().storedPluginHosts
-        for (channels in Channels.values()) {
-            hosts.remove(channels.url)
+        for (channel in Channels.values()) {
+            hosts.remove(channel.url)
         }
 
-        val channels = Channels.getChannel(channel) ?: // This really shouldn't happen
-            return
-
-        hosts.add(channels.url)
+        if (index != 0) {
+            val channel = Channels.values()[index - 1]
+            hosts.add(channel.url)
+        }
     }
 
     private fun saveSettings() {

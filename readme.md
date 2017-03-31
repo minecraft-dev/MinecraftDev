@@ -1,15 +1,16 @@
 <p align="center"><a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.svg" height="120"></img></a></p>
 
-Minecraft Development for IntelliJ [![forthebadge](http://forthebadge.com/images/badges/made-with-crayons.svg)](http://forthebadge.com)
+Minecraft Development for IntelliJ
 ==================================
 
 |  Service   |Status|
 |------------|------|
 |**TeamCity**|[![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
+|**Nightly**|[![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Nightly.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly)|
 |**CircleCI**|[![Travis Build Status](https://img.shields.io/circleci/project/github/minecraft-dev/MinecraftDev/2017.1.svg?style=flat-square)](https://circleci.com/gh/minecraft-dev/MinecraftDev)|
 |**Travis**  |[![CircleCI Build Status](https://img.shields.io/travis/minecraft-dev/MinecraftDev/2017.1.svg?style=flat-square)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-2017.2--0.6.2-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-2017.2--0.6.3-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 Visit [https://minecraftdev.org](https://minecraftdev.org) for information about the project, change logs, features, FAQs, and chat.

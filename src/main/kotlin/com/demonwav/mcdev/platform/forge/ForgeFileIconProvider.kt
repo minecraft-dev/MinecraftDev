@@ -31,7 +31,7 @@ class ForgeFileIconProvider : FileIconProvider {
         val module = ModuleUtilCore.findModuleForFile(file, project) ?: return null
         val forgeModule = MinecraftFacet.getInstance(module, ForgeModuleType) ?: return null
 
-        if (file == forgeModule.mcmod) {
+        if (file == forgeModule.getMcmod()) {
             return forgeModule.icon
         }
         return null

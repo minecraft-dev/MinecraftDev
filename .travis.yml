@@ -8,7 +8,7 @@ install: true
 script: ./gradlew build
 
 before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f $HOME/.gradle/caches/{modules-2,transforms-1}/*.lock
   - rm -rf $HOME/.gradle/caches/*/{file-changes,fileHashes,plugin-resolution,scripts,scripts-remapped,gradle-script-kotlin}/
 cache:
   directories:

@@ -38,12 +38,13 @@ object CanaryModuleType : AbstractModuleType<CanaryModule<CanaryModuleType>>("ne
         CanaryLegacyColors.applyLegacyColors(colorMap, CanaryConstants.LEGACY_TEXT_FORMAT_CLASS)
     }
 
-    override fun getPlatformType() = PlatformType.CANARY
-    override fun getIcon() = PlatformAssets.CANARY_ICON
-    override fun getId() = ID
-    override fun getIgnoredAnnotations() = IGNORED_ANNOTATIONS
-    override fun getListenerAnnotations() = LISTENER_ANNOTATIONS
+    override val platformType = PlatformType.CANARY
+    override val icon = PlatformAssets.CANARY_ICON
+    override val id = ID
+    override val ignoredAnnotations = IGNORED_ANNOTATIONS
+    override val listenerAnnotations = LISTENER_ANNOTATIONS
+    override val isEventGenAvailable = true
+
     override fun generateModule(facet: MinecraftFacet) = CanaryModule(facet, this)
-    override fun isEventGenAvailable() = true
     override fun getEventGenerationPanel(chosenClass: PsiClass) = CanaryHookGenerationPanel(chosenClass)
 }

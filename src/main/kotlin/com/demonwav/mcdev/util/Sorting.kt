@@ -8,7 +8,6 @@
  * MIT License
  */
 
-@file:JvmName("Sorting")
 package com.demonwav.mcdev.util
 
 import java.util.ArrayList

@@ -24,8 +24,8 @@ class MixinImplicitUsageProvider : ImplicitUsageProvider {
         element.findAnnotation(it) != null
     }
 
-    private fun isShadow(element: PsiElement) = element is PsiField && element.isShadow
+    private fun isShadowField(element: PsiElement) = element is PsiField && element.isShadow
 
-    override fun isImplicitRead(element: PsiElement) = isShadow(element)
-    override fun isImplicitWrite(element: PsiElement) = isShadow(element)
+    override fun isImplicitRead(element: PsiElement) = isShadowField(element)
+    override fun isImplicitWrite(element: PsiElement) = isShadowField(element)
 }

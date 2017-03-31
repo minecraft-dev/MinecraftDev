@@ -8,7 +8,6 @@
  * MIT License
  */
 
-@file:JvmName("McPsiUtil")
 package com.demonwav.mcdev.util
 
 import com.intellij.psi.ElementManipulator

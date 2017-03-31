@@ -8,7 +8,6 @@
  * MIT License
  */
 
-@file:JvmName("AtMixinUtil")
 package com.demonwav.mcdev.platform.mcp.at.psi
 
 import com.demonwav.mcdev.util.findQualifiedClass

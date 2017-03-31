@@ -26,11 +26,16 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIdentifier
 import com.intellij.util.FunctionUtil
 import java.awt.event.MouseEvent
-import javax.swing.Icon
 
 class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavigationHandler<PsiIdentifier> {
 
+    companion object {
+        private val ICON = MixinAssets.MIXIN_CLASS_ICON
+        private val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to target class")
+    }
+
     override fun getName() = "Mixin line marker"
+    override fun getIcon() = ICON
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiIdentifier>? {
         if (element !is PsiClass) {
@@ -58,16 +63,11 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
     }
 
     private class LineMarker(identifier: PsiIdentifier, navHandler: GutterIconNavigationHandler<PsiIdentifier>)
-        : MergeableLineMarkerInfo<PsiIdentifier>(identifier, identifier.textRange, ICON,
+        : MergeableLineMarkerInfo<PsiIdentifier>(identifier, identifier.textRange, MixinAssets.MIXIN_CLASS_ICON,
             Pass.LINE_MARKERS, TOOLTIP_FUNCTION, navHandler, GutterIconRenderer.Alignment.RIGHT) {
 
         override fun canMergeWith(info: MergeableLineMarkerInfo<*>) = info is LineMarker
         override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<PsiElement>>) = TOOLTIP_FUNCTION
-        override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<PsiElement>>) = ICON
-
-        private companion object {
-            @JvmField val ICON: Icon = MixinAssets.MIXIN_CLASS_ICON
-            @JvmField val TOOLTIP_FUNCTION = FunctionUtil.constant<Any, String>("Go to target class")
-        }
+        override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<PsiElement>>) = MixinAssets.MIXIN_CLASS_ICON
     }
 }

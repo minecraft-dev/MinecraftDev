@@ -30,12 +30,13 @@ object NeptuneModuleType : AbstractModuleType<CanaryModule<NeptuneModuleType>>("
         CanaryLegacyColors.applyLegacyColors(colorMap, CanaryConstants.LEGACY_TEXT_FORMAT_CLASS)
     }
 
-    override fun getPlatformType() = PlatformType.NEPTUNE
-    override fun getIcon() = PlatformAssets.NEPTUNE_ICON
-    override fun getId() = ID
-    override fun getIgnoredAnnotations() = CanaryModuleType.IGNORED_ANNOTATIONS
-    override fun getListenerAnnotations() = CanaryModuleType.LISTENER_ANNOTATIONS
+    override val platformType = PlatformType.NEPTUNE
+    override val icon = PlatformAssets.NEPTUNE_ICON
+    override val id = ID
+    override val ignoredAnnotations = CanaryModuleType.IGNORED_ANNOTATIONS
+    override val listenerAnnotations = CanaryModuleType.LISTENER_ANNOTATIONS
+    override val isEventGenAvailable = true
+
     override fun generateModule(facet: MinecraftFacet) = CanaryModule(facet, this)
-    override fun isEventGenAvailable() = true
     override fun getEventGenerationPanel(chosenClass: PsiClass) = CanaryHookGenerationPanel(chosenClass)
 }

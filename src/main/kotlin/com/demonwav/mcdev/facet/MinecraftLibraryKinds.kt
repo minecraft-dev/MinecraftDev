@@ -22,7 +22,6 @@ import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 
-@JvmField
 val MINECRAFT_LIBRARY_KINDS = setOf(
     BUKKIT_LIBRARY_KIND,
     SPIGOT_LIBRARY_KIND,

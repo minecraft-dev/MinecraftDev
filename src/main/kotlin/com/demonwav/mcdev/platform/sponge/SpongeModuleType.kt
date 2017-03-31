@@ -25,13 +25,14 @@ object SpongeModuleType : AbstractModuleType<SpongeModule>("org.spongepowered", 
     val IGNORED_ANNOTATIONS = listOf(SpongeConstants.LISTENER_ANNOTATION, SpongeConstants.PLUGIN_ANNOTATION)
     val LISTENER_ANNOTATIONS = listOf(SpongeConstants.LISTENER_ANNOTATION)
 
-    override fun getPlatformType() = PlatformType.SPONGE
-    override fun getIcon() = PlatformAssets.SPONGE_ICON
-    override fun getId() = ID
-    override fun getIgnoredAnnotations() = IGNORED_ANNOTATIONS
-    override fun getListenerAnnotations() = LISTENER_ANNOTATIONS
-    override fun getDefaultListenerName(psiClass: PsiClass): String = defaultNameForSubClassEvents(psiClass)
+    override val platformType = PlatformType.SPONGE
+    override val icon = PlatformAssets.SPONGE_ICON
+    override val id = ID
+    override val ignoredAnnotations = IGNORED_ANNOTATIONS
+    override val listenerAnnotations = LISTENER_ANNOTATIONS
+    override val isEventGenAvailable = true
+
     override fun generateModule(facet: MinecraftFacet) = SpongeModule(facet)
-    override fun isEventGenAvailable() = true
+    override fun getDefaultListenerName(psiClass: PsiClass): String = defaultNameForSubClassEvents(psiClass)
     override fun getEventGenerationPanel(chosenClass: PsiClass) = SpongeEventGenerationPanel(chosenClass)
 }

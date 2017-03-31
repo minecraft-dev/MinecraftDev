@@ -12,5 +12,4 @@ package com.demonwav.mcdev.platform.sponge.framework
 
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-@JvmField
 val SPONGE_LIBRARY_KIND: LibraryKind = LibraryKind.create("sponge-api")

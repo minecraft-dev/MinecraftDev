@@ -9,12 +9,13 @@
  */
 
 import org.gradle.api.tasks.AbstractCopyTask
-import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
+import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 
@@ -31,7 +32,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.1.1"
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.2.5"
+    id("org.jetbrains.intellij") version "0.2.7"
     id("net.minecrell.licenser") version "0.3"
 }
 
@@ -44,18 +45,27 @@ val javaVersion: String by extra
 val kotlinVersion: String by extra
 val downloadIdeaSources: String by extra
 
-val clean: Delete by tasks
-val processResources: AbstractCopyTask by tasks
-val runIde: JavaExec by tasks
+// for publishing nightlies
+val repoUsername: String by extra
+val repoPassword: String by extra
+val repoChannel: String by extra
+
 val compileKotlin by tasks
+val processResources: AbstractCopyTask by tasks
+val test: Test by tasks
+val runIde: JavaExec by tasks
+val publishPlugin: PublishTask by tasks
 
 configurations {
+    "kotlin"()
+    "compileOnly" { extendsFrom("kotlin"()) }
+    "testCompile" { extendsFrom("kotlin"()) }
+
+    "gradle-tooling-extension" { extendsFrom("idea"()) }
     "jflex"()
     "jflex-skeleton"()
     "grammar-kit"()
-    "testLibs" {
-        isTransitive = false
-    }
+    "testLibs" { isTransitive = false }
 }
 
 repositories {
@@ -70,23 +80,34 @@ repositories {
     }
 }
 
-dependencies {
-    compile(kotlinModule("stdlib-jre8")) {
-        // JetBrains annotations are already bundled with IntelliJ IDEA
-        exclude(group = "org.jetbrains", module = "annotations")
+java {
+    setSourceCompatibility(javaVersion)
+    setTargetCompatibility(javaVersion)
+
+    sourceSets {
+        "gradle-tooling-extension" {
+            configurations[compileOnlyConfigurationName].extendsFrom(configurations["gradle-tooling-extension"])
+        }
     }
+}
+
+val gradleToolingExtension = java().sourceSets["gradle-tooling-extension"]
+val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
+    from(gradleToolingExtension.output)
+    classifier = "gradle-tooling-extension"
+}
+
+dependencies {
+    "kotlin"(kotlinModule("runtime")) { isTransitive = false }
+    "kotlin"(kotlinModule("stdlib")) { isTransitive = false }
+    compile(kotlinModule("stdlib-jre7")) { isTransitive = false }
+    compile(kotlinModule("stdlib-jre8")) { isTransitive = false }
 
     // Add tools.jar for the JDI API
     compile(files(Jvm.current().toolsJar))
 
-    // Add an additional dependency on kotlin-runtime. It is essentially useless
-    // (since kotlin-runtime is a transitive dependency of kotlin-stdlib-jre8)
-    // but without kotlin-stdlib or kotlin-runtime on the classpath,
-    // gradle-intellij-plugin will add IntelliJ IDEA's Kotlin version to the
-    // dependencies which conflicts with our newer version.
-    compile(kotlinModule("runtime")) {
-        isTransitive = false
-    }
+    compile(files(gradleToolingExtensionJar))
+    "gradle-tooling-extension"(intellijPlugin("gradle"))
 
     "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
     "jflex-skeleton"("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
@@ -98,7 +119,7 @@ dependencies {
 
 intellij {
     // IntelliJ IDEA dependency
-    version = ideaVersion
+    version = "IC-$ideaVersion"
     // Bundled plugin dependencies
     setPlugins("maven", "gradle", "Groovy",
         // needed dependencies for unit tests
@@ -112,9 +133,14 @@ intellij {
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
-java {
-    setSourceCompatibility(javaVersion)
-    setTargetCompatibility(javaVersion)
+publishPlugin {
+    if (properties["publish"] != null) {
+        project.version = "${project.version}-${properties["buildNumber"]}"
+
+        username(repoUsername)
+        password(repoPassword)
+        channels(repoChannel)
+    }
 }
 
 tasks.withType<JavaCompile> {
@@ -133,7 +159,7 @@ processResources {
     }
 }
 
-tasks.withType<Test> {
+test {
     if (CI) {
         systemProperty("slowCI", "true")
     }
@@ -231,3 +257,9 @@ runIde {
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
 fun KotlinDependencyHandler.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
+fun intellijPlugin(name: String) = mapOf(
+    "group" to "org.jetbrains.plugins",
+    "name" to name,
+    "version" to ideaVersion,
+    "configuration" to "compile"
+)

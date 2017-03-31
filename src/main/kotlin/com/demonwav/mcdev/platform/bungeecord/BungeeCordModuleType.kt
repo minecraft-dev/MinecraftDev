@@ -30,11 +30,12 @@ object BungeeCordModuleType : AbstractModuleType<BungeeCordModule>("net.md-5", "
         CommonColors.applyStandardColors(colorMap, BungeeCordConstants.CHAT_COLOR_CLASS)
     }
 
-    override fun getPlatformType() = PlatformType.BUNGEECORD
-    override fun getIcon() = PlatformAssets.BUNGEECORD_ICON
-    override fun getId() = ID
-    override fun getIgnoredAnnotations() = IGNORED_ANNOTATIONS
-    override fun getListenerAnnotations() = LISTENER_ANNOTATIONS
+    override val platformType = PlatformType.BUNGEECORD
+    override val icon = PlatformAssets.BUNGEECORD_ICON
+    override val id = ID
+    override val ignoredAnnotations = IGNORED_ANNOTATIONS
+    override val listenerAnnotations = LISTENER_ANNOTATIONS
+
     override fun generateModule(facet: MinecraftFacet) = BungeeCordModule(facet)
     override fun getEventGenerationPanel(chosenClass: PsiClass) = BungeeCordEventGenerationPanel(chosenClass)
 }

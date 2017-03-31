@@ -12,5 +12,4 @@ package com.demonwav.mcdev.platform.bungeecord.framework
 
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-@JvmField
-val BUNGEECORD_LIBRARY_KIND = LibraryKind.create("bungeecord-api")
+val BUNGEECORD_LIBRARY_KIND = LibraryKind.create("bungeecord-api")!!

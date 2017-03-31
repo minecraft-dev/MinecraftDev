@@ -29,9 +29,11 @@ class AtFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, AtLangu
             return
         }
 
-        val module = ModuleUtilCore.findModuleForFile(virtualFile, project) ?: return
+        val vFile = viewProvider.virtualFile
+
+        val module = ModuleUtilCore.findModuleForFile(vFile, project) ?: return
         val mcpModule = MinecraftFacet.getInstance(module, McpModuleType) ?: return
-        mcpModule.addAccessTransformerFile(virtualFile)
+        mcpModule.addAccessTransformerFile(vFile)
     }
 
     override fun getFileType() = AtFileType

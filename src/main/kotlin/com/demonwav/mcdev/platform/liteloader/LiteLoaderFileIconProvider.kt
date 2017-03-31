@@ -29,7 +29,7 @@ class LiteLoaderFileIconProvider : FileIconProvider {
         val module = ModuleUtilCore.findModuleForFile(file, project) ?: return null
         val liteloaderModule = MinecraftFacet.getInstance(module, LiteLoaderModuleType) ?: return null
 
-        if (file == liteloaderModule.litemodJson) {
+        if (file == liteloaderModule.getLitemodJson()) {
             return liteloaderModule.icon
         }
         return null

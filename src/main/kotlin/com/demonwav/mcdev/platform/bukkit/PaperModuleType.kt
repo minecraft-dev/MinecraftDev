@@ -29,12 +29,13 @@ object PaperModuleType : AbstractModuleType<BukkitModule<PaperModuleType>>("com.
         CommonColors.applyStandardColors(colorMap, BungeeCordConstants.CHAT_COLOR_CLASS)
     }
 
-    override fun getPlatformType() = PlatformType.PAPER
-    override fun getIcon() = PlatformAssets.PAPER_ICON
-    override fun getId() = ID
-    override fun getIgnoredAnnotations() = BukkitModuleType.IGNORED_ANNOTATIONS
-    override fun getListenerAnnotations() = BukkitModuleType.LISTENER_ANNOTATIONS
+    override val platformType = PlatformType.PAPER
+    override val icon = PlatformAssets.PAPER_ICON
+    override val id = ID
+    override val ignoredAnnotations = BukkitModuleType.IGNORED_ANNOTATIONS
+    override val listenerAnnotations = BukkitModuleType.LISTENER_ANNOTATIONS
+    override val isEventGenAvailable = true
+
     override fun generateModule(facet: MinecraftFacet): BukkitModule<PaperModuleType> = BukkitModule(facet, this)
-    override fun isEventGenAvailable() = true
     override fun getEventGenerationPanel(chosenClass: PsiClass) = BukkitEventGenerationPanel(chosenClass)
 }
