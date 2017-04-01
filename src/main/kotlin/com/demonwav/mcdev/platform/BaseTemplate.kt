@@ -17,7 +17,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
-import java.io.IOException
 import java.util.Locale
 import java.util.Properties
 
@@ -39,13 +38,7 @@ object BaseTemplate {
         // This method should be never used for Sponge projects so we just pass false
         applyGradlePropertiesTemplate(project, file, groupId, artifactId, pluginVersion, false)
 
-        try {
-            return template.getText(buildGradleProps)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
-        return null
+        return template.getText(buildGradleProps)
     }
 
     fun applyMultiModuleBuildGradleTemplate(project: Project,
@@ -62,12 +55,7 @@ object BaseTemplate {
 
         applyGradlePropertiesTemplate(project, prop, groupId, artifactId, pluginVersion, hasSponge)
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MULTI_MODULE_BUILD_GRADLE_TEMPLATE, properties)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
+        applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MULTI_MODULE_BUILD_GRADLE_TEMPLATE, properties)
     }
 
     fun applyGradlePropertiesTemplate(project: Project,
@@ -87,12 +75,7 @@ object BaseTemplate {
         }
 
         // create gradle.properties
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.GRADLE_PROPERTIES_TEMPLATE, gradleProps)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
+        applyTemplate(project, file, MinecraftFileTemplateGroupFactory.GRADLE_PROPERTIES_TEMPLATE, gradleProps)
     }
 
     fun applySettingsGradleTemplate(project: Project,
@@ -104,12 +87,7 @@ object BaseTemplate {
         properties.setProperty("PROJECT_NAME", projectName)
         properties.setProperty("INCLUDES", includes)
 
-        try {
-            applyTemplate(project, file, MinecraftFileTemplateGroupFactory.SETTINGS_GRADLE_TEMPLATE, properties)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
+        applyTemplate(project, file, MinecraftFileTemplateGroupFactory.SETTINGS_GRADLE_TEMPLATE, properties)
     }
 
     fun applySubmoduleBuildGradleTemplate(project: Project,
@@ -121,13 +99,7 @@ object BaseTemplate {
         val manager = FileTemplateManager.getInstance(project)
         val template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SUBMODULE_BUILD_GRADLE_TEMPLATE)
 
-        try {
-            return template.getText(properties)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
-        return null
+        return template.getText(properties)
     }
 
     fun applyTemplate(project: Project, file: VirtualFile, templateName: String, properties: Properties, trimNewlines: Boolean = false) {
