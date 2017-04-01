@@ -18,7 +18,6 @@ import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiJavaCodeReferenceElement
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
@@ -46,12 +45,10 @@ fun PsiElement.findReferencedClass(): PsiClass? = findParent(resolveReferences =
 fun PsiElement.findReferencedMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = true)
 
 @Contract(pure = true)
-fun PsiElement.findContainingMethod(): PsiMethod? = findParent({ it is PsiClass }, resolveReferences = false)
+fun PsiElement.findContainingMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = false)
 
 @Contract(pure = true)
-fun PsiElement.findJavaCodeReferenceElement(): PsiJavaCodeReferenceElement? {
-    return findParent({ it is PsiMethod || it is PsiClass }, resolveReferences = false)
-}
+fun PsiElement.findContainingMethod(): PsiMethod? = findParent({ it is PsiClass }, resolveReferences = false)
 
 @Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findParent(resolveReferences: Boolean): T? {

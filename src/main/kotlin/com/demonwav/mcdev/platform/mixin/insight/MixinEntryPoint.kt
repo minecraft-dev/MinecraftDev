@@ -44,9 +44,11 @@ class MixinEntryPoint : EntryPointWithVisibilityLevel() {
     override fun getMinVisibilityLevel(member: PsiMember): Int {
         if (member !is PsiMethod) return -1
         val modifierList = member.modifierList
-        return if (MixinConstants.Annotations.METHOD_INJECTORS.any {
-            modifierList.findAnnotation(it) != null
-        }) PsiUtil.ACCESS_LEVEL_PRIVATE else -1
+        return if (MixinConstants.Annotations.METHOD_INJECTORS.any { modifierList.findAnnotation(it) != null }) {
+            PsiUtil.ACCESS_LEVEL_PRIVATE
+        } else {
+            -1
+        }
     }
 
     override fun isSelected() = MIXIN_ENTRY_POINT
