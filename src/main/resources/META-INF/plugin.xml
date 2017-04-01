@@ -151,6 +151,7 @@
 
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowNullableInspectionSuppressor"/>
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.mixin.insight.MixinImplicitUsageProvider"/>
+        <deadCode implementation="com.demonwav.mcdev.platform.mixin.insight.MixinEntryPoint"/>
 
         <!-- Mixin completion -->
         <superMethodsSearch implementation="com.demonwav.mcdev.platform.mixin.search.MixinSoftImplementMethodSuperSearcher"/>
