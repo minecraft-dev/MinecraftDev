@@ -144,6 +144,8 @@
         <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
 
         <moduleService serviceImplementation="com.demonwav.mcdev.platform.mcp.McpModuleSettings"/>
+
+        <gotoSymbolContributor implementation="com.demonwav.mcdev.platform.mcp.navigation.SrgMemberChooseByNameContributor" />
         <!--endregion-->
 
         <!--region MIXIN-->
@@ -671,7 +673,7 @@
                 description="Find the associated SRG mapping for this element">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu2"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mcp.actions.GotoAtEntryAction" id="GotoATEntry"
+        <action class="com.demonwav.mcdev.platform.mcp.actions.GotoAtEntryAction" id="GotoAtEntry"
                 text="Go To AT Entry"
                 description="Go to the relevant Access Transformer entry, if it exists">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>

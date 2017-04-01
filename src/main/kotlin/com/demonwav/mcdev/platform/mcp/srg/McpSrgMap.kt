@@ -23,9 +23,10 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class McpSrgMap private constructor(
-        private val classMap: ImmutableBiMap<String, String>,
-        private val fieldMap: ImmutableBiMap<MemberReference, MemberReference>,
-        private val methodMap: ImmutableBiMap<MemberReference, MemberReference>) {
+        val classMap: ImmutableBiMap<String, String>,
+        val fieldMap: ImmutableBiMap<MemberReference, MemberReference>,
+        val methodMap: ImmutableBiMap<MemberReference, MemberReference>
+) {
 
     @Contract(pure = true) fun getSrgClass(fullQualifiedName: String) = classMap[fullQualifiedName]
     @Contract(pure = true) fun mapToSrgClass(fullQualifiedName: String) = getSrgClass(fullQualifiedName) ?: fullQualifiedName
