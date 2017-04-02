@@ -98,7 +98,6 @@ val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
 }
 
 dependencies {
-    "kotlin"(kotlinModule("runtime")) { isTransitive = false }
     "kotlin"(kotlinModule("stdlib")) { isTransitive = false }
     compile(kotlinModule("stdlib-jre7")) { isTransitive = false }
     compile(kotlinModule("stdlib-jre8")) { isTransitive = false }
