@@ -66,7 +66,7 @@ val PsiClass.mixinTargets: List<PsiClass>
 
         // Read and add string targets (targets)
         mixinAnnotation.findDeclaredAttributeValue("targets")?.computeStringArray()
-            ?.mapNotNullTo(classTargets) { name -> findQualifiedClass(name, mixinAnnotation) }
+            ?.mapNotNullTo(classTargets) { name -> findQualifiedClass(name.replace('/', '.'), mixinAnnotation) }
 
         return classTargets
     }
