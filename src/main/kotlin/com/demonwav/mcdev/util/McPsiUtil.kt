@@ -18,6 +18,7 @@ import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiKeyword
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
@@ -97,6 +98,29 @@ private inline fun <reified T : PsiElement> PsiElement.findSibling(strict: Boole
         }
 
         sibling = sibling.nextSibling ?: return null
+    }
+}
+
+fun PsiElement.findKeyword(name: String): PsiKeyword? {
+    forEachChild {
+        if (it is PsiKeyword && it.text == name) {
+            return it
+        }
+    }
+    return null
+}
+
+@Contract(pure = true)
+private inline fun PsiElement.forEachChild(func: (PsiElement) -> Unit) {
+    firstChild?.forEachSibling(func, strict = false)
+}
+
+@Contract(pure = true)
+private inline fun PsiElement.forEachSibling(func: (PsiElement) -> Unit, strict: Boolean) {
+    var sibling = if (strict) nextSibling ?: return else this
+    while (true) {
+        func(sibling)
+        sibling = sibling.nextSibling ?: return
     }
 }
 

@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.FINAL
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.platform.mixin.util.resolveFirstShadowTarget
+import com.demonwav.mcdev.util.findKeyword
 import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInsight.intention.AddAnnotationFix
 import com.intellij.codeInsight.intention.QuickFixFactory
@@ -60,7 +61,8 @@ class ShadowModifiersInspection : MixinInspection() {
                     "@Shadow target method is not static"
                 }
 
-                holder.registerProblem(shadowModifierList, message, ProblemHighlightType.ERROR,
+                holder.registerProblem(shadowModifierList.findKeyword(PsiModifier.STATIC) ?: annotation, message,
+                    ProblemHighlightType.GENERIC_ERROR,
                     QuickFixFactory.getInstance().createModifierListFix(shadowModifierList, PsiModifier.STATIC, targetStatic, false))
             }
 
@@ -69,9 +71,10 @@ class ShadowModifiersInspection : MixinInspection() {
             val shadowAccessLevel = PsiUtil.getAccessLevel(shadowModifierList)
             if (targetAccessLevel != shadowAccessLevel) {
                 val targetModifier = PsiUtil.getAccessModifier(targetAccessLevel)
-                holder.registerProblem(shadowModifierList, "Invalid access modifiers, has: " +
-                    "${PsiUtil.getAccessModifier(shadowAccessLevel)}, but target member has: " +
-                    PsiUtil.getAccessModifier(PsiUtil.getAccessLevel(target)),
+                val shadowModifier = PsiUtil.getAccessModifier(shadowAccessLevel)
+                holder.registerProblem(shadowModifierList.findKeyword(shadowModifier) ?: annotation,
+                    "Invalid access modifiers, has: $shadowModifier, but target member has: " +
+                        PsiUtil.getAccessModifier(PsiUtil.getAccessLevel(target)),
                     QuickFixFactory.getInstance().createModifierListFix(shadowModifierList, targetModifier, true, false))
             }
 
@@ -86,7 +89,7 @@ class ShadowModifiersInspection : MixinInspection() {
             val shadowFinal = shadowModifierList.findAnnotation(FINAL)
             if (targetFinal != (shadowFinal != null)) {
                 if (targetFinal) {
-                    holder.registerProblem(shadowModifierList, "@Shadow for final member should be annotated as @Final",
+                    holder.registerProblem(annotation, "@Shadow for final member should be annotated as @Final",
                         AddAnnotationFix(FINAL, member))
                 } else {
                     holder.registerProblem(shadowFinal!!, "Target method is not final",

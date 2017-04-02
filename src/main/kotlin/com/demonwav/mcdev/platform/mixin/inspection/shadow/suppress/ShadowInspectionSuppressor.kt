@@ -19,7 +19,8 @@ import com.intellij.psi.PsiElement
 
 class ShadowInspectionSuppressor : InspectionSuppressor {
 
-    private val SUPPRESSED_INSPECTIONS = setOf("UnusedReturnValue", "SameParameterValue", "Guava", VisibilityInspection.SHORT_NAME)
+    private val SUPPRESSED_INSPECTIONS = setOf("UnusedReturnValue", "SameParameterValue", "Guava", VisibilityInspection.SHORT_NAME,
+        "MethodMayBeStatic")
 
     override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {
         if (toolId !in SUPPRESSED_INSPECTIONS) {

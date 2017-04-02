@@ -37,12 +37,12 @@ class ShadowModifiersInspectionTest : BaseShadowTest() {
                     @Shadow @Final public String publicFinalString;
                     @Shadow public String publicString;
 
-                    <warning descr="Invalid access modifiers, has: public, but target member has: protected">@Shadow public</warning> String wrongAccessor;
-                    <warning descr="@Shadow for final member should be annotated as @Final">@Shadow protected</warning> String noFinal;
+                    @Shadow <warning descr="Invalid access modifiers, has: public, but target member has: protected">public</warning> String wrongAccessor;
+                    <warning descr="@Shadow for final member should be annotated as @Final">@Shadow</warning> protected String noFinal;
 
                     @Shadow public String nonExistent;
 
-                    <warning descr="@Shadow for final member should be annotated as @Final"><warning descr="Invalid access modifiers, has: protected, but target member has: public">@Shadow protected</warning></warning> String twoIssues;
+                    <warning descr="@Shadow for final member should be annotated as @Final">@Shadow</warning> <warning descr="Invalid access modifiers, has: protected, but target member has: public">protected</warning> String twoIssues;
                 }
             """)
         }
