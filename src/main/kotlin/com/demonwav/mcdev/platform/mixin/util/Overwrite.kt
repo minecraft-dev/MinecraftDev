@@ -20,6 +20,10 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
 import org.jetbrains.annotations.Contract
 
+@get:Contract(pure = true)
+val PsiMethod.isOverwrite
+    get() = findAnnotation(OVERWRITE) != null
+
 @Contract(pure = true)
 fun PsiMethod.findFirstOverwriteTarget(): PsiMethod? {
     findAnnotation(OVERWRITE) ?: return null
