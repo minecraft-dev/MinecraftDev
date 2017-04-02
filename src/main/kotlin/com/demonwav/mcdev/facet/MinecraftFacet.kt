@@ -152,9 +152,16 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     }
 
     @Contract(pure = true)
-    fun isStaticListenerSupported(eventClass: PsiClass, method: PsiMethod): Boolean {
+    fun isStaticListenerSupported(method: PsiMethod): Boolean {
         return doIfGood(method) {
-            it.isStaticListenerSupported(eventClass, method)
+            it.isStaticListenerSupported(method)
+        } ?: false
+    }
+
+    @Contract(pure = true)
+    fun suppressStaticListener(method: PsiMethod): Boolean {
+        return doIfGood(method) {
+            !it.isStaticListenerSupported(method)
         } ?: false
     }
 

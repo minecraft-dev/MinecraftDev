@@ -63,7 +63,7 @@ val PsiElement.eventListener: Pair<PsiClass, PsiMethod>?
         // class reference.
         val resolve = type.resolve() ?: return null
 
-        if (!instance.isStaticListenerSupported(resolve, method) && method.hasModifierProperty(PsiModifier.STATIC)) {
+        if (!instance.isStaticListenerSupported(method) && method.hasModifierProperty(PsiModifier.STATIC)) {
             return null
         }
 

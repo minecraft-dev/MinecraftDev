@@ -72,7 +72,7 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) =
         BukkitConstants.EVENT_CLASS == eventClass.qualifiedName
 
-    override fun isStaticListenerSupported(eventClass: PsiClass, method: PsiMethod) = true
+    override fun isStaticListenerSupported(method: PsiMethod) = true
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) =
         "Parameter is not a subclass of org.bukkit.event.Event\n" +

@@ -71,6 +71,9 @@
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ColorAnnotator"/>
 
+        <!-- Project-independent Inspection Suppressors -->
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.inspection.StaticListenerInspectionSuppressor"/>
+
         <!-- Project View Node Decorators provide the project icons -->
         <projectViewNodeDecorator implementation="com.demonwav.mcdev.platform.MinecraftProjectViewNodeDecorator"/>
         <deadCode implementation="com.demonwav.mcdev.inspection.PlatformAnnotationEntryPoint"/>
