@@ -108,6 +108,9 @@ dependencies {
     compile(files(gradleToolingExtensionJar))
     "gradle-tooling-extension"(intellijPlugin("gradle"))
 
+    // For NBT editor
+    compile("com.flowpowered:flow-nbt:1.0.1-SNAPSHOT")
+
     "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
     "jflex-skeleton"("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
     "grammar-kit"("org.jetbrains.idea:grammar-kit:1.5.1")
