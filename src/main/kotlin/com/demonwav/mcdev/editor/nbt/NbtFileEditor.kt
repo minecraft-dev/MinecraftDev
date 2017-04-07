@@ -18,7 +18,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import java.beans.PropertyChangeListener
 import javax.swing.JComponent
 
-class NbtFileEditor(private val file: VirtualFile) : FileEditor {
+class NbtFileEditor internal constructor(private val file: VirtualFile) : FileEditor {
 
     override fun isModified(): Boolean {
     }

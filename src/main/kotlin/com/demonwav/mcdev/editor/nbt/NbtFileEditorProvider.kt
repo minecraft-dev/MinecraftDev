@@ -10,11 +10,18 @@
 
 package com.demonwav.mcdev.editor.nbt
 
-import com.intellij.ide.FileEditorProvider
-import com.intellij.openapi.fileEditor.FileEditor
+import com.intellij.openapi.fileEditor.FileEditorPolicy
+import com.intellij.openapi.fileEditor.FileEditorProvider
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 
 class NbtFileEditorProvider : FileEditorProvider {
-    override fun openFileEditor(): FileEditor {
+    override fun getEditorTypeId() = EDITOR_TYPE_ID
+    override fun accept(project: Project, file: VirtualFile) = file.isNbtFile
+    override fun createEditor(project: Project, file: VirtualFile) = NbtFileEditor(file)
+    override fun getPolicy() = FileEditorPolicy.HIDE_DEFAULT_EDITOR
 
+    companion object {
+        private const val EDITOR_TYPE_ID = "nbt_editor"
     }
 }
