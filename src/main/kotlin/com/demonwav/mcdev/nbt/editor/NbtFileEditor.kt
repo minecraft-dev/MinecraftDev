@@ -25,7 +25,7 @@ import javax.swing.JComponent
 
 class NbtFileEditor internal constructor(private val file: VirtualFile) : FileEditor, UserDataHolderBase() {
 
-    private val rootCompound: TagCompound = Nbt.buildTagTree(file.inputStream, true)
+    private val rootCompound: TagCompound = Nbt().buildTagTree(file.inputStream, true)
     private var modifiedCompound: TagCompound = rootCompound.copy()
 
     private val editor: Editor = EditorFactory.getInstance().createEditor(EditorFactory.getInstance().createDocument(modifiedCompound.toString()))
