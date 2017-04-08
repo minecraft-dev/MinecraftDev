@@ -12,13 +12,11 @@ package com.demonwav.mcdev.nbt.tags
 
 import java.io.OutputStream
 
-class TagFloat(override val name: String?, override val value: Float) : NbtValueTag<Float>(Float::class.java) {
+class TagFloat(override val value: Float) : NbtValueTag<Float>(Float::class.java) {
     override val payloadSize = 4
     override val typeId = NbtTypeId.FLOAT
 
     override fun write(stream: OutputStream, isBigEndian: Boolean) {
-        writeName(stream, isBigEndian)
-
         stream.write(value.toByteArray())
     }
 

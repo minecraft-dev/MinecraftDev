@@ -13,14 +13,12 @@ package com.demonwav.mcdev.nbt.tags
 import java.io.OutputStream
 import java.util.Objects
 
-class TagList(override val name: String?, val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
+class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
     // TAG_List has nameless tags, so we don't need to do anything for the names of tags
     override val payloadSize = tags.sumBy { it.payloadSize }
     override val typeId = NbtTypeId.LIST
 
     override fun write(stream: OutputStream, isBigEndian: Boolean) {
-        writeName(stream, isBigEndian)
-
         val length = if (isBigEndian) {
             tags.size.toBigEndian()
         } else {
@@ -40,7 +38,7 @@ class TagList(override val name: String?, val type: NbtTypeId, val tags: List<Nb
             return true
         }
 
-        if (other.name != this.name || other.type != this.type) {
+        if (other.type != this.type) {
             return false
         }
 
@@ -52,16 +50,12 @@ class TagList(override val name: String?, val type: NbtTypeId, val tags: List<Nb
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(name, type, tags.hashCode())
+        return Objects.hash(type, tags.hashCode())
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()
 
     override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
-        indent(sb, indentLevel)
-
-        appendTypeAndName(sb)
-
         val entry = if (tags.size == 1) {
             "entry"
         } else {
@@ -72,6 +66,8 @@ class TagList(override val name: String?, val type: NbtTypeId, val tags: List<Nb
         sb.append("{\n")
 
         for (tag in tags) {
+            indent(sb, indentLevel + 1)
+            tag.appendTypeAndName(sb, null)
             tag.toString(sb, indentLevel + 1)
             sb.append("\n")
         }
@@ -85,6 +81,6 @@ class TagList(override val name: String?, val type: NbtTypeId, val tags: List<Nb
     override fun copy(): TagList {
         val newTags = ArrayList<NbtTag>(tags.size)
         tags.mapTo(newTags) { it.copy() }
-        return TagList(name, type, newTags)
+        return TagList(type, newTags)
     }
 }

@@ -21,11 +21,6 @@ typealias JDouble = java.lang.Double
 interface NbtTag {
 
     /**
-     * The name of the given [NbtTag], if present, null otherwise.
-     */
-    val name: String?
-
-    /**
      * The payload size of this tag.
      */
     val payloadSize: Int
@@ -53,12 +48,6 @@ interface NbtTag {
 
 // Default implementation via extension properties
 /**
- * True if the given [NbtTag] has a name.
- */
-val NbtTag.isNamed: Boolean
-    get() = name != null
-
-/**
  * The `Type ID` byte value for this tag.
  */
 val NbtTag.typeIdByte
@@ -80,12 +69,12 @@ fun indent(sb: StringBuilder, indentLevel: Int) {
     }
 }
 
-fun NbtTag.appendTypeAndName(sb: StringBuilder) {
+fun NbtTag.appendTypeAndName(sb: StringBuilder, name: String?) {
     sb.append(typeName)
 
     sb.append("(")
-    if (isNamed) {
-        sb.append("\"").append(name!!.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")).append("\"")
+    if (name != null) {
+        sb.append("\"").append(name.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")).append("\"")
     } else {
         sb.append("None")
     }
@@ -95,12 +84,8 @@ fun NbtTag.appendTypeAndName(sb: StringBuilder) {
 /**
  * If this is a named tag, write it and the type.
  */
-fun NbtTag.writeName(stream: OutputStream, isBigEndian: Boolean = true) {
-    if (name == null) {
-        return
-    }
-
-    val nameArray = name!!.toByteArray()
+fun NbtTag.writeTypeAndName(stream: OutputStream, name: String, isBigEndian: Boolean = true) {
+    val nameArray = name.toByteArray()
 
     stream.write(byteArrayOf(
         typeIdByte,

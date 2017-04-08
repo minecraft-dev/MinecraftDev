@@ -10,8 +10,6 @@
 
 package com.demonwav.mcdev.nbt.tags
 
-import java.util.Objects
-
 abstract class NbtValueTag<T : Any>(protected val valueClass: Class<T>) : NbtTag {
 
     abstract val value: T
@@ -30,29 +28,24 @@ abstract class NbtValueTag<T : Any>(protected val valueClass: Class<T>) : NbtTag
         }
 
         @Suppress("UNCHECKED_CAST")
-        return name == other.name && valueEquals(other.value as T)
+        return valueEquals(other.value as T)
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(name, valueHashCode())
+        return valueHashCode()
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()
 
     override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
-        indent(sb, indentLevel)
-
-        appendTypeAndName(sb)
-
         valueToString(sb)
-
         return sb
     }
 
     override fun copy(): NbtValueTag<T> {
-        val const = typeId.tagClass.java.getConstructor(String::class.java, valueClass)
+        val const = typeId.tagClass.java.getConstructor(valueClass)
         @Suppress("UNCHECKED_CAST")
-        return const.newInstance(name, valueCopy()) as NbtValueTag<T>
+        return const.newInstance(valueCopy()) as NbtValueTag<T>
     }
 
     protected open fun valueToString(sb: StringBuilder) {

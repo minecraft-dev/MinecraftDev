@@ -13,7 +13,6 @@ package com.demonwav.mcdev.nbt.tags
 import java.io.OutputStream
 
 object TagEnd : NbtTag {
-    override val name = null
     override val payloadSize = 0
     override val typeId = NbtTypeId.END
 

@@ -10,23 +10,22 @@
 
 package com.demonwav.mcdev.nbt.tags
 
-import com.google.common.collect.HashMultiset
-import com.google.common.collect.Multiset
 import java.io.OutputStream
 import java.util.Objects
 
-class TagCompound(override val name: String?, val tags: Multiset<NbtTag>) : NbtTag {
+open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
     // If a tag doesn't have a name this will throw a NPE
     // but all tags should have names in a compound
-    override val payloadSize = tags.sumBy { it.name!!.toByteArray().size + it.payloadSize }
+    override val payloadSize = tagMap.entries.sumBy { it.key.toByteArray().size + it.value.payloadSize }
     override val typeId = NbtTypeId.COMPOUND
 
     override fun write(stream: OutputStream, isBigEndian: Boolean) {
-        writeName(stream, isBigEndian)
+        for ((name, value) in tagMap) {
+            value.writeTypeAndName(stream, name, isBigEndian)
+            value.write(stream, isBigEndian)
+        }
 
-        tags.forEach { it.write(stream, isBigEndian) }
-
-        stream.write(byteArrayOf(NbtTypeId.END.typeIdByte))
+        stream.write(NbtTypeId.END.typeIdByte.toInt())
     }
 
     override fun equals(other: Any?): Boolean {
@@ -38,39 +37,33 @@ class TagCompound(override val name: String?, val tags: Multiset<NbtTag>) : NbtT
             return true
         }
 
-        if (other.name != this.name) {
+        if (other.tags.size != this.tagMap.size) {
             return false
         }
 
-        if (other.tags.size != this.tags.size) {
-            return false
-        }
-
-        return this.tags == other.tags
+        return this.tagMap == other.tags
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(name, tags)
+        return Objects.hashCode(tagMap)
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()
 
     override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
-        indent(sb, indentLevel)
-
-        appendTypeAndName(sb)
-
-        val entry = if (tags.size == 1) {
+        val entry = if (tagMap.size == 1) {
             "entry"
         } else {
             "entries"
         }
-        sb.append(tags.size).append(" ").append(entry).append("\n")
+        sb.append(tagMap.size).append(" ").append(entry).append("\n")
         indent(sb, indentLevel)
         sb.append("{\n")
 
-        for (tag in tags) {
-            tag.toString(sb, indentLevel + 1)
+        for ((key, value) in tagMap) {
+            indent(sb, indentLevel + 1)
+            value.appendTypeAndName(sb, key)
+            value.toString(sb, indentLevel + 1)
             sb.append("\n")
         }
 
@@ -81,8 +74,24 @@ class TagCompound(override val name: String?, val tags: Multiset<NbtTag>) : NbtT
     }
 
     override fun copy(): TagCompound {
-        val newTags = HashMultiset.create<NbtTag>()
-        tags.mapTo(newTags) { it.copy() }
-        return TagCompound(name, newTags)
+        val newTags = HashMap<String, NbtTag>()
+        for ((key, value) in tagMap) {
+            newTags[key] = value.copy()
+        }
+        return TagCompound(newTags)
+    }
+}
+
+class RootCompound(private val name: String, tagMap: Map<String, NbtTag>) : TagCompound(tagMap) {
+
+    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
+        appendTypeAndName(sb, name)
+        super.toString(sb, indentLevel)
+        return sb
+    }
+
+    override fun copy(): TagCompound {
+        val copy = super.copy()
+        return RootCompound(name, copy.tagMap)
     }
 }

@@ -12,6 +12,7 @@ package com.demonwav.mcdev.nbt
 
 import com.demonwav.mcdev.nbt.tags.NbtTag
 import com.demonwav.mcdev.nbt.tags.NbtTypeId
+import com.demonwav.mcdev.nbt.tags.RootCompound
 import com.demonwav.mcdev.nbt.tags.TagByte
 import com.demonwav.mcdev.nbt.tags.TagByteArray
 import com.demonwav.mcdev.nbt.tags.TagCompound
@@ -33,7 +34,6 @@ import com.demonwav.mcdev.nbt.tags.littleEndianShort
 import com.demonwav.mcdev.nbt.tags.toDouble
 import com.demonwav.mcdev.nbt.tags.toFloat
 import com.demonwav.mcdev.nbt.tags.toUInt
-import com.google.common.collect.HashMultiset
 import java.io.InputStream
 import java.util.zip.GZIPInputStream
 import java.util.zip.ZipException
@@ -60,141 +60,116 @@ object Nbt {
         val stream = getActualInputStream(inputStream)
 
         stream.use {
-            val tagIdByte = readByte(stream, isBigEndian, false).value
+            val tagIdByte = readByte(stream).value
             val tagId = NbtTypeId.getById(tagIdByte)
 
             if (tagId != NbtTypeId.COMPOUND) {
                 throw MalformedNbtFileException("Root tag in NBT file is not a compound.")
             }
 
-            return readCompound(stream, isBigEndian, true)
+            return RootCompound(readString(stream, isBigEndian).value, readCompound(stream, isBigEndian).tagMap)
         }
     }
 
-    private fun readCompound(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): TagCompound {
-        val name = getName(stream, isBigEndian, isNamed)
+    private fun readCompound(stream: InputStream, isBigEndian: Boolean): TagCompound {
+        val tagMap = HashMap<String, NbtTag>()
 
-        val tagList = HashMultiset.create<NbtTag>()
-
-        var tagIdByte = readByte(stream, isBigEndian, false).value
+        var tagIdByte = readByte(stream).value
         var tagId = NbtTypeId.getById(tagIdByte)
         while (tagId != NbtTypeId.END) {
-            tagList.add(readTag(stream, isBigEndian, true, tagId))
+            val name = readString(stream, isBigEndian).value
 
-            tagIdByte = readByte(stream, isBigEndian, false).value
+            tagMap[name] = readTag(stream, isBigEndian, tagId)
+
+            tagIdByte = readByte(stream).value
             tagId = NbtTypeId.getById(tagIdByte)
         }
 
-        return TagCompound(name, tagList)
+        return TagCompound(tagMap)
     }
 
-    private fun readByte(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): TagByte {
-        val name = getName(stream, isBigEndian, isNamed)
-
-        return TagByte(name, stream.read().toByte())
+    private fun readByte(stream: InputStream): TagByte {
+        return TagByte(stream.read().toByte())
     }
 
-    private fun readShort(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): TagShort {
-        val name = getName(stream, isBigEndian, isNamed)
-
+    private fun readShort(stream: InputStream, isBigEndian: Boolean): TagShort {
         val bytes = byteArrayOf(stream.read().toByte(), stream.read().toByte())
         if (isBigEndian) {
-            return TagShort(name, bytes.bigEndianShort())
+            return TagShort(bytes.bigEndianShort())
         } else {
-             return TagShort(name, bytes.littleEndianShort())
+             return TagShort(bytes.littleEndianShort())
         }
     }
 
-    private fun readInt(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): TagInt {
-        val name = getName(stream, isBigEndian, isNamed)
-
+    private fun readInt(stream: InputStream, isBigEndian: Boolean): TagInt {
         val bytes = ByteArray(4)
         stream.read(bytes)
         if (isBigEndian) {
-            return TagInt(name, bytes.bigEndianInt())
+            return TagInt(bytes.bigEndianInt())
         } else {
-            return TagInt(name, bytes.littleEndianInt())
+            return TagInt(bytes.littleEndianInt())
         }
     }
 
-    private fun readLong(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): TagLong {
-        val name = getName(stream, isBigEndian, isNamed)
-
+    private fun readLong(stream: InputStream, isBigEndian: Boolean): TagLong {
         val bytes = ByteArray(8)
         stream.read(bytes)
         if (isBigEndian) {
-            return TagLong(name, bytes.bigEndianLong())
+            return TagLong(bytes.bigEndianLong())
         } else {
-            return TagLong(name, bytes.littleEndianLong())
+            return TagLong(bytes.littleEndianLong())
         }
     }
 
-    private fun readFloat(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): TagFloat {
-        val name = getName(stream, isBigEndian, isNamed)
-
+    private fun readFloat(stream: InputStream): TagFloat {
         val bytes = ByteArray(4)
         stream.read(bytes)
-        return TagFloat(name, bytes.toFloat())
+        return TagFloat(bytes.toFloat())
     }
 
-    private fun readDouble(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): TagDouble {
-        val name = getName(stream, isBigEndian, isNamed)
-
+    private fun readDouble(stream: InputStream): TagDouble {
         val bytes = ByteArray(8)
         stream.read(bytes)
-        return TagDouble(name, bytes.toDouble())
+        return TagDouble(bytes.toDouble())
     }
 
-    private fun readString(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): TagString {
-        // We can use the getName() method here, but that would cause this to awkwardly leap-frog back and forth a few times
-        val name = if (isNamed) {
-            readString(stream, isBigEndian, false).value
-        } else {
-            null
-        }
-
-        val length = readShort(stream, isBigEndian, false).value
+    private fun readString(stream: InputStream, isBigEndian: Boolean): TagString {
+        val length = readShort(stream, isBigEndian).value
         if (length == 0.toShort()) {
-            return TagString(name, "")
+            return TagString.EMPTY_STRING
         }
 
         val bytes = ByteArray(length.toUInt())
         stream.read(bytes)
-        return TagString(name, String(bytes))
+        return TagString(String(bytes))
     }
 
-    private fun readList(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): TagList {
-        val name = getName(stream, isBigEndian, isNamed)
-        
-        val tagIdByte = readByte(stream, isBigEndian, false).value
+    private fun readList(stream: InputStream, isBigEndian: Boolean): TagList {
+        val tagIdByte = readByte(stream).value
         val tagId = NbtTypeId.getById(tagIdByte)
 
-        val length = readInt(stream, isBigEndian, false).value
+        val length = readInt(stream, isBigEndian).value
         if (length <= 0) {
-            return TagList(name, tagId, emptyList())
+            return TagList(tagId, emptyList())
         }
 
         val list = ArrayList<NbtTag>(length)
         for (i in 0 until length) {
-            list.add(readTag(stream, isBigEndian, false, tagId))
+            list.add(readTag(stream, isBigEndian, tagId))
         }
-        return TagList(name, tagId, list)
+        return TagList(tagId, list)
     }
 
-    private fun readByteArray(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): TagByteArray {
-        val name = getName(stream, isBigEndian, isNamed)
-
-        val length = readInt(stream, isBigEndian, false).value
+    private fun readByteArray(stream: InputStream, isBigEndian: Boolean): TagByteArray {
+        val length = readInt(stream, isBigEndian).value
 
         val bytes = ByteArray(length)
         stream.read(bytes)
-        return TagByteArray(name, bytes)
+        return TagByteArray(bytes)
     }
 
-    private fun readIntArray(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): TagIntArray {
-        val name = getName(stream, isBigEndian, isNamed)
-
-        val length = readInt(stream, isBigEndian, false).value
+    private fun readIntArray(stream: InputStream, isBigEndian: Boolean): TagIntArray {
+        val length = readInt(stream, isBigEndian).value
 
         val bytes = ByteArray(length * 4)
         stream.read(bytes)
@@ -208,31 +183,23 @@ object Nbt {
             }
         }
 
-        return TagIntArray(name, ints)
+        return TagIntArray(ints)
     }
 
-    private fun getName(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean): String? {
-        return if (isNamed) {
-            readString(stream, isBigEndian, false).value
-        } else {
-            null
-        }
-    }
-
-    private fun readTag(stream: InputStream, isBigEndian: Boolean, isNamed: Boolean, tagId: NbtTypeId): NbtTag {
+    private fun readTag(stream: InputStream, isBigEndian: Boolean, tagId: NbtTypeId): NbtTag {
         when (tagId) {
             NbtTypeId.END -> return TagEnd
-            NbtTypeId.BYTE -> return readByte(stream, isBigEndian, isNamed)
-            NbtTypeId.SHORT -> return readShort(stream, isBigEndian, isNamed)
-            NbtTypeId.INT -> return readInt(stream, isBigEndian, isNamed)
-            NbtTypeId.LONG -> return readLong(stream, isBigEndian, isNamed)
-            NbtTypeId.FLOAT -> return readFloat(stream, isBigEndian, isNamed)
-            NbtTypeId.DOUBLE -> return readDouble(stream, isBigEndian, isNamed)
-            NbtTypeId.BYTE_ARRAY -> return readByteArray(stream, isBigEndian, isNamed)
-            NbtTypeId.STRING -> return readString(stream, isBigEndian, isNamed)
-            NbtTypeId.LIST -> return readList(stream, isBigEndian, isNamed)
-            NbtTypeId.COMPOUND -> return readCompound(stream, isBigEndian, isNamed)
-            NbtTypeId.INT_ARRAY -> return readIntArray(stream, isBigEndian, isNamed)
+            NbtTypeId.BYTE -> return readByte(stream)
+            NbtTypeId.SHORT -> return readShort(stream, isBigEndian)
+            NbtTypeId.INT -> return readInt(stream, isBigEndian)
+            NbtTypeId.LONG -> return readLong(stream, isBigEndian)
+            NbtTypeId.FLOAT -> return readFloat(stream)
+            NbtTypeId.DOUBLE -> return readDouble(stream)
+            NbtTypeId.BYTE_ARRAY -> return readByteArray(stream, isBigEndian)
+            NbtTypeId.STRING -> return readString(stream, isBigEndian)
+            NbtTypeId.LIST -> return readList(stream, isBigEndian)
+            NbtTypeId.COMPOUND -> return readCompound(stream, isBigEndian)
+            NbtTypeId.INT_ARRAY -> return readIntArray(stream, isBigEndian)
         }
     }
 }

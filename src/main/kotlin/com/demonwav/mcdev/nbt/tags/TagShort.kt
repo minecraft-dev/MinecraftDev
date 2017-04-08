@@ -12,13 +12,11 @@ package com.demonwav.mcdev.nbt.tags
 
 import java.io.OutputStream
 
-class TagShort(override val name: String?, override val value: Short) : NbtValueTag<Short>(Short::class.java) {
+class TagShort(override val value: Short) : NbtValueTag<Short>(Short::class.java) {
     override val payloadSize = 2
     override val typeId = NbtTypeId.SHORT
 
     override fun write(stream: OutputStream, isBigEndian: Boolean) {
-        writeName(stream, isBigEndian)
-
         if (isBigEndian) {
             stream.write(value.toBigEndian())
         } else {
