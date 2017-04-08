@@ -24,10 +24,11 @@ class TagByteArray(override val value: ByteArray) : NbtValueTag<ByteArray>(ByteA
 
     override fun toString() = toString(StringBuilder(), 0).toString()
 
-    override fun valueToString(sb: StringBuilder) {
+    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
         sb.append("[")
         value.joinTo(buffer = sb, separator = ", ")
         sb.append("]")
+        return sb
     }
 
     override fun valueEquals(otherValue: ByteArray): Boolean {

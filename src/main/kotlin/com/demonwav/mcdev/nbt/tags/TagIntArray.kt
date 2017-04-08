@@ -27,10 +27,11 @@ class TagIntArray(override val value: IntArray) : NbtValueTag<IntArray>(IntArray
 
     override fun toString() = toString(StringBuilder(), 0).toString()
 
-    override fun valueToString(sb: StringBuilder) {
+    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
         sb.append("[")
         value.joinTo(buffer = sb, separator = ", ")
         sb.append("]")
+        return sb
     }
 
     override fun valueEquals(otherValue: IntArray): Boolean {

@@ -38,18 +38,13 @@ abstract class NbtValueTag<T : Any>(protected val valueClass: Class<T>) : NbtTag
     override fun toString() = toString(StringBuilder(), 0).toString()
 
     override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
-        valueToString(sb)
-        return sb
+        return sb.append(value)
     }
 
     override fun copy(): NbtValueTag<T> {
         val const = typeId.tagClass.java.getConstructor(valueClass)
         @Suppress("UNCHECKED_CAST")
         return const.newInstance(valueCopy()) as NbtValueTag<T>
-    }
-
-    protected open fun valueToString(sb: StringBuilder) {
-        sb.append(value)
     }
 
     protected open fun valueEquals(otherValue: T): Boolean {
