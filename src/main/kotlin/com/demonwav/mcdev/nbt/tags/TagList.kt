@@ -15,7 +15,7 @@ import java.util.Objects
 
 class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
     // TAG_List has nameless tags, so we don't need to do anything for the names of tags
-    override val payloadSize = tags.sumBy { it.payloadSize }
+    override val payloadSize = 5 + tags.sumBy { it.payloadSize }
     override val typeId = NbtTypeId.LIST
 
     override fun write(stream: OutputStream, isBigEndian: Boolean) {

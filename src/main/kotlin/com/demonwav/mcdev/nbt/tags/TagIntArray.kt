@@ -14,7 +14,7 @@ import java.io.OutputStream
 import java.util.Arrays
 
 class TagIntArray(override val value: IntArray) : NbtValueTag<IntArray>(IntArray::class.java) {
-    override val payloadSize = value.size * 4
+    override val payloadSize = 4 + value.size * 4
     override val typeId = NbtTypeId.INT_ARRAY
 
     override fun write(stream: OutputStream, isBigEndian: Boolean) {
@@ -51,6 +51,11 @@ class TagIntArray(override val value: IntArray) : NbtValueTag<IntArray>(IntArray
 
     override fun valueEquals(otherValue: IntArray): Boolean {
         return Arrays.equals(this.value, otherValue)
+    }
+
+    // This makes IntelliJ happy.
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other)
     }
 
     override fun hashCode(): Int {

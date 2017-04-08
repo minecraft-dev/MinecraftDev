@@ -13,7 +13,7 @@ package com.demonwav.mcdev.nbt.tags
 import java.io.OutputStream
 
 class TagString(override val value: String) : NbtValueTag<String>(String::class.java) {
-    override val payloadSize = value.toByteArray().size
+    override val payloadSize = 2 + value.toByteArray().size
     override val typeId = NbtTypeId.STRING
 
     override fun write(stream: OutputStream, isBigEndian: Boolean) {
