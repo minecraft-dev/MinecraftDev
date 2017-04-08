@@ -94,11 +94,17 @@ class Nbt(private val isBigEndian: Boolean = true) {
     }
 
     private fun readByte(stream: InputStream): TagByte {
-        return TagByte(stream.read().toByte())
+        val read = stream.read()
+        if (read == -1) {
+            throw RuntimeException()
+        }
+        return TagByte(read.toByte())
     }
 
     private fun readShort(stream: InputStream): TagShort {
-        stream.read(bytes, 0, 2)
+        if (stream.read(bytes, 0, 2) != 2) {
+            throw RuntimeException()
+        }
         if (isBigEndian) {
             return TagShort(bytes.bigEndianShort())
         } else {
@@ -107,7 +113,9 @@ class Nbt(private val isBigEndian: Boolean = true) {
     }
 
     private fun readInt(stream: InputStream): TagInt {
-        stream.read(bytes, 0, 4)
+        if (stream.read(bytes, 0, 4) != 4) {
+            throw RuntimeException()
+        }
         if (isBigEndian) {
             return TagInt(bytes.bigEndianInt())
         } else {
@@ -116,7 +124,9 @@ class Nbt(private val isBigEndian: Boolean = true) {
     }
 
     private fun readLong(stream: InputStream): TagLong {
-        stream.read(bytes, 0, 8)
+        if (stream.read(bytes, 0, 8) != 8) {
+            throw RuntimeException()
+        }
         if (isBigEndian) {
             return TagLong(bytes.bigEndianLong())
         } else {
@@ -125,12 +135,16 @@ class Nbt(private val isBigEndian: Boolean = true) {
     }
 
     private fun readFloat(stream: InputStream): TagFloat {
-        stream.read(bytes, 0, 4)
+        if (stream.read(bytes, 0, 4) != 4) {
+            throw RuntimeException()
+        }
         return TagFloat(bytes.toFloat())
     }
 
     private fun readDouble(stream: InputStream): TagDouble {
-        stream.read(bytes, 0, 8)
+        if (stream.read(bytes, 0, 8) != 8) {
+            throw RuntimeException()
+        }
         return TagDouble(bytes.toDouble())
     }
 
@@ -141,7 +155,9 @@ class Nbt(private val isBigEndian: Boolean = true) {
         }
 
         val bytes = ByteArray(length.toUInt())
-        stream.read(bytes)
+        if (stream.read(bytes) != bytes.size) {
+            throw RuntimeException()
+        }
         return TagString(String(bytes))
     }
 
@@ -165,7 +181,9 @@ class Nbt(private val isBigEndian: Boolean = true) {
         val length = readInt(stream).value
 
         val bytes = ByteArray(length)
-        stream.read(bytes)
+        if (stream.read(bytes) != bytes.size) {
+            throw RuntimeException()
+        }
         return TagByteArray(bytes)
     }
 
@@ -173,7 +191,9 @@ class Nbt(private val isBigEndian: Boolean = true) {
         val length = readInt(stream).value
 
         val bytes = ByteArray(length * 4)
-        stream.read(bytes)
+        if (stream.read(bytes) != bytes.size) {
+            throw RuntimeException()
+        }
         val ints = IntArray(length)
 
         for (i in 0 until length) {
