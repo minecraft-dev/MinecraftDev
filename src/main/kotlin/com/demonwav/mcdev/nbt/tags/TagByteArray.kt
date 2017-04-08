@@ -39,7 +39,7 @@ class TagByteArray(override val value: ByteArray) : NbtValueTag<ByteArray>(ByteA
         return Arrays.equals(this.value, otherValue)
     }
 
-    override fun valueHashCode(): Int {
+    override fun hashCode(): Int {
         return Arrays.hashCode(this.value)
     }
 

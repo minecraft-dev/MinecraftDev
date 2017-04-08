@@ -38,7 +38,7 @@ import java.io.InputStream
 import java.util.zip.GZIPInputStream
 import java.util.zip.ZipException
 
-object Nbt {
+class Nbt {
 
     /**
      * Rather than creating a byte array over and over again for primitive reads, re-use the same one.

@@ -32,7 +32,7 @@ abstract class NbtValueTag<T : Any>(protected val valueClass: Class<T>) : NbtTag
     }
 
     override fun hashCode(): Int {
-        return valueHashCode()
+        return value.hashCode()
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()
@@ -54,10 +54,6 @@ abstract class NbtValueTag<T : Any>(protected val valueClass: Class<T>) : NbtTag
 
     protected open fun valueEquals(otherValue: T): Boolean {
         return this.value == otherValue
-    }
-
-    protected open fun valueHashCode(): Int {
-        return this.value.hashCode()
     }
 
     protected open fun valueCopy(): T {
