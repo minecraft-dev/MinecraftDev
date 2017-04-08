@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.nbt.tags
 
-import java.io.OutputStream
+import java.io.DataOutputStream
 import java.util.Objects
 
 class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
@@ -18,15 +18,10 @@ class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
     override val payloadSize = 5 + tags.sumBy { it.payloadSize }
     override val typeId = NbtTypeId.LIST
 
-    override fun write(stream: OutputStream, isBigEndian: Boolean) {
-        val length = if (isBigEndian) {
-            tags.size.toBigEndian()
-        } else {
-            tags.size.toLittleEndian()
-        }
-
-        stream.write(byteArrayOf(type.typeIdByte, *length))
-        tags.forEach { it.write(stream, isBigEndian) }
+    override fun write(stream: DataOutputStream) {
+        stream.writeByte(typeIdByte.toInt())
+        stream.writeInt(tags.size)
+        tags.forEach { it.write(stream) }
     }
 
     override fun equals(other: Any?): Boolean {

@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.nbt.tags
 
-import java.io.OutputStream
+import java.io.DataOutputStream
 import java.util.Objects
 
 open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
@@ -19,10 +19,11 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
     override val payloadSize = tagMap.entries.sumBy { 2 + it.key.toByteArray().size + it.value.payloadSize }
     override val typeId = NbtTypeId.COMPOUND
 
-    override fun write(stream: OutputStream, isBigEndian: Boolean) {
-        for ((name, value) in tagMap) {
-            value.writeTypeAndName(stream, name, isBigEndian)
-            value.write(stream, isBigEndian)
+    override fun write(stream: DataOutputStream) {
+        for ((name, tag) in tagMap) {
+            stream.writeByte(tag.typeIdByte.toInt())
+            stream.writeUTF(name)
+            tag.write(stream)
         }
 
         stream.write(NbtTypeId.END.typeIdByte.toInt())

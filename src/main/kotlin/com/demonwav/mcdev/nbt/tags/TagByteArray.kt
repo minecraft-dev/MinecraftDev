@@ -10,21 +10,16 @@
 
 package com.demonwav.mcdev.nbt.tags
 
-import java.io.OutputStream
+import java.io.DataOutputStream
 import java.util.Arrays
 
 class TagByteArray(override val value: ByteArray) : NbtValueTag<ByteArray>(ByteArray::class.java) {
     override val payloadSize = 4 + value.size
     override val typeId = NbtTypeId.BYTE_ARRAY
 
-    override fun write(stream: OutputStream, isBigEndian: Boolean) {
-        val length = if (isBigEndian) {
-            value.size.toBigEndian()
-        } else {
-            value.size.toLittleEndian()
-        }
-
-        stream.write(byteArrayOf(*length, *value))
+    override fun write(stream: DataOutputStream) {
+        stream.writeInt(value.size)
+        stream.write(value)
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()

@@ -10,18 +10,14 @@
 
 package com.demonwav.mcdev.nbt.tags
 
-import java.io.OutputStream
+import java.io.DataOutputStream
 
 class TagLong(override val value: Long) : NbtValueTag<Long>(Long::class.java) {
     override val payloadSize = 8
     override val typeId = NbtTypeId.LONG
 
-    override fun write(stream: OutputStream, isBigEndian: Boolean) {
-        if (isBigEndian) {
-            stream.write(value.toBigEndian())
-        } else {
-            stream.write(value.toLittleEndian())
-        }
+    override fun write(stream: DataOutputStream) {
+        stream.writeLong(value)
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()
