@@ -1,0 +1,90 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2017 minecraft-dev
+ *
+ * MIT License
+ */
+
+package com.demonwav.mcdev.nbt.tags
+
+import java.io.OutputStream
+import java.util.Objects
+
+class TagList(override val name: String?, val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
+    // TAG_List has nameless tags, so we don't need to do anything for the names of tags
+    override val payloadSize = tags.sumBy { it.payloadSize }
+    override val typeId = NbtTypeId.LIST
+
+    override fun write(stream: OutputStream, isBigEndian: Boolean) {
+        writeName(stream, isBigEndian)
+
+        val length = if (isBigEndian) {
+            tags.size.toBigEndian()
+        } else {
+            tags.size.toLittleEndian()
+        }
+
+        stream.write(byteArrayOf(type.typeIdByte, *length))
+        tags.forEach { it.write(stream, isBigEndian) }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is TagList) {
+            return false
+        }
+
+        if (other === this) {
+            return true
+        }
+
+        if (other.name != this.name || other.type != this.type) {
+            return false
+        }
+
+        if (other.tags.size != this.tags.size) {
+            return false
+        }
+
+        return (0 until this.tags.size).all { i -> other.tags[i] == this.tags[i] }
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(name, type, tags.hashCode())
+    }
+
+    override fun toString() = toString(StringBuilder(), 0).toString()
+
+    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
+        indent(sb, indentLevel)
+
+        appendTypeAndName(sb)
+
+        val entry = if (tags.size == 1) {
+            "entry"
+        } else {
+            "entries"
+        }
+        sb.append(tags.size).append(" ").append(entry).append("\n")
+        indent(sb, indentLevel)
+        sb.append("{\n")
+
+        for (tag in tags) {
+            tag.toString(sb, indentLevel + 1)
+            sb.append("\n")
+        }
+
+        indent(sb, indentLevel)
+        sb.append("}")
+
+        return sb
+    }
+
+    override fun copy(): TagList {
+        val newTags = ArrayList<NbtTag>(tags.size)
+        tags.mapTo(newTags) { it.copy() }
+        return TagList(name, type, newTags)
+    }
+}

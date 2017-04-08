@@ -84,6 +84,9 @@
                                  groupId="language"
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
 
+        <fileTypeFactory implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeFactory"/>
+        <fileEditorProvider implementation="com.demonwav.mcdev.nbt.editor.NbtFileEditorProvider" />
+
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
         <errorHandler implementation="com.demonwav.mcdev.error.ErrorReporter"/>
