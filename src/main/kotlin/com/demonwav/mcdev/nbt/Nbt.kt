@@ -40,6 +40,11 @@ import java.util.zip.ZipException
 
 object Nbt {
 
+    /**
+     * Rather than creating a byte array over and over again for primitive reads, re-use the same one.
+     */
+    private val bytes = ByteArray(8)
+
     private fun getActualInputStream(stream: InputStream): InputStream {
         var tempStream: InputStream? = null
         try {
@@ -93,7 +98,7 @@ object Nbt {
     }
 
     private fun readShort(stream: InputStream, isBigEndian: Boolean): TagShort {
-        val bytes = byteArrayOf(stream.read().toByte(), stream.read().toByte())
+        stream.read(bytes, 0, 2)
         if (isBigEndian) {
             return TagShort(bytes.bigEndianShort())
         } else {
@@ -102,8 +107,7 @@ object Nbt {
     }
 
     private fun readInt(stream: InputStream, isBigEndian: Boolean): TagInt {
-        val bytes = ByteArray(4)
-        stream.read(bytes)
+        stream.read(bytes, 0, 4)
         if (isBigEndian) {
             return TagInt(bytes.bigEndianInt())
         } else {
@@ -112,8 +116,7 @@ object Nbt {
     }
 
     private fun readLong(stream: InputStream, isBigEndian: Boolean): TagLong {
-        val bytes = ByteArray(8)
-        stream.read(bytes)
+        stream.read(bytes, 0, 8)
         if (isBigEndian) {
             return TagLong(bytes.bigEndianLong())
         } else {
@@ -122,14 +125,12 @@ object Nbt {
     }
 
     private fun readFloat(stream: InputStream): TagFloat {
-        val bytes = ByteArray(4)
-        stream.read(bytes)
+        stream.read(bytes, 0, 4)
         return TagFloat(bytes.toFloat())
     }
 
     private fun readDouble(stream: InputStream): TagDouble {
-        val bytes = ByteArray(8)
-        stream.read(bytes)
+        stream.read(bytes, 0, 8)
         return TagDouble(bytes.toDouble())
     }
 
