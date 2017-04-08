@@ -34,18 +34,14 @@ import com.demonwav.mcdev.nbt.tags.littleEndianShort
 import com.demonwav.mcdev.nbt.tags.toDouble
 import com.demonwav.mcdev.nbt.tags.toFloat
 import com.demonwav.mcdev.nbt.tags.toUInt
+import java.io.DataInputStream
 import java.io.InputStream
 import java.util.zip.GZIPInputStream
 import java.util.zip.ZipException
 
 class Nbt(private val isBigEndian: Boolean = true) {
 
-    /**
-     * Rather than creating a byte array over and over again for primitive reads, re-use the same one.
-     */
-    private val bytes = ByteArray(8)
-
-    private fun getActualInputStream(stream: InputStream): InputStream {
+    private fun getActualInputStream(stream: InputStream): DataInputStream {
         var tempStream: InputStream? = null
         try {
             tempStream = GZIPInputStream(stream)
@@ -54,7 +50,7 @@ class Nbt(private val isBigEndian: Boolean = true) {
             tempStream = stream
             tempStream.reset()
         }
-        return tempStream!!
+        return DataInputStream(tempStream!!)
     }
 
     /**
@@ -76,7 +72,7 @@ class Nbt(private val isBigEndian: Boolean = true) {
         }
     }
 
-    private fun readCompound(stream: InputStream): TagCompound {
+    private fun readCompound(stream: DataInputStream): TagCompound {
         val tagMap = HashMap<String, NbtTag>()
 
         var tagIdByte = readByte(stream).value
@@ -93,75 +89,36 @@ class Nbt(private val isBigEndian: Boolean = true) {
         return TagCompound(tagMap)
     }
 
-    private fun readByte(stream: InputStream): TagByte {
-        val read = stream.read()
-        if (read == -1) {
-            throw RuntimeException()
-        }
-        return TagByte(read.toByte())
+    private fun readByte(stream: DataInputStream): TagByte {
+        return TagByte(stream.readByte())
     }
 
-    private fun readShort(stream: InputStream): TagShort {
-        if (stream.read(bytes, 0, 2) != 2) {
-            throw RuntimeException()
-        }
-        if (isBigEndian) {
-            return TagShort(bytes.bigEndianShort())
-        } else {
-             return TagShort(bytes.littleEndianShort())
-        }
+    private fun readShort(stream: DataInputStream): TagShort {
+        return TagShort(stream.readShort())
     }
 
-    private fun readInt(stream: InputStream): TagInt {
-        if (stream.read(bytes, 0, 4) != 4) {
-            throw RuntimeException()
-        }
-        if (isBigEndian) {
-            return TagInt(bytes.bigEndianInt())
-        } else {
-            return TagInt(bytes.littleEndianInt())
-        }
+    private fun readInt(stream: DataInputStream): TagInt {
+        return TagInt(stream.readInt())
     }
 
-    private fun readLong(stream: InputStream): TagLong {
-        if (stream.read(bytes, 0, 8) != 8) {
-            throw RuntimeException()
-        }
-        if (isBigEndian) {
-            return TagLong(bytes.bigEndianLong())
-        } else {
-            return TagLong(bytes.littleEndianLong())
-        }
+    private fun readLong(stream: DataInputStream): TagLong {
+        return TagLong(stream.readLong())
     }
 
-    private fun readFloat(stream: InputStream): TagFloat {
-        if (stream.read(bytes, 0, 4) != 4) {
-            throw RuntimeException()
-        }
-        return TagFloat(bytes.toFloat())
+    private fun readFloat(stream: DataInputStream): TagFloat {
+        return TagFloat(stream.readFloat())
     }
 
-    private fun readDouble(stream: InputStream): TagDouble {
-        if (stream.read(bytes, 0, 8) != 8) {
-            throw RuntimeException()
-        }
-        return TagDouble(bytes.toDouble())
+    private fun readDouble(stream: DataInputStream): TagDouble {
+        return TagDouble(stream.readDouble())
     }
 
-    private fun readString(stream: InputStream): TagString {
-        val length = readShort(stream).value
-        if (length == 0.toShort()) {
-            return TagString.EMPTY_STRING
-        }
-
-        val bytes = ByteArray(length.toUInt())
-        if (stream.read(bytes) != bytes.size) {
-            throw RuntimeException()
-        }
-        return TagString(String(bytes))
+    private fun readString(stream: DataInputStream): TagString {
+        val string = stream.readUTF()
+        return TagString(string)
     }
 
-    private fun readList(stream: InputStream): TagList {
+    private fun readList(stream: DataInputStream): TagList {
         val tagIdByte = readByte(stream).value
         val tagId = NbtTypeId.getById(tagIdByte)
 
@@ -177,7 +134,7 @@ class Nbt(private val isBigEndian: Boolean = true) {
         return TagList(tagId, list)
     }
 
-    private fun readByteArray(stream: InputStream): TagByteArray {
+    private fun readByteArray(stream: DataInputStream): TagByteArray {
         val length = readInt(stream).value
 
         val bytes = ByteArray(length)
@@ -187,7 +144,7 @@ class Nbt(private val isBigEndian: Boolean = true) {
         return TagByteArray(bytes)
     }
 
-    private fun readIntArray(stream: InputStream): TagIntArray {
+    private fun readIntArray(stream: DataInputStream): TagIntArray {
         val length = readInt(stream).value
 
         val bytes = ByteArray(length * 4)
@@ -207,7 +164,7 @@ class Nbt(private val isBigEndian: Boolean = true) {
         return TagIntArray(ints)
     }
 
-    private fun readTag(stream: InputStream, tagId: NbtTypeId): NbtTag {
+    private fun readTag(stream: DataInputStream, tagId: NbtTypeId): NbtTag {
         when (tagId) {
             NbtTypeId.END -> return TagEnd
             NbtTypeId.BYTE -> return readByte(stream)
