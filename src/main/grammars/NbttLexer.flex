@@ -49,17 +49,17 @@ LINE_WS             = [\ \t]
 WHITE_SPACE_CHAR    = {EOL_WS} | {LINE_WS}
 WHITE_SPACE         = {WHITE_SPACE_CHAR}+
 
-BYTE_LITERAL = \d+(b|B)
-SHORT_LITERAL = \d+(s|S)
-INT_LITERAL = \d+(i|I)?
-LONG_LITERAL = \d+(l|L)
-FLOAT_LITERAL = \d+(\.\d+)?(f|F)
-DOUBLE_LITERAL = \d+\.\d+(d|D)? | \d+(d|D)
+BYTE_LITERAL = [+-]?\d+[bB]
+SHORT_LITERAL = [+-]?\d+[sS]
+INT_LITERAL = [+-]?\d+[iI]?
+LONG_LITERAL = [+-]?\d+[lL]
+FLOAT_LITERAL = [+-]?(\d+(\.\d*)?[fF]|\d*\.\d+[fF]|Infinity[fF])|NaN[fF]
+DOUBLE_LITERAL = [+-]?(\d*\.\d+[dD|]?|\d+\.\d*[dD|]?|\d+[dD|]|Infinity[dD|]?)|NaN[dD|]?
 
 STRING_LITERAL = \" ([^\n\"\\]+|\\.)* (\"|\n)
 
-BYTE_ARRAY_LITERAL = \d+(b|B)?
-BYTE_ARRAY_INT_LITEARL = \d+(i|I)
+BYTE_ARRAY_LITERAL = [+-]?\d+[bB]?
+BYTE_ARRAY_INT_LITEARL = [+-]?\d+[iI]
 
 
 %%
