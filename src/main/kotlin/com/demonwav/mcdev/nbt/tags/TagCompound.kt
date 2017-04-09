@@ -28,7 +28,7 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
         for ((name, tag) in tagMap) {
             // This should absolutely never ever happen
             if (tag.typeId == NbtTypeId.END) {
-                break
+                continue
             }
 
             stream.writeByte(tag.typeIdByte.toInt())
