@@ -21,8 +21,6 @@ object TagEnd : NbtTag {
     override fun toString() = toString(StringBuilder(), 0).toString()
 
     override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
-        indent(sb, indentLevel)
-        sb.append(NbtTypeId.END.tagName)
         return sb
     }
 
