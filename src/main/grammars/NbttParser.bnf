@@ -40,27 +40,87 @@
 
 nbtt_file ::= root_compound
 
-root_compound ::= STRING_LITERAL COLON compound
+root_compound ::= tag_name COLON compound {
+    methods=[getRootCompoundTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttRootCompoundImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttRootCompoundMixin"
+}
 
-compound ::= LBRACE named_tag* RBRACE
-named_tag ::= STRING_LITERAL COLON tag
+compound ::= LBRACE named_tag* RBRACE {
+    methods=[getCompoundTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttCompoundImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttCompoundMixin"
+}
+named_tag ::= tag_name COLON tag
+tag_name ::= STRING_LITERAL {
+    methods=[getTagName]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttTagNameImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttTagNameMixin"
+}
 
-list ::= LBRACKET list_params RBRACKET { pin = 1 }
+list ::= LBRACKET list_params RBRACKET {
+    pin = 1
+    methods=[getListTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttListImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttListMixin"
+}
 list_params ::= (tag COMMA?)*
 
-byte ::= BYTE_LITERAL
-short ::= SHORT_LITERAL
-int ::= INT_LITERAL
-long ::= LONG_LITERAL
-float ::= FLOAT_LITERAL
-double ::= DOUBLE_LITERAL
+byte ::= BYTE_LITERAL {
+    methods=[getByteTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttByteImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttByteMixin"
+}
+short ::= SHORT_LITERAL {
+    methods=[getShortTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttShortImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttShortMixin"
+}
+int ::= INT_LITERAL {
+    methods=[getIntTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttIntImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttIntMixin"
+}
+long ::= LONG_LITERAL {
+    methods=[getLongTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttLongImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttLongMixin"
+}
+float ::= FLOAT_LITERAL {
+    methods=[getFloatTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttFloatImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttFloatMixin"
+}
+double ::= DOUBLE_LITERAL {
+    methods=[getDoubleTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttDoubleImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttDoubleMixin"
+}
 
-string ::= STRING_LITERAL
+string ::= STRING_LITERAL {
+    methods=[getStringTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttStringImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttStringMixin"
+}
 
-byte_array ::= BYTES LPAREN byte_params RPAREN { pin = 2 }
+byte_array ::= BYTES LPAREN byte_params RPAREN {
+    pin = 2
+    methods=[getByteArrayTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttByteArrayImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttByteArrayMixin"
+}
 byte_params ::= (byte COMMA?)*
 
-int_array ::= INTS LPAREN int_params RPAREN { pin = 2 }
+int_array ::= INTS LPAREN int_params RPAREN {
+    pin = 2
+    methods=[getIntArrayTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttIntArrayImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttIntArrayMixin"
+}
 int_params ::= (int COMMA?)*
 
-tag ::= compound | list | byte | short | int | long | float | double | string | byte_array | int_array
+tag ::= compound | list | byte | short | int | long | float | double | string | byte_array | int_array {
+    methods=[getType getTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttTagImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttTagMixin"
+}

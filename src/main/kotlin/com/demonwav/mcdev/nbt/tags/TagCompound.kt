@@ -101,6 +101,12 @@ class RootCompound(private val name: String, tagMap: Map<String, NbtTag>) : TagC
         return RootCompound(name, copy.tagMap)
     }
 
+    override fun write(stream: DataOutputStream) {
+        stream.writeByte(NbtTypeId.COMPOUND.typeIdByte.toInt())
+        stream.writeUTF(name)
+        super.write(stream)
+    }
+
     fun buildPsi(project: Project): NbttRootCompound {
         val sb = StringBuilder()
         toString(sb, 0)

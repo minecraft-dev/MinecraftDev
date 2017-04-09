@@ -65,22 +65,23 @@ BYTE_ARRAY_INT_LITEARL = \d+(i|I)
 %%
 
 <YYINITIAL> {
-    {STRING_LITERAL}    { return STRING_LITERAL; }
+    {STRING_LITERAL}            { return STRING_LITERAL; }
 
-    ":"                 { return COLON; }
-    "{"                 { return LBRACE; }
-    "}"                 { maybeBegin(stack.pollFirst()); return RBRACE; }
-    "]"                 { maybeBegin(stack.pollFirst());  return RBRACKET; }
-    "["                 { stack.offerFirst(YYINITIAL); yybegin(IN_LIST); return LBRACKET; }
-    "bytes"             { stack.offerFirst(YYINITIAL); yybegin(IN_BYTE_ARRAY); return BYTES; }
-    "ints"              { stack.offerFirst(YYINITIAL); yybegin(IN_INT_ARRAY); return INTS; }
+    ":"                         { return COLON; }
+    "{"                         { stack.offerFirst(YYINITIAL); return LBRACE; }
+    "}"                         { maybeBegin(stack.pollFirst()); return RBRACE; }
+    "]"                         { maybeBegin(stack.pollFirst()); return RBRACKET; }
+    ")"                         { maybeBegin(stack.pollFirst()); return RPAREN; }
+    "["                         { stack.offerFirst(YYINITIAL); yybegin(IN_LIST); return LBRACKET; }
+    "bytes"                     { stack.offerFirst(YYINITIAL); yybegin(IN_BYTE_ARRAY); return BYTES; }
+    "ints"                      { stack.offerFirst(YYINITIAL); yybegin(IN_INT_ARRAY); return INTS; }
 
-    {BYTE_LITERAL}      { return BYTE_LITERAL; }
-    {SHORT_LITERAL}     { return SHORT_LITERAL; }
-    {INT_LITERAL}       { return INT_LITERAL; }
-    {LONG_LITERAL}      { return LONG_LITERAL; }
-    {FLOAT_LITERAL}     { return FLOAT_LITERAL; }
-    {DOUBLE_LITERAL}    { return DOUBLE_LITERAL; }
+    {BYTE_LITERAL}              { return BYTE_LITERAL; }
+    {SHORT_LITERAL}             { return SHORT_LITERAL; }
+    {INT_LITERAL}               { return INT_LITERAL; }
+    {LONG_LITERAL}              { return LONG_LITERAL; }
+    {FLOAT_LITERAL}             { return FLOAT_LITERAL; }
+    {DOUBLE_LITERAL}            { return DOUBLE_LITERAL; }
 }
 
 <IN_BYTE_ARRAY> {
@@ -104,46 +105,46 @@ BYTE_ARRAY_INT_LITEARL = \d+(i|I)
 }
 
 <IN_INT_ARRAY> {
-    {STRING_LITERAL}  { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return STRING_LITERAL; }
+    {STRING_LITERAL}            { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return STRING_LITERAL; }
 
-    "("               { return LPAREN; }
-    ")"               { yybegin(stack.pollFirst()); return RPAREN; }
-    ","               { return COMMA; }
-    {INT_LITERAL}     { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return INT_LITERAL; }
+    "("                         { return LPAREN; }
+    ")"                         { yybegin(stack.pollFirst()); return RPAREN; }
+    ","                         { return COMMA; }
+    {INT_LITERAL}               { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return INT_LITERAL; }
 
     // Everything below this is invalid
     // we just want to match them correctly so the parser has something to grab on to
 
-    {BYTE_LITERAL}    { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return INT_LITERAL; }
-    {SHORT_LITERAL}   { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return SHORT_LITERAL; }
-    {LONG_LITERAL}    { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return LONG_LITERAL; }
-    {FLOAT_LITERAL}   { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return FLOAT_LITERAL; }
-    {DOUBLE_LITERAL}  { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return DOUBLE_LITERAL; }
+    {BYTE_LITERAL}              { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return INT_LITERAL; }
+    {SHORT_LITERAL}             { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return SHORT_LITERAL; }
+    {LONG_LITERAL}              { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return LONG_LITERAL; }
+    {FLOAT_LITERAL}             { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return FLOAT_LITERAL; }
+    {DOUBLE_LITERAL}            { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return DOUBLE_LITERAL; }
 }
 
 <IN_LIST> {
-    {STRING_LITERAL}    { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return STRING_LITERAL; }
+    {STRING_LITERAL}            { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return STRING_LITERAL; }
 
-    "["                 { stack.offerFirst(IN_LIST); yybegin(IN_LIST); return LBRACKET; }
-    "bytes"             { stack.offerFirst(IN_LIST); yybegin(IN_BYTE_ARRAY); return BYTES; }
-    "ints"              { stack.offerFirst(IN_LIST); yybegin(IN_INT_ARRAY); return INTS; }
+    "["                         { stack.offerFirst(IN_LIST); stack.offerFirst(EXPECT_NEXT); yybegin(IN_LIST); return LBRACKET; }
+    "bytes"                     { stack.offerFirst(IN_LIST); stack.offerFirst(EXPECT_NEXT); yybegin(IN_BYTE_ARRAY); return BYTES; }
+    "ints"                      { stack.offerFirst(IN_LIST); stack.offerFirst(EXPECT_NEXT); yybegin(IN_INT_ARRAY); return INTS; }
 
-    "]"                 { yybegin(stack.pollFirst()); return RBRACKET; }
-    ","                 { return COMMA; }
-    "{"                 { stack.offerFirst(IN_LIST); yybegin(YYINITIAL); return LBRACE; }
-    {BYTE_LITERAL}      { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return INT_LITERAL; }
-    {SHORT_LITERAL}     { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return SHORT_LITERAL; }
-    {INT_LITERAL}       { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return INT_LITERAL; }
-    {LONG_LITERAL}      { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return LONG_LITERAL; }
-    {FLOAT_LITERAL}     { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return FLOAT_LITERAL; }
-    {DOUBLE_LITERAL}    { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return DOUBLE_LITERAL; }
+    "]"                         { yybegin(stack.pollFirst()); return RBRACKET; }
+    ","                         { return COMMA; }
+    "{"                         { stack.offerFirst(IN_LIST); stack.offerFirst(EXPECT_NEXT); yybegin(YYINITIAL); return LBRACE; }
+    {BYTE_LITERAL}              { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return INT_LITERAL; }
+    {SHORT_LITERAL}             { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return SHORT_LITERAL; }
+    {INT_LITERAL}               { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return INT_LITERAL; }
+    {LONG_LITERAL}              { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return LONG_LITERAL; }
+    {FLOAT_LITERAL}             { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return FLOAT_LITERAL; }
+    {DOUBLE_LITERAL}            { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return DOUBLE_LITERAL; }
 }
 
 <EXPECT_NEXT> {
-    ","     { yybegin(stack.pollFirst()); return COMMA; }
-    ")"     { yybegin(stack.pollFirst()); zzMarkedPos -= 1; }
-    "]"     { yybegin(stack.pollFirst()); zzMarkedPos -= 1; }
+    ","                         { yybegin(stack.pollFirst()); return COMMA; }
+    ")"                         { yybegin(stack.pollFirst()); zzMarkedPos = zzStartRead; }
+    "]"                         { yybegin(stack.pollFirst()); zzMarkedPos = zzStartRead; }
 }
 
-{WHITE_SPACE}   { return WHITE_SPACE; }
-[^]             { return BAD_CHARACTER; }
+{WHITE_SPACE}                   { return WHITE_SPACE; }
+[^]                             { return BAD_CHARACTER; }

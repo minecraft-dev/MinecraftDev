@@ -16,6 +16,7 @@ import com.demonwav.mcdev.nbt.lang.NbttFileType
 import com.demonwav.mcdev.nbt.tags.TagCompound
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.fileEditor.FileEditorLocation
 import com.intellij.openapi.fileEditor.FileEditorState
 import com.intellij.openapi.fileEditor.FileEditorStateLevel
 import com.intellij.openapi.fileEditor.TextEditor
@@ -66,8 +67,7 @@ class NbtFileEditor internal constructor(private val file: VirtualFile, project:
     override fun selectNotify() {}
     override fun deselectNotify() {}
 
-    override fun getCurrentLocation(): NbtFileEditorLocation? {
-        // TODO: is this necessary? it's optional
+    override fun getCurrentLocation(): FileEditorLocation? {
         return null
     }
 

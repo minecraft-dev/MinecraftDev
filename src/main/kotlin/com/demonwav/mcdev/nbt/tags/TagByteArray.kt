@@ -19,7 +19,9 @@ class TagByteArray(override val value: ByteArray) : NbtValueTag<ByteArray>(ByteA
 
     override fun write(stream: DataOutputStream) {
         stream.writeInt(value.size)
-        stream.write(value)
+        for (byte in value) {
+            stream.writeByte(byte.toInt())
+        }
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()

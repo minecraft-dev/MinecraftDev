@@ -26,9 +26,9 @@ class NbttFoldingBuilder : FoldingBuilder {
         return when (node.elementType) {
             NbttTypes.BYTE_ARRAY, NbttTypes.INT_ARRAY, NbttTypes.LIST -> "..."
             NbttTypes.COMPOUND -> {
-                val tagList = (node.psi as NbttCompound).namedTagList
+                val tagList = (node.psi as NbttCompound).getNamedTagList()
                 val tag = tagList[0].tag
-                if (tagList.size == 1 && tag.list == null && tag.compound == null && tag.intArray == null && tag.byteArray == null) {
+                if (tagList.size == 1 && tag.getList() == null && tag.getCompound() == null && tag.getIntArray() == null && tag.getByteArray() == null) {
                     tagList[0].text
                 } else {
                     "..."
@@ -49,19 +49,25 @@ class NbttFoldingBuilder : FoldingBuilder {
             val lbrace = node.findChildByType(NbttTypes.LBRACE)
             val rbrace = node.findChildByType(NbttTypes.RBRACE)
             if (lbrace != null && rbrace != null) {
-                list.add(FoldingDescriptor(node, TextRange(lbrace.textRange.endOffset, rbrace.textRange.startOffset)))
+                if (lbrace.textRange.endOffset != rbrace.textRange.startOffset) {
+                    list.add(FoldingDescriptor(node, TextRange(lbrace.textRange.endOffset, rbrace.textRange.startOffset)))
+                }
             }
         } else if (node.elementType == NbttTypes.LIST) {
             val lbracket = node.findChildByType(NbttTypes.LBRACKET)
             val rbracket = node.findChildByType(NbttTypes.RBRACKET)
             if (lbracket != null && rbracket != null) {
-                list.add(FoldingDescriptor(node, TextRange(lbracket.textRange.endOffset, rbracket.textRange.startOffset)))
+                if (lbracket.textRange.endOffset != rbracket.textRange.startOffset) {
+                    list.add(FoldingDescriptor(node, TextRange(lbracket.textRange.endOffset, rbracket.textRange.startOffset)))
+                }
             }
         } else if (node.elementType == NbttTypes.INT_ARRAY || node.elementType == NbttTypes.BYTE_ARRAY) {
             val lparen = node.findChildByType(NbttTypes.LPAREN)
             val rparen = node.findChildByType(NbttTypes.RPAREN)
             if (lparen != null && rparen != null) {
-                list.add(FoldingDescriptor(node, TextRange(lparen.textRange.endOffset, rparen.textRange.startOffset)))
+                if (lparen.textRange.endOffset != rparen.textRange.startOffset) {
+                    list.add(FoldingDescriptor(node, TextRange(lparen.textRange.endOffset, rparen.textRange.startOffset)))
+                }
             }
         }
 
@@ -72,19 +78,19 @@ class NbttFoldingBuilder : FoldingBuilder {
         val psi = node.psi
 
         val size = if (psi is NbttByteArray) {
-            psi.byteParams?.byteList?.size ?: 0
+            psi.getByteParams()?.byteList?.size ?: 0
         } else if (psi is NbttIntArray) {
-            psi.intParams?.intList?.size ?: 0
+            psi.getIntParams()?.intList?.size ?: 0
         } else if (psi is NbttList) {
-            psi.listParams?.tagList?.size ?: 0
+            psi.getListParams()?.tagList?.size ?: 0
         } else if (psi is NbttCompound) {
-            if (psi.namedTagList.size == 1) {
-                val tag = psi.namedTagList[0].tag
-                if (tag.list == null && tag.compound == null && tag.intArray == null && tag.byteArray == null) {
+            if (psi.getNamedTagList().size == 1) {
+                val tag = psi.getNamedTagList()[0].tag
+                if (tag.getList() == null && tag.getCompound() == null && tag.getIntArray() == null && tag.getByteArray() == null) {
                     return true
                 }
             }
-            psi.namedTagList.size
+            psi.getNamedTagList().size
         } else {
             0
         }

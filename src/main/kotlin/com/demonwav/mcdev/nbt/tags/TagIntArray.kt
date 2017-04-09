@@ -19,7 +19,6 @@ class TagIntArray(override val value: IntArray) : NbtValueTag<IntArray>(IntArray
 
     override fun write(stream: DataOutputStream) {
         stream.writeInt(value.size)
-
         for (i in value) {
             stream.writeInt(i)
         }
