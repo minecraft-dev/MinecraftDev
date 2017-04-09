@@ -19,7 +19,7 @@ class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
     override val typeId = NbtTypeId.LIST
 
     override fun write(stream: DataOutputStream) {
-        stream.writeByte(typeIdByte.toInt())
+        stream.writeByte(type.typeIdByte.toInt())
         stream.writeInt(tags.size)
         tags.forEach { it.write(stream) }
     }

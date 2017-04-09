@@ -96,6 +96,7 @@
         <lang.formatter language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttFormattingModelBuilder"/>
         <codeStyleSettingsProvider implementation="com.demonwav.mcdev.nbt.lang.format.NbttCodeStyleSettingsProvider"/>
         <lang.foldingBuilder language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttFoldingBuilder"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.nbt.lang.format.NbttColorSettingsPage" />
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
