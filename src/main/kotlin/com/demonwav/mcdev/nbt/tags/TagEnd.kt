@@ -16,9 +16,7 @@ object TagEnd : NbtTag {
     override val payloadSize = 0
     override val typeId = NbtTypeId.END
 
-    override fun write(stream: DataOutputStream) {
-        stream.writeByte(typeIdByte.toInt())
-    }
+    override fun write(stream: DataOutputStream) {}
 
     override fun toString() = toString(StringBuilder(), 0).toString()
 

@@ -26,6 +26,11 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
 
     override fun write(stream: DataOutputStream) {
         for ((name, tag) in tagMap) {
+            // This should absolutely never ever happen
+            if (tag.typeId == NbtTypeId.END) {
+                break
+            }
+
             stream.writeByte(tag.typeIdByte.toInt())
             stream.writeUTF(name)
             tag.write(stream)
