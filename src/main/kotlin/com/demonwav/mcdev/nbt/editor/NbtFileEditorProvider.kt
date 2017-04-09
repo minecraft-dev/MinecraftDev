@@ -20,7 +20,7 @@ import com.intellij.openapi.vfs.VirtualFile
 class NbtFileEditorProvider : FileEditorProvider, DumbAware {
     override fun getEditorTypeId() = EDITOR_TYPE_ID
     override fun accept(project: Project, file: VirtualFile) = file.fileType == NbtFileType
-    override fun createEditor(project: Project, file: VirtualFile) = NbtFileEditor(file)
+    override fun createEditor(project: Project, file: VirtualFile) = NbtFileEditor(file, project)
     override fun getPolicy() = FileEditorPolicy.HIDE_DEFAULT_EDITOR
 
     companion object {

@@ -51,24 +51,34 @@ class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
     override fun toString() = toString(StringBuilder(), 0).toString()
 
     override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
-        val entry = if (tags.size == 1) {
-            "entry"
-        } else {
-            "entries"
-        }
-        sb.append(tags.size).append(" ").append(entry).append("\n")
-        indent(sb, indentLevel)
-        sb.append("{\n")
+        sb.append("[")
 
+        if (tags.isEmpty()) {
+            sb.append("]")
+            return sb
+        }
+
+        val isCollection = type == NbtTypeId.COMPOUND || type == NbtTypeId.LIST || type == NbtTypeId.BYTE_ARRAY || type == NbtTypeId.INT_ARRAY
         for (tag in tags) {
-            indent(sb, indentLevel + 1)
-            tag.appendTypeAndName(sb, null)
+            if (isCollection) {
+                sb.append("\n")
+                indent(sb, indentLevel + 1)
+            } else {
+                sb.append(" ")
+            }
+
             tag.toString(sb, indentLevel + 1)
-            sb.append("\n")
+            sb.append(",")
         }
 
-        indent(sb, indentLevel)
-        sb.append("}")
+        if (isCollection) {
+            sb.append("\n")
+            indent(sb, indentLevel)
+            sb.append("]")
+        } else {
+            sb.append(" ]")
+        }
+
 
         return sb
     }

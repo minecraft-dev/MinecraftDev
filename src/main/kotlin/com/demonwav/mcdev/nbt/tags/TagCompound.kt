@@ -10,6 +10,11 @@
 
 package com.demonwav.mcdev.nbt.tags
 
+import com.demonwav.mcdev.nbt.lang.NbttFile
+import com.demonwav.mcdev.nbt.lang.NbttFileType
+import com.demonwav.mcdev.nbt.lang.gen.psi.NbttRootCompound
+import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiFileFactory
 import java.io.DataOutputStream
 import java.util.Objects
 
@@ -52,18 +57,18 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
     override fun toString() = toString(StringBuilder(), 0).toString()
 
     override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
-        val entry = if (tagMap.size == 1) {
-            "entry"
-        } else {
-            "entries"
+        sb.append("{")
+
+        if (tagMap.isEmpty()) {
+            sb.append("}")
+            return sb
         }
-        sb.append(tagMap.size).append(" ").append(entry).append("\n")
-        indent(sb, indentLevel)
-        sb.append("{\n")
+
+        sb.append("\n")
 
         for ((key, value) in tagMap) {
             indent(sb, indentLevel + 1)
-            value.appendTypeAndName(sb, key)
+            value.appendName(sb, key)
             value.toString(sb, indentLevel + 1)
             sb.append("\n")
         }
@@ -86,7 +91,7 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
 class RootCompound(private val name: String, tagMap: Map<String, NbtTag>) : TagCompound(tagMap) {
 
     override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
-        appendTypeAndName(sb, name)
+        appendName(sb, name)
         super.toString(sb, indentLevel)
         return sb
     }
@@ -94,5 +99,12 @@ class RootCompound(private val name: String, tagMap: Map<String, NbtTag>) : TagC
     override fun copy(): TagCompound {
         val copy = super.copy()
         return RootCompound(name, copy.tagMap)
+    }
+
+    fun buildPsi(project: Project): NbttRootCompound {
+        val sb = StringBuilder()
+        toString(sb, 0)
+        return (PsiFileFactory.getInstance(project).createFileFromText("name", NbttFileType, sb.toString()) as NbttFile)
+            .firstChild as NbttRootCompound
     }
 }

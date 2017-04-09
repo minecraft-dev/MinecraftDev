@@ -1,0 +1,66 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2017 minecraft-dev
+ *
+ * MIT License
+ */
+
+{
+    parserClass="com.demonwav.mcdev.nbt.lang.gen.parser.NbttParser"
+
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="Nbtt"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.demonwav.mcdev.nbt.lang.gen.psi"
+    psiImplPackage="com.demonwav.mcdev.nbt.lang.gen.psi.impl"
+
+    elementTypeHolderClass="com.demonwav.mcdev.nbt.lang.gen.psi.NbttTypes"
+    elementTypeClass="com.demonwav.mcdev.nbt.lang.psi.NbttElementType"
+    tokenTypeClass="com.demonwav.mcdev.nbt.lang.psi.NbttTokenType"
+
+    tokens = [
+        COLON=":"
+        LBRACE="{"
+        RBRACE="}"
+        LBRACKET="["
+        RBRACKET="]"
+        LPAREN="("
+        RPAREN=")"
+        BYTES="bytes"
+        INTS="ints"
+        COMMA=","
+    ]
+
+    consumeTokenMethod="consumeTokenFast"
+}
+
+nbtt_file ::= root_compound
+
+root_compound ::= STRING_LITERAL COLON compound
+
+compound ::= LBRACE named_tag* RBRACE
+named_tag ::= STRING_LITERAL COLON tag
+
+list ::= LBRACKET list_params RBRACKET { pin = 1 }
+list_params ::= (tag COMMA?)*
+
+byte ::= BYTE_LITERAL
+short ::= SHORT_LITERAL
+int ::= INT_LITERAL
+long ::= LONG_LITERAL
+float ::= FLOAT_LITERAL
+double ::= DOUBLE_LITERAL
+
+string ::= STRING_LITERAL
+
+byte_array ::= BYTES LPAREN byte_params RPAREN { pin = 2 }
+byte_params ::= (byte COMMA?)*
+
+int_array ::= INTS LPAREN int_params RPAREN { pin = 2 }
+int_params ::= (int COMMA?)*
+
+tag ::= compound | list | byte | short | int | long | float | double | string | byte_array | int_array

@@ -21,4 +21,8 @@ class TagLong(override val value: Long) : NbtValueTag<Long>(Long::class.java) {
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()
+
+    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
+        return sb.append(value).append("L")
+    }
 }

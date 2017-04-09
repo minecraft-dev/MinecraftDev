@@ -69,14 +69,11 @@ fun indent(sb: StringBuilder, indentLevel: Int) {
     }
 }
 
-fun NbtTag.appendTypeAndName(sb: StringBuilder, name: String?) {
-    sb.append(typeName)
-
-    sb.append("(")
+fun NbtTag.appendName(sb: StringBuilder, name: String?) {
     if (name != null) {
         sb.append("\"").append(name.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")).append("\"")
     } else {
-        sb.append("None")
+        sb.append("\"\"")
     }
-    sb.append("): ")
+    sb.append(": ")
 }

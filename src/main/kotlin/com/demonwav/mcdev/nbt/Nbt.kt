@@ -48,7 +48,7 @@ object Nbt {
      * Parse the NBT file from the InputStream and return the root TagCompound for the NBT file. This method closes the stream when
      * it is finished with it.
      */
-    fun buildTagTree(inputStream: InputStream): TagCompound {
+    fun buildTagTree(inputStream: InputStream): RootCompound {
         val stream = getActualInputStream(inputStream)
 
         stream.use {

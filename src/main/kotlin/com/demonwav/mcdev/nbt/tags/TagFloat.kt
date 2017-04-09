@@ -21,4 +21,8 @@ class TagFloat(override val value: Float) : NbtValueTag<Float>(Float::class.java
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()
+
+    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
+        return sb.append(value).append("F")
+    }
 }

@@ -21,4 +21,8 @@ class TagString(override val value: String) : NbtValueTag<String>(String::class.
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()
+
+    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
+        return sb.append("\"").append(value.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")).append("\"")
+    }
 }

@@ -21,4 +21,8 @@ class TagShort(override val value: Short) : NbtValueTag<Short>(Short::class.java
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()
+
+    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
+        return sb.append(value).append("S")
+    }
 }

@@ -21,4 +21,8 @@ class TagByte(override val value: Byte) : NbtValueTag<Byte>(Byte::class.java) {
     }
 
     override fun toString() = toString(StringBuilder(), 0).toString()
+
+    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
+        return sb.append(value).append("B")
+    }
 }
