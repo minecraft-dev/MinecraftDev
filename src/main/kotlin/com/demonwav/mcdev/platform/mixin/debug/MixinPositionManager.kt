@@ -21,10 +21,15 @@ import com.intellij.debugger.SourcePosition
 import com.intellij.debugger.engine.DebugProcess
 import com.intellij.debugger.engine.DebuggerUtils
 import com.intellij.debugger.engine.JVMNameUtil
+import com.intellij.debugger.impl.DebuggerUtilsEx
 import com.intellij.debugger.requests.ClassPrepareRequestor
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.fileTypes.FileType
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
 import com.sun.jdi.AbsentInformationException
 import com.sun.jdi.Location
 import com.sun.jdi.ReferenceType
@@ -47,6 +52,8 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
             throw NoDataException.INSTANCE
         }
 
+        println(type.sourceDebugExtension())
+
         // Return the correct PsiFile based on the source path in the SMAP
         try {
             val path = location.sourcePath()
@@ -54,15 +61,23 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
             // The source path is the package (separated by slashes) and class name with the ".java" file extension
             val className = path.removeSuffix(".java").replace('/', '.')
 
-            // Lookup class based on its qualified name (TODO: Support for anonymous classes)
-            val psiClass = DebuggerUtils.findClass(className, debugProcess.project, debugProcess.searchScope)
-            if (psiClass != null) {
-                // Mixin class found, return correct source file
-                return SourcePosition.createFromLine(psiClass.navigationElement.containingFile, location.lineNumber() - 1)
+            val psiFile = findAlternativeSource(className, debugProcess.project) ?:
+                // Lookup class based on its qualified name (TODO: Support for anonymous classes)
+                DebuggerUtils.findClass(className, debugProcess.project, debugProcess.searchScope)?.navigationElement?.containingFile
+
+            if (psiFile != null) {
+                // File found, return correct source file
+                return SourcePosition.createFromLine(psiFile, location.lineNumber() - 1)
             }
         } catch (ignored: AbsentInformationException) {}
 
         throw NoDataException.INSTANCE
+    }
+
+    private fun findAlternativeSource(className: String, project: Project): PsiFile? {
+        val alternativeSource = DebuggerUtilsEx.getAlternativeSourceUrl(className, project) ?: return null
+        val alternativeFile = VirtualFileManager.getInstance().findFileByUrl(alternativeSource) ?: return null
+        return PsiManager.getInstance(project).findFile(alternativeFile)
     }
 
     override fun getAllClasses(classPosition: SourcePosition): List<ReferenceType> {
