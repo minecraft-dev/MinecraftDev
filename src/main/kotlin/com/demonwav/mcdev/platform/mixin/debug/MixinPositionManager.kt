@@ -52,8 +52,6 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
             throw NoDataException.INSTANCE
         }
 
-        println(type.sourceDebugExtension())
-
         // Return the correct PsiFile based on the source path in the SMAP
         try {
             val path = location.sourcePath()
