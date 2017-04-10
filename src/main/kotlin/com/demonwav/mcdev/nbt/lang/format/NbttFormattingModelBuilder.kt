@@ -37,11 +37,11 @@ class NbttFormattingModelBuilder : FormattingModelBuilder {
 
             val spacesBeforeComma = if (commonSettings.SPACE_BEFORE_COMMA) 1 else 0
             val spacesBeforeColon = if (nbttSettings.SPACE_BEFORE_COLON) 1 else 0
-            val sspacesAfterColon = if (nbttSettings.SPACE_AFTER_COLON) 1 else 0
+            val spacesAfterColon = if (nbttSettings.SPACE_AFTER_COLON) 1 else 0
 
             return SpacingBuilder(settings, NbttLanguage)
                 .before(NbttTypes.COLON).spacing(spacesBeforeColon, spacesBeforeColon, 0, false, 0)
-                .after(NbttTypes.COLON).spacing(sspacesAfterColon, sspacesAfterColon, 0, false, 0)
+                .after(NbttTypes.COLON).spacing(spacesAfterColon, spacesAfterColon, 0, false, 0)
                 .withinPair(NbttTypes.LBRACKET, NbttTypes.RBRACKET).spaceIf(commonSettings.SPACE_WITHIN_BRACKETS, true)
                 .withinPair(NbttTypes.LPAREN, NbttTypes.RPAREN).spaceIf(commonSettings.SPACE_WITHIN_PARENTHESES, true)
                 .withinPair(NbttTypes.LBRACE, NbttTypes.RBRACE).spaceIf(commonSettings.SPACE_WITHIN_BRACES, true)

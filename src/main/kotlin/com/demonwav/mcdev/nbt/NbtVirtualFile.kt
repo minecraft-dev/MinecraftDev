@@ -36,7 +36,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
     override fun isDirectory() = false
     override fun getTimeStamp() = backingFile.timeStamp
     override fun getModificationStamp() = 0L
-    override fun getName() = backingFile.name + "t"
+    override fun getName() = backingFile.name + ".nbtt"
     override fun contentsToByteArray() = bytes
     override fun isValid() = backingFile.isValid
     override fun getInputStream() = ByteArrayInputStream(bytes)

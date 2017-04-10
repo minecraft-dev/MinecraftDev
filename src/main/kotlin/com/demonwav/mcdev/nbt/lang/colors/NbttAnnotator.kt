@@ -57,7 +57,7 @@ class NbttAnnotator : Annotator {
             // assume this string is quoted, since the lexer won't accept an unquoted string with a : character in it
             // won't even let you escape them
 
-            val range = TextRange(element.textRange.startOffset + index + 1, element.textRange.endOffset - 1)
+            val range = TextRange(element.textRange.startOffset + index + 2, element.textRange.endOffset - 1)
             val annotation = holder.createAnnotation(HighlightSeverity.INFORMATION, range, "Material")
             annotation.textAttributes = NbttSyntaxHighlighter.MATERIAL
         }

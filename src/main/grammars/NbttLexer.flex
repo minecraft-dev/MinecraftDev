@@ -53,8 +53,8 @@ BYTE_LITERAL = [+-]?\d+[bB]|true|false
 SHORT_LITERAL = [+-]?\d+[sS]
 INT_LITERAL = [+-]?\d+[iI]?
 LONG_LITERAL = [+-]?\d+[lL]
-FLOAT_LITERAL = [+-]?(\d+(\.\d*)?[fF]|\d*\.\d+[fF]|Infinity[fF])|NaN[fF]
-DOUBLE_LITERAL = [+-]?(\d*\.\d+[dD|]?|\d+\.\d*[dD|]?|\d+[dD|]|Infinity[dD|]?)|NaN[dD|]?
+FLOAT_LITERAL = [+-]?(\d+(\.\d*(E\d+)?)?[fF]|\d*\.\d+(E\d+)?[fF]|Infinity[fF])|NaN[fF]
+DOUBLE_LITERAL = [+-]?(\d*\.\d+(E\d+)?[dD|]?|\d+\.\d*(E\d+)?[dD|]?|\d+(E\d+)?[dD|]|Infinity[dD|]?)|NaN[dD|]?
 
 STRING_LITERAL = \"([^\"\\\n]|(\\[\"\\nt]))*[\"\n]
 UNQUOTED_STRING_LITERAL = ([^\"\s\n:{}\[\](),\d+\-]|\\[\"\\nt])|([^\"\s\n:{}\[\](),\d+\-]|\\[\"\\nt])([^\"\\:{}\[\](),\n]|\\[\"\\nt])*[^\"\s\n:{}\[\](),]
