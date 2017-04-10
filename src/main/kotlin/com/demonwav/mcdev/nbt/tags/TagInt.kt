@@ -20,5 +20,5 @@ class TagInt(override val value: Int) : NbtValueTag<Int>(Int::class.java) {
         stream.writeInt(value)
     }
 
-    override fun toString() = toString(StringBuilder(), 0).toString()
+    override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 }

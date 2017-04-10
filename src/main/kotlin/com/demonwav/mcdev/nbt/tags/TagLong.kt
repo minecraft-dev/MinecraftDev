@@ -20,9 +20,9 @@ class TagLong(override val value: Long) : NbtValueTag<Long>(Long::class.java) {
         stream.writeLong(value)
     }
 
-    override fun toString() = toString(StringBuilder(), 0).toString()
+    override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
-    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
+    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
         return sb.append(value).append("L")
     }
 }

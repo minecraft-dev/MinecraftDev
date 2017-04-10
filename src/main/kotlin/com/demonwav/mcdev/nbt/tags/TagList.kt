@@ -48,9 +48,9 @@ class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
         return Objects.hash(type, tags.hashCode())
     }
 
-    override fun toString() = toString(StringBuilder(), 0).toString()
+    override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
-    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
+    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
         sb.append("[")
 
         if (tags.isEmpty()) {
@@ -67,7 +67,7 @@ class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
                 sb.append(" ")
             }
 
-            tag.toString(sb, indentLevel + 1)
+            tag.toString(sb, indentLevel + 1, WriterState.LIST)
             sb.append(",")
         }
 

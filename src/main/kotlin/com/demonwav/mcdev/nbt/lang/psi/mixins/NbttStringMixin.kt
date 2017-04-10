@@ -16,4 +16,5 @@ import com.demonwav.mcdev.nbt.tags.TagString
 interface NbttStringMixin : NbttElement {
 
     fun getStringTag(): TagString
+    fun getStringValue(): String
 }

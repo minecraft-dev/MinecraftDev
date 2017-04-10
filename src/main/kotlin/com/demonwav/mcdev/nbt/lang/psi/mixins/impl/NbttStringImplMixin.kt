@@ -18,8 +18,20 @@ import com.intellij.lang.ASTNode
 abstract class NbttStringImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttStringMixin {
 
     override fun getStringTag(): TagString {
-        val noQuotes = text.let { it.substring(1, it.length - 1) }
+        return TagString(getStringValue())
+    }
 
-        return TagString(noQuotes.replace("\\\\", "\\").replace("\\n", "\n").replace("\\\"", "\""))
+    override fun getStringValue(): String {
+        val noQuotes = if (text.startsWith("\"")) {
+            text.let { it.substring(1, it.length - 1) }
+        } else {
+            text
+        }
+
+        return noQuotes
+                .replace("\\\\", "\\")
+                .replace("\\n", "\n")
+                .replace("\\\"", "\"")
+                .replace("\\t", "\t")
     }
 }

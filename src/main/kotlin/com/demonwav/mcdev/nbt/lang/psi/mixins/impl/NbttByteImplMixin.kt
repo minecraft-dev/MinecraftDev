@@ -18,6 +18,13 @@ import com.intellij.lang.ASTNode
 abstract class NbttByteImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttByteMixin {
 
     override fun getByteTag(): TagByte {
+        if (text == "false") {
+            return TagByte(0)
+        }
+        if (text == "true") {
+            return TagByte(1)
+        }
+
         return TagByte(text.trim().replace("[bB]".toRegex(), "").toByte())
     }
 }

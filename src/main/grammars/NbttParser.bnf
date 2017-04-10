@@ -52,7 +52,7 @@ compound ::= LBRACE named_tag* RBRACE {
     implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttCompoundMixin"
 }
 named_tag ::= tag_name COLON tag
-tag_name ::= STRING_LITERAL {
+tag_name ::= STRING_LITERAL | UNQUOTED_STRING_LITERAL {
     methods=[getTagName]
     mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttTagNameImplMixin"
     implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttTagNameMixin"
@@ -97,8 +97,8 @@ double ::= DOUBLE_LITERAL {
     implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttDoubleMixin"
 }
 
-string ::= STRING_LITERAL {
-    methods=[getStringTag]
+string ::= STRING_LITERAL | UNQUOTED_STRING_LITERAL {
+    methods=[getStringTag getStringValue]
     mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttStringImplMixin"
     implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttStringMixin"
 }

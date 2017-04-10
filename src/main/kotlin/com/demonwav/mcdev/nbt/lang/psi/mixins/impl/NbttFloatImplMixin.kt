@@ -18,6 +18,10 @@ import com.intellij.lang.ASTNode
 abstract class NbttFloatImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttFloatMixin {
 
     override fun getFloatTag(): TagFloat {
+        // Can't just regex out the f, since "Infinity" contains an f
+        if (text.contains("Infinity")) {
+            return TagFloat(text.trim().let { it.substring(0, it.length - 1) }.toFloat())
+        }
         return TagFloat(text.trim().replace("[fF]".toRegex(), "").toFloat())
     }
 }

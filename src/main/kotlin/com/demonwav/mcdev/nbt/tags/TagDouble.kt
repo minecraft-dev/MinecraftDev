@@ -20,5 +20,5 @@ class TagDouble(override val value: Double) : NbtValueTag<Double>(Double::class.
         stream.writeDouble(value)
     }
 
-    override fun toString() = toString(StringBuilder(), 0).toString()
+    override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 }

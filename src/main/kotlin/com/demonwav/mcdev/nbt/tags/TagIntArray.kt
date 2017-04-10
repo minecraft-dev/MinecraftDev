@@ -24,14 +24,11 @@ class TagIntArray(override val value: IntArray) : NbtValueTag<IntArray>(IntArray
         }
     }
 
-    override fun toString() = toString(StringBuilder(), 0).toString()
+    override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
-    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
-        sb.append("ints(\n")
-        indent(sb, indentLevel + 1)
+    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
+        sb.append("ints(")
         value.joinTo(buffer = sb, separator = ", ")
-        sb.append("\n")
-        indent(sb, indentLevel)
         sb.append(")")
         return sb
     }

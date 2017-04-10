@@ -59,9 +59,9 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
         return Objects.hashCode(tagMap)
     }
 
-    override fun toString() = toString(StringBuilder(), 0).toString()
+    override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
-    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
+    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
         sb.append("{")
 
         if (tagMap.isEmpty()) {
@@ -73,8 +73,8 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
 
         for ((key, value) in tagMap) {
             indent(sb, indentLevel + 1)
-            value.appendName(sb, key)
-            value.toString(sb, indentLevel + 1)
+            appendName(sb, key)
+            value.toString(sb, indentLevel + 1, WriterState.COMPOUND)
             sb.append("\n")
         }
 
@@ -95,9 +95,9 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
 
 class RootCompound(private val name: String, tagMap: Map<String, NbtTag>) : TagCompound(tagMap) {
 
-    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
+    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
         appendName(sb, name)
-        super.toString(sb, indentLevel)
+        super.toString(sb, indentLevel, WriterState.COMPOUND)
         return sb
     }
 
@@ -114,7 +114,7 @@ class RootCompound(private val name: String, tagMap: Map<String, NbtTag>) : TagC
 
     fun buildPsi(project: Project): NbttRootCompound {
         val sb = StringBuilder()
-        toString(sb, 0)
+        toString(sb, 0, WriterState.COMPOUND)
         return (PsiFileFactory.getInstance(project).createFileFromText("name", NbttFileType, sb.toString()) as NbttFile)
             .firstChild as NbttRootCompound
     }

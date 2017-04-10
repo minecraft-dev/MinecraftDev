@@ -20,9 +20,9 @@ class TagString(override val value: String) : NbtValueTag<String>(String::class.
         stream.writeUTF(value)
     }
 
-    override fun toString() = toString(StringBuilder(), 0).toString()
+    override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
-    override fun toString(sb: StringBuilder, indentLevel: Int): StringBuilder {
-        return sb.append("\"").append(value.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")).append("\"")
+    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
+        return writeString(sb, value)
     }
 }
