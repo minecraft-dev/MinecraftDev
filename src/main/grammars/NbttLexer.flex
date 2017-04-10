@@ -57,7 +57,7 @@ FLOAT_LITERAL = [+-]?(\d+(\.\d*)?[fF]|\d*\.\d+[fF]|Infinity[fF])|NaN[fF]
 DOUBLE_LITERAL = [+-]?(\d*\.\d+[dD|]?|\d+\.\d*[dD|]?|\d+[dD|]|Infinity[dD|]?)|NaN[dD|]?
 
 STRING_LITERAL = \"([^\"\\\n]|(\\[\"\\nt]))*[\"\n]
-UNQUOTED_STRING_LITERAL = ([^\"\s\n:{}\[\](),\d+-]|\\[\"\\nt])|([^\"\s\n:{}\[\](),\d+-]|\\[\"\\nt])([^\"\\:{}\[\](),\n]|\\[\"\\nt])*[^\"\s\n:{}\[\](),]
+UNQUOTED_STRING_LITERAL = ([^\"\s\n:{}\[\](),\d+\-]|\\[\"\\nt])|([^\"\s\n:{}\[\](),\d+\-]|\\[\"\\nt])([^\"\\:{}\[\](),\n]|\\[\"\\nt])*[^\"\s\n:{}\[\](),]
 
 BYTE_ARRAY_LITERAL = [+-]?\d+[bB]?|true|false
 BYTE_ARRAY_INT_LITEARL = [+-]?\d+[iI]
