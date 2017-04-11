@@ -10,6 +10,10 @@
 
 package com.demonwav.mcdev.nbt.lang.colors
 
-class NbttSyntaxHighlighterFactory : com.intellij.openapi.fileTypes.SyntaxHighlighterFactory() {
-    override fun getSyntaxHighlighter(project: com.intellij.openapi.project.Project?, virtualFile: com.intellij.openapi.vfs.VirtualFile?) = NbttSyntaxHighlighter()
+import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
+
+class NbttSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
+    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?) = NbttSyntaxHighlighter()
 }
