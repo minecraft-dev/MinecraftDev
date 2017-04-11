@@ -33,15 +33,12 @@ import java.util.zip.ZipException
 object Nbt {
 
     private fun getActualInputStream(stream: InputStream): DataInputStream {
-        var tempStream: InputStream? = null
         try {
-            tempStream = GZIPInputStream(stream)
+            return DataInputStream(GZIPInputStream(stream))
         } catch (e: ZipException) {
-            tempStream?.close()
-            tempStream = stream
-            tempStream.reset()
+            stream.reset()
+            return DataInputStream(stream)
         }
-        return DataInputStream(tempStream!!)
     }
 
     /**

@@ -17,6 +17,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFileFactory
+import com.intellij.psi.PsiManager
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
@@ -44,24 +45,31 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
     override fun getChildren() = emptyArray<VirtualFile>()
     override fun isWritable() = backingFile.isWritable
     override fun getOutputStream(requestor: Any, newModificationStamp: Long, newTimeStamp: Long) =
-        VfsUtilCore.outputStreamAddingBOM(NbtOutputStream(requestor, this, project), this)
+        VfsUtilCore.outputStreamAddingBOM(NbtOutputStream(requestor, this, project, true), this)
 }
 
-class NbtOutputStream(private val requestor: Any, private val file: NbtVirtualFile, private val project: Project) : ByteArrayOutputStream() {
+private class NbtOutputStream(
+    private val requestor: Any,
+    private val file: NbtVirtualFile,
+    private val project: Project,
+    private val compressed: Boolean
+) : ByteArrayOutputStream() {
     override fun close() {
-        val bytes = toByteArray()
-        val text = String(bytes)
+        file.bytes = toByteArray()
 
-        val rootTag = ((PsiFileFactory.getInstance(project)
-            .createFileFromText(NbttLanguage, text) as NbttFile).firstChild as NbttRootCompound).getRootCompoundTag()
+        val nbttFile = PsiManager.getInstance(project).findFile(file) as NbttFile
+        val rootTag = nbttFile.getRootCompound().getRootCompoundTag()
 
+        // just to be safe
         file.parent.bom = null
-        file.parent.getOutputStream(requestor).use { outputStream ->
-            GZIPOutputStream(outputStream).use { gzip ->
-                DataOutputStream(gzip).use { stream ->
-                    rootTag.write(stream)
-                }
-            }
+        val filteredStream = if (compressed) {
+            GZIPOutputStream(file.parent.getOutputStream(requestor))
+        } else {
+            file.parent.getOutputStream(requestor)
+        }
+
+        DataOutputStream(filteredStream).use { stream ->
+            rootTag.write(stream)
         }
     }
 }
