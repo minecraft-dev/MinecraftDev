@@ -11,21 +11,20 @@
 package com.demonwav.mcdev.platform.mixin.inspection.implements.suppress
 
 import com.demonwav.mcdev.platform.mixin.util.isSoftImplementedMethod
+import com.demonwav.mcdev.util.findContainingMethod
 import com.intellij.codeInspection.InspectionSuppressor
 import com.intellij.codeInspection.SuppressQuickFix
 import com.intellij.codeInspection.visibility.VisibilityInspection
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiKeyword
-import com.intellij.psi.PsiMethod
 
-class SoftImplementWeakenAccessInspectionSuppressor : InspectionSuppressor {
+class SoftImplementInspectionSuppressor : InspectionSuppressor {
 
     override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {
-        if (toolId != VisibilityInspection.SHORT_NAME || element !is PsiKeyword) {
+        if (toolId != VisibilityInspection.SHORT_NAME && toolId != "override") {
             return false
         }
 
-        val method = element.parent?.parent as? PsiMethod ?: return false
+        val method = element.findContainingMethod() ?: return false
         return method.isSoftImplementedMethod()
     }
 

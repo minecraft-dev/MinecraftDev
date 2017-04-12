@@ -40,7 +40,7 @@ class OverwriteModifiersInspection : OverwriteInspection() {
             val targetModifier = target.hasModifierProperty(modifier)
             val overwriteModifier = modifierList.hasModifierProperty(modifier)
             if (targetModifier != overwriteModifier) {
-                val target: PsiElement
+                val marker: PsiElement
                 val message = if (isAccessModifier(modifier)) {
                     if (!targetModifier) {
                         // Don't attempt to remove access modifiers
@@ -48,17 +48,17 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                     }
 
                     val currentModifier = PsiUtil.getAccessModifier(PsiUtil.getAccessLevel(modifierList))
-                    target = modifierList.findKeyword(currentModifier) ?: nameIdentifier
+                    marker = modifierList.findKeyword(currentModifier) ?: nameIdentifier
                     "Invalid access modifiers, has: $currentModifier, but target has: $overwriteModifier"
                 } else if (targetModifier) {
-                    target = nameIdentifier
+                    marker = nameIdentifier
                     "Method must be '$modifier'"
                 } else {
-                    target = modifierList.findKeyword(modifier) ?: nameIdentifier
+                    marker = modifierList.findKeyword(modifier) ?: nameIdentifier
                     "'$modifier' modifier does not match target method"
                 }
 
-                holder.registerProblem(target, message,
+                holder.registerProblem(marker, message,
                     QuickFixFactory.getInstance().createModifierListFix(modifierList, modifier, targetModifier, false))
             }
         }
