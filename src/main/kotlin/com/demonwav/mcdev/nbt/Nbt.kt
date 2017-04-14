@@ -32,12 +32,12 @@ import java.util.zip.ZipException
 
 object Nbt {
 
-    private fun getActualInputStream(stream: InputStream): DataInputStream {
+    private fun getActualInputStream(stream: InputStream): Pair<DataInputStream, Boolean> {
         try {
-            return DataInputStream(GZIPInputStream(stream))
+            return DataInputStream(GZIPInputStream(stream)) to true
         } catch (e: ZipException) {
             stream.reset()
-            return DataInputStream(stream)
+            return DataInputStream(stream) to false
         }
     }
 
@@ -45,8 +45,8 @@ object Nbt {
      * Parse the NBT file from the InputStream and return the root TagCompound for the NBT file. This method closes the stream when
      * it is finished with it.
      */
-    fun buildTagTree(inputStream: InputStream): RootCompound {
-        val stream = getActualInputStream(inputStream)
+    fun buildTagTree(inputStream: InputStream): Pair<RootCompound, Boolean> {
+        val (stream, isCompressed) = getActualInputStream(inputStream)
 
         stream.use {
             val tagIdByte = stream.readByte()
@@ -56,7 +56,7 @@ object Nbt {
                 throw MalformedNbtFileException("Root tag in NBT file is not a compound.")
             }
 
-            return RootCompound(stream.readUTF(), stream.readCompoundTag().tagMap)
+            return RootCompound(stream.readUTF(), stream.readCompoundTag().tagMap) to isCompressed
         }
     }
 

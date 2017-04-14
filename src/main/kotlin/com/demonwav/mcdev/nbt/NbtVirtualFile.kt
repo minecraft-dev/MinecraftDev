@@ -10,13 +10,12 @@
 
 package com.demonwav.mcdev.nbt
 
+import com.demonwav.mcdev.nbt.editor.CompressionSelection
+import com.demonwav.mcdev.nbt.editor.NbtToolbar
 import com.demonwav.mcdev.nbt.lang.NbttFile
-import com.demonwav.mcdev.nbt.lang.NbttLanguage
-import com.demonwav.mcdev.nbt.lang.gen.psi.NbttRootCompound
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -25,7 +24,15 @@ import java.util.zip.GZIPOutputStream
 
 class NbtVirtualFile(private val backingFile: VirtualFile, private val project: Project) : VirtualFile() {
 
-    var bytes = Nbt.buildTagTree(backingFile.inputStream).toString().toByteArray()
+    var bytes: ByteArray
+    val isCompressed: Boolean
+    lateinit var toolbar: NbtToolbar
+
+    init {
+        val (rootCompound, isCompressed) = Nbt.buildTagTree(backingFile.inputStream)
+        this.bytes = rootCompound.toString().toByteArray()
+        this.isCompressed = isCompressed
+    }
 
     override fun refresh(asynchronous: Boolean, recursive: Boolean, postRunnable: Runnable?) {
         backingFile.refresh(asynchronous, recursive, postRunnable)
@@ -45,14 +52,14 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
     override fun getChildren() = emptyArray<VirtualFile>()
     override fun isWritable() = backingFile.isWritable
     override fun getOutputStream(requestor: Any, newModificationStamp: Long, newTimeStamp: Long) =
-        VfsUtilCore.outputStreamAddingBOM(NbtOutputStream(requestor, this, project, true), this)
+        VfsUtilCore.outputStreamAddingBOM(NbtOutputStream(requestor, this, project, toolbar.selection), this)
 }
 
 private class NbtOutputStream(
     private val requestor: Any,
     private val file: NbtVirtualFile,
     private val project: Project,
-    private val compressed: Boolean
+    private val compressionSelection: CompressionSelection
 ) : ByteArrayOutputStream() {
     override fun close() {
         file.bytes = toByteArray()
@@ -62,10 +69,9 @@ private class NbtOutputStream(
 
         // just to be safe
         file.parent.bom = null
-        val filteredStream = if (compressed) {
-            GZIPOutputStream(file.parent.getOutputStream(requestor))
-        } else {
-            file.parent.getOutputStream(requestor)
+        val filteredStream = when (compressionSelection) {
+            CompressionSelection.GZIP -> GZIPOutputStream(file.parent.getOutputStream(requestor))
+            CompressionSelection.UNCOMPRESSED -> file.parent.getOutputStream(requestor)
         }
 
         DataOutputStream(filteredStream).use { stream ->
