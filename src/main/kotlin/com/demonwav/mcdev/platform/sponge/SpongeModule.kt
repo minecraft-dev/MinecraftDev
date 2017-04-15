@@ -33,7 +33,7 @@ import com.intellij.psi.impl.compiled.ClsMethodImpl
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.annotations.Contract
 
-class SpongeModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
+class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
     override val moduleType = SpongeModuleType
     override val type = PlatformType.SPONGE

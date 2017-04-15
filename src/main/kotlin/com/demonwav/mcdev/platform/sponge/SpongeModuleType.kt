@@ -16,6 +16,7 @@ import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.generation.SpongeEventGenerationPanel
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
+import com.demonwav.mcdev.util.CommonColors
 import com.intellij.psi.PsiClass
 
 object SpongeModuleType : AbstractModuleType<SpongeModule>("org.spongepowered", "spongeapi") {
@@ -24,6 +25,10 @@ object SpongeModuleType : AbstractModuleType<SpongeModule>("org.spongepowered", 
 
     val IGNORED_ANNOTATIONS = listOf(SpongeConstants.LISTENER_ANNOTATION, SpongeConstants.PLUGIN_ANNOTATION)
     val LISTENER_ANNOTATIONS = listOf(SpongeConstants.LISTENER_ANNOTATION)
+
+    init {
+        CommonColors.applyStandardColors(colorMap, SpongeConstants.TEXT_COLORS)
+    }
 
     override val platformType = PlatformType.SPONGE
     override val icon = PlatformAssets.SPONGE_ICON

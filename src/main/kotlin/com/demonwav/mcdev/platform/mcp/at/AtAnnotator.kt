@@ -80,15 +80,13 @@ class AtAnnotator : Annotator {
     }
 
     companion object {
-        val key = TextAttributesKey.createTextAttributesKey(
-            "AT_UNDERLINE",
-            TextAttributes(
-                null,
-                null,
-                AtSyntaxHighlighter.ELEMENT_NAME.defaultAttributes.foregroundColor,
-                EffectType.LINE_UNDERSCORE,
-                Font.PLAIN
-            )
-        )
+        @Suppress("DEPRECATION")
+        val key = TextAttributesKey.createTextAttributesKey("AT_UNDERLINE", TextAttributes(
+            null,
+            null,
+            AtSyntaxHighlighter.ELEMENT_NAME.defaultAttributes.foregroundColor,
+            EffectType.LINE_UNDERSCORE,
+            Font.PLAIN
+        ))
     }
 }
