@@ -63,7 +63,7 @@ class SpongeProjectConfiguration : ProjectConfiguration() {
                 buildSystem,
                 pluginName,
                 description,
-                website,
+                website ?: "",
                 hasAuthors(),
                 authors,
                 hasDependencies(),

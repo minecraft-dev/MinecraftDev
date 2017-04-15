@@ -24,7 +24,7 @@ abstract class ProjectConfiguration {
     lateinit var pluginVersion: String
     lateinit var mainClass: String
     lateinit var description: String
-    lateinit var website: String
+    var website: String? = null
     lateinit var type: PlatformType
 
     val authors = mutableListOf<String>()

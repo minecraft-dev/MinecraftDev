@@ -64,7 +64,7 @@ class SpongeForgeProjectConfiguration : ForgeProjectConfiguration() {
                 buildSystem,
                 pluginName,
                 description,
-                website,
+                website ?: "",
                 hasAuthors(),
                 authors,
                 hasDependencies(),

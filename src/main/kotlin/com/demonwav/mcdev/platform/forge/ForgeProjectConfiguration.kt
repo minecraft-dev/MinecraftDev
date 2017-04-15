@@ -80,7 +80,7 @@ open class ForgeProjectConfiguration : ProjectConfiguration() {
             buildSystem.artifactId,
             pluginName,
             description,
-            website,
+            website ?: "",
             updateUrl,
             authorsText,
             dependenciesText
