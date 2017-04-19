@@ -3,7 +3,7 @@ buildscript {
         jcenter()
         maven {
             name = "forge"
-            url = "http://files.minecraftforge.net/maven"
+            url = "https://files.minecraftforge.net/maven"
         }
 #if (${SPONGE_FORGE})
         maven {
@@ -14,7 +14,7 @@ buildscript {
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT"
 #if (${SPONGE_FORGE})
-        classpath "gradle.plugin.org.spongepowered:spongegradle:0.6"
+        classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
 #end
     }
 }
