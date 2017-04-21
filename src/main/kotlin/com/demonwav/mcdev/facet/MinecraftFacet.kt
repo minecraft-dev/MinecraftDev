@@ -63,7 +63,7 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
     fun refresh() {
         // Don't allow parent types with child types in auto detected set
-        configuration.state.autoDetectTypes = PlatformType.removeParents(configuration.state.autoDetectTypes)
+        PlatformType.removeParents(configuration.state.autoDetectTypes)
 
         val userEnabled = configuration.state.userChosenTypes.entries.asSequence()
             .filter { it.value }
