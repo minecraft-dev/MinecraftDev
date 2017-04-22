@@ -83,12 +83,11 @@ fun PsiExpressionList.setColor(red: Int, green: Int, blue: Int) {
         val nodeTwo = expressionTwo.node
         val nodeThree = expressionThree.node
 
-        val literalExpressionOne = JavaPsiFacade.getElementFactory(this.project)
-            .createExpressionFromText(red.toString(), null)
-        val literalExpressionTwo = JavaPsiFacade.getElementFactory(this.project)
-            .createExpressionFromText(green.toString(), null)
-        val literalExpressionThree = JavaPsiFacade.getElementFactory(this.project)
-            .createExpressionFromText(blue.toString(), null)
+        val facade = JavaPsiFacade.getElementFactory(this.project)
+
+        val literalExpressionOne = facade.createExpressionFromText(red.toString(), null)
+        val literalExpressionTwo = facade.createExpressionFromText(green.toString(), null)
+        val literalExpressionThree = facade.createExpressionFromText(blue.toString(), null)
 
         nodeOne.psi.replace(literalExpressionOne)
         nodeTwo.psi.replace(literalExpressionTwo)
