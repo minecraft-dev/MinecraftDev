@@ -89,7 +89,7 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         allEnabled
             .map { it.type }
             .filter { !modules.containsKey(it) }
-            .forEach { register(it) }
+            .forEach(this::register)
 
         ProjectView.getInstance(module.project).refresh()
     }

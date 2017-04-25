@@ -99,7 +99,7 @@ enum class PlatformType(
 
             types.clear()
             for (i in 0 until count) {
-                types.add(result[0]!!)
+                types.add(result[i]!!)
             }
         }
 

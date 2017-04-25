@@ -49,7 +49,7 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: Component) {
     }
 
     private fun addToPanel(row: Int, cols: Int, panel: JPanel, iterator: Iterator<Map.Entry<String, Color>>) {
-        for (i in 0..cols - 1) {
+        for (i in 0 until cols) {
             if (!iterator.hasNext()) {
                 break
             }
@@ -70,9 +70,7 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: Component) {
             constraints.fill = GridBagConstraints.NONE
             constraints.insets = Insets(10, 10, 10, 10)
 
-            panel.add(
-                label,
-                constraints
+            panel.add(label, constraints
             )
         }
     }
