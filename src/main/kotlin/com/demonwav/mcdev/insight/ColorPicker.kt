@@ -70,8 +70,7 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: Component) {
             constraints.fill = GridBagConstraints.NONE
             constraints.insets = Insets(10, 10, 10, 10)
 
-            panel.add(label, constraints
-            )
+            panel.add(label, constraints)
         }
     }
 
