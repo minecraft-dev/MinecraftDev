@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INVOKER
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MIXIN
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
+import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.findQualifiedClass
 import com.demonwav.mcdev.util.resolveClassArray
@@ -59,16 +60,17 @@ val PsiClass.mixinAnnotation
 @get:Contract(pure = true)
 val PsiClass.mixinTargets: List<PsiClass>
     get() {
-        val mixinAnnotation = mixinAnnotation ?: return emptyList()
+        return cached {
+            val mixinAnnotation = mixinAnnotation ?: return@cached emptyList()
 
-        // Read class targets (value)
-        val classTargets = mixinAnnotation.findDeclaredAttributeValue(null)?.resolveClassArray()?.toMutableList() ?: ArrayList()
+            // Read class targets (value)
+            val classTargets = mixinAnnotation.findDeclaredAttributeValue(null)?.resolveClassArray()?.toMutableList() ?: ArrayList()
 
-        // Read and add string targets (targets)
-        mixinAnnotation.findDeclaredAttributeValue("targets")?.computeStringArray()
-            ?.mapNotNullTo(classTargets) { name -> findQualifiedClass(name.replace('/', '.'), mixinAnnotation) }
-
-        return classTargets
+            // Read and add string targets (targets)
+            mixinAnnotation.findDeclaredAttributeValue("targets")?.computeStringArray()
+                ?.mapNotNullTo(classTargets) { name -> findQualifiedClass(name.replace('/', '.'), mixinAnnotation) }
+            classTargets
+        }
     }
 
 /**
