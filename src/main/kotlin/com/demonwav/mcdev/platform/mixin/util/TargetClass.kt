@@ -64,11 +64,12 @@ fun findFields(psiClass: PsiClass): Sequence<PsiField>? {
 
 @Contract(pure = true)
 fun findShadowTargets(psiClass: PsiClass, start: PsiClass, superMixin: Boolean): Sequence<ShadowTarget> {
-    return if (superMixin)
+    return if (superMixin) {
         findShadowTargetsDeep(psiClass, start)
-    else
+    } else {
         // No need to walk the hierarchy if we don't have a super mixin
         findMethods(start).plus<PsiMember>(findFields(start))?.map { ShadowTarget(null, it) } ?: emptySequence()
+    }
 }
 
 @Contract(pure = true)

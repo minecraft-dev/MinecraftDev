@@ -44,7 +44,9 @@ class MixinCompletionContributor : CompletionContributor() {
 
         // Check if completing inside Mixin class
         val psiClass = position.findContainingClass() ?: return
-        if (!psiClass.isMixin) return
+        if (!psiClass.isMixin) {
+            return
+        }
 
         val superMixin = psiClass.superClass?.takeIf { it.isWritable && it.isMixin }
 
