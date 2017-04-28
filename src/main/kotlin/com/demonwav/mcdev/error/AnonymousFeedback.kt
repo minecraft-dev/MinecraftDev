@@ -36,13 +36,13 @@ object AnonymousFeedback {
 
         var errorMessage = body["error.message"]
         if (errorMessage.isNullOrBlank()) {
-            errorMessage = "invalid error"
+            errorMessage = "no error"
         }
         body.remove("error.message")
 
         var stackTrace = body["error.stacktrace"]
         if (stackTrace.isNullOrEmpty()) {
-            stackTrace = "invalid stacktrace"
+            stackTrace = "no stacktrace"
         }
         body.remove("error.stacktrace")
 
