@@ -26,8 +26,3 @@ class NbtToolbar(selection: CompressionSelection) {
     val selection
         get() = compressionBox.selectedItem as CompressionSelection
 }
-
-enum class CompressionSelection(private val selectionName: String) {
-    GZIP("GZipped"), UNCOMPRESSED("Uncompressed");
-    override fun toString() = selectionName
-}
