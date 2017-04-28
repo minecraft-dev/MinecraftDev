@@ -85,6 +85,8 @@
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
+
+        <errorHandler implementation="com.demonwav.mcdev.error.ErrorReporter"/>
         <!--endregion-->
 
         <!--region BUKKIT-->
