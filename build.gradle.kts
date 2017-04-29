@@ -29,7 +29,7 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.1.1"
+    id("org.jetbrains.kotlin.jvm") version "1.1.2"
     groovy
     idea
     id("org.jetbrains.intellij") version "0.2.7"
