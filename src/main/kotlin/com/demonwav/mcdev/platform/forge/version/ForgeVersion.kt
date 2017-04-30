@@ -12,19 +12,16 @@ package com.demonwav.mcdev.platform.forge.version
 
 import com.demonwav.mcdev.util.sortVersions
 import com.google.gson.Gson
-import org.apache.commons.io.IOUtils
 import java.io.IOException
 import java.net.URL
 import java.util.ArrayList
 
-class ForgeVersion private constructor() {
-
-    private var map: Map<*, *> = mutableMapOf<Any, Any>()
+class ForgeVersion private constructor(private val map: Map<*, *>) {
 
     val sortedMcVersions: List<String>
         get() {
-            val mcversion = map["mcversion"] as Map<*, *>
-            return sortVersions(mcversion.keys)
+            val mcVersion = map["mcversion"] as Map<*, *>
+            return sortVersions(mcVersion.keys)
         }
 
     fun getRecommended(versions: List<String>): String? {
@@ -84,18 +81,13 @@ class ForgeVersion private constructor() {
     companion object {
         fun downloadData(): ForgeVersion? {
             try {
-                URL("https://files.minecraftforge.net/maven/net/minecraftforge/forge/json").openStream().use { inputStream ->
-                    val text = IOUtils.toString(inputStream)
+                val text = URL("https://files.minecraftforge.net/maven/net/minecraftforge/forge/json").readText()
 
-                    val map = Gson().fromJson(text, Map::class.java)
-                    val version = ForgeVersion()
-                    version.map = map
-                    return version
-                }
+                val map = Gson().fromJson(text, Map::class.java)
+                return ForgeVersion(map)
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-
             return null
         }
     }

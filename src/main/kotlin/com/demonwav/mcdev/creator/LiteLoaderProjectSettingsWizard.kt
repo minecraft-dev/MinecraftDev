@@ -13,6 +13,7 @@ package com.demonwav.mcdev.creator
 import com.demonwav.mcdev.exception.MinecraftSetupException
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
+import com.demonwav.mcdev.platform.liteloader.version.LiteLoaderVersion
 import com.demonwav.mcdev.platform.mcp.version.McpVersion
 import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry
 import com.intellij.openapi.application.ApplicationManager
@@ -48,6 +49,7 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
     private var settings: LiteLoaderProjectConfiguration? = null
 
     private var mcpVersion: McpVersion? = null
+    private var liteloaderVersion: LiteLoaderVersion? = null
 
     private var mainClassModified = false
 
@@ -114,23 +116,22 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
             object : SwingWorker<Any?, Any?>() {
                 override fun doInBackground(): Any? {
                     mcpVersion = McpVersion.downloadData()
+                    liteloaderVersion = LiteLoaderVersion.downloadData()
                     return null
                 }
 
                 override fun done() {
-                    if (mcpVersion == null) {
+                    if (mcpVersion == null || liteloaderVersion == null) {
                         return
                     }
 
                     minecraftVersionBox.removeAllItems()
 
-                    mcpVersion!!.versions.forEach { minecraftVersionBox.addItem(it) }
+                    liteloaderVersion!!.sortedMcVersions.forEach { minecraftVersionBox.addItem(it) }
                     // Always select most recent
                     minecraftVersionBox.selectedIndex = 0
 
-                    if (mcpVersion != null) {
-                        mcpVersion!!.setMcpVersion(mcpVersionBox, minecraftVersionBox.selectedItem as String, mcpBoxActionListener)
-                    }
+                    mcpVersion!!.setMcpVersion(mcpVersionBox, minecraftVersionBox.selectedItem as String, mcpBoxActionListener)
 
                     loadingBar.isIndeterminate = false
                     loadingBar.isVisible = false
