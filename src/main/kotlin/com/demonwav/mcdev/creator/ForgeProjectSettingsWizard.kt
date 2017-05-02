@@ -149,11 +149,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
 
     private fun setForgeVersion(data: Data) {
         forgeVersionBox.model = DefaultComboBoxModel<String>(data.forgeVersions.toTypedArray())
-        try {
-            forgeVersionBox.selectedIndex = data.forgeSelectedIndex
-        } catch (e: IllegalArgumentException) {
-            println()
-        }
+        forgeVersionBox.selectedIndex = data.forgeSelectedIndex
     }
 
     private val version: String?
