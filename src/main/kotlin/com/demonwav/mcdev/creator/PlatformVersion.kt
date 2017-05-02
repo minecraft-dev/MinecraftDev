@@ -12,7 +12,6 @@ package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.platform.PlatformType
 import com.google.gson.Gson
-import org.apache.commons.io.IOUtils
 import org.jetbrains.concurrency.runAsync
 import java.net.URL
 import java.util.Arrays
@@ -23,7 +22,6 @@ private const val baseUrl = "https://minecraftdev.org/versions"
 private const val bukkitUrl = "$baseUrl/bukkit.json"
 private const val spigotUrl = "$baseUrl/spigot.json"
 private const val paperUrl = "$baseUrl/paper.json"
-private const val spongeUrl = "$baseUrl/sponge.json"
 private const val bungeecordUrl = "$baseUrl/bungeecord.json"
 private const val canaryUrl = "$baseUrl/canary.json"
 private const val neptuneUrl = "$baseUrl/neptune.json"
@@ -33,7 +31,6 @@ fun getVersionSelector(type: PlatformType) = runAsync {
         PlatformType.BUKKIT -> bukkitUrl
         PlatformType.SPIGOT -> spigotUrl
         PlatformType.PAPER -> paperUrl
-        PlatformType.SPONGE -> spongeUrl
         PlatformType.BUNGEECORD -> bungeecordUrl
         PlatformType.CANARY -> canaryUrl
         PlatformType.NEPTUNE -> neptuneUrl
@@ -46,14 +43,11 @@ fun getVersionSelector(type: PlatformType) = runAsync {
         "User-Agent",
         "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2"
     )
-    val text = connection.getInputStream().use {
-        IOUtils.toString(it)
-    }
-
-    Gson().fromJson(text, VersionSelector::class.java)
+    val text = connection.getInputStream().use { it.reader().use { it.readText() } }
+    Gson().fromJson(text, PlatformVersion::class.java)
 }
 
-data class VersionSelector(var versions: Array<String>, var selectedIndex: Int) {
+data class PlatformVersion(var versions: Array<String>, var selectedIndex: Int) {
 
     fun set(combo: JComboBox<String>) {
         combo.removeAllItems()
@@ -68,7 +62,7 @@ data class VersionSelector(var versions: Array<String>, var selectedIndex: Int) 
             return true
         }
 
-        if (other !is VersionSelector) {
+        if (other !is PlatformVersion) {
             return false
         }
 

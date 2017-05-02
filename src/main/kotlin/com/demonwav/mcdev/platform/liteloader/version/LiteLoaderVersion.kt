@@ -17,11 +17,10 @@ import java.net.URL
 
 class LiteLoaderVersion private constructor(private var map: Map<*, *>) {
 
-    val sortedMcVersions: List<String>
-        get() {
-            val mcVersion = map["versions"] as Map<*, *>
-            return sortVersions(mcVersion.keys)
-        }
+    val sortedMcVersions: List<String> by lazy {
+        val mcVersion = map["versions"] as Map<*, *>
+        sortVersions(mcVersion.keys)
+    }
 
     companion object {
         fun downloadData(): LiteLoaderVersion? {
@@ -29,7 +28,9 @@ class LiteLoaderVersion private constructor(private var map: Map<*, *>) {
                 val text = URL("http://dl.liteloader.com/versions/versions.json").readText()
 
                 val map = Gson().fromJson(text, Map::class.java)
-                return LiteLoaderVersion(map)
+                val liteLoaderVersion = LiteLoaderVersion(map)
+                liteLoaderVersion.sortedMcVersions
+                return liteLoaderVersion
             } catch (e: IOException) {
                 e.printStackTrace()
             }

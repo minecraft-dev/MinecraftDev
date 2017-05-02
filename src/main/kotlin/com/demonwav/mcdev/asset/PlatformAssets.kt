@@ -30,9 +30,9 @@ object PlatformAssets {
     val SPONGE_ICON_DARK = Assets.loadIcon("/assets/icons/platform/Sponge_dark.png")
     val SPONGE_ICON_2X_DARK = Assets.loadIcon("/assets/icons/platform/Sponge@2x_dark.png")
 
-    val SPONGE_FORGE_ICON = Assets.loadIcon("/assets/icons/platform/SpongeForge_dark.png")
-    val SPONGE_FORGE_ICON_2X = Assets.loadIcon("/assets/icons/platform/SpongeForge@2x_dark.png")
-    val SPONGE_FORGE_ICON_DARK = Assets.loadIcon("/assets/icons/platform/SpongeForge.png")
+    val SPONGE_FORGE_ICON = Assets.loadIcon("/assets/icons/platform/SpongeForge.png")
+    val SPONGE_FORGE_ICON_2X = Assets.loadIcon("/assets/icons/platform/SpongeForge@2x.png")
+    val SPONGE_FORGE_ICON_DARK = Assets.loadIcon("/assets/icons/platform/SpongeForge_dark.png")
     val SPONGE_FORGE_ICON_2X_DARK = Assets.loadIcon("/assets/icons/platform/SpongeForge@2x_dark.png")
 
     val BUNGEECORD_ICON = Assets.loadIcon("/assets/icons/platform/BungeeCord.png")

@@ -18,13 +18,11 @@ import java.util.ArrayList
 
 class ForgeVersion private constructor(private val map: Map<*, *>) {
 
-    val sortedMcVersions: List<String>
-        get() {
-            val mcVersion = map["mcversion"] as Map<*, *>
-            return sortVersions(mcVersion.keys)
-        }
+    val sortedMcVersions: List<String> by lazy {
+        sortVersions((map["mcversion"] as Map<*, *>).keys)
+    }
 
-    fun getRecommended(versions: List<String>): String? {
+    fun getRecommended(versions: List<String>): String {
         var recommended = "1.7"
         for (version in versions) {
             getPromo(version) ?: continue
@@ -72,7 +70,7 @@ class ForgeVersion private constructor(private val map: Map<*, *>) {
         val finalVersion = number["version"] as? String ?: return null
 
         if (branch == null) {
-            return mcVersion + "-" + finalVersion
+            return "$mcVersion-$finalVersion"
         } else {
             return "$mcVersion-$finalVersion-$branch"
         }
@@ -84,7 +82,9 @@ class ForgeVersion private constructor(private val map: Map<*, *>) {
                 val text = URL("https://files.minecraftforge.net/maven/net/minecraftforge/forge/json").readText()
 
                 val map = Gson().fromJson(text, Map::class.java)
-                return ForgeVersion(map)
+                val forgeVersion = ForgeVersion(map)
+                forgeVersion.sortedMcVersions // sort em up
+                return forgeVersion
             } catch (e: IOException) {
                 e.printStackTrace()
             }
