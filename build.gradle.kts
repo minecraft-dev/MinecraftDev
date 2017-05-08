@@ -119,7 +119,7 @@ dependencies {
 
 intellij {
     // IntelliJ IDEA dependency
-    version = "IC-$ideaVersion"
+    version = ideaVersion
     // Bundled plugin dependencies
     setPlugins("maven", "gradle", "Groovy",
         // needed dependencies for unit tests
