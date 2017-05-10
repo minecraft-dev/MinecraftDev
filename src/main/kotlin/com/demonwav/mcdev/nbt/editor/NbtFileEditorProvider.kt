@@ -22,7 +22,6 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.WritingAccessProvider
 import java.awt.BorderLayout
 import java.beans.PropertyChangeListener
 import javax.swing.JPanel
@@ -35,7 +34,7 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
         val nbtFile = NbtVirtualFile(file, project)
         val fileEditor = NbtFileEditor(
             super.createEditor(project, nbtFile),
-            if (nbtFile.isCompressed) CompressionSelection.GZIP else CompressionSelection.UNCOMPRESSED
+            nbtFile
         )
 
         if (NonProjectFileWritingAccessProvider.isWriteAccessAllowed(file, project)) {
@@ -51,9 +50,9 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
     }
 }
 
-private class NbtFileEditor(private val editor: FileEditor, selection: CompressionSelection) : FileEditor {
+private class NbtFileEditor(private val editor: FileEditor, nbtFile: NbtVirtualFile) : FileEditor {
 
-    val toolbar = NbtToolbar(selection)
+    val toolbar = NbtToolbar(nbtFile)
     private val component = JPanel(BorderLayout())
 
     init {

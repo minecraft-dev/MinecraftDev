@@ -52,30 +52,29 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
     override fun getChildren() = emptyArray<VirtualFile>()
     override fun isWritable() = backingFile.isWritable
     override fun getOutputStream(requestor: Any, newModificationStamp: Long, newTimeStamp: Long) =
-        VfsUtilCore.outputStreamAddingBOM(NbtOutputStream(requestor, this, project, toolbar.selection), this)
-}
+        VfsUtilCore.outputStreamAddingBOM(NbtOutputStream(this, requestor), this)
 
-private class NbtOutputStream(
-    private val requestor: Any,
-    private val file: NbtVirtualFile,
-    private val project: Project,
-    private val compressionSelection: CompressionSelection
-) : ByteArrayOutputStream() {
-    override fun close() {
-        file.bytes = toByteArray()
-
-        val nbttFile = PsiManager.getInstance(project).findFile(file) as NbttFile
+    fun writeFile(requestor: Any) {
+        val nbttFile = PsiManager.getInstance(project).findFile(this) as NbttFile
         val rootTag = nbttFile.getRootCompound().getRootCompoundTag()
 
         // just to be safe
-        file.parent.bom = null
-        val filteredStream = when (compressionSelection) {
-            CompressionSelection.GZIP -> GZIPOutputStream(file.parent.getOutputStream(requestor))
-            CompressionSelection.UNCOMPRESSED -> file.parent.getOutputStream(requestor)
+        this.parent.bom = null
+        val filteredStream = when (toolbar.selection) {
+            CompressionSelection.GZIP -> GZIPOutputStream(this.parent.getOutputStream(requestor))
+            CompressionSelection.UNCOMPRESSED -> this.parent.getOutputStream(requestor)
         }
 
         DataOutputStream(filteredStream).use { stream ->
             rootTag.write(stream)
         }
+    }
+}
+
+private class NbtOutputStream(private val file: NbtVirtualFile, private val requestor: Any) : ByteArrayOutputStream() {
+    override fun close() {
+        file.bytes = toByteArray()
+
+        file.writeFile(requestor)
     }
 }
