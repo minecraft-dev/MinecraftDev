@@ -16,11 +16,13 @@ import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorPolicy
 import com.intellij.openapi.fileEditor.FileEditorState
 import com.intellij.openapi.fileEditor.FileEditorStateLevel
+import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
 import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.WritingAccessProvider
 import java.awt.BorderLayout
 import java.beans.PropertyChangeListener
 import javax.swing.JPanel
@@ -35,6 +37,11 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
             super.createEditor(project, nbtFile),
             if (nbtFile.isCompressed) CompressionSelection.GZIP else CompressionSelection.UNCOMPRESSED
         )
+
+        if (NonProjectFileWritingAccessProvider.isWriteAccessAllowed(file, project)) {
+            NonProjectFileWritingAccessProvider.allowWriting(nbtFile)
+        }
+
         nbtFile.toolbar = fileEditor.toolbar
         return fileEditor
     }
