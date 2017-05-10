@@ -27,6 +27,6 @@ enum class NbtTypeId(val typeIdByte: Byte, val tagName: String, val tagClass: KC
     INT_ARRAY(11.toByte(), "TAG_Int_Array", TagIntArray::class);
 
     companion object {
-        fun getById(id: Byte) = values().first { it.typeIdByte == id }
+        fun getById(id: Byte) = values().firstOrNull { it.typeIdByte == id }
     }
 }

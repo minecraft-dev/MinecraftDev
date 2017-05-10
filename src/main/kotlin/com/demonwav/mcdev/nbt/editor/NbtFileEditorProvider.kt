@@ -32,10 +32,7 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
     override fun getPolicy() = FileEditorPolicy.NONE
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {
         val nbtFile = NbtVirtualFile(file, project)
-        val fileEditor = NbtFileEditor(
-            super.createEditor(project, nbtFile),
-            nbtFile
-        )
+        val fileEditor = NbtFileEditor(super.createEditor(project, nbtFile), nbtFile)
 
         if (NonProjectFileWritingAccessProvider.isWriteAccessAllowed(file, project)) {
             NonProjectFileWritingAccessProvider.allowWriting(nbtFile)

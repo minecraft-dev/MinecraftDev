@@ -27,11 +27,23 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
     var bytes: ByteArray
     val isCompressed: Boolean
     lateinit var toolbar: NbtToolbar
+    val parseSuccessful: Boolean
 
     init {
-        val (rootCompound, isCompressed) = Nbt.buildTagTree(backingFile.inputStream)
-        this.bytes = rootCompound.toString().toByteArray()
-        this.isCompressed = isCompressed
+        var tempCompressed: Boolean
+        var tempParseSuccessful: Boolean
+        try {
+            val (rootCompound, isCompressed) = Nbt.buildTagTree(backingFile.inputStream, 1000)
+            this.bytes = rootCompound.toString().toByteArray()
+            tempCompressed = isCompressed
+            tempParseSuccessful = true
+        } catch (e: MalformedNbtFileException) {
+            this.bytes = "Malformed NBT file:\n${e.message}".toByteArray()
+            tempCompressed = false
+            tempParseSuccessful = false
+        }
+        this.isCompressed = tempCompressed
+        this.parseSuccessful = tempParseSuccessful
     }
 
     override fun refresh(asynchronous: Boolean, recursive: Boolean, postRunnable: Runnable?) {
@@ -44,7 +56,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
     override fun isDirectory() = false
     override fun getTimeStamp() = backingFile.timeStamp
     override fun getModificationStamp() = 0L
-    override fun getName() = backingFile.name + ".nbtt"
+    override fun getName() = backingFile.name + (if (parseSuccessful) ".nbtt" else ".txt") // don't highlight syntax on bad files
     override fun contentsToByteArray() = bytes
     override fun isValid() = backingFile.isValid
     override fun getInputStream() = ByteArrayInputStream(bytes)

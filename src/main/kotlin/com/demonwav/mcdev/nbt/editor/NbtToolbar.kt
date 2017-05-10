@@ -31,12 +31,16 @@ class NbtToolbar(nbtFile: NbtVirtualFile) {
 
         saveButton.isVisible = false
 
-        if (!nbtFile.isWritable) {
+        if (!nbtFile.isWritable || !nbtFile.parseSuccessful) {
             compressionBox.isEnabled = false
         } else {
             compressionBox.addActionListener {
                 saveButton.isVisible = lastSelection != selection
             }
+        }
+
+        if (!nbtFile.parseSuccessful) {
+            panel.isVisible = false
         }
 
         saveButton.addActionListener {
