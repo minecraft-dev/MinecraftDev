@@ -59,6 +59,9 @@ val NbtTag.typeIdByte
 val NbtTag.typeName
     get() = typeId.tagName
 
+val forbiddenCharacters = "[:(){}\\[\\],]".toRegex()
+val badFormat = "^[\\d+\\-\\\\\\s\\n:{}\\[\\](),].*|.*[\"\\\\:{}\\[\\]()\\s\\n,]$".toRegex()
+
 fun writeString(sb: StringBuilder, s: String): StringBuilder {
     if (s.isBlank()) {
         return sb.append("\"").append(s.replace("\\n".toRegex(), "\\n")).append("\"")
@@ -71,7 +74,7 @@ fun writeString(sb: StringBuilder, s: String): StringBuilder {
 
     val replaced = s.replace("\\", "\\\\").replace("\n", "\\n").replace("\"", "\\\"").replace("\t", "\\t")
 
-    if (s.contains("[:(){}\\[\\],]".toRegex()) || s.matches("^[\\d+\\-\\\\\\s\\n:{}\\[\\](),].*|.*[\"\\\\:{}\\[\\]()\\s\\n,]$".toRegex())) {
+    if (forbiddenCharacters in s || s.matches(badFormat)) {
         // Use quotes around this awful string
         return sb.append("\"").append(replaced).append("\"")
     }
