@@ -119,7 +119,15 @@ int_array ::= INTS LPAREN int_params RPAREN {
 }
 int_params ::= (int COMMA?)*
 
-tag ::= compound | list | byte | short | int | long | float | double | string | byte_array | int_array {
+long_array ::= LONGS LPAREN long_params RPAREN {
+    pin = 2
+    methods=[getLongArrayTag]
+    mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttLongArrayImplMixin"
+    implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttLongArrayMixin"
+}
+long_params ::= (long COMMA?)*
+
+tag ::= compound | list | byte | short | int | long | float | double | string | byte_array | int_array | long_array {
     methods=[getType getTag]
     mixin="com.demonwav.mcdev.nbt.lang.psi.mixins.impl.NbttTagImplMixin"
     implements="com.demonwav.mcdev.nbt.lang.psi.mixins.NbttTagMixin"

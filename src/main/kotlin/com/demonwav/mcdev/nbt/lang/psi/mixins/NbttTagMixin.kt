@@ -19,6 +19,7 @@ import com.demonwav.mcdev.nbt.lang.gen.psi.NbttInt
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttIntArray
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttList
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttLong
+import com.demonwav.mcdev.nbt.lang.gen.psi.NbttLongArray
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttShort
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttString
 import com.demonwav.mcdev.nbt.lang.psi.NbttElement
@@ -33,6 +34,7 @@ interface NbttTagMixin : NbttElement {
     fun getFloat(): NbttFloat?
     fun getInt(): NbttInt?
     fun getIntArray(): NbttIntArray?
+    fun getLongArray(): NbttLongArray?
     fun getList(): NbttList?
     fun getLong(): NbttLong?
     fun getShort(): NbttShort?

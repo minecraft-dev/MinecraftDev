@@ -13,6 +13,8 @@ package com.demonwav.mcdev.nbt
 import com.demonwav.mcdev.nbt.editor.CompressionSelection
 import com.demonwav.mcdev.nbt.editor.NbtToolbar
 import com.demonwav.mcdev.nbt.lang.NbttFile
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
@@ -68,7 +70,17 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
 
     fun writeFile(requestor: Any) {
         val nbttFile = PsiManager.getInstance(project).findFile(this) as NbttFile
-        val rootTag = nbttFile.getRootCompound().getRootCompoundTag()
+        val rootTag = nbttFile.getRootCompound()?.getRootCompoundTag()
+
+        if (rootTag == null) {
+            Notification(
+                "NBT Save Error",
+                "Error Saving NBT File",
+                "Due to errors in the text representation, ${backingFile.name} could not be saved.",
+                NotificationType.WARNING
+            ).notify(project)
+            return
+        }
 
         // just to be safe
         this.parent.bom = null

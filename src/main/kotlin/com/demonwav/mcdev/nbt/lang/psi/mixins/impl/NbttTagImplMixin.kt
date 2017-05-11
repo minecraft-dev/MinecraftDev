@@ -43,6 +43,9 @@ abstract class NbttTagImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), Nbt
         if (getIntArray() != null) {
             return NbtTypeId.INT_ARRAY
         }
+        if (getLongArray() != null) {
+            return NbtTypeId.LONG_ARRAY
+        }
         if (getList() != null) {
             return NbtTypeId.LIST
         }
@@ -68,6 +71,7 @@ abstract class NbttTagImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), Nbt
             NbtTypeId.LIST -> getList()
             NbtTypeId.COMPOUND -> getCompound()
             NbtTypeId.INT_ARRAY -> getIntArray()
+            NbtTypeId.LONG_ARRAY -> getLongArray()
         }
     }
 }

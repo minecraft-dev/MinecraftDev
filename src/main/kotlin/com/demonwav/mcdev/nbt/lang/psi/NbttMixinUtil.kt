@@ -20,6 +20,7 @@ import com.demonwav.mcdev.nbt.lang.gen.psi.NbttInt
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttIntArray
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttList
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttLong
+import com.demonwav.mcdev.nbt.lang.gen.psi.NbttLongArray
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttShort
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttString
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttTag
@@ -39,6 +40,7 @@ fun NbttTag.getNtbTag(): NbtTag {
         NbtTypeId.LIST -> (getTag() as NbttList).getListTag()
         NbtTypeId.COMPOUND -> (getTag() as NbttCompound).getCompoundTag()
         NbtTypeId.INT_ARRAY -> (getTag() as NbttIntArray).getIntArrayTag()
+        NbtTypeId.LONG_ARRAY -> (getTag() as NbttLongArray).getLongArrayTag()
         else -> throw MalformedNbtFileException("Unknown error")
     }
 }

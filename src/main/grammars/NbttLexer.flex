@@ -39,6 +39,7 @@ import static com.intellij.psi.TokenType.*;
 
 %s IN_BYTE_ARRAY
 %s IN_INT_ARRAY
+%s IN_LONG_ARRAY
 %s IN_LIST
 %s EXPECT_NEXT
 
@@ -60,7 +61,9 @@ STRING_LITERAL = \"([^\"\\\n]|(\\[\"\\nt]))*[\"\n]
 UNQUOTED_STRING_LITERAL = ([^\"\s\n:{}\[\](),\d+\-]|\\[\"\\nt])|([^\"\s\n:{}\[\](),\d+\-]|\\[\"\\nt])([^\"\\:{}\[\](),\n]|\\[\"\\nt])*[^\"\s\n:{}\[\](),]
 
 BYTE_ARRAY_LITERAL = [+-]?\d+[bB]?|true|false
-BYTE_ARRAY_INT_LITEARL = [+-]?\d+[iI]
+ARRAY_INT_LITEARL = [+-]?\d+[iI]
+
+LONG_ARRAY_LITERAL = [+-]?\d+[lL]?
 
 
 %%
@@ -74,6 +77,7 @@ BYTE_ARRAY_INT_LITEARL = [+-]?\d+[iI]
     "["                         { stack.offerFirst(YYINITIAL); yybegin(IN_LIST); return LBRACKET; }
     "bytes"                     { stack.offerFirst(YYINITIAL); yybegin(IN_BYTE_ARRAY); return BYTES; }
     "ints"                      { stack.offerFirst(YYINITIAL); yybegin(IN_INT_ARRAY); return INTS; }
+    "longs"                     { stack.offerFirst(YYINITIAL); yybegin(IN_LONG_ARRAY); return LONGS; }
 
     {BYTE_LITERAL}              { return BYTE_LITERAL; }
     {SHORT_LITERAL}             { return SHORT_LITERAL; }
@@ -97,7 +101,7 @@ BYTE_ARRAY_INT_LITEARL = [+-]?\d+[iI]
     // we just want to match them correctly so the parser has something to grab on to
 
     // Integers have to be explicitly defined as ints here, implicit numbers are bytes
-    {BYTE_ARRAY_INT_LITEARL}    { stack.offerFirst(IN_BYTE_ARRAY); yybegin(EXPECT_NEXT); return INT_LITERAL; }
+    {ARRAY_INT_LITEARL}    { stack.offerFirst(IN_BYTE_ARRAY); yybegin(EXPECT_NEXT); return INT_LITERAL; }
 
     {SHORT_LITERAL}             { stack.offerFirst(IN_BYTE_ARRAY); yybegin(EXPECT_NEXT); return SHORT_LITERAL; }
     {LONG_LITERAL}              { stack.offerFirst(IN_BYTE_ARRAY); yybegin(EXPECT_NEXT); return LONG_LITERAL; }
@@ -126,6 +130,28 @@ BYTE_ARRAY_INT_LITEARL = [+-]?\d+[iI]
 
     {STRING_LITERAL}            { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return STRING_LITERAL; }
     {UNQUOTED_STRING_LITERAL}   { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return UNQUOTED_STRING_LITERAL; }
+}
+
+<IN_LONG_ARRAY> {
+    "("                         { return LPAREN; }
+    ","                         { return COMMA; }
+    ")"                         { yybegin(stack.pollFirst()); return RPAREN; }
+
+    {LONG_ARRAY_LITERAL}        { stack.offerFirst(IN_LONG_ARRAY); yybegin(EXPECT_NEXT); return LONG_LITERAL; }
+
+    // Everything below this is invalid
+    // we just want to match them correctly so the parser has something to grab on to
+
+    // Integers have to be explicitly defined as ints here, implicit numbers are longs
+    {ARRAY_INT_LITEARL}         { stack.offerFirst(IN_LONG_ARRAY); yybegin(EXPECT_NEXT); return INT_LITERAL; }
+
+    {BYTE_LITERAL}              { stack.offerFirst(IN_LONG_ARRAY); yybegin(EXPECT_NEXT); return BYTE_LITERAL; }
+    {SHORT_LITERAL}             { stack.offerFirst(IN_LONG_ARRAY); yybegin(EXPECT_NEXT); return SHORT_LITERAL; }
+    {FLOAT_LITERAL}             { stack.offerFirst(IN_LONG_ARRAY); yybegin(EXPECT_NEXT); return FLOAT_LITERAL; }
+    {DOUBLE_LITERAL}            { stack.offerFirst(IN_LONG_ARRAY); yybegin(EXPECT_NEXT); return DOUBLE_LITERAL; }
+
+    {STRING_LITERAL}            { stack.offerFirst(IN_LONG_ARRAY); yybegin(EXPECT_NEXT); return STRING_LITERAL; }
+    {UNQUOTED_STRING_LITERAL}   { stack.offerFirst(IN_LONG_ARRAY); yybegin(EXPECT_NEXT); return UNQUOTED_STRING_LITERAL; }
 }
 
 <IN_LIST> {

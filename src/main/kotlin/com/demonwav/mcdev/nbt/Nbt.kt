@@ -23,6 +23,7 @@ import com.demonwav.mcdev.nbt.tags.TagInt
 import com.demonwav.mcdev.nbt.tags.TagIntArray
 import com.demonwav.mcdev.nbt.tags.TagList
 import com.demonwav.mcdev.nbt.tags.TagLong
+import com.demonwav.mcdev.nbt.tags.TagLongArray
 import com.demonwav.mcdev.nbt.tags.TagShort
 import com.demonwav.mcdev.nbt.tags.TagString
 import java.io.DataInputStream
@@ -125,6 +126,17 @@ object Nbt {
         return@checkTimeout TagIntArray(ints)
     }
 
+    private fun DataInputStream.readLongArrayTag(start: Long, timeout: Long) = checkTimeout(start, timeout) {
+        val length = this.readInt()
+
+        val longs = LongArray(length)
+        for (i in 0 until length) {
+            longs[i] = this.readLong()
+        }
+
+        return@checkTimeout TagLongArray(longs)
+    }
+
     private fun DataInputStream.readTag(tagId: NbtTypeId, start: Long, timeout: Long): NbtTag {
         when (tagId) {
             NbtTypeId.END -> return TagEnd
@@ -139,6 +151,7 @@ object Nbt {
             NbtTypeId.LIST -> return this.readListTag(start, timeout)
             NbtTypeId.COMPOUND -> return this.readCompoundTag(start, timeout)
             NbtTypeId.INT_ARRAY -> return this.readIntArrayTag(start, timeout)
+            NbtTypeId.LONG_ARRAY -> return this.readLongArrayTag(start, timeout)
         }
     }
 

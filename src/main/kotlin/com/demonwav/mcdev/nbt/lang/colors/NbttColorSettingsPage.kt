@@ -35,6 +35,7 @@ class NbttColorSettingsPage : ColorSettingsPage {
             <name>"doubleTest"</name>: 0.4931287132182315
             <name>"byteArray"</name>: bytes(1, 2, 3, 4b, 5B)
             <name>"intArray"</name>: ints(1, 2, 3, 4i, 5I)
+            <name>"longArray"</name>: longs(1, 2, 3, 4l, 5L)
             <uname>boolArray</uname>: bytes(true, false, true)
             <name>"listTest (long)"</name>: [ 11L, 12L, 13L, 14L, 15L ]
             <name>"listTest (compound)"</name>: [

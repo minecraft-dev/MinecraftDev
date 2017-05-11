@@ -20,5 +20,5 @@ class NbttFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, NbttL
     override fun getFileType() = NbttFileType
     override fun getIcon(flags: Int) = PlatformAssets.MINECRAFT_ICON
 
-    fun getRootCompound() = firstChild as NbttRootCompound
+    fun getRootCompound() = firstChild as? NbttRootCompound
 }

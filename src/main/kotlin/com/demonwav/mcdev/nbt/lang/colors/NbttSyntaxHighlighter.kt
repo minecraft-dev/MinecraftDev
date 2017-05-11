@@ -23,7 +23,7 @@ class NbttSyntaxHighlighter : SyntaxHighlighterBase() {
 
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
         return when (tokenType) {
-            NbttTypes.BYTES, NbttTypes.INTS -> KEYWORD_KEYS
+            NbttTypes.BYTES, NbttTypes.INTS, NbttTypes.LONGS -> KEYWORD_KEYS
             NbttTypes.STRING_LITERAL -> STRING_KEYS
             NbttTypes.UNQUOTED_STRING_LITERAL -> UNQUOTED_STRING_KEYS
             NbttTypes.BYTE_LITERAL -> BYTE_KEYS
