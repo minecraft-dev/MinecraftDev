@@ -35,9 +35,9 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
 
     private val creator = MinecraftProjectCreator()
 
-    override fun getPresentableName() = "Minecraft"
+    override fun getPresentableName() = MinecraftModuleType.NAME
     override fun getNodeIcon() = PlatformAssets.MINECRAFT_ICON
-    override fun getGroupName() = "Minecraft"
+    override fun getGroupName() = MinecraftModuleType.NAME
     override fun getWeight() = JavaModuleBuilder.BUILD_SYSTEM_WEIGHT - 1
     override fun getBuilderId() = "MINECRAFT_MODULE"
     override fun isSuitableSdkType(sdk: SdkTypeId?) = sdk === JavaSdk.getInstance()
