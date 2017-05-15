@@ -8,15 +8,10 @@
  * MIT License
  */
 
-@file:Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-
 package com.demonwav.mcdev.nbt.tags
 
 import java.io.DataOutputStream
 import java.io.OutputStream
-
-typealias JFloat = java.lang.Float
-typealias JDouble = java.lang.Double
 
 interface NbtTag {
 
@@ -53,12 +48,6 @@ interface NbtTag {
 val NbtTag.typeIdByte
     get() = typeId.typeIdByte
 
-/**
- * The `Type ID` tag name for this tag.
- */
-val NbtTag.typeName
-    get() = typeId.tagName
-
 val forbiddenCharacters = "[:(){}\\[\\],]".toRegex()
 val badFormat = "^[\\d+\\-\\\\\\s\\n:{}\\[\\](),].*|.*[\"\\\\:{}\\[\\]()\\s\\n,]$".toRegex()
 
@@ -67,7 +56,7 @@ fun writeString(sb: StringBuilder, s: String): StringBuilder {
         return sb.append("\"").append(s.replace("\\n".toRegex(), "\\n")).append("\"")
     }
 
-    if (s == "bytes" || s == "ints") {
+    if (s == "bytes" || s == "ints" || s == "longs") {
         // keywords must be quoted
         return sb.append("\"").append(s).append("\"")
     }

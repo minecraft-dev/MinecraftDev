@@ -28,7 +28,8 @@ class NbttFoldingBuilder : FoldingBuilder {
             NbttTypes.COMPOUND -> {
                 val tagList = (node.psi as NbttCompound).getNamedTagList()
                 val tag = tagList[0].tag
-                if (tagList.size == 1 && tag.getList() == null && tag.getCompound() == null && tag.getIntArray() == null && tag.getByteArray() == null) {
+                if (tagList.size == 1 && tag.getList() == null && tag.getCompound() == null &&
+                    tag.getIntArray() == null && tag.getByteArray() == null) {
                     tagList[0].text
                 } else {
                     "..."

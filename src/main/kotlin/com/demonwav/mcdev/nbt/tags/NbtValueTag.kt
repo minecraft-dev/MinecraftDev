@@ -31,15 +31,11 @@ abstract class NbtValueTag<T : Any>(protected val valueClass: Class<T>) : NbtTag
         return valueEquals(other.value as T)
     }
 
-    override fun hashCode(): Int {
-        return value.hashCode()
-    }
+    override fun hashCode() = value.hashCode()
 
     override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
-    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
-        return sb.append(value)
-    }
+    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState) = sb.append(value)!!
 
     override fun copy(): NbtValueTag<T> {
         val const = typeId.tagClass.java.getConstructor(valueClass)
@@ -47,11 +43,7 @@ abstract class NbtValueTag<T : Any>(protected val valueClass: Class<T>) : NbtTag
         return const.newInstance(valueCopy()) as NbtValueTag<T>
     }
 
-    protected open fun valueEquals(otherValue: T): Boolean {
-        return this.value == otherValue
-    }
+    protected open fun valueEquals(otherValue: T) = this.value == otherValue
 
-    protected open fun valueCopy(): T {
-        return this.value
-    }
+    protected open fun valueCopy() = this.value
 }

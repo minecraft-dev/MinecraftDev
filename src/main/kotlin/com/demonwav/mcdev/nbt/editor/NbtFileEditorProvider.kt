@@ -74,13 +74,7 @@ private class NbtFileEditor(private val editor: FileEditor, nbtFile: NbtVirtualF
     override fun removePropertyChangeListener(listener: PropertyChangeListener) = editor.removePropertyChangeListener(listener)
     override fun dispose() = editor.dispose()
     override fun getStructureViewBuilder() = editor.structureViewBuilder
-    override fun equals(other: Any?): Boolean {
-        if (other !is NbtFileEditor) {
-            return false
-        }
-
-        return other.component == this.component
-    }
+    override fun equals(other: Any?) = other is NbtFileEditor && other.component == this.component
     override fun hashCode() = editor.hashCode()
     override fun toString() = editor.toString()
 }

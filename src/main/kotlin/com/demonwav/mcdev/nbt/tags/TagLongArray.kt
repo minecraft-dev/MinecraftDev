@@ -33,19 +33,11 @@ class TagLongArray(override val value: LongArray) : NbtValueTag<LongArray>(LongA
         return sb
     }
 
-    override fun valueEquals(otherValue: LongArray): Boolean {
-        return Arrays.equals(this.value, otherValue)
-    }
+    override fun valueEquals(otherValue: LongArray) = Arrays.equals(this.value, otherValue)
 
-    override fun equals(other: Any?): Boolean {
-        return super.equals(other)
-    }
+    override fun equals(other: Any?) = super.equals(other)
 
-    override fun hashCode(): Int {
-        return Arrays.hashCode(this.value)
-    }
+    override fun hashCode() = Arrays.hashCode(this.value)
 
-    override fun valueCopy(): LongArray {
-        return Arrays.copyOf(value, value.size)
-    }
+    override fun valueCopy() = Arrays.copyOf(value, value.size)!!
 }

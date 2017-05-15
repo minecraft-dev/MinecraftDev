@@ -10,11 +10,6 @@
 
 package com.demonwav.mcdev.nbt.tags
 
-import com.demonwav.mcdev.nbt.lang.NbttFile
-import com.demonwav.mcdev.nbt.lang.NbttFileType
-import com.demonwav.mcdev.nbt.lang.gen.psi.NbttRootCompound
-import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiFileFactory
 import java.io.DataOutputStream
 import java.util.Objects
 
@@ -55,9 +50,7 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
         return this.tagMap == other.tags
     }
 
-    override fun hashCode(): Int {
-        return Objects.hashCode(tagMap)
-    }
+    override fun hashCode() = Objects.hashCode(tagMap)
 
     override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
@@ -110,12 +103,5 @@ class RootCompound(private val name: String, tagMap: Map<String, NbtTag>) : TagC
         stream.writeByte(NbtTypeId.COMPOUND.typeIdByte.toInt())
         stream.writeUTF(name)
         super.write(stream)
-    }
-
-    fun buildPsi(project: Project): NbttRootCompound {
-        val sb = StringBuilder()
-        toString(sb, 0, WriterState.COMPOUND)
-        return (PsiFileFactory.getInstance(project).createFileFromText("name", NbttFileType, sb.toString()) as NbttFile)
-            .firstChild as NbttRootCompound
     }
 }

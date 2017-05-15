@@ -32,11 +32,15 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
         } else if (element is NbttByteArray) {
             val size = element.getByteParams()?.byteList?.size ?: 0
 
-            list.add(InlayInfo("$size ${if (size == 1) "child" else "children"}", element.node.getChildren(null)[1].textRange.startOffset + 1))
+            list.add(InlayInfo(
+                "$size ${if (size == 1) "child" else "children"}", element.node.getChildren(null)[1].textRange.startOffset + 1
+            ))
         } else if (element is NbttIntArray) {
             val size = element.getIntParams()?.intList?.size ?: 0
 
-            list.add(InlayInfo("$size ${if (size == 1) "child" else "children"}", element.node.getChildren(null)[1].textRange.startOffset + 1))
+            list.add(InlayInfo(
+                "$size ${if (size == 1) "child" else "children"}", element.node.getChildren(null)[1].textRange.startOffset + 1
+            ))
         }
         return list
     }

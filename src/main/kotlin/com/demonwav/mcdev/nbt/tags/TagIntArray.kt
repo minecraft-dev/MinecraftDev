@@ -33,20 +33,12 @@ class TagIntArray(override val value: IntArray) : NbtValueTag<IntArray>(IntArray
         return sb
     }
 
-    override fun valueEquals(otherValue: IntArray): Boolean {
-        return Arrays.equals(this.value, otherValue)
-    }
+    override fun valueEquals(otherValue: IntArray) = Arrays.equals(this.value, otherValue)
 
     // This makes IntelliJ happy.
-    override fun equals(other: Any?): Boolean {
-        return super.equals(other)
-    }
+    override fun equals(other: Any?) = super.equals(other)
 
-    override fun hashCode(): Int {
-        return Arrays.hashCode(this.value)
-    }
+    override fun hashCode() = Arrays.hashCode(this.value)
 
-    override fun valueCopy(): IntArray {
-        return Arrays.copyOf(value, value.size)
-    }
+    override fun valueCopy() = Arrays.copyOf(value, value.size)!!
 }

@@ -44,9 +44,7 @@ class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
         return (0 until this.tags.size).all { i -> other.tags[i] == this.tags[i] }
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(type, tags.hashCode())
-    }
+    override fun hashCode() = Objects.hash(type, tags.hashCode())
 
     override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
@@ -78,7 +76,6 @@ class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
         } else {
             sb.append(" ]")
         }
-
 
         return sb
     }

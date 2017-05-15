@@ -65,17 +65,9 @@ class NbttBlock(
         return false
     }
 
-    override fun isLeaf(): Boolean {
-        return node.firstChildNode == null
-    }
-
-    override fun getSpacing(child1: Block?, child2: Block): Spacing? {
-        return spacingBuilder.getSpacing(this, child1, child2)
-    }
-
-    override fun getTextRange(): TextRange {
-        return node.textRange
-    }
+    override fun isLeaf() = node.firstChildNode == null
+    override fun getSpacing(child1: Block?, child2: Block) = spacingBuilder.getSpacing(this, child1, child2)
+    override fun getTextRange() = node.textRange!!
 
     override fun getSubBlocks(): MutableList<Block> {
         if (subBlocks == null) {

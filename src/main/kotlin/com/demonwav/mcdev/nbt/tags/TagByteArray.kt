@@ -38,15 +38,9 @@ class TagByteArray(override val value: ByteArray) : NbtValueTag<ByteArray>(ByteA
     }
 
     // This makes IntelliJ happy
-    override fun equals(other: Any?): Boolean {
-        return super.equals(other)
-    }
+    override fun equals(other: Any?) = super.equals(other)
 
-    override fun hashCode(): Int {
-        return Arrays.hashCode(this.value)
-    }
+    override fun hashCode() = Arrays.hashCode(this.value)
 
-    override fun valueCopy(): ByteArray {
-        return Arrays.copyOf(value, value.size)
-    }
+    override fun valueCopy() = Arrays.copyOf(value, value.size)!!
 }

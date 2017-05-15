@@ -20,11 +20,7 @@ object TagEnd : NbtTag {
 
     override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
-    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
-        return sb
-    }
+    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState) = sb
 
-    override fun copy(): NbtTag {
-        return this
-    }
+    override fun copy() = this
 }
