@@ -88,7 +88,7 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
     }
 
     override fun getModuleType(): ModuleType<*> = JavaModuleType.getModuleType()
-    override fun getParentGroup() = "Minecraft"
+    override fun getParentGroup() = MinecraftModuleType.NAME
 
     override fun createWizardSteps(wizardContext: WizardContext, modulesProvider: ModulesProvider): Array<ModuleWizardStep> {
         return arrayOf(
