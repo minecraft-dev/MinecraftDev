@@ -22,6 +22,10 @@ abstract class NbttFloatImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), N
         if (text.contains("Infinity")) {
             return TagFloat(text.trim().let { it.substring(0, it.length - 1) }.toFloat())
         }
-        return TagFloat(text.trim().replace("[fF]".toRegex(), "").toFloat())
+        return TagFloat(text.trim().replace(fRegex, "").toFloat())
+    }
+
+    companion object {
+        private val fRegex = "[fF]".toRegex()
     }
 }

@@ -21,17 +21,19 @@ abstract class NbttStringImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), 
         return TagString(getStringValue())
     }
 
-    override fun getStringValue(): String {
-        val noQuotes = if (text.startsWith("\"")) {
-            text.let { it.substring(1, it.length - 1) }
-        } else {
-            text
-        }
+    override fun getStringValue() = getNbtStringValue(text)
+}
 
-        return noQuotes
-                .replace("\\\\", "\\")
-                .replace("\\n", "\n")
-                .replace("\\\"", "\"")
-                .replace("\\t", "\t")
+fun getNbtStringValue(text: String): String {
+    val noQuotes = if (text.startsWith('"')) {
+        text.let { it.substring(1, it.length - 1) }
+    } else {
+        text
     }
+
+    return noQuotes
+        .replace("\\\\", "\\")
+        .replace("\\n", "\n")
+        .replace("\\\"", "\"")
+        .replace("\\t", "\t")
 }

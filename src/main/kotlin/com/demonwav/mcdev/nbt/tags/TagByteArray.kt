@@ -27,9 +27,7 @@ class TagByteArray(override val value: ByteArray) : NbtValueTag<ByteArray>(ByteA
     override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
     override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
-        sb.append("bytes(")
-        value.joinTo(buffer = sb, separator = ", ")
-        sb.append(")")
+        value.joinTo(buffer = sb, separator = ", ", prefix = "bytes(", postfix = ")")
         return sb
     }
 

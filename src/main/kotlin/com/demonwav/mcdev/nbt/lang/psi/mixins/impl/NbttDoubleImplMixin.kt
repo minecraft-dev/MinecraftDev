@@ -18,6 +18,10 @@ import com.intellij.lang.ASTNode
 abstract class NbttDoubleImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttDoubleMixin {
 
     override fun getDoubleTag(): TagDouble {
-        return TagDouble(text.trim().replace("[dD|]".toRegex(), "").toDouble())
+        return TagDouble(text.trim().replace(dRegex, "").toDouble())
+    }
+
+    companion object {
+        private val dRegex = "[dD|]".toRegex()
     }
 }

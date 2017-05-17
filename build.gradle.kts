@@ -14,7 +14,6 @@ import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
-import org.gradle.internal.impldep.org.apache.maven.wagon.PathUtils.password
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -235,7 +234,7 @@ fun generatePsiAndParser(name: String, bnf: String, pack: String) = task<JavaExe
 }
 
 val generateAtLexer = generateLexer("generateAtLexer", "AtLexer", "platform/mcp/at/gen/")
-val generateAtPsiAndParser = generatePsiAndParser("generateAtPsiAndParser", "AtParser", "package/mcp/at/gen")
+val generateAtPsiAndParser = generatePsiAndParser("generateAtPsiAndParser", "AtParser", "platform/mcp/at/gen")
 
 val generateNbttLexer = generateLexer("generateNbttLexer", "NbttLexer", "nbt/lang/gen/")
 val generateNbttPsiAndParser = generatePsiAndParser("generateNbttPsiAndParser", "NbttParser", "nbt/lang/gen")

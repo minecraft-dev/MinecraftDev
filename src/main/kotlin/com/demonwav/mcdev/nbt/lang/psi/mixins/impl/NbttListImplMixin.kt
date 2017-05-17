@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.nbt.lang.psi.mixins.impl
 
 import com.demonwav.mcdev.nbt.MalformedNbtFileException
-import com.demonwav.mcdev.nbt.lang.psi.getNtbTag
+import com.demonwav.mcdev.nbt.lang.psi.getNbtTag
 import com.demonwav.mcdev.nbt.lang.psi.mixins.NbttListMixin
 import com.demonwav.mcdev.nbt.tags.NbtTypeId
 import com.demonwav.mcdev.nbt.tags.TagList
@@ -40,7 +40,7 @@ abstract class NbttListImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), Nb
         assert(type != null)
 
         val tags = tagList.map {
-            it.getNtbTag()
+            it.getNbtTag()
         }
 
         return TagList(type!!, tags)

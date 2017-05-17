@@ -39,7 +39,7 @@ class NbttAnnotator : Annotator {
         val annotation = holder.createAnnotation(HighlightSeverity.INFORMATION, element.textRange, null)
         annotation.textAttributes = NbttSyntaxHighlighter.STRING_NAME
 
-        if (!element.text.startsWith("\"")) {
+        if (!element.text.startsWith('"')) {
             // is unquoted
             annotation.textAttributes = NbttSyntaxHighlighter.UNQUOTED_STRING_NAME
         }
@@ -52,7 +52,7 @@ class NbttAnnotator : Annotator {
 
         val value = element.getStringValue()
         val index = value.indexOf(':')
-        if (index != -1 && !value.startsWith(":") && !value.endsWith(":") && value.count { it == ':' } == 1) {
+        if (index != -1 && !value.startsWith(':') && !value.endsWith(':') && value.count { it == ':' } == 1) {
             // assume material
             // assume this string is quoted, since the lexer won't accept an unquoted string with a : character in it
             // won't even let you escape them

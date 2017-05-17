@@ -18,6 +18,10 @@ import com.intellij.lang.ASTNode
 abstract class NbttShortImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttShortMixin {
 
     override fun getShortTag(): TagShort {
-        return TagShort(text.trim().replace("[sS]".toRegex(), "").toShort())
+        return TagShort(text.trim().replace(sRegex, "").toShort())
+    }
+
+    companion object {
+        private val sRegex = "[sS]".toRegex()
     }
 }

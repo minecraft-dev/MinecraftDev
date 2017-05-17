@@ -101,7 +101,7 @@ LONG_ARRAY_LITERAL = [+-]?\d+[lL]?
     // we just want to match them correctly so the parser has something to grab on to
 
     // Integers have to be explicitly defined as ints here, implicit numbers are bytes
-    {ARRAY_INT_LITEARL}    { stack.offerFirst(IN_BYTE_ARRAY); yybegin(EXPECT_NEXT); return INT_LITERAL; }
+    {ARRAY_INT_LITEARL}         { stack.offerFirst(IN_BYTE_ARRAY); yybegin(EXPECT_NEXT); return INT_LITERAL; }
 
     {SHORT_LITERAL}             { stack.offerFirst(IN_BYTE_ARRAY); yybegin(EXPECT_NEXT); return SHORT_LITERAL; }
     {LONG_LITERAL}              { stack.offerFirst(IN_BYTE_ARRAY); yybegin(EXPECT_NEXT); return LONG_LITERAL; }

@@ -53,19 +53,19 @@ val badFormat = "^[\\d+\\-\\\\\\s\\n:{}\\[\\](),].*|.*[\"\\\\:{}\\[\\]()\\s\\n,]
 
 fun writeString(sb: StringBuilder, s: String): StringBuilder {
     if (s.isBlank()) {
-        return sb.append("\"").append(s.replace("\\n".toRegex(), "\\n")).append("\"")
+        return sb.append('"').append(s.replace("\n", "\\n")).append('"')
     }
 
     if (s == "bytes" || s == "ints" || s == "longs") {
         // keywords must be quoted
-        return sb.append("\"").append(s).append("\"")
+        return sb.append('"').append(s).append('"')
     }
 
     val replaced = s.replace("\\", "\\\\").replace("\n", "\\n").replace("\"", "\\\"").replace("\t", "\\t")
 
     if (forbiddenCharacters in s || s.matches(badFormat)) {
         // Use quotes around this awful string
-        return sb.append("\"").append(replaced).append("\"")
+        return sb.append('"').append(replaced).append('"')
     }
 
     // prefer no quotes

@@ -44,35 +44,35 @@ class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
         return (0 until this.tags.size).all { i -> other.tags[i] == this.tags[i] }
     }
 
-    override fun hashCode() = Objects.hash(type, tags.hashCode())
+    override fun hashCode() = Objects.hash(type, tags)
 
     override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
     override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
-        sb.append("[")
+        sb.append('[')
 
         if (tags.isEmpty()) {
-            sb.append("]")
+            sb.append(']')
             return sb
         }
 
         val isCollection = type == NbtTypeId.COMPOUND || type == NbtTypeId.LIST || type == NbtTypeId.BYTE_ARRAY || type == NbtTypeId.INT_ARRAY
         for (tag in tags) {
             if (isCollection) {
-                sb.append("\n")
+                sb.append('\n')
                 indent(sb, indentLevel + 1)
             } else {
-                sb.append(" ")
+                sb.append(' ')
             }
 
             tag.toString(sb, indentLevel + 1, WriterState.LIST)
-            sb.append(",")
+            sb.append(',')
         }
 
         if (isCollection) {
-            sb.append("\n")
+            sb.append('\n')
             indent(sb, indentLevel)
-            sb.append("]")
+            sb.append(']')
         } else {
             sb.append(" ]")
         }

@@ -18,6 +18,10 @@ import com.intellij.lang.ASTNode
 abstract class NbttLongImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttLongMixin {
 
     override fun getLongTag(): TagLong {
-        return TagLong(text.trim().replace("[lL]".toRegex(), "").toLong())
+        return TagLong(text.trim().replace(lRegex, "").toLong())
+    }
+
+    companion object {
+        private val lRegex = "[lL]".toRegex()
     }
 }

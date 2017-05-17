@@ -155,7 +155,7 @@ object Nbt {
         }
     }
 
-    private fun <T : Any> checkTimeout(start: Long, timeout: Long, action: () -> T): T {
+    private inline fun <T : Any> checkTimeout(start: Long, timeout: Long, action: () -> T): T {
         val now = System.currentTimeMillis()
         val took = now - start
 

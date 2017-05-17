@@ -18,6 +18,10 @@ import com.intellij.lang.ASTNode
 abstract class NbttIntImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttIntMixin {
 
     override fun getIntTag(): TagInt {
-        return TagInt(text.trim().replace("[iI]".toRegex(), "").toInt())
+        return TagInt(text.trim().replace(iRegex, "").toInt())
+    }
+
+    companion object {
+        private val iRegex = "[iI]".toRegex()
     }
 }

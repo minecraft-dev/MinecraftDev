@@ -25,6 +25,10 @@ abstract class NbttByteImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), Nb
             return TagByte(1)
         }
 
-        return TagByte(text.trim().replace("[bB]".toRegex(), "").toByte())
+        return TagByte(text.trim().replace(bRegex, "").toByte())
+    }
+
+    companion object {
+        private val bRegex = "[bB]".toRegex()
     }
 }

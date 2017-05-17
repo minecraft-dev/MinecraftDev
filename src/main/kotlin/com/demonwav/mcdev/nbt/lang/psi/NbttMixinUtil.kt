@@ -27,7 +27,7 @@ import com.demonwav.mcdev.nbt.lang.gen.psi.NbttTag
 import com.demonwav.mcdev.nbt.tags.NbtTag
 import com.demonwav.mcdev.nbt.tags.NbtTypeId
 
-fun NbttTag.getNtbTag(): NbtTag {
+fun NbttTag.getNbtTag(): NbtTag {
     return when (this.getType()) {
         NbtTypeId.BYTE -> (getTag() as NbttByte).getByteTag()
         NbtTypeId.SHORT -> (getTag() as NbttShort).getShortTag()

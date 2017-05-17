@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.nbt.tags
 
 import java.io.DataOutputStream
-import java.util.Objects
 
 open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
     // If a tag doesn't have a name this will throw a NPE
@@ -50,29 +49,29 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
         return this.tagMap == other.tags
     }
 
-    override fun hashCode() = Objects.hashCode(tagMap)
+    override fun hashCode() = tagMap.hashCode()
 
     override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
     override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
-        sb.append("{")
+        sb.append('{')
 
         if (tagMap.isEmpty()) {
-            sb.append("}")
+            sb.append('}')
             return sb
         }
 
-        sb.append("\n")
+        sb.append('\n')
 
         for ((key, value) in tagMap) {
             indent(sb, indentLevel + 1)
             appendName(sb, key)
             value.toString(sb, indentLevel + 1, WriterState.COMPOUND)
-            sb.append("\n")
+            sb.append('\n')
         }
 
         indent(sb, indentLevel)
-        sb.append("}")
+        sb.append('}')
 
         return sb
     }

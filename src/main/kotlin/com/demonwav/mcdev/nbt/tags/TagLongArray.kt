@@ -27,9 +27,7 @@ class TagLongArray(override val value: LongArray) : NbtValueTag<LongArray>(LongA
     override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
     override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState): StringBuilder {
-        sb.append("longs(")
-        value.joinTo(buffer = sb, separator = ", ")
-        sb.append(")")
+        value.joinTo(buffer = sb, separator = ", ", prefix = "longs(", postfix = ")")
         return sb
     }
 
