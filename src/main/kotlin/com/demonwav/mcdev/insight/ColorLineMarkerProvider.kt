@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
+import com.demonwav.mcdev.asset.MCMessages
 import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -36,7 +37,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
 
         val info = element.findColor { map, chosen -> ColorInfo(element, chosen.value, map) }
         if (info != null) {
-            NavigateAction.setNavigateAction(info, "Change color", null)
+            NavigateAction.setNavigateAction(info, MCMessages["color.line_marker_info"], null)
         }
 
         return info

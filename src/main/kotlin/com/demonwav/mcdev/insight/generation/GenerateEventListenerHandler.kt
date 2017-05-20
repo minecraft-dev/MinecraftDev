@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.insight.generation
 
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationDialog
 import com.demonwav.mcdev.platform.AbstractModule
@@ -37,7 +38,7 @@ import com.intellij.refactoring.RefactoringBundle
  * Note that this is a psuedo generator as it relies on a wizard and the
  * [.cleanup] to complete
  */
-class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event Listener") {
+class GenerateEventListenerHandler : GenerateMembersHandlerBase(MCMessages["generate.event_listener"]) {
     private var editor: Editor? = null
     private var position: LogicalPosition? = null
     private var method: PsiMethod? = null
@@ -49,7 +50,7 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event 
     private var relevantModule: AbstractModule? = null
     private var okay: Boolean = false
 
-    override fun getHelpId() = "Generate Event Listener Dialog"
+    override fun getHelpId() = MCMessages["generate.event_listener_dialog"]
 
     override fun chooseOriginalMembers(aClass: PsiClass, project: Project, editor: Editor?): Array<ClassMember>? {
         this.editor = editor

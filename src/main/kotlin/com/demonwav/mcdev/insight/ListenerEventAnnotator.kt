@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
@@ -80,7 +81,7 @@ class ListenerEventAnnotator : Annotator {
 
         if (!instance.isStaticListenerSupported(method) && method.hasModifierProperty(PsiModifier.STATIC)) {
             if (method.nameIdentifier != null) {
-                holder.createErrorAnnotation(method.nameIdentifier!!, "Event listener method must not be static")
+                holder.createErrorAnnotation(method.nameIdentifier!!, MCMessages["listener.listener_not_static"])
             }
         }
 

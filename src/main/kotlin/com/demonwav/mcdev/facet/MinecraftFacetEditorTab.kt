@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform
 
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.facet.MinecraftFacetConfiguration
 import com.intellij.facet.ui.FacetEditorTab
@@ -140,7 +141,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         return panel
     }
 
-    override fun getDisplayName() = "Minecraft Module Settings"
+    override fun getDisplayName() = MCMessages["facet.settings_name"]
 
     override fun isModified(): Boolean {
         var modified = false

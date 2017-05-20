@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.insight.generation.ui
 
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.insight.generation.GenerationData
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ui.DialogWrapper
@@ -26,7 +27,7 @@ class EventGenerationDialog(editor: Editor,
         private set
 
     init {
-        title = "Event Listener Settings"
+        title = MCMessages["generate.event_listener_settings"]
         isOKActionEnabled = true
         setValidationDelay(0)
 

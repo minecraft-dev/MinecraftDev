@@ -150,14 +150,6 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = javaVersion
 }
 
-processResources {
-    for (lang in arrayOf("", "_en")) {
-        from("src/main/resources/messages.MinecraftDevelopment_en_US.properties") {
-            rename { "messages.MinecraftDevelopment$lang.properties" }
-        }
-    }
-}
-
 test {
     if (CI) {
         systemProperty("slowCI", "true")

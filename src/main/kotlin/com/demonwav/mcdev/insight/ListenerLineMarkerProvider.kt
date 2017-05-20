@@ -12,16 +12,13 @@ package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.GeneralAssets
-import com.demonwav.mcdev.util.gotoTargetElement
+import com.demonwav.mcdev.asset.MCMessages
 import com.intellij.codeHighlighting.Pass
-import com.intellij.codeInsight.TargetElementUtil
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
 import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo
-import com.intellij.featureStatistics.FeatureUsageTracker
 import com.intellij.openapi.editor.markup.GutterIconRenderer
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
@@ -102,7 +99,7 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
         range,
         icon,
         passId,
-        Function { "Go to Event declaration" },
+        Function { MCMessages["listener.goto_declaration_action"] },
         handler,
         GutterIconRenderer.Alignment.RIGHT
     ) {
@@ -122,7 +119,7 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
 
         @Contract(pure = true)
         override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<*>>): Function<in PsiElement, String>  =
-            Function { "Multiple method overrides" }
+            Function { MCMessages["listener.multiple_method_overrides_tooltip"] }
 
         override fun getElementPresentation(element: PsiElement): String {
             val parent = element.parent

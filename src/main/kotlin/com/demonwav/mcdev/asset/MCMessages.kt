@@ -18,21 +18,12 @@ import java.lang.ref.SoftReference
 import java.util.ResourceBundle
 import com.intellij.reference.SoftReference as IJSoftReference
 
-object MessageAssets {
-    fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any): String {
-        return CommonBundle.message(bundle, key, *params)
-    }
+object MCMessages {
+    operator fun get(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) = CommonBundle.message(bundle, key, *params)
+    operator fun get(@PropertyKey(resourceBundle = BUNDLE) key: String) = CommonBundle.message(bundle, key)
 
+    @NonNls private const val BUNDLE = "assets.messages.MinecraftDevelopment"
     private var ourBundle: Reference<ResourceBundle>? = null
-    @NonNls
-    private const val BUNDLE = "messages.MinecraftDevelopment"
-
-    val generateEventListenerTitle: String
-        get() = message("generate.event_listener")
-
-    fun message(@PropertyKey(resourceBundle = BUNDLE) key: String): String {
-        return CommonBundle.message(bundle, key)
-    }
 
     private val bundle: ResourceBundle
         get() {

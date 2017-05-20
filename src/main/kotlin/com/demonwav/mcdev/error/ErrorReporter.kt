@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.error
 
+import com.demonwav.mcdev.asset.MCMessages
 import com.intellij.diagnostic.IdeErrorsDialog
 import com.intellij.diagnostic.LogMessageEx
 import com.intellij.diagnostic.ReportMessages
@@ -32,7 +33,7 @@ import java.awt.Component
 
 class ErrorReporter : ErrorReportSubmitter() {
     val baseUrl = "https://github.com/minecraft-dev/MinecraftDev/issues"
-    override fun getReportActionText() = "Report to Minecraft Dev GitHub Issue Tracker"
+    override fun getReportActionText() = MCMessages["reporter.action_text"]
 
     override fun submit(events: Array<out IdeaLoggingEvent>,
                         additionalInfo: String?,

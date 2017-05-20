@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.asset.GeneralAssets
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -22,7 +23,7 @@ import com.intellij.util.FunctionUtil
 
 class PluginLineMarkerProvider : LineMarkerProviderDescriptor() {
 
-    override fun getName() = "Minecraft Plugin line marker"
+    override fun getName() = MCMessages["plugin_marker.name"]
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
         val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return null
