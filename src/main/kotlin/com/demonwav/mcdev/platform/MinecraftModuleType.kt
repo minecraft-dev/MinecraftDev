@@ -21,10 +21,13 @@ class MinecraftModuleType : JavaModuleType() {
     override fun getBigIcon() = PlatformAssets.MINECRAFT_ICON_2X
     override fun getIcon() = PlatformAssets.MINECRAFT_ICON
     override fun getNodeIcon(isOpened: Boolean) = PlatformAssets.MINECRAFT_ICON
+    override fun getName() = NAME
+    override fun getDescription() = "Minecraft modules are used for developing plugins or mods for <b>Minecraft</b> (Java Edition, also known as the PC Edition)."
 
     companion object {
-        private val ID = "MINECRAFT_MODULE_TYPE"
-        val OPTION = "com.demonwav.mcdev.MinecraftModuleTypes"
+        private const val ID = "MINECRAFT_MODULE_TYPE"
+        const val NAME = "Minecraft"
+        const val OPTION = "com.demonwav.mcdev.MinecraftModuleTypes"
 
         val instance: MinecraftModuleType
             get() = ModuleTypeManager.getInstance().findByID(ID) as MinecraftModuleType

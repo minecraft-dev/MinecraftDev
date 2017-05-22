@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
@@ -35,9 +36,9 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
 
     private val creator = MinecraftProjectCreator()
 
-    override fun getPresentableName() = "Minecraft"
+    override fun getPresentableName() = MinecraftModuleType.NAME
     override fun getNodeIcon() = PlatformAssets.MINECRAFT_ICON
-    override fun getGroupName() = "Minecraft"
+    override fun getGroupName() = MinecraftModuleType.NAME
     override fun getWeight() = JavaModuleBuilder.BUILD_SYSTEM_WEIGHT - 1
     override fun getBuilderId() = "MINECRAFT_MODULE"
     override fun isSuitableSdkType(sdk: SdkTypeId?) = sdk === JavaSdk.getInstance()
@@ -87,7 +88,7 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
     }
 
     override fun getModuleType(): ModuleType<*> = JavaModuleType.getModuleType()
-    override fun getParentGroup() = "Minecraft"
+    override fun getParentGroup() = MinecraftModuleType.NAME
 
     override fun createWizardSteps(wizardContext: WizardContext, modulesProvider: ModulesProvider): Array<ModuleWizardStep> {
         return arrayOf(
