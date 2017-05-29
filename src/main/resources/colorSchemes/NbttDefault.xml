@@ -1,0 +1,64 @@
+<?xml version='1.0'?>
+<!--
+    Minecraft Dev for IntelliJ
+
+    https://minecraftdev.org
+
+    Copyright (c) 2017 minecraft-dev
+
+    MIT License
+-->
+
+<list>
+    <option name="NBTT_UNQUOTED_STRING">
+        <value>
+            <option name="FOREGROUND" value="008000" />
+            <option name="FONT_TYPE" value="1" />
+            <option name="EFFECT_COLOR" value="4D9D93" />
+            <option name="EFFECT_TYPE" value="1" />
+        </value>
+    </option>
+    <option name="NBTT_STRING_NAME">
+        <value>
+            <option name="FOREGROUND" value="674F72" />
+        </value>
+    </option>
+    <option name="NBTT_UNQUOTED_STRING_NAME">
+        <value>
+            <option name="FOREGROUND" value="674F72" />
+            <option name="FONT_TYPE" value="1" />
+            <option name="EFFECT_COLOR" value="A443BF" />
+            <option name="EFFECT_TYPE" value="1" />
+        </value>
+    </option>
+    <option name="NBTT_MATERIAL">
+        <value>
+            <option name="FOREGROUND" value="215C94" />
+        </value>
+    </option>
+    <option name="NBTT_BYTE">
+        <value>
+            <option name="FOREGROUND" value="9B3B6A" />
+        </value>
+    </option>
+    <option name="NBTT_SHORT">
+        <value>
+            <option name="FOREGROUND" value="114D77" />
+        </value>
+    </option>
+    <option name="NBTT_LONG">
+        <value>
+            <option name="FOREGROUND" value="BC8650" />
+        </value>
+    </option>
+    <option name="NBTT_FLOAT">
+        <value>
+            <option name="FOREGROUND" value="005910" />
+        </value>
+    </option>
+    <option name="NBTT_DOUBLE">
+        <value>
+            <option name="FOREGROUND" value="BC5150" />
+        </value>
+    </option>
+</list>

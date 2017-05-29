@@ -182,15 +182,15 @@ idea {
 license {
     header = file("copyright.txt")
     include("**/*.java", "**/*.kt", "**/*.groovy", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
-    exclude("com/demonwav/mcdev/platform/mcp/at/gen/**")
+    exclude("com/demonwav/mcdev/platform/mcp/at/gen/**", "com/demonwav/mcdev/nbt/lang/gen/**")
 }
 
 // Credit for this intellij-rust
 // https://github.com/intellij-rust/intellij-rust/blob/d6b82e6aa2f64b877a95afdd86ec7b84394678c3/build.gradle#L131-L181
-val generateAtLexer = task<JavaExec>("generateAtLexer") {
-    val src = "src/main/grammars/AtLexer.flex"
-    val dst = "gen/com/demonwav/mcdev/platform/mcp/at/gen/"
-    val output = "$dst/AtLexer.java"
+fun generateLexer(name: String, flex: String, pack: String) = task<JavaExec>(name) {
+    val src = "src/main/grammars/$flex.flex"
+    val dst = "gen/com/demonwav/mcdev/$pack"
+    val output = "$dst/$flex.java"
 
     classpath = configurations["jflex"]
     main = "jflex.Main"
@@ -210,10 +210,10 @@ val generateAtLexer = task<JavaExec>("generateAtLexer") {
     outputs.file(output)
 }
 
-val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
-    val src = "src/main/grammars/AtParser.bnf".replace("/", File.separator)
+fun generatePsiAndParser(name: String, bnf: String, pack: String) = task<JavaExec>(name) {
+    val src = "src/main/grammars/$bnf.bnf".replace("/", File.separator)
     val dstRoot = "gen"
-    val dst = "$dstRoot/com/demonwav/mcdev/platform/mcp/at/gen".replace("/", File.separator)
+    val dst = "$dstRoot/com/demonwav/mcdev/$pack".replace("/", File.separator)
     val psiDir = "$dst/psi/".replace("/", File.separator)
     val parserDir = "$dst/parser/".replace("/", File.separator)
 
@@ -233,10 +233,16 @@ val generateAtPsiAndParser = task<JavaExec>("generateAtPsiAndParser") {
     ))
 }
 
+val generateAtLexer = generateLexer("generateAtLexer", "AtLexer", "platform/mcp/at/gen/")
+val generateAtPsiAndParser = generatePsiAndParser("generateAtPsiAndParser", "AtParser", "platform/mcp/at/gen")
+
+val generateNbttLexer = generateLexer("generateNbttLexer", "NbttLexer", "nbt/lang/gen/")
+val generateNbttPsiAndParser = generatePsiAndParser("generateNbttPsiAndParser", "NbttParser", "nbt/lang/gen")
+
 val generate = task("generate") {
     group = "minecraft"
     description = "Generates sources needed to compile the plugin."
-    dependsOn(generateAtLexer, generateAtPsiAndParser)
+    dependsOn(generateAtLexer, generateAtPsiAndParser, generateNbttLexer, generateNbttPsiAndParser)
     outputs.dir("gen")
 }
 
