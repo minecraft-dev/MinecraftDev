@@ -69,13 +69,12 @@ class ErrorReporter : ErrorReportSubmitter() {
 
         val project = CommonDataKeys.PROJECT.getData(dataContext)
 
-        val task = AnonymousFeedbackTask(project, "Submitting error report", true, reportValues, { token ->
+        val task = AnonymousFeedbackTask(project, MCMessages["reporter.status"], true, reportValues, { token ->
             val url = "$baseUrl/$token"
             val reportInfo = SubmittedReportInfo(url, "Issue #$token", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE)
             consumer.consume(reportInfo)
 
-            val message = "<html>Created Issue #$token successfully.<br>" +
-                "<a href=\"$url\">View issue.</a></html>"
+            val message = MCMessages["reporter.message.success", token, url]
 
             ReportMessages.GROUP.createNotification(
                 ReportMessages.ERROR_REPORT,
@@ -84,8 +83,7 @@ class ErrorReporter : ErrorReportSubmitter() {
                 NotificationListener.URL_OPENING_LISTENER
             ).setImportant(false).notify(project)
         }, { e ->
-            val message = "<html>Error Submitting Issue: ${e.message}<br>Consider opening an issue on " +
-                "<a href=\"$baseUrl\">the GitHub issue tracker.</a></html>"
+            val message = MCMessages["reporter.message.error", e.message ?: MCMessages["reporter.unknown_error"]]
             ReportMessages.GROUP.createNotification(
                 ReportMessages.ERROR_REPORT,
                 message,

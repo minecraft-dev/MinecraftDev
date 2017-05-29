@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.error
 
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.update.PluginUtil
 import com.google.gson.Gson
 import com.intellij.ide.plugins.PluginManager
@@ -84,7 +85,7 @@ object AnonymousFeedback {
 
         val responseCode = connection.responseCode
         if (responseCode != 201) {
-            throw RuntimeException("Expected HTTP_CREATED (201), obtained $responseCode instead.")
+            throw RuntimeException(MCMessages["reporter.unexpected", responseCode])
         }
 
         val contentEncoding = connection.contentEncoding ?: "UTF-8"
