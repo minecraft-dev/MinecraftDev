@@ -56,7 +56,10 @@ class TagList(val type: NbtTypeId, val tags: List<NbtTag>) : NbtTag {
             return sb
         }
 
-        val isCollection = type == NbtTypeId.COMPOUND || type == NbtTypeId.LIST || type == NbtTypeId.BYTE_ARRAY || type == NbtTypeId.INT_ARRAY
+        val isCollection = when (type) {
+            NbtTypeId.COMPOUND, NbtTypeId.LIST, NbtTypeId.BYTE_ARRAY, NbtTypeId.INT_ARRAY, NbtTypeId.LONG_ARRAY -> true
+            else -> false
+        }
         for (tag in tags) {
             if (isCollection) {
                 sb.append('\n')
