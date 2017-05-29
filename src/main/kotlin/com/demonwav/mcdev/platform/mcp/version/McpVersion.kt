@@ -13,21 +13,15 @@ package com.demonwav.mcdev.platform.mcp.version
 import com.demonwav.mcdev.util.sortVersions
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.intellij.openapi.util.Pair
-import org.apache.commons.io.IOUtils
-import java.awt.event.ActionListener
 import java.io.IOException
 import java.net.URL
 import java.util.ArrayList
-import java.util.HashMap
-import javax.swing.JComboBox
 
-class McpVersion private constructor() {
+class McpVersion private constructor(private val map: Map<String, Map<String, List<Int>>>) {
 
-    private var map: Map<String, Map<String, List<Int>>> = HashMap()
-
-    val versions: List<String>
-        get() = sortVersions(map.keys)
+    val versions: List<String> by lazy {
+        sortVersions(map.keys)
+    }
 
     fun getSnapshot(version: String): Pair<List<Int>, List<Int>> {
         return get(version, "snapshot")
@@ -53,46 +47,40 @@ class McpVersion private constructor() {
             }
         }
 
-        return Pair(good, bad)
+        return good to bad
     }
 
-    fun setMcpVersion(mcpVersionBox: JComboBox<McpVersionEntry>, version: String, actionListener: ActionListener) {
-        mcpVersionBox.removeActionListener(actionListener)
-        mcpVersionBox.removeAllItems()
+    fun getMcpVersionList(version: String): List<McpVersionEntry> {
+        val result = mutableListOf<McpVersionEntry>()
 
         val stable = getStable(version)
-        stable.getFirst().stream().sorted { one, two -> one!!.compareTo(two!!) * -1 }
-            .map { s -> McpVersionEntry("stable_" + s!!) }.forEach { mcpVersionBox.addItem(it) }
+        stable.first.asSequence().sortedWith(Comparator.reverseOrder())
+            .mapTo(result) { s -> McpVersionEntry("stable_" + s) }
 
         val snapshot = getSnapshot(version)
-        snapshot.getFirst().stream().sorted { one, two -> one!!.compareTo(two!!) * -1 }
-            .map { s -> McpVersionEntry("snapshot_" + s!!) }.forEach { mcpVersionBox.addItem(it) }
+        snapshot.first.asSequence().sortedWith(Comparator.reverseOrder())
+            .mapTo(result) { s -> McpVersionEntry("snapshot_" + s) }
 
         // The "seconds" in the pairs are bad, but still available to the user
         // We will color them read
 
-        stable.getSecond().stream().sorted { one, two -> one!!.compareTo(two!!) * -1 }
-            .map { s -> McpVersionEntry("stable_" + s!!, true) }.forEach { mcpVersionBox.addItem(it) }
-        snapshot.getSecond().stream().sorted { one, two -> one!!.compareTo(two!!) * -1 }
-            .map { s -> McpVersionEntry("snapshot_" + s!!, true) }.forEach { mcpVersionBox.addItem(it) }
+        stable.second.asSequence().sortedWith(Comparator.reverseOrder())
+            .mapTo(result) { s -> McpVersionEntry("stable_" + s, true) }
+        snapshot.second.asSequence().sortedWith(Comparator.reverseOrder())
+            .mapTo(result) { s -> McpVersionEntry("snapshot_" + s, true) }
 
-        mcpVersionBox.addActionListener(actionListener)
+        return result
     }
 
     companion object {
         fun downloadData(): McpVersion? {
             try {
-                URL("http://export.mcpbot.bspk.rs/versions.json").openStream().use { inStream ->
-                    val text = IOUtils.toString(inStream)
-
-                    val tokenType = object : TypeToken<Map<String, Map<String, List<Int>>>>() {
-
-                    }.type
-                    val map = Gson().fromJson<Map<String, Map<String, List<Int>>>>(text, tokenType)
-                    val version = McpVersion()
-                    version.map = map
-                    return version
-                }
+                val text = URL("http://export.mcpbot.bspk.rs/versions.json").readText()
+                val tokenType = object : TypeToken<Map<String, Map<String, List<Int>>>>() {}.type
+                val map = Gson().fromJson<Map<String, Map<String, List<Int>>>>(text, tokenType)
+                val mcpVersion = McpVersion(map)
+                mcpVersion.versions
+                return mcpVersion
             } catch (e: IOException) {
                 e.printStackTrace()
             }

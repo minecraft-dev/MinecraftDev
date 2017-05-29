@@ -53,6 +53,6 @@ class AtSyntaxHighlighter : SyntaxHighlighterBase() {
         private val PRIMITIVE_KEYS = arrayOf(PRIMITIVE)
         private val COMMENT_KEYS = arrayOf(COMMENT)
         private val BAD_CHARACTER_KEYS = arrayOf(BAD_CHARACTER)
-        private val EMPTY_KEYS = arrayOf<TextAttributesKey>()
+        private val EMPTY_KEYS = emptyArray<TextAttributesKey>()
     }
 }

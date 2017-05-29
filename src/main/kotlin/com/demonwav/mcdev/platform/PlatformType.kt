@@ -32,9 +32,7 @@ import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
-import com.demonwav.mcdev.util.castNotNull
 import com.intellij.openapi.roots.libraries.LibraryKind
-import java.util.Arrays
 
 enum class PlatformType(
     val type: AbstractModuleType<*>,
@@ -61,7 +59,7 @@ enum class PlatformType(
          * Would certainly be better to just use Sets for everything, rather than this array business
          * but I'm too lazy right now. This is not hot code.
          */
-        fun removeParents(types: Set<PlatformType>): MutableSet<PlatformType> {
+        fun removeParents(types: MutableSet<PlatformType>) {
             val typesArray = types.toTypedArray()
             val result = arrayOfNulls<PlatformType>(types.size)
 
@@ -99,7 +97,10 @@ enum class PlatformType(
                 result[count++] = typesArray[i]
             }
 
-            return mutableSetOf(*Arrays.copyOf(result, count).castNotNull())
+            types.clear()
+            for (i in 0 until count) {
+                types.add(result[i]!!)
+            }
         }
 
         fun fromLibraryKind(kind: LibraryKind): PlatformType? {

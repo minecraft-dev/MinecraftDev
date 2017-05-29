@@ -19,7 +19,7 @@
     <defaultGoal>clean package</defaultGoal>
     <plugins>
       <plugin>
-        <version>3.1</version>
+        <version>3.6.1</version>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
@@ -30,7 +30,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.4</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <phase>package</phase>

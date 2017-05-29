@@ -18,10 +18,6 @@ class SrgPrefixMatcher(prefix: String) : PrefixMatcher(prefix) {
     override fun cloneWithPrefix(prefix: String) = SrgPrefixMatcher(prefix)
 
     override fun prefixMatches(element: LookupElement): Boolean {
-        if (element !is AtMcpLookupItem) {
-            return false
-        }
-
-        return element.getPrettyText().contains(myPrefix, ignoreCase = true)
+        return element.lookupString.contains(myPrefix, ignoreCase = true)
     }
 }

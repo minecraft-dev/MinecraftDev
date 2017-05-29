@@ -28,7 +28,7 @@
         Alpha release, may break. More features to come. Please report issues to
         <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2017.2-0.6.3
+        v. 2017.2-0.7.0
       </div>
     ]]>
     </change-notes>
@@ -71,6 +71,9 @@
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ColorAnnotator"/>
 
+        <!-- Project-independent Inspection Suppressors -->
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.inspection.StaticListenerInspectionSuppressor"/>
+
         <!-- Project View Node Decorators provide the project icons -->
         <projectViewNodeDecorator implementation="com.demonwav.mcdev.platform.MinecraftProjectViewNodeDecorator"/>
         <deadCode implementation="com.demonwav.mcdev.inspection.PlatformAnnotationEntryPoint"/>
@@ -81,7 +84,27 @@
                                  groupId="language"
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
 
+        <fileTypeFactory implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeFactory"/>
+        <fileEditorProvider implementation="com.demonwav.mcdev.nbt.editor.NbtFileEditorProvider" />
+
+        <!-- Text representation of NBT -->
+        <fileTypeFactory implementation="com.demonwav.mcdev.nbt.lang.NbttFileTypeFactory"/>
+        <lang.parserDefinition language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighterFactory"/>
+        <lang.braceMatcher language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttBraceMatcher"/>
+        <lang.quoteHandler language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttQuoteHandler"/>
+        <lang.formatter language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttFormattingModelBuilder"/>
+        <codeStyleSettingsProvider implementation="com.demonwav.mcdev.nbt.lang.format.NbttCodeStyleSettingsProvider"/>
+        <lang.foldingBuilder language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttFoldingBuilder"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.nbt.lang.colors.NbttColorSettingsPage" />
+        <annotator language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.colors.NbttAnnotator"/>
+        <additionalTextAttributes scheme="Default" file="colorSchemes/NbttDefault.xml"/>
+        <additionalTextAttributes scheme="Darcula" file="colorSchemes/NbttDarcula.xml"/>
+        <codeInsight.parameterNameHints language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttParameterNameHints" />
+
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
+
+        <errorHandler implementation="com.demonwav.mcdev.error.ErrorReporter"/>
         <!--endregion-->
 
         <!--region BUKKIT-->
@@ -144,13 +167,20 @@
         <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
 
         <moduleService serviceImplementation="com.demonwav.mcdev.platform.mcp.McpModuleSettings"/>
+
+        <gotoSymbolContributor implementation="com.demonwav.mcdev.platform.mcp.navigation.SrgMemberChooseByNameContributor" />
+        <unscrambleSupport implementation="com.demonwav.mcdev.platform.mcp.srg.McpUnscrambler"/>
         <!--endregion-->
 
         <!--region MIXIN-->
         <!---->
 
-        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowNullableInspectionSuppressor"/>
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.mixin.insight.MixinImplicitUsageProvider"/>
+        <deadCode implementation="com.demonwav.mcdev.platform.mixin.insight.MixinEntryPoint"/>
+
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.ShadowOverwriteInspectionSuppressor"/>
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.suppress.ShadowNullableInspectionSuppressor"/>
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.suppress.SoftImplementInspectionSuppressor"/>
 
         <!-- Mixin completion -->
         <superMethodsSearch implementation="com.demonwav.mcdev.platform.mixin.search.MixinSoftImplementMethodSuperSearcher"/>
@@ -667,7 +697,7 @@
                 description="Find the associated SRG mapping for this element">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu2"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mcp.actions.GotoAtEntryAction" id="GotoATEntry"
+        <action class="com.demonwav.mcdev.platform.mcp.actions.GotoAtEntryAction" id="GotoAtEntry"
                 text="Go To AT Entry"
                 description="Go to the relevant Access Transformer entry, if it exists">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>

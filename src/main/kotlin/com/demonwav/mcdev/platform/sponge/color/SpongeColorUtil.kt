@@ -24,7 +24,6 @@ import com.intellij.psi.impl.source.tree.JavaElementType
 import com.intellij.psi.search.GlobalSearchScope
 import java.awt.Color
 
-
 fun PsiElement.findColor(): Pair<Color, PsiElement>? {
     if (this !is PsiMethodCallExpression) {
         return null
@@ -61,26 +60,23 @@ fun PsiElement.findColor(): Pair<Color, PsiElement>? {
     if (types.size == 1 && types[0] === PsiType.INT && expressionList.expressions[0] is PsiLiteralExpression) {
         try {
             pair = handleSingleArgument(expressionList.expressions[0] as PsiLiteralExpression) to expressionList.expressions[0]
-        } catch (ignored: Exception) {
-        }
+        } catch (ignored: Exception) {}
 
-
-        // Triple Integer Argument
+    // Triple Integer Argument
     } else if (types.size == 3 && types[0] === PsiType.INT && types[1] === PsiType.INT && types[2] === PsiType.INT) {
         try {
             pair = handleThreeArguments(expressionList) to expressionList
-        } catch (ignored: Exception) {
-        }
+        } catch (ignored: Exception) {}
 
-        // Single Vector3* Argument
-    } else if (types.size == 1 && (types[0] == PsiType.getTypeByName("com.flowpowered.math.vector.Vector3i", project, GlobalSearchScope.allScope(project)) ||
+    // Single Vector3* Argument
+    } else if (types.size == 1 && (
+        types[0] == PsiType.getTypeByName("com.flowpowered.math.vector.Vector3i", project, GlobalSearchScope.allScope(project)) ||
         types[0] == PsiType.getTypeByName("com.flowpowered.math.vector.Vector3f", project, GlobalSearchScope.allScope(project)) ||
         types[0] == PsiType.getTypeByName("com.flowpowered.math.vector.Vector3d", project, GlobalSearchScope.allScope(project)))) {
 
         try {
             pair = handleVectorArgument(expressionList.expressions[0] as PsiNewExpression) to expressionList.expressions[0]
-        } catch (ignored: Exception) {
-        }
+        } catch (ignored: Exception) {}
     }
 
     return pair
@@ -103,9 +99,9 @@ private fun handleThreeArguments(expressionList: PsiExpressionList): Color {
     val expressionTwo = expressionList.expressions[1] as PsiLiteralExpression
     val expressionThree = expressionList.expressions[2] as PsiLiteralExpression
 
-    val one = Math.round(java.lang.Double.parseDouble(expressionOne.text)).toInt()
-    val two = Math.round(java.lang.Double.parseDouble(expressionTwo.text)).toInt()
-    val three = Math.round(java.lang.Double.parseDouble(expressionThree.text)).toInt()
+    val one = Math.round(expressionOne.text.toDouble()).toInt()
+    val two = Math.round(expressionTwo.text.toDouble()).toInt()
+    val three = Math.round(expressionThree.text.toDouble()).toInt()
 
     return Color(one, two, three)
 }

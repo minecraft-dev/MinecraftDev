@@ -63,7 +63,7 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
     fun refresh() {
         // Don't allow parent types with child types in auto detected set
-        configuration.state.autoDetectTypes = PlatformType.removeParents(configuration.state.autoDetectTypes)
+        PlatformType.removeParents(configuration.state.autoDetectTypes)
 
         val userEnabled = configuration.state.userChosenTypes.entries.asSequence()
             .filter { it.value }
@@ -89,7 +89,7 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         allEnabled
             .map { it.type }
             .filter { !modules.containsKey(it) }
-            .forEach { register(it) }
+            .forEach(this::register)
 
         ProjectView.getInstance(module.project).refresh()
     }
@@ -152,9 +152,16 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     }
 
     @Contract(pure = true)
-    fun isStaticListenerSupported(eventClass: PsiClass, method: PsiMethod): Boolean {
+    fun isStaticListenerSupported(method: PsiMethod): Boolean {
         return doIfGood(method) {
-            it.isStaticListenerSupported(eventClass, method)
+            it.isStaticListenerSupported(method)
+        } ?: false
+    }
+
+    @Contract(pure = true)
+    fun suppressStaticListener(method: PsiMethod): Boolean {
+        return doIfGood(method) {
+            !it.isStaticListenerSupported(method)
         } ?: false
     }
 

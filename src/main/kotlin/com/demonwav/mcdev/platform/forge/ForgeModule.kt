@@ -77,7 +77,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
             "Compiling and running this listener may result in a runtime exception"
     }
 
-    override fun isStaticListenerSupported(eventClass: PsiClass, method: PsiMethod) = true
+    override fun isStaticListenerSupported(method: PsiMethod) = true
 
     fun getMcmod(): VirtualFile? {
         if (mcmod == null) {

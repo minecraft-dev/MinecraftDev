@@ -12,22 +12,17 @@ package com.demonwav.mcdev.platform.forge.version
 
 import com.demonwav.mcdev.util.sortVersions
 import com.google.gson.Gson
-import org.apache.commons.io.IOUtils
 import java.io.IOException
 import java.net.URL
 import java.util.ArrayList
 
-class ForgeVersion private constructor() {
+class ForgeVersion private constructor(private val map: Map<*, *>) {
 
-    private var map: Map<*, *> = mutableMapOf<Any, Any>()
+    val sortedMcVersions: List<String> by lazy {
+        sortVersions((map["mcversion"] as Map<*, *>).keys)
+    }
 
-    val sortedMcVersions: List<String>
-        get() {
-            val mcversion = map["mcversion"] as Map<*, *>
-            return sortVersions(mcversion.keys)
-        }
-
-    fun getRecommended(versions: List<String>): String? {
+    fun getRecommended(versions: List<String>): String {
         var recommended = "1.7"
         for (version in versions) {
             getPromo(version) ?: continue
@@ -75,7 +70,7 @@ class ForgeVersion private constructor() {
         val finalVersion = number["version"] as? String ?: return null
 
         if (branch == null) {
-            return mcVersion + "-" + finalVersion
+            return "$mcVersion-$finalVersion"
         } else {
             return "$mcVersion-$finalVersion-$branch"
         }
@@ -84,18 +79,15 @@ class ForgeVersion private constructor() {
     companion object {
         fun downloadData(): ForgeVersion? {
             try {
-                URL("https://files.minecraftforge.net/maven/net/minecraftforge/forge/json").openStream().use { inputStream ->
-                    val text = IOUtils.toString(inputStream)
+                val text = URL("https://files.minecraftforge.net/maven/net/minecraftforge/forge/json").readText()
 
-                    val map = Gson().fromJson(text, Map::class.java)
-                    val version = ForgeVersion()
-                    version.map = map
-                    return version
-                }
+                val map = Gson().fromJson(text, Map::class.java)
+                val forgeVersion = ForgeVersion(map)
+                forgeVersion.sortedMcVersions // sort em up
+                return forgeVersion
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-
             return null
         }
     }

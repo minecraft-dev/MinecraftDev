@@ -14,7 +14,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import org.jetbrains.annotations.Contract
 
-// Kotlin functions
 inline fun <T> runInlineReadAction(func: () -> T): T {
     return ApplicationManager.getApplication().acquireReadActionLock().use { func() }
 }

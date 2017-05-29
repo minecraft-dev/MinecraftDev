@@ -16,8 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class KotlinIsBroken {
 
-    private KotlinIsBroken() {
-    }
+    private KotlinIsBroken() {}
 
     // See https://youtrack.jetbrains.com/issue/KT-16424
     public static void removeAnnotationAttribute(@NotNull PsiAnnotation annotation, @Nullable String name) {

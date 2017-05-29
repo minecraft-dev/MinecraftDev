@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.mixin.action
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.platform.mixin.util.findSource
-import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory.Companion.MIXIN_OVERWRITE_FALLBACK
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.ifEmpty
@@ -39,8 +38,8 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
     override fun invoke(project: Project, editor: Editor, file: PsiFile) {
         val offset = editor.caretModel.offset
         val psiClass = file.findElementAt(offset)?.findContainingClass() ?: return
-        val methods = (findMethods(psiClass, psiClass.mixinTargets) ?: return)
-                .map(::PsiMethodMember).toTypedArray()
+        val methods = (findMethods(psiClass) ?: return)
+            .map(::PsiMethodMember).toTypedArray()
 
         if (methods.isEmpty()) {
             HintManager.getInstance().showErrorHint(editor, "No methods to overwrite have been found")

@@ -26,7 +26,7 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedElementsSearch
 
-class SideOnlyProjectComponent protected constructor(project: Project) : AbstractProjectComponent(project) {
+class SideOnlyProjectComponent(project: Project) : AbstractProjectComponent(project) {
 
     override fun projectOpened() {
         val facets = ProjectFacetManager.getInstance(project).getFacets(MinecraftFacet.ID)

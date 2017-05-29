@@ -8,9 +8,6 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mcp.at.completion
+package com.demonwav.mcdev.nbt
 
-interface AtMcpLookupItem {
-
-    fun getPrettyText(): String
-}
+class MalformedNbtFileException(message: String = "") : Exception(message)

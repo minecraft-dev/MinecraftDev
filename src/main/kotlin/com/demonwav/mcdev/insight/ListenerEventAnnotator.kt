@@ -78,7 +78,7 @@ class ListenerEventAnnotator : Annotator {
             return
         }
 
-        if (!instance.isStaticListenerSupported(eventClass, method) && method.hasModifierProperty(PsiModifier.STATIC)) {
+        if (!instance.isStaticListenerSupported(method) && method.hasModifierProperty(PsiModifier.STATIC)) {
             if (method.nameIdentifier != null) {
                 holder.createErrorAnnotation(method.nameIdentifier!!, "Event listener method must not be static")
             }

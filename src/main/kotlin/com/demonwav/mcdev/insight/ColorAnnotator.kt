@@ -11,8 +11,6 @@
 package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
-import com.intellij.codeInsight.daemon.impl.AnnotationHolderImpl
-import com.intellij.lang.annotation.Annotation
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
@@ -36,26 +34,17 @@ class ColorAnnotator : Annotator {
 
     companion object {
         fun setColorAnnotator(color: Color, element: PsiElement, holder: AnnotationHolder) {
-            val key = TextAttributesKey.createTextAttributesKey(
-                "MC_COLOR_" + color.toString(),
-                TextAttributes(
-                    null,
-                    null,
-                    color,
-                    MinecraftSettings.instance.underlineType.effectType,
-                    Font.PLAIN
-                )
-            )
-            // We need to reset it even though we passed it in the create method, since the TextAttributesKey's are cached, so if this
-            // changes then the cached version of it still wont. We set it here to make sure it's always set properly
-            key.defaultAttributes.effectType = MinecraftSettings.instance.underlineType.effectType
-            val annotation = Annotation(
-                element.textRange.startOffset,
-                element.textRange.endOffset,
-                HighlightSeverity.INFORMATION, null, null
-            )
+            @Suppress("DEPRECATION")
+            val key = TextAttributesKey.createTextAttributesKey("MC_COLOR_" + color.toString(), TextAttributes(
+                null,
+                null,
+                color,
+                MinecraftSettings.instance.underlineType.effectType,
+                Font.PLAIN
+            ))
+
+            val annotation = holder.createAnnotation(HighlightSeverity.INFORMATION, element.textRange, null)
             annotation.textAttributes = key
-            (holder as AnnotationHolderImpl).add(annotation)
         }
     }
 }

@@ -13,6 +13,7 @@ package com.demonwav.mcdev.creator
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
+import com.demonwav.mcdev.platform.sponge.getSpongeVersionSelector
 import com.intellij.util.ui.UIUtil
 import org.apache.commons.lang.WordUtils
 import javax.swing.JCheckBox
@@ -66,7 +67,7 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             title.icon = PlatformAssets.SPONGE_ICON_2X
         }
 
-        getVersionSelector(PlatformType.SPONGE)
+        getSpongeVersionSelector()
             .done { it.set(spongeApiVersionBox) }
             .rejected { errorLabel.isVisible = true }
 

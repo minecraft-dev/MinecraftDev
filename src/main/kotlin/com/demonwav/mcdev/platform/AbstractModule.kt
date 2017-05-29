@@ -76,7 +76,7 @@ abstract class AbstractModule(protected val facet: MinecraftFacet) {
         return null
     }
 
-    open fun isStaticListenerSupported(eventClass: PsiClass, method: PsiMethod) = false
+    open fun isStaticListenerSupported(method: PsiMethod) = false
 
     @Contract(pure = true)
     protected fun standardSkip(method: PsiMethod, qualifierExpression: PsiExpression): Boolean {

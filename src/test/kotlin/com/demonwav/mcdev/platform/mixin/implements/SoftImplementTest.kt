@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.mixin.implements
 
 import com.demonwav.mcdev.platform.mixin.BaseMixinTest
 import com.demonwav.mcdev.platform.mixin.inspection.implements.SoftImplementOverridesInspection
+import org.intellij.lang.annotations.Language
 
 class SoftImplementTest : BaseMixinTest() {
 
@@ -30,7 +31,7 @@ class SoftImplementTest : BaseMixinTest() {
                     }
                 """)
 
-                java("test/SoftImplementMixin.java", """
+                java("test/SoftImplementMixin.java", fixPrefix("""
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -50,9 +51,13 @@ class SoftImplementTest : BaseMixinTest() {
                         }
 
                     }
-                """)
+                """))
             }
         }
+    }
+
+    private fun fixPrefix(@Language("JAVA") code: String): String {
+        return code.replace('_', '$')
     }
 
     fun testSoftImplements() {
