@@ -26,7 +26,8 @@
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="&lt;html&gt;&lt;font color='red'&gt;MCP versions colored in red are not for the chosen Minecraft version and are not recommended&lt;/font&gt;&lt;/html&gt;"/>
+              <foreground color="-65536"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.mcp.not_recommended"/>
             </properties>
           </component>
         </children>
@@ -44,7 +45,7 @@
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Required Settings"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.required_settings"/>
             </properties>
           </component>
           <component id="11e61" class="javax.swing.JSeparator">
@@ -68,7 +69,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Mod Name"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.mod_name"/>
                 </properties>
               </component>
               <component id="34efa" class="javax.swing.JTextField" binding="pluginNameField">
@@ -92,7 +93,7 @@
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Main Class Name"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.main_class_name"/>
                 </properties>
               </component>
               <component id="aaa6" class="javax.swing.JTextField" binding="mainClassField">
@@ -110,7 +111,7 @@
                   <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Mod Version"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.mod_version"/>
                 </properties>
               </component>
               <grid id="554a4" layout-manager="GridLayoutManager" row-count="1" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -131,14 +132,14 @@
                   </component>
                   <component id="22400" class="javax.swing.JLabel">
                     <constraints>
-                      <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                      <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="2" use-parent-layout="false">
                         <preferred-size width="-1" height="17"/>
                       </grid>
                     </constraints>
                     <properties>
                       <horizontalAlignment value="4"/>
                       <horizontalTextPosition value="4"/>
-                      <text value="    Minecraft Version"/>
+                      <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.minecraft_version"/>
                     </properties>
                   </component>
                   <component id="d64f9" class="javax.swing.JComboBox" binding="mcpVersionBox">
@@ -156,7 +157,7 @@
                     <properties>
                       <horizontalAlignment value="4"/>
                       <horizontalTextPosition value="4"/>
-                      <text value="    MCP Version"/>
+                      <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.mcp.version"/>
                     </properties>
                   </component>
                   <hspacer id="db85e">
@@ -179,8 +180,9 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <font size="18"/>
               <icon value="assets/icons/platform/LiteLoader@2x.png"/>
-              <text value="&lt;html&gt;&lt;font size=&quot;5&quot;&gt;LiteLoader Settings&lt;/font&gt;&lt;/html&gt;"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.settings.liteloader"/>
             </properties>
           </component>
         </children>

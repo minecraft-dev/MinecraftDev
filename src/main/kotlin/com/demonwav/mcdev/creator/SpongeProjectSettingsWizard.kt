@@ -85,17 +85,19 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun onStepLeaving() {
-        settings!!.pluginName = pluginNameField.text
-        settings!!.pluginVersion = pluginVersionField.text
-        settings!!.mainClass = mainClassField.text
+        this.settings!!.apply {
+            pluginName = pluginNameField.text
+            pluginVersion = pluginVersionField.text
+            mainClass = mainClassField.text
 
-        settings!!.setAuthors(authorsField.text)
-        settings!!.setDependencies(dependField.text)
-        settings!!.description = descriptionField.text
-        settings!!.website = websiteField.text
+            setAuthors(authorsField.text)
+            setDependencies(dependField.text)
+            description = descriptionField.text
+            website = websiteField.text
 
-        settings!!.generateDocumentedListeners = this.generateDocumentedListenersCheckBox.isSelected
-        settings!!.spongeApiVersion = spongeApiVersionBox.selectedItem as? String ?: ""
+            generateDocumentedListeners = generateDocumentedListenersCheckBox.isSelected
+            spongeApiVersion = spongeApiVersionBox.selectedItem as? String ?: ""
+        }
     }
 
     override fun updateDataModel() {}

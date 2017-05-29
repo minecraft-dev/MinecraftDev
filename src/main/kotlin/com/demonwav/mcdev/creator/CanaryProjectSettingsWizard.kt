@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.canary.CanaryProjectConfiguration
@@ -59,11 +60,11 @@ class CanaryProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         when (settings!!.type) {
             PlatformType.CANARY -> {
                 title.icon = PlatformAssets.CANARY_ICON_2X
-                title.text = "<html><font size=\"5\">Canary Settings</font></html>"
+                title.text = MCMessages["setup.settings.canary"]
             }
             PlatformType.NEPTUNE -> {
                 title.icon = PlatformAssets.NEPTUNE_ICON_2X
-                title.text = "<html><font size=\"5\">Neptune Settings</font></html>"
+                title.text = MCMessages["setup.settings.neptune"]
             }
             else -> {}
         }
@@ -86,13 +87,15 @@ class CanaryProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun onStepLeaving() {
-        this.settings!!.pluginName = pluginNameField.text
-        this.settings!!.pluginVersion = pluginVersionField.text
-        this.settings!!.mainClass = mainClassField.text
-        this.settings!!.setAuthors(this.authorsField.text)
-        this.settings!!.isEnableEarly = this.loadOrderBox.selectedIndex != 0
-        this.settings!!.setDependencies(this.dependField.text)
-        this.settings!!.canaryVersion = canaryVersionBox.selectedItem as? String ?: ""
+        this.settings!!.apply {
+            pluginName = pluginNameField.text
+            pluginVersion = pluginVersionField.text
+            mainClass = mainClassField.text
+            setAuthors(authorsField.text)
+            isEnableEarly = loadOrderBox.selectedIndex != 0
+            setDependencies(dependField.text)
+            canaryVersion = canaryVersionBox.selectedItem as? String ?: ""
+        }
     }
 
     override fun updateDataModel() {}

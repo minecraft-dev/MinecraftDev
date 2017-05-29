@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration
@@ -65,15 +66,15 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         when (settings!!.type) {
             PlatformType.BUKKIT -> {
                 title.icon = PlatformAssets.BUKKIT_ICON_2X
-                title.text = "<html><font size=\"5\">Bukkit Settings</font></html>"
+                title.text = MCMessages["setup.settings.bukkit"]
             }
             PlatformType.SPIGOT -> {
                 title.icon = PlatformAssets.SPIGOT_ICON_2X
-                title.text = "<html><font size=\"5\">Spigot Settings</font></html>"
+                title.text = MCMessages["setup.settings.spigot"]
             }
             PlatformType.PAPER -> {
                 title.icon = PlatformAssets.PAPER_ICON_2X
-                title.text = "<html><font size=\"5\">Paper Settings</font></html>"
+                title.text = MCMessages["setup.settings.paper"]
             }
             else -> {}
         }
@@ -96,18 +97,20 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun onStepLeaving() {
-        this.settings!!.pluginName = pluginNameField.text
-        this.settings!!.pluginVersion = pluginVersionField.text
-        this.settings!!.mainClass = mainClassField.text
-        this.settings!!.description = descriptionField.text
-        this.settings!!.setAuthors(this.authorsField.text)
-        this.settings!!.website = websiteField.text
-        this.settings!!.prefix = prefixField.text
-        this.settings!!.loadOrder = if (this.loadOrderBox.selectedIndex == 0) LoadOrder.POSTWORLD else LoadOrder.STARTUP
-        this.settings!!.setLoadBefore(this.loadBeforeField.text)
-        this.settings!!.setDependencies(this.dependField.text)
-        this.settings!!.setSoftDependencies(this.softDependField.text)
-        this.settings!!.minecraftVersion = minecraftVersionBox.selectedItem as? String ?: ""
+        this.settings!!.apply {
+            pluginName = pluginNameField.text
+            pluginVersion = pluginVersionField.text
+            mainClass = mainClassField.text
+            description = descriptionField.text
+            setAuthors(authorsField.text)
+            website = websiteField.text
+            prefix = prefixField.text
+            loadOrder = if (loadOrderBox.selectedIndex == 0) LoadOrder.POSTWORLD else LoadOrder.STARTUP
+            setLoadBefore(loadBeforeField.text)
+            setDependencies(dependField.text)
+            setSoftDependencies(softDependField.text)
+            minecraftVersion = minecraftVersionBox.selectedItem as? String ?: ""
+        }
     }
 
     override fun updateDataModel() {}

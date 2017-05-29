@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.buildsystem.BuildDependency
 import com.demonwav.mcdev.buildsystem.BuildRepository
 import com.demonwav.mcdev.buildsystem.BuildSystem
@@ -67,7 +68,7 @@ class MinecraftProjectCreator {
         val configuration = settings.values.iterator().next()
         addDependencies(configuration, buildSystem)
 
-        ProgressManager.getInstance().run(object : Task.Backgroundable(module.project, "Setting Up Project", false) {
+        ProgressManager.getInstance().run(object : Task.Backgroundable(module.project, MCMessages["setup.task.title"], false) {
             override fun shouldStartInBackground() = false
 
             override fun run(indicator: ProgressIndicator) {
@@ -83,11 +84,11 @@ class MinecraftProjectCreator {
 
     private fun doMultiModuleCreate() {
         if (buildSystem !is GradleBuildSystem) {
-            throw IllegalStateException("BuildSystem must be Gradle")
+            throw IllegalStateException(MCMessages["setup.error.multi_module_not_gradle"])
         }
 
         val gradleBuildSystem = buildSystem as GradleBuildSystem?
-        ProgressManager.getInstance().run(object : Task.Backgroundable(module.project, "Setting Up Project", false) {
+        ProgressManager.getInstance().run(object : Task.Backgroundable(module.project, MCMessages["setup.task.title"], false) {
             override fun shouldStartInBackground() = false
 
             override fun run(indicator: ProgressIndicator) {

@@ -18,7 +18,7 @@
             <constraints border-constraint="North"/>
             <properties>
               <requestFocusEnabled value="false"/>
-              <text value="Choose plugin type:"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.chooser.title"/>
             </properties>
           </component>
         </children>
@@ -98,7 +98,7 @@
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Bukkit Plugin"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.chooser.bukkit_plugin"/>
             </properties>
           </component>
           <component id="1a691" class="javax.swing.JCheckBox" binding="spigotPluginCheckBox" default-binding="true">
@@ -106,7 +106,7 @@
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Spigot Plugin"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.chooser.spigot_plugin"/>
             </properties>
           </component>
           <component id="24d89" class="javax.swing.JCheckBox" binding="paperPluginCheckBox">
@@ -114,7 +114,7 @@
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Paper Plugin"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.chooser.paper_plugin"/>
             </properties>
           </component>
           <component id="657b2" class="javax.swing.JCheckBox" binding="spongePluginCheckBox">
@@ -122,7 +122,7 @@
               <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Sponge Plugin"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.chooser.sponge_plugin"/>
             </properties>
           </component>
           <component id="d9577" class="javax.swing.JCheckBox" binding="forgeModCheckBox">
@@ -130,7 +130,7 @@
               <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Forge Mod"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.chooser.forge_mod"/>
             </properties>
           </component>
           <component id="51426" class="javax.swing.JCheckBox" binding="bungeeCordPluginCheckBox">
@@ -138,7 +138,7 @@
               <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="BungeeCord Plugin"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.chooser.bungeecord_plugin"/>
             </properties>
           </component>
           <component id="a965" class="javax.swing.JLabel">
@@ -155,7 +155,7 @@
               <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="LiteLoader Mod"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.chooser.liteloader_mod"/>
             </properties>
           </component>
           <component id="b9b97" class="javax.swing.JLabel">
@@ -173,7 +173,7 @@
               <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Canary Plugin"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.chooser.canary_plugin"/>
             </properties>
           </component>
           <component id="ed91d" class="javax.swing.JLabel">
@@ -196,7 +196,7 @@
               <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Neptune Plugin"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.chooser.neptune_plugin"/>
             </properties>
           </component>
         </children>

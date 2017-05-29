@@ -21,7 +21,7 @@
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Required Settings"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.required_settings"/>
             </properties>
           </component>
           <component id="9ed24" class="javax.swing.JSeparator">
@@ -45,7 +45,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Plugin Name"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.plugin_name"/>
                 </properties>
               </component>
               <component id="8f2bc" class="javax.swing.JTextField" binding="pluginNameField">
@@ -61,7 +61,7 @@
                   <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Plugin Version"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.plugin_version"/>
                 </properties>
               </component>
               <component id="4e39b" class="javax.swing.JTextField" binding="pluginVersionField">
@@ -77,7 +77,7 @@
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Main Class Name"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.main_class_name"/>
                 </properties>
               </component>
               <component id="5939f" class="javax.swing.JTextField" binding="mainClassField">
@@ -101,7 +101,7 @@
                   <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Canary Version"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.canary.canary_version"/>
                 </properties>
               </component>
               <component id="bd355" class="javax.swing.JLabel" binding="errorLabel">
@@ -121,7 +121,7 @@
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Optional Settings"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.optional_settings"/>
             </properties>
           </component>
           <component id="812ef" class="javax.swing.JSeparator">
@@ -145,7 +145,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Author"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.author"/>
                 </properties>
               </component>
               <component id="474fe" class="javax.swing.JLabel">
@@ -153,8 +153,8 @@
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Depend"/>
-                  <toolTipText value="Give a comma separated list of plugins"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.depend"/>
+                  <toolTipText resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.tooltip_plugins"/>
                 </properties>
               </component>
               <component id="5ecbb" class="javax.swing.JTextField" binding="dependField">
@@ -172,7 +172,7 @@
                   <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Enable Early?"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.canary.enable_early"/>
                 </properties>
               </component>
               <component id="3e9d1" class="javax.swing.JComboBox" binding="loadOrderBox">
@@ -208,8 +208,9 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <font size="18"/>
               <icon value="assets/icons/platform/Canary@2x.png"/>
-              <text value="&lt;html&gt;&lt;font size=&quot;5&quot;&gt;Canary Settings&lt;/font&gt;&lt;/html&gt;"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.settings.canary"/>
             </properties>
           </component>
         </children>

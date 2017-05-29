@@ -73,15 +73,16 @@ class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreat
     }
 
     override fun onStepLeaving() {
-        super.onStepLeaving()
-        this.settings!!.pluginName = pluginNameField.text
-        this.settings!!.pluginVersion = pluginVersionField.text
-        this.settings!!.mainClass = mainClassField.text
-        this.settings!!.description = descriptionField.text
-        this.settings!!.setAuthors(this.authorField.text)
-        this.settings!!.setDependencies(this.dependField.text)
-        this.settings!!.setSoftDependencies(this.softDependField.text)
-        this.settings!!.minecraftVersion = minecraftVersionBox.selectedItem as? String ?: ""
+        this.settings!!.apply {
+            pluginName = pluginNameField.text
+            pluginVersion = pluginVersionField.text
+            mainClass = mainClassField.text
+            description = descriptionField.text
+            setAuthors(authorField.text)
+            setDependencies(dependField.text)
+            setSoftDependencies(softDependField.text)
+            minecraftVersion = minecraftVersionBox.selectedItem as? String ?: ""
+        }
     }
 
     override fun updateDataModel() {}

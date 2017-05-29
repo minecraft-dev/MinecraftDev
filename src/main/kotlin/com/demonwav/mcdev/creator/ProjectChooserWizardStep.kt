@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration
@@ -208,32 +209,14 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
     }
 
     companion object {
-        private val bukkitInfo = "Create a standard " +
-            "<a href=\"https://bukkit.org/\">Bukkit</a> plugin, for use " +
-            "on CraftBukkit, Spigot, and Paper servers."
-        private val spigotInfo = "Create a standard " +
-            "<a href=\"https://www.spigotmc.org/\">Spigot</a> plugin, for use " +
-            "on Spigot and Paper servers."
-        private val paperInfo = "Create a standard " +
-            "<a href=\"https://paper.emc.gs\">Paper</a> plugin, for use " +
-            "on Paper servers."
-        private val bungeeCordInfo = "Create a standard " +
-            "<a href=\"https://www.spigotmc.org/wiki/bungeecord/\">BungeeCord</a> plugin, for use " +
-            "on BungeeCord servers."
-        private val spongeInfo = "Create a standard " +
-            "<a href=\"https://www.spongepowered.org/\">Sponge</a> plugin, for use " +
-            "on Sponge servers."
-        private val forgeInfo = "Create a standard " +
-            "<a href=\"https://files.minecraftforge.net/\">Forge</a> mod, for use " +
-            "on Forge servers and clients."
-        private val liteLoaderInfo = "Create a standard " +
-            "<a href=\"http://www.liteloader.com/\">LiteLoader</a> mod, for use " +
-            "on LiteLoader clients."
-        private val canaryInfo = "Create a standard " +
-            "<a href=\"https://canarymod.net/\">Canary</a> plugin, for use " +
-            "on CanaryMod and Neptune servers."
-        private val neptuneInfo = "Create a standard " +
-            "<a href=\"https://www.neptunepowered.org/\">Neptune</a> plugin, for use " +
-            "on Neptune servers."
+        private val bukkitInfo = MCMessages["setup.chooser.bukkit"]
+        private val spigotInfo = MCMessages["setup.chooser.spigot"]
+        private val paperInfo = MCMessages["setup.chooser.paper"]
+        private val bungeeCordInfo = MCMessages["setup.chooser.bungeecord"]
+        private val spongeInfo = MCMessages["setup.chooser.sponge"]
+        private val forgeInfo = MCMessages["setup.chooser.forge"]
+        private val liteLoaderInfo = MCMessages["setup.chooser.liteloader"]
+        private val canaryInfo = MCMessages["setup.chooser.canary"]
+        private val neptuneInfo = MCMessages["setup.chooser.neptune"]
     }
 }

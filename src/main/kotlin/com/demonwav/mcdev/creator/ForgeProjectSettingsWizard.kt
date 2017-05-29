@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration
@@ -118,16 +119,16 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
             } else {
                 title.icon = PlatformAssets.SPONGE_ICON_2X_DARK
             }
-            title.text = "<html><font size=\"5\">SpongeForge Settings</font></html>"
+            title.text = MCMessages["setup.settings.spongeforge"]
             generateDocsCheckbox.isVisible = true
 
-            minecraftVersionLabel.text = "Sponge API Version"
+            minecraftVersionLabel.text = MCMessages["setup.ui.sponge.version"]
         } else {
             title.icon = PlatformAssets.FORGE_ICON_2X
-            title.text = "<html><font size=\"5\">Forge Settings</font></html>"
+            title.text = MCMessages["setup.settings.forge"]
             generateDocsCheckbox.isVisible = false
 
-            minecraftVersionLabel.text = "Minecraft Version"
+            minecraftVersionLabel.text = MCMessages["setup.ui.general.minecraft_version"]
         }
 
         if ((forgeVersion == null || mcpVersion == null || spongeVersion == null) && (apiWorker.isCancelled || apiWorker.isDone)) {

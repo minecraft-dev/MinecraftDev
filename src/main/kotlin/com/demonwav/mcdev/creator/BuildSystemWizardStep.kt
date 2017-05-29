@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.asset.MCMessages
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem
@@ -93,15 +94,15 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
             }
 
             if (!groupIdField.text.matches("\\S+".toRegex())) {
-                throw MinecraftSetupException("The GroupId field cannot contain any whitespace", groupIdField)
+                throw MinecraftSetupException(MCMessages["setup.error.buildsystem.groupid_whitespace"], groupIdField)
             }
 
             if (!artifactIdField.text.matches("\\S+".toRegex())) {
-                throw MinecraftSetupException("The ArtifactId field cannot contain any whitespace", artifactIdField)
+                throw MinecraftSetupException(MCMessages["setup.error.buildsystem.artifactid_whitespace"], artifactIdField)
             }
 
             if (creator.settings.values.stream().anyMatch { s -> s.type === PlatformType.FORGE } && buildSystemBox.selectedIndex == 0) {
-                throw MinecraftSetupException("Forge does not support Maven", buildSystemBox)
+                throw MinecraftSetupException(MCMessages["setup.error.buildsystem.forge_maven"], buildSystemBox)
             }
         } catch (e: MinecraftSetupException) {
             JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(e.error, MessageType.ERROR, null)

@@ -21,7 +21,7 @@
               <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Required Settings"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.required_settings"/>
             </properties>
           </component>
           <component id="f9993" class="javax.swing.JSeparator">
@@ -45,7 +45,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Plugin Name"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.plugin_name"/>
                 </properties>
               </component>
               <component id="62e5" class="javax.swing.JTextField" binding="pluginNameField">
@@ -61,7 +61,7 @@
                   <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Plugin Version"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.plugin_version"/>
                 </properties>
               </component>
               <component id="793dc" class="javax.swing.JTextField" binding="pluginVersionField">
@@ -77,7 +77,7 @@
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Main Class Name"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.main_class_name"/>
                 </properties>
               </component>
               <component id="c2a11" class="javax.swing.JTextField" binding="mainClassField">
@@ -95,7 +95,7 @@
               <grid row="6" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Optional Settings"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.optional_settings"/>
             </properties>
           </component>
           <component id="fc22a" class="javax.swing.JSeparator">
@@ -111,8 +111,9 @@
               <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <font size="18"/>
               <icon value="assets/icons/platform/Sponge@2x.png"/>
-              <text value="&lt;html&gt;&lt;font size=&quot;5&quot;&gt;Sponge Settings&lt;/font&gt;&lt;/html&gt;"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.settings.sponge"/>
             </properties>
           </component>
           <grid id="a7f71" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
@@ -136,7 +137,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Description"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.description"/>
                 </properties>
               </component>
               <component id="a67b6" class="javax.swing.JLabel">
@@ -144,7 +145,7 @@
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Authors"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.authors"/>
                 </properties>
               </component>
               <component id="94488" class="javax.swing.JTextField" binding="authorsField">
@@ -160,7 +161,7 @@
                   <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Website"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.website"/>
                 </properties>
               </component>
               <component id="319a4" class="javax.swing.JTextField" binding="websiteField">
@@ -176,7 +177,7 @@
                   <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Depend"/>
+                  <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.general.depend"/>
                 </properties>
               </component>
               <component id="6cf4e" class="javax.swing.JTextField" binding="dependField">
@@ -203,7 +204,7 @@
               <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Sponge API"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.sponge.version"/>
             </properties>
           </component>
           <hspacer id="224f6">
@@ -241,7 +242,7 @@
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Generate Documented Listeners"/>
+              <text resource-bundle="assets/messages/MinecraftDevelopment" key="setup.ui.sponge.generate_doc"/>
             </properties>
           </component>
         </children>
