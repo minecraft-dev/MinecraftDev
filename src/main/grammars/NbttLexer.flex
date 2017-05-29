@@ -122,7 +122,7 @@ LONG_ARRAY_LITERAL = [+-]?\d+[lL]?
     // Everything below this is invalid
     // we just want to match them correctly so the parser has something to grab on to
 
-    {BYTE_LITERAL}              { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return INT_LITERAL; }
+    {BYTE_LITERAL}              { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return BYTE_LITERAL; }
     {SHORT_LITERAL}             { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return SHORT_LITERAL; }
     {LONG_LITERAL}              { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return LONG_LITERAL; }
     {FLOAT_LITERAL}             { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return FLOAT_LITERAL; }
@@ -159,12 +159,13 @@ LONG_ARRAY_LITERAL = [+-]?\d+[lL]?
     "["                         { stack.offerFirst(IN_LIST); stack.offerFirst(EXPECT_NEXT); yybegin(IN_LIST); return LBRACKET; }
     "bytes"                     { stack.offerFirst(IN_LIST); stack.offerFirst(EXPECT_NEXT); yybegin(IN_BYTE_ARRAY); return BYTES; }
     "ints"                      { stack.offerFirst(IN_LIST); stack.offerFirst(EXPECT_NEXT); yybegin(IN_INT_ARRAY); return INTS; }
+    "longs"                     { stack.offerFirst(IN_LIST); stack.offerFirst(EXPECT_NEXT); yybegin(IN_LONG_ARRAY); return LONGS; }
 
     ","                         { return COMMA; }
 
     "]"                         { yybegin(stack.pollFirst()); return RBRACKET; }
 
-    {BYTE_LITERAL}              { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return INT_LITERAL; }
+    {BYTE_LITERAL}              { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return BYTE_LITERAL; }
     {SHORT_LITERAL}             { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return SHORT_LITERAL; }
     {INT_LITERAL}               { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return INT_LITERAL; }
     {LONG_LITERAL}              { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return LONG_LITERAL; }
