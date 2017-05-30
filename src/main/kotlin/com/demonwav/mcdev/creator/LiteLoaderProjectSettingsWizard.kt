@@ -40,8 +40,8 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
 
     private lateinit var panel: JPanel
     private lateinit var mcpWarning: JLabel
-    private lateinit var pluginNameField: JTextField
-    private lateinit var pluginVersionField: JTextField
+    private lateinit var modNameField: JTextField
+    private lateinit var modVersionField: JTextField
     private lateinit var mainClassField: JTextField
     private lateinit var minecraftVersionBox: JComboBox<String>
     private lateinit var mcpVersionBox: JComboBox<McpVersionEntry>
@@ -104,13 +104,13 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
             }
         }
 
-        pluginNameField.document.addDocumentListener(object : DocumentAdapter() {
+        modNameField.document.addDocumentListener(object : DocumentAdapter() {
             override fun textChanged(e: DocumentEvent) {
                 if (mainClassModified) {
                     return
                 }
 
-                val words = pluginNameField.text.split("\\s+".toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
+                val words = modNameField.text.split("\\s+".toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
                 val word = words.joinToString { WordUtils.capitalize(it) }
 
                 val mainClassWords = mainClassField.text.split(".").toTypedArray()
@@ -133,12 +133,12 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
             return panel
         }
 
-        pluginNameField.text = WordUtils.capitalizeFully(creator.artifactId)
-        pluginVersionField.text = creator.version
+        modNameField.text = WordUtils.capitalizeFully(creator.artifactId)
+        modVersionField.text = creator.version
 
         if (settings != null && !settings!!.isFirst) {
-            pluginNameField.isEditable = false
-            pluginVersionField.isEditable = false
+            modNameField.isEditable = false
+            modVersionField.isEditable = false
         }
 
         mainClassField.document.removeDocumentListener(listener)
@@ -152,12 +152,12 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
 
     override fun validate(): Boolean {
         try {
-            if (pluginNameField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("empty", pluginNameField)
+            if (modNameField.text.trim { it <= ' ' }.isEmpty()) {
+                throw MinecraftSetupException("empty", modNameField)
             }
 
-            if (pluginVersionField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("empty", pluginVersionField)
+            if (modVersionField.text.trim { it <= ' ' }.isEmpty()) {
+                throw MinecraftSetupException("empty", modVersionField)
             }
 
             if (mainClassField.text.trim { it <= ' ' }.isEmpty()) {
@@ -189,8 +189,8 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
 
     override fun onStepLeaving() {
         settings!!.apply {
-            pluginName = pluginNameField.text
-            pluginVersion = pluginVersionField.text
+            pluginName = modNameField.text
+            pluginVersion = modVersionField.text
             mainClass = mainClassField.text
 
             mcVersion = minecraftVersionBox.selectedItem as String

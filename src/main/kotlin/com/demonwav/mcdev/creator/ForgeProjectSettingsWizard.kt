@@ -35,8 +35,8 @@ import javax.swing.SwingWorker
 
 class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) : MinecraftModuleWizardStep() {
 
-    private lateinit var pluginNameField: JTextField
-    private lateinit var pluginVersionField: JTextField
+    private lateinit var modNameField: JTextField
+    private lateinit var modVersionField: JTextField
     private lateinit var mainClassField: JTextField
     private lateinit var panel: JPanel
     private lateinit var title: JLabel
@@ -89,12 +89,12 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
             return null
         }
 
-        pluginNameField.text = WordUtils.capitalize(creator.artifactId)
-        pluginVersionField.text = creator.version
+        modNameField.text = WordUtils.capitalize(creator.artifactId)
+        modVersionField.text = creator.version
 
         if (settings != null && !settings!!.isFirst) {
-            pluginNameField.isEditable = false
-            pluginVersionField.isEditable = false
+            modNameField.isEditable = false
+            modVersionField.isEditable = false
         }
 
         mainClassField.text = "${this.creator.groupId.toLowerCase()}.${this.creator.artifactId.toLowerCase()}." +
@@ -162,7 +162,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         }
 
     override fun validate(): Boolean {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) && !loadingBar.isVisible
+        return validate(modNameField, modVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) && !loadingBar.isVisible
     }
 
     override fun isStepVisible(): Boolean {
@@ -178,8 +178,8 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         }
 
         settings!!.apply {
-            pluginName = pluginNameField.text
-            pluginVersion = pluginVersionField.text
+            pluginName = modNameField.text
+            pluginVersion = modVersionField.text
             mainClass = mainClassField.text
 
             setAuthors(authorsField.text)
@@ -191,10 +191,9 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
             mcpVersion = (mcpVersionBox.selectedItem as McpVersionEntry).text
         }
 
-        if (settings is SpongeForgeProjectConfiguration) {
-            val configuration = settings as SpongeForgeProjectConfiguration?
-            configuration!!.generateDocumentation = generateDocsCheckbox.isSelected
-            configuration.spongeApiVersion = minecraftVersionBox.selectedItem as String
+        (settings as? SpongeForgeProjectConfiguration)?.let { settings ->
+            settings.generateDocumentation = generateDocsCheckbox.isSelected
+            settings.spongeApiVersion = minecraftVersionBox.selectedItem as String
         }
 
         // If an error occurs while fetching the API, this may prevent the user from closing the dialog.

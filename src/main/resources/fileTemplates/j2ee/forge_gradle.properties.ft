@@ -1,6 +1,6 @@
 #if (${GROUP_ID})
 modGroup = ${GROUP_ID}
-modVersion = ${PLUGIN_VERSION}
+modVersion = ${MOD_VERSION}
 #end
 modBaseName = ${ARTIFACT_ID}
 
