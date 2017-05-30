@@ -21,13 +21,13 @@ import com.intellij.psi.codeStyle.CodeStyleSettingsProvider
 class NbttCodeStyleSettingsProvider : CodeStyleSettingsProvider() {
     override fun createSettingsPage(settings: CodeStyleSettings, originalSettings: CodeStyleSettings): Configurable {
         return object : CodeStyleAbstractConfigurable(settings, originalSettings, "NBT Text") {
-            override fun createPanel(settings: CodeStyleSettings?): CodeStyleAbstractPanel {
-                return object : TabbedLanguageCodeStylePanel(NbttLanguage, currentSettings, settings) {
-                    override fun initTabs(settings: CodeStyleSettings?) {
-                        addIndentOptionsTab(settings)
-                        addSpacesTab(settings)
-                        addBlankLinesTab(settings)
-                        addWrappingAndBracesTab(settings)
+            override fun createPanel(otherSettings: CodeStyleSettings?): CodeStyleAbstractPanel {
+                return object : TabbedLanguageCodeStylePanel(NbttLanguage, currentSettings, otherSettings) {
+                    override fun initTabs(otherOtherSettings: CodeStyleSettings?) {
+                        addIndentOptionsTab(otherOtherSettings)
+                        addSpacesTab(otherOtherSettings)
+                        addBlankLinesTab(otherOtherSettings)
+                        addWrappingAndBracesTab(otherOtherSettings)
                     }
                 }
             }

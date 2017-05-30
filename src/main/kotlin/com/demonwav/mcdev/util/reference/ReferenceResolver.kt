@@ -94,8 +94,8 @@ fun LookupElementBuilder.completeToLiteral(context: PsiElement): LookupElementBu
 
     // TODO: Currently we replace everything with a single PsiLiteral,
     // not sure how you would keep line breaks after completion
-    return withInsertHandler { context, item ->
-        context.laterRunnable = ReplaceElementWithLiteral(context.editor, context.file, item.lookupString)
+    return withInsertHandler { insertionContext, item ->
+        insertionContext.laterRunnable = ReplaceElementWithLiteral(insertionContext.editor, insertionContext.file, item.lookupString)
     }
 }
 

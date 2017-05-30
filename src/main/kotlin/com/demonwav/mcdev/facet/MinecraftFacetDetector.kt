@@ -121,18 +121,18 @@ class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(projec
                 .recursively()
                 .withoutLibraries()
                 .withoutSdk()
-                .forEachModule { module ->
-                    if (module.name.startsWith("SpongeAPI")) {
+                .forEachModule { m ->
+                    if (m.name.startsWith("SpongeAPI")) {
                         // We don't want want to add parent modules in module groups
-                        val moduleManager = ModuleManager.getInstance(module.project)
-                        val groupPath = moduleManager.getModuleGroupPath(module)
+                        val moduleManager = ModuleManager.getInstance(m.project)
+                        val groupPath = moduleManager.getModuleGroupPath(m)
                         if (groupPath == null) {
                             platformKinds.add(SPONGE_LIBRARY_KIND)
                             return@forEachModule true
                         }
 
                         val name = groupPath.lastOrNull() ?: return@forEachModule true
-                        if (module.name == name) {
+                        if (m.name == name) {
                             return@forEachModule true
                         }
 

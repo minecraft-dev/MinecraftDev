@@ -27,19 +27,21 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiReference
+import com.intellij.psi.PsiReferenceExpression
 import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
 
 class FindSrgMappingAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
-        val data = getDataFromActionEvent(e) ?: return showBalloon(e)
+        val data = getDataFromActionEvent(e) ?: return showBalloon("Unknown failure", e)
 
         if (data.element !is PsiIdentifier) {
-            showBalloon(e)
+            showBalloon("Not a valid element", e)
             return
         }
 
-        val mcpModule = data.instance.getModuleOfType(McpModuleType) ?: return showBalloon(e)
+        val mcpModule = data.instance.getModuleOfType(McpModuleType) ?: return showBalloon("No mappings found", e)
 
         mcpModule.srgManager?.srgMap?.done { srgMap ->
             var parent = data.element.parent
@@ -51,27 +53,31 @@ class FindSrgMappingAction : AnAction() {
                 }
             }
 
+            if (parent is PsiReference) {
+                parent = parent.resolve()
+            }
+
             if (parent is PsiField) {
-                val srg = srgMap.findSrgField(parent) ?: return@done showBalloon(e)
+                val srg = srgMap.findSrgField(parent) ?: return@done showBalloon("No SRG name found", e)
 
                 showSuccessBalloon(data.editor, data.element, srg.name)
             } else if (parent is PsiMethod) {
-                val srg = srgMap.findSrgMethod(parent) ?: return@done showBalloon(e)
+                val srg = srgMap.findSrgMethod(parent) ?: return@done showBalloon("No SRG name found", e)
 
                 showSuccessBalloon(data.editor, data.element, srg.name + srg.descriptor)
             } else if (parent is PsiClass) {
-                val classMcpToSrg = srgMap.findSrgClass(parent) ?: return@done showBalloon(e)
+                val classMcpToSrg = srgMap.findSrgClass(parent) ?: return@done showBalloon("No SRG name found", e)
 
                 showSuccessBalloon(data.editor, data.element, classMcpToSrg)
             } else {
-                showBalloon(e)
+                showBalloon("Not a valid element", e)
             }
-        } ?: showBalloon(e)
+        } ?: showBalloon("No mappings found", e)
     }
 
-    private fun showBalloon(e: AnActionEvent) {
+    private fun showBalloon(message: String, e: AnActionEvent) {
         val balloon = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder("No mappings found", null, LightColors.YELLOW, null)
+            .createHtmlTextBalloonBuilder(message, null, LightColors.YELLOW, null)
             .setHideOnAction(true)
             .setHideOnClickOutside(true)
             .setHideOnKeyOutside(true)
