@@ -28,7 +28,6 @@ import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiReference
-import com.intellij.psi.PsiReferenceExpression
 import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
 
