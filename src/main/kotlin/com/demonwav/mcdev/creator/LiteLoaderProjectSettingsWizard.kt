@@ -110,10 +110,9 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
                     return
                 }
 
-                val words = modNameField.text.split("\\s+".toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
-                val word = words.joinToString { WordUtils.capitalize(it) }
+                val word = modNameField.text.split("\\s+".toRegex()).joinToString { WordUtils.capitalize(it) }
 
-                val mainClassWords = mainClassField.text.split(".").toTypedArray()
+                val mainClassWords = mainClassField.text.split('.').toTypedArray()
                 mainClassWords[mainClassWords.size - 1] = LITEMOD + word
 
                 mainClassField.document.removeDocumentListener(listener)
