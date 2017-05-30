@@ -48,8 +48,7 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
                 throw BadListSetupException(dependField)
             }
         } catch (e: SetupException) {
-            val message = e.error
-            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
+            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(e.error, MessageType.ERROR, null)
                 .setFadeoutTime(4000)
                 .createBalloon()
                 .show(RelativePoint.getSouthWestOf(e.j), Balloon.Position.below)

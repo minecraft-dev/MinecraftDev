@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.exception.EmptyInputSetupException
 import com.demonwav.mcdev.exception.SetupException
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
@@ -152,19 +153,18 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
     override fun validate(): Boolean {
         try {
             if (modNameField.text.trim { it <= ' ' }.isEmpty()) {
-                throw SetupException("empty", modNameField)
+                throw EmptyInputSetupException(modNameField)
             }
 
             if (modVersionField.text.trim { it <= ' ' }.isEmpty()) {
-                throw SetupException("empty", modVersionField)
+                throw EmptyInputSetupException(modVersionField)
             }
 
             if (mainClassField.text.trim { it <= ' ' }.isEmpty()) {
-                throw SetupException("empty", mainClassField)
+                throw EmptyInputSetupException(mainClassField)
             }
         } catch (e: SetupException) {
-            val message = e.error
-            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
+            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(e.error, MessageType.ERROR, null)
                 .setFadeoutTime(4000)
                 .createBalloon()
                 .show(RelativePoint.getSouthWestOf(e.j), Balloon.Position.below)
