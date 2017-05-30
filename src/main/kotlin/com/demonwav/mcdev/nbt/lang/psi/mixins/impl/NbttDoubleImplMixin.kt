@@ -22,6 +22,6 @@ abstract class NbttDoubleImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), 
     }
 
     companion object {
-        private val dRegex = "[dD|]".toRegex()
+        private val dRegex = "[dD]".toRegex()
     }
 }
