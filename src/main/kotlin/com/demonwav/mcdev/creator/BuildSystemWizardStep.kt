@@ -13,7 +13,9 @@ package com.demonwav.mcdev.creator
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem
-import com.demonwav.mcdev.exception.MinecraftSetupException
+import com.demonwav.mcdev.exception.EmptyFieldSetupException
+import com.demonwav.mcdev.exception.OtherSetupException
+import com.demonwav.mcdev.exception.SetupException
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
@@ -81,29 +83,29 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
     override fun validate(): Boolean {
         try {
             if (groupIdField.text.isEmpty()) {
-                throw MinecraftSetupException("fillAll", groupIdField)
+                throw EmptyFieldSetupException(groupIdField)
             }
 
             if (artifactIdField.text.isEmpty()) {
-                throw MinecraftSetupException("fillAll", artifactIdField)
+                throw EmptyFieldSetupException(artifactIdField)
             }
 
             if (versionField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("fillAll", versionField)
+                throw EmptyFieldSetupException(versionField)
             }
 
             if (!groupIdField.text.matches("\\S+".toRegex())) {
-                throw MinecraftSetupException("The GroupId field cannot contain any whitespace", groupIdField)
+                throw OtherSetupException("The GroupId field cannot contain any whitespace", groupIdField)
             }
 
             if (!artifactIdField.text.matches("\\S+".toRegex())) {
-                throw MinecraftSetupException("The ArtifactId field cannot contain any whitespace", artifactIdField)
+                throw OtherSetupException("The ArtifactId field cannot contain any whitespace", artifactIdField)
             }
 
             if (creator.settings.values.stream().anyMatch { s -> s.type === PlatformType.FORGE } && buildSystemBox.selectedIndex == 0) {
-                throw MinecraftSetupException("Forge does not support Maven", buildSystemBox)
+                throw OtherSetupException("Forge does not support Maven", buildSystemBox)
             }
-        } catch (e: MinecraftSetupException) {
+        } catch (e: SetupException) {
             JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(e.error, MessageType.ERROR, null)
                 .setFadeoutTime(2000)
                 .createBalloon()

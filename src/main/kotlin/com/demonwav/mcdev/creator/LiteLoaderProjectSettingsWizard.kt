@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
-import com.demonwav.mcdev.exception.MinecraftSetupException
+import com.demonwav.mcdev.exception.SetupException
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
 import com.demonwav.mcdev.platform.liteloader.version.LiteLoaderVersion
@@ -152,17 +152,17 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
     override fun validate(): Boolean {
         try {
             if (modNameField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("empty", modNameField)
+                throw SetupException("empty", modNameField)
             }
 
             if (modVersionField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("empty", modVersionField)
+                throw SetupException("empty", modVersionField)
             }
 
             if (mainClassField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("empty", mainClassField)
+                throw SetupException("empty", mainClassField)
             }
-        } catch (e: MinecraftSetupException) {
+        } catch (e: SetupException) {
             val message = e.error
             JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
                 .setFadeoutTime(4000)

@@ -10,7 +10,9 @@
 
 package com.demonwav.mcdev.creator
 
-import com.demonwav.mcdev.exception.MinecraftSetupException
+import com.demonwav.mcdev.exception.BadListSetupException
+import com.demonwav.mcdev.exception.EmptyInputSetupException
+import com.demonwav.mcdev.exception.SetupException
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.ui.popup.Balloon
@@ -28,24 +30,24 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
                            pattern: Regex): Boolean {
         try {
             if (pluginNameField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("empty", pluginNameField)
+                throw EmptyInputSetupException(pluginNameField)
             }
 
             if (pluginVersionField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("empty", pluginVersionField)
+                throw EmptyInputSetupException(pluginVersionField)
             }
 
             if (mainClassField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("empty", mainClassField)
+                throw EmptyInputSetupException(mainClassField)
             }
             if (!authorsField.text.matches(pattern)) {
-                throw MinecraftSetupException("bad", authorsField)
+                throw BadListSetupException(authorsField)
             }
 
             if (!dependField.text.matches(pattern)) {
-                throw MinecraftSetupException("bad", dependField)
+                throw BadListSetupException(dependField)
             }
-        } catch (e: MinecraftSetupException) {
+        } catch (e: SetupException) {
             val message = e.error
             JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
                 .setFadeoutTime(4000)
