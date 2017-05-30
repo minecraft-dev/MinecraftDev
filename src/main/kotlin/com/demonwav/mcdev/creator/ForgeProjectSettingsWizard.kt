@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.exception.MinecraftSetupException
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration
@@ -32,6 +33,10 @@ import javax.swing.JPanel
 import javax.swing.JProgressBar
 import javax.swing.JTextField
 import javax.swing.SwingWorker
+import com.intellij.openapi.ui.MessageType
+import com.intellij.openapi.ui.popup.Balloon
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.ui.awt.RelativePoint
 
 class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) : MinecraftModuleWizardStep() {
 
@@ -89,7 +94,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
             return null
         }
 
-        pluginNameField.text = WordUtils.capitalize(creator.artifactId)
+        pluginNameField.text = creator.artifactId.toLowerCase()
         pluginVersionField.text = creator.version
 
         if (settings != null && !settings!!.isFirst) {
@@ -162,7 +167,21 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         }
 
     override fun validate(): Boolean {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) && !loadingBar.isVisible
+        if (validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) && !loadingBar.isVisible) {
+            try {
+                if (pluginNameField.text.toLowerCase() != pluginNameField.text) {
+                    throw MinecraftSetupException("Forge modids need to be lowercase only", pluginNameField)
+                }
+            } catch (e: MinecraftSetupException) {
+                val message = e.error
+                JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
+                        .setFadeoutTime(4000)
+                        .createBalloon()
+                        .show(RelativePoint.getSouthWestOf(e.j), Balloon.Position.below)
+                return false
+            }
+        }
+        return true
     }
 
     override fun isStepVisible(): Boolean {
