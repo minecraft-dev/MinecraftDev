@@ -28,7 +28,7 @@
         Alpha release, may break. More features to come. Please report issues to
         <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2017.2-0.7.1
+        v. 2017.2-0.7.2
       </div>
     ]]>
     </change-notes>
@@ -139,6 +139,7 @@
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.forge.framework.ForgePresentationProvider" />
 
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeRunConfigDataService" />
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgePatcherDataService"/>
         <!--endregion-->
 
         <!--region LITELOADER -->
@@ -622,6 +623,7 @@
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
+        <projectResolve implementation="com.demonwav.mcdev.platform.forge.gradle.ForgePatcherProjectResolverExtension"/>
     </extensions>
 
     <application-components>

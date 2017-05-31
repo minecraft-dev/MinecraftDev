@@ -55,7 +55,7 @@ class MixinCompletionContributor : CompletionContributor() {
         val filter = JavaCompletionContributor.getReferenceFilter(position)
         val prefixMatcher = result.prefixMatcher
 
-        LegacyCompletionContributor.processReferences(parameters, javaResult) { reference, result ->
+        LegacyCompletionContributor.processReferences(parameters, javaResult) { reference, r ->
             if (reference !is PsiJavaReference) {
                 // Only process references to Java elements
                 return@processReferences
@@ -98,7 +98,7 @@ class MixinCompletionContributor : CompletionContributor() {
                 .filter { prefixMatcher.prefixMatches(it) }
                 .filter(filter, position)
                 .map { PrioritizedLookupElement.withExplicitProximity(it, 1) }
-                .forEach(result::addElement)
+                .forEach(r::addElement)
         }
     }
 }

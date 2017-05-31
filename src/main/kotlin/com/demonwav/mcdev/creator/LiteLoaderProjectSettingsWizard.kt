@@ -10,7 +10,8 @@
 
 package com.demonwav.mcdev.creator
 
-import com.demonwav.mcdev.exception.MinecraftSetupException
+import com.demonwav.mcdev.exception.EmptyInputSetupException
+import com.demonwav.mcdev.exception.SetupException
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
 import com.demonwav.mcdev.platform.liteloader.version.LiteLoaderVersion
@@ -40,8 +41,8 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
 
     private lateinit var panel: JPanel
     private lateinit var mcpWarning: JLabel
-    private lateinit var pluginNameField: JTextField
-    private lateinit var pluginVersionField: JTextField
+    private lateinit var modNameField: JTextField
+    private lateinit var modVersionField: JTextField
     private lateinit var mainClassField: JTextField
     private lateinit var minecraftVersionBox: JComboBox<String>
     private lateinit var mcpVersionBox: JComboBox<McpVersionEntry>
@@ -104,16 +105,15 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
             }
         }
 
-        pluginNameField.document.addDocumentListener(object : DocumentAdapter() {
+        modNameField.document.addDocumentListener(object : DocumentAdapter() {
             override fun textChanged(e: DocumentEvent) {
                 if (mainClassModified) {
                     return
                 }
 
-                val words = pluginNameField.text.split("\\s+".toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
-                val word = words.joinToString { WordUtils.capitalize(it) }
+                val word = modNameField.text.split("\\s+".toRegex()).joinToString { WordUtils.capitalize(it) }
 
-                val mainClassWords = mainClassField.text.split(".").toTypedArray()
+                val mainClassWords = mainClassField.text.split('.').toTypedArray()
                 mainClassWords[mainClassWords.size - 1] = LITEMOD + word
 
                 mainClassField.document.removeDocumentListener(listener)
@@ -133,12 +133,12 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
             return panel
         }
 
-        pluginNameField.text = WordUtils.capitalizeFully(creator.artifactId)
-        pluginVersionField.text = creator.version
+        modNameField.text = WordUtils.capitalizeFully(creator.artifactId)
+        modVersionField.text = creator.version
 
         if (settings != null && !settings!!.isFirst) {
-            pluginNameField.isEditable = false
-            pluginVersionField.isEditable = false
+            modNameField.isEditable = false
+            modVersionField.isEditable = false
         }
 
         mainClassField.document.removeDocumentListener(listener)
@@ -152,20 +152,19 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
 
     override fun validate(): Boolean {
         try {
-            if (pluginNameField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("empty", pluginNameField)
+            if (modNameField.text.trim { it <= ' ' }.isEmpty()) {
+                throw EmptyInputSetupException(modNameField)
             }
 
-            if (pluginVersionField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("empty", pluginVersionField)
+            if (modVersionField.text.trim { it <= ' ' }.isEmpty()) {
+                throw EmptyInputSetupException(modVersionField)
             }
 
             if (mainClassField.text.trim { it <= ' ' }.isEmpty()) {
-                throw MinecraftSetupException("empty", mainClassField)
+                throw EmptyInputSetupException(mainClassField)
             }
-        } catch (e: MinecraftSetupException) {
-            val message = e.error
-            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
+        } catch (e: SetupException) {
+            JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(e.error, MessageType.ERROR, null)
                 .setFadeoutTime(4000)
                 .createBalloon()
                 .show(RelativePoint.getSouthWestOf(e.j), Balloon.Position.below)
@@ -189,8 +188,8 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
 
     override fun onStepLeaving() {
         settings!!.apply {
-            pluginName = pluginNameField.text
-            pluginVersion = pluginVersionField.text
+            pluginName = modNameField.text
+            pluginVersion = modVersionField.text
             mainClass = mainClassField.text
 
             mcVersion = minecraftVersionBox.selectedItem as String

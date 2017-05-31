@@ -25,7 +25,7 @@ object ForgeTemplate {
                                  artifactId: String,
                                  forgeVersion: String,
                                  mcpVersion: String,
-                                 pluginVersion: String,
+                                 modVersion: String,
                                  spongeForge: Boolean) {
 
         val properties = Properties()
@@ -39,7 +39,7 @@ object ForgeTemplate {
         val gradleProps = Properties()
         gradleProps.setProperty("GROUP_ID", groupId)
         gradleProps.setProperty("ARTIFACT_ID", artifactId)
-        gradleProps.setProperty("PLUGIN_VERSION", pluginVersion)
+        gradleProps.setProperty("MOD_VERSION", modVersion)
         gradleProps.setProperty("FORGE_VERSION", forgeVersion)
         gradleProps.setProperty("MCP_VERSION", mcpVersion)
 
@@ -77,7 +77,7 @@ object ForgeTemplate {
     fun applyMcmodInfoTemplate(project: Project,
                                file: VirtualFile,
                                artifactId: String,
-                               pluginName: String,
+                               modName: String,
                                description: String,
                                url: String,
                                updateUrl: String,
@@ -86,7 +86,7 @@ object ForgeTemplate {
 
         val properties = Properties()
         properties.setProperty("ARTIFACT_ID", artifactId)
-        properties.setProperty("PLUGIN_NAME", pluginName)
+        properties.setProperty("MOD_NAME", modName)
         properties.setProperty("DESCRIPTION", description)
         properties.setProperty("URL", url)
         properties.setProperty("UPDATE_URL", updateUrl)
@@ -108,15 +108,15 @@ object ForgeTemplate {
                                file: VirtualFile,
                                packageName: String,
                                artifactId: String,
-                               pluginName: String,
-                               pluginVersion: String,
+                               modName: String,
+                               modVersion: String,
                                className: String) {
 
         val properties = Properties()
         properties.setProperty("PACKAGE_NAME", packageName)
         properties.setProperty("ARTIFACT_ID", artifactId)
-        properties.setProperty("PLUGIN_NAME", pluginName)
-        properties.setProperty("PLUGIN_VERSION", pluginVersion)
+        properties.setProperty("MOD_NAME", modName)
+        properties.setProperty("MOD_VERSION", modVersion)
         properties.setProperty("CLASS_NAME", className)
 
         BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_MAIN_CLASS_TEMPLATE, properties)

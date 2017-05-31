@@ -1,7 +1,7 @@
 [
     {
         "modid": "${ARTIFACT_ID}",
-        "name": "${PLUGIN_NAME}",
+        "name": "${MOD_NAME}",
         "description": "${DESCRIPTION}",
         "version": "${version}",
         "mcversion": "${mcversion}",
