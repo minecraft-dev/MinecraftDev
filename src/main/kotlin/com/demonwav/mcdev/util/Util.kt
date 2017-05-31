@@ -12,6 +12,8 @@ package com.demonwav.mcdev.util
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleManager
 import org.jetbrains.annotations.Contract
 
 inline fun <T> runInlineReadAction(func: () -> T): T {
@@ -103,4 +105,28 @@ inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
 fun <T : Any> Array<T?>.castNotNull(): Array<T> {
     @Suppress("UNCHECKED_CAST")
     return this as Array<T>
+}
+
+fun Module.findChildren(): Set<Module> {
+    runInlineReadAction {
+        val manager = ModuleManager.getInstance(project)
+        val result = mutableSetOf<Module>()
+
+        for (m in manager.modules) {
+            if (m === this) {
+                continue
+            }
+
+            val path = manager.getModuleGroupPath(m) ?: continue
+            val namedModule = manager.findModuleByName(path.last()) ?: continue
+
+            if (namedModule != this) {
+                continue
+            }
+
+            result.add(m)
+        }
+
+        return result
+    }
 }

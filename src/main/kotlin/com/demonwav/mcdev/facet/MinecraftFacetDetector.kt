@@ -93,6 +93,13 @@ class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(projec
             val types = facet.configuration.state.autoDetectTypes
             types.clear()
             types.addAll(platforms)
+
+            if (facet.configuration.state.forgePatcher) {
+                // make sure Forge and MCP are present
+                types.add(PlatformType.FORGE)
+                types.add(PlatformType.MCP)
+            }
+
             facet.refresh()
         }
 

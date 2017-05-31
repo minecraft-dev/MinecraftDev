@@ -44,5 +44,7 @@ data class MinecraftFacetConfigurationData(
     var userChosenTypes: MutableMap<PlatformType, Boolean> = mutableMapOf(),
     @Tag("autoDetectTypes")
     @AbstractCollection(surroundWithTag = false, elementTag = "platformType", elementValueAttribute = "")
-    var autoDetectTypes: MutableSet<PlatformType> = mutableSetOf()
+    var autoDetectTypes: MutableSet<PlatformType> = mutableSetOf(),
+    @Tag("forgePatcher")
+    var forgePatcher: Boolean = false
 )

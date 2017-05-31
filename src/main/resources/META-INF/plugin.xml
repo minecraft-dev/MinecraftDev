@@ -139,6 +139,7 @@
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.forge.framework.ForgePresentationProvider" />
 
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeRunConfigDataService" />
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgePatcherDataService"/>
         <!--endregion-->
 
         <!--region LITELOADER -->
@@ -622,6 +623,7 @@
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
+        <projectResolve implementation="com.demonwav.mcdev.platform.forge.gradle.ForgePatcherProjectResolverExtension"/>
     </extensions>
 
     <application-components>
