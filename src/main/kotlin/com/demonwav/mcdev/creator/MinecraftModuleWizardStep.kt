@@ -38,23 +38,27 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
                 throw EmptyInputSetupException(pluginVersionField)
             }
 
-            if (mainClassField.text.trim { it <= ' ' }.isEmpty()) { // empty
+            // empty
+            if (mainClassField.text.trim { it <= ' ' }.isEmpty()) {
                 throw EmptyInputSetupException(mainClassField)
             }
-            if (!mainClassField.text.contains('.')) { // default package
+            // default package
+            if (!mainClassField.text.contains('.')) {
                 throw InvalidMainClassNameException(mainClassField)
             }
-            if (mainClassField.text.contains("\\s+".toRegex())) { // whitespace
+            // crazy dots
+            if (mainClassField.text.split('.').any { it.isEmpty() } ||
+                mainClassField.text.first() == '.' || mainClassField.text.last() == '.') {
                 throw InvalidMainClassNameException(mainClassField)
             }
-            if (mainClassField.text.first().isJavaIdentifierStart() && // invalid character
-                mainClassField.text.asSequence().drop(1).all { it.isJavaIdentifierPart() }) {
+            // invalid character
+            if (mainClassField.text.split('.').any {
+                !it.first().isJavaIdentifierStart() || !it.asSequence().drop(1).all { it.isJavaIdentifierPart() }
+            }) {
                 throw InvalidMainClassNameException(mainClassField)
             }
-            if (mainClassField.text.first() == '.') { // idk why this doesn't fail in the above check, but w/e
-                throw InvalidMainClassNameException(mainClassField)
-            }
-            if (mainClassField.text.split('.').any { keywords.contains(it) }) { // keyword identifier
+            // keyword identifier
+            if (mainClassField.text.split('.').any { keywords.contains(it) }) {
                 throw InvalidMainClassNameException(mainClassField)
             }
 
