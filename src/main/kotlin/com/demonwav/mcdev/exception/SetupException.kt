@@ -32,6 +32,11 @@ class EmptyInputSetupException(j: JComponent) : SetupException(j) {
         get() = "<html>Please fill in all required fields</html>"
 }
 
+class InvalidMainClassNameException(j: JComponent) : SetupException(j) {
+    override val error: String
+        get() = "<html>Main Class Name must be a valid Java identifier and cannot be the default package</html>"
+}
+
 class OtherSetupException(val msg: String, j: JComponent) : SetupException(j) {
     override val error: String
         get() = "<html>$msg</html>"

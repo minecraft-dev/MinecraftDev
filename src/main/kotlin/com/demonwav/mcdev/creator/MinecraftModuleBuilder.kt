@@ -55,7 +55,7 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
         creator.root = root
         creator.module = modifiableRootModel.module
 
-        val r = DumbAwareRunnable { creator.create() }
+        val r = DumbAwareRunnable(creator::create)
 
         if (project.isDisposed) {
             return
