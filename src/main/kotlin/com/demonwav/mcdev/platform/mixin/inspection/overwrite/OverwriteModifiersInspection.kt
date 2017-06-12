@@ -36,21 +36,28 @@ class OverwriteModifiersInspection : OverwriteInspection() {
         val nameIdentifier = method.nameIdentifier ?: return
         val modifierList = method.modifierList
 
+        // Check access modifiers
+        val targetAccessLevel = PsiUtil.getAccessLevel(target)
+        val currentAccessLevel = PsiUtil.getAccessLevel(modifierList)
+        if (currentAccessLevel < targetAccessLevel) {
+            val targetModifier = PsiUtil.getAccessModifier(targetAccessLevel)
+            val currentModifier = PsiUtil.getAccessModifier(currentAccessLevel)
+            holder.registerProblem(modifierList.findKeyword(currentModifier) ?: nameIdentifier,
+                "$currentModifier @Overwrite cannot reduce visibility of ${PsiUtil.getAccessModifier(targetAccessLevel)} target method",
+                QuickFixFactory.getInstance().createModifierListFix(modifierList, targetModifier, true, false))
+        }
+
         for (modifier in PsiModifier.MODIFIERS) {
+            if (isAccessModifier(modifier)) {
+                // Access modifiers are already checked above
+                continue
+            }
+
             val targetModifier = target.hasModifierProperty(modifier)
             val overwriteModifier = modifierList.hasModifierProperty(modifier)
             if (targetModifier != overwriteModifier) {
                 val marker: PsiElement
-                val message = if (isAccessModifier(modifier)) {
-                    if (!targetModifier) {
-                        // Don't attempt to remove access modifiers
-                        continue
-                    }
-
-                    val currentModifier = PsiUtil.getAccessModifier(PsiUtil.getAccessLevel(modifierList))
-                    marker = modifierList.findKeyword(currentModifier) ?: nameIdentifier
-                    "Invalid access modifiers, has: $currentModifier, but target has: $overwriteModifier"
-                } else if (targetModifier) {
+                val message = if (targetModifier) {
                     marker = nameIdentifier
                     "Method must be '$modifier'"
                 } else {
