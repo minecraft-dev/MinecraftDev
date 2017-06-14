@@ -176,6 +176,11 @@
         <!--region MIXIN-->
         <!---->
 
+        <!-- Folding -->
+        <applicationService serviceImplementation="com.demonwav.mcdev.platform.mixin.folding.MixinFoldingSettings" />
+        <codeFoldingOptionsProvider instance="com.demonwav.mcdev.platform.mixin.folding.MixinFoldingOptionsProvider" />
+        <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.folding.MixinFoldingBuilder"/>
+
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.mixin.insight.MixinImplicitUsageProvider"/>
         <deadCode implementation="com.demonwav.mcdev.platform.mixin.insight.MixinEntryPoint"/>
 
