@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.error
 
 import com.demonwav.mcdev.update.PluginUtil
+import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
 import com.intellij.ide.plugins.PluginManager
 import org.apache.commons.io.IOUtils
@@ -92,7 +93,7 @@ object AnonymousFeedback {
             IOUtils.toString(it, contentEncoding)
         }
 
-        val json = Gson().fromJson(body, HashMap::class.java)
+        val json = Gson().fromJson<Map<*, *>>(body)
         val issueNum = json["number"].toString().toDouble().toInt()
         return issueNum
     }

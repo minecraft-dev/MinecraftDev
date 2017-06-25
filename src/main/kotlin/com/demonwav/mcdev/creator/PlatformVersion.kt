@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
 import org.jetbrains.concurrency.runAsync
 import java.net.URL
@@ -44,7 +45,7 @@ fun getVersionSelector(type: PlatformType) = runAsync {
         "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2"
     )
     val text = connection.getInputStream().use { it.reader().use { it.readText() } }
-    Gson().fromJson(text, PlatformVersion::class.java)
+    Gson().fromJson<PlatformVersion>(text)
 }
 
 data class PlatformVersion(var versions: Array<String>, var selectedIndex: Int) {

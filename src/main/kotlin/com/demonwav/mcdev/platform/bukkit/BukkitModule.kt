@@ -152,7 +152,7 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
             return null
         }
 
-        if (resolve !is ClsMethodImpl) {
+        if (resolve !is PsiMethod) {
             return null
         }
 
@@ -160,10 +160,10 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
             return null
         }
 
-        return IsCancelled.builder()
-            .setErrorString("Cancellable.isCancelled() check is useless in a method annotated with ignoreCancelled=true.")
-            .setFix { expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression)) }
-            .build()
+        return IsCancelled(
+            errorString = "Cancellable.isCancelled() check is useless in a method annotated with ignoreCancelled=true.",
+            fix = { expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression)) }
+        )
     }
 
     @Contract(value = "null -> false", pure = true)
