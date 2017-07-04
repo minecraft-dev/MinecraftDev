@@ -22,6 +22,7 @@ import com.intellij.psi.PsiManager
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
+import java.util.concurrent.TimeUnit
 import java.util.zip.GZIPOutputStream
 
 class NbtVirtualFile(private val backingFile: VirtualFile, private val project: Project) : VirtualFile() {
@@ -35,7 +36,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
         var tempCompressed: Boolean
         var tempParseSuccessful: Boolean
         try {
-            val (rootCompound, isCompressed) = Nbt.buildTagTree(backingFile.inputStream, 1000)
+            val (rootCompound, isCompressed) = Nbt.buildTagTree(backingFile.inputStream, TimeUnit.SECONDS.toMillis(1))
             this.bytes = rootCompound.toString().toByteArray()
             tempCompressed = isCompressed
             tempParseSuccessful = true

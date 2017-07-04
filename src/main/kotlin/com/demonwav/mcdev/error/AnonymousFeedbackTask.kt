@@ -21,7 +21,7 @@ class AnonymousFeedbackTask(
     title: String,
     canBeCancelled: Boolean,
     private val params: LinkedHashMap<String, String?>,
-    private val callback: (Int) -> Unit,
+    private val callback: (String, Int, Boolean) -> Unit,
     private val errorCallback: (Exception) -> Unit
 ) : Task.Backgroundable(project, title, canBeCancelled) {
 
@@ -29,8 +29,8 @@ class AnonymousFeedbackTask(
         indicator.isIndeterminate = true
 
         try {
-            val token = AnonymousFeedback.sendFeedback(ProxyHttpConnectionFactory(), params)
-            callback(token)
+            val (url, token, isDuplicate) = AnonymousFeedback.sendFeedback(ProxyHttpConnectionFactory(), params)
+            callback(url, token, isDuplicate)
         } catch (e: Exception) {
             errorCallback(e)
         }
