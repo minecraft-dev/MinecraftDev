@@ -35,6 +35,8 @@ class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(projec
         val connection = project.messageBus.connect()
 
         for (module in ModuleManager.getInstance(project).modules) {
+            // This only exists for legacy reasons, hence why we are removing the option, so suppress deprecation
+            @Suppress("DEPRECATION")
             module.clearOption(MinecraftModuleType.OPTION)
         }
 

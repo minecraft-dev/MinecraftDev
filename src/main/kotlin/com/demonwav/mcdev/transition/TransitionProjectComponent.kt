@@ -22,6 +22,9 @@ class TransitionProjectComponent(project: Project) : AbstractProjectComponent(pr
         // Reset all Modules back to JavaModuleType
         for (module in ModuleManager.getInstance(project).modules) {
             for (type in types) {
+                // This only exists for legacy reasons, to reset the type option (previous versions used to set it).
+                // It's not actually used anymore, so suppress deprecation
+                @Suppress("DEPRECATION")
                 if (module.getOptionValue("type") == type) {
                     module.setOption("type", JavaModuleType.getModuleType().id)
                 }

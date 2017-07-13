@@ -205,7 +205,7 @@ class GradleBuildSystem : BuildSystem() {
 
         try {
             val sdkPair = ExternalSystemJdkUtil.getAvailableJdk(project)
-            if (sdkPair?.second?.homePath != null && ExternalSystemJdkUtil.USE_INTERNAL_JAVA != sdkPair.first) {
+            if (sdkPair.second?.homePath != null && ExternalSystemJdkUtil.USE_INTERNAL_JAVA != sdkPair.first) {
                 launcher.setJavaHome(File(sdkPair.second.homePath))
             }
 
