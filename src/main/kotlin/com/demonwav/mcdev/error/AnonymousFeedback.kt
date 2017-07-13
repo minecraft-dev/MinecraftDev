@@ -92,7 +92,7 @@ object AnonymousFeedback {
         }
 
         val json = Gson().fromJson<Map<*, *>>(body)
-        return json["html_url"] as String to (json["id"] as Double).toInt()
+        return json["html_url"] as String to (json["number"] as Double).toInt()
     }
 
     private fun connect(factory: HttpConnectionFactory, url: String): HttpURLConnection {
@@ -103,20 +103,25 @@ object AnonymousFeedback {
     }
 
     private fun findDuplicateIssue(envDetails: LinkedHashMap<String, String?>): Int? {
-        val stack = envDetails["error.stacktrace"] ?: return null
+        val stack = envDetails["error.stacktrace"]?.replace("\\d+".toRegex(), "") ?: return null
 
-        val text = URL("https://api.github.com/repos/minecraft-dev/MinecraftDev/issues").readText()
+        val text = URL("https://api.github.com/repos/minecraft-dev/MinecraftDev/issues?state=all&creator=minecraft-dev-autoreporter").readText()
         val list = Gson().fromJson<List<Map<*, *>>>(text)
         val block = list.firstOrNull {
             val body = it["body"] as? String ?: return@firstOrNull false
+
+            // We can't comment on locked issues
+            if (it["locked"] as Boolean) {
+                return@firstOrNull false
+            }
 
             val first = body.indexOf("\n```\n", startIndex = 0) + 5
             val second = body.indexOf("\n```\n", startIndex = first)
             val stackText = body.substring(first, second)
 
-            stackText == stack
+            stackText.replace("\\d+".toRegex(), "") == stack
         } ?: return null
-        return (block["id"] as Double).toInt()
+        return (block["number"] as Double).toInt()
     }
 
     private fun sendCommentOnDuplicateIssue(id: Int, factory: HttpConnectionFactory, payload: ByteArray): String {
@@ -160,8 +165,6 @@ object AnonymousFeedback {
     }
 
     open class HttpConnectionFactory {
-        open fun openHttpConnection(url: String): HttpURLConnection {
-            return URL(url).openConnection() as HttpURLConnection
-        }
+        open fun openHttpConnection(url: String) = URL(url).openConnection() as HttpURLConnection
     }
 }

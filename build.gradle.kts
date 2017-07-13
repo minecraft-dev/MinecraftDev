@@ -91,7 +91,7 @@ java {
     }
 }
 
-val gradleToolingExtension = java().sourceSets["gradle-tooling-extension"]
+val gradleToolingExtension = java().sourceSets["gradle-tooling-extension"]!!
 val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
     from(gradleToolingExtension.output)
     classifier = "gradle-tooling-extension"

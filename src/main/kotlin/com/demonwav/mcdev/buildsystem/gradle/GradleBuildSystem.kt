@@ -220,7 +220,7 @@ class GradleBuildSystem : BuildSystem() {
     }
 
     private fun createRepositoriesOrDependencies(project: Project, file: GroovyFile, name: String, expressions: List<String>) {
-        // Ge the block so we can start working with it
+        // Get the block so we can start working with it
         val block = getClosableBlockByName(file, name) ?: return
 
         // Create a super expression with all the expressions tied together
@@ -228,7 +228,7 @@ class GradleBuildSystem : BuildSystem() {
 
         // We can't create each expression and add them to the file...that won't work. Groovy requires a new line
         // from one method call expression to another, and there's no way to (easily) put whitespace in Psi because Psi is
-        // stupid. So instead we make hte whole thing as one big clump and insert it into the block.
+        // stupid. So instead we make the whole thing as one big clump and insert it into the block.
         val fakeFile = GroovyPsiElementFactory.getInstance(project).createGroovyFile(expressionText, false, null)
         val last = block.children.last()
         block.addBefore(fakeFile, last)

@@ -14,7 +14,6 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.util.net.HttpConfigurable
-import java.net.HttpURLConnection
 
 class AnonymousFeedbackTask(
     project: Project?,
@@ -37,8 +36,6 @@ class AnonymousFeedbackTask(
     }
 
     private inner class ProxyHttpConnectionFactory : AnonymousFeedback.HttpConnectionFactory() {
-        override fun openHttpConnection(url: String): HttpURLConnection {
-            return HttpConfigurable.getInstance().openHttpConnection(url)
-        }
+        override fun openHttpConnection(url: String) = HttpConfigurable.getInstance().openHttpConnection(url)
     }
 }

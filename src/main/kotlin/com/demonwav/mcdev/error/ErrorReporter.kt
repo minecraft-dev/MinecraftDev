@@ -31,7 +31,7 @@ import com.intellij.util.Consumer
 import java.awt.Component
 
 class ErrorReporter : ErrorReportSubmitter() {
-    val baseUrl = "https://github.com/minecraft-dev/MinecraftDev/issues"
+    private val baseUrl = "https://github.com/minecraft-dev/MinecraftDev/issues"
     override fun getReportActionText() = "Report to Minecraft Dev GitHub Issue Tracker"
 
     override fun submit(events: Array<out IdeaLoggingEvent>,
@@ -73,11 +73,11 @@ class ErrorReporter : ErrorReportSubmitter() {
             consumer.consume(reportInfo)
 
             val message = if (!isDuplicate) {
-                "<html>Created Issue #$token successfully.<br>" +
+                "<html>Created Issue #$token successfully. " +
                     "<a href=\"$htmlUrl\">View issue.</a></html>"
             } else {
-                "<html>Commented on existing Issue #$token successfully.<br>" +
-                    "<a href=\"$htmlUrl\" View issue.</a></html>"
+                "<html>Commented on existing Issue #$token successfully. " +
+                    "<a href=\"$htmlUrl\">View comment.</a></html>"
             }
 
             ReportMessages.GROUP.createNotification(

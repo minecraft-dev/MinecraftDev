@@ -133,9 +133,8 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     }
 
     @Contract(value = "null -> false", pure = true)
-    fun isEventClassValidForModule(eventClass: PsiClass?): Boolean {
-        return eventClass != null && modules.values.any { it.isEventClassValid(eventClass, null) }
-    }
+    fun isEventClassValidForModule(eventClass: PsiClass?) =
+        eventClass != null && modules.values.any { it.isEventClassValid(eventClass, null) }
 
     @Contract(pure = true)
     fun isEventClassValid(eventClass: PsiClass, method: PsiMethod): Boolean {
