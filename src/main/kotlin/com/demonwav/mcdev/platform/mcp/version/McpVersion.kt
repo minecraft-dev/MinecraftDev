@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mcp.version
 
+import com.demonwav.mcdev.util.fromJson
 import com.demonwav.mcdev.util.sortVersions
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -76,8 +77,7 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
         fun downloadData(): McpVersion? {
             try {
                 val text = URL("http://export.mcpbot.bspk.rs/versions.json").readText()
-                val tokenType = object : TypeToken<Map<String, Map<String, List<Int>>>>() {}.type
-                val map = Gson().fromJson<Map<String, Map<String, List<Int>>>>(text, tokenType)
+                val map = Gson().fromJson<Map<String, Map<String, List<Int>>>>(text)
                 val mcpVersion = McpVersion(map)
                 mcpVersion.versions
                 return mcpVersion

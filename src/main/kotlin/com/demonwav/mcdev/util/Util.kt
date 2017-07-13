@@ -10,6 +10,8 @@
 
 package com.demonwav.mcdev.util
 
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.module.Module
@@ -129,4 +131,10 @@ fun Module.findChildren(): Set<Module> {
 
         return result
     }
+}
+
+inline fun <reified T : Any> Gson.fromJson(text: String): T {
+    // Using the ugly TypeToken approach we can any complex generic signature, including
+    // nested generics
+    return fromJson(text, object : TypeToken<T>() {}.type)!!
 }

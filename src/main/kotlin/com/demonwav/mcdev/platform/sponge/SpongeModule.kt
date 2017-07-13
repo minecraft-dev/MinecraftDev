@@ -20,6 +20,7 @@ import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
+import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiClass
@@ -121,7 +122,6 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
             when (sub) {
                 "TRUE" -> isCancelled = true
                 "FALSE" -> isCancelled = false
-                "UNDEFINED" -> return null
                 else -> return null
             }
         }
@@ -155,21 +155,12 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
             return null
         }
 
-        val isCancelledBuilder = IsCancelled.builder()
-            .setErrorString(
-                "Cancellable.isCancelled() check is useless in a method not annotated with @IsCancelled(Tristate.UNDEFINED)"
-            )
-
-        if (isCancelled) {
-            isCancelledBuilder.setFix {
-                expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("true", expression))
+        return IsCancelled(
+            errorString = "Cancellable.isCancelled() check is useless in a method not annotated with @IsCancelled(Tristate.UNDEFINED)",
+            fix = {
+                expression.replace(JavaPsiFacade.getElementFactory(project)
+                                       .createExpressionFromText(if (isCancelled) "true" else "false", expression))
             }
-        } else {
-            isCancelledBuilder.setFix {
-                expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression))
-            }
-        }
-
-        return isCancelledBuilder.build()
+        )
     }
 }

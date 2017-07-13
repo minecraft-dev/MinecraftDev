@@ -15,38 +15,21 @@ import com.intellij.openapi.project.Project
 import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
-class IsCancelled(val buildFix: InspectionGadgetsFix, val errorString: String) {
+class IsCancelled(
+    fix: (ProblemDescriptor) -> Unit,
+    val errorString: String
+) {
+    val buildFix: InspectionGadgetsFix
 
-    class IsCancelledBuilder {
-        private var fix: InspectionGadgetsFix? = null
-        private var errorString: String? = null
+    init {
+        this.buildFix = object : InspectionGadgetsFix() {
+            override fun doFix(project: Project, descriptor: ProblemDescriptor) = fix(descriptor)
 
-        fun setFix(fix: (ProblemDescriptor) -> Unit): IsCancelledBuilder {
-            this.fix = object : InspectionGadgetsFix() {
-                override fun doFix(project: Project, descriptor: ProblemDescriptor) = fix(descriptor)
+            @Nls(capitalization = Nls.Capitalization.Sentence)
+            override fun getName() = "Simplify"
 
-                @Nls
-                override fun getName() = "Simplify"
-
-                @Nls
-                override fun getFamilyName() = "Useless Is Cancelled Check"
-            }
-            return this
-        }
-
-        fun setErrorString(errorString: String): IsCancelledBuilder {
-            this.errorString = errorString
-            return this
-        }
-
-        fun build(): IsCancelled {
-            return IsCancelled(fix!!, errorString!!)
-        }
-    }
-
-    companion object {
-        fun builder(): IsCancelledBuilder {
-            return IsCancelledBuilder()
+            @Nls(capitalization = Nls.Capitalization.Sentence)
+            override fun getFamilyName() = "Useless IsCancelled Check"
         }
     }
 }

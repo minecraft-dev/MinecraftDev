@@ -10,6 +10,11 @@
 
 package com.demonwav.mcdev.platform.mcp.srg
 
+import com.demonwav.mcdev.facet.MinecraftFacet
+import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.util.mapFirstNotNull
+import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Getter
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.createError
@@ -52,5 +57,10 @@ class SrgManager(val files: Set<String>) {
         private val map = HashMap<Set<String>, SrgManager>()
 
         fun getInstance(files: Set<String>) = map.computeIfAbsent(files, ::SrgManager)
+
+        fun findAnyInstance(project: Project) =
+            ModuleManager.getInstance(project).modules.mapFirstNotNull {
+                MinecraftFacet.getInstance(it, McpModuleType)?.srgManager
+            }
     }
 }

@@ -31,7 +31,7 @@ import com.intellij.util.Consumer
 import java.awt.Component
 
 class ErrorReporter : ErrorReportSubmitter() {
-    val baseUrl = "https://github.com/minecraft-dev/MinecraftDev/issues"
+    private val baseUrl = "https://github.com/minecraft-dev/MinecraftDev/issues"
     override fun getReportActionText() = "Report to Minecraft Dev GitHub Issue Tracker"
 
     override fun submit(events: Array<out IdeaLoggingEvent>,
@@ -68,13 +68,17 @@ class ErrorReporter : ErrorReportSubmitter() {
 
         val project = CommonDataKeys.PROJECT.getData(dataContext)
 
-        val task = AnonymousFeedbackTask(project, "Submitting error report", true, reportValues, { token ->
-            val url = "$baseUrl/$token"
-            val reportInfo = SubmittedReportInfo(url, "Issue #$token", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE)
+        val task = AnonymousFeedbackTask(project, "Submitting error report", true, reportValues, { htmlUrl, token, isDuplicate ->
+            val reportInfo = SubmittedReportInfo(htmlUrl, "Issue #$token", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE)
             consumer.consume(reportInfo)
 
-            val message = "<html>Created Issue #$token successfully.<br>" +
-                "<a href=\"$url\">View issue.</a></html>"
+            val message = if (!isDuplicate) {
+                "<html>Created Issue #$token successfully. " +
+                    "<a href=\"$htmlUrl\">View issue.</a></html>"
+            } else {
+                "<html>Commented on existing Issue #$token successfully. " +
+                    "<a href=\"$htmlUrl\">View comment.</a></html>"
+            }
 
             ReportMessages.GROUP.createNotification(
                 ReportMessages.ERROR_REPORT,
