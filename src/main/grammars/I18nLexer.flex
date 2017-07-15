@@ -35,8 +35,7 @@ import static com.intellij.psi.TokenType.*;
 %unicode
 
 EOL_WS              = \n | \r | \r\n
-WHITE_SPACE_CHAR    = {EOL_WS}
-WHITE_SPACE         = {WHITE_SPACE_CHAR}+
+LINE_ENDING         = {EOL_WS}+
 
 KEY = [^=#\n\r][^=\n\r]*
 VALUE = [^\n\r]+
@@ -48,7 +47,7 @@ COMMENT = #[^\n\r]+
     {KEY}                       { yybegin(WAITING_EQUALS); return KEY; }
     "="                         { yybegin(WAITING_VALUE); return EQUALS; }
     {COMMENT}                   { return COMMENT; }
-    {WHITE_SPACE}               { return WHITE_SPACE; }
+    {LINE_ENDING}               { return LINE_ENDING; }
 }
 
 <WAITING_EQUALS> {
@@ -56,7 +55,7 @@ COMMENT = #[^\n\r]+
 }
 
 <WAITING_VALUE> {
-    {WHITE_SPACE}               { yybegin(YYINITIAL); return WHITE_SPACE; }
+    {LINE_ENDING}               { yybegin(YYINITIAL); return LINE_ENDING; }
     {VALUE}                     { yybegin(YYINITIAL); return VALUE; }
 }
 

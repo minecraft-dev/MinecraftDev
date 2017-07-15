@@ -31,7 +31,7 @@
 
 i18n_file ::= line*
 
-private line ::= COMMENT | property
+private line ::= property | COMMENT | LINE_ENDING
 
 property ::= KEY? EQUALS VALUE? {
     methods=[]

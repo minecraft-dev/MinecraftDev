@@ -13,7 +13,9 @@ package com.demonwav.mcdev.i18n.lang.psi.mixins
 import com.intellij.psi.PsiNameIdentifierOwner
 
 interface I18nPropertyMixin : PsiNameIdentifierOwner {
-    fun getKey(): String
+    val key: String
+        get
 
-    fun getValue(): String
+    val value: String
+        get
 }
