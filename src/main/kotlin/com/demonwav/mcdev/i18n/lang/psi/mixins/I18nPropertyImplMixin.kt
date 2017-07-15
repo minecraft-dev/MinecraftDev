@@ -28,11 +28,15 @@ abstract class I18nPropertyImplMixin(node: ASTNode) : ASTWrapperPsiElement(node)
     override fun setName(name: String): PsiElement {
         val keyElement = node.findChildByType(I18nTypes.KEY)
         val renamed = I18nElementFactory.createProperty(project, name)
-        val newKey = renamed.node.findChildByType(I18nTypes.KEY)!!
-        if (keyElement != null)
-            this.node.replaceChild(keyElement, newKey)
-        else
-            this.node.addChild(newKey, node.findChildByType(I18nTypes.EQUALS))
+        val newKey = renamed.node.findChildByType(I18nTypes.KEY)
+        if (newKey != null) {
+            if (keyElement != null)
+                this.node.replaceChild(keyElement, newKey)
+            else
+                this.node.addChild(newKey, node.findChildByType(I18nTypes.EQUALS))
+        } else if (keyElement != null) {
+            this.node.removeChild(keyElement)
+        }
         return this
     }
 }
