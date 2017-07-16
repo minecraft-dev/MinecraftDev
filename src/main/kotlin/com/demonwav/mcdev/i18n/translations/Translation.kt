@@ -24,7 +24,6 @@ import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.PsiReferenceRegistrar
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
-import java.util.ArrayList
 
 data class Translation(val foldingElement: PsiElement?,
                        val referenceElement: PsiElement?,
@@ -89,7 +88,7 @@ data class Translation(val foldingElement: PsiElement?,
             identifiers.firstOrNull { it.elementClass().isAssignableFrom(element.javaClass) }?.identifyUnsafe(element)
 
         fun fold(root: PsiElement): Array<FoldingDescriptor> {
-            val descriptors = ArrayList<FoldingDescriptor>()
+            val descriptors = mutableListOf<FoldingDescriptor>()
             for (identifier in identifiers) {
                 val elements = PsiTreeUtil.findChildrenOfType(root, identifier.elementClass())
                 for (element in elements) {
@@ -116,7 +115,7 @@ data class Translation(val foldingElement: PsiElement?,
                     }
                 }
             }
-            return descriptors.toArray(arrayOfNulls(descriptors.size))
+            return descriptors.toTypedArray()
         }
 
         fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {

@@ -27,7 +27,7 @@ class I18nGotoModel(project: Project, val filter: Regex? = null) : ContributorsB
     }
 
     override fun getElementsByName(name: String, parameters: FindSymbolParameters, canceled: ProgressIndicator): Array<Any> {
-        val superResult = Lists.newArrayList(*super.getElementsByName(name, parameters, canceled))
+        val superResult = super.getElementsByName(name, parameters, canceled).toList()
         val result = TreeSet<Any> { o1, o2 -> (o1 as I18nProperty).key.compareTo((o2 as I18nProperty).key) }
         if (filter != null) {
             result.addAll(superResult.filter { filter.matches((it as I18nProperty).key) })

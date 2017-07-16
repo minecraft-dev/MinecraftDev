@@ -19,7 +19,6 @@ import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.util.PsiTreeUtil
-import java.util.ArrayList
 
 class I18nStructureViewElement(private val element: PsiElement) : StructureViewTreeElement, SortableTreeElement {
     override fun getValue() = element
@@ -42,9 +41,7 @@ class I18nStructureViewElement(private val element: PsiElement) : StructureViewT
         if (element is I18nFile) {
             val properties = PsiTreeUtil.getChildrenOfType(element, I18nProperty::class.java)
             if (properties != null) {
-                val treeElements = ArrayList<TreeElement>(properties.size)
-                properties.mapTo(treeElements) { I18nStructureViewElement(it) }
-                return treeElements.toTypedArray()
+                return properties.map(::I18nStructureViewElement).toTypedArray()
             }
             return emptyArray()
         } else {
