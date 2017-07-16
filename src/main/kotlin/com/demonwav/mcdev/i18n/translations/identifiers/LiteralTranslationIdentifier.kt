@@ -14,7 +14,7 @@ import com.demonwav.mcdev.i18n.translations.Translation
 import com.intellij.codeInsight.completion.CompletionUtilCore
 import com.intellij.psi.PsiLiteralExpression
 
-class LiteralTranslationIdentifier  : TranslationIdentifier<PsiLiteralExpression>() {
+class LiteralTranslationIdentifier : TranslationIdentifier<PsiLiteralExpression>() {
     override fun identify(element: PsiLiteralExpression): Translation? {
         val statement = element.parent
         if (element.value is String) {

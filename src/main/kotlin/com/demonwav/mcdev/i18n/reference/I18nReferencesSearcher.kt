@@ -29,7 +29,7 @@ class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.Sear
                     if (s.isEmpty())
                         acc
                     else
-                        pwr(s.takeLast(s.size - 1), acc.plus(acc.map { it.plus(s.first()) }))
+                        pwr(s.takeLast(s.size - 1), acc + acc.map { it + s.first() })
                 return pwr(start, setOf(emptyList()))
             }
 

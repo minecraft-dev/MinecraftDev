@@ -21,13 +21,13 @@ class I18nSyntaxHighlighter : SyntaxHighlighterBase() {
     override fun getHighlightingLexer() = I18nLexerAdapter()
 
     override fun getTokenHighlights(tokenType: IElementType?) =
-            when(tokenType) {
-                I18nTypes.KEY -> KEY_KEYS
-                I18nTypes.EQUALS -> EQUALS_KEYS
-                I18nTypes.VALUE -> VALUE_KEYS
-                I18nTypes.COMMENT -> COMMENT_KEYS
-                else -> EMPTY_KEYS
-            }
+        when (tokenType) {
+            I18nTypes.KEY -> KEY_KEYS
+            I18nTypes.EQUALS -> EQUALS_KEYS
+            I18nTypes.VALUE -> VALUE_KEYS
+            I18nTypes.COMMENT -> COMMENT_KEYS
+            else -> EMPTY_KEYS
+        }
 
     companion object {
         val KEY = TextAttributesKey.createTextAttributesKey("I18N_KEY", DefaultLanguageHighlighterColors.KEYWORD)

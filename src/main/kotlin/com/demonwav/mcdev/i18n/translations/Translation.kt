@@ -37,7 +37,7 @@ data class Translation(val foldingElement: PsiElement?,
     val regexPattern = Regex(varKey.split(I18nReference.VARIABLE_MARKER).map { Regex.escape(it) }.joinToString("(.*?)"))
 
     companion object {
-        val translationFunctions = ImmutableList.of(
+        val translationFunctions = listOf(
             TranslationFunction("net.minecraft.client.resources.I18n",
                 "format",
                 "Ljava.lang.String;[Ljava.lang.Object;",
@@ -143,3 +143,4 @@ data class Translation(val foldingElement: PsiElement?,
         }
     }
 }
+

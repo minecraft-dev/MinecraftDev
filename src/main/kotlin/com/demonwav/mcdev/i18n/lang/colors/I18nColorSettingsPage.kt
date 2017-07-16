@@ -25,17 +25,17 @@ class I18nColorSettingsPage : ColorSettingsPage {
     override fun getColorDescriptors(): Array<out ColorDescriptor> = ColorDescriptor.EMPTY_ARRAY
     override fun getDisplayName() = "Minecraft localization"
     override fun getDemoText() =
-            """
+        """
         # This is a comment
         path.to.key=This is a value
         """.trimIndent()
 
     companion object {
         private val DESCRIPTORS = arrayOf(
-                AttributesDescriptor("Key", I18nSyntaxHighlighter.KEY),
-                AttributesDescriptor("Separator", I18nSyntaxHighlighter.EQUALS),
-                AttributesDescriptor("Value", I18nSyntaxHighlighter.VALUE),
-                AttributesDescriptor("Comments", I18nSyntaxHighlighter.COMMENT)
+            AttributesDescriptor("Key", I18nSyntaxHighlighter.KEY),
+            AttributesDescriptor("Separator", I18nSyntaxHighlighter.EQUALS),
+            AttributesDescriptor("Value", I18nSyntaxHighlighter.VALUE),
+            AttributesDescriptor("Comments", I18nSyntaxHighlighter.COMMENT)
         )
     }
 }

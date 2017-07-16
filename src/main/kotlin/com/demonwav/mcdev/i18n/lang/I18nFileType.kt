@@ -12,7 +12,6 @@ package com.demonwav.mcdev.i18n.lang
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.openapi.fileTypes.LanguageFileType
-import javax.swing.Icon
 
 object I18nFileType : LanguageFileType(I18nLanguage) {
     override fun getIcon() = PlatformAssets.MINECRAFT_ICON
