@@ -169,7 +169,7 @@ idea {
 license {
     header = file("copyright.txt")
     include("**/*.java", "**/*.kt", "**/*.groovy", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
-    exclude("com/demonwav/mcdev/platform/mcp/at/gen/**", "com/demonwav/mcdev/nbt/lang/gen/**")
+    exclude("com/demonwav/mcdev/platform/mcp/at/gen/**", "com/demonwav/mcdev/nbt/lang/gen/**", "com/demonwav/mcdev/i18n/lang/gen/**")
 }
 
 // Credit for this intellij-rust
