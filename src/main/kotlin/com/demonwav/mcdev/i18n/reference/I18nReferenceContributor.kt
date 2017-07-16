@@ -28,11 +28,9 @@ class I18nReferenceContributor : PsiReferenceContributor() {
             object : PsiReferenceProvider() {
                 override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
                     val property = element as I18nProperty
-                    return arrayOf(I18nReference(element,
-                        TextRange(0, property.key.length),
-                        true,
-                        property.key,
-                        property.key))
+                    return arrayOf(
+                        I18nReference(element, TextRange(0, property.key.length), true, property.key, property.key)
+                    )
                 }
             })
     }

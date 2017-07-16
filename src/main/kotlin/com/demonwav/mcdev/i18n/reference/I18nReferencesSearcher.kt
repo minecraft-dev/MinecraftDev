@@ -26,10 +26,11 @@ class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.Sear
         if (property is I18nProperty) {
             fun <A> power(start: List<A>): Set<List<A>> {
                 tailrec fun pwr(s: List<A>, acc: Set<List<A>>): Set<List<A>> =
-                    if (s.isEmpty())
+                    if (s.isEmpty()) {
                         acc
-                    else
+                    } else {
                         pwr(s.takeLast(s.size - 1), acc + acc.map { it + s.first() })
+                    }
                 return pwr(start, setOf(emptyList()))
             }
 

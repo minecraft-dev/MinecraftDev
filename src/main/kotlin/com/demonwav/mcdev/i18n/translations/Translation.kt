@@ -13,7 +13,6 @@ package com.demonwav.mcdev.i18n.translations
 import com.demonwav.mcdev.i18n.reference.I18nReference
 import com.demonwav.mcdev.i18n.translations.identifiers.LiteralTranslationIdentifier
 import com.demonwav.mcdev.i18n.translations.identifiers.ReferenceTranslationIdentifier
-import com.google.common.collect.ImmutableList
 import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.openapi.editor.FoldingGroup
 import com.intellij.openapi.util.TextRange
@@ -86,9 +85,8 @@ data class Translation(val foldingElement: PsiElement?,
 
         private val identifiers = listOf(LiteralTranslationIdentifier(), ReferenceTranslationIdentifier())
 
-        fun find(element: PsiElement): Translation? {
-            return identifiers.firstOrNull { it.elementClass().isAssignableFrom(element.javaClass) }?.identifyUnsafe(element)
-        }
+        fun find(element: PsiElement): Translation? =
+            identifiers.firstOrNull { it.elementClass().isAssignableFrom(element.javaClass) }?.identifyUnsafe(element)
 
         fun fold(root: PsiElement): Array<FoldingDescriptor> {
             val descriptors = ArrayList<FoldingDescriptor>()
@@ -130,11 +128,9 @@ data class Translation(val foldingElement: PsiElement?,
                             val result = identifier.identifyUnsafe(element)
                             if (result != null) {
                                 val referenceElement = result.referenceElement ?: return emptyArray()
-                                return arrayOf(I18nReference(referenceElement,
-                                    TextRange(1, referenceElement.textLength - 1),
-                                    false,
-                                    result.key,
-                                    result.varKey))
+                                return arrayOf(
+                                    I18nReference(referenceElement, TextRange(1, referenceElement.textLength - 1), false, result.key, result.varKey)
+                                )
                             }
                             return emptyArray()
                         }

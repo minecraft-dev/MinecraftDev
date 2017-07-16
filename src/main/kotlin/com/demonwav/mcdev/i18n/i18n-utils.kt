@@ -34,9 +34,7 @@ private fun Project.files(scope: Scope) =
 private fun Project.findPropertiesImpl(scope: Scope, fileFilter: (I18nFile) -> Boolean = { true }, propertyFilter: (I18nProperty) -> Boolean = { true }) =
     files(scope)
         .filter(fileFilter)
-        .flatMap {
-            (PsiTreeUtil.getChildrenOfType(it, I18nProperty::class.java) ?: emptyArray()).asIterable()
-        }
+        .flatMap { (PsiTreeUtil.getChildrenOfType(it, I18nProperty::class.java) ?: emptyArray()).asIterable() }
         .filter(propertyFilter)
         .toList()
 
@@ -47,7 +45,5 @@ fun Project.findProperties(scope: Scope = Scope.GLOBAL, key: String? = null, fil
 
 fun Project.findDefaultProperties(scope: Scope = Scope.GLOBAL, key: String? = null, file: VirtualFile? = null) =
     findPropertiesImpl(scope,
-        {
-            it.virtualFile?.nameWithoutExtension?.toLowerCase() == "en_us" && (if (file != null) it.virtualFile?.path == file.path else true)
-        },
+        { it.virtualFile?.nameWithoutExtension?.toLowerCase() == "en_us" && (if (file != null) it.virtualFile?.path == file.path else true) },
         { if (key != null) it.key == key else true })

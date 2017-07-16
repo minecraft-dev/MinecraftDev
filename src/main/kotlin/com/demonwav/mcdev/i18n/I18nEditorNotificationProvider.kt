@@ -41,9 +41,7 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
         val properties = project.findProperties(file = file, scope = Scope.PROJECT)
         val defaultKeys = defaultProperties.map { it?.key }.toMutableSet()
         val keys = properties.map { it?.key }.toMutableSet()
-        val propertyMap = Maps.newHashMap<String, I18nProperty>()
-        for (property in defaultProperties)
-            propertyMap.put(property.key, property)
+        val propertyMap = defaultProperties.associate { it.key to it }
 
         if (!keys.containsAll(defaultKeys)) {
             val panel = InfoPanel()

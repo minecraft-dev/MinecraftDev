@@ -31,16 +31,18 @@ class TranslationFunction(val className: String, val methodName: String, val par
                           val matchedIndex: Int, val formatting: Boolean, val setter: Boolean = false,
                           val foldParameters: Boolean = false, val prefix: String = "", val suffix: String = "") {
     fun matches(method: PsiMethod?, paramIndex: Int): Boolean {
-        if (method == null)
+        if (method == null) {
             return false
+        }
         val scope = GlobalSearchScope.allScope(method.project)
         val psiClass = JavaPsiFacade.getInstance(method.project).findClass(className, scope) ?: return false
         val referenceMethod = psiClass.findMethodsByName(methodName, false)
             .first { convertSignatureToDescriptor(it.getSignature(PsiSubstitutor.EMPTY)) == parameterTypes };
-        if (setter)
+        if (setter) {
             return method.isCalling(referenceMethod, paramIndex, matchedIndex)
-        else
+        } else {
             return method.isReturningResultOf(referenceMethod, paramIndex, matchedIndex)
+        }
     }
 
     fun convertSignatureToDescriptor(signature: MethodSignature): String {
@@ -57,8 +59,9 @@ class TranslationFunction(val className: String, val methodName: String, val par
                 if (type.endsWith("]")) {
                     val dimension = type.count { it == '[' }
                     "[".repeat(dimension) + typeToDesc(type.takeWhile { it != '[' })
-                } else
+                } else {
                     "L$type;"
+                }
         }
 
         return signature.parameterTypes.map { typeToDesc(it.getCanonicalText(true)) }.joinToString("")
@@ -69,10 +72,11 @@ class TranslationFunction(val className: String, val methodName: String, val par
         val psiClass = JavaPsiFacade.getInstance(call.project).findClass(className, scope) ?: return emptyList()
         val referenceMethod = psiClass.findMethodsByName(methodName, false)
             .first { convertSignatureToDescriptor(it.getSignature(PsiSubstitutor.EMPTY)) == parameterTypes };
-        if (setter)
+        if (setter) {
             return call.getCalls(referenceMethod, paramIndex, matchedIndex)
-        else
+        } else {
             return call.getCallsReturningResult(referenceMethod, paramIndex, matchedIndex)
+        }
     }
 
     fun getTranslationKey(call: PsiCall): Pair<Boolean, String>? {
@@ -81,8 +85,9 @@ class TranslationFunction(val className: String, val methodName: String, val par
         }
 
         fun resolveCall(depth: Int, single: Boolean, referenced: PsiMethod, call: PsiCall, acc: Step): Step? {
-            if (acc.propagate)
+            if (acc.propagate) {
                 return acc
+            }
             val method = call.referencedMethod
             val isReferencedMethod = referenced === method
             val param = call.argumentList?.expressions?.get(matchedIndex)
@@ -111,8 +116,9 @@ class TranslationFunction(val className: String, val methodName: String, val par
     }
 
     fun format(translation: String, call: PsiCall): String? {
-        if (!formatting)
+        if (!formatting) {
             return translation
+        }
         val format = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]").matcher(translation).replaceAll("%$1s")
 
         fun resolveCall(call: PsiCall, substitutions: Map<Int, Array<String?>?>): Map<Int, Array<String?>?> {
@@ -129,8 +135,9 @@ class TranslationFunction(val className: String, val methodName: String, val par
                             Pair(i, args[i].substituteParameter(substitutions, true, true))
                         }
                     }.associate { it }
-            } else
+            } else {
                 return emptyMap()
+            }
         }
 
         val calls = getCalls(call, matchedIndex)
@@ -139,8 +146,7 @@ class TranslationFunction(val className: String, val methodName: String, val par
                 .take(calls.count() - 1)
                 .fold(emptyMap<Int, Array<String?>?>(), { acc, v -> resolveCall(v, acc) })
             val method = calls.last().referencedMethod ?: return translation
-            val varargs = calls.last().extractVarArgs(method.parameterList.parametersCount - 1,
-                substitutions, false, true)
+            val varargs = calls.last().extractVarArgs(method.parameterList.parametersCount - 1, substitutions, false, true)
             if (varargs.any { it == null }) {
                 return null
             }

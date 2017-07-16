@@ -34,10 +34,11 @@ abstract class I18nPropertyImplMixin(node: ASTNode) : ASTWrapperPsiElement(node)
         val renamed = I18nElementFactory.createProperty(project, name)
         val newKey = renamed.node.findChildByType(I18nTypes.KEY)
         if (newKey != null) {
-            if (keyElement != null)
+            if (keyElement != null) {
                 this.node.replaceChild(keyElement, newKey)
-            else
+            } else {
                 this.node.addChild(newKey, node.findChildByType(I18nTypes.EQUALS))
+            }
         } else if (keyElement != null) {
             this.node.removeChild(keyElement)
         }

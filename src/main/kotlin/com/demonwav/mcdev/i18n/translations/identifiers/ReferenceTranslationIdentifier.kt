@@ -24,17 +24,20 @@ class ReferenceTranslationIdentifier : TranslationIdentifier<PsiReferenceExpress
     override fun identify(element: PsiReferenceExpression): Translation? {
         val reference = element.resolve()
         val statement = element.parent
+
         if (reference is PsiField) {
             val scope = GlobalSearchScope.allScope(element.project)
-            val stringClass = JavaPsiFacade.getInstance(element.project).findClass("java.lang.String", scope)
-            if (reference.hasModifierProperty(PsiModifier.STATIC) && reference.hasModifierProperty(PsiModifier.FINAL) &&
-                reference.type is PsiClassReferenceType &&
-                ((reference.type as PsiClassReferenceType).resolve()!!.isEquivalentTo(stringClass) ||
-                    (reference.type as PsiClassReferenceType).resolve()!!.isInheritor(stringClass!!, true))) {
+            val stringClass = JavaPsiFacade.getInstance(element.project).findClass("java.lang.String", scope) ?: return null
+            val isConstant = reference.hasModifierProperty(PsiModifier.STATIC) && reference.hasModifierProperty(PsiModifier.FINAL)
+            val type = reference.type as? PsiClassReferenceType ?: return null
+            val resolved = type.resolve() ?: return null
+            if (isConstant && (resolved.isEquivalentTo(stringClass) || resolved.isInheritor(stringClass, true))) {
                 val referenceElement = if (reference.initializer is PsiLiteral) reference.initializer else null
                 val result = identify(element.project, element, statement, referenceElement!!)
-                return result?.copy(key = result.key.replace(CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED, ""),
-                    varKey = result.varKey.replace(CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED, ""))
+                return result?.copy(
+                    key = result.key.replace(CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED, ""),
+                    varKey = result.varKey.replace(CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED, "")
+                )
             }
         }
         return null

@@ -24,8 +24,9 @@ import com.intellij.psi.PsiTypeCastExpression
 import com.intellij.psi.PsiVariable
 
 fun PsiAnnotationMemberValue.evaluate(defaultValue: String?, parameterReplacement: String?): String? {
-    if (this is PsiTypeCastExpression && this.operand != null)
+    if (this is PsiTypeCastExpression && this.operand != null) {
         return this.operand!!.evaluate(defaultValue, parameterReplacement)
+    }
     if (this is PsiReferenceExpression) {
         val reference = this.advancedResolve(false).element
         if (reference is PsiParameter) {
@@ -50,14 +51,16 @@ fun PsiAnnotationMemberValue.evaluate(defaultValue: String?, parameterReplacemen
 }
 
 fun PsiExpression.substituteParameter(substitutions: Map<Int, Array<String?>?>, allowReferences: Boolean, allowTranslations: Boolean): Array<String?>? {
-    if (this is PsiTypeCastExpression && this.operand != null)
+    if (this is PsiTypeCastExpression && this.operand != null) {
         return this.operand!!.substituteParameter(substitutions, allowReferences, allowTranslations)
+    }
     if (this is PsiReferenceExpression) {
         val reference = this.advancedResolve(false).element
         if (reference is PsiParameter && reference.parent is PsiParameterList) {
             val paramIndex = (reference.parent as PsiParameterList).getParameterIndex(reference)
-            if (substitutions.containsKey(paramIndex))
+            if (substitutions.containsKey(paramIndex)) {
                 return substitutions[paramIndex]
+            }
         }
         if (reference is PsiVariable && reference.initializer != null) {
             return reference.initializer!!.substituteParameter(substitutions, allowReferences, allowTranslations)
@@ -82,8 +85,10 @@ fun PsiExpression.substituteParameter(substitutions: Map<Int, Array<String?>?>, 
             return arrayOf(translation.text)
         }
     }
-    if (allowReferences)
+    if (allowReferences) {
         return arrayOf("\${${this.text}}")
-    else
+    }
+    else {
         return null
+    }
 }

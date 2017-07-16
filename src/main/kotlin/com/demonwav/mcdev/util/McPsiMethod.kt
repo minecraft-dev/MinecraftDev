@@ -57,11 +57,12 @@ fun PsiMethod.isReturningResultOf(reference: PsiMethod?, paramIndex: Int, refere
                     val paramRef = param.advancedResolve(false).element
                     return paramRef === this.parameterList.parameters[paramIndex]
                 } else if (param is PsiPolyadicExpression) {
-                    for (operand in param.operands)
+                    for (operand in param.operands) {
                         if (operand is PsiReferenceExpression) {
                             val operandRef = operand.advancedResolve(false).element
                             return operandRef === this.parameterList.parameters[paramIndex]
                         }
+                    }
                 } else {
                     return param === value.argumentList.expressions[paramIndex]
                 }
@@ -84,11 +85,11 @@ fun PsiMethod.isConstructingType(reference: PsiMethod?, paramIndex: Int, referen
         return false
     }
     fun findFirstMethodCall(elem: PsiElement): PsiMethodCallExpression? =
-        if (elem is PsiMethodCallExpression &&
-            (elem.methodExpression.text == "super" || elem.methodExpression.text == "this"))
+        if (elem is PsiMethodCallExpression && (elem.methodExpression.text == "super" || elem.methodExpression.text == "this")) {
             elem
-        else
-            elem.children.map { findFirstMethodCall(it) }.find { it != null }
+        } else {
+            elem.children.mapFirstNotNull { findFirstMethodCall(it) }
+        }
 
     val value = findFirstMethodCall(this)
     return value?.checkForReference(this, reference, paramIndex, referenceParamIndex) { it.isConstructingType(reference, paramIndex, referenceParamIndex) } ?: false

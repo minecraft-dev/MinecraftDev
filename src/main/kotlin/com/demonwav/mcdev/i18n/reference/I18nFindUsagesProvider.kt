@@ -27,32 +27,20 @@ class I18nFindUsagesProvider : FindUsagesProvider {
 
     override fun getHelpId(psiElement: PsiElement) = null
 
-    override fun getType(element: PsiElement) =
-        if (element is I18nProperty)
-            "translation"
-        else
-            ""
+    override fun getType(element: PsiElement) = if (element is I18nProperty) "translation" else ""
 
-    override fun getDescriptiveName(element: PsiElement) =
-        if (element is I18nProperty)
-            element.key
-        else
-            ""
+    override fun getDescriptiveName(element: PsiElement) = if (element is I18nProperty) element.key else ""
 
-    override fun getNodeText(element: PsiElement, useFullName: Boolean) =
-        if (element is I18nProperty)
-            element.key + "=" + element.value
-        else
-            ""
+    override fun getNodeText(element: PsiElement, useFullName: Boolean) = if (element is I18nProperty) "${element.key}=${element.value}" else ""
 
     companion object {
-        private val WORDS_SCANNER = {
+        private val WORDS_SCANNER by lazy {
             val s = DefaultWordsScanner(I18nLexerAdapter(),
                 TokenSet.create(I18nTypes.KEY),
                 TokenSet.create(I18nTypes.COMMENT),
                 TokenSet.EMPTY)
             s.setMayHaveFileRefsInLiterals(true)
             s
-        }()
+        }
     }
 }
