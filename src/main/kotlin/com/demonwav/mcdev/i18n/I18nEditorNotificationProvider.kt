@@ -10,8 +10,6 @@
 
 package com.demonwav.mcdev.i18n
 
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
-import com.google.common.collect.Maps
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
@@ -37,7 +35,7 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
             return null
         }
 
-        val defaultProperties = project.findDefaultProperties(scope = Scope.PROJECT)
+        val defaultProperties = project.findDefaultProperties(scope = Scope.PROJECT, domain = I18nElementFactory.getResourceDomain(file))
         val properties = project.findProperties(file = file, scope = Scope.PROJECT)
         val defaultKeys = defaultProperties.map { it?.key }.toMutableSet()
         val keys = properties.map { it?.key }.toMutableSet()

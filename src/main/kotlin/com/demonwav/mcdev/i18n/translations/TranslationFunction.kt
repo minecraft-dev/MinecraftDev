@@ -134,7 +134,7 @@ class TranslationFunction(val className: String, val methodName: String, val par
                         } else {
                             Pair(i, args[i].substituteParameter(substitutions, true, true))
                         }
-                    }.associate { it }
+                    }.toMap()
             } else {
                 return emptyMap()
             }

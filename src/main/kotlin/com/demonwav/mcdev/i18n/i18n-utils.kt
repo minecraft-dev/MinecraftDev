@@ -38,12 +38,20 @@ private fun Project.findPropertiesImpl(scope: Scope, fileFilter: (I18nFile) -> B
         .filter(propertyFilter)
         .toList()
 
-fun Project.findProperties(scope: Scope = Scope.GLOBAL, key: String? = null, file: VirtualFile? = null) =
+fun Project.findProperties(scope: Scope = Scope.GLOBAL, key: String? = null, file: VirtualFile? = null, domain: String? = null) =
     findPropertiesImpl(scope,
-        { if (file != null) it.virtualFile?.path == file.path else true },
+        {
+            it.virtualFile != null
+                && (if (file != null) it.virtualFile.path == file.path else true)
+                && (if (domain != null) I18nElementFactory.getResourceDomain(it.virtualFile) == domain else true)
+        },
         { if (key != null) it.key == key else true })
 
-fun Project.findDefaultProperties(scope: Scope = Scope.GLOBAL, key: String? = null, file: VirtualFile? = null) =
+fun Project.findDefaultProperties(scope: Scope = Scope.GLOBAL, key: String? = null, file: VirtualFile? = null, domain: String? = null) =
     findPropertiesImpl(scope,
-        { it.virtualFile?.nameWithoutExtension?.toLowerCase() == "en_us" && (if (file != null) it.virtualFile?.path == file.path else true) },
+        {
+            it.virtualFile != null && it.virtualFile.nameWithoutExtension.toLowerCase() == "en_us"
+                && (if (file != null) it.virtualFile.path == file.path else true)
+                && (if (domain != null) I18nElementFactory.getResourceDomain(it.virtualFile) == domain else true)
+        },
         { if (key != null) it.key == key else true })

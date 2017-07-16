@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.i18n.reference
 
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
-import com.google.common.collect.Lists
 import com.intellij.ide.util.gotoByName.ContributorsBasedGotoByModel
 import com.intellij.navigation.ChooseByNameContributor
 import com.intellij.navigation.NavigationItem
@@ -39,13 +38,13 @@ class I18nGotoModel(project: Project, val filter: Regex? = null) : ContributorsB
 
     override fun getPromptText() = "Choose translation to use"
 
-    override fun getNotInMessage() = "test"
+    override fun getNotInMessage() = "Couldn't find translation with that name"
 
-    override fun getNotFoundMessage() = "test"
+    override fun getNotFoundMessage() = "Couldn't find translation with that name"
 
-    override fun getCheckBoxName() = "Include &&non-project translations"
+    override fun getCheckBoxName() = "Include non-project translations"
 
-    override fun getCheckBoxMnemonic() = 0.toChar()
+    override fun getCheckBoxMnemonic() = 'n'
 
     override fun loadInitialCheckBoxState() = false
 

@@ -106,6 +106,7 @@
         <lang.psiStructureViewFactory language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.structure.I18nStructureViewFactory"/>
         <lang.findUsagesProvider language="I18n" implementationClass="com.demonwav.mcdev.i18n.reference.I18nFindUsagesProvider"/>
         <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.i18n.I18nFoldingBuilder"/>
+        <lang.formatter language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.formatting.I18nFormattingModelBuilder"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.i18n.reference.I18nJavaReferenceContributor"/>
         <psi.referenceContributor language="I18n" implementation="com.demonwav.mcdev.i18n.reference.I18nReferenceContributor"/>
         <gotoSymbolContributor implementation="com.demonwav.mcdev.i18n.reference.I18nGotoSymbolContributor"/>
@@ -114,6 +115,12 @@
         <editorNotificationProvider implementation="com.demonwav.mcdev.i18n.I18nEditorNotificationProvider"/>
         <elementDescriptionProvider implementation="com.demonwav.mcdev.i18n.reference.I18nDescriptionProvider"/>
         <referencesSearch implementation="com.demonwav.mcdev.i18n.reference.I18nReferencesSearcher"/>
+        <annotator language="I18n" implementationClass="com.demonwav.mcdev.i18n.I18nAnnotator"/>
+        <intentionAction>
+            <className>com.demonwav.mcdev.i18n.intentions.ConvertToTranslationIntention</className>
+            <category>Minecraft</category>
+            <descriptionDirectoryName>convertToTranslation</descriptionDirectoryName>
+        </intentionAction>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
@@ -258,6 +265,23 @@
                          level="WARNING"
                          hasStaticDescription="false"
                          implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
+        <!--endregion-->
+
+        <!--region NO PLATFORM INSPECTIONS-->
+        <localInspection displayName="Detect missing translation"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.i18n.inspections.NoTranslationInspection"/>
+        <localInspection displayName="Detect missing format arguments for translations"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.i18n.inspections.MissingFormatInspection"/>
         <!--endregion-->
 
         <!--region BUKKIT INSPECTIONS-->
@@ -731,6 +755,16 @@
                 text="Lookup MCP Member"
                 description="Lookup MCP mapping info on a SRG field or method">
             <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
+        </action>
+        <action class="com.demonwav.mcdev.i18n.actions.ConvertToTranslationAction" id="ConvertToMcTranslationAction"
+                text="Convert string literal to translation"
+                description="Converts any string literal into a Minecraft localization translation">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+        </action>
+        <action class="com.demonwav.mcdev.i18n.actions.SortTranslationsAction" id="SortMcTranslationsAction"
+                text="Sort translations by specified order"
+                description="Sorts translations by specified order">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
     </actions>
 </idea-plugin>

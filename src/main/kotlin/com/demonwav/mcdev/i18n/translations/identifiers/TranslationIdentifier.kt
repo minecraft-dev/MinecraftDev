@@ -48,6 +48,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                     if (function.matches(method, index)) {
                         val result = function.getTranslationKey(call) ?: continue
                         val translationKey = result.second.trim()
+                        val varKey = if (translationKey == value) I18nReference.VARIABLE_MARKER else translationKey
                         val fullKey = translationKey.replace(I18nReference.VARIABLE_MARKER, value)
                         val properties = project.findDefaultProperties(key = fullKey)
                         val translation = if (properties.isNotEmpty()) properties[0].value else null
@@ -59,14 +60,14 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                 return Translation(if (function.foldParameters) container else call,
                                     if (result.first) referenceElement else null,
                                     fullKey,
-                                    translationKey,
+                                    varKey,
                                     function.format(translation, call) ?: translation,
                                     containsVariable = fullKey.contains(I18nReference.VARIABLE_MARKER))
                             } catch (ignored: MissingFormatArgumentException) {
                                 return Translation(if (function.foldParameters) container else call,
                                     if (result.first) referenceElement else null,
                                     fullKey,
-                                    translationKey,
+                                    varKey,
                                     translation,
                                     true,
                                     containsVariable = fullKey.contains(I18nReference.VARIABLE_MARKER))
@@ -75,7 +76,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                             return Translation(null,
                                 if (result.first) referenceElement else null,
                                 fullKey,
-                                translationKey,
+                                varKey,
                                 null,
                                 containsVariable = fullKey.contains(I18nReference.VARIABLE_MARKER))
                         }
