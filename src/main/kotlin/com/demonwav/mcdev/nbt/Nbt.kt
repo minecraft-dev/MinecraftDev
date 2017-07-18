@@ -97,9 +97,8 @@ object Nbt {
             return@checkTimeout TagList(tagId, emptyList())
         }
 
-        val list = ArrayList<NbtTag>(length)
-        for (i in 0 until length) {
-            list.add(this.readTag(tagId, start, timeout))
+        val list = List(length) {
+            this.readTag(tagId, start, timeout)
         }
         return@checkTimeout TagList(tagId, list)
     }
@@ -117,10 +116,8 @@ object Nbt {
     private fun DataInputStream.readIntArrayTag(start: Long, timeout: Long) = checkTimeout(start, timeout) {
         val length = this.readInt()
 
-        val ints = IntArray(length)
-
-        for (i in 0 until length) {
-            ints[i] = this.readInt()
+        val ints = IntArray(length) {
+            this.readInt()
         }
 
         return@checkTimeout TagIntArray(ints)
@@ -129,9 +126,8 @@ object Nbt {
     private fun DataInputStream.readLongArrayTag(start: Long, timeout: Long) = checkTimeout(start, timeout) {
         val length = this.readInt()
 
-        val longs = LongArray(length)
-        for (i in 0 until length) {
-            longs[i] = this.readLong()
+        val longs = LongArray(length) {
+            this.readLong()
         }
 
         return@checkTimeout TagLongArray(longs)
