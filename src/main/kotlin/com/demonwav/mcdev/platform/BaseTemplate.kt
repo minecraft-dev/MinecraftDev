@@ -48,12 +48,12 @@ object BaseTemplate {
                                             artifactId: String,
                                             pluginVersion: String,
                                             buildVersion: String,
-                                            hasSponge: Boolean) {
+                                            configurations:  Map<PlatformType, ProjectConfiguration>) {
 
         val properties = Properties()
         properties.setProperty("BUILD_VERSION", buildVersion)
 
-        applyGradlePropertiesTemplate(project, prop, groupId, artifactId, pluginVersion, hasSponge)
+        applyGradlePropertiesTemplate(project, prop, groupId, artifactId, pluginVersion, configurations.containsKey(PlatformType.SPONGE))
 
         applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MULTI_MODULE_BUILD_GRADLE_TEMPLATE, properties)
     }

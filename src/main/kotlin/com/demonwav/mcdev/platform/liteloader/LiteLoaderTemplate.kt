@@ -23,16 +23,14 @@ object LiteLoaderTemplate {
                                  prop: VirtualFile,
                                  groupId: String,
                                  artifactId: String,
-                                 modVersion: String,
-                                 mcVersion: String,
-                                 mcpMappings: String) {
+                                 configuration: LiteLoaderProjectConfiguration) {
 
         val properties = Properties()
         properties.setProperty("GROUP_ID", groupId)
         properties.setProperty("ARTIFACT_ID", artifactId)
-        properties.setProperty("VERSION", modVersion)
-        properties.setProperty("MC_VERSION", mcVersion)
-        properties.setProperty("MCP_MAPPINGS", mcpMappings)
+        properties.setProperty("VERSION", configuration.pluginVersion)
+        properties.setProperty("MC_VERSION", configuration.mcVersion)
+        properties.setProperty("MCP_MAPPINGS", configuration.mcpVersion)
 
         BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE, properties)
         BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_BUILD_GRADLE_TEMPLATE, Properties())
@@ -41,9 +39,7 @@ object LiteLoaderTemplate {
     fun applySubmoduleBuildGradleTemplate(project: Project,
                                           file: VirtualFile,
                                           prop: VirtualFile,
-                                          modVersion: String,
-                                          mcVersion: String,
-                                          mcpMappings: String,
+                                          configuration: LiteLoaderProjectConfiguration,
                                           commonProjectName: String) {
 
         val properties = Properties()
@@ -52,9 +48,9 @@ object LiteLoaderTemplate {
         BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties)
 
         val gradleProps = Properties()
-        gradleProps.setProperty("VERSION", modVersion)
-        gradleProps.setProperty("MC_VERSION", mcVersion)
-        gradleProps.setProperty("MCP_MAPPINGS", mcpMappings)
+        gradleProps.setProperty("VERSION", configuration.pluginVersion)
+        gradleProps.setProperty("MC_VERSION", configuration.mcVersion)
+        gradleProps.setProperty("MCP_MAPPINGS", configuration.mcpVersion)
 
         BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE, gradleProps)
     }

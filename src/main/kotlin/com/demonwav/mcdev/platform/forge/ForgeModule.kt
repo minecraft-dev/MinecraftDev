@@ -69,12 +69,20 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         val annotation = method.modifierList.findAnnotation(ForgeConstants.EVENT_HANDLER_ANNOTATION)
 
         if (annotation != null) {
-            return "Parameter is not a subclass of net.minecraftforge.fml.common.event.FMLEvent\n" +
-                "Compiling and running this listener may result in a runtime exception"
+            return formatWrongEventMessage(ForgeConstants.FML_EVENT, ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION,
+                    ForgeConstants.EVENT == eventClass.qualifiedName)
         }
 
-        return "Parameter is not a subclass of net.minecraftforge.fml.common.eventhandler.Event\n" +
-            "Compiling and running this listener may result in a runtime exception"
+        return formatWrongEventMessage(ForgeConstants.EVENT, ForgeConstants.EVENT_HANDLER_ANNOTATION,
+                ForgeConstants.FML_EVENT == eventClass.qualifiedName)
+    }
+
+    private fun formatWrongEventMessage(expected: String, suggested: String, wrong: Boolean): String {
+        val base = "Parameter is not a subclass of $expected\n"
+        if (wrong) {
+            return base + "This method should be annotated with $suggested"
+        }
+        return base + "Compiling and running this listener may result in a runtime exception"
     }
 
     override fun isStaticListenerSupported(method: PsiMethod) = true

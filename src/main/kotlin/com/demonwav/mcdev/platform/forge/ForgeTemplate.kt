@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.forge
 
 import com.demonwav.mcdev.platform.BaseTemplate
+import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -23,14 +24,12 @@ object ForgeTemplate {
                                  prop: VirtualFile,
                                  groupId: String,
                                  artifactId: String,
-                                 forgeVersion: String,
-                                 mcpVersion: String,
-                                 modVersion: String,
-                                 spongeForge: Boolean) {
+                                 configuration: ForgeProjectConfiguration,
+                                 modVersion: String) {
 
         val properties = Properties()
 
-        if (spongeForge) {
+        if (configuration is SpongeForgeProjectConfiguration) {
             properties.setProperty("SPONGE_FORGE", "true")
         }
 
@@ -40,8 +39,8 @@ object ForgeTemplate {
         gradleProps.setProperty("GROUP_ID", groupId)
         gradleProps.setProperty("ARTIFACT_ID", artifactId)
         gradleProps.setProperty("MOD_VERSION", modVersion)
-        gradleProps.setProperty("FORGE_VERSION", forgeVersion)
-        gradleProps.setProperty("MCP_VERSION", mcpVersion)
+        gradleProps.setProperty("FORGE_VERSION", configuration.forgeVersion)
+        gradleProps.setProperty("MCP_VERSION", configuration.mcpVersion)
 
         // create gradle.properties
         BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps)
@@ -51,15 +50,13 @@ object ForgeTemplate {
                                           file: VirtualFile,
                                           prop: VirtualFile,
                                           artifactId: String,
-                                          forgeVersion: String,
-                                          mcpVersion: String,
-                                          commonProjectName: String,
-                                          spongeForge: Boolean) {
+                                          configuration: ForgeProjectConfiguration,
+                                          commonProjectName: String) {
 
         val properties = Properties()
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName)
 
-        if (spongeForge) {
+        if (configuration is SpongeForgeProjectConfiguration) {
             properties.setProperty("SPONGE_FORGE", "true")
         }
 
@@ -67,8 +64,8 @@ object ForgeTemplate {
 
         val gradleProps = Properties()
         gradleProps.setProperty("ARTIFACT_ID", artifactId)
-        gradleProps.setProperty("FORGE_VERSION", forgeVersion)
-        gradleProps.setProperty("MCP_VERSION", mcpVersion)
+        gradleProps.setProperty("FORGE_VERSION", configuration.forgeVersion)
+        gradleProps.setProperty("MCP_VERSION", configuration.mcpVersion)
 
         // create gradle.properties
         BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps)

@@ -94,17 +94,7 @@ class GradleBuildSystem : BuildSystem() {
         runWriteTask {
             val gradleProp = setupGradleFiles()
 
-            ForgeTemplate.applyBuildGradleTemplate(
-                project,
-                buildGradle!!,
-                gradleProp,
-                groupId,
-                artifactId,
-                configuration.forgeVersion,
-                configuration.mcpVersion,
-                version,
-                configuration is SpongeForgeProjectConfiguration
-            )
+            ForgeTemplate.applyBuildGradleTemplate(project, buildGradle!!, gradleProp, groupId, artifactId, configuration, version)
 
             if (configuration is SpongeForgeProjectConfiguration) {
                 val buildGradlePsi = PsiManager.getInstance(project).findFile(buildGradle!!)
@@ -123,17 +113,7 @@ class GradleBuildSystem : BuildSystem() {
 
         runWriteTask {
             val gradleProp = setupGradleFiles()
-
-            LiteLoaderTemplate.applyBuildGradleTemplate(
-                project,
-                buildGradle!!,
-                gradleProp,
-                groupId,
-                artifactId,
-                configuration.pluginVersion,
-                configuration.mcVersion,
-                configuration.mcpVersion
-            )
+            LiteLoaderTemplate.applyBuildGradleTemplate(project, buildGradle!!, gradleProp, groupId, artifactId, configuration)
         }
 
         setupWrapper(project, indicator)
@@ -145,23 +125,9 @@ class GradleBuildSystem : BuildSystem() {
             val gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties")
 
             val buildGradleText = if (configuration.type == PlatformType.SPONGE) {
-                SpongeTemplate.applyBuildGradleTemplate(
-                    project,
-                    gradleProp,
-                    groupId,
-                    artifactId,
-                    version,
-                    buildVersion
-                )
+                SpongeTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, artifactId, version, buildVersion)
             } else {
-                BaseTemplate.applyBuildGradleTemplate(
-                    project,
-                    gradleProp,
-                    groupId,
-                    artifactId,
-                    version,
-                    buildVersion
-                )
+                BaseTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, artifactId, version, buildVersion)
             } ?: return@runWriteTask
 
             addBuildGradleDependencies(project, buildGradleText)
@@ -319,10 +285,11 @@ class GradleBuildSystem : BuildSystem() {
         val gradleProjectImportBuilder = GradleProjectImportBuilder(projectDataManager)
         val gradleProjectImportProvider = GradleProjectImportProvider(gradleProjectImportBuilder)
 
-        buildGradle ?: return
+        // Shadow name for ease of use, make non null
+        val buildGradle = buildGradle ?: return
 
         invokeLater {
-            val wizard = AddModuleWizard(project, buildGradle!!.path, gradleProjectImportProvider)
+            val wizard = AddModuleWizard(project, buildGradle.path, gradleProjectImportProvider)
             if (wizard.showAndGet()) {
                 ImportModuleAction.createFromWizard(project, wizard)
             }
@@ -388,26 +355,21 @@ class GradleBuildSystem : BuildSystem() {
         val includes = "'${pluginName.toLowerCase()}-common', " +
             configurations.values.joinToString(", ") { "'${pluginName.toLowerCase()}-${it.type.name.toLowerCase()}'" }
 
+        val artifactIdLower = artifactId.toLowerCase()
+
         runWriteTask {
             // Write the parent files to disk so the children modules can import correctly
             val gradleProp = setupGradleFiles()
             val settingsGradle = rootDirectory.createChildData(this, "settings.gradle")
 
             BaseTemplate.applyMultiModuleBuildGradleTemplate(
-                project,
-                buildGradle!!,
-                gradleProp,
-                groupId,
-                artifactId,
-                version,
-                buildVersion,
-                configurations.containsKey(PlatformType.SPONGE)
+                project, buildGradle!!, gradleProp, groupId, artifactId, version, buildVersion, configurations
             )
 
-            BaseTemplate.applySettingsGradleTemplate(project, settingsGradle, artifactId.toLowerCase(), includes)
+            BaseTemplate.applySettingsGradleTemplate(project, settingsGradle, artifactIdLower, includes)
 
             // Common will be empty, it's for the developers to fill in with common classes
-            val common = rootDirectory.createChildDirectory(this, artifactId.toLowerCase() + "-common")
+            val common = rootDirectory.createChildDirectory(this, artifactIdLower + "-common")
             createDirectories(common)
         }
 
@@ -417,7 +379,7 @@ class GradleBuildSystem : BuildSystem() {
 
             runWriteTask {
                 gradleBuildSystem.rootDirectory =
-                    rootDirectory.createChildDirectory(this, artifactId.toLowerCase() + "-" + configuration.type.name.toLowerCase())
+                    rootDirectory.createChildDirectory(this, artifactIdLower + "-" + configuration.type.name.toLowerCase())
             }
 
             gradleBuildSystem.artifactId = artifactId
@@ -432,7 +394,7 @@ class GradleBuildSystem : BuildSystem() {
 
             // For each build system we initialize it, but not the same as a normal create. We need to know the common project name,
             // as we automatically add it as a dependency too
-            gradleBuildSystem.createSubModule(project, configuration, artifactId.toLowerCase() + "-common", indicator)
+            gradleBuildSystem.createSubModule(project, configuration, artifactIdLower + "-common", indicator)
             map.putIfAbsent(gradleBuildSystem, configuration)
         }
 
@@ -468,16 +430,7 @@ class GradleBuildSystem : BuildSystem() {
         runWriteTask {
             val gradleProp = setupGradleFiles()
 
-            ForgeTemplate.applySubmoduleBuildGradleTemplate(
-                project,
-                buildGradle!!,
-                gradleProp,
-                artifactId,
-                configuration.forgeVersion,
-                configuration.mcpVersion,
-                commonProjectName,
-                configuration is SpongeForgeProjectConfiguration
-            )
+            ForgeTemplate.applySubmoduleBuildGradleTemplate(project, buildGradle!!, gradleProp, artifactId, configuration, commonProjectName)
 
             // We're only going to write the dependencies if it's a sponge forge project
             if (configuration is SpongeForgeProjectConfiguration) {
@@ -499,15 +452,7 @@ class GradleBuildSystem : BuildSystem() {
         runWriteTask {
             val gradleProp = setupGradleFiles()
 
-            LiteLoaderTemplate.applySubmoduleBuildGradleTemplate(
-                project,
-                buildGradle!!,
-                gradleProp,
-                configuration.pluginVersion,
-                configuration.mcVersion,
-                configuration.mcpVersion,
-                commonProjectName
-            )
+            LiteLoaderTemplate.applySubmoduleBuildGradleTemplate(project, buildGradle!!, gradleProp, configuration, commonProjectName)
         }
 
         setupDecompWorkspace(project, indicator)

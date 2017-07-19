@@ -45,3 +45,6 @@ hs_err_pid*
 .sandbox/
 
 /gen/
+
+
+.DS_Store
