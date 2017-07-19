@@ -121,6 +121,8 @@
             <category>Minecraft</category>
             <descriptionDirectoryName>convertToTranslation</descriptionDirectoryName>
         </intentionAction>
+        <codeFoldingOptionsProvider instance="com.demonwav.mcdev.i18n.I18nCodeFoldingOptionsProvider"/>
+        <applicationService serviceImplementation="com.demonwav.mcdev.i18n.I18nFoldingSettings"/>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 

@@ -21,5 +21,5 @@ class I18nFoldingBuilder : FoldingBuilderEx() {
 
     override fun getPlaceholderText(node: ASTNode) = "..."
 
-    override fun isCollapsedByDefault(node: ASTNode) = true
+    override fun isCollapsedByDefault(node: ASTNode) = I18nFoldingSettings.instance.isShouldFoldTranslations
 }
