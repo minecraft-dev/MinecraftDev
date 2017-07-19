@@ -80,6 +80,11 @@ object I18nElementFactory {
         return PsiFileFactory.getInstance(project).createFileFromText("name", I18nFileType, text) as I18nFile
     }
 
+    fun createComment(project: Project, text: String): PsiElement {
+        val file = createFile(project, "# $text")
+        return file.firstChild
+    }
+
     fun createProperty(project: Project, key: String, value: String = ""): I18nProperty {
         val file = createFile(project, "$key=$value")
         return file.firstChild as I18nProperty

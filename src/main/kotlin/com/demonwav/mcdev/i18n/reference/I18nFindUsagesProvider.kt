@@ -35,12 +35,12 @@ class I18nFindUsagesProvider : FindUsagesProvider {
 
     companion object {
         private val WORDS_SCANNER by lazy {
-            val s = DefaultWordsScanner(I18nLexerAdapter(),
+            DefaultWordsScanner(
+                I18nLexerAdapter(),
                 TokenSet.create(I18nTypes.KEY),
                 TokenSet.create(I18nTypes.COMMENT),
-                TokenSet.EMPTY)
-            s.setMayHaveFileRefsInLiterals(true)
-            s
+                TokenSet.EMPTY
+            )
         }
     }
 }

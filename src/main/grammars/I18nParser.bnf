@@ -33,7 +33,7 @@ i18n_file ::= line*
 
 private line ::= property | COMMENT | LINE_ENDING
 
-property ::= KEY? EQUALS VALUE? {
+property ::= KEY EQUALS VALUE? {
     methods=[]
     mixin="com.demonwav.mcdev.i18n.lang.psi.mixins.I18nPropertyImplMixin"
     implements="com.demonwav.mcdev.i18n.lang.psi.mixins.I18nPropertyMixin"

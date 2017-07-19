@@ -45,7 +45,6 @@ COMMENT = #[^\n\r]+
 
 <YYINITIAL> {
     {KEY}                       { yybegin(WAITING_EQUALS); return KEY; }
-    "="                         { yybegin(WAITING_VALUE); return EQUALS; }
     {COMMENT}                   { return COMMENT; }
     {LINE_ENDING}               { return LINE_ENDING; }
 }

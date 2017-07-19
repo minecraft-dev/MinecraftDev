@@ -28,8 +28,7 @@ class I18nBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, private val s
         var child: ASTNode? = myNode.firstChildNode
         var previousChild: ASTNode? = null
         while (child != null) {
-            if (child.elementType !== TokenType.WHITE_SPACE && (previousChild == null || previousChild.elementType !== I18nTypes.LINE_ENDING ||
-                child.elementType !== I18nTypes.LINE_ENDING)) {
+            if (child.elementType !== TokenType.WHITE_SPACE && (previousChild == null || previousChild.elementType !== I18nTypes.LINE_ENDING || child.elementType !== I18nTypes.LINE_ENDING)) {
                 val block = I18nBlock(child, Wrap.createWrap(WrapType.NONE, false), Alignment.createAlignment(), spacingBuilder)
                 blocks.add(block)
             }

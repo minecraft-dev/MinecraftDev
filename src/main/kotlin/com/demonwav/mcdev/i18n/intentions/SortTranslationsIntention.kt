@@ -14,14 +14,16 @@ import com.demonwav.mcdev.i18n.I18nElementFactory
 import com.demonwav.mcdev.i18n.Scope
 import com.demonwav.mcdev.i18n.findDefaultProperties
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.util.IncorrectOperationException
 
-class SortTranslationsIntention(private val ordering: SortTranslationsIntention.Ordering) : BaseIntentionAction() {
+class SortTranslationsIntention(private val ordering: SortTranslationsIntention.Ordering, private val keepComments: Int) : BaseIntentionAction() {
     enum class Ordering {
         ASCENDING, DESCENDING, LIKE_DEFAULT
     }
@@ -48,20 +50,35 @@ class SortTranslationsIntention(private val ordering: SortTranslationsIntention.
                 }
             }
         }
+
+        tailrec fun gatherComments(element: PsiElement, acc: List<String> = emptyList(), depth: Int = 0): List<String> {
+            if (keepComments != 0 && depth >= keepComments) {
+                return acc
+            }
+            val prev = element.prevSibling ?: return acc
+            if (prev.node.elementType != I18nTypes.LINE_ENDING) {
+                return acc
+            }
+            val prevLine = prev.prevSibling ?: return acc
+            if (prevLine.node.elementType != I18nTypes.COMMENT) {
+                return acc
+            }
+            return gatherComments(prevLine, listOf(prevLine.text.substring(1).trim()) + acc, depth + 1)
+        }
         object : WriteCommandAction.Simple<Unit>(project, psiFile) {
             @Throws(Throwable::class)
             override fun run() {
+                val withComments = sorted.associate { it to gatherComments(it) }
                 for (elem in psiFile.children) {
                     elem.delete()
                 }
-                var lastStart: Char = 0.toChar()
-                for (property in sorted) {
-                    if (lastStart.toInt() != 0 && property.key[0] != lastStart) {
+                for ((property, comments) in withComments) {
+                    for (comment in comments) {
+                        psiFile.add(I18nElementFactory.createComment(project, comment))
                         psiFile.add(I18nElementFactory.createLineEnding(project))
                     }
                     psiFile.add(I18nElementFactory.createProperty(project, property.key, property.value))
                     psiFile.add(I18nElementFactory.createLineEnding(project))
-                    lastStart = property.key[0]
                 }
             }
         }.execute()
