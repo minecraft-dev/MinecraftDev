@@ -65,6 +65,7 @@ class SortTranslationsIntention(private val ordering: SortTranslationsIntention.
             }
             return gatherComments(prevLine, listOf(prevLine.text.substring(1).trim()) + acc, depth + 1)
         }
+
         object : WriteCommandAction.Simple<Unit>(project, psiFile) {
             @Throws(Throwable::class)
             override fun run() {

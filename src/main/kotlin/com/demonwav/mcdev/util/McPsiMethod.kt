@@ -58,7 +58,7 @@ fun PsiMethod.isReturningResultOf(reference: PsiMethod?, paramIndex: Int, refere
                     return paramRef === this.parameterList.parameters[paramIndex]
                 } else if (param is PsiPolyadicExpression) {
                     for (operand in param.operands) {
-                        if (operand is PsiReferenceExpression) {
+                        if (operand is PsiReferenceExpression && this.parameterList.parameters.size > paramIndex) {
                             val operandRef = operand.advancedResolve(false).element
                             return operandRef === this.parameterList.parameters[paramIndex]
                         }

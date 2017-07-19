@@ -43,7 +43,7 @@ inline fun PsiMethodCallExpression.checkForReference(method: PsiMethod, referenc
             }
         } else if (param is PsiPolyadicExpression) {
             for (operand in param.operands) {
-                if (operand is PsiReferenceExpression) {
+                if (operand is PsiReferenceExpression && method.parameterList.parameters.size > paramIndex) {
                     val operandRef = operand.advancedResolve(false).element
                     if (operandRef === method.parameterList.parameters[paramIndex])
                         return true

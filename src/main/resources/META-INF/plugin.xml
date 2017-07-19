@@ -107,6 +107,7 @@
         <lang.findUsagesProvider language="I18n" implementationClass="com.demonwav.mcdev.i18n.reference.I18nFindUsagesProvider"/>
         <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.i18n.I18nFoldingBuilder"/>
         <lang.formatter language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.formatting.I18nFormattingModelBuilder"/>
+        <lang.commenter language="I18n" implementationClass="com.demonwav.mcdev.i18n.I18nCommenter" />
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.i18n.reference.I18nJavaReferenceContributor"/>
         <psi.referenceContributor language="I18n" implementation="com.demonwav.mcdev.i18n.reference.I18nReferenceContributor"/>
         <gotoSymbolContributor implementation="com.demonwav.mcdev.i18n.reference.I18nGotoSymbolContributor"/>

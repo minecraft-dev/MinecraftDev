@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.i18n
 
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
@@ -26,9 +27,7 @@ import java.awt.Color
 class I18nEditorNotificationProvider(private val project: Project) : EditorNotifications.Provider<I18nEditorNotificationProvider.InfoPanel>() {
     private var show: Boolean = true
 
-    override fun getKey(): Key<InfoPanel> {
-        return KEY
-    }
+    override fun getKey() = KEY
 
     override fun createNotificationPanel(file: VirtualFile, fileEditor: FileEditor): InfoPanel? {
         if (!show || !file.name.endsWith(".lang") || file.nameWithoutExtension.toLowerCase() == "en_us") {
@@ -44,16 +43,19 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
         if (!keys.containsAll(defaultKeys)) {
             val panel = InfoPanel()
             panel.setText("Translation file doesn't match default one (en_us.lang).")
-            panel.createActionLabel("Add missing translations") {
-                val psi = PsiManager.getInstance(project).findFile(file)
+            panel.createActionLabel("Add missing default entries (won't reflect changes in original English localization)") {
+                val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
                 object : WriteCommandAction.Simple<Unit>(project, psi) {
                     @Throws(Throwable::class)
                     override fun run() {
                         defaultKeys.removeAll(keys)
+                        if (psi.lastChild?.node?.elementType != I18nTypes.LINE_ENDING) {
+                            psi.add(I18nElementFactory.createLineEnding(project))
+                        }
                         for (key in defaultKeys) {
-                            if (key != null && propertyMap[key]?.value != null && psi != null) {
+                            if (key != null && propertyMap[key]?.value != null) {
+                                psi.add(I18nElementFactory.createProperty(project, key, propertyMap[key]!!.value))
                                 psi.add(I18nElementFactory.createLineEnding(project))
-                                psi.add(I18nElementFactory.createProperty(project, key, propertyMap[key]?.value!!))
                             }
                         }
                         EditorNotifications.updateAll()

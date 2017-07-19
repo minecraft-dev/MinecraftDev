@@ -36,7 +36,10 @@ class I18nFormattingModelBuilder : FormattingModelBuilder {
     }
 
     private fun createSpaceBuilder(settings: CodeStyleSettings): SpacingBuilder {
-        return SpacingBuilder(settings, I18nLanguage).around(I18nTypes.EQUALS).none().before(I18nTypes.PROPERTY).none()
+        return SpacingBuilder(settings, I18nLanguage)
+            .around(I18nTypes.EQUALS).none()
+            .around(I18nTypes.PROPERTY).none()
+            .around(I18nTypes.LINE_ENDING).none()
     }
 
     override fun getRangeAffectingIndent(file: PsiFile, offset: Int, elementAtOffset: ASTNode): TextRange? {
