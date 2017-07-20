@@ -13,11 +13,13 @@ package com.demonwav.mcdev.platform.forge
 import com.demonwav.mcdev.platform.BaseTemplate
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory
+import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import java.util.Properties
 
 object ForgeTemplate {
+    private val MC_1_12 = SemanticVersion("1.12")
 
     fun applyBuildGradleTemplate(project: Project,
                                  file: VirtualFile,
@@ -31,6 +33,13 @@ object ForgeTemplate {
 
         if (configuration is SpongeForgeProjectConfiguration) {
             properties.setProperty("SPONGE_FORGE", "true")
+        }
+        // Fixes builds for MC1.12+, requires FG 2.3
+        val mcVersion = SemanticVersion(configuration.mcVersion)
+        if (mcVersion >= MC_1_12) {
+            properties.setProperty("FORGEGRADLE_VERSION", "2.3")
+        } else {
+            properties.setProperty("FORGEGRADLE_VERSION", "2.2")
         }
 
         BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_BUILD_GRADLE_TEMPLATE, properties)

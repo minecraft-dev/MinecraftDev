@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.forge.version
 
 import com.demonwav.mcdev.util.gson
+import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.sortVersions
 import java.io.IOException
 import java.net.URL
@@ -23,16 +24,16 @@ class ForgeVersion private constructor(private val map: Map<*, *>) {
     }
 
     fun getRecommended(versions: List<String>): String {
-        var recommended = "1.7"
+        var recommended = SemanticVersion("1.7")
         for (version in versions) {
             getPromo(version) ?: continue
-
-            if (recommended < version) {
-                recommended = version
+            val semantic = SemanticVersion(version)
+            if (recommended < semantic) {
+                recommended = semantic
             }
         }
 
-        return recommended
+        return recommended.value
     }
 
     fun getPromo(version: String): Double? {
