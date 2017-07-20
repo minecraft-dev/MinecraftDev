@@ -47,6 +47,7 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
 
     fun java(path: String, @Language("JAVA") code: String, configure: Boolean = true) = file(path, code, ".java", configure)
     fun at(path: String, @Language("Access Transformers") code: String, configure: Boolean = true) = file(path, code, "_at.cfg", configure)
+    fun i18n(path: String, @Language("I18n") code: String, configure: Boolean = true) = file(path, code, ".lang", configure)
 
     fun dir(path: String, block: ProjectBuilder.() -> Unit) {
         val oldIntermediatePath = intermediatePath
