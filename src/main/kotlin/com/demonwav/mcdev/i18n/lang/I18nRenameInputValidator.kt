@@ -20,12 +20,12 @@ import com.intellij.util.ProcessingContext
 
 class I18nRenameInputValidator : RenameInputValidatorEx {
     override fun isInputValid(newName: String, element: PsiElement, context: ProcessingContext): Boolean =
-        !newName.contains("=")
+        !newName.contains('=')
 
     override fun getPattern(): ElementPattern<out PsiElement> = PlatformPatterns.psiElement(I18nProperty::class.java)
 
     override fun getErrorMessage(newName: String, project: Project): String? {
-        if (newName.contains("=")) {
+        if (newName.contains('=')) {
             return "Key must not contain separator character ('=')"
         }
         return null

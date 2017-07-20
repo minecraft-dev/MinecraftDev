@@ -41,7 +41,7 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                 null,
                 object : InputValidatorEx {
                     override fun getErrorText(inputString: String): String? {
-                        if (inputString.contains("="))
+                        if (inputString.contains('='))
                             return "Key must not contain separator character ('=')"
                         if (inputString.isEmpty())
                             return "Key must not be empty"
@@ -49,11 +49,11 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                     }
 
                     override fun checkInput(inputString: String): Boolean {
-                        return !inputString.contains("=") && !inputString.isEmpty()
+                        return !inputString.contains('=') && !inputString.isEmpty()
                     }
 
                     override fun canClose(inputString: String): Boolean {
-                        return !inputString.contains("=") && !inputString.isEmpty()
+                        return !inputString.contains('=') && !inputString.isEmpty()
                     }
                 })
             if (result.getFirst() != null) {
