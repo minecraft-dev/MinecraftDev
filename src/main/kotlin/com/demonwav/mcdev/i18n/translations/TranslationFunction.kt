@@ -21,6 +21,7 @@ import com.demonwav.mcdev.util.getCalls
 import com.demonwav.mcdev.util.getCallsReturningResult
 import com.demonwav.mcdev.util.isCalling
 import com.demonwav.mcdev.util.isReturningResultOf
+import com.demonwav.mcdev.util.isSameReference
 import com.demonwav.mcdev.util.referencedMethod
 import com.demonwav.mcdev.util.substituteParameter
 import com.intellij.openapi.module.ModuleManager
@@ -38,7 +39,6 @@ class TranslationFunction(val className: String, val name: String, val parameter
                           val foldParameters: Boolean = false, val prefix: String = "", val suffix: String = "",
                           val obfuscatedName: Boolean = false) {
     fun getMethodName(element: PsiElement): String {
-        println(ModuleManager.getInstance(element.project).modules.map { MinecraftFacet.getInstance(it, McpModuleType)?.srgManager }.toList())
         val srgManager = element.findModule()?.let { MinecraftFacet.getInstance(it, McpModuleType)?.srgManager } ?: SrgManager.findAnyInstance(element.project)
         if (obfuscatedName && srgManager != null) {
             return srgManager.srgMapNow?.mapSrgName(name) ?: name
@@ -106,7 +106,7 @@ class TranslationFunction(val className: String, val name: String, val parameter
                 return acc
             }
             val method = call.referencedMethod
-            val isReferencedMethod = referenced === method
+            val isReferencedMethod = referenced.isSameReference(method)
             val param = call.argumentList?.expressions?.get(matchedIndex)
             if (method != null && param != null) {
                 val result = param.evaluate(null, I18nReference.VARIABLE_MARKER) ?: return null
