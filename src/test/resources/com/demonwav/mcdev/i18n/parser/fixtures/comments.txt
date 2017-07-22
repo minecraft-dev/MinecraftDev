@@ -1,0 +1,6 @@
+FILE
+  PsiElement(COMMENT)('# Comment 1')
+  PsiElement(LINE_ENDING)('\n')
+  PsiElement(COMMENT)('# Comment 2')
+  PsiElement(LINE_ENDING)('\n')
+  PsiElement(COMMENT)('# Comment 3')
