@@ -14,7 +14,7 @@ import com.demonwav.mcdev.framework.toSnakeCase
 import com.demonwav.mcdev.i18n.lang.I18nParserDefintion
 import com.intellij.testFramework.ParsingTestCase
 
-class I18nParsingTest : ParsingTestCase("com/demonwav/mcdev/i18n/parser/fixtures", "lang", true, I18nParserDefintion()) {
+class I18nParsingTest : ParsingTestCase("com/demonwav/mcdev/i18n/parser/fixtures", I18nConstants.FILE_EXTENSION, true, I18nParserDefintion()) {
     override fun getTestDataPath() = "src/test/resources"
     override fun getTestName(lowercaseFirstLetter: Boolean) = super.getTestName(lowercaseFirstLetter).toSnakeCase()
 

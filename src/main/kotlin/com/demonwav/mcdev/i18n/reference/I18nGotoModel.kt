@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.i18n.reference
 
+import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
 import com.intellij.ide.util.gotoByName.ContributorsBasedGotoByModel
 import com.intellij.navigation.ChooseByNameContributor
@@ -22,7 +23,7 @@ import java.util.TreeSet
 
 class I18nGotoModel(project: Project, val filter: Regex? = null) : ContributorsBasedGotoByModel(project, arrayOf(Extensions.findExtension(ChooseByNameContributor.SYMBOL_EP_NAME, I18nGotoSymbolContributor::class.java))) {
     override fun acceptItem(item: NavigationItem?): Boolean {
-        return (item as I18nProperty).containingFile.virtualFile.nameWithoutExtension.toLowerCase() == "en_us"
+        return (item as I18nProperty).containingFile.virtualFile.nameWithoutExtension.toLowerCase() == I18nConstants.DEFAULT_LOCALE
     }
 
     override fun getElementsByName(name: String, parameters: FindSymbolParameters, canceled: ProgressIndicator): Array<Any> {

@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.i18n
 
+import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.colors.EditorColors
@@ -30,7 +31,7 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
     override fun getKey() = KEY
 
     override fun createNotificationPanel(file: VirtualFile, fileEditor: FileEditor): InfoPanel? {
-        if (!show || !file.name.endsWith(".lang") || file.nameWithoutExtension.toLowerCase() == "en_us") {
+        if (!show || file.fileType != I18nFileType || file.nameWithoutExtension.toLowerCase() == I18nConstants.DEFAULT_LOCALE) {
             return null
         }
 
@@ -42,7 +43,7 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
 
         if (!keys.containsAll(defaultKeys)) {
             val panel = InfoPanel()
-            panel.setText("Translation file doesn't match default one (en_us.lang).")
+            panel.setText("Translation file doesn't match default one (${I18nConstants.DEFAULT_LOCALE}.lang).")
             panel.createActionLabel("Add missing default entries (won't reflect changes in original English localization)") {
                 val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
                 object : WriteCommandAction.Simple<Unit>(project, psi) {

@@ -50,7 +50,7 @@ fun Project.findProperties(scope: Scope = Scope.GLOBAL, key: String? = null, fil
 fun Project.findDefaultProperties(scope: Scope = Scope.GLOBAL, key: String? = null, file: VirtualFile? = null, domain: String? = null) =
     findPropertiesImpl(scope,
         {
-            it.virtualFile != null && it.virtualFile.nameWithoutExtension.toLowerCase() == "en_us"
+            it.virtualFile != null && it.virtualFile.nameWithoutExtension.toLowerCase() == I18nConstants.DEFAULT_LOCALE
                 && (if (file != null) it.virtualFile.path == file.path else true)
                 && (if (domain != null) I18nElementFactory.getResourceDomain(it.virtualFile) == domain else true)
         },

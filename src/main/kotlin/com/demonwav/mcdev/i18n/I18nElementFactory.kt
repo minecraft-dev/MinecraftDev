@@ -55,7 +55,7 @@ object I18nElementFactory {
         }
 
         val files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, I18nFileType, GlobalSearchScope.moduleScope(module))
-        val fileNames = files.map { it.nameWithoutExtension.toLowerCase() }.filter { it == "en_us" }
+        val fileNames = files.map { it.nameWithoutExtension.toLowerCase() }.filter { it == I18nConstants.DEFAULT_LOCALE }
         if (fileNames.size > 1) {
             val choices = files.mapNotNull(this::getResourceDomain).distinct().sortedBy { it }
             val swingList = JList(choices.toTypedArray())

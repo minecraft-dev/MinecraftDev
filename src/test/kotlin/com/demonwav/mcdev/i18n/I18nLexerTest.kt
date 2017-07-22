@@ -28,7 +28,7 @@ class I18nLexerTest : LexerTestCase() {
 
     // Copied because it wasn't handling the paths correctly
     private fun doTest() {
-        val fileName = dirPath + "/" + getTestName(true) + ".lang"
+        val fileName = dirPath + "/" + getTestName(true) + ".${I18nConstants.FILE_EXTENSION}"
         var text = ""
         try {
             val fileText = FileUtil.loadFile(File(fileName))
