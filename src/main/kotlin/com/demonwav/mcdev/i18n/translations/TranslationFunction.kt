@@ -10,34 +10,51 @@
 
 package com.demonwav.mcdev.i18n.translations
 
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.i18n.reference.I18nReference
+import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.mcp.srg.SrgManager
 import com.demonwav.mcdev.util.evaluate
 import com.demonwav.mcdev.util.extractVarArgs
+import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.getCalls
 import com.demonwav.mcdev.util.getCallsReturningResult
 import com.demonwav.mcdev.util.isCalling
 import com.demonwav.mcdev.util.isReturningResultOf
 import com.demonwav.mcdev.util.referencedMethod
 import com.demonwav.mcdev.util.substituteParameter
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiCall
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.MethodSignature
 import java.util.regex.Pattern
 
-class TranslationFunction(val className: String, val methodName: String, val parameterTypes: String,
+class TranslationFunction(val className: String, val name: String, val parameterTypes: String,
                           val matchedIndex: Int, val formatting: Boolean, val setter: Boolean = false,
-                          val foldParameters: Boolean = false, val prefix: String = "", val suffix: String = "") {
+                          val foldParameters: Boolean = false, val prefix: String = "", val suffix: String = "",
+                          val obfuscatedName: Boolean = false) {
+    fun getMethodName(element: PsiElement): String {
+        println(ModuleManager.getInstance(element.project).modules.map { MinecraftFacet.getInstance(it, McpModuleType)?.srgManager }.toList())
+        val srgManager = element.findModule()?.let { MinecraftFacet.getInstance(it, McpModuleType)?.srgManager } ?: SrgManager.findAnyInstance(element.project)
+        if (obfuscatedName && srgManager != null) {
+            return srgManager.srgMapNow?.mapSrgName(name) ?: name
+        } else {
+            return name
+        }
+    }
+
     fun matches(method: PsiMethod?, paramIndex: Int): Boolean {
         if (method == null) {
             return false
         }
         val scope = GlobalSearchScope.allScope(method.project)
         val psiClass = JavaPsiFacade.getInstance(method.project).findClass(className, scope) ?: return false
-        val referenceMethod = psiClass.findMethodsByName(methodName, false)
-            .first { convertSignatureToDescriptor(it.getSignature(PsiSubstitutor.EMPTY)) == parameterTypes };
+        val referenceMethod = psiClass.findMethodsByName(getMethodName(method), false)
+            .firstOrNull { convertSignatureToDescriptor(it.getSignature(PsiSubstitutor.EMPTY)) == parameterTypes } ?: return false
         if (setter) {
             return method.isCalling(referenceMethod, paramIndex, matchedIndex)
         } else {
@@ -70,8 +87,8 @@ class TranslationFunction(val className: String, val methodName: String, val par
     fun getCalls(call: PsiCall, paramIndex: Int): Iterable<PsiCall> {
         val scope = GlobalSearchScope.allScope(call.project)
         val psiClass = JavaPsiFacade.getInstance(call.project).findClass(className, scope) ?: return emptyList()
-        val referenceMethod = psiClass.findMethodsByName(methodName, false)
-            .first { convertSignatureToDescriptor(it.getSignature(PsiSubstitutor.EMPTY)) == parameterTypes };
+        val referenceMethod = psiClass.findMethodsByName(getMethodName(call), false)
+            .firstOrNull { convertSignatureToDescriptor(it.getSignature(PsiSubstitutor.EMPTY)) == parameterTypes } ?: return emptyList()
         if (setter) {
             return call.getCalls(referenceMethod, paramIndex, matchedIndex)
         } else {
@@ -105,8 +122,8 @@ class TranslationFunction(val className: String, val methodName: String, val par
         val calls = getCalls(call, matchedIndex)
         val scope = GlobalSearchScope.allScope(call.project)
         val psiClass = JavaPsiFacade.getInstance(call.project).findClass(className, scope) ?: return null
-        val referenced = psiClass.findMethodsByName(methodName, false)
-            .first { convertSignatureToDescriptor(it.getSignature(PsiSubstitutor.EMPTY)) == parameterTypes };
+        val referenced = psiClass.findMethodsByName(getMethodName(psiClass), false)
+            .firstOrNull { convertSignatureToDescriptor(it.getSignature(PsiSubstitutor.EMPTY)) == parameterTypes } ?: return null
         val result = calls.foldIndexed(Step(false, true, "") as Step?,
             {
                 depth, acc, v ->
@@ -162,6 +179,6 @@ class TranslationFunction(val className: String, val methodName: String, val par
     }
 
     override fun toString(): String {
-        return "$className.$methodName@$matchedIndex"
+        return "$className.$name@$matchedIndex"
     }
 }

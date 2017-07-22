@@ -10,9 +10,11 @@
 
 package com.demonwav.mcdev.i18n.translations
 
+import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.reference.I18nReference
 import com.demonwav.mcdev.i18n.translations.identifiers.LiteralTranslationIdentifier
 import com.demonwav.mcdev.i18n.translations.identifiers.ReferenceTranslationIdentifier
+import com.demonwav.mcdev.platform.mcp.util.McpConstants
 import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.openapi.editor.FoldingGroup
 import com.intellij.openapi.util.TextRange
@@ -36,51 +38,56 @@ data class Translation(val foldingElement: PsiElement?,
 
     companion object {
         val translationFunctions = listOf(
-            TranslationFunction("net.minecraft.client.resources.I18n",
-                "format",
+            TranslationFunction(I18nConstants.I18N_CLIENT_CLASS,
+                I18nConstants.FORMAT,
                 "Ljava.lang.String;[Ljava.lang.Object;",
                 0,
-                formatting = true),
-            TranslationFunction("net.minecraft.util.text.translation.I18n",
-                "translateToLocal",
+                formatting = true,
+                obfuscatedName = true),
+            TranslationFunction(I18nConstants.I18N_COMMON_CLASS,
+                I18nConstants.TRANSLATE_TO_LOCAL,
                 "Ljava.lang.String;",
                 0,
-                formatting = false),
-            TranslationFunction("net.minecraft.util.text.translation.I18n",
-                "translateToLocalFormatted",
+                formatting = false,
+                obfuscatedName = true),
+            TranslationFunction(I18nConstants.I18N_COMMON_CLASS,
+                I18nConstants.TRANSLATE_TO_LOCAL_FORMATTED,
                 "Ljava.lang.String;[Ljava.lang.Object;",
                 0,
-                formatting = true),
-            TranslationFunction("net.minecraft.util.text.TextComponentTranslation",
-                "TextComponentTranslation",
+                formatting = true,
+                obfuscatedName = true),
+            TranslationFunction(I18nConstants.TRANSLATION_COMPONENT_CLASS,
+                I18nConstants.TRANSLATION_COMPONENT_CONSTRUCTOR,
                 "Ljava.lang.String;[Ljava.lang.Object;",
                 0,
                 formatting = true,
                 foldParameters = true),
-            TranslationFunction("net.minecraft.command.CommandException",
-                "CommandException",
+            TranslationFunction(I18nConstants.COMMAND_EXCEPTION_CLASS,
+                I18nConstants.COMMAND_EXCEPTION_CONSTRUCTOR,
                 "Ljava.lang.String;[Ljava.lang.Object;",
                 0,
                 formatting = true,
                 foldParameters = true),
-            TranslationFunction("net.minecraft.block.Block",
-                "setUnlocalizedName",
+            TranslationFunction(McpConstants.BLOCK,
+                I18nConstants.SET_BLOCK_NAME,
                 "Ljava.lang.String;",
                 0,
                 formatting = false,
                 setter = true,
                 foldParameters = true,
                 prefix = "tile.",
-                suffix = ".name"),
-            TranslationFunction("net.minecraft.item.Item",
-                "setUnlocalizedName",
+                suffix = ".name",
+                obfuscatedName = true),
+            TranslationFunction(McpConstants.ITEM,
+                I18nConstants.SET_ITEM_NAME,
                 "Ljava.lang.String;",
                 0,
                 formatting = false,
                 setter = true,
                 foldParameters = true,
                 prefix = "item.",
-                suffix = ".name"))
+                suffix = ".name",
+                obfuscatedName = true))
 
         private val identifiers = listOf(LiteralTranslationIdentifier(), ReferenceTranslationIdentifier())
 

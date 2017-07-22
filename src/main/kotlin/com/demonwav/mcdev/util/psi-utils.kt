@@ -10,6 +10,8 @@
 
 package com.demonwav.mcdev.util
 
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.psi.ElementManipulator
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.JavaPsiFacade
@@ -37,6 +39,7 @@ import org.jetbrains.annotations.Contract
 import java.util.stream.Stream
 
 // Parent
+fun PsiElement.findModule(): Module? = ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(containingFile.virtualFile)
 
 @Contract(pure = true)
 fun PsiElement.findContainingClass(): PsiClass? = findParent(resolveReferences = false)
