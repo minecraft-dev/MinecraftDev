@@ -41,7 +41,7 @@ object I18nElementFactory {
         fun write(files: Iterable<VirtualFile>) {
             for (file in files) {
                 val simpleFile = PsiManager.getInstance(module.project).findFile(file)
-                if (simpleFile != null && simpleFile is I18nFile) {
+                if (simpleFile is I18nFile) {
                     object : WriteCommandAction.Simple<Unit>(module.project, simpleFile) {
                         @Throws(Throwable::class)
                         override fun run() {
