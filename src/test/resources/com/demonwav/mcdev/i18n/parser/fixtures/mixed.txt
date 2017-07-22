@@ -17,4 +17,5 @@ FILE
     PsiElement(KEY)('path.to.key3')
     PsiElement(=)('=')
     PsiElement(VALUE)('value of key 3')
+  PsiElement(LINE_ENDING)('\n')
   PsiElement(COMMENT)('#path.to.commented.key=value')
