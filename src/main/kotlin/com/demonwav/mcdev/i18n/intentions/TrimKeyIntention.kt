@@ -24,8 +24,14 @@ class TrimKeyIntention : BaseElementAtCaretIntentionAction() {
 
     override fun getFamilyName() = "Minecraft"
 
-    override fun isAvailable(project: Project, editor: Editor, element: PsiElement) =
-        element.node.elementType === I18nTypes.KEY && element.text.endsWith(" ")
+    override fun isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean {
+        val property: I18nProperty = when {
+            element is I18nProperty -> element
+            element.node.elementType === I18nTypes.KEY && element.parent is I18nProperty -> element.parent as I18nProperty
+            else -> return false
+        }
+        return property.key != property.trimmedKey
+    }
 
     @Throws(IncorrectOperationException::class)
     override fun invoke(project: Project, editor: Editor, element: PsiElement) {
@@ -33,6 +39,6 @@ class TrimKeyIntention : BaseElementAtCaretIntentionAction() {
             return
         }
         val property = element.parent as I18nProperty
-        property.setName(property.key.trim { it <= ' ' })
+        property.setName(property.trimmedKey)
     }
 }

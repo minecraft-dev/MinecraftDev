@@ -67,13 +67,13 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                         PsiDocumentManager.getInstance(project).getPsiFile(editor.document)) {
                         @Throws(Throwable::class)
                         override fun run() {
-                            val expression = JavaPsiFacade.getElementFactory(project).createExpressionFromText("net.minecraft.client.resources.I18n.format(\"" + result.getFirst() + "\")",
-                                element.context)
-                            if (PsiDocumentManager.getInstance(project).getPsiFile(editor.document)!!.language === JavaLanguage.INSTANCE)
+                            val expression = JavaPsiFacade.getElementFactory(project).createExpressionFromText("net.minecraft.client.resources.I18n.format(\"" + result.getFirst() + "\")", element.context)
+                            if (PsiDocumentManager.getInstance(project).getPsiFile(editor.document)!!.language === JavaLanguage.INSTANCE) {
                                 JavaCodeStyleManager.getInstance(project).shortenClassReferences(element.parent.replace(
                                     expression))
-                            else
+                            } else {
                                 element.parent.replace(expression)
+                            }
                         }
                     }.execute()
                 }
@@ -82,7 +82,7 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
     }
 
     override fun isAvailable(project: Project, editor: Editor, element: PsiElement) =
-        element.parent is PsiLiteral && (element.parent as PsiLiteral).value is String
+        (element.parent as? PsiLiteral)?.value is String
 
     override fun getFamilyName() = "Convert string literal to translation"
 

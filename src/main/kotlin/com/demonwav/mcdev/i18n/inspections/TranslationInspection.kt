@@ -35,23 +35,13 @@ abstract class TranslationInspection : BaseJavaLocalInspectionTool() {
             }
 
             override fun visitElement(element: PsiElement?) {
-                addDescriptors(checkElement(element, holder.manager, isOnTheFly))
+                checkElement(element, holder)
             }
 
             override fun visitFile(file: PsiFile) {
             }
-
-            private fun addDescriptors(descriptors: Array<ProblemDescriptor>?) {
-                if (descriptors != null) {
-                    for (descriptor in descriptors) {
-                        holder.registerProblem(descriptor)
-                    }
-                }
-            }
         }
     }
 
-    open fun checkElement(element: PsiElement?, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor>? {
-        return null
-    }
+    abstract fun checkElement(element: PsiElement?, holder: ProblemsHolder)
 }

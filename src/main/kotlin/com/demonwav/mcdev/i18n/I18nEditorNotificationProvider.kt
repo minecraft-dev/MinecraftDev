@@ -37,8 +37,8 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
 
         val defaultProperties = project.findDefaultProperties(scope = Scope.PROJECT, domain = I18nElementFactory.getResourceDomain(file))
         val properties = project.findProperties(file = file, scope = Scope.PROJECT)
-        val defaultKeys = defaultProperties.map { it?.key }.toMutableSet()
-        val keys = properties.map { it?.key }.toMutableSet()
+        val defaultKeys = defaultProperties.map { it.key }.toMutableSet()
+        val keys = properties.map { it.key }
         val propertyMap = defaultProperties.associate { it.key to it }
 
         if (!keys.containsAll(defaultKeys)) {
@@ -54,7 +54,7 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
                             psi.add(I18nElementFactory.createLineEnding(project))
                         }
                         for (key in defaultKeys) {
-                            if (key != null && propertyMap[key]?.value != null) {
+                            if (propertyMap[key]?.value != null) {
                                 psi.add(I18nElementFactory.createProperty(project, key, propertyMap[key]!!.value))
                                 psi.add(I18nElementFactory.createLineEnding(project))
                             }

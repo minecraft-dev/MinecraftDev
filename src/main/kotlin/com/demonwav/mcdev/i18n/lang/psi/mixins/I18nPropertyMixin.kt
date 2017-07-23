@@ -16,6 +16,9 @@ interface I18nPropertyMixin : PsiNameIdentifierOwner {
     val key: String
         get
 
+    val trimmedKey: String
+        get() = key.trim()
+
     val value: String
         get
 }

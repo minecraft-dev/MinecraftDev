@@ -27,14 +27,12 @@ enum class Scope {
 
 private fun Project.files(scope: Scope) =
     FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, I18nFileType, if (scope == Scope.GLOBAL) GlobalSearchScope.allScope(this) else GlobalSearchScope.projectScope(this))
-        .map { PsiManager.getInstance(this).findFile(it) as I18nFile? }
-        .filter { it != null }
-        .map { it as I18nFile }
+        .mapNotNull { PsiManager.getInstance(this).findFile(it) as I18nFile? }
 
 private fun Project.findPropertiesImpl(scope: Scope, fileFilter: (I18nFile) -> Boolean = { true }, propertyFilter: (I18nProperty) -> Boolean = { true }) =
     files(scope)
         .filter(fileFilter)
-        .flatMap { (PsiTreeUtil.getChildrenOfType(it, I18nProperty::class.java) ?: emptyArray()).asIterable() }
+        .flatMap { PsiTreeUtil.getChildrenOfType(it, I18nProperty::class.java)?.asIterable() ?: emptyList() }
         .filter(propertyFilter)
         .toList()
 
@@ -42,16 +40,16 @@ fun Project.findProperties(scope: Scope = Scope.GLOBAL, key: String? = null, fil
     findPropertiesImpl(scope,
         {
             it.virtualFile != null
-                && (if (file != null) it.virtualFile.path == file.path else true)
-                && (if (domain != null) I18nElementFactory.getResourceDomain(it.virtualFile) == domain else true)
+                && (file == null || it.virtualFile.path == file.path)
+                && (domain == null || I18nElementFactory.getResourceDomain(it.virtualFile) == domain)
         },
-        { if (key != null) it.key == key else true })
+        { key == null || it.key == key })
 
 fun Project.findDefaultProperties(scope: Scope = Scope.GLOBAL, key: String? = null, file: VirtualFile? = null, domain: String? = null) =
     findPropertiesImpl(scope,
         {
             it.virtualFile != null && it.virtualFile.nameWithoutExtension.toLowerCase() == I18nConstants.DEFAULT_LOCALE
-                && (if (file != null) it.virtualFile.path == file.path else true)
-                && (if (domain != null) I18nElementFactory.getResourceDomain(it.virtualFile) == domain else true)
+                && (file == null || it.virtualFile.path == file.path)
+                && (domain == null || I18nElementFactory.getResourceDomain(it.virtualFile) == domain)
         },
-        { if (key != null) it.key == key else true })
+        { key == null || it.key == key })

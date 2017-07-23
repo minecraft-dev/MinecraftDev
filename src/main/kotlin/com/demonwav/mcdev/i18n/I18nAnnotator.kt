@@ -29,7 +29,7 @@ class I18nAnnotator : Annotator {
     }
 
     private fun checkPropertyKey(property: I18nProperty, annotations: AnnotationHolder) {
-        if (property.key != property.key.trim { it <= ' ' }) {
+        if (property.key != property.trimmedKey) {
             annotations.createWarningAnnotation(TextRange(property.textRange.startOffset,
                 property.textRange.startOffset + property.key.length),
                 "Translation key contains whitespace at start or end").registerFix(TrimKeyIntention())
