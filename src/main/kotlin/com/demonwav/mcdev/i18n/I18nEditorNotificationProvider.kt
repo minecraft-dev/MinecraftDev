@@ -12,6 +12,7 @@ package com.demonwav.mcdev.i18n
 
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
@@ -46,22 +47,19 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
             panel.setText("Translation file doesn't match default one (${I18nConstants.DEFAULT_LOCALE}.lang).")
             panel.createActionLabel("Add missing default entries (won't reflect changes in original English localization)") {
                 val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
-                object : WriteCommandAction.Simple<Unit>(project, psi) {
-                    @Throws(Throwable::class)
-                    override fun run() {
-                        defaultKeys.removeAll(keys)
-                        if (psi.lastChild?.node?.elementType != I18nTypes.LINE_ENDING) {
-                            psi.add(I18nElementFactory.createLineEnding(project))
-                        }
-                        for (key in defaultKeys) {
-                            if (propertyMap[key]?.value != null) {
-                                psi.add(I18nElementFactory.createProperty(project, key, propertyMap[key]!!.value))
-                                psi.add(I18nElementFactory.createLineEnding(project))
-                            }
-                        }
-                        EditorNotifications.updateAll()
+                psi.runWriteAction {
+                    defaultKeys.removeAll(keys)
+                    if (lastChild?.node?.elementType != I18nTypes.LINE_ENDING) {
+                        add(I18nElementFactory.createLineEnding(project))
                     }
-                }.execute()
+                    for (key in defaultKeys) {
+                        if (propertyMap[key]?.value != null) {
+                            add(I18nElementFactory.createProperty(project, key, propertyMap[key]!!.value))
+                            add(I18nElementFactory.createLineEnding(project))
+                        }
+                    }
+                    EditorNotifications.updateAll()
+                }
             }
             panel.createActionLabel("Hide notification") {
                 panel.isVisible = false

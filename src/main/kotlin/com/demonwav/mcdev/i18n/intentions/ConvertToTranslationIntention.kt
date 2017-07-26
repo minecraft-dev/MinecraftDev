@@ -11,9 +11,9 @@
 package com.demonwav.mcdev.i18n.intentions
 
 import com.demonwav.mcdev.i18n.I18nElementFactory
+import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
 import com.intellij.lang.java.JavaLanguage
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
@@ -63,19 +63,15 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                     value
                 )
                 if (result.getSecond()) {
-                    object : WriteCommandAction.Simple<Unit>(project,
-                        PsiDocumentManager.getInstance(project).getPsiFile(editor.document)) {
-                        @Throws(Throwable::class)
-                        override fun run() {
-                            val expression = JavaPsiFacade.getElementFactory(project).createExpressionFromText("net.minecraft.client.resources.I18n.format(\"" + result.getFirst() + "\")", element.context)
-                            if (PsiDocumentManager.getInstance(project).getPsiFile(editor.document)!!.language === JavaLanguage.INSTANCE) {
-                                JavaCodeStyleManager.getInstance(project).shortenClassReferences(element.parent.replace(
-                                    expression))
-                            } else {
-                                element.parent.replace(expression)
-                            }
+                    val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return
+                    file.runWriteAction {
+                        val expression = JavaPsiFacade.getElementFactory(project).createExpressionFromText("net.minecraft.client.resources.I18n.format(\"" + result.getFirst() + "\")", element.context)
+                        if (file.language === JavaLanguage.INSTANCE) {
+                            JavaCodeStyleManager.getInstance(project).shortenClassReferences(element.parent.replace(expression))
+                        } else {
+                            element.parent.replace(expression)
                         }
-                    }.execute()
+                    }
                 }
             }
         }

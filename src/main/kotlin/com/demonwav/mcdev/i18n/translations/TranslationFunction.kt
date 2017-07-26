@@ -73,7 +73,7 @@ class TranslationFunction(val className: String, val name: String, val parameter
             "short" -> "S"
             "boolean" -> "Z"
             else ->
-                if (type.endsWith('[')) {
+                if (type.endsWith(']')) {
                     val dimension = type.count { it == '[' }
                     "[".repeat(dimension) + typeToDesc(type.takeWhile { it != '[' })
                 } else {

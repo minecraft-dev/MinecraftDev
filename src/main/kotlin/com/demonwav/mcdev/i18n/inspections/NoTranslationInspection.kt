@@ -15,6 +15,7 @@ import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
 import com.demonwav.mcdev.i18n.reference.I18nGotoModel
 import com.demonwav.mcdev.i18n.reference.I18nReference
 import com.demonwav.mcdev.i18n.translations.identifiers.LiteralTranslationIdentifier
+import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
@@ -44,7 +45,7 @@ class NoTranslationInspection : TranslationInspection() {
         if (element is PsiLiteralExpression) {
             val result = LiteralTranslationIdentifier().identify(element)
             if (result != null && !result.containsVariable && result.text == null) {
-                holder.registerProblem(element, "The given translation key does not exist", ProblemHighlightType.GENERIC_ERROR, CreateTranslationQuickFix, ChangeTranslationQuickFix)
+                holder.registerProblem(element, "The given translation key does not exist", ProblemHighlightType.GENERIC_ERROR, CreateTranslationQuickFix, ChangeTranslationQuickFix( "Use existing translation"))
             }
         }
     }
@@ -72,36 +73,6 @@ class NoTranslationInspection : TranslationInspection() {
                 } catch (ignored: IncorrectOperationException) {
                 }
 
-            }
-
-            override fun startInWriteAction() = false
-
-            override fun getFamilyName() = name
-        }
-
-        private object ChangeTranslationQuickFix : LocalQuickFix {
-            override fun getName() = "Use existing translation"
-
-            override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-                try {
-                    val literal = descriptor.psiElement as PsiLiteralExpression
-                    val translation = LiteralTranslationIdentifier().identify(literal)
-                    val popup = ChooseByNamePopup.createPopup(project, I18nGotoModel(project, translation?.regexPattern), null)
-                    popup.invoke(object : ChooseByNamePopupComponent.Callback() {
-                        override fun elementChosen(element: Any) {
-                            val selectedProperty = element as I18nProperty
-                            object : WriteCommandAction.Simple<Unit>(project, literal.containingFile) {
-                                @Throws(Throwable::class)
-                                override fun run() {
-                                    val match = translation?.regexPattern?.matchEntire(selectedProperty.key)
-                                    val insertion = if (match == null || match.groups.size <= 1) selectedProperty.key else match.groupValues[1]
-                                    literal.replace(JavaPsiFacade.getInstance(project).elementFactory.createExpressionFromText("\"$insertion\"", literal.context))
-                                }
-                            }.execute()
-                        }
-                    }, ModalityState.current(), false)
-                } catch (ignored: IncorrectOperationException) {
-                }
             }
 
             override fun startInWriteAction() = false

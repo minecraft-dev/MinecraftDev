@@ -15,6 +15,7 @@ import com.demonwav.mcdev.i18n.Scope
 import com.demonwav.mcdev.i18n.findDefaultProperties
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
@@ -66,22 +67,19 @@ class SortTranslationsIntention(private val ordering: SortTranslationsIntention.
             return gatherComments(prevLine, listOf(prevLine.text.substring(1).trim()) + acc, depth + 1)
         }
 
-        object : WriteCommandAction.Simple<Unit>(project, psiFile) {
-            @Throws(Throwable::class)
-            override fun run() {
-                val withComments = sorted.associate { it to gatherComments(it) }
-                for (elem in psiFile.children) {
-                    elem.delete()
-                }
-                for ((property, comments) in withComments) {
-                    for (comment in comments) {
-                        psiFile.add(I18nElementFactory.createComment(project, comment))
-                        psiFile.add(I18nElementFactory.createLineEnding(project))
-                    }
-                    psiFile.add(I18nElementFactory.createProperty(project, property.key, property.value))
+        psiFile.runWriteAction {
+            val withComments = sorted.associate { it to gatherComments(it) }
+            for (elem in psiFile.children) {
+                elem.delete()
+            }
+            for ((property, comments) in withComments) {
+                for (comment in comments) {
+                    psiFile.add(I18nElementFactory.createComment(project, comment))
                     psiFile.add(I18nElementFactory.createLineEnding(project))
                 }
+                psiFile.add(I18nElementFactory.createProperty(project, property.key, property.value))
+                psiFile.add(I18nElementFactory.createLineEnding(project))
             }
-        }.execute()
+        }
     }
 }
