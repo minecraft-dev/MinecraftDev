@@ -32,7 +32,7 @@ abstract class TranslationInspection : BaseJavaLocalInspectionTool() {
             override fun visitField(field: PsiField) {
             }
 
-            override fun visitElement(element: PsiElement?) {
+            override fun visitElement(element: PsiElement) {
                 checkElement(element, holder)
             }
 
@@ -41,5 +41,5 @@ abstract class TranslationInspection : BaseJavaLocalInspectionTool() {
         }
     }
 
-    abstract fun checkElement(element: PsiElement?, holder: ProblemsHolder)
+    abstract fun checkElement(element: PsiElement, holder: ProblemsHolder)
 }

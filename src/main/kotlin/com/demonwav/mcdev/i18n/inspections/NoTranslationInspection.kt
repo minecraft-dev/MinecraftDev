@@ -33,11 +33,12 @@ class NoTranslationInspection : TranslationInspection() {
         "Checks whether a translation key used in calls to <code>StatCollector.translateToLocal()</code>, " +
             "<code>StatCollector.translateToLocalFormatted()</code> or <code>I18n.format()</code> exists."
 
-    override fun checkElement(element: PsiElement?, holder: ProblemsHolder) {
+    override fun checkElement(element: PsiElement, holder: ProblemsHolder) {
         if (element is PsiLiteralExpression) {
             val result = LiteralTranslationIdentifier().identify(element)
             if (result != null && !result.containsVariable && result.text == null) {
-                holder.registerProblem(element, "The given translation key does not exist", ProblemHighlightType.GENERIC_ERROR, CreateTranslationQuickFix, ChangeTranslationQuickFix("Use existing translation"))
+                val quickFixes = if (element is PsiLiteralExpression) arrayOf(CreateTranslationQuickFix, ChangeTranslationQuickFix("Use existing translation")) else emptyArray()
+                holder.registerProblem(element, "The given translation key does not exist", ProblemHighlightType.GENERIC_ERROR, *quickFixes)
             }
         }
     }

@@ -13,6 +13,7 @@ package com.demonwav.mcdev.i18n.translations.identifiers
 import com.demonwav.mcdev.i18n.findDefaultProperties
 import com.demonwav.mcdev.i18n.reference.I18nReference
 import com.demonwav.mcdev.i18n.translations.Translation
+import com.demonwav.mcdev.i18n.translations.Translation.Companion.FormattingError
 import com.demonwav.mcdev.util.evaluate
 import com.demonwav.mcdev.util.referencedMethod
 import com.intellij.openapi.project.Project
@@ -57,11 +58,14 @@ abstract class TranslationIdentifier<T : PsiElement> {
                         }
                         if (translation != null) {
                             try {
+                                val (formatted, superfluousParams) = function.format(translation, call) ?: (translation to -1)
                                 return Translation(if (function.foldParameters) container else call,
                                     if (result.first) referenceElement else null,
                                     fullKey,
                                     varKey,
-                                    function.format(translation, call) ?: translation,
+                                    formatted,
+                                    if (superfluousParams >= 0) FormattingError.SUPERFLUOUS else null,
+                                    superfluousParams,
                                     containsVariable = fullKey.contains(I18nReference.VARIABLE_MARKER))
                             } catch (ignored: MissingFormatArgumentException) {
                                 return Translation(if (function.foldParameters) container else call,
@@ -69,7 +73,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                     fullKey,
                                     varKey,
                                     translation,
-                                    true,
+                                    FormattingError.MISSING,
                                     containsVariable = fullKey.contains(I18nReference.VARIABLE_MARKER))
                             }
                         } else {

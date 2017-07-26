@@ -32,11 +32,16 @@ data class Translation(val foldingElement: PsiElement?,
                        val key: String,
                        val varKey: String,
                        val text: String?,
-                       val formattingError: Boolean = false,
+                       val formattingError: FormattingError? = null,
+                       val superfluousVarargStart: Int = -1,
                        val containsVariable: Boolean = false) {
     val regexPattern = Regex(varKey.split(I18nReference.VARIABLE_MARKER).map { Regex.escape(it) }.joinToString("(.*?)"))
 
     companion object {
+        enum class FormattingError {
+            MISSING, SUPERFLUOUS
+        }
+
         val translationFunctions = listOf(
             TranslationFunction(I18nConstants.I18N_CLIENT_CLASS,
                 I18nConstants.FORMAT,
@@ -113,7 +118,7 @@ data class Translation(val foldingElement: PsiElement?,
                             range,
                             FoldingGroup.newGroup("mc.i18n." + translation.key)) {
                             override fun getPlaceholderText(): String? {
-                                if (translation.formattingError) {
+                                if (translation.formattingError == FormattingError.MISSING) {
                                     return "\"Insufficient parameters for formatting '${translation.text}'\""
                                 }
                                 return "\"${translation.text}\""

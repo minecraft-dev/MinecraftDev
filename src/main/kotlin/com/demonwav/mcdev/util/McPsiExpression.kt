@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.util
 
 import com.demonwav.mcdev.i18n.translations.Translation
+import com.demonwav.mcdev.i18n.translations.Translation.Companion.FormattingError
 import com.intellij.psi.JavaTokenType
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiExpression
@@ -79,7 +80,7 @@ fun PsiExpression.substituteParameter(substitutions: Map<Int, Array<String?>?>, 
     } else if (this is PsiMethodCallExpression && allowTranslations) {
         for (argument in this.argumentList.expressions) {
             val translation = Translation.find(argument) ?: continue
-            if (translation.formattingError) {
+            if (translation.formattingError == FormattingError.MISSING) {
                 return arrayOf("{${translation.text}}")
             }
             return arrayOf(translation.text)

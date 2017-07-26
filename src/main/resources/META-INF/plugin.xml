@@ -285,6 +285,13 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.i18n.inspections.MissingFormatInspection"/>
+        <localInspection displayName="Detect superfluous format arguments for translations"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.i18n.inspections.SuperfluousFormatInspection"/>
         <!--endregion-->
 
         <!--region BUKKIT INSPECTIONS-->

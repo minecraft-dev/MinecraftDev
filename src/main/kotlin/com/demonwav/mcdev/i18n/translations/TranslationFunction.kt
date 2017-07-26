@@ -131,11 +131,11 @@ class TranslationFunction(val className: String, val name: String, val parameter
         return result?.copy(second = prefix + result.second + suffix)
     }
 
-    fun format(translation: String, call: PsiCall): String? {
+    fun format(translation: String, topCall: PsiCall): Pair<String, Int>? {
         if (!formatting) {
-            return translation
+            return translation to -1
         }
-        val format = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]").matcher(translation).replaceAll("%$1s")
+        val format = NUMBER_FORMATTING_PATTERN.matcher(translation).replaceAll("%$1s")
 
         fun resolveCall(call: PsiCall, substitutions: Map<Int, Array<String?>?>): Map<Int, Array<String?>?> {
             val method = call.referencedMethod
@@ -156,28 +156,31 @@ class TranslationFunction(val className: String, val name: String, val parameter
             }
         }
 
-        val calls = getCalls(call, matchedIndex)
-        if (calls.count() > 1) {
-            val substitutions = calls
-                .take(calls.count() - 1)
-                .fold(emptyMap<Int, Array<String?>?>(), { acc, v -> resolveCall(v, acc) })
-            val method = calls.last().referencedMethod ?: return translation
-            val varargs = calls.last().extractVarArgs(method.parameterList.parametersCount - 1, substitutions, false, true)
-            if (varargs.any { it == null }) {
-                return null
+        val calls = getCalls(topCall, matchedIndex)
+        val paramCount = STRING_FORMATTING_PATTERN.matcher(format).let {
+            var count = 0
+            while (it.find()) {
+                count++
             }
-            return String.format(format, *varargs)
-        } else {
-            val method = calls.first().referencedMethod ?: return translation
-            val varargs = calls.first().extractVarArgs(method.parameterList.parametersCount - 1, emptyMap(), true, true)
-            if (varargs.any { it == null }) {
-                return null
-            }
-            return String.format(format, *varargs)
+            return@let count
         }
+        val substitutions = if (calls.count() > 1) calls.take(calls.count() - 1).fold(emptyMap<Int, Array<String?>?>(), { acc, v -> resolveCall(v, acc) }) else emptyMap()
+        val referenceCall = if (calls.count() > 1) calls.last() else calls.first()
+        val method = referenceCall.referencedMethod ?: return translation to -1
+        val varargs = referenceCall.extractVarArgs(method.parameterList.parametersCount - 1, substitutions, calls.count() <= 1, true)
+        if (varargs.any { it == null }) {
+            return null
+        }
+        val varargStart = if (varargs.size > paramCount) method.parameterList.parametersCount - 1 + paramCount else -1
+        return String.format(format, *varargs) to varargStart
     }
 
     override fun toString(): String {
         return "$className.$name@$matchedIndex"
+    }
+
+    companion object {
+        val NUMBER_FORMATTING_PATTERN = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]")
+        val STRING_FORMATTING_PATTERN = Pattern.compile("[^%]?%(?:\\d+\\$)?s")
     }
 }
