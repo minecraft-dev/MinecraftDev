@@ -17,7 +17,6 @@ import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement

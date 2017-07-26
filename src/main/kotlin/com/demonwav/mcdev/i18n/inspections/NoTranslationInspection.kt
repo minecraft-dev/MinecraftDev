@@ -11,23 +11,15 @@
 package com.demonwav.mcdev.i18n.inspections
 
 import com.demonwav.mcdev.i18n.I18nElementFactory
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
-import com.demonwav.mcdev.i18n.reference.I18nGotoModel
 import com.demonwav.mcdev.i18n.reference.I18nReference
 import com.demonwav.mcdev.i18n.translations.identifiers.LiteralTranslationIdentifier
-import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.ide.util.gotoByName.ChooseByNamePopup
-import com.intellij.ide.util.gotoByName.ChooseByNamePopupComponent
-import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.ui.Messages
-import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.util.IncorrectOperationException
@@ -45,7 +37,7 @@ class NoTranslationInspection : TranslationInspection() {
         if (element is PsiLiteralExpression) {
             val result = LiteralTranslationIdentifier().identify(element)
             if (result != null && !result.containsVariable && result.text == null) {
-                holder.registerProblem(element, "The given translation key does not exist", ProblemHighlightType.GENERIC_ERROR, CreateTranslationQuickFix, ChangeTranslationQuickFix( "Use existing translation"))
+                holder.registerProblem(element, "The given translation key does not exist", ProblemHighlightType.GENERIC_ERROR, CreateTranslationQuickFix, ChangeTranslationQuickFix("Use existing translation"))
             }
         }
     }

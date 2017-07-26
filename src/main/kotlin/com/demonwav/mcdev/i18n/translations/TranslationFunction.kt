@@ -24,7 +24,6 @@ import com.demonwav.mcdev.util.isReturningResultOf
 import com.demonwav.mcdev.util.isSameReference
 import com.demonwav.mcdev.util.referencedMethod
 import com.demonwav.mcdev.util.substituteParameter
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiCall
 import com.intellij.psi.PsiElement

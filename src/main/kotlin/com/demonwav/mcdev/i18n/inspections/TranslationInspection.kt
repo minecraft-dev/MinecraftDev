@@ -11,8 +11,6 @@
 package com.demonwav.mcdev.i18n.inspections
 
 import com.intellij.codeInspection.BaseJavaLocalInspectionTool
-import com.intellij.codeInspection.InspectionManager
-import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiClass

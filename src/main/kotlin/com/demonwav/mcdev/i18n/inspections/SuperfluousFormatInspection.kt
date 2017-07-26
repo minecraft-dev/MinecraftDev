@@ -17,9 +17,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteralExpression
 import org.jetbrains.annotations.Nls
 
-class MissingFormatInspection : TranslationInspection() {
+class SuperfluousFormatInspection : TranslationInspection() {
     @Nls
-    override fun getDisplayName() = "Detect missing format arguments for translations"
+    override fun getDisplayName() = "Detect superfluous format arguments for translations"
 
     override fun checkElement(element: PsiElement?, holder: ProblemsHolder) {
         if (element is PsiLiteralExpression) {
