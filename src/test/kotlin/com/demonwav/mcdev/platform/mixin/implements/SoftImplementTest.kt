@@ -60,7 +60,7 @@ class SoftImplementTest : BaseMixinTest() {
         return code.replace('_', '$')
     }
 
-    fun testSoftImplements() {
+    fun `test soft implements`() {
         myFixture.enableInspections(SoftImplementOverridesInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }

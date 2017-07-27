@@ -14,32 +14,32 @@ import com.intellij.psi.PsiClass
 
 class McPsiClassTest : OuterClassTest() {
 
-    fun testOuterFullQualifiedName() = assertEquals("com.example.test.OuterClass", outerClass.fullQualifiedName)
-    fun testOuterShortName() = assertEquals("OuterClass", outerClass.shortName)
+    fun `test outer full qualified name`() = assertEquals("com.example.test.OuterClass", outerClass.fullQualifiedName)
+    fun `test outer short name`() = assertEquals("OuterClass", outerClass.shortName)
 
-    fun testOuterAnonymousFullQualifiedName() = assertEquals("com.example.test.OuterClass$1", outerAnonymousClass.fullQualifiedName)
-    fun testOuterAnonymousShortName() = assertEquals("OuterClass.1", outerAnonymousClass.shortName)
+    fun `test outer anonymous full qualified name`() = assertEquals("com.example.test.OuterClass$1", outerAnonymousClass.fullQualifiedName)
+    fun `test outer anonymous short name`() = assertEquals("OuterClass.1", outerAnonymousClass.shortName)
 
-    fun testInnerFullQualifiedName() = assertEquals("com.example.test.OuterClass\$InnerClass", innerClass.fullQualifiedName)
-    fun testInnerShortName() = assertEquals("OuterClass.InnerClass", innerClass.shortName)
+    fun `test inner full qualified name`() = assertEquals("com.example.test.OuterClass\$InnerClass", innerClass.fullQualifiedName)
+    fun `test inner short name`() = assertEquals("OuterClass.InnerClass", innerClass.shortName)
 
-    fun testInnerAnonymousFullQualifiedName() =
+    fun `test inner anonymous full qualified name`() =
             assertEquals("com.example.test.OuterClass\$InnerClass$1", innerAnonymousClass.fullQualifiedName)
-    fun testInnerAnonymousShortName() = assertEquals("OuterClass.InnerClass.1", innerAnonymousClass.shortName)
+    fun `test inner anonymous short name`() = assertEquals("OuterClass.InnerClass.1", innerAnonymousClass.shortName)
 
-    fun testInnerAnonymousInnerFullQualifiedName() =
+    fun `test inner anonymous inner full qualified name`() =
             assertEquals("com.example.test.OuterClass\$InnerClass$1\$AnonymousInnerClass", innerAnonymousInnerClass.fullQualifiedName)
-    fun testInnerAnonymousInnerShortName() = assertEquals("OuterClass.InnerClass.1.AnonymousInnerClass", innerAnonymousInnerClass.shortName)
+    fun `test inner anonymous inner short name`() = assertEquals("OuterClass.InnerClass.1.AnonymousInnerClass", innerAnonymousInnerClass.shortName)
 
     private fun findQualifiedClass(fullQualifiedName: String): PsiClass? {
         return findQualifiedClass(project, fullQualifiedName)
     }
 
-    fun testFindOuter() = assertSame(outerClass, findQualifiedClass("com.example.test.OuterClass"))
-    fun testFindOuterAnonymous() = assertSame(outerAnonymousClass, findQualifiedClass("com.example.test.OuterClass$1"))
-    fun testFindInner() = assertSame(innerClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass"))
-    fun testFindInnerAnonymous() = assertSame(innerAnonymousClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass$1"))
-    fun testFindInnerAnonymousInner() =
+    fun `test find outer`() = assertSame(outerClass, findQualifiedClass("com.example.test.OuterClass"))
+    fun `test find outerAnonymous`() = assertSame(outerAnonymousClass, findQualifiedClass("com.example.test.OuterClass$1"))
+    fun `test find inner`() = assertSame(innerClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass"))
+    fun `test find inner anonymous`() = assertSame(innerAnonymousClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass$1"))
+    fun `test find inner anonymous inner`() =
             assertSame(innerAnonymousInnerClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass$1\$AnonymousInnerClass"))
 
 }

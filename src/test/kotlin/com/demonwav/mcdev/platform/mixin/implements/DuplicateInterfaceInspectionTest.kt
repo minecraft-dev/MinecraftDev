@@ -51,7 +51,7 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
         myFixture.checkHighlighting(true, false, false)
     }
 
-    fun testGood() {
+    fun `test no highlight on no duplicate interface`() {
         doTest("""
             package test;
 
@@ -70,7 +70,7 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
         """)
     }
 
-    fun testBad() {
+    fun `test highlight on duplicate interface`() {
         doTest("""
             package test;
 

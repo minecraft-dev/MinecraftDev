@@ -16,12 +16,12 @@ import com.intellij.testFramework.ParsingTestCase
 class AtParsingTest : ParsingTestCase("com/demonwav/mcdev/platform/mcp/at/parser/fixtures", "cfg", true, AtParserDefinition()) {
 
     override fun getTestDataPath() = "src/test/resources"
-    override fun getTestName(lowercaseFirstLetter: Boolean) = super.getTestName(lowercaseFirstLetter).toSnakeCase("_at")
+    override fun getTestName(lowercaseFirstLetter: Boolean) = super.getTestName(lowercaseFirstLetter).substring(1).toSnakeCase("_at")
 
-    fun testAsterisks() = doTest(true)
-    fun testComments() = doTest(true)
-    fun testFields() = doTest(true)
-    fun testFuncs() = doTest(true)
-    fun testKeywords() = doTest(true)
-    fun testNoValue() = doTest(true)
+    fun `test asterisks`() = doTest(true)
+    fun `test comments`() = doTest(true)
+    fun `test fields`() = doTest(true)
+    fun `test funcs`() = doTest(true)
+    fun `test keywords`() = doTest(true)
+    fun `test no value`() = doTest(true)
 }

@@ -56,7 +56,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
         }
     }
 
-    fun testIfInterfaceIsInterface() {
+    fun `test if @Interface is interface`() {
         myFixture.enableInspections(InterfaceIsInterfaceInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }

@@ -43,7 +43,7 @@ class EmptyImplementsTest : BaseMixinTest() {
         myFixture.checkHighlighting(true, false, false)
     }
 
-    fun testEmpty() {
+    fun `test highlight on empty @Implements`() {
         doTest("""
             package test;
 
@@ -59,7 +59,7 @@ class EmptyImplementsTest : BaseMixinTest() {
         """)
     }
 
-    fun testSingle() {
+    fun `test no highlight with single @Implements`() {
         doTest("""
             package test;
 
@@ -75,7 +75,7 @@ class EmptyImplementsTest : BaseMixinTest() {
         """)
     }
 
-    fun testMultiple() {
+    fun `test no highlight with mutli @Implements`() {
         doTest("""
             package test;
 
