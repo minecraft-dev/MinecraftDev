@@ -29,10 +29,10 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.1.1" // kept in sync with IntelliJ's bundled dep
+    id("org.jetbrains.kotlin.jvm") version "1.1.3-2" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.2.13"
+    id("org.jetbrains.intellij") version "0.2.15"
     id("net.minecrell.licenser") version "0.3"
 }
 
@@ -91,7 +91,7 @@ java {
     }
 }
 
-val gradleToolingExtension = java().sourceSets["gradle-tooling-extension"]!!
+val gradleToolingExtension = java.sourceSets["gradle-tooling-extension"]!!
 val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
     from(gradleToolingExtension.output)
     classifier = "gradle-tooling-extension"
@@ -174,7 +174,7 @@ test {
 idea {
     module {
         generatedSourceDirs.add(file("gen"))
-        excludeDirs.add(file(intellij().sandboxDirectory))
+        excludeDirs.add(file(intellij.sandboxDirectory))
     }
 }
 
@@ -246,13 +246,13 @@ val generate = task("generate") {
     outputs.dir("gen")
 }
 
-java().sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
+java.sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 
 // Workaround for KT-16764
 compileKotlin.inputs.dir(generate)
 
 runIde {
-    findProperty("intellijJre")?.let(this::setExecutable)
+    (findProperty("intellijJre") as? String)?.let(this::setExecutable)
 
     System.getProperty("debug")?.let {
         systemProperty("idea.ProcessCanceledException", "disabled")
@@ -261,7 +261,7 @@ runIde {
 }
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
-fun KotlinDependencyHandler.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
+fun DependencyHandlerScope.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
 fun intellijPlugin(name: String) = mapOf(
     "group" to "org.jetbrains.plugins",
     "name" to name,
