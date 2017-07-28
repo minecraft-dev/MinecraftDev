@@ -252,6 +252,8 @@ java.sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 compileKotlin.inputs.dir(generate)
 
 runIde {
+    maxHeapSize = "2G"
+
     (findProperty("intellijJre") as? String)?.let(this::setExecutable)
 
     System.getProperty("debug")?.let {
