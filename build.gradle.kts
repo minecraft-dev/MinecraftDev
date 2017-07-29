@@ -113,7 +113,7 @@ dependencies {
     "grammar-kit"("org.jetbrains.idea:grammar-kit:1.5.1")
 
     "testLibs"("org.jetbrains.idea:mockJDK:1.7-4d76c50")
-    "testLibs"("org.spongepowered:mixin:0.6.8-SNAPSHOT:thin")
+    "testLibs"("org.spongepowered:mixin:0.7-SNAPSHOT:thin")
 }
 
 intellij {
