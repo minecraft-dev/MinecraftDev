@@ -11,8 +11,8 @@
 package com.demonwav.mcdev.platform.liteloader.version
 
 import com.demonwav.mcdev.util.fromJson
+import com.demonwav.mcdev.util.gson
 import com.demonwav.mcdev.util.sortVersions
-import com.google.gson.Gson
 import java.io.IOException
 import java.net.URL
 
@@ -28,7 +28,7 @@ class LiteLoaderVersion private constructor(private var map: Map<*, *>) {
             try {
                 val text = URL("http://dl.liteloader.com/versions/versions.json").readText()
 
-                val map = Gson().fromJson<Map<*, *>>(text)
+                val map = gson.fromJson<Map<*, *>>(text)
                 val liteLoaderVersion = LiteLoaderVersion(map)
                 liteLoaderVersion.sortedMcVersions
                 return liteLoaderVersion

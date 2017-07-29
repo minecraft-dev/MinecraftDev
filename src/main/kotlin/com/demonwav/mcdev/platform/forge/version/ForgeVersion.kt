@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.platform.forge.version
 
+import com.demonwav.mcdev.util.gson
 import com.demonwav.mcdev.util.sortVersions
-import com.google.gson.Gson
 import java.io.IOException
 import java.net.URL
 import java.util.ArrayList
@@ -81,7 +81,7 @@ class ForgeVersion private constructor(private val map: Map<*, *>) {
             try {
                 val text = URL("https://files.minecraftforge.net/maven/net/minecraftforge/forge/json").readText()
 
-                val map = Gson().fromJson(text, Map::class.java)
+                val map = gson.fromJson(text, Map::class.java)
                 val forgeVersion = ForgeVersion(map)
                 forgeVersion.sortedMcVersions // sort em up
                 return forgeVersion

@@ -12,9 +12,11 @@ package com.demonwav.mcdev.error
 
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.fromJson
-import com.google.gson.Gson
+import com.demonwav.mcdev.util.gson
 import com.intellij.ide.plugins.PluginManager
+import com.intellij.util.io.readCharSequence
 import org.apache.commons.io.IOUtils
+import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -25,7 +27,7 @@ object AnonymousFeedback {
     const val url = "https://www.demonwav.com/errorReport"
 
     fun sendFeedback(factory: HttpConnectionFactory, envDetails: LinkedHashMap<String, String?>): FeedbackData {
-        val duplicateId = findDuplicateIssue(envDetails)
+        val duplicateId = findDuplicateIssue(envDetails, factory)
         if (duplicateId != null) {
             // This is a duplicate
             val commentUrl = sendCommentOnDuplicateIssue(duplicateId, factory, convertToGitHubIssueFormat(envDetails))
@@ -40,7 +42,7 @@ object AnonymousFeedback {
         val result = LinkedHashMap<String, String>(5)
         result.put("title", "[auto-generated] Exception in plugin")
         result.put("body", generateGitHubIssueBody(envDetails))
-        return Gson().toJson(result).toByteArray()
+        return gson.toJson(result).toByteArray()
     }
 
     private fun generateGitHubIssueBody(body: LinkedHashMap<String, String?>): String {
@@ -77,6 +79,7 @@ object AnonymousFeedback {
 
     private fun sendFeedback(factory: HttpConnectionFactory, payload: ByteArray): Pair<String, Int> {
         val connection = getConnection(factory, url)
+        connection.connect()
         connection.outputStream.use {
             it.write(payload)
         }
@@ -90,8 +93,9 @@ object AnonymousFeedback {
         val body = connection.inputStream.use {
             IOUtils.toString(it, contentEncoding)
         }
+        connection.disconnect()
 
-        val json = Gson().fromJson<Map<*, *>>(body)
+        val json = gson.fromJson<Map<*, *>>(body)
         return json["html_url"] as String to (json["number"] as Double).toInt()
     }
 
@@ -102,11 +106,11 @@ object AnonymousFeedback {
         return connection
     }
 
-    private fun findDuplicateIssue(envDetails: LinkedHashMap<String, String?>): Int? {
+    private fun findDuplicateIssue(envDetails: LinkedHashMap<String, String?>, factory: HttpConnectionFactory): Int? {
         val stack = envDetails["error.stacktrace"]?.replace("\\d+".toRegex(), "") ?: return null
 
-        val text = URL("https://api.github.com/repos/minecraft-dev/MinecraftDev/issues?state=all&creator=minecraft-dev-autoreporter").readText()
-        val list = Gson().fromJson<List<Map<*, *>>>(text)
+        val list = getAllIssues("https://api.github.com/repos/minecraft-dev/MinecraftDev/issues" +
+                                    "?state=all&creator=minecraft-dev-autoreporter&per_page=100", factory) ?: return null
         val block = list.firstOrNull {
             val body = it["body"] as? String ?: return@firstOrNull false
 
@@ -122,6 +126,65 @@ object AnonymousFeedback {
             stackText.replace("\\d+".toRegex(), "") == stack
         } ?: return null
         return (block["number"] as Double).toInt()
+    }
+
+    private fun getAllIssues(url: String, factory: HttpConnectionFactory): List<Map<*, *>>? {
+        var connection = connect(factory, url)
+        connection.requestMethod = "GET"
+        connection.setRequestProperty("User-Agent", userAgent)
+
+        connection.connect()
+        if (connection.responseCode != 200) {
+            connection.disconnect()
+            return null
+        }
+
+        val list = mutableListOf<Map<*, *>>()
+        var data = connection.inputStream.reader().use(InputStreamReader::readCharSequence).toString()
+
+        var response = gson.fromJson<List<Map<*, *>>>(data)
+        list.addAll(response)
+
+        var link = connection.getHeaderField("Link")
+        connection.disconnect()
+
+        var next = getNextLink(link)
+        while (next != null) {
+            connection = connect(factory, next)
+            connection.requestMethod = "GET"
+            connection.setRequestProperty("User-Agent", userAgent)
+
+            connection.connect()
+            if (connection.responseCode != 200) {
+                connection.disconnect()
+                continue
+            }
+
+            data = connection.inputStream.reader().use(InputStreamReader::readCharSequence).toString()
+
+            response = gson.fromJson<List<Map<*, *>>>(data)
+            list.addAll(response)
+
+            link = connection.getHeaderField("Link")
+            connection.disconnect()
+            next = getNextLink(link)
+        }
+
+        return list
+    }
+
+    private fun getNextLink(link: String): String? {
+        val lines = link.split(",")
+        for (line in lines) {
+            if (!line.contains("rel=\"next\"")) {
+                continue
+            }
+
+            val parts = line.split(";")
+            return parts[0].substring(1, parts[0].length-1)
+        }
+
+        return null
     }
 
     private fun sendCommentOnDuplicateIssue(id: Int, factory: HttpConnectionFactory, payload: ByteArray): String {
@@ -140,21 +203,13 @@ object AnonymousFeedback {
         val body = connection.inputStream.use {
             IOUtils.toString(it, contentEncoding)
         }
+        connection.disconnect()
 
-        val json = Gson().fromJson<Map<*, *>>(body)
+        val json = gson.fromJson<Map<*, *>>(body)
         return json["html_url"] as String
     }
 
     private fun getConnection(factory: HttpConnectionFactory, url: String): HttpURLConnection {
-        var userAgent = "Minecraft Development IntelliJ IDEA plugin"
-
-        val pluginDescription = PluginManager.getPlugin(PluginUtil.PLUGIN_ID)
-        if (pluginDescription != null) {
-            val name = pluginDescription.name
-            val version = pluginDescription.version
-            userAgent = "$name ($version)"
-        }
-
         val connection = connect(factory, url)
         connection.doOutput = true
         connection.requestMethod = "POST"
@@ -162,6 +217,18 @@ object AnonymousFeedback {
         connection.setRequestProperty("Content-Type", "application/json")
 
         return connection
+    }
+
+    private val userAgent by lazy {
+        var agent = "Minecraft Development IntelliJ IDEA plugin"
+
+        val pluginDescription = PluginManager.getPlugin(PluginUtil.PLUGIN_ID)
+        if (pluginDescription != null) {
+            val name = pluginDescription.name
+            val version = pluginDescription.version
+            agent = "$name ($version)"
+        }
+        agent
     }
 
     open class HttpConnectionFactory {

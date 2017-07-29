@@ -133,6 +133,9 @@ fun Module.findChildren(): Set<Module> {
     }
 }
 
+// Keep a single gson constant around rather than initializing it everywhere
+val gson = Gson()
+
 inline fun <reified T : Any> Gson.fromJson(text: String): T {
     // Using the ugly TypeToken approach we can any complex generic signature, including
     // nested generics
