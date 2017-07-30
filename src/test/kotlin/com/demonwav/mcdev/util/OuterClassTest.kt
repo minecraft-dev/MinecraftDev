@@ -13,6 +13,7 @@ package com.demonwav.mcdev.util
 import com.demonwav.mcdev.framework.ProjectBuilderTest
 import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiJavaFile
 
 abstract class OuterClassTest : ProjectBuilderTest() {
@@ -55,5 +56,9 @@ abstract class OuterClassTest : ProjectBuilderTest() {
         this.innerClass = outerClass.innerClasses.single()
         this.innerAnonymousClass = innerClass.anonymousElements!!.single() as PsiAnonymousClass
         this.innerAnonymousInnerClass = innerAnonymousClass.innerClasses.single()
+    }
+
+    protected fun assertEquivalent(a: PsiElement, b: PsiElement?) {
+        assertTrue("Expected $a == $b", a.manager.areElementsEquivalent(a, b))
     }
 }

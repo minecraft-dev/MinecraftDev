@@ -35,11 +35,11 @@ class McPsiClassTest : OuterClassTest() {
         return findQualifiedClass(project, fullQualifiedName)
     }
 
-    fun `test find outer`() = assertSame(outerClass, findQualifiedClass("com.example.test.OuterClass"))
-    fun `test find outerAnonymous`() = assertSame(outerAnonymousClass, findQualifiedClass("com.example.test.OuterClass$1"))
-    fun `test find inner`() = assertSame(innerClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass"))
-    fun `test find inner anonymous`() = assertSame(innerAnonymousClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass$1"))
+    fun `test find outer`() = assertEquivalent(outerClass, findQualifiedClass("com.example.test.OuterClass"))
+    fun `test find outerAnonymous`() = assertEquivalent(outerAnonymousClass, findQualifiedClass("com.example.test.OuterClass$1"))
+    fun `test find inner`() = assertEquivalent(innerClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass"))
+    fun `test find inner anonymous`() = assertEquivalent(innerAnonymousClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass$1"))
     fun `test find inner anonymous inner`() =
-            assertSame(innerAnonymousInnerClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass$1\$AnonymousInnerClass"))
+            assertEquivalent(innerAnonymousInnerClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass$1\$AnonymousInnerClass"))
 
 }
