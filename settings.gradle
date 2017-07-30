@@ -9,4 +9,3 @@
  */
 
 rootProject.name = "MinecraftDev"
-rootProject.buildFileName = "build.gradle.kts"
