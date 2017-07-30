@@ -54,9 +54,6 @@
         <!--region NO PLATFORM-->
         <!---->
 
-        <!-- Allows using multiple inspection suppressors -->
-        <lang.inspectionSuppressor order="first" language="JAVA" implementationClass="com.demonwav.mcdev.util.MultiInspectionSuppressor"/>
-
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
 
         <!-- File templates are for project creations -->
