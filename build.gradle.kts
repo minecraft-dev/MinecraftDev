@@ -251,6 +251,12 @@ java.sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 // Workaround for KT-16764
 compileKotlin.inputs.dir(generate)
 
+// Workaround problems caused by separate output directories for classes in Gradle 4.0
+// gradle-intellij-plugin needs to be updated to support them properly
+java.sourceSets.all {
+    output.classesDir = File(buildDir, "classes/$name")
+}
+
 runIde {
     maxHeapSize = "2G"
 
