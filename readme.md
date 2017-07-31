@@ -21,8 +21,8 @@ Installation
 This plugin is available on the [JetBrains IntelliJ plugin repository](https://plugins.jetbrains.com/plugin/8327).
 
 Because of this, you can install the plugin through IntelliJ's internal plugin browser. Navigate to
-`File -> Settings -> Plugins` and click the `Browser Repositories...` button at the bottom of the window. In the search
-box, simply search for `Minecraft` and this plugin will be the only result it shows. You can install it from there and
+`File -> Settings -> Plugins` and click the `Browse Repositories...` button at the bottom of the window. In the search
+box, simply search for `Minecraft` and this plugin will be the first result it shows. You can install it from there and
 restart IntelliJ to activate the plugin.
 
 Building
