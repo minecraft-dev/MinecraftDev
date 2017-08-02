@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.asset
 
 @Suppress("unused")
-object GeneralAssets {
-    val LISTENER = Assets.loadIcon("/assets/icons/general/EventListener_dark.png")
-    val PLUGIN = Assets.loadIcon("/assets/icons/general/plugin.png")
+object GeneralAssets : Assets() {
+    val LISTENER = loadIcon("/assets/icons/general/EventListener_dark.png")
+    val PLUGIN = loadIcon("/assets/icons/general/plugin.png")
 }
