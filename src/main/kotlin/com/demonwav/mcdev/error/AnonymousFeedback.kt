@@ -46,20 +46,17 @@ object AnonymousFeedback {
     }
 
     private fun generateGitHubIssueBody(body: LinkedHashMap<String, String?>): String {
-        val errorDescription = body["error.description"] ?: ""
-        body.remove("error.description")
+        val errorDescription = body.remove("error.description") ?: ""
 
-        var errorMessage = body["error.message"]
+        var errorMessage = body.remove("error.message")
         if (errorMessage.isNullOrBlank()) {
             errorMessage = "no error"
         }
-        body.remove("error.message")
 
-        var stackTrace = body["error.stacktrace"]
+        var stackTrace = body.remove("error.stacktrace")
         if (stackTrace.isNullOrEmpty()) {
             stackTrace = "no stacktrace"
         }
-        body.remove("error.stacktrace")
 
         val sb = StringBuilder()
 
