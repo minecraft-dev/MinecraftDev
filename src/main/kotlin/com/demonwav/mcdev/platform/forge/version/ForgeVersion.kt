@@ -33,7 +33,7 @@ class ForgeVersion private constructor(private val map: Map<*, *>) {
             }
         }
 
-        return recommended.toString()
+        return recommended.versionString
     }
 
     fun getPromo(version: String): Double? {

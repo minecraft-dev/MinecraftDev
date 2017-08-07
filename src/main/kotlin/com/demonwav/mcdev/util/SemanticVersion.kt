@@ -19,6 +19,8 @@ import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.ReleasePart
  * to the version ranking with decreasing priority from left to right.
  */
 class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion> {
+    val versionString = parts.map { it.versionString }.joinToString(".");
+
     override fun compareTo(other: SemanticVersion): Int {
         // Zipping limits the compared parts to the shorter version, then we perform a component-wise comparison
         // Short-circuits if any component of this version is smaller/older
@@ -38,8 +40,6 @@ class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion
         }
 
     override fun hashCode() = parts.hashCode()
-
-    override fun toString() = parts.map { it.toString() }.joinToString(".")
 
     companion object {
         /**
@@ -71,24 +71,26 @@ class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion
         }
 
         sealed class VersionPart : Comparable<VersionPart> {
+            abstract val versionString: String
+
             data class ReleasePart(val version: Int) : VersionPart() {
+                override val versionString = version.toString()
+
                 override fun compareTo(other: VersionPart) =
                     when (other) {
                         is PreReleasePart -> if (version != other.version) version - other.version else 1
                         is ReleasePart -> version - other.version
                     }
-
-                override fun toString() = version.toString()
             }
 
             data class PreReleasePart(val version: Int, val pre: Int) : VersionPart() {
+                override val versionString = "${version}_pre$pre"
+
                 override fun compareTo(other: VersionPart) =
                     when (other) {
                         is PreReleasePart -> if (version != other.version) version - other.version else pre - other.pre
                         is ReleasePart -> if (version != other.version) version - other.version else -1
                     }
-
-                override fun toString() = "${version}_pre$pre"
             }
         }
     }
