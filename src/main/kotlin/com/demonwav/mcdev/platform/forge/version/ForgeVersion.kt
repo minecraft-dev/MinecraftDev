@@ -24,16 +24,16 @@ class ForgeVersion private constructor(private val map: Map<*, *>) {
     }
 
     fun getRecommended(versions: List<String>): String {
-        var recommended = SemanticVersion("1.7")
+        var recommended = SemanticVersion.parse("1.7")
         for (version in versions) {
             getPromo(version) ?: continue
-            val semantic = SemanticVersion(version)
+            val semantic = SemanticVersion.parse(version)
             if (recommended < semantic) {
                 recommended = semantic
             }
         }
 
-        return recommended.value
+        return recommended.toString()
     }
 
     fun getPromo(version: String): Double? {
