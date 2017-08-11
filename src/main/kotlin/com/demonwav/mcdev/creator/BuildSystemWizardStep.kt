@@ -61,7 +61,6 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
     override fun updateDataModel() {}
 
     override fun onStepLeaving() {
-        super.onStepLeaving()
         creator.groupId = groupIdField.text
         creator.artifactId = artifactIdField.text
         creator.version = versionField.text

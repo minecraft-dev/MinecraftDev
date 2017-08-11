@@ -49,8 +49,6 @@ class SpongeForgeChooser(private val creator: MinecraftProjectCreator) : ModuleW
     }
 
     override fun onStepLeaving() {
-        super.onStepLeaving()
-
         if (singleRadioButton.isSelected) {
             // First remove the singular forge and sponge configurations
             creator.settings

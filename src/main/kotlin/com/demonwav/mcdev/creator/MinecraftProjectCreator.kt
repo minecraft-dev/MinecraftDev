@@ -24,7 +24,6 @@ import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
 import com.google.common.base.MoreObjects
 import com.google.common.base.Objects
 import com.google.common.collect.ImmutableList
-import com.google.common.collect.Maps
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -40,7 +39,7 @@ class MinecraftProjectCreator {
     lateinit var module: Module
     lateinit var buildSystem: BuildSystem
 
-    val settings = Maps.newLinkedHashMap<PlatformType, ProjectConfiguration>()!!
+    val settings = LinkedHashMap<PlatformType, ProjectConfiguration>()
 
     lateinit var sourceDir: VirtualFile
     lateinit var resourceDir: VirtualFile

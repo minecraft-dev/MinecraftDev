@@ -50,6 +50,7 @@ val processResources: AbstractCopyTask by tasks
 val test: Test by tasks
 val runIde: JavaExec by tasks
 val publishPlugin: PublishTask by tasks
+val clean: Task by tasks
 
 configurations {
     "kotlin"()
@@ -262,6 +263,12 @@ runIde {
         systemProperty("idea.debug.mode", "true")
     }
 }
+
+val cleanGen = task<Delete>("cleanGen") {
+    delete = setOf(file("gen"))
+}
+
+clean.dependsOn(cleanGen)
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
 fun DependencyHandlerScope.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
