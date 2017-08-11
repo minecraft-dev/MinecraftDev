@@ -201,6 +201,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         if (fullVersion != null) {
             settings!!.forgeVersion = fullVersion
         }
+        settings!!.mcVersion = minecraftVersionBox.selectedItem as String
     }
 
     fun error() {
