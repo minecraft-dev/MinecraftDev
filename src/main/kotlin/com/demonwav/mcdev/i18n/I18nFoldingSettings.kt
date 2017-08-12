@@ -19,7 +19,7 @@ import com.intellij.openapi.components.Storage
 class I18nFoldingSettings : PersistentStateComponent<I18nFoldingSettings.State> {
 
     data class State(
-        var isShouldFoldTranslations: Boolean = true
+        var shouldFoldTranslations: Boolean = true
     )
 
     private var state = State()
@@ -33,10 +33,10 @@ class I18nFoldingSettings : PersistentStateComponent<I18nFoldingSettings.State> 
     }
 
     // State mappings
-    var isShouldFoldTranslations: Boolean
-        get() = state.isShouldFoldTranslations
+    var shouldFoldTranslations: Boolean
+        get() = state.shouldFoldTranslations
         set(isShouldFoldTranslations) {
-            state.isShouldFoldTranslations = isShouldFoldTranslations
+            state.shouldFoldTranslations = isShouldFoldTranslations
         }
 
     companion object {

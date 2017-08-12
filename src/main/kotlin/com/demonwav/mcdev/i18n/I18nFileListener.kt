@@ -34,7 +34,7 @@ class I18nFileListener : ApplicationComponent, BulkFileListener {
 
     override fun after(events: List<VFileEvent>) {
         for (event in events) {
-            if (event.file != null && event.file!!.fileType === I18nFileType) {
+            if (event.file?.fileType == I18nFileType) {
                 EditorNotifications.updateAll()
             }
         }

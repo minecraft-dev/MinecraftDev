@@ -24,8 +24,8 @@ import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.util.indexing.FileBasedIndex
-import javax.swing.JList
+import com.intellij.ui.components.JBList
+import java.util.Locale
 
 object I18nElementFactory {
     val DOMAIN_PATTERN = Regex("^.*?/assets/(.*?)/lang.*?\$")
@@ -34,8 +34,9 @@ object I18nElementFactory {
         DOMAIN_PATTERN.matchEntire(file.path)?.groupValues?.get(1)
 
     fun addTranslation(module: Module?, name: String, value: String?) {
-        if (module == null || value == null)
+        if (module == null || value == null) {
             return
+        }
         fun write(files: Iterable<VirtualFile>) {
             for (file in files) {
                 val simpleFile = PsiManager.getInstance(module.project).findFile(file)
@@ -48,19 +49,20 @@ object I18nElementFactory {
             }
         }
 
-        val files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, I18nFileType, GlobalSearchScope.moduleScope(module))
-        val fileNames = files.map { it.nameWithoutExtension.toLowerCase() }.filter { it == I18nConstants.DEFAULT_LOCALE }
-        if (fileNames.size > 1) {
-            val choices = files.mapNotNull(this::getResourceDomain).distinct().sortedBy { it }
-            val swingList = JList(choices.toTypedArray())
+        val files = FileTypeIndex.getFiles(I18nFileType, GlobalSearchScope.moduleScope(module))
+        if (files.count { it.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE } > 1) {
+            val choices = files.mapNotNull(this::getResourceDomain).distinct().sorted()
+            val swingList = JBList(choices)
             JBPopupFactory.getInstance()
                 .createListPopupBuilder(swingList)
                 .setTitle("Choose resource domain")
                 .setAdText("There are multiple resource domains with localization files, choose one for this translation.")
                 .setItemChoosenCallback {
                     if (swingList.selectedValue != null) {
-                        val validPattern = Regex("^.*?/assets/${Regex.escape(swingList.selectedValue!!)}/lang.*?\$")
-                        write(files.filter { validPattern.matches(it.path) })
+                        swingList.selectedValue?.let {
+                            val validPattern = Regex("^.*?/assets/${Regex.escape(it)}/lang.*?\$")
+                            write(files.filter { validPattern.matches(it.path) })
+                        }
                     }
                 }
                 .createPopup()

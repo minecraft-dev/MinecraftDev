@@ -33,6 +33,6 @@ class ConvertToTranslationAction : AnAction() {
             return
         }
         val element = file.findElementAt(editor.caretModel.offset)
-        e.presentation.isEnabled = element != null && element.parent is PsiLiteral && (element.parent as PsiLiteral).value is String
+        e.presentation.isEnabled = (element?.parent as? PsiLiteral)?.value is String
     }
 }

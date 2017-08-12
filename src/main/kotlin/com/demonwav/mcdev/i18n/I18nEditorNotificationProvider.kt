@@ -24,6 +24,7 @@ import com.intellij.ui.EditorNotificationPanel
 import com.intellij.ui.EditorNotifications
 import com.intellij.util.ui.UIUtil
 import java.awt.Color
+import java.util.Locale
 
 class I18nEditorNotificationProvider(private val project: Project) : EditorNotifications.Provider<I18nEditorNotificationProvider.InfoPanel>() {
     private var show: Boolean = true
@@ -31,7 +32,7 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
     override fun getKey() = KEY
 
     override fun createNotificationPanel(file: VirtualFile, fileEditor: FileEditor): InfoPanel? {
-        if (!show || file.fileType != I18nFileType || file.nameWithoutExtension.toLowerCase() == I18nConstants.DEFAULT_LOCALE) {
+        if (!show || file.fileType != I18nFileType || file.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE) {
             return null
         }
 
@@ -52,8 +53,8 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
                         add(I18nElementFactory.createLineEnding(project))
                     }
                     for (key in defaultKeys) {
-                        if (propertyMap[key]?.value != null) {
-                            add(I18nElementFactory.createProperty(project, key, propertyMap[key]!!.value))
+                        propertyMap[key]?.value?.let {
+                            add(I18nElementFactory.createProperty(project, key, it))
                             add(I18nElementFactory.createLineEnding(project))
                         }
                     }
