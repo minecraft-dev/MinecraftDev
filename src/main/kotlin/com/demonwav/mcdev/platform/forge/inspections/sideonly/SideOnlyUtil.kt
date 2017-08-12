@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.forge.inspections.sideonly
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
+import com.demonwav.mcdev.platform.forge.sided.Side
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.util.Pair

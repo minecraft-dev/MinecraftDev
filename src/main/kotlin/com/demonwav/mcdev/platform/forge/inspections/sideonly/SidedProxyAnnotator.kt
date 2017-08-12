@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
+import com.demonwav.mcdev.platform.forge.sided.Side
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.google.common.base.Strings
 import com.intellij.lang.annotation.AnnotationHolder

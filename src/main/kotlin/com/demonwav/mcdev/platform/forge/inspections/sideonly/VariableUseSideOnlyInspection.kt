@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.demonwav.mcdev.platform.forge.sided.Side
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.impl.source.PsiFieldImpl

@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.demonwav.mcdev.platform.forge.sided.Side
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiField
 import com.siyeh.ig.BaseInspection
