@@ -58,11 +58,9 @@ object I18nElementFactory {
                 .setTitle("Choose resource domain")
                 .setAdText("There are multiple resource domains with localization files, choose one for this translation.")
                 .setItemChoosenCallback {
-                    if (swingList.selectedValue != null) {
-                        swingList.selectedValue?.let {
-                            val validPattern = Regex("^.*?/assets/${Regex.escape(it)}/lang.*?\$")
-                            write(files.filter { validPattern.matches(it.path) })
-                        }
+                    swingList.selectedValue?.let {
+                        val validPattern = Regex("^.*?/assets/${Regex.escape(it)}/lang.*?\$")
+                        write(files.filter { validPattern.matches(it.path) })
                     }
                 }
                 .createPopup()
