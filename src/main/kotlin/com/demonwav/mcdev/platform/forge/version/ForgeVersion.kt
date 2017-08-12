@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.platform.forge.version
 
-import com.demonwav.mcdev.util.gson
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.gson
 import com.demonwav.mcdev.util.sortVersions
 import java.io.IOException
 import java.net.URL

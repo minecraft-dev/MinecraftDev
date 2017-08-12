@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.forge.sided
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyUtil
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.util.findAnnotation
-import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiClassType
@@ -44,7 +43,7 @@ class SidedFieldCache(project: Project) : SidedCache<PsiField>(project) {
         }
 
         // Now check the class that contains the field
-        val containingClass = field.findContainingClass() ?: return null
+        val containingClass = field.containingClass ?: return null
 
         val state = classCache.getSideState(containingClass)
         if (state != null) {

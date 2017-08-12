@@ -52,3 +52,12 @@ fun toInternalIdentifier(element: PsiElement?): String? {
         else -> null
     }
 }
+
+fun getInferenceReason(state: SideState, name: String?, project: Project): String? {
+    if (state.reasonPointer != null) {
+        val reason = state.computeReason(project)?.name ?: "null"
+        return state.reason?.getText(name ?: "null", state.side.annotation, reason)
+    } else {
+        return null
+    }
+}

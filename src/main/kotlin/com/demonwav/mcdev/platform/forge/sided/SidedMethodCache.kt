@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.forge.sided
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyUtil
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.util.findAnnotation
-import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiClassType
@@ -35,7 +34,7 @@ class SidedMethodCache(project: Project) : SidedCache<PsiMethod>(project) {
         val classCache = SidedClassCache.getInstance(project)
 
         // First check the class the method's in
-        method.findContainingClass()?.let { containingClass ->
+        method.containingClass?.let { containingClass ->
             val state = classCache.getSideState(containingClass)
             if (state != null) {
                 return createResult(SideState(state.side, containingClass, SideReason.IS_CONTAINED_IN))

@@ -11,108 +11,85 @@
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
 import com.demonwav.mcdev.platform.forge.sided.Side
+import com.demonwav.mcdev.platform.forge.sided.SidedClassCache
+import com.demonwav.mcdev.platform.forge.sided.SidedFieldCache
+import com.demonwav.mcdev.platform.forge.sided.getInferenceReason
+import com.demonwav.mcdev.util.shortName
+import com.intellij.codeInspection.BaseJavaBatchLocalInspectionTool
+import com.intellij.codeInspection.ProblemHighlightType
+import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiField
-import com.siyeh.ig.BaseInspection
-import com.siyeh.ig.BaseInspectionVisitor
-import com.siyeh.ig.InspectionGadgetsFix
-import org.jetbrains.annotations.Nls
 
-class FieldDeclarationSideOnlyInspection : BaseInspection() {
+class FieldDeclarationSideOnlyInspection : BaseJavaBatchLocalInspectionTool() {
 
-    @Nls
     override fun getDisplayName() = "Invalid usage of @SideOnly in field declaration"
-
-    override fun buildErrorString(vararg infos: Any): String {
-        val error = infos[0] as Error
-        return error.getErrorString(*SideOnlyUtil.getSubArray(infos))
-    }
 
     override fun getStaticDescription(): String? {
         return "A field in a class annotated for one side cannot be declared as being in the other side. For example, a class which is " +
             "annotated as @SideOnly(Side.SERVER) cannot contain a field which is annotated as @SideOnly(Side.CLIENT). Since a class that " +
-            "is annotated with @SideOnly brings everything with it, @SideOnly annotated fields are usually useless"
+            "is annotated with @SideOnly brings everything with it, @SideOnly annotated fields are usually useless in that case"
     }
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
-        val field = infos[3] as PsiField
+    override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = Visitor(holder)
 
-        if (field.isWritable) {
-            return object : RemoveAnnotationInspectionGadgetsFix() {
-                override val listOwner = field
-                @Nls
-                override fun getName() = "Remove @SideOnly annotation from field"
+    private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
+        private val project = holder.project
+        private val fieldCache = SidedFieldCache.getInstance(project)
+        private val classCache = SidedClassCache.getInstance(project)
+
+        override fun visitField(field: PsiField) {
+            if (!SideOnlyUtil.beginningCheck(field)) {
+                return
             }
-        } else {
-            return null
-        }
-    }
 
-    override fun buildVisitor(): BaseInspectionVisitor {
-        return object : BaseInspectionVisitor() {
-            override fun visitField(field: PsiField) {
-                val psiClass = field.containingClass ?: return
+            val fieldState = fieldCache.getSideState(field) ?: return
+            val containingClass = field.containingClass ?: return
+            val containingClassState = classCache.getSideState(containingClass)
 
-                if (!SideOnlyUtil.beginningCheck(field)) {
-                    return
-                }
+            if (fieldState.side === Side.INVALID) {
+                return
+            }
 
-                val fieldSide = SideOnlyUtil.checkField(field)
-                if (fieldSide === Side.INVALID) {
-                    return
-                }
+            val fieldInference = getInferenceReason(fieldState, field.name, project)
 
-                val classSide = SideOnlyUtil.getSideForClass(psiClass)
+            if (containingClassState != null && containingClassState.side !== Side.INVALID) {
+                if (fieldState.side !== containingClassState.side) {
+                    val classInference = getInferenceReason(containingClassState, containingClass.shortName, project)
 
-                if (fieldSide !== Side.NONE && fieldSide !== classSide) {
-                    if (classSide !== Side.NONE && classSide !== Side.INVALID) {
-                        registerFieldError(field, Error.CLASS_CROSS_ANNOTATED, fieldSide.annotation, classSide.annotation, field)
-                    } else if (classSide !== Side.NONE) {
-                        registerFieldError(field, Error.CLASS_UNANNOTATED, fieldSide.annotation, null, field)
+                    val text = buildString {
+                        append("Field with side of ").append(fieldState.side.annotation)
+                        append(" cannot be declared in a class with side of ").append(containingClassState.side.annotation)
+                        fieldInference?.let { append('\n').append(it) }
+                        classInference?.let { append('\n').append(it) }
                     }
-                }
 
-                if (fieldSide === Side.NONE) {
+                    holder.registerProblem(field, text, ProblemHighlightType.ERROR)
+                }
+            }
+
+            (field.type as? PsiClassType)?.resolve()?.let { fieldClass ->
+                val fieldClassState = classCache.getSideState(fieldClass) ?: return
+
+                if (fieldClassState.side === Side.INVALID) {
                     return
                 }
 
-                if (field.type !is PsiClassType) {
-                    return
-                }
+                if (fieldState.side !== fieldClassState.side) {
+                    val fieldClassInference = getInferenceReason(fieldClassState, fieldClass.shortName, project)
 
-                val type = field.type as PsiClassType
-                val fieldClass = type.resolve() ?: return
+                    val text = buildString {
+                        append("Field with type side of ").append(fieldClassState.side.annotation)
+                        append(" cannot be declared with side of ").append(fieldState.side.annotation)
+                        fieldClassInference?.let { append('\n').append(it) }
+                        fieldInference?.let { append('\n').append(it) }
+                    }
 
-                val fieldClassSide = SideOnlyUtil.getSideForClass(fieldClass)
-
-                if (fieldClassSide === Side.NONE || fieldClassSide === Side.INVALID) {
-                    return
-                }
-
-                if (fieldClassSide !== fieldSide) {
-                    registerFieldError(field, Error.FIELD_CROSS_ANNOTATED, fieldClassSide.annotation, fieldSide.annotation, field)
+                    holder.registerProblem(field, text, ProblemHighlightType.ERROR)
                 }
             }
         }
-    }
-
-    enum class Error {
-        CLASS_UNANNOTATED {
-            override fun getErrorString(vararg infos: Any): String {
-                return "Field with type annotation ${infos[1]} cannot be declared in an un-annotated class"
-            }
-        },
-        CLASS_CROSS_ANNOTATED {
-            override fun getErrorString(vararg infos: Any): String {
-                return "Field annotated with ${infos[0]} cannot be declared inside a class annotated with ${infos[1]}."
-            }
-        },
-        FIELD_CROSS_ANNOTATED {
-            override fun getErrorString(vararg infos: Any): String {
-                return "Field with type annotation ${infos[0]} cannot be declared as ${infos[1]}."
-            }
-        };
-
-        abstract fun getErrorString(vararg infos: Any): String
     }
 }
