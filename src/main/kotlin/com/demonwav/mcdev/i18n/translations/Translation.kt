@@ -15,6 +15,7 @@ import com.demonwav.mcdev.i18n.reference.I18nReference
 import com.demonwav.mcdev.i18n.translations.identifiers.LiteralTranslationIdentifier
 import com.demonwav.mcdev.i18n.translations.identifiers.ReferenceTranslationIdentifier
 import com.demonwav.mcdev.platform.mcp.util.McpConstants
+import com.demonwav.mcdev.util.MemberReference
 import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.openapi.editor.FoldingGroup
 import com.intellij.openapi.util.TextRange
@@ -43,39 +44,33 @@ data class Translation(val foldingElement: PsiElement?,
         }
 
         val translationFunctions = listOf(
-            TranslationFunction(I18nConstants.I18N_CLIENT_CLASS,
-                I18nConstants.FORMAT,
-                "Ljava.lang.String;[Ljava.lang.Object;",
+            TranslationFunction(
+                MemberReference(I18nConstants.FORMAT, "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;", I18nConstants.I18N_CLIENT_CLASS),
                 0,
                 formatting = true,
                 obfuscatedName = true),
-            TranslationFunction(I18nConstants.I18N_COMMON_CLASS,
-                I18nConstants.TRANSLATE_TO_LOCAL,
-                "Ljava.lang.String;",
+            TranslationFunction(
+                MemberReference(I18nConstants.TRANSLATE_TO_LOCAL, "(Ljava/lang/String;)Ljava/lang/String;", I18nConstants.I18N_COMMON_CLASS),
                 0,
                 formatting = false,
                 obfuscatedName = true),
-            TranslationFunction(I18nConstants.I18N_COMMON_CLASS,
-                I18nConstants.TRANSLATE_TO_LOCAL_FORMATTED,
-                "Ljava.lang.String;[Ljava.lang.Object;",
+            TranslationFunction(
+                MemberReference(I18nConstants.TRANSLATE_TO_LOCAL_FORMATTED, "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;", I18nConstants.I18N_COMMON_CLASS),
                 0,
                 formatting = true,
                 obfuscatedName = true),
-            TranslationFunction(I18nConstants.TRANSLATION_COMPONENT_CLASS,
-                I18nConstants.TRANSLATION_COMPONENT_CONSTRUCTOR,
-                "Ljava.lang.String;[Ljava.lang.Object;",
+            TranslationFunction(
+                MemberReference(I18nConstants.CONSTRUCTOR, "(Ljava/lang/String;[Ljava/lang/Object;)V", I18nConstants.TRANSLATION_COMPONENT_CLASS),
                 0,
                 formatting = true,
                 foldParameters = true),
-            TranslationFunction(I18nConstants.COMMAND_EXCEPTION_CLASS,
-                I18nConstants.COMMAND_EXCEPTION_CONSTRUCTOR,
-                "Ljava.lang.String;[Ljava.lang.Object;",
+            TranslationFunction(
+                MemberReference(I18nConstants.CONSTRUCTOR, "(Ljava/lang/String;[Ljava/lang/Object;)V", I18nConstants.COMMAND_EXCEPTION_CLASS),
                 0,
                 formatting = true,
                 foldParameters = true),
-            TranslationFunction(McpConstants.BLOCK,
-                I18nConstants.SET_BLOCK_NAME,
-                "Ljava.lang.String;",
+            TranslationFunction(
+                MemberReference(I18nConstants.SET_BLOCK_NAME, "(Ljava/lang/String;)V", McpConstants.BLOCK),
                 0,
                 formatting = false,
                 setter = true,
@@ -83,9 +78,8 @@ data class Translation(val foldingElement: PsiElement?,
                 prefix = "tile.",
                 suffix = ".name",
                 obfuscatedName = true),
-            TranslationFunction(McpConstants.ITEM,
-                I18nConstants.SET_ITEM_NAME,
-                "Ljava.lang.String;",
+            TranslationFunction(
+                MemberReference(I18nConstants.SET_ITEM_NAME, "(Ljava/lang/String;)V", McpConstants.ITEM),
                 0,
                 formatting = false,
                 setter = true,

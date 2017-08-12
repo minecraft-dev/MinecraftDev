@@ -34,7 +34,7 @@ val PsiCall.referencedMethod: PsiMethod?
 
 inline fun PsiMethodCallExpression.checkForReference(method: PsiMethod, reference: PsiMethod?, paramIndex: Int, referenceParamIndex: Int, recurse: (PsiMethod) -> Boolean): Boolean {
     val ref = this.referencedMethod
-    if (ref != null && ref.isSameReference(reference)) {
+    if (ref.isSameReference(reference)) {
         val param = this.argumentList.expressions[referenceParamIndex]
         if (param is PsiReferenceExpression) {
             val paramRef = param.advancedResolve(false).element
@@ -75,7 +75,7 @@ fun PsiCall.getSupers(reference: PsiMethod, paramIndex: Int, referenceParamIndex
     val value = findFirstMethodCall(method)
     if (value is PsiMethodCallExpression) {
         val ref = value.referencedMethod
-        if (ref != null && ref.isSameReference(reference)) {
+        if (ref.isSameReference(reference)) {
             val param = value.argumentList.expressions[referenceParamIndex]
             if (param is PsiReferenceExpression) {
                 val paramRef = param.advancedResolve(false).element
@@ -113,7 +113,7 @@ fun PsiCall.getCalls(reference: PsiMethod, paramIndex: Int, referenceParamIndex:
     val value = findFirstMethodCall(method)
     if (value is PsiMethodCallExpression) {
         val ref = value.referencedMethod
-        if (ref != null && ref.isSameReference(reference)) {
+        if (ref.isSameReference(reference)) {
             val param = value.argumentList.expressions[referenceParamIndex]
             if (param is PsiReferenceExpression) {
                 val paramRef = param.advancedResolve(false).element
@@ -153,7 +153,7 @@ fun PsiCall.getCallsReturningResult(reference: PsiMethod, paramIndex: Int, refer
         val value = returnStatement.returnValue
         if (value is PsiMethodCallExpression) {
             val ref = value.referencedMethod
-            if (ref != null && ref.isSameReference(reference)) {
+            if (ref.isSameReference(reference)) {
                 val param = value.argumentList.expressions[referenceParamIndex]
                 if (param is PsiReferenceExpression) {
                     val paramRef = param.advancedResolve(false).element

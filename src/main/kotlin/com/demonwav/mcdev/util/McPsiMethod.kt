@@ -15,14 +15,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiPolyadicExpression
 import com.intellij.psi.PsiReferenceExpression
-import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.util.PsiUtil
-
-fun PsiMethod.isSameReference(reference: PsiMethod?): Boolean =
-    this === reference || (reference != null &&
-        containingClass?.fullQualifiedName == reference.containingClass?.fullQualifiedName &&
-        name == reference.name &&
-        getSignature(PsiSubstitutor.EMPTY) == reference.getSignature(PsiSubstitutor.EMPTY))
 
 fun PsiMethod.isCalling(reference: PsiMethod?, paramIndex: Int, referenceParamIndex: Int): Boolean {
     if (isSameReference(reference) && paramIndex == referenceParamIndex) {
@@ -58,7 +51,7 @@ fun PsiMethod.isReturningResultOf(reference: PsiMethod?, paramIndex: Int, refere
         val value = returnStatement.returnValue
         if (value is PsiMethodCallExpression) {
             val ref = value.referencedMethod
-            if (ref != null && ref.isSameReference(reference)) {
+            if (ref.isSameReference(reference)) {
                 val param = value.argumentList.expressions[referenceParamIndex]
                 if (param is PsiReferenceExpression) {
                     val paramRef = param.advancedResolve(false).element
