@@ -11,12 +11,12 @@
 package com.demonwav.mcdev.platform.mixin.folding
 
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
+import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
-import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
-import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.CustomFoldingBuilder
 import com.intellij.lang.folding.FoldingDescriptor
+import com.intellij.navigation.NavigationItem
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.CommonClassNames
@@ -50,27 +50,25 @@ class MixinFoldingBuilder : CustomFoldingBuilder() {
         }
     }
 
+    private fun formatElement(element: PsiElement): String? {
+        return when (element) {
+            is PsiMethod -> PsiFormatUtil.formatMethod(element, PsiSubstitutor.EMPTY,
+                PsiFormatUtilBase.SHOW_NAME or PsiFormatUtilBase.SHOW_PARAMETERS or SHOW_CONTAINING_CLASS,
+                PsiFormatUtilBase.SHOW_TYPE)
+            is PsiVariable -> PsiFormatUtil.formatVariable(element,
+                PsiFormatUtilBase.SHOW_NAME or SHOW_CONTAINING_CLASS, PsiSubstitutor.EMPTY)
+            is NavigationItem -> element.presentation?.presentableText
+            else -> null
+        }
+    }
+
     override fun getLanguagePlaceholderText(node: ASTNode, range: TextRange): String {
         val element = node.psi
-        when (element) {
-            is PsiTypeCastExpression -> {
-                val castText = element.castType?.text ?: return node.text
-                return "($castText)"
-            }
-            is PsiAnnotationMemberValue -> {
-                val value = element.constantStringValue ?: return node.text
-                val member = MixinMemberReference.parse(value)?.resolveMember(element.project, element.resolveScope) ?: return node.text
-                return when (member) {
-                    is PsiMethod -> PsiFormatUtil.formatMethod(member, PsiSubstitutor.EMPTY,
-                        PsiFormatUtilBase.SHOW_NAME or PsiFormatUtilBase.SHOW_PARAMETERS or SHOW_CONTAINING_CLASS,
-                        PsiFormatUtilBase.SHOW_TYPE)
-                    is PsiVariable -> PsiFormatUtil.formatVariable(member, PsiFormatUtilBase.SHOW_NAME or SHOW_CONTAINING_CLASS, PsiSubstitutor.EMPTY)
-                    else -> member.presentation?.presentableText ?: node.text
-                }
-            }
+        return when (element) {
+            is PsiTypeCastExpression -> "(${element.castType?.text ?: return node.text})"
+            is PsiAnnotationMemberValue -> TargetReference.resolveTarget(element)?.let { formatElement(it) } ?: node.text
+            else -> node.text
         }
-
-        return node.text
     }
 
     override fun buildLanguageFoldRegions(descriptors: MutableList<FoldingDescriptor>, root: PsiElement, document: Document, quick: Boolean) {

@@ -67,6 +67,11 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
         return handler.usesMemberReference()
     }
 
+    fun resolveTarget(context: PsiElement): PsiElement? {
+        val handler = getHandler(context.annotationFromValue ?: return null) ?: return null
+        return handler.resolveTarget(context)
+    }
+
     private fun getTargetMethod(at: PsiAnnotation): PsiMethod? {
         // TODO: Right now this will only work for Mixins with a single target class
         val methodValue = at.annotationFromArrayValue?.findDeclaredAttributeValue("method") ?: return null
@@ -116,6 +121,8 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
         open fun usesMemberReference() = false
 
+        abstract fun resolveTarget(context: PsiElement): PsiElement?
+
         abstract fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass,
                                                       checkOnly: Boolean): CollectVisitor<out PsiElement>?
         abstract fun createCollectUsagesVisitor(): CollectVisitor<T>
@@ -128,6 +135,11 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
         override final fun usesMemberReference() = true
 
         protected abstract fun createLookup(targetClass: PsiClass, m: T, owner: PsiClass): LookupElementBuilder
+
+        override open fun resolveTarget(context: PsiElement): PsiElement? {
+            val value = context.constantStringValue ?: return null
+            return MixinMemberReference.parse(value)?.resolveMember(context.project, context.resolveScope)
+        }
 
         protected open fun getInternalName(m: QualifiedMember<T>): String {
             return m.member.name!!
