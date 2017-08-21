@@ -45,16 +45,17 @@ object MixinConstants {
         const val INJECT = "org.spongepowered.asm.mixin.injection.Inject"
         const val INVOKER = "org.spongepowered.asm.mixin.gen.Invoker"
         const val MODIFY_ARG = "org.spongepowered.asm.mixin.injection.ModifyArg"
+        const val MODIFY_ARGS = "org.spongepowered.asm.mixin.injection.ModifyArgs"
         const val MODIFY_CONSTANT = "org.spongepowered.asm.mixin.injection.ModifyConstant"
         const val MODIFY_VARIABLE = "org.spongepowered.asm.mixin.injection.ModifyVariable"
         const val REDIRECT = "org.spongepowered.asm.mixin.injection.Redirect"
         const val SURROGATE = "org.spongepowered.asm.mixin.injection.Surrogate"
 
-        val METHOD_INJECTORS = listOf(INJECT, MODIFY_ARG, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT)
-        val ENTRY_POINTS = arrayOf(INJECT, MODIFY_ARG, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE, OVERWRITE)
+        val METHOD_INJECTORS = listOf(INJECT, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT)
+        val ENTRY_POINTS = arrayOf(INJECT, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE, OVERWRITE)
         val MIXIN_ANNOTATIONS = setOf(
             ACCESSOR, AT, DEBUG, FINAL, IMPLEMENTS, INTERFACE, INTRINSIC, MIXIN, MUTABLE, OVERWRITE, SHADOW, SOFT_OVERRIDE, UNIQUE, INJECT,
-            INVOKER, MODIFY_ARG, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE)
+            INVOKER, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE)
 
     }
 }
