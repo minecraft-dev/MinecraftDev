@@ -27,6 +27,7 @@ open class ForgeProjectConfiguration : ProjectConfiguration() {
 
     var mcpVersion: String = ""
     var forgeVersion: String = ""
+    var mcVersion: String = ""
 
     init {
         type = PlatformType.FORGE

@@ -34,7 +34,6 @@ import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
-import com.intellij.psi.impl.compiled.ClsMethodImpl
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTypesUtil
 import org.jetbrains.annotations.Contract

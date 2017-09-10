@@ -62,7 +62,11 @@ data class MemberReference(val name: String, val descriptor: String? = null,
 
     @Contract(pure = true)
     private inline fun <R> resolve(project: Project, scope: GlobalSearchScope, ret: (PsiClass, PsiMember) -> R): R? {
-        val psiClass = findQualifiedClass(project, this.owner!!, scope) ?: return null
+        if (this.owner == null) {
+            throw IllegalStateException("Cannot resolve unqualified member reference (owner == null)")
+        }
+
+        val psiClass = findQualifiedClass(project, this.owner, scope) ?: return null
 
         val member: PsiMember? = if (descriptor != null && descriptor.startsWith('(')) {
             // Method, we assume there is only one (since this member descriptor is full qualified)

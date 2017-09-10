@@ -18,7 +18,7 @@ import java.lang.ref.SoftReference
 import java.util.ResourceBundle
 import com.intellij.reference.SoftReference as IJSoftReference
 
-object MessageAssets {
+object MessageAssets : Assets() {
     fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any): String {
         return CommonBundle.message(bundle, key, *params)
     }

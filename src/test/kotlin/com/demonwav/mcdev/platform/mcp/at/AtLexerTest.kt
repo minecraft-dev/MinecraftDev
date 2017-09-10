@@ -23,7 +23,7 @@ class AtLexerTest : LexerTestCase() {
     override fun getDirPath() = "src/test/resources/com/demonwav/mcdev/platform/mcp/at/lexer/fixtures"
     override fun createLexer() = AtLexerAdapter()
 
-    override fun getTestName(lowercaseFirstLetter: Boolean) = super.getTestName(lowercaseFirstLetter).toSnakeCase("_at")
+    override fun getTestName(lowercaseFirstLetter: Boolean) = super.getTestName(lowercaseFirstLetter).substring(1).toSnakeCase("_at")
 
     // Copied because it wasn't handling the paths correctly
     private fun doTest() {
@@ -41,11 +41,11 @@ class AtLexerTest : LexerTestCase() {
         UsefulTestCase.assertSameLinesWithFile(dirPath + "/" + getTestName(true) + ".txt", result)
     }
 
-    fun testClassNames() = doTest()
-    fun testClassValues() = doTest()
-    fun testComments() = doTest()
-    fun testFuncs() = doTest()
-    fun testKeywords() = doTest()
-    fun testNames() = doTest()
-    fun testPrimitives() = doTest()
+    fun `test class names`() = doTest()
+    fun `test class values`() = doTest()
+    fun `test comments`() = doTest()
+    fun `test funcs`() = doTest()
+    fun `test keywords`() = doTest()
+    fun `test names`() = doTest()
+    fun `test primitives`() = doTest()
 }

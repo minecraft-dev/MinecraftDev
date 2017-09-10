@@ -20,7 +20,6 @@ import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
-import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiClass

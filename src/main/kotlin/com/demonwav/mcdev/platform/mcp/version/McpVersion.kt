@@ -11,9 +11,8 @@
 package com.demonwav.mcdev.platform.mcp.version
 
 import com.demonwav.mcdev.util.fromJson
+import com.demonwav.mcdev.util.gson
 import com.demonwav.mcdev.util.sortVersions
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.io.IOException
 import java.net.URL
 import java.util.ArrayList
@@ -77,7 +76,7 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
         fun downloadData(): McpVersion? {
             try {
                 val text = URL("http://export.mcpbot.bspk.rs/versions.json").readText()
-                val map = Gson().fromJson<Map<String, Map<String, List<Int>>>>(text)
+                val map = gson.fromJson<Map<String, Map<String, List<Int>>>>(text)
                 val mcpVersion = McpVersion(map)
                 mcpVersion.versions
                 return mcpVersion

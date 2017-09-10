@@ -58,7 +58,7 @@ class SuperClassTest : BaseMixinTest() {
         myFixture.checkHighlighting(true, false, false)
     }
 
-    fun testNone() {
+    fun `test no mixin superclass`() {
         doTest("""
             package test;
 
@@ -72,7 +72,7 @@ class SuperClassTest : BaseMixinTest() {
     }
 
 
-    fun testCool() {
+    fun `test good mixin superclass`() {
         doTest("""
             package test;
 
@@ -85,7 +85,7 @@ class SuperClassTest : BaseMixinTest() {
         """)
     }
 
-    fun testNotItself() {
+    fun `test mixin not its own superclass`() {
         doTest("""
             package test;
 
@@ -98,7 +98,7 @@ class SuperClassTest : BaseMixinTest() {
         """)
     }
 
-    fun testHierarchy() {
+    fun `test mixin class hierarchy not found`() {
         doTest("""
             package test;
 

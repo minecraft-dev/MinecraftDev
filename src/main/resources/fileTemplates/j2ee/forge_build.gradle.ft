@@ -12,7 +12,7 @@ buildscript {
 #end
     }
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT"
+        classpath "net.minecraftforge.gradle:ForgeGradle:${FORGEGRADLE_VERSION}-SNAPSHOT"
 #if (${SPONGE_FORGE})
         classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
 #end

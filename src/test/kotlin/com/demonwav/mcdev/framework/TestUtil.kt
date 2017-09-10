@@ -42,6 +42,4 @@ fun createLibrary(project: Project, name: String): Library {
 }
 
 fun String.toSnakeCase(postFix: String = "") =
-    split("(?=[A-Z])".toRegex())
-        .map(String::toLowerCase)
-        .joinToString("_") + postFix
+    replace(" ", "_") + postFix

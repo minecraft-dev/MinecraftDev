@@ -8,12 +8,7 @@
  * MIT License
  */
 
-import org.gradle.api.tasks.AbstractCopyTask
-import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.api.tasks.testing.Test
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -29,10 +24,10 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.1.1" // kept in sync with IntelliJ's bundled dep
+    id("org.jetbrains.kotlin.jvm") version "1.1.3-2" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.2.13"
+    id("org.jetbrains.intellij") version "0.2.15"
     id("net.minecrell.licenser") version "0.3"
 }
 
@@ -55,6 +50,7 @@ val processResources: AbstractCopyTask by tasks
 val test: Test by tasks
 val runIde: JavaExec by tasks
 val publishPlugin: PublishTask by tasks
+val clean: Task by tasks
 
 configurations {
     "kotlin"()
@@ -91,7 +87,7 @@ java {
     }
 }
 
-val gradleToolingExtension = java().sourceSets["gradle-tooling-extension"]!!
+val gradleToolingExtension = java.sourceSets["gradle-tooling-extension"]!!
 val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
     from(gradleToolingExtension.output)
     classifier = "gradle-tooling-extension"
@@ -113,7 +109,7 @@ dependencies {
     "grammar-kit"("org.jetbrains.idea:grammar-kit:1.5.1")
 
     "testLibs"("org.jetbrains.idea:mockJDK:1.7-4d76c50")
-    "testLibs"("org.spongepowered:mixin:0.6.8-SNAPSHOT:thin")
+    "testLibs"("org.spongepowered:mixin:0.7-SNAPSHOT:thin")
 }
 
 intellij {
@@ -174,7 +170,7 @@ test {
 idea {
     module {
         generatedSourceDirs.add(file("gen"))
-        excludeDirs.add(file(intellij().sandboxDirectory))
+        excludeDirs.add(file(intellij.sandboxDirectory))
     }
 }
 
@@ -246,13 +242,21 @@ val generate = task("generate") {
     outputs.dir("gen")
 }
 
-java().sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
+java.sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 
 // Workaround for KT-16764
 compileKotlin.inputs.dir(generate)
 
+// Workaround problems caused by separate output directories for classes in Gradle 4.0
+// gradle-intellij-plugin needs to be updated to support them properly
+java.sourceSets.all {
+    output.classesDir = File(buildDir, "classes/$name")
+}
+
 runIde {
-    findProperty("intellijJre")?.let(this::setExecutable)
+    maxHeapSize = "2G"
+
+    (findProperty("intellijJre") as? String)?.let(this::setExecutable)
 
     System.getProperty("debug")?.let {
         systemProperty("idea.ProcessCanceledException", "disabled")
@@ -260,8 +264,14 @@ runIde {
     }
 }
 
+val cleanGen = task<Delete>("cleanGen") {
+    delete = setOf(file("gen"))
+}
+
+clean.dependsOn(cleanGen)
+
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
-fun KotlinDependencyHandler.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
+fun DependencyHandlerScope.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
 fun intellijPlugin(name: String) = mapOf(
     "group" to "org.jetbrains.plugins",
     "name" to name,

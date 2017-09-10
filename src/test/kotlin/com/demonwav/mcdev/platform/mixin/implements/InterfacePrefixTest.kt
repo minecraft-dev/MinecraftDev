@@ -48,7 +48,7 @@ class InterfacePrefixTest : BaseMixinTest() {
         }
     }
 
-    fun testInterfacePrefixInspection() {
+    fun `test interface prefix inspection`() {
         myFixture.enableInspections(InterfacePrefixInspection::class.java)
         myFixture.checkHighlighting(true, false, false)
     }

@@ -46,7 +46,7 @@ class AccessorMixinTest : BaseMixinTest() {
         test(psiClass!!)
     }
 
-    fun testAccessorMixin() = doTest("AccessorMixin", """
+    fun `test accessor mixin`() = doTest("AccessorMixin", """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;
@@ -64,7 +64,7 @@ class AccessorMixinTest : BaseMixinTest() {
         assertTrue(psiClass.isAccessorMixin)
     }
 
-    fun testMissingAnnotation() = doTest("MissingAnnotationAccessorMixin", """
+    fun `test missing accessor annotation`() = doTest("MissingAnnotationAccessorMixin", """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;
@@ -82,7 +82,7 @@ class AccessorMixinTest : BaseMixinTest() {
         assertFalse(psiClass.isAccessorMixin)
     }
 
-    fun testTargetInterface() = doTest("TargetInterface", """
+    fun `test accessor target interface`() = doTest("TargetInterface", """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;
@@ -100,7 +100,7 @@ class AccessorMixinTest : BaseMixinTest() {
         assertFalse(psiClass.isAccessorMixin)
     }
 
-    fun testOnlyAccessors() = doTest("AccessorMixin", """
+    fun `test only accessors`() = doTest("AccessorMixin", """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;
@@ -115,7 +115,7 @@ class AccessorMixinTest : BaseMixinTest() {
         assertTrue(psiClass.isAccessorMixin)
     }
 
-    fun testOnlyInvokers() = doTest("AccessorMixin", """
+    fun `test only invokers`() = doTest("AccessorMixin", """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Invoker;
@@ -130,7 +130,7 @@ class AccessorMixinTest : BaseMixinTest() {
         assertTrue(psiClass.isAccessorMixin)
     }
 
-    fun testNonInterfaceAccessorMixin() = doTest("NonInterfaceAccessorMixin", """
+    fun `test non-interface accessor mixin`() = doTest("NonInterfaceAccessorMixin", """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;
@@ -146,7 +146,7 @@ class AccessorMixinTest : BaseMixinTest() {
         assertFalse(psiClass.isAccessorMixin)
     }
 
-    fun testNonInterfaceTargetInterface() = doTest("NonInterfaceTargetInterface", """
+    fun `test non-interface target interface`() = doTest("NonInterfaceTargetInterface", """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;

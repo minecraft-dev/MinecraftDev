@@ -73,7 +73,6 @@ class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreat
     }
 
     override fun onStepLeaving() {
-        super.onStepLeaving()
         this.settings!!.pluginName = pluginNameField.text
         this.settings!!.pluginVersion = pluginVersionField.text
         this.settings!!.mainClass = mainClassField.text

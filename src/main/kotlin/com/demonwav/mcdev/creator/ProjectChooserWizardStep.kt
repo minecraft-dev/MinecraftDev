@@ -208,31 +208,31 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
     }
 
     companion object {
-        private val bukkitInfo = "Create a standard " +
+        private const val bukkitInfo = "Create a standard " +
             "<a href=\"https://bukkit.org/\">Bukkit</a> plugin, for use " +
             "on CraftBukkit, Spigot, and Paper servers."
-        private val spigotInfo = "Create a standard " +
+        private const val spigotInfo = "Create a standard " +
             "<a href=\"https://www.spigotmc.org/\">Spigot</a> plugin, for use " +
             "on Spigot and Paper servers."
-        private val paperInfo = "Create a standard " +
+        private const val paperInfo = "Create a standard " +
             "<a href=\"https://paper.emc.gs\">Paper</a> plugin, for use " +
             "on Paper servers."
-        private val bungeeCordInfo = "Create a standard " +
+        private const val bungeeCordInfo = "Create a standard " +
             "<a href=\"https://www.spigotmc.org/wiki/bungeecord/\">BungeeCord</a> plugin, for use " +
             "on BungeeCord servers."
-        private val spongeInfo = "Create a standard " +
+        private const val spongeInfo = "Create a standard " +
             "<a href=\"https://www.spongepowered.org/\">Sponge</a> plugin, for use " +
             "on Sponge servers."
-        private val forgeInfo = "Create a standard " +
+        private const val forgeInfo = "Create a standard " +
             "<a href=\"https://files.minecraftforge.net/\">Forge</a> mod, for use " +
             "on Forge servers and clients."
-        private val liteLoaderInfo = "Create a standard " +
+        private const val liteLoaderInfo = "Create a standard " +
             "<a href=\"http://www.liteloader.com/\">LiteLoader</a> mod, for use " +
             "on LiteLoader clients."
-        private val canaryInfo = "Create a standard " +
+        private const val canaryInfo = "Create a standard " +
             "<a href=\"https://canarymod.net/\">Canary</a> plugin, for use " +
             "on CanaryMod and Neptune servers."
-        private val neptuneInfo = "Create a standard " +
+        private const val neptuneInfo = "Create a standard " +
             "<a href=\"https://www.neptunepowered.org/\">Neptune</a> plugin, for use " +
             "on Neptune servers."
     }

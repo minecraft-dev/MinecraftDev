@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.findQualifiedClass
 import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.shortName
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
@@ -20,6 +21,11 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNewExpression
 
 object ConstructorTargetReference : TargetReference.Handler<PsiClass>() {
+
+    override fun resolveTarget(context: PsiElement): PsiElement? {
+        val name = context.constantStringValue?.replace('/', '.') ?: return null
+        return findQualifiedClass(name, context)
+    }
 
     override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass, checkOnly: Boolean): CollectVisitor<out PsiElement>? {
         val name = context.constantStringValue?.replace('/', '.') ?: return null
