@@ -159,7 +159,7 @@ object AnonymousFeedback {
 
             data = connection.inputStream.reader().use(InputStreamReader::readCharSequence).toString()
 
-            response = gson.fromJson<List<Map<*, *>>>(data)
+            response = gson.fromJson(data)
             list.addAll(response)
 
             link = connection.getHeaderField("Link")

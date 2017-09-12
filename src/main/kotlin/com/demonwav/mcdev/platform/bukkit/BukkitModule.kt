@@ -116,9 +116,7 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
         val annotation = method.modifierList.findAnnotation(BukkitConstants.HANDLER_ANNOTATION) ?: return null
 
         // We are in an event method
-        val annotationMemberValue = annotation.findAttributeValue("ignoreCancelled") as? PsiLiteralExpression ?: return null
-
-        val value = annotationMemberValue
+        val value = annotation.findAttributeValue("ignoreCancelled") as? PsiLiteralExpression ?: return null
         if (value.value !is Boolean) {
             return null
         }

@@ -29,7 +29,6 @@ import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
-import com.intellij.psi.impl.compiled.ClsMethodImpl
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.annotations.Contract
 
@@ -97,7 +96,7 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         val psiClass = element.parent as PsiClass
 
         val modifierList = psiClass.modifierList
-        return modifierList != null && modifierList.findAnnotation(SpongeConstants.PLUGIN_ANNOTATION) != null
+        return modifierList?.findAnnotation(SpongeConstants.PLUGIN_ANNOTATION) != null
     }
 
     override fun checkUselessCancelCheck(expression: PsiMethodCallExpression): IsCancelled? {
@@ -106,9 +105,8 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         // Make sure this is an event listener method
         method.modifierList.findAnnotation(SpongeConstants.LISTENER_ANNOTATION) ?: return null
 
-        var isCancelled = false
         val annotation = method.modifierList.findAnnotation(SpongeConstants.IS_CANCELLED_ANNOTATION)
-        if (annotation != null) {
+        val isCancelled = if (annotation != null) {
             val value = annotation.findAttributeValue("value") ?: return null
 
             val text = value.text
@@ -119,38 +117,27 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
             val sub = text.substring(text.lastIndexOf('.') + 1)
             when (sub) {
-                "TRUE" -> isCancelled = true
-                "FALSE" -> isCancelled = false
+                "TRUE" -> true
+                "FALSE" -> false
                 else -> return null
             }
+        } else {
+            false
         }
 
         val methodExpression = expression.methodExpression
-        val qualifierExpression = methodExpression.qualifierExpression
-        val resolve = methodExpression.resolve()
-
-        if (qualifierExpression == null) {
-            return null
-        }
-        if (resolve == null) {
-            return null
-        }
-
+        val qualifierExpression = methodExpression.qualifierExpression ?: return null
         if (standardSkip(method, qualifierExpression)) {
             return null
         }
 
-        val content = resolve.context as? PsiClass ?: return null
-
-        if (!content.extendsOrImplements(SpongeConstants.CANCELLABLE)) {
-            return null
-        }
-
-        if (resolve !is ClsMethodImpl) {
-            return null
-        }
-
+        val resolve = methodExpression.resolve() as? PsiMethod ?: return null
         if (resolve.name != SpongeConstants.EVENT_ISCANCELLED_METHOD_NAME) {
+            return null
+        }
+
+        val content = resolve.containingClass ?: return null
+        if (!content.extendsOrImplements(SpongeConstants.CANCELLABLE)) {
             return null
         }
 

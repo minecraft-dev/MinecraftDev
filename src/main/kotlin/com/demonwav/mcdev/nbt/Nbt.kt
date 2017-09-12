@@ -34,11 +34,11 @@ import java.util.zip.ZipException
 object Nbt {
 
     private fun getActualInputStream(stream: InputStream): Pair<DataInputStream, Boolean> {
-        try {
-            return DataInputStream(GZIPInputStream(stream)) to true
+        return try {
+            DataInputStream(GZIPInputStream(stream)) to true
         } catch (e: ZipException) {
             stream.reset()
-            return DataInputStream(stream) to false
+            DataInputStream(stream) to false
         }
     }
 
@@ -134,20 +134,20 @@ object Nbt {
     }
 
     private fun DataInputStream.readTag(tagId: NbtTypeId, start: Long, timeout: Long): NbtTag {
-        when (tagId) {
-            NbtTypeId.END -> return TagEnd
-            NbtTypeId.BYTE -> return this.readByteTag(start, timeout)
-            NbtTypeId.SHORT -> return this.readShortTag(start, timeout)
-            NbtTypeId.INT -> return this.readIntTag(start, timeout)
-            NbtTypeId.LONG -> return this.readLongTag(start, timeout)
-            NbtTypeId.FLOAT -> return this.readFloatTag(start, timeout)
-            NbtTypeId.DOUBLE -> return this.readDoubleTag(start, timeout)
-            NbtTypeId.BYTE_ARRAY -> return this.readByteArrayTag(start, timeout)
-            NbtTypeId.STRING -> return this.readStringTag(start, timeout)
-            NbtTypeId.LIST -> return this.readListTag(start, timeout)
-            NbtTypeId.COMPOUND -> return this.readCompoundTag(start, timeout)
-            NbtTypeId.INT_ARRAY -> return this.readIntArrayTag(start, timeout)
-            NbtTypeId.LONG_ARRAY -> return this.readLongArrayTag(start, timeout)
+        return when (tagId) {
+            NbtTypeId.END -> TagEnd
+            NbtTypeId.BYTE -> this.readByteTag(start, timeout)
+            NbtTypeId.SHORT -> this.readShortTag(start, timeout)
+            NbtTypeId.INT -> this.readIntTag(start, timeout)
+            NbtTypeId.LONG -> this.readLongTag(start, timeout)
+            NbtTypeId.FLOAT -> this.readFloatTag(start, timeout)
+            NbtTypeId.DOUBLE -> this.readDoubleTag(start, timeout)
+            NbtTypeId.BYTE_ARRAY -> this.readByteArrayTag(start, timeout)
+            NbtTypeId.STRING -> this.readStringTag(start, timeout)
+            NbtTypeId.LIST -> this.readListTag(start, timeout)
+            NbtTypeId.COMPOUND -> this.readCompoundTag(start, timeout)
+            NbtTypeId.INT_ARRAY -> this.readIntArrayTag(start, timeout)
+            NbtTypeId.LONG_ARRAY -> this.readLongArrayTag(start, timeout)
         }
     }
 

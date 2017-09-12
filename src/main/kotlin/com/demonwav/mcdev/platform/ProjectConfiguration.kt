@@ -41,7 +41,7 @@ abstract class ProjectConfiguration {
         authors.addAll(commaSplit(string))
     }
 
-    fun hasDescription() = !description.isNullOrBlank()
+    fun hasDescription() = description.isNotBlank()
 
     protected fun commaSplit(string: String) =
         string.trim().replace("[\\[\\]]".toRegex(), "").split("\\s*,\\s*".toRegex()).toTypedArray()
@@ -62,10 +62,10 @@ abstract class ProjectConfiguration {
         for (i in 0 until (files.size - 1)) {
             val s = files[i]
             val temp = movingFile.findChild(s)
-            if (temp != null && temp.isDirectory) {
-                movingFile = temp
+            movingFile = if (temp != null && temp.isDirectory) {
+                temp
             } else {
-                movingFile = movingFile.createChildDirectory(this, s)
+                movingFile.createChildDirectory(this, s)
             }
         }
 

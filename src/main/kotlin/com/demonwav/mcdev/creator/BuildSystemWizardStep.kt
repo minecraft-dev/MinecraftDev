@@ -72,10 +72,10 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
     }
 
     private fun createBuildSystem(): BuildSystem {
-        if (buildSystemBox.selectedIndex == 0) {
-            return MavenBuildSystem()
+        return if (buildSystemBox.selectedIndex == 0) {
+            MavenBuildSystem()
         } else {
-            return GradleBuildSystem()
+            GradleBuildSystem()
         }
     }
 
@@ -89,7 +89,7 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
                 throw EmptyFieldSetupException(artifactIdField)
             }
 
-            if (versionField.text.trim { it <= ' ' }.isEmpty()) {
+            if (versionField.text.isBlank()) {
                 throw EmptyFieldSetupException(versionField)
             }
 

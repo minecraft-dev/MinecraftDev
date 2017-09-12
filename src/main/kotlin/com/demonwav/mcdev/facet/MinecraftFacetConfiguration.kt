@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.facet
 
-import com.demonwav.mcdev.platform.MinecraftFacetEditorTab
 import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.facet.FacetConfiguration
 import com.intellij.facet.ui.FacetEditorContext

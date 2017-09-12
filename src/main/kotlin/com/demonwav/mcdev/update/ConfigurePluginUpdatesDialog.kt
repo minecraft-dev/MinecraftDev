@@ -37,15 +37,16 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
             PluginUpdater.runUpdateCheck { pluginUpdateStatus ->
                 form.updateCheckInProgressIcon.suspend()
 
-                if (pluginUpdateStatus is PluginUpdateStatus.LatestVersionInstalled) {
-                    form.updateStatusLabel.text = "You have the latest version of the plugin (${PluginUtil.pluginVersion}) installed."
-                } else if (pluginUpdateStatus is PluginUpdateStatus.Update) {
-                    update = pluginUpdateStatus
-                    form.installButton.isVisible = true
-                    form.updateStatusLabel.text = "A new version (${pluginUpdateStatus.pluginDescriptor.version}) is available"
-                } else {
-                    // CheckFailed
-                    form.updateStatusLabel.text = "Update check failed: " + (pluginUpdateStatus as PluginUpdateStatus.CheckFailed).message
+                form.updateStatusLabel.text = when (pluginUpdateStatus) {
+                    is PluginUpdateStatus.LatestVersionInstalled ->
+                        "You have the latest version of the plugin (${PluginUtil.pluginVersion}) installed."
+                    is PluginUpdateStatus.Update -> {
+                        update = pluginUpdateStatus
+                        form.installButton.isVisible = true
+                        "A new version (${pluginUpdateStatus.pluginDescriptor.version}) is available"
+                    }
+                    else -> // CheckFailed
+                        "Update check failed: " + (pluginUpdateStatus as PluginUpdateStatus.CheckFailed).message
                 }
 
                 false

@@ -31,7 +31,7 @@ class AtLexerTest : LexerTestCase() {
         var text = ""
         try {
             val fileText = FileUtil.loadFile(File(fileName))
-            text = StringUtil.convertLineSeparators(if (shouldTrim()) fileText.trim { it <= ' ' } else fileText)
+            text = StringUtil.convertLineSeparators(if (shouldTrim()) fileText.trim() else fileText)
         } catch (e: IOException) {
             fail("can't load file " + fileName + ": " + e.message)
         }

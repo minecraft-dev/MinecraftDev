@@ -80,7 +80,7 @@ class MavenBuildSystem : BuildSystem() {
                         root.addAfter(url, properties)
                     }
 
-                    if (!configuration.description.isNullOrEmpty()) {
+                    if (configuration.description.isNotEmpty()) {
                         val description = root.createChildTag("description", null, configuration.description, false)
                         root.addBefore(description, properties)
                     }

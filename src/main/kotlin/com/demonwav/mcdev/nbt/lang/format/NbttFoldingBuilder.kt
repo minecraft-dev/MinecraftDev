@@ -78,22 +78,20 @@ class NbttFoldingBuilder : FoldingBuilder {
     override fun isCollapsedByDefault(node: ASTNode): Boolean {
         val psi = node.psi
 
-        val size = if (psi is NbttByteArray) {
-            psi.getByteParams()?.byteList?.size ?: 0
-        } else if (psi is NbttIntArray) {
-            psi.getIntParams()?.intList?.size ?: 0
-        } else if (psi is NbttList) {
-            psi.getListParams()?.tagList?.size ?: 0
-        } else if (psi is NbttCompound) {
-            if (psi.getNamedTagList().size == 1) {
-                val tag = psi.getNamedTagList()[0].tag
-                if (tag.getList() == null && tag.getCompound() == null && tag.getIntArray() == null && tag.getByteArray() == null) {
-                    return true
+        val size = when (psi) {
+            is NbttByteArray -> psi.getByteParams()?.byteList?.size ?: 0
+            is NbttIntArray -> psi.getIntParams()?.intList?.size ?: 0
+            is NbttList -> psi.getListParams()?.tagList?.size ?: 0
+            is NbttCompound -> {
+                if (psi.getNamedTagList().size == 1) {
+                    val tag = psi.getNamedTagList()[0].tag
+                    if (tag.getList() == null && tag.getCompound() == null && tag.getIntArray() == null && tag.getByteArray() == null) {
+                        return true
+                    }
                 }
+                psi.getNamedTagList().size
             }
-            psi.getNamedTagList().size
-        } else {
-            0
+            else -> 0
         }
 
         return size > 50 // TODO arbitrary? make a setting?

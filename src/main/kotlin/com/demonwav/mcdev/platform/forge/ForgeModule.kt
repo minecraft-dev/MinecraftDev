@@ -136,7 +136,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         val psiClass = element.parent as PsiClass
 
         val modifierList = psiClass.modifierList
-        return modifierList != null && modifierList.findAnnotation(ForgeConstants.MOD_ANNOTATION) != null
+        return modifierList?.findAnnotation(ForgeConstants.MOD_ANNOTATION) != null
     }
 
     override fun checkUselessCancelCheck(expression: PsiMethodCallExpression) = null

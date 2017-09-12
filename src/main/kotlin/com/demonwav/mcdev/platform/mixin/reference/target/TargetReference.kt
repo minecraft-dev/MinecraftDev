@@ -144,7 +144,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
         protected abstract fun createLookup(targetClass: PsiClass, m: T, owner: PsiClass): LookupElementBuilder
 
-        override open fun resolveTarget(context: PsiElement): PsiElement? {
+        override fun resolveTarget(context: PsiElement): PsiElement? {
             val value = context.constantStringValue ?: return null
             return MixinMemberReference.parse(value)?.resolveMember(context.project, context.resolveScope)
         }

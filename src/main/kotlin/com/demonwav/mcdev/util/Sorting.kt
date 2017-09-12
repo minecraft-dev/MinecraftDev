@@ -18,7 +18,7 @@ import java.util.stream.Stream
 
 val LEXICOGRAPHICAL_ORDER: Comparator<IntArray> = Comparator { one, two ->
     val length = Math.min(one.size, two.size)
-    for (i in 0..length - 1) {
+    for (i in 0 until length) {
         val first = one[i]
         val second = two[i]
 
