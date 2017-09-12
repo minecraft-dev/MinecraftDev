@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.reference.target
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SLICE
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.platform.mixin.util.findSource
 import com.demonwav.mcdev.util.annotationFromArrayValue
@@ -74,7 +75,14 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
     private fun getTargetMethod(at: PsiAnnotation): PsiMethod? {
         // TODO: Right now this will only work for Mixins with a single target class
-        val methodValue = at.annotationFromArrayValue?.findDeclaredAttributeValue("method") ?: return null
+        val parentAnnotation = at.annotationFromArrayValue ?: return null
+        val injectorAnnotation = if (parentAnnotation.qualifiedName == SLICE) {
+            parentAnnotation.annotationFromValue ?: return null
+        } else {
+            parentAnnotation
+        }
+
+        val methodValue = injectorAnnotation.findDeclaredAttributeValue("method") ?: return null
         return MethodReference.resolveIfUnique(methodValue)?.findSource()
     }
 

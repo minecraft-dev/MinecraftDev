@@ -40,6 +40,7 @@ object MixinConstants {
         const val MUTABLE = "org.spongepowered.asm.mixin.Mutable"
         const val OVERWRITE = "org.spongepowered.asm.mixin.Overwrite"
         const val SHADOW = "org.spongepowered.asm.mixin.Shadow"
+        const val SLICE = "org.spongepowered.asm.mixin.injection.Slice"
         const val SOFT_OVERRIDE = "org.spongepowered.asm.mixin.SoftOverride"
         const val UNIQUE = "org.spongepowered.asm.mixin.Unique"
         const val INJECT = "org.spongepowered.asm.mixin.injection.Inject"
