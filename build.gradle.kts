@@ -27,7 +27,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.1.3-2" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.2.15"
+    id("org.jetbrains.intellij") version "0.2.17"
     id("net.minecrell.licenser") version "0.3"
 }
 
@@ -50,7 +50,7 @@ val processResources: AbstractCopyTask by tasks
 val test: Test by tasks
 val runIde: JavaExec by tasks
 val publishPlugin: PublishTask by tasks
-val clean: Task by tasks
+val clean: Delete by tasks
 
 configurations {
     "kotlin"()
@@ -244,14 +244,11 @@ val generate = task("generate") {
 
 java.sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 
+// Remove gen directory on clean
+clean.delete(generate)
+
 // Workaround for KT-16764
 compileKotlin.inputs.dir(generate)
-
-// Workaround problems caused by separate output directories for classes in Gradle 4.0
-// gradle-intellij-plugin needs to be updated to support them properly
-java.sourceSets.all {
-    output.classesDir = File(buildDir, "classes/$name")
-}
 
 runIde {
     maxHeapSize = "2G"
@@ -263,12 +260,6 @@ runIde {
         systemProperty("idea.debug.mode", "true")
     }
 }
-
-val cleanGen = task<Delete>("cleanGen") {
-    delete = setOf(file("gen"))
-}
-
-clean.dependsOn(cleanGen)
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
 fun DependencyHandlerScope.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
