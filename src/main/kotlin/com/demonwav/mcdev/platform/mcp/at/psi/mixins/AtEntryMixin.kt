@@ -35,14 +35,11 @@ interface AtEntryMixin : AtElement {
 
     fun replaceMember(element: AtElement) {
         // One of these must be true
-        if (fieldName != null) {
-            fieldName!!.replace(element)
-        } else if (function != null) {
-            function!!.replace(element)
-        } else if (asterisk != null) {
-            asterisk!!.replace(element)
-        } else {
-            addAfter(className, element)
+        when {
+            fieldName != null -> fieldName!!.replace(element)
+            function != null -> function!!.replace(element)
+            asterisk != null -> asterisk!!.replace(element)
+            else -> addAfter(className, element)
         }
     }
 }

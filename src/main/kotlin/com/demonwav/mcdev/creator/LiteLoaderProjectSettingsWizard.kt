@@ -152,15 +152,15 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
 
     override fun validate(): Boolean {
         try {
-            if (modNameField.text.trim { it <= ' ' }.isEmpty()) {
+            if (modNameField.text.isBlank()) {
                 throw EmptyInputSetupException(modNameField)
             }
 
-            if (modVersionField.text.trim { it <= ' ' }.isEmpty()) {
+            if (modVersionField.text.isBlank()) {
                 throw EmptyInputSetupException(modVersionField)
             }
 
-            if (mainClassField.text.trim { it <= ' ' }.isEmpty()) {
+            if (mainClassField.text.isBlank()) {
                 throw EmptyInputSetupException(mainClassField)
             }
         } catch (e: SetupException) {

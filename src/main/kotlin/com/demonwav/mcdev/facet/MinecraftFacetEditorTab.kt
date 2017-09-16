@@ -8,10 +8,10 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform
+package com.demonwav.mcdev.facet
 
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.facet.MinecraftFacetConfiguration
+import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.facet.ui.FacetEditorTab
 import com.intellij.util.ui.UIUtil
 import javax.swing.JCheckBox

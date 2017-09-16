@@ -30,16 +30,16 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
                            dependField: JTextField,
                            pattern: Regex): Boolean {
         try {
-            if (pluginNameField.text.trim { it <= ' ' }.isEmpty()) {
+            if (pluginNameField.text.isBlank()) {
                 throw EmptyInputSetupException(pluginNameField)
             }
 
-            if (pluginVersionField.text.trim { it <= ' ' }.isEmpty()) {
+            if (pluginVersionField.text.isBlank()) {
                 throw EmptyInputSetupException(pluginVersionField)
             }
 
             // empty
-            if (mainClassField.text.trim { it <= ' ' }.isEmpty()) {
+            if (mainClassField.text.isBlank()) {
                 throw EmptyInputSetupException(mainClassField)
             }
             // default package

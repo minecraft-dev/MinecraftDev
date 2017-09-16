@@ -45,12 +45,13 @@ class AtUsageInspection : LocalInspectionTool() {
                 val member = element.function ?: element.fieldName ?: return
                 val reference = AtMemberReference.get(element, member) ?: return
 
-                val psi = if (member is AtFunction) {
-                    reference.resolveMember(element.project) ?: srgMap.getMcpMethod(reference)?.resolveMember(element.project) ?: return
-                } else if (member is AtFieldName) {
-                    reference.resolveMember(element.project) ?: srgMap.getMcpField(reference)?.resolveMember(element.project) ?: return
-                } else {
-                    return
+                val psi = when (member) {
+                    is AtFunction ->
+                        reference.resolveMember(element.project) ?: srgMap.getMcpMethod(reference)?.resolveMember(element.project) ?: return
+                    is AtFieldName ->
+                        reference.resolveMember(element.project) ?: srgMap.getMcpField(reference)?.resolveMember(element.project) ?: return
+                    else ->
+                        return
                 }
 
                 val query = ReferencesSearch.search(psi, GlobalSearchScope.projectScope(element.project))

@@ -154,10 +154,10 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
 
     private val version: String?
         get() {
-            if (isSpongeForge == true || (isSpongeForge == null && settings is SpongeForgeProjectConfiguration)) {
-                return spongeVersion?.let { it.versions[minecraftVersionBox.selectedItem as? String] }
+            return if (isSpongeForge == true || (isSpongeForge == null && settings is SpongeForgeProjectConfiguration)) {
+                spongeVersion?.let { it.versions[minecraftVersionBox.selectedItem as? String] }
             } else {
-                return minecraftVersionBox.selectedItem as? String
+                minecraftVersionBox.selectedItem as? String
             }
         }
 

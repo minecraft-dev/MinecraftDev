@@ -55,14 +55,16 @@ class AtAnnotator : Annotator {
         }
 
         // We need to check the srg map, or it can't be resolved (and no underline)
-        if (member is AtFieldName) {
-            srgMap.getMcpField(reference)?.resolveMember(element.project) ?: return
-            underline(member, holder)
-        } else if (member is AtFunction) {
-            srgMap.getMcpMethod(reference)?.resolveMember(element.project) ?: return
-            underline(member.funcName, holder)
-        } else {
-            return
+        when (member) {
+            is AtFieldName -> {
+                srgMap.getMcpField(reference)?.resolveMember(element.project) ?: return
+                underline(member, holder)
+            }
+            is AtFunction -> {
+                srgMap.getMcpMethod(reference)?.resolveMember(element.project) ?: return
+                underline(member.funcName, holder)
+            }
+            else -> return
         }
     }
 

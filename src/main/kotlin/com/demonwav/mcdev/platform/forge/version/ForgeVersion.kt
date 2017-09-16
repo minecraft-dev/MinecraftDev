@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.platform.forge.version
 
-import com.demonwav.mcdev.util.gson
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.gson
 import com.demonwav.mcdev.util.sortVersions
 import java.io.IOException
 import java.net.URL
@@ -47,9 +47,8 @@ class ForgeVersion private constructor(private val map: Map<*, *>) {
     fun getForgeVersions(version: String): List<String> {
         val list = ArrayList<String>()
         val numbers = map["number"] as? Map<*, *>
-        numbers?.forEach { _, v ->
-            if (v is Map<*, *>) {
-                val number = v
+        numbers?.forEach { _, number ->
+            if (number is Map<*, *>) {
                 val currentVersion = number["mcversion"] as? String
 
                 if (currentVersion == version) {
@@ -70,10 +69,10 @@ class ForgeVersion private constructor(private val map: Map<*, *>) {
         val mcVersion = number["mcversion"] as? String ?: return null
         val finalVersion = number["version"] as? String ?: return null
 
-        if (branch == null) {
-            return "$mcVersion-$finalVersion"
+        return if (branch == null) {
+            "$mcVersion-$finalVersion"
         } else {
-            return "$mcVersion-$finalVersion-$branch"
+            "$mcVersion-$finalVersion-$branch"
         }
     }
 

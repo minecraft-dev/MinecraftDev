@@ -96,20 +96,20 @@ fun writeMainSpongeClass(
         annotationString + ",\nversion = ${escape(buildSystem.version)}"
     }
 
-    if (!description.isNullOrEmpty()) {
+    if (description.isNotEmpty()) {
         annotationString + ",\ndescription = ${escape(description)}"
     }
 
-    if (!website.isNullOrEmpty()) {
+    if (website.isNotEmpty()) {
         annotationString + ",\nurl = ${escape(website)}"
     }
 
     if (hasAuthors) {
-        annotationString + ",\nauthors = {\n${authors.map(::escape).joinToString(",\n")}\n}"
+        annotationString + ",\nauthors = {\n${authors.joinToString(",\n", transform = ::escape)}\n}"
     }
 
     if (hasDependencies) {
-        annotationString + ",\ndependencies = {\n${dependencies.map { "@Dependency(id = ${escape(it)})" }.joinToString(",\n")}\n}"
+        annotationString + ",\ndependencies = {\n${dependencies.joinToString(",\n") { "@Dependency(id = ${escape(it)})" }}\n}"
     }
 
     annotationString + "\n)"

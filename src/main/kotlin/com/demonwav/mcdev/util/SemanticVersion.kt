@@ -19,7 +19,7 @@ import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.ReleasePart
  * to the version ranking with decreasing priority from left to right.
  */
 class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion> {
-    val versionString = parts.map { it.versionString }.joinToString(".");
+    val versionString = parts.joinToString(".") { it.versionString }
 
     override fun compareTo(other: SemanticVersion): Int {
         // Zipping limits the compared parts to the shorter version, then we perform a component-wise comparison

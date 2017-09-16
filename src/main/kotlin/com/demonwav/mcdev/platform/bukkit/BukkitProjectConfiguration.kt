@@ -28,7 +28,7 @@ class BukkitProjectConfiguration : ProjectConfiguration() {
     var prefix = ""
     var minecraftVersion = ""
 
-    fun hasPrefix() = !prefix.isNullOrBlank()
+    fun hasPrefix() = prefix.isNotBlank()
 
     fun hasLoadBefore() = listContainsAtLeastOne(loadBefore)
     fun setLoadBefore(string: String) {

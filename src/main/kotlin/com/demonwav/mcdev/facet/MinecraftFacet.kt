@@ -140,7 +140,7 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     fun isEventClassValid(eventClass: PsiClass, method: PsiMethod): Boolean {
         return doIfGood(method) {
             it.isEventClassValid(eventClass, method)
-        } ?: false
+        } == true
     }
 
     @Contract(pure = true)
@@ -154,14 +154,14 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     fun isStaticListenerSupported(method: PsiMethod): Boolean {
         return doIfGood(method) {
             it.isStaticListenerSupported(method)
-        } ?: false
+        } == true
     }
 
     @Contract(pure = true)
     fun suppressStaticListener(method: PsiMethod): Boolean {
         return doIfGood(method) {
             !it.isStaticListenerSupported(method)
-        } ?: false
+        } == true
     }
 
     private inline fun <T> doIfGood(method: PsiMethod, action: (AbstractModule) -> T): T? {

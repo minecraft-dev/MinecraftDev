@@ -43,46 +43,51 @@ class AtGotoDeclarationHandler : GotoDeclarationHandler {
 
         val srgMap = mcpModule.srgManager?.srgMapNow ?: return null
 
-        if (sourceElement.node.treeParent.elementType === AtTypes.CLASS_NAME) {
-            val className = sourceElement.parent as AtClassName
-            val classSrgToMcp = srgMap.mapToMcpClass(className.classNameText)
-            val psiClass = findQualifiedClass(sourceElement.project, classSrgToMcp) ?: return null
-            return arrayOf(psiClass)
-        } else if (sourceElement.node.treeParent.elementType === AtTypes.FUNC_NAME) {
-            val funcName = sourceElement.parent as AtFuncName
-            val function = funcName.parent as AtFunction
-            val entry = function.parent as AtEntry
-
-            val reference = srgMap.mapToMcpMethod(AtMemberReference.get(entry, function) ?: return null)
-            val member = reference.resolveMember(sourceElement.project) ?: return null
-            return arrayOf(member)
-        } else if (sourceElement.node.treeParent.elementType === AtTypes.FIELD_NAME) {
-            val fieldName = sourceElement.parent as AtFieldName
-            val entry = fieldName.parent as AtEntry
-
-            val reference = srgMap.mapToMcpField(AtMemberReference.get(entry, fieldName) ?: return null)
-            val member = reference.resolveMember(sourceElement.project) ?: return null
-            return arrayOf(member)
-        } else if (sourceElement.node.elementType === AtTypes.CLASS_VALUE) {
-            val className = srgMap.mapToMcpClass(parseClassDescriptor(sourceElement.text))
-            val psiClass = findQualifiedClass(sourceElement.project, className) ?: return null
-            return arrayOf(psiClass)
-        } else if (sourceElement.node.elementType === AtTypes.PRIMITIVE) {
-            val text = sourceElement.text
-            if (text.length != 1) {
-                return null
+        return when {
+            sourceElement.node.treeParent.elementType === AtTypes.CLASS_NAME -> {
+                val className = sourceElement.parent as AtClassName
+                val classSrgToMcp = srgMap.mapToMcpClass(className.classNameText)
+                val psiClass = findQualifiedClass(sourceElement.project, classSrgToMcp) ?: return null
+                arrayOf(psiClass)
             }
+            sourceElement.node.treeParent.elementType === AtTypes.FUNC_NAME -> {
+                val funcName = sourceElement.parent as AtFuncName
+                val function = funcName.parent as AtFunction
+                val entry = function.parent as AtEntry
 
-            val type = getPrimitiveType(text[0]) ?: return null
+                val reference = srgMap.mapToMcpMethod(AtMemberReference.get(entry, function) ?: return null)
+                val member = reference.resolveMember(sourceElement.project) ?: return null
+                arrayOf(member)
+            }
+            sourceElement.node.treeParent.elementType === AtTypes.FIELD_NAME -> {
+                val fieldName = sourceElement.parent as AtFieldName
+                val entry = fieldName.parent as AtEntry
 
-            val boxedType = type.boxedTypeName ?: return null
+                val reference = srgMap.mapToMcpField(AtMemberReference.get(entry, fieldName) ?: return null)
+                val member = reference.resolveMember(sourceElement.project) ?: return null
+                arrayOf(member)
+            }
+            sourceElement.node.elementType === AtTypes.CLASS_VALUE -> {
+                val className = srgMap.mapToMcpClass(parseClassDescriptor(sourceElement.text))
+                val psiClass = findQualifiedClass(sourceElement.project, className) ?: return null
+                arrayOf(psiClass)
+            }
+            sourceElement.node.elementType === AtTypes.PRIMITIVE -> {
+                val text = sourceElement.text
+                if (text.length != 1) {
+                    return null
+                }
 
-            val psiClass = JavaPsiFacade.getInstance(sourceElement.project).findClass(boxedType,
-                                                                                      GlobalSearchScope.allScope(sourceElement.project)) ?: return null
-            return arrayOf(psiClass)
+                val type = getPrimitiveType(text[0]) ?: return null
+
+                val boxedType = type.boxedTypeName ?: return null
+
+                val psiClass = JavaPsiFacade.getInstance(sourceElement.project).findClass(boxedType,
+                    GlobalSearchScope.allScope(sourceElement.project)) ?: return null
+                arrayOf(psiClass)
+            }
+            else -> null
         }
-
-        return null
     }
 
     override fun getActionText(context: DataContext) = null
