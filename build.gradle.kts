@@ -16,10 +16,7 @@ import java.io.File
 
 buildscript {
     repositories {
-        maven {
-            name = "intellij-plugin-service"
-            setUrl("https://dl.bintray.com/jetbrains/intellij-plugin-service")
-        }
+        maven("https://dl.bintray.com/jetbrains/intellij-plugin-service")
     }
 }
 
@@ -66,14 +63,8 @@ configurations {
 
 repositories {
     mavenCentral()
-    maven {
-        name = "minecraft-dev"
-        setUrl("https://dl.bintray.com/minecraft-dev/maven")
-    }
-    maven {
-        name = "sponge"
-        setUrl("https://repo.spongepowered.org/maven")
-    }
+    maven("https://dl.bintray.com/minecraft-dev/maven")
+    maven("https://repo.spongepowered.org/maven")
 }
 
 java {
@@ -94,9 +85,9 @@ val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
 }
 
 dependencies {
-    "kotlin"(kotlinModule("stdlib")) { isTransitive = false }
-    compile(kotlinModule("stdlib-jre7")) { isTransitive = false }
-    compile(kotlinModule("stdlib-jre8")) { isTransitive = false }
+    "kotlin"(kotlin("stdlib")) { isTransitive = false }
+    compile(kotlin("stdlib-jre7")) { isTransitive = false }
+    compile(kotlin("stdlib-jre8")) { isTransitive = false }
 
     // Add tools.jar for the JDI API
     compile(files(Jvm.current().toolsJar))
@@ -262,7 +253,7 @@ runIde {
 }
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
-fun DependencyHandlerScope.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
+fun DependencyHandlerScope.kotlin(module: String) = kotlin(module, kotlinVersion) as String
 fun intellijPlugin(name: String) = mapOf(
     "group" to "org.jetbrains.plugins",
     "name" to name,
