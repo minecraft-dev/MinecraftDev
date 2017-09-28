@@ -23,6 +23,7 @@ import com.demonwav.mcdev.platform.liteloader.LiteLoaderTemplate
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.localFile
+import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
@@ -31,7 +32,6 @@ import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl
 import com.intellij.ide.actions.ImportModuleAction
 import com.intellij.ide.util.newProjectWizard.AddModuleWizard
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration
@@ -200,65 +200,57 @@ class GradleBuildSystem : BuildSystem() {
         block.addBefore(fakeFile, last)
     }
 
-    private fun getClosableBlockByName(element: PsiElement, name: String): GrClosableBlock? {
-        val blocks = getClosableBlocksByName(element, name)
-        return blocks.firstOrNull()
-    }
-
-    private fun getClosableBlocksByName(element: PsiElement, name: String): List<GrClosableBlock> {
-        return element.children.asSequence()
+    private fun getClosableBlockByName(element: PsiElement, name: String) =
+        element.children.asSequence()
             .filter {
                 // We want to find the child which has a GrReferenceExpression with the right name
                 it.children.any { it is GrReferenceExpression && it.text == name }
             }.map {
                 // We want to find the grandchild which is a GrClosable block, this is the
                 // basis for the method block
-                it.children.mapNotNull{  it as? GrClosableBlock }.firstOrNull()
+                it.children.mapNotNull { it as? GrClosableBlock }.firstOrNull()
             }.filterNotNull()
-            .toList()
-    }
+            .firstOrNull()
 
     private fun addBuildGradleDependencies(project: Project, file: PsiFile, addToDirectory: Boolean) {
         // Write the repository and dependency data to the psi file
-        object : WriteCommandAction.Simple<Any>(project, file) {
-            override fun run() {
-                val newBuildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle")
+        file.runWriteAction {
+            val newBuildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle")
 
-                file.name = "build.gradle"
+            file.name = "build.gradle"
 
-                val groovyFile = file as GroovyFile
+            val groovyFile = file as GroovyFile
 
-                createRepositoriesOrDependencies(
-                    project,
-                    groovyFile,
-                    "repositories",
-                    repositories.map { "maven {name = '${it.id}'\nurl = '${it.url}'\n}" }
-                )
+            createRepositoriesOrDependencies(
+                project,
+                groovyFile,
+                "repositories",
+                repositories.map { "maven {name = '${it.id}'\nurl = '${it.url}'\n}" }
+            )
 
-                createRepositoriesOrDependencies(
-                    project,
-                    groovyFile,
-                    "dependencies",
-                    dependencies.map { "compile '${it.groupId}:${it.artifactId}:${it.version}'" }
-                )
+            createRepositoriesOrDependencies(
+                project,
+                groovyFile,
+                "dependencies",
+                dependencies.map { "compile '${it.groupId}:${it.artifactId}:${it.version}'" }
+            )
 
-                ReformatCodeProcessor(file, false).run()
-                if (addToDirectory) {
-                    val rootDirectoryPsi = PsiManager.getInstance(project).findDirectory(rootDirectory)
-                    if (rootDirectoryPsi != null) {
-                        newBuildGradle.delete(this)
+            ReformatCodeProcessor(file, false).run()
+            if (addToDirectory) {
+                val rootDirectoryPsi = PsiManager.getInstance(project).findDirectory(rootDirectory)
+                if (rootDirectoryPsi != null) {
+                    newBuildGradle.delete(this)
 
-                        rootDirectoryPsi.add(file)
-                    }
+                    rootDirectoryPsi.add(file)
                 }
-
-                buildGradle = rootDirectory.findChild("build.gradle") ?: return
-
-                // Reformat code to match their code style
-                val newBuildGradlePsi = PsiManager.getInstance(project).findFile(buildGradle!!) ?: return
-                ReformatCodeProcessor(newBuildGradlePsi, false).run()
             }
-        }.execute()
+
+            buildGradle = rootDirectory.findChild("build.gradle") ?: return@runWriteAction
+
+            // Reformat code to match their code style
+            val newBuildGradlePsi = PsiManager.getInstance(project).findFile(buildGradle!!) ?: return@runWriteAction
+            ReformatCodeProcessor(newBuildGradlePsi, false).run()
+        }
     }
 
     private fun addBuildGradleDependencies(project: Project, text: String) {

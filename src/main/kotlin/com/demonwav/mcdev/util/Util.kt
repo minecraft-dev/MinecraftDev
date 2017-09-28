@@ -14,8 +14,11 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.Result
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.psi.PsiFile
 import org.jetbrains.annotations.Contract
 
 inline fun <T> runInlineReadAction(func: () -> T): T {
@@ -69,6 +72,13 @@ inline fun invokeLaterAny(crossinline func: () -> Unit) {
         ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.any())
     }
 }
+
+inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
+    object : WriteCommandAction<T>(project) {
+        override fun run(result: Result<T>) {
+            result.setResult(func())
+        }
+    }.execute().resultObject
 
 /**
  * Returns an untyped array for the specified [Collection].

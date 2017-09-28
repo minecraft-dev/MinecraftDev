@@ -14,9 +14,9 @@ import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
+import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.ide.util.EditorHelper
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
@@ -116,12 +116,10 @@ fun writeMainSpongeClass(
     val factory = JavaPsiFacade.getElementFactory(project)
     val annotation = factory.createAnnotationFromText(annotationString.toString(), null)
 
-    object : WriteCommandAction.Simple<Any>(project, mainClassPsi) {
-        override fun run() {
-            psiClass.modifierList?.addBefore(annotation, psiClass.modifierList!!.firstChild)
-            CodeStyleManager.getInstance(project).reformat(psiClass)
-        }
-    }.execute()
+    mainClassPsi.runWriteAction {
+        psiClass.modifierList?.addBefore(annotation, psiClass.modifierList!!.firstChild)
+        CodeStyleManager.getInstance(project).reformat(psiClass)
+    }
 }
 
 private fun escape(text: String): String {
