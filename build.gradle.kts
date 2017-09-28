@@ -21,7 +21,7 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.1.3-2" // kept in sync with IntelliJ's bundled dep
+    id("org.jetbrains.kotlin.jvm") version "1.1.4-3" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
     id("org.jetbrains.intellij") version "0.2.17"
@@ -112,7 +112,7 @@ intellij {
         "properties", "junit")
 
     pluginName = "Minecraft Development"
-    updateSinceUntilBuild = false
+    updateSinceUntilBuild = true
 
     downloadSources = !CI && downloadIdeaSources.toBoolean()
 
