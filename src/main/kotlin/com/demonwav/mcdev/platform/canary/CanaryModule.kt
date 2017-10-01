@@ -32,6 +32,7 @@ class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, overrid
 
     override val type: PlatformType = moduleType.platformType
     private var canaryInf: VirtualFile? = null
+    private var neptuneInf: VirtualFile? = null
 
     init {
         setup()
@@ -39,6 +40,7 @@ class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, overrid
 
     private fun setup() {
         canaryInf = facet.findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE)
+        neptuneInf = facet.findFile(CanaryConstants.NEPTUNE_INF, SourceType.RESOURCE)
     }
 
     fun getCanaryInf(): VirtualFile? {
@@ -48,6 +50,15 @@ class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, overrid
             setup()
         }
         return canaryInf
+    }
+
+    fun getNeptuneInf(): VirtualFile? {
+        if (neptuneInf == null) {
+            // try and find the file again if it's not already present
+            // when this object was first created it may not have been ready
+            setup()
+        }
+        return neptuneInf
     }
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) =
@@ -89,6 +100,7 @@ class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, overrid
         super.dispose()
 
         canaryInf = null
+        neptuneInf = null
     }
 
     companion object {
@@ -102,7 +114,7 @@ class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, overrid
             val list = newMethod.parameterList
             val parameter = JavaPsiFacade.getElementFactory(project)
                 .createParameter(
-                    "event",
+                    "hook",
                     PsiClassType.getTypeByName(chosenClass.qualifiedName, project, GlobalSearchScope.allScope(project))
                 )
             list.add(parameter)

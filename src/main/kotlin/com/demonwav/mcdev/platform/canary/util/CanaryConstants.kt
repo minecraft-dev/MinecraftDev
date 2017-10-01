@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.canary.util
 object CanaryConstants {
 
     const val CANARY_INF = "Canary.inf"
+    const val NEPTUNE_INF = "Neptune.inf"
 
     /* Hooks */
     const val HOOK_HANDLER_ANNOTATION = "net.canarymod.hook.HookHandler"
