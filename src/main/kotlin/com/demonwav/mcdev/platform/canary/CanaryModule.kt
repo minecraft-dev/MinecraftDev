@@ -31,35 +31,22 @@ import com.intellij.psi.search.GlobalSearchScope
 class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, override val moduleType: T) : AbstractModule(facet) {
 
     override val type: PlatformType = moduleType.platformType
-    private var canaryInf: VirtualFile? = null
-    private var neptuneInf: VirtualFile? = null
-
-    init {
-        setup()
-    }
-
-    private fun setup() {
-        canaryInf = facet.findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE)
-        neptuneInf = facet.findFile(CanaryConstants.NEPTUNE_INF, SourceType.RESOURCE)
-    }
-
-    fun getCanaryInf(): VirtualFile? {
-        if (canaryInf == null) {
-            // try and find the file again if it's not already present
-            // when this object was first created it may not have been ready
-            setup()
+    var canaryInf: VirtualFile? = null
+        get() {
+            if (field == null) {
+                field = facet.findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE)
+            }
+            return field
         }
-        return canaryInf
-    }
-
-    fun getNeptuneInf(): VirtualFile? {
-        if (neptuneInf == null) {
-            // try and find the file again if it's not already present
-            // when this object was first created it may not have been ready
-            setup()
+        private set
+    var neptuneInf: VirtualFile? = null
+        get() {
+            if (field == null) {
+                field = facet.findFile(CanaryConstants.NEPTUNE_INF, SourceType.RESOURCE)
+            }
+            return field
         }
-        return neptuneInf
-    }
+        private set
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) =
         CanaryConstants.HOOK_CLASS == eventClass.qualifiedName
