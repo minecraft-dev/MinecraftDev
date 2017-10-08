@@ -20,7 +20,8 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.ui.Messages
-import com.intellij.psi.PsiElement
+import com.intellij.psi.JavaElementVisitor
+import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.annotations.Nls
@@ -33,12 +34,14 @@ class NoTranslationInspection : TranslationInspection() {
         "Checks whether a translation key used in calls to <code>StatCollector.translateToLocal()</code>, " +
             "<code>StatCollector.translateToLocalFormatted()</code> or <code>I18n.format()</code> exists."
 
-    override fun checkElement(element: PsiElement, holder: ProblemsHolder) {
-        if (element is PsiLiteralExpression) {
-            val result = LiteralTranslationIdentifier().identify(element)
+    override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
+
+    private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
+        override fun visitLiteralExpression(expression: PsiLiteralExpression) {
+            val result = LiteralTranslationIdentifier().identify(expression)
             if (result != null && !result.containsVariable && result.text == null) {
-                val quickFixes = if (element is PsiLiteralExpression) arrayOf(CreateTranslationQuickFix, ChangeTranslationQuickFix("Use existing translation")) else emptyArray()
-                holder.registerProblem(element, "The given translation key does not exist", ProblemHighlightType.GENERIC_ERROR, *quickFixes)
+                holder.registerProblem(expression, "The given translation key does not exist", ProblemHighlightType.GENERIC_ERROR,
+                    CreateTranslationQuickFix, ChangeTranslationQuickFix("Use existing translation"))
             }
         }
     }
