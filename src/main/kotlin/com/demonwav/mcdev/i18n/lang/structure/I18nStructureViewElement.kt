@@ -15,7 +15,6 @@ import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.util.mapToArray
 import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.ide.util.treeView.smartTree.SortableTreeElement
-import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
@@ -38,15 +37,12 @@ class I18nStructureViewElement(private val element: PsiElement) : StructureViewT
 
     override fun getPresentation() = (element as NavigationItem).presentation!!
 
-    override fun getChildren(): Array<TreeElement> {
-        if (element is I18nFile) {
-            val entries = PsiTreeUtil.getChildrenOfType(element, I18nEntry::class.java)
-            if (entries != null) {
-                return entries.mapToArray(::I18nStructureViewElement)
+    override fun getChildren() =
+        when (element) {
+            is I18nFile -> {
+                val entries = PsiTreeUtil.getChildrenOfType(element, I18nEntry::class.java) ?: emptyArray()
+                entries.mapToArray(::I18nStructureViewElement)
             }
-            return emptyArray()
-        } else {
-            return emptyArray()
+            else -> emptyArray()
         }
-    }
 }

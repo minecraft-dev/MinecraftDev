@@ -27,9 +27,6 @@ import com.intellij.util.IncorrectOperationException
 import org.jetbrains.annotations.Nls
 
 class NoTranslationInspection : TranslationInspection() {
-    @Nls
-    override fun getDisplayName() = "Detect missing translation"
-
     override fun getStaticDescription() =
         "Checks whether a translation key used in calls to <code>StatCollector.translateToLocal()</code>, " +
             "<code>StatCollector.translateToLocalFormatted()</code> or <code>I18n.format()</code> exists."

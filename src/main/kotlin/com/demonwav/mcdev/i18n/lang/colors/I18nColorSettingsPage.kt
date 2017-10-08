@@ -17,7 +17,6 @@ import com.intellij.openapi.options.colors.ColorDescriptor
 import com.intellij.openapi.options.colors.ColorSettingsPage
 
 class I18nColorSettingsPage : ColorSettingsPage {
-
     override fun getIcon() = PlatformAssets.MINECRAFT_ICON
     override fun getHighlighter() = I18nSyntaxHighlighter()
     override fun getAdditionalHighlightingTagToDescriptorMap() = emptyMap<String, TextAttributesKey>()

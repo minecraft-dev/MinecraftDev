@@ -28,8 +28,7 @@ import com.intellij.util.IncorrectOperationException
 import org.jetbrains.annotations.Nls
 
 class SuperfluousFormatInspection : TranslationInspection() {
-    @Nls
-    override fun getDisplayName() = "Detect superfluous format arguments for translations"
+    override fun getStaticDescription() = "Detect superfluous format arguments for translations"
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 

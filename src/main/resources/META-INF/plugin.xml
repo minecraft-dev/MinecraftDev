@@ -271,21 +271,21 @@
         <!--endregion-->
 
         <!--region NO PLATFORM INSPECTIONS-->
-        <localInspection displayName="Detect missing translation"
+        <localInspection displayName="Missing translations"
                          groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.i18n.inspections.NoTranslationInspection"/>
-        <localInspection displayName="Detect missing format arguments for translations"
+        <localInspection displayName="Missing format arguments"
                          groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.i18n.inspections.MissingFormatInspection"/>
-        <localInspection displayName="Detect superfluous format arguments for translations"
+        <localInspection displayName="Superfluous format arguments"
                          groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="true"

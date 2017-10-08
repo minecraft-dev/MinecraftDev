@@ -44,9 +44,8 @@ abstract class TranslationIdentifier<T : PsiElement> {
                 val index = container.expressions.indexOf(element)
                 val value = element.evaluate("", I18nReference.VARIABLE_MARKER) ?: ""
 
-                val method = call.referencedMethod
                 for (function in Translation.translationFunctions) {
-                    if (function.matches(method, index)) {
+                    if (function.matches(call, index)) {
                         val result = function.getTranslationKey(call) ?: continue
                         val translationKey = result.second.trim()
                         val varKey = if (translationKey == value) I18nReference.VARIABLE_MARKER else translationKey

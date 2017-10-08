@@ -19,15 +19,10 @@ import com.intellij.refactoring.rename.RenameInputValidatorEx
 import com.intellij.util.ProcessingContext
 
 class I18nRenameInputValidator : RenameInputValidatorEx {
-    override fun isInputValid(newName: String, element: PsiElement, context: ProcessingContext): Boolean =
-        !newName.contains('=')
+    override fun isInputValid(newName: String, element: PsiElement, context: ProcessingContext) = !newName.contains('=')
 
     override fun getPattern(): ElementPattern<out PsiElement> = PlatformPatterns.psiElement(I18nEntry::class.java)
 
-    override fun getErrorMessage(newName: String, project: Project): String? {
-        if (newName.contains('=')) {
-            return "Key must not contain separator character ('=')"
-        }
-        return null
-    }
+    override fun getErrorMessage(newName: String, project: Project) =
+        if (newName.contains('=')) "Key must not contain separator character ('=')" else null
 }

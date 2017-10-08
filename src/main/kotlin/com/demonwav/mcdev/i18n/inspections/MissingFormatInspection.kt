@@ -23,8 +23,7 @@ import com.intellij.psi.PsiReferenceExpression
 import org.jetbrains.annotations.Nls
 
 class MissingFormatInspection : TranslationInspection() {
-    @Nls
-    override fun getDisplayName() = "Detect missing format arguments for translations"
+    override fun getStaticDescription() = "Detects missing format arguments for translations"
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 

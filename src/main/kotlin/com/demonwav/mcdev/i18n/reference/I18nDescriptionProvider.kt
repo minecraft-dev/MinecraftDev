@@ -17,13 +17,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.usageView.UsageViewTypeLocation
 
 class I18nDescriptionProvider : ElementDescriptionProvider {
-    override fun getElementDescription(element: PsiElement, location: ElementDescriptionLocation): String? {
-        if (element is I18nEntry) {
-            if (location is UsageViewTypeLocation) {
-                return "translation"
-            }
-            return element.key
+    override fun getElementDescription(element: PsiElement, location: ElementDescriptionLocation) =
+        when (element) {
+            is I18nEntry -> if (location is UsageViewTypeLocation) "translation" else element.key
+            else -> null
         }
-        return null
-    }
 }

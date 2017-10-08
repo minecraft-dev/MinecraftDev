@@ -20,8 +20,6 @@ import com.demonwav.mcdev.util.extractVarArgs
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.getCalls
 import com.demonwav.mcdev.util.getCallsReturningResult
-import com.demonwav.mcdev.util.isCalling
-import com.demonwav.mcdev.util.isReturningResultOf
 import com.demonwav.mcdev.util.isSameReference
 import com.demonwav.mcdev.util.referencedMethod
 import com.demonwav.mcdev.util.substituteParameter
@@ -36,7 +34,7 @@ class TranslationFunction(val memberReference: MemberReference,
                           val foldParameters: Boolean = false, val prefix: String = "", val suffix: String = "",
                           val obfuscatedName: Boolean = false) {
     private fun getMethod(context: PsiElement): PsiMethod? {
-        var reference: MemberReference = memberReference
+        var reference = memberReference
         if (obfuscatedName) {
             val srgManager = context.findModule()?.let { MinecraftFacet.getInstance(it, McpModuleType)?.srgManager } ?: SrgManager.findAnyInstance(context.project)
             srgManager?.srgMapNow?.mapToMcpMethod(memberReference)?.let {
@@ -46,15 +44,8 @@ class TranslationFunction(val memberReference: MemberReference,
         return reference.resolveMember(context.project) as? PsiMethod
     }
 
-    fun matches(method: PsiMethod?, paramIndex: Int): Boolean {
-        if (method == null) {
-            return false
-        }
-        val referenceMethod = getMethod(method) ?: return false
-        return if (setter)
-            method.isCalling(referenceMethod, paramIndex, matchedIndex)
-        else
-            method.isReturningResultOf(referenceMethod, paramIndex, matchedIndex)
+    fun matches(call: PsiCall, paramIndex: Int): Boolean {
+        return getCalls(call, paramIndex).any()
     }
 
     fun getCalls(call: PsiCall, paramIndex: Int): Iterable<PsiCall> {
@@ -82,8 +73,7 @@ class TranslationFunction(val memberReference: MemberReference,
                 if (!result.contains(I18nReference.VARIABLE_MARKER) && (depth > 0 || isReferencedMethod)) {
                     return Step(true, single, result)
                 }
-                return Step(false, true,
-                    if (acc.key.contains(I18nReference.VARIABLE_MARKER)) result.replace(I18nReference.VARIABLE_MARKER, acc.key) else result)
+                return Step(false, true, if (acc.key.contains(I18nReference.VARIABLE_MARKER)) result.replace(I18nReference.VARIABLE_MARKER, acc.key) else result)
             }
             return null
         }
@@ -131,9 +121,6 @@ class TranslationFunction(val memberReference: MemberReference,
         val referenceCall = if (calls.count() > 1) calls.last() else calls.first()
         val method = referenceCall.referencedMethod ?: return translation to -1
         val varargs = referenceCall.extractVarArgs(method.parameterList.parametersCount - 1, substitutions, calls.count() <= 1, true)
-        if (varargs.any { it == null }) {
-            return null
-        }
         val varargStart = if (varargs.size > paramCount) method.parameterList.parametersCount - 1 + paramCount else -1
         return String.format(format, *varargs) to varargStart
     }

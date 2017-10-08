@@ -32,36 +32,12 @@ val PsiCall.referencedMethod: PsiMethod?
         else -> null
     }
 
-inline fun PsiMethodCallExpression.checkForReference(method: PsiMethod, reference: PsiMethod?, paramIndex: Int, referenceParamIndex: Int, recurse: (PsiMethod) -> Boolean): Boolean {
-    val ref = this.referencedMethod
-    if (ref.isSameReference(reference)) {
-        val param = this.argumentList.expressions[referenceParamIndex]
-        if (param is PsiReferenceExpression) {
-            val paramRef = param.advancedResolve(false).element
-            if (paramRef === method.parameterList.parameters[referenceParamIndex]) {
-                return true
-            }
-        } else if (param is PsiPolyadicExpression) {
-            for (operand in param.operands) {
-                if (operand is PsiReferenceExpression && method.parameterList.parameters.size > paramIndex) {
-                    val operandRef = operand.advancedResolve(false).element
-                    if (operandRef === method.parameterList.parameters[paramIndex])
-                        return true
-                }
-            }
-        }
-    } else if (ref != null) {
-        return recurse(ref)
-    }
-    return false
-}
-
 fun PsiCall.getSupers(reference: PsiMethod, paramIndex: Int, referenceParamIndex: Int): Iterable<PsiCall> {
     val method = this.resolveMethod() ?: return emptyList()
     if (!method.isConstructor) {
         return emptyList()
     }
-    if (method.isSameReference(reference)) {
+    if (method.isSameReference(reference) && paramIndex == referenceParamIndex) {
         return listOf(this)
     }
 
@@ -73,115 +49,95 @@ fun PsiCall.getSupers(reference: PsiMethod, paramIndex: Int, referenceParamIndex
         }
 
     val value = findFirstMethodCall(method)
-    if (value is PsiMethodCallExpression) {
-        val ref = value.referencedMethod
-        if (ref.isSameReference(reference)) {
-            val param = value.argumentList.expressions[referenceParamIndex]
-            if (param is PsiReferenceExpression) {
-                val paramRef = param.advancedResolve(false).element
-                if (paramRef === method.parameterList.parameters[referenceParamIndex]) {
-                    return listOf(this, value)
-                }
-            } else if (param is PsiPolyadicExpression) {
-                for (operand in param.operands) {
-                    if (operand is PsiReferenceExpression) {
-                        val operandRef = operand.advancedResolve(false).element
-                        if (operandRef === method.parameterList.parameters[paramIndex]) {
-                            return listOf(this, value)
-                        }
-                    }
-                }
-            }
-        } else {
-            val result = mutableListOf(this)
-            result.addAll(value.getSupers(reference, paramIndex, referenceParamIndex))
-            return result
-        }
-    }
-    return emptyList()
+    return value?.extractReferences(this, method, reference, paramIndex, referenceParamIndex, { false }) {
+        it.getSupers(reference, paramIndex, referenceParamIndex)
+    } ?: emptyList()
 }
 
 fun PsiCall.getCalls(reference: PsiMethod, paramIndex: Int, referenceParamIndex: Int): Iterable<PsiCall> {
     val method = this.resolveMethod() ?: return emptyList()
-    if (method.isSameReference(reference)) {
+    if (method.isSameReference(reference) && paramIndex == referenceParamIndex) {
         return listOf(this)
+    }
+    if (paramIndex == -1) {
+        return emptyList()
     }
 
     fun findFirstMethodCall(elem: PsiElement): PsiMethodCallExpression? =
         elem as? PsiMethodCallExpression ?: elem.children.mapFirstNotNull { findFirstMethodCall(it) }
 
     val value = findFirstMethodCall(method)
-    if (value is PsiMethodCallExpression) {
-        val ref = value.referencedMethod
-        if (ref.isSameReference(reference)) {
-            val param = value.argumentList.expressions[referenceParamIndex]
-            if (param is PsiReferenceExpression) {
-                val paramRef = param.advancedResolve(false).element
-                if (paramRef === method.parameterList.parameters[referenceParamIndex]) {
-                    return listOf(this, value)
-                }
-            } else if (param is PsiPolyadicExpression) {
-                for (operand in param.operands) {
-                    if (operand is PsiReferenceExpression) {
-                        val operandRef = operand.advancedResolve(false).element
-                        if (operandRef === method.parameterList.parameters[paramIndex])
-                            return listOf(this, value)
-                    }
-                }
-            }
-        } else {
-            val result = mutableListOf(this)
-            result.addAll(value.getCalls(reference, paramIndex, referenceParamIndex))
-            return result
-        }
-    }
-    return emptyList()
+    return value?.extractReferences(this, method, reference, paramIndex, referenceParamIndex, { false }) {
+        it.getCalls(reference, paramIndex, referenceParamIndex)
+    } ?: emptyList()
 }
 
 fun PsiCall.getCallsReturningResult(reference: PsiMethod, paramIndex: Int, referenceParamIndex: Int): Iterable<PsiCall> {
     val method = this.referencedMethod ?: return emptyList()
-    if (method.isConstructor) {
+    if (method.isSameReference(reference) && paramIndex == referenceParamIndex) {
+        return listOf(this)
+    }
+    if (method.isConstructor || reference.isConstructor) {
         return this.getSupers(reference, paramIndex, referenceParamIndex)
     }
     if (!method.returnType!!.isAssignableFrom(reference.returnType!!)) {
         return emptyList()
     }
-    if (method.isSameReference(reference)) {
-        return listOf(this)
-    }
-    for (returnStatement in PsiUtil.findReturnStatements(method)) {
-        val value = returnStatement.returnValue
-        if (value is PsiMethodCallExpression) {
-            val ref = value.referencedMethod
-            if (ref.isSameReference(reference)) {
-                val param = value.argumentList.expressions[referenceParamIndex]
-                if (param is PsiReferenceExpression) {
-                    val paramRef = param.advancedResolve(false).element
-                    if (paramRef === method.parameterList.parameters[referenceParamIndex]) {
-                        return listOf(this, value)
-                    }
-                } else if (param is PsiPolyadicExpression) {
-                    for (operand in param.operands) {
-                        if (operand is PsiReferenceExpression) {
-                            val operandRef = operand.advancedResolve(false).element
-                            if (operandRef === method.parameterList.parameters[paramIndex]) {
-                                return listOf(this, value)
-                            }
-                        }
-                    }
-                } else {
-                    if (param.evaluate(null, null) != null) {
-                        return listOf(this, value)
-                    }
-                }
-            } else {
-                val result = mutableListOf(this)
-                result.addAll(value.getCallsReturningResult(reference, paramIndex, referenceParamIndex))
-                return result
+    return PsiUtil.findReturnStatements(method)
+        .map { it.returnValue }
+        .filterIsInstance<PsiMethodCallExpression>()
+        .map {
+            it.extractReferences(this, method, reference, paramIndex, referenceParamIndex, { it.evaluate(null, null) != null }) {
+                it.getCallsReturningResult(reference, paramIndex, referenceParamIndex)
             }
         }
+        .firstOrNull { it.any() } ?: emptyList()
+}
+
+inline fun PsiMethodCallExpression.extractReferences(call: PsiCall, method: PsiMethod, reference: PsiMethod?, paramIndex: Int, referenceParamIndex: Int, defaultParamCase: (PsiExpression) -> Boolean, recurse: (PsiMethodCallExpression) -> Iterable<PsiCall>): Iterable<PsiCall> {
+    val ref = this.referencedMethod
+    return when {
+        ref.isSameReference(reference) -> {
+            val param = this.argumentList.expressions[referenceParamIndex]
+            when (param) {
+                is PsiReferenceExpression -> {
+                    val paramRef = param.advancedResolve(false).element
+                    if (paramRef === method.parameterList.parameters[referenceParamIndex]) {
+                        listOf(call, this)
+                    } else {
+                        emptyList()
+                    }
+                }
+                is PsiPolyadicExpression -> {
+                    val operandRef = param.operands
+                        .filterIsInstance<PsiReferenceExpression>()
+                        .filter { method.parameterList.parameters.size > paramIndex }
+                        .map { it.advancedResolve(false).element }
+                        .find { it === method.parameterList.parameters[paramIndex] }
+                    if (operandRef != null) {
+                        listOf(call, this)
+                    } else {
+                        emptyList()
+                    }
+                }
+                else ->
+                    if (defaultParamCase(param)) {
+                        listOf(call, this)
+                    } else {
+                        emptyList()
+                    }
+            }
+        }
+        ref != null -> {
+            val result = recurse(this)
+            if (result.any()) {
+                listOf(this) + result
+            } else {
+                emptyList()
+            }
+        }
+        else -> emptyList()
     }
-    return emptyList()
 }
 
 fun PsiCall.extractVarArgs(index: Int, substitutions: Map<Int, Array<String?>?>, allowReferences: Boolean, allowTranslations: Boolean): Array<String?> {
@@ -219,18 +175,18 @@ fun extractVarArgs(type: PsiType, elements: List<PsiExpression>, substitutions: 
         return arrayOf(expression.evaluate(null, null))
     }
 
-    if (elements[0].type == type) {
-        // We're dealing with an array initialiser, let's analyse it!
-        val initialiser = elements[0]
-        if (initialiser is PsiNewExpression && initialiser.arrayInitializer != null) {
-            return initialiser.arrayInitializer!!.initializers
+    return if (elements[0].type == type) {
+        // We're dealing with an array initializer, let's analyse it!
+        val initializer = elements[0]
+        if (initializer is PsiNewExpression && initializer.arrayInitializer != null) {
+            initializer.arrayInitializer!!.initializers
                 .flatMap { convertExpression(it)?.toList() ?: listOf<String?>(null) }
                 .toTypedArray()
         } else {
-            return resolveReference(initialiser)
+            resolveReference(initializer)
         }
     } else {
-        return elements
+        elements
             .flatMap { convertExpression(it)?.toList() ?: listOf<String?>(null) }
             .toTypedArray()
     }
