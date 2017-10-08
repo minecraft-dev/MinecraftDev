@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.i18n.reference
 
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.intellij.find.FindModel
 import com.intellij.find.impl.FindInProjectUtil
 import com.intellij.psi.PsiReference
@@ -23,7 +23,7 @@ import com.intellij.util.QueryExecutor
 class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.SearchParameters> {
     override fun execute(parameters: ReferencesSearch.SearchParameters, consumer: Processor<PsiReference>): Boolean {
         val property = parameters.elementToSearch
-        if (property is I18nProperty) {
+        if (property is I18nEntry) {
             fun <A> power(start: List<A>): Set<List<A>> {
                 tailrec fun pwr(s: List<A>, acc: Set<List<A>>): Set<List<A>> =
                     if (s.isEmpty()) {

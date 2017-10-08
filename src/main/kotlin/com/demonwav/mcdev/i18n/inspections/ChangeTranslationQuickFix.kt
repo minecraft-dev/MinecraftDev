@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.i18n.inspections
 
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.reference.I18nGotoModel
 import com.demonwav.mcdev.i18n.translations.identifiers.LiteralTranslationIdentifier
 import com.demonwav.mcdev.util.runWriteAction
@@ -34,7 +34,7 @@ class ChangeTranslationQuickFix(private val name: String) : LocalQuickFix {
             val popup = ChooseByNamePopup.createPopup(project, I18nGotoModel(project, translation?.regexPattern), null)
             popup.invoke(object : ChooseByNamePopupComponent.Callback() {
                 override fun elementChosen(element: Any) {
-                    val selectedProperty = element as I18nProperty
+                    val selectedProperty = element as I18nEntry
                     literal.containingFile.runWriteAction {
                         val match = translation?.regexPattern?.matchEntire(selectedProperty.key)
                         val insertion = if (match == null || match.groups.size <= 1) selectedProperty.key else match.groupValues[1]

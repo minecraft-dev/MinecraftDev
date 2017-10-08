@@ -12,11 +12,10 @@ package com.demonwav.mcdev.i18n
 
 import com.demonwav.mcdev.i18n.lang.I18nFile
 import com.demonwav.mcdev.i18n.lang.I18nFileType
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.util.applyWriteAction
 import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -84,9 +83,9 @@ object I18nElementFactory {
         return file.firstChild
     }
 
-    fun createProperty(project: Project, key: String, value: String = ""): I18nProperty {
+    fun createProperty(project: Project, key: String, value: String = ""): I18nEntry {
         val file = createFile(project, "$key=$value")
-        return file.firstChild as I18nProperty
+        return file.firstChild as I18nEntry
     }
 
     fun createLineEnding(project: Project): PsiElement {

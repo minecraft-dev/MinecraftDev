@@ -16,12 +16,10 @@ import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiReferenceExpression
-import com.sun.org.apache.xpath.internal.operations.Bool
 import org.jetbrains.annotations.Nls
 
 class MissingFormatInspection : TranslationInspection() {
@@ -30,7 +28,7 @@ class MissingFormatInspection : TranslationInspection() {
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
-    private class Visitor(private val holder: ProblemsHolder): JavaElementVisitor() {
+    private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
             visit(expression)
         }

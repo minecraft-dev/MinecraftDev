@@ -38,7 +38,7 @@ class I18nFormattingModelBuilder : FormattingModelBuilder {
     private fun createSpaceBuilder(settings: CodeStyleSettings): SpacingBuilder {
         return SpacingBuilder(settings, I18nLanguage)
             .around(I18nTypes.EQUALS).none()
-            .around(I18nTypes.PROPERTY).none()
+            .around(I18nTypes.ENTRY).none()
             .around(I18nTypes.LINE_ENDING).none()
     }
 

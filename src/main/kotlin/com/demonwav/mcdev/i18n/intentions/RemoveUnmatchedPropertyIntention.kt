@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.i18n.intentions
 
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
 import com.intellij.openapi.editor.Editor
@@ -23,7 +23,7 @@ class RemoveUnmatchedPropertyIntention : PsiElementBaseIntentionAction() {
 
     @Throws(IncorrectOperationException::class)
     override fun invoke(project: Project, editor: Editor, element: PsiElement) {
-        val elem = element as? I18nProperty ?: element.parent
+        val elem = element as? I18nEntry ?: element.parent
         if (elem.nextSibling?.node?.elementType === I18nTypes.LINE_ENDING) {
             elem.nextSibling.delete()
         }

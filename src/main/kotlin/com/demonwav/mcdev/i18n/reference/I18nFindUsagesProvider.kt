@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.i18n.reference
 
 import com.demonwav.mcdev.i18n.lang.I18nLexerAdapter
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner
 import com.intellij.lang.cacheBuilder.WordsScanner
@@ -27,11 +27,11 @@ class I18nFindUsagesProvider : FindUsagesProvider {
 
     override fun getHelpId(psiElement: PsiElement) = null
 
-    override fun getType(element: PsiElement) = if (element is I18nProperty) "translation" else ""
+    override fun getType(element: PsiElement) = if (element is I18nEntry) "translation" else ""
 
-    override fun getDescriptiveName(element: PsiElement) = if (element is I18nProperty) element.key else ""
+    override fun getDescriptiveName(element: PsiElement) = if (element is I18nEntry) element.key else ""
 
-    override fun getNodeText(element: PsiElement, useFullName: Boolean) = if (element is I18nProperty) "${element.key}=${element.value}" else ""
+    override fun getNodeText(element: PsiElement, useFullName: Boolean) = if (element is I18nEntry) "${element.key}=${element.value}" else ""
 
     companion object {
         private val WORDS_SCANNER by lazy {

@@ -11,9 +11,9 @@
 package com.demonwav.mcdev.i18n.reference
 
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.i18n.findDefaultProperties
-import com.demonwav.mcdev.i18n.findProperties
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
+import com.demonwav.mcdev.i18n.findDefaultLangEntries
+import com.demonwav.mcdev.i18n.findLangEntries
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.util.toArray
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.util.TextRange
@@ -31,7 +31,7 @@ class I18nReference(element: PsiElement,
                     val varKey: String) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         val project = myElement.project
-        val properties = if (useDefault) project.findDefaultProperties(key = key) else project.findProperties(key = key)
+        val properties = if (useDefault) project.findDefaultLangEntries(key = key) else project.findLangEntries(key = key)
         return properties.map(::PsiElementResolveResult).toTypedArray()
     }
 
@@ -42,7 +42,7 @@ class I18nReference(element: PsiElement,
 
     override fun getVariants(): Array<Any?> {
         val project = myElement.project
-        val properties = project.findDefaultProperties()
+        val properties = project.findDefaultLangEntries()
         val stringPattern =
             if (varKey.contains(VARIABLE_MARKER)) {
                 varKey.split(VARIABLE_MARKER).map { Regex.escape(it) }.joinToString("(.*?)")
@@ -77,7 +77,7 @@ class I18nReference(element: PsiElement,
     }
 
     override fun isReferenceTo(element: PsiElement): Boolean {
-        return element is I18nProperty && element.key == key
+        return element is I18nEntry && element.key == key
     }
 
     companion object {

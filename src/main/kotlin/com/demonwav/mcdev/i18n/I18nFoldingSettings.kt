@@ -35,8 +35,8 @@ class I18nFoldingSettings : PersistentStateComponent<I18nFoldingSettings.State> 
     // State mappings
     var shouldFoldTranslations: Boolean
         get() = state.shouldFoldTranslations
-        set(isShouldFoldTranslations) {
-            state.shouldFoldTranslations = isShouldFoldTranslations
+        set(value) {
+            state.shouldFoldTranslations = value
         }
 
     companion object {

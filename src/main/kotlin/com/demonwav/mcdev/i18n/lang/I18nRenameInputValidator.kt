@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.i18n.lang
 
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.intellij.openapi.project.Project
 import com.intellij.patterns.ElementPattern
 import com.intellij.patterns.PlatformPatterns
@@ -22,7 +22,7 @@ class I18nRenameInputValidator : RenameInputValidatorEx {
     override fun isInputValid(newName: String, element: PsiElement, context: ProcessingContext): Boolean =
         !newName.contains('=')
 
-    override fun getPattern(): ElementPattern<out PsiElement> = PlatformPatterns.psiElement(I18nProperty::class.java)
+    override fun getPattern(): ElementPattern<out PsiElement> = PlatformPatterns.psiElement(I18nEntry::class.java)
 
     override fun getErrorMessage(newName: String, project: Project): String? {
         if (newName.contains('=')) {

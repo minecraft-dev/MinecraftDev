@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.i18n.intentions
 
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.intellij.codeInsight.FileModificationService
 import com.intellij.codeInsight.intention.BaseElementAtCaretIntentionAction
@@ -25,9 +25,9 @@ class TrimKeyIntention : BaseElementAtCaretIntentionAction() {
     override fun getFamilyName() = "Minecraft"
 
     override fun isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean {
-        val property: I18nProperty = when {
-            element is I18nProperty -> element
-            element.node.elementType === I18nTypes.KEY && element.parent is I18nProperty -> element.parent as I18nProperty
+        val property: I18nEntry = when {
+            element is I18nEntry -> element
+            element.node.elementType === I18nTypes.KEY && element.parent is I18nEntry -> element.parent as I18nEntry
             else -> return false
         }
         return property.key != property.trimmedKey
@@ -38,7 +38,7 @@ class TrimKeyIntention : BaseElementAtCaretIntentionAction() {
         if (!FileModificationService.getInstance().preparePsiElementForWrite(element.parent)) {
             return
         }
-        val property = element.parent as I18nProperty
+        val property = element.parent as I18nEntry
         property.setName(property.trimmedKey)
     }
 }

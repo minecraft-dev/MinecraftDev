@@ -36,8 +36,8 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
             return null
         }
 
-        val defaultProperties = project.findDefaultProperties(scope = Scope.PROJECT, domain = I18nElementFactory.getResourceDomain(file))
-        val properties = project.findProperties(file = file, scope = Scope.PROJECT)
+        val defaultProperties = project.findDefaultLangEntries(scope = Scope.PROJECT, domain = I18nElementFactory.getResourceDomain(file))
+        val properties = project.findLangEntries(file = file, scope = Scope.PROJECT)
         val defaultKeys = defaultProperties.map { it.key }.toMutableSet()
         val keys = properties.map { it.key }
         val propertyMap = defaultProperties.associate { it.key to it }

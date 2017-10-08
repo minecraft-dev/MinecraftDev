@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.i18n.reference
 
 import com.demonwav.mcdev.i18n.I18nConstants
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.intellij.ide.util.gotoByName.ContributorsBasedGotoByModel
 import com.intellij.navigation.ChooseByNameContributor
 import com.intellij.navigation.NavigationItem
@@ -24,14 +24,14 @@ import java.util.TreeSet
 
 class I18nGotoModel(project: Project, val filter: Regex? = null) : ContributorsBasedGotoByModel(project, arrayOf(Extensions.findExtension(ChooseByNameContributor.SYMBOL_EP_NAME, I18nGotoSymbolContributor::class.java))) {
     override fun acceptItem(item: NavigationItem?): Boolean {
-        return (item as I18nProperty).containingFile.virtualFile.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE
+        return (item as I18nEntry).containingFile.virtualFile.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE
     }
 
     override fun getElementsByName(name: String, parameters: FindSymbolParameters, canceled: ProgressIndicator): Array<Any> {
         val superResult = super.getElementsByName(name, parameters, canceled).toList()
-        val result = TreeSet<Any> { o1, o2 -> (o1 as I18nProperty).key.compareTo((o2 as I18nProperty).key) }
+        val result = TreeSet<Any> { o1, o2 -> (o1 as I18nEntry).key.compareTo((o2 as I18nEntry).key) }
         if (filter != null) {
-            result.addAll(superResult.filter { filter.matches((it as I18nProperty).key) })
+            result.addAll(superResult.filter { filter.matches((it as I18nEntry).key) })
         } else {
             result.addAll(superResult)
         }

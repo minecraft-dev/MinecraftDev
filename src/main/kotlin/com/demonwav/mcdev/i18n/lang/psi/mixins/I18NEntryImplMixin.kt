@@ -18,7 +18,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.PsiElement
 
-abstract class I18nPropertyImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), I18nPropertyMixin {
+abstract class I18nEntryImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), I18nEntryMixin {
     override val key: String
         get() = node.findChildByType(I18nTypes.KEY)?.text ?: ""
 
@@ -53,5 +53,5 @@ abstract class I18nPropertyImplMixin(node: ASTNode) : ASTWrapperPsiElement(node)
         override fun getIcon(unused: Boolean) = PlatformAssets.MINECRAFT_ICON
     }
 
-    override fun toString() = "I18nProperty($key=$value)"
+    override fun toString() = "I18nEntry($key=$value)"
 }

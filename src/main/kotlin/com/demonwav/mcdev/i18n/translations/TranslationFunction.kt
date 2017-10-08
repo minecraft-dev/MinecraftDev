@@ -93,8 +93,7 @@ class TranslationFunction(val memberReference: MemberReference,
         val calls = getCalls(call, matchedIndex)
         val referenced = getMethod(call) ?: return null
         val result = calls.foldIndexed(Step(false, true, "") as Step?,
-            {
-                depth, acc, v ->
+            { depth, acc, v ->
                 if (acc == null) acc else resolveCall(depth, calls.count() == 1, referenced, v, acc)
             })?.result
         return result?.copy(second = prefix + result.second + suffix)
@@ -111,8 +110,7 @@ class TranslationFunction(val memberReference: MemberReference,
             val args = call.argumentList?.expressions
             if (method != null && args != null && args.size >= method.parameterList.parametersCount) {
                 return method.parameterList.parameters
-                    .mapIndexed {
-                        i, parameter ->
+                    .mapIndexed { i, parameter ->
                         if (parameter.isVarArgs) {
                             val varargType = method.getSignature(PsiSubstitutor.EMPTY).parameterTypes[i]
                             Pair(i, extractVarArgs(varargType, args.drop(i), substitutions, true, true))
