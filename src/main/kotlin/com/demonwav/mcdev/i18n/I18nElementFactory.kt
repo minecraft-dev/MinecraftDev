@@ -13,7 +13,7 @@ package com.demonwav.mcdev.i18n
 import com.demonwav.mcdev.i18n.lang.I18nFile
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
-import com.demonwav.mcdev.util.runWriteAction
+import com.demonwav.mcdev.util.runWriteActionScoped
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
@@ -41,9 +41,9 @@ object I18nElementFactory {
             for (file in files) {
                 val simpleFile = PsiManager.getInstance(module.project).findFile(file)
                 if (simpleFile is I18nFile) {
-                    simpleFile.runWriteAction {
-                        simpleFile.add(createLineEnding(project))
-                        simpleFile.add(createProperty(project, name, value))
+                    simpleFile.runWriteActionScoped {
+                        add(createLineEnding(project))
+                        add(createProperty(project, name, value))
                     }
                 }
             }
