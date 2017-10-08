@@ -30,18 +30,17 @@ class I18nAnnotator : Annotator {
 
     private fun checkPropertyKey(property: I18nProperty, annotations: AnnotationHolder) {
         if (property.key != property.trimmedKey) {
-            annotations.createWarningAnnotation(TextRange(property.textRange.startOffset,
-                property.textRange.startOffset + property.key.length),
-                "Translation key contains whitespace at start or end").registerFix(TrimKeyIntention())
+            val range = TextRange.from(property.textRange.startOffset, property.key.length)
+            annotations.createWarningAnnotation(range, "Translation key contains whitespace at start or end")
+                .registerFix(TrimKeyIntention())
         }
     }
 
     private fun checkPropertyDuplicates(property: I18nProperty, siblings: Array<PsiElement>, annotations: AnnotationHolder) {
         val count = siblings.count { it is I18nProperty && property.key == it.key }
         if (count > 1) {
-            annotations.createWarningAnnotation(property,
-                "Duplicate translation keys \"" + property.key + "\"").registerFix(
-                RemoveDuplicatesIntention(property))
+            annotations.createWarningAnnotation(property, "Duplicate translation keys \"${property.key}\"")
+                .registerFix(RemoveDuplicatesIntention(property))
         }
     }
 
@@ -51,8 +50,7 @@ class I18nAnnotator : Annotator {
                 return
             }
         }
-        annotations.createWarningAnnotation(property.textRange,
-            "Translation key not included in default localization file")
+        annotations.createWarningAnnotation(property.textRange, "Translation key not included in default localization file")
             .registerFix(RemoveUnmatchedPropertyIntention())
     }
 }

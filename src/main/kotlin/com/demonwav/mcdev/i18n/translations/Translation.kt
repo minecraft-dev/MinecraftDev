@@ -99,15 +99,12 @@ data class Translation(val foldingElement: PsiElement?,
                 val elements = PsiTreeUtil.findChildrenOfType(root, identifier.elementClass())
                 for (element in elements) {
                     val translation = identifier.identifyUnsafe(element)
-                    if (translation != null && translation.foldingElement != null) {
+                    if (translation?.foldingElement != null) {
                         val range =
-                            if (translation.foldingElement is PsiExpressionList) {
-                                TextRange(translation.foldingElement.textRange.startOffset + 1,
-                                    translation.foldingElement.textRange.endOffset - 1)
-                            } else {
-                                TextRange(translation.foldingElement.textRange.startOffset,
-                                    translation.foldingElement.textRange.endOffset)
-                            }
+                            if (translation.foldingElement is PsiExpressionList)
+                                translation.foldingElement.textRange.grown(-2).shiftRight(1)
+                            else
+                                translation.foldingElement.textRange
                         descriptors.add(object : FoldingDescriptor(translation.foldingElement.node,
                             range,
                             FoldingGroup.newGroup("mc.i18n." + translation.key)) {
