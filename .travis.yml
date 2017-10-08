@@ -4,7 +4,7 @@ dist: trusty
 language: java
 jdk: openjdk8
 
-install: true
+install: unset _JAVA_OPTIONS
 script: ./gradlew build
 
 before_cache:
