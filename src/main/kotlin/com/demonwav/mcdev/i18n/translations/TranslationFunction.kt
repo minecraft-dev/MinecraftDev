@@ -44,9 +44,7 @@ class TranslationFunction(val memberReference: MemberReference,
         return reference.resolveMember(context.project) as? PsiMethod
     }
 
-    fun matches(call: PsiCall, paramIndex: Int): Boolean {
-        return getCalls(call, paramIndex).any()
-    }
+    fun matches(call: PsiCall, paramIndex: Int) = getCalls(call, paramIndex).any()
 
     fun getCalls(call: PsiCall, paramIndex: Int): Iterable<PsiCall> {
         val referenceMethod = getMethod(call) ?: return emptyList()

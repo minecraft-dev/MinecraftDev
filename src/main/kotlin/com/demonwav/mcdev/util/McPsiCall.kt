@@ -96,16 +96,14 @@ fun PsiCall.getCallsReturningResult(reference: PsiMethod, paramIndex: Int, refer
 
 inline fun PsiMethodCallExpression.extractReferences(call: PsiCall, method: PsiMethod, reference: PsiMethod?, paramIndex: Int, referenceParamIndex: Int, defaultParamCase: (PsiExpression) -> Boolean, recurse: (PsiMethodCallExpression) -> Iterable<PsiCall>): Iterable<PsiCall> {
     val ref = this.referencedMethod
-    return when {
+    when {
         ref.isSameReference(reference) -> {
             val param = this.argumentList.expressions[referenceParamIndex]
             when (param) {
                 is PsiReferenceExpression -> {
                     val paramRef = param.advancedResolve(false).element
                     if (paramRef === method.parameterList.parameters[referenceParamIndex]) {
-                        listOf(call, this)
-                    } else {
-                        emptyList()
+                        return listOf(call, this)
                     }
                 }
                 is PsiPolyadicExpression -> {
@@ -115,29 +113,22 @@ inline fun PsiMethodCallExpression.extractReferences(call: PsiCall, method: PsiM
                         .map { it.advancedResolve(false).element }
                         .find { it === method.parameterList.parameters[paramIndex] }
                     if (operandRef != null) {
-                        listOf(call, this)
-                    } else {
-                        emptyList()
+                        return listOf(call, this)
                     }
                 }
-                else ->
-                    if (defaultParamCase(param)) {
-                        listOf(call, this)
-                    } else {
-                        emptyList()
-                    }
+                else -> if (defaultParamCase(param)) {
+                    return listOf(call, this)
+                }
             }
         }
         ref != null -> {
             val result = recurse(this)
             if (result.any()) {
-                listOf(this) + result
-            } else {
-                emptyList()
+                return listOf(this) + result
             }
         }
-        else -> emptyList()
     }
+    return emptyList()
 }
 
 fun PsiCall.extractVarArgs(index: Int, substitutions: Map<Int, Array<String?>?>, allowReferences: Boolean, allowTranslations: Boolean): Array<String?> {
