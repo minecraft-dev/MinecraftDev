@@ -45,7 +45,7 @@ object I18nElementFactory {
                 if (simpleFile is I18nFile) {
                     simpleFile.applyWriteAction {
                         add(createLineEnding(project))
-                        add(createProperty(project, name, value))
+                        add(createEntry(project, name, value))
                     }
                 }
             }
@@ -83,7 +83,7 @@ object I18nElementFactory {
         return file.firstChild
     }
 
-    fun createProperty(project: Project, key: String, value: String = ""): I18nEntry {
+    fun createEntry(project: Project, key: String, value: String = ""): I18nEntry {
         val file = createFile(project, "$key=$value")
         return file.firstChild as I18nEntry
     }

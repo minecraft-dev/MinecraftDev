@@ -34,10 +34,10 @@ class ChangeTranslationQuickFix(private val name: String) : LocalQuickFix {
             val popup = ChooseByNamePopup.createPopup(project, I18nGotoModel(project, translation?.regexPattern), null)
             popup.invoke(object : ChooseByNamePopupComponent.Callback() {
                 override fun elementChosen(element: Any) {
-                    val selectedProperty = element as I18nEntry
+                    val selectedEntry = element as I18nEntry
                     literal.containingFile.runWriteAction {
-                        val match = translation?.regexPattern?.matchEntire(selectedProperty.key)
-                        val insertion = if (match == null || match.groups.size <= 1) selectedProperty.key else match.groupValues[1]
+                        val match = translation?.regexPattern?.matchEntire(selectedEntry.key)
+                        val insertion = if (match == null || match.groups.size <= 1) selectedEntry.key else match.groupValues[1]
                         literal.replace(JavaPsiFacade.getInstance(project).elementFactory.createExpressionFromText("\"$insertion\"", literal.context))
                     }
                 }

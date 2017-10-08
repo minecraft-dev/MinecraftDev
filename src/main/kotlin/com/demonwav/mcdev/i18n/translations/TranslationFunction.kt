@@ -51,20 +51,18 @@ class TranslationFunction(val memberReference: MemberReference,
             return false
         }
         val referenceMethod = getMethod(method) ?: return false
-        if (setter) {
-            return method.isCalling(referenceMethod, paramIndex, matchedIndex)
-        } else {
-            return method.isReturningResultOf(referenceMethod, paramIndex, matchedIndex)
-        }
+        return if (setter)
+            method.isCalling(referenceMethod, paramIndex, matchedIndex)
+        else
+            method.isReturningResultOf(referenceMethod, paramIndex, matchedIndex)
     }
 
     fun getCalls(call: PsiCall, paramIndex: Int): Iterable<PsiCall> {
         val referenceMethod = getMethod(call) ?: return emptyList()
-        if (setter) {
-            return call.getCalls(referenceMethod, paramIndex, matchedIndex)
-        } else {
-            return call.getCallsReturningResult(referenceMethod, paramIndex, matchedIndex)
-        }
+        return if (setter)
+            call.getCalls(referenceMethod, paramIndex, matchedIndex)
+        else
+            call.getCallsReturningResult(referenceMethod, paramIndex, matchedIndex)
     }
 
     fun getTranslationKey(call: PsiCall): Pair<Boolean, String>? {
@@ -108,8 +106,8 @@ class TranslationFunction(val memberReference: MemberReference,
         fun resolveCall(call: PsiCall, substitutions: Map<Int, Array<String?>?>): Map<Int, Array<String?>?> {
             val method = call.referencedMethod
             val args = call.argumentList?.expressions
-            if (method != null && args != null && args.size >= method.parameterList.parametersCount) {
-                return method.parameterList.parameters
+            return if (method != null && args != null && args.size >= method.parameterList.parametersCount)
+                method.parameterList.parameters
                     .mapIndexed { i, parameter ->
                         if (parameter.isVarArgs) {
                             val varargType = method.getSignature(PsiSubstitutor.EMPTY).parameterTypes[i]
@@ -118,9 +116,7 @@ class TranslationFunction(val memberReference: MemberReference,
                             Pair(i, args[i].substituteParameter(substitutions, true, true))
                         }
                     }.toMap()
-            } else {
-                return emptyMap()
-            }
+            else emptyMap()
         }
 
         val calls = getCalls(topCall, matchedIndex)
@@ -147,7 +143,7 @@ class TranslationFunction(val memberReference: MemberReference,
     }
 
     companion object {
-        val NUMBER_FORMATTING_PATTERN = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]")
+        val NUMBER_FORMATTING_PATTERN = Pattern.compile("%(\\d+\\$)?[\\d.]*[df]")
         val STRING_FORMATTING_PATTERN = Pattern.compile("[^%]?%(?:\\d+\\$)?s")
     }
 }

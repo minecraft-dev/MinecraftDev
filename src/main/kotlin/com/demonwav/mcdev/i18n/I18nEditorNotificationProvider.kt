@@ -36,11 +36,11 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
             return null
         }
 
-        val defaultProperties = project.findDefaultLangEntries(scope = Scope.PROJECT, domain = I18nElementFactory.getResourceDomain(file))
-        val properties = project.findLangEntries(file = file, scope = Scope.PROJECT)
-        val defaultKeys = defaultProperties.map { it.key }.toMutableSet()
-        val keys = properties.map { it.key }
-        val propertyMap = defaultProperties.associate { it.key to it }
+        val defaultEntries = project.findDefaultLangEntries(scope = Scope.PROJECT, domain = I18nElementFactory.getResourceDomain(file))
+        val entries = project.findLangEntries(file = file, scope = Scope.PROJECT)
+        val defaultKeys = defaultEntries.map { it.key }.toMutableSet()
+        val keys = entries.map { it.key }
+        val entryMap = defaultEntries.associate { it.key to it }
 
         if (!keys.containsAll(defaultKeys)) {
             val panel = InfoPanel()
@@ -53,8 +53,8 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
                         add(I18nElementFactory.createLineEnding(project))
                     }
                     for (key in defaultKeys) {
-                        propertyMap[key]?.value?.let {
-                            add(I18nElementFactory.createProperty(project, key, it))
+                        entryMap[key]?.value?.let {
+                            add(I18nElementFactory.createEntry(project, key, it))
                             add(I18nElementFactory.createLineEnding(project))
                         }
                     }

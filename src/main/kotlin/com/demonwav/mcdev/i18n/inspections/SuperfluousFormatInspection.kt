@@ -53,22 +53,20 @@ class SuperfluousFormatInspection : TranslationInspection() {
         }
     }
 
-    companion object {
-        private class RemoveArgumentsQuickFix(private val call: PsiCall, private val position: Int) : LocalQuickFix {
-            override fun getName() = "Remove superfluous arguments"
+    private class RemoveArgumentsQuickFix(private val call: PsiCall, private val position: Int) : LocalQuickFix {
+        override fun getName() = "Remove superfluous arguments"
 
-            override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-                try {
-                    descriptor.psiElement.containingFile.runWriteAction {
-                        call.argumentList?.expressions?.drop(position)?.forEach { it.delete() }
-                    }
-                } catch (ignored: IncorrectOperationException) {
+        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+            try {
+                descriptor.psiElement.containingFile.runWriteAction {
+                    call.argumentList?.expressions?.drop(position)?.forEach { it.delete() }
                 }
+            } catch (ignored: IncorrectOperationException) {
             }
-
-            override fun startInWriteAction() = false
-
-            override fun getFamilyName() = name
         }
+
+        override fun startInWriteAction() = false
+
+        override fun getFamilyName() = name
     }
 }

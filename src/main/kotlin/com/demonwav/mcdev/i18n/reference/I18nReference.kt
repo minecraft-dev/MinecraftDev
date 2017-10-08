@@ -14,6 +14,7 @@ import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.i18n.findDefaultLangEntries
 import com.demonwav.mcdev.i18n.findLangEntries
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
+import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.toArray
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.util.TextRange
@@ -31,8 +32,8 @@ class I18nReference(element: PsiElement,
                     val varKey: String) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         val project = myElement.project
-        val properties = if (useDefault) project.findDefaultLangEntries(key = key) else project.findLangEntries(key = key)
-        return properties.map(::PsiElementResolveResult).toTypedArray()
+        val entries = if (useDefault) project.findDefaultLangEntries(key = key) else project.findLangEntries(key = key)
+        return entries.mapToArray(::PsiElementResolveResult)
     }
 
     override fun resolve(): PsiElement? {
@@ -42,23 +43,23 @@ class I18nReference(element: PsiElement,
 
     override fun getVariants(): Array<Any?> {
         val project = myElement.project
-        val properties = project.findDefaultLangEntries()
+        val entries = project.findDefaultLangEntries()
         val stringPattern =
             if (varKey.contains(VARIABLE_MARKER)) {
-                varKey.split(VARIABLE_MARKER).map { Regex.escape(it) }.joinToString("(.*?)")
+                varKey.split(VARIABLE_MARKER).joinToString("(.*?)") { Regex.escape(it) }
             } else {
                 "(" + Regex.escape(varKey) + ".*?)"
             }
         val pattern = Regex(stringPattern)
-        return properties
+        return entries
             .filter { it.key.isNotEmpty() }
-            .mapNotNull { property -> pattern.matchEntire(property.key)?.let { property to it } }
-            .map { (property, match) ->
+            .mapNotNull { entry -> pattern.matchEntire(entry.key)?.let { entry to it } }
+            .map { (entry, match) ->
                 LookupElementBuilder
-                    .create(if (match.groups.size <= 1) property.key else match.groupValues[1])
+                    .create(if (match.groups.size <= 1) entry.key else match.groupValues[1])
                     .withIcon(PlatformAssets.MINECRAFT_ICON)
-                    .withTypeText(property.containingFile.name)
-                    .withPresentableText(property.key)
+                    .withTypeText(entry.containingFile.name)
+                    .withPresentableText(entry.key)
             }
             .toArray()
     }
@@ -67,7 +68,7 @@ class I18nReference(element: PsiElement,
     override fun handleElementRename(newElementName: String): PsiElement {
         val stringPattern =
             if (varKey.contains(VARIABLE_MARKER)) {
-                varKey.split(VARIABLE_MARKER).map { Regex.escape(it) }.joinToString("(.*?)")
+                varKey.split(VARIABLE_MARKER).joinToString("(.*?)") { Regex.escape(it) }
             } else {
                 "(" + Regex.escape(varKey) + ")"
             }

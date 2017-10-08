@@ -18,7 +18,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.util.IncorrectOperationException
 
-class RemoveUnmatchedPropertyIntention : PsiElementBaseIntentionAction() {
+class RemoveUnmatchedEntryIntention : PsiElementBaseIntentionAction() {
     override fun getText() = "Remove translation"
 
     @Throws(IncorrectOperationException::class)

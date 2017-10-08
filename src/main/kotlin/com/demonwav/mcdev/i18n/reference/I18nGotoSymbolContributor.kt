@@ -12,19 +12,19 @@ package com.demonwav.mcdev.i18n.reference
 
 import com.demonwav.mcdev.i18n.Scope
 import com.demonwav.mcdev.i18n.findLangEntries
+import com.demonwav.mcdev.util.mapToArray
 import com.intellij.navigation.ChooseByNameContributor
 import com.intellij.navigation.NavigationItem
 import com.intellij.openapi.project.Project
 
 class I18nGotoSymbolContributor : ChooseByNameContributor {
     override fun getNames(project: Project, includeNonProjectItems: Boolean): Array<String> {
-        val properties = if (includeNonProjectItems) project.findLangEntries() else project.findLangEntries(Scope.PROJECT)
-        val names = properties.filter { it.key.isNotEmpty() }.map { it.key }
-        return names.toTypedArray()
+        val entries = if (includeNonProjectItems) project.findLangEntries() else project.findLangEntries(Scope.PROJECT)
+        return entries.filter { it.key.isNotEmpty() }.mapToArray { it.key }
     }
 
     override fun getItemsByName(name: String, pattern: String, project: Project, includeNonProjectItems: Boolean): Array<NavigationItem> {
-        val properties = if (includeNonProjectItems) project.findLangEntries(key = name) else project.findLangEntries(Scope.PROJECT, name)
-        return properties.map { it as NavigationItem }.toTypedArray()
+        val entries = if (includeNonProjectItems) project.findLangEntries(key = name) else project.findLangEntries(Scope.PROJECT, name)
+        return entries.mapToArray { it as NavigationItem }
     }
 }

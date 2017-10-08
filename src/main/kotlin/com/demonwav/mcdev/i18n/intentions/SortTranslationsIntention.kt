@@ -71,12 +71,12 @@ class SortTranslationsIntention(private val ordering: SortTranslationsIntention.
             for (elem in psiFile.children) {
                 elem.delete()
             }
-            for ((property, comments) in withComments) {
+            for ((entry, comments) in withComments) {
                 for (comment in comments) {
                     psiFile.add(I18nElementFactory.createComment(project, comment))
                     psiFile.add(I18nElementFactory.createLineEnding(project))
                 }
-                psiFile.add(I18nElementFactory.createProperty(project, property.key, property.value))
+                psiFile.add(I18nElementFactory.createEntry(project, entry.key, entry.value))
                 psiFile.add(I18nElementFactory.createLineEnding(project))
             }
         }

@@ -51,8 +51,8 @@ abstract class TranslationIdentifier<T : PsiElement> {
                         val translationKey = result.second.trim()
                         val varKey = if (translationKey == value) I18nReference.VARIABLE_MARKER else translationKey
                         val fullKey = translationKey.replace(I18nReference.VARIABLE_MARKER, value)
-                        val properties = project.findDefaultLangEntries(key = fullKey)
-                        val translation = properties.firstOrNull()?.value
+                        val entries = project.findDefaultLangEntries(key = fullKey)
+                        val translation = entries.firstOrNull()?.value
                         if (translation == null && function.setter) {
                             return null
                         }

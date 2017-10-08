@@ -14,11 +14,9 @@ import com.intellij.psi.PsiNameIdentifierOwner
 
 interface I18nEntryMixin : PsiNameIdentifierOwner {
     val key: String
-        get
 
     val trimmedKey: String
         get() = key.trim()
 
     val value: String
-        get
 }

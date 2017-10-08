@@ -31,7 +31,7 @@ abstract class I18nEntryImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), I
 
     override fun setName(name: String): PsiElement {
         val keyElement = node.findChildByType(I18nTypes.KEY)
-        val renamed = I18nElementFactory.createProperty(project, name)
+        val renamed = I18nElementFactory.createEntry(project, name)
         val newKey = renamed.node.findChildByType(I18nTypes.KEY)
         if (newKey != null) {
             if (keyElement != null) {

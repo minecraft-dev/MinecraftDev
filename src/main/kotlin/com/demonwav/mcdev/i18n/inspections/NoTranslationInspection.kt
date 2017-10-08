@@ -46,34 +46,32 @@ class NoTranslationInspection : TranslationInspection() {
         }
     }
 
-    companion object {
-        private object CreateTranslationQuickFix : LocalQuickFix {
-            override fun getName() = "Create translation"
+    private object CreateTranslationQuickFix : LocalQuickFix {
+        override fun getName() = "Create translation"
 
-            override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-                try {
-                    val literal = descriptor.psiElement as PsiLiteralExpression
-                    val translation = LiteralTranslationIdentifier().identify(literal)
-                    val literalValue = literal.value as String
-                    val key = translation?.varKey?.replace(I18nReference.VARIABLE_MARKER, literalValue) ?: literalValue
-                    val result = Messages.showInputDialog("Enter default value for \"$key\":",
-                        "Create Translation",
-                        Messages.getQuestionIcon())
-                    if (result != null) {
-                        I18nElementFactory.addTranslation(
-                            ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(literal.containingFile.virtualFile),
-                            key,
-                            result
-                        )
-                    }
-                } catch (ignored: IncorrectOperationException) {
+        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+            try {
+                val literal = descriptor.psiElement as PsiLiteralExpression
+                val translation = LiteralTranslationIdentifier().identify(literal)
+                val literalValue = literal.value as String
+                val key = translation?.varKey?.replace(I18nReference.VARIABLE_MARKER, literalValue) ?: literalValue
+                val result = Messages.showInputDialog("Enter default value for \"$key\":",
+                    "Create Translation",
+                    Messages.getQuestionIcon())
+                if (result != null) {
+                    I18nElementFactory.addTranslation(
+                        ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(literal.containingFile.virtualFile),
+                        key,
+                        result
+                    )
                 }
-
+            } catch (ignored: IncorrectOperationException) {
             }
 
-            override fun startInWriteAction() = false
-
-            override fun getFamilyName() = name
         }
+
+        override fun startInWriteAction() = false
+
+        override fun getFamilyName() = name
     }
 }
