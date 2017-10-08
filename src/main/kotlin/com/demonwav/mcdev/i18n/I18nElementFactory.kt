@@ -13,8 +13,10 @@ package com.demonwav.mcdev.i18n
 import com.demonwav.mcdev.i18n.lang.I18nFile
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nProperty
-import com.demonwav.mcdev.util.runWriteActionScoped
-import com.intellij.openapi.fileEditor.FileEditorManager
+import com.demonwav.mcdev.util.applyWriteAction
+import com.intellij.ide.DataManager
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -25,6 +27,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.ui.components.JBList
+import com.intellij.util.Consumer
 import java.util.Locale
 
 object I18nElementFactory {
@@ -41,7 +44,7 @@ object I18nElementFactory {
             for (file in files) {
                 val simpleFile = PsiManager.getInstance(module.project).findFile(file)
                 if (simpleFile is I18nFile) {
-                    simpleFile.runWriteActionScoped {
+                    simpleFile.applyWriteAction {
                         add(createLineEnding(project))
                         add(createProperty(project, name, value))
                     }
@@ -53,18 +56,20 @@ object I18nElementFactory {
         if (files.count { it.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE } > 1) {
             val choices = files.mapNotNull(this::getResourceDomain).distinct().sorted()
             val swingList = JBList(choices)
-            JBPopupFactory.getInstance()
-                .createListPopupBuilder(swingList)
-                .setTitle("Choose resource domain")
-                .setAdText("There are multiple resource domains with localization files, choose one for this translation.")
-                .setItemChoosenCallback {
-                    swingList.selectedValue?.let {
-                        val validPattern = Regex("^.*?/assets/${Regex.escape(it)}/lang.*?\$")
-                        write(files.filter { validPattern.matches(it.path) })
+            DataManager.getInstance().dataContextFromFocus.doWhenDone(Consumer<DataContext> {
+                JBPopupFactory.getInstance()
+                    .createListPopupBuilder(swingList)
+                    .setTitle("Choose resource domain")
+                    .setAdText("There are multiple resource domains with localization files, choose one for this translation.")
+                    .setItemChoosenCallback {
+                        swingList.selectedValue?.let {
+                            val validPattern = Regex("^.*?/assets/${Regex.escape(it)}/lang.*?\$")
+                            write(files.filter { validPattern.matches(it.path) })
+                        }
                     }
-                }
-                .createPopup()
-                .showInBestPositionFor(FileEditorManager.getInstance(module.project).selectedTextEditor!!)
+                    .createPopup()
+                    .showInBestPositionFor(it)
+            })
         } else {
             write(files)
         }

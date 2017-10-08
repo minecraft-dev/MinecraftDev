@@ -12,7 +12,7 @@ package com.demonwav.mcdev.i18n
 
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
-import com.demonwav.mcdev.util.runWriteActionScoped
+import com.demonwav.mcdev.util.applyWriteAction
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.fileEditor.FileEditor
@@ -44,10 +44,10 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
 
         if (!keys.containsAll(defaultKeys)) {
             val panel = InfoPanel()
-            panel.setText("Translation file doesn't match default one (${I18nConstants.DEFAULT_LOCALE}.lang).")
+            panel.setText("Translation file doesn't match default one (${I18nConstants.DEFAULT_LOCALE}.${I18nConstants.FILE_EXTENSION}).")
             panel.createActionLabel("Add missing default entries (won't reflect changes in original English localization)") {
                 val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
-                psi.runWriteActionScoped {
+                psi.applyWriteAction {
                     defaultKeys.removeAll(keys)
                     if (lastChild?.node?.elementType != I18nTypes.LINE_ENDING) {
                         add(I18nElementFactory.createLineEnding(project))

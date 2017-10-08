@@ -75,17 +75,10 @@ inline fun invokeLaterAny(crossinline func: () -> Unit) {
     }
 }
 
-inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T): T {
-    val result = object : WriteCommandAction<T>(project) {
-        override fun run(result: Result<T>) {
-            result.setResult(func())
-        }
-    }.execute().resultObject
-    PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return result)
-    return result
-}
+inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
+    applyWriteAction { func() }
 
-inline fun <T : Any?> PsiFile.runWriteActionScoped(crossinline func: PsiFile.() -> T): T {
+inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T): T {
     val result = object : WriteCommandAction<T>(project) {
         override fun run(result: Result<T>) {
             result.setResult(func())
