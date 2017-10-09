@@ -73,7 +73,7 @@ inline fun invokeLaterAny(crossinline func: () -> Unit) {
     }
 }
 
-inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
+inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T): T? =
     object : WriteCommandAction<T>(project) {
         override fun run(result: Result<T>) {
             result.setResult(func())

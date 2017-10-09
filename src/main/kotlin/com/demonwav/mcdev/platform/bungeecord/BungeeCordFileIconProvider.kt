@@ -31,7 +31,7 @@ class BungeeCordFileIconProvider : FileIconProvider {
         val module = ModuleUtilCore.findModuleForFile(file, project) ?: return null
         val bungeecordModule = MinecraftFacet.getInstance(module, BungeeCordModuleType) ?: return null
 
-        if (file == bungeecordModule.getPluginYml()) {
+        if (file == bungeecordModule.pluginYml) {
             return bungeecordModule.icon
         }
         return null

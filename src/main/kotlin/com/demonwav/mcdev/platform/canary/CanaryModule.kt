@@ -18,8 +18,8 @@ import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.canary.generation.CanaryGenerationData
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants
+import com.demonwav.mcdev.util.nullable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiClass
@@ -31,21 +31,10 @@ import com.intellij.psi.search.GlobalSearchScope
 class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, override val moduleType: T) : AbstractModule(facet) {
 
     override val type: PlatformType = moduleType.platformType
-    var canaryInf: VirtualFile? = null
-        get() {
-            if (field == null) {
-                field = facet.findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE)
-            }
-            return field
-        }
+    
+    var canaryInf by nullable { facet.findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE) }
         private set
-    var neptuneInf: VirtualFile? = null
-        get() {
-            if (field == null) {
-                field = facet.findFile(CanaryConstants.NEPTUNE_INF, SourceType.RESOURCE)
-            }
-            return field
-        }
+    var neptuneInf by nullable { facet.findFile(CanaryConstants.NEPTUNE_INF, SourceType.RESOURCE) }
         private set
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) =

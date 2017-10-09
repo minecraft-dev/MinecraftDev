@@ -16,7 +16,7 @@ import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.liteloader.util.LiteLoaderConstants
-import com.intellij.openapi.vfs.VirtualFile
+import com.demonwav.mcdev.util.nullable
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIdentifier
@@ -24,22 +24,8 @@ import com.intellij.psi.PsiMethod
 
 class LiteLoaderModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
-    private var litemodJson: VirtualFile? = null
-
-    init {
-        setup()
-    }
-
-    private fun setup() {
-        litemodJson = facet.findFile(LiteLoaderConstants.LITEMOD_JSON, SourceType.RESOURCE)
-    }
-
-    fun getLitemodJson(): VirtualFile? {
-        if (litemodJson == null) {
-            setup()
-        }
-        return litemodJson
-    }
+    var litemodJson by nullable { facet.findFile(LiteLoaderConstants.LITEMOD_JSON, SourceType.RESOURCE) }
+        private set
 
     override val moduleType = LiteLoaderModuleType
     override val type = PlatformType.LITELOADER

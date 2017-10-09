@@ -21,7 +21,7 @@ import com.demonwav.mcdev.platform.bungeecord.generation.BungeeCordGenerationDat
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.extendsOrImplements
-import com.intellij.openapi.vfs.VirtualFile
+import com.demonwav.mcdev.util.nullable
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -33,24 +33,8 @@ import org.jetbrains.annotations.Contract
 
 class BungeeCordModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
-    private var pluginYml: VirtualFile? = null
-
-    init {
-        setup()
-    }
-
-    private fun setup() {
-        pluginYml = facet.findFile("plugin.yml", SourceType.RESOURCE)
-    }
-
-    fun getPluginYml(): VirtualFile? {
-        if (pluginYml == null) {
-            // try and find the file again if it's not already present
-            // when this object was first created it may not have been ready
-            setup()
-        }
-        return pluginYml
-    }
+    var pluginYml by nullable { facet.findFile("plugin.yml", SourceType.RESOURCE) }
+        private set
 
     override val moduleType = BungeeCordModuleType
     override val type = PlatformType.BUNGEECORD
