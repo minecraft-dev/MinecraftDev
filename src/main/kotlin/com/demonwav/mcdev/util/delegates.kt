@@ -12,17 +12,17 @@ package com.demonwav.mcdev.util
 
 import kotlin.reflect.KProperty
 
-private object Lock
-
 class NullableDelegate<T>(private val supplier: () -> T?) {
     private var field: T? = null
+
+    private val lock = Lock()
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T? {
         if (field != null) {
             return field
         }
 
-        synchronized(Lock) {
+        synchronized(lock) {
             if (field != null) {
                 return field
             }
@@ -36,6 +36,8 @@ class NullableDelegate<T>(private val supplier: () -> T?) {
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
         this.field = value
     }
+
+    private inner class Lock
 }
 
 fun <T> nullable(supplier: () -> T?): NullableDelegate<T>  = NullableDelegate(supplier)
