@@ -15,7 +15,7 @@ import com.demonwav.mcdev.i18n.intentions.RemoveUnmatchedEntryIntention
 import com.demonwav.mcdev.i18n.intentions.TrimKeyIntention
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
-import com.demonwav.mcdev.util.mcDomain
+import com.demonwav.mcdev.util.resourceDomain
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.openapi.util.TextRange
@@ -50,7 +50,7 @@ class I18nAnnotator : Annotator {
     }
 
     private fun checkEntryMatchesDefault(entry: I18nEntry, annotations: AnnotationHolder) {
-        if (entry.project.findDefaultLangEntries(domain = entry.containingFile.virtualFile.mcDomain).any { it.key == entry.key }) {
+        if (entry.project.findDefaultLangEntries(domain = entry.containingFile.virtualFile.resourceDomain).any { it.key == entry.key }) {
             return
         }
         annotations.createWarningAnnotation(entry.textRange, "Translation key not included in default localization file.")

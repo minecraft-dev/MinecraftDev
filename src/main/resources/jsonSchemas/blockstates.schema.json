@@ -1,0 +1,70 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Minecraft Blockstates JSON",
+    "definitions": {
+        "variantDefinition": {
+            "type": "object",
+            "additionalProperties": {
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "additionalProperties": { "$ref": "#/definitions/variantObject" }
+                    },
+                    {
+                        "type": "array",
+                        "items": { "$ref": "#/definitions/variantObject" }
+                    }
+                ]
+            }
+        },
+        "variantObject": {
+            "type": "object",
+            "properties": {
+                "__comment": {
+                    "type": "string"
+                },
+                "model": { "type": "string" },
+                "textures": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "oneOf": [
+        {
+            "type": "object",
+            "properties": {
+                "__comment": {
+                    "type": "string"
+                },
+                "variants": {
+                    "type": "object",
+                    "additionalProperties": { "$ref": "#/definitions/variantObject" }
+                }
+            },
+            "additionalProperties": false,
+            "required": [ "variants" ],
+            "not": { "required": [ "forge_marker" ] }
+        },
+        {
+            "type": "object",
+            "properties": {
+                "__comment": {
+                    "type": "string"
+                },
+                "forge_marker": {
+                    "type": "integer",
+                    "enum": [ 1 ]
+                },
+                "variants": { "$ref": "#/definitions/variantDefinition" },
+                "defaults": { "$ref": "#/definitions/variantObject" }
+            },
+            "additionalProperties": false,
+            "required": [ "forge_marker", "variants" ]
+        }
+    ]
+}

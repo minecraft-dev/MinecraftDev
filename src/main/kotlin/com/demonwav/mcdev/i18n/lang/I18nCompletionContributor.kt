@@ -17,7 +17,7 @@ import com.demonwav.mcdev.i18n.findDefaultLangEntries
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.demonwav.mcdev.util.getSimilarity
-import com.demonwav.mcdev.util.mcDomain
+import com.demonwav.mcdev.util.resourceDomain
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
@@ -55,7 +55,7 @@ class I18nCompletionContributor : CompletionContributor() {
 
         if (KEY_PATTERN.accepts(position) || DUMMY_PATTERN.accepts(position)) {
             val text = position.text.let { it.substring(0, it.length - CompletionUtil.DUMMY_IDENTIFIER.length) }
-            val domain = file.mcDomain
+            val domain = file.resourceDomain
             handleKey(text, position, domain, result)
         }
     }

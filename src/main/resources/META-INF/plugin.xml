@@ -701,6 +701,10 @@
         <projectResolve implementation="com.demonwav.mcdev.platform.forge.gradle.ForgePatcherProjectResolverExtension"/>
     </extensions>
 
+    <extensions defaultExtensionNs="JavaScript.JsonSchema">
+        <ProviderFactory implementation="com.demonwav.mcdev.json.SchemaProviderFactory"/>
+    </extensions>
+
     <application-components>
         <component>
             <implementation-class>com.demonwav.mcdev.i18n.I18nFileListener</implementation-class>

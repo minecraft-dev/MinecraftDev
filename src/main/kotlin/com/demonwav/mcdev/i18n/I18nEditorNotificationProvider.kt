@@ -16,7 +16,7 @@ import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.demonwav.mcdev.i18n.sorting.I18nSorter
 import com.demonwav.mcdev.i18n.sorting.Ordering
 import com.demonwav.mcdev.util.applyWriteAction
-import com.demonwav.mcdev.util.mcDomain
+import com.demonwav.mcdev.util.resourceDomain
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.fileEditor.FileEditor
@@ -80,7 +80,7 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
     }
 
     private fun getMissingEntries(file: VirtualFile): Map<String, I18nEntry> {
-        val defaultEntries = project.findDefaultLangEntries(scope = Scope.PROJECT, domain = file.mcDomain)
+        val defaultEntries = project.findDefaultLangEntries(scope = Scope.PROJECT, domain = file.resourceDomain)
         val entries = project.findLangEntries(file = file, scope = Scope.PROJECT)
         val keys = entries.map { it.key }
         val missingEntries = defaultEntries.associate { it.key to it }.toMutableMap()
