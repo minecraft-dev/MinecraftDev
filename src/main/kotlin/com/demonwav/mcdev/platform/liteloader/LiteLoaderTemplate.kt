@@ -11,7 +11,9 @@
 package com.demonwav.mcdev.platform.liteloader
 
 import com.demonwav.mcdev.platform.BaseTemplate
+import com.demonwav.mcdev.platform.forge.ForgeTemplate
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory
+import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import java.util.Properties
@@ -33,7 +35,18 @@ object LiteLoaderTemplate {
         properties.setProperty("MCP_MAPPINGS", configuration.mcpVersion)
 
         BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE, properties)
-        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_BUILD_GRADLE_TEMPLATE, Properties())
+
+        val gradleProps = Properties()
+
+        // Fixes builds for MC1.12+, requires FG 2.3
+        val mcVersion = SemanticVersion.parse(configuration.mcVersion)
+        if (mcVersion >= ForgeTemplate.MC_1_12) {
+            gradleProps.setProperty("FORGEGRADLE_VERSION", "2.3")
+        } else {
+            gradleProps.setProperty("FORGEGRADLE_VERSION", "2.2")
+        }
+
+        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_BUILD_GRADLE_TEMPLATE, gradleProps)
     }
 
     fun applySubmoduleBuildGradleTemplate(project: Project,
@@ -44,6 +57,14 @@ object LiteLoaderTemplate {
 
         val properties = Properties()
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName)
+
+        // Fixes builds for MC1.12+, requires FG 2.3
+        val mcVersion = SemanticVersion.parse(configuration.mcVersion)
+        if (mcVersion >= ForgeTemplate.MC_1_12) {
+            properties.setProperty("FORGEGRADLE_VERSION", "2.3")
+        } else {
+            properties.setProperty("FORGEGRADLE_VERSION", "2.2")
+        }
 
         BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties)
 

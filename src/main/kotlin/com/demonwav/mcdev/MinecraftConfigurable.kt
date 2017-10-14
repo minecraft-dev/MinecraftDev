@@ -61,11 +61,7 @@ class MinecraftConfigurable : Configurable {
     }
 
     private fun setUnderlineBox() {
-        if (showChatColorUnderlinesCheckBox.isSelected) {
-            chatColorUnderlinesComboBox.setEnabled(true)
-        } else {
-            chatColorUnderlinesComboBox.setEnabled(false)
-        }
+        chatColorUnderlinesComboBox.isEnabled = showChatColorUnderlinesCheckBox.isSelected
     }
 
     override fun isModified(): Boolean {
