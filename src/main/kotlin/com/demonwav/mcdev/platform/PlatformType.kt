@@ -17,7 +17,9 @@ import com.demonwav.mcdev.platform.bukkit.framework.BUKKIT_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bukkit.framework.PAPER_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bukkit.framework.SPIGOT_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType
+import com.demonwav.mcdev.platform.bungeecord.WaterfallModuleType
 import com.demonwav.mcdev.platform.bungeecord.framework.BUNGEECORD_LIBRARY_KIND
+import com.demonwav.mcdev.platform.bungeecord.framework.WATERFALL_LIBRARY_KIND
 import com.demonwav.mcdev.platform.canary.CanaryModuleType
 import com.demonwav.mcdev.platform.canary.NeptuneModuleType
 import com.demonwav.mcdev.platform.canary.framework.CANARY_LIBRARY_KIND
@@ -47,7 +49,8 @@ enum class PlatformType(
     SPONGE(SpongeModuleType, "Sponge"),
     NEPTUNE(NeptuneModuleType, "Neptune"),
     CANARY(CanaryModuleType, "Canary", arrayOf(NEPTUNE)),
-    BUNGEECORD(BungeeCordModuleType, "BungeeCord"),
+    WATERFALL(WaterfallModuleType, "Waterfall"),
+    BUNGEECORD(BungeeCordModuleType, "BungeeCord", arrayOf(WATERFALL)),
     LITELOADER(LiteLoaderModuleType, "LiteLoader"),
     MIXIN(MixinModuleType, "Mixin"),
     MCP(McpModuleType, "MCP");
@@ -114,6 +117,7 @@ enum class PlatformType(
                 MCP_LIBRARY_KIND -> MCP
                 MIXIN_LIBRARY_KIND -> MIXIN
                 BUNGEECORD_LIBRARY_KIND -> BUNGEECORD
+                WATERFALL_LIBRARY_KIND -> WATERFALL
                 CANARY_LIBRARY_KIND -> CANARY
                 NEPTUNE_LIBRARY_KIND -> NEPTUNE
                 else -> null
