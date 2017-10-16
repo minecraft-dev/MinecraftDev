@@ -76,19 +76,11 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         return panel
     }
 
-    private fun toggle(one: JCheckBox, two: JCheckBox) {
+    private fun toggle(one: JCheckBox, vararg others: JCheckBox) {
         if (one.isSelected) {
-            two.isSelected = false
-            fillInInfoPane()
+            others.forEach { it.isSelected = false }
         }
-    }
-
-    private fun toggle(one: JCheckBox, two: JCheckBox, three: JCheckBox) {
-        if (one.isSelected) {
-            two.isSelected = false
-            three.isSelected = false
-            fillInInfoPane()
-        }
+        fillInInfoPane()
     }
 
     private fun fillInInfoPane() {
