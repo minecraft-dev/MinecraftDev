@@ -41,6 +41,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     private lateinit var mixinAutoCheckBox: JCheckBox
     private lateinit var bungeecordEnabledCheckBox: JCheckBox
     private lateinit var bungeecordAutoCheckBox: JCheckBox
+    private lateinit var waterfallEnabledCheckBox: JCheckBox
+    private lateinit var waterfallAutoCheckBox: JCheckBox
     private lateinit var canaryEnabledCheckBox: JCheckBox
     private lateinit var canaryAutoCheckBox: JCheckBox
     private lateinit var neptuneEnabledCheckBox: JCheckBox
@@ -61,10 +63,12 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             mcpEnabledCheckBox,
             mixinEnabledCheckBox,
             bungeecordEnabledCheckBox,
+            waterfallEnabledCheckBox,
             canaryEnabledCheckBox,
             neptuneEnabledCheckBox
         )
     }
+
     private val autoCheckBoxArray: Array<JCheckBox> by lazy {
         arrayOf(
             bukkitAutoCheckBox,
@@ -76,37 +80,11 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             mcpAutoCheckBox,
             mixinAutoCheckBox,
             bungeecordAutoCheckBox,
+            waterfallAutoCheckBox,
             canaryAutoCheckBox,
             neptuneAutoCheckBox
         )
     }
-
-    private val BUKKIT = 0
-    private val SPIGOT = BUKKIT + 1
-    private val PAPER = SPIGOT + 1
-    private val SPONGE = PAPER + 1
-    private val FORGE = SPONGE + 1
-    private val LITELOADER  = FORGE + 1
-    private val MCP = LITELOADER + 1
-    private val MIXIN = MCP + 1
-    private val BUNGEECORD = MIXIN + 1
-    private val CANARY = BUNGEECORD + 1
-    private val NEPTUNE = CANARY + 1
-
-    private val platformTypes = arrayOf(
-        PlatformType.BUKKIT,
-        PlatformType.SPIGOT,
-        PlatformType.PAPER,
-        PlatformType.SPONGE,
-        PlatformType.FORGE,
-        PlatformType.LITELOADER,
-        PlatformType.MCP,
-        PlatformType.MIXIN,
-        PlatformType.BUNGEECORD,
-        PlatformType.CANARY,
-        PlatformType.NEPTUNE
-    )
-    private val indexes = intArrayOf(BUKKIT, SPIGOT, PAPER, SPONGE, FORGE, LITELOADER, MCP, MIXIN, BUNGEECORD, CANARY, NEPTUNE)
 
     override fun createComponent(): JComponent {
         if (UIUtil.isUnderDarcula()) {
@@ -136,6 +114,9 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         forgeEnabledCheckBox.addActionListener { also(forgeEnabledCheckBox, mcpEnabledCheckBox) }
         liteloaderEnabledCheckBox.addActionListener { also(liteloaderEnabledCheckBox, mcpEnabledCheckBox) }
         mixinEnabledCheckBox.addActionListener { also(mixinEnabledCheckBox, mcpEnabledCheckBox) }
+
+        bungeecordEnabledCheckBox.addActionListener { unique(bungeecordEnabledCheckBox, waterfallEnabledCheckBox) }
+        waterfallEnabledCheckBox.addActionListener { unique(waterfallEnabledCheckBox, bungeecordEnabledCheckBox) }
 
         return panel
     }
@@ -234,4 +215,36 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     private operator fun Boolean.plus(n: Boolean) = this || n
     // This is here so we can use vararg. Can't use parameter modifiers in function type definitions for some reason
     open class Invoker { open operator fun invoke(vararg indexes: Int) {} }
+
+    companion object {
+        private const val BUKKIT = 0
+        private const val SPIGOT = BUKKIT + 1
+        private const val PAPER = SPIGOT + 1
+        private const val SPONGE = PAPER + 1
+        private const val FORGE = SPONGE + 1
+        private const val LITELOADER  = FORGE + 1
+        private const val MCP = LITELOADER + 1
+        private const val MIXIN = MCP + 1
+        private const val BUNGEECORD = MIXIN + 1
+        private const val WATERFALL = BUNGEECORD + 1
+        private const val CANARY = BUNGEECORD + 1
+        private const val NEPTUNE = CANARY + 1
+
+        private val platformTypes = arrayOf(
+            PlatformType.BUKKIT,
+            PlatformType.SPIGOT,
+            PlatformType.PAPER,
+            PlatformType.SPONGE,
+            PlatformType.FORGE,
+            PlatformType.LITELOADER,
+            PlatformType.MCP,
+            PlatformType.MIXIN,
+            PlatformType.BUNGEECORD,
+            PlatformType.WATERFALL,
+            PlatformType.CANARY,
+            PlatformType.NEPTUNE
+        )
+
+        private val indexes = intArrayOf(BUKKIT, SPIGOT, PAPER, SPONGE, FORGE, LITELOADER, MCP, MIXIN, BUNGEECORD, WATERFALL, CANARY, NEPTUNE)
+    }
 }
