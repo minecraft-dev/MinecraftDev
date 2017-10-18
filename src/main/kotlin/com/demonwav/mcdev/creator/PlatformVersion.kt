@@ -24,6 +24,7 @@ private const val bukkitUrl = "$baseUrl/bukkit.json"
 private const val spigotUrl = "$baseUrl/spigot.json"
 private const val paperUrl = "$baseUrl/paper.json"
 private const val bungeecordUrl = "$baseUrl/bungeecord.json"
+private const val waterfallUrl = "$baseUrl/waterfall.json"
 private const val canaryUrl = "$baseUrl/canary.json"
 private const val neptuneUrl = "$baseUrl/neptune.json"
 
@@ -33,6 +34,7 @@ fun getVersionSelector(type: PlatformType) = runAsync {
         PlatformType.SPIGOT -> spigotUrl
         PlatformType.PAPER -> paperUrl
         PlatformType.BUNGEECORD -> bungeecordUrl
+        PlatformType.WATERFALL -> waterfallUrl
         PlatformType.CANARY -> canaryUrl
         PlatformType.NEPTUNE -> neptuneUrl
         else -> throw UnsupportedOperationException("Incorrect platform type: $type")

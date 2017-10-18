@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration
 import org.apache.commons.lang.WordUtils
@@ -29,6 +30,7 @@ class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreat
     private lateinit var authorField: JTextField
     private lateinit var dependField: JTextField
     private lateinit var softDependField: JTextField
+    private lateinit var title: JLabel
     private lateinit var minecraftVersionBox: JComboBox<String>
     private lateinit var errorLabel: JLabel
 
@@ -52,10 +54,22 @@ class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreat
         mainClassField.text = "${creator.groupId.toLowerCase()}.${creator.artifactId.toLowerCase()}.$name"
 
         if (creator.settings.size > 1) {
-            mainClassField.text = mainClassField.text + PlatformType.BUNGEECORD.normalName
+            mainClassField.text = mainClassField.text + settings!!.type.normalName
         }
 
-        getVersionSelector(PlatformType.BUNGEECORD)
+        when (settings!!.type) {
+            PlatformType.BUNGEECORD -> {
+                title.icon = PlatformAssets.BUNGEECORD_ICON_2X
+                title.text = "<html><font size=\"5\">BungeeCord Settings</font></html>"
+            }
+            PlatformType.WATERFALL -> {
+                title.icon = PlatformAssets.WATERFALL_ICON_2X
+                title.text = "<html><font size=\"5\">Waterfall Settings</font></html>"
+            }
+            else -> {}
+        }
+
+        getVersionSelector(settings!!.type)
             .done { it.set(minecraftVersionBox) }
             .rejected { errorLabel.isVisible = true }
 

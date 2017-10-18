@@ -15,6 +15,7 @@ import com.demonwav.mcdev.buildsystem.SourceType
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.GenerationData
 import com.demonwav.mcdev.platform.AbstractModule
+import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.BukkitModule
 import com.demonwav.mcdev.platform.bungeecord.generation.BungeeCordGenerationData
@@ -31,12 +32,11 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTypesUtil
 import org.jetbrains.annotations.Contract
 
-class BungeeCordModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
+class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, override val moduleType: T) : AbstractModule(facet) {
 
     var pluginYml by nullable { facet.findFile("plugin.yml", SourceType.RESOURCE) }
         private set
 
-    override val moduleType = BungeeCordModuleType
     override val type = PlatformType.BUNGEECORD
     override val icon = PlatformAssets.BUNGEECORD_ICON
 
