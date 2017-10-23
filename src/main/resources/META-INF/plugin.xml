@@ -20,15 +20,15 @@
     <vendor>DemonWav</vendor>
 
     <description><![CDATA[
-      Brings support for Bukkit, Spigot, Paper, BungeeCord, Waterfall, Sponge, LiteLoader, Forge, and Canary projects to Intellij IDEA.
+      Brings support for Bukkit, Spigot, Paper, Sponge, Forge, MCP, Mixins, BungeeCord, Waterfall, LiteLoader, Canary and Neptune projects
+      to Intellij IDEA.
     ]]></description>
 
     <change-notes><![CDATA[
       <div>
-        Alpha release, may break. More features to come. Please report issues to
-        <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
+        Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2017.2-0.7.5
+        v. 2017.2-1.0.0
       </div>
     ]]>
     </change-notes>

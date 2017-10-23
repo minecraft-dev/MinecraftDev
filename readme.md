@@ -6,11 +6,11 @@ Minecraft Development for IntelliJ
 |  Service   |Status|
 |------------|------|
 |**TeamCity**|[![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
-|**Nightly** |[![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Nightly.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly)|
+|**Nightly** |[![TeamCity Nightly Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Nightly.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly)|
 |**CircleCI**|[![Travis Build Status](https://img.shields.io/circleci/project/github/minecraft-dev/MinecraftDev/dev.svg?style=flat-square)](https://circleci.com/gh/minecraft-dev/MinecraftDev)|
 | **Travis** |[![CircleCI Build Status](https://img.shields.io/travis/minecraft-dev/MinecraftDev/dev.svg?style=flat-square)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-2017.2--0.7.5-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-2017.2--1.0.0-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 Visit [https://minecraftdev.org](https://minecraftdev.org) for information about the project, change logs, features, FAQs, and chat.
@@ -64,13 +64,13 @@ style slightly modified). Link [here](http://www.demonwav.com/style).
 Developers
 ----------
 
-[**@DemonWav** - Kyle Wood](https://github.com/DemonWav)
+- Project Owner - [**@DemonWav** - Kyle Wood](https://github.com/DemonWav)
+- [**@Minecrell**](https://github.com/Minecrell)
 
 #### **Contributors**
 
 - [**@gabizou** - Gabriel Harris-Rouquette](https://github.com/gabizou)
 - [**@kashike**](https://github.com/kashike)
-- [**@Minecrell**](https://github.com/Minecrell)
 - [**@jamierocks** - Jamie Mansfield](https://github.com/jamierocks)
 
 Issues
@@ -96,5 +96,5 @@ Supported Platforms
 - [![LiteLoader Icon](src/main/resources/assets/icons/platform/LiteLoader.png?raw=true) **LiteLoader**](http://www.liteloader.com/)
 - [![MCP Icon](src/main/resources/assets/icons/platform/MCP.png?raw=true) **MCP**](http://www.modcoderpack.com/)
 - [![Mixins Icon](src/main/resources/assets/icons/platform/Mixins_dark.png?raw=true) **Mixins**](https://github.com/SpongePowered/Mixin)
-- [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/)
+- [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/) ([![Waterfall Icon](src/main/resources/assets/icons/platform/Waterfall.png?raw=true) Waterfall](https://github.com/WaterfallMC))
 - [![Canary Icon](src/main/resources/assets/icons/platform/Canary.png?raw=true) **Canary**](https://canarymod.net/) ([![Neptune Icon](src/main/resources/assets/icons/platform/Neptune.png?raw=true) **Neptune**](https://www.neptunepowered.org/))
