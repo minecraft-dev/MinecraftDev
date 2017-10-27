@@ -25,7 +25,7 @@ class I18nSyntaxHighlighter : SyntaxHighlighterBase() {
             I18nTypes.KEY -> KEY_KEYS
             I18nTypes.EQUALS -> EQUALS_KEYS
             I18nTypes.VALUE -> VALUE_KEYS
-            I18nTypes.COMMENT -> COMMENT_KEYS
+            I18nTypes.COMMENT, I18nTypes.DUMMY -> COMMENT_KEYS
             else -> EMPTY_KEYS
         }
 

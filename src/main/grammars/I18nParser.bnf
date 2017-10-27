@@ -31,7 +31,7 @@
 
 i18n_file ::= line*
 
-private line ::= entry | COMMENT | LINE_ENDING
+private line ::= entry | COMMENT | DUMMY | LINE_ENDING
 
 entry ::= KEY EQUALS VALUE? {
     methods=[]
