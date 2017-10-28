@@ -10,12 +10,17 @@
 
 package com.demonwav.mcdev.platform.mixin.util
 
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DYNAMIC
 import com.demonwav.mcdev.util.equivalentTo
+import com.demonwav.mcdev.util.findAnnotation
+import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.findMatchingMethods
 import com.demonwav.mcdev.util.isMatchingField
 import com.demonwav.mcdev.util.isMatchingMethod
 import com.demonwav.mcdev.util.memberReference
+import com.demonwav.mcdev.util.resolveClass
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
@@ -23,6 +28,15 @@ import com.intellij.psi.impl.compiled.ClsMethodImpl
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
 import org.jetbrains.annotations.Contract
+
+@Contract(pure = true)
+fun PsiMember.findUpstreamMixin(): PsiClass? {
+    return findAnnotation(DYNAMIC)?.findDeclaredAttributeValue("mixin")?.resolveClass()
+}
+
+@get:Contract(pure = true)
+val PsiElement.isWithinDynamicMixin: Boolean
+    get() = findContainingMethod()?.findAnnotation(DYNAMIC) != null
 
 @Contract(pure = true)
 fun findMethods(psiClass: PsiClass): Sequence<PsiMethod>? {

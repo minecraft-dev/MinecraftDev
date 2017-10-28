@@ -32,6 +32,7 @@ object MixinConstants {
         const val AT = "org.spongepowered.asm.mixin.injection.At"
         const val AT_CODE = "org.spongepowered.asm.mixin.injection.InjectionPoint.AtCode"
         const val DEBUG = "org.spongepowered.asm.mixin.Debug"
+        const val DYNAMIC = "org.spongepowered.asm.mixin.Dynamic"
         const val FINAL = "org.spongepowered.asm.mixin.Final"
         const val IMPLEMENTS = "org.spongepowered.asm.mixin.Implements"
         const val INTERFACE = "org.spongepowered.asm.mixin.Interface"
@@ -55,8 +56,8 @@ object MixinConstants {
         val METHOD_INJECTORS = listOf(INJECT, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT)
         val ENTRY_POINTS = arrayOf(INJECT, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE, OVERWRITE)
         val MIXIN_ANNOTATIONS = setOf(
-            ACCESSOR, AT, DEBUG, FINAL, IMPLEMENTS, INTERFACE, INTRINSIC, MIXIN, MUTABLE, OVERWRITE, SHADOW, SLICE, SOFT_OVERRIDE, UNIQUE,
-            INJECT, INVOKER, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE)
+            ACCESSOR, AT, DEBUG, DYNAMIC, FINAL, IMPLEMENTS, INTERFACE, INTRINSIC, MIXIN, MUTABLE, OVERWRITE, SHADOW, SLICE, SOFT_OVERRIDE,
+            UNIQUE, INJECT, INVOKER, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE)
 
     }
 }
