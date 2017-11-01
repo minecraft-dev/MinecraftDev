@@ -45,8 +45,8 @@ class UnresolvedReferenceInspection : MixinInspection() {
             }
 
             // Check if valid annotation
-            val annotation = pair.annotationFromNameValuePair ?: return
-            if (!resolver.isValidAnnotation(annotation.qualifiedName!!)) {
+            val qualifiedName = pair.annotationFromNameValuePair?.qualifiedName ?: return
+            if (!resolver.isValidAnnotation(qualifiedName)) {
                 return
             }
 
