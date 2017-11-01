@@ -70,10 +70,11 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                                     createMethodParametersFix(parameters, expectedParameters))
                         }
 
-                        if (!method.returnType!!.isErasureEquivalentTo(expectedReturnType)) {
+                        val methodReturnType = method.returnType
+                        if (methodReturnType == null || !methodReturnType.isErasureEquivalentTo(expectedReturnType)) {
                             reportedSignature = true
 
-                            holder.registerProblem(method.returnTypeElement!!,
+                            holder.registerProblem(method.returnTypeElement ?: identifier,
                                     "Expected return type '${expectedReturnType.presentableText}' for ${type.annotationName} method",
                                     QuickFixFactory.getInstance().createMethodReturnFix(method, expectedReturnType, false))
                         }
