@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.mixin.inspection.shadow
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SHADOW
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.DEFAULT_SHADOW_PREFIX
-import com.demonwav.mcdev.util.KotlinIsBroken
 import com.demonwav.mcdev.util.annotationFromValue
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findAnnotation
@@ -68,7 +67,7 @@ class ShadowFieldPrefixInspection : MixinInspection() {
             // Delete prefix
             val shadow = element.annotationFromValue!!
             runWriteAction {
-                KotlinIsBroken.removeAnnotationAttribute(shadow, "prefix")
+                shadow.setDeclaredAttributeValue<PsiAnnotationMemberValue>("prefix", null)
             }
 
             // Rename field (if necessary)
