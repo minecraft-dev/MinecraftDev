@@ -14,8 +14,6 @@ import com.intellij.openapi.wm.WindowManager
 import com.intellij.psi.*
 import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
-import java.awt.Toolkit.getDefaultToolkit
-import javafx.scene.input.Clipboard.getSystemClipboard
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 
