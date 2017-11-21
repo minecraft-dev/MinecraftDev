@@ -27,8 +27,6 @@ import com.intellij.ui.awt.RelativePoint
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 
-
-
 class CopyATAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val data = getDataFromActionEvent(e) ?: return showBalloon("Unknown failure", e)
@@ -57,18 +55,17 @@ class CopyATAction : AnAction() {
             when (parent) {
                 is PsiField -> {
                     val srg = srgMap.findSrgField(parent) ?: return@done showBalloon("No SRG name found", e)
-                    copyToClipboard(data.editor, data.element, parent.containingClass?.qualifiedName + " " + srg.name + " #"+parent.name)
+                    copyToClipboard(data.editor, data.element, parent.containingClass?.qualifiedName+" "+srg.name+" #"+parent.name)
                 }
                 is PsiMethod -> {
                     val srg = srgMap.findSrgMethod(parent) ?: return@done showBalloon("No SRG name found", e)
-                    copyToClipboard(data.editor, data.element, parent.containingClass?.qualifiedName + " " + srg.name + srg.descriptor+ " #"+parent.name)
+                    copyToClipboard(data.editor, data.element, parent.containingClass?.qualifiedName+" "+srg.name+srg.descriptor+" #"+parent.name)
                 }
                 is PsiClass -> {
                     val classMcpToSrg = srgMap.findSrgClass(parent) ?: return@done showBalloon("No SRG name found", e)
                     copyToClipboard(data.editor, data.element, classMcpToSrg)
                 }
-                else ->
-                    showBalloon("Not a valid element", e)
+                else -> showBalloon("Not a valid element", e)
             }
         } ?: showBalloon("No mappings found", e)
     }
@@ -83,7 +80,9 @@ class CopyATAction : AnAction() {
 
         val statusBar = WindowManager.getInstance().getStatusBar(DataKeys.PROJECT.getData(e.dataContext))
 
-        invokeLater { balloon.show(RelativePoint.getCenterOf(statusBar.component), Balloon.Position.atRight) }
+        invokeLater { 
+            balloon.show(RelativePoint.getCenterOf(statusBar.component), Balloon.Position.atRight) 
+        }
     }
 
     private fun copyToClipboard(editor: Editor, element: PsiElement, text: String) {
@@ -103,11 +102,11 @@ class CopyATAction : AnAction() {
 
         invokeLater {
             balloon.show(
-                    RelativePoint(
-                            editor.contentComponent,
-                            editor.visualPositionToXY(editor.offsetToVisualPosition(element.textRange.endOffset))
-                    ),
-                    Balloon.Position.atRight
+                RelativePoint(
+                        editor.contentComponent,
+                        editor.visualPositionToXY(editor.offsetToVisualPosition(element.textRange.endOffset))
+                ),
+                Balloon.Position.atRight
             )
         }
     }
