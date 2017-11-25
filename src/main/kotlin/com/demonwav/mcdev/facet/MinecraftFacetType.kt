@@ -22,9 +22,7 @@ class MinecraftFacetType : FacetType<MinecraftFacet, MinecraftFacetConfiguration
     override fun createFacet(module: Module,
                              name: String,
                              configuration: MinecraftFacetConfiguration,
-                             underlyingFacet: Facet<*>?): MinecraftFacet {
-        return MinecraftFacet(module, name, configuration, underlyingFacet)
-    }
+                             underlyingFacet: Facet<*>?) = MinecraftFacet(module, name, configuration, underlyingFacet)
 
     override fun createDefaultConfiguration() = MinecraftFacetConfiguration()
     override fun isSuitableModuleType(moduleType: ModuleType<*>?) = moduleType is JavaModuleType

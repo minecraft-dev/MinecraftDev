@@ -63,16 +63,18 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
     fun refresh() {
         // Don't allow parent types with child types in auto detected set
-        PlatformType.removeParents(configuration.state.autoDetectTypes)
+        val allEnabled = configuration.state.run {
+            autoDetectTypes = PlatformType.removeParents(autoDetectTypes)
 
-        val userEnabled = configuration.state.userChosenTypes.entries.asSequence()
-            .filter { it.value }
-            .map { it.key }
+            val userEnabled = userChosenTypes.entries.asSequence()
+                .filter { it.value }
+                .map { it.key }
 
-        val autoEnabled = configuration.state.autoDetectTypes.asSequence()
-            .filter { configuration.state.userChosenTypes[it] == null }
+            val autoEnabled = autoDetectTypes.asSequence()
+                .filter { userChosenTypes[it] == null }
 
-        val allEnabled = userEnabled + autoEnabled
+            userEnabled + autoEnabled
+        }
 
         // Remove modules that aren't registered anymore
         val toBeRemoved = modules.entries.asSequence()
@@ -97,20 +99,18 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     private fun updateRoots() {
         roots.clear()
         val rootManager = ModuleRootManager.getInstance(module)
-        for (entry in rootManager.contentEntries) {
-            for (sourceFolder in entry.sourceFolders) {
-                if (sourceFolder.file == null) {
-                    continue
-                }
 
-                when (sourceFolder.rootType) {
-                    JavaSourceRootType.SOURCE -> roots.put(SourceType.SOURCE, sourceFolder.file)
-                    JavaSourceRootType.TEST_SOURCE -> roots.put(SourceType.TEST_SOURCE, sourceFolder.file)
-                    JavaResourceRootType.RESOURCE -> roots.put(SourceType.RESOURCE, sourceFolder.file)
-                    JavaResourceRootType.TEST_RESOURCE -> roots.put(SourceType.TEST_RESOURCE, sourceFolder.file)
+        rootManager.contentEntries.asSequence()
+            .flatMap { entry -> entry.sourceFolders.asSequence() }
+            .filter { it.file == null }
+            .forEach {
+                when (it.rootType) {
+                    JavaSourceRootType.SOURCE -> roots.put(SourceType.SOURCE, it.file)
+                    JavaSourceRootType.TEST_SOURCE -> roots.put(SourceType.TEST_SOURCE, it.file)
+                    JavaResourceRootType.RESOURCE -> roots.put(SourceType.RESOURCE, it.file)
+                    JavaResourceRootType.TEST_RESOURCE -> roots.put(SourceType.TEST_RESOURCE, it.file)
                 }
             }
-        }
     }
 
     private fun register(type: AbstractModuleType<*>) {

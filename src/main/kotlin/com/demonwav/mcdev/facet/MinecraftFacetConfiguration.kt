@@ -25,9 +25,8 @@ class MinecraftFacetConfiguration : FacetConfiguration, PersistentStateComponent
     var facet: MinecraftFacet? = null
     private var state = MinecraftFacetConfigurationData()
 
-    override fun createEditorTabs(editorContext: FacetEditorContext?, validatorsManager: FacetValidatorsManager?): Array<FacetEditorTab> {
-        return arrayOf(MinecraftFacetEditorTab(this))
-    }
+    override fun createEditorTabs(editorContext: FacetEditorContext?, validatorsManager: FacetValidatorsManager?) =
+        arrayOf(MinecraftFacetEditorTab(this))
 
     override fun getState() = state
     override fun loadState(state: MinecraftFacetConfigurationData) {
