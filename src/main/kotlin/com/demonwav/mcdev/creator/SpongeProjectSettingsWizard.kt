@@ -46,7 +46,7 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             return panel
         }
 
-        val name = WordUtils.capitalize(creator.artifactId)
+        val name = WordUtils.capitalize(creator.artifactId.replace('-', ' '))
         pluginNameField.text = name
         pluginVersionField.text = creator.version
 
@@ -55,7 +55,8 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             pluginVersionField.isEditable = false
         }
 
-        mainClassField.text = "${creator.groupId.toLowerCase()}.${creator.artifactId.toLowerCase()}.$name"
+        mainClassField.text = creator.groupId.replace("-", "").toLowerCase() + "." +
+            creator.artifactId.replace("-", "").toLowerCase() + "." + name.replace(" ", "")
 
         if (creator.settings.size > 1) {
             mainClassField.text = mainClassField.text + PlatformType.SPONGE.normalName

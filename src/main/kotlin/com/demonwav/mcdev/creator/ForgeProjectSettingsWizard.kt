@@ -89,7 +89,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
             return null
         }
 
-        modNameField.text = WordUtils.capitalize(creator.artifactId)
+        modNameField.text = WordUtils.capitalize(creator.artifactId.replace('-', ' '))
         modVersionField.text = creator.version
 
         if (settings != null && !settings!!.isFirst) {
@@ -97,8 +97,9 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
             modVersionField.isEditable = false
         }
 
-        mainClassField.text = "${this.creator.groupId.toLowerCase()}.${this.creator.artifactId.toLowerCase()}." +
-            WordUtils.capitalize(this.creator.artifactId)
+        mainClassField.text = this.creator.groupId.replace("-", "").toLowerCase() + "." +
+            this.creator.artifactId.replace("-", "").toLowerCase() + "." +
+            WordUtils.capitalize(this.creator.artifactId.replace('-', ' ')).replace(" ", "")
 
         if (creator.settings.size > 1) {
             mainClassField.text = mainClassField.text + PlatformType.FORGE.normalName

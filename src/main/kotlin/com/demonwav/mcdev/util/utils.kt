@@ -106,13 +106,8 @@ inline fun <T, R> Array<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     return null
 }
 
-inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R): Array<R> {
-    return Array(size) { i -> transform(this[i]) }
-}
-
-inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
-    return Array(size) { i -> transform(this[i]) }
-}
+inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R) = Array(size) { i -> transform(this[i]) }
+inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R) = Array(size) { i -> transform(this[i]) }
 
 fun <T : Any> Array<T?>.castNotNull(): Array<T> {
     @Suppress("UNCHECKED_CAST")
@@ -146,8 +141,8 @@ fun Module.findChildren(): Set<Module> {
 // Keep a single gson constant around rather than initializing it everywhere
 val gson = Gson()
 
-inline fun <reified T : Any> Gson.fromJson(text: String): T {
-    // Using the ugly TypeToken approach we can any complex generic signature, including
-    // nested generics
-    return fromJson(text, object : TypeToken<T>() {}.type)!!
-}
+// Using the ugly TypeToken approach we can any complex generic signature, including
+// nested generics
+inline fun <reified T : Any> Gson.fromJson(text: String): T = fromJson(text, object : TypeToken<T>() {}.type)
+
+fun <K> Map<K, *>.containsAllKeys(vararg keys: K) = keys.all { this.containsKey(it) }

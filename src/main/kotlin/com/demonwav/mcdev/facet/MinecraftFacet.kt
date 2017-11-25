@@ -18,6 +18,7 @@ import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
+import com.demonwav.mcdev.util.containsAllKeys
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.demonwav.mcdev.util.runInlineReadAction
 import com.google.common.collect.HashMultimap
@@ -189,10 +190,8 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         return when {
             iconCount == 0 -> null
             iconCount == 1 -> modules.keys.firstOrNull { it.hasIcon() }?.icon
-            iconCount == 2 && modules.containsKey(SpongeModuleType) && modules.containsKey(ForgeModuleType) ->
-                PlatformAssets.SPONGE_FORGE_ICON
-            modules.size > 0 ->
-                PlatformAssets.MINECRAFT_ICON
+            iconCount == 2 && modules.containsAllKeys(SpongeModuleType, ForgeModuleType) -> PlatformAssets.SPONGE_FORGE_ICON
+            modules.size > 0 -> PlatformAssets.MINECRAFT_ICON
             else -> null
         }
     }

@@ -133,7 +133,7 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
             return panel
         }
 
-        modNameField.text = WordUtils.capitalizeFully(creator.artifactId)
+        modNameField.text = WordUtils.capitalizeFully(creator.artifactId.replace('-', ' '))
         modVersionField.text = creator.version
 
         if (settings != null && !settings!!.isFirst) {
@@ -142,7 +142,9 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
         }
 
         mainClassField.document.removeDocumentListener(listener)
-        mainClassField.text = "${this.creator.groupId}.${this.creator.artifactId}.$LITEMOD${WordUtils.capitalizeFully(creator.artifactId)}"
+        mainClassField.text = this.creator.groupId.replace("-", "") + "." +
+            this.creator.artifactId.replace("-", "") + "." + LITEMOD +
+            WordUtils.capitalizeFully(creator.artifactId.replace('-', ' ')).replace(" ", "")
         mainClassField.document.addDocumentListener(listener)
 
         loadingBar.isIndeterminate = true
