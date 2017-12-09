@@ -33,13 +33,44 @@ data class Template(val elements: List<TemplateElement>) {
                         when {
                             it.isEmpty() -> EmptyLine
                             it.startsWith("#") -> Comment(it.substring(1).trim())
-                            else -> Key(it.trim().split('*').joinToString("(.*?)", "^", "$") { Regex.escape(it) }.toRegex())
+                            else -> Key(parseKey(it.trim()))
                         }
                     }
                 } else {
                     listOf()
                 }
             )
+
+        private val keyRegex = "(![+*]?|\\?[+*]?|[+*])?([^+*!?]*)(![+*]?|\\?[+*]?|[+*])?".toRegex()
+
+        private fun parseKey(s: String) =
+            keyRegex.findAll(s).map {
+                parseQuantifier(it.groupValues[1]) + Regex.escape(it.groupValues[2]) + parseQuantifier(it.groupValues[3])
+            }.joinToString("", "^", "$").toRegex()
+
+        private fun parseQuantifier(q: String?) =
+            when (q) {
+                "!" -> "([^.])"
+                "!+" -> "([^.]+)"
+                "!*" -> "([^.]*)"
+
+                "?" -> "(.)"
+                "?+" -> "(..+)"
+
+                "+", "?*" -> "(.+)"
+                "*" -> "(.*?)"
+                
+                else -> ""
+            }
+
+        private fun recombineStar(s: String) =
+            s.split('*').joinToString("(.*?)") { Regex.escape(it) }
+
+        private fun recombinePlus(s: String) =
+            s.split('+').joinToString("(.+)")
+
+        private fun recombineQuestionMark(s: String) =
+            s.split('?').joinToString("([^.]+)")
     }
 }
 
