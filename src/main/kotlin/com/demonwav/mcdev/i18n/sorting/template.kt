@@ -41,7 +41,7 @@ data class Template(val elements: List<TemplateElement>) {
                 }
             )
 
-        private val keyRegex = "(![+*]?|\\?[+*]?|[+*])?([^+*!?]*)(![+*]?|\\?[+*]?|[+*])?".toRegex()
+        private val keyRegex = "([?!]?[+*]?)([^+*!?]*)([?!]?[+*]?)".toRegex()
 
         private fun parseKey(s: String) =
             keyRegex.findAll(s).map {
@@ -59,7 +59,7 @@ data class Template(val elements: List<TemplateElement>) {
 
                 "+", "?*" -> "(.+)"
                 "*" -> "(.*?)"
-                
+
                 else -> ""
             }
 
