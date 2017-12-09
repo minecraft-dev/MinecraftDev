@@ -154,3 +154,17 @@ val gson = Gson()
 inline fun <reified T : Any> Gson.fromJson(text: String): T = fromJson(text, object : TypeToken<T>() {}.type)
 
 fun <K> Map<K, *>.containsAllKeys(vararg keys: K) = keys.all { this.containsKey(it) }
+
+fun <T> Comparator<in T>.lexicographical(): Comparator<in Iterable<T>> =
+    Comparator { left, right ->
+        // Zipping limits the compared parts to the shorter list, then we perform a component-wise comparison
+        // Short-circuits if any component of this version is smaller/older
+        left.zip(right).fold(0) { acc, (a, b) -> if (acc != 0) acc else this.compare(a, b) }.let {
+            // When all the parts are equal, the longer list wins (is greater)
+            if (it == 0) {
+                left.count() - right.count()
+            } else {
+                it
+            }
+        }
+    }

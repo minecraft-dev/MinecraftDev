@@ -229,10 +229,12 @@ val generateNbttPsiAndParser = generatePsiAndParser("generateNbttPsiAndParser", 
 val generateI18nLexer = generateLexer("generateI18nLexer", "I18nLexer", "i18n/lang/gen/")
 val generateI18nPsiAndParser = generatePsiAndParser("generateI18nPsiAndParser", "I18nParser", "i18n/lang/gen")
 
+val generateI18nTemplateLexer = generateLexer("generateI18nTemplateLexer", "I18nTemplateLexer", "i18n/lang/gen/")
+
 val generate = task("generate") {
     group = "minecraft"
     description = "Generates sources needed to compile the plugin."
-    dependsOn(generateAtLexer, generateAtPsiAndParser, generateNbttLexer, generateNbttPsiAndParser, generateI18nLexer, generateI18nPsiAndParser)
+    dependsOn(generateAtLexer, generateAtPsiAndParser, generateNbttLexer, generateNbttPsiAndParser, generateI18nLexer, generateI18nPsiAndParser, generateI18nTemplateLexer)
     outputs.dir("gen")
 }
 

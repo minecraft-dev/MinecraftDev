@@ -21,17 +21,8 @@ import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.ReleasePart
 class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion> {
     val versionString = parts.joinToString(".") { it.versionString }
 
-    override fun compareTo(other: SemanticVersion): Int {
-        // Zipping limits the compared parts to the shorter version, then we perform a component-wise comparison
-        // Short-circuits if any component of this version is smaller/older
-        val result = parts.zip(other.parts).fold(0) { acc, (a, b) -> if (acc == -1) acc else a.compareTo(b) }
-        // When all the parts are equal, the longer version wins
-        // Generally speaking, 1.0 is considered older than 1.0.1 (see MC 1.12 vs 1.12.1)
-        if (parts.size != other.parts.size && result == 0) {
-            return parts.size - other.parts.size
-        }
-        return result
-    }
+    override fun compareTo(other: SemanticVersion) =
+        naturalOrder<VersionPart>().lexicographical().compare(parts, other.parts)
 
     override fun equals(other: Any?) =
         when (other) {

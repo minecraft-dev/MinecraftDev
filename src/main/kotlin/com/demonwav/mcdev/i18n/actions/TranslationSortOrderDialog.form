@@ -3,7 +3,7 @@
   <grid id="cbd77" binding="contentPane" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="49" y="54" width="390" height="149"/>
+      <xy x="49" y="54" width="390" height="168"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -35,6 +35,7 @@
                 <item value="Ascending"/>
                 <item value="Descending"/>
                 <item value="Like default (en_us.lang)"/>
+                <item value="Use Project Template"/>
               </model>
             </properties>
           </component>

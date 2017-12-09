@@ -12,13 +12,14 @@ package com.demonwav.mcdev.i18n.lang.colors
 
 import com.demonwav.mcdev.i18n.lang.I18nLexerAdapter
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 
-class I18nSyntaxHighlighter : SyntaxHighlighterBase() {
-    override fun getHighlightingLexer() = I18nLexerAdapter()
+class I18nSyntaxHighlighter(private val lexer: Lexer) : SyntaxHighlighterBase() {
+    override fun getHighlightingLexer() = lexer
 
     override fun getTokenHighlights(tokenType: IElementType?) =
         when (tokenType) {
