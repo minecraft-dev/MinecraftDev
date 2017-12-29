@@ -16,6 +16,20 @@ import java.util.Comparator
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
+fun <T> Comparator<in T>.lexicographical(): Comparator<in Iterable<T>> =
+    Comparator { left, right ->
+        // Zipping limits the compared parts to the shorter list, then we perform a component-wise comparison
+        // Short-circuits if any component of this version is smaller/older
+        left.zip(right).fold(0) { acc, (a, b) -> if (acc != 0) return@Comparator acc else this.compare(a, b) }.let {
+            // When all the parts are equal, the longer list wins (is greater)
+            if (it == 0) {
+                left.count() - right.count()
+            } else {
+                it
+            }
+        }
+    }
+
 val LEXICOGRAPHICAL_ORDER: Comparator<IntArray> = Comparator { one, two ->
     val length = Math.min(one.size, two.size)
     for (i in 0 until length) {
