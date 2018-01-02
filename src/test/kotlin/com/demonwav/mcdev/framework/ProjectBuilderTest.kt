@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.framework
 
+import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 
@@ -28,5 +29,15 @@ abstract class ProjectBuilderTest : LightCodeInsightFixtureTestCase() {
                 contentEntry.addSourceFolder(srcFolder, false)
             }
         }
+    }
+
+    override fun tearDown() {
+        runWriteAction {
+            ModuleRootModificationUtil.updateModel(myFixture.module) { model ->
+                model.removeContentEntry(model.contentEntries.first { it.file == project.baseDir })
+            }
+        }
+
+        super.tearDown()
     }
 }
