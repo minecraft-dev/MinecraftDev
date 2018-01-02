@@ -18,7 +18,7 @@ import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.util.extendsOrImplements
-import com.intellij.openapi.vfs.VirtualFile
+import com.demonwav.mcdev.util.nullable
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
@@ -32,15 +32,8 @@ import org.jetbrains.annotations.Contract
 
 class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
-    private var mcmod: VirtualFile? = null
-
-    init {
-        setup()
-    }
-
-    private fun setup() {
-        mcmod = facet.findFile(ForgeConstants.MCMOD_INFO, SourceType.RESOURCE)
-    }
+    var mcmod by nullable { facet.findFile(ForgeConstants.MCMOD_INFO, SourceType.RESOURCE) }
+        private set
 
     override val moduleType = ForgeModuleType
     override val type = PlatformType.FORGE
@@ -87,15 +80,6 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
 
     override fun isStaticListenerSupported(method: PsiMethod) = true
 
-    fun getMcmod(): VirtualFile? {
-        if (mcmod == null) {
-            // try and find the file again if it's not already present
-            // when this object was first created it may not have been ready
-            setup()
-        }
-        return mcmod
-    }
-
     override fun generateEventListenerMethod(containingClass: PsiClass,
                                              chosenClass: PsiClass,
                                              chosenName: String,
@@ -136,7 +120,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         val psiClass = element.parent as PsiClass
 
         val modifierList = psiClass.modifierList
-        return modifierList != null && modifierList.findAnnotation(ForgeConstants.MOD_ANNOTATION) != null
+        return modifierList?.findAnnotation(ForgeConstants.MOD_ANNOTATION) != null
     }
 
     override fun checkUselessCancelCheck(expression: PsiMethodCallExpression) = null

@@ -57,7 +57,8 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
             val path = location.sourcePath()
 
             // The source path is the package (separated by slashes) and class name with the ".java" file extension
-            val className = path.removeSuffix(".java").replace('/', '.')
+            val className = path.removeSuffix(".java")
+                .replace('/', '.').replace('\\', '.')
 
             val psiFile = findAlternativeSource(className, debugProcess.project) ?:
                 // Lookup class based on its qualified name (TODO: Support for anonymous classes)

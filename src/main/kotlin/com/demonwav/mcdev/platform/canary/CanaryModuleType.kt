@@ -34,6 +34,7 @@ object CanaryModuleType : AbstractModuleType<CanaryModule<CanaryModuleType>>("ne
 
     init {
         CommonColors.applyStandardColors(colorMap, CanaryConstants.CHAT_FORMAT_CLASS)
+        CommonColors.applyStandardColors(colorMap, CanaryConstants.MCP_CHAT_FORMATTING)
         CanaryLegacyColors.applyLegacyColors(colorMap, CanaryConstants.LEGACY_COLORS_CLASS)
         CanaryLegacyColors.applyLegacyColors(colorMap, CanaryConstants.LEGACY_TEXT_FORMAT_CLASS)
     }

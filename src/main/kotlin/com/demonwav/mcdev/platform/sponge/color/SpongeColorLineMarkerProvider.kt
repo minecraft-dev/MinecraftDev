@@ -54,12 +54,10 @@ class SpongeColorLineMarkerProvider : LineMarkerProvider {
 
         val c = ColorChooser.chooseColor(editor.component, "Choose Color", color, false)
         if (c != null) {
-            if (workElement is PsiLiteralExpression) {
-                workElement.setColor(c.rgb and 0xFFFFFF)
-            } else if (workElement is PsiExpressionList) {
-                workElement.setColor(c.red, c.green, c.blue)
-            } else if (workElement is PsiNewExpression) {
-                (workElement.getNode().findChildByType(JavaElementType.EXPRESSION_LIST) as PsiExpressionList?)
+            when (workElement) {
+                is PsiLiteralExpression -> workElement.setColor(c.rgb and 0xFFFFFF)
+                is PsiExpressionList -> workElement.setColor(c.red, c.green, c.blue)
+                is PsiNewExpression -> (workElement.getNode().findChildByType(JavaElementType.EXPRESSION_LIST) as PsiExpressionList?)
                     ?.setColor(c.red, c.green, c.blue)
             }
         }

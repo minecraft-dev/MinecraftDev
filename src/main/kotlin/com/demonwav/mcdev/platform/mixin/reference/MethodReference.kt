@@ -12,10 +12,12 @@ package com.demonwav.mcdev.platform.mixin.reference
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.platform.mixin.util.findUpstreamMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.memberReference
@@ -44,7 +46,12 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
     private fun getTargets(context: PsiElement): Collection<PsiClass>? {
         val psiClass = context.findContainingClass() ?: return null
         val targets = psiClass.mixinTargets
-        return if (targets.isEmpty()) null else targets
+        val upstreamMixin = context.findContainingMethod()?.findUpstreamMixin()
+        return when {
+            targets.isEmpty() -> listOfNotNull(upstreamMixin)
+            upstreamMixin != null -> targets + upstreamMixin
+            else -> targets
+        }
     }
 
     override fun isUnresolved(context: PsiElement): Boolean {

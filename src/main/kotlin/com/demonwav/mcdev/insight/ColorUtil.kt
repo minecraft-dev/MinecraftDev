@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.intellij.openapi.command.WriteCommandAction
+import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.JavaTokenType
@@ -49,12 +49,12 @@ fun <T> PsiElement.findColor(function: (Map<String, Color>, Map.Entry<String, Co
 }
 
 fun PsiElement.setColor(color: String) {
-    WriteCommandAction.runWriteCommandAction(this.project) {
+    this.containingFile.runWriteAction {
         val split = color.split(".").dropLastWhile(String::isEmpty).toTypedArray()
         val newColorBase = split.last()
 
         val node = this.node
-        val child = node.findChildByType(JavaTokenType.IDENTIFIER) ?: return@runWriteCommandAction
+        val child = node.findChildByType(JavaTokenType.IDENTIFIER) ?: return@runWriteAction
 
         val identifier = JavaPsiFacade.getElementFactory(this.project).createIdentifier(newColorBase)
 
@@ -63,7 +63,7 @@ fun PsiElement.setColor(color: String) {
 }
 
 fun PsiLiteralExpression.setColor(value: Int) {
-    WriteCommandAction.runWriteCommandAction(this.project) {
+    this.containingFile.runWriteAction {
         val node = this.node
 
         val literalExpression = JavaPsiFacade.getElementFactory(this.project)
@@ -74,7 +74,7 @@ fun PsiLiteralExpression.setColor(value: Int) {
 }
 
 fun PsiExpressionList.setColor(red: Int, green: Int, blue: Int) {
-    WriteCommandAction.runWriteCommandAction(this.project) {
+    this.containingFile.runWriteAction {
         val expressionOne = this.expressions[0]
         val expressionTwo = this.expressions[1]
         val expressionThree = this.expressions[2]

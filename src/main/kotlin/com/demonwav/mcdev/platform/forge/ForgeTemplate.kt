@@ -19,7 +19,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import java.util.Properties
 
 object ForgeTemplate {
-    private val MC_1_12 = SemanticVersion.parse("1.12")
+    val MC_1_12 = SemanticVersion.parse("1.12")
 
     fun applyBuildGradleTemplate(project: Project,
                                  file: VirtualFile,
@@ -67,6 +67,13 @@ object ForgeTemplate {
 
         if (configuration is SpongeForgeProjectConfiguration) {
             properties.setProperty("SPONGE_FORGE", "true")
+        }
+        // Fixes builds for MC1.12+, requires FG 2.3
+        val mcVersion = SemanticVersion.parse(configuration.mcVersion)
+        if (mcVersion >= MC_1_12) {
+            properties.setProperty("FORGEGRADLE_VERSION", "2.3")
+        } else {
+            properties.setProperty("FORGEGRADLE_VERSION", "2.2")
         }
 
         BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties)

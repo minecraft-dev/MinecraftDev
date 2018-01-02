@@ -55,16 +55,17 @@ class GotoAtEntryAction : AnAction() {
                 }
             }
 
-            if (parent is PsiField) {
-                val reference = srgMap.findSrgField(parent) ?: return@done showBalloon(e)
-
-                searchForText(mcpModule, e, data, reference.name)
-            } else if (parent is PsiMethod) {
-                val reference = srgMap.findSrgMethod(parent) ?: return@done showBalloon(e)
-
-                searchForText(mcpModule, e, data, reference.name + reference.descriptor)
-            } else {
-                showBalloon(e)
+            when (parent) {
+                is PsiField -> {
+                    val reference = srgMap.findSrgField(parent) ?: return@done showBalloon(e)
+                    searchForText(mcpModule, e, data, reference.name)
+                }
+                is PsiMethod -> {
+                    val reference = srgMap.findSrgMethod(parent) ?: return@done showBalloon(e)
+                    searchForText(mcpModule, e, data, reference.name + reference.descriptor)
+                }
+                else ->
+                    showBalloon(e)
             }
         } ?: showBalloon(e)
     }

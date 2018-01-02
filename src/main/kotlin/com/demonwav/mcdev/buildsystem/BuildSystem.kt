@@ -57,8 +57,8 @@ abstract class BuildSystem {
      * ProjectConfiguration are provided here as well.
 
      * @param project The project
-     * *
-     * @param configurations The configuration objects for the project
+     * @param configuration The configuration object for the project
+     * @param indicator The progress indicator
      */
     abstract fun create(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator)
 
@@ -71,9 +71,9 @@ abstract class BuildSystem {
      * It is legal for this method to have different default setups for each platform type, so the PlatformType and
      * ProjectConfiguration are provided here as well.
 
-     * @param module the module
-     * *
+     * @param rootModule the root module
      * @param configurations The configuration object for the project
+     * @param indicator The progress indicator
      */
     abstract fun finishSetup(rootModule: Module, configurations: Collection<ProjectConfiguration>, indicator: ProgressIndicator)
 

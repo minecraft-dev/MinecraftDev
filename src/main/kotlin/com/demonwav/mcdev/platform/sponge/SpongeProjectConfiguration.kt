@@ -14,9 +14,9 @@ import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
+import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.ide.util.EditorHelper
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
@@ -96,32 +96,30 @@ fun writeMainSpongeClass(
         annotationString + ",\nversion = ${escape(buildSystem.version)}"
     }
 
-    if (!description.isNullOrEmpty()) {
+    if (description.isNotEmpty()) {
         annotationString + ",\ndescription = ${escape(description)}"
     }
 
-    if (!website.isNullOrEmpty()) {
+    if (website.isNotEmpty()) {
         annotationString + ",\nurl = ${escape(website)}"
     }
 
     if (hasAuthors) {
-        annotationString + ",\nauthors = {\n${authors.map(::escape).joinToString(",\n")}\n}"
+        annotationString + ",\nauthors = {\n${authors.joinToString(",\n", transform = ::escape)}\n}"
     }
 
     if (hasDependencies) {
-        annotationString + ",\ndependencies = {\n${dependencies.map { "@Dependency(id = ${escape(it)})" }.joinToString(",\n")}\n}"
+        annotationString + ",\ndependencies = {\n${dependencies.joinToString(",\n") { "@Dependency(id = ${escape(it)})" }}\n}"
     }
 
     annotationString + "\n)"
     val factory = JavaPsiFacade.getElementFactory(project)
     val annotation = factory.createAnnotationFromText(annotationString.toString(), null)
 
-    object : WriteCommandAction.Simple<Any>(project, mainClassPsi) {
-        override fun run() {
-            psiClass.modifierList?.addBefore(annotation, psiClass.modifierList!!.firstChild)
-            CodeStyleManager.getInstance(project).reformat(psiClass)
-        }
-    }.execute()
+    mainClassPsi.runWriteAction {
+        psiClass.modifierList?.addBefore(annotation, psiClass.modifierList!!.firstChild)
+        CodeStyleManager.getInstance(project).reformat(psiClass)
+    }
 }
 
 private fun escape(text: String): String {

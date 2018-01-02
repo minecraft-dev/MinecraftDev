@@ -23,7 +23,7 @@
           </component>
         </children>
       </grid>
-      <grid id="c580e" binding="chooserPanel" layout-manager="GridLayoutManager" row-count="10" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
+      <grid id="c580e" binding="chooserPanel" layout-manager="GridLayoutManager" row-count="11" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
         <margin top="2" left="10" bottom="10" right="10"/>
         <constraints border-constraint="Center"/>
         <properties/>
@@ -160,7 +160,7 @@
           </component>
           <component id="b9b97" class="javax.swing.JLabel">
             <constraints>
-              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <icon value="assets/icons/platform/Canary@2x.png"/>
@@ -170,7 +170,7 @@
           </component>
           <component id="a87a5" class="javax.swing.JCheckBox" binding="canaryPluginCheckBox">
             <constraints>
-              <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Canary Plugin"/>
@@ -178,7 +178,7 @@
           </component>
           <component id="ed91d" class="javax.swing.JLabel">
             <constraints>
-              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <icon value="assets/icons/platform/Neptune@2x.png"/>
@@ -188,15 +188,34 @@
           </component>
           <vspacer id="d9ec2">
             <constraints>
-              <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
             </constraints>
           </vspacer>
           <component id="4c404" class="javax.swing.JCheckBox" binding="neptunePluginCheckBox">
             <constraints>
-              <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Neptune Plugin"/>
+            </properties>
+          </component>
+          <component id="87b9d" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <enabled value="true"/>
+              <icon value="assets/icons/platform/Waterfall@2x.png"/>
+              <iconTextGap value="0"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="55507" class="javax.swing.JCheckBox" binding="waterfallPluginCheckBox">
+            <constraints>
+              <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Waterfall Plugin"/>
             </properties>
           </component>
         </children>
@@ -213,8 +232,8 @@
           <component id="20c91" class="javax.swing.JEditorPane" binding="infoPane">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <minimum-size width="-1" height="150"/>
-                <preferred-size width="150" height="150"/>
+                <minimum-size width="-1" height="180"/>
+                <preferred-size width="150" height="180"/>
               </grid>
             </constraints>
             <properties>

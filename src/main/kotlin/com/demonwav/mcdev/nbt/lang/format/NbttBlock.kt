@@ -40,12 +40,12 @@ class NbttBlock(
     private val spacingBuilder = NbttFormattingModelBuilder.createSpacingBuilder(settings)
 
     init {
-        if (psiElement is NbttCompound) {
-            childWrap = Wrap.createWrap(getCustomSettings().OBJECT_WRAPPING, true)
+        childWrap = if (psiElement is NbttCompound) {
+            Wrap.createWrap(getCustomSettings().OBJECT_WRAPPING, true)
         } else if (psiElement is NbttList || psiElement is NbttByteArray || psiElement is NbttIntArray) {
-            childWrap = Wrap.createWrap(getCustomSettings().LIST_WRAPPING, true)
+            Wrap.createWrap(getCustomSettings().LIST_WRAPPING, true)
         } else {
-            childWrap = null
+            null
         }
     }
 

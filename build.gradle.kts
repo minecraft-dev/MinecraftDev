@@ -16,18 +16,15 @@ import java.io.File
 
 buildscript {
     repositories {
-        maven {
-            name = "intellij-plugin-service"
-            setUrl("https://dl.bintray.com/jetbrains/intellij-plugin-service")
-        }
+        maven("https://dl.bintray.com/jetbrains/intellij-plugin-service")
     }
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.1.3-2" // kept in sync with IntelliJ's bundled dep
+    id("org.jetbrains.kotlin.jvm") version "1.1.4-3" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.2.15"
+    id("org.jetbrains.intellij") version "0.2.17"
     id("net.minecrell.licenser") version "0.3"
 }
 
@@ -50,7 +47,7 @@ val processResources: AbstractCopyTask by tasks
 val test: Test by tasks
 val runIde: JavaExec by tasks
 val publishPlugin: PublishTask by tasks
-val clean: Task by tasks
+val clean: Delete by tasks
 
 configurations {
     "kotlin"()
@@ -66,14 +63,8 @@ configurations {
 
 repositories {
     mavenCentral()
-    maven {
-        name = "minecraft-dev"
-        setUrl("https://dl.bintray.com/minecraft-dev/maven")
-    }
-    maven {
-        name = "sponge"
-        setUrl("https://repo.spongepowered.org/maven")
-    }
+    maven("https://dl.bintray.com/minecraft-dev/maven")
+    maven("https://repo.spongepowered.org/maven")
 }
 
 java {
@@ -94,9 +85,9 @@ val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
 }
 
 dependencies {
-    "kotlin"(kotlinModule("stdlib")) { isTransitive = false }
-    compile(kotlinModule("stdlib-jre7")) { isTransitive = false }
-    compile(kotlinModule("stdlib-jre8")) { isTransitive = false }
+    "kotlin"(kotlin("stdlib")) { isTransitive = false }
+    compile(kotlin("stdlib-jre7")) { isTransitive = false }
+    compile(kotlin("stdlib-jre8")) { isTransitive = false }
 
     // Add tools.jar for the JDI API
     compile(files(Jvm.current().toolsJar))
@@ -121,7 +112,7 @@ intellij {
         "properties", "junit")
 
     pluginName = "Minecraft Development"
-    updateSinceUntilBuild = false
+    updateSinceUntilBuild = true
 
     downloadSources = !CI && downloadIdeaSources.toBoolean()
 
@@ -244,14 +235,11 @@ val generate = task("generate") {
 
 java.sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 
+// Remove gen directory on clean
+clean.delete(generate)
+
 // Workaround for KT-16764
 compileKotlin.inputs.dir(generate)
-
-// Workaround problems caused by separate output directories for classes in Gradle 4.0
-// gradle-intellij-plugin needs to be updated to support them properly
-java.sourceSets.all {
-    output.classesDir = File(buildDir, "classes/$name")
-}
 
 runIde {
     maxHeapSize = "2G"
@@ -264,14 +252,8 @@ runIde {
     }
 }
 
-val cleanGen = task<Delete>("cleanGen") {
-    delete = setOf(file("gen"))
-}
-
-clean.dependsOn(cleanGen)
-
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
-fun DependencyHandlerScope.kotlinModule(module: String) = kotlinModule(module, kotlinVersion) as String
+fun DependencyHandlerScope.kotlin(module: String) = kotlin(module, kotlinVersion) as String
 fun intellijPlugin(name: String) = mapOf(
     "group" to "org.jetbrains.plugins",
     "name" to name,

@@ -18,8 +18,8 @@ import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.canary.generation.CanaryGenerationData
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants
+import com.demonwav.mcdev.util.nullable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiClass
@@ -31,24 +31,11 @@ import com.intellij.psi.search.GlobalSearchScope
 class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, override val moduleType: T) : AbstractModule(facet) {
 
     override val type: PlatformType = moduleType.platformType
-    private var canaryInf: VirtualFile? = null
-
-    init {
-        setup()
-    }
-
-    private fun setup() {
-        canaryInf = facet.findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE)
-    }
-
-    fun getCanaryInf(): VirtualFile? {
-        if (canaryInf == null) {
-            // try and find the file again if it's not already present
-            // when this object was first created it may not have been ready
-            setup()
-        }
-        return canaryInf
-    }
+    
+    var canaryInf by nullable { facet.findFile(CanaryConstants.CANARY_INF, SourceType.RESOURCE) }
+        private set
+    var neptuneInf by nullable { facet.findFile(CanaryConstants.NEPTUNE_INF, SourceType.RESOURCE) }
+        private set
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) =
         CanaryConstants.HOOK_CLASS == eventClass.qualifiedName
@@ -89,6 +76,7 @@ class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, overrid
         super.dispose()
 
         canaryInf = null
+        neptuneInf = null
     }
 
     companion object {
@@ -102,7 +90,7 @@ class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, overrid
             val list = newMethod.parameterList
             val parameter = JavaPsiFacade.getElementFactory(project)
                 .createParameter(
-                    "event",
+                    "hook",
                     PsiClassType.getTypeByName(chosenClass.qualifiedName, project, GlobalSearchScope.allScope(project))
                 )
             list.add(parameter)

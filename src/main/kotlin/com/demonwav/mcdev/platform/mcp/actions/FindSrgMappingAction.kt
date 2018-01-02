@@ -56,20 +56,21 @@ class FindSrgMappingAction : AnAction() {
                 parent = parent.resolve()
             }
 
-            if (parent is PsiField) {
-                val srg = srgMap.findSrgField(parent) ?: return@done showBalloon("No SRG name found", e)
-
-                showSuccessBalloon(data.editor, data.element, srg.name)
-            } else if (parent is PsiMethod) {
-                val srg = srgMap.findSrgMethod(parent) ?: return@done showBalloon("No SRG name found", e)
-
-                showSuccessBalloon(data.editor, data.element, srg.name + srg.descriptor)
-            } else if (parent is PsiClass) {
-                val classMcpToSrg = srgMap.findSrgClass(parent) ?: return@done showBalloon("No SRG name found", e)
-
-                showSuccessBalloon(data.editor, data.element, classMcpToSrg)
-            } else {
-                showBalloon("Not a valid element", e)
+            when (parent) {
+                is PsiField -> {
+                    val srg = srgMap.findSrgField(parent) ?: return@done showBalloon("No SRG name found", e)
+                    showSuccessBalloon(data.editor, data.element, srg.name)
+                }
+                is PsiMethod -> {
+                    val srg = srgMap.findSrgMethod(parent) ?: return@done showBalloon("No SRG name found", e)
+                    showSuccessBalloon(data.editor, data.element, srg.name + srg.descriptor)
+                }
+                is PsiClass -> {
+                    val classMcpToSrg = srgMap.findSrgClass(parent) ?: return@done showBalloon("No SRG name found", e)
+                    showSuccessBalloon(data.editor, data.element, classMcpToSrg)
+                }
+                else ->
+                    showBalloon("Not a valid element", e)
             }
         } ?: showBalloon("No mappings found", e)
     }

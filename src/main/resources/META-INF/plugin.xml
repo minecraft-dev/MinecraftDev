@@ -20,15 +20,15 @@
     <vendor>DemonWav</vendor>
 
     <description><![CDATA[
-      Brings support for Bukkit, Spigot, Paper, BungeeCord, Sponge, LiteLoader, Forge, and Canary projects to Intellij IDEA.
+      Brings support for Bukkit, Spigot, Paper, Sponge, Forge, MCP, Mixins, BungeeCord, Waterfall, LiteLoader, Canary and Neptune projects
+      to Intellij IDEA.
     ]]></description>
 
     <change-notes><![CDATA[
       <div>
-        Alpha release, may break. More features to come. Please report issues to
-        <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
+        Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2017.3-0.7.5
+        v. 2017.3-1.0.0
       </div>
     ]]>
     </change-notes>
@@ -227,6 +227,7 @@
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.bungeecord.framework.BungeeCordPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.bungeecord.framework.WaterfallPresentationProvider" />
         <!--endregion-->
 
 
@@ -257,49 +258,49 @@
         <localInspection displayName="Invalid usage of @SideOnly in nested class declaration"
                          groupName="Minecraft Forge"
                          language="JAVA"
-                         enabledByDefault="true"
+                         enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NestedClassSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of @SideOnly in field declaration"
                          groupName="Minecraft Forge"
                          language="JAVA"
-                         enabledByDefault="true"
+                         enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.FieldDeclarationSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of @SideOnly in method declaration"
                          groupName="Minecraft Forge"
                          language="JAVA"
-                         enabledByDefault="true"
+                         enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of variable annotated with @SideOnly"
                          groupName="Minecraft Forge"
                          language="JAVA"
-                         enabledByDefault="true"
+                         enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.VariableUseSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of method annotated with @SideOnly"
                          groupName="Minecraft Forge"
                          language="JAVA"
-                         enabledByDefault="true"
+                         enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodCallSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of new object annotated with @SideOnly"
                          groupName="Minecraft Forge"
                          language="JAVA"
-                         enabledByDefault="true"
+                         enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NewExpressionSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of local variable declaration annotated with @SideOnly"
                          groupName="Minecraft Forge"
                          language="JAVA"
-                         enabledByDefault="true"
+                         enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.LocalVariableDeclarationSideOnlyInspection"/>

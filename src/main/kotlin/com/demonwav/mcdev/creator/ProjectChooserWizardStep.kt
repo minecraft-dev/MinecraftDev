@@ -42,6 +42,7 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
     private lateinit var spongePluginCheckBox: JCheckBox
     private lateinit var forgeModCheckBox: JCheckBox
     private lateinit var bungeeCordPluginCheckBox: JCheckBox
+    private lateinit var waterfallPluginCheckBox: JCheckBox
     private lateinit var liteLoaderModCheckBox: JCheckBox
     private lateinit var canaryPluginCheckBox: JCheckBox
     private lateinit var neptunePluginCheckBox: JCheckBox
@@ -67,7 +68,8 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         spongePluginCheckBox.addActionListener { fillInInfoPane() }
         forgeModCheckBox.addActionListener { fillInInfoPane() }
         liteLoaderModCheckBox.addActionListener { fillInInfoPane() }
-        bungeeCordPluginCheckBox.addActionListener { fillInInfoPane() }
+        bungeeCordPluginCheckBox.addActionListener { toggle(bungeeCordPluginCheckBox, waterfallPluginCheckBox) }
+        waterfallPluginCheckBox.addActionListener { toggle(waterfallPluginCheckBox, bungeeCordPluginCheckBox) }
         canaryPluginCheckBox.addActionListener { toggle(canaryPluginCheckBox, neptunePluginCheckBox) }
         neptunePluginCheckBox.addActionListener { toggle(neptunePluginCheckBox, canaryPluginCheckBox) }
 
@@ -76,19 +78,11 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         return panel
     }
 
-    private fun toggle(one: JCheckBox, two: JCheckBox) {
+    private fun toggle(one: JCheckBox, vararg others: JCheckBox) {
         if (one.isSelected) {
-            two.isSelected = false
-            fillInInfoPane()
+            others.forEach { it.isSelected = false }
         }
-    }
-
-    private fun toggle(one: JCheckBox, two: JCheckBox, three: JCheckBox) {
-        if (one.isSelected) {
-            two.isSelected = false
-            three.isSelected = false
-            fillInInfoPane()
-        }
+        fillInInfoPane()
     }
 
     private fun fillInInfoPane() {
@@ -126,6 +120,11 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
 
         if (bungeeCordPluginCheckBox.isSelected) {
             text += bungeeCordInfo
+            text += "<p/>"
+        }
+
+        if (waterfallPluginCheckBox.isSelected) {
+            text += waterfallInfo
             text += "<p/>"
         }
 
@@ -177,7 +176,15 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         }
 
         if (bungeeCordPluginCheckBox.isSelected) {
-            creator.settings.put(PlatformType.BUNGEECORD, BungeeCordProjectConfiguration())
+            val configuration = BungeeCordProjectConfiguration()
+            configuration.type = PlatformType.BUNGEECORD
+            creator.settings.put(PlatformType.BUNGEECORD, configuration)
+        }
+
+        if (waterfallPluginCheckBox.isSelected) {
+            val configuration = BungeeCordProjectConfiguration()
+            configuration.type = PlatformType.WATERFALL
+            creator.settings.put(PlatformType.BUNGEECORD, configuration)
         }
 
         if (canaryPluginCheckBox.isSelected) {
@@ -203,6 +210,7 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
             forgeModCheckBox.isSelected ||
             liteLoaderModCheckBox.isSelected ||
             bungeeCordPluginCheckBox.isSelected ||
+            waterfallPluginCheckBox.isSelected ||
             canaryPluginCheckBox.isSelected ||
             neptunePluginCheckBox.isSelected
     }
@@ -219,7 +227,10 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
             "on Paper servers."
         private const val bungeeCordInfo = "Create a standard " +
             "<a href=\"https://www.spigotmc.org/wiki/bungeecord/\">BungeeCord</a> plugin, for use " +
-            "on BungeeCord servers."
+            "on BungeeCord and Waterfall servers."
+        private const val waterfallInfo = "Create a standard " +
+            "<a href=\"https://aquifermc.org/\">Waterfall</a> plugin, for use " +
+            "on Waterfall servers."
         private const val spongeInfo = "Create a standard " +
             "<a href=\"https://www.spongepowered.org/\">Sponge</a> plugin, for use " +
             "on Sponge servers."

@@ -67,12 +67,10 @@ class AtCompletionContributor : CompletionContributor() {
 
         val text = parent.text.let { it.substring(0, it.length - intellijPlz) }
 
-        if (AFTER_KEYWORD.accepts(parent)) {
-            handleAtClassName(text, parent, result)
-        } else if (AFTER_CLASS_NAME.accepts(parent)) {
-            handleAtName(text, parent, result)
-        } else if (AFTER_NEWLINE.accepts(parent)) {
-            handleNewLine(text, result)
+        when {
+            AFTER_KEYWORD.accepts(parent) -> handleAtClassName(text, parent, result)
+            AFTER_CLASS_NAME.accepts(parent) -> handleAtName(text, parent, result)
+            AFTER_NEWLINE.accepts(parent) -> handleNewLine(text, result)
         }
     }
 

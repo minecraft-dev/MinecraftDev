@@ -193,6 +193,14 @@ class MinecraftProjectCreator {
                     buildDependency.artifactId = "bungeecord-api"
                     buildDependency.version = (configuration as BungeeCordProjectConfiguration).minecraftVersion + "-SNAPSHOT"
                 }
+                PlatformType.WATERFALL -> {
+                    buildRepository.id = "destroystokyo-repo"
+                    buildRepository.url = "https://repo.destroystokyo.com/repository/maven-public/"
+                    buildDependency.groupId = "io.github.waterfallmc"
+                    buildDependency.artifactId = "waterfall-api"
+                    buildDependency.version = (configuration as BungeeCordProjectConfiguration).minecraftVersion + "-SNAPSHOT"
+                    addSonatype(buildSystem.repositories)
+                }
                 PlatformType.SPONGE -> {
                     buildRepository.id = "spongepowered-repo"
                     buildRepository.url = "https://repo.spongepowered.org/maven/"

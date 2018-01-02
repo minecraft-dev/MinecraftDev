@@ -22,9 +22,8 @@ import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
-import com.google.common.base.Objects
+import com.demonwav.mcdev.util.nullable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
@@ -41,7 +40,8 @@ import java.util.Arrays
 
 class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
-    private var pluginYml: VirtualFile? = null
+    var pluginYml by nullable { facet.findFile("plugin.yml", SourceType.RESOURCE) }
+        private set
 
     override lateinit var type: PlatformType
         private set
@@ -52,20 +52,6 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
     init {
         this.moduleType = type
         this.type = type.platformType
-        setup()
-    }
-
-    private fun setup() {
-        pluginYml = facet.findFile("plugin.yml", SourceType.RESOURCE)
-    }
-
-    fun getPluginYml(): VirtualFile? {
-        if (pluginYml == null) {
-            // try and find the file again if it's not already present
-            // when this object was first created it may not have been ready
-            setup()
-        }
-        return pluginYml
     }
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) =
@@ -116,9 +102,7 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
         val annotation = method.modifierList.findAnnotation(BukkitConstants.HANDLER_ANNOTATION) ?: return null
 
         // We are in an event method
-        val annotationMemberValue = annotation.findAttributeValue("ignoreCancelled") as? PsiLiteralExpression ?: return null
-
-        val value = annotationMemberValue
+        val value = annotation.findAttributeValue("ignoreCancelled") as? PsiLiteralExpression ?: return null
         if (value.value !is Boolean) {
             return null
         }
@@ -190,23 +174,6 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
         super.dispose()
 
         pluginYml = null
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (other == null || javaClass != other.javaClass) {
-            return false
-        }
-        val that = other as BukkitModule<*>?
-        return Objects.equal(pluginYml, that!!.pluginYml) &&
-            type === that.type &&
-            Objects.equal(moduleType, that.moduleType)
-    }
-
-    override fun hashCode(): Int {
-        return Objects.hashCode(pluginYml, type, moduleType)
     }
 
     companion object {
