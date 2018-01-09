@@ -166,7 +166,7 @@ private class FieldSignature(private val field: PsiField) {
     }
 
     override fun hashCode(): Int {
-        return 31 * field.name!!.hashCode() + TypeConversionUtil.erasure(field.type).hashCode()
+        return 31 * field.name.hashCode() + TypeConversionUtil.erasure(field.type).hashCode()
     }
 }
 

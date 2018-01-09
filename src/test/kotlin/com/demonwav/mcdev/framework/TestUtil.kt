@@ -22,7 +22,7 @@ import com.intellij.openapi.vfs.StandardFileSystems
 val mockJdk by lazy {
     val path = findLibraryPath("mockJDK")
     val rtFile = StandardFileSystems.local().findFileByPath(path)!!
-    val rt = StandardFileSystems.getJarRootForLocalFile(rtFile)!!
+    val rt = JarFileSystem.getInstance().getRootByLocal(rtFile)!!
     val home = rtFile.parent!!
     MockJdk("1.7", rt, home)
 }

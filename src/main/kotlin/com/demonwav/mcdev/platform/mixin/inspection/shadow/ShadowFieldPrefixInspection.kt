@@ -46,7 +46,7 @@ class ShadowFieldPrefixInspection : MixinInspection() {
             }
 
             // Check if field name starts with default shadow prefix
-            val fieldName = field.name ?: return
+            val fieldName = field.name
             if (fieldName.startsWith(DEFAULT_SHADOW_PREFIX)) {
                 holder.registerProblem(field.nameIdentifier, "Cannot use prefix for @Shadow fields",
                     QuickFixFactory.getInstance().createRenameElementFix(field, fieldName.removePrefix(DEFAULT_SHADOW_PREFIX)))
@@ -73,7 +73,7 @@ class ShadowFieldPrefixInspection : MixinInspection() {
 
             // Rename field (if necessary)
             val field = (shadow.owner as PsiModifierList).parent as PsiField
-            val fieldName = field.name!!
+            val fieldName = field.name
             if (fieldName.startsWith(prefixName)) {
                 // Rename field
                 QuickFixFactory.getInstance().createRenameElementFix(field, fieldName.removePrefix(prefixName)).applyFix()
