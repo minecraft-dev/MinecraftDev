@@ -25,8 +25,10 @@ abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
     override fun setUp() {
         super.setUp()
 
-        library = createLibrary(project, "mixin")
         ModuleRootModificationUtil.updateModel(myModule) { model ->
+            runWriteTask {
+                library = createLibrary(project, "mixin")
+            }
             model.addLibraryEntry(library ?: throw IllegalStateException("Library not created"))
         }
     }
