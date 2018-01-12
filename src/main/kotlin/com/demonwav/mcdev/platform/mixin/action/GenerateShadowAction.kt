@@ -19,6 +19,7 @@ import com.demonwav.mcdev.util.findLastChild
 import com.demonwav.mcdev.util.findNextMember
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.toTypedArray
+import com.intellij.application.options.CodeStyle
 import com.intellij.codeInsight.generation.GenerateMembersUtil
 import com.intellij.codeInsight.generation.GenerationInfo
 import com.intellij.codeInsight.generation.OverrideImplementUtil
@@ -45,8 +46,7 @@ import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.PsiSubstitutor
-import com.intellij.psi.codeStyle.CodeStyleSettings
-import com.intellij.psi.codeStyle.CodeStyleSettingsManager
+import com.intellij.psi.codeStyle.CommonCodeStyleSettings
 import java.util.stream.Stream
 import kotlin.streams.toList
 
@@ -207,11 +207,11 @@ private fun copyAnnotation(modifiers: PsiModifierList, newModifiers: PsiModifier
 }
 
 inline fun disableAnnotationWrapping(project: Project, func: () -> Unit) {
-    val settings = CodeStyleSettingsManager.getSettings(project).getCommonSettings(JavaLanguage.INSTANCE)
+    val settings = CodeStyle.getSettings(project).getCommonSettings(JavaLanguage.INSTANCE)
     val methodWrap = settings.METHOD_ANNOTATION_WRAP
     val fieldWrap = settings.FIELD_ANNOTATION_WRAP
-    settings.METHOD_ANNOTATION_WRAP = CodeStyleSettings.DO_NOT_WRAP
-    settings.FIELD_ANNOTATION_WRAP = CodeStyleSettings.DO_NOT_WRAP
+    settings.METHOD_ANNOTATION_WRAP = CommonCodeStyleSettings.DO_NOT_WRAP
+    settings.FIELD_ANNOTATION_WRAP = CommonCodeStyleSettings.DO_NOT_WRAP
 
     try {
         func()
