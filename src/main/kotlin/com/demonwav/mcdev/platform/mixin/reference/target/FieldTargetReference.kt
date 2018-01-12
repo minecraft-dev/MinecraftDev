@@ -33,8 +33,8 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
 
     override fun createLookup(targetClass: PsiClass, m: PsiField, owner: PsiClass): LookupElementBuilder {
         return JavaLookupElementBuilder.forField(m, MixinMemberReference.toString(m.getQualifiedMemberReference(owner)), targetClass)
-                .withPresentableText(m.name!!)
-                .withLookupString(m.name!!)
+                .withPresentableText(m.name)
+                .withLookupString(m.name)
     }
 
     private class FindUsagesVisitor(private val targetClass: PsiClass, private val target: MemberReference, checkOnly: Boolean)

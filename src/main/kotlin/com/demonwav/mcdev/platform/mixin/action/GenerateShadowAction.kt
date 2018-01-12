@@ -159,7 +159,7 @@ private fun shadowMethod(project: Project, psiClass: PsiClass, method: PsiMethod
 }
 
 private fun shadowField(project: Project, field: PsiField): PsiField {
-    val newField = JavaPsiFacade.getElementFactory(project).createField(field.name!!, field.type)
+    val newField = JavaPsiFacade.getElementFactory(project).createField(field.name, field.type)
     val newModifiers = newField.modifierList!!
 
     val modifiers = field.modifierList!!

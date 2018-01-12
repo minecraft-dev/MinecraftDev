@@ -203,18 +203,14 @@ class AtCompletionContributor : CompletionContributor() {
         val srgResult = result.withPrefixMatcher(SrgPrefixMatcher(text))
 
         for (field in entryClass.fields) {
-            if (field.name == null) {
-                continue
-            }
-
-            if (!field.name!!.contains(text, ignoreCase = true)) {
+            if (!field.name.contains(text, ignoreCase = true)) {
                 continue
             }
 
             val memberReference = srgMap.findSrgField(field) ?: field.simpleQualifiedMemberReference
             srgResult.addElement(PrioritizedLookupElement.withPriority(
                 LookupElementBuilder
-                    .create(field.name!!)
+                    .create(field.name)
                     .withIcon(PlatformIcons.FIELD_ICON)
                     .withTailText(" (${memberReference.name})", true)
                     .withInsertHandler handler@ { context, _ ->
@@ -223,7 +219,7 @@ class AtCompletionContributor : CompletionContributor() {
 
                         // TODO: Fix visibility decrease
                         PsiDocumentManager.getInstance(context.project).doPostponedOperationsAndUnblockDocument(context.document)
-                        val comment = " # ${field.name!!}"
+                        val comment = " # ${field.name}"
                         context.document.insertString(context.editor.caretModel.offset, comment)
                         context.editor.caretModel.moveCaretRelatively(comment.length, 0, false, false, false)
                     },

@@ -10,6 +10,8 @@
 
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.internal.jvm.Jvm
+import org.jetbrains.intellij.IntelliJPlugin
+import org.jetbrains.intellij.IntelliJPluginExtension
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
@@ -21,7 +23,7 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.1.4-3" // kept in sync with IntelliJ's bundled dep
+    id("org.jetbrains.kotlin.jvm") version "1.2.10" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
     id("org.jetbrains.intellij") version "0.2.17"
@@ -146,10 +148,6 @@ processResources {
 }
 
 test {
-    if (CI) {
-        systemProperty("slowCI", "true")
-    }
-
     dependsOn(configurations["testLibs"])
     doFirst {
         configurations["testLibs"].resolvedConfiguration.resolvedArtifacts.forEach {

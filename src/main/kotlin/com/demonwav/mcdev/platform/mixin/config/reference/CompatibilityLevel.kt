@@ -47,7 +47,7 @@ object CompatibilityLevel : PsiReferenceProvider() {
                     continue
                 }
 
-                list.add(LookupElementBuilder.create(field.name!!))
+                list.add(LookupElementBuilder.create(field.name))
             }
 
             return list.toArray()
