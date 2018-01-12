@@ -25,11 +25,17 @@ abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
     override fun setUp() {
         super.setUp()
 
+        runWriteTask {
+            library = createLibrary(project, "mixin")
+        }
+
         ModuleRootModificationUtil.updateModel(myModule) { model ->
-            runWriteTask {
-                library = createLibrary(project, "mixin")
-            }
             model.addLibraryEntry(library ?: throw IllegalStateException("Library not created"))
+            val orderEntries = model.orderEntries
+            val last = orderEntries.last()
+            System.arraycopy(orderEntries, 0, orderEntries, 1, orderEntries.size - 1)
+            orderEntries[0] = last
+            model.rearrangeOrderEntries(orderEntries)
         }
     }
 

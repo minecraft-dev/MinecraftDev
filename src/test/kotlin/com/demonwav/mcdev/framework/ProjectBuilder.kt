@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.framework
 
 import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -84,10 +85,10 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
         runWriteAction {
             VfsUtil.markDirtyAndRefresh(false, true, true, root)
             // Make sure to always add the module content root
-            ModuleRootModificationUtil.updateModel(fixture.module) { model ->
-                model.contentEntries.firstOrNull { it.file == project.baseDir } ?:
-                    model.addContentEntry(project.baseDir)
+            if (fixture.module.rootManager.contentEntries.none { it.file == project.baseDir }) {
+                ModuleRootModificationUtil.addContentRoot(fixture.module, project.baseDir)
             }
+
             builder()
         }
     }
