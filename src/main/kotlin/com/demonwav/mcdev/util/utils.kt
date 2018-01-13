@@ -146,3 +146,13 @@ val gson = Gson()
 inline fun <reified T : Any> Gson.fromJson(text: String): T = fromJson(text, object : TypeToken<T>() {}.type)
 
 fun <K> Map<K, *>.containsAllKeys(vararg keys: K) = keys.all { this.containsKey(it) }
+
+/**
+ * Splits a string into the longest prefix matching a predicate and the corresponding suffix *not* matching.
+ *
+ * Note: Name inspired by Scala.
+ */
+inline fun String.span(predicate: (Char) -> Boolean): Pair<String, String> {
+    val prefix = takeWhile(predicate)
+    return prefix to drop(prefix.length)
+}
