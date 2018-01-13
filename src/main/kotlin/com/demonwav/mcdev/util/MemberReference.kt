@@ -136,22 +136,22 @@ fun PsiMethod?.isSameReference(reference: PsiMethod?): Boolean =
 
 @get:Contract(pure = true)
 val PsiField.simpleMemberReference
-    get() = MemberReference(name!!)
+    get() = MemberReference(name)
 
 @get:Contract(pure = true)
 val PsiField.memberReference
-    get() = MemberReference(name!!, descriptor)
+    get() = MemberReference(name, descriptor)
 
 @get:Contract(pure = true)
 val PsiField.simpleQualifiedMemberReference
-    get() = MemberReference(name!!, null, containingClass!!.fullQualifiedName)
+    get() = MemberReference(name, null, containingClass!!.fullQualifiedName)
 
 @get:Contract(pure = true)
 val PsiField.qualifiedMemberReference
-    get() = MemberReference(name!!, descriptor, containingClass!!.fullQualifiedName)
+    get() = MemberReference(name, descriptor, containingClass!!.fullQualifiedName)
 
 @Contract(pure = true)
 fun PsiField.getQualifiedMemberReference(owner: PsiClass): MemberReference {
-    return MemberReference(name!!, descriptor, owner.fullQualifiedName)
+    return MemberReference(name, descriptor, owner.fullQualifiedName)
 }
 

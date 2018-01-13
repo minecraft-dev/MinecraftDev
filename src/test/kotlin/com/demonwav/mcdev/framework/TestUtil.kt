@@ -22,13 +22,13 @@ import com.intellij.openapi.vfs.StandardFileSystems
 val mockJdk by lazy {
     val path = findLibraryPath("mockJDK")
     val rtFile = StandardFileSystems.local().findFileByPath(path)!!
-    val rt = StandardFileSystems.getJarRootForLocalFile(rtFile)!!
+    val rt = JarFileSystem.getInstance().getRootByLocal(rtFile)!!
     val home = rtFile.parent!!
     MockJdk("1.7", rt, home)
 }
 
 private fun findLibraryPath(name: String) = FileUtil.toSystemIndependentName(System.getProperty("testLibs.$name")!!)
-private fun findLibrary(name: String) = StandardFileSystems.jar().findFileByPath(findLibraryPath(name) + JarFileSystem.JAR_SEPARATOR)
+private fun findLibrary(name: String) = StandardFileSystems.jar().refreshAndFindFileByPath(findLibraryPath(name) + JarFileSystem.JAR_SEPARATOR)
 
 fun createLibrary(project: Project, name: String): Library {
     val table = LibraryTablesRegistrar.getInstance().getLibraryTable(project)

@@ -212,7 +212,7 @@ fun PsiMethod.isMatchingMethod(pattern: PsiMethod): Boolean {
         && this.returnType.isErasureEquivalentTo(pattern.returnType)
 }
 
-fun PsiClass.findMatchingField(pattern: PsiField, checkBases: Boolean, name: String = pattern.name!!): PsiField? {
+fun PsiClass.findMatchingField(pattern: PsiField, checkBases: Boolean, name: String = pattern.name): PsiField? {
     return findFieldByName(name, checkBases)?.takeIf { it.isMatchingField(pattern) }
 }
 

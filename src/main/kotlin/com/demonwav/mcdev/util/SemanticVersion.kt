@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.PreReleasePart
 import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.ReleasePart
+import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.TextPart
 
 /**
  * Represents a comparable and generalised "semantic version".
@@ -21,7 +21,7 @@ import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.ReleasePart
 class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion> {
     val versionString = parts.joinToString(".") { it.versionString }
 
-    override fun compareTo(other: SemanticVersion) =
+    override fun compareTo(other: SemanticVersion): Int =
         naturalOrder<VersionPart>().lexicographical().compare(parts, other.parts)
 
     override fun equals(other: Any?) =
@@ -32,10 +32,26 @@ class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion
 
     override fun hashCode() = parts.hashCode()
 
+    override fun toString() = versionString
+
     companion object {
         /**
+         * The higher the priority value associated with a certain part, the higher it is ranked in comparisons.
+         * Unknown parts will always be "rated" lower and equal among each other.
+         */
+        val TEXT_PRIORITIES = mapOf(
+            "snapshot" to 0,
+            "rc" to 1,
+            "pre" to 1
+        )
+        /**
+         * All separators allowed between a number and a modifier (i.e. (numbered) text part).
+         */
+        val SEPARATORS = listOf('-', '_')
+
+        /**
          * Parses a version string into a comparable representation.
-         * @throws IllegalArgumentException if any part of the version string cannot be parsed as integer or split into pre-release parts.
+         * @throws IllegalArgumentException if any part of the version string cannot be parsed as integer or split into text parts.
          */
         fun parse(value: String): SemanticVersion {
             fun parseInt(part: String): Int =
@@ -44,18 +60,25 @@ class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion
                 else
                     throw IllegalArgumentException("Failed to parse version part as integer: $part")
 
-            val parts = value.split('.').map {
-                if (it.contains("_pre")) {
-                    // There have been cases of Forge builds for MC pre-releases (1.7.10_pre4)
-                    // We're consuming the 10_pre4 and extracting 10 and 4 from it
-                    val subParts = it.split("_pre")
-                    if (subParts.size == 2) {
-                        PreReleasePart(parseInt(subParts[0]), parseInt(subParts[1]))
-                    } else {
-                        throw IllegalArgumentException("Failed to split pre-release version part into two numbers: $it")
-                    }
+            // We need to support pre-releases/RCs and snapshots as well
+            fun parseTextPart(subParts: List<String>, separator: Char): VersionPart =
+                if (subParts.size == 2) {
+                    val version = parseInt(subParts[0])
+                    val (text, number) = subParts[1].span { !it.isDigit() }
+                    // Pure text parts always are considered older than numbered ones
+                    // Since we don't handle negative version numbers, -1 is guaranteed to be smaller than any numbered part
+                    val versionNumber = if (number.isEmpty()) -1 else parseInt(number)
+                    TextPart(version, separator, text, versionNumber)
                 } else {
-                    ReleasePart(parseInt(it))
+                    throw IllegalArgumentException("Failed to split text version part into two: ${subParts.first()}$separator")
+                }
+
+            val parts = value.split('.').map { part ->
+                val separator = SEPARATORS.find { it in part }
+                if (separator != null) {
+                    parseTextPart(part.split(separator, limit = 2), separator)
+                } else {
+                    ReleasePart(parseInt(part))
                 }
             }
             return SemanticVersion(parts)
@@ -69,18 +92,25 @@ class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion
 
                 override fun compareTo(other: VersionPart) =
                     when (other) {
-                        is PreReleasePart -> if (version != other.version) version - other.version else 1
                         is ReleasePart -> version - other.version
+                        is TextPart -> if (version != other.version) version - other.version else 1
                     }
             }
 
-            data class PreReleasePart(val version: Int, val pre: Int) : VersionPart() {
-                override val versionString = "${version}_pre$pre"
+            data class TextPart(val version: Int, val separator: Char, val text: String, val number: Int) : VersionPart() {
+                private val priority = TEXT_PRIORITIES[text.toLowerCase()] ?: -1
+
+                override val versionString = "$version$separator$text${if (number == -1) "" else number.toString()}"
 
                 override fun compareTo(other: VersionPart) =
                     when (other) {
-                        is PreReleasePart -> if (version != other.version) version - other.version else pre - other.pre
                         is ReleasePart -> if (version != other.version) version - other.version else -1
+                        is TextPart ->
+                            when {
+                                version != other.version -> version - other.version
+                                text != other.text -> priority - other.priority
+                                else -> number - other.number
+                            }
                     }
             }
         }

@@ -113,7 +113,7 @@ class MixinFoldingBuilder : CustomFoldingBuilder() {
                 val start = (expression as? CompositeElement)?.findChildByRole(ChildRole.LPARENTH) ?: return
                 val end = (innerCast as? CompositeElement)?.findChildByRole(ChildRole.RPARENTH) ?: return
 
-                descriptors.add(FoldingDescriptor(expression, TextRange(start.startOffset, end.startOffset + end.textLength)))
+                descriptors.add(FoldingDescriptor(expression.node, TextRange(start.startOffset, end.startOffset + end.textLength)))
             }
         }
 

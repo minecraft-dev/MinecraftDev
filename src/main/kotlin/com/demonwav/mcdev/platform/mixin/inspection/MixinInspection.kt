@@ -11,14 +11,14 @@
 package com.demonwav.mcdev.platform.mixin.inspection
 
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
-import com.intellij.codeInspection.BaseJavaBatchLocalInspectionTool
+import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiFile
 
-abstract class MixinInspection : BaseJavaBatchLocalInspectionTool() {
+abstract class MixinInspection : AbstractBaseJavaLocalInspectionTool() {
 
     protected abstract fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor
 

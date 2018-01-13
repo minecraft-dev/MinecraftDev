@@ -12,6 +12,7 @@ package com.demonwav.mcdev.framework
 
 import com.demonwav.mcdev.i18n.I18nConstants
 import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -50,7 +51,7 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
     fun at(path: String, @Language("Access Transformers") code: String, configure: Boolean = true) = file(path, code, "_at.cfg", configure)
     fun i18n(path: String, @Language("I18n") code: String, configure: Boolean = true) = file(path, code, ".${I18nConstants.FILE_EXTENSION}", configure)
 
-    fun dir(path: String, block: ProjectBuilder.() -> Unit) {
+    inline fun dir(path: String, block: ProjectBuilder.() -> Unit) {
         val oldIntermediatePath = intermediatePath
         if (intermediatePath.isEmpty()) {
             intermediatePath = path
@@ -86,10 +87,10 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
         runWriteAction {
             VfsUtil.markDirtyAndRefresh(false, true, true, root)
             // Make sure to always add the module content root
-            ModuleRootModificationUtil.updateModel(fixture.module) { model ->
-                model.contentEntries.firstOrNull { it.file == project.baseDir } ?:
-                    model.addContentEntry(project.baseDir)
+            if (fixture.module.rootManager.contentEntries.none { it.file == project.baseDir }) {
+                ModuleRootModificationUtil.addContentRoot(fixture.module, project.baseDir)
             }
+
             builder()
         }
     }
