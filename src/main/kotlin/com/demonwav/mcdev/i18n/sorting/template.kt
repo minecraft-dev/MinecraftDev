@@ -14,6 +14,7 @@ import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.project.stateStore
+import sun.security.pkcs.PKCS8Key.parseKey
 import java.io.File
 
 sealed class TemplateElement
@@ -29,10 +30,10 @@ data class Template(val elements: List<TemplateElement>) {
         fun parse(s: String): Template =
             Template(
                 if (s.isNotEmpty()) {
-                    s.split("\n").map {
+                    s.split('\n').map {
                         when {
                             it.isEmpty() -> EmptyLine
-                            it.startsWith("#") -> Comment(it.substring(1).trim())
+                            it.startsWith('#') -> Comment(it.substring(1).trim())
                             else -> Key(parseKey(it.trim()))
                         }
                     }

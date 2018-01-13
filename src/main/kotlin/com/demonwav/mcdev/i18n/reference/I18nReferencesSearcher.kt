@@ -39,7 +39,7 @@ class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.Sear
             model.isCaseSensitive = true
             model.searchContext = FindModel.SearchContext.IN_STRING_LITERALS
             model.isRegularExpressions = true
-            model.stringToFind = power(entry.key.split("."))
+            model.stringToFind = power(entry.key.split('.'))
                 .filter { it.isNotEmpty() }
                 .joinToString("|") { Regex.escape(it.joinToString(".")) }
             FindInProjectUtil.findUsages(model, parameters.project,
