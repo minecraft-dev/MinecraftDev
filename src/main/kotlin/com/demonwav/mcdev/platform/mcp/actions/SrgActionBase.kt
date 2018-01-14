@@ -30,8 +30,8 @@ import com.intellij.psi.PsiReference
 import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
 
-
 abstract class SrgActionBase : AnAction() {
+
     override fun actionPerformed(e: AnActionEvent) {
         val data = getDataFromActionEvent(e) ?: return showBalloon("Unknown failure", e)
 
@@ -72,7 +72,9 @@ abstract class SrgActionBase : AnAction() {
 
         val statusBar = WindowManager.getInstance().getStatusBar(DataKeys.PROJECT.getData(e.dataContext))
 
-        invokeLater { balloon.show(RelativePoint.getCenterOf(statusBar.component), Balloon.Position.atRight) }
+        invokeLater {
+            balloon.show(RelativePoint.getCenterOf(statusBar.component), Balloon.Position.atRight)
+        }
     }
 
     protected fun showSuccessBalloon(editor: Editor, element: PsiElement, text: String) {
