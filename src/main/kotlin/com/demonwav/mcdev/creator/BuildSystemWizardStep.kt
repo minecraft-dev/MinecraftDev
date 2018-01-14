@@ -93,11 +93,11 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
                 throw EmptyFieldSetupException(versionField)
             }
 
-            if (!groupIdField.text.matches("\\S+".toRegex())) {
+            if (!groupIdField.text.matches(NO_WHITESPACE)) {
                 throw OtherSetupException("The GroupId field cannot contain any whitespace", groupIdField)
             }
 
-            if (!artifactIdField.text.matches("\\S+".toRegex())) {
+            if (!artifactIdField.text.matches(NO_WHITESPACE)) {
                 throw OtherSetupException("The ArtifactId field cannot contain any whitespace", artifactIdField)
             }
 
@@ -113,5 +113,9 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
         }
 
         return true
+    }
+
+    companion object {
+        val NO_WHITESPACE = "\\S+".toRegex()
     }
 }

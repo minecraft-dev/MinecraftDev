@@ -45,7 +45,7 @@ class ListenerEventAnnotator : Annotator {
         val instance = MinecraftFacet.getInstance(module) ?: return
         // Since each platform has their own valid listener annotations,
         // some platforms may have multiple allowed annotations for various cases
-        val moduleTypes = instance.getTypes()
+        val moduleTypes = instance.types
         var contains = false
         for (moduleType in moduleTypes) {
             val listenerAnnotations = moduleType.listenerAnnotations

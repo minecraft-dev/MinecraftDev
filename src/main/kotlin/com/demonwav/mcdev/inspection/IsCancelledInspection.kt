@@ -40,7 +40,7 @@ class IsCancelledInspection : BaseInspection() {
 
                 val instance = MinecraftFacet.getInstance(module) ?: return
 
-                val useless = instance.getModules().stream()
+                val useless = instance.modules.stream()
                     .mapNotNull { m -> m.checkUselessCancelCheck(expression) }
                     .findAny()
 

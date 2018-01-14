@@ -61,7 +61,7 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
         val manager = ModuleManager.getInstance(project)
         val path = manager.getModuleGroupPath(module)
         if (path == null) {
-            data.setIcon(children.iterator().next().getIcon())
+            data.setIcon(children.iterator().next().icon)
             return
         }
 
@@ -70,7 +70,7 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
             return
         }
 
-        data.setIcon(children.iterator().next().getIcon())
+        data.setIcon(children.iterator().next().icon)
     }
 
     override fun decorate(node: PackageDependenciesNode, cellRenderer: ColoredTreeCellRenderer) {}
