@@ -17,7 +17,7 @@ import com.intellij.openapi.components.StoragePathMacros
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 
-@State(name = "McpModuleSettings", storages = arrayOf(Storage(StoragePathMacros.MODULE_FILE)))
+@State(name = "McpModuleSettings", storages = [Storage(StoragePathMacros.MODULE_FILE)])
 class McpModuleSettings : PersistentStateComponent<McpModuleSettings.State> {
 
     data class State(
@@ -57,5 +57,4 @@ class McpModuleSettings : PersistentStateComponent<McpModuleSettings.State> {
             return newSettings
         }
     }
-
 }

@@ -40,7 +40,7 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) = ""
 
-    private fun getSettings() = settings.state
+    fun getSettings() = settings.state
 
     fun updateSettings(data: McpModuleSettings.State) {
         this.settings.loadState(data)
