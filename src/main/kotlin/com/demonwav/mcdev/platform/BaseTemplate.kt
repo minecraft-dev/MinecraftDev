@@ -22,6 +22,8 @@ import java.util.Properties
 
 object BaseTemplate {
 
+    private val NEW_LINE = "\\n+".toRegex()
+
     fun applyBuildGradleTemplate(project: Project,
                                  file: VirtualFile,
                                  groupId: String,
@@ -112,7 +114,7 @@ object BaseTemplate {
 
         var text = template.getText(allProperties)
         if (trimNewlines) {
-            text = text.replace("\\n+".toRegex(), "\n")
+            text = text.replace(NEW_LINE, "\n")
         }
         VfsUtil.saveText(file, text)
 

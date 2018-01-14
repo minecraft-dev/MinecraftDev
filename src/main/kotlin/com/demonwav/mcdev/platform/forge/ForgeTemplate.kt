@@ -104,12 +104,12 @@ object ForgeTemplate {
         properties.setProperty("URL", url)
         properties.setProperty("UPDATE_URL", updateUrl)
 
-        if (authorList != null) {
+        if (!authorList.isNullOrBlank()) {
             properties.setProperty("HAS_AUTHOR_LIST", "true")
             properties.setProperty("AUTHOR_LIST", authorList)
         }
 
-        if (dependenciesList != null) {
+        if (!dependenciesList.isNullOrBlank()) {
             properties.setProperty("HAS_DEPENDENCIES_LIST", "true")
             properties.setProperty("DEPENDENCIES_LIST", dependenciesList)
         }

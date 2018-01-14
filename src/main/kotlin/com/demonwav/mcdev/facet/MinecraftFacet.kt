@@ -184,10 +184,10 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
     val icon: Icon?
         get() {
-            val iconCount = moduleMap.keys.count { it.hasIcon() }
+            val iconCount = moduleMap.keys.count { it.hasIcon }
             return when {
                 iconCount == 0 -> null
-                iconCount == 1 -> moduleMap.keys.firstOrNull { it.hasIcon() }?.icon
+                iconCount == 1 -> moduleMap.keys.firstOrNull { it.hasIcon }?.icon
                 iconCount == 2 && moduleMap.containsAllKeys(SpongeModuleType, ForgeModuleType) -> PlatformAssets.SPONGE_FORGE_ICON
                 moduleMap.size > 0 -> PlatformAssets.MINECRAFT_ICON
                 else -> null
