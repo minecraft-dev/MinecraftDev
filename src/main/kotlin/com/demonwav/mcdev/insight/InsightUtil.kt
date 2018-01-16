@@ -38,7 +38,7 @@ val PsiElement.eventListener: Pair<PsiClass, PsiMethod>?
         val instance = MinecraftFacet.getInstance(module) ?: return null
         // Since each platform has their own valid listener annotations,
         // some platforms may have multiple allowed annotations for various cases
-        val listenerAnnotations = instance.getTypes().flatMap { it.listenerAnnotations }
+        val listenerAnnotations = instance.types.flatMap { it.listenerAnnotations }
         var contains = false
         for (listenerAnnotation in listenerAnnotations) {
             if (modifierList.findAnnotation(listenerAnnotation) != null) {

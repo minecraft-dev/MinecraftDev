@@ -25,18 +25,13 @@ import javax.swing.Icon
 
 abstract class AbstractModule(protected val facet: MinecraftFacet) {
 
-    @get:Contract(pure = true)
     val module: Module = facet.module
-    @get:Contract(pure = true)
     val project = module.project
 
-    @get:Contract(pure = true)
     abstract val moduleType: AbstractModuleType<*>
 
-    @get:Contract(pure = true)
     abstract val type: PlatformType
 
-    @get:Contract(pure = true)
     open val icon: Icon?
         get() = moduleType.icon
 

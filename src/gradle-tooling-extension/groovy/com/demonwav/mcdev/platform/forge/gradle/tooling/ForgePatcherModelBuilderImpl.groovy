@@ -49,7 +49,7 @@ final class ForgePatcherModelBuilderImpl implements ModelBuilderService {
     @Override
     ErrorMessageBuilder getErrorMessageBuilder(@NotNull Project project, @NotNull Exception e) {
         return ErrorMessageBuilder.create(
-                project, e, "MinecraftDev import errors"
+            project, e, "MinecraftDev import errors"
         ).withDescription("Unable to build MinecraftDev Forge patcher project configuration")
     }
 }

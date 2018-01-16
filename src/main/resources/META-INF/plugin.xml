@@ -28,7 +28,7 @@
       <div>
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2018.1-1.0.0
+        v. 2018.1-1.1.0
       </div>
     ]]>
     </change-notes>
@@ -154,6 +154,8 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.mcp.framework.McpPresentationProvider" />
+
+        <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mcp.debug.McpRunConfigurationExtension"/>
 
         <!-- access transformer file type -->
         <fileTypeFactory implementation="com.demonwav.mcdev.platform.mcp.at.AtFileTypeFactory"/>
@@ -701,6 +703,11 @@
         <action class="com.demonwav.mcdev.platform.mcp.actions.FindSrgMappingAction" id="FindSrgMappingAction"
                 text="Get SRG Name"
                 description="Find the associated SRG mapping for this element">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu2"/>
+        </action>
+        <action class="com.demonwav.mcdev.platform.mcp.actions.CopyAtAction" id="CopyATAction"
+                text="Copy AT Entry to Clipboard"
+                description="Copy the reference to clipboard in Access Transformer format">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu2"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.GotoAtEntryAction" id="GotoAtEntry"

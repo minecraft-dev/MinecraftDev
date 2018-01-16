@@ -30,25 +30,18 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
 
     val colorMap = LinkedHashMap<String, Color>()
 
-    @get:Contract(pure = true)
     abstract val platformType: PlatformType
 
-    @get:Contract(pure = true)
     abstract val icon: Icon?
 
-    @Contract(pure = true)
-    open fun hasIcon() = true
+    open val hasIcon = true
 
-    @get:Contract(pure = true)
     abstract val id: String
 
-    @get:Contract(pure = true)
     abstract val ignoredAnnotations: List<String>
 
-    @get:Contract(pure = true)
     abstract val listenerAnnotations: List<String>
 
-    @get:Contract(pure = true)
     val classToColorMappings: Map<String, Color>
         get() = this.colorMap
 

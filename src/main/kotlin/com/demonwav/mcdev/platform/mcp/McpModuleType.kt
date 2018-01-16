@@ -29,7 +29,7 @@ object McpModuleType : AbstractModuleType<McpModule>("", "") {
     override val id = ID
     override val ignoredAnnotations = emptyList<String>()
     override val listenerAnnotations = emptyList<String>()
+    override val hasIcon = false
 
     override fun generateModule(facet: MinecraftFacet) = McpModule(facet)
-    override fun hasIcon() = false
 }

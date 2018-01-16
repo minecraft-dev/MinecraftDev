@@ -33,7 +33,7 @@ fun <T> PsiElement.findColor(function: (Map<String, Color>, Map.Entry<String, Co
     val expression = this
     val type = expression.type ?: return null
 
-    for (abstractModuleType in facet.getTypes()) {
+    for (abstractModuleType in facet.types) {
         val map = abstractModuleType.classToColorMappings
         for (entry in map.entries) {
             // This is such a hack

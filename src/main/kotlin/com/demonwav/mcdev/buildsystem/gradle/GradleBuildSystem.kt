@@ -148,7 +148,7 @@ class GradleBuildSystem : BuildSystem() {
         runWriteTask {
             val wrapperDirPath = VfsUtil.createDirectoryIfMissing(rootDirectory, "gradle/wrapper").path
             FileUtils.writeLines(File(wrapperDirPath, "gradle-wrapper.properties"), listOf(
-                "distributionUrl=https\\://services.gradle.org/distributions/gradle-3.3-bin.zip"
+                "distributionUrl=https\\://services.gradle.org/distributions/gradle-4.4.1-bin.zip"
             ))
         }
 

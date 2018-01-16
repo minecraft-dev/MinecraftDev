@@ -68,7 +68,7 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event 
         chosenClass = chooser.selected
 
         chosenClass?.let { chosenClass ->
-            val relevantModule = facet.getModules().asSequence()
+            val relevantModule = facet.modules.asSequence()
                 .filter { m -> isSuperEventListenerAllowed(chosenClass, m) }
                 .firstOrNull() ?: return null
 
@@ -131,7 +131,7 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event 
         val module = ModuleUtilCore.findModuleForPsiElement(file) ?: return false
 
         val instance = MinecraftFacet.getInstance(module)
-        return instance != null && instance.isEventGenAvailable()
+        return instance != null && instance.isEventGenAvailable
     }
 
     companion object {
