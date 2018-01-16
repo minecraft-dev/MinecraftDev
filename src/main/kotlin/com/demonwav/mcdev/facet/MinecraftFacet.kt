@@ -210,30 +210,29 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
         fun getInstance(module: Module) = FacetManager.getInstance(module).getFacetByType(ID)
 
-        fun getChildInstances(module: Module): Set<MinecraftFacet> {
-            runInlineReadAction {
-                val instance = getInstance(module)
-                if (instance != null) {
-                    return setOf(instance)
-                }
-
-                val manager = ModuleManager.getInstance(module.project)
-                val result = mutableSetOf<MinecraftFacet>()
-
-                for (m in manager.modules) {
-                    val path = manager.getModuleGroupPath(m) ?: continue
-                    val namedModule = manager.findModuleByName(path.last()) ?: continue
-
-                    if (namedModule != module) {
-                        continue
-                    }
-
-                    val facet = getInstance(m) ?: continue
-                    result.add(facet)
-                }
-                return result
+        fun getChildInstances(module: Module) = runInlineReadAction run@{
+            val instance = getInstance(module)
+            if (instance != null) {
+                return@run setOf(instance)
             }
+
+            val manager = ModuleManager.getInstance(module.project)
+            val result = mutableSetOf<MinecraftFacet>()
+
+            for (m in manager.modules) {
+                val path = manager.getModuleGroupPath(m) ?: continue
+                val namedModule = manager.findModuleByName(path.last()) ?: continue
+
+                if (namedModule != module) {
+                    continue
+                }
+
+                val facet = getInstance(m) ?: continue
+                result.add(facet)
+            }
+            return@run result
         }
+
 
         fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>) = getInstance(module)?.getModuleOfType(type)
 
