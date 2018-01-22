@@ -36,7 +36,6 @@ val CI = System.getenv("CI") != null
 
 val ideaVersion: String by extra
 val javaVersion: String by extra
-val kotlinVersion: String by extra
 val downloadIdeaSources: String by extra
 
 // for publishing nightlies
@@ -236,9 +235,6 @@ java.sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
 // Remove gen directory on clean
 clean.delete(generate)
 
-// Workaround for KT-16764
-compileKotlin.inputs.dir(generate)
-
 runIde {
     maxHeapSize = "2G"
 
@@ -251,7 +247,7 @@ runIde {
 }
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
-fun DependencyHandlerScope.kotlin(module: String) = kotlin(module, kotlinVersion) as String
+fun DependencyHandlerScope.kotlin(module: String) = kotlin(module, null) as String
 fun intellijPlugin(name: String) = mapOf(
     "group" to "org.jetbrains.plugins",
     "name" to name,
