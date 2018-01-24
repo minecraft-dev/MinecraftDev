@@ -13,14 +13,14 @@ package com.demonwav.mcdev.util
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.project.Project
 
-abstract class AbstractProjectComponent(var projectRef: Project?) : ProjectComponent {
+abstract class AbstractProjectComponent(private var projectRef: Project?) : ProjectComponent {
 
     protected val project
         get() = projectRef!!
 
     override fun getComponentName(): String = javaClass.name
 
-    override final fun disposeComponent() {
+    final override fun disposeComponent() {
         projectRef = null
     }
 
