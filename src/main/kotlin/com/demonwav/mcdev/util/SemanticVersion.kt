@@ -50,6 +50,11 @@ class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion
         val SEPARATORS = listOf('-', '_')
 
         /**
+         * Creates a simple release version where each provided value forms a part (read from left to right).
+         */
+        fun release(vararg parts: Int) = SemanticVersion(parts.map(::ReleasePart))
+
+        /**
          * Parses a version string into a comparable representation.
          * @throws IllegalArgumentException if any part of the version string cannot be parsed as integer or split into text parts.
          */
@@ -112,6 +117,17 @@ class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion
                                 else -> number - other.number
                             }
                     }
+
+                override fun hashCode(): Int {
+                    return version + 31 * text.hashCode() + 31 * number
+                }
+
+                override fun equals(other: Any?): Boolean {
+                    return when (other) {
+                        is TextPart -> other.version == version && other.text == text && other.number == number
+                        else -> false
+                    }
+                }
             }
         }
     }
