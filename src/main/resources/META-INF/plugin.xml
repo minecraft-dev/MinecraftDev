@@ -81,7 +81,9 @@
                                  groupId="language"
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
 
+        <!-- NBT -->
         <fileTypeFactory implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeFactory"/>
+        <fileTypeDetector implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeDetector"/>
         <fileEditorProvider implementation="com.demonwav.mcdev.nbt.editor.NbtFileEditorProvider" />
 
         <!-- Text representation of NBT -->
