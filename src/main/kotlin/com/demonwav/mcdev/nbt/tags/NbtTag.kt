@@ -56,7 +56,7 @@ fun writeString(sb: StringBuilder, s: String): StringBuilder {
         return sb.append('"').append(s.replace("\n", "\\n")).append('"')
     }
 
-    if (s == "bytes" || s == "ints" || s == "longs") {
+    if (s == "bytes" || s == "ints" || s == "longs" || s == "true" || s == "false") {
         // keywords must be quoted
         return sb.append('"').append(s).append('"')
     }
