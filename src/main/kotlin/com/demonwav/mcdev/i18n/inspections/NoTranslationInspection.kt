@@ -24,7 +24,6 @@ import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.util.IncorrectOperationException
-import org.jetbrains.annotations.Nls
 
 class NoTranslationInspection : TranslationInspection() {
     override fun getStaticDescription() =

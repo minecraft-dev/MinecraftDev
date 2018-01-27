@@ -15,7 +15,6 @@ import com.demonwav.mcdev.i18n.reference.I18nReference
 import com.demonwav.mcdev.i18n.translations.Translation
 import com.demonwav.mcdev.i18n.translations.Translation.Companion.FormattingError
 import com.demonwav.mcdev.util.evaluate
-import com.demonwav.mcdev.util.referencedMethod
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiElement

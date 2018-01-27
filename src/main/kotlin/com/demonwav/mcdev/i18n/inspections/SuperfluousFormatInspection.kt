@@ -25,7 +25,6 @@ import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.util.IncorrectOperationException
-import org.jetbrains.annotations.Nls
 
 class SuperfluousFormatInspection : TranslationInspection() {
     override fun getStaticDescription() = "Detect superfluous format arguments for translations"

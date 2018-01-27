@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.i18n.lang.colors
 
-import com.demonwav.mcdev.i18n.lang.I18nLexerAdapter
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors

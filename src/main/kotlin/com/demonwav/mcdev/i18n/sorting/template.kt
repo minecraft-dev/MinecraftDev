@@ -14,7 +14,6 @@ import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.project.stateStore
-import sun.security.pkcs.PKCS8Key.parseKey
 import java.io.File
 
 sealed class TemplateElement
@@ -63,15 +62,6 @@ data class Template(val elements: List<TemplateElement>) {
 
                 else -> ""
             }
-
-        private fun recombineStar(s: String) =
-            s.split('*').joinToString("(.*?)") { Regex.escape(it) }
-
-        private fun recombinePlus(s: String) =
-            s.split('+').joinToString("(.+)")
-
-        private fun recombineQuestionMark(s: String) =
-            s.split('?').joinToString("([^.]+)")
     }
 }
 

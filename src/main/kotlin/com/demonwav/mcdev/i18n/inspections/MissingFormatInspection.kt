@@ -20,7 +20,6 @@ import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiReferenceExpression
-import org.jetbrains.annotations.Nls
 
 class MissingFormatInspection : TranslationInspection() {
     override fun getStaticDescription() = "Detects missing format arguments for translations"

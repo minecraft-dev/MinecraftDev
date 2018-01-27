@@ -88,8 +88,7 @@ fun PsiExpression.substituteParameter(substitutions: Map<Int, Array<String?>?>, 
     }
     if (allowReferences) {
         return arrayOf("\${${this.text}}")
-    }
-    else {
+    } else {
         return null
     }
 }
