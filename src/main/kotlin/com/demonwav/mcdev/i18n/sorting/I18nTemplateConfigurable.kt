@@ -38,7 +38,7 @@ class I18nTemplateConfigurable : Configurable {
     @Nls
     override fun getDisplayName() = "Localization Template"
 
-    override fun getHelpTopic() = null
+    override fun getHelpTopic(): String? = null
 
     override fun createComponent(): JComponent {
         return panel
@@ -52,7 +52,7 @@ class I18nTemplateConfigurable : Configurable {
         }
 
     private fun init() {
-        val project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().dataContext)
+        val project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel))
         if (project == null) {
             cmbScheme.selectedIndex = 0
             cmbScheme.model = DefaultComboBoxModel(arrayOf("Global"))
@@ -80,11 +80,11 @@ class I18nTemplateConfigurable : Configurable {
     }
 
     override fun isModified(): Boolean {
-        return templateEditor.document.text != getActiveTemplateText(CommonDataKeys.PROJECT.getData(DataManager.getInstance().dataContext))
+        return templateEditor.document.text != getActiveTemplateText(CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel)))
     }
 
     override fun apply() {
-        val project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().dataContext)
+        val project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel))
         if (cmbScheme.selectedIndex == 0) {
             TemplateManager.writeGlobalTemplate(templateEditor.document.text)
         } else if (project != null) {

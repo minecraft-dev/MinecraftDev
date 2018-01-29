@@ -13,6 +13,7 @@ package com.demonwav.mcdev.i18n
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.demonwav.mcdev.util.applyWriteAction
+import com.demonwav.mcdev.util.mcDomain
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.fileEditor.FileEditor
@@ -36,7 +37,7 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
             return null
         }
 
-        val defaultEntries = project.findDefaultLangEntries(scope = Scope.PROJECT, domain = I18nElementFactory.getResourceDomain(file))
+        val defaultEntries = project.findDefaultLangEntries(scope = Scope.PROJECT, domain = file.mcDomain)
         val entries = project.findLangEntries(file = file, scope = Scope.PROJECT)
         val defaultKeys = defaultEntries.map { it.key }.toMutableSet()
         val keys = entries.map { it.key }

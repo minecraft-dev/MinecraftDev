@@ -21,7 +21,7 @@ import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 
-class I18nParserDefintion : ParserDefinition {
+class I18nParserDefinition : ParserDefinition {
     override fun createParser(project: Project) = I18nParser()
     override fun createLexer(project: Project) = I18nLexerAdapter()
     override fun createFile(viewProvider: FileViewProvider) = I18nFile(viewProvider)

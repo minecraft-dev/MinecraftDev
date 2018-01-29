@@ -21,6 +21,7 @@ import com.demonwav.mcdev.i18n.sorting.Key
 import com.demonwav.mcdev.i18n.sorting.Template
 import com.demonwav.mcdev.i18n.sorting.TemplateManager
 import com.demonwav.mcdev.util.lexicographical
+import com.demonwav.mcdev.util.mcDomain
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
 import com.intellij.openapi.editor.Editor
@@ -34,11 +35,11 @@ class SortTranslationsIntention(private val ordering: SortTranslationsIntention.
         ASCENDING, DESCENDING, LIKE_DEFAULT, TEMPLATE
     }
 
-    val ascendingComparator = compareBy<I18nEntry, Iterable<String>>(
+    private val ascendingComparator = compareBy<I18nEntry, Iterable<String>>(
         naturalOrder<String>().lexicographical(),
         { it.key.split('.') }
     )
-    val descendingComparator = ascendingComparator.reversed()
+    private val descendingComparator = ascendingComparator.reversed()
 
     override fun getText() = "Sort translations"
 
@@ -56,7 +57,7 @@ class SortTranslationsIntention(private val ordering: SortTranslationsIntention.
                 else -> {
                     val defaults = project.findDefaultLangEntries(
                         scope = Scope.PROJECT,
-                        domain = I18nElementFactory.getResourceDomain(psiFile.virtualFile)
+                        domain = psiFile.virtualFile.mcDomain
                     )
                     val indices = defaults.mapIndexed { i, prop -> prop.key to i }.toMap()
                     assembleElements(project, it.sortedBy { indices[it.key] ?: Int.MAX_VALUE })
@@ -101,7 +102,7 @@ class SortTranslationsIntention(private val ordering: SortTranslationsIntention.
         val result = mutableListOf<PsiElement>()
         val withComments = elements.associate { it to gatherComments(it) }
         for ((entry, comments) in withComments) {
-            for (comment in comments) {
+            for (comment in comments.asReversed()) {
                 result.add(I18nElementFactory.createComment(project, comment))
                 result.add(I18nElementFactory.createLineEnding(project))
             }
@@ -111,7 +112,7 @@ class SortTranslationsIntention(private val ordering: SortTranslationsIntention.
         return result
     }
 
-    private tailrec fun gatherComments(element: PsiElement, acc: List<String> = emptyList(), depth: Int = 0): List<String> {
+    private tailrec fun gatherComments(element: PsiElement, acc: MutableList<String> = mutableListOf(), depth: Int = 0): List<String> {
         if (keepComments != 0 && depth >= keepComments) {
             return acc
         }
@@ -123,6 +124,7 @@ class SortTranslationsIntention(private val ordering: SortTranslationsIntention.
         if (prevLine.node.elementType != I18nTypes.COMMENT) {
             return acc
         }
-        return gatherComments(prevLine, listOf(prevLine.text.substring(1).trim()) + acc, depth + 1)
+        acc.add(prevLine.text.substring(1).trim())
+        return gatherComments(prevLine, acc, depth + 1)
     }
 }

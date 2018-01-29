@@ -24,7 +24,7 @@ import com.intellij.psi.PsiPolyadicExpression
 import java.util.MissingFormatArgumentException
 
 abstract class TranslationIdentifier<T : PsiElement> {
-    @SuppressWarnings("unchecked")
+    @Suppress("UNCHECKED_CAST")
     fun identifyUnsafe(element: PsiElement): Translation? {
         return identify(element as T)
     }
@@ -57,30 +57,36 @@ abstract class TranslationIdentifier<T : PsiElement> {
                         if (translation != null) {
                             try {
                                 val (formatted, superfluousParams) = function.format(translation, call) ?: (translation to -1)
-                                return Translation(if (function.foldParameters) container else call,
+                                return Translation(
+                                    if (function.foldParameters) container else call,
                                     if (result.first) referenceElement else null,
                                     fullKey,
                                     varKey,
                                     formatted,
                                     if (superfluousParams >= 0) FormattingError.SUPERFLUOUS else null,
                                     superfluousParams,
-                                    containsVariable = fullKey.contains(I18nReference.VARIABLE_MARKER))
+                                    containsVariable = fullKey.contains(I18nReference.VARIABLE_MARKER)
+                                )
                             } catch (ignored: MissingFormatArgumentException) {
-                                return Translation(if (function.foldParameters) container else call,
+                                return Translation(
+                                    if (function.foldParameters) container else call,
                                     if (result.first) referenceElement else null,
                                     fullKey,
                                     varKey,
                                     translation,
                                     FormattingError.MISSING,
-                                    containsVariable = fullKey.contains(I18nReference.VARIABLE_MARKER))
+                                    containsVariable = fullKey.contains(I18nReference.VARIABLE_MARKER)
+                                )
                             }
                         } else {
-                            return Translation(null,
+                            return Translation(
+                                null,
                                 if (result.first) referenceElement else null,
                                 fullKey,
                                 varKey,
                                 null,
-                                containsVariable = fullKey.contains(I18nReference.VARIABLE_MARKER))
+                                containsVariable = fullKey.contains(I18nReference.VARIABLE_MARKER)
+                            )
                         }
                     }
                 }

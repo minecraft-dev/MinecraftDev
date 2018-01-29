@@ -29,7 +29,7 @@ class I18nReference(element: PsiElement,
                     textRange: TextRange,
                     private val useDefault: Boolean,
                     val key: String,
-                    val varKey: String) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
+                    private val varKey: String) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         val project = myElement.project
         val entries = if (useDefault) project.findDefaultLangEntries(key = key) else project.findLangEntries(key = key)

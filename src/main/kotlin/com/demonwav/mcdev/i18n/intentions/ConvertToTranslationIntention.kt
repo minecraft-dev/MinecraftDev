@@ -56,17 +56,24 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                         return !inputString.isEmpty() && !inputString.contains('=')
                     }
                 })
-            if (result.getFirst() != null) {
+            val key = result.first
+            val replaceLiteral = result.second
+            if (key != null) {
+                val editorFile = FileDocumentManager.getInstance().getFile(editor.document) ?: return
+                val module = ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(editorFile)
                 I18nElementFactory.addTranslation(
-                    ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(FileDocumentManager.getInstance().getFile(editor.document)!!),
+                    module,
                     result.getFirst(),
                     value
                 )
-                if (result.getSecond()) {
-                    val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return
-                    file.runWriteAction {
-                        val expression = JavaPsiFacade.getElementFactory(project).createExpressionFromText("net.minecraft.client.resources.I18n.format(\"" + result.getFirst() + "\")", element.context)
-                        if (file.language === JavaLanguage.INSTANCE) {
+                if (replaceLiteral) {
+                    val psi = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return
+                    psi.runWriteAction {
+                        val expression = JavaPsiFacade.getElementFactory(project).createExpressionFromText(
+                            "net.minecraft.client.resources.I18n.format(\"$key\")",
+                            element.context
+                        )
+                        if (psi.language === JavaLanguage.INSTANCE) {
                             JavaCodeStyleManager.getInstance(project).shortenClassReferences(element.parent.replace(expression))
                         } else {
                             element.parent.replace(expression)

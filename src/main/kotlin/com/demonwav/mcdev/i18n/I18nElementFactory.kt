@@ -14,6 +14,7 @@ import com.demonwav.mcdev.i18n.lang.I18nFile
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.util.applyWriteAction
+import com.demonwav.mcdev.util.mcDomain
 import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.module.Module
@@ -30,11 +31,6 @@ import com.intellij.util.Consumer
 import java.util.Locale
 
 object I18nElementFactory {
-    val DOMAIN_PATTERN = Regex("^.*?/assets/(.*?)/lang.*?\$")
-
-    fun getResourceDomain(file: VirtualFile) =
-        DOMAIN_PATTERN.matchEntire(file.path)?.groupValues?.get(1)
-
     fun addTranslation(module: Module?, name: String, value: String?) {
         if (module == null || value == null) {
             return
@@ -53,7 +49,7 @@ object I18nElementFactory {
 
         val files = FileTypeIndex.getFiles(I18nFileType, GlobalSearchScope.moduleScope(module))
         if (files.count { it.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE } > 1) {
-            val choices = files.mapNotNull(this::getResourceDomain).distinct().sorted()
+            val choices = files.mapNotNull { it.mcDomain }.distinct().sorted()
             val swingList = JBList(choices)
             DataManager.getInstance().dataContextFromFocus.doWhenDone(Consumer<DataContext> {
                 JBPopupFactory.getInstance()

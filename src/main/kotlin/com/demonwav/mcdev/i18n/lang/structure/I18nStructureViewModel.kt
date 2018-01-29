@@ -16,7 +16,8 @@ import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.ide.util.treeView.smartTree.Sorter
 import com.intellij.psi.PsiFile
 
-class I18nStructureViewModel(psiFile: PsiFile) : StructureViewModelBase(psiFile, I18nStructureViewElement(psiFile)), StructureViewModel.ElementInfoProvider {
+class I18nStructureViewModel(psiFile: PsiFile) :
+    StructureViewModelBase(psiFile, I18nStructureViewElement(psiFile)), StructureViewModel.ElementInfoProvider {
     override fun getSorters() = arrayOf(Sorter.ALPHA_SORTER)
 
     override fun isAlwaysShowsPlus(element: StructureViewTreeElement) = false

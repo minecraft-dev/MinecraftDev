@@ -15,7 +15,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 
-@State(name = "I18nFoldingSettings", storages = arrayOf(Storage("minecraft_dev.xml")))
+@State(name = "I18nFoldingSettings", storages = [(Storage("minecraft_dev.xml"))])
 class I18nFoldingSettings : PersistentStateComponent<I18nFoldingSettings.State> {
 
     data class State(

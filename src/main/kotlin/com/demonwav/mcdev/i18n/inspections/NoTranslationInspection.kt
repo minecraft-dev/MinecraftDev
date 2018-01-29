@@ -36,8 +36,12 @@ class NoTranslationInspection : TranslationInspection() {
         override fun visitLiteralExpression(expression: PsiLiteralExpression) {
             val result = LiteralTranslationIdentifier().identify(expression)
             if (result != null && !result.containsVariable && result.text == null) {
-                holder.registerProblem(expression, "The given translation key does not exist", ProblemHighlightType.GENERIC_ERROR,
-                    CreateTranslationQuickFix, ChangeTranslationQuickFix("Use existing translation"))
+                holder.registerProblem(
+                    expression,
+                    "The given translation key does not exist",
+                    ProblemHighlightType.GENERIC_ERROR,
+                    CreateTranslationQuickFix, ChangeTranslationQuickFix("Use existing translation")
+                )
             }
         }
     }

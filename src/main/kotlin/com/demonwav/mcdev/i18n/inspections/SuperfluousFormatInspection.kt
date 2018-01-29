@@ -24,6 +24,8 @@ import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiReferenceExpression
+import com.intellij.psi.SmartPointerManager
+import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.util.IncorrectOperationException
 
 class SuperfluousFormatInspection : TranslationInspection() {
@@ -42,7 +44,15 @@ class SuperfluousFormatInspection : TranslationInspection() {
         override fun visitLiteralExpression(expression: PsiLiteralExpression) {
             val result = Translation.find(expression)
             if (result != null && result.foldingElement is PsiCall && result.formattingError == FormattingError.SUPERFLUOUS) {
-                registerProblem(expression, result, RemoveArgumentsQuickFix(result.foldingElement, result.superfluousVarargStart), ChangeTranslationQuickFix("Use a different translation"))
+                registerProblem(
+                    expression,
+                    result,
+                    RemoveArgumentsQuickFix(
+                        SmartPointerManager.getInstance(holder.project).createSmartPsiElementPointer(result.foldingElement),
+                        result.superfluousVarargStart
+                    ),
+                    ChangeTranslationQuickFix("Use a different translation")
+                )
             }
         }
 
@@ -51,13 +61,13 @@ class SuperfluousFormatInspection : TranslationInspection() {
         }
     }
 
-    private class RemoveArgumentsQuickFix(private val call: PsiCall, private val position: Int) : LocalQuickFix {
+    private class RemoveArgumentsQuickFix(private val call: SmartPsiElementPointer<PsiCall>, private val position: Int) : LocalQuickFix {
         override fun getName() = "Remove superfluous arguments"
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             try {
                 descriptor.psiElement.containingFile.runWriteAction {
-                    call.argumentList?.expressions?.drop(position)?.forEach { it.delete() }
+                    call.element?.argumentList?.expressions?.drop(position)?.forEach { it.delete() }
                 }
             } catch (ignored: IncorrectOperationException) {
             }

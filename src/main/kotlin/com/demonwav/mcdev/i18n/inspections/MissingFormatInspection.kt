@@ -38,7 +38,12 @@ class MissingFormatInspection : TranslationInspection() {
         private fun visit(expression: PsiExpression, vararg quickFixes: LocalQuickFix) {
             val result = Translation.find(expression)
             if (result != null && result.formattingError == FormattingError.MISSING) {
-                holder.registerProblem(expression, "There are missing formatting arguments to satisfy '${result.text}'", ProblemHighlightType.GENERIC_ERROR, *quickFixes)
+                holder.registerProblem(
+                    expression,
+                    "There are missing formatting arguments to satisfy '${result.text}'",
+                    ProblemHighlightType.GENERIC_ERROR,
+                    *quickFixes
+                )
             }
         }
     }

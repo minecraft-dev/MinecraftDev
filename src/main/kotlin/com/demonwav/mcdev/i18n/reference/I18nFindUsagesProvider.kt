@@ -25,7 +25,7 @@ class I18nFindUsagesProvider : FindUsagesProvider {
 
     override fun canFindUsagesFor(psiElement: PsiElement) = psiElement is PsiNamedElement
 
-    override fun getHelpId(psiElement: PsiElement) = null
+    override fun getHelpId(psiElement: PsiElement): String? = null
 
     override fun getType(element: PsiElement) = if (element is I18nEntry) "translation" else ""
 
@@ -34,13 +34,12 @@ class I18nFindUsagesProvider : FindUsagesProvider {
     override fun getNodeText(element: PsiElement, useFullName: Boolean) = if (element is I18nEntry) "${element.key}=${element.value}" else ""
 
     companion object {
-        private val WORDS_SCANNER by lazy {
+        private val WORDS_SCANNER =
             DefaultWordsScanner(
                 I18nLexerAdapter(),
                 TokenSet.create(I18nTypes.KEY),
                 TokenSet.create(I18nTypes.COMMENT),
                 TokenSet.EMPTY
             )
-        }
     }
 }

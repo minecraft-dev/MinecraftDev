@@ -13,6 +13,7 @@ package com.demonwav.mcdev.i18n
 import com.demonwav.mcdev.i18n.lang.I18nFile
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
+import com.demonwav.mcdev.util.mcDomain
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
@@ -40,19 +41,23 @@ private fun Project.findEntriesImpl(scope: Scope, fileFilter: (I18nFile) -> Bool
         .toList()
 
 fun Project.findLangEntries(scope: Scope = Scope.GLOBAL, key: String? = null, file: VirtualFile? = null, domain: String? = null) =
-    findEntriesImpl(scope,
+    findEntriesImpl(
+        scope,
         {
             it.virtualFile != null
                 && (file == null || it.virtualFile.path == file.path)
-                && (domain == null || I18nElementFactory.getResourceDomain(it.virtualFile) == domain)
+                && (domain == null || it.virtualFile.mcDomain == domain)
         },
-        { key == null || it.key == key })
+        { key == null || it.key == key }
+    )
 
 fun Project.findDefaultLangEntries(scope: Scope = Scope.GLOBAL, key: String? = null, file: VirtualFile? = null, domain: String? = null) =
-    findEntriesImpl(scope,
+    findEntriesImpl(
+        scope,
         {
             it.virtualFile != null && it.virtualFile.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE
                 && (file == null || it.virtualFile.path == file.path)
-                && (domain == null || I18nElementFactory.getResourceDomain(it.virtualFile) == domain)
+                && (domain == null || it.virtualFile.mcDomain == domain)
         },
-        { key == null || it.key == key })
+        { key == null || it.key == key }
+    )

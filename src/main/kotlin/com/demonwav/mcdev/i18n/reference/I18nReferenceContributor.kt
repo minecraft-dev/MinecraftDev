@@ -32,6 +32,7 @@ class I18nReferenceContributor : PsiReferenceContributor() {
                         I18nReference(element, TextRange(0, entry.key.length), true, entry.key, entry.key)
                     )
                 }
-            })
+            }
+        )
     }
 }

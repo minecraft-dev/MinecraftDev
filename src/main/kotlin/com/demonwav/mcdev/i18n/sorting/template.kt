@@ -66,11 +66,11 @@ data class Template(val elements: List<TemplateElement>) {
 }
 
 object TemplateManager {
-    const val FILE_NAME = "minecraft_localization_template.lang"
+    private const val FILE_NAME = "minecraft_localization_template.lang"
 
-    fun globalFile(): File = File(PathManager.getConfigPath(), FILE_NAME)
+    private fun globalFile(): File = File(PathManager.getConfigPath(), FILE_NAME)
 
-    fun projectFile(project: Project): File =
+    private fun projectFile(project: Project): File =
         File(FileUtil.toSystemDependentName(project.stateStore.getDirectoryStorePath(false)!!), FILE_NAME)
 
     fun getGlobalTemplateText() = if (globalFile().exists()) globalFile().readText() else ""

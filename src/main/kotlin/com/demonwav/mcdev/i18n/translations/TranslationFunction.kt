@@ -27,16 +27,16 @@ import com.intellij.psi.PsiCall
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiSubstitutor
-import java.util.regex.Pattern
 
-class TranslationFunction(val memberReference: MemberReference,
-                          val matchedIndex: Int, val formatting: Boolean, val setter: Boolean = false,
+class TranslationFunction(private val memberReference: MemberReference,
+                          private val matchedIndex: Int, val formatting: Boolean, val setter: Boolean = false,
                           val foldParameters: Boolean = false, val prefix: String = "", val suffix: String = "",
                           val obfuscatedName: Boolean = false) {
     private fun getMethod(context: PsiElement): PsiMethod? {
         var reference = memberReference
         if (obfuscatedName) {
-            val srgManager = context.findModule()?.let { MinecraftFacet.getInstance(it, McpModuleType)?.srgManager } ?: SrgManager.findAnyInstance(context.project)
+            val moduleSrgManager = context.findModule()?.let { MinecraftFacet.getInstance(it, McpModuleType)?.srgManager }
+            val srgManager = moduleSrgManager ?: SrgManager.findAnyInstance(context.project)
             srgManager?.srgMapNow?.mapToMcpMethod(memberReference)?.let {
                 reference = it
             }
@@ -46,12 +46,13 @@ class TranslationFunction(val memberReference: MemberReference,
 
     fun matches(call: PsiCall, paramIndex: Int) = getCalls(call, paramIndex).any()
 
-    fun getCalls(call: PsiCall, paramIndex: Int): Iterable<PsiCall> {
+    private fun getCalls(call: PsiCall, paramIndex: Int): Iterable<PsiCall> {
         val referenceMethod = getMethod(call) ?: return emptyList()
-        return if (setter)
+        return if (setter) {
             call.getCalls(referenceMethod, paramIndex, matchedIndex)
-        else
+        } else {
             call.getCallsReturningResult(referenceMethod, paramIndex, matchedIndex)
+        }
     }
 
     fun getTranslationKey(call: PsiCall): Pair<Boolean, String>? {
@@ -78,10 +79,10 @@ class TranslationFunction(val memberReference: MemberReference,
 
         val calls = getCalls(call, matchedIndex)
         val referenced = getMethod(call) ?: return null
-        val result = calls.foldIndexed(Step(false, true, "") as Step?,
-            { depth, acc, v ->
-                if (acc == null) acc else resolveCall(depth, calls.count() == 1, referenced, v, acc)
-            })?.result
+        val result = calls.foldIndexed(
+            Step(false, true, "") as Step?,
+            { depth, acc, v -> if (acc == null) acc else resolveCall(depth, calls.count() == 1, referenced, v, acc) }
+        )?.result
         return result?.copy(second = prefix + result.second + suffix)
     }
 
@@ -89,7 +90,7 @@ class TranslationFunction(val memberReference: MemberReference,
         if (!formatting) {
             return translation to -1
         }
-        val format = NUMBER_FORMATTING_PATTERN.matcher(translation).replaceAll("%$1s")
+        val format = NUMBER_FORMATTING_PATTERN.replace(translation, "%$1s")
 
         fun resolveCall(call: PsiCall, substitutions: Map<Int, Array<String?>?>): Map<Int, Array<String?>?> {
             val method = call.referencedMethod
@@ -108,13 +109,7 @@ class TranslationFunction(val memberReference: MemberReference,
         }
 
         val calls = getCalls(topCall, matchedIndex)
-        val paramCount = STRING_FORMATTING_PATTERN.matcher(format).let {
-            var count = 0
-            while (it.find()) {
-                count++
-            }
-            return@let count
-        }
+        val paramCount = STRING_FORMATTING_PATTERN.findAll(format).count()
         val substitutions = if (calls.count() > 1) calls.take(calls.count() - 1).fold(emptyMap<Int, Array<String?>?>(), { acc, v -> resolveCall(v, acc) }) else emptyMap()
         val referenceCall = if (calls.count() > 1) calls.last() else calls.first()
         val method = referenceCall.referencedMethod ?: return translation to -1
@@ -128,7 +123,7 @@ class TranslationFunction(val memberReference: MemberReference,
     }
 
     companion object {
-        val NUMBER_FORMATTING_PATTERN = Pattern.compile("%(\\d+\\$)?[\\d.]*[df]")
-        val STRING_FORMATTING_PATTERN = Pattern.compile("[^%]?%(?:\\d+\\$)?s")
+        val NUMBER_FORMATTING_PATTERN = Regex("%(\\d+\\$)?[\\d.]*[df]")
+        val STRING_FORMATTING_PATTERN = Regex("[^%]?%(?:\\d+\\$)?s")
     }
 }

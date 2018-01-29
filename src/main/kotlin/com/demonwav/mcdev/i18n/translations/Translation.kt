@@ -48,27 +48,32 @@ data class Translation(val foldingElement: PsiElement?,
                 MemberReference(I18nConstants.FORMAT, "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;", I18nConstants.I18N_CLIENT_CLASS),
                 0,
                 formatting = true,
-                obfuscatedName = true),
+                obfuscatedName = true
+            ),
             TranslationFunction(
                 MemberReference(I18nConstants.TRANSLATE_TO_LOCAL, "(Ljava/lang/String;)Ljava/lang/String;", I18nConstants.I18N_COMMON_CLASS),
                 0,
                 formatting = false,
-                obfuscatedName = true),
+                obfuscatedName = true
+            ),
             TranslationFunction(
                 MemberReference(I18nConstants.TRANSLATE_TO_LOCAL_FORMATTED, "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;", I18nConstants.I18N_COMMON_CLASS),
                 0,
                 formatting = true,
-                obfuscatedName = true),
+                obfuscatedName = true
+            ),
             TranslationFunction(
                 MemberReference(I18nConstants.CONSTRUCTOR, "(Ljava/lang/String;[Ljava/lang/Object;)V", I18nConstants.TRANSLATION_COMPONENT_CLASS),
                 0,
                 formatting = true,
-                foldParameters = true),
+                foldParameters = true
+            ),
             TranslationFunction(
                 MemberReference(I18nConstants.CONSTRUCTOR, "(Ljava/lang/String;[Ljava/lang/Object;)V", I18nConstants.COMMAND_EXCEPTION_CLASS),
                 0,
                 formatting = true,
-                foldParameters = true),
+                foldParameters = true
+            ),
             TranslationFunction(
                 MemberReference(I18nConstants.SET_BLOCK_NAME, "(Ljava/lang/String;)Lnet/minecraft/block/Block;", McpConstants.BLOCK),
                 0,
@@ -77,7 +82,8 @@ data class Translation(val foldingElement: PsiElement?,
                 foldParameters = true,
                 prefix = "tile.",
                 suffix = ".name",
-                obfuscatedName = true),
+                obfuscatedName = true
+            ),
             TranslationFunction(
                 MemberReference(I18nConstants.SET_ITEM_NAME, "(Ljava/lang/String;)Lnet/minecraft/item/Item;", McpConstants.ITEM),
                 0,
@@ -86,7 +92,9 @@ data class Translation(val foldingElement: PsiElement?,
                 foldParameters = true,
                 prefix = "item.",
                 suffix = ".name",
-                obfuscatedName = true))
+                obfuscatedName = true
+            )
+        )
 
         private val identifiers = listOf(LiteralTranslationIdentifier(), ReferenceTranslationIdentifier())
 
@@ -101,20 +109,23 @@ data class Translation(val foldingElement: PsiElement?,
                     val translation = identifier.identifyUnsafe(element)
                     if (translation?.foldingElement != null) {
                         val range =
-                            if (translation.foldingElement is PsiExpressionList)
+                            if (translation.foldingElement is PsiExpressionList) {
                                 translation.foldingElement.textRange.grown(-2).shiftRight(1)
-                            else
+                            } else {
                                 translation.foldingElement.textRange
-                        descriptors.add(object : FoldingDescriptor(translation.foldingElement.node,
-                            range,
-                            FoldingGroup.newGroup("mc.i18n." + translation.key)) {
-                            override fun getPlaceholderText(): String? {
-                                if (translation.formattingError == FormattingError.MISSING) {
-                                    return "\"Insufficient parameters for formatting '${translation.text}'\""
-                                }
-                                return "\"${translation.text}\""
                             }
-                        })
+                        descriptors.add(
+                            object : FoldingDescriptor(translation.foldingElement.node,
+                                range,
+                                FoldingGroup.newGroup("mc.i18n." + translation.key)) {
+                                override fun getPlaceholderText(): String? {
+                                    if (translation.formattingError == FormattingError.MISSING) {
+                                        return "\"Insufficient parameters for formatting '${translation.text}'\""
+                                    }
+                                    return "\"${translation.text}\""
+                                }
+                            }
+                        )
                     }
                 }
             }
@@ -136,7 +147,8 @@ data class Translation(val foldingElement: PsiElement?,
                             }
                             return emptyArray()
                         }
-                    })
+                    }
+                )
             }
         }
     }

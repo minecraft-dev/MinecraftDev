@@ -22,7 +22,8 @@ import com.intellij.util.indexing.FindSymbolParameters
 import java.util.Locale
 import java.util.TreeSet
 
-class I18nGotoModel(project: Project, val filter: Regex? = null) : ContributorsBasedGotoByModel(project, arrayOf(Extensions.findExtension(ChooseByNameContributor.SYMBOL_EP_NAME, I18nGotoSymbolContributor::class.java))) {
+class I18nGotoModel(project: Project, val filter: Regex? = null) :
+    ContributorsBasedGotoByModel(project, arrayOf(Extensions.findExtension(ChooseByNameContributor.SYMBOL_EP_NAME, I18nGotoSymbolContributor::class.java))) {
     override fun acceptItem(item: NavigationItem?): Boolean {
         return (item as I18nEntry).containingFile.virtualFile.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE
     }
