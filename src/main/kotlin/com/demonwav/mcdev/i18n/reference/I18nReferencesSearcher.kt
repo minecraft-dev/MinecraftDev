@@ -42,7 +42,9 @@ class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.Sear
             model.stringToFind = power(entry.key.split('.'))
                 .filter { it.isNotEmpty() }
                 .joinToString("|") { Regex.escape(it.joinToString(".")) }
-            FindInProjectUtil.findUsages(model, parameters.project,
+            FindInProjectUtil.findUsages(
+                model,
+                parameters.project,
                 {
                     if (it.file != null && it.element != null && it.rangeInElement != null) {
                         val highlighted = it.file!!.findElementAt(it.rangeInElement!!.startOffset)
@@ -52,7 +54,8 @@ class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.Sear
                     }
                     true
                 },
-                FindUsagesProcessPresentation(UsageViewPresentation()))
+                FindUsagesProcessPresentation(UsageViewPresentation())
+            )
         }
         return true
     }
