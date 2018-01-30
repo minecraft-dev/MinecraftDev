@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.i18n.actions
 
-import com.demonwav.mcdev.i18n.intentions.SortTranslationsIntention
+import com.demonwav.mcdev.i18n.sorting.Ordering
 import java.awt.Component
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
@@ -28,11 +28,11 @@ import javax.swing.KeyStroke
 import javax.swing.SpinnerNumberModel
 import javax.swing.WindowConstants
 
-class TranslationSortOrderDialog(excludeDefaultOption: Boolean) : JDialog() {
+class TranslationSortOrderDialog(excludeDefaultOption: Boolean, defaultSelection: Ordering) : JDialog() {
     private lateinit var contentPane: JPanel
     private lateinit var buttonOK: JButton
     private lateinit var buttonCancel: JButton
-    private lateinit var comboSelection: JComboBox<SortTranslationsIntention.Ordering>
+    private lateinit var comboSelection: JComboBox<Ordering>
     private lateinit var spinnerComments: JSpinner
 
     init {
@@ -47,6 +47,7 @@ class TranslationSortOrderDialog(excludeDefaultOption: Boolean) : JDialog() {
         val availableOrderings = if (excludeDefaultOption) NON_DEFAULT_ORDERINGS else ALL_ORDERINGS
         comboSelection.model = DefaultComboBoxModel(availableOrderings)
         comboSelection.renderer = CellRenderer
+        comboSelection.selectedItem = defaultSelection
 
         // call onCancel() when cross is clicked
         defaultCloseOperation = WindowConstants.DO_NOTHING_ON_CLOSE
@@ -73,22 +74,22 @@ class TranslationSortOrderDialog(excludeDefaultOption: Boolean) : JDialog() {
 
     object CellRenderer : DefaultListCellRenderer() {
         override fun getListCellRendererComponent(list: JList<*>?, value: Any?, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
-            val displayValue = (value as? SortTranslationsIntention.Ordering)?.text
+            val displayValue = (value as? Ordering)?.text
             return super.getListCellRendererComponent(list, displayValue, index, isSelected, cellHasFocus)
         }
     }
 
     companion object {
-        private val ALL_ORDERINGS = SortTranslationsIntention.Ordering.values()
-        private val NON_DEFAULT_ORDERINGS = SortTranslationsIntention.Ordering.values()
-            .filterNot { it == SortTranslationsIntention.Ordering.LIKE_DEFAULT }.toTypedArray()
+        private val ALL_ORDERINGS = Ordering.values()
+        private val NON_DEFAULT_ORDERINGS = Ordering.values()
+            .filterNot { it == Ordering.LIKE_DEFAULT }.toTypedArray()
 
-        fun show(excludeDefaultOption: Boolean): Pair<SortTranslationsIntention.Ordering?, Int> {
-            val dialog = TranslationSortOrderDialog(excludeDefaultOption)
+        fun show(excludeDefaultOption: Boolean, defaultSelection: Ordering): Pair<Ordering?, Int> {
+            val dialog = TranslationSortOrderDialog(excludeDefaultOption, defaultSelection)
             dialog.pack()
             dialog.setLocationRelativeTo(dialog.owner)
             dialog.isVisible = true
-            val order = dialog.comboSelection.selectedItem as? SortTranslationsIntention.Ordering
+            val order = dialog.comboSelection.selectedItem as? Ordering
             val comments = dialog.spinnerComments.value as Int
             return (order to comments)
         }
