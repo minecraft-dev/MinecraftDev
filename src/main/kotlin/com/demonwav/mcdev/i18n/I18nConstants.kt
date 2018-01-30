@@ -13,6 +13,7 @@ package com.demonwav.mcdev.i18n
 object I18nConstants {
     const val FILE_EXTENSION = "lang"
     const val DEFAULT_LOCALE = "en_us"
+    const val DEFAULT_LOCALE_FILE = "$DEFAULT_LOCALE.$FILE_EXTENSION"
     const val I18N_CLIENT_CLASS = "net.minecraft.client.resources.I18n"
     const val I18N_COMMON_CLASS = "net.minecraft.util.text.translation.I18n"
     const val CONSTRUCTOR = "<init>"

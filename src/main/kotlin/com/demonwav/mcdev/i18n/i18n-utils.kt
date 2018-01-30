@@ -18,6 +18,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FileTypeIndex
+import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import java.util.Locale
@@ -61,3 +62,11 @@ fun Project.findDefaultLangEntries(scope: Scope = Scope.GLOBAL, key: String? = n
         },
         { key == null || it.key == key }
     )
+
+fun Project.findDefaultLangFile(domain: String? = null) =
+    FilenameIndex.getVirtualFilesByName(
+            this,
+            I18nConstants.DEFAULT_LOCALE_FILE,
+            false,
+            GlobalSearchScope.projectScope(this)
+    ).firstOrNull() { domain == null || it.mcDomain == domain }

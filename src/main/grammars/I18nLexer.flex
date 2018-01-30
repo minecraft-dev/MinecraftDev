@@ -35,11 +35,11 @@ import static com.intellij.psi.TokenType.*;
 %unicode
 
 EOL_WS              = \n | \r | \r\n
-LINE_ENDING         = {EOL_WS}+
+LINE_ENDING         = {EOL_WS}
 
 KEY = [^=#\n\r][^=\n\r]*
 VALUE = [^\n\r]+
-COMMENT = #[^\n\r]+
+COMMENT = #[^\n\r]*
 
 %%
 

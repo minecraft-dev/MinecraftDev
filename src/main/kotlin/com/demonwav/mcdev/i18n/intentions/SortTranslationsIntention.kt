@@ -10,15 +10,18 @@
 
 package com.demonwav.mcdev.i18n.intentions
 
+import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.I18nElementFactory
 import com.demonwav.mcdev.i18n.Scope
 import com.demonwav.mcdev.i18n.findDefaultLangEntries
+import com.demonwav.mcdev.i18n.findDefaultLangFile
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.demonwav.mcdev.i18n.sorting.Comment
 import com.demonwav.mcdev.i18n.sorting.EmptyLine
 import com.demonwav.mcdev.i18n.sorting.Key
 import com.demonwav.mcdev.i18n.sorting.Template
+import com.demonwav.mcdev.i18n.sorting.TemplateElement
 import com.demonwav.mcdev.i18n.sorting.TemplateManager
 import com.demonwav.mcdev.util.lexicographical
 import com.demonwav.mcdev.util.mcDomain
@@ -28,11 +31,15 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
 import com.intellij.util.IncorrectOperationException
 
 class SortTranslationsIntention(private val ordering: SortTranslationsIntention.Ordering, private val keepComments: Int) : BaseIntentionAction() {
-    enum class Ordering {
-        ASCENDING, DESCENDING, LIKE_DEFAULT, TEMPLATE
+    enum class Ordering(val text: String) {
+        ASCENDING("Ascending"),
+        DESCENDING("Descending"),
+        LIKE_DEFAULT("Like default (${I18nConstants.DEFAULT_LOCALE_FILE})"),
+        TEMPLATE("Use Project Template")
     }
 
     private val ascendingComparator = compareBy<I18nEntry, Iterable<String>>(
@@ -54,14 +61,7 @@ class SortTranslationsIntention(private val ordering: SortTranslationsIntention.
                 Ordering.ASCENDING -> assembleElements(project, it.sortedWith(ascendingComparator))
                 Ordering.DESCENDING -> assembleElements(project, it.sortedWith(descendingComparator))
                 Ordering.TEMPLATE -> sortByTemplate(project, TemplateManager.getProjectTemplate(project), it)
-                else -> {
-                    val defaults = project.findDefaultLangEntries(
-                        scope = Scope.PROJECT,
-                        domain = psiFile.virtualFile.mcDomain
-                    )
-                    val indices = defaults.mapIndexed { i, prop -> prop.key to i }.toMap()
-                    assembleElements(project, it.sortedBy { indices[it.key] ?: Int.MAX_VALUE })
-                }
+                else -> sortByTemplate(project, buildDefaultTemplate(project, psiFile.virtualFile.mcDomain) ?: return, it)
             }
         }
 
@@ -73,6 +73,21 @@ class SortTranslationsIntention(private val ordering: SortTranslationsIntention.
                 psiFile.add(elem)
             }
         }
+    }
+
+    private fun buildDefaultTemplate(project: Project, domain: String?): Template? {
+        val referenceFile = project.findDefaultLangFile(domain) ?: return null
+        val psi = PsiManager.getInstance(project).findFile(referenceFile) ?: return null
+        val elements = mutableListOf<TemplateElement>()
+        for (child in psi.children) {
+            when {
+                child is I18nEntry ->
+                    elements.add(Key(Regex.escape(child.key).toRegex()))
+                child.node.elementType == I18nTypes.LINE_ENDING && child.prevSibling.node.elementType == I18nTypes.LINE_ENDING ->
+                    elements.add(EmptyLine)
+            }
+        }
+        return Template(elements)
     }
 
     private fun sortByTemplate(project: Project, template: Template, entries: List<I18nEntry>): List<PsiElement> {

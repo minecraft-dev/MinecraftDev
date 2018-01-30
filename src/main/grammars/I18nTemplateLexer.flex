@@ -38,12 +38,12 @@ EOL_WS              = \n | \r | \r\n
 LINE_ENDING         = {EOL_WS}+
 
 KEY = [^#\n\r][^\n\r]*
-COMMENT = #[^\n\r]+
+COMMENT = #[^\n\r]*
 
 %%
 
 <YYINITIAL> {
-    {KEY}/"="                   { return KEY; }
+    {KEY}                       { return KEY; }
     {COMMENT}                   { return COMMENT; }
     {LINE_ENDING}               { return LINE_ENDING; }
 }
