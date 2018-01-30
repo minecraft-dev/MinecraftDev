@@ -14,6 +14,8 @@ import com.demonwav.mcdev.i18n.translations.Translation
 import com.demonwav.mcdev.i18n.translations.Translation.Companion.FormattingError
 import com.intellij.psi.JavaTokenType
 import com.intellij.psi.PsiAnnotationMemberValue
+import com.intellij.psi.PsiCall
+import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethodCallExpression
@@ -77,18 +79,18 @@ fun PsiExpression.substituteParameter(substitutions: Map<Int, Array<String?>?>, 
             }
         }
         return arrayOf(value)
-    } else if (this is PsiMethodCallExpression && allowTranslations) {
-        for (argument in this.argumentList.expressions) {
+    } else if (this is PsiCall && allowTranslations) {
+        for (argument in this.argumentList?.expressions ?: emptyArray()) {
             val translation = Translation.find(argument) ?: continue
             if (translation.formattingError == FormattingError.MISSING) {
-                return arrayOf("{${translation.text}}")
+                return arrayOf("{ERROR: Missing formatting arguments for '${translation.text}'}")
             }
             return arrayOf(translation.text)
         }
     }
-    if (allowReferences) {
-        return arrayOf("\${${this.text}}")
+    return if (allowReferences) {
+        arrayOf("\${${this.text}}")
     } else {
-        return null
+        null
     }
 }
