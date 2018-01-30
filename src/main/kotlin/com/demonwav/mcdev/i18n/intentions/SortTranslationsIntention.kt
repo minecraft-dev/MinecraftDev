@@ -12,8 +12,6 @@ package com.demonwav.mcdev.i18n.intentions
 
 import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.I18nElementFactory
-import com.demonwav.mcdev.i18n.Scope
-import com.demonwav.mcdev.i18n.findDefaultLangEntries
 import com.demonwav.mcdev.i18n.findDefaultLangFile
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes

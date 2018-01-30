@@ -65,8 +65,8 @@ fun Project.findDefaultLangEntries(scope: Scope = Scope.GLOBAL, key: String? = n
 
 fun Project.findDefaultLangFile(domain: String? = null) =
     FilenameIndex.getVirtualFilesByName(
-            this,
-            I18nConstants.DEFAULT_LOCALE_FILE,
-            false,
-            GlobalSearchScope.projectScope(this)
-    ).firstOrNull() { domain == null || it.mcDomain == domain }
+        this,
+        I18nConstants.DEFAULT_LOCALE_FILE,
+        false,
+        GlobalSearchScope.projectScope(this)
+    ).firstOrNull { domain == null || it.mcDomain == domain }
