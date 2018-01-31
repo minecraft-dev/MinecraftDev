@@ -87,8 +87,8 @@ val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
 
 dependencies {
     "kotlin"(kotlin("stdlib")) { isTransitive = false }
-    compile(kotlin("stdlib-jre7")) { isTransitive = false }
-    compile(kotlin("stdlib-jre8")) { isTransitive = false }
+    compile(kotlin("stdlib-jdk7")) { isTransitive = false }
+    compile(kotlin("stdlib-jdk8")) { isTransitive = false }
 
     // Add tools.jar for the JDI API
     compile(files(Jvm.current().toolsJar))
