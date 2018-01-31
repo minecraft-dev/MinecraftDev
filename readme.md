@@ -13,7 +13,7 @@ Minecraft Development for IntelliJ
 Info and Documentation [![Current Release](https://img.shields.io/badge/release-2017.3--1.1.1-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
-Visit [https://minecraftdev.org](https://minecraftdev.org) for information about the project, change logs, features, FAQs, and chat.
+Visit [https://minecraftdev.org](https://minecraftdev.org) for some information about the project, FAQs, and chat.
 
 Installation
 ------------
