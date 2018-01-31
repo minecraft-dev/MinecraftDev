@@ -95,11 +95,8 @@ class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, ove
         }
 
         val project = element.project
-
         val psiClass = element.parent as PsiClass
-
-        val pluginClass = JavaPsiFacade.getInstance(project)
-            .findClass(BungeeCordConstants.PLUGIN, GlobalSearchScope.allScope(project))
+        val pluginClass = JavaPsiFacade.getInstance(project).findClass(BungeeCordConstants.PLUGIN, GlobalSearchScope.allScope(project))
 
         return pluginClass != null && psiClass.extendsListTypes.any { c -> c == PsiTypesUtil.getClassType(pluginClass) }
     }

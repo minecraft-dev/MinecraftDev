@@ -274,7 +274,7 @@ class AtCompletionContributor : CompletionContributor() {
         }
     }
 
-    fun handleNewLine(text: String, result: CompletionResultSet) {
+    private fun handleNewLine(text: String, result: CompletionResultSet) {
         for (keyword in AtElementFactory.Keyword.softMatch(text)) {
             result.addElement(LookupElementBuilder.create(keyword.text))
         }

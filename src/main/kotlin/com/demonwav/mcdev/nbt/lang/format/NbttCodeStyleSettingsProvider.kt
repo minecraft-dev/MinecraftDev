@@ -32,7 +32,7 @@ class NbttCodeStyleSettingsProvider : CodeStyleSettingsProvider() {
                 }
             }
 
-            override fun getHelpTopic() = null
+            override fun getHelpTopic(): String? = null
         }
     }
 

@@ -26,8 +26,12 @@ import java.util.stream.Stream
  * resolve to multiple members if [matchAll] is set or if the member is
  * not full qualified.
  */
-data class MemberReference(val name: String, val descriptor: String? = null,
-                           val owner: String? = null, val matchAll: Boolean = false) : Serializable {
+data class MemberReference(
+    val name: String,
+    val descriptor: String? = null,
+    val owner: String? = null,
+    val matchAll: Boolean = false
+) : Serializable {
 
     @get:Contract(pure = true)
     val qualified
@@ -130,7 +134,6 @@ fun PsiMethod.getQualifiedMemberReference(owner: PsiClass): MemberReference {
 
 
 // Field
-
 @get:Contract(pure = true)
 val PsiField.simpleMemberReference
     get() = MemberReference(name)

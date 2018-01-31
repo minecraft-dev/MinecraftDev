@@ -17,6 +17,7 @@ import com.demonwav.mcdev.nbt.lang.gen.psi.NbttIntArray
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttList
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttTypes
 import com.intellij.formatting.ASTBlock
+import com.intellij.formatting.Alignment
 import com.intellij.formatting.Block
 import com.intellij.formatting.ChildAttributes
 import com.intellij.formatting.Indent
@@ -90,7 +91,7 @@ class NbttBlock(
         return ChildAttributes(null, null)
     }
 
-    override fun getAlignment() = null
+    override fun getAlignment(): Alignment? = null
     override fun getWrap() = wrap
     override fun getIndent() = indent
     override fun getNode() = node

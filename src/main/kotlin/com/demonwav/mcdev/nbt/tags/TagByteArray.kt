@@ -35,7 +35,8 @@ class TagByteArray(override val value: ByteArray) : NbtValueTag<ByteArray>(ByteA
         return Arrays.equals(this.value, otherValue)
     }
 
-    // This makes IntelliJ happy
+    // This makes IntelliJ happy - and angry at the same time
+    @Suppress("RedundantOverride")
     override fun equals(other: Any?) = super.equals(other)
 
     override fun hashCode() = Arrays.hashCode(this.value)

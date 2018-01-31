@@ -68,7 +68,7 @@ class ForgePatcherDataService : AbstractProjectDataService<ForgePatcherModelData
         }
     }
 
-    fun register(module: Module, modelsProvider: IdeModifiableModelsProvider) {
+    private fun register(module: Module, modelsProvider: IdeModifiableModelsProvider) {
         val model = modelsProvider.getModifiableFacetModel(module)
         val facet = model.getFacetByType(MinecraftFacet.ID)
 

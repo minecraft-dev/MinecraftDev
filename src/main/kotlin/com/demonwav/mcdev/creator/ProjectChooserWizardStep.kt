@@ -148,55 +148,55 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         if (bukkitPluginCheckBox.isSelected) {
             val configuration = BukkitProjectConfiguration()
             configuration.type = PlatformType.BUKKIT
-            creator.settings.put(PlatformType.BUKKIT, configuration)
+            creator.settings[PlatformType.BUKKIT] = configuration
         }
 
         if (spigotPluginCheckBox.isSelected) {
             val configuration = BukkitProjectConfiguration()
             configuration.type = PlatformType.SPIGOT
-            creator.settings.put(PlatformType.BUKKIT, configuration)
+            creator.settings[PlatformType.BUKKIT] = configuration
         }
 
         if (paperPluginCheckBox.isSelected) {
             val configuration = BukkitProjectConfiguration()
             configuration.type = PlatformType.PAPER
-            creator.settings.put(PlatformType.BUKKIT, configuration)
+            creator.settings[PlatformType.BUKKIT] = configuration
         }
 
         if (spongePluginCheckBox.isSelected) {
-            creator.settings.put(PlatformType.SPONGE, SpongeProjectConfiguration())
+            creator.settings[PlatformType.SPONGE] = SpongeProjectConfiguration()
         }
 
         if (forgeModCheckBox.isSelected) {
-            creator.settings.put(PlatformType.FORGE, ForgeProjectConfiguration())
+            creator.settings[PlatformType.FORGE] = ForgeProjectConfiguration()
         }
 
         if (liteLoaderModCheckBox.isSelected) {
-            creator.settings.put(PlatformType.LITELOADER, LiteLoaderProjectConfiguration())
+            creator.settings[PlatformType.LITELOADER] = LiteLoaderProjectConfiguration()
         }
 
         if (bungeeCordPluginCheckBox.isSelected) {
             val configuration = BungeeCordProjectConfiguration()
             configuration.type = PlatformType.BUNGEECORD
-            creator.settings.put(PlatformType.BUNGEECORD, configuration)
+            creator.settings[PlatformType.BUNGEECORD] = configuration
         }
 
         if (waterfallPluginCheckBox.isSelected) {
             val configuration = BungeeCordProjectConfiguration()
             configuration.type = PlatformType.WATERFALL
-            creator.settings.put(PlatformType.BUNGEECORD, configuration)
+            creator.settings[PlatformType.BUNGEECORD] = configuration
         }
 
         if (canaryPluginCheckBox.isSelected) {
             val configuration = CanaryProjectConfiguration()
             configuration.type = PlatformType.CANARY
-            creator.settings.put(PlatformType.CANARY, configuration)
+            creator.settings[PlatformType.CANARY] = configuration
         }
 
         if (neptunePluginCheckBox.isSelected) {
             val configuration = CanaryProjectConfiguration()
             configuration.type = PlatformType.NEPTUNE
-            creator.settings.put(PlatformType.CANARY, configuration)
+            creator.settings[PlatformType.CANARY] = configuration
         }
 
         creator.settings.values.iterator().next().isFirst = true

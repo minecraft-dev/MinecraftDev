@@ -237,7 +237,7 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
     private data class Data(val mcpVersions: List<McpVersionEntry>)
 
     companion object {
-        private val LITEMOD = "LiteMod"
+        private const val LITEMOD = "LiteMod"
         private val javaClassPattern = Pattern.compile("\\s+|-|\\$")
     }
 }

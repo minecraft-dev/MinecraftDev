@@ -34,14 +34,10 @@ class NewExpressionSideOnlyInspection : BaseInspection() {
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         val psiClass = infos[0] as PsiClass
 
-        if (psiClass.isWritable) {
-            return object : RemoveAnnotationInspectionGadgetsFix() {
-                override val listOwner = psiClass
-                @Nls
-                override fun getName() = "Remove @SideOnly annotation from class declaration"
-            }
+        return if (psiClass.isWritable) {
+            RemoveAnnotationInspectionGadgetsFix(psiClass, "Remove @SideOnly annotation from class declaration")
         } else {
-            return null
+            null
         }
     }
 

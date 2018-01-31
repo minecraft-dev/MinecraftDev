@@ -24,7 +24,7 @@ import java.util.jar.Attributes.Name.IMPLEMENTATION_VERSION
 abstract class ManifestLibraryPresentationProvider(kind: LibraryKind, private val title: String, private val startsWith: Boolean = false)
     : LibraryPresentationProvider<LibraryVersionProperties>(kind) {
 
-    override final fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
+    final override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
         for (classesRoot in classesRoots) {
             val manifest = classesRoot.manifest ?: continue
 
@@ -52,7 +52,7 @@ abstract class MavenLibraryPresentationProvider(kind: LibraryKind, private val g
 
     private val propertiesPath = "META-INF/maven/$groupId/$artifactId/pom.properties"
 
-    override final fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
+    final override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
         for (classesRoot in classesRoots) {
             val file = classesRoot.localFile
             val properties = JarUtil.loadProperties(file, propertiesPath) ?: continue

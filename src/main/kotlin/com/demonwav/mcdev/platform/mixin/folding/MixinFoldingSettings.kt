@@ -15,7 +15,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 
-@State(name = "MixinFoldingSettings", storages = arrayOf(Storage("editor.codeinsight.xml")))
+@State(name = "MixinFoldingSettings", storages = [Storage("editor.codeinsight.xml")])
 class MixinFoldingSettings : PersistentStateComponent<MixinFoldingSettings.State> {
 
     data class State(

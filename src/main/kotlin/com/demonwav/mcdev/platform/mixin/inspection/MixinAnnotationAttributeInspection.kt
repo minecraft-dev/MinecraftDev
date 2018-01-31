@@ -24,7 +24,7 @@ abstract class MixinAnnotationAttributeInspection(private val annotation: List<S
 
     protected abstract fun visitAnnotationAttribute(annotation: PsiAnnotation, value: PsiAnnotationMemberValue, holder: ProblemsHolder)
 
-    override final fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
+    final override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
     private inner class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
 

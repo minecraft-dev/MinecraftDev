@@ -36,7 +36,7 @@ import com.intellij.ui.content.ContentFactory
 class FindMixinsAction : AnAction() {
 
     companion object {
-        private val TOOL_WINDOW_ID = "Find Mixins"
+        private const val TOOL_WINDOW_ID = "Find Mixins"
     }
 
     override fun actionPerformed(e: AnActionEvent?) {

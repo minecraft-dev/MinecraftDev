@@ -34,14 +34,10 @@ class NestedClassSideOnlyInspection : BaseInspection() {
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         val psiClass = infos[0] as PsiClass
 
-        if (psiClass.isWritable) {
-            return object : RemoveAnnotationInspectionGadgetsFix() {
-                override val listOwner = psiClass
-                @Nls
-                override fun getName() = "Remove @SideOnly annotation from nested class"
-            }
+        return if (psiClass.isWritable) {
+            RemoveAnnotationInspectionGadgetsFix(psiClass, "Remove @SideOnly annotation from nested class")
         } else {
-            return null
+            null
         }
     }
 

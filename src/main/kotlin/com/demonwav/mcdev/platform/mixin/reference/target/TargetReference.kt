@@ -140,7 +140,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
     abstract class QualifiedHandler<T : PsiMember> : Handler<QualifiedMember<T>>() {
 
-        override final fun usesMemberReference() = true
+        final override fun usesMemberReference() = true
 
         protected abstract fun createLookup(targetClass: PsiClass, m: T, owner: PsiClass): LookupElementBuilder
 
@@ -153,7 +153,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
             return m.member.name!!
         }
 
-        override final fun createLookup(targetClass: PsiClass, element: QualifiedMember<T>): LookupElementBuilder {
+        final override fun createLookup(targetClass: PsiClass, element: QualifiedMember<T>): LookupElementBuilder {
             return qualifyLookup(createLookup(targetClass, element.member, element.qualifier ?: targetClass), targetClass, element)
         }
 

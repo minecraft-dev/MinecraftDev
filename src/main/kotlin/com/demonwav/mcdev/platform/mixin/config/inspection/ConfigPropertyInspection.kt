@@ -23,7 +23,7 @@ abstract class ConfigPropertyInspection(private vararg val names: String) : Mixi
 
     protected open fun findProperty(literal: PsiElement) = (literal.parent as? JsonProperty)?.takeIf { it.value === literal }
 
-    override final fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
+    final override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
     private inner class Visitor(private val holder: ProblemsHolder) : JsonElementVisitor() {
 

@@ -17,6 +17,7 @@ import com.demonwav.mcdev.platform.mcp.srg.SrgManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
+import javax.swing.Icon
 
 class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
@@ -36,7 +37,7 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
     override val moduleType  = McpModuleType
     override val type = PlatformType.MCP
-    override val icon = null
+    override val icon: Icon? = null
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) = ""
 

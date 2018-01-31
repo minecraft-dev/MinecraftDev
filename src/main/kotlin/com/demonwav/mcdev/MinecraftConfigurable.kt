@@ -32,7 +32,7 @@ class MinecraftConfigurable : Configurable {
 
     @Nls
     override fun getDisplayName() = "Minecraft Development"
-    override fun getHelpTopic() = null
+    override fun getHelpTopic(): String? = null
 
     override fun createComponent(): JComponent {
         showChatColorUnderlinesCheckBox.addActionListener { setUnderlineBox() }

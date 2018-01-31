@@ -14,6 +14,7 @@ import com.demonwav.mcdev.nbt.lang.gen.psi.NbttByteArray
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttCompound
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttIntArray
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttList
+import com.intellij.codeInsight.hints.HintInfo
 import com.intellij.codeInsight.hints.InlayInfo
 import com.intellij.codeInsight.hints.InlayParameterHintsProvider
 import com.intellij.psi.PsiElement
@@ -46,6 +47,6 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
         return list
     }
 
-    override fun getHintInfo(element: PsiElement) = null
+    override fun getHintInfo(element: PsiElement): HintInfo? = null
     override fun getDefaultBlackList() = mutableSetOf<String>()
 }

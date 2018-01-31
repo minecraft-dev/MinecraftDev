@@ -20,7 +20,7 @@ class ForgeImplicitUsageProvider : ImplicitUsageProvider {
 
     override fun isImplicitUsage(element: PsiElement) = isCoreMod(element)
 
-    fun isCoreMod(element: PsiElement): Boolean {
+    private fun isCoreMod(element: PsiElement): Boolean {
         return element is PsiClass && element.extendsOrImplements(ForgeConstants.CORE_MOD_INTERFACE)
     }
 

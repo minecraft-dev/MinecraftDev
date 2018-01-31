@@ -39,14 +39,10 @@ class VariableUseSideOnlyInspection : BaseInspection() {
 
                 val declaration = expression.resolve() as? PsiFieldImpl ?: return
 
-                // We can't really do anything unless this is a PsiFieldImpl, which it should be, but to be safe,
-                // check the type before we make the cast
-
-                val field = declaration
-                var elementSide = SideOnlyUtil.checkField(field)
+                var elementSide = SideOnlyUtil.checkField(declaration)
 
                 // Check the class(es) the element is declared in
-                val declarationContainingClass = field.containingClass ?: return
+                val declarationContainingClass = declaration.containingClass ?: return
 
                 val declarationClassHierarchySides = SideOnlyUtil.checkClassHierarchy(declarationContainingClass)
 
@@ -78,7 +74,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_CLASS_VAR_IN_CROSS_ANNOTATED_CLASS_METHOD,
                                 elementSide.annotation,
                                 classSide.annotation,
-                                field
+                                declaration
                             )
                         } else {
                             registerError(
@@ -86,7 +82,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_VAR_IN_CROSS_ANNOTATED_CLASS_METHOD,
                                 elementSide.annotation,
                                 classSide.annotation,
-                                field
+                                declaration
                             )
                         }
                     }
@@ -107,7 +103,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                     Error.ANNOTATED_CLASS_VAR_IN_UNANNOTATED_METHOD,
                                     elementSide.annotation,
                                     null,
-                                    field
+                                    declaration
                                 )
                             } else {
                                 registerError(
@@ -115,7 +111,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                     Error.ANNOTATED_VAR_IN_UNANNOTATED_METHOD,
                                     elementSide.annotation,
                                     null,
-                                    field
+                                    declaration
                                 )
                             }
                         }
@@ -126,7 +122,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_CLASS_VAR_IN_CROSS_ANNOTATED_METHOD,
                                 elementSide.annotation,
                                 methodSide.annotation,
-                                field
+                                declaration
                             )
                         } else {
                             registerError(
@@ -134,7 +130,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_VAR_IN_CROSS_ANNOTATED_METHOD,
                                 elementSide.annotation,
                                 methodSide.annotation,
-                                field
+                                declaration
                             )
                         }
                     }

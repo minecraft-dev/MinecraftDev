@@ -36,14 +36,10 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         val variableClass = infos[3] as PsiClass
 
-        if (variableClass.isWritable) {
-            return object : RemoveAnnotationInspectionGadgetsFix() {
-                override val listOwner = variableClass
-                @Nls
-                override fun getName() = "Remove @SideOnly annotation from variable class declaration"
-            }
+        return if (variableClass.isWritable) {
+            RemoveAnnotationInspectionGadgetsFix(variableClass, "Remove @SideOnly annotation from variable class declaration")
         } else {
-            return null
+            null
         }
     }
 

@@ -18,7 +18,7 @@ import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.TextPart
  * Each constituent part (delimited by periods in a version string) contributes
  * to the version ranking with decreasing priority from left to right.
  */
-class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion> {
+class SemanticVersion(private val parts: List<VersionPart>) : Comparable<SemanticVersion> {
     val versionString = parts.joinToString(".") { it.versionString }
 
     override fun compareTo(other: SemanticVersion): Int =
@@ -44,6 +44,7 @@ class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion
             "rc" to 1,
             "pre" to 1
         )
+
         /**
          * All separators allowed between a number and a modifier (i.e. (numbered) text part).
          */

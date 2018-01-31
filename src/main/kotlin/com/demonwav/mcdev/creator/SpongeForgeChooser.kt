@@ -26,7 +26,6 @@ class SpongeForgeChooser(private val creator: MinecraftProjectCreator) : ModuleW
 
     private lateinit var panel: JPanel
     private lateinit var singleRadioButton: JRadioButton
-    private lateinit var multiRadioButton: JRadioButton
     private lateinit var title: JLabel
 
     override fun getComponent(): JComponent {
@@ -57,7 +56,7 @@ class SpongeForgeChooser(private val creator: MinecraftProjectCreator) : ModuleW
 
             // Now add the combined SpongeForgeProjectConfiguration only if it's not already there
             if (creator.settings.values.none { configuration -> configuration is SpongeForgeProjectConfiguration }) {
-                creator.settings.put(PlatformType.FORGE, SpongeForgeProjectConfiguration())
+                creator.settings[PlatformType.FORGE] = SpongeForgeProjectConfiguration()
             }
         } else {
             // First remove the multi sponge forge configuration
@@ -65,10 +64,10 @@ class SpongeForgeChooser(private val creator: MinecraftProjectCreator) : ModuleW
 
             // Now add Forge and Sponge configurations respectively, but only if they aren't already there
             if (creator.settings.values.none { configuration -> configuration is ForgeProjectConfiguration }) {
-                creator.settings.put(PlatformType.FORGE, ForgeProjectConfiguration())
+                creator.settings[PlatformType.FORGE] = ForgeProjectConfiguration()
             }
             if (creator.settings.values.none { configuration -> configuration is SpongeProjectConfiguration }) {
-                creator.settings.put(PlatformType.SPONGE, SpongeProjectConfiguration())
+                creator.settings[PlatformType.SPONGE] = SpongeProjectConfiguration()
             }
         }
     }

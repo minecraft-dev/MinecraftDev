@@ -37,14 +37,10 @@ class MethodSideOnlyInspection : BaseInspection() {
         val error = infos[0] as Error
         val method = infos[3] as PsiMethod
 
-        if (method.isWritable && error === Error.METHOD_IN_WRONG_CLASS) {
-            return object : RemoveAnnotationInspectionGadgetsFix() {
-                override val listOwner = method
-                @Nls
-                override fun getName() = "Remove @SideOnly annotation from method"
-            }
+        return if (method.isWritable && error === Error.METHOD_IN_WRONG_CLASS) {
+            RemoveAnnotationInspectionGadgetsFix(method, "Remove @SideOnly annotation from method")
         } else {
-            return null
+            null
         }
     }
 

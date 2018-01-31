@@ -36,7 +36,6 @@ import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTypesUtil
 import org.jetbrains.annotations.Contract
-import java.util.Arrays
 
 class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
@@ -61,7 +60,7 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) =
         "Parameter is not a subclass of org.bukkit.event.Event\n" +
-        "Compiling and running this listener may result in a runtime exception"
+            "Compiling and running this listener may result in a runtime exception"
 
     override fun doPreEventGenerate(psiClass: PsiClass, data: GenerationData?) {
         if (!psiClass.extendsOrImplements(BukkitConstants.LISTENER_CLASS)) {
@@ -69,10 +68,12 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
         }
     }
 
-    override fun generateEventListenerMethod(containingClass: PsiClass,
-                                             chosenClass: PsiClass,
-                                             chosenName: String,
-                                             data: GenerationData?): PsiMethod? {
+    override fun generateEventListenerMethod(
+        containingClass: PsiClass,
+        chosenClass: PsiClass,
+        chosenName: String,
+        data: GenerationData?
+    ): PsiMethod? {
         val bukkitData = data as BukkitGenerationData
 
         val method = generateBukkitStyleEventListenerMethod(
@@ -160,14 +161,10 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
         }
 
         val project = element.project
-
         val psiClass = element.parent as PsiClass
+        val javaPluginClass = JavaPsiFacade.getInstance(project).findClass(BukkitConstants.JAVA_PLUGIN, GlobalSearchScope.allScope(project))
 
-        val javaPluginClass = JavaPsiFacade.getInstance(project)
-            .findClass(BukkitConstants.JAVA_PLUGIN, GlobalSearchScope.allScope(project))
-
-        return javaPluginClass != null && Arrays.stream(psiClass.extendsListTypes)
-            .anyMatch { c -> c == PsiTypesUtil.getClassType(javaPluginClass) }
+        return javaPluginClass != null && psiClass.extendsListTypes.any { c -> c == PsiTypesUtil.getClassType(javaPluginClass) }
     }
 
     override fun dispose() {
@@ -177,11 +174,13 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
     }
 
     companion object {
-        fun generateBukkitStyleEventListenerMethod(chosenClass: PsiClass,
-                                                   chosenName: String,
-                                                   project: Project,
-                                                   annotationName: String,
-                                                   setIgnoreCancelled: Boolean): PsiMethod {
+        fun generateBukkitStyleEventListenerMethod(
+            chosenClass: PsiClass,
+            chosenName: String,
+            project: Project,
+            annotationName: String,
+            setIgnoreCancelled: Boolean
+        ): PsiMethod {
 
             val newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)
 

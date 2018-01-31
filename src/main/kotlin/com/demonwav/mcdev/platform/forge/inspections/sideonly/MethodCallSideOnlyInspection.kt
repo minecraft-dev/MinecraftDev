@@ -38,14 +38,10 @@ class MethodCallSideOnlyInspection : BaseInspection() {
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         val method = infos[3] as PsiMethod
 
-        if (method.isWritable) {
-            return object : RemoveAnnotationInspectionGadgetsFix() {
-                override val listOwner = method
-                @Nls
-                override fun getName() = "Remove @SideOnly annotation from method declaration"
-            }
+        return if (method.isWritable) {
+            RemoveAnnotationInspectionGadgetsFix(method, "Remove @SideOnly annotation from method declaration")
         } else {
-            return null
+            null
         }
     }
 
@@ -79,14 +75,10 @@ class MethodCallSideOnlyInspection : BaseInspection() {
 
                 val declaration = referenceExpression.resolve() as? PsiMethod ?: return
 
-                // We can't really do anything unless this is a PsiFieldImpl, which it should be, but to be safe,
-                // check the type before we make the cast
-
-                val method = declaration
-                var elementSide = SideOnlyUtil.checkMethod(method)
+                var elementSide = SideOnlyUtil.checkMethod(declaration)
 
                 // Check the class(es) the element is declared in
-                val declarationContainingClass = method.containingClass ?: return
+                val declarationContainingClass = declaration.containingClass ?: return
 
                 val declarationClassHierarchySides = SideOnlyUtil.checkClassHierarchy(declarationContainingClass)
 
@@ -118,7 +110,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_CLASS_METHOD_IN_CROSS_ANNOTATED_CLASS_METHOD,
                                 elementSide.annotation,
                                 classSide.annotation,
-                                method
+                                declaration
                             )
                         } else {
                             registerError(
@@ -126,7 +118,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_METHOD_IN_CROSS_ANNOTATED_CLASS_METHOD,
                                 elementSide.annotation,
                                 classSide.annotation,
-                                method
+                                declaration
                             )
                         }
                     }
@@ -146,14 +138,14 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                     referenceExpression.element,
                                     Error.ANNOTATED_CLASS_METHOD_IN_UNANNOTATED_METHOD,
                                     elementSide.annotation, null,
-                                    method
+                                    declaration
                                 )
                             } else {
                                 registerError(
                                     referenceExpression.element,
                                     Error.ANNOTATED_METHOD_IN_UNANNOTATED_METHOD,
                                     elementSide.annotation, null,
-                                    method
+                                    declaration
                                 )
                             }
                         }
@@ -164,7 +156,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_CLASS_METHOD_IN_CROSS_ANNOTATED_METHOD,
                                 elementSide.annotation,
                                 methodSide.annotation,
-                                method
+                                declaration
                             )
                         } else {
                             registerError(
@@ -172,7 +164,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_METHOD_IN_CROSS_ANNOTATED_METHOD,
                                 elementSide.annotation,
                                 methodSide.annotation,
-                                method
+                                declaration
                             )
                         }
                     }

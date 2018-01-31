@@ -18,12 +18,13 @@ import com.intellij.formatting.FormattingModelProvider
 import com.intellij.formatting.Indent
 import com.intellij.formatting.SpacingBuilder
 import com.intellij.lang.ASTNode
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettings
 
 class NbttFormattingModelBuilder : FormattingModelBuilder {
-    override fun getRangeAffectingIndent(file: PsiFile, offset: Int, elementAtOffset: ASTNode) = null
+    override fun getRangeAffectingIndent(file: PsiFile, offset: Int, elementAtOffset: ASTNode): TextRange? = null
 
     override fun createModel(element: PsiElement, settings: CodeStyleSettings): FormattingModel {
         val block = NbttBlock(element.node, settings, Indent.getNoneIndent(), null)

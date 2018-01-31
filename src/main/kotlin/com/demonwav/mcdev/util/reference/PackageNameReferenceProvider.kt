@@ -82,7 +82,7 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
         return Reference(element, range, range.startOffset, null).multiResolve(false).firstOrNull()?.element
     }
 
-    override final fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
+    final override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
         val baseRange = element.manipulator!!.getRangeInElement(element)
 
         val text = element.text!!

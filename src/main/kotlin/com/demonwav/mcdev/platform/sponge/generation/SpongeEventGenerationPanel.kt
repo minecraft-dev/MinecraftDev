@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.sponge.generation
 
 import com.demonwav.mcdev.insight.generation.GenerationData
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel
-import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.psi.PsiClass
 import javax.swing.JCheckBox
 import javax.swing.JComboBox
@@ -43,10 +42,6 @@ class SpongeEventGenerationPanel(chosenClass: PsiClass) : EventGenerationPanel(c
 
             return parentPanel
         }
-
-    override fun doValidate(): ValidationInfo? {
-        return super.doValidate()
-    }
 
     override fun gatherData(): GenerationData? {
         return SpongeGenerationData(ignoreCanceledCheckBox.isSelected, eventOrderComboBox.selectedItem as String)

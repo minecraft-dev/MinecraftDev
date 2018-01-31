@@ -41,7 +41,7 @@ object SideOnlyUtil {
         return facet != null && facet.isOfType(ForgeModuleType)
     }
 
-    fun normalize(text: String): String {
+    private fun normalize(text: String): String {
         if (text.startsWith(ForgeConstants.SIDE_ANNOTATION)) {
             // We chop off the "net.minecraftforge.fml.relauncher." part here
             return text.substring(text.lastIndexOf(".") - 4)
@@ -110,7 +110,7 @@ object SideOnlyUtil {
         return getFirstSide(checkClassHierarchy(psiClass))
     }
 
-    fun checkClass(psiClass: PsiClass): Pair<Side, PsiClass> {
+    private fun checkClass(psiClass: PsiClass): Pair<Side, PsiClass> {
         val side = psiClass.getUserData(Side.KEY)
         if (side != null) {
             return Pair(side, psiClass)
@@ -157,11 +157,11 @@ object SideOnlyUtil {
         return SideOnlyUtil.getFromName(value.text)
     }
 
-    fun getFromName(name: String): Side {
-        when (normalize(name)) {
-            "Side.SERVER" -> return Side.SERVER
-            "Side.CLIENT" -> return Side.CLIENT
-            else -> return Side.INVALID
+    private fun getFromName(name: String): Side {
+        return when (normalize(name)) {
+            "Side.SERVER" -> Side.SERVER
+            "Side.CLIENT" -> Side.CLIENT
+            else -> Side.INVALID
         }
     }
 

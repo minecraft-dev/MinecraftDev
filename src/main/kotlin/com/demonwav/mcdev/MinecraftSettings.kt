@@ -17,7 +17,7 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.editor.markup.EffectType
 import org.jetbrains.annotations.Contract
 
-@State(name = "MinecraftSettings", storages = arrayOf(Storage("minecraft_dev.xml")))
+@State(name = "MinecraftSettings", storages = [Storage("minecraft_dev.xml")])
 class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
 
     data class State(

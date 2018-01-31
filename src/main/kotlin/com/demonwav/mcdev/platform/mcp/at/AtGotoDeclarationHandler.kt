@@ -90,5 +90,5 @@ class AtGotoDeclarationHandler : GotoDeclarationHandler {
         }
     }
 
-    override fun getActionText(context: DataContext) = null
+    override fun getActionText(context: DataContext): String? = null
 }
