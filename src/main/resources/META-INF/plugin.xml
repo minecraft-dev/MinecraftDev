@@ -17,7 +17,7 @@
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
-    <vendor>DemonWav</vendor>
+    <vendor email="demonwav@gmail.com" url="https://minecraftdev.org/">DemonWav</vendor>
 
     <description><![CDATA[
       Brings support for Bukkit, Spigot, Paper, Sponge, Forge, MCP, Mixins, BungeeCord, Waterfall, LiteLoader, Canary and Neptune projects
