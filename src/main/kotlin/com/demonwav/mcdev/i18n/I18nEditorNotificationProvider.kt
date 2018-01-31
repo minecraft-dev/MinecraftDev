@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.i18n
 
 import com.demonwav.mcdev.i18n.lang.I18nFileType
+import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.demonwav.mcdev.i18n.sorting.I18nSorter
 import com.demonwav.mcdev.i18n.sorting.Ordering
@@ -40,19 +41,17 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
             return null
         }
 
-        val defaultEntries = project.findDefaultLangEntries(scope = Scope.PROJECT, domain = file.mcDomain)
-        val entries = project.findLangEntries(file = file, scope = Scope.PROJECT)
-        val keys = entries.map { it.key }
-        val missingEntries = defaultEntries.associate { it.key to it }.toMutableMap()
-        missingEntries.keys.removeAll(keys)
-
-        if (!missingEntries.isEmpty()) {
+        if (!getMissingEntries(file).isEmpty()) {
             val panel = InfoPanel()
             panel.setText("Translation file doesn't match default one (${I18nConstants.DEFAULT_LOCALE_FILE}).")
             panel.createActionLabel("Add missing default entries (won't reflect changes in original English localization)") {
                 val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
+                val missingEntries = getMissingEntries(file)
                 psi.applyWriteAction {
-                    if (lastChild != null && lastChild?.node?.elementType != I18nTypes.LINE_ENDING) {
+                    if (lastChild != null) {
+                        if (lastChild?.node?.elementType != I18nTypes.LINE_ENDING) {
+                            add(I18nElementFactory.createLineEnding(project))
+                        }
                         add(I18nElementFactory.createLineEnding(project))
                     }
                     val newElements = I18nElementFactory.assembleElements(project, missingEntries.values, Int.MAX_VALUE)
@@ -78,6 +77,15 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
             return panel
         }
         return null
+    }
+
+    private fun getMissingEntries(file: VirtualFile): Map<String, I18nEntry> {
+        val defaultEntries = project.findDefaultLangEntries(scope = Scope.PROJECT, domain = file.mcDomain)
+        val entries = project.findLangEntries(file = file, scope = Scope.PROJECT)
+        val keys = entries.map { it.key }
+        val missingEntries = defaultEntries.associate { it.key to it }.toMutableMap()
+        missingEntries.keys.removeAll(keys)
+        return missingEntries
     }
 
     class InfoPanel : EditorNotificationPanel() {

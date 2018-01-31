@@ -22,10 +22,10 @@ class I18nSyntaxHighlighter(private val lexer: Lexer) : SyntaxHighlighterBase() 
 
     override fun getTokenHighlights(tokenType: IElementType?) =
         when (tokenType) {
-            I18nTypes.KEY -> KEY_KEYS
+            I18nTypes.KEY, I18nTypes.DUMMY -> KEY_KEYS
             I18nTypes.EQUALS -> EQUALS_KEYS
             I18nTypes.VALUE -> VALUE_KEYS
-            I18nTypes.COMMENT, I18nTypes.DUMMY -> COMMENT_KEYS
+            I18nTypes.COMMENT -> COMMENT_KEYS
             else -> EMPTY_KEYS
         }
 
