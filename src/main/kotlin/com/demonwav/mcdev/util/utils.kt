@@ -16,8 +16,10 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.Result
 import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import org.jetbrains.annotations.Contract
 
@@ -73,12 +75,18 @@ inline fun invokeLaterAny(crossinline func: () -> Unit) {
     }
 }
 
-inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T): T? =
-    object : WriteCommandAction<T>(project) {
+inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
+    applyWriteAction { func() }
+
+inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T): T {
+    val result = object : WriteCommandAction<T>(project) {
         override fun run(result: Result<T>) {
             result.setResult(func())
         }
     }.execute().resultObject
+    PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return result)
+    return result
+}
 
 /**
  * Returns an untyped array for the specified [Collection].

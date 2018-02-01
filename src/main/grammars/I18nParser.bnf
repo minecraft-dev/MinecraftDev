@@ -1,0 +1,40 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2017 minecraft-dev
+ *
+ * MIT License
+ */
+
+{
+    parserClass="com.demonwav.mcdev.i18n.lang.gen.parser.I18nParser"
+
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="I18n"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.demonwav.mcdev.i18n.lang.gen.psi"
+    psiImplPackage="com.demonwav.mcdev.i18n.lang.gen.psi.impl"
+
+    elementTypeHolderClass="com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes"
+    elementTypeClass="com.demonwav.mcdev.i18n.lang.psi.I18nElementType"
+    tokenTypeClass="com.demonwav.mcdev.i18n.lang.psi.I18nTokenType"
+
+    tokens = [
+        EQUALS="="
+    ]
+
+    consumeTokenMethod="consumeTokenFast"
+}
+
+i18n_file ::= line*
+
+private line ::= entry | COMMENT | DUMMY | LINE_ENDING
+
+entry ::= KEY EQUALS VALUE? {
+    methods=[]
+    mixin="com.demonwav.mcdev.i18n.lang.psi.mixins.I18nEntryImplMixin"
+    implements="com.demonwav.mcdev.i18n.lang.psi.mixins.I18nEntryMixin"
+}

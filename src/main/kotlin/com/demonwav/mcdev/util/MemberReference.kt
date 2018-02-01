@@ -132,6 +132,9 @@ fun PsiMethod.getQualifiedMemberReference(owner: PsiClass): MemberReference {
     return MemberReference(internalName, descriptor, owner.fullQualifiedName)
 }
 
+fun PsiMethod?.isSameReference(reference: PsiMethod?): Boolean =
+    this != null && (this === reference || qualifiedMemberReference == reference?.qualifiedMemberReference)
+
 
 // Field
 @get:Contract(pure = true)
