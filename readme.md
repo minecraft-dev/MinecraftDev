@@ -66,6 +66,7 @@ Developers
 
 - Project Owner - [**@DemonWav** - Kyle Wood](https://github.com/DemonWav)
 - [**@Minecrell**](https://github.com/Minecrell)
+- [**@PaleoCrafter** - Marvin Rösch](https://github.com/PaleoCrafter)
 
 #### **Contributors**
 
