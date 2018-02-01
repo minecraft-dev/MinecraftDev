@@ -131,6 +131,7 @@
         </intentionAction>
         <codeFoldingOptionsProvider instance="com.demonwav.mcdev.i18n.I18nCodeFoldingOptionsProvider"/>
         <applicationService serviceImplementation="com.demonwav.mcdev.i18n.I18nFoldingSettings"/>
+        <completion.contributor language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nCompletionContributor" />
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
