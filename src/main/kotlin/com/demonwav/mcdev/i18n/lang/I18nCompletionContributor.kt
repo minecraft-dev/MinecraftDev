@@ -16,6 +16,7 @@ import com.demonwav.mcdev.i18n.Scope
 import com.demonwav.mcdev.i18n.findDefaultLangEntries
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.util.getSimilarity
 import com.demonwav.mcdev.util.mcDomain
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionParameters
@@ -83,31 +84,10 @@ class I18nCompletionContributor : CompletionContributor() {
             prefixResult.addElement(
                 PrioritizedLookupElement.withPriority(
                     LookupElementBuilder.create(key).withIcon(PlatformAssets.MINECRAFT_ICON),
-                    1.0 + key.getValue(text)
+                    1.0 + key.getSimilarity(text)
                 )
             )
         }
-    }
-
-    private fun String.getValue(text: String): Int {
-        if (this == text) {
-            return 1_000_000 // exact match
-        }
-
-        val lowerCaseThis = this.toLowerCase()
-        val lowerCaseText = text.toLowerCase()
-
-        if (lowerCaseThis == lowerCaseText) {
-            return 100_000 // lowercase exact match
-        }
-
-        val distance = Math.min(lowerCaseThis.length, lowerCaseText.length)
-        for (i in 0 until distance) {
-            if (lowerCaseThis[i] != lowerCaseText[i]) {
-                return i
-            }
-        }
-        return distance
     }
 
     companion object {
