@@ -28,6 +28,7 @@ import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.codeInsight.completion.CompletionUtil
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.module.ModuleUtilCore
@@ -66,7 +67,7 @@ class AtCompletionContributor : CompletionContributor() {
 
         val parent = position.parent
 
-        val text = parent.text.let { it.substring(0, it.length - intellijPlz) }
+        val text = parent.text.let { it.substring(0, it.length - CompletionUtil.DUMMY_IDENTIFIER.length) }
 
         when {
             AFTER_KEYWORD.accepts(parent) -> handleAtClassName(text, parent, result)
@@ -304,8 +305,5 @@ class AtCompletionContributor : CompletionContributor() {
         val AFTER_KEYWORD = after(AtTypes.KEYWORD)
         val AFTER_CLASS_NAME = after(AtTypes.CLASS_NAME)
         val AFTER_NEWLINE = after(AtTypes.CRLF)
-
-        // https://intellij-support.jetbrains.com/hc/en-us/community/posts/206752355-The-dreaded-IntellijIdeaRulezzz-string
-        const val intellijPlz = "IntellijIdeaRulezzz".length
     }
 }
