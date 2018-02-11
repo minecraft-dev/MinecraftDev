@@ -46,20 +46,29 @@ object Nbt {
      * Parse the NBT file from the InputStream and return the root TagCompound for the NBT file. This method closes the stream when
      * it is finished with it.
      */
+    @Throws(MalformedNbtFileException::class)
     fun buildTagTree(inputStream: InputStream, timeout: Long): Pair<RootCompound, Boolean> {
-        val (stream, isCompressed) = getActualInputStream(inputStream)
+        try {
+            val (stream, isCompressed) = getActualInputStream(inputStream)
 
-        stream.use {
-            val tagIdByte = stream.readByte()
-            val tagId = NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
+            stream.use {
+                val tagIdByte = stream.readByte()
+                val tagId = NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
 
-            if (tagId != NbtTypeId.COMPOUND) {
-                throw MalformedNbtFileException("Root tag in NBT file is not a compound.")
+                if (tagId != NbtTypeId.COMPOUND) {
+                    throw MalformedNbtFileException("Root tag in NBT file is not a compound.")
+                }
+
+                val start = System.currentTimeMillis()
+
+                return RootCompound(stream.readUTF(), stream.readCompoundTag(start, timeout).tagMap) to isCompressed
             }
-
-            val start = System.currentTimeMillis()
-
-            return RootCompound(stream.readUTF(), stream.readCompoundTag(start, timeout).tagMap) to isCompressed
+        } catch (e: Throwable) {
+            if (e is MalformedNbtFileException) {
+                throw e
+            } else {
+                throw MalformedNbtFileException("Error reading file", e)
+            }
         }
     }
 
@@ -107,9 +116,7 @@ object Nbt {
         val length = this.readInt()
 
         val bytes = ByteArray(length)
-        if (this.read(bytes) != bytes.size) {
-            throw RuntimeException()
-        }
+        this.readFully(bytes)
         return@checkTimeout TagByteArray(bytes)
     }
 

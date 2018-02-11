@@ -10,4 +10,7 @@
 
 package com.demonwav.mcdev.nbt
 
-class MalformedNbtFileException(message: String = "") : Exception(message)
+class MalformedNbtFileException : Exception {
+    constructor(message: String) : super(message)
+    constructor(message: String, cause: Throwable) : super(message, cause)
+}
