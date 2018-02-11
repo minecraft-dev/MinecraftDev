@@ -42,9 +42,9 @@ class SpongeForgeChooser(private val creator: MinecraftProjectCreator) : ModuleW
 
     override fun isStepVisible(): Boolean {
         // Only show this if both Sponge and Forge are selected
-        return creator.settings.values.stream()
-            .filter { configuration -> configuration is ForgeProjectConfiguration || configuration is SpongeProjectConfiguration }
-            .count() >= 2 || creator.settings.values.any { conf -> conf is SpongeForgeProjectConfiguration }
+        val values = creator.settings.values
+        return values.count { conf -> conf is ForgeProjectConfiguration || conf is SpongeProjectConfiguration } >= 2 ||
+            values.any { conf -> conf is SpongeForgeProjectConfiguration }
     }
 
     override fun onStepLeaving() {

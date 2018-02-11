@@ -114,6 +114,10 @@ inline fun <T, R> Array<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     return null
 }
 
+inline fun <T : Any> Iterable<T?>.forEachNotNull(func: (T) -> Unit) {
+    forEach { it?.let(func) }
+}
+
 inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R) = Array(size) { i -> transform(this[i]) }
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R) = Array(size) { i -> transform(this[i]) }
 

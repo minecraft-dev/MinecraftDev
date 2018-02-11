@@ -28,11 +28,6 @@ fun <T> Stream<T?>.filterNotNull(): Stream<T> = filter { it != null } as Stream<
 inline fun <T, R> Stream<T>.mapNotNull(crossinline transform: (T) -> R?): Stream<R> = map { transform(it) }.filterNotNull()
 
 /**
- * Runs the given function on each non-null element in the stream.
- */
-inline fun <T> Stream<T?>.forEachNotNull(crossinline consume: (T) -> Unit) = filterNotNull().forEach { consume(it) }
-
-/**
  * Creates a typed [Array] of [T] for the elements in the [Stream].
  */
 @Contract(pure = true)

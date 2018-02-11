@@ -43,7 +43,6 @@ object PluginUpdater {
             updateStatus = checkUpdatesInMainRepo()
 
             RepositoryHelper.getPluginHosts()
-                .stream()
                 .forEachNotNull { updateStatus = updateStatus.mergeWith(checkUpdatesInCustomRepo(it)) }
 
             val finalUpdate = updateStatus
@@ -99,9 +98,8 @@ object PluginUpdater {
             return PluginUpdateStatus.CheckFailed("Checking custom plugin repository $host  failed")
         }
 
-        val minecraftPlugin = plugins.stream()
-            .filter { plugin -> plugin.pluginId == PluginUtil.PLUGIN_ID }
-            .findFirst().orElse(null) ?: return PluginUpdateStatus.LatestVersionInstalled() // Effectively remove isEmpty call
+        val minecraftPlugin = plugins.firstOrNull { plugin -> plugin.pluginId == PluginUtil.PLUGIN_ID }
+            ?: return PluginUpdateStatus.LatestVersionInstalled()
 
         return updateIfNotLatest(minecraftPlugin, host)
     }

@@ -49,7 +49,9 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
 
     fun performCreationSettingSetup(project: Project) {
         val annotations = (EntryPointsManager.getInstance(project) as EntryPointsManagerBase).ADDITIONAL_ANNOTATIONS
-        ignoredAnnotations.stream().filter { annotation -> !annotations.contains(annotation) }.forEach { annotations.add(it) }
+        ignoredAnnotations.asSequence()
+            .filter { annotation -> !annotations.contains(annotation) }
+            .forEach { annotations.add(it) }
     }
 
     @Contract(pure = true)

@@ -71,7 +71,7 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
     }
 
     private fun isAmbiguous(targets: Collection<PsiClass>, targetReference: MemberReference): Boolean {
-        return targets.stream().anyMatch { it.findMethodsByName(targetReference.name, false).size > 1 }
+        return targets.any { it.findMethodsByName(targetReference.name, false).size > 1 }
     }
 
     private fun resolve(context: PsiElement): Stream<PsiMethod>? {
