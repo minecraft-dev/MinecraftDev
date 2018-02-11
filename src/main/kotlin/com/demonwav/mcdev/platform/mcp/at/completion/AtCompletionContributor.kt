@@ -20,6 +20,7 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes
 import com.demonwav.mcdev.util.anonymousElements
 import com.demonwav.mcdev.util.fullQualifiedName
+import com.demonwav.mcdev.util.getSimilarity
 import com.demonwav.mcdev.util.nameAndParameterTypes
 import com.demonwav.mcdev.util.qualifiedMemberReference
 import com.demonwav.mcdev.util.simpleQualifiedMemberReference
@@ -293,24 +294,7 @@ class AtCompletionContributor : CompletionContributor() {
 
         val thisName = this.substringAfterLast('.')
 
-        if (thisName == text) {
-            return 1_000_000 + packageBonus // exact match
-        }
-
-        val lowerCaseThis = thisName.toLowerCase()
-        val lowerCaseText = text.toLowerCase()
-
-        if (lowerCaseThis == lowerCaseText) {
-            return 100_000 + packageBonus // lowercase exact match
-        }
-
-        val distance = Math.min(lowerCaseThis.length, lowerCaseText.length)
-        for (i in 0 until distance) {
-            if (lowerCaseThis[i] != lowerCaseText[i]) {
-                return i + packageBonus
-            }
-        }
-        return distance + packageBonus
+        return thisName.getSimilarity(text, packageBonus)
     }
 
     companion object {

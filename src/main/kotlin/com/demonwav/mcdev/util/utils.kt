@@ -168,3 +168,24 @@ inline fun String.span(predicate: (Char) -> Boolean): Pair<String, String> {
     val prefix = takeWhile(predicate)
     return prefix to drop(prefix.length)
 }
+
+fun String.getSimilarity(text: String, bonus: Int = 0): Int {
+    if (this == text) {
+        return 1_000_000 + bonus// exact match
+    }
+
+    val lowerCaseThis = this.toLowerCase()
+    val lowerCaseText = text.toLowerCase()
+
+    if (lowerCaseThis == lowerCaseText) {
+        return 100_000 + bonus // lowercase exact match
+    }
+
+    val distance = Math.min(lowerCaseThis.length, lowerCaseText.length)
+    for (i in 0 until distance) {
+        if (lowerCaseThis[i] != lowerCaseText[i]) {
+            return i + bonus
+        }
+    }
+    return distance + bonus
+}
