@@ -38,7 +38,7 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
             return
         }
 
-        val directory = node.value
+        val directory = node.value ?: return
         val module = ModuleUtilCore.findModuleForPsiElement(directory) ?: return
 
         val rootManager = ModuleRootManager.getInstance(module)
