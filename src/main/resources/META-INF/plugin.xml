@@ -159,6 +159,14 @@
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.sponge.framework.SpongePresentationProvider" />
+
+        <localInspection displayName="Wrong Sponge logger implementation"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeLoggingInspection"/>
         <!--endregion-->
 
         <!--region FORGE-->

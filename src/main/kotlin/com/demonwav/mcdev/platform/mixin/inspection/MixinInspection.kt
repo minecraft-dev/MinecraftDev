@@ -35,7 +35,7 @@ abstract class MixinInspection : AbstractBaseJavaLocalInspectionTool() {
         return if (MixinModuleType.isInModule(file)) {
             super.processFile(file, manager)
         } else {
-            listOf()
+            emptyList()
         }
     }
 }

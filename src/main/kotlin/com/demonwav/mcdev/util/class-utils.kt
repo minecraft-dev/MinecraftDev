@@ -33,7 +33,7 @@ val PsiClass.packageName
 
 @get:Contract(pure = true)
 val PsiClassType.fullQualifiedName
-    get() = resolve()!!.fullQualifiedName
+    get() = resolve()?.fullQualifiedName // this can be null if the type import is missing
 
 // Class
 

@@ -17,7 +17,7 @@ import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiMethod
 
-class SoftImplementOverridesInspection : MixinInspection() {
+class SuSoftImplementOverridesInspection : MixinInspection() {
 
     override fun getStaticDescription() = "Reports soft-implemented methods in Mixins that do not override a method in the target classes."
 
