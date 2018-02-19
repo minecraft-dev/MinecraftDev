@@ -24,7 +24,7 @@ class I18nCommenterTest : BaseMinecraftTest(PlatformType.MCP) {
 
     private fun doTest(actionId: String, @Language("I18n") before: String, @Language("I18n") after: String) {
         buildProject {
-            i18n("${fileName}.lang", before, configure = true)
+            i18n("$fileName.lang", before, configure = true)
             i18n("${fileName}_after.lang", after, configure = false)
         }
 

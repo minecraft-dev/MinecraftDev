@@ -32,13 +32,11 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
 
     private val fixture: JavaCodeInsightTestFixture
         get() {
-            if (fixtureRef.get() == null) {
-                throw Exception("Reference collected")
-            }
-            if (fixtureRef.get()!!.project.isDisposed) {
+            val fix = fixtureRef.get() ?: throw Exception("Reference collected")
+            if (fix.project.isDisposed) {
                 throw Exception("Project disposed")
             }
-            return fixtureRef.get()!!
+            return fix
         }
     private val project
         get() = fixture.project

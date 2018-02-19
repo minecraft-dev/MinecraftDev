@@ -39,6 +39,7 @@ class TransitionProjectComponent(project: Project) : AbstractProjectComponent(pr
             "PAPER_MODULE_TYPE",
             "SPONGE_MODULE_TYPE",
             "FORGE_MODULE_TYPE",
-            "BUNGEECORD_MODULE_TYPE")
+            "BUNGEECORD_MODULE_TYPE"
+        )
     }
 }

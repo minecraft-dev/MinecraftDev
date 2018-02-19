@@ -43,25 +43,14 @@ class BukkitListenerImplementedInspection : BaseInspection() {
             @Nls
             override fun getName() = "Implement Listener"
             @Nls
-            override fun getFamilyName() =name
+            override fun getFamilyName() = name
         }
     }
 
     override fun buildVisitor(): BaseInspectionVisitor {
         return object : BaseInspectionVisitor() {
             override fun visitClass(aClass: PsiClass) {
-                val methods = aClass.methods
-                var isEventHandler = false
-                for (method in methods) {
-                    val list = method.modifierList
-                    val annotation = list.findAnnotation(BukkitConstants.HANDLER_ANNOTATION)
-                    if (annotation != null) {
-                        isEventHandler = true
-                        break
-                    }
-                }
-
-                if (!isEventHandler) {
+                if (aClass.methods.none { it.modifierList.findAnnotation(BukkitConstants.HANDLER_ANNOTATION) != null }) {
                     return
                 }
 
