@@ -132,6 +132,7 @@ publishPlugin {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+    options.compilerArgs = listOf("-proc:none")
 }
 
 tasks.withType<KotlinCompile> {
