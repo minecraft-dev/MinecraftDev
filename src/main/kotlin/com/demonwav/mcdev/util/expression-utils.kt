@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -15,10 +15,8 @@ import com.demonwav.mcdev.i18n.translations.Translation.Companion.FormattingErro
 import com.intellij.psi.JavaTokenType
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiCall
-import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteral
-import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiPolyadicExpression

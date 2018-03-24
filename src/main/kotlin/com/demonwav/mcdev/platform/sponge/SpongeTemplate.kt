@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -34,8 +34,7 @@ object SpongeTemplate {
                                mainClassFile: VirtualFile,
                                packageName: String,
                                className: String,
-                               hasDependencies: Boolean,
-                               generateDocumentation: Boolean) {
+                               hasDependencies: Boolean) {
 
         val properties = Properties()
 
@@ -43,10 +42,6 @@ object SpongeTemplate {
         properties.setProperty("CLASS_NAME", className)
         if (hasDependencies) {
             properties.setProperty("HAS_DEPENDENCIES", "true")
-        }
-
-        if (generateDocumentation) {
-            properties.setProperty("GENERATE_DOCUMENTATION", "true")
         }
 
         BaseTemplate.applyTemplate(project, mainClassFile, MinecraftFileTemplateGroupFactory.SPONGE_MAIN_CLASS_TEMPLATE, properties)

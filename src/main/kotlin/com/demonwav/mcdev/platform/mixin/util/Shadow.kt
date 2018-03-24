@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -21,7 +21,6 @@ import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.isNotEmpty
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiArrayInitializerMemberValue
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember

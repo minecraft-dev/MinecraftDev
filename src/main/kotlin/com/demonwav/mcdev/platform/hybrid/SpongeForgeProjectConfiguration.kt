@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -48,8 +48,7 @@ class SpongeForgeProjectConfiguration : ForgeProjectConfiguration() {
                 mainClassFile,
                 packageName,
                 className,
-                hasDependencies(),
-                generateDocumentation
+                hasDependencies()
             )
 
             writeMcmodInfo(project, buildSystem)
