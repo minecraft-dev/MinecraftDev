@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -82,7 +82,7 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
         return Reference(element, range, range.startOffset, null).multiResolve(false).firstOrNull()?.element
     }
 
-    override final fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
+    final override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
         val baseRange = element.manipulator!!.getRangeInElement(element)
 
         val text = element.text!!
@@ -148,7 +148,7 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
             return getBasePackage(element)?.let { newName.removePrefix(it + '.') } ?: newName
         }
 
-        override fun bindToElement(newTarget: PsiElement): PsiElement {
+        override fun bindToElement(newTarget: PsiElement): PsiElement? {
             if (!canBindTo(newTarget)) {
                 throw IncorrectOperationException("Cannot bind to $newTarget")
             }
@@ -158,7 +158,7 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
             }
 
             val newName = getNewName(newTarget as PsiQualifiedNamedElement)
-            return element.manipulator!!.handleContentChange(element, qualifiedRange, newName)
+            return element.manipulator?.handleContentChange(element, qualifiedRange, newName)
         }
 
         override fun isReferenceTo(element: PsiElement) = canBindTo(element) && super.isReferenceTo(element)

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -16,5 +16,7 @@ object McpConstants {
     const val ENTITY = "net.minecraft.entity.Entity"
     const val WORLD = "net.minecraft.world.World"
     const val ITEM_STACK = "net.minecraft.item.ItemStack"
+    const val BLOCK = "net.minecraft.block.Block"
+    const val ITEM = "net.minecraft.item.Item"
     const val MINECRAFT_SERVER = "net.minecraft.server.MinecraftServer"
 }

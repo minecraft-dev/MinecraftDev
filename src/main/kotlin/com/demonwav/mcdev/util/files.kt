@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -27,6 +27,12 @@ val VirtualFile.manifest: Manifest?
     } catch (e: IOException) {
         null
     }
+
+// Technically resource domains are much more restricted ([a-z0-9_-]+) in modern versions, but we want to support as much as possible
+private val DOMAIN_PATTERN = Regex("^.*?/assets/([^/]+)/lang.*?$")
+
+val VirtualFile.mcDomain: String?
+    get() = DOMAIN_PATTERN.matchEntire(this.path)?.groupValues?.get(1)
 
 operator fun Manifest.get(attribute: String): String? = mainAttributes.getValue(attribute)
 operator fun Manifest.get(attribute: Attributes.Name): String? = mainAttributes.getValue(attribute)

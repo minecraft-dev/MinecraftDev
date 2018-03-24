@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.mcp.at
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.options.colors.AttributesDescriptor
 import com.intellij.openapi.options.colors.ColorDescriptor
 import com.intellij.openapi.options.colors.ColorSettingsPage
@@ -32,7 +33,7 @@ class AtColorSettingsPage : ColorSettingsPage {
         public net.minecraft.world.demo.DemoWorldServer func_175680_a(IIZ)Z # isChunkLoaded
         """.trimIndent()
 
-    override fun getAdditionalHighlightingTagToDescriptorMap() = null
+    override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey>? = null
     override fun getAttributeDescriptors() = DESCRIPTORS
     override fun getColorDescriptors(): Array<out ColorDescriptor> = ColorDescriptor.EMPTY_ARRAY
     override fun getDisplayName() = "Access Transformers"

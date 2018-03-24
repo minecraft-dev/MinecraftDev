@@ -1,0 +1,7 @@
+COMMENT ('# Comment 1')
+LINE_ENDING ('\n')
+COMMENT ('# Comment 2')
+LINE_ENDING ('\n')
+COMMENT ('# Comment 3')
+LINE_ENDING ('\n')
+COMMENT ('#commented.property=Commented Property')

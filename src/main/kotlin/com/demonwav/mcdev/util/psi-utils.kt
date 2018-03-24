@@ -3,13 +3,15 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.util
 
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.ElementManipulator
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.JavaPsiFacade
@@ -37,6 +39,7 @@ import org.jetbrains.annotations.Contract
 import java.util.stream.Stream
 
 // Parent
+fun PsiElement.findModule(): Module? = ModuleUtilCore.findModuleForPsiElement(this)
 
 @Contract(pure = true)
 fun PsiElement.findContainingClass(): PsiClass? = findParent(resolveReferences = false)

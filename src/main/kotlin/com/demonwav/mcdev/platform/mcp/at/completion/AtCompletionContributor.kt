@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -20,6 +20,7 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes
 import com.demonwav.mcdev.util.anonymousElements
 import com.demonwav.mcdev.util.fullQualifiedName
+import com.demonwav.mcdev.util.getSimilarity
 import com.demonwav.mcdev.util.nameAndParameterTypes
 import com.demonwav.mcdev.util.qualifiedMemberReference
 import com.demonwav.mcdev.util.simpleQualifiedMemberReference
@@ -27,6 +28,7 @@ import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.codeInsight.completion.CompletionUtil
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.module.ModuleUtilCore
@@ -65,7 +67,7 @@ class AtCompletionContributor : CompletionContributor() {
 
         val parent = position.parent
 
-        val text = parent.text.let { it.substring(0, it.length - intellijPlz) }
+        val text = parent.text.let { it.substring(0, it.length - CompletionUtil.DUMMY_IDENTIFIER.length) }
 
         when {
             AFTER_KEYWORD.accepts(parent) -> handleAtClassName(text, parent, result)
@@ -274,7 +276,7 @@ class AtCompletionContributor : CompletionContributor() {
         }
     }
 
-    fun handleNewLine(text: String, result: CompletionResultSet) {
+    private fun handleNewLine(text: String, result: CompletionResultSet) {
         for (keyword in AtElementFactory.Keyword.softMatch(text)) {
             result.addElement(LookupElementBuilder.create(keyword.text))
         }
@@ -293,24 +295,7 @@ class AtCompletionContributor : CompletionContributor() {
 
         val thisName = this.substringAfterLast('.')
 
-        if (thisName == text) {
-            return 1_000_000 + packageBonus // exact match
-        }
-
-        val lowerCaseThis = thisName.toLowerCase()
-        val lowerCaseText = text.toLowerCase()
-
-        if (lowerCaseThis == lowerCaseText) {
-            return 100_000 + packageBonus // lowercase exact match
-        }
-
-        val distance = Math.min(lowerCaseThis.length, lowerCaseText.length)
-        for (i in 0 until distance) {
-            if (lowerCaseThis[i] != lowerCaseText[i]) {
-                return i + packageBonus
-            }
-        }
-        return distance + packageBonus
+        return thisName.getSimilarity(text, packageBonus)
     }
 
     companion object {
@@ -320,8 +305,5 @@ class AtCompletionContributor : CompletionContributor() {
         val AFTER_KEYWORD = after(AtTypes.KEYWORD)
         val AFTER_CLASS_NAME = after(AtTypes.CLASS_NAME)
         val AFTER_NEWLINE = after(AtTypes.CRLF)
-
-        // https://intellij-support.jetbrains.com/hc/en-us/community/posts/206752355-The-dreaded-IntellijIdeaRulezzz-string
-        const val intellijPlz = "IntellijIdeaRulezzz".length
     }
 }

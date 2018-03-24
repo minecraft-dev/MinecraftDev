@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -47,6 +47,17 @@ fun PsiAnnotationMemberValue.resolveClass(): PsiClass? {
     }
 
     return (operand.type as PsiClassType).resolve()
+}
+
+/**
+ * Returns `true` if the annotation value is present (not `null`) and
+ * initialized either to a single value or an array with at least one
+ * element.
+ *
+ * @return `true` if the annotation member is not empty
+ */
+fun PsiAnnotationMemberValue?.isNotEmpty(): Boolean {
+    return this != null && (this !is PsiArrayInitializerMemberValue || initializers.isNotEmpty())
 }
 
 @Contract(pure = true)

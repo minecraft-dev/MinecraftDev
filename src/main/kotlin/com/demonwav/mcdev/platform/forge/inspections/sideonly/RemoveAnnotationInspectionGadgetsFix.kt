@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -14,25 +14,24 @@ import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiModifierListOwner
+import com.intellij.structuralsearch.plugin.util.SmartPsiPointer
 import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
-abstract class RemoveAnnotationInspectionGadgetsFix : InspectionGadgetsFix() {
+class RemoveAnnotationInspectionGadgetsFix(element: PsiModifierListOwner, private val name: String) : InspectionGadgetsFix() {
 
-    abstract val listOwner: PsiModifierListOwner?
+    private val pointer: SmartPsiPointer = SmartPsiPointer(element)
 
     override fun doFix(project: Project, descriptor: ProblemDescriptor) {
-        val owner = listOwner ?: return
-
+        val owner = pointer.element as? PsiModifierListOwner ?: return
         val list = owner.modifierList ?: return
-
         val annotation = list.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION) ?: return
 
         annotation.delete()
     }
 
     @Nls
-    abstract override fun getName(): String
+    override fun getName() = name
 
     @Nls
     override fun getFamilyName(): String {

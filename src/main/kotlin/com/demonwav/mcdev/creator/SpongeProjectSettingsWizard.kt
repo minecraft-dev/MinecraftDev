@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -16,7 +16,6 @@ import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
 import com.demonwav.mcdev.platform.sponge.getSpongeVersionSelector
 import com.intellij.util.ui.UIUtil
 import org.apache.commons.lang.WordUtils
-import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -34,7 +33,6 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     private lateinit var authorsField: JTextField
     private lateinit var websiteField: JTextField
     private lateinit var dependField: JTextField
-    private lateinit var generateDocumentedListenersCheckBox: JCheckBox
     private lateinit var spongeApiVersionBox: JComboBox<String>
     private lateinit var errorLabel: JLabel
 
@@ -95,7 +93,6 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         settings!!.description = descriptionField.text
         settings!!.website = websiteField.text
 
-        settings!!.generateDocumentedListeners = this.generateDocumentedListenersCheckBox.isSelected
         settings!!.spongeApiVersion = spongeApiVersionBox.selectedItem as? String ?: ""
     }
 

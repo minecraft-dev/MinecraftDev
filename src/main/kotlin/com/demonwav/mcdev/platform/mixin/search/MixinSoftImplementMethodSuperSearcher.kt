@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.search
 
 import com.demonwav.mcdev.platform.mixin.util.findSoftImplementedMethods
-import com.demonwav.mcdev.util.runInlineReadAction
+import com.intellij.openapi.application.runReadAction
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.search.searches.SuperMethodsSearch
@@ -34,19 +34,19 @@ class MixinSoftImplementMethodSuperSearcher : QueryExecutor<MethodSignatureBacke
         // This is very simple and probably doesn't handle all cases
         // Right now we simply check for @Implements annotation on the class and look
         // for a similar method in the interface
-        runInlineReadAction {
+        runReadAction run@ {
             if (!method.name.contains('$') || method.hasModifierProperty(PsiModifier.STATIC)) {
-                return true
+                return@run true
             }
 
             // Don't return anything if method has an @Override annotation because that would be an error
             if (method.modifierList.findAnnotation(CommonClassNames.JAVA_LANG_OVERRIDE) != null) {
-                return true
+                return@run true
             }
 
             method.findSoftImplementedMethods(checkBases) {
                 if (!consumer.process(it.hierarchicalMethodSignature)) {
-                    return false
+                    return@run false
                 }
             }
         }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -18,9 +18,9 @@ import com.demonwav.mcdev.util.findMatchingField
 import com.demonwav.mcdev.util.findMatchingMethod
 import com.demonwav.mcdev.util.findMatchingMethods
 import com.demonwav.mcdev.util.ifEmpty
+import com.demonwav.mcdev.util.isNotEmpty
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiArrayInitializerMemberValue
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
@@ -69,10 +69,7 @@ fun resolveShadowTargets(shadow: PsiAnnotation, targetClasses: Collection<PsiCla
     }
 }
 
-private fun hasAliases(shadow: PsiAnnotation): Boolean {
-    val aliases = shadow.findDeclaredAttributeValue("aliases") as? PsiArrayInitializerMemberValue ?: return false
-    return aliases.initializers.isNotEmpty()
-}
+private fun hasAliases(shadow: PsiAnnotation): Boolean = shadow.findDeclaredAttributeValue("aliases").isNotEmpty()
 
 @Contract(pure = true)
 private fun stripPrefix(shadow: PsiAnnotation, member: PsiMember): String? {

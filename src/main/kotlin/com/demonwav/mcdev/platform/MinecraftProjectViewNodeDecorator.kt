@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -38,7 +38,7 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
             return
         }
 
-        val directory = node.value
+        val directory = node.value ?: return
         val module = ModuleUtilCore.findModuleForPsiElement(directory) ?: return
 
         val rootManager = ModuleRootManager.getInstance(module)

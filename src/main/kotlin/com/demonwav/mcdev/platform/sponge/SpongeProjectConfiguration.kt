@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -28,7 +28,6 @@ import com.intellij.psi.codeStyle.CodeStyleManager
 class SpongeProjectConfiguration : ProjectConfiguration() {
 
     val dependencies = mutableListOf<String>()
-    var generateDocumentedListeners = false
     var spongeApiVersion = ""
 
     init {
@@ -51,7 +50,7 @@ class SpongeProjectConfiguration : ProjectConfiguration() {
             file = getMainClassDirectory(files, file)
 
             val mainClassFile = file.findOrCreateChildData(this, className + ".java")
-            SpongeTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className, hasDependencies(), generateDocumentedListeners)
+            SpongeTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className, hasDependencies())
 
             val mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile) as PsiJavaFile? ?: return@runWriteTask
             val psiClass = mainClassPsi.classes[0]

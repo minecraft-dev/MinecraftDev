@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -24,7 +24,6 @@ import org.apache.commons.lang.WordUtils
 import org.jetbrains.concurrency.runAsync
 import java.awt.event.ActionListener
 import javax.swing.DefaultComboBoxModel
-import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -49,7 +48,6 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     private lateinit var forgeVersionBox: JComboBox<String>
     private lateinit var mcpVersionBox: JComboBox<McpVersionEntry>
     private lateinit var loadingBar: JProgressBar
-    private lateinit var generateDocsCheckbox: JCheckBox
     private lateinit var minecraftVersionLabel: JLabel
     private lateinit var mcpWarning: JLabel
     private lateinit var errorLabel: JLabel
@@ -79,7 +77,6 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     private var apiWorker = ForgeWorker(null)
 
     init {
-        generateDocsCheckbox.isVisible = false
         mcpWarning.isVisible = false
     }
 
@@ -120,13 +117,11 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
                 title.icon = PlatformAssets.SPONGE_ICON_2X_DARK
             }
             title.text = "<html><font size=\"5\">SpongeForge Settings</font></html>"
-            generateDocsCheckbox.isVisible = true
 
             minecraftVersionLabel.text = "Sponge API Version"
         } else {
             title.icon = PlatformAssets.FORGE_ICON_2X
             title.text = "<html><font size=\"5\">Forge Settings</font></html>"
-            generateDocsCheckbox.isVisible = false
 
             minecraftVersionLabel.text = "Minecraft Version"
         }
@@ -193,7 +188,6 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         }
 
         (settings as? SpongeForgeProjectConfiguration)?.let { settings ->
-            settings.generateDocumentation = generateDocsCheckbox.isSelected
             settings.spongeApiVersion = minecraftVersionBox.selectedItem as String
         }
 

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -33,7 +33,8 @@ class TagIntArray(override val value: IntArray) : NbtValueTag<IntArray>(IntArray
 
     override fun valueEquals(otherValue: IntArray) = Arrays.equals(this.value, otherValue)
 
-    // This makes IntelliJ happy.
+    // This makes IntelliJ happy - and angry at the same time
+    @Suppress("RedundantOverride")
     override fun equals(other: Any?) = super.equals(other)
 
     override fun hashCode() = Arrays.hashCode(this.value)

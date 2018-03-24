@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -101,7 +101,7 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
                 throw OtherSetupException("The ArtifactId field cannot contain any whitespace", artifactIdField)
             }
 
-            if (creator.settings.values.stream().anyMatch { s -> s.type === PlatformType.FORGE } && buildSystemBox.selectedIndex == 0) {
+            if (creator.settings.values.any { s -> s.type === PlatformType.FORGE } && buildSystemBox.selectedIndex == 0) {
                 throw OtherSetupException("Forge does not support Maven", buildSystemBox)
             }
         } catch (e: SetupException) {

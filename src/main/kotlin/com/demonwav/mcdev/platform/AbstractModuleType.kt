@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -49,7 +49,9 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
 
     fun performCreationSettingSetup(project: Project) {
         val annotations = (EntryPointsManager.getInstance(project) as EntryPointsManagerBase).ADDITIONAL_ANNOTATIONS
-        ignoredAnnotations.stream().filter { annotation -> !annotations.contains(annotation) }.forEach { annotations.add(it) }
+        ignoredAnnotations.asSequence()
+            .filter { annotation -> !annotations.contains(annotation) }
+            .forEach { annotations.add(it) }
     }
 
     @Contract(pure = true)

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -27,7 +27,7 @@ abstract class MixinConfigInspection : LocalInspectionTool() {
         return file.fileType === MixinConfigFileType && MixinModuleType.isInModule(file)
     }
 
-    override final fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
+    final override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         if (checkFile(holder.file)) {
             return buildVisitor(holder)
         }
@@ -35,7 +35,7 @@ abstract class MixinConfigInspection : LocalInspectionTool() {
         return PsiElementVisitor.EMPTY_VISITOR
     }
 
-    override final fun processFile(file: PsiFile, manager: InspectionManager): List<ProblemDescriptor> {
+    final override fun processFile(file: PsiFile, manager: InspectionManager): List<ProblemDescriptor> {
         return if (checkFile(file)) {
             super.processFile(file, manager)
         } else {

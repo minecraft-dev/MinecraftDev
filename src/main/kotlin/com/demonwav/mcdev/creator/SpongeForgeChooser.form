@@ -40,7 +40,7 @@
           <text value="A single plugin which uses both the Sponge and Forge API's"/>
         </properties>
       </component>
-      <component id="79904" class="javax.swing.JRadioButton" binding="multiRadioButton">
+      <component id="79904" class="javax.swing.JRadioButton">
         <constraints>
           <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>

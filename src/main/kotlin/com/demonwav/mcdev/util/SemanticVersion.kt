@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -18,7 +18,7 @@ import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.TextPart
  * Each constituent part (delimited by periods in a version string) contributes
  * to the version ranking with decreasing priority from left to right.
  */
-class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion> {
+class SemanticVersion(private val parts: List<VersionPart>) : Comparable<SemanticVersion> {
     val versionString = parts.joinToString(".") { it.versionString }
 
     override fun compareTo(other: SemanticVersion): Int =
@@ -44,10 +44,16 @@ class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion
             "rc" to 1,
             "pre" to 1
         )
+
         /**
          * All separators allowed between a number and a modifier (i.e. (numbered) text part).
          */
         val SEPARATORS = listOf('-', '_')
+
+        /**
+         * Creates a simple release version where each provided value forms a part (read from left to right).
+         */
+        fun release(vararg parts: Int) = SemanticVersion(parts.map(::ReleasePart))
 
         /**
          * Parses a version string into a comparable representation.
@@ -112,6 +118,17 @@ class SemanticVersion(val parts: List<VersionPart>) : Comparable<SemanticVersion
                                 else -> number - other.number
                             }
                     }
+
+                override fun hashCode(): Int {
+                    return version + 31 * text.hashCode() + 31 * number
+                }
+
+                override fun equals(other: Any?): Boolean {
+                    return when (other) {
+                        is TextPart -> other.version == version && other.text == text && other.number == number
+                        else -> false
+                    }
+                }
             }
         }
     }

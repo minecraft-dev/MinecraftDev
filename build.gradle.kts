@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -87,8 +87,8 @@ val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
 
 dependencies {
     "kotlin"(kotlin("stdlib")) { isTransitive = false }
-    compile(kotlin("stdlib-jre7")) { isTransitive = false }
-    compile(kotlin("stdlib-jre8")) { isTransitive = false }
+    compile(kotlin("stdlib-jdk7")) { isTransitive = false }
+    compile(kotlin("stdlib-jdk8")) { isTransitive = false }
 
     // Add tools.jar for the JDI API
     compile(files(Jvm.current().toolsJar))
@@ -132,6 +132,7 @@ publishPlugin {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+    options.compilerArgs = listOf("-proc:none")
 }
 
 tasks.withType<KotlinCompile> {
@@ -166,7 +167,7 @@ idea {
 license {
     header = file("copyright.txt")
     include("**/*.java", "**/*.kt", "**/*.groovy", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
-    exclude("com/demonwav/mcdev/platform/mcp/at/gen/**", "com/demonwav/mcdev/nbt/lang/gen/**")
+    exclude("com/demonwav/mcdev/platform/mcp/at/gen/**", "com/demonwav/mcdev/nbt/lang/gen/**", "com/demonwav/mcdev/i18n/lang/gen/**")
 }
 
 // Credit for this intellij-rust
@@ -223,10 +224,15 @@ val generateAtPsiAndParser = generatePsiAndParser("generateAtPsiAndParser", "AtP
 val generateNbttLexer = generateLexer("generateNbttLexer", "NbttLexer", "nbt/lang/gen/")
 val generateNbttPsiAndParser = generatePsiAndParser("generateNbttPsiAndParser", "NbttParser", "nbt/lang/gen")
 
+val generateI18nLexer = generateLexer("generateI18nLexer", "I18nLexer", "i18n/lang/gen/")
+val generateI18nPsiAndParser = generatePsiAndParser("generateI18nPsiAndParser", "I18nParser", "i18n/lang/gen")
+
+val generateI18nTemplateLexer = generateLexer("generateI18nTemplateLexer", "I18nTemplateLexer", "i18n/lang/gen/")
+
 val generate = task("generate") {
     group = "minecraft"
     description = "Generates sources needed to compile the plugin."
-    dependsOn(generateAtLexer, generateAtPsiAndParser, generateNbttLexer, generateNbttPsiAndParser)
+    dependsOn(generateAtLexer, generateAtPsiAndParser, generateNbttLexer, generateNbttPsiAndParser, generateI18nLexer, generateI18nPsiAndParser, generateI18nTemplateLexer)
     outputs.dir("gen")
 }
 

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -26,8 +26,12 @@ import java.util.stream.Stream
  * resolve to multiple members if [matchAll] is set or if the member is
  * not full qualified.
  */
-data class MemberReference(val name: String, val descriptor: String? = null,
-                           val owner: String? = null, val matchAll: Boolean = false) : Serializable {
+data class MemberReference(
+    val name: String,
+    val descriptor: String? = null,
+    val owner: String? = null,
+    val matchAll: Boolean = false
+) : Serializable {
 
     @get:Contract(pure = true)
     val qualified
@@ -128,9 +132,11 @@ fun PsiMethod.getQualifiedMemberReference(owner: PsiClass): MemberReference {
     return MemberReference(internalName, descriptor, owner.fullQualifiedName)
 }
 
+fun PsiMethod?.isSameReference(reference: PsiMethod?): Boolean =
+    this != null && (this === reference || qualifiedMemberReference == reference?.qualifiedMemberReference)
+
 
 // Field
-
 @get:Contract(pure = true)
 val PsiField.simpleMemberReference
     get() = MemberReference(name)

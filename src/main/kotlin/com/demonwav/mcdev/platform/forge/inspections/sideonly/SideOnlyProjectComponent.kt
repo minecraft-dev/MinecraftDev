@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -14,8 +14,8 @@ import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.util.AbstractProjectComponent
-import com.demonwav.mcdev.util.runInlineReadAction
 import com.intellij.facet.ProjectFacetManager
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -38,10 +38,10 @@ class SideOnlyProjectComponent(project: Project) : AbstractProjectComponent(proj
             DumbService.getInstance(project).smartInvokeLater {
                 ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Indexing @SidedProxy", true, null) {
                     override fun run(indicator: ProgressIndicator) {
-                        runInlineReadAction {
+                        runReadAction {
                             indicator.isIndeterminate = true
                             val scope = GlobalSearchScope.projectScope(myProject)
-                            val sidedProxy = JavaPsiFacade.getInstance(myProject).findClass(ForgeConstants.SIDED_PROXY_ANNOTATION, scope) ?: return
+                            val sidedProxy = JavaPsiFacade.getInstance(myProject).findClass(ForgeConstants.SIDED_PROXY_ANNOTATION, scope) ?: return@runReadAction
                             val annotatedFields = AnnotatedElementsSearch.searchPsiFields(sidedProxy, scope).findAll()
 
                             indicator.isIndeterminate = false

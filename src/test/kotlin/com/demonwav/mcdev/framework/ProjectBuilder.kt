@@ -3,13 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.framework
 
+import com.demonwav.mcdev.i18n.I18nConstants
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
@@ -31,13 +32,11 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
 
     private val fixture: JavaCodeInsightTestFixture
         get() {
-            if (fixtureRef.get() == null) {
-                throw Exception("Reference collected")
-            }
-            if (fixtureRef.get()!!.project.isDisposed) {
+            val fix = fixtureRef.get() ?: throw Exception("Reference collected")
+            if (fix.project.isDisposed) {
                 throw Exception("Project disposed")
             }
-            return fixtureRef.get()!!
+            return fix
         }
     private val project
         get() = fixture.project
@@ -48,6 +47,7 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
 
     fun java(path: String, @Language("JAVA") code: String, configure: Boolean = true) = file(path, code, ".java", configure)
     fun at(path: String, @Language("Access Transformers") code: String, configure: Boolean = true) = file(path, code, "_at.cfg", configure)
+    fun i18n(path: String, @Language("I18n") code: String, configure: Boolean = true) = file(path, code, ".${I18nConstants.FILE_EXTENSION}", configure)
 
     inline fun dir(path: String, block: ProjectBuilder.() -> Unit) {
         val oldIntermediatePath = intermediatePath

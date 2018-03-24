@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -90,5 +90,5 @@ class AtGotoDeclarationHandler : GotoDeclarationHandler {
         }
     }
 
-    override fun getActionText(context: DataContext) = null
+    override fun getActionText(context: DataContext): String? = null
 }

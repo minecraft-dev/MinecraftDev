@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.inspection
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.util.mapNotNull
+import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiMethodCallExpression
 import com.siyeh.ig.BaseInspection
@@ -40,15 +40,9 @@ class IsCancelledInspection : BaseInspection() {
 
                 val instance = MinecraftFacet.getInstance(module) ?: return
 
-                val useless = instance.modules.stream()
-                    .mapNotNull { m -> m.checkUselessCancelCheck(expression) }
-                    .findAny()
+                val useless = instance.modules.mapFirstNotNull { m -> m.checkUselessCancelCheck(expression) } ?: return
 
-                if (!useless.isPresent) {
-                    return
-                }
-
-                registerMethodCallError(expression, useless.get())
+                registerMethodCallError(expression, useless)
             }
         }
     }

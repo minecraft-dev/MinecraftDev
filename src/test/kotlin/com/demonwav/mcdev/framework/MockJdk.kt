@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -13,6 +13,7 @@ package com.demonwav.mcdev.framework
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.projectRoots.SdkAdditionalData
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.RootProvider
 import com.intellij.openapi.util.UserDataHolderBase
@@ -37,7 +38,7 @@ class MockJdk(private val name: String, jar: VirtualFile, private val home: Virt
     override fun getSdkModificator() =
         throw IncorrectOperationException("Can't modify, MockJDK is read-only")
 
-    override fun getSdkAdditionalData() = null
+    override fun getSdkAdditionalData(): SdkAdditionalData? = null
 
     override fun clone() = throw CloneNotSupportedException()
 

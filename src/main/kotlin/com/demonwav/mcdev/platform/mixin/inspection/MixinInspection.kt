@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -22,7 +22,7 @@ abstract class MixinInspection : AbstractBaseJavaLocalInspectionTool() {
 
     protected abstract fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor
 
-    override final fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
+    final override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         // TODO: Check if file is actually a Mixin file?
         if (MixinModuleType.isInModule(holder.file)) {
             return buildVisitor(holder)
@@ -31,11 +31,11 @@ abstract class MixinInspection : AbstractBaseJavaLocalInspectionTool() {
         return PsiElementVisitor.EMPTY_VISITOR
     }
 
-    override final fun processFile(file: PsiFile, manager: InspectionManager): List<ProblemDescriptor> {
+    final override fun processFile(file: PsiFile, manager: InspectionManager): List<ProblemDescriptor> {
         return if (MixinModuleType.isInModule(file)) {
             super.processFile(file, manager)
         } else {
-            listOf()
+            emptyList()
         }
     }
 }

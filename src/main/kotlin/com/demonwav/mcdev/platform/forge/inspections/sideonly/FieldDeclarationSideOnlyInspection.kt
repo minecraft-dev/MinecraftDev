@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -36,14 +36,10 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         val field = infos[3] as PsiField
 
-        if (field.isWritable) {
-            return object : RemoveAnnotationInspectionGadgetsFix() {
-                override val listOwner = field
-                @Nls
-                override fun getName() = "Remove @SideOnly annotation from field"
-            }
+        return if (field.isWritable) {
+            RemoveAnnotationInspectionGadgetsFix(field, "Remove @SideOnly annotation from field")
         } else {
-            return null
+            null
         }
     }
 

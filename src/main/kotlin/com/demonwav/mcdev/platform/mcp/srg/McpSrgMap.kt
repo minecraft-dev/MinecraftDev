@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -23,10 +23,10 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class McpSrgMap private constructor(
-        val classMap: ImmutableBiMap<String, String>,
-        val fieldMap: ImmutableBiMap<MemberReference, MemberReference>,
-        val methodMap: ImmutableBiMap<MemberReference, MemberReference>,
-        private val srgNames: Map<String, String>
+    val classMap: ImmutableBiMap<String, String>,
+    val fieldMap: ImmutableBiMap<MemberReference, MemberReference>,
+    val methodMap: ImmutableBiMap<MemberReference, MemberReference>,
+    private val srgNames: Map<String, String>
 ) {
 
     @Contract(pure = true) fun getSrgClass(fullQualifiedName: String) = classMap[fullQualifiedName]

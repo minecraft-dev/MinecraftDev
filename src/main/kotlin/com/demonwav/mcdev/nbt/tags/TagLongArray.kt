@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -33,6 +33,8 @@ class TagLongArray(override val value: LongArray) : NbtValueTag<LongArray>(LongA
 
     override fun valueEquals(otherValue: LongArray) = Arrays.equals(this.value, otherValue)
 
+    // This makes IntelliJ happy - and angry at the same time
+    @Suppress("RedundantOverride")
     override fun equals(other: Any?) = super.equals(other)
 
     override fun hashCode() = Arrays.hashCode(this.value)

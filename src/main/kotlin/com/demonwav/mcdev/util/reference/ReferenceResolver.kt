@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -36,8 +36,8 @@ abstract class ReferenceResolver : PsiReferenceProvider() {
     protected abstract fun resolveReference(context: PsiElement): PsiElement?
     protected abstract fun collectVariants(context: PsiElement): Array<Any>
 
-    fun createReference(element: PsiLiteral): PsiReference = Reference(element, this)
-    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext) = arrayOf(createReference(element as PsiLiteral))
+    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<out PsiReference> =
+        arrayOf(Reference(element as PsiLiteral, this))
 
     private class Reference(element: PsiLiteral, private val resolver: ReferenceResolver) : PsiReferenceBase<PsiLiteral>(element) {
 
@@ -56,8 +56,8 @@ abstract class PolyReferenceResolver : PsiReferenceProvider() {
     protected abstract fun resolveReference(context: PsiElement): Array<ResolveResult>
     protected abstract fun collectVariants(context: PsiElement): Array<Any>
 
-    fun createReference(element: PsiLiteral): PsiReference = Reference(element, this)
-    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext) = arrayOf(createReference(element as PsiLiteral))
+    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<out PsiReference> =
+        arrayOf(Reference(element as PsiLiteral, this))
 
     private class Reference(element: PsiLiteral, private val resolver: PolyReferenceResolver) : PsiReferenceBase.Poly<PsiLiteral>(element) {
 

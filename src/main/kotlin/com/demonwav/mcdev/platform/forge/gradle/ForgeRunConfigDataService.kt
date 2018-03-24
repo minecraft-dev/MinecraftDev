@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -12,13 +12,13 @@ package com.demonwav.mcdev.platform.forge.gradle
 
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.util.invokeLater
-import com.demonwav.mcdev.util.runInlineReadAction
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.execution.RunManager
 import com.intellij.execution.application.ApplicationConfiguration
 import com.intellij.execution.application.ApplicationConfigurationType
 import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.ProjectKeys
 import com.intellij.openapi.externalSystem.model.project.ProjectData
@@ -49,7 +49,7 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
         }
 
         val (moduleName, sizeText) = try {
-            runInlineReadAction {
+            runReadAction {
                 hello.inputStream.bufferedReader().use { it.readText() }.split("\n")
             }
         } finally {

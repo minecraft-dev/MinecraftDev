@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -19,7 +19,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import java.util.Properties
 
 object ForgeTemplate {
-    val MC_1_12 = SemanticVersion.parse("1.12")
+    val MC_1_12 = SemanticVersion.release(1, 12)
 
     fun applyBuildGradleTemplate(project: Project,
                                  file: VirtualFile,

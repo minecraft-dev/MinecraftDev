@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -24,7 +24,7 @@ class ForgeVersion private constructor(private val map: Map<*, *>) {
     }
 
     fun getRecommended(versions: List<String>): String {
-        var recommended = SemanticVersion.parse("1.7")
+        var recommended = SemanticVersion.release(1, 7)
         for (version in versions) {
             getPromo(version) ?: continue
             val semantic = SemanticVersion.parse(version)

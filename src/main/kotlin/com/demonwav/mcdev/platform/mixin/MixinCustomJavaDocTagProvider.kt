@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -14,6 +14,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiReference
 import com.intellij.psi.javadoc.CustomJavadocTagProvider
 import com.intellij.psi.javadoc.JavadocTagInfo
 import com.intellij.psi.javadoc.PsiDocTagValue
@@ -34,7 +35,7 @@ class MixinCustomJavaDocTagProvider : CustomJavadocTagProvider {
         }
 
         override fun checkTagValue(value: PsiDocTagValue?): String? = null
-        override fun getReference(value: PsiDocTagValue?) = null
+        override fun getReference(value: PsiDocTagValue?): PsiReference? = null
 
         object Author : InjectorTag() {
 

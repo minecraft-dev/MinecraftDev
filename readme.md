@@ -10,10 +10,10 @@ Minecraft Development for IntelliJ
 |**CircleCI**|[![Travis Build Status](https://img.shields.io/circleci/project/github/minecraft-dev/MinecraftDev/dev.svg?style=flat-square)](https://circleci.com/gh/minecraft-dev/MinecraftDev)|
 | **Travis** |[![CircleCI Build Status](https://img.shields.io/travis/minecraft-dev/MinecraftDev/dev.svg?style=flat-square)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-2018.1--1.1.1-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-2018.1--1.2.0-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
-Visit [https://minecraftdev.org](https://minecraftdev.org) for information about the project, change logs, features, FAQs, and chat.
+Visit [https://minecraftdev.org](https://minecraftdev.org) for some information about the project, FAQs, and chat.
 
 Installation
 ------------
@@ -66,6 +66,7 @@ Developers
 
 - Project Owner - [**@DemonWav** - Kyle Wood](https://github.com/DemonWav)
 - [**@Minecrell**](https://github.com/Minecrell)
+- [**@PaleoCrafter** - Marvin Rösch](https://github.com/PaleoCrafter)
 
 #### **Contributors**
 

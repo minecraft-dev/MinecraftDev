@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -16,7 +16,6 @@ import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.FileTypeRegistry
 import com.intellij.openapi.util.io.ByteSequence
 import com.intellij.openapi.vfs.VirtualFile
-import java.io.IOException
 
 class NbtFileTypeDetector : FileTypeRegistry.FileTypeDetector {
     override fun getVersion() = 1
@@ -26,8 +25,6 @@ class NbtFileTypeDetector : FileTypeRegistry.FileTypeDetector {
             Nbt.buildTagTree(file.inputStream, 100)
             NbtFileType
         } catch (e: MalformedNbtFileException) {
-            null
-        } catch (e: IOException) {
             null
         }
     }

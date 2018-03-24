@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -15,7 +15,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 
-@State(name = "MixinFoldingSettings", storages = arrayOf(Storage("editor.codeinsight.xml")))
+@State(name = "MixinFoldingSettings", storages = [Storage("minecraft_dev.xml")])
 class MixinFoldingSettings : PersistentStateComponent<MixinFoldingSettings.State> {
 
     data class State(

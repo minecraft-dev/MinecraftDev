@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -14,6 +14,7 @@ import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.buildsystem.SourceType
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.GenerationData
+import com.demonwav.mcdev.inspection.IsCancelled
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
@@ -123,7 +124,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         return modifierList?.findAnnotation(ForgeConstants.MOD_ANNOTATION) != null
     }
 
-    override fun checkUselessCancelCheck(expression: PsiMethodCallExpression) = null
+    override fun checkUselessCancelCheck(expression: PsiMethodCallExpression): IsCancelled? = null
 
     override fun dispose() {
         super.dispose()

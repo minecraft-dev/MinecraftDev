@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -16,7 +16,7 @@ import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotationMemberValue
 
-class RemoveAnnotationAttributeQuickFix(val annotation: String, val attribute: String) : LocalQuickFix {
+class RemoveAnnotationAttributeQuickFix(val annotation: String, private val attribute: String) : LocalQuickFix {
     override fun getFamilyName() = "Remove $attribute from $annotation"
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {

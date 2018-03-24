@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -40,8 +40,8 @@ object AnonymousFeedback {
 
     private fun convertToGitHubIssueFormat(envDetails: LinkedHashMap<String, String?>): ByteArray {
         val result = LinkedHashMap<String, String>(5)
-        result.put("title", "[auto-generated] Exception in plugin")
-        result.put("body", generateGitHubIssueBody(envDetails))
+        result["title"] = "[auto-generated] Exception in plugin"
+        result["body"] = generateGitHubIssueBody(envDetails)
         return gson.toJson(result).toByteArray()
     }
 

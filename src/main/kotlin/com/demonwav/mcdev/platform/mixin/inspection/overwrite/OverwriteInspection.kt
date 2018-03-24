@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -23,7 +23,7 @@ abstract class OverwriteInspection : MixinInspection() {
 
     protected abstract fun visitOverwrite(holder: ProblemsHolder, method: PsiMethod, overwrite: PsiAnnotation)
 
-    override final fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
+    final override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
     private inner class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
 

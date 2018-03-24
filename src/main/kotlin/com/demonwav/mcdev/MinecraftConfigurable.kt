@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -32,7 +32,7 @@ class MinecraftConfigurable : Configurable {
 
     @Nls
     override fun getDisplayName() = "Minecraft Development"
-    override fun getHelpTopic() = null
+    override fun getHelpTopic(): String? = null
 
     override fun createComponent(): JComponent {
         showChatColorUnderlinesCheckBox.addActionListener { setUnderlineBox() }

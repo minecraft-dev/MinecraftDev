@@ -3,14 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.nbt.tags
 
-abstract class NbtValueTag<T : Any>(protected val valueClass: Class<T>) : NbtTag {
+abstract class NbtValueTag<T : Any>(private val valueClass: Class<T>) : NbtTag {
 
     abstract val value: T
 

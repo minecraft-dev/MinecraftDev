@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -41,10 +41,10 @@ class MinecraftProjectCreator {
 
     val settings = LinkedHashMap<PlatformType, ProjectConfiguration>()
 
-    lateinit var sourceDir: VirtualFile
-    lateinit var resourceDir: VirtualFile
-    lateinit var testDir: VirtualFile
-    lateinit var pomFile: VirtualFile
+    private lateinit var sourceDir: VirtualFile
+    private lateinit var resourceDir: VirtualFile
+    private lateinit var testDir: VirtualFile
+    private lateinit var pomFile: VirtualFile
 
     fun create() {
         buildSystem.rootDirectory = root

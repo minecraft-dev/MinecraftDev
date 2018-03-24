@@ -3,7 +3,7 @@
 
     https://minecraftdev.org
 
-    Copyright (c) 2017 minecraft-dev
+    Copyright (c) 2018 minecraft-dev
 
     MIT License
 -->
@@ -17,7 +17,7 @@
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
-    <vendor>DemonWav</vendor>
+    <vendor email="demonwav@gmail.com" url="https://minecraftdev.org/">DemonWav</vendor>
 
     <description><![CDATA[
       Brings support for Bukkit, Spigot, Paper, Sponge, Forge, MCP, Mixins, BungeeCord, Waterfall, LiteLoader, Canary and Neptune projects
@@ -28,7 +28,7 @@
       <div>
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2018.1-1.1.1
+        v. 2018.1-1.2.0
       </div>
     ]]>
     </change-notes>
@@ -80,6 +80,11 @@
                                  id="Settings.Minecraft"
                                  groupId="language"
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
+        <projectConfigurable displayName="Language Template"
+                             id="Settings.Minecraft.I18nTemplate"
+                             groupId="language"
+                             parentId="Settings.Minecraft"
+                             instance="com.demonwav.mcdev.i18n.sorting.I18nTemplateConfigurable"/>
 
         <!-- NBT -->
         <fileTypeFactory implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeFactory"/>
@@ -100,6 +105,35 @@
         <additionalTextAttributes scheme="Default" file="colorSchemes/NbttDefault.xml"/>
         <additionalTextAttributes scheme="Darcula" file="colorSchemes/NbttDarcula.xml"/>
         <codeInsight.parameterNameHints language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttParameterNameHints" />
+
+        <!-- Minecraft localization files -->
+        <fileTypeFactory implementation="com.demonwav.mcdev.i18n.lang.I18nFileTypeFactory"/>
+        <lang.parserDefinition language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.colors.I18nSyntaxHighlighterFactory"/>
+        <lang.psiStructureViewFactory language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.structure.I18nStructureViewFactory"/>
+        <lang.findUsagesProvider language="I18n" implementationClass="com.demonwav.mcdev.i18n.reference.I18nFindUsagesProvider"/>
+        <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.i18n.I18nFoldingBuilder"/>
+        <lang.formatter language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.formatting.I18nFormattingModelBuilder"/>
+        <lang.commenter language="I18n" implementationClass="com.demonwav.mcdev.i18n.I18nCommenter" />
+        <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.i18n.reference.I18nJavaReferenceContributor"/>
+        <psi.referenceContributor language="I18n" implementation="com.demonwav.mcdev.i18n.reference.I18nReferenceContributor"/>
+        <gotoSymbolContributor implementation="com.demonwav.mcdev.i18n.reference.I18nGotoSymbolContributor"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.i18n.lang.colors.I18nColorSettingsPage"/>
+        <renameInputValidator implementation="com.demonwav.mcdev.i18n.lang.I18nRenameInputValidator"/>
+        <editorNotificationProvider implementation="com.demonwav.mcdev.i18n.I18nEditorNotificationProvider"/>
+        <elementDescriptionProvider implementation="com.demonwav.mcdev.i18n.reference.I18nDescriptionProvider"/>
+        <referencesSearch implementation="com.demonwav.mcdev.i18n.reference.I18nReferencesSearcher"/>
+        <annotator language="I18n" implementationClass="com.demonwav.mcdev.i18n.I18nAnnotator"/>
+        <intentionAction>
+            <className>com.demonwav.mcdev.i18n.intentions.ConvertToTranslationIntention</className>
+            <category>Minecraft</category>
+            <descriptionDirectoryName>convertToTranslation</descriptionDirectoryName>
+        </intentionAction>
+        <codeFoldingOptionsProvider instance="com.demonwav.mcdev.i18n.I18nCodeFoldingOptionsProvider"/>
+        <applicationService serviceImplementation="com.demonwav.mcdev.i18n.I18nFoldingSettings"/>
+        <completion.contributor language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nCompletionContributor" />
+        <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.i18n.reference.I18nReferenceCompletionConfidence"
+                               order="before javaSkipAutopopupInStrings"/>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
@@ -125,6 +159,15 @@
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.sponge.framework.SpongePresentationProvider" />
+        <importFilter implementation="com.demonwav.mcdev.platform.sponge.SpongeImportFilter" />
+
+        <localInspection displayName="Wrong Sponge logger implementation"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeLoggingInspection"/>
         <!--endregion-->
 
         <!--region FORGE-->
@@ -246,6 +289,30 @@
                          level="WARNING"
                          hasStaticDescription="false"
                          implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
+        <!--endregion-->
+
+        <!--region NO PLATFORM INSPECTIONS-->
+        <localInspection displayName="Missing translations"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.i18n.inspections.NoTranslationInspection"/>
+        <localInspection displayName="Missing format arguments"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.i18n.inspections.MissingFormatInspection"/>
+        <localInspection displayName="Superfluous format arguments"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.i18n.inspections.SuperfluousFormatInspection"/>
         <!--endregion-->
 
         <!--region BUKKIT INSPECTIONS-->
@@ -635,6 +702,9 @@
     </extensions>
 
     <application-components>
+        <component>
+            <implementation-class>com.demonwav.mcdev.i18n.I18nFileListener</implementation-class>
+        </component>
     </application-components>
 
     <project-components>
@@ -721,6 +791,16 @@
                 text="Lookup MCP Member"
                 description="Lookup MCP mapping info on a SRG field or method">
             <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
+        </action>
+        <action class="com.demonwav.mcdev.i18n.actions.ConvertToTranslationAction" id="ConvertToMcTranslationAction"
+                text="Convert string literal to translation"
+                description="Converts any string literal into a Minecraft localization translation">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+        </action>
+        <action class="com.demonwav.mcdev.i18n.actions.SortTranslationsAction" id="SortMcTranslationsAction"
+                text="Sort translations by specified order"
+                description="Sorts translations by specified order">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
     </actions>
 </idea-plugin>

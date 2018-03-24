@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -37,7 +37,7 @@ class InvalidMainClassNameException(j: JComponent) : SetupException(j) {
         get() = "<html>Main Class Name must be a valid Java identifier and cannot be the default package</html>"
 }
 
-class OtherSetupException(val msg: String, j: JComponent) : SetupException(j) {
+class OtherSetupException(private val msg: String, j: JComponent) : SetupException(j) {
     override val error: String
         get() = "<html>$msg</html>"
 }
