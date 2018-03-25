@@ -139,6 +139,10 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = javaVersion
 }
 
+tasks.withType<GroovyCompile> {
+    options.compilerArgs = listOf("-proc:none")
+}
+
 processResources {
     for (lang in arrayOf("", "_en")) {
         from("src/main/resources/messages.MinecraftDevelopment_en_US.properties") {
