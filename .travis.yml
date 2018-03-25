@@ -1,12 +1,14 @@
 sudo: required
 dist: trusty
 
-os:
-  - linux
-  - osx
+matrix:
+  include:
+    - os: linux
+      jdk: openjdk8
+    - os: osx
+      osx_image: xcode8
 
 language: java
-jdk: openjdk8
 
 install: unset _JAVA_OPTIONS
 script: ./gradlew build
