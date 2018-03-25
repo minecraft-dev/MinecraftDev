@@ -8,7 +8,7 @@ build_script:
 test_script:
   - gradlew.bat check --no-daemon
 
-on_finish:
+on_success:
   - ps: rm C:\Users\appveyor\.gradle\caches\modules-2\*.lock -force
   - ps: rm C:\Users\appveyor\.gradle\caches\transforms-1\*.lock -force
   - ps: rm C:\Users\appveyor\.gradle\caches\*\file-changes\ -recurse -force
