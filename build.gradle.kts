@@ -8,13 +8,9 @@
  * MIT License
  */
 
-import org.gradle.api.tasks.bundling.Jar
 import org.gradle.internal.jvm.Jvm
-import org.jetbrains.intellij.IntelliJPlugin
-import org.jetbrains.intellij.IntelliJPluginExtension
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.File
 
 buildscript {
     repositories {
