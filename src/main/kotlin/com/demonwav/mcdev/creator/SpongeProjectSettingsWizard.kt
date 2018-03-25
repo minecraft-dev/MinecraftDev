@@ -67,8 +67,8 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         }
 
         getSpongeVersionSelector()
-            .done { it.set(spongeApiVersionBox) }
-            .rejected { errorLabel.isVisible = true }
+            .onSuccess { it.set(spongeApiVersionBox) }
+            .onError { errorLabel.isVisible = true }
 
         return panel
     }

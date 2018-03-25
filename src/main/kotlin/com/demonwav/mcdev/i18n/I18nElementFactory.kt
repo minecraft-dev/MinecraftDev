@@ -17,7 +17,6 @@ import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.demonwav.mcdev.util.applyWriteAction
 import com.demonwav.mcdev.util.mcDomain
 import com.intellij.ide.DataManager
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -27,8 +26,6 @@ import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.ui.components.JBList
-import com.intellij.util.Consumer
 import java.util.Locale
 
 object I18nElementFactory {
@@ -51,21 +48,18 @@ object I18nElementFactory {
         val files = FileTypeIndex.getFiles(I18nFileType, GlobalSearchScope.moduleScope(module))
         if (files.count { it.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE } > 1) {
             val choices = files.mapNotNull { it.mcDomain }.distinct().sorted()
-            val swingList = JBList(choices)
-            DataManager.getInstance().dataContextFromFocus.doWhenDone(Consumer<DataContext> {
+            DataManager.getInstance().dataContextFromFocusAsync.onSuccess {
                 JBPopupFactory.getInstance()
-                    .createListPopupBuilder(swingList)
+                    .createPopupChooserBuilder(choices)
                     .setTitle("Choose resource domain")
                     .setAdText("There are multiple resource domains with localization files, choose one for this translation.")
-                    .setItemChoosenCallback {
-                        swingList.selectedValue?.let {
-                            val validPattern = Regex("^.*?/assets/${Regex.escape(it)}/lang.*?\$")
-                            write(files.filter { validPattern.matches(it.path) })
-                        }
+                    .setItemChosenCallback {
+                        val validPattern = Regex("^.*?/assets/${Regex.escape(it)}/lang.*?\$")
+                        write(files.filter { validPattern.matches(it.path) })
                     }
                     .createPopup()
                     .showInBestPositionFor(it)
-            })
+            }
         } else {
             write(files)
         }

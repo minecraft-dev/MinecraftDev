@@ -45,7 +45,7 @@ class GotoAtEntryAction : AnAction() {
 
         val mcpModule = data.instance.getModuleOfType(McpModuleType) ?: return showBalloon(e)
 
-        mcpModule.srgManager?.srgMap?.done { srgMap ->
+        mcpModule.srgManager?.srgMap?.onSuccess { srgMap ->
             var parent = data.element.parent
 
             if (parent is PsiMember) {
@@ -57,11 +57,11 @@ class GotoAtEntryAction : AnAction() {
 
             when (parent) {
                 is PsiField -> {
-                    val reference = srgMap.findSrgField(parent) ?: return@done showBalloon(e)
+                    val reference = srgMap.findSrgField(parent) ?: return@onSuccess showBalloon(e)
                     searchForText(mcpModule, e, data, reference.name)
                 }
                 is PsiMethod -> {
-                    val reference = srgMap.findSrgMethod(parent) ?: return@done showBalloon(e)
+                    val reference = srgMap.findSrgMethod(parent) ?: return@onSuccess showBalloon(e)
                     searchForText(mcpModule, e, data, reference.name + reference.descriptor)
                 }
                 else ->
@@ -75,7 +75,7 @@ class GotoAtEntryAction : AnAction() {
             val file = PsiManager.getInstance(data.project).findFile(virtualFile) ?: continue
 
             var found = false
-            PsiSearchHelper.SERVICE.getInstance(data.project)
+            PsiSearchHelper.getInstance(data.project)
                 .processElementsWithWord(
                     { element, _ ->
                         gotoTargetElement(element, data.editor, data.file)

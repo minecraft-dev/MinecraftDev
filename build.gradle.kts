@@ -23,7 +23,7 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.2.10" // kept in sync with IntelliJ's bundled dep
+    id("org.jetbrains.kotlin.jvm") version "1.2.30" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
     id("org.jetbrains.intellij") version "0.2.17"
@@ -51,10 +51,6 @@ val publishPlugin: PublishTask by tasks
 val clean: Delete by tasks
 
 configurations {
-    "kotlin"()
-    "compileOnly" { extendsFrom("kotlin"()) }
-    "testCompile" { extendsFrom("kotlin"()) }
-
     "gradle-tooling-extension" { extendsFrom("idea"()) }
     "jflex"()
     "jflex-skeleton"()
@@ -86,10 +82,6 @@ val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
 }
 
 dependencies {
-    "kotlin"(kotlin("stdlib")) { isTransitive = false }
-    compile(kotlin("stdlib-jdk7")) { isTransitive = false }
-    compile(kotlin("stdlib-jdk8")) { isTransitive = false }
-
     // Add tools.jar for the JDI API
     compile(files(Jvm.current().toolsJar))
 
@@ -137,6 +129,10 @@ tasks.withType<JavaCompile> {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = javaVersion
+}
+
+tasks.withType<GroovyCompile> {
+    options.compilerArgs = listOf("-proc:none")
 }
 
 processResources {
@@ -253,7 +249,6 @@ runIde {
 }
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
-fun DependencyHandlerScope.kotlin(module: String) = kotlin(module, null) as String
 fun intellijPlugin(name: String) = mapOf(
     "group" to "org.jetbrains.plugins",
     "name" to name,

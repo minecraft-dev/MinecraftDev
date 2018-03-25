@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.update
 
 import com.demonwav.mcdev.util.forEachNotNull
+import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.invokeLaterAny
 import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.plugins.PluginManager
@@ -118,11 +119,10 @@ object PluginUpdater {
             override fun run(indicator: ProgressIndicator) {
                 try {
                     if (downloader.prepareToInstall(indicator)) {
-                        val descriptor = downloader.descriptor
-                        if (descriptor != null) {
-                            downloader.install()
+                        downloader.install()
 
-                            ApplicationManager.getApplication().invokeLater { PluginManagerMain.notifyPluginsUpdated(null) }
+                        invokeLater {
+                            PluginManagerMain.notifyPluginsUpdated(null)
                         }
                     }
                 } catch (e: IOException) {

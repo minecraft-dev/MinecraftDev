@@ -94,7 +94,7 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
             val version = minecraftVersionBox.selectedItem as String
             runAsync {
                 getData(version)
-            }.done { (mcpVersions) ->
+            }.onSuccess { (mcpVersions) ->
                 invokeLater {
                     mcpVersionBox.removeActionListener(mcpBoxActionListener)
                     mcpVersionBox.removeAllItems()

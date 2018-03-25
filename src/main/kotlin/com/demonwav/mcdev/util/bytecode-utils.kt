@@ -61,7 +61,8 @@ fun getPrimitiveType(internalName: Char): PsiPrimitiveType? {
 @Contract(pure = true)
 fun getPrimitiveWrapperClass(internalName: Char, project: Project): PsiClass? {
     val type = getPrimitiveType(internalName) ?: return null
-    return JavaPsiFacade.getInstance(project).findClass(type.boxedTypeName, GlobalSearchScope.allScope(project))
+    val boxedTypeName = type.boxedTypeName ?: return null
+    return JavaPsiFacade.getInstance(project).findClass(boxedTypeName, GlobalSearchScope.allScope(project))
 }
 
 @Contract(pure = true)

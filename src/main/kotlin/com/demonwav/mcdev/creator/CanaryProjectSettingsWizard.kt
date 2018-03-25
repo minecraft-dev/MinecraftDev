@@ -70,8 +70,8 @@ class CanaryProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         }
 
         getVersionSelector(settings!!.type)
-            .done { it.set(canaryVersionBox) }
-            .rejected { errorLabel.isVisible = true }
+            .onSuccess { it.set(canaryVersionBox) }
+            .onError { errorLabel.isVisible = true }
 
         return panel
     }

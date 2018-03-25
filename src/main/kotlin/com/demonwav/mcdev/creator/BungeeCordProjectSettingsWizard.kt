@@ -71,8 +71,8 @@ class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreat
         }
 
         getVersionSelector(settings!!.type)
-            .done { it.set(minecraftVersionBox) }
-            .rejected { errorLabel.isVisible = true }
+            .onSuccess { it.set(minecraftVersionBox) }
+            .onError { errorLabel.isVisible = true }
 
         return panel
     }

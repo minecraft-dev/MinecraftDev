@@ -42,7 +42,7 @@ abstract class SrgActionBase : AnAction() {
 
         val mcpModule = data.instance.getModuleOfType(McpModuleType) ?: return showBalloon("No mappings found", e)
 
-        mcpModule.srgManager?.srgMap?.done { srgMap ->
+        mcpModule.srgManager?.srgMap?.onSuccess { srgMap ->
             var parent = data.element.parent
 
             if (parent is PsiMember) {

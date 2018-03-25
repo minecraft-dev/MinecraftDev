@@ -67,7 +67,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         val tempVersion = version
         runAsync {
             getData(tempVersion)
-        }.done { data ->
+        }.onSuccess { data ->
             invokeLaterAny {
                 mcVersionUpdate(data)
             }
@@ -135,7 +135,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
             val tempVersion = version
             runAsync {
                 getData(tempVersion)
-            }.done { data ->
+            }.onSuccess { data ->
                 invokeLaterAny {
                     update(data)
                 }
