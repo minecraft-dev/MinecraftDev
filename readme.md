@@ -3,12 +3,12 @@
 Minecraft Development for IntelliJ
 ==================================
 
-|  Service   |Status|
-|------------|------|
-|**TeamCity**|[![TeamCity Build Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Build.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
-|**Nightly** |[![TeamCity Nightly Status](https://img.shields.io/teamcity/http/ci.demonwav.com/s/MinecraftDev_Nightly.svg?style=flat-square)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly)|
-|**CircleCI**|[![Travis Build Status](https://img.shields.io/circleci/project/github/minecraft-dev/MinecraftDev/dev.svg?style=flat-square)](https://circleci.com/gh/minecraft-dev/MinecraftDev)|
-| **Travis** |[![CircleCI Build Status](https://img.shields.io/travis/minecraft-dev/MinecraftDev/dev.svg?style=flat-square)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
+|  Service           |Status|
+|--------------------|------|
+|    **TeamCity**    |[![TeamCity Build Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
+|    **Nightly**     |[![TeamCity Nightly Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly)|
+| **Travis (Linux)** |[![Travis Linux Build Status](https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/1)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
+| **Travis (macOS)** |[![Travis macOS Build Status](https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/2)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
 
 Info and Documentation [![Current Release](https://img.shields.io/badge/release-2017.3--1.2.0-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
