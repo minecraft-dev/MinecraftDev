@@ -21,13 +21,13 @@ import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.util.containsAllKeys
 import com.demonwav.mcdev.util.filterNotNull
 import com.demonwav.mcdev.util.mapFirstNotNull
-import com.demonwav.mcdev.util.runInlineReadAction
 import com.google.common.collect.HashMultimap
 import com.intellij.facet.Facet
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetTypeId
 import com.intellij.facet.FacetTypeRegistry
 import com.intellij.ide.projectView.ProjectView
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.roots.ModuleRootManager
@@ -210,7 +210,7 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
         fun getInstance(module: Module) = FacetManager.getInstance(module).getFacetByType(ID)
 
-        fun getChildInstances(module: Module) = runInlineReadAction run@{
+        fun getChildInstances(module: Module) = runReadAction run@{
             val instance = getInstance(module)
             if (instance != null) {
                 return@run setOf(instance)

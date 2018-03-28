@@ -15,6 +15,7 @@ import com.google.gson.reflect.TypeToken
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.Result
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
@@ -22,10 +23,6 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import org.jetbrains.annotations.Contract
-
-inline fun <T> runInlineReadAction(func: () -> T): T {
-    return ApplicationManager.getApplication().acquireReadActionLock().use { func() }
-}
 
 inline fun runWriteTask(crossinline func: () -> Unit) {
     if (ApplicationManager.getApplication().isWriteAccessAllowed) {
@@ -127,7 +124,7 @@ fun <T : Any> Array<T?>.castNotNull(): Array<T> {
 }
 
 fun Module.findChildren(): Set<Module> {
-    runInlineReadAction {
+    return runReadAction {
         val manager = ModuleManager.getInstance(project)
         val result = mutableSetOf<Module>()
 
@@ -146,7 +143,7 @@ fun Module.findChildren(): Set<Module> {
             result.add(m)
         }
 
-        return result
+        return@runReadAction result
     }
 }
 

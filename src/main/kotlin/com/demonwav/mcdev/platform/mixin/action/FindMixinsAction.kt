@@ -23,7 +23,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys.CARET
 import com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR
 import com.intellij.openapi.actionSystem.CommonDataKeys.PROJECT
 import com.intellij.openapi.actionSystem.CommonDataKeys.PSI_FILE
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.progress.runBackgroundableTask
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
@@ -52,9 +52,9 @@ class FindMixinsAction : AnAction() {
             runBackgroundableTask("Searching for Mixins", project, true) run@ { indicator ->
                 indicator.isIndeterminate = true
 
-                val classes = ApplicationManager.getApplication().acquireReadActionLock().use {
+                val classes = runReadAction {
                     val mixinAnnotation = JavaPsiFacade.getInstance(project).findClass(MixinConstants.Annotations.MIXIN,
-                            GlobalSearchScope.allScope(project)) ?: return@use null
+                            GlobalSearchScope.allScope(project)) ?: return@runReadAction null
 
                     // Check all classes with the Mixin annotation
                     val classes = AnnotatedElementsSearch.searchPsiClasses(mixinAnnotation,

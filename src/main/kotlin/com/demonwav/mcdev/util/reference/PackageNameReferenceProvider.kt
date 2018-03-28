@@ -148,7 +148,7 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
             return getBasePackage(element)?.let { newName.removePrefix(it + '.') } ?: newName
         }
 
-        override fun bindToElement(newTarget: PsiElement): PsiElement {
+        override fun bindToElement(newTarget: PsiElement): PsiElement? {
             if (!canBindTo(newTarget)) {
                 throw IncorrectOperationException("Cannot bind to $newTarget")
             }
@@ -158,7 +158,7 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
             }
 
             val newName = getNewName(newTarget as PsiQualifiedNamedElement)
-            return element.manipulator!!.handleContentChange(element, qualifiedRange, newName)
+            return element.manipulator?.handleContentChange(element, qualifiedRange, newName)
         }
 
         override fun isReferenceTo(element: PsiElement) = canBindTo(element) && super.isReferenceTo(element)

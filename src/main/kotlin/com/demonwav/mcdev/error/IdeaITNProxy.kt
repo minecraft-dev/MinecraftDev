@@ -13,7 +13,7 @@ package com.demonwav.mcdev.error
 import com.intellij.errorreport.bean.ErrorBean
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.intellij.openapi.application.ex.ApplicationInfoEx
-import com.intellij.util.SystemProperties
+import com.intellij.openapi.util.SystemInfo
 
 object IdeaITNProxy {
     fun getKeyValuePairs(error: ErrorBean,
@@ -26,9 +26,9 @@ object IdeaITNProxy {
         params["Plugin Name"] = error.pluginName
         params["Plugin Version"] = error.pluginVersion
 
-        params["OS Name"] = SystemProperties.getOsName()
-        params["Java Version"] = SystemProperties.getJavaVersion()
-        params["Java VM Vendor"] = SystemProperties.getJavaVmVendor()
+        params["OS Name"] = SystemInfo.OS_NAME
+        params["Java Version"] = SystemInfo.JAVA_VERSION
+        params["Java VM Vendor"] = SystemInfo.JAVA_VENDOR
 
         params["App Name"] = namesInfo.productName
         params["App Full Name"] = namesInfo.fullProductName

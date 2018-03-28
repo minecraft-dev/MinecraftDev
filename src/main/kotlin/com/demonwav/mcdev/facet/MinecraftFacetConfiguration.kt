@@ -15,8 +15,8 @@ import com.intellij.facet.FacetConfiguration
 import com.intellij.facet.ui.FacetEditorContext
 import com.intellij.facet.ui.FacetValidatorsManager
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.util.xmlb.annotations.AbstractCollection
 import com.intellij.util.xmlb.annotations.Tag
+import com.intellij.util.xmlb.annotations.XCollection
 import org.jdom.Element
 
 class MinecraftFacetConfiguration : FacetConfiguration, PersistentStateComponent<MinecraftFacetConfigurationData> {
@@ -40,7 +40,7 @@ data class MinecraftFacetConfigurationData(
     @Tag("userChosenTypes")
     var userChosenTypes: MutableMap<PlatformType, Boolean> = mutableMapOf(),
     @Tag("autoDetectTypes")
-    @AbstractCollection(surroundWithTag = false, elementTag = "platformType", elementValueAttribute = "")
+    @XCollection(elementName = "platformType", valueAttributeName = "", style = XCollection.Style.v2)
     var autoDetectTypes: MutableSet<PlatformType> = mutableSetOf(),
     @Tag("forgePatcher")
     var forgePatcher: Boolean = false
