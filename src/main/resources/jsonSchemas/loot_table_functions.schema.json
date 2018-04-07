@@ -1,0 +1,76 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "enchantRandomly": {
+        "properties": {
+            "enchantments": {
+                "type": "array",
+                "items": { "type": "string" }
+            }
+        }
+    },
+    "enchantWithLevels": {
+        "properties": {
+            "treasure": { "type": "boolean" },
+            "levels": { "$ref": "common.schema.json#/integerRange" }
+        }
+    },
+    "explorationMap": {
+        "properties": {
+            "destination": { "type": "string" },
+            "decoration": { "type": "string" },
+            "zoom": { "type": "integer" },
+            "search_radius": { "type": "integer" },
+            "skip_existing_chunks": { "type": "boolean" }
+        }
+    },
+    "lootingEnchant": {
+        "properties": {
+            "limit": { "type": "integer", "minimum": 0 },
+            "count": { "$ref": "common.schema.json#/integerRange" }
+        }
+    },
+    "setAttributes": {
+        "properties": {
+            "modifiers": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": { "type": "string" },
+                        "attribute": { "type": "string" },
+                        "operation": { "type": "string", "enum": [ "addition", "multiply_base", "multiply_total" ] },
+                        "amount": { "$ref": "common.schema.json#/floatRange" },
+                        "id": { "type": "string" },
+                        "slot": { "$ref": "common.schema.json#/equipmentSlots" }
+                    },
+                    "additionalProperties": false,
+                    "required": [ "name", "attribute", "operation", "amount" ]
+                }
+            }
+        }
+    },
+    "setCount": {
+        "properties": {
+            "count": { "$ref": "common.schema.json#/integerRange" }
+        },
+        "required": [ "count" ]
+    },
+    "setDamage": {
+        "properties": {
+            "damage": { "$ref": "common.schema.json#/floatRange" }
+        },
+        "required": [ "damage" ]
+    },
+    "setData": {
+        "properties": {
+            "data": { "$ref": "common.schema.json#/integerRange" }
+        },
+        "required": [ "data" ]
+    },
+    "setNbt": {
+        "properties": {
+            "tag": { "type": "string" }
+        },
+        "required": [ "tag" ]
+    }
+}

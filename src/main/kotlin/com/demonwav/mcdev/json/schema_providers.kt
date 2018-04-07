@@ -24,7 +24,8 @@ class SchemaProviderFactory : JsonSchemaProviderFactory {
             SoundsSchemaProvider(),
             PathBasedSchemaProvider("Minecraft Blockstates JSON", "blockstates", "blockstates/"),
             PathBasedSchemaProvider("Minecraft Item Model JSON", "model_item", "models/item/"),
-            PathBasedSchemaProvider("Minecraft Block Model JSON", "model_block", "models/block/")
+            PathBasedSchemaProvider("Minecraft Block Model JSON", "model_block", "models/block/"),
+            PathBasedSchemaProvider("Minecraft Loot Table JSON", "loot_table", "loot_tables/")
         )
 }
 
