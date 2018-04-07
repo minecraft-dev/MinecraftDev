@@ -1,0 +1,95 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Minecraft Vanilla Blockstates JSON",
+    "type": "object",
+    "properties": {
+        "__comment": { "type": "string" },
+        "variants": {
+            "type": "object",
+            "patternProperties": {
+                "^([a-z0-9_]+=[^,]*,)*([a-z0-9_]+=[^,]*)$": { "$ref": "#/definitions/variant" }
+            }
+        },
+        "multipart": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/multipartCase" }
+        }
+    },
+    "additionalProperties": false,
+    "dependencies": {
+        "variants": {
+            "required": [ "variants" ],
+            "not": { "title": "Multipart and full variant definitions are mutually exclusive", "required": [ "multipart" ] }
+        },
+        "multipart": {
+            "required": [ "multipart" ],
+            "not": { "title": "Multipart and full variant definitions are mutually exclusive", "required": [ "variants" ] }
+        }
+    },
+    "definitions": {
+        "variant": {
+            "oneOf": [
+                {
+                    "allOf": [
+                        { "$ref": "blockstates_common.schema.json#/baseVariant" },
+                        { "required": [ "model" ] }
+                    ]
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "allOf": [
+                            { "$ref": "blockstates_common.schema.json#/baseVariant" },
+                            { "required": [ "model" ] },
+                            {
+                                "properties": {
+                                    "weight": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "multipartCase": {
+            "type": "object",
+            "properties": {
+                "apply": {
+                    "$ref": "#/definitions/variant"
+                },
+                "when": {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "patternProperties": {
+                                "^[a-z0-9_]*$": { }
+                            },
+                            "additionalProperties": false,
+                            "not": { "required": [ "OR" ] }
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "OR": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "patternProperties": {
+                                            "^[a-z0-9_]*$": { }
+                                        },
+                                        "additionalProperties": false
+                                    }
+                                }
+                            },
+                            "required": [ "OR" ],
+                            "additionalProperties": false
+                        }
+                    ]
+                }
+            },
+            "required": [ "apply" ]
+        }
+    }
+}
