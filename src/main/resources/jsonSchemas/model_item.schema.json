@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Minecraft Item Model JSON",
+    "type": "object",
+    "properties": {
+        "__comment": { "type": "string" },
+        "parent": { "type": "string" },
+        "textures": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "elements": { "#ref": "model_common.schema.json#/elements" },
+        "display": { "#ref": "model_common.schema.json#/transforms" },
+        "overrides": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "predicate": {
+                        "type": "object",
+                        "additionalProperties": { "type": "number" }
+                    },
+                    "model": { "type": "string" }
+                },
+                "additionalProperties": false,
+                "required": [ "predicate", "model" ]
+            }
+        }
+    },
+    "additionalProperties": false,
+    "anyOf": [
+        { "required": [ "parent" ] },
+        { "required": [ "elements" ] }
+    ]
+}

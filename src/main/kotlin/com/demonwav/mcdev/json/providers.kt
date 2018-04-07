@@ -20,7 +20,7 @@ import com.jetbrains.jsonSchema.extension.SchemaType
 
 class SchemaProviderFactory : JsonSchemaProviderFactory {
     override fun getProviders(project: Project) =
-        listOf(SoundsSchemaProvider(), BlockstatesSchemaProvider())
+        listOf(SoundsSchemaProvider(), BlockstatesSchemaProvider(), ItemModelSchemaProvider())
 }
 
 class SoundsSchemaProvider : JsonSchemaFileProvider {
@@ -45,6 +45,20 @@ class BlockstatesSchemaProvider : JsonSchemaFileProvider {
     override fun getName() = "Minecraft Blockstates JSON"
 
     override fun isAvailable(file: VirtualFile) = file.resourceDomain != null && file.resourcePath?.startsWith("blockstates/") == true
+
+    override fun getSchemaType(): SchemaType = SchemaType.embeddedSchema
+
+    override fun getSchemaFile(): VirtualFile = FILE
+}
+
+class ItemModelSchemaProvider : JsonSchemaFileProvider {
+    companion object {
+        val FILE = JsonSchemaProviderFactory.getResourceFile(SchemaProviderFactory::class.java, "/jsonSchemas/model_item.schema.json")
+    }
+
+    override fun getName() = "Minecraft Item Model JSON"
+
+    override fun isAvailable(file: VirtualFile) = file.resourceDomain != null && file.resourcePath?.startsWith("models/item/") == true
 
     override fun getSchemaType(): SchemaType = SchemaType.embeddedSchema
 
