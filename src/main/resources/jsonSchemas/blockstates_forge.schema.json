@@ -18,15 +18,25 @@
             "type": "object",
             "patternProperties": {
                 "^([a-z0-9_]+=[^,]*,)*([a-z0-9_]+=[^,]*)$": {
+                    "$ref": "#/definitions/variant"
                 },
                 "^[a-z0-9_]+$": {
-                    "type": "object",
-                    "additionalProperties": { "$ref": "#/definitions/variant" }
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "additionalProperties": { "$ref": "#/definitions/variant" }
+                        },
+                        {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/variantObject" }
+                        }
+                    ]
                 }
-            }
+            },
+            "additionalProperties": false
         },
         "variant": {
-            "oneOf": [
+            "anyOf": [
                 { "$ref": "#/definitions/variantObject" },
                 {
                     "type": "array",
@@ -84,7 +94,8 @@
                     "required": [ "matrix" ],
                     "properties": {
                         "matrix": { "$ref": "#/definitions/transformMatrix" }
-                    }
+                    },
+                    "additionalProperties": false
                 },
                 { "$ref": "#/definitions/transformMatrix" },
                 {
@@ -109,7 +120,8 @@
                         },
                         "rotation": { "$ref": "#/definitions/transformRotation" },
                         "post-rotation": { "$ref": "#/definitions/transformRotation" }
-                    }
+                    },
+                    "additionalProperties": false
                 }
             ]
         },

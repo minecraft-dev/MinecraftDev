@@ -8,7 +8,8 @@
             "type": "object",
             "patternProperties": {
                 "^([a-z0-9_]+=[^,]*,)*([a-z0-9_]+=[^,]*)$": { "$ref": "#/definitions/variant" }
-            }
+            },
+            "additionalProperties": false
         },
         "multipart": {
             "type": "array",
@@ -28,7 +29,7 @@
     },
     "definitions": {
         "variant": {
-            "oneOf": [
+            "anyOf": [
                 {
                     "allOf": [
                         { "$ref": "blockstates_common.schema.json#/baseVariant" },
