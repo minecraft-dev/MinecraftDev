@@ -28,6 +28,5 @@
                 "required": [ "predicate", "model" ]
             }
         }
-    },
-    "additionalProperties": false
+    }
 }
