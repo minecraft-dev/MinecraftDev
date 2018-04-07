@@ -5,7 +5,6 @@
         "items": {
             "type": "object",
             "properties": {
-                "__comment": { "type": "string" },
                 "from": { "$ref": "#/elementCoord" },
                 "to": { "$ref": "#/elementCoord" },
                 "rotation": {
@@ -55,14 +54,12 @@
                                 "tintindex": {
                                     "type": "integer"
                                 }
-                            },
-                            "additionalProperties": false
+                            }
                         }
                     },
                     "additionalProperties": false
                 }
             },
-            "additionalProperties": false,
             "required": [ "from", "to" ]
         }
     },

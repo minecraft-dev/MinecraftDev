@@ -7,12 +7,10 @@
             "type": "integer",
             "enum": [ 1 ]
         },
-        "__comment": { "type": "string" },
         "variants": { "$ref": "#/definitions/variants" },
         "defaults": { "$ref": "#/definitions/variantObject" }
     },
     "required": [ "forge_marker" ],
-    "additionalProperties": false,
     "definitions": {
         "variants": {
             "type": "object",

@@ -3,7 +3,6 @@
     "title": "Minecraft Vanilla Blockstates JSON",
     "type": "object",
     "properties": {
-        "__comment": { "type": "string" },
         "variants": {
             "type": "object",
             "patternProperties": {
@@ -16,7 +15,6 @@
             "items": { "$ref": "#/definitions/multipartCase" }
         }
     },
-    "additionalProperties": false,
     "dependencies": {
         "variants": {
             "required": [ "variants" ],

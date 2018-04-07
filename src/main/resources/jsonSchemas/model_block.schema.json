@@ -3,7 +3,6 @@
     "title": "Minecraft Block Model JSON",
     "type": "object",
     "properties": {
-        "__comment": { "type": "string" },
         "parent": { "type": "string" },
         "textures": {
             "type": "object",
