@@ -20,7 +20,12 @@ import com.jetbrains.jsonSchema.extension.SchemaType
 
 class SchemaProviderFactory : JsonSchemaProviderFactory {
     override fun getProviders(project: Project) =
-        listOf(SoundsSchemaProvider(), BlockstatesSchemaProvider(), ItemModelSchemaProvider())
+        listOf(
+            SoundsSchemaProvider(),
+            PathBasedSchemaProvider("Minecraft Blockstates JSON", "blockstates", "blockstates/"),
+            PathBasedSchemaProvider("Minecraft Item Model JSON", "model_item", "models/item/"),
+            PathBasedSchemaProvider("Minecraft Block Model JSON", "model_block", "models/block/")
+        )
 }
 
 class SoundsSchemaProvider : JsonSchemaFileProvider {
@@ -37,30 +42,15 @@ class SoundsSchemaProvider : JsonSchemaFileProvider {
     override fun getSchemaFile(): VirtualFile = FILE
 }
 
-class BlockstatesSchemaProvider : JsonSchemaFileProvider {
-    companion object {
-        val FILE = JsonSchemaProviderFactory.getResourceFile(SchemaProviderFactory::class.java, "/jsonSchemas/blockstates.schema.json")
-    }
+class PathBasedSchemaProvider(name: String, schema: String, private val path: String) : JsonSchemaFileProvider {
+    private val _name = name
+    private val file = JsonSchemaProviderFactory.getResourceFile(SchemaProviderFactory::class.java, "/jsonSchemas/$schema.schema.json")
 
-    override fun getName() = "Minecraft Blockstates JSON"
+    override fun getName() = this._name
 
-    override fun isAvailable(file: VirtualFile) = file.resourceDomain != null && file.resourcePath?.startsWith("blockstates/") == true
-
-    override fun getSchemaType(): SchemaType = SchemaType.embeddedSchema
-
-    override fun getSchemaFile(): VirtualFile = FILE
-}
-
-class ItemModelSchemaProvider : JsonSchemaFileProvider {
-    companion object {
-        val FILE = JsonSchemaProviderFactory.getResourceFile(SchemaProviderFactory::class.java, "/jsonSchemas/model_item.schema.json")
-    }
-
-    override fun getName() = "Minecraft Item Model JSON"
-
-    override fun isAvailable(file: VirtualFile) = file.resourceDomain != null && file.resourcePath?.startsWith("models/item/") == true
+    override fun isAvailable(file: VirtualFile) = file.resourceDomain != null && file.resourcePath?.startsWith(path) == true
 
     override fun getSchemaType(): SchemaType = SchemaType.embeddedSchema
 
-    override fun getSchemaFile(): VirtualFile = FILE
+    override fun getSchemaFile(): VirtualFile = file
 }

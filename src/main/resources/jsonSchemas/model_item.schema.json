@@ -29,9 +29,5 @@
             }
         }
     },
-    "additionalProperties": false,
-    "anyOf": [
-        { "required": [ "parent" ] },
-        { "required": [ "elements" ] }
-    ]
+    "additionalProperties": false
 }
