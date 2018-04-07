@@ -11,8 +11,8 @@
                 "type": "string"
             }
         },
-        "elements": { "#ref": "model_common.schema.json#/elements" },
-        "display": { "#ref": "model_common.schema.json#/transforms" },
+        "elements": { "$ref": "model_common.schema.json#/elements" },
+        "display": { "$ref": "model_common.schema.json#/transforms" },
         "overrides": {
             "type": "array",
             "items": {

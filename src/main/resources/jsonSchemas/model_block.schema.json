@@ -12,7 +12,7 @@
             }
         },
         "ambientocclusion": { "type": "boolean" },
-        "elements": { "#ref": "model_common.schema.json#/elements" },
-        "display": { "#ref": "model_common.schema.json#/transforms" }
+        "elements": { "$ref": "model_common.schema.json#/elements" },
+        "display": { "$ref": "model_common.schema.json#/transforms" }
     }
 }
