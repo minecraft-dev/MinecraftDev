@@ -130,8 +130,7 @@ class AtCompletionContributor : CompletionContributor() {
                 ))
             }
 
-            val anonymousElements = currentClass.anonymousElements ?: arrayOf()
-            for (anonymousElement in anonymousElements) {
+            for (anonymousElement in currentClass.anonymousElements) {
                 val anonClass = anonymousElement as? PsiClass ?: continue
 
                 val name = anonClass.fullQualifiedName
