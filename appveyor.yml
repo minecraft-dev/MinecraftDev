@@ -2,6 +2,9 @@ environment:
   APPVEYOR_CACHE_ENTRY_ZIP_ARGS: -t7z -m0=lzma2 -mx=9
   JAVA_HOME: C:\Program Files\Java\jdk1.8.0
 
+before_build:
+  - ps: rm .sandbox -recurse -force
+
 build_script:
   - gradlew.bat assemble testClasses --no-daemon
 

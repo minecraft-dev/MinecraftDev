@@ -39,18 +39,21 @@ class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.Sear
             model.isCaseSensitive = true
             model.searchContext = FindModel.SearchContext.IN_STRING_LITERALS
             model.isRegularExpressions = true
+            // Enables custom translations functions (for auto-prefixing calls, for instance)
             model.stringToFind = power(entry.key.split('.'))
+                .map { it.joinToString(".") }
                 .filter { it.isNotEmpty() }
-                .joinToString("|") { Regex.escape(it.joinToString(".")) }
+                .joinToString("|") { "(${Regex.escape(it)})" }
             FindInProjectUtil.findUsages(
                 model,
                 parameters.project,
                 {
                     if (it.file != null && it.element != null && it.rangeInElement != null) {
-                        val highlighted = it.file!!.findElementAt(it.rangeInElement!!.startOffset)
+                        val highlighted = it.file?.findElementAt(it.rangeInElement!!.startOffset)
                         val ref = highlighted?.parent?.references?.find { it is I18nReference } as I18nReference?
-                        if (ref != null && ref.key == entry.key)
+                        if (ref?.key == entry.key) {
                             consumer.process(ref)
+                        }
                     }
                     true
                 },

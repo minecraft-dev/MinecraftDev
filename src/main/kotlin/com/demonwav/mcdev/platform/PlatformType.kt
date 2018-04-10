@@ -39,18 +39,19 @@ import com.intellij.openapi.roots.libraries.LibraryKind
 enum class PlatformType(
     val type: AbstractModuleType<*>,
     val normalName: String,
+    val versionJson: String? = null,
     val children: Array<PlatformType> = arrayOf()
 ) {
 
-    PAPER(PaperModuleType, "Paper"),
-    SPIGOT(SpigotModuleType, "Spigot", arrayOf(PAPER)),
-    BUKKIT(BukkitModuleType, "Bukkit", arrayOf(SPIGOT, PAPER)),
+    PAPER(PaperModuleType, "Paper", "paper.json"),
+    SPIGOT(SpigotModuleType, "Spigot", "spigot.json", arrayOf(PAPER)),
+    BUKKIT(BukkitModuleType, "Bukkit", "bukkit.json", arrayOf(SPIGOT, PAPER)),
     FORGE(ForgeModuleType, "Forge"),
     SPONGE(SpongeModuleType, "Sponge"),
-    NEPTUNE(NeptuneModuleType, "Neptune"),
-    CANARY(CanaryModuleType, "Canary", arrayOf(NEPTUNE)),
-    WATERFALL(WaterfallModuleType, "Waterfall"),
-    BUNGEECORD(BungeeCordModuleType, "BungeeCord", arrayOf(WATERFALL)),
+    NEPTUNE(NeptuneModuleType, "Neptune", "neptune.json"),
+    CANARY(CanaryModuleType, "Canary", "canary.json", arrayOf(NEPTUNE)),
+    WATERFALL(WaterfallModuleType, "Waterfall", "waterfall.json"),
+    BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord.json", arrayOf(WATERFALL)),
     LITELOADER(LiteLoaderModuleType, "LiteLoader"),
     MIXIN(MixinModuleType, "Mixin"),
     MCP(McpModuleType, "MCP");
