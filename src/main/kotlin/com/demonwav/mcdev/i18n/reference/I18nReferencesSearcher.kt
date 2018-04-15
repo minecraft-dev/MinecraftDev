@@ -21,7 +21,7 @@ import com.intellij.util.Processor
 import com.intellij.util.QueryExecutor
 
 class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.SearchParameters> {
-    override fun execute(parameters: ReferencesSearch.SearchParameters, consumer: Processor<PsiReference>): Boolean {
+    override fun execute(parameters: ReferencesSearch.SearchParameters, consumer: Processor<in PsiReference>): Boolean {
         val entry = parameters.elementToSearch
         if (entry is I18nEntry) {
             fun <A> power(start: List<A>): Set<List<A>> {

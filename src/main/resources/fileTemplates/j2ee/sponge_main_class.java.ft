@@ -1,19 +1,15 @@
-package import com.google.inject.Inject;
-import org.spongepowered.api.entity.living.player.Player;
+package
+
+import com.google.inject.Inject;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
 
 ${PACKAGE}
     ;
-#if(${HAS_DEPENDENCIES})
-#end
+    #if(${HAS_DEPENDENCIES})
+    #end
 
 public class ${CLASS_NAME} {
 

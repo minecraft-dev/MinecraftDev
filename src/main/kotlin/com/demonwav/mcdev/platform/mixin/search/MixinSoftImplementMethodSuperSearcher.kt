@@ -22,7 +22,7 @@ import com.intellij.util.QueryExecutor
 class MixinSoftImplementMethodSuperSearcher : QueryExecutor<MethodSignatureBackedByPsiMethod, SuperMethodsSearch.SearchParameters> {
 
     override fun execute(queryParameters: SuperMethodsSearch.SearchParameters,
-                         consumer: Processor<MethodSignatureBackedByPsiMethod>): Boolean {
+                         consumer: Processor<in MethodSignatureBackedByPsiMethod>): Boolean {
 
         if (queryParameters.psiClass != null) {
             return true // Not entirely sure what this is used for
