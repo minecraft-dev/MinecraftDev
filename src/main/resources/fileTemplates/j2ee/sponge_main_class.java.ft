@@ -1,15 +1,12 @@
-package
+package ${PACKAGE};
 
 import com.google.inject.Inject;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+#if(${HAS_DEPENDENCIES})
 import org.spongepowered.api.plugin.Dependency;
+#end
 import org.spongepowered.api.plugin.Plugin;
-
-${PACKAGE}
-    ;
-    #if(${HAS_DEPENDENCIES})
-    #end
 
 public class ${CLASS_NAME} {
 
