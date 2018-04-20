@@ -38,5 +38,11 @@
             { "$ref": "#/equipmentSlot" },
             { "type": "array", "items": { "$ref": "#/equipmentSlot" } }
         ]
+    },
+    "textComponent": {
+        "anyOf": [
+            { "type": "string" },
+            { "type": "object" }
+        ]
     }
 }
