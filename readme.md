@@ -11,7 +11,7 @@ Minecraft Development for IntelliJ
 |   **Travis (macOS)**   |[![Travis macOS Build Status](https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/2)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
 | **AppVeyor (Windows)** |[![AppVeyor Windows Build Status](https://ci.appveyor.com/api/projects/status/p2qp6iinqvf4im64/branch/dev?svg=true)](https://ci.appveyor.com/project/DemonWav/minecraftdev/branch/dev)|
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-2018.1--1.2.1-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-2018.1--1.2.4-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 Visit [https://minecraftdev.org](https://minecraftdev.org) for some information about the project, FAQs, and chat.

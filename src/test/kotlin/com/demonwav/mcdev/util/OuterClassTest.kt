@@ -51,10 +51,10 @@ abstract class OuterClassTest : ProjectBuilderTest() {
             }
         }
 
-        this.outerAnonymousClass = outerClass.anonymousElements!!.single() as PsiAnonymousClass
+        this.outerAnonymousClass = outerClass.anonymousElements.single() as PsiAnonymousClass
 
         this.innerClass = outerClass.innerClasses.single()
-        this.innerAnonymousClass = innerClass.anonymousElements!!.single() as PsiAnonymousClass
+        this.innerAnonymousClass = innerClass.anonymousElements.single() as PsiAnonymousClass
         this.innerAnonymousInnerClass = innerAnonymousClass.innerClasses.single()
     }
 

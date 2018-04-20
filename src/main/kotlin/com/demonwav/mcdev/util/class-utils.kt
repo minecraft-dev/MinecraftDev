@@ -132,7 +132,6 @@ private fun PsiClass.findInnerClass(name: String): PsiClass? {
         // Named inner class
         findInnerClassByName(name, false)
     } else {
-        val anonymousElements = anonymousElements ?: return null
         if (anonymousIndex <= anonymousElements.size) {
             anonymousElements[anonymousIndex - 1] as PsiClass
         } else {
@@ -144,7 +143,7 @@ private fun PsiClass.findInnerClass(name: String): PsiClass? {
 @Contract(pure = true)
 fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
     // Attempt to find name for anonymous class
-    for ((i, element) in anonymousElements!!.withIndex()) {
+    for ((i, element) in anonymousElements.withIndex()) {
         if (element equivalentTo anonymousElement) {
             return i + 1
         }
@@ -154,7 +153,7 @@ fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
 }
 
 @get:Contract(pure = true)
-val PsiElement.anonymousElements: Array<PsiElement>?
+val PsiElement.anonymousElements: Array<PsiElement>
     get() {
         for (provider in Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
             val elements = provider.getAnonymousElements(this)
@@ -163,7 +162,7 @@ val PsiElement.anonymousElements: Array<PsiElement>?
             }
         }
 
-        return null
+        return emptyArray()
     }
 
 // Inheritance
