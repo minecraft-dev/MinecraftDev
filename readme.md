@@ -9,7 +9,7 @@ Minecraft Development for IntelliJ
 |      **Nightly**       |[![TeamCity Nightly Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly)|
 |   **Travis (Linux)**   |[![Travis Linux Build Status](https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/1)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
 |   **Travis (macOS)**   |[![Travis macOS Build Status](https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/2)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
-| **AppVeyor (Windows)** |[![AppVeyor Windows Build Status](https://ci.appveyor.com/api/projects/status/p2qp6iinqvf4im64/branch/dev?svg=true)](https://ci.appveyor.com/project/DemonWav/minecraftdev/branch/dev)|
+| **TeamCity (Windows)** |[![AppVeyor Windows Build Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_WindowsBuild)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_WindowsBuild)|
 
 Info and Documentation [![Current Release](https://img.shields.io/badge/release-2018.1--1.2.4-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
