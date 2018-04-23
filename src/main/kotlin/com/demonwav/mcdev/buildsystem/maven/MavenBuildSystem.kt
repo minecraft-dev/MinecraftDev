@@ -37,7 +37,7 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager
 
 class MavenBuildSystem : BuildSystem() {
 
-    private var pomFile: VirtualFile? = null
+    private lateinit var pomFile: VirtualFile
 
     override fun create(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
         rootDirectory.refresh(false, true)
@@ -48,7 +48,7 @@ class MavenBuildSystem : BuildSystem() {
             val text = when (configuration.type) {
                 PlatformType.BUKKIT, PlatformType.SPIGOT, PlatformType.PAPER ->
                     BukkitTemplate.applyPomTemplate(project, buildVersion)
-                PlatformType.BUNGEECORD -> BungeeCordTemplate.applyPomTemplate(project, buildVersion)
+                PlatformType.BUNGEECORD, PlatformType.WATERFALL -> BungeeCordTemplate.applyPomTemplate(project, buildVersion)
                 PlatformType.SPONGE -> SpongeTemplate.applyPomTemplate(project, buildVersion)
                 PlatformType.CANARY, PlatformType.NEPTUNE ->
                     CanaryTemplate.applyPomTemplate(project, buildVersion)
@@ -99,9 +99,9 @@ class MavenBuildSystem : BuildSystem() {
 
                 PsiManager.getInstance(project).findDirectory(rootDirectory)?.add(pomPsi)
 
-                pomFile = rootDirectory.findChild("pom.xml")
+                pomFile = rootDirectory.findChild("pom.xml") ?: return@runWriteAction
                 // Reformat the code to match their code style
-                PsiManager.getInstance(project).findFile(pomFile!!)?.let {
+                PsiManager.getInstance(project).findFile(pomFile)?.let {
                     ReformatCodeProcessor(it, false).run()
                 }
             }
@@ -114,7 +114,7 @@ class MavenBuildSystem : BuildSystem() {
 
             // Force Maven to setup the project
             val manager = MavenProjectsManager.getInstance(project)
-            manager.addManagedFilesOrUnignore(listOf(pomFile!!))
+            manager.addManagedFilesOrUnignore(listOf(pomFile))
             manager.importingSettings.isDownloadDocsAutomatically = true
             manager.importingSettings.isDownloadSourcesAutomatically = true
 
