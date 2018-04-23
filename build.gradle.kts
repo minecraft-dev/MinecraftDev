@@ -22,7 +22,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.2.30" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.2.17"
+    id("org.jetbrains.intellij") version "0.3.1"
     id("net.minecrell.licenser") version "0.3"
 }
 
@@ -31,7 +31,6 @@ defaultTasks("build")
 val CI = System.getenv("CI") != null
 
 val ideaVersion: String by extra
-val javaVersion: String by extra
 val downloadIdeaSources: String by extra
 
 // for publishing nightlies
@@ -58,11 +57,12 @@ repositories {
     mavenCentral()
     maven("https://dl.bintray.com/minecraft-dev/maven")
     maven("https://repo.spongepowered.org/maven")
+    maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
 }
 
 java {
-    setSourceCompatibility(javaVersion)
-    setTargetCompatibility(javaVersion)
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     sourceSets {
         "gradle-tooling-extension" {
@@ -82,7 +82,7 @@ dependencies {
     compile(files(Jvm.current().toolsJar))
 
     compile(files(gradleToolingExtensionJar))
-    "gradle-tooling-extension"(intellijPlugin("gradle"))
+    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:$ideaVersion")
 
     "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
     "jflex-skeleton"("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
@@ -124,7 +124,7 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = javaVersion
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
 }
 
 tasks.withType<GroovyCompile> {
@@ -245,9 +245,3 @@ runIde {
 }
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
-fun intellijPlugin(name: String) = mapOf(
-    "group" to "org.jetbrains.plugins",
-    "name" to name,
-    "version" to ideaVersion,
-    "configuration" to "compile"
-)

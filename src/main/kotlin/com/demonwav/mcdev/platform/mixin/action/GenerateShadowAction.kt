@@ -111,7 +111,7 @@ fun createShadowMembers(project: Project, psiClass: PsiClass, members: Stream<Ps
         val shadowMember: PsiMember = when (m) {
             is PsiMethod -> {
                 methodAdded = true
-                shadowMethod(project, psiClass, m)
+                shadowMethod(psiClass, m)
             }
             is PsiField -> shadowField(project, m)
             else -> throw UnsupportedOperationException("Unsupported member type: ${m::class.java.name}")
@@ -131,7 +131,7 @@ fun createShadowMembers(project: Project, psiClass: PsiClass, members: Stream<Ps
     return result
 }
 
-private fun shadowMethod(project: Project, psiClass: PsiClass, method: PsiMethod): PsiMethod {
+private fun shadowMethod(psiClass: PsiClass, method: PsiMethod): PsiMethod {
     val newMethod = GenerateMembersUtil.substituteGenericMethod(method, PsiSubstitutor.EMPTY, psiClass)
 
     // Remove Javadocs
@@ -142,7 +142,7 @@ private fun shadowMethod(project: Project, psiClass: PsiClass, method: PsiMethod
     // Relevant modifiers are copied by GenerateMembersUtil.substituteGenericMethod
 
     // Copy annotations
-    copyAnnotations(project, method.modifierList, newModifiers)
+    copyAnnotations(psiClass.containingFile, method.modifierList, newModifiers)
 
     // If the method was original private, make it protected now
     if (newModifiers.hasModifierProperty(PsiModifier.PRIVATE)) {
@@ -168,7 +168,7 @@ private fun shadowField(project: Project, field: PsiField): PsiField {
     copyModifiers(modifiers, newModifiers)
 
     // Copy annotations
-    copyAnnotations(project, modifiers, newModifiers)
+    copyAnnotations(field.containingFile, modifiers, newModifiers)
 
     if (newModifiers.hasModifierProperty(PsiModifier.FINAL)) {
         // If original field was final, add the @Final annotation instead
@@ -187,10 +187,10 @@ private fun copyModifiers(modifiers: PsiModifierList, newModifiers: PsiModifierL
     }
 }
 
-private fun copyAnnotations(project: Project, modifiers: PsiModifierList, newModifiers: PsiModifierList) {
+private fun copyAnnotations(file: PsiFile, modifiers: PsiModifierList, newModifiers: PsiModifierList) {
     // Copy annotations registered by extensions (e.g. @Nullable), based on OverrideImplementUtil.annotateOnOverrideImplement
     for (ext in Extensions.getExtensions(OverrideImplementsAnnotationsHandler.EP_NAME)) {
-        for (annotation in ext.getAnnotations(project)) {
+        for (annotation in ext.getAnnotations(file)) {
             copyAnnotation(modifiers, newModifiers, annotation)
         }
     }
