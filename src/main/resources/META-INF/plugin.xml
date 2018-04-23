@@ -244,6 +244,7 @@
         <!-- Mixin configuration -->
         <fileTypeFactory implementation="com.demonwav.mcdev.platform.mixin.config.MixinConfigFileTypeFactory"/>
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.mixin.config.reference.MixinConfigReferenceContributor" />
+        <lang.importOptimizer language="JSON" implementationClass="com.demonwav.mcdev.platform.mixin.config.MixinConfigImportOptimizer"/>
 
         <!-- Mixin Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.MixinLineMarkerProvider"/>
