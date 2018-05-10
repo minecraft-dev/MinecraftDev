@@ -290,9 +290,6 @@
                          level="WARNING"
                          hasStaticDescription="false"
                          implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
-        <!--endregion-->
-
-        <!--region NO PLATFORM INSPECTIONS-->
         <localInspection displayName="Missing translations"
                          groupName="Minecraft"
                          language="JAVA"

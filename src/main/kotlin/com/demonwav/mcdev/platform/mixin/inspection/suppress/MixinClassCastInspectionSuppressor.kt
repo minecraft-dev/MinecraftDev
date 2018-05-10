@@ -47,9 +47,14 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
         val factory = JavaPsiFacade.getInstance(project).elementFactory
 
         val toType = castType.type
-        if (!targets.asSequence()
-            .map(factory::createType)
-            .any { t -> t == toType || toType.superTypes.contains(t) || t.superTypes.contains(toType) }
+        if (
+            targets.none { t ->
+                val type = factory.createType(t)
+                // type == toType                   --> direct cast
+                // toType.superTypes.contains(type) --> cast to a subclass of the current mixin
+                // t.superTypes.contains(toType)    --> cast to a superclass of the current mixin
+                type == toType || toType.superTypes.contains(type) || t.superTypes.contains(toType)
+            }
         ) {
             return false
         }
