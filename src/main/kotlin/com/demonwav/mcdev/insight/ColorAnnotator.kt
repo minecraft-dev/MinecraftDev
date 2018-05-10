@@ -34,17 +34,9 @@ class ColorAnnotator : Annotator {
 
     companion object {
         fun setColorAnnotator(color: Color, element: PsiElement, holder: AnnotationHolder) {
-            @Suppress("DEPRECATION")
-            val key = TextAttributesKey.createTextAttributesKey("MC_COLOR_" + color.toString(), TextAttributes(
-                null,
-                null,
-                color,
-                MinecraftSettings.instance.underlineType.effectType,
-                Font.PLAIN
-            ))
-
-            val annotation = holder.createAnnotation(HighlightSeverity.INFORMATION, element.textRange, null)
-            annotation.textAttributes = key
+            val annotation = holder.createInfoAnnotation(element, null)
+            annotation.enforcedTextAttributes =
+                TextAttributes(null, null, color, MinecraftSettings.instance.underlineType.effectType, Font.PLAIN)
         }
     }
 }
