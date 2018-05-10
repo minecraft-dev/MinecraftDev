@@ -25,7 +25,6 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         var isShowEventListenerGutterIcons: Boolean = true,
         var isShowChatColorGutterIcons: Boolean = true,
         var isShowChatColorUnderlines: Boolean = false,
-        var isEnableSideOnlyChecks: Boolean = true,
         var underlineType: MinecraftSettings.UnderlineType = MinecraftSettings.UnderlineType.DOTTED
     )
 
@@ -74,12 +73,6 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         get() {
             val type = underlineType
             return (0 until UnderlineType.values().size).firstOrNull { type == UnderlineType.values()[it] } ?: 0
-        }
-
-    var isEnableSideOnlyChecks: Boolean
-        get() = state.isEnableSideOnlyChecks
-        set(enableSideOnlyChecks) {
-            state.isEnableSideOnlyChecks = enableSideOnlyChecks
         }
 
     enum class UnderlineType(private val regular: String, val effectType: EffectType) {
