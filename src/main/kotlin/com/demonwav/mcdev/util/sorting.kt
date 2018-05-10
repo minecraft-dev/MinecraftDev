@@ -33,4 +33,10 @@ fun <T> Comparator<in T>.lexicographical(): Comparator<in Iterable<T>> =
 private val MC_1_8_8 = SemanticVersion.release(1, 8, 8)
 
 fun sortVersions(versions: Collection<*>): List<String> =
-    versions.map(Any?::toString).map(SemanticVersion.Companion::parse).sortedDescending().filter { it >= MC_1_8_8 }.map { it.toString() }
+    versions.asSequence()
+        .map(Any?::toString)
+        .map(SemanticVersion.Companion::parse)
+        .sortedDescending()
+        .filter { it >= MC_1_8_8 }
+        .map { it.toString() }
+        .toList()
