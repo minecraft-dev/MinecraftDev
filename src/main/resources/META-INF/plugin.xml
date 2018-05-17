@@ -376,6 +376,13 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.LocalVariableDeclarationSideOnlyInspection"/>
+        <localInspection displayName="Invalid empty ItemStack comparison with ItemStack.EMPTY"
+                         groupName="Minecraft Forge"
+                         language="JAVA"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.forge.inspections.StackEmptyInspection"/>
         <!--endregion-->
 
         <!--region MCP INSPECTIONS-->
