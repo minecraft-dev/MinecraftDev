@@ -8,7 +8,7 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.forge.inspections
+package com.demonwav.mcdev.platform.mcp.inspections
 
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInspection.ProblemDescriptor
@@ -91,8 +91,8 @@ class StackEmptyInspection : BaseInspection() {
             }
 
             private fun isExpressionEmptyConstant(expression: PsiExpression?): Boolean {
-                val reference = expression as? PsiReferenceExpression
-                val field = reference?.resolve() as? PsiField ?: return false
+                val reference = expression as? PsiReferenceExpression ?: return false
+                val field = reference.resolve() as? PsiField ?: return false
                 return field.name == EMPTY_NAME && field.containingClass?.fullQualifiedName == STACK_FQ_NAME
             }
         }
