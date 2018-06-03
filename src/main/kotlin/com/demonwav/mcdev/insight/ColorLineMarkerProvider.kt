@@ -54,7 +54,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             Pass.UPDATE_ALL,
             FunctionUtil.nullConstant<Any, String>(),
             GutterIconNavigationHandler handler@ { _, psiElement ->
-                if (!psiElement.isWritable) {
+                if (!psiElement.isWritable || !element.isValid) {
                     return@handler
                 }
 

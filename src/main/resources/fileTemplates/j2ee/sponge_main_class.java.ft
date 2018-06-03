@@ -1,6 +1,7 @@
 package ${PACKAGE};
 
 import com.google.inject.Inject;
+import org.slf4j.Logger;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 #if(${HAS_DEPENDENCIES})

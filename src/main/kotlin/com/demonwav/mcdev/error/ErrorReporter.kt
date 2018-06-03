@@ -11,9 +11,8 @@
 package com.demonwav.mcdev.error
 
 import com.intellij.diagnostic.IdeErrorsDialog
-import com.intellij.diagnostic.LogMessageEx
+import com.intellij.diagnostic.LogMessage
 import com.intellij.diagnostic.ReportMessages
-import com.intellij.errorreport.bean.ErrorBean
 import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.idea.IdeaLogger
@@ -60,7 +59,7 @@ class ErrorReporter : ErrorReportSubmitter() {
 
         val data = event.data
 
-        if (data is LogMessageEx) {
+        if (data is LogMessage) {
             bean.attachments = data.includedAttachments
         }
 

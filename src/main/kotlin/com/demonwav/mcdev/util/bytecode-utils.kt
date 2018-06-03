@@ -70,9 +70,9 @@ private fun PsiClassType.erasure() = TypeConversionUtil.erasure(this) as PsiClas
 
 @get:Contract(pure = true)
 val PsiClassType.internalName
-    get() = erasure().resolve()!!.internalName
+    get() = erasure().resolve()?.internalName
 
-fun PsiClassType.appendInternalName(builder: StringBuilder): StringBuilder = erasure().resolve()!!.appendInternalName(builder)
+fun PsiClassType.appendInternalName(builder: StringBuilder): StringBuilder = erasure().resolve()?.appendInternalName(builder) ?: builder
 
 @get:Contract(pure = true)
 val PsiType.descriptor: String

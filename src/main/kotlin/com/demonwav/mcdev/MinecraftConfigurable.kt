@@ -27,7 +27,6 @@ class MinecraftConfigurable : Configurable {
     private lateinit var showChatColorUnderlinesCheckBox: JCheckBox
     private lateinit var chatColorUnderlinesComboBox: JComboBox<MinecraftSettings.UnderlineType>
     private lateinit var showChatGutterIconsCheckBox: JCheckBox
-    private lateinit var enableSideOnlyChecksCheckBox: JCheckBox
     private lateinit var changePluginUpdateChannelButton: JButton
 
     @Nls
@@ -55,8 +54,6 @@ class MinecraftConfigurable : Configurable {
         chatColorUnderlinesComboBox.selectedIndex = settings.underlineTypeIndex
         setUnderlineBox()
 
-        enableSideOnlyChecksCheckBox.isSelected = settings.isEnableSideOnlyChecks
-
         changePluginUpdateChannelButton.addActionListener { ConfigurePluginUpdatesDialog().show() }
     }
 
@@ -71,8 +68,7 @@ class MinecraftConfigurable : Configurable {
             showEventListenerGutterCheckBox.isSelected != settings.isShowEventListenerGutterIcons ||
             showChatGutterIconsCheckBox.isSelected != settings.isShowChatColorGutterIcons ||
             showChatColorUnderlinesCheckBox.isSelected != settings.isShowChatColorUnderlines ||
-            chatColorUnderlinesComboBox.selectedItem !== settings.underlineType ||
-            enableSideOnlyChecksCheckBox.isSelected != settings.isEnableSideOnlyChecks
+            chatColorUnderlinesComboBox.selectedItem !== settings.underlineType
     }
 
     override fun apply() {
@@ -83,7 +79,6 @@ class MinecraftConfigurable : Configurable {
         settings.isShowChatColorGutterIcons = showChatGutterIconsCheckBox.isSelected
         settings.isShowChatColorUnderlines = showChatColorUnderlinesCheckBox.isSelected
         settings.underlineType = chatColorUnderlinesComboBox.selectedItem as MinecraftSettings.UnderlineType
-        settings.isEnableSideOnlyChecks = enableSideOnlyChecksCheckBox.isSelected
     }
 
     override fun reset() {

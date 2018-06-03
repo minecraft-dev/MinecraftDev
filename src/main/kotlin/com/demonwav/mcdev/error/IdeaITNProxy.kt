@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.error
 
-import com.intellij.errorreport.bean.ErrorBean
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.util.SystemInfo
@@ -37,7 +36,7 @@ object IdeaITNProxy {
         params["App Build"] = appInfo.build.asString()
         params["App Version"] = appInfo.fullVersion
 
-        if (error.lastAction.isNullOrBlank()) {
+        if (error.lastAction.isBlank()) {
             params["Last Action"] = "None"
         } else {
             params["Last Action"] = error.lastAction

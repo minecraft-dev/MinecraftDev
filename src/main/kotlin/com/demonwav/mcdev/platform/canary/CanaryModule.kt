@@ -57,7 +57,7 @@ class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, overrid
             project,
             CanaryConstants.HOOK_HANDLER_ANNOTATION,
             canaryData.isIgnoreCanceled
-        )
+        ) ?: return null
 
         if (canaryData.priority != "NORMAL") {
             val list = method.modifierList
@@ -84,14 +84,15 @@ class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, overrid
                                                    chosenName: String,
                                                    project: Project,
                                                    annotationName: String,
-                                                   setIgnoreCancelled: Boolean): PsiMethod {
+                                                   setIgnoreCancelled: Boolean): PsiMethod? {
             val newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)
 
             val list = newMethod.parameterList
+            val qName = chosenClass.qualifiedName ?: return null
             val parameter = JavaPsiFacade.getElementFactory(project)
                 .createParameter(
                     "hook",
-                    PsiClassType.getTypeByName(chosenClass.qualifiedName, project, GlobalSearchScope.allScope(project))
+                    PsiClassType.getTypeByName(qName, project, GlobalSearchScope.allScope(project))
                 )
             list.add(parameter)
 

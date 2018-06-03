@@ -90,10 +90,11 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         val method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)
         val parameterList = method.parameterList
 
+        val qName = chosenClass.qualifiedName ?: return null
         val parameter = JavaPsiFacade.getElementFactory(project)
             .createParameter(
                 "event",
-                PsiClassType.getTypeByName(chosenClass.qualifiedName, project, GlobalSearchScope.allScope(project))
+                PsiClassType.getTypeByName(qName, project, GlobalSearchScope.allScope(project))
             )
 
         parameterList.add(parameter)

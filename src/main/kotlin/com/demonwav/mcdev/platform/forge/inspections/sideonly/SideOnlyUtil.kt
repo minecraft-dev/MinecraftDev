@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
-import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
@@ -26,11 +25,6 @@ import java.util.LinkedList
 object SideOnlyUtil {
 
     fun beginningCheck(element: PsiElement): Boolean {
-        // Don't check if this is disabled
-        if (!MinecraftSettings.instance.isEnableSideOnlyChecks) {
-            return false
-        }
-
         // We need the module to get the MinecraftModule
         val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return false
 

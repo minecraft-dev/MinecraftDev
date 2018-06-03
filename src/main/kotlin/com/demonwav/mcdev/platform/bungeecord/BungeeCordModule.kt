@@ -65,7 +65,7 @@ class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, ove
             project,
             BungeeCordConstants.HANDLER_ANNOTATION,
             false
-        )
+        ) ?: return null
 
         val generationData = data as BungeeCordGenerationData? ?: return method
 

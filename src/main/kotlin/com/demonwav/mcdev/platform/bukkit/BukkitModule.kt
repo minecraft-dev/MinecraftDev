@@ -82,7 +82,7 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
             project,
             BukkitConstants.HANDLER_ANNOTATION,
             bukkitData.isIgnoreCanceled
-        )
+        ) ?: return null
 
         if (bukkitData.eventPriority != "NORMAL") {
             val list = method.modifierList
@@ -180,15 +180,16 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
             project: Project,
             annotationName: String,
             setIgnoreCancelled: Boolean
-        ): PsiMethod {
+        ): PsiMethod? {
 
             val newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)
 
             val list = newMethod.parameterList
+            val qName = chosenClass.qualifiedName ?: return null
             val parameter = JavaPsiFacade.getElementFactory(project)
                 .createParameter(
                     "event",
-                    PsiClassType.getTypeByName(chosenClass.qualifiedName, project, GlobalSearchScope.allScope(project))
+                    PsiClassType.getTypeByName(qName, project, GlobalSearchScope.allScope(project))
                 )
             list.add(parameter)
 
