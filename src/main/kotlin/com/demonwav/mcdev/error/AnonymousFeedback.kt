@@ -170,7 +170,10 @@ object AnonymousFeedback {
         return list
     }
 
-    private fun getNextLink(link: String): String? {
+    private fun getNextLink(link: String?): String? {
+        if (link == null) {
+            return null
+        }
         val lines = link.split(",")
         for (line in lines) {
             if (!line.contains("rel=\"next\"")) {

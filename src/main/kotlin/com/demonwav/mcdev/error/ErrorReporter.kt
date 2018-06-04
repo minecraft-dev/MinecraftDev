@@ -33,11 +33,12 @@ class ErrorReporter : ErrorReportSubmitter() {
     private val baseUrl = "https://github.com/minecraft-dev/MinecraftDev/issues"
     override fun getReportActionText() = "Report to Minecraft Dev GitHub Issue Tracker"
 
-    override fun submit(events: Array<out IdeaLoggingEvent>,
-                        additionalInfo: String?,
-                        parentComponent: Component,
-                        consumer: Consumer<SubmittedReportInfo>): Boolean {
-
+    override fun submit(
+        events: Array<out IdeaLoggingEvent>,
+        additionalInfo: String?,
+        parentComponent: Component,
+        consumer: Consumer<SubmittedReportInfo>
+    ): Boolean {
         val event = events[0]
         val bean = ErrorBean(event.throwable, IdeaLogger.ourLastActionId)
         val dataContext = DataManager.getInstance().getDataContext(parentComponent)
