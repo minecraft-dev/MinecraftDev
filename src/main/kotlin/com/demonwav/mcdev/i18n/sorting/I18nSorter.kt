@@ -16,11 +16,15 @@ import com.demonwav.mcdev.i18n.actions.TranslationSortOrderDialog
 import com.demonwav.mcdev.i18n.findDefaultLangFile
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.util.computeReadAction
+import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.lexicographical
 import com.demonwav.mcdev.util.mcDomain
 import com.demonwav.mcdev.util.runWriteAction
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 
@@ -38,30 +42,56 @@ object I18nSorter {
         if (order == null) {
             return
         }
-        sort(project, file, order, comments)
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Sorting Translation File", false) {
+            override fun run(indicator: ProgressIndicator) {
+                indicator.isIndeterminate = true
+                sort(project, file, order, comments, indicator)
+            }
+        })
     }
 
-    private fun sort(project: Project, file: PsiFile, ordering: Ordering, keepComments: Int) {
-        val sorted = file.children.mapNotNull { it as? I18nEntry }.let {
-            when (ordering) {
-                Ordering.ASCENDING -> I18nElementFactory.assembleElements(project, it.sortedWith(ascendingComparator), keepComments)
-                Ordering.DESCENDING -> I18nElementFactory.assembleElements(project, it.sortedWith(descendingComparator), keepComments)
-                Ordering.TEMPLATE -> sortByTemplate(project, TemplateManager.getProjectTemplate(project), it, keepComments)
-                else -> sortByTemplate(project, buildDefaultTemplate(project, file.virtualFile.mcDomain) ?: return, it, keepComments)
-            }
-        }
+    private inline fun <T> time(name: String, func: () -> T): T {
+        val startTime = System.nanoTime()
+        val result = func()
+        val endTime = System.nanoTime()
+        println("$name TIME: ${endTime - startTime}ns")
+        return result
+    }
 
-        file.runWriteAction {
-            for (elem in file.children) {
-                elem.delete()
+    private fun sort(project: Project, file: PsiFile, ordering: Ordering, keepComments: Int, indicator: ProgressIndicator) {
+        indicator.text2 = "Sorting keys..."
+        val children = computeReadAction { file.children }
+        val entries = children.mapNotNull { it as? I18nEntry }
+
+        val sorted = time("READ") {
+            computeReadAction {
+                I18nElementFactory.createFile(
+                    project,
+                    entries.let {
+                        when (ordering) {
+                            Ordering.ASCENDING -> I18nElementFactory.assembleRawElements(it.sortedWith(ascendingComparator), keepComments)
+                            Ordering.DESCENDING -> I18nElementFactory.assembleRawElements(it.sortedWith(descendingComparator), keepComments)
+                            Ordering.TEMPLATE -> sortByTemplate(TemplateManager.getProjectTemplate(project), it, keepComments)
+                            else -> sortByTemplate(buildDefaultTemplate(project, file.virtualFile.mcDomain)
+                                ?: return@computeReadAction null, it, keepComments)
+                        }
+                    }).children
             }
-            for (elem in sorted) {
-                file.add(elem)
+        } ?: return
+
+        invokeLater {
+            file.runWriteAction {
+                time("DELETE") {
+                    file.deleteChildRange(children.first(), children.last())
+                }
+                time("WRITE") {
+                    file.addRange(sorted.first(), sorted.last())
+                }
             }
         }
     }
 
-    private fun buildDefaultTemplate(project: com.intellij.openapi.project.Project, domain: String?): Template? {
+    private fun buildDefaultTemplate(project: Project, domain: String?): Template? {
         val referenceFile = project.findDefaultLangFile(domain) ?: return null
         val psi = PsiManager.getInstance(project).findFile(referenceFile) ?: return null
         val elements = mutableListOf<TemplateElement>()
@@ -76,26 +106,23 @@ object I18nSorter {
         return Template(elements)
     }
 
-    private fun sortByTemplate(project: com.intellij.openapi.project.Project, template: Template, entries: List<I18nEntry>, keepComments: Int): List<PsiElement> {
-        val result = mutableListOf<PsiElement>()
+    private fun sortByTemplate(template: Template, entries: List<I18nEntry>, keepComments: Int): String {
+        val result = StringBuilder()
         val tmp = entries.toMutableList()
         for (elem in template.elements) {
             when (elem) {
-                is Comment -> {
-                    result.add(I18nElementFactory.createComment(project, elem.text))
-                    result.add(I18nElementFactory.createLineEnding(project))
-                }
-                EmptyLine -> result.add(I18nElementFactory.createLineEnding(project))
+                is Comment -> result.append("# ${elem.text}\n")
+                EmptyLine -> result.append('\n')
                 is Key -> {
                     val toWrite = tmp.filter { elem.matcher.matches(it.key) }
-                    result.addAll(I18nElementFactory.assembleElements(project, toWrite.sortedWith(ascendingComparator), keepComments))
+                    result.append(I18nElementFactory.assembleRawElements(toWrite.sortedWith(ascendingComparator), keepComments))
                     tmp.removeAll(toWrite)
                 }
             }
         }
         if (tmp.isNotEmpty()) {
-            result.addAll(I18nElementFactory.assembleElements(project, tmp.sortedWith(ascendingComparator), keepComments))
+            result.append(I18nElementFactory.assembleRawElements(tmp.sortedWith(ascendingComparator), keepComments))
         }
-        return result
+        return result.toString()
     }
 }

@@ -76,7 +76,7 @@ inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
     applyWriteAction { func() }
 
 inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T): T {
-    val result = object : WriteCommandAction<T>(project) {
+    val result = object : WriteCommandAction<T>(project, this) {
         override fun run(result: Result<T>) {
             result.setResult(func())
         }
@@ -84,6 +84,13 @@ inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T
     PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return result)
     return result
 }
+
+inline fun <T: Any?> computeReadAction(crossinline func: () -> T): T =
+    if (ApplicationManager.getApplication().isReadAccessAllowed) {
+        func()
+    } else {
+        ApplicationManager.getApplication().runReadAction<T, Throwable> { func() }
+    }
 
 /**
  * Returns an untyped array for the specified [Collection].

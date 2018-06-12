@@ -23,6 +23,7 @@ import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
 import com.intellij.ui.EditorNotificationPanel
@@ -46,18 +47,13 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
             panel.setText("Translation file doesn't match default one (${I18nConstants.DEFAULT_LOCALE_FILE}).")
             panel.createActionLabel("Add missing default entries (won't reflect changes in original English localization)") {
                 val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
-                val missingEntries = getMissingEntries(file)
+                val missingEntries = getMissingEntries(file).values
                 psi.applyWriteAction {
-                    if (lastChild != null) {
-                        if (lastChild?.node?.elementType != I18nTypes.LINE_ENDING) {
-                            add(I18nElementFactory.createLineEnding(project))
-                        }
-                        add(I18nElementFactory.createLineEnding(project))
-                    }
-                    val newElements = I18nElementFactory.assembleElements(project, missingEntries.values, Int.MAX_VALUE)
-                    for (element in newElements) {
-                        add(element)
-                    }
+                    val existing = VfsUtil.loadText(virtualFile).trimEnd()
+                    VfsUtil.saveText(
+                        virtualFile,
+                        listOf(existing, I18nElementFactory.assembleRawElements(missingEntries, Int.MAX_VALUE)).joinToString("\n")
+                    )
                     EditorNotifications.updateAll()
                 }
                 val sort = Messages.showYesNoDialog(

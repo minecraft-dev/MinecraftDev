@@ -14,6 +14,7 @@ import com.demonwav.mcdev.i18n.lang.I18nFile
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.platform.mcp.at.AtAnnotator.Companion.key
 import com.demonwav.mcdev.util.applyWriteAction
 import com.demonwav.mcdev.util.mcDomain
 import com.intellij.ide.DataManager
@@ -29,6 +30,7 @@ import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.ui.components.JBList
 import com.intellij.util.Consumer
+import java.awt.SystemColor.text
 import java.util.Locale
 
 object I18nElementFactory {
@@ -83,6 +85,14 @@ object I18nElementFactory {
             result.add(createLineEnding(project))
         }
         return result
+    }
+
+    fun assembleRawElements(elements: Collection<I18nEntry>, keepComments: Int): String {
+        return elements.joinToString("\n", postfix = "\n") {
+            """${gatherComments(it, keepComments).asReversed().joinToString("\n") {"# $it"}}
+                |${it.key}=${it.value}
+            """.trimMargin()
+        }
     }
 
     private tailrec fun gatherComments(element: PsiElement, maxDepth: Int, acc: MutableList<String> = mutableListOf(), depth: Int = 0): List<String> {
