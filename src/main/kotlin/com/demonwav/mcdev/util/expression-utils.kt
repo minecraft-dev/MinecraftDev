@@ -25,70 +25,89 @@ import com.intellij.psi.PsiTypeCastExpression
 import com.intellij.psi.PsiVariable
 
 fun PsiAnnotationMemberValue.evaluate(defaultValue: String?, parameterReplacement: String?): String? {
-    if (this is PsiTypeCastExpression && this.operand != null) {
-        return this.operand!!.evaluate(defaultValue, parameterReplacement)
-    }
-    if (this is PsiReferenceExpression) {
-        val reference = this.advancedResolve(false).element
-        if (reference is PsiParameter) {
-            return parameterReplacement
+    val visited = mutableSetOf<PsiAnnotationMemberValue?>()
+
+    fun eval(expr: PsiAnnotationMemberValue?, defaultValue: String?): String? {
+        if (visited.contains(expr)) {
+            return defaultValue
         }
-        if (reference is PsiVariable && reference.initializer != null) {
-            return reference.initializer!!.evaluate(null, parameterReplacement)
-        }
-    } else if (this is PsiLiteral) {
-        return this.value.toString()
-    } else if (this is PsiPolyadicExpression) {
-        var value = ""
-        for (operand in this.operands) {
-            val operandResult = operand.evaluate(defaultValue, parameterReplacement) ?: return defaultValue
-            when (this.operationTokenType) {
-                JavaTokenType.PLUS -> value += operandResult
+        visited.add(expr)
+        when {
+            expr is PsiTypeCastExpression && expr.operand != null ->
+                return eval(expr.operand, defaultValue)
+            expr is PsiReferenceExpression -> {
+                val reference = expr.advancedResolve(false).element
+                if (reference is PsiParameter) {
+                    return parameterReplacement
+                }
+                if (reference is PsiVariable && reference.initializer != null) {
+                    return eval(reference.initializer, null)
+                }
+            }
+            expr is PsiLiteral ->
+                return expr.value.toString()
+            expr is PsiPolyadicExpression && expr.operationTokenType == JavaTokenType.PLUS -> {
+                var value = ""
+                for (operand in expr.operands) {
+                    val operandResult = eval(operand, defaultValue) ?: return defaultValue
+                    value += operandResult
+                }
+                return value
             }
         }
-        return value
+
+        return defaultValue
     }
-    return defaultValue
+
+    return eval(this, defaultValue)
 }
 
 fun PsiExpression.substituteParameter(substitutions: Map<Int, Array<String?>?>, allowReferences: Boolean, allowTranslations: Boolean): Array<String?>? {
-    if (this is PsiTypeCastExpression && this.operand != null) {
-        return this.operand!!.substituteParameter(substitutions, allowReferences, allowTranslations)
-    }
-    if (this is PsiReferenceExpression) {
-        val reference = this.advancedResolve(false).element
-        if (reference is PsiParameter && reference.parent is PsiParameterList) {
-            val paramIndex = (reference.parent as PsiParameterList).getParameterIndex(reference)
-            if (substitutions.containsKey(paramIndex)) {
-                return substitutions[paramIndex]
+    val visited = mutableSetOf<PsiExpression?>()
+    fun substitute(expr: PsiExpression?): Array<String?>? {
+        if (visited.contains(expr) && expr != null) {
+            return arrayOf("\${${expr.text}}")
+        }
+        visited.add(expr)
+        when {
+            expr is PsiTypeCastExpression && expr.operand != null ->
+                return substitute(expr.operand)
+            expr is PsiReferenceExpression -> {
+                val reference = expr.advancedResolve(false).element
+                if (reference is PsiParameter && reference.parent is PsiParameterList) {
+                    val paramIndex = (reference.parent as PsiParameterList).getParameterIndex(reference)
+                    if (substitutions.containsKey(paramIndex)) {
+                        return substitutions[paramIndex]
+                    }
+                }
+                if (reference is PsiVariable && reference.initializer != null) {
+                    return substitute(reference.initializer)
+                }
             }
-        }
-        if (reference is PsiVariable && reference.initializer != null) {
-            return reference.initializer!!.substituteParameter(substitutions, allowReferences, allowTranslations)
-        }
-    } else if (this is PsiLiteral) {
-        return arrayOf(this.value.toString())
-    } else if (this is PsiPolyadicExpression) {
-        var value = ""
-        for (operand in this.operands) {
-            val operandResult = operand.evaluate(null, null) ?: return null
-            when (this.operationTokenType) {
-                JavaTokenType.PLUS -> value += operandResult
+            expr is PsiLiteral ->
+                return arrayOf(expr.value.toString())
+            expr is PsiPolyadicExpression && expr.operationTokenType == JavaTokenType.PLUS -> {
+                var value = ""
+                for (operand in expr.operands) {
+                    val operandResult = operand.evaluate(null, null) ?: return null
+                    value += operandResult
+                }
+                return arrayOf(value)
             }
+            expr is PsiCall && allowTranslations ->
+                for (argument in expr.argumentList?.expressions ?: emptyArray()) {
+                    val translation = Translation.find(argument) ?: continue
+                    if (translation.formattingError == FormattingError.MISSING) {
+                        return arrayOf("{ERROR: Missing formatting arguments for '${translation.text}'}")
+                    }
+                    return arrayOf(translation.text)
+                }
         }
-        return arrayOf(value)
-    } else if (this is PsiCall && allowTranslations) {
-        for (argument in this.argumentList?.expressions ?: emptyArray()) {
-            val translation = Translation.find(argument) ?: continue
-            if (translation.formattingError == FormattingError.MISSING) {
-                return arrayOf("{ERROR: Missing formatting arguments for '${translation.text}'}")
-            }
-            return arrayOf(translation.text)
+        return if (allowReferences && expr != null) {
+            arrayOf("\${${expr.text}}")
+        } else {
+            null
         }
     }
-    return if (allowReferences) {
-        arrayOf("\${${this.text}}")
-    } else {
-        null
-    }
+    return substitute(this)
 }
