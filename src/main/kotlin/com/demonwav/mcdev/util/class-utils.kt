@@ -133,7 +133,7 @@ private fun PsiClass.findInnerClass(name: String): PsiClass? {
         // Named inner class
         findInnerClassByName(name, false)
     } else {
-        if (anonymousIndex <= anonymousElements.size) {
+        if (anonymousIndex > 0 && anonymousIndex <= anonymousElements.size) {
             anonymousElements[anonymousIndex - 1] as PsiClass
         } else {
             null
