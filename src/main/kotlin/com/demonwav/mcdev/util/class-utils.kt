@@ -67,6 +67,7 @@ val PsiClass.shortName: String
         return builder.toString()
     }
 
+// TODO this method is incredibly fragile. Needs to be fixed ASAP
 inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (PsiClass) -> String?, separator: Char = '$') {
     var currentClass: PsiClass = this
     var parentClass: PsiClass?
