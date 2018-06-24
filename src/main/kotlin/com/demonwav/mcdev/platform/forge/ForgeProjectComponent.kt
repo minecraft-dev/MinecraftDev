@@ -16,17 +16,21 @@ import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.json.JsonFileType
 import com.intellij.openapi.fileTypes.FileNameMatcher
 import com.intellij.openapi.fileTypes.FileTypeManager
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 
 class ForgeProjectComponent(project: Project) : AbstractProjectComponent(project) {
 
     override fun projectOpened() {
         // assign mcmod.info json thing
-        runWriteTaskLater {
-            FileTypeManager.getInstance().associate(JsonFileType.INSTANCE, object : FileNameMatcher {
-                override fun accept(fileName: String) = fileName == ForgeConstants.MCMOD_INFO
-                override fun getPresentableString() = ForgeConstants.MCMOD_INFO
-            })
+        // Maybe this will prevent things not going wrong idk
+        DumbService.getInstance(project).runWhenSmart {
+            runWriteTaskLater {
+                FileTypeManager.getInstance().associate(JsonFileType.INSTANCE, object : FileNameMatcher {
+                    override fun accept(fileName: String) = fileName == ForgeConstants.MCMOD_INFO
+                    override fun getPresentableString() = ForgeConstants.MCMOD_INFO
+                })
+            }
         }
     }
 }
