@@ -97,7 +97,9 @@ class MavenBuildSystem : BuildSystem() {
                     dependency.scope.value = scope
                 }
 
-                PsiManager.getInstance(project).findDirectory(rootDirectory)?.add(pomPsi)
+                val dir = PsiManager.getInstance(project).findDirectory(rootDirectory) ?: return@runWriteAction
+                dir.findFile(pomPsi.name)?.delete()
+                dir.add(pomPsi)
 
                 pomFile = rootDirectory.findChild("pom.xml") ?: return@runWriteAction
                 // Reformat the code to match their code style
