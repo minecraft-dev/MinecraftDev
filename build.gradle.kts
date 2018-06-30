@@ -23,7 +23,7 @@ plugins {
     groovy
     idea
     id("org.jetbrains.intellij") version "0.2.17"
-    id("net.minecrell.licenser") version "0.3"
+    id("net.minecrell.licenser") version "0.4"
 }
 
 defaultTasks("build")
@@ -166,8 +166,14 @@ idea {
 // License header formatting
 license {
     header = file("copyright.txt")
-    include("**/*.java", "**/*.kt", "**/*.groovy", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
+    include("**/*.java", "**/*.kt", "**/*.kts", "**/*.groovy", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
     exclude("com/demonwav/mcdev/platform/mcp/at/gen/**", "com/demonwav/mcdev/nbt/lang/gen/**", "com/demonwav/mcdev/i18n/lang/gen/**")
+
+    tasks {
+        "gradle" {
+            files = project.files("build.gradle.kts", "settings.gradle.kts", "gradle.properties")
+        }
+    }
 }
 
 // Credit for this intellij-rust
