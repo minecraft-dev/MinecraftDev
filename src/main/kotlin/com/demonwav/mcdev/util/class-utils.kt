@@ -22,6 +22,7 @@ import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiPrimitiveType
+import com.intellij.psi.PsiTypeParameter
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.annotations.Contract
 
@@ -43,13 +44,19 @@ val PsiClass.outerQualifiedName
 
 @get:Contract(pure = true)
 val PsiClass.fullQualifiedName
-    get() = outerQualifiedName ?: buildQualifiedName(StringBuilder()).toString()
+    get(): String? {
+        return try {
+            outerQualifiedName ?: buildQualifiedName(StringBuilder()).toString()
+        } catch (e: ClassNameResolutionFailedException) {
+            null
+        }
+    }
 
-fun PsiClass.appendFullQualifiedName(builder: StringBuilder): StringBuilder {
-    return outerQualifiedName?.let { builder.append(it) } ?: buildQualifiedName(builder)
-}
-
+@Throws(ClassNameResolutionFailedException::class)
 private fun PsiClass.buildQualifiedName(builder: StringBuilder): StringBuilder {
+    if (this is PsiTypeParameter) {
+        throw ClassNameResolutionFailedException()
+    }
     buildInnerName(builder, PsiClass::outerQualifiedName)
     return builder
 }
@@ -59,15 +66,22 @@ private val PsiClass.outerShortName
     get() = if (containingClass == null) name else null
 
 @get:Contract(pure = true)
-val PsiClass.shortName: String
+val PsiClass.shortName: String?
     get() {
+        if (this is PsiTypeParameter) {
+            return null
+        }
         outerShortName?.let { return it }
-        val builder = StringBuilder()
-        buildInnerName(builder, PsiClass::outerShortName, '.')
-        return builder.toString()
+        return try {
+            val builder = StringBuilder()
+            buildInnerName(builder, PsiClass::outerShortName, '.')
+            return builder.toString()
+        } catch (e: ClassNameResolutionFailedException) {
+            null
+        }
     }
 
-// TODO this method is incredibly fragile. Needs to be fixed ASAP
+@Throws(ClassNameResolutionFailedException::class)
 inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (PsiClass) -> String?, separator: Char = '$') {
     var currentClass: PsiClass = this
     var parentClass: PsiClass?
@@ -78,9 +92,9 @@ inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (PsiClass) -
         parentClass = currentClass.containingClass
         if (parentClass != null) {
             // Add named inner class
-            list.add(currentClass.name!!)
+            list.add(currentClass.name ?: throw ClassNameResolutionFailedException())
         } else {
-            parentClass = currentClass.parent.findContainingClass()!!
+            parentClass = currentClass.parent.findContainingClass() ?: throw ClassNameResolutionFailedException()
 
             // Add index of anonymous class to list
             list.add(parentClass.getAnonymousIndex(currentClass).toString())
@@ -105,14 +119,18 @@ fun findQualifiedClass(fullQualifiedName: String, context: PsiElement): PsiClass
 }
 
 @Contract(pure = true)
-fun findQualifiedClass(project: Project, fullQualifiedName: String,
-                                scope: GlobalSearchScope = GlobalSearchScope.allScope(project)): PsiClass? {
+fun findQualifiedClass(
+    project: Project,
+    fullQualifiedName: String,
+    scope: GlobalSearchScope = GlobalSearchScope.allScope(project)
+): PsiClass? {
     var innerPos = fullQualifiedName.indexOf('$')
     if (innerPos == -1) {
         return JavaPsiFacade.getInstance(project).findClass(fullQualifiedName, scope)
     }
 
-    var currentClass = JavaPsiFacade.getInstance(project).findClass(fullQualifiedName.substring(0, innerPos), scope) ?: return null
+    var currentClass = JavaPsiFacade.getInstance(project)
+        .findClass(fullQualifiedName.substring(0, innerPos), scope) ?: return null
     var outerPos: Int
 
     while (true) {
@@ -243,3 +261,5 @@ private fun areReallyOnlyParametersErasureEqual(parameterList1: PsiParameterList
 
     return true
 }
+
+class ClassNameResolutionFailedException : Exception()

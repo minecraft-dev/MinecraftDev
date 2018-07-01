@@ -11,6 +11,8 @@
 package com.demonwav.mcdev.util
 
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
+import sun.tools.java.ClassType
 
 class McPsiClassTest : OuterClassTest() {
 
@@ -41,5 +43,10 @@ class McPsiClassTest : OuterClassTest() {
     fun `test find inner anonymous`() = assertEquivalent(innerAnonymousClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass$1"))
     fun `test find inner anonymous inner`() =
             assertEquivalent(innerAnonymousInnerClass, findQualifiedClass("com.example.test.OuterClass\$InnerClass$1\$AnonymousInnerClass"))
+
+    fun `test self referencing generic`() = assertEquals("com.example.test.OuterClass\$SelfReferencingGeneric", selfReferencingGeneric.fullQualifiedName)
+    fun `test self referencing generic method`() {
+        assertNull((selfReferencingGeneric.methods.single().returnType as PsiClassType).fullQualifiedName)
+    }
 
 }

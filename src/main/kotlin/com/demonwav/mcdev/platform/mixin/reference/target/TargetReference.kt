@@ -23,6 +23,7 @@ import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.mapToArray
+import com.demonwav.mcdev.util.notNullToArray
 import com.demonwav.mcdev.util.reference.PolyReferenceResolver
 import com.demonwav.mcdev.util.reference.completeToLiteral
 import com.demonwav.mcdev.util.shortName
@@ -109,20 +110,23 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
     }
 
     override fun collectVariants(context: PsiElement): Array<Any> {
-        val at = context.annotationFromValue!! // @At
+        val at = context.annotationFromValue ?: return ArrayUtil.EMPTY_OBJECT_ARRAY // @At
         val handler = getHandler(at) ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
 
         val targetMethod = getTargetMethod(at) ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
         val codeBlock = targetMethod.body ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
 
-        return collectUsages(context, handler, codeBlock, targetMethod.containingClass!!)
+        val containingClass = targetMethod.containingClass ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
+        return collectUsages(context, handler, codeBlock, containingClass)
     }
 
     private fun <T> collectUsages(context: PsiElement, handler: Handler<T>, codeBlock: PsiElement, targetClass: PsiClass): Array<Any> {
         // Collect all possible targets
         val visitor = handler.createCollectUsagesVisitor()
         codeBlock.accept(visitor)
-        return visitor.result.mapToArray { handler.createLookup(targetClass, it).completeToLiteral(context) }
+        return visitor.result.asSequence()
+            .map { handler.createLookup(targetClass, it)?.completeToLiteral(context) }
+            .notNullToArray()
     }
 
     abstract class Handler<T> {
@@ -135,7 +139,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
                                                       checkOnly: Boolean): CollectVisitor<out PsiElement>?
         abstract fun createCollectUsagesVisitor(): CollectVisitor<T>
 
-        abstract fun createLookup(targetClass: PsiClass, element: T): LookupElementBuilder
+        abstract fun createLookup(targetClass: PsiClass, element: T): LookupElementBuilder?
     }
 
     abstract class QualifiedHandler<T : PsiMember> : Handler<QualifiedMember<T>>() {
@@ -153,7 +157,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
             return m.member.name!!
         }
 
-        final override fun createLookup(targetClass: PsiClass, element: QualifiedMember<T>): LookupElementBuilder {
+        final override fun createLookup(targetClass: PsiClass, element: QualifiedMember<T>): LookupElementBuilder? {
             return qualifyLookup(createLookup(targetClass, element.member, element.qualifier ?: targetClass), targetClass, element)
         }
 

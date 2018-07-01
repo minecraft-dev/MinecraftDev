@@ -23,6 +23,7 @@ abstract class OuterClassTest : ProjectBuilderTest() {
     protected lateinit var innerClass: PsiClass
     protected lateinit var innerAnonymousClass: PsiAnonymousClass
     protected lateinit var innerAnonymousInnerClass: PsiClass
+    protected lateinit var selfReferencingGeneric: PsiClass
 
     override fun setUp() {
         super.setUp()
@@ -46,6 +47,10 @@ abstract class OuterClassTest : ProjectBuilderTest() {
                                 };
                             }
                         }
+
+                        class SelfReferencingGeneric<C extends SelfReferencingGeneric<C>> {
+                            public C doSomething() {}
+                        }
                     }
                 """).toPsiFile<PsiJavaFile>().classes.single()
             }
@@ -53,9 +58,11 @@ abstract class OuterClassTest : ProjectBuilderTest() {
 
         this.outerAnonymousClass = outerClass.anonymousElements.single() as PsiAnonymousClass
 
-        this.innerClass = outerClass.innerClasses.single()
+        this.innerClass = outerClass.innerClasses.first()
         this.innerAnonymousClass = innerClass.anonymousElements.single() as PsiAnonymousClass
         this.innerAnonymousInnerClass = innerAnonymousClass.innerClasses.single()
+
+        this.selfReferencingGeneric = outerClass.innerClasses[1]
     }
 
     protected fun assertEquivalent(a: PsiElement, b: PsiElement?) {

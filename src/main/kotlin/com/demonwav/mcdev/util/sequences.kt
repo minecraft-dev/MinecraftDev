@@ -14,4 +14,8 @@ inline fun <reified T> Sequence<T>.toTypedArray(): Array<T> {
     return toList().toTypedArray()
 }
 
+fun Sequence<*>.notNullToArray(): Array<Any> {
+    return filterNotNull().toList().toTypedArray()
+}
+
 fun <T> Sequence<T>.filterNotNull(transform: (T) -> Any?) = this.filter { transform(it) != null }
