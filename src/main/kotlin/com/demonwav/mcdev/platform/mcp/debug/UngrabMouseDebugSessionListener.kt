@@ -21,6 +21,10 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl) : X
 
     private fun grabMouse(grab: Boolean) {
         val suspendContextImpl = process.debuggerContext.suspendContext ?: return
+        if (suspendContextImpl.thread?.isAtBreakpoint != true) {
+            return
+        }
+
         val frameProxy = suspendContextImpl.frameProxy ?: return
         val debugProcess = suspendContextImpl.debugProcess
         val virtualMachine = debugProcess.virtualMachineProxy as? VirtualMachineProxyImpl ?: return
@@ -39,6 +43,5 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl) : X
 
     override fun sessionPaused() {
         grabMouse(false)
-     }
-
+    }
 }
