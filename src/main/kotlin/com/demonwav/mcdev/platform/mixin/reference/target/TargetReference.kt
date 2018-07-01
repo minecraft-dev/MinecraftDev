@@ -150,7 +150,9 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
         override fun resolveTarget(context: PsiElement): PsiElement? {
             val value = context.constantStringValue ?: return null
-            return MixinMemberReference.parse(value)?.resolveMember(context.project, context.resolveScope)
+            val ref = MixinMemberReference.parse(value)
+            ref?.owner ?: return null
+            return ref.resolveMember(context.project, context.resolveScope)
         }
 
         protected open fun getInternalName(m: QualifiedMember<T>): String {
