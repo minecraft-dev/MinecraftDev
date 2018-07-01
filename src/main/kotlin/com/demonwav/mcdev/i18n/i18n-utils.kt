@@ -31,7 +31,7 @@ private fun Project.files(scope: Scope): Sequence<I18nFile> {
     val searchScope = if (scope == Scope.GLOBAL) GlobalSearchScope.allScope(this) else GlobalSearchScope.projectScope(this)
     return FileTypeIndex.getFiles(I18nFileType, searchScope)
         .asSequence()
-        .mapNotNull { PsiManager.getInstance(this).findFile(it) as I18nFile? }
+        .mapNotNull { PsiManager.getInstance(this).findFile(it) as? I18nFile }
 }
 
 private fun Project.findEntriesImpl(scope: Scope, fileFilter: (I18nFile) -> Boolean = { true }, entryFilter: (I18nEntry) -> Boolean = { true }) =

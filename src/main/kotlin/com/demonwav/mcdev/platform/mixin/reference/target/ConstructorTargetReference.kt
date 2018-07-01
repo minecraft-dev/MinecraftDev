@@ -34,9 +34,9 @@ object ConstructorTargetReference : TargetReference.Handler<PsiClass>() {
 
     override fun createCollectUsagesVisitor(): CollectVisitor<PsiClass> = CollectUsagesVisitor()
 
-    override fun createLookup(targetClass: PsiClass, element: PsiClass): LookupElementBuilder {
+    override fun createLookup(targetClass: PsiClass, element: PsiClass): LookupElementBuilder? {
         return JavaLookupElementBuilder.forClass(element, element.internalName)
-                .withPresentableText(element.shortName)
+                .withPresentableText(element.shortName ?: return null)
     }
 
     private fun resolveConstructedClass(expression: PsiNewExpression): PsiClass? {

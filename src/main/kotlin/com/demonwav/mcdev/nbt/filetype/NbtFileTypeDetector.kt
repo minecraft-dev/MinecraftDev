@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.nbt.filetype
 
-import com.demonwav.mcdev.nbt.MalformedNbtFileException
 import com.demonwav.mcdev.nbt.Nbt
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.FileTypeRegistry
@@ -24,7 +23,7 @@ class NbtFileTypeDetector : FileTypeRegistry.FileTypeDetector {
         return try {
             Nbt.buildTagTree(file.inputStream, 100)
             NbtFileType
-        } catch (e: MalformedNbtFileException) {
+        } catch (e: Exception) {
             null
         }
     }

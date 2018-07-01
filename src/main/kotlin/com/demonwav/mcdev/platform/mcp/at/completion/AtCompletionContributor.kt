@@ -105,7 +105,7 @@ class AtCompletionContributor : CompletionContributor() {
 
                 val classesByName = cache.getClassesByName(className, scope)
                 for (classByName in classesByName) {
-                    val name = classByName.fullQualifiedName
+                    val name = classByName.fullQualifiedName ?: continue
                     kindResult.addElement(PrioritizedLookupElement.withPriority(
                         LookupElementBuilder.create(name).withIcon(PlatformIcons.CLASS_ICON),
                         1.0 + name.getValue(beginning)
@@ -123,7 +123,7 @@ class AtCompletionContributor : CompletionContributor() {
                     continue
                 }
 
-                val name = innerClass.fullQualifiedName
+                val name = innerClass.fullQualifiedName ?: continue
                 result.addElement(PrioritizedLookupElement.withPriority(
                     LookupElementBuilder.create(name).withIcon(PlatformIcons.CLASS_ICON),
                     1.0
@@ -133,7 +133,7 @@ class AtCompletionContributor : CompletionContributor() {
             for (anonymousElement in currentClass.anonymousElements) {
                 val anonClass = anonymousElement as? PsiClass ?: continue
 
-                val name = anonClass.fullQualifiedName
+                val name = anonClass.fullQualifiedName ?: continue
                 result.addElement(PrioritizedLookupElement.withPriority(
                     LookupElementBuilder.create(name).withIcon(PlatformIcons.CLASS_ICON),
                     1.0
@@ -159,7 +159,7 @@ class AtCompletionContributor : CompletionContributor() {
                 continue
             }
 
-            val name = psiClass.fullQualifiedName
+            val name = psiClass.fullQualifiedName ?: continue
             result.addElement(PrioritizedLookupElement.withPriority(
                 LookupElementBuilder.create(name).withIcon(PlatformIcons.CLASS_ICON),
                 1.0

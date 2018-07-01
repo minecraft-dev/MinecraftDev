@@ -31,7 +31,9 @@ class McpSrgMap private constructor(
 
     @Contract(pure = true) fun getSrgClass(fullQualifiedName: String) = classMap[fullQualifiedName]
     @Contract(pure = true) fun mapToSrgClass(fullQualifiedName: String) = getSrgClass(fullQualifiedName) ?: fullQualifiedName
-    @Contract(pure = true) fun findSrgClass(psiClass: PsiClass) = getSrgClass(psiClass.fullQualifiedName)
+    @Contract(pure = true) fun findSrgClass(psiClass: PsiClass): String? {
+        return getSrgClass(psiClass.fullQualifiedName ?: return null)
+    }
 
     @Contract(pure = true) fun getSrgField(reference: MemberReference) = fieldMap[reference]
     @Contract(pure = true) fun mapToSrgField(reference: MemberReference) = getSrgField(reference) ?: reference

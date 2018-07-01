@@ -28,7 +28,7 @@
       <div>
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2018.2-1.2.7
+        v. 2018.2-1.2.8
       </div>
     ]]>
     </change-notes>
@@ -229,6 +229,7 @@
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.mixin.insight.MixinImplicitUsageProvider"/>
         <deadCode implementation="com.demonwav.mcdev.platform.mixin.insight.MixinEntryPoint"/>
 
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.MixinClassCastInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.ShadowOverwriteInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.suppress.ShadowNullableInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.suppress.SoftImplementInspectionSuppressor"/>
@@ -290,9 +291,6 @@
                          level="WARNING"
                          hasStaticDescription="false"
                          implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
-        <!--endregion-->
-
-        <!--region NO PLATFORM INSPECTIONS-->
         <localInspection displayName="Missing translations"
                          groupName="Minecraft"
                          language="JAVA"
@@ -393,6 +391,13 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mcp.at.AtUsageInspection"/>
+        <localInspection displayName="Invalid empty ItemStack comparison with ItemStack.EMPTY"
+                         groupName="MCP"
+                         language="JAVA"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.inspections.StackEmptyInspection"/>
         <!--endregion-->
 
         <!--region MIXIN INSPECTIONS-->

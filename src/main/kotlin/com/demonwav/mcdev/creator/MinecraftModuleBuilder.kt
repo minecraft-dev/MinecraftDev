@@ -71,11 +71,7 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
             return
         }
 
-        if (DumbService.isDumbAware(r)) {
-            r.run()
-        } else {
-            DumbService.getInstance(project).runWhenSmart(r)
-        }
+        DumbService.getInstance(project).runWhenSmart(r)
     }
 
     private fun createAndGetRoot(): VirtualFile? {

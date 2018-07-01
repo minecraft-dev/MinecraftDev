@@ -68,17 +68,11 @@ fun getPrimitiveWrapperClass(internalName: Char, project: Project): PsiClass? {
 @Contract(pure = true)
 private fun PsiClassType.erasure() = TypeConversionUtil.erasure(this) as PsiClassType
 
-@get:Contract(pure = true)
-val PsiClassType.internalName
-    get() = erasure().resolve()?.internalName
+@Throws(ClassNameResolutionFailedException::class)
+private fun PsiClassType.appendInternalName(builder: StringBuilder): StringBuilder = erasure().resolve()?.appendInternalName(builder) ?: builder
 
-fun PsiClassType.appendInternalName(builder: StringBuilder): StringBuilder = erasure().resolve()?.appendInternalName(builder) ?: builder
-
-@get:Contract(pure = true)
-val PsiType.descriptor: String
-    get() = appendDescriptor(StringBuilder()).toString()
-
-fun PsiType.appendDescriptor(builder: StringBuilder): StringBuilder {
+@Throws(ClassNameResolutionFailedException::class)
+private fun PsiType.appendDescriptor(builder: StringBuilder): StringBuilder {
     return when (this) {
         is PsiPrimitiveType -> builder.append(internalName)
         is PsiArrayType -> componentType.appendDescriptor(builder.append('['))
@@ -95,13 +89,21 @@ fun parseClassDescriptor(descriptor: String): String {
 // Class
 
 @get:Contract(pure = true)
-val PsiClass.internalName
-    get() = outerQualifiedName?.replace('.', '/') ?: buildInternalName(StringBuilder()).toString()
+val PsiClass.internalName: String?
+    get() {
+        return try {
+            outerQualifiedName?.replace('.', '/') ?: buildInternalName(StringBuilder()).toString()
+        } catch (e: ClassNameResolutionFailedException) {
+            null
+        }
+    }
 
-fun PsiClass.appendInternalName(builder: StringBuilder): StringBuilder {
+@Throws(ClassNameResolutionFailedException::class)
+private fun PsiClass.appendInternalName(builder: StringBuilder): StringBuilder {
     return outerQualifiedName?.let { builder.append(it.replace('.', '/')) } ?: buildInternalName(builder)
 }
 
+@Throws(ClassNameResolutionFailedException::class)
 private fun PsiClass.buildInternalName(builder: StringBuilder): StringBuilder {
     buildInnerName(builder, { it.outerQualifiedName?.replace('.', '/') })
     return builder
@@ -109,9 +111,13 @@ private fun PsiClass.buildInternalName(builder: StringBuilder): StringBuilder {
 
 @get:Contract(pure = true)
 val PsiClass.descriptor: String?
-    get() = appendInternalName(StringBuilder().append('L')).append(';').toString()
-
-fun PsiClass.appendDescriptor(builder: StringBuilder): StringBuilder = appendInternalName(builder.append('L')).append(';')
+    get() {
+        return try {
+            appendInternalName(StringBuilder().append('L')).append(';').toString()
+        } catch (e: ClassNameResolutionFailedException) {
+            null
+        }
+    }
 
 @Contract(pure = true)
 fun PsiClass.findMethodsByInternalName(internalName: String, checkBases: Boolean = false): Array<PsiMethod> {
@@ -129,10 +135,17 @@ val PsiMethod.internalName: String
     get() = if (isConstructor) INTERNAL_CONSTRUCTOR_NAME else name
 
 @get:Contract(pure = true)
-val PsiMethod.descriptor: String
-    get() = appendDescriptor(StringBuilder()).toString()
+val PsiMethod.descriptor: String?
+    get() {
+        return try {
+            appendDescriptor(StringBuilder()).toString()
+        } catch (e: ClassNameResolutionFailedException) {
+            null
+        }
+    }
 
-fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
+@Throws(ClassNameResolutionFailedException::class)
+private fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
     builder.append('(')
     for (parameter in parameterList.parameters) {
         parameter.typeElement?.type?.appendDescriptor(builder)
@@ -143,7 +156,14 @@ fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
 
 // Field
 @get:Contract(pure = true)
-val PsiField.descriptor: String
-    get() = appendDescriptor(StringBuilder()).toString()
+val PsiField.descriptor: String?
+    get() {
+        return try {
+            appendDescriptor(StringBuilder()).toString()
+        } catch (e: ClassNameResolutionFailedException) {
+            null
+        }
+    }
 
-fun PsiField.appendDescriptor(builder: StringBuilder): StringBuilder = type.appendDescriptor(builder)
+@Throws(ClassNameResolutionFailedException::class)
+private fun PsiField.appendDescriptor(builder: StringBuilder): StringBuilder = type.appendDescriptor(builder)
