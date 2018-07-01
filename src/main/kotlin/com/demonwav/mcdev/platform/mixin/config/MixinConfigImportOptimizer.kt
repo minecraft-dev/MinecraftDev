@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.mixin.config
 
 import com.demonwav.mcdev.util.gson
 import com.google.common.collect.Comparators
-import com.google.gson.Gson
 import com.intellij.json.psi.JsonArray
 import com.intellij.json.psi.JsonElementGenerator
 import com.intellij.json.psi.JsonFile

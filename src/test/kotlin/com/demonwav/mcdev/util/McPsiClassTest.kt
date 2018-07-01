@@ -12,7 +12,6 @@ package com.demonwav.mcdev.util
 
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
-import sun.tools.java.ClassType
 
 class McPsiClassTest : OuterClassTest() {
 
