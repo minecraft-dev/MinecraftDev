@@ -28,10 +28,9 @@ fun PsiAnnotationMemberValue.evaluate(defaultValue: String?, parameterReplacemen
     val visited = mutableSetOf<PsiAnnotationMemberValue?>()
 
     fun eval(expr: PsiAnnotationMemberValue?, defaultValue: String?): String? {
-        if (visited.contains(expr)) {
+        if (!visited.add(expr)) {
             return defaultValue
         }
-        visited.add(expr)
         when {
             expr is PsiTypeCastExpression && expr.operand != null ->
                 return eval(expr.operand, defaultValue)
@@ -65,10 +64,9 @@ fun PsiAnnotationMemberValue.evaluate(defaultValue: String?, parameterReplacemen
 fun PsiExpression.substituteParameter(substitutions: Map<Int, Array<String?>?>, allowReferences: Boolean, allowTranslations: Boolean): Array<String?>? {
     val visited = mutableSetOf<PsiExpression?>()
     fun substitute(expr: PsiExpression?): Array<String?>? {
-        if (visited.contains(expr) && expr != null) {
+        if (!visited.add(expr) && expr != null) {
             return arrayOf("\${${expr.text}}")
         }
-        visited.add(expr)
         when {
             expr is PsiTypeCastExpression && expr.operand != null ->
                 return substitute(expr.operand)
