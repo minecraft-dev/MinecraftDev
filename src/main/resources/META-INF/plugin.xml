@@ -174,7 +174,8 @@
         <!--endregion-->
 
         <!--region FORGE-->
-        <!---->
+        <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.forge.reflection.reference.ReflectionReferenceContributor"/>
+        <!--endregion-->
 
         <fileIconProvider implementation="com.demonwav.mcdev.platform.forge.ForgeFileIconProvider"/>
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.forge.insight.ForgeImplicitUsageProvider" />
