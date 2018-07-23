@@ -16,6 +16,7 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
 import com.demonwav.mcdev.platform.mcp.at.psi.AtElement
+import com.demonwav.mcdev.util.CommonColors
 import com.intellij.codeInsight.daemon.impl.AnnotationHolderImpl
 import com.intellij.lang.annotation.Annotation
 import com.intellij.lang.annotation.AnnotationHolder
@@ -64,31 +65,12 @@ class AtAnnotator : Annotator {
                 srgMap.getMcpMethod(reference)?.resolveMember(element.project) ?: return
                 underline(member.funcName, holder)
             }
-            else -> return
         }
     }
 
     private fun underline(element: AtElement, holder: AnnotationHolder) {
-        val annotation = Annotation(
-            element.textRange.startOffset,
-            element.textRange.endOffset,
-            HighlightSeverity.INFORMATION,
-            null,
-            null
-        )
-        annotation.textAttributes = key
-
-        (holder as AnnotationHolderImpl).add(annotation)
-    }
-
-    companion object {
-        @Suppress("DEPRECATION")
-        val key = TextAttributesKey.createTextAttributesKey("AT_UNDERLINE", TextAttributes(
-            null,
-            null,
-            AtSyntaxHighlighter.ELEMENT_NAME.defaultAttributes.foregroundColor,
-            EffectType.LINE_UNDERSCORE,
-            Font.PLAIN
-        ))
+        val annotation = holder.createInfoAnnotation(element, null)
+        annotation.enforcedTextAttributes =
+            TextAttributes(null, null, CommonColors.RED, EffectType.LINE_UNDERSCORE, Font.PLAIN)
     }
 }

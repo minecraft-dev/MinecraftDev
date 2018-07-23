@@ -10,16 +10,21 @@
 
 package com.demonwav.mcdev.platform.mcp.actions
 
-import com.demonwav.mcdev.platform.mcp.McpModule
+import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.mcp.srg.SrgManager
 import com.demonwav.mcdev.platform.mixin.util.findFirstShadowTarget
 import com.demonwav.mcdev.util.ActionData
 import com.demonwav.mcdev.util.getDataFromActionEvent
 import com.demonwav.mcdev.util.gotoTargetElement
 import com.demonwav.mcdev.util.invokeLater
+import com.demonwav.mcdev.util.qualifiedMemberReference
+import com.demonwav.mcdev.util.simpleMemberReference
+import com.demonwav.mcdev.util.simpleQualifiedMemberReference
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataKeys
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.wm.WindowManager
@@ -43,9 +48,12 @@ class GotoAtEntryAction : AnAction() {
             return
         }
 
-        val mcpModule = data.instance.getModuleOfType(McpModuleType) ?: return showBalloon(e)
+        val srgManager = data.instance.getModuleOfType(McpModuleType)?.srgManager ?:
+            // Not all ATs are in MCP modules, fallback to this if possible
+            // TODO try to find SRG references for all modules if current module isn't found?
+            SrgManager.findAnyInstance(data.project) ?: return showBalloon(e)
 
-        mcpModule.srgManager?.srgMap?.onSuccess { srgMap ->
+        srgManager.srgMap.onSuccess { srgMap ->
             var parent = data.element.parent
 
             if (parent is PsiMember) {
@@ -57,41 +65,46 @@ class GotoAtEntryAction : AnAction() {
 
             when (parent) {
                 is PsiField -> {
-                    val reference = srgMap.findSrgField(parent) ?: return@onSuccess showBalloon(e)
-                    searchForText(mcpModule, e, data, reference.name)
+                    val reference = srgMap.findSrgField(parent) ?: parent.simpleQualifiedMemberReference ?: return@onSuccess showBalloon(e)
+                    searchForText(e, data, reference.name)
                 }
                 is PsiMethod -> {
-                    val reference = srgMap.findSrgMethod(parent) ?: return@onSuccess showBalloon(e)
-                    searchForText(mcpModule, e, data, reference.name + reference.descriptor)
+                    val reference = srgMap.findSrgMethod(parent) ?: parent.qualifiedMemberReference ?: return@onSuccess showBalloon(e)
+                    searchForText(e, data, reference.name + reference.descriptor)
                 }
                 else ->
                     showBalloon(e)
             }
-        } ?: showBalloon(e)
+        }
     }
 
-    private fun searchForText(mcpModule: McpModule, e: AnActionEvent, data: ActionData, text: String) {
-        for (virtualFile in mcpModule.accessTransformers) {
-            val file = PsiManager.getInstance(data.project).findFile(virtualFile) ?: continue
+    private fun searchForText(e: AnActionEvent, data: ActionData, text: String) {
+        val manager = ModuleManager.getInstance(data.project)
+        manager.modules.asSequence()
+            .mapNotNull { MinecraftFacet.getInstance(it, McpModuleType) }
+            .flatMap { it.accessTransformers.asSequence() }
+            .forEach { virtualFile ->
+                val file = PsiManager.getInstance(data.project).findFile(virtualFile) ?: return@forEach
 
-            var found = false
-            PsiSearchHelper.getInstance(data.project)
-                .processElementsWithWord(
-                    { element, _ ->
-                        gotoTargetElement(element, data.editor, data.file)
-                        found = true
-                        false
-                    },
-                    LocalSearchScope(file),
-                    text,
-                    UsageSearchContext.ANY,
-                    true
-                )
+                var found = false
+                PsiSearchHelper.getInstance(data.project)
+                    .processElementsWithWord(
+                        { element, _ ->
+                            gotoTargetElement(element, data.editor, data.file)
+                            found = true
+                            false
+                        },
+                        LocalSearchScope(file),
+                        text,
+                        UsageSearchContext.ANY,
+                        true
+                    )
 
-            if (found) {
-                return
+                if (found) {
+                    return
+                }
             }
-        }
+
         showBalloon(e)
     }
 

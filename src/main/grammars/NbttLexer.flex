@@ -18,13 +18,13 @@ import static com.intellij.psi.TokenType.*;
 %%
 
 %{
-    public java.util.Deque<Integer> stack = new java.util.ArrayDeque<Integer>();
+    private final java.util.Deque<Integer> stack = new java.util.ArrayDeque<>();
 
     public NbttLexer() {
         this((java.io.Reader)null);
     }
 
-    public void maybeBegin(Integer i) {
+    private void maybeBegin(final Integer i) {
         if (i != null) {
             yybegin(i);
         }
@@ -93,7 +93,7 @@ LONG_ARRAY_LITERAL = [+-]?\d+[lL]?
 <IN_BYTE_ARRAY> {
     "("                         { return LPAREN; }
     ","                         { return COMMA; }
-    ")"                         { yybegin(stack.pollFirst()); return RPAREN; }
+    ")"                         { maybeBegin(stack.pollFirst()); return RPAREN; }
 
     {BYTE_ARRAY_LITERAL}        { stack.offerFirst(IN_BYTE_ARRAY); yybegin(EXPECT_NEXT); return BYTE_LITERAL; }
 
@@ -115,7 +115,7 @@ LONG_ARRAY_LITERAL = [+-]?\d+[lL]?
 <IN_INT_ARRAY> {
     "("                         { return LPAREN; }
     ","                         { return COMMA; }
-    ")"                         { yybegin(stack.pollFirst()); return RPAREN; }
+    ")"                         { maybeBegin(stack.pollFirst()); return RPAREN; }
 
     {INT_LITERAL}               { stack.offerFirst(IN_INT_ARRAY); yybegin(EXPECT_NEXT); return INT_LITERAL; }
 
@@ -135,7 +135,7 @@ LONG_ARRAY_LITERAL = [+-]?\d+[lL]?
 <IN_LONG_ARRAY> {
     "("                         { return LPAREN; }
     ","                         { return COMMA; }
-    ")"                         { yybegin(stack.pollFirst()); return RPAREN; }
+    ")"                         { maybeBegin(stack.pollFirst()); return RPAREN; }
 
     {LONG_ARRAY_LITERAL}        { stack.offerFirst(IN_LONG_ARRAY); yybegin(EXPECT_NEXT); return LONG_LITERAL; }
 
@@ -163,7 +163,7 @@ LONG_ARRAY_LITERAL = [+-]?\d+[lL]?
 
     ","                         { return COMMA; }
 
-    "]"                         { yybegin(stack.pollFirst()); return RBRACKET; }
+    "]"                         { maybeBegin(stack.pollFirst()); return RBRACKET; }
 
     {BYTE_LITERAL}              { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return BYTE_LITERAL; }
     {SHORT_LITERAL}             { stack.offerFirst(IN_LIST); yybegin(EXPECT_NEXT); return SHORT_LITERAL; }
@@ -177,9 +177,9 @@ LONG_ARRAY_LITERAL = [+-]?\d+[lL]?
 }
 
 <EXPECT_NEXT> {
-    ","                         { yybegin(stack.pollFirst()); return COMMA; }
-    ")"                         { yybegin(stack.pollFirst()); zzMarkedPos = zzStartRead; }
-    "]"                         { yybegin(stack.pollFirst()); zzMarkedPos = zzStartRead; }
+    ","                         { maybeBegin(stack.pollFirst()); return COMMA; }
+    ")"                         { maybeBegin(stack.pollFirst()); zzMarkedPos = zzStartRead; }
+    "]"                         { maybeBegin(stack.pollFirst()); zzMarkedPos = zzStartRead; }
 }
 
 {WHITE_SPACE}                   { return WHITE_SPACE; }
