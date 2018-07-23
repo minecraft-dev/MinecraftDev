@@ -71,6 +71,12 @@ class AtAnnotator : Annotator {
     private fun underline(element: AtElement, holder: AnnotationHolder) {
         val annotation = holder.createInfoAnnotation(element, null)
         annotation.enforcedTextAttributes =
-            TextAttributes(null, null, CommonColors.RED, EffectType.LINE_UNDERSCORE, Font.PLAIN)
+            TextAttributes(
+                null,
+                null,
+                AtSyntaxHighlighter.ELEMENT_NAME.defaultAttributes.foregroundColor,
+                EffectType.LINE_UNDERSCORE,
+                Font.PLAIN
+            )
     }
 }
