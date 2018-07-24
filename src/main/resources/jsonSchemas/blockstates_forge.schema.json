@@ -1,0 +1,171 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Minecraft Forge Blockstates JSON",
+    "type": "object",
+    "properties": {
+        "forge_marker": {
+            "type": "integer",
+            "enum": [ 1 ]
+        },
+        "variants": { "$ref": "#/definitions/variants" },
+        "defaults": { "$ref": "#/definitions/variantObject" }
+    },
+    "required": [ "forge_marker" ],
+    "definitions": {
+        "variants": {
+            "type": "object",
+            "patternProperties": {
+                "^([a-z0-9_]+=[^,]*,)*([a-z0-9_]+=[^,]*)$": {
+                    "$ref": "#/definitions/variant"
+                },
+                "^[a-z0-9_]+$": {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "additionalProperties": { "$ref": "#/definitions/variant" }
+                        },
+                        {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/variantObject" }
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "variant": {
+            "anyOf": [
+                { "$ref": "#/definitions/variantObject" },
+                {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/variantObject" }
+                }
+            ]
+        },
+        "variantObject": {
+            "allOf": [
+                { "$ref": "blockstates_common.schema.json#/baseVariant" },
+                {
+                    "properties": {
+                        "transform": { "$ref": "#/definitions/rootTransform" },
+                        "weight": { "type": "number" },
+                        "submodel": {
+                            "oneOf": [
+                                { "type": "string" },
+                                {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "$ref": "#/definitions/variant"
+                                    }
+                                }
+                            ]
+                        },
+                        "custom": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            ]
+        },
+        "rootTransform": {
+            "oneOf": [
+                { "$ref": "#/definitions/transform" },
+                {
+                    "type": "object",
+                    "patternProperties": {
+                        "(third|first)person_(left|right)hand": { "$ref": "#/definitions/transform" },
+                        "gui|head|ground|fixed": { "$ref": "#/definitions/transform" }
+                    },
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "transform": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "enum": [ "identity", "forge:default-block", "forge:default-item", "forge:default-tool" ]
+                },
+                {
+                    "type": "object",
+                    "required": [ "matrix" ],
+                    "properties": {
+                        "matrix": { "$ref": "#/definitions/transformMatrix" }
+                    },
+                    "additionalProperties": false
+                },
+                { "$ref": "#/definitions/transformMatrix" },
+                {
+                    "type": "object",
+                    "properties": {
+                        "translation": {
+                            "type": "array",
+                            "minItems": 3,
+                            "maxItems": 3,
+                            "items": { "type": "number" }
+                        },
+                        "scale": {
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "minItems": 3,
+                                    "maxItems": 3,
+                                    "items": { "type": "number" }
+                                },
+                                { "type": "number" }
+                            ]
+                        },
+                        "rotation": { "$ref": "#/definitions/transformRotation" },
+                        "post-rotation": { "$ref": "#/definitions/transformRotation" }
+                    },
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "transformMatrix": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+                "type": "array",
+                "minItems": 4,
+                "maxItems": 4,
+                "items": { "type": "number" }
+            }
+        },
+        "transformRotation": {
+            "oneOf": [
+                {
+                    "type": "array",
+                    "minItems": 4,
+                    "maxItems": 4,
+                    "items": { "type": "number" }
+                },
+                {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 1,
+                    "properties": {
+                        "x": { "type": "number" },
+                        "y": { "type": "number" },
+                        "z": { "type": "number" }
+                    }
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 1,
+                        "properties": {
+                            "x": { "type": "number" },
+                            "y": { "type": "number" },
+                            "z": { "type": "number" }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

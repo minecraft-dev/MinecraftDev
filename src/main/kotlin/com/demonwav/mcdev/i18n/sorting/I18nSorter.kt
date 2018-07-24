@@ -17,7 +17,7 @@ import com.demonwav.mcdev.i18n.findDefaultLangFile
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.demonwav.mcdev.util.lexicographical
-import com.demonwav.mcdev.util.mcDomain
+import com.demonwav.mcdev.util.resourceDomain
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
@@ -32,7 +32,7 @@ object I18nSorter {
     private val descendingComparator = ascendingComparator.reversed()
 
     fun query(project: Project, file: PsiFile, defaultSelection: Ordering = Ordering.ASCENDING) {
-        val defaultFileMissing = project.findDefaultLangFile(file.virtualFile.mcDomain ?: return) == null
+        val defaultFileMissing = project.findDefaultLangFile(file.virtualFile.resourceDomain ?: return) == null
         val isDefaultFile = file.name == I18nConstants.DEFAULT_LOCALE_FILE
         val (order, comments) = TranslationSortOrderDialog.show(defaultFileMissing || isDefaultFile, defaultSelection)
         if (order == null) {
@@ -47,7 +47,7 @@ object I18nSorter {
                 Ordering.ASCENDING -> I18nElementFactory.assembleElements(project, it.sortedWith(ascendingComparator), keepComments)
                 Ordering.DESCENDING -> I18nElementFactory.assembleElements(project, it.sortedWith(descendingComparator), keepComments)
                 Ordering.TEMPLATE -> sortByTemplate(project, TemplateManager.getProjectTemplate(project), it, keepComments)
-                else -> sortByTemplate(project, buildDefaultTemplate(project, file.virtualFile.mcDomain) ?: return, it, keepComments)
+                else -> sortByTemplate(project, buildDefaultTemplate(project, file.virtualFile.resourceDomain) ?: return, it, keepComments)
             }
         }
 

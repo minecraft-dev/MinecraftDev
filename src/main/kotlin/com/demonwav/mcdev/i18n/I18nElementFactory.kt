@@ -15,7 +15,7 @@ import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.demonwav.mcdev.util.applyWriteAction
-import com.demonwav.mcdev.util.mcDomain
+import com.demonwav.mcdev.util.resourceDomain
 import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.module.Module
@@ -50,7 +50,7 @@ object I18nElementFactory {
 
         val files = FileTypeIndex.getFiles(I18nFileType, GlobalSearchScope.moduleScope(module))
         if (files.count { it.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE } > 1) {
-            val choices = files.mapNotNull { it.mcDomain }.distinct().sorted()
+            val choices = files.mapNotNull { it.resourceDomain }.distinct().sorted()
             val swingList = JBList(choices)
             DataManager.getInstance().dataContextFromFocus.doWhenDone(Consumer<DataContext> {
                 JBPopupFactory.getInstance()

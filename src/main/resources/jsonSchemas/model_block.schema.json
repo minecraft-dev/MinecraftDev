@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Minecraft Block Model JSON",
+    "type": "object",
+    "properties": {
+        "parent": { "type": "string" },
+        "textures": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "ambientocclusion": { "type": "boolean" },
+        "elements": { "$ref": "model_common.schema.json#/elements" },
+        "display": { "$ref": "model_common.schema.json#/transforms" }
+    }
+}

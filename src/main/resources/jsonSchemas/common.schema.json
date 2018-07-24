@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "integerRange": {
+        "oneOf": [
+            {
+                "type": "integer"
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "min": { "type": "integer" },
+                    "max": { "type": "integer" }
+                },
+                "required": [ "min", "max" ],
+                "additionalProperties": false
+            }
+        ]
+    },
+    "floatRange": {
+        "oneOf": [
+            {
+                "type": "number"
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "min": { "type": "number" },
+                    "max": { "type": "number" }
+                },
+                "required": [ "min", "max" ],
+                "additionalProperties": false
+            }
+        ]
+    },
+    "equipmentSlot": { "type": "string", "enum": [ "mainhand", "offhand", "feet", "legs", "chest", "head" ] },
+    "equipmentSlots": {
+        "oneOf": [
+            { "$ref": "#/equipmentSlot" },
+            { "type": "array", "items": { "$ref": "#/equipmentSlot" } }
+        ]
+    },
+    "textComponent": {
+        "anyOf": [
+            { "type": "string" },
+            { "type": "object" }
+        ]
+    }
+}

@@ -13,7 +13,7 @@ package com.demonwav.mcdev.i18n
 import com.demonwav.mcdev.i18n.lang.I18nFile
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
-import com.demonwav.mcdev.util.mcDomain
+import com.demonwav.mcdev.util.resourceDomain
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
@@ -47,7 +47,7 @@ fun Project.findLangEntries(scope: Scope = Scope.GLOBAL, key: String? = null, fi
         {
             it.virtualFile != null
                 && (file == null || it.virtualFile.path == file.path)
-                && (domain == null || it.virtualFile.mcDomain == domain)
+                && (domain == null || it.virtualFile.resourceDomain == domain)
         },
         { key == null || it.key == key }
     )
@@ -58,7 +58,7 @@ fun Project.findDefaultLangEntries(scope: Scope = Scope.GLOBAL, key: String? = n
         {
             it.virtualFile != null && it.virtualFile.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE
                 && (file == null || it.virtualFile.path == file.path)
-                && (domain == null || it.virtualFile.mcDomain == domain)
+                && (domain == null || it.virtualFile.resourceDomain == domain)
         },
         { key == null || it.key == key }
     )
@@ -69,4 +69,4 @@ fun Project.findDefaultLangFile(domain: String? = null) =
         I18nConstants.DEFAULT_LOCALE_FILE,
         false,
         GlobalSearchScope.projectScope(this)
-    ).firstOrNull { domain == null || it.mcDomain == domain }
+    ).firstOrNull { domain == null || it.resourceDomain == domain }
