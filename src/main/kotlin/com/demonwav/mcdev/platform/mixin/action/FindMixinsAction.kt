@@ -39,8 +39,8 @@ class FindMixinsAction : AnAction() {
         private const val TOOL_WINDOW_ID = "Find Mixins"
     }
 
-    override fun actionPerformed(e: AnActionEvent?) {
-        val project = e!!.getData(PROJECT) ?: return
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.getData(PROJECT) ?: return
         val file = e.getData(PSI_FILE) ?: return
         val caret = e.getData(CARET) ?: return
         val editor = e.getData(EDITOR) ?: return
