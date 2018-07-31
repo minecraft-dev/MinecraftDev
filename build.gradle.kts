@@ -19,24 +19,24 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.2.50" // kept in sync with IntelliJ's bundled dep
+    id("org.jetbrains.kotlin.jvm") version "1.2.51" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.3.4"
-    id("net.minecrell.licenser") version "0.4"
+    id("org.jetbrains.intellij") version "0.3.5"
+    id("net.minecrell.licenser") version "0.4.1"
 }
 
 defaultTasks("build")
 
 val CI = System.getenv("CI") != null
 
-val ideaVersion: String by extra
-val downloadIdeaSources: String by extra
+val ideaVersion: String by project
+val downloadIdeaSources: String by project
 
 // for publishing nightlies
-val repoUsername: String by extra
-val repoPassword: String by extra
-val repoChannel: String by extra
+val repoUsername: String by project
+val repoPassword: String by project
+val repoChannel: String by project
 
 val compileKotlin by tasks
 val processResources: AbstractCopyTask by tasks
@@ -207,11 +207,11 @@ fun generateLexer(name: String, flex: String, pack: String) = task<JavaExec>(nam
 }
 
 fun generatePsiAndParser(name: String, bnf: String, pack: String) = task<JavaExec>(name) {
-    val src = "src/main/grammars/$bnf.bnf".replace("/", File.separator)
+    val src = "src/main/grammars/$bnf.bnf".replace('/', File.separatorChar)
     val dstRoot = "gen"
-    val dst = "$dstRoot/com/demonwav/mcdev/$pack".replace("/", File.separator)
-    val psiDir = "$dst/psi/".replace("/", File.separator)
-    val parserDir = "$dst/parser/".replace("/", File.separator)
+    val dst = "$dstRoot/com/demonwav/mcdev/$pack".replace('/', File.separatorChar)
+    val psiDir = "$dst/psi/".replace('/', File.separatorChar)
+    val parserDir = "$dst/parser/".replace('/', File.separatorChar)
 
     doFirst {
         delete(psiDir, parserDir)
@@ -254,8 +254,6 @@ clean.delete(generate)
 
 runIde {
     maxHeapSize = "2G"
-
-    (findProperty("intellijJre") as? String)?.let(this::setExecutable)
 
     System.getProperty("debug")?.let {
         systemProperty("idea.ProcessCanceledException", "disabled")
