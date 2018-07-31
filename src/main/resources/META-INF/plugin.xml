@@ -99,6 +99,7 @@
         <lang.quoteHandler language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttQuoteHandler"/>
         <lang.formatter language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttFormattingModelBuilder"/>
         <codeStyleSettingsProvider implementation="com.demonwav.mcdev.nbt.lang.format.NbttCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider implementation="com.demonwav.mcdev.nbt.lang.format.NbttLanguageCodeStyleSettingsProvider"/>
         <lang.foldingBuilder language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttFoldingBuilder"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.nbt.lang.colors.NbttColorSettingsPage" />
         <annotator language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.colors.NbttAnnotator"/>

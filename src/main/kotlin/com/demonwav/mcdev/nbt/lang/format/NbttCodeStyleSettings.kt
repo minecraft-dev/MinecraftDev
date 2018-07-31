@@ -17,8 +17,8 @@ import com.intellij.psi.codeStyle.CustomCodeStyleSettings
 
 class NbttCodeStyleSettings(container: CodeStyleSettings) : CustomCodeStyleSettings(NbttLanguage.id, container) {
 
-    var SPACE_AFTER_COLON = true
-    var SPACE_BEFORE_COLON = false
-    var LIST_WRAPPING = CommonCodeStyleSettings.WRAP_ALWAYS
-    var OBJECT_WRAPPING = CommonCodeStyleSettings.WRAP_ALWAYS
+    @JvmField var SPACE_AFTER_COLON = true
+    @JvmField var SPACE_BEFORE_COLON = false
+    @JvmField var LIST_WRAPPING = CommonCodeStyleSettings.WRAP_ALWAYS
+    @JvmField var ARRAY_WRAPPING = CommonCodeStyleSettings.WRAP_ALWAYS
 }

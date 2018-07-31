@@ -75,7 +75,7 @@ class AtAnnotator : Annotator {
                 null,
                 null,
                 AtSyntaxHighlighter.ELEMENT_NAME.defaultAttributes.foregroundColor,
-                EffectType.LINE_UNDERSCORE,
+                EffectType.BOLD_LINE_UNDERSCORE,
                 Font.PLAIN
             )
     }

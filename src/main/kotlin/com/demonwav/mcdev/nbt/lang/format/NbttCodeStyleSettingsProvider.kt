@@ -12,31 +12,29 @@ package com.demonwav.mcdev.nbt.lang.format
 
 import com.demonwav.mcdev.nbt.lang.NbttLanguage
 import com.intellij.application.options.CodeStyleAbstractConfigurable
-import com.intellij.application.options.CodeStyleAbstractPanel
 import com.intellij.application.options.TabbedLanguageCodeStylePanel
-import com.intellij.openapi.options.Configurable
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.codeStyle.CodeStyleSettingsProvider
 
 class NbttCodeStyleSettingsProvider : CodeStyleSettingsProvider() {
-    override fun createSettingsPage(settings: CodeStyleSettings, originalSettings: CodeStyleSettings): Configurable {
-        return object : CodeStyleAbstractConfigurable(settings, originalSettings, "NBT Text") {
-            override fun createPanel(otherSettings: CodeStyleSettings?): CodeStyleAbstractPanel {
-                return object : TabbedLanguageCodeStylePanel(NbttLanguage, currentSettings, otherSettings) {
-                    override fun initTabs(otherOtherSettings: CodeStyleSettings?) {
-                        addIndentOptionsTab(otherOtherSettings)
-                        addSpacesTab(otherOtherSettings)
-                        addBlankLinesTab(otherOtherSettings)
-                        addWrappingAndBracesTab(otherOtherSettings)
-                    }
-                }
-            }
-
+    override fun createSettingsPage(settings: CodeStyleSettings, originalSettings: CodeStyleSettings) =
+        object : CodeStyleAbstractConfigurable(settings, originalSettings, configurableDisplayName) {
+            override fun createPanel(settings: CodeStyleSettings) = NbttCodeStyleMainPanel(currentSettings, settings)
             override fun getHelpTopic(): String? = null
         }
-    }
 
-    override fun getConfigurableDisplayName() = NbttLanguage.displayName
+    override fun getConfigurableDisplayName() = "NBT Text"
 
     override fun createCustomSettings(settings: CodeStyleSettings) = NbttCodeStyleSettings(settings)
+
+    private class NbttCodeStyleMainPanel(currentSettings: CodeStyleSettings, settings: CodeStyleSettings) :
+        TabbedLanguageCodeStylePanel(NbttLanguage, currentSettings, settings) {
+
+        override fun initTabs(settings: CodeStyleSettings?) {
+            addIndentOptionsTab(settings)
+            addWrappingAndBracesTab(settings)
+            addSpacesTab(settings)
+        }
+    }
 }
+

@@ -18,7 +18,6 @@ import com.intellij.lang.ASTNode
 abstract class NbttLongArrayImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttLongArrayMixin {
 
     override fun getLongArrayTag(): TagLongArray {
-        val longParams = getLongParams() ?: return TagLongArray(longArrayOf())
-        return TagLongArray(longParams.longList.map { it.getLongTag().value }.toLongArray())
+        return TagLongArray(getLongList().map { it.getLongTag().value }.toLongArray())
     }
 }

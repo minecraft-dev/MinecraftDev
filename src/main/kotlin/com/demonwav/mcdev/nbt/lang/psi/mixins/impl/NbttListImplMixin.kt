@@ -21,7 +21,7 @@ import com.intellij.lang.ASTNode
 abstract class NbttListImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttListMixin {
 
     override fun getListTag(): TagList {
-        val tagList = getListParams()?.tagList ?: return TagList(NbtTypeId.END, emptyList())
+        val tagList = getTagList()
 
         var type: NbtTypeId? = null
         for (nbttTag in tagList) {
@@ -33,7 +33,7 @@ abstract class NbttListImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), Nb
             }
         }
 
-        if (tagList.size == 0) {
+        if (tagList.isEmpty()) {
             type = NbtTypeId.END
         }
 

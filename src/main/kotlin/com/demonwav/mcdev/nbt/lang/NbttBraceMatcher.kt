@@ -12,6 +12,7 @@ package com.demonwav.mcdev.nbt.lang
 
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttByteArray
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttIntArray
+import com.demonwav.mcdev.nbt.lang.gen.psi.NbttLongArray
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttTypes
 import com.intellij.lang.BracePair
 import com.intellij.lang.PairedBraceMatcher
@@ -27,7 +28,7 @@ class NbttBraceMatcher : PairedBraceMatcher {
 
         val parent = element.parent
 
-        if (parent is NbttIntArray || parent is NbttByteArray) {
+        if (parent is NbttByteArray || parent is NbttIntArray || parent is NbttLongArray) {
             return parent.textRange.startOffset
         }
 

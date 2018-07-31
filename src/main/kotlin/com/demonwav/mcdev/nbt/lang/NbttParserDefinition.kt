@@ -42,18 +42,26 @@ class NbttParserDefinition : ParserDefinition {
 
         val FILE = IFileElementType(NbttLanguage)
 
-        val NBTT_CONTAINERS = TokenSet.create(NbttTypes.BYTE_ARRAY, NbttTypes.INT_ARRAY, NbttTypes.COMPOUND, NbttTypes.LIST)
+        val NBTT_CONTAINERS = TokenSet.create(
+            NbttTypes.BYTE_ARRAY,
+            NbttTypes.INT_ARRAY,
+            NbttTypes.LONG_ARRAY,
+            NbttTypes.COMPOUND,
+            NbttTypes.LIST
+        )
 
         val NBTT_OPEN_BRACES = TokenSet.create(
             NbttTypes.LPAREN,
             NbttTypes.LBRACE,
             NbttTypes.LBRACKET
         )
+
         val NBTT_CLOSE_BRACES = TokenSet.create(
             NbttTypes.RPAREN,
             NbttTypes.RBRACE,
             NbttTypes.RBRACKET
         )
+
         val NBTT_BRACES = TokenSet.orSet(NBTT_OPEN_BRACES, NBTT_CLOSE_BRACES)
     }
 }

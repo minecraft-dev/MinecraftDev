@@ -10,12 +10,12 @@
 
 package com.demonwav.mcdev.nbt.lang.psi.mixins
 
-import com.demonwav.mcdev.nbt.lang.gen.psi.NbttListParams
+import com.demonwav.mcdev.nbt.lang.gen.psi.NbttTag
 import com.demonwav.mcdev.nbt.lang.psi.NbttElement
 import com.demonwav.mcdev.nbt.tags.TagList
 
 interface NbttListMixin : NbttElement {
 
-    fun getListParams(): NbttListParams?
+    fun getTagList(): List<NbttTag>
     fun getListTag(): TagList
 }

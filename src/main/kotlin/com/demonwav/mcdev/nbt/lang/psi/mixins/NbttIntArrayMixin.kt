@@ -10,12 +10,12 @@
 
 package com.demonwav.mcdev.nbt.lang.psi.mixins
 
-import com.demonwav.mcdev.nbt.lang.gen.psi.NbttIntParams
+import com.demonwav.mcdev.nbt.lang.gen.psi.NbttInt
 import com.demonwav.mcdev.nbt.lang.psi.NbttElement
 import com.demonwav.mcdev.nbt.tags.TagIntArray
 
 interface NbttIntArrayMixin : NbttElement {
 
-    fun getIntParams(): NbttIntParams?
+    fun getIntList(): List<NbttInt>
     fun getIntArrayTag(): TagIntArray
 }

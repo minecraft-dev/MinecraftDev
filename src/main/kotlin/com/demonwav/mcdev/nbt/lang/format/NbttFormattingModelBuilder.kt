@@ -24,8 +24,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettings
 
 class NbttFormattingModelBuilder : FormattingModelBuilder {
-    override fun getRangeAffectingIndent(file: PsiFile, offset: Int, elementAtOffset: ASTNode): TextRange? = null
-
     override fun createModel(element: PsiElement, settings: CodeStyleSettings): FormattingModel {
         val block = NbttBlock(element.node, settings, Indent.getNoneIndent(), null)
         return FormattingModelProvider.createFormattingModelForPsiFile(element.containingFile, block, settings)
@@ -43,6 +41,11 @@ class NbttFormattingModelBuilder : FormattingModelBuilder {
             return SpacingBuilder(settings, NbttLanguage)
                 .before(NbttTypes.COLON).spacing(spacesBeforeColon, spacesBeforeColon, 0, false, 0)
                 .after(NbttTypes.COLON).spacing(spacesAfterColon, spacesAfterColon, 0, false, 0)
+                // Empty blocks
+                .between(NbttTypes.LBRACKET, NbttTypes.RBRACKET).spacing(0, 0, 0, false, 0)
+                .between(NbttTypes.LPAREN, NbttTypes.RPAREN).spacing(0, 0, 0, false, 0)
+                .between(NbttTypes.LBRACE, NbttTypes.RBRACE).spacing(0, 0, 0, false, 0)
+                // Non-empty blocks
                 .withinPair(NbttTypes.LBRACKET, NbttTypes.RBRACKET).spaceIf(commonSettings.SPACE_WITHIN_BRACKETS, true)
                 .withinPair(NbttTypes.LPAREN, NbttTypes.RPAREN).spaceIf(commonSettings.SPACE_WITHIN_PARENTHESES, true)
                 .withinPair(NbttTypes.LBRACE, NbttTypes.RBRACE).spaceIf(commonSettings.SPACE_WITHIN_BRACES, true)

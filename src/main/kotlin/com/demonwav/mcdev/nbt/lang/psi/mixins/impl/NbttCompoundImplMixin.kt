@@ -22,7 +22,7 @@ abstract class NbttCompoundImplMixin(node: ASTNode) : ASTWrapperPsiElement(node)
     override fun getCompoundTag(): TagCompound {
         val map = mutableMapOf<String, NbtTag>()
         for (nbttNamedTag in getNamedTagList()) {
-            map[nbttNamedTag.tagName.getTagName()] = nbttNamedTag.tag.getNbtTag()
+            map[nbttNamedTag.tagName.getTagName()] = nbttNamedTag.tag?.getNbtTag() ?: continue
         }
         return TagCompound(map)
     }

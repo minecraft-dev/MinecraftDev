@@ -18,7 +18,6 @@ import com.intellij.lang.ASTNode
 abstract class NbttByteArrayImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttByteArrayMixin {
 
     override fun getByteArrayTag(): TagByteArray {
-        val byteParams = getByteParams() ?: return TagByteArray(byteArrayOf())
-        return TagByteArray(byteParams.byteList.map { it.getByteTag().value }.toByteArray())
+        return TagByteArray(getByteList().map { it.getByteTag().value }.toByteArray())
     }
 }
