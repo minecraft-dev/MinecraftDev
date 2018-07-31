@@ -10,12 +10,12 @@
 
 package com.demonwav.mcdev.nbt.lang.psi.mixins
 
-import com.demonwav.mcdev.nbt.lang.gen.psi.NbttLongParams
+import com.demonwav.mcdev.nbt.lang.gen.psi.NbttLong
 import com.demonwav.mcdev.nbt.lang.psi.NbttElement
 import com.demonwav.mcdev.nbt.tags.TagLongArray
 
 interface NbttLongArrayMixin : NbttElement {
 
-    fun getLongParams(): NbttLongParams?
+    fun getLongList(): List<NbttLong>
     fun getLongArrayTag(): TagLongArray
 }

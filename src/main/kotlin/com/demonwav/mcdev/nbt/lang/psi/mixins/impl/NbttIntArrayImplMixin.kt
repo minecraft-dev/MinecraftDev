@@ -18,7 +18,6 @@ import com.intellij.lang.ASTNode
 abstract class NbttIntArrayImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttIntArrayMixin {
 
     override fun getIntArrayTag(): TagIntArray {
-        val intParams = getIntParams() ?: return TagIntArray(intArrayOf())
-        return TagIntArray(intParams.intList.map { it.getIntTag().value }.toIntArray())
+        return TagIntArray(getIntList().map { it.getIntTag().value }.toIntArray())
     }
 }

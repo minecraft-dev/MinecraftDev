@@ -28,7 +28,7 @@
       <div>
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2018.3-1.2.8
+        v. 2018.3-1.2.9
       </div>
     ]]>
     </change-notes>
@@ -99,6 +99,7 @@
         <lang.quoteHandler language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttQuoteHandler"/>
         <lang.formatter language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttFormattingModelBuilder"/>
         <codeStyleSettingsProvider implementation="com.demonwav.mcdev.nbt.lang.format.NbttCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider implementation="com.demonwav.mcdev.nbt.lang.format.NbttLanguageCodeStyleSettingsProvider"/>
         <lang.foldingBuilder language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttFoldingBuilder"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.nbt.lang.colors.NbttColorSettingsPage" />
         <annotator language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.colors.NbttAnnotator"/>

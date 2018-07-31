@@ -30,7 +30,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 
 class AtGotoDeclarationHandler : GotoDeclarationHandler {
-    override fun getGotoDeclarationTargets(sourceElement: PsiElement?, offset: Int, editor: Editor): Array<PsiElement>? {
+    override fun getGotoDeclarationTargets(sourceElement: PsiElement?, offset: Int, editor: Editor): Array<out PsiElement>? {
         if (sourceElement?.language !== AtLanguage) {
             return null
         }

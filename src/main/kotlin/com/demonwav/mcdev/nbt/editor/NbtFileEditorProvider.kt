@@ -12,6 +12,7 @@ package com.demonwav.mcdev.nbt.editor
 
 import com.demonwav.mcdev.nbt.NbtVirtualFile
 import com.demonwav.mcdev.nbt.filetype.NbtFileType
+import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorPolicy
 import com.intellij.openapi.fileEditor.FileEditorState
@@ -22,6 +23,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiManager
 import java.awt.BorderLayout
 import java.beans.PropertyChangeListener
 import javax.swing.JPanel
@@ -36,6 +38,11 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
 
         if (NonProjectFileWritingAccessProvider.isWriteAccessAllowed(file, project)) {
             NonProjectFileWritingAccessProvider.allowWriting(nbtFile)
+        }
+
+        // Format to their format preferences
+        PsiManager.getInstance(project).findFile(nbtFile)?.let {
+            ReformatCodeProcessor(it, false).run()
         }
 
         nbtFile.toolbar = fileEditor.toolbar

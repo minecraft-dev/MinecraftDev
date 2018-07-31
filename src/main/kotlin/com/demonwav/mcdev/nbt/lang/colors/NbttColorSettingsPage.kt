@@ -46,6 +46,16 @@ class NbttColorSettingsPage : ColorSettingsPage {
                 {
                     <uname>created-on</uname>: 1264099775885L
                     <uname>name</uname>: "Compound tag #1"
+                    <uname>nested</uname>: {
+                        <uname>list</uname>: [
+                            [ 0B, 1B, false, true, 14B ],
+                            [
+                                {
+                                    <uname>nested again</uname>: 0D
+                                }
+                            ]
+                        ]
+                    }
                 },
             ]
             <uname>materialString</name>: "minecraft<material>:block</material>"
