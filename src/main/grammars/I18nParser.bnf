@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -22,10 +22,6 @@
     elementTypeClass="com.demonwav.mcdev.i18n.lang.psi.I18nElementType"
     tokenTypeClass="com.demonwav.mcdev.i18n.lang.psi.I18nTokenType"
 
-    tokens = [
-        EQUALS="="
-    ]
-
     consumeTokenMethod="consumeTokenFast"
 }
 
@@ -34,7 +30,6 @@ i18n_file ::= line*
 private line ::= entry | COMMENT | DUMMY | LINE_ENDING
 
 entry ::= KEY EQUALS VALUE? {
-    methods=[]
     mixin="com.demonwav.mcdev.i18n.lang.psi.mixins.I18nEntryImplMixin"
     implements="com.demonwav.mcdev.i18n.lang.psi.mixins.I18nEntryMixin"
 }

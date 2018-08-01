@@ -8,6 +8,9 @@
  * MIT License
  */
 
+import net.minecrell.gradle.licenser.header.HeaderFormat
+import net.minecrell.gradle.licenser.header.HeaderFormatRegistry
+import net.minecrell.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -171,12 +174,33 @@ idea {
 // License header formatting
 license {
     header = file("copyright.txt")
-    include("**/*.java", "**/*.kt", "**/*.kts", "**/*.groovy", "**/*.gradle", "**/*.xml", "**/*.properties", "**/*.html")
-    exclude("com/demonwav/mcdev/platform/mcp/at/gen/**", "com/demonwav/mcdev/nbt/lang/gen/**", "com/demonwav/mcdev/i18n/lang/gen/**")
+    style["flex"] = HeaderStyle.BLOCK_COMMENT.format
+    style["bnf"] = HeaderStyle.BLOCK_COMMENT.format
+
+    include(
+        "**/*.java",
+        "**/*.kt",
+        "**/*.kts",
+        "**/*.groovy",
+        "**/*.gradle",
+        "**/*.xml",
+        "**/*.properties",
+        "**/*.html",
+        "**/*.flex",
+        "**/*.bnf"
+    )
+    exclude(
+        "com/demonwav/mcdev/platform/mcp/at/gen/**",
+        "com/demonwav/mcdev/nbt/lang/gen/**",
+        "com/demonwav/mcdev/i18n/lang/gen/**"
+    )
 
     tasks {
         "gradle" {
             files = project.files("build.gradle.kts", "settings.gradle.kts", "gradle.properties")
+        }
+        "grammars" {
+            files = project.fileTree("src/main/grammars")
         }
     }
 }
@@ -243,7 +267,15 @@ val generateI18nTemplateLexer = generateLexer("generateI18nTemplateLexer", "I18n
 val generate = task("generate") {
     group = "minecraft"
     description = "Generates sources needed to compile the plugin."
-    dependsOn(generateAtLexer, generateAtPsiAndParser, generateNbttLexer, generateNbttPsiAndParser, generateI18nLexer, generateI18nPsiAndParser, generateI18nTemplateLexer)
+    dependsOn(
+        generateAtLexer,
+        generateAtPsiAndParser,
+        generateNbttLexer,
+        generateNbttPsiAndParser,
+        generateI18nLexer,
+        generateI18nPsiAndParser,
+        generateI18nTemplateLexer
+    )
     outputs.dir("gen")
 }
 
