@@ -93,18 +93,18 @@ dependencies {
     "testLibs"("org.jetbrains.idea:mockJDK:1.7-4d76c50")
     "testLibs"("org.spongepowered:mixin:0.7-SNAPSHOT:thin")
 
-    // Better way to do this?
-    if (!ideaVersion.endsWith("SNAPSHOT")) {
-        afterEvaluate {
-            // This needs to happen after build number is resolved
-            // intellij.ideaDependency.buildNumber == intellij.type-<buildnumber>
-            // gradle-tooling-extension isn't released with major intellij versions like intellij is
-            // intellij.type is typically IC
-            // build number is IC-number, so + 1 is needed to remove the -
-            "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:${intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)}")
+    // This needs to happen after build number is resolved
+    // intellij.ideaDependency.buildNumber == intellij.type-<buildnumber>
+    // gradle-tooling-extension isn't released with major intellij versions like intellij is
+    // intellij.type is typically IC
+    // build number is IC-number, so + 1 is needed to remove the -
+    afterEvaluate {
+        val gradleVersion = if (!ideaVersion.endsWith("SNAPSHOT")) {
+            intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)
+        } else {
+            ideaVersion
         }
-    } else {
-        "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:$ideaVersion")
+        "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:$gradleVersion")
     }
 }
 
