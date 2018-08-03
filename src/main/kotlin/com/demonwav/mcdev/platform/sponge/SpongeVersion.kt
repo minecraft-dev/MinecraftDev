@@ -10,10 +10,10 @@
 
 package com.demonwav.mcdev.platform.sponge
 
+import com.demonwav.mcdev.util.ProxyHttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
 import com.demonwav.mcdev.util.gson
 import org.jetbrains.concurrency.runAsync
-import java.net.URL
 import java.util.Objects
 import javax.swing.JComboBox
 
@@ -51,13 +51,14 @@ data class SpongeVersion(var versions: LinkedHashMap<String, String>, var select
 
     companion object {
         fun downloadData(): SpongeVersion {
-            val url = URL(spongeUrl)
-            val connection = url.openConnection()
+            val connection = ProxyHttpConnectionFactory.openHttpConnection(spongeUrl)
+
             connection.setRequestProperty(
                 "User-Agent",
                 "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2"
             )
-            val text = connection.getInputStream().use { it.reader().use { it.readText() } }
+
+            val text = connection.inputStream.use { stream -> stream.reader().use { it.readText() } }
             return gson.fromJson(text)
         }
     }

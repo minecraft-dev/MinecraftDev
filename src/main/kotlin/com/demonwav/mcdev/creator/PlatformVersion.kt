@@ -11,11 +11,11 @@
 package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.util.ProxyHttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
 import com.demonwav.mcdev.util.gson
 import org.jetbrains.concurrency.runAsync
 import java.io.IOException
-import java.net.URL
 import java.util.Arrays
 import java.util.Objects
 import javax.swing.JComboBox
@@ -36,13 +36,14 @@ fun getVersionSelector(type: PlatformType) = runAsync {
 }
 
 private fun doCall(urlText: String): PlatformVersion {
-    val url = URL(urlText)
-    val connection = url.openConnection()
+    val connection = ProxyHttpConnectionFactory.openHttpConnection(urlText)
+
     connection.setRequestProperty(
         "User-Agent",
         "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2"
     )
-    val text = connection.getInputStream().use { it.reader().use { it.readText() } }
+
+    val text = connection.inputStream.use { stream -> stream.reader().use { it.readText() } }
     return gson.fromJson(text)
 }
 
