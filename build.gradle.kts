@@ -14,6 +14,7 @@ import net.minecrell.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlin.reflect.KClass
 
 buildscript {
     repositories {
@@ -41,19 +42,19 @@ val repoUsername: String by project
 val repoPassword: String by project
 val repoChannel: String by project
 
-val compileKotlin by tasks
-val processResources: AbstractCopyTask by tasks
-val test: Test by tasks
-val runIde: JavaExec by tasks
-val publishPlugin: PublishTask by tasks
-val clean: Delete by tasks
+val compileKotlin by tasks.existing
+val processResources by tasks.existing<AbstractCopyTask>()
+val test by tasks.existing<Test>()
+val runIde by tasks.existing<JavaExec>()
+val publishPlugin by tasks.existing<PublishTask>()
+val clean by tasks.existing<Delete>()
 
 configurations {
-    "gradle-tooling-extension" { extendsFrom("idea"()) }
-    "jflex"()
-    "jflex-skeleton"()
-    "grammar-kit"()
-    "testLibs" { isTransitive = false }
+    register("gradle-tooling-extension") { extendsFrom(configurations["idea"]) }
+    register("jflex")
+    register("jflex-skeleton")
+    register("grammar-kit")
+    register("testLibs") { isTransitive = false }
 }
 
 repositories {
@@ -66,16 +67,14 @@ repositories {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-
-    sourceSets {
-        "gradle-tooling-extension" {
-            configurations[compileOnlyConfigurationName].extendsFrom(configurations["gradle-tooling-extension"])
-        }
-    }
 }
 
-val gradleToolingExtension = java.sourceSets["gradle-tooling-extension"]!!
-val gradleToolingExtensionJar = task<Jar>(gradleToolingExtension.jarTaskName) {
+val gradleToolingExtension = sourceSets.create("gradle-tooling-extension") {
+    configurations.named<Configuration>(compileOnlyConfigurationName) {
+        extendsFrom(configurations["gradle-tooling-extension"])
+    }
+}
+val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtension.jarTaskName) {
     from(gradleToolingExtension.output)
     classifier = "gradle-tooling-extension"
 }
@@ -97,19 +96,9 @@ dependencies {
     "testLibs"("org.jetbrains.idea:mockJDK:1.7-4d76c50")
     "testLibs"("org.spongepowered:mixin:0.7-SNAPSHOT:thin")
 
-    // This needs to happen after build number is resolved
-    // intellij.ideaDependency.buildNumber == intellij.type-<buildnumber>
-    // gradle-tooling-extension isn't released with major intellij versions like intellij is
-    // intellij.type is typically IC
-    // build number is IC-number, so + 1 is needed to remove the -
-    afterEvaluate {
-        val gradleVersion = if (!ideaVersion.endsWith("SNAPSHOT")) {
-            intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)
-        } else {
-            ideaVersion
-        }
-        "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:$gradleVersion")
-    }
+    // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
+    // intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)
+    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:182.3684.90")
 }
 
 intellij {
@@ -138,16 +127,16 @@ publishPlugin {
     }
 }
 
-tasks.withType<JavaCompile> {
+tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.compilerArgs = listOf("-proc:none")
 }
 
-tasks.withType<KotlinCompile> {
+tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
 }
 
-tasks.withType<GroovyCompile> {
+tasks.withType<GroovyCompile>().configureEach {
     options.compilerArgs = listOf("-proc:none")
 }
 
@@ -175,7 +164,6 @@ idea {
     }
 }
 
-// License header formatting
 license {
     header = file("copyright.txt")
     style["flex"] = HeaderStyle.BLOCK_COMMENT.format
@@ -200,10 +188,10 @@ license {
     )
 
     tasks {
-        "gradle" {
+        register("gradle") {
             files = project.files("build.gradle.kts", "settings.gradle.kts", "gradle.properties")
         }
-        "grammars" {
+        register("grammars") {
             files = project.fileTree("src/main/grammars")
         }
     }
@@ -211,7 +199,7 @@ license {
 
 // Credit for this intellij-rust
 // https://github.com/intellij-rust/intellij-rust/blob/d6b82e6aa2f64b877a95afdd86ec7b84394678c3/build.gradle#L131-L181
-fun generateLexer(name: String, flex: String, pack: String) = task<JavaExec>(name) {
+fun generateLexer(name: String, flex: String, pack: String) = tasks.register<JavaExec>(name) {
     val src = "src/main/grammars/$flex.flex"
     val dst = "gen/com/demonwav/mcdev/$pack"
     val output = "$dst/$flex.java"
@@ -234,7 +222,7 @@ fun generateLexer(name: String, flex: String, pack: String) = task<JavaExec>(nam
     outputs.file(output)
 }
 
-fun generatePsiAndParser(name: String, bnf: String, pack: String) = task<JavaExec>(name) {
+fun generatePsiAndParser(name: String, bnf: String, pack: String) = tasks.register<JavaExec>(name) {
     val src = "src/main/grammars/$bnf.bnf".replace('/', File.separatorChar)
     val dstRoot = "gen"
     val dst = "$dstRoot/com/demonwav/mcdev/$pack".replace('/', File.separatorChar)
@@ -268,7 +256,7 @@ val generateI18nPsiAndParser = generatePsiAndParser("generateI18nPsiAndParser", 
 
 val generateI18nTemplateLexer = generateLexer("generateI18nTemplateLexer", "I18nTemplateLexer", "i18n/lang/gen/")
 
-val generate = task("generate") {
+val generate = tasks.register("generate") {
     group = "minecraft"
     description = "Generates sources needed to compile the plugin."
     dependsOn(
@@ -283,10 +271,10 @@ val generate = task("generate") {
     outputs.dir("gen")
 }
 
-java.sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].java.srcDir(generate)
+sourceSets.named<SourceSet>("main") { java.srcDir(generate) }
 
 // Remove gen directory on clean
-clean.delete(generate)
+clean { delete(generate) }
 
 runIde {
     maxHeapSize = "2G"
@@ -297,4 +285,5 @@ runIde {
     }
 }
 
-inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
+inline fun <reified T : Task> TaskContainer.existing() = existing(T::class)
+inline fun <reified T : Task> TaskContainer.register(name: String, configuration: Action<in T>) = register(name, T::class, configuration)
