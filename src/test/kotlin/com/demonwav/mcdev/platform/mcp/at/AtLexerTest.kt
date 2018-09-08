@@ -41,11 +41,5 @@ class AtLexerTest : LexerTestCase() {
         UsefulTestCase.assertSameLinesWithFile(dirPath + "/" + getTestName(true) + ".txt", result)
     }
 
-    fun `test class names`() = doTest()
-    fun `test class values`() = doTest()
-    fun `test comments`() = doTest()
-    fun `test funcs`() = doTest()
-    fun `test keywords`() = doTest()
-    fun `test names`() = doTest()
-    fun `test primitives`() = doTest()
+    fun `test spigot mapped srg`() = doTest()
 }

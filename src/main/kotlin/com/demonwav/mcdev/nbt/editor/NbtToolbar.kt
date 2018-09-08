@@ -19,7 +19,7 @@ import javax.swing.JPanel
 class NbtToolbar(nbtFile: NbtVirtualFile) {
     lateinit var panel: JPanel
     private lateinit var compressionBox: JComboBox<CompressionSelection>
-    private lateinit var saveButton: JButton
+    lateinit var saveButton: JButton
 
     private var lastSelection: CompressionSelection
 
@@ -35,7 +35,7 @@ class NbtToolbar(nbtFile: NbtVirtualFile) {
             compressionBox.isEnabled = false
         } else {
             compressionBox.addActionListener {
-                saveButton.isVisible = lastSelection != selection
+                checkModified()
             }
         }
 
@@ -44,12 +44,17 @@ class NbtToolbar(nbtFile: NbtVirtualFile) {
         }
 
         saveButton.addActionListener {
-            saveButton.isVisible = false
+            lastSelection = selection
+            checkModified()
 
             runWriteTaskLater {
                 nbtFile.writeFile(this)
             }
         }
+    }
+
+    private fun checkModified() {
+        saveButton.isVisible = lastSelection != selection
     }
 
     val selection

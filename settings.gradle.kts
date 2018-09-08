@@ -8,4 +8,5 @@
  * MIT License
  */
 
-rootProject.name = "MinecraftDev"
+val name: String by settings
+rootProject.name = name

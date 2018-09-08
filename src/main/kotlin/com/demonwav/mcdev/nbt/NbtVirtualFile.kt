@@ -13,12 +13,19 @@ package com.demonwav.mcdev.nbt
 import com.demonwav.mcdev.nbt.editor.CompressionSelection
 import com.demonwav.mcdev.nbt.editor.NbtToolbar
 import com.demonwav.mcdev.nbt.lang.NbttFile
+import com.demonwav.mcdev.nbt.lang.NbttLanguage
+import com.demonwav.mcdev.util.invokeLaterAny
+import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
+import com.intellij.psi.codeStyle.CodeStyleManager
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
@@ -33,20 +40,37 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
     val parseSuccessful: Boolean
 
     init {
+        this.bytes = byteArrayOf()
+        var text: String
+
         var tempCompressed: Boolean
         var tempParseSuccessful: Boolean
         try {
             val (rootCompound, isCompressed) = Nbt.buildTagTree(backingFile.inputStream, TimeUnit.SECONDS.toMillis(1))
-            this.bytes = rootCompound.toString().toByteArray()
+            text = rootCompound.toString()
             tempCompressed = isCompressed
             tempParseSuccessful = true
         } catch (e: MalformedNbtFileException) {
-            this.bytes = "Malformed NBT file:\n${e.message}".toByteArray()
+            text = "Malformed NBT file:\n${e.message}"
             tempCompressed = false
             tempParseSuccessful = false
         }
+
         this.isCompressed = tempCompressed
         this.parseSuccessful = tempParseSuccessful
+
+        if (this.parseSuccessful) {
+            val psiFile = PsiFileFactory.getInstance(project).createFileFromText(NbttLanguage, text)
+            invokeLaterAny {
+                psiFile.runWriteAction {
+                    this.bytes = PsiDocumentManager.getInstance(project).getDocument(
+                        CodeStyleManager.getInstance(project).reformat(psiFile, true) as PsiFile
+                    )?.immutableCharSequence?.toString()?.toByteArray() ?: byteArrayOf()
+                }
+            }
+        } else {
+            this.bytes = text.toByteArray()
+        }
     }
 
     override fun refresh(asynchronous: Boolean, recursive: Boolean, postRunnable: Runnable?) {
@@ -69,7 +93,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
     override fun getOutputStream(requestor: Any, newModificationStamp: Long, newTimeStamp: Long) =
         VfsUtilCore.outputStreamAddingBOM(NbtOutputStream(this, requestor), this)
 
-    fun writeFile(requestor: Any) {
+    fun writeFile(requester: Any) {
         val nbttFile = PsiManager.getInstance(project).findFile(this) as NbttFile
         val rootTag = nbttFile.getRootCompound()?.getRootCompoundTag()
 
@@ -83,11 +107,14 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
             return
         }
 
+        this.bytes = PsiDocumentManager.getInstance(project).getDocument(nbttFile)?.immutableCharSequence?.toString()?.toByteArray()
+            ?: byteArrayOf()
+
         // just to be safe
         this.parent.bom = null
         val filteredStream = when (toolbar.selection) {
-            CompressionSelection.GZIP -> GZIPOutputStream(this.parent.getOutputStream(requestor))
-            CompressionSelection.UNCOMPRESSED -> this.parent.getOutputStream(requestor)
+            CompressionSelection.GZIP -> GZIPOutputStream(this.parent.getOutputStream(requester))
+            CompressionSelection.UNCOMPRESSED -> this.parent.getOutputStream(requester)
         }
 
         DataOutputStream(filteredStream).use { stream ->

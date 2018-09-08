@@ -1,6 +1,6 @@
-FILE
-  PsiElement(COMMENT)('# Comment 1')
-  PsiElement(LINE_ENDING)('\n')
-  PsiElement(COMMENT)('# Comment 2')
-  PsiElement(LINE_ENDING)('\n')
-  PsiElement(COMMENT)('# Comment 3')
+FILE(0,35)
+  PsiElement(COMMENT)('# Comment 1')(0,11)
+  PsiElement(LINE_ENDING)('\n')(11,12)
+  PsiElement(COMMENT)('# Comment 2')(12,23)
+  PsiElement(LINE_ENDING)('\n')(23,24)
+  PsiElement(COMMENT)('# Comment 3')(24,35)

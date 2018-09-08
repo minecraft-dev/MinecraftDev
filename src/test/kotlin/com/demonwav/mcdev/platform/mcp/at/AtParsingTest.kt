@@ -17,6 +17,7 @@ class AtParsingTest : ParsingTestCase("com/demonwav/mcdev/platform/mcp/at/parser
 
     override fun getTestDataPath() = "src/test/resources"
     override fun getTestName(lowercaseFirstLetter: Boolean) = super.getTestName(lowercaseFirstLetter).substring(1).toSnakeCase("_at")
+    override fun includeRanges() = true
 
     fun `test asterisks`() = doTest(true)
     fun `test comments`() = doTest(true)

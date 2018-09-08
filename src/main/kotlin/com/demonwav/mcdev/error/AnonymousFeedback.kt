@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.error
 
 import com.demonwav.mcdev.update.PluginUtil
+import com.demonwav.mcdev.util.HttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
 import com.demonwav.mcdev.util.gson
 import com.intellij.ide.plugins.PluginManager
@@ -18,7 +19,6 @@ import com.intellij.util.io.readCharSequence
 import org.apache.commons.io.IOUtils
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
-import java.net.URL
 
 object AnonymousFeedback {
 
@@ -229,9 +229,5 @@ object AnonymousFeedback {
             agent = "$name ($version)"
         }
         agent
-    }
-
-    open class HttpConnectionFactory {
-        open fun openHttpConnection(url: String) = URL(url).openConnection() as HttpURLConnection
     }
 }

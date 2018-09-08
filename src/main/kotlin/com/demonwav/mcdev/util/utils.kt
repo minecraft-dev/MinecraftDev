@@ -19,21 +19,22 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.util.Computable
+import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import org.jetbrains.annotations.Contract
 
-inline fun runWriteTask(crossinline func: () -> Unit) {
+inline fun <T : Any?> runWriteTask(crossinline func: () -> T): T =
     if (ApplicationManager.getApplication().isWriteAccessAllowed) {
         func()
     } else {
         invokeAndWait {
-            ApplicationManager.getApplication().runWriteAction {
+            ApplicationManager.getApplication().runWriteAction(Computable {
                 func()
-            }
+            })
         }
     }
-}
 
 inline fun runWriteTaskLater(crossinline func: () -> Unit) {
     if (ApplicationManager.getApplication().isWriteAccessAllowed) {
@@ -47,13 +48,14 @@ inline fun runWriteTaskLater(crossinline func: () -> Unit) {
     }
 }
 
-inline fun invokeAndWait(crossinline func: () -> Unit) {
+inline fun <T : Any?> invokeAndWait(crossinline func: () -> T): T =
     if (ApplicationManager.getApplication().isDispatchThread) {
         func()
     } else {
-        ApplicationManager.getApplication().invokeAndWait({ func() }, ModalityState.defaultModalityState())
+        val ref = Ref<T>()
+        ApplicationManager.getApplication().invokeAndWait({ ref.set(func()) }, ModalityState.defaultModalityState())
+        ref.get()
     }
-}
 
 inline fun invokeLater(crossinline func: () -> Unit) {
     if (ApplicationManager.getApplication().isDispatchThread) {
@@ -76,7 +78,8 @@ inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
 
 inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T): T {
     val result = WriteCommandAction.writeCommandAction(this).withGlobalUndo().compute<T, Throwable> { func() }
-    PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return result)
+    PsiDocumentManager.getInstance(project)
+        .doPostponedOperationsAndUnblockDocument(FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return result)
     return result
 }
 
@@ -96,13 +99,13 @@ inline fun <T : Collection<*>> T.ifEmpty(func: () -> Unit): T {
 
 @Contract(pure = true)
 inline fun <T, R> Iterable<T>.mapFirstNotNull(transform: (T) -> R?): R? {
-    forEach { transform(it)?.let { return it } }
+    forEach { element -> transform(element)?.let { return it } }
     return null
 }
 
 @Contract(pure = true)
 inline fun <T, R> Array<T>.mapFirstNotNull(transform: (T) -> R?): R? {
-    forEach { transform(it)?.let { return it } }
+    forEach { element -> transform(element)?.let { return it } }
     return null
 }
 

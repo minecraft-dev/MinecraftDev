@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -28,13 +28,18 @@ import static com.intellij.psi.TokenType.*;
 %implements FlexLexer
 %function advance
 %type IElementType
+
+%s CLASS_NAME
+%s MEMBER_NAME
+%s TYPES
+
 %unicode
 
 PRIMITIVE=[ZBCSIFDJV]
-CLASS_VALUE=\[*([ZBCSIFDJ]|L[^;\n]+;)
+CLASS_VALUE=(\[+[ZBCSIFDJ]|(\[*L[^;\n]+;))
 KEYWORD_ELEMENT=(public|private|protected|default)([-+]f)?
-NAME_ELEMENT=[a-zA-Z0-9_]+|<init>
-CLASS_NAME_ELEMENT=[a-zA-Z_$0-9\.]*[a-zA-Z_$0-9]
+NAME_ELEMENT=([\p{L}_\p{Sc}][\p{L}\p{N}_\p{Sc}]*)|<init>
+CLASS_NAME_ELEMENT=([\p{L}_\p{Sc}][\p{L}\p{N}_\p{Sc}]*\.)*[\p{L}_\p{Sc}][\p{L}\p{N}_\p{Sc}]*
 COMMENT=#.*
 CRLF=\n|\r|\r\n
 WHITE_SPACE=\s
@@ -42,20 +47,27 @@ WHITE_SPACE=\s
 %%
 
 <YYINITIAL> {
-    {CRLF}                                      { return CRLF; }
-    {WHITE_SPACE}                               { return WHITE_SPACE; }
-
-    "("                                         { return OPEN_PAREN; }
-    ")"                                         { return CLOSE_PAREN; }
-    "*" | "*()"                                 { return ASTERISK_ELEMENT; }
-
-    {PRIMITIVE} ({PRIMITIVE}|{CLASS_VALUE})*    { zzMarkedPos = zzStartRead + 1; return PRIMITIVE; }
-
-    {CLASS_VALUE}                               { return CLASS_VALUE; }
-    {KEYWORD_ELEMENT}                           { return KEYWORD_ELEMENT; }
-    {NAME_ELEMENT}                              { return NAME_ELEMENT; }
-    {CLASS_NAME_ELEMENT}                        { return CLASS_NAME_ELEMENT; }
-    {COMMENT}                                   { return COMMENT; }
+    {KEYWORD_ELEMENT}                           { yybegin(CLASS_NAME); return KEYWORD_ELEMENT; }
 }
 
+<CLASS_NAME> {
+    {CLASS_NAME_ELEMENT}                        { yybegin(MEMBER_NAME); return CLASS_NAME_ELEMENT; }
+}
+
+<MEMBER_NAME> {
+    "*" | "*()"                                 { return ASTERISK_ELEMENT; }
+    {NAME_ELEMENT}                              { yybegin(TYPES); return NAME_ELEMENT; }
+}
+
+<TYPES> {
+    "("                                         { return OPEN_PAREN; }
+    ")"                                         { return CLOSE_PAREN; }
+    {CLASS_VALUE}                               { return CLASS_VALUE; }
+    {PRIMITIVE} ({PRIMITIVE}|{CLASS_VALUE})*    { zzMarkedPos = zzStartRead + 1; return PRIMITIVE; }
+}
+
+{CRLF}                                          { yybegin(YYINITIAL); return CRLF; }
+{WHITE_SPACE}                                   { return WHITE_SPACE; }
+
+{COMMENT}                                       { return COMMENT; }
 [^]                                             { return BAD_CHARACTER; }

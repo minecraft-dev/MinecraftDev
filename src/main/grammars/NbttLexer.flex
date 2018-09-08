@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -64,7 +64,6 @@ BYTE_ARRAY_LITERAL = [+-]?\d+[bB]?|true|false
 ARRAY_INT_LITEARL = [+-]?\d+[iI]
 
 LONG_ARRAY_LITERAL = [+-]?\d+[lL]?
-
 
 %%
 
