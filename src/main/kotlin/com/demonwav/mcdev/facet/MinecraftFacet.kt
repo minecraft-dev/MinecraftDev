@@ -90,10 +90,15 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
         updateRoots()
 
         // Add modules which are new
+        val newlyEnabled = mutableListOf<AbstractModule>()
         allEnabled
             .map { it.type }
             .filter { !moduleMap.containsKey(it) }
-            .forEach(this::register)
+            .forEach {
+                newlyEnabled += register(it)
+            }
+
+        newlyEnabled.forEach(AbstractModule::init)
 
         ProjectView.getInstance(module.project).refresh()
     }
@@ -115,9 +120,11 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
             }
     }
 
-    private fun register(type: AbstractModuleType<*>) {
+    private fun register(type: AbstractModuleType<*>): AbstractModule {
         type.performCreationSettingSetup(module.project)
-        moduleMap[type] = type.generateModule(this)
+        val module = type.generateModule(this)
+        moduleMap[type] = module
+        return module
     }
 
     val modules get() = moduleMap.values

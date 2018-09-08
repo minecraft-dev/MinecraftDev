@@ -19,6 +19,10 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.canary.generation.CanaryGenerationData
 import com.demonwav.mcdev.platform.canary.util.CanaryConstants
 import com.demonwav.mcdev.util.nullable
+import com.demonwav.mcdev.util.runWriteTaskLater
+import com.intellij.lang.properties.PropertiesFileType
+import com.intellij.openapi.fileTypes.FileNameMatcher
+import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotationMemberValue
@@ -36,6 +40,15 @@ class CanaryModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, overrid
         private set
     var neptuneInf by nullable { facet.findFile(CanaryConstants.NEPTUNE_INF, SourceType.RESOURCE) }
         private set
+
+    override fun init() {
+        runWriteTaskLater {
+            FileTypeManager.getInstance().associate(PropertiesFileType.INSTANCE, object : FileNameMatcher {
+                override fun accept(fileName: String) = fileName == CanaryConstants.CANARY_INF
+                override fun getPresentableString() = CanaryConstants.CANARY_INF
+            })
+        }
+    }
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) =
         CanaryConstants.HOOK_CLASS == eventClass.qualifiedName

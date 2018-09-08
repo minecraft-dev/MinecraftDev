@@ -715,21 +715,8 @@
     </application-components>
 
     <project-components>
-        <!-- Application components for Project open listeners -->
         <component>
             <implementation-class>com.demonwav.mcdev.facet.MinecraftFacetDetector</implementation-class>
-            <loadForDefaultProject/>
-        </component>
-        <component>
-            <implementation-class>com.demonwav.mcdev.platform.forge.ForgeProjectComponent</implementation-class>
-            <loadForDefaultProject/>
-        </component>
-        <component>
-            <implementation-class>com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyProjectComponent</implementation-class>
-            <loadForDefaultProject/>
-        </component>
-        <component>
-            <implementation-class>com.demonwav.mcdev.platform.canary.CanaryProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>
         <component>

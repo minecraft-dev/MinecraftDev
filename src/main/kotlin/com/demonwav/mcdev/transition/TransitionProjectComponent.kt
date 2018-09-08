@@ -18,7 +18,6 @@ import com.intellij.openapi.project.Project
 class TransitionProjectComponent(project: Project) : AbstractProjectComponent(project) {
 
     override fun projectOpened() {
-        super.projectOpened()
         // Reset all Modules back to JavaModuleType
         for (module in ModuleManager.getInstance(project).modules) {
             for (type in types) {

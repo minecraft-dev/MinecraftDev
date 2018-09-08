@@ -83,5 +83,6 @@ abstract class AbstractModule(protected val facet: MinecraftFacet) {
         return parameters.isNotEmpty() && refResolve != parameters[0]
     }
 
+    open fun init() {}
     open fun dispose() {}
 }
