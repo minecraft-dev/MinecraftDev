@@ -132,6 +132,7 @@
         </intentionAction>
         <codeFoldingOptionsProvider instance="com.demonwav.mcdev.i18n.I18nCodeFoldingOptionsProvider"/>
         <applicationService serviceImplementation="com.demonwav.mcdev.i18n.I18nFoldingSettings"/>
+        <typedHandler implementation="com.demonwav.mcdev.i18n.lang.I18nTypedHandlerDelegate" />
         <completion.contributor language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nCompletionContributor" />
         <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.i18n.reference.I18nReferenceCompletionConfidence"
                                order="before javaSkipAutopopupInStrings"/>
@@ -209,6 +210,7 @@
         <lang.syntaxHighlighterFactory language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.at.AtColorSettingsPage" />
         <lang.commenter language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCommenter" />
+        <typedHandler implementation="com.demonwav.mcdev.platform.mcp.at.completion.AtTypedHandlerDelegate" />
         <completion.contributor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.completion.AtCompletionContributor" />
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.at.AtGotoDeclarationHandler" />
         <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>

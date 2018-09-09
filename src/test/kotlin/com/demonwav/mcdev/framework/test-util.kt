@@ -17,6 +17,7 @@ import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.JarFileSystem
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.StandardFileSystems
 
 val mockJdk by lazy {
@@ -40,6 +41,9 @@ fun createLibrary(project: Project, name: String): Library {
         library
     }
 }
+
+val Project.baseDirPath
+    get() = LocalFileSystem.getInstance().findFileByPath(this.basePath!!)!!
 
 fun String.toSnakeCase(postFix: String = "") =
     replace(" ", "_") + postFix

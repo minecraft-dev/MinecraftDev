@@ -41,7 +41,7 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
     private val project
         get() = fixture.project
     private val root
-        get() = fixture.project.baseDir
+        get() = fixture.project.baseDirPath
 
     var intermediatePath = ""
 
@@ -85,8 +85,8 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
         runWriteAction {
             VfsUtil.markDirtyAndRefresh(false, true, true, root)
             // Make sure to always add the module content root
-            if (fixture.module.rootManager.contentEntries.none { it.file == project.baseDir }) {
-                ModuleRootModificationUtil.addContentRoot(fixture.module, project.baseDir)
+            if (fixture.module.rootManager.contentEntries.none { it.file == project.baseDirPath }) {
+                ModuleRootModificationUtil.addContentRoot(fixture.module, project.baseDirPath)
             }
 
             builder()

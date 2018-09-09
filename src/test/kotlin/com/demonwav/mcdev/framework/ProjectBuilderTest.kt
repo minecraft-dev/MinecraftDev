@@ -20,11 +20,11 @@ abstract class ProjectBuilderTest : LightCodeInsightFixtureTestCase() {
     protected fun buildProject(builder: ProjectBuilder.() -> Unit) = ProjectBuilder(myFixture).build(builder)
 
     fun ProjectBuilder.src(block: ProjectBuilder.() -> Unit) {
-        val srcFolder = VfsUtil.createDirectoryIfMissing(project.baseDir, "src")
-        val entry = myFixture.module.rootManager.contentEntries.first { it.file == project.baseDir }
+        val srcFolder = VfsUtil.createDirectoryIfMissing(project.baseDirPath, "src")
+        val entry = myFixture.module.rootManager.contentEntries.first { it.file == project.baseDirPath }
         if (!entry.sourceFolderFiles.contains(srcFolder)) {
             ModuleRootModificationUtil.updateModel(myFixture.module) { model ->
-                model.contentEntries.first { it.file == project.baseDir }.addSourceFolder(srcFolder, false)
+                model.contentEntries.first { it.file == project.baseDirPath }.addSourceFolder(srcFolder, false)
             }
         }
 
@@ -33,7 +33,7 @@ abstract class ProjectBuilderTest : LightCodeInsightFixtureTestCase() {
 
     override fun tearDown() {
         ModuleRootModificationUtil.updateModel(myFixture.module) { model ->
-            model.removeContentEntry(model.contentEntries.first { it.file == project.baseDir })
+            model.removeContentEntry(model.contentEntries.first { it.file == project.baseDirPath })
         }
 
         super.tearDown()

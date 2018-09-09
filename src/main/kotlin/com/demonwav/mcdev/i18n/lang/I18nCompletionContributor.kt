@@ -31,12 +31,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiUtilCore
 
 class I18nCompletionContributor : CompletionContributor() {
-    override fun invokeAutoPopup(position: PsiElement, typeChar: Char): Boolean {
-        if (typeChar == '.') {
-            return true
-        }
-        return super.invokeAutoPopup(position, typeChar)
-    }
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         if (parameters.completionType != CompletionType.BASIC) {

@@ -21,7 +21,7 @@ class AtCommenterTest : BaseMinecraftTest(PlatformType.MCP) {
         get() = getTestName(true)
 
     // Dirty hack :(
-    override fun getTestDataPath() = project.baseDir.path
+    override fun getTestDataPath() = project.basePath!!
 
     private fun doTest(actionId: String, @Language("Access Transformers") before: String, @Language("Access Transformers") after: String) {
         buildProject {

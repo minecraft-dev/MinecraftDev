@@ -26,6 +26,7 @@ import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsPr
 import com.intellij.openapi.externalSystem.service.project.manage.AbstractProjectDataService
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import java.io.File
@@ -43,7 +44,9 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             return
         }
 
-        val hello = VfsUtil.findRelativeFile(project.baseDir, ".gradle", GradleBuildSystem.HELLO) ?: return
+        val basePath = project.basePath ?: return
+        val baseDir = LocalFileSystem.getInstance().findFileByPath(basePath)
+        val hello = VfsUtil.findRelativeFile(baseDir, ".gradle", GradleBuildSystem.HELLO) ?: return
         if (!hello.exists()) {
             return
         }
@@ -86,7 +89,7 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             }
 
             runClientConfiguration.workingDirectory = project.basePath + File.separator + "run"
-            runClientConfiguration.setMainClassName("GradleStart")
+            runClientConfiguration.mainClassName = "GradleStart"
 
             if (size == 1) {
                 runClientConfiguration.setModule(mainModule ?: rootModule)
@@ -114,7 +117,7 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
                 ApplicationConfigurationType.getInstance()
             )
 
-            runServerConfiguration.setMainClassName("GradleStartServer")
+            runServerConfiguration.mainClassName = "GradleStartServer"
             runServerConfiguration.programParameters = "nogui"
             runServerConfiguration.workingDirectory = project.basePath + File.separator + "run"
 

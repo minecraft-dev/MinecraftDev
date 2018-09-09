@@ -326,8 +326,9 @@ class GradleBuildSystem : BuildSystem() {
     private fun requestCreateForgeRunConfigs(project: Project, rootModule: Module, configurations: Collection<ProjectConfiguration>) {
         runWriteTaskLater {
             // Basically mark this as a newly created project
-            val gradleDir = VfsUtil.createDirectoryIfMissing(project.baseDir, ".gradle")
-            val hello = gradleDir.findOrCreateChildData(this, HELLO)
+            val basePath = project.basePath ?: return@runWriteTaskLater // If this is null there's not much we can do
+            val gradleDir = VfsUtil.createDirectoryIfMissing("$basePath/.gradle")
+            val hello = gradleDir?.findOrCreateChildData(this, HELLO) ?: return@runWriteTaskLater
 
             hello.setBinaryContent((rootModule.name + "\n" + configurations.size).toByteArray(Charsets.UTF_8))
         }

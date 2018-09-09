@@ -48,13 +48,6 @@ import com.intellij.util.PlatformIcons
 
 class AtCompletionContributor : CompletionContributor() {
 
-    override fun invokeAutoPopup(position: PsiElement, typeChar: Char): Boolean {
-        if (typeChar == '$') {
-            return true
-        }
-        return super.invokeAutoPopup(position, typeChar)
-    }
-
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         if (parameters.completionType != CompletionType.BASIC) {
             return
@@ -67,7 +60,11 @@ class AtCompletionContributor : CompletionContributor() {
 
         val parent = position.parent
 
-        val text = parent.text.let { it.substring(0, it.length - CompletionUtil.DUMMY_IDENTIFIER.length) }
+        val parentText = parent.text ?: return
+        if (parentText.length < CompletionUtil.DUMMY_IDENTIFIER.length) {
+            return
+        }
+        val text = parentText.substring(0, parentText.length - CompletionUtil.DUMMY_IDENTIFIER.length)
 
         when {
             AFTER_KEYWORD.accepts(parent) -> handleAtClassName(text, parent, result)
