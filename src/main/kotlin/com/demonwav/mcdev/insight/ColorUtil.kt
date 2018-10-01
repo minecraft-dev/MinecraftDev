@@ -62,12 +62,13 @@ fun PsiElement.setColor(color: String) {
     }
 }
 
-fun PsiLiteralExpression.setColor(value: Int) {
+fun PsiLiteralExpression.setColor(value: Int, hasAlpha: Boolean = false) {
     this.containingFile.runWriteAction {
         val node = this.node
 
+        val padLength = if (hasAlpha) 8 else 6
         val literalExpression = JavaPsiFacade.getElementFactory(this.project)
-            .createExpressionFromText("0x" + Integer.toHexString(value).toUpperCase(), null) as PsiLiteralExpression
+            .createExpressionFromText("0x" + Integer.toHexString(value).toUpperCase().padStart(padLength, '0'), null) as PsiLiteralExpression
 
         node.psi.replace(literalExpression)
     }
