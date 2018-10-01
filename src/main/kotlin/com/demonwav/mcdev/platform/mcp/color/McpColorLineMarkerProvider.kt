@@ -72,7 +72,7 @@ class McpColorLineMarkerProvider : LineMarkerProvider {
             return AllIcons.Gutter.Colors
         }
 
-        override fun getElementPresentation(element: PsiElement?): String {
+        override fun getElementPresentation(element: PsiElement): String {
             return result.param.description
         }
     }
