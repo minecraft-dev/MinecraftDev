@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2017 minecraft-dev
+ * Copyright (c) 2018 minecraft-dev
  *
  * MIT License
  */
@@ -30,66 +30,6 @@ import java.awt.Color
 import java.lang.reflect.Type
 
 data class McpColorMethod(val member: MemberReference, val srgName: Boolean, val params: List<Param>) {
-    companion object {
-        val vanilla = listOf(
-            McpColorMethod(
-                MemberReference("func_73734_a", "(IIIII)V", "net.minecraft.client.gui.Gui"),
-                true,
-                listOf(SingleIntParam(4, "Rectangle Color", true))
-            ),
-            McpColorMethod(
-                MemberReference("func_73730_a", "(IIII)V", "net.minecraft.client.gui.Gui"),
-                true,
-                listOf(SingleIntParam(3, "Line Color", true))
-            ),
-            McpColorMethod(
-                MemberReference("func_73728_b", "(IIII)V", "net.minecraft.client.gui.Gui"),
-                true,
-                listOf(SingleIntParam(3, "Line Color", true))
-            ),
-            McpColorMethod(
-                MemberReference("func_73733_a", "(IIIIII)V", "net.minecraft.client.gui.Gui"),
-                true,
-                listOf(SingleIntParam(4, "Start Color", true), SingleIntParam(5, "End Color", true))
-            ),
-            McpColorMethod(
-                MemberReference("func_179131_c", "(FFFF)V", "net.minecraft.client.renderer.GlStateManager"),
-                true,
-                listOf(FloatVectorParam(0, "Color Multiplier", true))
-            ),
-            McpColorMethod(
-                MemberReference("func_179124_c", "(FFF)V", "net.minecraft.client.renderer.GlStateManager"),
-                true,
-                listOf(FloatVectorParam(0, "Color Multiplier", false))
-            ),
-            McpColorMethod(
-                MemberReference("func_179082_a", "(FFFF)V", "net.minecraft.client.renderer.GlStateManager"),
-                true,
-                listOf(FloatVectorParam(0, "Clear Color", true))
-            ),
-            McpColorMethod(
-                MemberReference("func_178994_b", "(FFFI)V", "net.minecraft.client.renderer.BufferBuilder"),
-                true,
-                listOf(FloatVectorParam(0, "Color Multiplier", false))
-            ),
-            McpColorMethod(
-                MemberReference("func_178994_b", "(FFFI)V", "net.minecraft.client.renderer.BufferBuilder"),
-                true,
-                listOf(FloatVectorParam(0, "Color Multiplier", false))
-            ),
-            McpColorMethod(
-                MemberReference("func_181666_a", "(FFFF)Lnet/minecraft/client/renderer/BufferBuilder;", "net.minecraft.client.renderer.BufferBuilder"),
-                true,
-                listOf(FloatVectorParam(0, "Color Multiplier", true))
-            ),
-            McpColorMethod(
-                MemberReference("func_181669_b", "(IIII)Lnet/minecraft/client/renderer/BufferBuilder;", "net.minecraft.client.renderer.BufferBuilder"),
-                true,
-                listOf(IntVectorParam(0, "Color Multiplier", true))
-            )
-        )// net.minecraft.client.renderer.BufferBuilder func_181669_b(IIII)Lnet/minecraft/client/renderer/BufferBuilder; #color
-    }
-
     fun match(call: PsiCall): Boolean {
         val referenced = call.referencedMethod
         return referenced != null && referenced == getMethod(call)
