@@ -101,6 +101,14 @@ object BukkitTemplate {
             properties.setProperty("HAS_WEBSITE", "true")
         }
 
+        // Plugins targeting 1.13 or newer need an explicit api declaration flag
+        // Unfortunately this flag has no contract to match any specific API version
+        val mcVer = settings.minecraftVersion.substring(0, 4).toDoubleOrNull()
+        if (mcVer != null && mcVer >= 1.13) {
+            properties.setProperty("API_VERSION", "1.13")
+            properties.setProperty("HAS_API_VERSION", "true")
+        }
+
         BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_PLUGIN_YML_TEMPLATE, properties, true)
     }
 }
