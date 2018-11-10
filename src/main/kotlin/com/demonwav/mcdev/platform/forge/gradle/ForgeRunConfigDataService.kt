@@ -16,8 +16,6 @@ import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.execution.RunManager
 import com.intellij.execution.application.ApplicationConfiguration
 import com.intellij.execution.application.ApplicationConfigurationType
-import com.intellij.execution.impl.RunManagerImpl
-import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.ProjectKeys
@@ -73,12 +71,15 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             }
             val forgeModule = moduleMap[rootModule.name + "-forge"]
 
+            val runManager = RunManager.getInstance(project)
+            val factory = ApplicationConfigurationType.getInstance().configurationFactories.first()
+
             // Client run config
-            val runClientConfiguration = ApplicationConfiguration(
+            val clientSettings = runManager.createConfiguration(
                 (forgeModule ?: rootModule).name + " run client",
-                project,
-                ApplicationConfigurationType.getInstance()
+                factory
             )
+            val runClientConfiguration = clientSettings.configuration as ApplicationConfiguration
 
             val runningDir = File(project.basePath, "run")
             if (!runningDir.exists()) {
@@ -86,35 +87,27 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             }
 
             runClientConfiguration.workingDirectory = project.basePath + File.separator + "run"
-            runClientConfiguration.setMainClassName("GradleStart")
+            runClientConfiguration.mainClassName = "GradleStart"
 
             if (size == 1) {
                 runClientConfiguration.setModule(mainModule ?: rootModule)
             } else {
                 runClientConfiguration.setModule(mainModule ?: forgeModule ?: rootModule)
             }
-
-            val clientSettings = RunnerAndConfigurationSettingsImpl(
-                RunManagerImpl.getInstanceImpl(project),
-                runClientConfiguration,
-                false
-            )
-
             clientSettings.isActivateToolWindowBeforeRun = true
             clientSettings.isSingleton = true
 
-            val runManager = RunManager.getInstance(project)
             runManager.addConfiguration(clientSettings, false)
             runManager.selectedConfiguration = clientSettings
 
             // Server run config
-            val runServerConfiguration = ApplicationConfiguration(
+            val serverSettings = runManager.createConfiguration(
                 (forgeModule ?: rootModule).name + " run server",
-                project,
-                ApplicationConfigurationType.getInstance()
+                factory
             )
+            val runServerConfiguration = serverSettings.configuration as ApplicationConfiguration
 
-            runServerConfiguration.setMainClassName("GradleStartServer")
+            runServerConfiguration.mainClassName = "GradleStartServer"
             runServerConfiguration.programParameters = "nogui"
             runServerConfiguration.workingDirectory = project.basePath + File.separator + "run"
 
@@ -123,12 +116,6 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             } else {
                 runServerConfiguration.setModule(mainModule ?: forgeModule ?: rootModule)
             }
-
-            val serverSettings = RunnerAndConfigurationSettingsImpl(
-                RunManagerImpl.getInstanceImpl(project),
-                runServerConfiguration,
-                false
-            )
 
             serverSettings.isActivateToolWindowBeforeRun = true
             serverSettings.isSingleton = true
