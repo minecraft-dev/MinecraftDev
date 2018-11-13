@@ -1,6 +1,9 @@
 name: ${NAME}
 version: ${VERSION}
 main: ${MAIN}
+#if (${HAS_API_VERSION})
+api-version: ${API_VERSION}
+#end
 #if (${HAS_PREFIX})
 prefix: ${PREFIX}
 #end
