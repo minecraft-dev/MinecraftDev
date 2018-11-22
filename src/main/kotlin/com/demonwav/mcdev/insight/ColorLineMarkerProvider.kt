@@ -23,7 +23,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiUtilBase
 import com.intellij.util.FunctionUtil
 import com.intellij.util.ui.ColorIcon
-import com.intellij.util.ui.TwoColorsIcon
+import com.intellij.util.ui.ColorsIcon
 import java.awt.Color
 import javax.swing.Icon
 
@@ -88,7 +88,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
 
         override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<*>>): Icon {
             if (infos.size == 2 && infos[0] is ColorInfo && infos[1] is ColorInfo) {
-                return TwoColorsIcon(12, (infos[0] as ColorInfo).color, (infos[1] as ColorInfo).color)
+                return ColorsIcon(12, (infos[0] as ColorInfo).color, (infos[1] as ColorInfo).color)
             }
             return AllIcons.Gutter.Colors
         }

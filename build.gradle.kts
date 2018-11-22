@@ -97,7 +97,8 @@ dependencies {
     "testLibs"("org.spongepowered:mixin:0.7-SNAPSHOT:thin")
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
-    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:183.4284.85")
+    // intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)
+    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:191-SNAPSHOT")
 }
 
 intellij {
