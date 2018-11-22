@@ -23,10 +23,10 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.2.51" // kept in sync with IntelliJ's bundled dep
+    id("org.jetbrains.kotlin.jvm") version "1.3.0" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.3.9"
+    id("org.jetbrains.intellij") version "0.3.12"
     id("net.minecrell.licenser") version "0.4.1"
 }
 
@@ -97,8 +97,7 @@ dependencies {
     "testLibs"("org.spongepowered:mixin:0.7-SNAPSHOT:thin")
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
-    // intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)
-    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:183-EAP-SNAPSHOT")
+    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:183.4284.85")
 }
 
 intellij {

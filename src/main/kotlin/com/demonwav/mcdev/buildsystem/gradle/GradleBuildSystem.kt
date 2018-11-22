@@ -67,7 +67,7 @@ class GradleBuildSystem : BuildSystem() {
     var buildGradle: VirtualFile? = null
 
     override fun create(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
-        rootDirectory.refresh(false,  true)
+        rootDirectory.refresh(false, true)
         createDirectories()
 
         if (configuration.type == PlatformType.FORGE || configuration is SpongeForgeProjectConfiguration) {
@@ -204,11 +204,11 @@ class GradleBuildSystem : BuildSystem() {
         element.children.asSequence()
             .filter {
                 // We want to find the child which has a GrReferenceExpression with the right name
-                it.children.any { it is GrReferenceExpression && it.text == name }
+                it.children.any { child -> child is GrReferenceExpression && child.text == name }
             }.map {
                 // We want to find the grandchild which is a GrClosable block, this is the
                 // basis for the method block
-                it.children.mapNotNull { it as? GrClosableBlock }.firstOrNull()
+                it.children.mapNotNull { child -> child as? GrClosableBlock }.firstOrNull()
             }.filterNotNull()
             .firstOrNull()
 
@@ -294,6 +294,8 @@ class GradleBuildSystem : BuildSystem() {
                 requestCreateForgeRunConfigs(project, rootModule, configurations)
             }
 
+            val runManager = RunManager.getInstance(project)
+
             val runConfiguration = ExternalSystemRunConfiguration(
                 GradleConstants.SYSTEM_ID,
                 project,
@@ -306,16 +308,15 @@ class GradleBuildSystem : BuildSystem() {
             runConfiguration.settings.executionName = rootModule.name + " build"
             runConfiguration.settings.taskNames = listOf("build")
 
-            val settings = RunnerAndConfigurationSettingsImpl(
-                RunManagerImpl.getInstanceImpl(project),
+            runConfiguration.isAllowRunningInParallel = false
+
+            val settings = runManager.createConfiguration(
                 runConfiguration,
-                false
+                GradleExternalTaskConfigurationType.getInstance().configurationFactories.first()
             )
 
             settings.isActivateToolWindowBeforeRun = true
-            settings.isSingleton = true
 
-            val runManager = RunManager.getInstance(project)
             runManager.addConfiguration(settings, false)
             if (runManager.selectedConfiguration == null) {
                 runManager.selectedConfiguration = settings

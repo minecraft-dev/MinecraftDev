@@ -174,7 +174,7 @@ fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
 @get:Contract(pure = true)
 val PsiElement.anonymousElements: Array<PsiElement>
     get() {
-        for (provider in Extensions.getExtensions(AnonymousElementProvider.EP_NAME)) {
+        for (provider in AnonymousElementProvider.EP_NAME.extensionList) {
             val elements = provider.getAnonymousElements(this)
             if (elements.isNotEmpty()) {
                 return elements

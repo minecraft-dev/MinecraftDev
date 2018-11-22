@@ -33,6 +33,7 @@ import com.intellij.ide.util.MemberChooser
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
@@ -189,7 +190,7 @@ private fun copyModifiers(modifiers: PsiModifierList, newModifiers: PsiModifierL
 
 private fun copyAnnotations(file: PsiFile, modifiers: PsiModifierList, newModifiers: PsiModifierList) {
     // Copy annotations registered by extensions (e.g. @Nullable), based on OverrideImplementUtil.annotateOnOverrideImplement
-    for (ext in Extensions.getExtensions(OverrideImplementsAnnotationsHandler.EP_NAME)) {
+    for (ext in OverrideImplementsAnnotationsHandler.EP_NAME.extensionList) {
         for (annotation in ext.getAnnotations(file)) {
             copyAnnotation(modifiers, newModifiers, annotation)
         }
