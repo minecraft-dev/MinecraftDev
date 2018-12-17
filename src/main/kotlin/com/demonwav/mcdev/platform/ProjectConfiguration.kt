@@ -43,8 +43,11 @@ abstract class ProjectConfiguration {
 
     fun hasDescription() = description.isNotBlank()
 
-    protected fun commaSplit(string: String) =
-        string.trim().replace("[\\[\\]]".toRegex(), "").split("\\s*,\\s*".toRegex()).toTypedArray()
+    protected fun commaSplit(string: String): List<String> {
+        var output = ArrayList<String>(0) as List<String>
+        if(!string.isBlank()) output = string.trim().replace("[\\[\\]]".toRegex(), "").split("\\s*,\\s*".toRegex()).toList()
+        return output
+    }
 
     @Contract("null -> false")
     fun listContainsAtLeastOne(list: MutableList<String>?): Boolean {
