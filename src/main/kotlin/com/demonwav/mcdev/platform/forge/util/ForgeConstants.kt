@@ -21,5 +21,7 @@ object ForgeConstants {
     const val SUBSCRIBE_EVENT_ANNOTATION = "net.minecraftforge.fml.common.eventhandler.SubscribeEvent"
     const val FML_EVENT = "net.minecraftforge.fml.common.event.FMLEvent"
     const val EVENT = "net.minecraftforge.fml.common.eventhandler.Event"
+    const val NETWORK_MESSAGE = "net.minecraftforge.fml.common.network.simpleimpl.IMessage"
+    const val NETWORK_MESSAGE_HANDLER = "net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler"
     const val MCMOD_INFO = "mcmod.info"
 }
