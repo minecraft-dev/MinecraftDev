@@ -392,6 +392,14 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.LocalVariableDeclarationSideOnlyInspection"/>
+
+        <localInspection displayName="IMessage or IMessageHandler implementation without empty constructor"
+                         groupName="Minecraft Forge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.forge.inspections.simpleimpl.MissingMessageConstructorInspection"/>
         <!--endregion-->
 
         <!--region MCP INSPECTIONS-->
