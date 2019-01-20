@@ -109,7 +109,7 @@ object AnonymousFeedback {
         val list = getAllIssues("https://api.github.com/repos/minecraft-dev/MinecraftDev/issues" +
                                     "?state=all&creator=minecraft-dev-autoreporter&per_page=100", factory) ?: return null
         val block = list.firstOrNull {
-            val body = it["body"] as? String ?: return@firstOrNull false
+            val body = (it["body"] as? String ?: return@firstOrNull false).replace(Regex("[\r\n]+"), "\n")
 
             // We can't comment on locked issues
             if (it["locked"] as Boolean) {
