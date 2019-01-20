@@ -49,7 +49,7 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
             buildSystemBox.selectedIndex = 1
             buildSystemBox.setVisible(false)
         } else if (creator.settings.values
-            .any { s -> s.type === PlatformType.SPONGE || s.type === PlatformType.CANARY || s.type === PlatformType.NEPTUNE }) {
+            .any { s -> s.type === PlatformType.SPONGE }) {
             buildSystemBox.selectedIndex = 1
             buildSystemBox.setVisible(true)
         } else {

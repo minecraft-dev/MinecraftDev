@@ -20,7 +20,7 @@
     <vendor email="demonwav@gmail.com" url="https://minecraftdev.org/">DemonWav</vendor>
 
     <description><![CDATA[
-      Brings support for Bukkit, Spigot, Paper, Sponge, Forge, MCP, Mixins, BungeeCord, Waterfall, LiteLoader, Canary and Neptune projects
+      Brings support for Bukkit, Spigot, Paper, Sponge, Forge, MCP, Mixins, BungeeCord, Waterfall, and LiteLoader projects
       to Intellij IDEA.
     ]]></description>
 
@@ -47,7 +47,6 @@
                 * LiteLoader
                 * MCP
                 * Mixin
-                * Canary
                 * BungeeCord
         -->
 
@@ -262,15 +261,6 @@
         <debuggerClassFilterProvider implementation="com.demonwav.mcdev.platform.mixin.debug.MixinDebuggerClassFilterProvider"/>
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.mixin.framework.MixinPresentationProvider" />
-        <!--endregion-->
-
-        <!--region CANARY-->
-        <!---->
-
-        <fileIconProvider implementation="com.demonwav.mcdev.platform.canary.CanaryFileIconProvider"/>
-
-        <library.presentationProvider implementation="com.demonwav.mcdev.platform.canary.framework.CanaryPresentationProvider" />
-        <library.presentationProvider implementation="com.demonwav.mcdev.platform.canary.framework.NeptunePresentationProvider" />
         <!--endregion-->
 
         <!--region BUNGEECORD-->
@@ -656,30 +646,6 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.MixinPluginInspection"/>
-        <!--endregion-->
-
-        <!--region CANARY INSPECTIONS-->
-        <localInspection displayName="Canary @Command in class not implementing CommandListener"
-                         groupName="Minecraft Canary"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="WARNING"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.canary.inspection.CanaryCommandImplementedInspection"/>
-        <localInspection displayName="Canary @HookHandler in class not implementing PluginListener"
-                         groupName="Minecraft Canary"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="WARNING"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.canary.inspection.CanaryListenerImplementedInspection"/>
-        <localInspection displayName="Canary @TabComplete in class not implementing PluginListener"
-                         groupName="Minecraft Canary"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="WARNING"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.canary.inspection.CanaryTabCompleteImplementedInspection"/>
         <!--endregion-->
 
         <!--region BUNGEECORD INSPECTIONS-->

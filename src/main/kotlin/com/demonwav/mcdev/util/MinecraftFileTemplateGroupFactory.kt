@@ -51,10 +51,6 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
         group.addTemplate(FileTemplateDescriptor(LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.LITELOADER_ICON))
         group.addTemplate(FileTemplateDescriptor(LITELOADER_MAIN_CLASS_TEMPLATE, PlatformAssets.LITELOADER_ICON))
 
-        group.addTemplate(FileTemplateDescriptor(CANARY_MAIN_CLASS_TEMPLATE, PlatformAssets.CANARY_ICON))
-        group.addTemplate(FileTemplateDescriptor(CANARY_INF_TEMPLATE, PlatformAssets.CANARY_ICON))
-        group.addTemplate(FileTemplateDescriptor(CANARY_POM_TEMPLATE, PlatformAssets.CANARY_ICON))
-
         group.addTemplate(FileTemplateDescriptor(MIXIN_OVERWRITE_FALLBACK, PlatformAssets.MIXIN_ICON))
 
         return group
@@ -90,10 +86,6 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
         const val LITELOADER_BUILD_GRADLE_TEMPLATE = "liteloader_build.gradle"
         const val LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE = "liteloader_submodule_build.gradle"
         const val LITELOADER_MAIN_CLASS_TEMPLATE = "liteloader_main_class.java"
-
-        const val CANARY_MAIN_CLASS_TEMPLATE = "canary_main_class.java"
-        const val CANARY_INF_TEMPLATE = "canary_plugin_description_file.inf"
-        const val CANARY_POM_TEMPLATE = "canary_pom_template.xml"
 
         const val MIXIN_OVERWRITE_FALLBACK = "Mixin Overwrite Fallback.java"
     }

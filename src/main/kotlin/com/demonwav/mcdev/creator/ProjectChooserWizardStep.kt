@@ -14,7 +14,6 @@ import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration
-import com.demonwav.mcdev.platform.canary.CanaryProjectConfiguration
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
@@ -44,8 +43,6 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
     private lateinit var bungeeCordPluginCheckBox: JCheckBox
     private lateinit var waterfallPluginCheckBox: JCheckBox
     private lateinit var liteLoaderModCheckBox: JCheckBox
-    private lateinit var canaryPluginCheckBox: JCheckBox
-    private lateinit var neptunePluginCheckBox: JCheckBox
 
     override fun getComponent(): JComponent {
         chooserPanel.border = IdeBorderFactory.createBorder()
@@ -70,8 +67,6 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         liteLoaderModCheckBox.addActionListener { fillInInfoPane() }
         bungeeCordPluginCheckBox.addActionListener { toggle(bungeeCordPluginCheckBox, waterfallPluginCheckBox) }
         waterfallPluginCheckBox.addActionListener { toggle(waterfallPluginCheckBox, bungeeCordPluginCheckBox) }
-        canaryPluginCheckBox.addActionListener { toggle(canaryPluginCheckBox, neptunePluginCheckBox) }
-        neptunePluginCheckBox.addActionListener { toggle(neptunePluginCheckBox, canaryPluginCheckBox) }
 
         spongeIcon.icon = PlatformAssets.SPONGE_ICON_2X
 
@@ -128,15 +123,6 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
             text += "<p/>"
         }
 
-        if (canaryPluginCheckBox.isSelected) {
-            text += canaryInfo
-            text += "<p/>"
-        }
-
-        if (neptunePluginCheckBox.isSelected) {
-            text += neptuneInfo
-        }
-
         text += "</font></html>"
 
         infoPane.text = text
@@ -187,18 +173,6 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
             creator.settings[PlatformType.BUNGEECORD] = configuration
         }
 
-        if (canaryPluginCheckBox.isSelected) {
-            val configuration = CanaryProjectConfiguration()
-            configuration.type = PlatformType.CANARY
-            creator.settings[PlatformType.CANARY] = configuration
-        }
-
-        if (neptunePluginCheckBox.isSelected) {
-            val configuration = CanaryProjectConfiguration()
-            configuration.type = PlatformType.NEPTUNE
-            creator.settings[PlatformType.CANARY] = configuration
-        }
-
         creator.settings.values.iterator().next().isFirst = true
     }
 
@@ -210,9 +184,7 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
             forgeModCheckBox.isSelected ||
             liteLoaderModCheckBox.isSelected ||
             bungeeCordPluginCheckBox.isSelected ||
-            waterfallPluginCheckBox.isSelected ||
-            canaryPluginCheckBox.isSelected ||
-            neptunePluginCheckBox.isSelected
+            waterfallPluginCheckBox.isSelected
     }
 
     companion object {
@@ -240,11 +212,5 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         private const val liteLoaderInfo = "Create a standard " +
             "<a href=\"http://www.liteloader.com/\">LiteLoader</a> mod, for use " +
             "on LiteLoader clients."
-        private const val canaryInfo = "Create a standard " +
-            "<a href=\"https://canarymod.net/\">Canary</a> plugin, for use " +
-            "on CanaryMod and Neptune servers."
-        private const val neptuneInfo = "Create a standard " +
-            "<a href=\"https://www.neptunepowered.org/\">Neptune</a> plugin, for use " +
-            "on Neptune servers."
     }
 }

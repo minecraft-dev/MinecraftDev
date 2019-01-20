@@ -28,8 +28,6 @@ import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.execution.RunManager
-import com.intellij.execution.impl.RunManagerImpl
-import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl
 import com.intellij.ide.actions.ImportModuleAction
 import com.intellij.ide.util.newProjectWizard.AddModuleWizard
 import com.intellij.openapi.components.ServiceManager
@@ -64,7 +62,7 @@ import java.io.File
 
 class GradleBuildSystem : BuildSystem() {
 
-    var buildGradle: VirtualFile? = null
+    private var buildGradle: VirtualFile? = null
 
     override fun create(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
         rootDirectory.refresh(false, true)
@@ -169,19 +167,17 @@ class GradleBuildSystem : BuildSystem() {
         val connection = connector.connect()
         val launcher = connection.newBuild()
 
-        try {
+        connection.use {
             val sdkPair = ExternalSystemJdkUtil.getAvailableJdk(project)
             if (sdkPair.second?.homePath != null && ExternalSystemJdkUtil.USE_INTERNAL_JAVA != sdkPair.first) {
                 launcher.setJavaHome(File(sdkPair.second.homePath))
             }
 
-            launcher.addProgressListener(ProgressListener {
-                indicator.text = it.description
+            launcher.addProgressListener(ProgressListener { event ->
+                indicator.text = event.description
             })
             func(launcher)
             launcher.run()
-        } finally {
-            connection.close()
         }
     }
 
@@ -363,7 +359,7 @@ class GradleBuildSystem : BuildSystem() {
             BaseTemplate.applySettingsGradleTemplate(project, settingsGradle, artifactIdLower, includes)
 
             // Common will be empty, it's for the developers to fill in with common classes
-            val common = rootDirectory.createChildDirectory(this, artifactIdLower + "-common")
+            val common = rootDirectory.createChildDirectory(this, "$artifactIdLower-common")
             createDirectories(common)
         }
 
@@ -388,7 +384,7 @@ class GradleBuildSystem : BuildSystem() {
 
             // For each build system we initialize it, but not the same as a normal create. We need to know the common project name,
             // as we automatically add it as a dependency too
-            gradleBuildSystem.createSubModule(project, configuration, artifactIdLower + "-common", indicator)
+            gradleBuildSystem.createSubModule(project, configuration, "$artifactIdLower-common", indicator)
             map.putIfAbsent(gradleBuildSystem, configuration)
         }
 

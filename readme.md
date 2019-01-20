@@ -82,7 +82,7 @@ Issues
 ------
 
 We have a few ambiguous labels on the issues page, so here are their definitions:
- * `platform: all` - An issue which applies to all supported platforms (`Bukkit`, `Sponge`, `BungeeCord`, `Forge`, `LiteLoader`, and `Canary`)
+ * `platform: all` - An issue which applies to all supported platforms (`Bukkit`, `Sponge`, `BungeeCord`, `Forge`, `LiteLoader`)
  * `platform: main` - Multiple platforms, containing at least `Bukkit`, `Sponge`, and `Forge`. It can contain either of the other two as
    well, as long as it doesn't contain all of them. In that case, `platform: all` would be more appropriate, of course.
  * `platform: multi` - Any issue with more than two platforms which doesn't fall under the first two categories.
@@ -102,4 +102,3 @@ Supported Platforms
 - [![MCP Icon](src/main/resources/assets/icons/platform/MCP.png?raw=true) **MCP**](http://www.modcoderpack.com/)
 - [![Mixins Icon](src/main/resources/assets/icons/platform/Mixins_dark.png?raw=true) **Mixins**](https://github.com/SpongePowered/Mixin)
 - [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/) ([![Waterfall Icon](src/main/resources/assets/icons/platform/Waterfall.png?raw=true) Waterfall](https://github.com/WaterfallMC))
-- [![Canary Icon](src/main/resources/assets/icons/platform/Canary.png?raw=true) **Canary**](https://canarymod.net/) ([![Neptune Icon](src/main/resources/assets/icons/platform/Neptune.png?raw=true) **Neptune**](https://www.neptunepowered.org/))
