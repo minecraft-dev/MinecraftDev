@@ -13,24 +13,36 @@ package com.demonwav.mcdev.platform.mcp.at
 import com.demonwav.mcdev.framework.BaseMinecraftTest
 import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.util.io.delete
 import org.intellij.lang.annotations.Language
+import java.nio.file.Files
+import java.nio.file.Path
 
 class AtCommenterTest : BaseMinecraftTest(PlatformType.MCP) {
 
     private val fileName: String
         get() = getTestName(true)
 
-    // Dirty hack :(
-    override fun getTestDataPath() = project.basePath!!
+    private val testDataPath: Path by lazy {
+        Files.createTempDirectory("mcdev")
+    }
+
+    override fun getTestDataPath() = testDataPath.toString()
 
     private fun doTest(actionId: String, @Language("Access Transformers") before: String, @Language("Access Transformers") after: String) {
-        buildProject {
+        buildProject(VfsUtil.findFile(testDataPath, true)!!) {
             at("${fileName}_at.cfg", before, configure = true)
             at("${fileName}_after_at.cfg", after, configure = false)
         }
 
         myFixture.performEditorAction(actionId)
         myFixture.checkResultByFile("${fileName}_after_at.cfg", true)
+    }
+
+    override fun tearDown() {
+        testDataPath.delete()
+        super.tearDown()
     }
 
     fun testSingleLineComment() = doTest(IdeActions.ACTION_COMMENT_LINE, """

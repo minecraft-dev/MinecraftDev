@@ -74,7 +74,7 @@ val gradleToolingExtension = sourceSets.create("gradle-tooling-extension") {
         extendsFrom(configurations["gradle-tooling-extension"])
     }
 }
-val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtension.jarTaskName) {
+val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtension.jarTaskName) { 
     from(gradleToolingExtension.output)
     classifier = "gradle-tooling-extension"
 }
