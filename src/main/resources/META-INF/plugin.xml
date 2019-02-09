@@ -159,6 +159,11 @@
         <!-- Sponge Annotator -->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
 
+        <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.completion.SpongeGetterFilterCompletionContributor" />
+        <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.sponge.reference.SpongeReferenceContributor" />
+        <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.completion.SpongeCompletionConfidence"
+                               order="before javaSkipAutopopupInStrings" />
+
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.sponge.framework.SpongePresentationProvider" />
         <importFilter implementation="com.demonwav.mcdev.platform.sponge.SpongeImportFilter" />
 
@@ -169,6 +174,24 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeLoggingInspection"/>
+
+        <localInspection displayName="@Getter targeted method does not exist"
+                         groupName="Minecraft Sponge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeInvalidGetterTargetInspection"/>
+        <localInspection displayName="Parameter's type is not assignable to its @Getter method return type"
+                         groupName="Minecraft Sponge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeWrongGetterTypeInspection"/>
+
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.inspection.suppress.SpongeGetterParamOptionalInspectionSuppressor" />
+        <daemon.highlightInfoFilter implementation="com.demonwav.mcdev.platform.sponge.codeInsight.highlighting.SpongeGetterFilterInfoFilter" />
         <!--endregion-->
 
         <!--region FORGE-->
