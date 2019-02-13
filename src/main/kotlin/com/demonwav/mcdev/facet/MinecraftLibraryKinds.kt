@@ -15,8 +15,6 @@ import com.demonwav.mcdev.platform.bukkit.framework.PAPER_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bukkit.framework.SPIGOT_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bungeecord.framework.BUNGEECORD_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bungeecord.framework.WATERFALL_LIBRARY_KIND
-import com.demonwav.mcdev.platform.canary.framework.CANARY_LIBRARY_KIND
-import com.demonwav.mcdev.platform.canary.framework.NEPTUNE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.forge.framework.FORGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.liteloader.framework.LITELOADER_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
@@ -33,7 +31,5 @@ val MINECRAFT_LIBRARY_KINDS = setOf(
     MCP_LIBRARY_KIND,
     MIXIN_LIBRARY_KIND,
     BUNGEECORD_LIBRARY_KIND,
-    WATERFALL_LIBRARY_KIND,
-    CANARY_LIBRARY_KIND,
-    NEPTUNE_LIBRARY_KIND
+    WATERFALL_LIBRARY_KIND
 )

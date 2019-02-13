@@ -36,7 +36,7 @@ object IdeaITNProxy {
         params["App Build"] = appInfo.build.asString()
         params["App Version"] = appInfo.fullVersion
 
-        if (error.lastAction.isBlank()) {
+        if (error.lastAction.isNullOrBlank()) {
             params["Last Action"] = "None"
         } else {
             params["Last Action"] = error.lastAction

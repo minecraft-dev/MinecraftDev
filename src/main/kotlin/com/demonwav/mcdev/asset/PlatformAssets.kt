@@ -48,11 +48,6 @@ object PlatformAssets : Assets() {
     val MIXIN_ICON_DARK = loadIcon("/assets/icons/platform/Mixins_dark.png")
     val MIXIN_ICON_2X_DARK = loadIcon("/assets/icons/platform/Mixins@2x_dark.png")
 
-    val CANARY_ICON = loadIcon("/assets/icons/platform/Canary.png")
-    val CANARY_ICON_2X = loadIcon("/assets/icons/platform/Canary@2x.png")
-    val NEPTUNE_ICON = loadIcon("/assets/icons/platform/Neptune.png")
-    val NEPTUNE_ICON_2X = loadIcon("/assets/icons/platform/Neptune@2x.png")
-
     val MCP_ICON = loadIcon("/assets/icons/platform/MCP.png")
     val MCP_ICON_2X = loadIcon("/assets/icons/platform/MCP@2x.png")
     val MCP_ICON_DARK = loadIcon("/assets/icons/platform/MCP_dark.png")

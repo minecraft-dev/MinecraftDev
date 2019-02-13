@@ -20,10 +20,6 @@ import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType
 import com.demonwav.mcdev.platform.bungeecord.WaterfallModuleType
 import com.demonwav.mcdev.platform.bungeecord.framework.BUNGEECORD_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bungeecord.framework.WATERFALL_LIBRARY_KIND
-import com.demonwav.mcdev.platform.canary.CanaryModuleType
-import com.demonwav.mcdev.platform.canary.NeptuneModuleType
-import com.demonwav.mcdev.platform.canary.framework.CANARY_LIBRARY_KIND
-import com.demonwav.mcdev.platform.canary.framework.NEPTUNE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.forge.framework.FORGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderModuleType
@@ -48,8 +44,6 @@ enum class PlatformType(
     BUKKIT(BukkitModuleType, "Bukkit", "bukkit.json", arrayOf(SPIGOT, PAPER)),
     FORGE(ForgeModuleType, "Forge"),
     SPONGE(SpongeModuleType, "Sponge"),
-    NEPTUNE(NeptuneModuleType, "Neptune", "neptune.json"),
-    CANARY(CanaryModuleType, "Canary", "canary.json", arrayOf(NEPTUNE)),
     WATERFALL(WaterfallModuleType, "Waterfall", "waterfall.json"),
     BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord.json", arrayOf(WATERFALL)),
     LITELOADER(LiteLoaderModuleType, "LiteLoader"),
@@ -72,8 +66,6 @@ enum class PlatformType(
             MIXIN_LIBRARY_KIND -> MIXIN
             BUNGEECORD_LIBRARY_KIND -> BUNGEECORD
             WATERFALL_LIBRARY_KIND -> WATERFALL
-            CANARY_LIBRARY_KIND -> CANARY
-            NEPTUNE_LIBRARY_KIND -> NEPTUNE
             else -> null
         }
     }

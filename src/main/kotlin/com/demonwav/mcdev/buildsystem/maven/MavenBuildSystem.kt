@@ -15,7 +15,6 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.bukkit.BukkitTemplate
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordTemplate
-import com.demonwav.mcdev.platform.canary.CanaryTemplate
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
@@ -50,8 +49,6 @@ class MavenBuildSystem : BuildSystem() {
                     BukkitTemplate.applyPomTemplate(project, buildVersion)
                 PlatformType.BUNGEECORD, PlatformType.WATERFALL -> BungeeCordTemplate.applyPomTemplate(project, buildVersion)
                 PlatformType.SPONGE -> SpongeTemplate.applyPomTemplate(project, buildVersion)
-                PlatformType.CANARY, PlatformType.NEPTUNE ->
-                    CanaryTemplate.applyPomTemplate(project, buildVersion)
                 else -> return@runWriteTask
             }
 

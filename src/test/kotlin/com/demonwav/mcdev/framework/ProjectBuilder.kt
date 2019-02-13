@@ -27,7 +27,7 @@ import java.lang.ref.WeakReference
  * Like most things in this project at this point, taken from the intellij-rust folks
  * https://github.com/intellij-rust/intellij-rust/blob/master/src/test/kotlin/org/rust/ProjectBuilder.kt
  */
-class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
+class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: VirtualFile) {
     private val fixtureRef = WeakReference(fixture)
 
     private val fixture: JavaCodeInsightTestFixture
@@ -40,8 +40,6 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture) {
         }
     private val project
         get() = fixture.project
-    private val root
-        get() = fixture.project.baseDirPath
 
     var intermediatePath = ""
 

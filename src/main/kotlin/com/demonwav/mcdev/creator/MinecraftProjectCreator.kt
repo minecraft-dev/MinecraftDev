@@ -18,7 +18,6 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration
-import com.demonwav.mcdev.platform.canary.CanaryProjectConfiguration
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
 import com.google.common.base.MoreObjects
@@ -210,31 +209,6 @@ class MinecraftProjectCreator {
                     } else {
                         buildDependency.version = (configuration as SpongeForgeProjectConfiguration).spongeApiVersion
                     }
-                }
-                PlatformType.CANARY -> {
-                    if (!(configuration as CanaryProjectConfiguration).canaryVersion.endsWith("-SNAPSHOT")) {
-                        buildRepository.id = "vi-releases"
-                        buildRepository.url = "http://repo.visualillusionsent.net:8888/repository/internal/"
-                    } else {
-                        buildRepository.id = "vi-snapshots"
-                        buildRepository.url = "http://repo.visualillusionsent.net:8888/repository/snapshots/"
-                    }
-                    buildDependency.groupId = "net.canarymod"
-                    buildDependency.artifactId = "CanaryLib"
-                    buildDependency.version = configuration.canaryVersion
-                }
-                PlatformType.NEPTUNE -> {
-                    if (!(configuration as CanaryProjectConfiguration).canaryVersion.endsWith("-SNAPSHOT")) {
-                        buildRepository.id = "lex-releases"
-                        buildRepository.url = "https://repo.lexteam.xyz/maven/releases/"
-                    } else {
-                        buildRepository.id = "lex-snapshots"
-                        buildRepository.url = "https://repo.lexteam.xyz/maven/snapshots/"
-                    }
-                    addVIRepo(buildSystem.repositories)
-                    buildDependency.groupId = "org.neptunepowered"
-                    buildDependency.artifactId = "NeptuneLib"
-                    buildDependency.version = configuration.canaryVersion
                 }
                 else -> {}
             }

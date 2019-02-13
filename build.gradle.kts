@@ -8,13 +8,10 @@
  * MIT License
  */
 
-import net.minecrell.gradle.licenser.header.HeaderFormat
-import net.minecrell.gradle.licenser.header.HeaderFormatRegistry
 import net.minecrell.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import kotlin.reflect.KClass
 
 buildscript {
     repositories {
@@ -74,9 +71,9 @@ val gradleToolingExtension = sourceSets.create("gradle-tooling-extension") {
         extendsFrom(configurations["gradle-tooling-extension"])
     }
 }
-val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtension.jarTaskName) {
+val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtension.jarTaskName) { 
     from(gradleToolingExtension.output)
-    classifier = "gradle-tooling-extension"
+    archiveClassifier.set("gradle-tooling-extension")
 }
 
 dependencies {
@@ -98,7 +95,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)
-    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:191-SNAPSHOT")
+    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:191-EAP-SNAPSHOT")
 }
 
 intellij {

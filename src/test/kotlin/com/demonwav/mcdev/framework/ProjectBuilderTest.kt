@@ -13,11 +13,13 @@ package com.demonwav.mcdev.framework
 import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 
 abstract class ProjectBuilderTest : LightCodeInsightFixtureTestCase() {
 
-    protected fun buildProject(builder: ProjectBuilder.() -> Unit) = ProjectBuilder(myFixture).build(builder)
+    protected fun buildProject(root: VirtualFile = myFixture.project.baseDirPath, builder: ProjectBuilder.() -> Unit) =
+            ProjectBuilder(myFixture, root).build(builder)
 
     fun ProjectBuilder.src(block: ProjectBuilder.() -> Unit) {
         val srcFolder = VfsUtil.createDirectoryIfMissing(project.baseDirPath, "src")
