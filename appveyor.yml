@@ -1,0 +1,23 @@
+environment:
+  APPVEYOR_CACHE_ENTRY_ZIP_ARGS: -t7z -m0=lzma2 -mx=9
+  JAVA_HOME: C:\Program Files\Java\jdk1.8.0
+
+build_script:
+  - gradlew.bat assemble testClasses --no-daemon
+
+test_script:
+  - gradlew.bat check --no-daemon
+
+on_success:
+  - ps: rm C:\Users\appveyor\.gradle\caches\modules-2\*.lock -force
+  - ps: rm C:\Users\appveyor\.gradle\caches\transforms-1\*.lock -force
+  - ps: rm C:\Users\appveyor\.gradle\caches\*\file-changes\ -recurse -force
+  - ps: rm C:\Users\appveyor\.gradle\caches\*\fileHashes\ -recurse -force
+  - ps: rm C:\Users\appveyor\.gradle\caches\*\plugin-resolution\ -recurse -force
+  - ps: rm C:\Users\appveyor\.gradle\caches\*\scripts\ -recurse -force
+  - ps: rm C:\Users\appveyor\.gradle\caches\*\scripts-remapped\ -recurse -force
+  - ps: rm C:\Users\appveyor\.gradle\caches\*\gradle-script-kotlin\ -recurse -force
+
+cache:
+  - C:\Users\appveyor\.gradle\caches\
+  - C:\Users\appveyor\.gradle\wrapper\
