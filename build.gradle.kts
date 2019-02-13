@@ -23,7 +23,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.3.0" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.3.12"
+    id("org.jetbrains.intellij") version "0.4.2"
     id("net.minecrell.licenser") version "0.4.1"
 }
 
