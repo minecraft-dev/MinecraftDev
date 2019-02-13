@@ -35,7 +35,7 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
         val fileEditor = NbtFileEditor(super.createEditor(project, nbtFile), nbtFile)
 
         if (NonProjectFileWritingAccessProvider.isWriteAccessAllowed(file, project)) {
-            NonProjectFileWritingAccessProvider.allowWriting(nbtFile)
+            NonProjectFileWritingAccessProvider.allowWriting(listOf(nbtFile))
         }
 
         nbtFile.toolbar = fileEditor.toolbar
