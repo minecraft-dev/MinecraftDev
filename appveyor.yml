@@ -9,14 +9,14 @@ test_script:
   - gradlew.bat check --no-daemon
 
 on_success:
-  - ps: rm C:\Users\appveyor\.gradle\caches\modules-2\*.lock -force
-  - ps: rm C:\Users\appveyor\.gradle\caches\transforms-1\*.lock -force
-  - ps: rm C:\Users\appveyor\.gradle\caches\*\file-changes\ -recurse -force
-  - ps: rm C:\Users\appveyor\.gradle\caches\*\fileHashes\ -recurse -force
-  - ps: rm C:\Users\appveyor\.gradle\caches\*\plugin-resolution\ -recurse -force
-  - ps: rm C:\Users\appveyor\.gradle\caches\*\scripts\ -recurse -force
-  - ps: rm C:\Users\appveyor\.gradle\caches\*\scripts-remapped\ -recurse -force
-  - ps: rm C:\Users\appveyor\.gradle\caches\*\gradle-script-kotlin\ -recurse -force
+  - ps: Get-ChildItem C:\Users\appveyor\.gradle\caches\modules-2 -Include *.lock -ErrorAction SilentlyContinue | Remove-Item -Force
+  - ps: Get-ChildItem C:\Users\appveyor\.gradle\caches\transforms-1 -Include *.lock -ErrorAction SilentlyContinue | Remove-Item -Force
+  - ps: Remove-Item C:\Users\appveyor\.gradle\caches\*\file-changes\ -Recurse -Force
+  - ps: Remove-Item C:\Users\appveyor\.gradle\caches\*\fileHashes\ -Recurse -Force
+  - ps: Remove-Item C:\Users\appveyor\.gradle\caches\*\plugin-resolution\ -Recurse -Force
+  - ps: Remove-Item C:\Users\appveyor\.gradle\caches\*\scripts\ -Recurse -Force
+  - ps: Remove-Item C:\Users\appveyor\.gradle\caches\*\scripts-remapped\ -Recurse -Force
+  - ps: Remove-Item C:\Users\appveyor\.gradle\caches\*\gradle-script-kotlin\ -Recurse -Force
 
 cache:
   - C:\Users\appveyor\.gradle\caches\
