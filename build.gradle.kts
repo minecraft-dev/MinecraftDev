@@ -8,13 +8,10 @@
  * MIT License
  */
 
-import net.minecrell.gradle.licenser.header.HeaderFormat
-import net.minecrell.gradle.licenser.header.HeaderFormatRegistry
 import net.minecrell.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import kotlin.reflect.KClass
 
 buildscript {
     repositories {
@@ -76,7 +73,7 @@ val gradleToolingExtension = sourceSets.create("gradle-tooling-extension") {
 }
 val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtension.jarTaskName) { 
     from(gradleToolingExtension.output)
-    classifier = "gradle-tooling-extension"
+    archiveClassifier.set("gradle-tooling-extension")
 }
 
 dependencies {
