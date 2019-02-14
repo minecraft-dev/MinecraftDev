@@ -15,7 +15,6 @@ import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.intellij.ide.util.gotoByName.ContributorsBasedGotoByModel
 import com.intellij.navigation.ChooseByNameContributor
 import com.intellij.navigation.NavigationItem
-import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.util.indexing.FindSymbolParameters
@@ -46,8 +45,6 @@ class I18nGotoModel(project: Project, val filter: Regex? = null) :
     override fun getNotFoundMessage() = "Couldn't find translation with that name"
 
     override fun getCheckBoxName() = "Include non-project translations"
-
-    override fun getCheckBoxMnemonic() = 'n'
 
     override fun loadInitialCheckBoxState() = false
 

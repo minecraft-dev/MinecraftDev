@@ -17,10 +17,7 @@ import com.intellij.formatting.FormattingModelBuilder
 import com.intellij.formatting.FormattingModelProvider
 import com.intellij.formatting.Indent
 import com.intellij.formatting.SpacingBuilder
-import com.intellij.lang.ASTNode
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettings
 
 class NbttFormattingModelBuilder : FormattingModelBuilder {

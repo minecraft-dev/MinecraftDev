@@ -13,7 +13,6 @@ package com.demonwav.mcdev.insight
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.util.ui.ColorIcon
 import java.awt.Color
-import java.awt.Component
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
@@ -23,7 +22,7 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 
-class ColorPicker(private val colorMap: Map<String, Color>, parent: Component) {
+class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) {
 
     private val panel = JPanel(GridBagLayout())
 
@@ -74,7 +73,7 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: Component) {
         }
     }
 
-    private class ColorPickerDialog constructor(parent: Component, private val component: JComponent) : DialogWrapper(parent, false) {
+    private class ColorPickerDialog constructor(parent: JComponent, private val component: JComponent) : DialogWrapper(parent, false) {
 
         init {
             title = "Choose Color"

@@ -16,6 +16,7 @@ import com.demonwav.mcdev.util.sortVersions
 import java.io.IOException
 import java.net.URL
 import java.util.ArrayList
+import kotlin.Int
 
 class McpVersion private constructor(private val map: Map<String, Map<String, List<Int>>>) {
 

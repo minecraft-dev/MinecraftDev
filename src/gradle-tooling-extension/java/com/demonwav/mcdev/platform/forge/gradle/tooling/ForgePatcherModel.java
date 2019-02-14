@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.forge.gradle.tooling;
 
 import com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModel;
+
 import java.util.Set;
 
 public interface ForgePatcherModel {

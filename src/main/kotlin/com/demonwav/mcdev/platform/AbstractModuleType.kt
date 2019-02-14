@@ -23,6 +23,7 @@ import com.intellij.psi.PsiFile
 import org.apache.commons.lang.builder.ToStringBuilder
 import org.jetbrains.annotations.Contract
 import java.awt.Color
+import java.util.ArrayList
 import java.util.LinkedHashMap
 import javax.swing.Icon
 
@@ -48,7 +49,8 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
     abstract fun generateModule(facet: MinecraftFacet): T
 
     fun performCreationSettingSetup(project: Project) {
-        val annotations = (EntryPointsManager.getInstance(project) as EntryPointsManagerBase).ADDITIONAL_ANNOTATIONS
+        val manager = EntryPointsManager.getInstance(project)
+        val annotations = (manager as? EntryPointsManagerBase)?.ADDITIONAL_ANNOTATIONS as? MutableList<String> ?: return
         ignoredAnnotations.asSequence()
             .filter { annotation -> !annotations.contains(annotation) }
             .forEach { annotations.add(it) }

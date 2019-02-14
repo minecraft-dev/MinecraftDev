@@ -1,6 +1,6 @@
-package ${PACKAGE};
+package ${PACKAGE}import net.md_5.bungee.api.plugin.Plugin;
 
-import net.md_5.bungee.api.plugin.Plugin;
+;
 
 public final class ${CLASS_NAME} extends Plugin {
 

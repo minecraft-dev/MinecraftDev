@@ -26,7 +26,7 @@ class I18nParserDefinition : ParserDefinition {
     override fun createLexer(project: Project) = I18nLexerAdapter()
     override fun createFile(viewProvider: FileViewProvider) = I18nFile(viewProvider)
 
-    override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode) =
+    override fun spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) =
         LanguageUtil.canStickTokensTogetherByLexer(left, right, I18nLexerAdapter())!!
 
     override fun getStringLiteralElements() = STRING_LITERALS

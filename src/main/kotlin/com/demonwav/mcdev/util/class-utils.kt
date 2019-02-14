@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.util
 
 import com.intellij.navigation.AnonymousElementProvider
-import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
