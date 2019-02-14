@@ -658,17 +658,6 @@
                          implementationClass="com.demonwav.mcdev.platform.bungeecord.inspection.BungeeCordListenerImplementedInspection"/>
         <!--endregion-->
         <!--endregion-->
-
-
-        <!--region Module types are for transitions from old versions only -->
-        <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
-        <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BukkitModuleTypeTransition"/>
-        <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.SpigotModuleTypeTransition"/>
-        <moduleType id="PAPER_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.PaperModuleTypeTransition"/>
-        <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BungeeCordModuleTypeTransition"/>
-        <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.SpongeModuleTypeTransition"/>
-        <moduleType id="FORGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.ForgeModuleTypeTransition"/>
-        <!--endregion-->
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
@@ -685,10 +674,6 @@
     <project-components>
         <component>
             <implementation-class>com.demonwav.mcdev.facet.MinecraftFacetDetector</implementation-class>
-            <loadForDefaultProject/>
-        </component>
-        <component>
-            <implementation-class>com.demonwav.mcdev.transition.TransitionProjectComponent</implementation-class>
             <loadForDefaultProject/>
         </component>
     </project-components>

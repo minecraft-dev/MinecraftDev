@@ -34,7 +34,7 @@ class AtParserDefinition : ParserDefinition {
     override fun createFile(viewProvider: FileViewProvider) = AtFile(viewProvider)
     override fun createElement(node: ASTNode): PsiElement = AtTypes.Factory.createElement(node)
 
-    override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode) =
+    override fun spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) =
         map.entries.firstOrNull { e -> left.elementType == e.key.first || right.elementType == e.key.second }?.value
             ?: ParserDefinition.SpaceRequirements.MUST_NOT
 

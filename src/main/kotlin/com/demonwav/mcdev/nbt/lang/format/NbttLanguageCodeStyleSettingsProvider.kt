@@ -85,13 +85,10 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
 
     override fun getLanguage() = NbttLanguage
 
-    override fun getDefaultCommonSettings(): CommonCodeStyleSettings =
-        CommonCodeStyleSettings(language).apply {
-            RIGHT_MARGIN = 150
-            initIndentOptions().apply {
-                CONTINUATION_INDENT_SIZE = INDENT_SIZE
-            }
-        }
+    override fun customizeDefaults(commonSettings: CommonCodeStyleSettings, indentOptions: CommonCodeStyleSettings.IndentOptions) {
+        commonSettings.RIGHT_MARGIN = 150
+        indentOptions.CONTINUATION_INDENT_SIZE = indentOptions.INDENT_SIZE
+    }
 }
 
 private fun sample(@Language("NBTT") code: String) = code.trim()

@@ -13,12 +13,13 @@ package com.demonwav.mcdev.nbt.lang.format
 import com.demonwav.mcdev.nbt.lang.NbttLanguage
 import com.intellij.application.options.CodeStyleAbstractConfigurable
 import com.intellij.application.options.TabbedLanguageCodeStylePanel
+import com.intellij.psi.codeStyle.CodeStyleConfigurable
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.codeStyle.CodeStyleSettingsProvider
 
 class NbttCodeStyleSettingsProvider : CodeStyleSettingsProvider() {
-    override fun createSettingsPage(settings: CodeStyleSettings, originalSettings: CodeStyleSettings) =
-        object : CodeStyleAbstractConfigurable(settings, originalSettings, configurableDisplayName) {
+    override fun createConfigurable(settings: CodeStyleSettings, modelSettings: CodeStyleSettings) =
+        object : CodeStyleAbstractConfigurable(settings, modelSettings, configurableDisplayName) {
             override fun createPanel(settings: CodeStyleSettings) = NbttCodeStyleMainPanel(currentSettings, settings)
             override fun getHelpTopic(): String? = null
         }

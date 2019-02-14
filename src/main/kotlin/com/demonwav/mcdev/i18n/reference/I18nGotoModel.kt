@@ -46,8 +46,6 @@ class I18nGotoModel(project: Project, val filter: Regex? = null) :
 
     override fun getCheckBoxName() = "Include non-project translations"
 
-    override fun getCheckBoxMnemonic() = 'n'
-
     override fun loadInitialCheckBoxState() = false
 
     override fun saveInitialCheckBoxState(state: Boolean) {

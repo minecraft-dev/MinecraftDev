@@ -31,9 +31,6 @@ class MinecraftFacetConfiguration : FacetConfiguration, PersistentStateComponent
     override fun loadState(state: MinecraftFacetConfigurationData) {
         this.state = state
     }
-
-    @Suppress("OverridingDeprecatedMember") override fun readExternal(element: Element?) {}
-    @Suppress("OverridingDeprecatedMember") override fun writeExternal(element: Element?) {}
 }
 
 data class MinecraftFacetConfigurationData(
