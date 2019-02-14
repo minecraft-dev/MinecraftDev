@@ -28,7 +28,7 @@
       <div>
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2019.1-1.2.13
+        v. 2019.1-1.2.14
       </div>
     ]]>
     </change-notes>
@@ -53,6 +53,7 @@
         <!--region NO PLATFORM-->
         <!---->
 
+        <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
 
         <!-- File templates are for project creations -->
