@@ -15,8 +15,6 @@ import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Getter
-import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.createError
 import org.jetbrains.concurrency.rejectedPromise

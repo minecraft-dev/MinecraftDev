@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.error
 
-import com.intellij.diagnostic.IdeErrorsDialog
+import com.demonwav.mcdev.update.PluginUtil
 import com.intellij.diagnostic.LogMessage
 import com.intellij.diagnostic.ReportMessages
 import com.intellij.ide.DataManager
@@ -46,16 +46,9 @@ class ErrorReporter : ErrorReportSubmitter() {
         bean.description = additionalInfo
         bean.message = event.message
 
-        val throwable = event.throwable
-        if (throwable != null) {
-            val pluginId = IdeErrorsDialog.findPluginId(throwable)
-            if (pluginId != null) {
-                val ideaPluginDescriptor = PluginManager.getPlugin(pluginId)
-                if (ideaPluginDescriptor != null && !ideaPluginDescriptor.isBundled) {
-                    bean.pluginName = ideaPluginDescriptor.name
-                    bean.pluginVersion = ideaPluginDescriptor.version
-                }
-            }
+        PluginManager.getPlugin(PluginUtil.PLUGIN_ID)?.let { plugin ->
+            bean.pluginName = plugin.name
+            bean.pluginVersion = plugin.version
         }
 
         val data = event.data

@@ -13,7 +13,6 @@ package com.demonwav.mcdev.update
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.extensions.PluginId
-
 import java.util.Arrays
 
 object PluginUtil {

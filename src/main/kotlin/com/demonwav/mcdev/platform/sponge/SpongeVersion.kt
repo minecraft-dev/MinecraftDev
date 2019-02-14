@@ -14,6 +14,7 @@ import com.demonwav.mcdev.util.ProxyHttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
 import com.demonwav.mcdev.util.gson
 import org.jetbrains.concurrency.runAsync
+import java.util.LinkedHashMap
 import java.util.Objects
 import javax.swing.JComboBox
 
