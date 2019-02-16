@@ -19,58 +19,38 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import org.jetbrains.annotations.Contract
 
-inline fun <T : Any?> runWriteTask(crossinline func: () -> T): T =
-    if (ApplicationManager.getApplication().isWriteAccessAllowed) {
-        func()
-    } else {
-        invokeAndWait {
-            ApplicationManager.getApplication().runWriteAction(Computable {
-                func()
-            })
-        }
-    }
-
-inline fun runWriteTaskLater(crossinline func: () -> Unit) {
-    if (ApplicationManager.getApplication().isWriteAccessAllowed) {
-        func()
-    } else {
-        invokeLater {
-            ApplicationManager.getApplication().runWriteAction {
-                func()
-            }
-        }
+inline fun <T : Any?> runWriteTask(crossinline func: () -> T): T {
+    return invokeAndWait {
+        ApplicationManager.getApplication().runWriteAction(Computable { func() })
     }
 }
 
-inline fun <T : Any?> invokeAndWait(crossinline func: () -> T): T =
-    if (ApplicationManager.getApplication().isDispatchThread) {
-        func()
-    } else {
-        val ref = Ref<T>()
-        ApplicationManager.getApplication().invokeAndWait({ ref.set(func()) }, ModalityState.defaultModalityState())
-        ref.get()
-    }
-
-inline fun invokeLater(crossinline func: () -> Unit) {
-    if (ApplicationManager.getApplication().isDispatchThread) {
-        func()
-    } else {
-        ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.defaultModalityState())
+fun runWriteTaskLater(func: () -> Unit) {
+    invokeLater {
+        ApplicationManager.getApplication().runWriteAction(func)
     }
 }
 
-inline fun invokeLaterAny(crossinline func: () -> Unit) {
-    if (ApplicationManager.getApplication().isDispatchThread) {
-        func()
-    } else {
-        ApplicationManager.getApplication().invokeLater({ func() }, ModalityState.any())
-    }
+fun <T : Any?> invokeAndWait(func: () -> T): T {
+    val ref = Ref<T>()
+    ApplicationManager.getApplication().invokeAndWait({ ref.set(func()) }, ModalityState.defaultModalityState())
+    return ref.get()
+}
+
+fun invokeLater(func: () -> Unit) {
+    ApplicationManager.getApplication().invokeLater(func, ModalityState.defaultModalityState())
+}
+
+fun invokeLaterAny(func: () -> Unit) {
+    ApplicationManager.getApplication().invokeLater(func, ModalityState.any())
 }
 
 inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
@@ -83,6 +63,12 @@ inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T
     return result
 }
 
+fun waitForAllSmart() {
+    for (project in ProjectManager.getInstance().openProjects) {
+        DumbService.getInstance(project).waitForSmartMode()
+    }
+}
+
 /**
  * Returns an untyped array for the specified [Collection].
  */
@@ -93,7 +79,9 @@ fun Collection<*>.toArray(): Array<Any?> {
 }
 
 inline fun <T : Collection<*>> T.ifEmpty(func: () -> Unit): T {
-    if (isEmpty()) func()
+    if (isEmpty()) {
+        func()
+    }
     return this
 }
 
@@ -145,10 +133,7 @@ fun Module.findChildren(): Set<Module> {
     }
 }
 
-// Keep a single gson constant around rather than initializing it everywhere
-val gson = Gson()
-
-// Using the ugly TypeToken approach we can any complex generic signature, including
+// Using the ugly TypeToken approach we can use any complex generic signature, including
 // nested generics
 inline fun <reified T : Any> Gson.fromJson(text: String): T = fromJson(text, object : TypeToken<T>() {}.type)
 

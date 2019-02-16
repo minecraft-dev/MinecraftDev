@@ -48,7 +48,7 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
         /**
          * All separators allowed between a number and a modifier (i.e. (numbered) text part).
          */
-        val SEPARATORS = listOf('-', '_')
+        private val SEPARATORS = listOf('-', '_')
 
         /**
          * Creates a simple release version where each provided value forms a part (read from left to right).

@@ -13,7 +13,7 @@ package com.demonwav.mcdev.creator
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.ProxyHttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
-import com.demonwav.mcdev.util.gson
+import com.google.gson.Gson
 import org.jetbrains.concurrency.runAsync
 import java.io.IOException
 import java.util.Arrays
@@ -44,7 +44,7 @@ private fun doCall(urlText: String): PlatformVersion {
     )
 
     val text = connection.inputStream.use { stream -> stream.reader().use { it.readText() } }
-    return gson.fromJson(text)
+    return Gson().fromJson(text)
 }
 
 data class PlatformVersion(var versions: Array<String>, var selectedIndex: Int) {

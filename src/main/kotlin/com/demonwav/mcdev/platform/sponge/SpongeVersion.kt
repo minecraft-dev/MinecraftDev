@@ -12,7 +12,7 @@ package com.demonwav.mcdev.platform.sponge
 
 import com.demonwav.mcdev.util.ProxyHttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
-import com.demonwav.mcdev.util.gson
+import com.google.gson.Gson
 import org.jetbrains.concurrency.runAsync
 import java.util.LinkedHashMap
 import java.util.Objects
@@ -34,22 +34,6 @@ data class SpongeVersion(var versions: LinkedHashMap<String, String>, var select
         combo.selectedIndex = this.selectedIndex
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-
-        if (other !is SpongeVersion) {
-            return false
-        }
-
-        return this.versions == other.versions && this.selectedIndex == other.selectedIndex
-    }
-
-    override fun hashCode(): Int {
-        return Objects.hash(versions, selectedIndex)
-    }
-
     companion object {
         fun downloadData(): SpongeVersion {
             val connection = ProxyHttpConnectionFactory.openHttpConnection(spongeUrl)
@@ -60,7 +44,7 @@ data class SpongeVersion(var versions: LinkedHashMap<String, String>, var select
             )
 
             val text = connection.inputStream.use { stream -> stream.reader().use { it.readText() } }
-            return gson.fromJson(text)
+            return Gson().fromJson(text)
         }
     }
 }

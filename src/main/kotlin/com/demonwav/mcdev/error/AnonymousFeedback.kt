@@ -13,7 +13,7 @@ package com.demonwav.mcdev.error
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.HttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
-import com.demonwav.mcdev.util.gson
+import com.google.gson.Gson
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.util.io.readCharSequence
 import org.apache.commons.io.IOUtils
@@ -42,7 +42,7 @@ object AnonymousFeedback {
         val result = LinkedHashMap<String, String>(5)
         result["title"] = "[auto-generated] Exception in plugin"
         result["body"] = generateGitHubIssueBody(envDetails)
-        return gson.toJson(result).toByteArray()
+        return Gson().toJson(result).toByteArray()
     }
 
     private fun generateGitHubIssueBody(body: LinkedHashMap<String, String?>): String {
@@ -92,7 +92,7 @@ object AnonymousFeedback {
         }
         connection.disconnect()
 
-        val json = gson.fromJson<Map<*, *>>(body)
+        val json = Gson().fromJson<Map<*, *>>(body)
         return json["html_url"] as String to (json["number"] as Double).toInt()
     }
 
@@ -139,7 +139,7 @@ object AnonymousFeedback {
         val list = mutableListOf<Map<*, *>>()
         var data = connection.inputStream.reader().use(InputStreamReader::readCharSequence).toString()
 
-        var response = gson.fromJson<List<Map<*, *>>>(data)
+        var response = Gson().fromJson<List<Map<*, *>>>(data)
         list.addAll(response)
 
         var link = connection.getHeaderField("Link")
@@ -159,7 +159,7 @@ object AnonymousFeedback {
 
             data = connection.inputStream.reader().use(InputStreamReader::readCharSequence).toString()
 
-            response = gson.fromJson(data)
+            response = Gson().fromJson(data)
             list.addAll(response)
 
             link = connection.getHeaderField("Link")
@@ -205,7 +205,7 @@ object AnonymousFeedback {
         }
         connection.disconnect()
 
-        val json = gson.fromJson<Map<*, *>>(body)
+        val json = Gson().fromJson<Map<*, *>>(body)
         return json["html_url"] as String
     }
 
