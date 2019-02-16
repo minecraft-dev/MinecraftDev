@@ -1,6 +1,6 @@
-package ${PACKAGE}import org.bukkit.plugin.java.JavaPlugin;
+package ${PACKAGE};
 
-;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ${CLASS_NAME} extends JavaPlugin {
 

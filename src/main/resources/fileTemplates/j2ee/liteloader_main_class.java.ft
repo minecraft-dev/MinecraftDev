@@ -1,6 +1,7 @@
-package ${PACKAGE_NAME}import com.mumfrey.liteloader.LiteMod;
+package ${PACKAGE_NAME};
 
-;
+import com.mumfrey.liteloader.LiteMod;
+import java.io.File;
 
 public class ${CLASS_NAME} implements LiteMod {
 
