@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.platform.mixin.config
 
-import com.demonwav.mcdev.util.gson
 import com.google.common.collect.Comparators
+import com.google.gson.Gson
 import com.intellij.json.psi.JsonArray
 import com.intellij.json.psi.JsonElementGenerator
 import com.intellij.json.psi.JsonFile
@@ -99,7 +99,7 @@ class MixinConfigImportOptimizer : ImportOptimizer {
 
         // Kind of lazy here, serialize the sorted list and let IntelliJ parse it
         val classesSorted = classes.toSortedSet(ClassPackageComparator)
-        return JsonElementGenerator(property.project).createValue(gson.toJson(classesSorted))
+        return JsonElementGenerator(property.project).createValue(Gson().toJson(classesSorted))
     }
 
     private class Task(

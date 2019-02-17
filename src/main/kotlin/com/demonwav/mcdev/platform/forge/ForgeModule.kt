@@ -22,12 +22,15 @@ import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.nullable
 import com.demonwav.mcdev.util.runWriteTaskLater
+import com.demonwav.mcdev.util.waitForAllSmart
 import com.intellij.json.JsonFileType
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
@@ -50,8 +53,11 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
     override val icon = PlatformAssets.FORGE_ICON
 
     override fun init() {
-        runWriteTaskLater {
-            FileTypeManager.getInstance().associatePattern(JsonFileType.INSTANCE, ForgeConstants.MCMOD_INFO)
+        ApplicationManager.getApplication().executeOnPooledThread {
+            waitForAllSmart()
+            runWriteTaskLater {
+                FileTypeManager.getInstance().associatePattern(JsonFileType.INSTANCE, ForgeConstants.MCMOD_INFO)
+            }
         }
 
         ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Indexing @SidedProxy", true, null) {
