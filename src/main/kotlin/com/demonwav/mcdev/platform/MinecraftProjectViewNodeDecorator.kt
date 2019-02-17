@@ -16,7 +16,6 @@ import com.intellij.ide.projectView.PresentationData
 import com.intellij.ide.projectView.ProjectViewNode
 import com.intellij.ide.projectView.ProjectViewNodeDecorator
 import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.packageDependencies.ui.PackageDependenciesNode
@@ -31,8 +30,6 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
         if (!MinecraftSettings.instance.isShowProjectPlatformIcons) {
             return
         }
-
-        val project = node.project ?: return
 
         if (node !is PsiDirectoryNode) {
             return
@@ -53,24 +50,8 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
             return
         }
 
-        val children = MinecraftFacet.getChildInstances(module)
-        if (children.isEmpty()) {
-            return
-        }
-
-        val manager = ModuleManager.getInstance(project)
-        val path = manager.getModuleGroupPath(module)
-        if (path == null) {
-            data.setIcon(children.iterator().next().icon)
-            return
-        }
-
-        val testModule = manager.findModuleByName(path.last())
-        if (module !== testModule) {
-            return
-        }
-
-        data.setIcon(children.iterator().next().icon)
+        val facet = MinecraftFacet.getInstance(module) ?: return
+        data.setIcon(facet.icon)
     }
 
     override fun decorate(node: PackageDependenciesNode, cellRenderer: ColoredTreeCellRenderer) {}

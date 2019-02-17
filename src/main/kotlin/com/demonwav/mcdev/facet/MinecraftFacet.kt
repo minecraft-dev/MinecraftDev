@@ -29,6 +29,7 @@ import com.intellij.facet.FacetTypeRegistry
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleGrouper
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFile
@@ -38,6 +39,7 @@ import com.intellij.psi.PsiMethod
 import org.jetbrains.annotations.Contract
 import org.jetbrains.jps.model.java.JavaResourceRootType
 import org.jetbrains.jps.model.java.JavaSourceRootType
+import java.util.Arrays
 import java.util.concurrent.ConcurrentHashMap
 import javax.swing.Icon
 
@@ -223,14 +225,17 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
                 return@run setOf(instance)
             }
 
-            val manager = ModuleManager.getInstance(module.project)
+            val project = module.project
+            val manager = ModuleManager.getInstance(project)
+            val grouper = ModuleGrouper.instanceFor(project)
+
             val result = mutableSetOf<MinecraftFacet>()
 
-            for (m in manager.modules) {
-                val path = manager.getModuleGroupPath(m) ?: continue
-                val namedModule = manager.findModuleByName(path.last()) ?: continue
+            val modulePath = grouper.getModuleAsGroupPath(module) ?: return@run result
 
-                if (namedModule != module) {
+            for (m in manager.modules) {
+                val path = grouper.getGroupPath(m)
+                if (modulePath != path) {
                     continue
                 }
 

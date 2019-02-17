@@ -10,81 +10,66 @@
 
 package com.demonwav.mcdev.platform.forge.version
 
-import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.getMajorVersion
 import com.demonwav.mcdev.util.sortVersions
-import com.google.gson.Gson
 import java.io.IOException
 import java.net.URL
-import java.util.ArrayList
+import javax.xml.stream.XMLInputFactory
+import javax.xml.stream.events.XMLEvent
 
-class ForgeVersion private constructor(private val map: Map<*, *>) {
+class ForgeVersion private constructor(val versions: List<String>) {
 
     val sortedMcVersions: List<String> by lazy {
-        sortVersions((map["mcversion"] as Map<*, *>).keys)
-    }
-
-    fun getRecommended(versions: List<String>): String {
-        var recommended = SemanticVersion.release(1, 7)
-        for (version in versions) {
-            getPromo(version) ?: continue
-            val semantic = SemanticVersion.parse(version)
-            if (recommended < semantic) {
-                recommended = semantic
-            }
-        }
-
-        return recommended.versionString
-    }
-
-    fun getPromo(version: String): Double? {
-        val promos = map["promos"] as? Map<*, *>
-        if (promos != null) {
-            return promos[version + "-recommended"] as? Double
-        }
-        return null
-    }
-
-    fun getForgeVersions(version: String): List<String> {
-        val list = ArrayList<String>()
-        val numbers = map["number"] as? Map<*, *>
-        numbers?.forEach { _, number ->
-            if (number is Map<*, *>) {
-                val currentVersion = number["mcversion"] as? String
-
-                if (currentVersion == version) {
-                    list.add(number["version"] as? String ?: return@forEach)
+        val unsortedVersions = versions.asSequence()
+            .mapNotNull(fun (version: String): String? {
+                val index = version.indexOf('-')
+                if (index == -1) {
+                    return null
                 }
-            }
-        }
-        return list
+                return version.substring(0, index)
+            }).distinct()
+            .toList()
+        return@lazy sortVersions(unsortedVersions)
     }
 
-    fun getFullVersion(version: String): String? {
-        val numbers = map["number"] as? Map<*, *> ?: return null
-        val parts = version.split(".").dropLastWhile(String::isEmpty).toTypedArray()
-        val versionSmall = parts.last()
-        val number = numbers[versionSmall] as? Map<*, *> ?: return null
-
-        val branch = number["branch"] as? String
-        val mcVersion = number["mcversion"] as? String ?: return null
-        val finalVersion = number["version"] as? String ?: return null
-
-        return if (branch == null) {
-            "$mcVersion-$finalVersion"
-        } else {
-            "$mcVersion-$finalVersion-$branch"
-        }
+    fun getForgeVersions(mcVersion: String): ArrayList<String> {
+        return versions.filterTo(ArrayList()) { it.startsWith(getMajorVersion(mcVersion)) }
     }
 
     companion object {
         fun downloadData(): ForgeVersion? {
             try {
-                val text = URL("https://files.minecraftforge.net/maven/net/minecraftforge/forge/json").readText()
+                val url = URL("https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml")
+                val result = mutableListOf<String>()
+                url.openStream().use { stream ->
+                    val inputFactory = XMLInputFactory.newInstance()
+                    @Suppress("UNCHECKED_CAST")
+                    val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
+                    for (event in reader) {
+                        if (!event.isStartElement) {
+                            continue
+                        }
+                        val start = event.asStartElement()
+                        val name = start.name.localPart
+                        if (name != "version") {
+                            continue
+                        }
 
-                val map = Gson().fromJson(text, Map::class.java)
-                val forgeVersion = ForgeVersion(map)
-                forgeVersion.sortedMcVersions // sort em up
-                return forgeVersion
+                        val versionEvent = reader.next()
+                        if (!versionEvent.isCharacters) {
+                            continue
+                        }
+                        val version = versionEvent.asCharacters().data
+                        val index = version.indexOf('-')
+                        if (index == -1) {
+                            continue
+                        }
+
+                        result += version
+                    }
+                }
+
+                return ForgeVersion(result)
             } catch (e: IOException) {
                 e.printStackTrace()
             }
