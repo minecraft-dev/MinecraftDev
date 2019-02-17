@@ -191,10 +191,8 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
             settings.spongeApiVersion = minecraftVersionBox.selectedItem as String
         }
 
-        // If an error occurs while fetching the API, this may prevent the user from closing the dialog.
-        val fullVersion = forgeVersion?.getFullVersion(forgeVersionBox.selectedItem as String)
-        if (fullVersion != null) {
-            settings!!.forgeVersion = fullVersion
+        (forgeVersionBox.selectedItem as? String)?.let { version ->
+            settings!!.forgeVersion = forgeVersion!!.versions.first { it.endsWith(version) }
         }
         settings!!.mcVersion = version!!
     }
@@ -208,55 +206,44 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     override fun updateDataModel() {}
 
     private fun getData(version: String?): Data {
-        val recommended = forgeVersion!!.getRecommended(mcpVersion!!.versions)
-
-        var index = forgeVersion!!.sortedMcVersions.indexOf(recommended)
-        if (index == -1) {
-            index = 0
+        val finalVersion = when {
+            version != null -> version
+            settings !is SpongeForgeProjectConfiguration -> {
+                forgeVersion!!.sortedMcVersions[0]
+            }
+            else -> {
+                val versionString = spongeVersion!!.versions.values.toTypedArray()[spongeVersion!!.selectedIndex]
+                forgeVersion!!.sortedMcVersions.first { it == versionString }
+            }
         }
 
-        var finalVersion = version ?: if (settings !is SpongeForgeProjectConfiguration) {
-            forgeVersion!!.sortedMcVersions[index]
-        } else {
-            spongeVersion!!.versions.values.toTypedArray()[spongeVersion!!.selectedIndex]
-        }
-
-        if (settings !is SpongeForgeProjectConfiguration) {
-            index = forgeVersion!!.sortedMcVersions.indexOf(finalVersion)
-        } else {
-            if (spongeVersion!!.versions.containsValue(finalVersion)) {
-                index = -1
+        val mcIndex = when {
+            settings is SpongeForgeProjectConfiguration && spongeVersion!!.versions.containsValue(finalVersion) -> {
                 var i = 0
                 for ((_, value) in spongeVersion!!.versions) {
                     i++
                     if (value == finalVersion) {
-                        index = i
                         break
                     }
                 }
-            } else {
-                finalVersion = spongeVersion!!.versions.values.toTypedArray()[spongeVersion!!.selectedIndex]
-                index = forgeVersion!!.sortedMcVersions.indexOf(finalVersion)
+                i
+            }
+            else -> {
+                0
             }
         }
 
         val mcpVersionList = mcpVersion!!.getMcpVersionList(finalVersion)
-        val forgeVersions = forgeVersion!!.getForgeVersions(finalVersion).sortedWith(Comparator.reverseOrder())
+        val forgeVersions = forgeVersion!!.getForgeVersions(finalVersion)
+        forgeVersions.sortDescending()
 
-        var forgeIndex = 0
-        val promo = forgeVersion!!.getPromo(finalVersion)
-        if (promo != null) {
-            for (i in 0 until forgeVersions.size) {
-                try {
-                    if (forgeVersions[i].endsWith(promo.toInt().toString())) {
-                        forgeIndex = i
-                        break
-                    }
-                } catch (ignored: NumberFormatException) {}
-            }
+        for (i in 0 until forgeVersions.size) {
+            forgeVersions[i] = forgeVersions[i].substring(forgeVersions[i].indexOf('-') + 1)
         }
 
-        return Data(index, mcpVersionList, forgeVersions, forgeIndex)
+        val forgeIndex = 0
+
+        return Data(mcIndex, mcpVersionList, forgeVersions, forgeIndex)
     }
 
     private fun update(data: Data) {
