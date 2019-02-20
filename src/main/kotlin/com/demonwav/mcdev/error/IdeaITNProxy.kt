@@ -12,12 +12,15 @@ package com.demonwav.mcdev.error
 
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.intellij.openapi.application.ex.ApplicationInfoEx
+import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.openapi.util.SystemInfo
 
 object IdeaITNProxy {
-    fun getKeyValuePairs(error: ErrorBean,
-                         appInfo: ApplicationInfoEx,
-                         namesInfo: ApplicationNamesInfo): LinkedHashMap<String, String?> {
+    fun getKeyValuePairs(
+        error: ErrorBean,
+        appInfo: ApplicationInfoEx,
+        namesInfo: ApplicationNamesInfo
+    ): Pair<LinkedHashMap<String, String?>, List<Attachment>> {
         val params = LinkedHashMap<String, String?>(21)
 
         params["error.description"] = error.description
@@ -45,11 +48,6 @@ object IdeaITNProxy {
         params["error.message"] = error.message
         params["error.stacktrace"] = error.stackTrace
 
-        for (attachment in error.attachments) {
-            params["attachment.name"] = attachment.name
-            params["attachment.value"] = attachment.encodedBytes
-        }
-
-        return params
+        return params to error.attachments
     }
 }

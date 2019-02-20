@@ -15,6 +15,7 @@ import com.demonwav.mcdev.util.HttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
 import com.intellij.ide.plugins.PluginManager
+import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.util.io.readCharSequence
 import org.apache.commons.io.IOUtils
 import java.io.InputStreamReader
@@ -26,26 +27,33 @@ object AnonymousFeedback {
 
     const val url = "https://www.demonwav.com/errorReport"
 
-    fun sendFeedback(factory: HttpConnectionFactory, envDetails: LinkedHashMap<String, String?>): FeedbackData {
+    fun sendFeedback(
+        factory: HttpConnectionFactory,
+        envDetails: LinkedHashMap<String, String?>,
+        attachments: List<Attachment>
+    ): FeedbackData {
         val duplicateId = findDuplicateIssue(envDetails, factory)
         if (duplicateId != null) {
             // This is a duplicate
-            val commentUrl = sendCommentOnDuplicateIssue(duplicateId, factory, convertToGitHubIssueFormat(envDetails))
+            val commentUrl = sendCommentOnDuplicateIssue(duplicateId, factory, convertToGitHubIssueFormat(envDetails, attachments))
             return FeedbackData(commentUrl, duplicateId, true)
         }
 
-        val (htmlUrl, token) = sendFeedback(factory, convertToGitHubIssueFormat(envDetails))
+        val (htmlUrl, token) = sendFeedback(factory, convertToGitHubIssueFormat(envDetails, attachments))
         return FeedbackData(htmlUrl, token, false)
     }
 
-    private fun convertToGitHubIssueFormat(envDetails: LinkedHashMap<String, String?>): ByteArray {
+    private fun convertToGitHubIssueFormat(
+        envDetails: LinkedHashMap<String, String?>,
+        attachments: List<Attachment>
+    ): ByteArray {
         val result = LinkedHashMap<String, String>(5)
         result["title"] = "[auto-generated] Exception in plugin"
-        result["body"] = generateGitHubIssueBody(envDetails)
+        result["body"] = generateGitHubIssueBody(envDetails, attachments)
         return Gson().toJson(result).toByteArray()
     }
 
-    private fun generateGitHubIssueBody(body: LinkedHashMap<String, String?>): String {
+    private fun generateGitHubIssueBody(body: LinkedHashMap<String, String?>, attachments: List<Attachment>): String {
         val errorDescription = body.remove("error.description") ?: ""
 
         var errorMessage = body.remove("error.message")
@@ -70,6 +78,20 @@ object AnonymousFeedback {
 
         sb.append("\n```\n").append(stackTrace).append("\n```\n")
         sb.append("\n```\n").append(errorMessage).append("\n```\n")
+
+        if (attachments.isNotEmpty()) {
+            for (attachment in attachments) {
+                sb.append("\n---\n\n```\n").append(attachment.name).append("\n```\n")
+                sb.append("```\n")
+                when {
+                    attachment.name.endsWith(".txt") -> {
+                        sb.append(String(attachment.bytes, Charsets.UTF_8))
+                    }
+                    else -> sb.append(attachment.encodedBytes)
+                }
+                sb.append("\n```\n")
+            }
+        }
 
         return sb.toString()
     }
@@ -103,13 +125,28 @@ object AnonymousFeedback {
         return connection
     }
 
-    private fun findDuplicateIssue(envDetails: LinkedHashMap<String, String?>, factory: HttpConnectionFactory): Int? {
-        val stack = envDetails["error.stacktrace"]?.replace("\\d+".toRegex(), "") ?: return null
+    private val numberRegex = Regex("\\d+")
+    private val newLineRegex = Regex("[\r\n]+")
 
-        val list = getAllIssues("https://api.github.com/repos/minecraft-dev/MinecraftDev/issues" +
-                                    "?state=all&creator=minecraft-dev-autoreporter&per_page=100", factory) ?: return null
+    private const val issueUrl = "https://api.github.com/repos/minecraft-dev/MinecraftDev/issues" +
+        "?state=all&creator=minecraft-dev-autoreporter&per_page=100"
+    private const val packagePrefix = "\tat com.demonwav.mcdev"
+
+    private fun findDuplicateIssue(envDetails: LinkedHashMap<String, String?>, factory: HttpConnectionFactory): Int? {
+        val stack = envDetails["error.stacktrace"]?.replace(numberRegex, "") ?: return null
+
+        val list = getAllIssues(issueUrl, factory) ?: return null
+
+        val stackMessage = stack.lineSequence()
+            .takeWhile { line -> !line.startsWith("\t") }
+            .joinToString()
+
+        val stackMcdevParts = stack.lineSequence()
+            .filter { line -> line.startsWith(packagePrefix) }
+            .joinToString()
+
         val block = list.firstOrNull {
-            val body = (it["body"] as? String ?: return@firstOrNull false).replace(Regex("[\r\n]+"), "\n")
+            val body = (it["body"] as? String ?: return@firstOrNull false).replace(newLineRegex, "\n")
 
             // We can't comment on locked issues
             if (it["locked"] as Boolean) {
@@ -120,7 +157,15 @@ object AnonymousFeedback {
             val second = body.indexOf("\n```\n", startIndex = first)
             val stackText = body.substring(first, second)
 
-            stackText.replace("\\d+".toRegex(), "") == stack
+            val message = stackText.lineSequence()
+                .takeWhile { line -> !line.startsWith("\t") }
+                .joinToString()
+
+            val mcdevParts = stackText.lineSequence()
+                .filter { line -> line.startsWith(packagePrefix) }
+                .joinToString()
+
+            return@firstOrNull stackMessage == message && stackMcdevParts == mcdevParts
         } ?: return null
         return (block["number"] as Double).toInt()
     }
