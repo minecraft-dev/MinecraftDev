@@ -159,7 +159,8 @@ private fun PsiClass.findInnerClass(name: String): PsiClass? {
 }
 
 @Contract(pure = true)
-fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
+@Throws(ClassNameResolutionFailedException::class)
+fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int? {
     // Attempt to find name for anonymous class
     for ((i, element) in anonymousElements.withIndex()) {
         if (element equivalentTo anonymousElement) {
@@ -167,7 +168,7 @@ fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
         }
     }
 
-    throw IllegalStateException("Failed to determine anonymous class for $anonymousElement")
+    throw ClassNameResolutionFailedException("Failed to determine anonymous class for $anonymousElement")
 }
 
 @get:Contract(pure = true)
@@ -261,4 +262,7 @@ private fun areReallyOnlyParametersErasureEqual(parameterList1: PsiParameterList
     return true
 }
 
-class ClassNameResolutionFailedException : Exception()
+class ClassNameResolutionFailedException : Exception {
+    constructor() : super()
+    constructor(message: String) : super(message)
+}
