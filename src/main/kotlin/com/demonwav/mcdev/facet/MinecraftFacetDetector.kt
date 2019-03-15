@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.facet
 
-import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.util.AbstractProjectComponent
@@ -18,6 +17,7 @@ import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.ProjectTopics
 import com.intellij.facet.FacetManager
+import com.intellij.facet.ModifiableFacetModel
 import com.intellij.facet.impl.ui.libraries.LibrariesValidatorContextImpl
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
@@ -77,14 +77,18 @@ class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(projec
 
             val facet = facetManager.createFacet(MinecraftFacet.facetType, "Minecraft", configuration, null)
             runWriteTaskLater {
-                val modifiableModel = facetManager.createModifiableModel()
-                modifiableModel.addFacet(facet)
-                modifiableModel.commit()
+                // Only add the new facet if there isn't a Minecraft facet already - double check here since this
+                // task may run much later
+                if (facetManager.getFacetByType(MinecraftFacet.ID) == null) {
+                    val model = facetManager.createModifiableModel()
+                    model.addFacet(facet)
+                    model.commit()
+                }
             }
         }
 
         private fun checkExistingFacet(module: Module, facet: MinecraftFacet) {
-            val platforms = autoDetectTypes(module)
+            val platforms = autoDetectTypes(module).ifEmpty { return }
 
             val types = facet.configuration.state.autoDetectTypes
             types.clear()
@@ -109,13 +113,13 @@ class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(projec
                 .using(context.modulesProvider)
                 .recursively()
                 .librariesOnly()
-                .forEachLibrary { library ->
+                .forEachLibrary forEach@ { library ->
                     MINECRAFT_LIBRARY_KINDS.forEach { kind ->
                         if (presentationManager.isLibraryOfKind(library, context.librariesContainer, setOf(kind))) {
                             platformKinds.add(kind)
                         }
                     }
-                    true
+                    return@forEach true
                 }
 
             context.rootModel
@@ -124,24 +128,24 @@ class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(projec
                 .recursively()
                 .withoutLibraries()
                 .withoutSdk()
-                .forEachModule { m ->
+                .forEachModule forEach@ { m ->
                     if (m.name.startsWith("SpongeAPI")) {
                         // We don't want want to add parent modules in module groups
                         val moduleManager = ModuleManager.getInstance(m.project)
                         val groupPath = moduleManager.getModuleGroupPath(m)
                         if (groupPath == null) {
                             platformKinds.add(SPONGE_LIBRARY_KIND)
-                            return@forEachModule true
+                            return@forEach true
                         }
 
-                        val name = groupPath.lastOrNull() ?: return@forEachModule true
+                        val name = groupPath.lastOrNull() ?: return@forEach true
                         if (m.name == name) {
-                            return@forEachModule true
+                            return@forEach true
                         }
 
                         platformKinds.add(SPONGE_LIBRARY_KIND)
                     }
-                    true
+                    return@forEach true
                 }
 
             return platformKinds.mapNotNull { kind -> PlatformType.fromLibraryKind(kind) }.toSet()

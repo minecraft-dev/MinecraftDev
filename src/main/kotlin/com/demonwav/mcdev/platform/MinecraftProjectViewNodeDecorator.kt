@@ -38,6 +38,10 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
         val directory = node.value ?: return
         val module = ModuleUtilCore.findModuleForPsiElement(directory) ?: return
 
+        if (module.isDisposed || !module.isLoaded || module.project.isDisposed) {
+            return
+        }
+
         val rootManager = ModuleRootManager.getInstance(module)
         // Make sure there is at least a root to go off of
         if (rootManager.contentRoots.isEmpty()) {

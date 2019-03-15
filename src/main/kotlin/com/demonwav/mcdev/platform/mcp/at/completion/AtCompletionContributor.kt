@@ -78,8 +78,12 @@ class AtCompletionContributor : CompletionContributor() {
             return
         }
 
-        val currentPackage = text.substringBeforeLast('.')
-        val beginning = text.substringAfterLast('.')
+        val currentPackage = text.substringBeforeLast('.', "")
+        val beginning = text.substringAfterLast('.', "")
+
+        if (currentPackage == "" || beginning == "") {
+            return
+        }
 
         val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return
         val scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module)
