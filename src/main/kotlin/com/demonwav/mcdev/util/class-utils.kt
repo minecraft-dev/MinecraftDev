@@ -17,6 +17,7 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
+import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiParameterList
@@ -231,7 +232,11 @@ fun PsiMethod.isMatchingMethod(pattern: PsiMethod): Boolean {
 }
 
 fun PsiClass.findMatchingField(pattern: PsiField, checkBases: Boolean, name: String = pattern.name): PsiField? {
-    return findFieldByName(name, checkBases)?.takeIf { it.isMatchingField(pattern) }
+    return try {
+        findFieldByName(name, checkBases)?.takeIf { it.isMatchingField(pattern) }
+    } catch (e: PsiInvalidElementAccessException) {
+        null
+    }
 }
 
 fun PsiField.isMatchingField(pattern: PsiField): Boolean {
