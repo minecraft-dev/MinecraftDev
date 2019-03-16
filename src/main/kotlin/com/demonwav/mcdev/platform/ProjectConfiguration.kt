@@ -18,6 +18,9 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.containers.isNullOrEmpty
 import org.jetbrains.annotations.Contract
 
+private val bracketRegex = Regex("[\\[\\]]")
+private val commaRegex = Regex("\\s*,\\s*")
+
 abstract class ProjectConfiguration {
 
     lateinit var pluginName: String
@@ -43,8 +46,13 @@ abstract class ProjectConfiguration {
 
     fun hasDescription() = description.isNotBlank()
 
-    protected fun commaSplit(string: String) =
-        string.trim().replace("[\\[\\]]".toRegex(), "").split("\\s*,\\s*".toRegex()).toTypedArray()
+    protected fun commaSplit(string: String): List<String> {
+        return if (!string.isBlank()) {
+            string.trim().replace(bracketRegex, "").split(commaRegex).toList()
+        } else {
+            emptyList()
+        }
+    }
 
     @Contract("null -> false")
     fun listContainsAtLeastOne(list: MutableList<String>?): Boolean {
