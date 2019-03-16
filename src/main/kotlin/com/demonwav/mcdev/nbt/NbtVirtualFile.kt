@@ -14,10 +14,11 @@ import com.demonwav.mcdev.nbt.editor.CompressionSelection
 import com.demonwav.mcdev.nbt.editor.NbtToolbar
 import com.demonwav.mcdev.nbt.lang.NbttFile
 import com.demonwav.mcdev.nbt.lang.NbttLanguage
-import com.demonwav.mcdev.util.invokeLaterAny
+import com.demonwav.mcdev.util.invokeAndWait
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
@@ -60,8 +61,10 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
         this.parseSuccessful = tempParseSuccessful
 
         if (this.parseSuccessful) {
-            val psiFile = PsiFileFactory.getInstance(project).createFileFromText(NbttLanguage, text)
-            invokeLaterAny {
+            val psiFile = runReadAction {
+                PsiFileFactory.getInstance(project).createFileFromText(NbttLanguage, text)
+            }
+            invokeAndWait {
                 psiFile.runWriteAction {
                     this.bytes = PsiDocumentManager.getInstance(project).getDocument(
                         CodeStyleManager.getInstance(project).reformat(psiFile, true) as PsiFile
