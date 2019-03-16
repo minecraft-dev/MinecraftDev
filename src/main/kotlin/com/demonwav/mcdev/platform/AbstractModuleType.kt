@@ -49,6 +49,9 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
     abstract fun generateModule(facet: MinecraftFacet): T
 
     fun performCreationSettingSetup(project: Project) {
+        if (project.isDisposed) {
+            return
+        }
         val manager = EntryPointsManager.getInstance(project)
         val annotations = (manager as? EntryPointsManagerBase)?.ADDITIONAL_ANNOTATIONS as? MutableList<String> ?: return
         ignoredAnnotations.asSequence()

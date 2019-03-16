@@ -40,6 +40,9 @@ open class ForgeProjectConfiguration : ProjectConfiguration() {
     }
 
     override fun create(project: Project, buildSystem: BuildSystem, indicator: ProgressIndicator) {
+        if (project.isDisposed) {
+            return
+        }
         runWriteTask {
             indicator.text = "Writing main class"
             var file = buildSystem.sourceDirectory
