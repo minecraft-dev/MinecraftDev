@@ -39,6 +39,9 @@ class MavenBuildSystem : BuildSystem() {
     private lateinit var pomFile: VirtualFile
 
     override fun create(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
+        if (project.isDisposed) {
+            return
+        }
         rootDirectory.refresh(false, true)
 
         runWriteTask {
@@ -108,6 +111,9 @@ class MavenBuildSystem : BuildSystem() {
     }
 
     override fun finishSetup(rootModule: Module, configurations: Collection<ProjectConfiguration>, indicator: ProgressIndicator) {
+        if (rootModule.isDisposed || rootModule.project.isDisposed) {
+            return
+        }
         runWriteTask {
             val project = rootModule.project
 

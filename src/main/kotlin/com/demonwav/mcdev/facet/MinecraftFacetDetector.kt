@@ -79,6 +79,10 @@ class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(projec
             runWriteTaskLater {
                 // Only add the new facet if there isn't a Minecraft facet already - double check here since this
                 // task may run much later
+                if (module.isDisposed || facet.isDisposed) {
+                    // Module may be disposed before we run
+                    return@runWriteTaskLater
+                }
                 if (facetManager.getFacetByType(MinecraftFacet.ID) == null) {
                     val model = facetManager.createModifiableModel()
                     model.addFacet(facet)

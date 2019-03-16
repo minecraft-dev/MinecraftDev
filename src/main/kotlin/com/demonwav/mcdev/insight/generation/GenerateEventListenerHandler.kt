@@ -38,22 +38,23 @@ import com.intellij.refactoring.RefactoringBundle
  * [.cleanup] to complete
  */
 class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event Listener") {
-    private var editor: Editor? = null
-    private var position: LogicalPosition? = null
-    private var method: PsiMethod? = null
-    private var model: CaretModel? = null
 
-    private var data: GenerationData? = null
-    private var chosenClass: PsiClass? = null
-    private var chosenName: String? = null
-    private var relevantModule: AbstractModule? = null
-    private var okay: Boolean = false
+    private data class GenerateData(
+         var editor: Editor,
+         var position: LogicalPosition,
+         var method: PsiMethod?,
+         var model: CaretModel,
+         var data: GenerationData?,
+         var chosenClass: PsiClass,
+         var chosenName: String,
+         var relevantModule: AbstractModule
+    )
+
+    private var data: GenerateData? = null
 
     override fun getHelpId() = "Generate Event Listener Dialog"
 
-    override fun chooseOriginalMembers(aClass: PsiClass, project: Project, editor: Editor?): Array<ClassMember>? {
-        this.editor = editor
-
+    override fun chooseOriginalMembers(aClass: PsiClass, project: Project, editor: Editor): Array<ClassMember>? {
         val moduleForPsiElement = ModuleUtilCore.findModuleForPsiElement(aClass) ?: return null
 
         val facet = MinecraftFacet.getInstance(moduleForPsiElement) ?: return null
@@ -65,59 +66,58 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event 
             )
 
         chooser.showDialog()
-        chosenClass = chooser.selected
+        val chosenClass = chooser.selected ?: return null
 
-        chosenClass?.let { chosenClass ->
-            val relevantModule = facet.modules.asSequence()
-                .filter { m -> isSuperEventListenerAllowed(chosenClass, m) }
-                .firstOrNull() ?: return null
+        val relevantModule = facet.modules.asSequence()
+            .filter { m -> isSuperEventListenerAllowed(chosenClass, m) }
+            .firstOrNull() ?: return null
 
-            this.relevantModule = relevantModule
+        val chosenClassName = chosenClass.nameIdentifier?.text ?: return null
 
-            val generationDialog = EventGenerationDialog(
-                editor!!,
-                relevantModule.moduleType.getEventGenerationPanel(chosenClass),
-                chosenClass.nameIdentifier!!.text,
-                relevantModule.moduleType.getDefaultListenerName(chosenClass)
-            )
+        val generationDialog = EventGenerationDialog(
+            editor,
+            relevantModule.moduleType.getEventGenerationPanel(chosenClass),
+            chosenClassName,
+            relevantModule.moduleType.getDefaultListenerName(chosenClass)
+        )
 
-            okay = generationDialog.showAndGet()
+        val okay = generationDialog.showAndGet()
 
-            if (!okay) {
-                return null
-            }
-
-            data = generationDialog.data
-            chosenName = generationDialog.chosenName
-
-            model = editor.caretModel
-            position = model!!.logicalPosition
-
-            method = PsiTreeUtil.getParentOfType(aClass.containingFile.findElementAt(model!!.offset), PsiMethod::class.java)
+        if (!okay) {
+            return null
         }
 
-        return DUMMY_RESULT.castNotNull()
+        val dialogDAta = generationDialog.data
+        val chosenName = generationDialog.chosenName
+
+        val position = editor.caretModel.logicalPosition
+
+        val method = PsiTreeUtil.getParentOfType(aClass.containingFile.findElementAt(editor.caretModel.offset), PsiMethod::class.java)
+
+        this.data = GenerateData(editor, position, method, editor.caretModel, dialogDAta, chosenClass, chosenName, relevantModule)
+
+        return DUMMY_RESULT
     }
 
     override fun getAllOriginalMembers(aClass: PsiClass) = null
 
     override fun generateMemberPrototypes(aClass: PsiClass, originalMember: ClassMember?): Array<GenerationInfo>? {
-        if (!okay) {
+        if (data == null) {
             return null
         }
 
-        relevantModule?.let { relevantModule ->
-            relevantModule.doPreEventGenerate(aClass, data)
+        data?.let { data ->
+            data.relevantModule.doPreEventGenerate(aClass, data.data)
 
-            model!!.moveToLogicalPosition(position!!)
+            data.model.moveToLogicalPosition(data.position)
 
-            val newMethod = relevantModule.generateEventListenerMethod(aClass, chosenClass!!, chosenName!!, data)
+            val newMethod = data.relevantModule.generateEventListenerMethod(aClass, data.chosenClass, data.chosenName, data.data)
 
             if (newMethod != null) {
                 val info = PsiGenerationInfo(newMethod)
-                info.positionCaret(editor!!, true)
-                if (method != null) {
-                    info.insert(aClass, method, false)
+                info.positionCaret(data.editor, true)
+                if (data.method != null) {
+                    info.insert(aClass, data.method, false)
                 }
 
                 return arrayOf(info)
@@ -134,33 +134,33 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event 
         return instance != null && instance.isEventGenAvailable
     }
 
+    private fun isSuperEventListenerAllowed(eventClass: PsiClass, module: AbstractModule): Boolean {
+        val supers = eventClass.supers
+        for (aSuper in supers) {
+            if (module.isEventClassValid(aSuper, null)) {
+                return true
+            }
+            if (isSuperEventListenerAllowed(aSuper, module)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun isSuperEventListenerAllowed(eventClass: PsiClass, facet: MinecraftFacet): Boolean {
+        val supers = eventClass.supers
+        for (aSuper in supers) {
+            if (facet.isEventClassValidForModule(aSuper)) {
+                return true
+            }
+            if (isSuperEventListenerAllowed(aSuper, facet)) {
+                return true
+            }
+        }
+        return false
+    }
+
     companion object {
-        private val DUMMY_RESULT = arrayOfNulls<ClassMember>(1) //cannot return empty array, but this result won't be used anyway
-
-        private fun isSuperEventListenerAllowed(eventClass: PsiClass, facet: MinecraftFacet): Boolean {
-            val supers = eventClass.supers
-            for (aSuper in supers) {
-                if (facet.isEventClassValidForModule(aSuper)) {
-                    return true
-                }
-                if (isSuperEventListenerAllowed(aSuper, facet)) {
-                    return true
-                }
-            }
-            return false
-        }
-
-        private fun isSuperEventListenerAllowed(eventClass: PsiClass, module: AbstractModule): Boolean {
-            val supers = eventClass.supers
-            for (aSuper in supers) {
-                if (module.isEventClassValid(aSuper, null)) {
-                    return true
-                }
-                if (isSuperEventListenerAllowed(aSuper, module)) {
-                    return true
-                }
-            }
-            return false
-        }
+        private val DUMMY_RESULT = arrayOfNulls<ClassMember>(1).castNotNull() //cannot return empty array, but this result won't be used anyway
     }
 }

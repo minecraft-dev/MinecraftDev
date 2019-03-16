@@ -65,6 +65,9 @@ class GradleBuildSystem : BuildSystem() {
     private var buildGradle: VirtualFile? = null
 
     override fun create(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
+        if (project.isDisposed) {
+            return
+        }
         rootDirectory.refresh(false, true)
         createDirectories()
 
@@ -267,6 +270,9 @@ class GradleBuildSystem : BuildSystem() {
 
     override fun finishSetup(rootModule: Module, configurations: Collection<ProjectConfiguration>, indicator: ProgressIndicator) {
         val project = rootModule.project
+        if (rootModule.isDisposed || project.isDisposed) {
+            return
+        }
 
         // Tell Gradle to import this project
         val projectDataManager = ServiceManager.getService(ProjectDataManager::class.java)

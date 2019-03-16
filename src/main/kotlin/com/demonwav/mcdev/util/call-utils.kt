@@ -48,9 +48,13 @@ fun PsiCall.getSupers(reference: PsiMethod, paramIndex: Int, referenceParamIndex
             elem.children.mapFirstNotNull { findFirstMethodCall(it) }
         }
 
+    val funcThis = this
     val value = findFirstMethodCall(method)
-    return value?.extractReferences(this, method, reference, paramIndex, referenceParamIndex, { false }) {
-        it.getSupers(reference, paramIndex, referenceParamIndex)
+    return value?.extractReferences(this, method, reference, paramIndex, referenceParamIndex, { false }) recurse@{
+        if (this === funcThis) {
+            return@recurse emptyList()
+        }
+        return@recurse it.getSupers(reference, paramIndex, referenceParamIndex)
     } ?: emptyList()
 }
 
@@ -66,9 +70,13 @@ fun PsiCall.getCalls(reference: PsiMethod, paramIndex: Int, referenceParamIndex:
     fun findFirstMethodCall(elem: PsiElement): PsiMethodCallExpression? =
         elem as? PsiMethodCallExpression ?: elem.children.mapFirstNotNull { findFirstMethodCall(it) }
 
+    val funcThis = this
     val value = findFirstMethodCall(method)
-    return value?.extractReferences(this, method, reference, paramIndex, referenceParamIndex, { false }) {
-        it.getCalls(reference, paramIndex, referenceParamIndex)
+    return value?.extractReferences(this, method, reference, paramIndex, referenceParamIndex, { false }) recurse@{
+        if (this === funcThis) {
+            return@recurse emptyList()
+        }
+        return@recurse it.getCalls(reference, paramIndex, referenceParamIndex)
     } ?: emptyList()
 }
 

@@ -68,6 +68,9 @@ class MinecraftProjectCreator {
             override fun shouldStartInBackground() = false
 
             override fun run(indicator: ProgressIndicator) {
+                if (module.isDisposed || module.project.isDisposed) {
+                    return
+                }
                 indicator.isIndeterminate = true
 
                 buildSystem.create(module.project, configuration, indicator)

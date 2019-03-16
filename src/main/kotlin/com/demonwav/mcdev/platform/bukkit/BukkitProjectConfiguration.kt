@@ -51,6 +51,9 @@ class BukkitProjectConfiguration : ProjectConfiguration() {
     fun hasWebsite() = !website.isNullOrBlank()
 
     override fun create(project: Project, buildSystem: BuildSystem, indicator: ProgressIndicator) {
+        if (project.isDisposed) {
+            return
+        }
         runWriteTask {
             indicator.text = "Writing main class"
             // Create plugin main class
