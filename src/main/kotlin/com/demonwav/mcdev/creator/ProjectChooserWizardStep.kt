@@ -19,6 +19,7 @@ import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ui.IdeBorderFactory
+import com.intellij.util.ui.UIUtil
 import java.awt.Desktop
 import javax.swing.JCheckBox
 import javax.swing.JComponent
@@ -68,7 +69,11 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         bungeeCordPluginCheckBox.addActionListener { toggle(bungeeCordPluginCheckBox, waterfallPluginCheckBox) }
         waterfallPluginCheckBox.addActionListener { toggle(waterfallPluginCheckBox, bungeeCordPluginCheckBox) }
 
-        spongeIcon.icon = PlatformAssets.SPONGE_ICON_2X
+        if (UIUtil.isUnderDarcula()) {
+            spongeIcon.icon = PlatformAssets.SPONGE_ICON_2X_DARK
+        } else {
+            spongeIcon.icon = PlatformAssets.SPONGE_ICON_2X
+        }
 
         return panel
     }
@@ -81,99 +86,63 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
     }
 
     private fun fillInInfoPane() {
-        var text = "<html><font size=\"4\">"
+        val sb = StringBuilder("<html><font size=\"4\">")
 
-        if (bukkitPluginCheckBox.isSelected) {
-            text += bukkitInfo
-            text += "<p/>"
+        fun StringBuilder.append(checkbox: JCheckBox, text: String) {
+            if (checkbox.isSelected) {
+                append(text)
+                append("<p/>")
+            }
         }
 
-        if (spigotPluginCheckBox.isSelected) {
-            text += spigotInfo
-            text += "<p/>"
-        }
+        sb.append(bukkitPluginCheckBox, bukkitInfo)
+        sb.append(spigotPluginCheckBox, spigotInfo)
+        sb.append(paperPluginCheckBox, paperInfo)
+        sb.append(spongePluginCheckBox, spongeInfo)
+        sb.append(forgeModCheckBox, forgeInfo)
+        sb.append(liteLoaderModCheckBox, liteLoaderInfo)
+        sb.append(bungeeCordPluginCheckBox, bungeeCordInfo)
+        sb.append(waterfallPluginCheckBox, waterfallInfo)
 
-        if (paperPluginCheckBox.isSelected) {
-            text += paperInfo
-            text += "<p/>"
-        }
+        sb.append("</font></html>")
 
-        if (spongePluginCheckBox.isSelected) {
-            text += spongeInfo
-            text += "<p/>"
-        }
-
-        if (forgeModCheckBox.isSelected) {
-            text += forgeInfo
-            text += "<p/>"
-        }
-
-        if (liteLoaderModCheckBox.isSelected) {
-            text += liteLoaderInfo
-            text += "<p/>"
-        }
-
-        if (bungeeCordPluginCheckBox.isSelected) {
-            text += bungeeCordInfo
-            text += "<p/>"
-        }
-
-        if (waterfallPluginCheckBox.isSelected) {
-            text += waterfallInfo
-            text += "<p/>"
-        }
-
-        text += "</font></html>"
-
-        infoPane.text = text
+        infoPane.text = sb.toString()
     }
 
     override fun updateDataModel() {
-        creator.settings.clear()
+        creator.configs.clear()
 
         if (bukkitPluginCheckBox.isSelected) {
-            val configuration = BukkitProjectConfiguration()
-            configuration.type = PlatformType.BUKKIT
-            creator.settings[PlatformType.BUKKIT] = configuration
+            creator.configs += BukkitProjectConfiguration(PlatformType.BUKKIT)
         }
 
         if (spigotPluginCheckBox.isSelected) {
-            val configuration = BukkitProjectConfiguration()
-            configuration.type = PlatformType.SPIGOT
-            creator.settings[PlatformType.BUKKIT] = configuration
+            creator.configs += BukkitProjectConfiguration(PlatformType.SPIGOT)
         }
 
         if (paperPluginCheckBox.isSelected) {
-            val configuration = BukkitProjectConfiguration()
-            configuration.type = PlatformType.PAPER
-            creator.settings[PlatformType.BUKKIT] = configuration
+            creator.configs += BukkitProjectConfiguration(PlatformType.PAPER)
         }
 
         if (spongePluginCheckBox.isSelected) {
-            creator.settings[PlatformType.SPONGE] = SpongeProjectConfiguration()
+            creator.configs += SpongeProjectConfiguration()
         }
 
         if (forgeModCheckBox.isSelected) {
-            creator.settings[PlatformType.FORGE] = ForgeProjectConfiguration()
+            creator.configs += ForgeProjectConfiguration()
         }
 
         if (liteLoaderModCheckBox.isSelected) {
-            creator.settings[PlatformType.LITELOADER] = LiteLoaderProjectConfiguration()
+            creator.configs += LiteLoaderProjectConfiguration()
         }
 
         if (bungeeCordPluginCheckBox.isSelected) {
-            val configuration = BungeeCordProjectConfiguration()
-            configuration.type = PlatformType.BUNGEECORD
-            creator.settings[PlatformType.BUNGEECORD] = configuration
+            creator.configs += BungeeCordProjectConfiguration(PlatformType.BUNGEECORD)
         }
 
         if (waterfallPluginCheckBox.isSelected) {
-            val configuration = BungeeCordProjectConfiguration()
-            configuration.type = PlatformType.WATERFALL
-            creator.settings[PlatformType.BUNGEECORD] = configuration
+            creator.configs += BungeeCordProjectConfiguration(PlatformType.WATERFALL)
         }
-
-        creator.settings.values.iterator().next().isFirst = true
     }
 
     override fun validate(): Boolean {

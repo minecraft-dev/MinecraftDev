@@ -16,8 +16,9 @@ import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.exception.EmptyFieldSetupException
 import com.demonwav.mcdev.exception.OtherSetupException
 import com.demonwav.mcdev.exception.SetupException
-import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration
+import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration
+import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
+import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.ui.popup.Balloon
@@ -38,44 +39,38 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
     override fun getComponent() = panel
 
     override fun updateStep() {
-        if (creator.settings.size > 1) {
+        if (creator.configs.size > 1) {
             buildSystemBox.selectedIndex = 1
             buildSystemBox.isVisible = false
             return
         }
-        if (creator.settings.values.any { s -> s.type === PlatformType.FORGE } ||
-            creator.settings.values.any { s -> s.type === PlatformType.LITELOADER } ||
-            creator.settings.values.any { s -> s is SpongeForgeProjectConfiguration }) {
-            buildSystemBox.selectedIndex = 1
-            buildSystemBox.setVisible(false)
-        } else if (creator.settings.values
-            .any { s -> s.type === PlatformType.SPONGE }) {
-            buildSystemBox.selectedIndex = 1
-            buildSystemBox.setVisible(true)
-        } else {
-            buildSystemBox.selectedIndex = 0
-            buildSystemBox.setVisible(true)
+        when {
+            creator.configs.any { s -> s is ForgeProjectConfiguration || s is LiteLoaderProjectConfiguration } -> {
+                buildSystemBox.selectedIndex = 1
+                buildSystemBox.setVisible(false)
+            }
+            creator.configs.any { s -> s is SpongeProjectConfiguration } -> {
+                buildSystemBox.selectedIndex = 1
+                buildSystemBox.setVisible(true)
+            }
+            else -> {
+                buildSystemBox.selectedIndex = 0
+                buildSystemBox.setVisible(true)
+            }
         }
     }
 
     override fun updateDataModel() {}
 
     override fun onStepLeaving() {
-        creator.groupId = groupIdField.text
-        creator.artifactId = artifactIdField.text
-        creator.version = versionField.text
-        val buildSystem = createBuildSystem()
-
-        // Java 8 always
-        buildSystem.buildVersion = "1.8"
-        creator.buildSystem = buildSystem
+        creator.buildSystem = createBuildSystem()
     }
 
     private fun createBuildSystem(): BuildSystem {
         return if (buildSystemBox.selectedIndex == 0) {
-            MavenBuildSystem()
+            MavenBuildSystem(artifactIdField.text, groupIdField.text, versionField.text)
         } else {
-            GradleBuildSystem()
+            GradleBuildSystem(artifactIdField.text, groupIdField.text, versionField.text)
         }
     }
 
@@ -101,7 +96,7 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
                 throw OtherSetupException("The ArtifactId field cannot contain any whitespace", artifactIdField)
             }
 
-            if (creator.settings.values.any { s -> s.type === PlatformType.FORGE } && buildSystemBox.selectedIndex == 0) {
+            if (creator.configs.any { s -> s is ForgeProjectConfiguration } && buildSystemBox.selectedIndex == 0) {
                 throw OtherSetupException("Forge does not support Maven", buildSystemBox)
             }
         } catch (e: SetupException) {

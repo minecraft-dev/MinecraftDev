@@ -8,11 +8,20 @@
  * MIT License
  */
 
+@file:Suppress("Duplicates")
+
 package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration
+import com.demonwav.mcdev.util.firstOfType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.apache.commons.lang.WordUtils
 import javax.swing.JComboBox
 import javax.swing.JComponent
@@ -34,31 +43,44 @@ class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreat
     private lateinit var minecraftVersionBox: JComboBox<String>
     private lateinit var errorLabel: JLabel
 
-    private var settings: BungeeCordProjectConfiguration? = null
+    private var config: BungeeCordProjectConfiguration? = null
 
     override fun getComponent(): JComponent {
-        settings = creator.settings[PlatformType.BUNGEECORD] as? BungeeCordProjectConfiguration
-        if (settings == null) {
-            return panel
+        return panel
+    }
+
+    override fun validate(): Boolean {
+        return validate(pluginNameField, pluginVersionField, mainClassField, authorField, dependField, pattern) &&
+            minecraftVersionBox.selectedItem != null
+    }
+
+    override fun updateStep() {
+        config = creator.configs.firstOfType()
+        if (config == null) {
+            return
         }
 
-        val name = WordUtils.capitalize(creator.artifactId.replace('-', ' '))
-        pluginNameField.text = name
-        pluginVersionField.text = creator.version
+        val buildSystem = creator.buildSystem ?: return
 
-        if (settings != null && !settings!!.isFirst) {
+        val name = WordUtils.capitalize(buildSystem.artifactId.replace('-', ' '))
+        pluginNameField.text = name
+        pluginVersionField.text = buildSystem.version
+
+        val conf = config ?: return
+
+        if (creator.configs.indexOf(conf) != 0) {
             pluginNameField.isEditable = false
             pluginVersionField.isEditable = false
         }
 
-        mainClassField.text = creator.groupId.replace("-", "").toLowerCase() + "." +
-            creator.artifactId.replace("-", "").toLowerCase() + "." + name.replace(" ", "")
+        mainClassField.text = buildSystem.groupId.replace("-", "").toLowerCase() + "." +
+            buildSystem.artifactId.replace("-", "").toLowerCase() + "." + name.replace(" ", "")
 
-        if (creator.settings.size > 1) {
-            mainClassField.text = mainClassField.text + settings!!.type.normalName
+        if (creator.configs.size > 1) {
+            mainClassField.text = mainClassField.text + conf.type.normalName
         }
 
-        when (settings!!.type) {
+        when (conf.type) {
             PlatformType.BUNGEECORD -> {
                 title.icon = PlatformAssets.BUNGEECORD_ICON_2X
                 title.text = "<html><font size=\"5\">BungeeCord Settings</font></html>"
@@ -70,32 +92,33 @@ class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreat
             else -> {}
         }
 
-        getVersionSelector(settings!!.type)
-            .onSuccess { it.set(minecraftVersionBox) }
-            .onError { errorLabel.isVisible = true }
-
-        return panel
-    }
-
-    override fun validate(): Boolean {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorField, dependField, pattern) &&
-            minecraftVersionBox.selectedItem != null
+        CoroutineScope(Dispatchers.Swing).launch {
+            try {
+                withContext(Dispatchers.IO) { getVersionSelector(conf.type) }.set(minecraftVersionBox)
+            } catch (e: Exception) {
+                errorLabel.isVisible = true
+            }
+        }
     }
 
     override fun isStepVisible(): Boolean {
-        settings = creator.settings[PlatformType.BUNGEECORD] as? BungeeCordProjectConfiguration
-        return settings != null
+        return creator.configs.any { it is BungeeCordProjectConfiguration }
     }
 
     override fun onStepLeaving() {
-        this.settings!!.pluginName = pluginNameField.text
-        this.settings!!.pluginVersion = pluginVersionField.text
-        this.settings!!.mainClass = mainClassField.text
-        this.settings!!.description = descriptionField.text
-        this.settings!!.setAuthors(this.authorField.text)
-        this.settings!!.setDependencies(this.dependField.text)
-        this.settings!!.setSoftDependencies(this.softDependField.text)
-        this.settings!!.minecraftVersion = minecraftVersionBox.selectedItem as? String ?: ""
+        val conf = config ?: return
+
+        conf.base = ProjectConfiguration.BaseConfigs(
+            pluginNameField.text,
+            pluginVersionField.text,
+            mainClassField.text,
+            descriptionField.text
+        )
+
+        conf.setAuthors(this.authorField.text)
+        conf.setDependencies(this.dependField.text)
+        conf.setSoftDependencies(this.softDependField.text)
+        conf.minecraftVersion = minecraftVersionBox.selectedItem as? String ?: ""
     }
 
     override fun updateDataModel() {}

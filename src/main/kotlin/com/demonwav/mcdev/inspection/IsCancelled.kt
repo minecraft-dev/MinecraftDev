@@ -13,7 +13,6 @@ package com.demonwav.mcdev.inspection
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
 import com.siyeh.ig.InspectionGadgetsFix
-import org.jetbrains.annotations.Nls
 
 class IsCancelled(
     fix: (ProblemDescriptor) -> Unit,

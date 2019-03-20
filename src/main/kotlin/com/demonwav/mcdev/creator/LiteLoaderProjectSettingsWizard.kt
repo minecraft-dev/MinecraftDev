@@ -12,19 +12,26 @@ package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.exception.EmptyInputSetupException
 import com.demonwav.mcdev.exception.SetupException
-import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
 import com.demonwav.mcdev.platform.liteloader.version.LiteLoaderVersion
 import com.demonwav.mcdev.platform.mcp.version.McpVersion
 import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry
+import com.demonwav.mcdev.util.firstOfType
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.awt.RelativePoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.apache.commons.lang.WordUtils
-import org.jetbrains.concurrency.runAsync
 import java.awt.event.ActionListener
 import java.util.regex.Pattern
 import javax.swing.JComboBox
@@ -33,7 +40,6 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JProgressBar
 import javax.swing.JTextField
-import javax.swing.SwingWorker
 import javax.swing.event.DocumentEvent
 import javax.swing.text.AbstractDocument
 
@@ -48,18 +54,21 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
     private lateinit var mcpVersionBox: JComboBox<McpVersionEntry>
     private lateinit var loadingBar: JProgressBar
 
-    private var settings: LiteLoaderProjectConfiguration? = null
+    private var config: LiteLoaderProjectConfiguration? = null
 
-    private var mcpVersion: McpVersion? = null
-    private var liteloaderVersion: LiteLoaderVersion? = null
+    private data class LiteLoaderVersions(
+        val mcpVersion: McpVersion,
+        val liteloaderVersion: LiteLoaderVersion
+    )
 
+    private var versions: LiteLoaderVersions? = null
     private var mainClassModified = false
+
+    private var currentJob: Job? = null
 
     private val mcpBoxActionListener = ActionListener {
         mcpWarning.isVisible = (mcpVersionBox.selectedItem as McpVersionEntry).isRed
     }
-
-    private var apiWorker = LiteLoaderWorker(null)
 
     private val listener = object : DocumentAdapter() {
         override fun textChanged(e: DocumentEvent) {
@@ -75,7 +84,7 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
 
             // We just need to make sure they aren't messing up the LiteMod text
             val words = mainClassField.text.split(".").dropLastWhile(String::isEmpty).toTypedArray()
-            if (!words[words.size - 1].startsWith(LITEMOD)) {
+            if (!words.last().startsWith(LITEMOD)) {
                 invokeLater {
                     mainClassField.document.removeDocumentListener(this)
 
@@ -91,17 +100,16 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
         mcpWarning.isVisible = false
 
         minecraftVersionBox.addActionListener {
-            val version = minecraftVersionBox.selectedItem as String
-            runAsync {
-                getData(version)
-            }.onSuccess { (mcpVersions) ->
-                invokeLater {
-                    mcpVersionBox.removeActionListener(mcpBoxActionListener)
-                    mcpVersionBox.removeAllItems()
-                    mcpVersions.forEach { mcpVersionBox.addItem(it) }
-                    mcpVersionBox.addActionListener(mcpBoxActionListener)
-                    mcpBoxActionListener.actionPerformed(null)
-                }
+            val mcpVersion = versions?.mcpVersion ?: return@addActionListener
+            CoroutineScope(Dispatchers.Swing).launch {
+                val version = minecraftVersionBox.selectedItem as String
+                val mcpVersions = withContext(Dispatchers.Default) { mcpVersion.getMcpVersionList(version) }
+
+                mcpVersionBox.removeActionListener(mcpBoxActionListener)
+                mcpVersionBox.removeAllItems()
+                mcpVersions.forEach { mcpVersionBox.addItem(it) }
+                mcpVersionBox.addActionListener(mcpBoxActionListener)
+                mcpBoxActionListener.actionPerformed(null)
             }
         }
 
@@ -111,7 +119,7 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
                     return
                 }
 
-                val word = modNameField.text.split("\\s+".toRegex()).joinToString { WordUtils.capitalize(it) }
+                val word = modNameField.text.split(Regex("\\s+")).joinToString { WordUtils.capitalize(it) }
 
                 val mainClassWords = mainClassField.text.split('.').toTypedArray()
                 mainClassWords[mainClassWords.size - 1] = LITEMOD + word
@@ -123,32 +131,9 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
         })
 
         mainClassField.document.addDocumentListener(listener)
-
-        apiWorker.execute()
     }
 
     override fun getComponent(): JComponent {
-        settings = creator.settings[PlatformType.LITELOADER] as? LiteLoaderProjectConfiguration
-        if (settings == null) {
-            return panel
-        }
-
-        modNameField.text = WordUtils.capitalizeFully(creator.artifactId.replace('-', ' '))
-        modVersionField.text = creator.version
-
-        if (settings != null && !settings!!.isFirst) {
-            modNameField.isEditable = false
-            modVersionField.isEditable = false
-        }
-
-        mainClassField.document.removeDocumentListener(listener)
-        mainClassField.text = this.creator.groupId.replace("-", "") + "." +
-            this.creator.artifactId.replace("-", "") + "." + LITEMOD +
-            WordUtils.capitalizeFully(creator.artifactId.replace('-', ' ')).replace(" ", "")
-        mainClassField.document.addDocumentListener(listener)
-
-        loadingBar.isIndeterminate = true
-
         return panel
     }
 
@@ -177,64 +162,99 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
     }
 
     override fun isStepVisible(): Boolean {
-        settings = creator.settings[PlatformType.LITELOADER] as? LiteLoaderProjectConfiguration
-        return settings != null
+        return creator.configs.any { it is LiteLoaderProjectConfiguration }
     }
 
     override fun updateStep() {
-        if ((liteloaderVersion == null || mcpVersion == null) && (apiWorker.isCancelled || apiWorker.isDone)) {
-            apiWorker = LiteLoaderWorker(minecraftVersionBox.selectedItem as String)
-            apiWorker.execute()
+        config = creator.configs.firstOfType()
+        if (config == null) {
+            return
         }
+
+        val buildSystem = creator.buildSystem ?: return
+
+        modNameField.text = WordUtils.capitalizeFully(buildSystem.artifactId.replace('-', ' '))
+        modVersionField.text = buildSystem.version
+
+        val conf = config ?: return
+
+        if (creator.configs.indexOf(conf) != 0) {
+            modNameField.isEditable = false
+            modVersionField.isEditable = false
+        }
+
+        mainClassField.document.removeDocumentListener(listener)
+        mainClassField.text = buildSystem.groupId.replace("-", "") + "." +
+            buildSystem.artifactId.replace("-", "") + "." + LITEMOD +
+            WordUtils.capitalizeFully(buildSystem.artifactId.replace('-', ' ')).replace(" ", "")
+        mainClassField.document.addDocumentListener(listener)
+
+        if (versions != null || currentJob?.isActive == true) {
+            return
+        }
+        currentJob = updateVersions()
     }
 
     override fun onStepLeaving() {
-        settings!!.apply {
-            pluginName = modNameField.text
-            pluginVersion = modVersionField.text
-            mainClass = mainClassField.text
-
-            mcVersion = minecraftVersionBox.selectedItem as String
-            mcpVersion = (mcpVersionBox.selectedItem as McpVersionEntry).text
+        currentJob?.let { job ->
+            // we're in a cancel state
+            job.cancel()
+            return
         }
+
+        val conf = config ?: return
+        conf.base = ProjectConfiguration.BaseConfigs(
+            modNameField.text,
+            modVersionField.text,
+            mainClassField.text
+        )
+
+        conf.mcVersion = minecraftVersionBox.selectedItem as String
+        conf.mcpVersion = (mcpVersionBox.selectedItem as McpVersionEntry).text
     }
 
     override fun updateDataModel() {}
 
-    private fun getData(version: String): Data {
-        return Data(mcpVersion!!.getMcpVersionList(version))
-    }
+    private fun updateVersions() = CoroutineScope(Dispatchers.Swing).launch {
+        loadingBar.isIndeterminate = true
+        loadingBar.isVisible = true
 
-    private inner class LiteLoaderWorker(val version: String?) : SwingWorker<Data, Any>() {
-        override fun doInBackground(): Data {
-            mcpVersion = McpVersion.downloadData()
-            liteloaderVersion = LiteLoaderVersion.downloadData()
-            return getData(version ?: liteloaderVersion!!.sortedMcVersions[0])
+        val version = minecraftVersionBox.selectedItem as? String
+
+        val mcpVersionJob = async(Dispatchers.IO) { McpVersion.downloadData() }
+        val liteloaderVersionJob = async(Dispatchers.IO) { LiteLoaderVersion.downloadData() }
+
+        val mcpVersion = mcpVersionJob.await() ?: return@launch
+        val liteloaderVersion = liteloaderVersionJob.await() ?: return@launch
+
+        val data = withContext(Dispatchers.IO) {
+            val listVersion = version ?: liteloaderVersion.sortedMcVersions.first()
+            return@withContext mcpVersion.getMcpVersionList(listVersion)
         }
 
-        override fun done() {
-            if (mcpVersion == null || liteloaderVersion == null) {
-                return
-            }
-
-            minecraftVersionBox.removeAllItems()
-
-            liteloaderVersion!!.sortedMcVersions.forEach { minecraftVersionBox.addItem(it) }
-            // Always select most recent
-            minecraftVersionBox.selectedIndex = 0
-
-            mcpVersionBox.removeActionListener(mcpBoxActionListener)
-            mcpVersionBox.removeAllItems()
-            get().mcpVersions.forEach { mcpVersionBox.addItem(it) }
-            mcpVersionBox.addActionListener(mcpBoxActionListener)
-            mcpBoxActionListener.actionPerformed(null)
-
-            loadingBar.isIndeterminate = false
-            loadingBar.isVisible = false
+        if (liteloaderVersion.sortedMcVersions.isEmpty()) {
+            return@launch
         }
-    }
 
-    private data class Data(val mcpVersions: List<McpVersionEntry>)
+        minecraftVersionBox.removeAllItems()
+
+        liteloaderVersion.sortedMcVersions.forEach { minecraftVersionBox.addItem(it) }
+        // Always select most recent
+        minecraftVersionBox.selectedIndex = 0
+
+        mcpVersionBox.removeActionListener(mcpBoxActionListener)
+        mcpVersionBox.removeAllItems()
+        data.forEach { mcpVersionBox.addItem(it) }
+        mcpVersionBox.addActionListener(mcpBoxActionListener)
+        mcpBoxActionListener.actionPerformed(null)
+
+        versions = LiteLoaderVersions(mcpVersion, liteloaderVersion)
+
+        loadingBar.isIndeterminate = false
+        loadingBar.isVisible = false
+
+        currentJob = null
+    }
 
     companion object {
         private const val LITEMOD = "LiteMod"

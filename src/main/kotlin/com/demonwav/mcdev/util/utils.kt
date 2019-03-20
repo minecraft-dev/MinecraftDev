@@ -169,3 +169,7 @@ fun String.getSimilarity(text: String, bonus: Int = 0): Int {
     }
     return distance + bonus
 }
+
+inline fun <reified T> Iterable<*>.firstOfType(): T? {
+    return this.firstOrNull { it is T } as? T
+}

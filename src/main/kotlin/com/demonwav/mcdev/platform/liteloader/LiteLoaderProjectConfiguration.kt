@@ -8,6 +8,8 @@
  * MIT License
  */
 
+@file:Suppress("Duplicates")
+
 package com.demonwav.mcdev.platform.liteloader
 
 import com.demonwav.mcdev.buildsystem.BuildSystem
@@ -24,25 +26,27 @@ class LiteLoaderProjectConfiguration : ProjectConfiguration() {
     var mcpVersion = ""
     var mcVersion = ""
 
-    init {
-        type = PlatformType.LITELOADER
-    }
+    override var type = PlatformType.LITELOADER
 
     override fun create(project: Project, buildSystem: BuildSystem, indicator: ProgressIndicator) {
         if (project.isDisposed) {
             return
         }
+
+        val baseConfig = base ?: return
+        val dirs = buildSystem.directories ?: return
+
         runWriteTask {
             indicator.text = "Writing main class"
 
-            var file = buildSystem.sourceDirectory
-            val files = mainClass.split(".").toTypedArray()
+            var file = dirs.sourceDirectory
+            val files = baseConfig.mainClass.split(".").toTypedArray()
             val className = files.last()
-            val packageName = mainClass.substring(0, mainClass.length - className.length - 1)
+            val packageName = baseConfig.mainClass.substring(0, baseConfig.mainClass.length - className.length - 1)
             file = getMainClassDirectory(files, file)
 
             val mainClassFile = file.findOrCreateChildData(this, className + ".java")
-            LiteLoaderTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className, pluginName, pluginVersion)
+            LiteLoaderTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className, baseConfig.pluginName, baseConfig.pluginVersion)
 
             PsiManager.getInstance(project).findFile(mainClassFile)?.let { mainClassPsi ->
                 EditorHelper.openInEditor(mainClassPsi)

@@ -12,6 +12,7 @@
   <name></name>
 
   <properties>
+    <java.version>1.8</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -23,8 +24,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.7.0</version>
         <configuration>
-          <source>${BUILD_VERSION}</source>
-          <target>${BUILD_VERSION}</target>
+          <source>\${java.version}</source>
+          <target>\${java.version}</target>
         </configuration>
       </plugin>
       <plugin>

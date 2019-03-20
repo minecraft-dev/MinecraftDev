@@ -21,28 +21,26 @@ import java.util.Properties
 object ForgeTemplate {
     val MC_1_12 = SemanticVersion.release(1, 12)
 
-    fun applyBuildGradleTemplate(project: Project,
-                                 file: VirtualFile,
-                                 prop: VirtualFile,
-                                 groupId: String,
-                                 artifactId: String,
-                                 configuration: ForgeProjectConfiguration,
-                                 modVersion: String) {
+    fun applyBuildGradleTemplate(
+        project: Project,
+        file: VirtualFile,
+        prop: VirtualFile,
+        groupId: String,
+        artifactId: String,
+        configuration: ForgeProjectConfiguration,
+        modVersion: String
+    ) {
 
         val properties = Properties()
 
-        if (configuration is SpongeForgeProjectConfiguration) {
-            properties.setProperty("SPONGE_FORGE", "true")
-        }
-        // Fixes builds for MC1.12+, requires FG 2.3
-        val mcVersion = SemanticVersion.parse(configuration.mcVersion)
-        if (mcVersion >= MC_1_12) {
-            properties.setProperty("FORGEGRADLE_VERSION", "2.3")
-        } else {
-            properties.setProperty("FORGEGRADLE_VERSION", "2.2")
-        }
+        applyForgeGradle(properties, configuration)
 
-        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_BUILD_GRADLE_TEMPLATE, properties)
+        BaseTemplate.applyTemplate(
+            project,
+            file,
+            MinecraftFileTemplateGroupFactory.FORGE_BUILD_GRADLE_TEMPLATE,
+            properties
+        )
 
         val gradleProps = Properties()
         gradleProps.setProperty("GROUP_ID", groupId)
@@ -52,31 +50,34 @@ object ForgeTemplate {
         gradleProps.setProperty("MCP_VERSION", configuration.mcpVersion)
 
         // create gradle.properties
-        BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps)
+        BaseTemplate.applyTemplate(
+            project,
+            prop,
+            MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE,
+            gradleProps
+        )
     }
 
-    fun applySubmoduleBuildGradleTemplate(project: Project,
-                                          file: VirtualFile,
-                                          prop: VirtualFile,
-                                          artifactId: String,
-                                          configuration: ForgeProjectConfiguration,
-                                          commonProjectName: String) {
+    fun applySubmoduleBuildGradleTemplate(
+        project: Project,
+        file: VirtualFile,
+        prop: VirtualFile,
+        artifactId: String,
+        configuration: ForgeProjectConfiguration,
+        commonProjectName: String
+    ) {
 
         val properties = Properties()
         properties.setProperty("COMMON_PROJECT_NAME", commonProjectName)
 
-        if (configuration is SpongeForgeProjectConfiguration) {
-            properties.setProperty("SPONGE_FORGE", "true")
-        }
-        // Fixes builds for MC1.12+, requires FG 2.3
-        val mcVersion = SemanticVersion.parse(configuration.mcVersion)
-        if (mcVersion >= MC_1_12) {
-            properties.setProperty("FORGEGRADLE_VERSION", "2.3")
-        } else {
-            properties.setProperty("FORGEGRADLE_VERSION", "2.2")
-        }
+        applyForgeGradle(properties, configuration)
 
-        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties)
+        BaseTemplate.applyTemplate(
+            project,
+            file,
+            MinecraftFileTemplateGroupFactory.FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE,
+            properties
+        )
 
         val gradleProps = Properties()
         gradleProps.setProperty("ARTIFACT_ID", artifactId)
@@ -84,19 +85,32 @@ object ForgeTemplate {
         gradleProps.setProperty("MCP_VERSION", configuration.mcpVersion)
 
         // create gradle.properties
-        BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE, gradleProps)
+        BaseTemplate.applyTemplate(
+            project,
+            prop,
+            MinecraftFileTemplateGroupFactory.FORGE_GRADLE_PROPERTIES_TEMPLATE,
+            gradleProps
+        )
     }
 
-    fun applyMcmodInfoTemplate(project: Project,
-                               file: VirtualFile,
-                               artifactId: String,
-                               modName: String,
-                               description: String,
-                               url: String,
-                               updateUrl: String,
-                               authorList: String?,
-                               dependenciesList: String?) {
+    private fun applyForgeGradle(properties: Properties, configuration: ForgeProjectConfiguration) {
+        if (configuration is SpongeForgeProjectConfiguration) {
+            properties.setProperty("SPONGE_FORGE", "true")
+        }
+        properties.setProperty("FORGEGRADLE_VERSION", "2.3")
+    }
 
+    fun applyMcmodInfoTemplate(
+        project: Project,
+        file: VirtualFile,
+        artifactId: String,
+        modName: String,
+        description: String,
+        url: String,
+        updateUrl: String,
+        authorList: String?,
+        dependenciesList: String?
+    ) {
         val properties = Properties()
         properties.setProperty("ARTIFACT_ID", artifactId)
         properties.setProperty("MOD_NAME", modName)
@@ -117,14 +131,15 @@ object ForgeTemplate {
         BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MCMOD_INFO_TEMPLATE, properties)
     }
 
-    fun applyMainClassTemplate(project: Project,
-                               file: VirtualFile,
-                               packageName: String,
-                               artifactId: String,
-                               modName: String,
-                               modVersion: String,
-                               className: String) {
-
+    fun applyMainClassTemplate(
+        project: Project,
+        file: VirtualFile,
+        packageName: String,
+        artifactId: String,
+        modName: String,
+        modVersion: String,
+        className: String
+    ) {
         val properties = Properties()
         properties.setProperty("PACKAGE_NAME", packageName)
         properties.setProperty("ARTIFACT_ID", artifactId)
@@ -132,6 +147,11 @@ object ForgeTemplate {
         properties.setProperty("MOD_VERSION", modVersion)
         properties.setProperty("CLASS_NAME", className)
 
-        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.FORGE_MAIN_CLASS_TEMPLATE, properties)
+        BaseTemplate.applyTemplate(
+            project,
+            file,
+            MinecraftFileTemplateGroupFactory.FORGE_MAIN_CLASS_TEMPLATE,
+            properties
+        )
     }
 }

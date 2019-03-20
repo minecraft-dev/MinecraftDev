@@ -16,8 +16,8 @@ subprojects {
     group = project.pluginGroup
     version = project.pluginVersion
 
-    sourceCompatibility = '${BUILD_VERSION}'
-    targetCompatibility = '${BUILD_VERSION}'
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 
     repositories {
         mavenCentral()

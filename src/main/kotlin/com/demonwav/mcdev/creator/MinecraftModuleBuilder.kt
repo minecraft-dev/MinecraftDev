@@ -30,7 +30,9 @@ import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
-import java.io.File
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class MinecraftModuleBuilder : JavaModuleBuilder() {
 
@@ -52,10 +54,10 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
             modifiableRootModel.sdk = moduleJdk
         }
 
-        creator.root = root
-        creator.module = modifiableRootModel.module
 
-        val r = DumbAwareRunnable(creator::create)
+        val r = DumbAwareRunnable {
+            creator.create(root, modifiableRootModel.module)
+        }
 
         if (project.isDisposed) {
             return
@@ -79,8 +81,12 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
 
         val path = FileUtil.toSystemIndependentName(temp)
 
-        File(path).mkdirs()
-        return LocalFileSystem.getInstance().refreshAndFindFileByPath(path)
+        return try {
+            Files.createDirectories(Paths.get(path))
+            LocalFileSystem.getInstance().refreshAndFindFileByPath(path)
+        } catch (e: IOException) {
+            null
+        }
     }
 
     override fun getModuleType(): ModuleType<*> = JavaModuleType.getModuleType()

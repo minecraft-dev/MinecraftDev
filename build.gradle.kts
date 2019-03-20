@@ -83,6 +83,9 @@ dependencies {
     compile(files(gradleToolingExtensionJar))
 
     compileOnly(kotlin("stdlib-jdk8"))
+    val coroutineVersion = "1.1.1"
+    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
+    compile("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutineVersion")
 
     "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
     "jflex-skeleton"("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")

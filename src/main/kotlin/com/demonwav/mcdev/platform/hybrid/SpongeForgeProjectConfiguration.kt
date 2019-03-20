@@ -8,6 +8,8 @@
  * MIT License
  */
 
+@file:Suppress("Duplicates")
+
 package com.demonwav.mcdev.platform.hybrid
 
 import com.demonwav.mcdev.buildsystem.BuildSystem
@@ -24,25 +26,24 @@ import com.intellij.psi.PsiManager
 
 class SpongeForgeProjectConfiguration : ForgeProjectConfiguration() {
 
-    var generateDocumentation = false
-    var spongeApiVersion = ""
+    override var type: PlatformType = PlatformType.SPONGE
 
-    init {
-        // We set our platform type to sponge because we want it to provide us the dependency. The GradleBuildSystem
-        // will properly handle us as a a combined project
-        type = PlatformType.SPONGE
-    }
+    var spongeApiVersion = ""
 
     override fun create(project: Project, buildSystem: BuildSystem, indicator: ProgressIndicator) {
         if (project.isDisposed) {
             return
         }
+
+        val baseConfig = base ?: return
+        val dirs = buildSystem.directories ?: return
+
         runWriteTask {
             indicator.text = "Writing main class"
-            var file = buildSystem.sourceDirectory
-            val files = mainClass.split(".").toTypedArray()
+            var file = dirs.sourceDirectory
+            val files = baseConfig.mainClass.split(".").toTypedArray()
             val className = files.last()
-            val packageName = mainClass.substring(0, mainClass.length - className.length - 1)
+            val packageName = baseConfig.mainClass.substring(0, baseConfig.mainClass.length - className.length - 1)
             file = getMainClassDirectory(files, file)
 
             val mainClassFile = file.findOrCreateChildData(this, className + ".java")
@@ -54,7 +55,7 @@ class SpongeForgeProjectConfiguration : ForgeProjectConfiguration() {
                 hasDependencies()
             )
 
-            writeMcmodInfo(project, buildSystem)
+            writeMcmodInfo(project, baseConfig, buildSystem, dirs)
 
             val mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile) as? PsiJavaFile ?: return@runWriteTask
             val psiClass = mainClassPsi.classes[0]
@@ -64,11 +65,11 @@ class SpongeForgeProjectConfiguration : ForgeProjectConfiguration() {
                 mainClassPsi,
                 psiClass,
                 buildSystem,
-                pluginName,
-                description,
-                website ?: "",
+                baseConfig.pluginName,
+                baseConfig.description ?: "",
+                baseConfig.website ?: "",
                 hasAuthors(),
-                authors,
+                baseConfig.authors,
                 hasDependencies(),
                 dependencies
             )
