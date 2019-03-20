@@ -20,7 +20,7 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.3.0" // kept in sync with IntelliJ's bundled dep
+    kotlin("jvm") version "1.3.0" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
     id("org.jetbrains.intellij") version "0.4.5"
@@ -82,8 +82,6 @@ dependencies {
 
     compile(files(gradleToolingExtensionJar))
 
-    // gradle-intellij-plugin doesn't attach sources properly for Kotlin unless it's manually defined here
-    // compileOnly since it's only here for reference
     compileOnly(kotlin("stdlib-jdk8"))
 
     "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
