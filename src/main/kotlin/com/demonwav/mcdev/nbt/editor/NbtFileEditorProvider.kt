@@ -59,8 +59,6 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
 
 private class NbtFileEditor(private val editorProvider: (NbtVirtualFile) -> FileEditor) : FileEditor {
 
-    private var disposed = false
-
     private var editor: FileEditor? = null
     private val component = JPanel(BorderLayout())
 
@@ -78,6 +76,7 @@ private class NbtFileEditor(private val editorProvider: (NbtVirtualFile) -> File
         nbtFile.toolbar = toolbar
         editor = editorProvider(nbtFile)
         editor?.let { editor ->
+            Disposer.register(this, editor)
             component.add(toolbar.panel, BorderLayout.NORTH)
             component.add(editor.component, BorderLayout.CENTER)
         }
@@ -116,10 +115,7 @@ private class NbtFileEditor(private val editorProvider: (NbtVirtualFile) -> File
     override fun removePropertyChangeListener(listener: PropertyChangeListener) {
         editor.exec { removePropertyChangeListener(listener) }
     }
-    override fun dispose() {
-        disposed = true
-        editor?.let { Disposer.dispose(it) }
-    }
+    override fun dispose() {}
 
     override fun getStructureViewBuilder() = editor.exec { structureViewBuilder }
     override fun equals(other: Any?) = other is NbtFileEditor && other.component == this.component
@@ -127,7 +123,7 @@ private class NbtFileEditor(private val editorProvider: (NbtVirtualFile) -> File
     override fun toString() = editor.toString()
 
     private inline fun <T : Any?> FileEditor?.exec(action: FileEditor.() -> T): T? {
-        if (disposed) {
+        if (editor?.let { ed -> Disposer.isDisposed(ed) || Disposer.isDisposing(ed) } == true) {
             return null
         }
         return this?.action()
