@@ -163,7 +163,7 @@ object Nbt {
         val took = now - start
 
         if (took > timeout) {
-            throw MalformedNbtFileException("NBT parse timeout exceeded - Parse time: $took, Timeout: $timeout.")
+            throw NbtFileParseTimeoutException("NBT parse timeout exceeded - Parse time: $took, Timeout: $timeout.")
         }
 
         return action()

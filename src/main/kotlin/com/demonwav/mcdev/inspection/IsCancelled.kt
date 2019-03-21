@@ -24,11 +24,7 @@ class IsCancelled(
     init {
         this.buildFix = object : InspectionGadgetsFix() {
             override fun doFix(project: Project, descriptor: ProblemDescriptor) = fix(descriptor)
-
-            @Nls(capitalization = Nls.Capitalization.Sentence)
             override fun getName() = "Simplify"
-
-            @Nls(capitalization = Nls.Capitalization.Sentence)
             override fun getFamilyName() = "Useless IsCancelled Check"
         }
     }

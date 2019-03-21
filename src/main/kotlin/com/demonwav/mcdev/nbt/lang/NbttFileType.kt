@@ -17,5 +17,5 @@ object NbttFileType : LanguageFileType(NbttLanguage) {
     override fun getIcon() = PlatformAssets.MINECRAFT_ICON
     override fun getName() = "NBTT"
     override fun getDefaultExtension() = "nbtt"
-    override fun getDescription() = "NBT Text Representation (don't use this one)"
+    override fun getDescription() = "NBT Text Representation (Don't Use This One)"
 }
