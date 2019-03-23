@@ -47,7 +47,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
         var tempCompressed: Boolean
         var tempParseSuccessful: Boolean
         try {
-            val (rootCompound, isCompressed) = Nbt.buildTagTree(backingFile.inputStream, TimeUnit.SECONDS.toMillis(1))
+            val (rootCompound, isCompressed) = Nbt.buildTagTree(backingFile.inputStream, TimeUnit.SECONDS.toMillis(10))
             text = rootCompound.toString()
             tempCompressed = isCompressed
             tempParseSuccessful = true

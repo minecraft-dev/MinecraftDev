@@ -11,6 +11,7 @@
 import net.minecrell.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.intellij.tasks.PublishTask
+import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -20,10 +21,10 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.3.11" // kept in sync with IntelliJ's bundled dep
+    kotlin("jvm") version "1.3.11" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.2"
+    id("org.jetbrains.intellij") version "0.4.5"
     id("net.minecrell.licenser") version "0.4.1"
 }
 
@@ -35,14 +36,13 @@ val ideaVersion: String by project
 val downloadIdeaSources: String by project
 
 // for publishing nightlies
-val repoUsername: String by project
-val repoPassword: String by project
+val repoToken: String by project
 val repoChannel: String by project
 
 val compileKotlin by tasks.existing
 val processResources by tasks.existing<AbstractCopyTask>()
 val test by tasks.existing<Test>()
-val runIde by tasks.existing<JavaExec>()
+val runIde by tasks.existing<RunIdeTask>()
 val publishPlugin by tasks.existing<PublishTask>()
 val clean by tasks.existing<Delete>()
 
@@ -82,8 +82,6 @@ dependencies {
 
     compile(files(gradleToolingExtensionJar))
 
-    // gradle-intellij-plugin doesn't attach sources properly for Kotlin unless it's manually defined here
-    // compileOnly since it's only here for reference
     compileOnly(kotlin("stdlib-jdk8"))
 
     "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
@@ -118,8 +116,7 @@ publishPlugin {
     if (properties["publish"] != null) {
         project.version = "${project.version}-${properties["buildNumber"]}"
 
-        username(repoUsername)
-        password(repoPassword)
+        token(repoToken)
         channels(repoChannel)
     }
 }

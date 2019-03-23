@@ -76,50 +76,56 @@ private class NbtFileEditor(private val editorProvider: (NbtVirtualFile) -> File
         nbtFile.toolbar = toolbar
         editor = editorProvider(nbtFile)
         editor?.let { editor ->
+            Disposer.register(this, editor)
             component.add(toolbar.panel, BorderLayout.NORTH)
             component.add(editor.component, BorderLayout.CENTER)
         }
     }
 
-    override fun isModified() = editor?.isModified ?: false
+    override fun isModified() = editor.exec { isModified } ?: false
     override fun addPropertyChangeListener(listener: PropertyChangeListener) {
-        editor?.addPropertyChangeListener(listener)
+        editor.exec { addPropertyChangeListener(listener) }
     }
-    override fun getName() = editor?.name ?: ""
+    override fun getName() = editor.exec { name } ?: ""
     override fun setState(state: FileEditorState) {
-        editor?.setState(state)
+        editor.exec { setState(state) }
     }
 
-    override fun getState(level: FileEditorStateLevel): FileEditorState = editor?.getState(level)
+    override fun getState(level: FileEditorStateLevel): FileEditorState = editor.exec { getState(level) }
         ?: FileEditorState.INSTANCE
 
     override fun getComponent() = component
-    override fun getPreferredFocusedComponent() = editor?.preferredFocusedComponent
-    override fun <T : Any?> getUserData(key: Key<T>) = editor?.getUserData(key)
+    override fun getPreferredFocusedComponent() = editor.exec { preferredFocusedComponent }
+    override fun <T : Any?> getUserData(key: Key<T>) = editor.exec { getUserData(key) }
     override fun selectNotify() {
-        editor?.selectNotify()
+        editor.exec { selectNotify() }
     }
 
     override fun <T : Any?> putUserData(key: Key<T>, value: T?) {
-        editor?.putUserData(key, value)
+        editor.exec { putUserData(key, value) }
     }
 
-    override fun getCurrentLocation() = editor?.currentLocation
+    override fun getCurrentLocation() = editor.exec { currentLocation }
     override fun deselectNotify() {
-        editor?.deselectNotify()
+        editor.exec { deselectNotify() }
     }
 
-    override fun getBackgroundHighlighter() = editor?.backgroundHighlighter
-    override fun isValid() = editor?.isValid ?: true
+    override fun getBackgroundHighlighter() = editor.exec { backgroundHighlighter }
+    override fun isValid() = editor.exec { isValid } ?: true
     override fun removePropertyChangeListener(listener: PropertyChangeListener) {
-        editor?.removePropertyChangeListener(listener)
+        editor.exec { removePropertyChangeListener(listener) }
     }
-    override fun dispose() {
-        editor?.let { Disposer.dispose(it) }
-    }
+    override fun dispose() {}
 
-    override fun getStructureViewBuilder() = editor?.structureViewBuilder
+    override fun getStructureViewBuilder() = editor.exec { structureViewBuilder }
     override fun equals(other: Any?) = other is NbtFileEditor && other.component == this.component
     override fun hashCode() = editor.hashCode()
     override fun toString() = editor.toString()
+
+    private inline fun <T : Any?> FileEditor?.exec(action: FileEditor.() -> T): T? {
+        if (editor?.let { ed -> Disposer.isDisposed(ed) || Disposer.isDisposing(ed) } == true) {
+            return null
+        }
+        return this?.action()
+    }
 }

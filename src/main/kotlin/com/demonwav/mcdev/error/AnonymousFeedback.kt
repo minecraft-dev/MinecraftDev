@@ -20,6 +20,8 @@ import com.intellij.util.io.readCharSequence
 import org.apache.commons.io.IOUtils
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
+import java.nio.ByteBuffer
+import java.nio.charset.CodingErrorAction
 
 object AnonymousFeedback {
 
@@ -83,12 +85,28 @@ object AnonymousFeedback {
             for (attachment in attachments) {
                 sb.append("\n---\n\n```\n").append(attachment.name).append("\n```\n")
                 sb.append("```\n")
-                when {
-                    attachment.name.endsWith(".txt") -> {
-                        sb.append(String(attachment.bytes, Charsets.UTF_8))
+
+                try {
+                    // No clue what the data format of the attachment is
+                    // but if we try to decode it as UTF-8 and it succeeds, chances are likely that's what it is
+                    val charBuf = Charsets.UTF_8.newDecoder()
+                        .onMalformedInput(CodingErrorAction.REPORT)
+                        .onUnmappableCharacter(CodingErrorAction.REPORT)
+                        .decode(ByteBuffer.wrap(attachment.bytes))
+
+                    val text = charBuf.toString()
+                    if (text != attachment.displayText) {
+                        sb.append(attachment.displayText).append("\n```\n")
+                        sb.append("```\n")
                     }
-                    else -> sb.append(attachment.encodedBytes)
+                    sb.append(text)
+                } catch (e: Exception) {
+                    // Guess it's not text...
+                    sb.append(attachment.displayText).append("\n```\n")
+                    sb.append("```\n")
+                    sb.append(attachment.encodedBytes)
                 }
+
                 sb.append("\n```\n")
             }
         }
@@ -99,22 +117,7 @@ object AnonymousFeedback {
     private fun sendFeedback(factory: HttpConnectionFactory, payload: ByteArray): Pair<String, Int> {
         val connection = getConnection(factory, url)
         connection.connect()
-        connection.outputStream.use {
-            it.write(payload)
-        }
-
-        val responseCode = connection.responseCode
-        if (responseCode != 201) {
-            throw RuntimeException("Expected HTTP_CREATED (201), obtained $responseCode instead.")
-        }
-
-        val contentEncoding = connection.contentEncoding ?: "UTF-8"
-        val body = connection.inputStream.use {
-            IOUtils.toString(it, contentEncoding)
-        }
-        connection.disconnect()
-
-        val json = Gson().fromJson<Map<*, *>>(body)
+        val json = executeCall(connection, payload)
         return json["html_url"] as String to (json["number"] as Double).toInt()
     }
 
@@ -128,45 +131,45 @@ object AnonymousFeedback {
     private val numberRegex = Regex("\\d+")
     private val newLineRegex = Regex("[\r\n]+")
 
-    private const val issueUrl = "https://api.github.com/repos/minecraft-dev/MinecraftDev/issues" +
-        "?state=all&creator=minecraft-dev-autoreporter&per_page=100"
+    private const val openIssueUrl = "https://api.github.com/repos/minecraft-dev/MinecraftDev/issues" +
+        "?state=open&creator=minecraft-dev-autoreporter&per_page=100"
+    private const val closedIssueUrl = "https://api.github.com/repos/minecraft-dev/MinecraftDev/issues" +
+        "?state=closed&creator=minecraft-dev-autoreporter&per_page=100"
+
     private const val packagePrefix = "\tat com.demonwav.mcdev"
 
     private fun findDuplicateIssue(envDetails: LinkedHashMap<String, String?>, factory: HttpConnectionFactory): Int? {
         val stack = envDetails["error.stacktrace"]?.replace(numberRegex, "") ?: return null
 
-        val list = getAllIssues(issueUrl, factory) ?: return null
-
-        val stackMessage = stack.lineSequence()
-            .takeWhile { line -> !line.startsWith("\t") }
-            .joinToString()
-
         val stackMcdevParts = stack.lineSequence()
             .filter { line -> line.startsWith(packagePrefix) }
-            .joinToString()
+            .joinToString("\n")
 
-        val block = list.firstOrNull {
-            val body = (it["body"] as? String ?: return@firstOrNull false).replace(newLineRegex, "\n")
+        val predicate = fun(map: Map<*, *>): Boolean {
+            val body = (map["body"] as? String ?: return false)
+                .replace(numberRegex, "")
+                .replace(newLineRegex, "\n")
 
             // We can't comment on locked issues
-            if (it["locked"] as Boolean) {
-                return@firstOrNull false
+            if (map["locked"] as Boolean) {
+                return false
             }
 
             val first = body.indexOf("\n```\n", startIndex = 0) + 5
             val second = body.indexOf("\n```\n", startIndex = first)
             val stackText = body.substring(first, second)
 
-            val message = stackText.lineSequence()
-                .takeWhile { line -> !line.startsWith("\t") }
-                .joinToString()
-
             val mcdevParts = stackText.lineSequence()
                 .filter { line -> line.startsWith(packagePrefix) }
-                .joinToString()
+                .joinToString("\n")
 
-            return@firstOrNull stackMessage == message && stackMcdevParts == mcdevParts
-        } ?: return null
+            return stackMcdevParts == mcdevParts
+        }
+
+        // Look first for an open issue, then for a closed issue if one isn't found
+        val block = getAllIssues(openIssueUrl, factory)?.firstOrNull(predicate)
+            ?: getAllIssues(closedIssueUrl, factory)?.firstOrNull(predicate)
+            ?: return null
         return (block["number"] as Double).toInt()
     }
 
@@ -235,6 +238,11 @@ object AnonymousFeedback {
     private fun sendCommentOnDuplicateIssue(id: Int, factory: HttpConnectionFactory, payload: ByteArray): String {
         val commentUrl = "$url/$id/comments"
         val connection = getConnection(factory, commentUrl)
+        val json = executeCall(connection, payload)
+        return json["html_url"] as String
+    }
+
+    private fun executeCall(connection: HttpURLConnection, payload: ByteArray): Map<*, *> {
         connection.outputStream.use {
             it.write(payload)
         }
@@ -250,8 +258,7 @@ object AnonymousFeedback {
         }
         connection.disconnect()
 
-        val json = Gson().fromJson<Map<*, *>>(body)
-        return json["html_url"] as String
+        return Gson().fromJson<Map<*, *>>(body)
     }
 
     private fun getConnection(factory: HttpConnectionFactory, url: String): HttpURLConnection {

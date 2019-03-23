@@ -10,7 +10,9 @@
 
 package com.demonwav.mcdev.nbt
 
-class MalformedNbtFileException : Exception {
+open class MalformedNbtFileException : Exception {
     constructor(message: String) : super(message)
     constructor(message: String, cause: Throwable) : super(message, cause)
 }
+
+class NbtFileParseTimeoutException(message: String) : MalformedNbtFileException(message)
