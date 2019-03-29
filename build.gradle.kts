@@ -28,6 +28,8 @@ plugins {
     id("net.minecrell.licenser") version "0.4.1"
 }
 
+val coroutineVersion = "1.0.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
+
 defaultTasks("build")
 
 val CI = System.getenv("CI") != null
@@ -76,16 +78,24 @@ val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtension.jarTa
     archiveClassifier.set("gradle-tooling-extension")
 }
 
+// Sources aren't provided through the gradle intellij plugin for bundled libs, use compileOnly to attach them
+// but not include them in the output artifact
+//
+// Kept in a separate block for readability
+dependencies {
+    compileOnly(kotlin("stdlib-jdk8"))
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
+}
+
 dependencies {
     // Add tools.jar for the JDI API
     compile(files(Jvm.current().toolsJar))
 
     compile(files(gradleToolingExtensionJar))
 
-    compileOnly(kotlin("stdlib-jdk8"))
-    val coroutineVersion = "1.1.1"
-    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
-    compile("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutineVersion")
+    compile("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutineVersion") {
+        isTransitive = false
+    }
 
     "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
     "jflex-skeleton"("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
@@ -95,8 +105,8 @@ dependencies {
     "testLibs"("org.spongepowered:mixin:0.7-SNAPSHOT:thin")
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
-    // intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)
-    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:191-EAP-SNAPSHOT")
+    // println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1))
+    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:191.6183.87")
 }
 
 intellij {
