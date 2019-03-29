@@ -39,7 +39,6 @@ import com.intellij.psi.PsiMethod
 import org.jetbrains.annotations.Contract
 import org.jetbrains.jps.model.java.JavaResourceRootType
 import org.jetbrains.jps.model.java.JavaSourceRootType
-import java.util.Arrays
 import java.util.concurrent.ConcurrentHashMap
 import javax.swing.Icon
 

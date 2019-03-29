@@ -20,8 +20,6 @@ import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
-import com.google.common.base.MoreObjects
-import com.google.common.base.Objects
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -30,38 +28,25 @@ import com.intellij.openapi.vfs.VirtualFile
 
 class MinecraftProjectCreator {
 
-    lateinit var root: VirtualFile
-    lateinit var groupId: String
-    lateinit var artifactId: String
-    lateinit var version: String
-    lateinit var module: Module
-    lateinit var buildSystem: BuildSystem
+    var buildSystem: BuildSystem? = null
 
-    val settings = LinkedHashMap<PlatformType, ProjectConfiguration>()
+    val configs = LinkedHashSet<ProjectConfiguration>()
 
-    private lateinit var sourceDir: VirtualFile
-    private lateinit var resourceDir: VirtualFile
-    private lateinit var testDir: VirtualFile
-    private lateinit var pomFile: VirtualFile
+    fun create(root: VirtualFile, module: Module) {
+        val build = buildSystem ?: return
 
-    fun create() {
-        buildSystem.rootDirectory = root
-
-        buildSystem.groupId = groupId
-        buildSystem.artifactId = artifactId
-        buildSystem.version = version
-
-        buildSystem.pluginName = settings.values.iterator().next().pluginName
-
-        if (settings.size == 1) {
-            doSingleModuleCreate()
+        if (configs.size == 1) {
+            doSingleModuleCreate(root, build, module)
         } else {
-            doMultiModuleCreate()
+            doMultiModuleCreate(root, build, module)
         }
     }
 
-    private fun doSingleModuleCreate() {
-        val configuration = settings.values.iterator().next()
+    private fun doSingleModuleCreate(rootDirectory: VirtualFile, buildSystem: BuildSystem, module: Module) {
+        if (configs.isEmpty()) {
+            return
+        }
+        val configuration = configs.first()
         addDependencies(configuration, buildSystem)
 
         ProgressManager.getInstance().run(object : Task.Backgroundable(module.project, "Setting Up Project", false) {
@@ -73,82 +58,49 @@ class MinecraftProjectCreator {
                 }
                 indicator.isIndeterminate = true
 
-                buildSystem.create(module.project, configuration, indicator)
+                val pluginName = configuration.base?.pluginName ?: return
+                buildSystem.create(module.project, rootDirectory, configuration, indicator, pluginName)
                 configuration.create(module.project, buildSystem, indicator)
                 configuration.type.type.performCreationSettingSetup(module.project)
-                buildSystem.finishSetup(module, listOf(configuration), indicator)
+                buildSystem.finishSetup(module, rootDirectory, configs, indicator)
             }
         })
     }
 
-    private fun doMultiModuleCreate() {
+    private fun doMultiModuleCreate(rootDirectory: VirtualFile, buildSystem: BuildSystem, module: Module) {
         if (buildSystem !is GradleBuildSystem) {
             throw IllegalStateException("BuildSystem must be Gradle")
         }
 
-        val gradleBuildSystem = buildSystem as GradleBuildSystem?
         ProgressManager.getInstance().run(object : Task.Backgroundable(module.project, "Setting Up Project", false) {
             override fun shouldStartInBackground() = false
 
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
 
-                val map = gradleBuildSystem!!.createMultiModuleProject(module.project, settings, indicator)
+                val pluginName = configs.firstOrNull()?.base?.pluginName ?: return
+                val map = buildSystem.createMultiModuleProject(
+                    rootDirectory,
+                    module.project,
+                    configs,
+                    indicator,
+                    pluginName
+                )
 
                 map.forEach { g, p ->
                     p.create(module.project, g, indicator)
                     p.type.type.performCreationSettingSetup(module.project)
                 }
-                gradleBuildSystem.finishSetup(module, map.values, indicator)
+                buildSystem.finishSetup(module, rootDirectory, map.values, indicator)
             }
         })
     }
 
-    override fun toString(): String {
-        return MoreObjects.toStringHelper(this)
-            .add("root", root)
-            .add("groupId", groupId)
-            .add("artifactId", artifactId)
-            .add("version", version)
-            .add("module", module)
-            .add("buildSystem", buildSystem)
-            .add("settings", settings)
-            .add("sourceDir", sourceDir)
-            .add("resourceDir", resourceDir)
-            .add("testDir", testDir)
-            .add("pomFile", pomFile)
-            .toString()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (other == null || javaClass != other.javaClass) {
-            return false
-        }
-        val that = other as? MinecraftProjectCreator ?: return false
-        return Objects.equal(root, that.root) &&
-            Objects.equal(groupId, that.groupId) &&
-            Objects.equal(artifactId, that.artifactId) &&
-            Objects.equal(version, that.version) &&
-            Objects.equal(module, that.module) &&
-            Objects.equal(buildSystem, that.buildSystem) &&
-            Objects.equal(settings, that.settings) &&
-            Objects.equal(sourceDir, that.sourceDir) &&
-            Objects.equal(resourceDir, that.resourceDir) &&
-            Objects.equal(testDir, that.testDir) &&
-            Objects.equal(pomFile, that.pomFile)
-    }
-
-    override fun hashCode(): Int {
-        return Objects.hashCode(root, groupId, artifactId, version, module,
-                                buildSystem, settings, sourceDir, resourceDir, testDir, pomFile)
-    }
-
     companion object {
-        fun addDependencies(configuration: ProjectConfiguration,
-                            buildSystem: BuildSystem) {
+        fun addDependencies(
+            configuration: ProjectConfiguration,
+            buildSystem: BuildSystem
+        ) {
             // Forge doesn't have a dependency like this
             if (configuration.type === PlatformType.FORGE) {
                 return
@@ -169,14 +121,16 @@ class MinecraftProjectCreator {
                     buildRepository.url = "https://hub.spigotmc.org/nexus/content/groups/public/"
                     buildDependency.groupId = "org.bukkit"
                     buildDependency.artifactId = "bukkit"
-                    buildDependency.version = (configuration as BukkitProjectConfiguration).minecraftVersion + "-R0.1-SNAPSHOT"
+                    val mcVers = (configuration as BukkitProjectConfiguration).data?.minecraftVersion ?: return
+                    buildDependency.version = "$mcVers-R0.1-SNAPSHOT"
                 }
                 PlatformType.SPIGOT -> {
                     buildRepository.id = "spigotmc-repo"
                     buildRepository.url = "https://hub.spigotmc.org/nexus/content/groups/public/"
                     buildDependency.groupId = "org.spigotmc"
                     buildDependency.artifactId = "spigot-api"
-                    buildDependency.version = (configuration as BukkitProjectConfiguration).minecraftVersion + "-R0.1-SNAPSHOT"
+                    val mcVers = (configuration as BukkitProjectConfiguration).data?.minecraftVersion ?: return
+                    buildDependency.version = "$mcVers-R0.1-SNAPSHOT"
                     addSonatype(buildSystem.repositories)
                 }
                 PlatformType.PAPER -> {
@@ -184,7 +138,8 @@ class MinecraftProjectCreator {
                     buildRepository.url = "https://repo.destroystokyo.com/repository/maven-public/"
                     buildDependency.groupId = "com.destroystokyo.paper"
                     buildDependency.artifactId = "paper-api"
-                    buildDependency.version = (configuration as BukkitProjectConfiguration).minecraftVersion + "-R0.1-SNAPSHOT"
+                    val mcVers = (configuration as BukkitProjectConfiguration).data?.minecraftVersion ?: return
+                    buildDependency.version = "$mcVers-R0.1-SNAPSHOT"
                     addSonatype(buildSystem.repositories)
                 }
                 PlatformType.BUNGEECORD -> {
@@ -220,11 +175,6 @@ class MinecraftProjectCreator {
 
         private fun addSonatype(buildRepositories: MutableList<BuildRepository>) {
             buildRepositories.add(BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/"))
-        }
-
-        private fun addVIRepo(buildRepositories: MutableList<BuildRepository>) {
-            buildRepositories.add(BuildRepository("vi-releases", "http://repo.visualillusionsent.net:8888/repository/internal/"))
-            buildRepositories.add(BuildRepository("vi-snapshots", "http://repo.visualillusionsent.net:8888/repository/snapshots/"))
         }
     }
 }

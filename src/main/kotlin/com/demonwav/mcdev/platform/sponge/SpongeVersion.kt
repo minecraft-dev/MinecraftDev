@@ -13,16 +13,10 @@ package com.demonwav.mcdev.platform.sponge
 import com.demonwav.mcdev.util.ProxyHttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
-import org.jetbrains.concurrency.runAsync
 import java.util.LinkedHashMap
-import java.util.Objects
 import javax.swing.JComboBox
 
 private const val spongeUrl = "https://minecraftdev.org/versions/sponge_v2.json"
-
-fun getSpongeVersionSelector() = runAsync {
-    SpongeVersion.downloadData()
-}
 
 data class SpongeVersion(var versions: LinkedHashMap<String, String>, var selectedIndex: Int) {
 
@@ -35,7 +29,7 @@ data class SpongeVersion(var versions: LinkedHashMap<String, String>, var select
     }
 
     companion object {
-        fun downloadData(): SpongeVersion {
+        fun downloadData(): SpongeVersion? {
             val connection = ProxyHttpConnectionFactory.openHttpConnection(spongeUrl)
 
             connection.setRequestProperty(
@@ -43,8 +37,12 @@ data class SpongeVersion(var versions: LinkedHashMap<String, String>, var select
                 "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2"
             )
 
-            val text = connection.inputStream.use { stream -> stream.reader().use { it.readText() } }
-            return Gson().fromJson(text)
+            return try {
+                val text = connection.inputStream.use { stream -> stream.reader().use { it.readText() } }
+                Gson().fromJson(text)
+            } catch (e: Exception) {
+                null
+            }
         }
     }
 }

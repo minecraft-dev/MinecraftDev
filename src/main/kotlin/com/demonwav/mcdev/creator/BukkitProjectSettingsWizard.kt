@@ -8,12 +8,21 @@
  * MIT License
  */
 
+@file:Suppress("Duplicates")
+
 package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder
+import com.demonwav.mcdev.util.firstOfType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.apache.commons.lang.WordUtils
 import javax.swing.JComboBox
 import javax.swing.JComponent
@@ -39,31 +48,43 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     private lateinit var minecraftVersionBox: JComboBox<String>
     private lateinit var errorLabel: JLabel
 
-    private var settings: BukkitProjectConfiguration? = null
+    private var config: BukkitProjectConfiguration? = null
 
     override fun getComponent(): JComponent {
-        settings = creator.settings[PlatformType.BUKKIT] as? BukkitProjectConfiguration
-        if (settings == null) {
-            return panel
+        return panel
+    }
+
+    override fun isStepVisible(): Boolean {
+        return creator.configs.any { it is BukkitProjectConfiguration }
+    }
+
+    override fun updateStep() {
+        config = creator.configs.firstOfType()
+        if (config == null) {
+            return
         }
 
-        val name = WordUtils.capitalize(creator.artifactId.replace('-', ' '))
-        pluginNameField.text = name
-        pluginVersionField.text = creator.version
+        val buildSystem = creator.buildSystem ?: return
 
-        if (settings != null && !settings!!.isFirst) {
+        val name = WordUtils.capitalize(buildSystem.artifactId.replace('-', ' '))
+        pluginNameField.text = name
+        pluginVersionField.text = buildSystem.version
+
+        val conf = config ?: return
+
+        if (creator.configs.indexOf(conf) != 0) {
             pluginNameField.isEditable = false
             pluginVersionField.isEditable = false
         }
 
-        mainClassField.text = creator.groupId.replace("-", "").toLowerCase() + "." +
-            creator.artifactId.replace("-", "").toLowerCase() + "." + name.replace(" ", "")
+        mainClassField.text = buildSystem.groupId.replace("-", "").toLowerCase() + "." +
+            buildSystem.artifactId.replace("-", "").toLowerCase() + "." + name.replace(" ", "")
 
-        if (creator.settings.size > 1) {
-            mainClassField.text = mainClassField.text + settings!!.type.normalName
+        if (creator.configs.size > 1) {
+            mainClassField.text = mainClassField.text + conf.type.normalName
         }
 
-        when (settings!!.type) {
+        when (conf.type) {
             PlatformType.BUKKIT -> {
                 title.icon = PlatformAssets.BUKKIT_ICON_2X
                 title.text = "<html><font size=\"5\">Bukkit Settings</font></html>"
@@ -79,16 +100,14 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             else -> {}
         }
 
-        getVersionSelector(settings!!.type)
-            .onSuccess { it.set(minecraftVersionBox) }
-            .onError { errorLabel.isVisible = true }
+        CoroutineScope(Dispatchers.Swing).launch {
+            try {
+                withContext(Dispatchers.IO) { getVersionSelector(conf.type) }.set(minecraftVersionBox)
+            } catch (e: Exception) {
+                errorLabel.isVisible = true
+            }
+        }
 
-        return panel
-    }
-
-    override fun isStepVisible(): Boolean {
-        settings = creator.settings[PlatformType.BUKKIT] as? BukkitProjectConfiguration
-        return settings != null
     }
 
     override fun validate(): Boolean {
@@ -97,18 +116,25 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun onStepLeaving() {
-        this.settings!!.pluginName = pluginNameField.text
-        this.settings!!.pluginVersion = pluginVersionField.text
-        this.settings!!.mainClass = mainClassField.text
-        this.settings!!.description = descriptionField.text
-        this.settings!!.setAuthors(this.authorsField.text)
-        this.settings!!.website = websiteField.text
-        this.settings!!.prefix = prefixField.text
-        this.settings!!.loadOrder = if (this.loadOrderBox.selectedIndex == 0) LoadOrder.POSTWORLD else LoadOrder.STARTUP
-        this.settings!!.setLoadBefore(this.loadBeforeField.text)
-        this.settings!!.setDependencies(this.dependField.text)
-        this.settings!!.setSoftDependencies(this.softDependField.text)
-        this.settings!!.minecraftVersion = minecraftVersionBox.selectedItem as? String ?: ""
+        val conf = config ?: return
+        conf.data = BukkitProjectConfiguration.BukkitData(
+            loadOrder = if (loadOrderBox.selectedIndex == 0) LoadOrder.POSTWORLD else LoadOrder.STARTUP,
+            prefix = prefixField.text,
+            minecraftVersion = minecraftVersionBox.selectedItem as? String ?: ""
+        )
+        conf.setLoadBefore(loadBeforeField.text)
+
+        conf.base = ProjectConfiguration.BaseConfigs(
+            pluginNameField.text,
+            pluginVersionField.text,
+            mainClassField.text,
+            descriptionField.text,
+            websiteField.text
+        )
+
+        conf.setAuthors(this.authorsField.text)
+        conf.setDependencies(this.dependField.text)
+        conf.setSoftDependencies(this.softDependField.text)
     }
 
     override fun updateDataModel() {}

@@ -8,9 +8,12 @@
  * MIT License
  */
 
+@file:Suppress("Duplicates")
+
 package com.demonwav.mcdev.platform.bukkit
 
 import com.demonwav.mcdev.buildsystem.BuildSystem
+import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder
 import com.demonwav.mcdev.util.runWriteTask
@@ -19,55 +22,66 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiManager
 
-class BukkitProjectConfiguration : ProjectConfiguration() {
+class BukkitProjectConfiguration(override var type: PlatformType) : ProjectConfiguration(), BukkitLikeConfiguration {
 
-    var loadOrder = LoadOrder.POSTWORLD
-    val loadBefore = mutableListOf<String>()
-    val dependencies = mutableListOf<String>()
-    val softDependencies = mutableListOf<String>()
-    var prefix = ""
-    var minecraftVersion = ""
+    data class BukkitData(
+        val loadOrder: LoadOrder = LoadOrder.POSTWORLD,
+        val loadBefore: MutableList<String> = mutableListOf(),
+        val prefix: String = "",
+        val minecraftVersion: String = ""
+    )
 
-    fun hasPrefix() = prefix.isNotBlank()
+    var data: BukkitData? = null
 
-    fun hasLoadBefore() = listContainsAtLeastOne(loadBefore)
+    override val dependencies = mutableListOf<String>()
+    override val softDependencies = mutableListOf<String>()
+
+    fun hasPrefix() = data?.prefix?.isNotBlank() == true
+
+    fun hasLoadBefore() = listContainsAtLeastOne(data?.loadBefore)
     fun setLoadBefore(string: String) {
-        loadBefore.clear()
-        loadBefore.addAll(commaSplit(string))
+        data?.loadBefore?.let { loadBefore ->
+            loadBefore.clear()
+            loadBefore.addAll(commaSplit(string))
+        }
     }
 
-    fun hasDependencies() = listContainsAtLeastOne(dependencies)
-    fun setDependencies(string: String) {
+    override fun hasDependencies() = listContainsAtLeastOne(dependencies)
+    override fun setDependencies(string: String) {
         dependencies.clear()
         dependencies.addAll(commaSplit(string))
     }
 
-    fun hasSoftDependencies() = listContainsAtLeastOne(softDependencies)
-    fun setSoftDependencies(string: String) {
+    override fun hasSoftDependencies() = listContainsAtLeastOne(softDependencies)
+    override fun setSoftDependencies(string: String) {
         softDependencies.clear()
         softDependencies.addAll(commaSplit(string))
     }
 
-    fun hasWebsite() = !website.isNullOrBlank()
+    fun hasWebsite() = !base?.website.isNullOrBlank()
 
     override fun create(project: Project, buildSystem: BuildSystem, indicator: ProgressIndicator) {
         if (project.isDisposed) {
             return
         }
+
+        val baseConfig = base ?: return
+        val dirs = buildSystem.directories ?: return
+
         runWriteTask {
             indicator.text = "Writing main class"
             // Create plugin main class
-            var file = buildSystem.sourceDirectory
-            val files = mainClass.split(".").toTypedArray()
+            var file = dirs.sourceDirectory
+            val files = baseConfig.mainClass.split(".").toTypedArray()
             val className = files.last()
 
-            val packageName = mainClass.substring(0, mainClass.length - className.length - 1)
+            val packageName = baseConfig.mainClass.substring(0, baseConfig.mainClass.length - className.length - 1)
             file = getMainClassDirectory(files, file)
 
-            val mainClassFile = file.findOrCreateChildData(this, className + ".java")
+            val mainClassFile = file.findOrCreateChildData(this, "$className.java")
 
             BukkitTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className)
-            val pluginYml = buildSystem.resourceDirectory.findOrCreateChildData(this, "plugin.yml")
+            val pluginYml = dirs.resourceDirectory.findOrCreateChildData(this, "plugin.yml")
             BukkitTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this, buildSystem)
 
             // Set the editor focus on the main class

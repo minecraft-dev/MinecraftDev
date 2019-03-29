@@ -23,8 +23,8 @@ object SpongeModuleType : AbstractModuleType<SpongeModule>("org.spongepowered", 
 
     private const val ID = "SPONGE_MODULE_TYPE"
 
-    val IGNORED_ANNOTATIONS = listOf(SpongeConstants.LISTENER_ANNOTATION, SpongeConstants.PLUGIN_ANNOTATION)
-    val LISTENER_ANNOTATIONS = listOf(SpongeConstants.LISTENER_ANNOTATION)
+    private val IGNORED_ANNOTATIONS = listOf(SpongeConstants.LISTENER_ANNOTATION, SpongeConstants.PLUGIN_ANNOTATION)
+    private val LISTENER_ANNOTATIONS = listOf(SpongeConstants.LISTENER_ANNOTATION)
 
     init {
         CommonColors.applyStandardColors(colorMap, SpongeConstants.TEXT_COLORS)

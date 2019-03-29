@@ -23,7 +23,6 @@ import com.intellij.psi.PsiFile
 import org.apache.commons.lang.builder.ToStringBuilder
 import org.jetbrains.annotations.Contract
 import java.awt.Color
-import java.util.ArrayList
 import java.util.LinkedHashMap
 import javax.swing.Icon
 

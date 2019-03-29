@@ -5,11 +5,9 @@ plugins {
 group = pluginGroup
 version = pluginVersion
 
-#if (${BUILD_VERSION})
-sourceCompatibility = ${BUILD_VERSION}
-targetCompatibility = ${BUILD_VERSION}
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
-#end
 dependencies {
 }
 

@@ -8,12 +8,16 @@
  * MIT License
  */
 
+@file:Suppress("Duplicates")
+
 package com.demonwav.mcdev.platform.forge
 
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
+import com.demonwav.mcdev.platform.mixin.reference.InjectionPointType.description
+import com.demonwav.mcdev.update.PluginUtil.pluginVersion
 import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.ide.util.EditorHelper
 import com.intellij.openapi.progress.ProgressIndicator
@@ -25,13 +29,11 @@ open class ForgeProjectConfiguration : ProjectConfiguration() {
     val dependencies = mutableListOf<String>()
     var updateUrl: String = ""
 
+    override var type: PlatformType = PlatformType.FORGE
+
     var mcpVersion: String = ""
     var forgeVersion: String = ""
     var mcVersion: String = ""
-
-    init {
-        type = PlatformType.FORGE
-    }
 
     fun hasDependencies() = listContainsAtLeastOne(dependencies)
     fun setDependencies(string: String) {
@@ -43,12 +45,16 @@ open class ForgeProjectConfiguration : ProjectConfiguration() {
         if (project.isDisposed) {
             return
         }
+
+        val baseConfig = base ?: return
+        val dirs = buildSystem.directories ?: return
+
         runWriteTask {
             indicator.text = "Writing main class"
-            var file = buildSystem.sourceDirectory
-            val files = mainClass.split(".").toTypedArray()
+            var file = dirs.sourceDirectory
+            val files = baseConfig.mainClass.split(".").toTypedArray()
             val className = files.last()
-            val packageName = mainClass.substring(0, mainClass.length - className.length - 1)
+            val packageName = baseConfig.mainClass.substring(0, baseConfig.mainClass.length - className.length - 1)
             file = getMainClassDirectory(files, file)
 
             val mainClassFile = file.findOrCreateChildData(this, className + ".java")
@@ -57,12 +63,12 @@ open class ForgeProjectConfiguration : ProjectConfiguration() {
                 mainClassFile,
                 packageName,
                 buildSystem.artifactId,
-                pluginName,
+                baseConfig.pluginName,
                 pluginVersion,
                 className
             )
 
-            writeMcmodInfo(project, buildSystem)
+            writeMcmodInfo(project, baseConfig, buildSystem, dirs)
 
             // Set the editor focus on the main class
             PsiManager.getInstance(project).findFile(mainClassFile)?.let { mainClassPsi ->
@@ -71,20 +77,25 @@ open class ForgeProjectConfiguration : ProjectConfiguration() {
         }
     }
 
-    protected fun writeMcmodInfo(project: Project, buildSystem: BuildSystem) {
-        val file = buildSystem.resourceDirectory
+    protected fun writeMcmodInfo(
+        project: Project,
+        baseConfigs: BaseConfigs,
+        buildSystem: BuildSystem,
+        dirs: BuildSystem.DirectorySet
+    ) {
+        val file = dirs.resourceDirectory
         val mcmodInfoFile = file.findOrCreateChildData(this, ForgeConstants.MCMOD_INFO)
 
-        val authorsText = authors.joinToString(", ") { "\"$it\"" }
+        val authorsText = baseConfigs.authors.joinToString(", ") { "\"$it\"" }
         val dependenciesText = dependencies.joinToString(", ") { "\"$it\"" }
 
         ForgeTemplate.applyMcmodInfoTemplate(
             project,
             mcmodInfoFile,
             buildSystem.artifactId,
-            pluginName,
+            baseConfigs.pluginName,
             description,
-            website ?: "",
+            baseConfigs.website ?: "",
             updateUrl,
             authorsText,
             dependenciesText

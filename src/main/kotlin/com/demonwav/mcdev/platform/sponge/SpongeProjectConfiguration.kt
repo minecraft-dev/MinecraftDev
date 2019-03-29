@@ -30,11 +30,13 @@ class SpongeProjectConfiguration : ProjectConfiguration() {
     val dependencies = mutableListOf<String>()
     var spongeApiVersion = ""
 
+    override var type = PlatformType.SPONGE
+
     init {
         type = PlatformType.SPONGE
     }
 
-    fun hasDependencies() = listContainsAtLeastOne(dependencies)
+    private fun hasDependencies() = listContainsAtLeastOne(dependencies)
     fun setDependencies(string: String) {
         dependencies.clear()
         dependencies.addAll(commaSplit(string))
@@ -44,15 +46,20 @@ class SpongeProjectConfiguration : ProjectConfiguration() {
         if (project.isDisposed) {
             return
         }
+
+        val baseConfig = base ?: return
+        val dirs = buildSystem.directories ?: return
+
         runWriteTask {
             indicator.text = "Writing main class"
-            var file = buildSystem.sourceDirectory
-            val files = this.mainClass.split("\\.".toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
+
+            var file = dirs.sourceDirectory
+            val files = baseConfig.mainClass.split("\\.".toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
             val className = files[files.size - 1]
-            val packageName = this.mainClass.substring(0, this.mainClass.length - className.length - 1)
+            val packageName = baseConfig.mainClass.substring(0, baseConfig.mainClass.length - className.length - 1)
             file = getMainClassDirectory(files, file)
 
-            val mainClassFile = file.findOrCreateChildData(this, className + ".java")
+            val mainClassFile = file.findOrCreateChildData(this, "$className.java")
             SpongeTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className, hasDependencies())
 
             val mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile) as PsiJavaFile? ?: return@runWriteTask
@@ -63,11 +70,11 @@ class SpongeProjectConfiguration : ProjectConfiguration() {
                 mainClassPsi,
                 psiClass,
                 buildSystem,
-                pluginName,
-                description,
-                website ?: "",
+                baseConfig.pluginName,
+                baseConfig.description ?: "",
+                baseConfig.website ?: "",
                 hasAuthors(),
-                authors,
+                baseConfig.authors,
                 hasDependencies(),
                 dependencies
             )

@@ -17,7 +17,6 @@ import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.ProjectTopics
 import com.intellij.facet.FacetManager
-import com.intellij.facet.ModifiableFacetModel
 import com.intellij.facet.impl.ui.libraries.LibrariesValidatorContextImpl
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager

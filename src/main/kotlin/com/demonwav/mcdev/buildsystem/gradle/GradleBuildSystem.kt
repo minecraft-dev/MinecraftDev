@@ -20,9 +20,11 @@ import com.demonwav.mcdev.platform.forge.ForgeTemplate
 import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderTemplate
+import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.localFile
+import com.demonwav.mcdev.util.refreshFs
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.runWriteTaskLater
@@ -60,111 +62,130 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlo
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression
 import java.io.File
 
-class GradleBuildSystem : BuildSystem() {
+class GradleBuildSystem(
+    artifactId: String,
+    groupId: String,
+    version: String
+) : BuildSystem(artifactId, groupId, version) {
 
-    private var buildGradle: VirtualFile? = null
+    data class ProjectDescriptor(
+        val rootDirectory: VirtualFile,
+        val project: Project
+    )
 
-    override fun create(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
+    override fun create(
+        project: Project,
+        rootDirectory: VirtualFile,
+        configuration: ProjectConfiguration,
+        indicator: ProgressIndicator,
+        pluginName: String
+    ) {
         if (project.isDisposed) {
             return
         }
         rootDirectory.refresh(false, true)
-        createDirectories()
+        directories = createDirectories(rootDirectory)
 
-        if (configuration.type == PlatformType.FORGE || configuration is SpongeForgeProjectConfiguration) {
-            handleForgeCreate(project, configuration, indicator)
-        } else if (configuration.type == PlatformType.LITELOADER) {
-            handleLiteLoaderCreate(project, configuration, indicator)
-        } else {
-            handleGeneralCreate(project, configuration, indicator)
+        val descriptor = ProjectDescriptor(rootDirectory, project)
+
+        when (configuration) {
+            is ForgeProjectConfiguration -> handleForgeCreate(descriptor, configuration, indicator)
+            is LiteLoaderProjectConfiguration -> handleLiteLoaderCreate(descriptor, configuration, indicator)
+            else -> handleGeneralCreate(descriptor, configuration, indicator)
         }
 
-        // The file needs to be saved, if not Gradle will see the file without the dependencies and won't import correctly
-        if (buildGradle == null) {
-            return
-        }
-
+        val buildGradle = rootDirectory.findChild("build.gradle") ?: return
         saveFile(buildGradle)
     }
 
-    private fun handleForgeCreate(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
-        if (configuration !is ForgeProjectConfiguration) {
-            return
-        }
-
+    private fun handleForgeCreate(descriptor: ProjectDescriptor, configuration: ForgeProjectConfiguration, indicator: ProgressIndicator) {
+        val (rootDirectory, project) = descriptor
         runWriteTask {
-            val gradleProp = setupGradleFiles()
+            val (buildGradle, gradleProp) = setupGradleFiles(rootDirectory)
 
-            ForgeTemplate.applyBuildGradleTemplate(project, buildGradle!!, gradleProp, groupId, artifactId, configuration, version)
+            ForgeTemplate.applyBuildGradleTemplate(
+                project, buildGradle, gradleProp, groupId, artifactId, configuration, version
+            )
+            val newBuildGradle = buildGradle.refreshFs()
 
             if (configuration is SpongeForgeProjectConfiguration) {
-                val buildGradlePsi = PsiManager.getInstance(project).findFile(buildGradle!!)
-                buildGradlePsi?.let { addBuildGradleDependencies(project, it, false) }
+                val buildGradlePsi = PsiManager.getInstance(project).findFile(newBuildGradle)
+                buildGradlePsi?.let { addBuildGradleDependencies(descriptor, it, false) }
             }
         }
 
-        setupWrapper(project, indicator)
-        setupDecompWorkspace(project, indicator)
+        setupWrapper(descriptor, indicator)
+        setupDecompWorkspace(descriptor, indicator)
     }
 
-    private fun handleLiteLoaderCreate(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
-        if (configuration !is LiteLoaderProjectConfiguration) {
-            return
-        }
-
+    private fun handleLiteLoaderCreate(descriptor: ProjectDescriptor, configuration: LiteLoaderProjectConfiguration, indicator: ProgressIndicator) {
         runWriteTask {
-            val gradleProp = setupGradleFiles()
-            LiteLoaderTemplate.applyBuildGradleTemplate(project, buildGradle!!, gradleProp, groupId, artifactId, configuration)
+            val (buildGradle, gradleProp) = setupGradleFiles(descriptor.rootDirectory)
+
+            LiteLoaderTemplate.applyBuildGradleTemplate(
+                descriptor.project, buildGradle, gradleProp, groupId, artifactId, configuration
+            )
         }
 
-        setupWrapper(project, indicator)
-        setupDecompWorkspace(project, indicator)
+        setupWrapper(descriptor, indicator)
+        setupDecompWorkspace(descriptor, indicator)
     }
 
-    private fun handleGeneralCreate(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
+    private fun handleGeneralCreate(descriptor: ProjectDescriptor, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
+        val (rootDirectory, project) = descriptor
         runWriteTask {
-            val gradleProp = rootDirectory.findOrCreateChildData(this, "gradle.properties")
+            val (_, gradleProp) = setupGradleFiles(rootDirectory)
 
-            val buildGradleText = if (configuration.type == PlatformType.SPONGE) {
-                SpongeTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, artifactId, version, buildVersion)
+            val buildGradleText = if (configuration is SpongeProjectConfiguration) {
+                SpongeTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, artifactId, version)
             } else {
-                BaseTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, artifactId, version, buildVersion)
+                BaseTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, artifactId, version)
             } ?: return@runWriteTask
 
-            addBuildGradleDependencies(project, buildGradleText)
+            addBuildGradleDependencies(descriptor, buildGradleText)
             VirtualFileManager.getInstance().refreshWithoutFileWatcher(false)
         }
 
-        setupWrapper(project, indicator)
+        setupWrapper(descriptor, indicator)
     }
 
-    private fun setupGradleFiles(): VirtualFile {
-        buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle")
-        return rootDirectory.findOrCreateChildData(this, "gradle.properties")
+    data class GradleFiles(val buildGradle: VirtualFile, val gradleProperties: VirtualFile)
+
+    private fun setupGradleFiles(dir: VirtualFile): GradleFiles {
+        return GradleFiles(
+            dir.findOrCreateChildData(this, "build.gradle"),
+            dir.findOrCreateChildData(this, "gradle.properties")
+        )
     }
 
-    private fun setupWrapper(project: Project, indicator: ProgressIndicator) {
+    private fun setupWrapper(descriptor: ProjectDescriptor, indicator: ProgressIndicator) {
         // Setup gradle wrapper
         // We'll write the properties file to ensure it sets up with the right version
         runWriteTask {
-            val wrapperDirPath = VfsUtil.createDirectoryIfMissing(rootDirectory, "gradle/wrapper").path
+            val wrapperDirPath = VfsUtil.createDirectoryIfMissing(descriptor.rootDirectory, "gradle/wrapper").path
             FileUtils.writeLines(File(wrapperDirPath, "gradle-wrapper.properties"), listOf(
                 "distributionUrl=https\\://services.gradle.org/distributions/gradle-4.4.1-bin.zip"
             ))
         }
 
-        runGradleTask(project, indicator) { launcher ->
+        runGradleTask(descriptor, indicator) { launcher ->
             launcher.forTasks("wrapper")
         }
     }
 
-    private fun setupDecompWorkspace(project: Project, indicator: ProgressIndicator) {
-        runGradleTask(project, indicator) { launcher ->
+    private fun setupDecompWorkspace(descriptor: ProjectDescriptor, indicator: ProgressIndicator) {
+        runGradleTask(descriptor, indicator) { launcher ->
             launcher.forTasks("setupDecompWorkspace").setJvmArguments("-Xmx2G")
         }
     }
 
-    private inline fun runGradleTask(project: Project, indicator: ProgressIndicator, func: (BuildLauncher) -> Unit) {
+    private inline fun runGradleTask(
+        descriptor: ProjectDescriptor,
+        indicator: ProgressIndicator,
+        func: (BuildLauncher) -> Unit
+    ) {
+        val (rootDirectory, project) = descriptor
+
         val connector = GradleConnector.newConnector()
         connector.forProjectDirectory(rootDirectory.localFile)
         val connection = connector.connect()
@@ -205,16 +226,20 @@ class GradleBuildSystem : BuildSystem() {
                 // We want to find the child which has a GrReferenceExpression with the right name
                 it.children.any { child -> child is GrReferenceExpression && child.text == name }
             }.map {
-                // We want to find the grandchild which is a GrClosable block, this is the
-                // basis for the method block
+                // We want to find the grandchild which is a GrClosable block
                 it.children.mapNotNull { child -> child as? GrClosableBlock }.firstOrNull()
             }.filterNotNull()
             .firstOrNull()
 
-    private fun addBuildGradleDependencies(project: Project, file: PsiFile, addToDirectory: Boolean) {
+    private fun addBuildGradleDependencies(
+        descriptor: ProjectDescriptor,
+        file: PsiFile,
+        addToDirectory: Boolean
+    ) {
+        val (rootDirectory, project) = descriptor
         // Write the repository and dependency data to the psi file
         file.runWriteAction {
-            val newBuildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle")
+            var buildGradle = rootDirectory.findOrCreateChildData(this, "build.gradle")
 
             file.name = "build.gradle"
 
@@ -238,37 +263,40 @@ class GradleBuildSystem : BuildSystem() {
             if (addToDirectory) {
                 val rootDirectoryPsi = PsiManager.getInstance(project).findDirectory(rootDirectory)
                 if (rootDirectoryPsi != null) {
-                    newBuildGradle.delete(this)
+                    buildGradle.delete(this)
 
                     rootDirectoryPsi.add(file)
                 }
             }
 
-            buildGradle = rootDirectory.findChild("build.gradle") ?: return@runWriteAction
+            buildGradle = buildGradle.refreshFs()
 
             // Reformat code to match their code style
-            val newBuildGradlePsi = PsiManager.getInstance(project).findFile(buildGradle!!) ?: return@runWriteAction
+            val newBuildGradlePsi = PsiManager.getInstance(project).findFile(buildGradle) ?: return@runWriteAction
             ReformatCodeProcessor(newBuildGradlePsi, false).run()
         }
     }
 
-    private fun addBuildGradleDependencies(project: Project, text: String) {
+    private fun addBuildGradleDependencies(descriptor: ProjectDescriptor, text: String) {
         // Create the Psi file from the text, but don't write it until we are finished with it
-        val buildGradlePsi = PsiFileFactory.getInstance(project).createFileFromText(GroovyLanguage, text)
+        val buildGradlePsi = PsiFileFactory.getInstance(descriptor.project).createFileFromText(GroovyLanguage, text)
 
-        addBuildGradleDependencies(project, buildGradlePsi, true)
+        addBuildGradleDependencies(descriptor, buildGradlePsi, true)
     }
 
-    private fun saveFile(file: VirtualFile?) {
-        file ?: return
-
+    private fun saveFile(file: VirtualFile) {
         runWriteTask {
             val document = FileDocumentManager.getInstance().getDocument(file) ?: return@runWriteTask
             FileDocumentManager.getInstance().saveDocument(document)
         }
     }
 
-    override fun finishSetup(rootModule: Module, configurations: Collection<ProjectConfiguration>, indicator: ProgressIndicator) {
+    override fun finishSetup(
+        rootModule: Module,
+        rootDirectory: VirtualFile,
+        configurations: Collection<ProjectConfiguration>,
+        indicator: ProgressIndicator
+    ) {
         val project = rootModule.project
         if (rootModule.isDisposed || project.isDisposed) {
             return
@@ -279,8 +307,7 @@ class GradleBuildSystem : BuildSystem() {
         val gradleProjectImportBuilder = GradleProjectImportBuilder(projectDataManager)
         val gradleProjectImportProvider = GradleProjectImportProvider(gradleProjectImportBuilder)
 
-        // Shadow name for ease of use, make non null
-        val buildGradle = buildGradle ?: return
+        val buildGradle = rootDirectory.findChild("build.gradle") ?: return
 
         invokeLater {
             val wizard = AddModuleWizard(project, buildGradle.path, gradleProjectImportProvider)
@@ -337,29 +364,32 @@ class GradleBuildSystem : BuildSystem() {
         }
     }
 
-    fun createMultiModuleProject(project: Project,
-                                 configurations: Map<PlatformType, ProjectConfiguration>,
-                                 indicator: ProgressIndicator): Map<GradleBuildSystem, ProjectConfiguration> {
-
+    fun createMultiModuleProject(
+        rootDirectory: VirtualFile,
+        project: Project,
+        configurations: LinkedHashSet<ProjectConfiguration>,
+        indicator: ProgressIndicator,
+        pluginName: String
+    ): Map<GradleBuildSystem, ProjectConfiguration> {
         val map = mutableMapOf<GradleBuildSystem, ProjectConfiguration>()
 
-        setupWrapper(project, indicator)
+        setupWrapper(ProjectDescriptor(rootDirectory, project), indicator)
 
         rootDirectory.refresh(false, true)
 
         // Create the includes string for settings.gradle
         val includes = "'${pluginName.toLowerCase()}-common', " +
-            configurations.values.joinToString(", ") { "'${pluginName.toLowerCase()}-${it.type.name.toLowerCase()}'" }
+            configurations.joinToString(", ") { "'${pluginName.toLowerCase()}-${it.type.name.toLowerCase()}'" }
 
         val artifactIdLower = artifactId.toLowerCase()
 
         runWriteTask {
             // Write the parent files to disk so the children modules can import correctly
-            val gradleProp = setupGradleFiles()
+            val (buildGradle, gradleProp) = setupGradleFiles(rootDirectory)
             val settingsGradle = rootDirectory.createChildData(this, "settings.gradle")
 
             BaseTemplate.applyMultiModuleBuildGradleTemplate(
-                project, buildGradle!!, gradleProp, groupId, artifactId, version, buildVersion, configurations
+                project, buildGradle, gradleProp, groupId, artifactId, version, configurations
             )
 
             BaseTemplate.applySettingsGradleTemplate(project, settingsGradle, artifactIdLower, includes)
@@ -369,92 +399,106 @@ class GradleBuildSystem : BuildSystem() {
             createDirectories(common)
         }
 
-        for (configuration in configurations.values) {
+        for (configuration in configurations) {
             // We associate each configuration with the given build system, which we add to the map at the end
-            val gradleBuildSystem = GradleBuildSystem()
-
-            runWriteTask {
-                gradleBuildSystem.rootDirectory =
-                    rootDirectory.createChildDirectory(this, artifactIdLower + "-" + configuration.type.name.toLowerCase())
-            }
-
-            gradleBuildSystem.artifactId = artifactId
-            gradleBuildSystem.groupId = groupId
-            gradleBuildSystem.version = version
-
-            gradleBuildSystem.pluginName = pluginName
-            gradleBuildSystem.buildVersion = buildVersion
+            val gradleBuildSystem = GradleBuildSystem(artifactId, groupId, version)
 
             // it knows which dependencies are needed for each configuration
             MinecraftProjectCreator.addDependencies(configuration, gradleBuildSystem)
 
+            val newRootDir = runWriteTask {
+                rootDirectory.createChildDirectory(this, artifactIdLower + "-" + configuration.type.name.toLowerCase())
+            }
+
             // For each build system we initialize it, but not the same as a normal create. We need to know the common project name,
             // as we automatically add it as a dependency too
-            gradleBuildSystem.createSubModule(project, configuration, "$artifactIdLower-common", indicator)
+            val newDesc = ProjectDescriptor(newRootDir, project)
+            gradleBuildSystem.createSubModule(newDesc, configuration, "$artifactIdLower-common", indicator)
             map.putIfAbsent(gradleBuildSystem, configuration)
         }
 
         return map
     }
 
-    private fun createSubModule(project: Project, configuration: ProjectConfiguration, commonProjectName: String, indicator: ProgressIndicator) {
-        rootDirectory.refresh(false, true)
-        createDirectories()
+    private fun createSubModule(
+        descriptor: ProjectDescriptor,
+        configuration: ProjectConfiguration,
+        commonProjectName: String,
+        indicator: ProgressIndicator
+    ) {
+        descriptor.rootDirectory.let { dir ->
+            dir.refresh(false, true)
+            directories = createDirectories(dir)
+        }
 
         // This is mostly the same as a normal create, but we use different files and don't setup the wrapper
         if (configuration.type == PlatformType.FORGE || configuration is SpongeForgeProjectConfiguration) {
-            handleForgeSubCreate(project, configuration, commonProjectName, indicator)
+            handleForgeSubCreate(descriptor, configuration, commonProjectName, indicator)
         } else if (configuration.type == PlatformType.LITELOADER) {
-            handleLiteLoaderSubCreate(project, configuration, commonProjectName, indicator)
+            handleLiteLoaderSubCreate(descriptor, configuration, commonProjectName, indicator)
         } else {
-            handleGeneralSubCreate(project, configuration, commonProjectName)
+            handleGeneralSubCreate(descriptor, configuration, commonProjectName)
         }
 
-        // The file needs to be saved, if not Gradle will see the file without the dependencies and won't import correctly
-        if (buildGradle == null) {
-            return
-        }
-
+        val buildGradle = descriptor.rootDirectory.findChild("build.gradle") ?: return
         saveFile(buildGradle)
     }
 
-    private fun handleForgeSubCreate(project: Project, configuration: ProjectConfiguration, commonProjectName: String, indicator: ProgressIndicator) {
+    private fun handleForgeSubCreate(
+        descriptor: ProjectDescriptor,
+        configuration: ProjectConfiguration,
+        commonProjectName: String,
+        indicator: ProgressIndicator
+    ) {
+        val (rootDirectory, project) = descriptor
+
         if (configuration !is ForgeProjectConfiguration) {
             return
         }
 
         runWriteTask {
-            val gradleProp = setupGradleFiles()
+            val (buildGradle, gradleProp) = setupGradleFiles(rootDirectory)
 
-            ForgeTemplate.applySubmoduleBuildGradleTemplate(project, buildGradle!!, gradleProp, artifactId, configuration, commonProjectName)
+            ForgeTemplate.applySubmoduleBuildGradleTemplate(project, buildGradle, gradleProp, artifactId, configuration, commonProjectName)
 
             // We're only going to write the dependencies if it's a sponge forge project
             if (configuration is SpongeForgeProjectConfiguration) {
-                val buildGradlePsi = PsiManager.getInstance(project).findFile(buildGradle!!)
+                val buildGradlePsi = PsiManager.getInstance(project).findFile(buildGradle)
                 if (buildGradlePsi != null) {
-                    addBuildGradleDependencies(project, buildGradlePsi, false)
+                    addBuildGradleDependencies(descriptor, buildGradlePsi, false)
                 }
             }
         }
 
-        setupDecompWorkspace(project, indicator)
+        setupDecompWorkspace(descriptor, indicator)
     }
 
-    private fun handleLiteLoaderSubCreate(project: Project, configuration: ProjectConfiguration, commonProjectName: String, indicator: ProgressIndicator) {
+    private fun handleLiteLoaderSubCreate(
+        descriptor: ProjectDescriptor,
+        configuration: ProjectConfiguration,
+        commonProjectName: String,
+        indicator: ProgressIndicator
+    ) {
         if (configuration !is LiteLoaderProjectConfiguration) {
             return
         }
 
+        val (rootDirectory, project) = descriptor
         runWriteTask {
-            val gradleProp = setupGradleFiles()
+            val (buildGradle, gradleProp) = setupGradleFiles(rootDirectory)
 
-            LiteLoaderTemplate.applySubmoduleBuildGradleTemplate(project, buildGradle!!, gradleProp, configuration, commonProjectName)
+            LiteLoaderTemplate.applySubmoduleBuildGradleTemplate(project, buildGradle, gradleProp, configuration, commonProjectName)
         }
 
-        setupDecompWorkspace(project, indicator)
+        setupDecompWorkspace(descriptor, indicator)
     }
 
-    private fun handleGeneralSubCreate(project: Project, configuration: ProjectConfiguration, commonProjectName: String) {
+    private fun handleGeneralSubCreate(
+        descriptor: ProjectDescriptor,
+        configuration: ProjectConfiguration,
+        commonProjectName: String
+    ) {
+        val (_, project) = descriptor
         runWriteTask {
             val buildGradleText = if (configuration.type == PlatformType.SPONGE) {
                 SpongeTemplate.applySubmoduleBuildGradleTemplate(project, commonProjectName)
@@ -462,7 +506,7 @@ class GradleBuildSystem : BuildSystem() {
                 BaseTemplate.applySubmoduleBuildGradleTemplate(project, commonProjectName)
             } ?: return@runWriteTask
 
-            addBuildGradleDependencies(project, buildGradleText)
+            addBuildGradleDependencies(descriptor, buildGradleText)
         }
     }
 

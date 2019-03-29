@@ -23,12 +23,14 @@ import javax.swing.JTextField
 
 abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
 
-    protected fun validate(pluginNameField: JTextField,
-                           pluginVersionField: JTextField,
-                           mainClassField: JTextField,
-                           authorsField: JTextField,
-                           dependField: JTextField,
-                           pattern: Regex): Boolean {
+    protected fun validate(
+        pluginNameField: JTextField,
+        pluginVersionField: JTextField,
+        mainClassField: JTextField,
+        authorsField: JTextField,
+        dependField: JTextField,
+        pattern: Regex
+    ): Boolean {
         try {
             if (pluginNameField.text.isBlank()) {
                 throw EmptyInputSetupException(pluginNameField)

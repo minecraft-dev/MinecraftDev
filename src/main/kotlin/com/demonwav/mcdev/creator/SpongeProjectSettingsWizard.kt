@@ -8,13 +8,22 @@
  * MIT License
  */
 
+@file:Suppress("Duplicates")
+
 package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
-import com.demonwav.mcdev.platform.sponge.getSpongeVersionSelector
+import com.demonwav.mcdev.platform.sponge.SpongeVersion
+import com.demonwav.mcdev.util.firstOfType
 import com.intellij.util.ui.UIUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.apache.commons.lang.WordUtils
 import javax.swing.JComboBox
 import javax.swing.JComponent
@@ -36,27 +45,40 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     private lateinit var spongeApiVersionBox: JComboBox<String>
     private lateinit var errorLabel: JLabel
 
-    private var settings: SpongeProjectConfiguration? = null
+    private var config: SpongeProjectConfiguration? = null
 
     override fun getComponent(): JComponent {
-        settings = creator.settings[PlatformType.SPONGE] as? SpongeProjectConfiguration
-        if (settings == null) {
-            return panel
+        return panel
+    }
+
+    override fun validate(): Boolean {
+        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) &&
+            spongeApiVersionBox.selectedItem != null
+    }
+
+    override fun updateStep() {
+        config = creator.configs.firstOfType()
+        if (config == null) {
+            return
         }
 
-        val name = WordUtils.capitalize(creator.artifactId.replace('-', ' '))
-        pluginNameField.text = name
-        pluginVersionField.text = creator.version
+        val buildSystem = creator.buildSystem ?: return
 
-        if (settings != null && !settings!!.isFirst) {
+        val name = WordUtils.capitalize(buildSystem.artifactId.replace('-', ' '))
+        pluginNameField.text = name
+        pluginVersionField.text = buildSystem.version
+
+        val conf = config ?: return
+
+        if (creator.configs.indexOf(conf) != 0) {
             pluginNameField.isEditable = false
             pluginVersionField.isEditable = false
         }
 
-        mainClassField.text = creator.groupId.replace("-", "").toLowerCase() + "." +
-            creator.artifactId.replace("-", "").toLowerCase() + "." + name.replace(" ", "")
+        mainClassField.text = buildSystem.groupId.replace("-", "").toLowerCase() + "." +
+            buildSystem.artifactId.replace("-", "").toLowerCase() + "." + name.replace(" ", "")
 
-        if (creator.settings.size > 1) {
+        if (creator.configs.size > 1) {
             mainClassField.text = mainClassField.text + PlatformType.SPONGE.normalName
         }
 
@@ -66,34 +88,33 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             title.icon = PlatformAssets.SPONGE_ICON_2X
         }
 
-        getSpongeVersionSelector()
-            .onSuccess { it.set(spongeApiVersionBox) }
-            .onError { errorLabel.isVisible = true }
-
-        return panel
-    }
-
-    override fun validate(): Boolean {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) &&
-            spongeApiVersionBox.selectedItem != null
+        CoroutineScope(Dispatchers.Swing).launch {
+            try {
+                withContext(Dispatchers.IO) { SpongeVersion.downloadData() }?.set(spongeApiVersionBox)
+            } catch (e: Exception) {
+                errorLabel.isVisible = true
+            }
+        }
     }
 
     override fun isStepVisible(): Boolean {
-        settings = creator.settings[PlatformType.SPONGE] as? SpongeProjectConfiguration
-        return settings != null
+        return creator.configs.any { it is SpongeProjectConfiguration }
     }
 
     override fun onStepLeaving() {
-        settings!!.pluginName = pluginNameField.text
-        settings!!.pluginVersion = pluginVersionField.text
-        settings!!.mainClass = mainClassField.text
+        val conf = config ?: return
+        conf.base = ProjectConfiguration.BaseConfigs(
+            pluginNameField.text,
+            pluginVersionField.text,
+            mainClassField.text,
+            descriptionField.text,
+            websiteField.text
+        )
 
-        settings!!.setAuthors(authorsField.text)
-        settings!!.setDependencies(dependField.text)
-        settings!!.description = descriptionField.text
-        settings!!.website = websiteField.text
+        conf.setAuthors(authorsField.text)
+        conf.setDependencies(dependField.text)
 
-        settings!!.spongeApiVersion = spongeApiVersionBox.selectedItem as? String ?: ""
+        conf.spongeApiVersion = spongeApiVersionBox.selectedItem as? String ?: ""
     }
 
     override fun updateDataModel() {}

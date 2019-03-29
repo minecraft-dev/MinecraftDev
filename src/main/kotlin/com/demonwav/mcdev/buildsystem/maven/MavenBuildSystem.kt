@@ -34,35 +34,47 @@ import org.jetbrains.idea.maven.execution.MavenRunConfigurationType
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters
 import org.jetbrains.idea.maven.project.MavenProjectsManager
 
-class MavenBuildSystem : BuildSystem() {
+class MavenBuildSystem(
+    artifactId: String,
+    groupId: String,
+    version: String
+) : BuildSystem(artifactId, groupId, version) {
 
-    private lateinit var pomFile: VirtualFile
-
-    override fun create(project: Project, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
+    override fun create(
+        project: Project,
+        rootDirectory: VirtualFile,
+        configuration: ProjectConfiguration,
+        indicator: ProgressIndicator,
+        pluginName: String
+    ) {
         if (project.isDisposed) {
             return
         }
         rootDirectory.refresh(false, true)
 
         runWriteTask {
-            createDirectories()
+            directories = createDirectories(rootDirectory)
 
             val text = when (configuration.type) {
                 PlatformType.BUKKIT, PlatformType.SPIGOT, PlatformType.PAPER ->
-                    BukkitTemplate.applyPomTemplate(project, buildVersion)
-                PlatformType.BUNGEECORD, PlatformType.WATERFALL -> BungeeCordTemplate.applyPomTemplate(project, buildVersion)
-                PlatformType.SPONGE -> SpongeTemplate.applyPomTemplate(project, buildVersion)
+                    BukkitTemplate.applyPomTemplate(project)
+                PlatformType.BUNGEECORD, PlatformType.WATERFALL ->
+                    BungeeCordTemplate.applyPomTemplate(project)
+                PlatformType.SPONGE ->
+                    SpongeTemplate.applyPomTemplate(project)
                 else -> return@runWriteTask
             }
 
-            val pomPsi = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, text) ?: return@runWriteTask
+            val pomPsi = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, text)
+                ?: return@runWriteTask
 
             pomPsi.name = "pom.xml"
 
             val pomXmlPsi = pomPsi as XmlFile
             pomPsi.runWriteAction {
                 val manager = DomManager.getDomManager(project)
-                val mavenProjectXml = manager.getFileElement(pomXmlPsi, MavenDomProjectModel::class.java)!!.rootElement
+                val mavenProjectXml = manager.getFileElement(pomXmlPsi, MavenDomProjectModel::class.java)?.rootElement
+                    ?: return@runWriteAction
 
                 mavenProjectXml.groupId.value = groupId
                 mavenProjectXml.artifactId.value = artifactId
@@ -73,13 +85,15 @@ class MavenBuildSystem : BuildSystem() {
 
                 val properties = root.findFirstSubTag("properties") ?: return@runWriteAction
 
-                if (!configuration.website.isNullOrEmpty()) {
-                    val url = root.createChildTag("url", null, configuration.website, false)
+                val base = configuration.base ?: return@runWriteAction
+
+                if (!base.website.isNullOrEmpty()) {
+                    val url = root.createChildTag("url", null, base.website, false)
                     root.addAfter(url, properties)
                 }
 
-                if (configuration.description.isNotEmpty()) {
-                    val description = root.createChildTag("description", null, configuration.description, false)
+                if (!base.description.isNullOrEmpty()) {
+                    val description = root.createChildTag("description", null, base.description, false)
                     root.addBefore(description, properties)
                 }
 
@@ -101,7 +115,8 @@ class MavenBuildSystem : BuildSystem() {
                 dir.findFile(pomPsi.name)?.delete()
                 dir.add(pomPsi)
 
-                pomFile = rootDirectory.findChild("pom.xml") ?: return@runWriteAction
+                val pomFile = rootDirectory.findChild(pomPsi.name) ?: return@runWriteAction
+
                 // Reformat the code to match their code style
                 PsiManager.getInstance(project).findFile(pomFile)?.let {
                     ReformatCodeProcessor(it, false).run()
@@ -110,12 +125,19 @@ class MavenBuildSystem : BuildSystem() {
         }
     }
 
-    override fun finishSetup(rootModule: Module, configurations: Collection<ProjectConfiguration>, indicator: ProgressIndicator) {
+    override fun finishSetup(
+        rootModule: Module,
+        rootDirectory: VirtualFile,
+        configurations: Collection<ProjectConfiguration>,
+        indicator: ProgressIndicator
+    ) {
         if (rootModule.isDisposed || rootModule.project.isDisposed) {
             return
         }
         runWriteTask {
             val project = rootModule.project
+
+            val pomFile = rootDirectory.findChild("pom.xml") ?: return@runWriteTask
 
             // Force Maven to setup the project
             val manager = MavenProjectsManager.getInstance(project)
@@ -125,7 +147,7 @@ class MavenBuildSystem : BuildSystem() {
 
             // Setup the default Maven run config
             val params = MavenRunnerParameters()
-            params.workingDirPath = rootDirectory.canonicalPath!!
+            params.workingDirPath = rootDirectory.canonicalPath ?: return@runWriteTask
             params.goals = listOf("clean", "package")
             val runnerSettings = MavenRunConfigurationType
                 .createRunnerAndConfigurationSettings(null, null, params, project)

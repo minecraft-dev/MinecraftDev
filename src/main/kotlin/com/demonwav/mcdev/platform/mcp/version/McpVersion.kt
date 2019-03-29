@@ -84,9 +84,7 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
                 val mcpVersion = McpVersion(map)
                 mcpVersion.versions
                 return mcpVersion
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
+            } catch (ignored: IOException) {}
 
             return null
         }

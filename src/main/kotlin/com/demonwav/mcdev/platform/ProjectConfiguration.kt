@@ -11,40 +11,40 @@
 package com.demonwav.mcdev.platform
 
 import com.demonwav.mcdev.buildsystem.BuildSystem
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.containers.isNullOrEmpty
-import org.jetbrains.annotations.Contract
 
 private val bracketRegex = Regex("[\\[\\]]")
 private val commaRegex = Regex("\\s*,\\s*")
 
 abstract class ProjectConfiguration {
 
-    lateinit var pluginName: String
-    lateinit var pluginVersion: String
-    lateinit var mainClass: String
-    lateinit var description: String
-    var website: String? = null
-    lateinit var type: PlatformType
+    data class BaseConfigs(
+        val pluginName: String,
+        val pluginVersion: String,
+        val mainClass: String,
+        val description: String? = null,
+        val website: String? = null,
+        val authors: MutableList<String> = mutableListOf()
+    )
 
-    val authors = mutableListOf<String>()
+    var base: BaseConfigs? = null
 
-    lateinit var module: Module
-
-    var isFirst = false
+    abstract var type: PlatformType
 
     abstract fun create(project: Project, buildSystem: BuildSystem, indicator: ProgressIndicator)
 
-    fun hasAuthors() = listContainsAtLeastOne(authors)
+    fun hasAuthors() = listContainsAtLeastOne(base?.authors)
     fun setAuthors(string: String) {
-        authors.clear()
-        authors.addAll(commaSplit(string))
+        base?.authors?.let { authors ->
+            authors.clear()
+            authors.addAll(commaSplit(string))
+        }
     }
 
-    fun hasDescription() = description.isNotBlank()
+    fun hasDescription() = base?.description?.isNotBlank() == true
 
     protected fun commaSplit(string: String): List<String> {
         return if (!string.isBlank()) {
@@ -54,7 +54,6 @@ abstract class ProjectConfiguration {
         }
     }
 
-    @Contract("null -> false")
     fun listContainsAtLeastOne(list: MutableList<String>?): Boolean {
         if (list.isNullOrEmpty()) {
             return false
