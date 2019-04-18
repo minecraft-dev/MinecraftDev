@@ -29,7 +29,7 @@ val PsiElement.eventListener: Pair<PsiClass, PsiMethod>?
         }
         // The PsiIdentifier is going to be a method of course!
         val method = this.getParent() as PsiMethod
-        if (method.hasModifierProperty(PsiModifier.ABSTRACT) || method.hasModifierProperty(PsiModifier.PRIVATE)) {
+        if (method.hasModifierProperty(PsiModifier.ABSTRACT)) {
             // I don't think any implementation allows for abstract method listeners.
             return null
         }
