@@ -21,7 +21,12 @@ import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.tree.TokenSet
 
 class I18nFindUsagesProvider : FindUsagesProvider {
-    override fun getWordsScanner(): WordsScanner? = WORDS_SCANNER
+    override fun getWordsScanner(): WordsScanner? = DefaultWordsScanner(
+        I18nLexerAdapter(),
+        TokenSet.create(I18nTypes.KEY),
+        TokenSet.create(I18nTypes.COMMENT),
+        TokenSet.EMPTY
+    )
 
     override fun canFindUsagesFor(psiElement: PsiElement) = psiElement is PsiNamedElement
 
@@ -32,14 +37,4 @@ class I18nFindUsagesProvider : FindUsagesProvider {
     override fun getDescriptiveName(element: PsiElement) = if (element is I18nEntry) element.key else ""
 
     override fun getNodeText(element: PsiElement, useFullName: Boolean) = if (element is I18nEntry) "${element.key}=${element.value}" else ""
-
-    companion object {
-        private val WORDS_SCANNER =
-            DefaultWordsScanner(
-                I18nLexerAdapter(),
-                TokenSet.create(I18nTypes.KEY),
-                TokenSet.create(I18nTypes.COMMENT),
-                TokenSet.EMPTY
-            )
-    }
 }
