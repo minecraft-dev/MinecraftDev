@@ -12,8 +12,7 @@ package com.demonwav.mcdev.i18n.lang
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.i18n.I18nConstants
-import com.demonwav.mcdev.i18n.Scope
-import com.demonwav.mcdev.i18n.findDefaultLangEntries
+import com.demonwav.mcdev.i18n.index.TranslationIndex
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.demonwav.mcdev.util.getSimilarity
@@ -28,10 +27,11 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns.elementType
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiUtilCore
+import com.intellij.util.indexing.FileBasedIndex
 
 class I18nCompletionContributor : CompletionContributor() {
-
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         if (parameters.completionType != CompletionType.BASIC) {
             return
@@ -59,7 +59,13 @@ class I18nCompletionContributor : CompletionContributor() {
             return
         }
 
-        val defaultEntries = element.project.findDefaultLangEntries(scope = Scope.GLOBAL, domain = domain)
+        val defaultEntries = FileBasedIndex.getInstance().getValues(
+            TranslationIndex.NAME,
+            I18nConstants.DEFAULT_LOCALE,
+            GlobalSearchScope.allScope(element.project)
+        ).asSequence()
+            .filter { domain == null || it.sourceDomain == domain }
+            .flatMap { it.translations.asSequence() }
         val existingKeys = element.containingFile.children.mapNotNull { (it as? I18nEntry)?.key }
         val prefixResult = result.withPrefixMatcher(text)
 

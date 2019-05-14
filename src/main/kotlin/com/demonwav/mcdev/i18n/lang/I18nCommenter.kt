@@ -8,7 +8,7 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.i18n
+package com.demonwav.mcdev.i18n.lang
 
 import com.intellij.lang.Commenter
 

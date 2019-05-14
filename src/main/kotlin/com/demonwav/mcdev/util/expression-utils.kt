@@ -31,6 +31,7 @@ fun PsiAnnotationMemberValue.evaluate(defaultValue: String?, parameterReplacemen
         if (!visited.add(expr)) {
             return defaultValue
         }
+
         when {
             expr is PsiTypeCastExpression && expr.operand != null ->
                 return eval(expr.operand, defaultValue)
@@ -61,51 +62,47 @@ fun PsiAnnotationMemberValue.evaluate(defaultValue: String?, parameterReplacemen
     return eval(this, defaultValue)
 }
 
-fun PsiExpression.substituteParameter(substitutions: Map<Int, Array<String?>?>, allowReferences: Boolean, allowTranslations: Boolean): Array<String?>? {
+fun PsiExpression.substituteParameter(allowReferences: Boolean, allowTranslations: Boolean): String? {
     val visited = mutableSetOf<PsiExpression?>()
-    fun substitute(expr: PsiExpression?): Array<String?>? {
+
+    tailrec fun substitute(expr: PsiExpression?, defaultValue: String? = null): String? {
         if (!visited.add(expr) && expr != null) {
-            return arrayOf("\${${expr.text}}")
+            return "\${${expr.text}}"
         }
         when {
             expr is PsiTypeCastExpression && expr.operand != null ->
                 return substitute(expr.operand)
             expr is PsiReferenceExpression -> {
                 val reference = expr.advancedResolve(false).element
-                if (reference is PsiParameter && reference.parent is PsiParameterList) {
-                    val paramIndex = (reference.parent as PsiParameterList).getParameterIndex(reference)
-                    if (substitutions.containsKey(paramIndex)) {
-                        return substitutions[paramIndex]
-                    }
-                }
                 if (reference is PsiVariable && reference.initializer != null) {
-                    return substitute(reference.initializer)
+                    return substitute(reference.initializer, "\${${expr.text}}")
                 }
             }
             expr is PsiLiteral ->
-                return arrayOf(expr.value.toString())
+                return expr.value.toString()
             expr is PsiPolyadicExpression && expr.operationTokenType == JavaTokenType.PLUS -> {
                 var value = ""
                 for (operand in expr.operands) {
-                    val operandResult = operand.evaluate(null, null) ?: return null
+                    val operandResult = operand.evaluate(null, null) ?: return defaultValue
                     value += operandResult
                 }
-                return arrayOf(value)
+                return value
             }
             expr is PsiCall && allowTranslations ->
                 for (argument in expr.argumentList?.expressions ?: emptyArray()) {
                     val translation = Translation.find(argument) ?: continue
                     if (translation.formattingError == FormattingError.MISSING) {
-                        return arrayOf("{ERROR: Missing formatting arguments for '${translation.text}'}")
+                        return "{ERROR: Missing formatting arguments for '${translation.text}'}"
                     }
-                    return arrayOf(translation.text)
+                    return translation.text
                 }
         }
         return if (allowReferences && expr != null) {
-            arrayOf("\${${expr.text}}")
+            "\${${expr.text}}"
         } else {
-            null
+            defaultValue
         }
     }
+
     return substitute(this)
 }

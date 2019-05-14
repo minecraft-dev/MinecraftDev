@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.i18n.translations.identifiers
 
 import com.demonwav.mcdev.i18n.I18nConstants
-import com.demonwav.mcdev.i18n.findDefaultLangEntries
 import com.demonwav.mcdev.i18n.index.TranslationIndex
 import com.demonwav.mcdev.i18n.index.merge
 import com.demonwav.mcdev.i18n.reference.I18nReference
@@ -51,7 +50,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                 for (function in Translation.translationFunctions) {
                     if (function.matches(call, index)) {
                         val result = function.getTranslationKey(call) ?: continue
-                        val translationKey = result.second.trim()
+                        val translationKey = result.trim()
                         val varKey = if (translationKey == value) I18nReference.VARIABLE_MARKER else translationKey
                         val fullKey = translationKey.replace(I18nReference.VARIABLE_MARKER, value)
                         val entries = FileBasedIndex.getInstance().getValues(TranslationIndex.NAME, I18nConstants.DEFAULT_LOCALE, GlobalSearchScope.allScope(project)).merge("")
@@ -64,7 +63,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                 val (formatted, superfluousParams) = function.format(translation, call) ?: (translation to -1)
                                 return Translation(
                                     if (function.foldParameters) container else call,
-                                    if (result.first) referenceElement else null,
+                                    referenceElement,
                                     fullKey,
                                     varKey,
                                     formatted,
@@ -75,7 +74,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                             } catch (ignored: MissingFormatArgumentException) {
                                 return Translation(
                                     if (function.foldParameters) container else call,
-                                    if (result.first) referenceElement else null,
+                                    referenceElement,
                                     fullKey,
                                     varKey,
                                     translation,
@@ -86,7 +85,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                         } else {
                             return Translation(
                                 null,
-                                if (result.first) referenceElement else null,
+                                referenceElement,
                                 fullKey,
                                 varKey,
                                 null,

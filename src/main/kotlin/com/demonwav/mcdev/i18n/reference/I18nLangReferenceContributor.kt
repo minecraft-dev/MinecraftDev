@@ -14,6 +14,7 @@ import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.intellij.openapi.util.TextRange
 import com.intellij.patterns.PlatformPatterns
+import com.intellij.psi.ElementManipulators
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceContributor
@@ -29,7 +30,13 @@ class I18nLangReferenceContributor : PsiReferenceContributor() {
                 override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
                     val entry = element as I18nEntry
                     return arrayOf(
-                        I18nReference(element, TextRange(0, entry.key.length), true, entry.key, entry.key)
+                        I18nReference(
+                            element,
+                            TextRange(0, entry.key.length),
+                            true,
+                            entry.key,
+                            entry.key
+                        )
                     )
                 }
             }

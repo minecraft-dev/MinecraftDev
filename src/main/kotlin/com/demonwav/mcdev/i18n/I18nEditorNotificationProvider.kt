@@ -10,6 +10,8 @@
 
 package com.demonwav.mcdev.i18n
 
+import com.demonwav.mcdev.i18n.index.TranslationEntry
+import com.demonwav.mcdev.i18n.index.TranslationIndex
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
@@ -25,8 +27,11 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.ui.EditorNotificationPanel
 import com.intellij.ui.EditorNotifications
+import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.util.ui.UIUtil
 import java.awt.Color
 import java.util.Locale
@@ -54,7 +59,7 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
                         }
                         add(I18nElementFactory.createLineEnding(project))
                     }
-                    val newElements = I18nElementFactory.assembleElements(project, missingEntries.values, Int.MAX_VALUE)
+                    val newElements = I18nElementFactory.assembleTranslations(project, missingEntries.values)
                     for (element in newElements) {
                         add(element)
                     }
@@ -79,9 +84,17 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
         return null
     }
 
-    private fun getMissingEntries(file: VirtualFile): Map<String, I18nEntry> {
-        val defaultEntries = project.findDefaultLangEntries(scope = Scope.PROJECT, domain = file.mcDomain)
-        val entries = project.findLangEntries(file = file, scope = Scope.PROJECT)
+    private fun getMissingEntries(file: VirtualFile): Map<String, TranslationEntry> {
+        val domain = file.mcDomain
+        val defaultEntries = FileBasedIndex.getInstance().getValues(
+            TranslationIndex.NAME,
+            I18nConstants.DEFAULT_LOCALE,
+            GlobalSearchScope.projectScope(project)
+        ).asSequence()
+            .filter { domain == null || it.sourceDomain == domain }
+            .flatMap { it.translations.asSequence() }
+        val entries = PsiTreeUtil.getChildrenOfType(PsiManager.getInstance(project).findFile(file), I18nEntry::class.java)?.asSequence()
+            ?: emptySequence()
         val keys = entries.map { it.key }
         val missingEntries = defaultEntries.associate { it.key to it }.toMutableMap()
         missingEntries.keys.removeAll(keys)

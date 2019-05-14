@@ -116,7 +116,7 @@
         <lang.findUsagesProvider language="JSON" implementationClass="com.demonwav.mcdev.i18n.reference.I18nJsonFindUsagesProvider" order="first"/>
         <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.i18n.I18nFoldingBuilder"/>
         <lang.formatter language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.formatting.I18nFormattingModelBuilder"/>
-        <lang.commenter language="I18n" implementationClass="com.demonwav.mcdev.i18n.I18nCommenter" />
+        <lang.commenter language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nCommenter" />
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.i18n.reference.I18nJavaReferenceContributor"/>
         <psi.referenceContributor language="I18n" implementation="com.demonwav.mcdev.i18n.reference.I18nLangReferenceContributor"/>
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.i18n.reference.I18nJsonReferenceContributor"/>
@@ -126,7 +126,7 @@
         <editorNotificationProvider implementation="com.demonwav.mcdev.i18n.I18nEditorNotificationProvider"/>
         <elementDescriptionProvider implementation="com.demonwav.mcdev.i18n.reference.I18nDescriptionProvider"/>
         <referencesSearch implementation="com.demonwav.mcdev.i18n.reference.I18nReferencesSearcher"/>
-        <annotator language="I18n" implementationClass="com.demonwav.mcdev.i18n.I18nAnnotator"/>
+        <annotator language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nAnnotator"/>
         <intentionAction>
             <className>com.demonwav.mcdev.i18n.intentions.ConvertToTranslationIntention</className>
             <category>Minecraft</category>

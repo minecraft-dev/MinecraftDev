@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.i18n
 
+import com.demonwav.mcdev.i18n.index.TranslationEntry
 import com.demonwav.mcdev.i18n.lang.I18nFile
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
@@ -74,6 +75,15 @@ object I18nElementFactory {
                 result.add(createLineEnding(project))
             }
             result.add(createEntry(project, entry.key, entry.value))
+            result.add(createLineEnding(project))
+        }
+        return result
+    }
+
+    fun assembleTranslations(project: Project, entries: Collection<TranslationEntry>): List<PsiElement> {
+        val result = mutableListOf<PsiElement>()
+        for (entry in entries) {
+            result.add(createEntry(project, entry.key, entry.text))
             result.add(createLineEnding(project))
         }
         return result

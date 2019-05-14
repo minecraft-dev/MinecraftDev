@@ -3,13 +3,15 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
 
-package com.demonwav.mcdev.i18n
+package com.demonwav.mcdev.i18n.lang
 
+import com.demonwav.mcdev.i18n.I18nConstants
+import com.demonwav.mcdev.i18n.index.TranslationIndex
 import com.demonwav.mcdev.i18n.intentions.RemoveDuplicatesIntention
 import com.demonwav.mcdev.i18n.intentions.RemoveUnmatchedEntryIntention
 import com.demonwav.mcdev.i18n.intentions.TrimKeyIntention
@@ -20,6 +22,8 @@ import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.util.indexing.FileBasedIndex
 
 class I18nAnnotator : Annotator {
     override fun annotate(psiElement: PsiElement, annotations: AnnotationHolder) {
@@ -50,7 +54,14 @@ class I18nAnnotator : Annotator {
     }
 
     private fun checkEntryMatchesDefault(entry: I18nEntry, annotations: AnnotationHolder) {
-        if (entry.project.findDefaultLangEntries(domain = entry.containingFile.virtualFile.mcDomain).any { it.key == entry.key }) {
+        val domain = entry.containingFile.virtualFile.mcDomain
+        val defaultEntries = FileBasedIndex.getInstance().getValues(
+            TranslationIndex.NAME,
+            I18nConstants.DEFAULT_LOCALE,
+            GlobalSearchScope.allScope(entry.project)
+        ).asSequence()
+            .filter { domain == null || it.sourceDomain == domain }
+        if (defaultEntries.any { it.contains(entry.key) }) {
             return
         }
         annotations.createWarningAnnotation(entry.textRange, "Translation key not included in default localization file.")
