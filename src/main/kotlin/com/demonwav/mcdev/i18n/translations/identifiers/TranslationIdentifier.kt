@@ -10,7 +10,10 @@
 
 package com.demonwav.mcdev.i18n.translations.identifiers
 
+import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.findDefaultLangEntries
+import com.demonwav.mcdev.i18n.index.TranslationIndex
+import com.demonwav.mcdev.i18n.index.merge
 import com.demonwav.mcdev.i18n.reference.I18nReference
 import com.demonwav.mcdev.i18n.translations.Translation
 import com.demonwav.mcdev.i18n.translations.Translation.Companion.FormattingError
@@ -21,6 +24,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiExpressionList
 import com.intellij.psi.PsiPolyadicExpression
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.util.indexing.FileBasedIndex
 import java.util.MissingFormatArgumentException
 
 abstract class TranslationIdentifier<T : PsiElement> {
@@ -49,8 +54,8 @@ abstract class TranslationIdentifier<T : PsiElement> {
                         val translationKey = result.second.trim()
                         val varKey = if (translationKey == value) I18nReference.VARIABLE_MARKER else translationKey
                         val fullKey = translationKey.replace(I18nReference.VARIABLE_MARKER, value)
-                        val entries = project.findDefaultLangEntries(key = fullKey)
-                        val translation = entries.firstOrNull()?.value
+                        val entries = FileBasedIndex.getInstance().getValues(TranslationIndex.NAME, I18nConstants.DEFAULT_LOCALE, GlobalSearchScope.allScope(project)).merge("")
+                        val translation = entries[fullKey]?.text
                         if (translation == null && function.setter) {
                             return null
                         }

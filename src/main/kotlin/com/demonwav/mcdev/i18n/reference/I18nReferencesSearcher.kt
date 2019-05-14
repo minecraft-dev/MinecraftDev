@@ -13,6 +13,7 @@ package com.demonwav.mcdev.i18n.reference
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.intellij.find.FindModel
 import com.intellij.find.impl.FindInProjectUtil
+import com.intellij.json.psi.JsonProperty
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.usages.FindUsagesProcessPresentation
@@ -23,7 +24,12 @@ import com.intellij.util.QueryExecutor
 class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.SearchParameters> {
     override fun execute(parameters: ReferencesSearch.SearchParameters, consumer: Processor<in PsiReference>): Boolean {
         val entry = parameters.elementToSearch
-        if (entry is I18nEntry) {
+        val key = when (entry) {
+            is I18nEntry -> entry.key
+            is JsonProperty -> "test1"
+            else -> null
+        }
+        if (key != null) {
             fun <A> power(start: List<A>): Set<List<A>> {
                 tailrec fun pwr(s: List<A>, acc: Set<List<A>>): Set<List<A>> =
                     if (s.isEmpty()) {
@@ -40,7 +46,7 @@ class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.Sear
             model.searchContext = FindModel.SearchContext.IN_STRING_LITERALS
             model.isRegularExpressions = true
             // Enables custom translations functions (for auto-prefixing calls, for instance)
-            model.stringToFind = power(entry.key.split('.'))
+            model.stringToFind = power(key.split('.'))
                 .map { it.joinToString(".") }
                 .filter { it.isNotEmpty() }
                 .joinToString("|") { "(${Regex.escape(it)})" }
@@ -51,7 +57,7 @@ class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.Sear
                     if (it.file != null && it.element != null && it.rangeInElement != null) {
                         val highlighted = it.file?.findElementAt(it.rangeInElement!!.startOffset)
                         val ref = highlighted?.parent?.references?.find { it is I18nReference } as I18nReference?
-                        if (ref?.key == entry.key) {
+                        if (ref?.key == key) {
                             consumer.process(ref)
                         }
                     }

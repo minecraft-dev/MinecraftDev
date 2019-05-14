@@ -113,11 +113,13 @@
         <lang.syntaxHighlighterFactory language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.colors.I18nSyntaxHighlighterFactory"/>
         <lang.psiStructureViewFactory language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.structure.I18nStructureViewFactory"/>
         <lang.findUsagesProvider language="I18n" implementationClass="com.demonwav.mcdev.i18n.reference.I18nFindUsagesProvider"/>
+        <lang.findUsagesProvider language="JSON" implementationClass="com.demonwav.mcdev.i18n.reference.I18nJsonFindUsagesProvider" order="first"/>
         <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.i18n.I18nFoldingBuilder"/>
         <lang.formatter language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.formatting.I18nFormattingModelBuilder"/>
         <lang.commenter language="I18n" implementationClass="com.demonwav.mcdev.i18n.I18nCommenter" />
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.i18n.reference.I18nJavaReferenceContributor"/>
-        <psi.referenceContributor language="I18n" implementation="com.demonwav.mcdev.i18n.reference.I18nReferenceContributor"/>
+        <psi.referenceContributor language="I18n" implementation="com.demonwav.mcdev.i18n.reference.I18nLangReferenceContributor"/>
+        <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.i18n.reference.I18nJsonReferenceContributor"/>
         <gotoSymbolContributor implementation="com.demonwav.mcdev.i18n.reference.I18nGotoSymbolContributor"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.i18n.lang.colors.I18nColorSettingsPage"/>
         <renameInputValidator implementation="com.demonwav.mcdev.i18n.lang.I18nRenameInputValidator"/>
@@ -136,6 +138,8 @@
         <completion.contributor language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nCompletionContributor" />
         <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.i18n.reference.I18nReferenceCompletionConfidence"
                                order="before javaSkipAutopopupInStrings"/>
+        <fileBasedIndex implementation="com.demonwav.mcdev.i18n.index.TranslationIndex"/>
+        <fileBasedIndex implementation="com.demonwav.mcdev.i18n.index.TranslationInverseIndex"/>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 

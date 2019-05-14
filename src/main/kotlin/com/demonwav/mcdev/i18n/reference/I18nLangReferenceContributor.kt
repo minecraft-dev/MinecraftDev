@@ -21,7 +21,7 @@ import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.PsiReferenceRegistrar
 import com.intellij.util.ProcessingContext
 
-class I18nReferenceContributor : PsiReferenceContributor() {
+class I18nLangReferenceContributor : PsiReferenceContributor() {
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         registrar.registerReferenceProvider(
             PlatformPatterns.psiElement().withChild(PlatformPatterns.psiElement().withElementType(I18nTypes.KEY)),

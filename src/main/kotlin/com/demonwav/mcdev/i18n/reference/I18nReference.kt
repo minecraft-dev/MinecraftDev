@@ -11,19 +11,26 @@
 package com.demonwav.mcdev.i18n.reference
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.findDefaultLangEntries
 import com.demonwav.mcdev.i18n.findLangEntries
+import com.demonwav.mcdev.i18n.index.TranslationIndex
+import com.demonwav.mcdev.i18n.index.TranslationInverseIndex
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.toArray
+import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.json.psi.JsonProperty
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.ResolveResult
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.IncorrectOperationException
+import com.intellij.util.indexing.FileBasedIndex
 
 class I18nReference(element: PsiElement,
                     textRange: TextRange,
@@ -32,7 +39,7 @@ class I18nReference(element: PsiElement,
                     private val varKey: String) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         val project = myElement.project
-        val entries = if (useDefault) project.findDefaultLangEntries(key = key) else project.findLangEntries(key = key)
+        val entries = TranslationInverseIndex.findElements(key, GlobalSearchScope.allScope(project), if (useDefault) I18nConstants.DEFAULT_LOCALE else null)// if (useDefault) project.findDefaultLangEntries(key = key) else project.findLangEntries(key = key)
         return entries.mapToArray(::PsiElementResolveResult)
     }
 
@@ -43,7 +50,7 @@ class I18nReference(element: PsiElement,
 
     override fun getVariants(): Array<Any?> {
         val project = myElement.project
-        val entries = project.findDefaultLangEntries()
+        val entries = FileBasedIndex.getInstance().getValues(TranslationIndex.NAME, I18nConstants.DEFAULT_LOCALE, GlobalSearchScope.allScope(project))
         val stringPattern =
             if (varKey.contains(VARIABLE_MARKER)) {
                 varKey.split(VARIABLE_MARKER).joinToString("(.*?)") { Regex.escape(it) }
@@ -52,16 +59,18 @@ class I18nReference(element: PsiElement,
             }
         val pattern = Regex(stringPattern)
         return entries
+            .asSequence()
+            .flatMap { it.translations.asSequence() }
             .filter { it.key.isNotEmpty() }
             .mapNotNull { entry -> pattern.matchEntire(entry.key)?.let { entry to it } }
             .map { (entry, match) ->
                 LookupElementBuilder
                     .create(if (match.groups.size <= 1) entry.key else match.groupValues[1])
                     .withIcon(PlatformAssets.MINECRAFT_ICON)
-                    .withTypeText(entry.containingFile.name)
+//                    .withTypeText(entry.containingFile.name)
                     .withPresentableText(entry.key)
             }
-            .toArray()
+            .toTypedArray()
     }
 
     @Throws(IncorrectOperationException::class)
@@ -78,7 +87,7 @@ class I18nReference(element: PsiElement,
     }
 
     override fun isReferenceTo(element: PsiElement): Boolean {
-        return element is I18nEntry && element.key == key
+        return (element is I18nEntry && element.key == key) || (element is JsonProperty && element.name == key)
     }
 
     companion object {
