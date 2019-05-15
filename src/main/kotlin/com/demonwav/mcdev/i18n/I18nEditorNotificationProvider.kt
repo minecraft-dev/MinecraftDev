@@ -17,6 +17,7 @@ import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
 import com.demonwav.mcdev.i18n.sorting.I18nSorter
 import com.demonwav.mcdev.i18n.sorting.Ordering
+import com.demonwav.mcdev.i18n.translations.TranslationStorage
 import com.demonwav.mcdev.util.applyWriteAction
 import com.demonwav.mcdev.util.mcDomain
 import com.intellij.openapi.editor.colors.EditorColors
@@ -42,27 +43,18 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
     override fun getKey() = KEY
 
     override fun createNotificationPanel(file: VirtualFile, fileEditor: FileEditor): InfoPanel? {
-        if (!show || file.fileType != I18nFileType || file.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE) {
+        if (!show || file.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE) {
             return null
         }
 
-        if (!getMissingEntries(file).isEmpty()) {
+        val missingEntries = getMissingEntries(file)
+        if (missingEntries.any()) {
             val panel = InfoPanel()
-            panel.setText("Translation file doesn't match default one (${I18nConstants.DEFAULT_LOCALE_FILE}).")
+            panel.setText("Translation file doesn't match default one (${I18nConstants.DEFAULT_LOCALE} locale).")
             panel.createActionLabel("Add missing default entries (won't reflect changes in original English localization)") {
                 val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
-                val missingEntries = getMissingEntries(file)
                 psi.applyWriteAction {
-                    if (lastChild != null) {
-                        if (lastChild?.node?.elementType != I18nTypes.LINE_ENDING) {
-                            add(I18nElementFactory.createLineEnding(project))
-                        }
-                        add(I18nElementFactory.createLineEnding(project))
-                    }
-                    val newElements = I18nElementFactory.assembleTranslations(project, missingEntries.values)
-                    for (element in newElements) {
-                        add(element)
-                    }
+                    TranslationStorage.addAll(psi, missingEntries.asIterable())
                     EditorNotifications.updateAll()
                 }
                 val sort = Messages.showYesNoDialog(
@@ -84,8 +76,9 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
         return null
     }
 
-    private fun getMissingEntries(file: VirtualFile): Map<String, TranslationEntry> {
+    private fun getMissingEntries(file: VirtualFile): Sequence<TranslationEntry> {
         val domain = file.mcDomain
+
         val defaultEntries = FileBasedIndex.getInstance().getValues(
             TranslationIndex.NAME,
             I18nConstants.DEFAULT_LOCALE,
@@ -93,12 +86,18 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
         ).asSequence()
             .filter { domain == null || it.sourceDomain == domain }
             .flatMap { it.translations.asSequence() }
-        val entries = PsiTreeUtil.getChildrenOfType(PsiManager.getInstance(project).findFile(file), I18nEntry::class.java)?.asSequence()
-            ?: emptySequence()
-        val keys = entries.map { it.key }
-        val missingEntries = defaultEntries.associate { it.key to it }.toMutableMap()
-        missingEntries.keys.removeAll(keys)
-        return missingEntries
+
+        val entries = FileBasedIndex.getInstance().getValues(
+            TranslationIndex.NAME,
+            file.nameWithoutExtension.toLowerCase(Locale.ROOT),
+            GlobalSearchScope.fileScope(project, file)
+        ).asSequence()
+            .filter { domain == null || it.sourceDomain == domain }
+            .flatMap { it.translations.asSequence() }
+
+        val keys = entries.map { it.key }.toSet()
+
+        return defaultEntries.filter { it.key !in keys }
     }
 
     class InfoPanel : EditorNotificationPanel() {

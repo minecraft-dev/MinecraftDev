@@ -10,8 +10,7 @@
 
 package com.demonwav.mcdev.i18n.inspections
 
-import com.demonwav.mcdev.i18n.I18nElementFactory
-import com.demonwav.mcdev.i18n.reference.I18nReference
+import com.demonwav.mcdev.i18n.translations.TranslationStorage
 import com.demonwav.mcdev.i18n.translations.identifiers.LiteralTranslationIdentifier
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
@@ -61,7 +60,7 @@ class NoTranslationInspection : TranslationInspection() {
                     Messages.getQuestionIcon()
                 )
                 if (result != null) {
-                    I18nElementFactory.addTranslation(
+                    TranslationStorage.persist(
                         ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(literal.containingFile.virtualFile),
                         key,
                         result

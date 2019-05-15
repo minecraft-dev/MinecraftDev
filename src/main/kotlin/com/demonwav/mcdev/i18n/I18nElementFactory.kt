@@ -30,42 +30,6 @@ import com.intellij.psi.search.GlobalSearchScope
 import java.util.Locale
 
 object I18nElementFactory {
-    fun addTranslation(module: Module?, name: String, value: String?) {
-        if (module == null || value == null) {
-            return
-        }
-        fun write(files: Iterable<VirtualFile>) {
-            for (file in files) {
-                val simpleFile = PsiManager.getInstance(module.project).findFile(file)
-                if (simpleFile is I18nFile) {
-                    simpleFile.applyWriteAction {
-                        add(createLineEnding(project))
-                        add(createEntry(project, name, value))
-                    }
-                }
-            }
-        }
-
-        val files = FileTypeIndex.getFiles(I18nFileType, GlobalSearchScope.moduleScope(module))
-        if (files.count { it.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE } > 1) {
-            val choices = files.mapNotNull { it.mcDomain }.distinct().sorted()
-            DataManager.getInstance().dataContextFromFocusAsync.onSuccess {
-                JBPopupFactory.getInstance()
-                    .createPopupChooserBuilder(choices)
-                    .setTitle("Choose resource domain")
-                    .setAdText("There are multiple resource domains with localization files, choose one for this translation.")
-                    .setItemChosenCallback {
-                        val validPattern = Regex("^.*?/assets/${Regex.escape(it)}/lang.*?\$")
-                        write(files.filter { validPattern.matches(it.path) })
-                    }
-                    .createPopup()
-                    .showInBestPositionFor(it)
-            }
-        } else {
-            write(files)
-        }
-    }
-
     fun assembleElements(project: Project, elements: Collection<I18nEntry>, keepComments: Int): List<PsiElement> {
         val result = mutableListOf<PsiElement>()
         val withComments = elements.associate { it to gatherComments(it, keepComments) }
@@ -75,15 +39,6 @@ object I18nElementFactory {
                 result.add(createLineEnding(project))
             }
             result.add(createEntry(project, entry.key, entry.value))
-            result.add(createLineEnding(project))
-        }
-        return result
-    }
-
-    fun assembleTranslations(project: Project, entries: Collection<TranslationEntry>): List<PsiElement> {
-        val result = mutableListOf<PsiElement>()
-        for (entry in entries) {
-            result.add(createEntry(project, entry.key, entry.text))
             result.add(createLineEnding(project))
         }
         return result
