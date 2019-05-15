@@ -10,9 +10,11 @@
 
 package com.demonwav.mcdev.i18n.reference
 
+import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.lang.I18nLexerAdapter
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.util.mcPath
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner
 import com.intellij.lang.cacheBuilder.WordsScanner
 import com.intellij.lang.findUsages.FindUsagesProvider
@@ -29,6 +31,7 @@ class I18nFindUsagesProvider : FindUsagesProvider {
     )
 
     override fun canFindUsagesFor(psiElement: PsiElement) = psiElement is PsiNamedElement
+        && psiElement.containingFile.virtualFile.nameWithoutExtension == I18nConstants.DEFAULT_LOCALE
 
     override fun getHelpId(psiElement: PsiElement): String? = null
 

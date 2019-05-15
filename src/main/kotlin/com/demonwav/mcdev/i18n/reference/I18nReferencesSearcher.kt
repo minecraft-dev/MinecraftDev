@@ -14,6 +14,7 @@ import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.intellij.find.FindModel
 import com.intellij.find.impl.FindInProjectUtil
 import com.intellij.json.psi.JsonProperty
+import com.intellij.openapi.application.runReadAction
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.usages.FindUsagesProcessPresentation
@@ -24,11 +25,15 @@ import com.intellij.util.QueryExecutor
 class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.SearchParameters> {
     override fun execute(parameters: ReferencesSearch.SearchParameters, consumer: Processor<in PsiReference>): Boolean {
         val entry = parameters.elementToSearch
-        val key = when (entry) {
-            is I18nEntry -> entry.key
-            is JsonProperty -> "test1"
-            else -> null
+
+        val key = runReadAction {
+            when (entry) {
+                is I18nEntry -> entry.key
+                is JsonProperty -> entry.name
+                else -> null
+            }
         }
+
         if (key != null) {
             fun <A> power(start: List<A>): Set<List<A>> {
                 tailrec fun pwr(s: List<A>, acc: Set<List<A>>): Set<List<A>> =
@@ -57,7 +62,7 @@ class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.Sear
                     if (it.file != null && it.element != null && it.rangeInElement != null) {
                         val highlighted = it.file?.findElementAt(it.rangeInElement!!.startOffset)
                         val ref = highlighted?.parent?.references?.find { it is I18nReference } as I18nReference?
-                        if (ref?.key == key) {
+                        if (ref?.key?.full == key) {
                             consumer.process(ref)
                         }
                     }

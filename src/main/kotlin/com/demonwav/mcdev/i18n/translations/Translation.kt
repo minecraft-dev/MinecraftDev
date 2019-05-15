@@ -28,15 +28,17 @@ import com.intellij.psi.PsiReferenceRegistrar
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 
-data class Translation(val foldingElement: PsiElement?,
-                       val referenceElement: PsiElement?,
-                       val key: String,
-                       val varKey: String,
-                       val text: String?,
-                       val formattingError: FormattingError? = null,
-                       val superfluousVarargStart: Int = -1,
-                       val containsVariable: Boolean = false) {
-    val regexPattern = Regex(varKey.split(I18nReference.VARIABLE_MARKER).joinToString("(.*?)") { Regex.escape(it) })
+data class Translation(
+    val foldingElement: PsiElement?,
+    val referenceElement: PsiElement?,
+    val key: Key,
+    val text: String?,
+    val formattingError: FormattingError? = null,
+    val superfluousVarargStart: Int = -1
+) {
+    data class Key(val prefix: String, val infix: String, val suffix: String) {
+        val full = (prefix + infix + suffix).trim()
+    }
 
     companion object {
         enum class FormattingError {
@@ -142,7 +144,7 @@ data class Translation(val foldingElement: PsiElement?,
                             if (result != null) {
                                 val referenceElement = result.referenceElement ?: return emptyArray()
                                 return arrayOf(
-                                    I18nReference(referenceElement, TextRange(1, referenceElement.textLength - 1), false, result.key, result.varKey)
+                                    I18nReference(referenceElement, TextRange(1, referenceElement.textLength - 1), result.key)
                                 )
                             }
                             return emptyArray()

@@ -35,7 +35,7 @@ class NoTranslationInspection : TranslationInspection() {
     private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
         override fun visitLiteralExpression(expression: PsiLiteralExpression) {
             val result = LiteralTranslationIdentifier().identify(expression)
-            if (result != null && !result.containsVariable && result.text == null) {
+            if (result != null && result.text == null) {
                 holder.registerProblem(
                     expression,
                     "The given translation key does not exist",
@@ -54,10 +54,12 @@ class NoTranslationInspection : TranslationInspection() {
                 val literal = descriptor.psiElement as PsiLiteralExpression
                 val translation = LiteralTranslationIdentifier().identify(literal)
                 val literalValue = literal.value as String
-                val key = translation?.varKey?.replace(I18nReference.VARIABLE_MARKER, literalValue) ?: literalValue
-                val result = Messages.showInputDialog("Enter default value for \"$key\":",
+                val key = translation?.key?.copy(infix = literalValue)?.full ?: literalValue
+                val result = Messages.showInputDialog(
+                    "Enter default value for \"$key\":",
                     "Create Translation",
-                    Messages.getQuestionIcon())
+                    Messages.getQuestionIcon()
+                )
                 if (result != null) {
                     I18nElementFactory.addTranslation(
                         ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(literal.containingFile.virtualFile),

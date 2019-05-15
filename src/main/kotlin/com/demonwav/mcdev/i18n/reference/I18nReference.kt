@@ -15,6 +15,7 @@ import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.index.TranslationIndex
 import com.demonwav.mcdev.i18n.index.TranslationInverseIndex
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
+import com.demonwav.mcdev.i18n.translations.Translation
 import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -33,22 +34,15 @@ import com.intellij.util.indexing.FileBasedIndex
 class I18nReference(
     element: PsiElement,
     textRange: TextRange,
-    private val useDefault: Boolean,
-    val key: String,
-    private val varKey: String,
+    val key: Translation.Key,
     private val renameHandler: (element: PsiElement, range: TextRange, newName: String) -> PsiElement = {
         elem, range, newName -> ElementManipulators.getManipulator(elem).handleContentChange(elem, range, newName)!!
     }
-) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
+) : PsiReferenceBase.Poly<PsiElement>(element, textRange, false), PsiPolyVariantReference {
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         val project = myElement.project
-        val entries = TranslationInverseIndex.findElements(key, GlobalSearchScope.allScope(project), if (useDefault) I18nConstants.DEFAULT_LOCALE else null)
+        val entries = TranslationInverseIndex.findElements(key.full, GlobalSearchScope.allScope(project), I18nConstants.DEFAULT_LOCALE)
         return entries.mapToArray(::PsiElementResolveResult)
-    }
-
-    override fun resolve(): PsiElement? {
-        val resolveResults = multiResolve(false)
-        return resolveResults.singleOrNull()?.element
     }
 
     override fun getVariants(): Array<Any?> {
@@ -58,13 +52,7 @@ class I18nReference(
             I18nConstants.DEFAULT_LOCALE,
             GlobalSearchScope.allScope(project)
         )
-        val stringPattern =
-            if (varKey.contains(VARIABLE_MARKER)) {
-                varKey.split(VARIABLE_MARKER).joinToString("(.*?)") { Regex.escape(it) }
-            } else {
-                "(" + Regex.escape(varKey) + ".*?)"
-            }
-        val pattern = Regex(stringPattern)
+        val pattern = Regex("${Regex.escape(key.prefix)}(.*?)${Regex.escape(key.suffix)}")
         return entries
             .asSequence()
             .flatMap { it.translations.asSequence() }
@@ -82,20 +70,15 @@ class I18nReference(
 
     @Throws(IncorrectOperationException::class)
     override fun handleElementRename(newElementName: String): PsiElement {
-        val stringPattern =
-            if (varKey.contains(VARIABLE_MARKER)) {
-                varKey.split(VARIABLE_MARKER).joinToString("(.*?)") { Regex.escape(it) }
-            } else {
-                "(" + Regex.escape(varKey) + ")"
-            }
-        val pattern = Regex(stringPattern)
-        val match = pattern.matchEntire(newElementName)
-        val newName = if (match != null && match.groups.size > 1) match.groupValues[1] else newElementName
-        return renameHandler(myElement, rangeInElement, newName)
+        return renameHandler(myElement, rangeInElement, newElementName)
     }
 
     override fun isReferenceTo(element: PsiElement): Boolean {
-        return (element is I18nEntry && element.key == key) || (element is JsonProperty && element.name == key)
+        if (element.containingFile.virtualFile.nameWithoutExtension != I18nConstants.DEFAULT_LOCALE) {
+            return false
+        }
+
+        return (element is I18nEntry && element.key == key.full) || (element is JsonProperty && element.name == key.full)
     }
 
     companion object {

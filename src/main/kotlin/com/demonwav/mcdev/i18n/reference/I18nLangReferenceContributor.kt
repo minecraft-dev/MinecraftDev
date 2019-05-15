@@ -12,6 +12,7 @@ package com.demonwav.mcdev.i18n.reference
 
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.i18n.translations.Translation
 import com.intellij.openapi.util.TextRange
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.ElementManipulators
@@ -33,9 +34,7 @@ class I18nLangReferenceContributor : PsiReferenceContributor() {
                         I18nReference(
                             element,
                             TextRange(0, entry.key.length),
-                            true,
-                            entry.key,
-                            entry.key
+                            Translation.Key("", entry.key, "")
                         )
                     )
                 }

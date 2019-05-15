@@ -22,6 +22,7 @@ import com.demonwav.mcdev.util.isSameReference
 import com.demonwav.mcdev.util.referencedMethod
 import com.intellij.psi.PsiCall
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 
 class TranslationFunction(
@@ -48,13 +49,13 @@ class TranslationFunction(
         return method.isSameReference(referenceMethod) && paramIndex == matchedIndex
     }
 
-    fun getTranslationKey(call: PsiCall): String? {
+    fun getTranslationKey(call: PsiCall): Translation.Key? {
         if (!matches(call, matchedIndex)) {
             return null
         }
         val param = call.argumentList?.expressions?.get(matchedIndex) ?: return null
-        val value = param.evaluate(null, I18nReference.VARIABLE_MARKER) ?: return null
-        return prefix + value + suffix
+        val value = ((param as? PsiLiteral)?.value as? String) ?: return null
+        return Translation.Key(prefix, value, suffix)
     }
 
     fun format(translation: String, call: PsiCall): Pair<String, Int>? {
