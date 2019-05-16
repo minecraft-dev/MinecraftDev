@@ -27,6 +27,8 @@ import com.intellij.codeInsight.completion.CompletionUtil
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.json.JsonLanguage
+import com.intellij.json.psi.JsonProperty
+import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiUtilCore
@@ -38,7 +40,7 @@ sealed class TranslationCompletionContributor : CompletionContributor() {
         }
 
         val defaultEntries = TranslationIndex.getAllDefaultTranslations(element.project, domain)
-        val existingKeys = TranslationIndex.getTranslations(element.containingFile).map { it.key }.toSet()
+        val existingKeys = TranslationIndex.getTranslations(element.containingFile ?: return).map { it.key }.toSet()
         val prefixResult = result.withPrefixMatcher(text)
 
         var counter = 0
@@ -79,7 +81,7 @@ class JsonCompletionContributor : TranslationCompletionContributor() {
             return
         }
 
-        if (KEY_PATTERN.accepts(position) || DUMMY_PATTERN.accepts(position)) {
+        if (KEY_PATTERN.accepts(position)) {
             val text = position.text.let { it.substring(0, it.length - CompletionUtil.DUMMY_IDENTIFIER.length) }
             val domain = file.mcDomain
             handleKey(text, position, domain, result)
@@ -87,8 +89,7 @@ class JsonCompletionContributor : TranslationCompletionContributor() {
     }
 
     companion object {
-        val KEY_PATTERN = PlatformPatterns.psiElement().withElementType(PlatformPatterns.elementType().oneOf(LangTypes.KEY))
-        val DUMMY_PATTERN = PlatformPatterns.psiElement().withElementType(PlatformPatterns.elementType().oneOf(LangTypes.DUMMY))
+        val KEY_PATTERN = PlatformPatterns.psiElement(JsonStringLiteral::class.java).withParent(PlatformPatterns.psiElement(JsonProperty::class.java))
     }
 }
 
