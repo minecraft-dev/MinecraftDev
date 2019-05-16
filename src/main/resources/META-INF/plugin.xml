@@ -84,7 +84,7 @@
                              id="Settings.Minecraft.I18nTemplate"
                              groupId="language"
                              parentId="Settings.Minecraft"
-                             instance="com.demonwav.mcdev.i18n.sorting.I18nTemplateConfigurable"/>
+                             instance="com.demonwav.mcdev.i18n.sorting.TranslationTemplateConfigurable"/>
 
         <!-- NBT -->
         <fileTypeFactory implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeFactory"/>
@@ -108,25 +108,25 @@
         <codeInsight.parameterNameHints language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttParameterNameHints" />
 
         <!-- Minecraft localization files -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.i18n.lang.I18nFileTypeFactory"/>
-        <lang.parserDefinition language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nParserDefinition"/>
-        <lang.syntaxHighlighterFactory language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.colors.I18nSyntaxHighlighterFactory"/>
-        <lang.psiStructureViewFactory language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.structure.I18nStructureViewFactory"/>
-        <lang.findUsagesProvider language="I18n" implementationClass="com.demonwav.mcdev.i18n.reference.I18nFindUsagesProvider"/>
+        <fileTypeFactory implementation="com.demonwav.mcdev.i18n.lang.LangFileTypeFactory"/>
+        <lang.parserDefinition language="MCLang" implementationClass="com.demonwav.mcdev.i18n.lang.LangParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="MCLang" implementationClass="com.demonwav.mcdev.i18n.lang.colors.LangSyntaxHighlighterFactory"/>
+        <lang.psiStructureViewFactory language="MCLang" implementationClass="com.demonwav.mcdev.i18n.lang.structure.LangStructureViewFactory"/>
+        <lang.findUsagesProvider language="MCLang" implementationClass="com.demonwav.mcdev.i18n.reference.I18nFindUsagesProvider"/>
         <lang.findUsagesProvider language="JSON" implementationClass="com.demonwav.mcdev.i18n.reference.I18nJsonFindUsagesProvider" order="first"/>
         <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.i18n.I18nFoldingBuilder"/>
-        <lang.formatter language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.formatting.I18nFormattingModelBuilder"/>
-        <lang.commenter language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nCommenter" />
+        <lang.formatter language="MCLang" implementationClass="com.demonwav.mcdev.i18n.lang.formatting.LangFormattingModelBuilder"/>
+        <lang.commenter language="MCLang" implementationClass="com.demonwav.mcdev.i18n.lang.LangCommenter" />
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.i18n.reference.I18nJavaReferenceContributor"/>
-        <psi.referenceContributor language="I18n" implementation="com.demonwav.mcdev.i18n.reference.I18nLangReferenceContributor"/>
+        <psi.referenceContributor language="MCLang" implementation="com.demonwav.mcdev.i18n.reference.I18nLangReferenceContributor"/>
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.i18n.reference.I18nJsonReferenceContributor"/>
         <gotoSymbolContributor implementation="com.demonwav.mcdev.i18n.reference.I18nGotoSymbolContributor"/>
-        <colorSettingsPage implementation="com.demonwav.mcdev.i18n.lang.colors.I18nColorSettingsPage"/>
-        <renameInputValidator implementation="com.demonwav.mcdev.i18n.lang.I18nRenameInputValidator"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.i18n.lang.colors.LangColorSettingsPage"/>
+        <renameInputValidator implementation="com.demonwav.mcdev.i18n.lang.LangRenameInputValidator"/>
         <editorNotificationProvider implementation="com.demonwav.mcdev.i18n.I18nEditorNotificationProvider"/>
         <elementDescriptionProvider implementation="com.demonwav.mcdev.i18n.reference.I18nDescriptionProvider"/>
         <referencesSearch implementation="com.demonwav.mcdev.i18n.reference.I18nReferencesSearcher"/>
-        <annotator language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nAnnotator"/>
+        <annotator language="MCLang" implementationClass="com.demonwav.mcdev.i18n.lang.LangAnnotator"/>
         <intentionAction>
             <className>com.demonwav.mcdev.i18n.intentions.ConvertToTranslationIntention</className>
             <category>Minecraft</category>
@@ -134,8 +134,9 @@
         </intentionAction>
         <codeFoldingOptionsProvider instance="com.demonwav.mcdev.i18n.I18nCodeFoldingOptionsProvider"/>
         <applicationService serviceImplementation="com.demonwav.mcdev.i18n.I18nFoldingSettings"/>
-        <typedHandler implementation="com.demonwav.mcdev.i18n.lang.I18nTypedHandlerDelegate" />
-        <completion.contributor language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nCompletionContributor" />
+        <typedHandler implementation="com.demonwav.mcdev.i18n.lang.LangTypedHandlerDelegate" />
+        <completion.contributor language="MCLang" implementationClass="com.demonwav.mcdev.i18n.reference.LangCompletionContributor" />
+        <completion.contributor language="JSON" implementationClass="com.demonwav.mcdev.i18n.reference.JsonCompletionContributor" />
         <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.i18n.reference.I18nReferenceCompletionConfidence"
                                order="before javaSkipAutopopupInStrings"/>
         <fileBasedIndex implementation="com.demonwav.mcdev.i18n.index.TranslationIndex"/>

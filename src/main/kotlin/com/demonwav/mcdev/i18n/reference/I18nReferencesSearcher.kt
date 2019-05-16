@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.i18n.reference
 
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
+import com.demonwav.mcdev.i18n.lang.gen.psi.LangEntry
 import com.intellij.find.FindModel
 import com.intellij.find.impl.FindInProjectUtil
 import com.intellij.json.psi.JsonProperty
@@ -28,7 +28,7 @@ class I18nReferencesSearcher : QueryExecutor<PsiReference, ReferencesSearch.Sear
 
         val key = runReadAction {
             when (entry) {
-                is I18nEntry -> entry.key
+                is LangEntry -> entry.key
                 is JsonProperty -> entry.name
                 else -> null
             }

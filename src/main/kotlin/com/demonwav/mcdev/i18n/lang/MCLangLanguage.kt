@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.i18n.lang
 
-import com.demonwav.mcdev.i18n.lang.gen.I18nLexer
-import com.intellij.lexer.FlexAdapter
+import com.intellij.lang.Language
 
-class I18nLexerAdapter : FlexAdapter(I18nLexer())
+object MCLangLanguage : Language("MCLang")

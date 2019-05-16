@@ -11,9 +11,9 @@
 package com.demonwav.mcdev.i18n.reference
 
 import com.demonwav.mcdev.i18n.I18nConstants
-import com.demonwav.mcdev.i18n.lang.I18nLexerAdapter
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.i18n.lang.LangLexerAdapter
+import com.demonwav.mcdev.i18n.lang.gen.psi.LangEntry
+import com.demonwav.mcdev.i18n.lang.gen.psi.LangTypes
 import com.demonwav.mcdev.i18n.translations.TranslationFiles
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner
 import com.intellij.lang.cacheBuilder.WordsScanner
@@ -24,9 +24,9 @@ import com.intellij.psi.tree.TokenSet
 
 class I18nFindUsagesProvider : FindUsagesProvider {
     override fun getWordsScanner(): WordsScanner? = DefaultWordsScanner(
-        I18nLexerAdapter(),
-        TokenSet.create(I18nTypes.KEY),
-        TokenSet.create(I18nTypes.COMMENT),
+        LangLexerAdapter(),
+        TokenSet.create(LangTypes.KEY),
+        TokenSet.create(LangTypes.COMMENT),
         TokenSet.EMPTY
     )
 
@@ -35,9 +35,9 @@ class I18nFindUsagesProvider : FindUsagesProvider {
 
     override fun getHelpId(psiElement: PsiElement): String? = null
 
-    override fun getType(element: PsiElement) = if (element is I18nEntry) "translation" else ""
+    override fun getType(element: PsiElement) = if (element is LangEntry) "translation" else ""
 
-    override fun getDescriptiveName(element: PsiElement) = if (element is I18nEntry) element.key else ""
+    override fun getDescriptiveName(element: PsiElement) = if (element is LangEntry) element.key else ""
 
-    override fun getNodeText(element: PsiElement, useFullName: Boolean) = if (element is I18nEntry) "${element.key}=${element.value}" else ""
+    override fun getNodeText(element: PsiElement, useFullName: Boolean) = if (element is LangEntry) "${element.key}=${element.value}" else ""
 }

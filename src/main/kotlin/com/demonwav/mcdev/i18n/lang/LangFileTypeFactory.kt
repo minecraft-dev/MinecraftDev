@@ -13,8 +13,8 @@ package com.demonwav.mcdev.i18n.lang
 import com.intellij.openapi.fileTypes.FileTypeConsumer
 import com.intellij.openapi.fileTypes.FileTypeFactory
 
-class I18nFileTypeFactory : FileTypeFactory() {
+class LangFileTypeFactory : FileTypeFactory() {
     override fun createFileTypes(consumer: FileTypeConsumer) {
-        consumer.consume(I18nFileType)
+        consumer.consume(LangFileType)
     }
 }

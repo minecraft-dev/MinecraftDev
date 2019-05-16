@@ -19,7 +19,7 @@ import org.intellij.lang.annotations.Language
 import java.nio.file.Files
 import java.nio.file.Path
 
-class I18nCommenterTest : BaseMinecraftTest(PlatformType.MCP) {
+class LangCommenterTest : BaseMinecraftTest(PlatformType.MCP) {
 
     private val fileName: String
         get() = getTestName(true)

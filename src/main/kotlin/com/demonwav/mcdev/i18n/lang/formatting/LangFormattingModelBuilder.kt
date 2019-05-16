@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.i18n.lang.formatting
 
-import com.demonwav.mcdev.i18n.lang.I18nLanguage
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.i18n.lang.MCLangLanguage
+import com.demonwav.mcdev.i18n.lang.gen.psi.LangTypes
 import com.intellij.formatting.Alignment
 import com.intellij.formatting.FormattingModel
 import com.intellij.formatting.FormattingModelBuilder
@@ -25,10 +25,10 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettings
 
-class I18nFormattingModelBuilder : FormattingModelBuilder {
+class LangFormattingModelBuilder : FormattingModelBuilder {
     override fun createModel(element: PsiElement, settings: CodeStyleSettings): FormattingModel {
         return FormattingModelProvider.createFormattingModelForPsiFile(element.containingFile,
-            I18nBlock(element.node,
+            LangBlock(element.node,
                 Wrap.createWrap(WrapType.NONE, false),
                 Alignment.createAlignment(),
                 createSpaceBuilder(settings)),
@@ -36,10 +36,10 @@ class I18nFormattingModelBuilder : FormattingModelBuilder {
     }
 
     private fun createSpaceBuilder(settings: CodeStyleSettings): SpacingBuilder {
-        return SpacingBuilder(settings, I18nLanguage)
-            .around(I18nTypes.EQUALS).none()
-            .around(I18nTypes.ENTRY).none()
-            .around(I18nTypes.LINE_ENDING).none()
+        return SpacingBuilder(settings, MCLangLanguage)
+            .around(LangTypes.EQUALS).none()
+            .around(LangTypes.ENTRY).none()
+            .around(LangTypes.LINE_ENDING).none()
     }
 
     override fun getRangeAffectingIndent(file: PsiFile, offset: Int, elementAtOffset: ASTNode): TextRange? {

@@ -12,7 +12,7 @@ package com.demonwav.mcdev.i18n.lang.psi.mixins
 
 import com.intellij.psi.PsiNameIdentifierOwner
 
-interface I18nEntryMixin : PsiNameIdentifierOwner {
+interface LangEntryMixin : PsiNameIdentifierOwner {
     val key: String
 
     val trimmedKey: String

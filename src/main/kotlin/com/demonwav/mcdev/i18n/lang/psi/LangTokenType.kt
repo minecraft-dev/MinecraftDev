@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.i18n.lang.psi
 
-import com.demonwav.mcdev.i18n.lang.I18nLanguage
+import com.demonwav.mcdev.i18n.lang.MCLangLanguage
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.annotations.NonNls
 
-class I18nTokenType(@NonNls debugName: String) : IElementType(debugName, I18nLanguage)
+class LangTokenType(@NonNls debugName: String) : IElementType(debugName, MCLangLanguage)

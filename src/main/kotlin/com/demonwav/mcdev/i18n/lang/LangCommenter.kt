@@ -12,7 +12,7 @@ package com.demonwav.mcdev.i18n.lang
 
 import com.intellij.lang.Commenter
 
-class I18nCommenter : Commenter {
+class LangCommenter : Commenter {
     override fun getLineCommentPrefix(): String? = "#"
     override fun getBlockCommentPrefix(): String? = null
     override fun getBlockCommentSuffix(): String? = null

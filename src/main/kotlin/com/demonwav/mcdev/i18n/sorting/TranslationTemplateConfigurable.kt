@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.i18n.sorting
 
-import com.demonwav.mcdev.i18n.lang.colors.I18nSyntaxHighlighter
+import com.demonwav.mcdev.i18n.lang.colors.LangSyntaxHighlighter
 import com.intellij.codeInsight.template.impl.TemplateEditorUtil
 import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -29,7 +29,7 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 
 
-class I18nTemplateConfigurable : Configurable {
+class TranslationTemplateConfigurable : Configurable {
     private lateinit var panel: JPanel
     private lateinit var cmbScheme: JComboBox<String>
     private lateinit var editorPanel: JPanel
@@ -69,7 +69,7 @@ class I18nTemplateConfigurable : Configurable {
     private fun setupEditor(project: Project?) {
         templateEditor = TemplateEditorUtil.createEditor(false, getActiveTemplateText(project))
         val editorColorsScheme = EditorColorsManager.getInstance().globalScheme
-        val highlighter = LexerEditorHighlighter(I18nSyntaxHighlighter(I18nTemplateLexerAdapter()), editorColorsScheme)
+        val highlighter = LexerEditorHighlighter(LangSyntaxHighlighter(TranslationTemplateLexerAdapter()), editorColorsScheme)
         (templateEditor as EditorEx).highlighter = highlighter
         templateEditor.settings.isLineNumbersShown = true
 

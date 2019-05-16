@@ -8,9 +8,9 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.i18n.sorting
+package com.demonwav.mcdev.i18n.lang
 
-import com.demonwav.mcdev.i18n.lang.gen.I18nTemplateLexer
+import com.demonwav.mcdev.i18n.lang.gen.LangLexer
 import com.intellij.lexer.FlexAdapter
 
-class I18nTemplateLexerAdapter : FlexAdapter(I18nTemplateLexer())
+class LangLexerAdapter : FlexAdapter(LangLexer())

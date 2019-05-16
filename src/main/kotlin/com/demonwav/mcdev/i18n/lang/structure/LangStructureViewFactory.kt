@@ -16,10 +16,10 @@ import com.intellij.lang.PsiStructureViewFactory
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiFile
 
-class I18nStructureViewFactory : PsiStructureViewFactory {
+class LangStructureViewFactory : PsiStructureViewFactory {
     override fun getStructureViewBuilder(psiFile: PsiFile): StructureViewBuilder? {
         return object : TreeBasedStructureViewBuilder() {
-            override fun createStructureViewModel(editor: Editor?) = I18nStructureViewModel(psiFile)
+            override fun createStructureViewModel(editor: Editor?) = LangStructureViewModel(psiFile)
         }
     }
 }

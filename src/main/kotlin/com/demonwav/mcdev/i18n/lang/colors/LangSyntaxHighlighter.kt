@@ -10,22 +10,22 @@
 
 package com.demonwav.mcdev.i18n.lang.colors
 
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.i18n.lang.gen.psi.LangTypes
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 
-class I18nSyntaxHighlighter(private val lexer: Lexer) : SyntaxHighlighterBase() {
+class LangSyntaxHighlighter(private val lexer: Lexer) : SyntaxHighlighterBase() {
     override fun getHighlightingLexer() = lexer
 
     override fun getTokenHighlights(tokenType: IElementType?) =
         when (tokenType) {
-            I18nTypes.KEY, I18nTypes.DUMMY -> KEY_KEYS
-            I18nTypes.EQUALS -> EQUALS_KEYS
-            I18nTypes.VALUE -> VALUE_KEYS
-            I18nTypes.COMMENT -> COMMENT_KEYS
+            LangTypes.KEY, LangTypes.DUMMY -> KEY_KEYS
+            LangTypes.EQUALS -> EQUALS_KEYS
+            LangTypes.VALUE -> VALUE_KEYS
+            LangTypes.COMMENT -> COMMENT_KEYS
             else -> EMPTY_KEYS
         }
 

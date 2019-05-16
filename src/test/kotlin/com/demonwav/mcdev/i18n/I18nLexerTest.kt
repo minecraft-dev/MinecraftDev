@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.i18n
 
 import com.demonwav.mcdev.framework.toSnakeCase
-import com.demonwav.mcdev.i18n.lang.I18nLexerAdapter
+import com.demonwav.mcdev.i18n.lang.LangLexerAdapter
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.testFramework.LexerTestCase
@@ -22,7 +22,7 @@ import java.io.IOException
 class I18nLexerTest : LexerTestCase() {
 
     override fun getDirPath() = "src/test/resources/com/demonwav/mcdev/i18n/lexer/fixtures"
-    override fun createLexer() = I18nLexerAdapter()
+    override fun createLexer() = LangLexerAdapter()
 
     override fun getTestName(lowercaseFirstLetter: Boolean) = super.getTestName(lowercaseFirstLetter).toSnakeCase()
 

@@ -15,10 +15,10 @@ import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.index.TranslationEntry
 import com.demonwav.mcdev.i18n.index.TranslationIndex
 import com.demonwav.mcdev.i18n.index.TranslationInverseIndex
-import com.demonwav.mcdev.i18n.lang.I18nFile
-import com.demonwav.mcdev.i18n.lang.I18nFileType
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.i18n.lang.LangFile
+import com.demonwav.mcdev.i18n.lang.LangFileType
+import com.demonwav.mcdev.i18n.lang.gen.psi.LangEntry
+import com.demonwav.mcdev.i18n.lang.gen.psi.LangTypes
 import com.demonwav.mcdev.i18n.sorting.EmptyLine
 import com.demonwav.mcdev.i18n.sorting.Key
 import com.demonwav.mcdev.i18n.sorting.Template
@@ -52,7 +52,7 @@ object TranslationFiles {
     private val MC_1_12_2 = SemanticVersion.release(1, 12, 2)
 
     fun isTranslationFile(file: VirtualFile) =
-        file.mcPath?.startsWith("lang/") == true && file.fileType in listOf(I18nFileType, JsonFileType.INSTANCE)
+        file.mcPath?.startsWith("lang/") == true && file.fileType in listOf(LangFileType, JsonFileType.INSTANCE)
 
     fun getLocale(file: VirtualFile) =
         file.nameWithoutExtension.toLowerCase(Locale.ROOT)
@@ -81,7 +81,7 @@ object TranslationFiles {
             }
         }
 
-        val files = FileTypeIndex.getFiles(if (jsonVersion) JsonFileType.INSTANCE else I18nFileType, GlobalSearchScope.moduleScope(module))
+        val files = FileTypeIndex.getFiles(if (jsonVersion) JsonFileType.INSTANCE else LangFileType, GlobalSearchScope.moduleScope(module))
             .filter { getLocale(it) == I18nConstants.DEFAULT_LOCALE }
         val domains = files.asSequence().mapNotNull { it.mcDomain }.distinct().sorted().toList()
         if (domains.size > 1) {
@@ -104,7 +104,7 @@ object TranslationFiles {
 
     fun addAll(file: PsiFile, entries: Iterable<FileEntry>) {
         when {
-            file.fileType == I18nFileType -> file.persistAsLang(entries)
+            file.fileType == LangFileType -> file.persistAsLang(entries)
             file.fileType == JsonFileType.INSTANCE -> file.persistAsJson(entries)
             else -> throw IllegalArgumentException("Cannot add translations to file '${file.name}' of unknown type!")
         }
@@ -113,7 +113,7 @@ object TranslationFiles {
     fun replaceAll(file: PsiFile, entries: Iterable<FileEntry>) {
         val doc = FileDocumentManager.getInstance().getDocument(file.virtualFile) ?: return
         when {
-            file.fileType == I18nFileType -> {
+            file.fileType == LangFileType -> {
                 val content = generateLangFile(false, entries)
                 doc.setText(content)
             }
@@ -129,7 +129,7 @@ object TranslationFiles {
 
     private fun PsiFile.persistAsLang(entries: Iterable<FileEntry>) {
         val doc = FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return
-        val content = generateLangFile(this.lastChild != null && this.lastChild.node.elementType != I18nTypes.LINE_ENDING, entries)
+        val content = generateLangFile(this.lastChild != null && this.lastChild.node.elementType != LangTypes.LINE_ENDING, entries)
         doc.insertString(this.lastChild?.textOffset ?: 0, content)
     }
 
@@ -187,7 +187,7 @@ object TranslationFiles {
             for (entry in entries) {
                 val langElement = TranslationInverseIndex.findElements(entry.key, GlobalSearchScope.allScope(project), locale)
                     .asSequence()
-                    .mapNotNull { it as? I18nEntry }
+                    .mapNotNull { it as? LangEntry }
                     .firstOrNull()
                 val comments = langElement?.let { gatherLangComments(it, keepComments) } ?: emptyList()
                 yieldAll(comments.asReversed().map { FileEntry.Comment(it) })
@@ -200,11 +200,11 @@ object TranslationFiles {
             return acc
         }
         val prev = element.prevSibling ?: return acc
-        if (prev.node.elementType != I18nTypes.LINE_ENDING) {
+        if (prev.node.elementType != LangTypes.LINE_ENDING) {
             return acc
         }
         val prevLine = prev.prevSibling ?: return acc
-        if (prevLine.node.elementType != I18nTypes.COMMENT) {
+        if (prevLine.node.elementType != LangTypes.COMMENT) {
             return acc
         }
         acc.add(prevLine.text.substring(1).trim())
@@ -221,17 +221,17 @@ object TranslationFiles {
             TranslationIndex.NAME, I18nConstants.DEFAULT_LOCALE, GlobalSearchScope.projectScope(module.project)
         ).asSequence()
             .filter { domain == null || it.mcDomain == domain }
-            .filter { (jsonVersion && it.fileType == JsonFileType.INSTANCE) || it.fileType == I18nFileType }
+            .filter { (jsonVersion && it.fileType == JsonFileType.INSTANCE) || it.fileType == LangFileType }
             .firstOrNull() ?: return null
         val psi = PsiManager.getInstance(module.project).findFile(defaultTranslationFile) ?: return null
 
         val elements = mutableListOf<TemplateElement>()
-        if (psi is I18nFile) {
+        if (psi is LangFile) {
             for (child in psi.children) {
                 when {
-                    child is I18nEntry ->
+                    child is LangEntry ->
                         elements.add(Key(Regex.escape(child.key).toRegex()))
-                    child.node.elementType == I18nTypes.LINE_ENDING && child.prevSibling.node.elementType == I18nTypes.LINE_ENDING ->
+                    child.node.elementType == LangTypes.LINE_ENDING && child.prevSibling.node.elementType == LangTypes.LINE_ENDING ->
                         elements.add(EmptyLine)
                 }
             }

@@ -10,9 +10,9 @@
 
 package com.demonwav.mcdev.i18n.index
 
-import com.demonwav.mcdev.i18n.lang.I18nFile
-import com.demonwav.mcdev.i18n.lang.I18nFileType
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
+import com.demonwav.mcdev.i18n.lang.LangFile
+import com.demonwav.mcdev.i18n.lang.LangFileType
+import com.demonwav.mcdev.i18n.lang.gen.psi.LangEntry
 import com.google.gson.JsonParser
 import com.intellij.json.JsonFileType
 import com.intellij.json.psi.JsonFile
@@ -36,7 +36,7 @@ interface TranslationProvider {
 
     companion object {
         val INSTANCES = mapOf(
-            I18nFileType to LangTranslationProvider,
+            LangFileType to LangTranslationProvider,
             JsonFileType.INSTANCE to JsonTranslationProvider
         )
     }
@@ -51,14 +51,14 @@ object LangTranslationProvider : TranslationProvider {
         return TranslationIndexEntry(domain, translations)
     }
 
-    override fun findElements(project: Project, file: VirtualFile, key: String): List<I18nEntry> {
-        val psiFile = PsiManager.getInstance(project).findFile(file) as? I18nFile ?: return emptyList()
+    override fun findElements(project: Project, file: VirtualFile, key: String): List<LangEntry> {
+        val psiFile = PsiManager.getInstance(project).findFile(file) as? LangFile ?: return emptyList()
         return CachedValuesManager.getCachedValue(
             psiFile,
             Key("translation_lookup.$key")
         ) {
             CachedValueProvider.Result.create(
-                psiFile.childrenOfType<I18nEntry>().filter { it.key == key },
+                psiFile.childrenOfType<LangEntry>().filter { it.key == key },
                 PsiModificationTracker.MODIFICATION_COUNT
             )
         }

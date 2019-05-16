@@ -14,7 +14,7 @@ import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.index.TranslationIndex
 import com.demonwav.mcdev.i18n.index.TranslationInverseIndex
-import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
+import com.demonwav.mcdev.i18n.lang.gen.psi.LangEntry
 import com.demonwav.mcdev.i18n.translations.Translation
 import com.demonwav.mcdev.i18n.translations.TranslationFiles
 import com.demonwav.mcdev.util.mapToArray
@@ -72,6 +72,6 @@ class I18nReference(
             return false
         }
 
-        return (element is I18nEntry && element.key == key.full) || (element is JsonProperty && element.name == key.full)
+        return (element is LangEntry && element.key == key.full) || (element is JsonProperty && element.name == key.full)
     }
 }
