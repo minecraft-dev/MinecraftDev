@@ -12,6 +12,7 @@ package com.demonwav.mcdev.i18n.inspections
 
 import com.demonwav.mcdev.i18n.translations.TranslationFiles
 import com.demonwav.mcdev.i18n.translations.identifiers.LiteralTranslationIdentifier
+import com.demonwav.mcdev.util.findModule
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
@@ -19,10 +20,14 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.ui.popup.JBPopupAdapter
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.util.IncorrectOperationException
+import javax.swing.ListSelectionModel
 
 class NoTranslationInspection : TranslationInspection() {
     override fun getStaticDescription() =
@@ -60,11 +65,7 @@ class NoTranslationInspection : TranslationInspection() {
                     Messages.getQuestionIcon()
                 )
                 if (result != null) {
-                    TranslationFiles.add(
-                        ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(literal.containingFile.virtualFile),
-                        key,
-                        result
-                    )
+                    TranslationFiles.add(literal.containingFile.findModule(), key, result)
                 }
             } catch (ignored: IncorrectOperationException) {
             }

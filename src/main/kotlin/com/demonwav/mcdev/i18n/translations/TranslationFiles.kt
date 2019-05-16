@@ -93,6 +93,7 @@ object TranslationFiles {
                     .setItemChosenCallback { domain ->
                         write(files.filter { f -> f.mcDomain == domain })
                     }
+                    .setCancelOnWindowDeactivation(false)
                     .createPopup()
                     .showInBestPositionFor(it)
             }

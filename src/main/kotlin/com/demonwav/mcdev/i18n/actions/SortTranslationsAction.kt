@@ -16,6 +16,8 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import javax.swing.ListSelectionModel
 
 class SortTranslationsAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
