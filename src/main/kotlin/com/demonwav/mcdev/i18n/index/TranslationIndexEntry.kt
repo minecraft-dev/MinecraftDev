@@ -18,7 +18,7 @@ data class TranslationIndexEntry(val sourceDomain: String, val translations: Lis
     operator fun contains(key: String) = this[key] != null
 }
 
-fun Iterable<TranslationIndexEntry>.merge(sourceDomain: String) =
-    this.asSequence().fold(TranslationIndexEntry(sourceDomain, emptyList())) { acc, entry ->
+fun Sequence<TranslationIndexEntry>.merge(sourceDomain: String) =
+    this.fold(TranslationIndexEntry(sourceDomain, emptyList())) { acc, entry ->
         TranslationIndexEntry(sourceDomain, acc.translations + entry.translations.filterNot { it.key in acc })
     }

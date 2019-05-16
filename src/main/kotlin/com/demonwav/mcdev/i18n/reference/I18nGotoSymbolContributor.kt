@@ -25,8 +25,8 @@ class I18nGotoSymbolContributor : ChooseByNameContributor {
     override fun getNames(project: Project, includeNonProjectItems: Boolean): Array<String> {
         val scope = if (includeNonProjectItems) GlobalSearchScope.allScope(project) else GlobalSearchScope.projectScope(project)
         val keys = FileBasedIndex.getInstance().getAllKeys(TranslationIndex.NAME, project)
-        val entries = keys.asSequence().flatMap { FileBasedIndex.getInstance().getValues(TranslationIndex.NAME, it, scope).merge("").translations.asSequence() }
-        return entries.map { it.key }.distinct().filter { it.isNotEmpty() }.toTypedArray()
+        val translations = keys.asSequence().flatMap { TranslationIndex.getEntries(scope, it).merge("").translations.asSequence() }
+        return translations.map { it.key }.distinct().filter { it.isNotEmpty() }.toTypedArray()
     }
 
     override fun getItemsByName(name: String, pattern: String, project: Project, includeNonProjectItems: Boolean): Array<NavigationItem> {

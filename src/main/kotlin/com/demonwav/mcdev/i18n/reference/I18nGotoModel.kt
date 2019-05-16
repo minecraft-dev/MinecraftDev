@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.i18n.reference
 
 import com.demonwav.mcdev.i18n.I18nConstants
+import com.demonwav.mcdev.i18n.translations.TranslationFiles
 import com.intellij.ide.util.gotoByName.ContributorsBasedGotoByModel
 import com.intellij.navigation.ChooseByNameContributor
 import com.intellij.navigation.NavigationItem
@@ -19,13 +20,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.util.indexing.FindSymbolParameters
-import java.util.Locale
 import java.util.TreeSet
 
 class I18nGotoModel(project: Project, private val prefix: String, private val suffix: String) :
     ContributorsBasedGotoByModel(project, arrayOf(ChooseByNameContributor.SYMBOL_EP_NAME.findExtensionOrFail(I18nGotoSymbolContributor::class.java))) {
     override fun acceptItem(item: NavigationItem?): Boolean {
-        return (item as PsiElement).containingFile.virtualFile.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE
+        return TranslationFiles.getLocale((item as PsiElement).containingFile.virtualFile) == I18nConstants.DEFAULT_LOCALE
     }
 
     override fun getElementsByName(name: String, parameters: FindSymbolParameters, canceled: ProgressIndicator): Array<Any> {

@@ -16,6 +16,7 @@ import com.demonwav.mcdev.i18n.index.TranslationIndex
 import com.demonwav.mcdev.i18n.index.TranslationInverseIndex
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.translations.Translation
+import com.demonwav.mcdev.i18n.translations.TranslationFiles
 import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -29,14 +30,13 @@ import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.IncorrectOperationException
-import com.intellij.util.indexing.FileBasedIndex
 
 class I18nReference(
     element: PsiElement,
     textRange: TextRange,
     val key: Translation.Key,
-    private val renameHandler: (element: PsiElement, range: TextRange, newName: String) -> PsiElement = {
-        elem, range, newName -> ElementManipulators.getManipulator(elem).handleContentChange(elem, range, newName)!!
+    private val renameHandler: (element: PsiElement, range: TextRange, newName: String) -> PsiElement = { elem, range, newName ->
+        ElementManipulators.getManipulator(elem).handleContentChange(elem, range, newName)!!
     }
 ) : PsiReferenceBase.Poly<PsiElement>(element, textRange, false), PsiPolyVariantReference {
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
@@ -47,15 +47,9 @@ class I18nReference(
 
     override fun getVariants(): Array<Any?> {
         val project = myElement.project
-        val entries = FileBasedIndex.getInstance().getValues(
-            TranslationIndex.NAME,
-            I18nConstants.DEFAULT_LOCALE,
-            GlobalSearchScope.allScope(project)
-        )
+        val defaultTranslations = TranslationIndex.getAllDefaultTranslations(project)
         val pattern = Regex("${Regex.escape(key.prefix)}(.*?)${Regex.escape(key.suffix)}")
-        return entries
-            .asSequence()
-            .flatMap { it.translations.asSequence() }
+        return defaultTranslations
             .filter { it.key.isNotEmpty() }
             .mapNotNull { entry -> pattern.matchEntire(entry.key)?.let { entry to it } }
             .map { (entry, match) ->
@@ -74,14 +68,10 @@ class I18nReference(
     }
 
     override fun isReferenceTo(element: PsiElement): Boolean {
-        if (element.containingFile.virtualFile.nameWithoutExtension != I18nConstants.DEFAULT_LOCALE) {
+        if (TranslationFiles.getLocale(element.containingFile.virtualFile) != I18nConstants.DEFAULT_LOCALE) {
             return false
         }
 
         return (element is I18nEntry && element.key == key.full) || (element is JsonProperty && element.name == key.full)
-    }
-
-    companion object {
-        const val VARIABLE_MARKER = "\$IDEA_TRANSLATION_VARIABLE"
     }
 }

@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.i18n.inspections
 
-import com.demonwav.mcdev.i18n.translations.TranslationStorage
+import com.demonwav.mcdev.i18n.translations.TranslationFiles
 import com.demonwav.mcdev.i18n.translations.identifiers.LiteralTranslationIdentifier
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
@@ -60,7 +60,7 @@ class NoTranslationInspection : TranslationInspection() {
                     Messages.getQuestionIcon()
                 )
                 if (result != null) {
-                    TranslationStorage.persist(
+                    TranslationFiles.add(
                         ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(literal.containingFile.virtualFile),
                         key,
                         result

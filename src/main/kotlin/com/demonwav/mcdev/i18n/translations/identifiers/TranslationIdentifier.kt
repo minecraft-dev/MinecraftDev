@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.i18n.translations.identifiers
 
-import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.index.TranslationIndex
 import com.demonwav.mcdev.i18n.index.merge
 import com.demonwav.mcdev.i18n.translations.Translation
@@ -20,9 +19,6 @@ import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiExpressionList
-import com.intellij.psi.PsiPolyadicExpression
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.util.indexing.FileBasedIndex
 import java.util.MissingFormatArgumentException
 
 abstract class TranslationIdentifier<T : PsiElement> {
@@ -44,11 +40,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                 for (function in Translation.translationFunctions) {
                     if (function.matches(call, index)) {
                         val translationKey = function.getTranslationKey(call) ?: continue
-                        val entries = FileBasedIndex.getInstance().getValues(
-                            TranslationIndex.NAME,
-                            I18nConstants.DEFAULT_LOCALE,
-                            GlobalSearchScope.allScope(project)
-                        ).merge("")
+                        val entries = TranslationIndex.getAllDefaultEntries(project).merge("")
                         val translation = entries[translationKey.full]?.text
                         if (translation != null) {
                             try {

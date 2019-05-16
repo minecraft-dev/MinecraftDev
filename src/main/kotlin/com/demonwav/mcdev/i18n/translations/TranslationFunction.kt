@@ -11,11 +11,9 @@
 package com.demonwav.mcdev.i18n.translations
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.i18n.reference.I18nReference
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.srg.SrgManager
 import com.demonwav.mcdev.util.MemberReference
-import com.demonwav.mcdev.util.evaluate
 import com.demonwav.mcdev.util.extractVarArgs
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.isSameReference

@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.i18n.intentions
 
-import com.demonwav.mcdev.i18n.translations.TranslationStorage
+import com.demonwav.mcdev.i18n.translations.TranslationFiles
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
 import com.intellij.lang.java.JavaLanguage
@@ -61,7 +61,7 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
             if (key != null) {
                 val editorFile = FileDocumentManager.getInstance().getFile(editor.document) ?: return
                 val module = ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(editorFile)
-                TranslationStorage.persist(
+                TranslationFiles.add(
                     module,
                     result.getFirst(),
                     value

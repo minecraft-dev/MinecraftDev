@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.i18n.index
 
+import com.demonwav.mcdev.i18n.translations.TranslationFiles
 import com.demonwav.mcdev.util.mcDomain
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
@@ -23,7 +24,6 @@ import com.intellij.util.io.DataExternalizer
 import com.intellij.util.io.EnumeratorStringDescriptor
 import com.intellij.util.io.KeyDescriptor
 import com.intellij.util.io.VoidDataExternalizer
-import java.util.Locale
 
 class TranslationInverseIndex : FileBasedIndexExtension<String, Void>(), PsiDependentIndex {
     override fun getName() = NAME
@@ -47,7 +47,7 @@ class TranslationInverseIndex : FileBasedIndexExtension<String, Void>(), PsiDepe
             val project = filter.project ?: return emptyList()
             return FileBasedIndex.getInstance().getContainingFiles(NAME, key, filter)
                 .filter {
-                    locale == null || it.nameWithoutExtension.toLowerCase(Locale.ROOT) == locale
+                    locale == null || TranslationFiles.getLocale(it) == locale
                 }
                 .flatMap {
                     TranslationProvider.INSTANCES[it.fileType]?.findElements(project, it, key) ?: emptyList()

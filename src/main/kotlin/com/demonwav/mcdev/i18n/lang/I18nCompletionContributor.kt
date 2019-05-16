@@ -15,6 +15,7 @@ import com.demonwav.mcdev.i18n.I18nConstants
 import com.demonwav.mcdev.i18n.index.TranslationIndex
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
+import com.demonwav.mcdev.i18n.translations.TranslationFiles
 import com.demonwav.mcdev.util.getSimilarity
 import com.demonwav.mcdev.util.mcDomain
 import com.intellij.codeInsight.completion.CompletionContributor
@@ -27,9 +28,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns.elementType
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiUtilCore
-import com.intellij.util.indexing.FileBasedIndex
 
 class I18nCompletionContributor : CompletionContributor() {
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
@@ -43,7 +42,7 @@ class I18nCompletionContributor : CompletionContributor() {
         }
 
         val file = position.containingFile.originalFile.virtualFile
-        if (file.nameWithoutExtension == I18nConstants.DEFAULT_LOCALE) {
+        if (!TranslationFiles.isTranslationFile(file) || TranslationFiles.getLocale(file) == I18nConstants.DEFAULT_LOCALE) {
             return
         }
 
@@ -59,13 +58,7 @@ class I18nCompletionContributor : CompletionContributor() {
             return
         }
 
-        val defaultEntries = FileBasedIndex.getInstance().getValues(
-            TranslationIndex.NAME,
-            I18nConstants.DEFAULT_LOCALE,
-            GlobalSearchScope.allScope(element.project)
-        ).asSequence()
-            .filter { domain == null || it.sourceDomain == domain }
-            .flatMap { it.translations.asSequence() }
+        val defaultEntries = TranslationIndex.getAllDefaultTranslations(element.project, domain)
         val existingKeys = element.containingFile.children.mapNotNull { (it as? I18nEntry)?.key }
         val prefixResult = result.withPrefixMatcher(text)
 

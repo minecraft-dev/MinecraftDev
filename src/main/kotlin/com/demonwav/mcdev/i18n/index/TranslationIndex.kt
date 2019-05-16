@@ -10,13 +10,13 @@
 
 package com.demonwav.mcdev.i18n.index
 
-import com.demonwav.mcdev.i18n.lang.I18nFileType
+import com.demonwav.mcdev.i18n.I18nConstants
+import com.demonwav.mcdev.i18n.translations.TranslationFiles
 import com.demonwav.mcdev.util.mcDomain
-import com.demonwav.mcdev.util.mcPath
-import com.intellij.json.JsonFileType
-import com.intellij.openapi.fileTypes.FileType
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.util.Consumer
+import com.intellij.psi.PsiFile
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.indexing.DataIndexer
 import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.util.indexing.FileBasedIndexExtension
@@ -46,6 +46,36 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
 
     companion object {
         val NAME = ID.create<String, TranslationIndexEntry>("TranslationIndex")
+
+        fun getAllDefaultTranslations(project: Project, domain: String? = null) =
+            getAllDefaultEntries(project, domain).flatten()
+
+        fun getProjectDefaultTranslations(project: Project, domain: String? = null) =
+            getProjectDefaultEntries(project, domain).flatten()
+
+        fun getTranslations(project: Project, file: VirtualFile) =
+            getEntries(GlobalSearchScope.fileScope(project, file), TranslationFiles.getLocale(file), file.mcDomain).flatten()
+
+        fun getTranslations(file: PsiFile): Sequence<TranslationEntry> {
+            val virtualFile = file.virtualFile
+            return getEntries(GlobalSearchScope.fileScope(file), TranslationFiles.getLocale(virtualFile), virtualFile.mcDomain).flatten()
+        }
+
+        fun getAllDefaultEntries(project: Project, domain: String? = null) =
+            getEntries(GlobalSearchScope.allScope(project), I18nConstants.DEFAULT_LOCALE, domain)
+
+        fun getProjectDefaultEntries(project: Project, domain: String? = null) =
+            getEntries(GlobalSearchScope.projectScope(project), I18nConstants.DEFAULT_LOCALE, domain)
+
+        fun getEntries(scope: GlobalSearchScope, locale: String, domain: String? = null) =
+            FileBasedIndex.getInstance().getValues(
+                TranslationIndex.NAME,
+                locale,
+                scope
+            ).asSequence()
+                .filter { domain == null || it.sourceDomain == domain }
+
+        private fun Sequence<TranslationIndexEntry>.flatten() = this.flatMap { it.translations.asSequence() }
     }
 
     private object ValueExternalizer : DataExternalizer<TranslationIndexEntry> {
@@ -70,7 +100,7 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
         override fun map(inputData: FileContent): MutableMap<String, TranslationIndexEntry> {
             val domain = inputData.file.mcDomain ?: return mutableMapOf()
             val entry = TranslationProvider.INSTANCES[inputData.fileType]?.map(domain, inputData) ?: return mutableMapOf()
-            return mutableMapOf(inputData.file.nameWithoutExtension to entry)
+            return mutableMapOf(TranslationFiles.getLocale(inputData.file) to entry)
         }
     }
 }

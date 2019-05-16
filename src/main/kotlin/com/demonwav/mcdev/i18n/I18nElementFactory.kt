@@ -10,24 +10,13 @@
 
 package com.demonwav.mcdev.i18n
 
-import com.demonwav.mcdev.i18n.index.TranslationEntry
 import com.demonwav.mcdev.i18n.lang.I18nFile
 import com.demonwav.mcdev.i18n.lang.I18nFileType
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nEntry
 import com.demonwav.mcdev.i18n.lang.gen.psi.I18nTypes
-import com.demonwav.mcdev.util.applyWriteAction
-import com.demonwav.mcdev.util.mcDomain
-import com.intellij.ide.DataManager
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
-import com.intellij.psi.PsiManager
-import com.intellij.psi.search.FileTypeIndex
-import com.intellij.psi.search.GlobalSearchScope
-import java.util.Locale
 
 object I18nElementFactory {
     fun assembleElements(project: Project, elements: Collection<I18nEntry>, keepComments: Int): List<PsiElement> {

@@ -32,10 +32,14 @@ class I18nJsonReferenceContributor : PsiReferenceContributor() {
                         return arrayOf()
                     }
                     val entry = element as? JsonProperty ?: return arrayOf()
+                    val range = entry.nameElement.textRangeInParent
+                    if (range.endOffset - 3 < range.startOffset) {
+                        return emptyArray()
+                    }
                     return arrayOf(
                         I18nReference(
                             element,
-                            entry.nameElement.textRangeInParent.shiftRight(1).grown(-2),
+                            range.shiftRight(1).grown(-2),
                             Translation.Key("", entry.name, "")
                         ) { elem, _, newName ->
                             (elem as JsonProperty).setName(newName)
