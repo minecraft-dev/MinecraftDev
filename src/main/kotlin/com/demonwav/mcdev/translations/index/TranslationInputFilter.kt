@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.translations.index
 
+import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.util.mcDomain
 import com.demonwav.mcdev.util.mcPath
 import com.intellij.openapi.fileTypes.FileType
@@ -25,6 +26,6 @@ object TranslationInputFilter : FileBasedIndex.FileTypeSpecificInputFilter {
     }
 
     override fun acceptInput(file: VirtualFile): Boolean {
-        return file.mcDomain != null && file.mcPath?.startsWith("lang/") == true
+        return TranslationFiles.isTranslationFile(file)
     }
 }

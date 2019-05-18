@@ -17,6 +17,7 @@ import com.intellij.psi.PsiElement
 
 data class TranslationInstance(
     val foldingElement: PsiElement?,
+    val foldStart: Int,
     val referenceElement: PsiElement?,
     val key: Key,
     val text: String?,

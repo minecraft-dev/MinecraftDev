@@ -70,27 +70,27 @@ class TranslationFoldingBuilder : FoldingBuilderEx() {
             val elements = PsiTreeUtil.findChildrenOfType(root, identifier.elementClass())
             for (element in elements) {
                 val translation = identifier.identifyUnsafe(element)
-                if (translation?.foldingElement != null) {
-                    val range =
-                        if (translation.foldingElement is PsiExpressionList) {
-                            translation.foldingElement.textRange.grown(-2).shiftRight(1)
-                        } else {
-                            translation.foldingElement.textRange
-                        }
-                    descriptors.add(
-                        object : FoldingDescriptor(
-                            translation.foldingElement.node,
-                            range,
-                            FoldingGroup.newGroup("mc.translation." + translation.key)) {
-                            override fun getPlaceholderText(): String? {
-                                if (translation.formattingError == TranslationInstance.Companion.FormattingError.MISSING) {
-                                    return "\"Insufficient parameters for formatting '${translation.text}'\""
-                                }
-                                return "\"${translation.text}\""
+                val foldingElement = translation?.foldingElement ?: continue
+                val range =
+                    if (foldingElement is PsiExpressionList) {
+                        val args = foldingElement.expressions.drop(translation.foldStart)
+                        args.first().textRange.union(args.last().textRange)
+                    } else {
+                        foldingElement.textRange
+                    }
+                descriptors.add(
+                    object : FoldingDescriptor(
+                        translation.foldingElement.node,
+                        range,
+                        FoldingGroup.newGroup("mc.translation." + translation.key)) {
+                        override fun getPlaceholderText(): String? {
+                            if (translation.formattingError == TranslationInstance.Companion.FormattingError.MISSING) {
+                                return "\"Insufficient parameters for formatting '${translation.text}'\""
                             }
+                            return "\"${translation.text}\""
                         }
-                    )
-                }
+                    }
+                )
             }
         }
         return descriptors.toTypedArray()

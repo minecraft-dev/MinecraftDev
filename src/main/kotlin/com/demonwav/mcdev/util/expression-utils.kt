@@ -23,10 +23,10 @@ import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiTypeCastExpression
 import com.intellij.psi.PsiVariable
 
-fun PsiAnnotationMemberValue.evaluate(defaultValue: String?, parameterReplacement: String?): String? {
+fun PsiAnnotationMemberValue.evaluate(allowReferences: Boolean, allowTranslations: Boolean): String? {
     val visited = mutableSetOf<PsiAnnotationMemberValue?>()
 
-    fun eval(expr: PsiAnnotationMemberValue?, defaultValue: String?): String? {
+    fun eval(expr: PsiAnnotationMemberValue?, defaultValue: String? = null): String? {
         if (!visited.add(expr)) {
             return defaultValue
         }
@@ -36,57 +36,12 @@ fun PsiAnnotationMemberValue.evaluate(defaultValue: String?, parameterReplacemen
                 return eval(expr.operand, defaultValue)
             expr is PsiReferenceExpression -> {
                 val reference = expr.advancedResolve(false).element
-                if (reference is PsiParameter) {
-                    return parameterReplacement
-                }
                 if (reference is PsiVariable && reference.initializer != null) {
-                    return eval(reference.initializer, null)
+                    return eval(reference.initializer, "\${${expr.text}}")
                 }
             }
             expr is PsiLiteral ->
                 return expr.value.toString()
-            expr is PsiPolyadicExpression && expr.operationTokenType == JavaTokenType.PLUS -> {
-                var value = ""
-                for (operand in expr.operands) {
-                    val operandResult = eval(operand, defaultValue) ?: return defaultValue
-                    value += operandResult
-                }
-                return value
-            }
-        }
-
-        return defaultValue
-    }
-
-    return eval(this, defaultValue)
-}
-
-fun PsiExpression.substituteParameter(allowReferences: Boolean, allowTranslations: Boolean): String? {
-    val visited = mutableSetOf<PsiExpression?>()
-
-    tailrec fun substitute(expr: PsiExpression?, defaultValue: String? = null): String? {
-        if (!visited.add(expr) && expr != null) {
-            return "\${${expr.text}}"
-        }
-        when {
-            expr is PsiTypeCastExpression && expr.operand != null ->
-                return substitute(expr.operand)
-            expr is PsiReferenceExpression -> {
-                val reference = expr.advancedResolve(false).element
-                if (reference is PsiVariable && reference.initializer != null) {
-                    return substitute(reference.initializer, "\${${expr.text}}")
-                }
-            }
-            expr is PsiLiteral ->
-                return expr.value.toString()
-            expr is PsiPolyadicExpression && expr.operationTokenType == JavaTokenType.PLUS -> {
-                var value = ""
-                for (operand in expr.operands) {
-                    val operandResult = operand.evaluate(null, null) ?: return defaultValue
-                    value += operandResult
-                }
-                return value
-            }
             expr is PsiCall && allowTranslations ->
                 for (argument in expr.argumentList?.expressions ?: emptyArray()) {
                     val translation = TranslationInstance.find(argument) ?: continue
@@ -96,6 +51,7 @@ fun PsiExpression.substituteParameter(allowReferences: Boolean, allowTranslation
                     return translation.text
                 }
         }
+
         return if (allowReferences && expr != null) {
             "\${${expr.text}}"
         } else {
@@ -103,5 +59,5 @@ fun PsiExpression.substituteParameter(allowReferences: Boolean, allowTranslation
         }
     }
 
-    return substitute(this)
+    return eval(this)
 }

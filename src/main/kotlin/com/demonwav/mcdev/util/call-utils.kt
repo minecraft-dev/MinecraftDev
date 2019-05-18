@@ -39,7 +39,7 @@ fun PsiCall.extractVarArgs(index: Int, allowReferences: Boolean, allowTranslatio
         return emptyArray()
     }
     if (!method.parameterList.parameters[index].isVarArgs) {
-        return arrayOf(args[index].evaluate(null, null))
+        return arrayOf(args[index].evaluate(allowTranslations, allowReferences))
     }
 
     val varargType = method.getSignature(PsiSubstitutor.EMPTY).parameterTypes[index]
@@ -48,25 +48,22 @@ fun PsiCall.extractVarArgs(index: Int, allowReferences: Boolean, allowTranslatio
 }
 
 private fun extractVarArgs(type: PsiType, elements: List<PsiExpression>, allowReferences: Boolean, allowTranslations: Boolean): Array<String?> {
-    fun convertExpression(expression: PsiExpression): String? =
-        expression.substituteParameter(allowReferences, allowTranslations)
-
-    fun resolveReference(expression: PsiExpression): Array<String?> {
+     tailrec fun resolveReference(expression: PsiExpression): Array<String?> {
         if (expression is PsiTypeCastExpression && expression.operand != null) {
             return resolveReference(expression.operand!!)
         }
-        return arrayOf(expression.evaluate(null, null))
+        return arrayOf(expression.evaluate(allowTranslations, allowReferences))
     }
 
     return if (elements[0].type == type) {
         // We're dealing with an array initializer, let's analyse it!
         val initializer = elements[0]
         if (initializer is PsiNewExpression && initializer.arrayInitializer != null) {
-            initializer.arrayInitializer!!.initializers.asSequence().map { convertExpression(it) }.toTypedArray()
+            initializer.arrayInitializer!!.initializers.asSequence().map { it.evaluate(allowReferences, allowTranslations) }.toTypedArray()
         } else {
             resolveReference(initializer)
         }
     } else {
-        elements.asSequence().map { convertExpression(it) }.toTypedArray()
+        elements.asSequence().map { it.evaluate(allowReferences, allowTranslations) }.toTypedArray()
     }
 }

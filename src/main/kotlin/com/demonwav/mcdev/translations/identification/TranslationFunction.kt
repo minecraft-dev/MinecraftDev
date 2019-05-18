@@ -25,7 +25,7 @@ import com.intellij.psi.PsiMethod
 
 class TranslationFunction(
     private val memberReference: MemberReference,
-    private val matchedIndex: Int, val formatting: Boolean, val setter: Boolean = false,
+    val matchedIndex: Int, val formatting: Boolean, val setter: Boolean = false,
     val foldParameters: Boolean = false, val prefix: String = "", val suffix: String = "",
     val obfuscatedName: Boolean = false
 ) {

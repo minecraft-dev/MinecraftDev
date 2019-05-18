@@ -48,6 +48,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                 val (formatted, superfluousParams) = function.format(translation, call) ?: (translation to -1)
                                 return TranslationInstance(
                                     if (function.foldParameters) container else call,
+                                    function.matchedIndex,
                                     referenceElement,
                                     translationKey,
                                     formatted,
@@ -57,6 +58,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                             } catch (ignored: MissingFormatArgumentException) {
                                 return TranslationInstance(
                                     if (function.foldParameters) container else call,
+                                    function.matchedIndex,
                                     referenceElement,
                                     translationKey,
                                     translation,
@@ -66,6 +68,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                         } else {
                             return TranslationInstance(
                                 null,
+                                function.matchedIndex,
                                 referenceElement,
                                 translationKey,
                                 null

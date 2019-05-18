@@ -53,7 +53,7 @@ object TranslationFiles {
     private val MC_1_12_2 = SemanticVersion.release(1, 12, 2)
 
     fun isTranslationFile(file: VirtualFile) =
-        file.mcPath?.startsWith("lang/") == true && file.fileType in listOf(LangFileType, JsonFileType.INSTANCE)
+        file.mcDomain != null && file.mcPath?.startsWith("lang/") == true && file.fileType in listOf(LangFileType, JsonFileType.INSTANCE)
 
     fun getLocale(file: VirtualFile) =
         file.nameWithoutExtension.toLowerCase(Locale.ROOT)

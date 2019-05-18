@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.translations.reference
 
+import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.identification.TranslationIdentifier
 import com.demonwav.mcdev.translations.identification.TranslationInstance
 import com.demonwav.mcdev.translations.lang.gen.psi.LangEntry
@@ -54,7 +55,7 @@ class JsonReferenceContributor : PsiReferenceContributor() {
             PlatformPatterns.psiElement().withElementType(JsonElementTypes.PROPERTY),
             object : PsiReferenceProvider() {
                 override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
-                    if (element.containingFile.virtualFile?.mcPath?.startsWith("lang/") == false) {
+                    if (!TranslationFiles.isTranslationFile(element.containingFile.virtualFile)) {
                         return arrayOf()
                     }
                     val entry = element as? JsonProperty ?: return arrayOf()
