@@ -24,8 +24,11 @@ import com.demonwav.mcdev.translations.sorting.Template
 import com.demonwav.mcdev.translations.sorting.TemplateElement
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.applyWriteAction
+import com.demonwav.mcdev.util.findMcpModule
+import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.mcDomain
 import com.demonwav.mcdev.util.mcPath
+import com.demonwav.mcdev.util.mcVersion
 import com.intellij.ide.DataManager
 import com.intellij.json.JsonElementTypes
 import com.intellij.json.JsonFileType
@@ -92,19 +95,14 @@ object TranslationFiles {
         element.delete()
     }
 
-    fun add(module: Module?, key: String, text: String) {
-        if (module == null) {
-            return
-        }
-
-        val facet = MinecraftFacet.getInstance(module) ?: return
-        val mcpModule = facet.getModuleOfType(McpModuleType) ?: return
-        val version = SemanticVersion.parse(mcpModule.getSettings().minecraftVersion ?: return)
+    fun add(context: PsiElement, key: String, text: String) {
+        val module = context.findModule() ?: throw IllegalArgumentException("Cannot add translation for element outside of module")
+        val version = context.mcVersion ?: throw IllegalArgumentException("Cannot determine MC version for element $context")
         val jsonVersion = version > MC_1_12_2
 
         fun write(files: Iterable<VirtualFile>) {
             for (file in files) {
-                val psiFile = PsiManager.getInstance(module.project).findFile(file) ?: continue
+                val psiFile = PsiManager.getInstance(context.project).findFile(file) ?: continue
                 psiFile.applyWriteAction {
                     val entries = listOf(TranslationFiles.FileEntry.Translation(key, text))
                     if (jsonVersion) {
@@ -116,8 +114,9 @@ object TranslationFiles {
             }
         }
 
-        val files = FileTypeIndex.getFiles(if (jsonVersion) JsonFileType.INSTANCE else LangFileType, GlobalSearchScope.moduleScope(module))
-            .filter { getLocale(it) == TranslationConstants.DEFAULT_LOCALE }
+        val files = FileTypeIndex.getFiles(
+            if (jsonVersion) JsonFileType.INSTANCE else LangFileType, GlobalSearchScope.moduleScope(module)
+        ).filter { getLocale(it) == TranslationConstants.DEFAULT_LOCALE }
         val domains = files.asSequence().mapNotNull { it.mcDomain }.distinct().sorted().toList()
         if (domains.size > 1) {
             DataManager.getInstance().dataContextFromFocusAsync.onSuccess {
@@ -246,19 +245,18 @@ object TranslationFiles {
         return gatherLangComments(prevLine, maxDepth, acc, depth + 1)
     }
 
-    fun buildSortingTemplateFromDefault(module: Module, domain: String? = null): Template? {
-        val facet = MinecraftFacet.getInstance(module) ?: return null
-        val mcpModule = facet.getModuleOfType(McpModuleType) ?: return null
-        val version = SemanticVersion.parse(mcpModule.getSettings().minecraftVersion ?: return null)
+    fun buildSortingTemplateFromDefault(context: PsiElement, domain: String? = null): Template? {
+        val module = context.findModule() ?: throw IllegalArgumentException("Cannot add translation for element outside of module")
+        val version = context.mcVersion ?: throw IllegalArgumentException("Cannot determine MC version for element $context")
         val jsonVersion = version > MC_1_12_2
 
         val defaultTranslationFile = FileBasedIndex.getInstance().getContainingFiles(
-            TranslationIndex.NAME, TranslationConstants.DEFAULT_LOCALE, GlobalSearchScope.projectScope(module.project)
+            TranslationIndex.NAME, TranslationConstants.DEFAULT_LOCALE, GlobalSearchScope.moduleScope(module)
         ).asSequence()
             .filter { domain == null || it.mcDomain == domain }
             .filter { (jsonVersion && it.fileType == JsonFileType.INSTANCE) || it.fileType == LangFileType }
             .firstOrNull() ?: return null
-        val psi = PsiManager.getInstance(module.project).findFile(defaultTranslationFile) ?: return null
+        val psi = PsiManager.getInstance(context.project).findFile(defaultTranslationFile) ?: return null
 
         val elements = mutableListOf<TemplateElement>()
         if (psi is LangFile) {

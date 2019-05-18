@@ -60,7 +60,7 @@ class NoTranslationInspection : TranslationInspection() {
                     Messages.getQuestionIcon()
                 )
                 if (result != null) {
-                    TranslationFiles.add(literal.containingFile.findModule(), key, result)
+                    TranslationFiles.add(literal, key, result)
                 }
             } catch (ignored: IncorrectOperationException) {
             }

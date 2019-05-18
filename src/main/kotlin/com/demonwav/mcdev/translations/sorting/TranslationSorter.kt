@@ -44,8 +44,6 @@ object TranslationSorter {
     }
 
     private fun sort(project: Project, file: PsiFile, ordering: Ordering, keepComments: Int) {
-        val module = file.findModule() ?: throw IllegalStateException("Could not find module for translation file")
-
         val domain = file.virtualFile.mcDomain
         val locale = TranslationFiles.getLocale(file.virtualFile)
         val translations = TranslationIndex.getTranslations(file)
@@ -57,7 +55,7 @@ object TranslationSorter {
                 else -> sortByTemplate(
                     project,
                     locale,
-                    TranslationFiles.buildSortingTemplateFromDefault(module, domain)
+                    TranslationFiles.buildSortingTemplateFromDefault(file, domain)
                         ?: throw IllegalStateException("Could not generate template from default translation file"),
                     it,
                     keepComments

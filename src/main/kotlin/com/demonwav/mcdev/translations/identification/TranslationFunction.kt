@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.srg.SrgManager
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.extractVarArgs
+import com.demonwav.mcdev.util.findMcpModule
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.isSameReference
 import com.demonwav.mcdev.util.referencedMethod
@@ -32,7 +33,7 @@ class TranslationFunction(
     private fun getMethod(context: PsiElement): PsiMethod? {
         var reference = memberReference
         if (obfuscatedName) {
-            val moduleSrgManager = context.findModule()?.let { MinecraftFacet.getInstance(it, McpModuleType)?.srgManager }
+            val moduleSrgManager = context.findMcpModule()?.srgManager
             val srgManager = moduleSrgManager ?: SrgManager.findAnyInstance(context.project)
             srgManager?.srgMapNow?.mapToMcpMethod(memberReference)?.let {
                 reference = it

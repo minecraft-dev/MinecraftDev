@@ -59,9 +59,7 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
             val key = result.first
             val replaceLiteral = result.second
             if (key != null) {
-                val editorFile = FileDocumentManager.getInstance().getFile(editor.document) ?: return
-                val module = ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(editorFile)
-                TranslationFiles.add(module, key, value)
+                TranslationFiles.add(element, key, value)
                 if (replaceLiteral) {
                     val psi = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return
                     psi.runWriteAction {

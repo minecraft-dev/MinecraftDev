@@ -10,8 +10,16 @@
 
 package com.demonwav.mcdev.util
 
+import com.demonwav.mcdev.facet.MinecraftFacet
+import com.demonwav.mcdev.platform.mcp.McpModule
+import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.roots.LibraryOrderEntry
+import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.roots.ProjectFileIndex
+import com.intellij.openapi.roots.impl.OrderEntryUtil
 import com.intellij.psi.ElementManipulator
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.JavaPsiFacade
@@ -194,3 +202,26 @@ val <T : PsiElement> T.manipulator: ElementManipulator<T>?
 inline fun <T> PsiElement.cached(crossinline compute: () -> T): T {
     return CachedValuesManager.getCachedValue(this) { CachedValueProvider.Result.create(compute(), this) }
 }
+
+fun PsiElement.findMcpModule(): McpModule? {
+    val file = containingFile.virtualFile
+    val index = ProjectFileIndex.getInstance(project)
+    val modules = if (index.isInLibrary(file)) {
+        val library = index.getOrderEntriesForFile(file).asSequence().mapNotNull { it as? LibraryOrderEntry }.first().library
+        ModuleManager.getInstance(project).modules.asSequence()
+            .filter { OrderEntryUtil.findLibraryOrderEntry(ModuleRootManager.getInstance(it), library) != null }
+    } else sequenceOf(this.findModule())
+    return modules.mapNotNull { it?.findMcpModule() }.firstOrNull()
+}
+
+private fun Module.findMcpModule(): McpModule? {
+    var result: McpModule? = null
+    ModuleUtilCore.visitMeAndDependentModules(this) {
+        result = MinecraftFacet.getInstance(it, McpModuleType)
+        result == null
+    }
+    return result
+}
+
+val PsiElement.mcVersion: SemanticVersion?
+    get() = findMcpModule()?.let { SemanticVersion.parse(it.getSettings().minecraftVersion ?: return@let null) }
