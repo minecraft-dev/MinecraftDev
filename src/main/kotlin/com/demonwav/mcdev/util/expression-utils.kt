@@ -10,15 +10,14 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.i18n.translations.Translation
-import com.demonwav.mcdev.i18n.translations.Translation.Companion.FormattingError
+import com.demonwav.mcdev.translations.identification.TranslationInstance
+import com.demonwav.mcdev.translations.identification.TranslationInstance.Companion.FormattingError
 import com.intellij.psi.JavaTokenType
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiCall
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiParameter
-import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiPolyadicExpression
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiTypeCastExpression
@@ -90,7 +89,7 @@ fun PsiExpression.substituteParameter(allowReferences: Boolean, allowTranslation
             }
             expr is PsiCall && allowTranslations ->
                 for (argument in expr.argumentList?.expressions ?: emptyArray()) {
-                    val translation = Translation.find(argument) ?: continue
+                    val translation = TranslationInstance.find(argument) ?: continue
                     if (translation.formattingError == FormattingError.MISSING) {
                         return "{ERROR: Missing formatting arguments for '${translation.text}'}"
                     }

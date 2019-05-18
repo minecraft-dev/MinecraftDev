@@ -258,10 +258,10 @@ val generateAtPsiAndParser = generatePsiAndParser("generateAtPsiAndParser", "AtP
 val generateNbttLexer = generateLexer("generateNbttLexer", "NbttLexer", "nbt/lang/gen/")
 val generateNbttPsiAndParser = generatePsiAndParser("generateNbttPsiAndParser", "NbttParser", "nbt/lang/gen")
 
-val generateLangLexer = generateLexer("generateLangLexer", "LangLexer", "i18n/lang/gen/")
-val generateLangPsiAndParser = generatePsiAndParser("generateLangPsiAndParser", "LangParser", "i18n/lang/gen")
+val generateLangLexer = generateLexer("generateLangLexer", "LangLexer", "translations/lang/gen/")
+val generateLangPsiAndParser = generatePsiAndParser("generateLangPsiAndParser", "LangParser", "translations/lang/gen")
 
-val generateTranslationTemplateLexer = generateLexer("generateTranslationTemplateLexer", "TranslationTemplateLexer", "i18n/lang/gen/")
+val generateTranslationTemplateLexer = generateLexer("generateTranslationTemplateLexer", "TranslationTemplateLexer", "translations/lang/gen/")
 
 val generate = tasks.register("generate") {
     group = "minecraft"

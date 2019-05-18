@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.framework
 
-import com.demonwav.mcdev.i18n.I18nConstants
+import com.demonwav.mcdev.translations.lang.LangFileType
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
@@ -45,7 +45,7 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
 
     fun java(path: String, @Language("JAVA") code: String, configure: Boolean = true) = file(path, code, ".java", configure)
     fun at(path: String, @Language("Access Transformers") code: String, configure: Boolean = true) = file(path, code, "_at.cfg", configure)
-    fun i18n(path: String, @Language("I18n") code: String, configure: Boolean = true) = file(path, code, ".${I18nConstants.FILE_EXTENSION}", configure)
+    fun lang(path: String, @Language("MCLang") code: String, configure: Boolean = true) = file(path, code, ".${LangFileType.FILE_EXTENSION}", configure)
 
     inline fun dir(path: String, block: ProjectBuilder.() -> Unit) {
         val oldIntermediatePath = intermediatePath

@@ -8,11 +8,11 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.i18n.lang.gen;
+package com.demonwav.mcdev.translations.lang.gen;
 
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
-import static com.demonwav.mcdev.i18n.lang.gen.psi.LangTypes.*;
+import static com.demonwav.mcdev.translations.lang.gen.psi.LangTypes.*;
 import static com.intellij.psi.TokenType.*;
 
 %%

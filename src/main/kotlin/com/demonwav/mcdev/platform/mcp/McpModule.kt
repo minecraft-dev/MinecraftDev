@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.mcp
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.i18n.I18nFileListener
+import com.demonwav.mcdev.translations.TranslationFileListener
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.mcp.srg.SrgManager
@@ -40,7 +40,7 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
         }
 
         connection = project.messageBus.connect()
-        connection.subscribe(VirtualFileManager.VFS_CHANGES, I18nFileListener)
+        connection.subscribe(VirtualFileManager.VFS_CHANGES, TranslationFileListener)
     }
 
     override val moduleType  = McpModuleType
