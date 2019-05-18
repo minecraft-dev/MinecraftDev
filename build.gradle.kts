@@ -191,7 +191,7 @@ license {
     exclude(
         "com/demonwav/mcdev/platform/mcp/at/gen/**",
         "com/demonwav/mcdev/nbt/lang/gen/**",
-        "com/demonwav/mcdev/i18n/lang/gen/**"
+        "com/demonwav/mcdev/translations/lang/gen/**"
     )
 
     tasks {
