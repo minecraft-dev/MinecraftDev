@@ -100,7 +100,7 @@ object TranslationFiles {
         val facet = MinecraftFacet.getInstance(module) ?: return
         val mcpModule = facet.getModuleOfType(McpModuleType) ?: return
         val version = SemanticVersion.parse(mcpModule.getSettings().minecraftVersion ?: return)
-        val jsonVersion = version <= MC_1_12_2
+        val jsonVersion = version > MC_1_12_2
 
         fun write(files: Iterable<VirtualFile>) {
             for (file in files) {
@@ -250,7 +250,7 @@ object TranslationFiles {
         val facet = MinecraftFacet.getInstance(module) ?: return null
         val mcpModule = facet.getModuleOfType(McpModuleType) ?: return null
         val version = SemanticVersion.parse(mcpModule.getSettings().minecraftVersion ?: return null)
-        val jsonVersion = version <= MC_1_12_2
+        val jsonVersion = version > MC_1_12_2
 
         val defaultTranslationFile = FileBasedIndex.getInstance().getContainingFiles(
             TranslationIndex.NAME, TranslationConstants.DEFAULT_LOCALE, GlobalSearchScope.projectScope(module.project)
