@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.translations.actions
 
-import com.demonwav.mcdev.translations.sorting.TranslationSorter
 import com.demonwav.mcdev.translations.TranslationFiles
+import com.demonwav.mcdev.translations.sorting.TranslationSorter
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.LangDataKeys

@@ -65,36 +65,36 @@ class TranslationFoldingSettings : PersistentStateComponent<TranslationFoldingSe
 
 class TranslationFoldingBuilder : FoldingBuilderEx() {
     override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean): Array<FoldingDescriptor> {
-            val descriptors = mutableListOf<FoldingDescriptor>()
-            for (identifier in TranslationIdentifier.INSTANCES) {
-                val elements = PsiTreeUtil.findChildrenOfType(root, identifier.elementClass())
-                for (element in elements) {
-                    val translation = identifier.identifyUnsafe(element)
-                    if (translation?.foldingElement != null) {
-                        val range =
-                            if (translation.foldingElement is PsiExpressionList) {
-                                translation.foldingElement.textRange.grown(-2).shiftRight(1)
-                            } else {
-                                translation.foldingElement.textRange
-                            }
-                        descriptors.add(
-                            object : FoldingDescriptor(
-                                translation.foldingElement.node,
-                                range,
-                                FoldingGroup.newGroup("mc.i18n." + translation.key)) {
-                                override fun getPlaceholderText(): String? {
-                                    if (translation.formattingError == TranslationInstance.Companion.FormattingError.MISSING) {
-                                        return "\"Insufficient parameters for formatting '${translation.text}'\""
-                                    }
-                                    return "\"${translation.text}\""
+        val descriptors = mutableListOf<FoldingDescriptor>()
+        for (identifier in TranslationIdentifier.INSTANCES) {
+            val elements = PsiTreeUtil.findChildrenOfType(root, identifier.elementClass())
+            for (element in elements) {
+                val translation = identifier.identifyUnsafe(element)
+                if (translation?.foldingElement != null) {
+                    val range =
+                        if (translation.foldingElement is PsiExpressionList) {
+                            translation.foldingElement.textRange.grown(-2).shiftRight(1)
+                        } else {
+                            translation.foldingElement.textRange
+                        }
+                    descriptors.add(
+                        object : FoldingDescriptor(
+                            translation.foldingElement.node,
+                            range,
+                            FoldingGroup.newGroup("mc.translation." + translation.key)) {
+                            override fun getPlaceholderText(): String? {
+                                if (translation.formattingError == TranslationInstance.Companion.FormattingError.MISSING) {
+                                    return "\"Insufficient parameters for formatting '${translation.text}'\""
                                 }
+                                return "\"${translation.text}\""
                             }
-                        )
-                    }
+                        }
+                    )
                 }
             }
-            return descriptors.toTypedArray()
         }
+        return descriptors.toTypedArray()
+    }
 
     override fun getPlaceholderText(node: ASTNode) = "..."
 

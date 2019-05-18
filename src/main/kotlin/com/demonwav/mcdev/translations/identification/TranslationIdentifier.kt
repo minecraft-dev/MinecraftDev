@@ -10,9 +10,9 @@
 
 package com.demonwav.mcdev.translations.identification
 
+import com.demonwav.mcdev.translations.identification.TranslationInstance.Companion.FormattingError
 import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.index.merge
-import com.demonwav.mcdev.translations.identification.TranslationInstance.Companion.FormattingError
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiElement

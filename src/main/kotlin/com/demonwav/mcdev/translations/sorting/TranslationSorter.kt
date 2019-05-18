@@ -10,11 +10,11 @@
 
 package com.demonwav.mcdev.translations.sorting
 
-import com.demonwav.mcdev.translations.TranslationConstants
-import com.demonwav.mcdev.translations.actions.TranslationSortOrderDialog
 import com.demonwav.mcdev.translations.Translation
-import com.demonwav.mcdev.translations.index.TranslationIndex
+import com.demonwav.mcdev.translations.TranslationConstants
 import com.demonwav.mcdev.translations.TranslationFiles
+import com.demonwav.mcdev.translations.actions.TranslationSortOrderDialog
+import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.lexicographical
 import com.demonwav.mcdev.util.mcDomain

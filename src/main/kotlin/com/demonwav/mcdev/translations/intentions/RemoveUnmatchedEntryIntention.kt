@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.translations.intentions
 
 import com.demonwav.mcdev.translations.TranslationFiles
-import com.demonwav.mcdev.translations.lang.gen.psi.LangTypes
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project

@@ -12,10 +12,10 @@ package com.demonwav.mcdev.translations.reference
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.translations.TranslationConstants
+import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.lang.MCLangLanguage
 import com.demonwav.mcdev.translations.lang.gen.psi.LangTypes
-import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.util.getSimilarity
 import com.demonwav.mcdev.util.mcDomain
 import com.intellij.codeInsight.completion.CompletionContributor

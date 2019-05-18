@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.translations.inspections
 
-import com.demonwav.mcdev.translations.reference.TranslationGotoModel
 import com.demonwav.mcdev.translations.identification.LiteralTranslationIdentifier
+import com.demonwav.mcdev.translations.reference.TranslationGotoModel
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor

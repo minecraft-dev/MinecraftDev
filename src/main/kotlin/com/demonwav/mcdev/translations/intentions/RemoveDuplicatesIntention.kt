@@ -13,16 +13,11 @@ package com.demonwav.mcdev.translations.intentions
 import com.demonwav.mcdev.translations.Translation
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.index.TranslationInverseIndex
-import com.demonwav.mcdev.translations.lang.gen.psi.LangEntry
-import com.demonwav.mcdev.translations.lang.gen.psi.LangTypes
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
-import com.intellij.codeInsight.intention.impl.BaseIntentionAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.util.IncorrectOperationException
 
 class RemoveDuplicatesIntention(private val translation: Translation) : PsiElementBaseIntentionAction() {
     override fun getText() = "Remove duplicates (keep this translation)"

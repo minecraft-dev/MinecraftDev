@@ -16,7 +16,6 @@ import com.demonwav.mcdev.translations.lang.LangLexerAdapter
 import com.demonwav.mcdev.translations.lang.gen.psi.LangTypes
 import com.intellij.json.JsonElementTypes
 import com.intellij.json.JsonLexer
-import com.intellij.json.psi.JsonProperty
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner
 import com.intellij.lang.cacheBuilder.WordsScanner
 import com.intellij.lang.findUsages.FindUsagesProvider

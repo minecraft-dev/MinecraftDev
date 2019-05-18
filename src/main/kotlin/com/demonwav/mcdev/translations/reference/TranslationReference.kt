@@ -12,11 +12,11 @@ package com.demonwav.mcdev.translations.reference
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.translations.TranslationConstants
+import com.demonwav.mcdev.translations.TranslationFiles
+import com.demonwav.mcdev.translations.identification.TranslationInstance
 import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.index.TranslationInverseIndex
 import com.demonwav.mcdev.translations.lang.gen.psi.LangEntry
-import com.demonwav.mcdev.translations.identification.TranslationInstance
-import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.lookup.LookupElementBuilder

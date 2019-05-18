@@ -11,15 +11,11 @@
 package com.demonwav.mcdev.translations.intentions
 
 import com.demonwav.mcdev.translations.TranslationFiles
-import com.demonwav.mcdev.translations.lang.gen.psi.LangEntry
-import com.demonwav.mcdev.translations.lang.gen.psi.LangTypes
 import com.intellij.codeInsight.FileModificationService
-import com.intellij.codeInsight.intention.BaseElementAtCaretIntentionAction
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiNamedElement
 import com.intellij.util.IncorrectOperationException
 
 class TrimKeyIntention : PsiElementBaseIntentionAction() {
