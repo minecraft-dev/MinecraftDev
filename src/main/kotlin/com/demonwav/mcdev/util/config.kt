@@ -10,20 +10,18 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.reflect.TypeToken
 import com.intellij.openapi.application.PathManager
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.ModificationTracker
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.project.stateStore
+import com.intellij.psi.PsiElement
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.util.io.inputStream
@@ -48,11 +46,9 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
     private val builtinEntries by lazy { build(load(javaClass.getResource("/configs/$name").toURI())) }
     private val globalModificationTracker = ConfigModificationTracker()
 
-    operator fun get(module: Module): List<V> {
-        val facet = MinecraftFacet.getInstance(module) ?: return listOf()
-        val mcpModule = facet.getModuleOfType(McpModuleType) ?: return listOf()
-        val semVer = SemanticVersion.parse(mcpModule.getSettings().minecraftVersion ?: return listOf())
-        return getProjectEntries(module.project).floorEntry(semVer)?.value ?: emptyList()
+    operator fun get(element: PsiElement): List<V> {
+        val version = element.mcVersion ?: return listOf()
+        return getProjectEntries(element.project).floorEntry(version)?.value ?: emptyList()
     }
 
     private fun build(files: Map<SemanticVersion, ConfigFile>): TreeMap<SemanticVersion, List<V>> {

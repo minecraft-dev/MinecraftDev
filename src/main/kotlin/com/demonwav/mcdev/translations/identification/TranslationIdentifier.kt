@@ -44,7 +44,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                 val call = container.parent as PsiCallExpression
                 val index = container.expressions.indexOf(element)
 
-                val functions = TranslationFunctionRepository[element.findModule() ?: return null]
+                val functions = TranslationFunctionRepository[element]
                 for (function in functions) {
                     if (function.matches(call, index)) {
                         val translationKey = function.getTranslationKey(call, referenceElement) ?: continue
