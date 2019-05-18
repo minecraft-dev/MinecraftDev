@@ -1,0 +1,74 @@
+{
+    "entries": [
+        {
+            "__comment": "Client I18n.format",
+            "member": "net.minecraft.client.resources.I18n#func_135052_a(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;",
+            "srgName": true,
+            "paramIndex": 0,
+            "keyPrefix": "",
+            "keySuffix": "",
+            "formatting": true,
+            "foldParametersOnly": false
+        },
+        {
+            "__comment": "Server I18n.translateToLocal",
+            "member": "net.minecraft.util.text.translation.I18n#func_74838_a(Ljava/lang/String;)Ljava/lang/String;",
+            "srgName": true,
+            "paramIndex": 0,
+            "keyPrefix": "",
+            "keySuffix": "",
+            "formatting": false,
+            "foldParametersOnly": false
+        },
+        {
+            "__comment": "Server I18n.translateToLocalFormatted",
+            "member": "net.minecraft.util.text.translation.I18n#func_74837_a(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;",
+            "srgName": true,
+            "paramIndex": 0,
+            "keyPrefix": "",
+            "keySuffix": "",
+            "formatting": false,
+            "foldParametersOnly": false
+        },
+        {
+            "__comment": "TextComponentTranslation constructor",
+            "member": "net.minecraft.util.text.TextComponentTranslation#<init>(Ljava/lang/String;[Ljava/lang/Object;)V",
+            "srgName": false,
+            "paramIndex": 0,
+            "keyPrefix": "",
+            "keySuffix": "",
+            "formatting": true,
+            "foldParametersOnly": true
+        },
+        {
+            "__comment": "CommandException constructor",
+            "member": "net.minecraft.command.CommandException#<init>(Ljava/lang/String;[Ljava/lang/Object;)V",
+            "srgName": false,
+            "paramIndex": 0,
+            "keyPrefix": "",
+            "keySuffix": "",
+            "formatting": true,
+            "foldParametersOnly": true
+        },
+        {
+            "__comment": "Block.setUnlocalizedName",
+            "member": "net.minecraft.block.Block#func_149663_c(Ljava/lang/String;)Lnet/minecraft/block/Block;",
+            "srgName": true,
+            "paramIndex": 0,
+            "keyPrefix": "tile.",
+            "keySuffix": ".name",
+            "formatting": false,
+            "foldParametersOnly": true
+        },
+        {
+            "__comment": "Item.setUnlocalizedName",
+            "member": "net.minecraft.item.Item#func_77655_b(Ljava/lang/String;)Lnet/minecraft/item/Item;",
+            "srgName": true,
+            "paramIndex": 0,
+            "keyPrefix": "item.",
+            "keySuffix": ".name",
+            "formatting": false,
+            "foldParametersOnly": true
+        }
+    ]
+}

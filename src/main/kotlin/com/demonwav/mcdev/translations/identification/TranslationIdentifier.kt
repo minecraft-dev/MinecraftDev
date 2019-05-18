@@ -13,6 +13,7 @@ package com.demonwav.mcdev.translations.identification
 import com.demonwav.mcdev.translations.identification.TranslationInstance.Companion.FormattingError
 import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.index.merge
+import com.demonwav.mcdev.util.findModule
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiElement
@@ -43,7 +44,8 @@ abstract class TranslationIdentifier<T : PsiElement> {
                 val call = container.parent as PsiCallExpression
                 val index = container.expressions.indexOf(element)
 
-                for (function in TranslationInstance.translationFunctions) {
+                val functions = TranslationFunctionRepository[element.findModule() ?: return null]
+                for (function in functions) {
                     if (function.matches(call, index)) {
                         val translationKey = function.getTranslationKey(call, referenceElement) ?: continue
                         val entries = TranslationIndex.getAllDefaultEntries(project).merge("")
@@ -53,8 +55,8 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                 val (formatted, superfluousParams) = function.format(translation, call)
                                     ?: (translation to -1)
                                 return TranslationInstance(
-                                    if (function.foldParameters) container else call,
-                                    function.matchedIndex,
+                                    if (function.foldParametersOnly) container else call,
+                                    function.paramIndex,
                                     referenceElement,
                                     translationKey,
                                     formatted,
@@ -63,8 +65,8 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                 )
                             } catch (ignored: MissingFormatArgumentException) {
                                 return TranslationInstance(
-                                    if (function.foldParameters) container else call,
-                                    function.matchedIndex,
+                                    if (function.foldParametersOnly) container else call,
+                                    function.paramIndex,
                                     referenceElement,
                                     translationKey,
                                     translation,
@@ -74,7 +76,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                         } else {
                             return TranslationInstance(
                                 null,
-                                function.matchedIndex,
+                                function.paramIndex,
                                 referenceElement,
                                 translationKey,
                                 null

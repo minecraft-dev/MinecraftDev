@@ -141,6 +141,7 @@
                                order="before javaSkipAutopopupInStrings"/>
         <fileBasedIndex implementation="com.demonwav.mcdev.translations.index.TranslationIndex"/>
         <fileBasedIndex implementation="com.demonwav.mcdev.translations.index.TranslationInverseIndex"/>
+        <projectService serviceImplementation="com.demonwav.mcdev.translations.identification.TranslationFunctionRepository$ProjectModificationTracking"/>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
