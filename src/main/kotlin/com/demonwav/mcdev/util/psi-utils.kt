@@ -203,7 +203,7 @@ inline fun <T> PsiElement.cached(crossinline compute: () -> T): T {
     return CachedValuesManager.getCachedValue(this) { CachedValueProvider.Result.create(compute(), this) }
 }
 
-fun PsiElement.findMcpModule(): McpModule? {
+fun PsiElement.findMcpModule() = this.cached {
     val file = containingFile.virtualFile
     val index = ProjectFileIndex.getInstance(project)
     val modules = if (index.isInLibrary(file)) {
@@ -211,7 +211,7 @@ fun PsiElement.findMcpModule(): McpModule? {
         ModuleManager.getInstance(project).modules.asSequence()
             .filter { OrderEntryUtil.findLibraryOrderEntry(ModuleRootManager.getInstance(it), library) != null }
     } else sequenceOf(this.findModule())
-    return modules.mapNotNull { it?.findMcpModule() }.firstOrNull()
+    modules.mapNotNull { it?.findMcpModule() }.firstOrNull()
 }
 
 private fun Module.findMcpModule(): McpModule? {
@@ -224,4 +224,4 @@ private fun Module.findMcpModule(): McpModule? {
 }
 
 val PsiElement.mcVersion: SemanticVersion?
-    get() = findMcpModule()?.let { SemanticVersion.parse(it.getSettings().minecraftVersion ?: return@let null) }
+    get() = this.cached { findMcpModule()?.let { SemanticVersion.parse(it.getSettings().minecraftVersion ?: return@let null) } }
