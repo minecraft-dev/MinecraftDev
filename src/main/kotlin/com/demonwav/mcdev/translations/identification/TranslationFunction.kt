@@ -21,14 +21,14 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 
-class TranslationFunction(
+data class TranslationFunction(
     val member: MemberReference,
-    private val srgName: Boolean = false,
+    val srgName: Boolean,
     val paramIndex: Int,
-    private val keyPrefix: String = "",
-    private val keySuffix: String = "",
+    val keyPrefix: String,
+    val keySuffix: String,
     val formatting: Boolean,
-    val foldParametersOnly: Boolean = false
+    val foldParametersOnly: Boolean
 ) {
     private fun getMethod(context: PsiElement): PsiMethod? {
         var reference = member

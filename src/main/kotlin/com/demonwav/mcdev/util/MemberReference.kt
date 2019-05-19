@@ -13,6 +13,8 @@ package com.demonwav.mcdev.util
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
@@ -88,13 +90,17 @@ data class MemberReference(
         return member?.let { ret(psiClass, member) }
     }
 
-    object Deserializer : JsonDeserializer<MemberReference> {
+    object JsonAdapter : JsonSerializer<MemberReference>, JsonDeserializer<MemberReference> {
+        override fun serialize(value: MemberReference, type: Type, ctx: JsonSerializationContext): JsonElement? =
+            ctx.serialize(listOfNotNull(value.owner, value.name).joinToString("#") + (value.descriptor ?: ""))
+
         override fun deserialize(json: JsonElement, type: Type, ctx: JsonDeserializationContext): MemberReference {
             val ref = json.asString
-            val className = ref.substringBefore('#')
-            val methodName = ref.substring(className.length + 1, ref.indexOf("("))
-            val methodDesc = ref.substring(className.length + methodName.length + 1)
-            return MemberReference(methodName, methodDesc, className)
+            val descriptorStart = ref.indexOf('(')
+            val owner = ref.substringBefore('#', "").takeIf { it.isNotEmpty() }
+            val methodName = ref.substring(ref.indexOf('#') + 1, if (descriptorStart >= 0) descriptorStart else ref.length)
+            val methodDesc = if (descriptorStart >= 0) ref.substring(descriptorStart) else null
+            return MemberReference(methodName, methodDesc, owner)
         }
     }
 }

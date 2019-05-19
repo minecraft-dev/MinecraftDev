@@ -45,6 +45,7 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
     }.create()
     private val builtinEntries by lazy { build(load(javaClass.getResource("/configs/$name").toURI())) }
     private val globalModificationTracker = ConfigModificationTracker()
+    private val globalConfigDirectory = Paths.get(PathManager.getConfigPath(), "mcdev_configs", name)
 
     operator fun get(element: PsiElement): List<V> {
         val version = element.mcVersion ?: return listOf()
@@ -148,17 +149,36 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
     }
 
     fun getGlobalConfigFiles(): Map<SemanticVersion, ConfigFile> {
-        val path = Paths.get(PathManager.getConfigPath(), "mcdev_configs", name)
-        return load(path.toUri())
+        return load(globalConfigDirectory.toUri())
     }
 
     fun getProjectConfigFiles(project: Project): Map<SemanticVersion, ConfigFile> {
-        val path = Paths.get(
+        return load(getProjectConfigDirectory(project).toUri())
+    }
+
+    fun saveGlobalConfig(version: SemanticVersion, inherit: Boolean, entries: List<V>) {
+        saveConfig(version, globalConfigDirectory, inherit, entries, globalModificationTracker)
+    }
+
+    fun saveProjectConfig(project: Project, version: SemanticVersion, inherit: Boolean, entries: List<V>) {
+        saveConfig(version, getProjectConfigDirectory(project), inherit, entries, getProjectModificationTracker(project))
+    }
+
+    private fun saveConfig(version: SemanticVersion, configDirectory: Path, inherit: Boolean, entries: List<V>, modificationTracker: ConfigModificationTracker) {
+        if (!Files.exists(configDirectory)) {
+            Files.createDirectories(configDirectory)
+        }
+        val path = configDirectory.resolve("${version.versionString}.json")
+        Files.write(path, gson.toJson(ConfigFile(inherit, entries)).toByteArray())
+        modificationTracker.update()
+    }
+
+    private fun getProjectConfigDirectory(project: Project): Path {
+        return Paths.get(
             FileUtil.toSystemDependentName(project.stateStore.getDirectoryStorePath(false)!!),
             "mcdev_configs",
             name
         )
-        return load(path.toUri())
     }
 
     protected abstract fun GsonBuilder.setup()
