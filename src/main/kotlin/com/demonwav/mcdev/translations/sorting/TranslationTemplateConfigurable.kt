@@ -28,8 +28,7 @@ import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JPanel
 
-
-class TranslationTemplateConfigurable : Configurable {
+class TranslationTemplateConfigurable(private val project: Project) : Configurable {
     private lateinit var panel: JPanel
     private lateinit var cmbScheme: JComboBox<String>
     private lateinit var editorPanel: JPanel
@@ -44,30 +43,29 @@ class TranslationTemplateConfigurable : Configurable {
         return panel
     }
 
-    private fun getActiveTemplateText(project: Project?) =
+    private fun getActiveTemplateText() =
         when {
             cmbScheme.selectedIndex == 0 -> TemplateManager.getGlobalTemplateText()
-            project != null -> TemplateManager.getProjectTemplateText(project)
+            !project.isDefault -> TemplateManager.getProjectTemplateText(project)
             else -> "You must have selected a project for this!"
         }
 
     private fun init() {
-        val project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel))
-        if (project == null) {
+        if (project.isDefault) {
             cmbScheme.selectedIndex = 0
             cmbScheme.model = DefaultComboBoxModel(arrayOf("Global"))
         } else if (cmbScheme.selectedIndex == 0) {
             cmbScheme.model = DefaultComboBoxModel(arrayOf("Global", "Project"))
         }
         cmbScheme.addActionListener {
-            setupEditor(project)
+            setupEditor()
         }
 
-        setupEditor(project)
+        setupEditor()
     }
 
-    private fun setupEditor(project: Project?) {
-        templateEditor = TemplateEditorUtil.createEditor(false, getActiveTemplateText(project))
+    private fun setupEditor() {
+        templateEditor = TemplateEditorUtil.createEditor(false, getActiveTemplateText())
         val editorColorsScheme = EditorColorsManager.getInstance().globalScheme
         val highlighter = LexerEditorHighlighter(LangSyntaxHighlighter(TranslationTemplateLexerAdapter()), editorColorsScheme)
         (templateEditor as EditorEx).highlighter = highlighter
@@ -80,7 +78,7 @@ class TranslationTemplateConfigurable : Configurable {
     }
 
     override fun isModified(): Boolean {
-        return templateEditor.document.text != getActiveTemplateText(CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel)))
+        return templateEditor.document.text != getActiveTemplateText()
     }
 
     override fun apply() {
