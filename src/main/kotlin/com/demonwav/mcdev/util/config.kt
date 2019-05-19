@@ -43,7 +43,7 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
         registerTypeAdapter(ConfigFile::class.java, ConfigFileDeserializer())
         setup()
     }.create()
-    private val builtinEntries by lazy { build(load(javaClass.getResource("/configs/$name").toURI())) }
+    private val builtinFiles by lazy { load(javaClass.getResource("/configs/$name").toURI()).entries.sortedBy { it.key } }
     private val globalModificationTracker = ConfigModificationTracker()
     private val globalConfigDirectory = Paths.get(PathManager.getConfigPath(), "mcdev_configs", name)
 
@@ -52,22 +52,45 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
         return getProjectEntries(element.project).floorEntry(version)?.value ?: emptyList()
     }
 
-    private fun build(files: Map<SemanticVersion, ConfigFile>): TreeMap<SemanticVersion, List<V>> {
-        val sorted = files.entries.sortedBy { it.key }
+    private fun build(global: Map<SemanticVersion, ConfigFile>, project: Map<SemanticVersion, ConfigFile>): TreeMap<SemanticVersion, List<V>> {
+        fun getRelevant(version: SemanticVersion, files: List<Map.Entry<SemanticVersion, ConfigFile>>) =
+            files.filter { it.key <= version }
+                .takeLastUntil { !it.value.inherit }
+                .asSequence()
+                .map { MergeResult(it.key, it.value.entries) }
+
+        val globalSorted = global.entries.sortedBy { it.key }
+        val projectSorted = project.entries.sortedBy { it.key }
         return TreeMap(
-            files.mapValues { ref ->
+            project.mapValues { ref ->
                 // For each version, we want to inherit the values from the older version, unless the config specifies otherwise
                 // Hence, for each entry, collect all older versions and merge their lists of config values
-                sorted.filter { it.key <= ref.key }
-                    .takeLastUntil { !it.value.inherit }
-                    .asSequence()
-                    .map { it.value.entries }
+                val builtinRelevant = getRelevant(ref.key, builtinFiles)
+                val globalRelevant = getRelevant(ref.key, globalSorted)
+                val projectRelevant = getRelevant(ref.key, projectSorted)
+                merge(merge(builtinRelevant, globalRelevant), projectRelevant)
+                    .map { it.entries }
                     .reduce { acc, cur ->
                         acc.filter { older -> cur.none { newer -> newer.overrides(older) } } + cur
                     }
             }
         )
     }
+
+    private fun merge(lowPriority: Sequence<MergeResult>, highPriority: Sequence<MergeResult>): Sequence<MergeResult> {
+        val result = lowPriority.toMutableList()
+        for (merged in highPriority) {
+            val current = result.find { it.version == merged.version }
+            if (current == null) {
+                result.add(merged)
+            } else {
+                current.entries = current.entries.filter { lower -> merged.entries.none { higher -> higher.overrides(lower) } } + merged.entries
+            }
+        }
+        return result.asSequence()
+    }
+
+    private inner class MergeResult(val version: SemanticVersion, var entries: List<V>)
 
     private fun <T> List<T>.takeLastUntil(predicate: (T) -> Boolean): List<T> {
         val iterator = listIterator(size)
@@ -119,34 +142,13 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
             project,
             Key("project.mcdev_configs.$name"),
             {
-                val globalEntries = getGlobalEntries(project)
-                val projectEntries = build(getProjectConfigFiles(project))
-                val merged = merge(merge(builtinEntries, globalEntries), projectEntries)
-                CachedValueProvider.Result.create(merged, getProjectModificationTracker(project))
+                val globalFiles = getGlobalConfigFiles()
+                val projectFiles = getProjectConfigFiles(project)
+                val merged = build(globalFiles, projectFiles)
+                CachedValueProvider.Result.create(merged, getProjectModificationTracker(project), globalModificationTracker)
             },
             false
         )
-
-    private fun getGlobalEntries(project: Project) =
-        CachedValuesManager.getManager(project).getCachedValue(
-            project,
-            Key("mcdev_configs.$name"),
-            { CachedValueProvider.Result.create(build(getGlobalConfigFiles()), globalModificationTracker) },
-            false
-        )
-
-    private fun merge(lowPriority: TreeMap<SemanticVersion, List<V>>, highPriority: TreeMap<SemanticVersion, List<V>>): TreeMap<SemanticVersion, List<V>> {
-        val result = TreeMap(lowPriority)
-        for ((version, entries) in highPriority) {
-            if (version !in result) {
-                result[version] = entries
-            } else {
-                val current = result[version] ?: listOf()
-                result[version] = current.filter { lower -> entries.none { higher -> higher.overrides(lower) } } + entries
-            }
-        }
-        return result
-    }
 
     fun getGlobalConfigFiles(): Map<SemanticVersion, ConfigFile> {
         return load(globalConfigDirectory.toUri())
