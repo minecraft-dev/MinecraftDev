@@ -41,7 +41,10 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiSubstitutor
+import com.intellij.psi.presentation.java.ClassPresentationUtil
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.util.PsiFormatUtil
 import com.intellij.psi.util.PsiFormatUtilBase
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.ErrorLabel
@@ -627,21 +630,27 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
     }
 
     private inner class FunctionColumn : ColumnInfo<FunctionEntry, String>("") {
-        private val methodCellRenderer = MethodCellRenderer(
-            true,
-            PsiFormatUtilBase.SHOW_CONTAINING_CLASS or PsiFormatUtilBase.SHOW_NAME or PsiFormatUtilBase.SHOW_PARAMETERS
-        )
-
         override fun valueOf(entry: FunctionEntry?): String? {
             if (entry == null) {
                 return null
             }
-            val method = entry.findMethod(project) ?: return formatNonProjectMethod(entry)
-            return methodCellRenderer.getElementText(method)
+            val method = entry.findMethod(project)
+            val className = method?.containingClass?.let { ClassPresentationUtil.getNameForClass(it, false) } ?: entry.className
+            val methodName = method?.internalName ?: entry.methodName
+            val descriptor = method?.let {
+                PsiFormatUtil.formatMethod(it, PsiSubstitutor.EMPTY, PsiFormatUtilBase.SHOW_PARAMETERS, PsiFormatUtilBase.SHOW_TYPE)
+            } ?: entry.methodDescriptor
+            val result = StringBuilder()
+            result.append(className.trim())
+            if (className.isNotBlank() && methodName != "<init>") {
+                result.append('.')
+            }
+            if (methodName != "<init>") {
+                result.append(methodName)
+            }
+            result.append(descriptor)
+            return result.toString()
         }
-
-        private fun formatNonProjectMethod(entry: FunctionEntry): String =
-            "${entry.className}.${entry.methodName}${entry.methodDescriptor}"
     }
 
     private inner class FunctionTable : TableView<FunctionEntry>() {

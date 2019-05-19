@@ -156,6 +156,16 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
         return load(getProjectConfigDirectory(project).toUri())
     }
 
+    fun addToGlobalConfig(version: SemanticVersion, entry: V) {
+        val current = getGlobalConfigFiles()[version] ?: ConfigFile(true, emptyList())
+        saveGlobalConfig(version, current.inherit, current.entries + entry)
+    }
+
+    fun addToProjectConfig(project: Project, version: SemanticVersion, entry: V) {
+        val current = getProjectConfigFiles(project)[version] ?: ConfigFile(true, emptyList())
+        saveProjectConfig(project, version, current.inherit, current.entries + entry)
+    }
+
     fun saveGlobalConfig(version: SemanticVersion, inherit: Boolean, entries: List<V>) {
         saveConfig(version, globalConfigDirectory, inherit, entries, globalModificationTracker)
     }

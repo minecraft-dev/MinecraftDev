@@ -147,6 +147,11 @@
         <fileBasedIndex implementation="com.demonwav.mcdev.translations.index.TranslationIndex"/>
         <fileBasedIndex implementation="com.demonwav.mcdev.translations.index.TranslationInverseIndex"/>
         <projectService serviceImplementation="com.demonwav.mcdev.translations.identification.TranslationFunctionRepository$ProjectModificationTracking"/>
+        <intentionAction>
+            <className>com.demonwav.mcdev.translations.intentions.CreateTranslationFunctionIntention</className>
+            <category>Minecraft</category>
+            <descriptionDirectoryName>createTranslationFunction</descriptionDirectoryName>
+        </intentionAction>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
