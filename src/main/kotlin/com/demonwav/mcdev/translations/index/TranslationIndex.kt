@@ -54,12 +54,21 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
         fun getProjectDefaultTranslations(project: Project, domain: String? = null) =
             getProjectDefaultEntries(project, domain).flatten()
 
-        fun getTranslations(project: Project, file: VirtualFile) =
-            getEntries(GlobalSearchScope.fileScope(project, file), TranslationFiles.getLocale(file), file.mcDomain).flatten()
+        fun getTranslations(project: Project, file: VirtualFile): Sequence<Translation> {
+            return getEntries(
+                GlobalSearchScope.fileScope(project, file),
+                TranslationFiles.getLocale(file) ?: return emptySequence(),
+                file.mcDomain
+            ).flatten()
+        }
 
         fun getTranslations(file: PsiFile): Sequence<Translation> {
             val virtualFile = file.virtualFile
-            return getEntries(GlobalSearchScope.fileScope(file), TranslationFiles.getLocale(virtualFile), virtualFile.mcDomain).flatten()
+            return getEntries(
+                GlobalSearchScope.fileScope(file),
+                TranslationFiles.getLocale(virtualFile) ?: return emptySequence(),
+                virtualFile.mcDomain
+            ).flatten()
         }
 
         fun getAllDefaultEntries(project: Project, domain: String? = null) =
@@ -101,7 +110,8 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
         override fun map(inputData: FileContent): MutableMap<String, TranslationIndexEntry> {
             val domain = inputData.file.mcDomain ?: return mutableMapOf()
             val entry = TranslationProvider.INSTANCES[inputData.fileType]?.map(domain, inputData) ?: return mutableMapOf()
-            return mutableMapOf(TranslationFiles.getLocale(inputData.file) to entry)
+            val locale = TranslationFiles.getLocale(inputData.file) ?: return mutableMapOf()
+            return mutableMapOf(locale to entry)
         }
     }
 }

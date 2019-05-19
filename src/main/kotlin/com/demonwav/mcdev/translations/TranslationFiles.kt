@@ -10,8 +10,6 @@
 
 package com.demonwav.mcdev.translations
 
-import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.index.TranslationInverseIndex
 import com.demonwav.mcdev.translations.lang.LangFile
@@ -24,7 +22,6 @@ import com.demonwav.mcdev.translations.sorting.Template
 import com.demonwav.mcdev.translations.sorting.TemplateElement
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.applyWriteAction
-import com.demonwav.mcdev.util.findMcpModule
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.mcDomain
 import com.demonwav.mcdev.util.mcPath
@@ -36,7 +33,6 @@ import com.intellij.json.psi.JsonObject
 import com.intellij.json.psi.JsonProperty
 import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.text.StringUtil
@@ -55,11 +51,11 @@ import java.util.Locale
 object TranslationFiles {
     private val MC_1_12_2 = SemanticVersion.release(1, 12, 2)
 
-    fun isTranslationFile(file: VirtualFile) =
-        file.mcDomain != null && file.mcPath?.startsWith("lang/") == true && file.fileType in listOf(LangFileType, JsonFileType.INSTANCE)
+    fun isTranslationFile(file: VirtualFile?) =
+        file?.mcDomain != null && file.mcPath?.startsWith("lang/") == true && file.fileType in listOf(LangFileType, JsonFileType.INSTANCE)
 
-    fun getLocale(file: VirtualFile) =
-        file.nameWithoutExtension.toLowerCase(Locale.ROOT)
+    fun getLocale(file: VirtualFile?) =
+        file?.nameWithoutExtension?.toLowerCase(Locale.ROOT)
 
     tailrec fun seekTranslation(element: PsiElement): PsiNamedElement? {
         return TranslationFiles.toTranslation(element)?.let { element as? PsiNamedElement }

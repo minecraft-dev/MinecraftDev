@@ -12,7 +12,6 @@ package com.demonwav.mcdev.translations.inspections
 
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.identification.LiteralTranslationIdentifier
-import com.demonwav.mcdev.util.findModule
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType

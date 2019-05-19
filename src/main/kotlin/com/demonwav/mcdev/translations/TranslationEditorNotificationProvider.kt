@@ -28,18 +28,18 @@ import com.intellij.ui.EditorNotifications
 import com.intellij.util.ui.UIUtil
 import java.awt.Color
 
-class TranslationEditorNotificationProvider(private val project: Project) : EditorNotifications.Provider<TranslationEditorNotificationProvider.InfoPanel>() {
+class TranslationEditorNotificationProvider() : EditorNotifications.Provider<TranslationEditorNotificationProvider.InfoPanel>() {
     private var show: Boolean = true
 
     override fun getKey() = KEY
 
-    override fun createNotificationPanel(file: VirtualFile, fileEditor: FileEditor): InfoPanel? {
+    override fun createNotificationPanel(file: VirtualFile, fileEditor: FileEditor, project: Project): InfoPanel? {
         val locale = TranslationFiles.getLocale(file)
         if (!show || !TranslationFiles.isTranslationFile(file) || locale == TranslationConstants.DEFAULT_LOCALE) {
             return null
         }
 
-        val missingTranslations = getMissingTranslations(file)
+        val missingTranslations = getMissingTranslations(project, file)
         if (missingTranslations.any()) {
             val panel = InfoPanel()
             panel.setText("Translation file doesn't match default one (${TranslationConstants.DEFAULT_LOCALE} locale).")
@@ -69,7 +69,7 @@ class TranslationEditorNotificationProvider(private val project: Project) : Edit
         return null
     }
 
-    private fun getMissingTranslations(file: VirtualFile): Sequence<Translation> {
+    private fun getMissingTranslations(project: Project, file: VirtualFile): Sequence<Translation> {
         val domain = file.mcDomain
 
         val defaultTranslations = TranslationIndex.getProjectDefaultTranslations(project, domain)

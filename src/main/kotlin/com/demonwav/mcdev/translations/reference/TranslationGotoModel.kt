@@ -28,7 +28,7 @@ class TranslationGotoModel(project: Project, private val prefix: String, private
         arrayOf(ChooseByNameContributor.SYMBOL_EP_NAME.findExtensionOrFail(TranslationGotoSymbolContributor::class.java))
     ) {
     override fun acceptItem(item: NavigationItem?): Boolean {
-        return TranslationFiles.getLocale((item as PsiElement).containingFile.virtualFile) == TranslationConstants.DEFAULT_LOCALE
+        return TranslationFiles.getLocale((item as PsiElement).containingFile?.virtualFile) == TranslationConstants.DEFAULT_LOCALE
     }
 
     override fun getElementsByName(name: String, parameters: FindSymbolParameters, canceled: ProgressIndicator): Array<Any> {

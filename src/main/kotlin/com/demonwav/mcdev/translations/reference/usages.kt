@@ -25,7 +25,7 @@ import com.intellij.psi.tree.TokenSet
 
 sealed class TranslationFindUsagesProvider : FindUsagesProvider {
     override fun canFindUsagesFor(element: PsiElement) =
-        element is PsiNamedElement && element.containingFile.virtualFile.let {
+        element is PsiNamedElement && element.containingFile?.virtualFile.let {
             TranslationFiles.isTranslationFile(it) && TranslationFiles.getLocale(it) == TranslationConstants.DEFAULT_LOCALE
         }
 

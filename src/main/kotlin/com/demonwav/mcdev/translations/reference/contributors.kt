@@ -15,7 +15,6 @@ import com.demonwav.mcdev.translations.identification.TranslationIdentifier
 import com.demonwav.mcdev.translations.identification.TranslationInstance
 import com.demonwav.mcdev.translations.lang.gen.psi.LangEntry
 import com.demonwav.mcdev.translations.lang.gen.psi.LangTypes
-import com.demonwav.mcdev.util.mcPath
 import com.intellij.json.JsonElementTypes
 import com.intellij.json.psi.JsonProperty
 import com.intellij.openapi.util.TextRange
@@ -55,7 +54,7 @@ class JsonReferenceContributor : PsiReferenceContributor() {
             PlatformPatterns.psiElement().withElementType(JsonElementTypes.PROPERTY),
             object : PsiReferenceProvider() {
                 override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
-                    if (!TranslationFiles.isTranslationFile(element.containingFile.virtualFile)) {
+                    if (!TranslationFiles.isTranslationFile(element.containingFile?.virtualFile)) {
                         return arrayOf()
                     }
                     val entry = element as? JsonProperty ?: return arrayOf()
@@ -66,7 +65,7 @@ class JsonReferenceContributor : PsiReferenceContributor() {
                     return arrayOf(
                         TranslationReference(
                             element,
-                            range.shiftRight(1).grown(-2),
+                            element.textRange,
                             TranslationInstance.Key("", entry.name, "")
                         ) { elem, _, newName ->
                             (elem as JsonProperty).setName(newName)

@@ -68,7 +68,7 @@ class TranslationReference(
     }
 
     override fun isReferenceTo(element: PsiElement): Boolean {
-        if (TranslationFiles.getLocale(element.containingFile.virtualFile) != TranslationConstants.DEFAULT_LOCALE) {
+        if (TranslationFiles.getLocale(element.containingFile?.virtualFile) != TranslationConstants.DEFAULT_LOCALE) {
             return false
         }
 

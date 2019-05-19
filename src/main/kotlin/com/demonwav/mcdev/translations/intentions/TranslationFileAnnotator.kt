@@ -48,7 +48,7 @@ class TranslationFileAnnotator : Annotator {
     }
 
     private fun checkEntryMatchesDefault(element: PsiElement, translation: Translation, annotations: AnnotationHolder) {
-        val domain = element.containingFile.virtualFile.mcDomain
+        val domain = element.containingFile?.virtualFile?.mcDomain
         val defaultEntries = TranslationIndex.getAllDefaultEntries(element.project, domain)
         if (defaultEntries.any { it.contains(translation.key) }) {
             return

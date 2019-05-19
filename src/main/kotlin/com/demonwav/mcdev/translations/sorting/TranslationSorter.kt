@@ -15,7 +15,6 @@ import com.demonwav.mcdev.translations.TranslationConstants
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.actions.TranslationSortOrderDialog
 import com.demonwav.mcdev.translations.index.TranslationIndex
-import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.lexicographical
 import com.demonwav.mcdev.util.mcDomain
 import com.demonwav.mcdev.util.runWriteAction
@@ -45,7 +44,7 @@ object TranslationSorter {
 
     private fun sort(project: Project, file: PsiFile, ordering: Ordering, keepComments: Int) {
         val domain = file.virtualFile.mcDomain
-        val locale = TranslationFiles.getLocale(file.virtualFile)
+        val locale = TranslationFiles.getLocale(file.virtualFile) ?: return
         val translations = TranslationIndex.getTranslations(file)
         val sorted = translations.let {
             when (ordering) {

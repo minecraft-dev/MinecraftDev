@@ -20,7 +20,7 @@ import com.intellij.usageView.UsageViewTypeLocation
 
 class TranslationDescriptionProvider : ElementDescriptionProvider {
     override fun getElementDescription(element: PsiElement, location: ElementDescriptionLocation): String? {
-        val file = element.containingFile.virtualFile
+        val file = element.containingFile?.virtualFile
         if (!TranslationFiles.isTranslationFile(file)) {
             return null
         }

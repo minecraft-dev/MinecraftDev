@@ -11,8 +11,6 @@
 package com.demonwav.mcdev.translations.index
 
 import com.demonwav.mcdev.translations.TranslationFiles
-import com.demonwav.mcdev.util.mcDomain
-import com.demonwav.mcdev.util.mcPath
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.Consumer
