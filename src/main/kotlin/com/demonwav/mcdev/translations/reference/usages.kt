@@ -20,13 +20,12 @@ import com.intellij.lang.cacheBuilder.DefaultWordsScanner
 import com.intellij.lang.cacheBuilder.WordsScanner
 import com.intellij.lang.findUsages.FindUsagesProvider
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.tree.TokenSet
 
 sealed class TranslationFindUsagesProvider : FindUsagesProvider {
     override fun canFindUsagesFor(element: PsiElement) =
-        element is PsiNamedElement && element.containingFile?.virtualFile.let {
-            TranslationFiles.isTranslationFile(it) && TranslationFiles.getLocale(it) == TranslationConstants.DEFAULT_LOCALE
+        TranslationFiles.toTranslation(element) != null && element.containingFile?.virtualFile.let {
+            TranslationFiles.getLocale(it) == TranslationConstants.DEFAULT_LOCALE
         }
 
     override fun getHelpId(psiElement: PsiElement): String? =

@@ -25,6 +25,7 @@ import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.completion.CompletionUtil
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.json.JsonElementTypes
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi.JsonProperty
 import com.intellij.json.psi.JsonStringLiteral
@@ -80,15 +81,21 @@ class JsonCompletionContributor : TranslationCompletionContributor() {
             return
         }
 
-        if (KEY_PATTERN.accepts(position)) {
-            val text = position.text.let { it.substring(0, it.length - CompletionUtil.DUMMY_IDENTIFIER.length) }
+        val text = getKey(position)
+        if (text != null) {
             val domain = file.mcDomain
-            handleKey(text, position, domain, result)
+            handleKey(text.substring(0, text.length - CompletionUtil.DUMMY_IDENTIFIER.length), position, domain, result)
         }
     }
 
-    companion object {
-        val KEY_PATTERN = PlatformPatterns.psiElement(JsonStringLiteral::class.java).withParent(PlatformPatterns.psiElement(JsonProperty::class.java))
+    private tailrec fun getKey(element: PsiElement): String? {
+        if (element.node.elementType  == JsonElementTypes.DOUBLE_QUOTED_STRING) {
+            return getKey(element.parent)
+        }
+        if (element is JsonStringLiteral && element.isPropertyName) {
+            return element.value
+        }
+        return null
     }
 }
 
