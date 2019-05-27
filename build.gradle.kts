@@ -24,7 +24,7 @@ plugins {
     kotlin("jvm") version "1.3.11" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.5"
+    id("org.jetbrains.intellij") version "0.4.8"
     id("net.minecrell.licenser") version "0.4.1"
 }
 
