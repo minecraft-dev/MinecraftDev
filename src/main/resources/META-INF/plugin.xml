@@ -28,13 +28,13 @@
       <div>
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2019.1-1.2.22
+        v. 2019.2-1.2.22
       </div>
     ]]>
     </change-notes>
 
     <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="191" until-build="191.*"/>
+    <idea-version since-build="192.2840" until-build="192.*"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- This is grouped in the following order EXCEPT for localInspections and moduleTypes. All localInspections are grouped at the

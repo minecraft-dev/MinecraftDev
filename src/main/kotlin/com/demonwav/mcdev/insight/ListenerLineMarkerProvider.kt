@@ -53,7 +53,6 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
             element,
             element.textRange,
             icon,
-            Pass.UPDATE_ALL,
             createHandler(listener.second)
         )
     }
@@ -95,13 +94,11 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
         element: PsiElement,
         range: TextRange,
         icon: Icon,
-        passId: Int,
         handler: GutterIconNavigationHandler<PsiElement>
     ) : MergeableLineMarkerInfo<PsiElement>(
         element,
         range,
         icon,
-        passId,
         Function { "Go to Event declaration" },
         handler,
         GutterIconRenderer.Alignment.RIGHT

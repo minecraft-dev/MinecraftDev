@@ -21,14 +21,14 @@ buildscript {
 }
 
 plugins {
-    kotlin("jvm") version "1.3.11" // kept in sync with IntelliJ's bundled dep
+    kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
     id("org.jetbrains.intellij") version "0.4.8"
     id("net.minecrell.licenser") version "0.4.1"
 }
 
-val coroutineVersion = "1.0.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
+val coroutineVersion = "1.2.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
 defaultTasks("build")
 
@@ -106,7 +106,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1))
-    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:191.6183.87")
+    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:LATEST-EAP-SNAPSHOT")
 }
 
 intellij {

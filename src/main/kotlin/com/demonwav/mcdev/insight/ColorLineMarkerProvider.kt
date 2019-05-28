@@ -51,7 +51,6 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             element,
             element.textRange,
             ColorIcon(12, color),
-            Pass.UPDATE_ALL,
             FunctionUtil.nullConstant<Any, String>(),
             GutterIconNavigationHandler handler@ { _, psiElement ->
                 if (!psiElement.isWritable || !element.isValid) {
@@ -75,7 +74,6 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             element,
             element.textRange,
             ColorIcon(12, color),
-            Pass.UPDATE_ALL,
             FunctionUtil.nullConstant<Any, String>(),
             handler,
             GutterIconRenderer.Alignment.RIGHT

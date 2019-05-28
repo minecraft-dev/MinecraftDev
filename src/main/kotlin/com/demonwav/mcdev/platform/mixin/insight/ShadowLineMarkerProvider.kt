@@ -76,9 +76,17 @@ class ShadowLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavig
             "Choose target class of ${member.name!!}", null, renderer)
     }
 
-    private class LineMarker(identifier: PsiIdentifier, navHandler: GutterIconNavigationHandler<PsiIdentifier>)
-        : MergeableLineMarkerInfo<PsiIdentifier>(identifier, identifier.textRange, ICON,
-            Pass.LINE_MARKERS, TOOLTIP_FUNCTION, navHandler, GutterIconRenderer.Alignment.LEFT) {
+    private class LineMarker(
+        identifier: PsiIdentifier,
+        navHandler: GutterIconNavigationHandler<PsiIdentifier>
+    ) : MergeableLineMarkerInfo<PsiIdentifier>(
+        identifier,
+        identifier.textRange,
+        ICON,
+        TOOLTIP_FUNCTION,
+        navHandler,
+        GutterIconRenderer.Alignment.LEFT
+    ) {
 
         override fun canMergeWith(info: MergeableLineMarkerInfo<*>) = info is LineMarker
         override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<PsiElement>>) = TOOLTIP_FUNCTION
