@@ -44,6 +44,10 @@ class EntityConstructorInspection : BaseInspection() {
                     return
                 }
 
+                if (aClass.extendsOrImplements(McpConstants.ENTITY_FX)) {
+                    return
+                }
+
                 val module = ModuleUtilCore.findModuleForPsiElement(aClass) ?: return
 
                 val instance = MinecraftFacet.getInstance(module) ?: return
