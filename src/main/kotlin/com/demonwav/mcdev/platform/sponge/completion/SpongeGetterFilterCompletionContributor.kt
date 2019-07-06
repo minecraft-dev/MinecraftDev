@@ -89,7 +89,7 @@ class SpongeGetterFilterCompletionContributor : CompletionContributor() {
         }
 
         val eventReferenceType = eventHandler.parameters[0].type as? JvmReferenceType ?: return
-        val eventClass = eventReferenceType.resolve() as PsiClass
+        val eventClass = eventReferenceType.resolve() as? PsiClass ?: return
         for (method in eventClass.allMethods) {
             if (method.returnType != PsiType.VOID && method.containingClass?.qualifiedName != "java.lang.Object") {
                 result.addElement(JavaLookupElementBuilder.forMethod(method as PsiMethod, PsiSubstitutor.EMPTY)
