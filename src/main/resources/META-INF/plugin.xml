@@ -204,6 +204,12 @@
 
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mcp.debug.McpRunConfigurationExtension"/>
 
+        <!-- MCP Line Marker Provider -->
+        <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.platform.mcp.color.McpColorLineMarkerProvider"/>
+
+        <!-- MCP Annotator -->
+        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.mcp.color.McpColorAnnotator"/>
+
         <!-- access transformer file type -->
         <fileTypeFactory implementation="com.demonwav.mcdev.platform.mcp.at.AtFileTypeFactory"/>
         <lang.parserDefinition language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtParserDefinition"/>
@@ -371,6 +377,42 @@
         <!--endregion-->
 
         <!--region MCP INSPECTIONS-->
+        <localInspection displayName="MCP Color using non-hex literal"
+                         groupName="MCP"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.color.inspections.NonHexColorInspection"/>
+        <localInspection displayName="MCP Color missing one or more component"
+                         groupName="MCP"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.color.inspections.MissingColorComponentInspection"/>
+        <localInspection displayName="MCP Color missing alpha component"
+                         groupName="MCP"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.color.inspections.ColorMissingAlphaInspection"/>
+        <localInspection displayName="MCP Color superfluous alpha component"
+                         groupName="MCP"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.color.inspections.ColorSuperfluousAlphaInspection"/>
+        <localInspection displayName="MCP Color component out of range"
+                         groupName="MCP"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.color.inspections.ColorComponentOutOfRangeInspection"/>
+
         <localInspection displayName="MCP Entity class missing World constructor"
                          groupName="MCP"
                          language="JAVA"
@@ -717,7 +759,7 @@
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.action.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
                 text="Copy Mixin target reference"
-                description="Copy the reference to the element for use in an injector">
+                description="Copy the reference to the element for call in an injector">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.FindSrgMappingAction" id="FindSrgMappingAction"

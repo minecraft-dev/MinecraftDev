@@ -14,6 +14,7 @@ import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.i18n.I18nFileListener
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.mcp.color.McpColorMethods
 import com.demonwav.mcdev.platform.mcp.srg.SrgManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -31,6 +32,7 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
     var srgManager: SrgManager? = null
         private set
+    val colorMethods = McpColorMethods[settings.state.minecraftVersion ?: "1.12"]
 
     override fun init() {
         val files = getSettings().mappingFiles

@@ -1,0 +1,127 @@
+{
+    "entries": [
+        {
+            "__comment": "drawRect",
+            "member": "net.minecraft.client.gui.Gui#func_73734_a(IIIII)V",
+            "srgName": true,
+            "params": [
+                {
+                    "type": "int",
+                    "description": "Rectangle Color",
+                    "position": 4,
+                    "hasAlpha": true
+                }
+            ]
+        },
+        {
+            "__comment": "drawHorizontalLine",
+            "member": "net.minecraft.client.gui.Gui#func_73730_a(IIII)V",
+            "srgName": true,
+            "params": [
+                {
+                    "type": "int",
+                    "description": "Line Color",
+                    "position": 3,
+                    "hasAlpha": true
+                }
+            ]
+        },
+        {
+            "__comment": "drawVerticalLine",
+            "member": "net.minecraft.client.gui.Gui#func_73728_b(IIII)V",
+            "srgName": true,
+            "params": [
+                {
+                    "type": "int",
+                    "description": "Line Color",
+                    "position": 3,
+                    "hasAlpha": true
+                }
+            ]
+        },
+        {
+            "__comment": "drawGradientRect",
+            "member": "net.minecraft.client.gui.Gui#func_73733_a(IIIIII)V",
+            "srgName": true,
+            "params": [
+                {
+                    "type": "int",
+                    "description": "Start Color",
+                    "position": 4,
+                    "hasAlpha": true
+                },
+                {
+                    "type": "int",
+                    "description": "End Color",
+                    "position": 5,
+                    "hasAlpha": true
+                }
+            ]
+        },
+        {
+            "__comment": "clearColor",
+            "member": "net.minecraft.client.renderer.GlStateManager#func_179082_a(FFFF)V",
+            "srgName": true,
+            "params": [
+                {
+                    "type": "floatvec",
+                    "description": "Clear Color",
+                    "startPosition": 0,
+                    "hasAlpha": true
+                }
+            ]
+        },
+        {
+            "__comment": "color4f",
+            "member": "net.minecraft.client.renderer.GlStateManager#func_179131_c(FFFF)V",
+            "srgName": true,
+            "params": [
+                {
+                    "type": "floatvec",
+                    "description": "Color Multiplier",
+                    "startPosition": 0,
+                    "hasAlpha": true
+                }
+            ]
+        },
+        {
+            "__comment": "color3f",
+            "member": "net.minecraft.client.renderer.GlStateManager#func_179124_c(FFF)V",
+            "srgName": true,
+            "params": [
+                {
+                    "type": "floatvec",
+                    "description": "Color Multiplier",
+                    "startPosition": 0,
+                    "hasAlpha": false
+                }
+            ]
+        },
+        {
+            "__comment": "color4f",
+            "member": "net.minecraft.client.renderer.BufferBuilder#func_181666_a(FFFF)Lnet/minecraft/client/renderer/BufferBuilder;",
+            "srgName": true,
+            "params": [
+                {
+                    "type": "floatvec",
+                    "description": "Color Multiplier",
+                    "startPosition": 0,
+                    "hasAlpha": true
+                }
+            ]
+        },
+        {
+            "__comment": "color4i",
+            "member": "net.minecraft.client.renderer.BufferBuilder#func_181669_b(IIII)Lnet/minecraft/client/renderer/BufferBuilder;",
+            "srgName": true,
+            "params": [
+                {
+                    "type": "intvec",
+                    "description": "Color Multiplier",
+                    "startPosition": 0,
+                    "hasAlpha": true
+                }
+            ]
+        }
+    ]
+}
