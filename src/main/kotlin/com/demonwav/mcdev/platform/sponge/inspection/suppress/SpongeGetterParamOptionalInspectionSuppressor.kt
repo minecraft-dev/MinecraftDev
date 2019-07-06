@@ -39,7 +39,12 @@ class SpongeGetterParamOptionalInspectionSuppressor : InspectionSuppressor {
         val getterAnnotation = param.getAnnotation(SpongeConstants.GETTER_ANNOTATION) ?: return false
         val targetMethod = getterAnnotation.resolveSpongeGetterTarget() ?: return false
 
-        return targetMethod.returnType == param.type && ((param.type as JvmReferenceType).resolve()!! as PsiClass).qualifiedName == SpongeConstants.OPTIONAL
+        if (targetMethod.returnType != param.type) {
+            return false
+        }
+
+        val parameterType = (param.type as JvmReferenceType).resolve()
+        return parameterType != null && (parameterType as PsiClass).qualifiedName == SpongeConstants.OPTIONAL
     }
 
     override fun getSuppressActions(element: PsiElement?, toolId: String): Array<out SuppressQuickFix> = SuppressQuickFix.EMPTY_ARRAY
