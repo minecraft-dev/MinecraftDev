@@ -13,9 +13,7 @@ package com.demonwav.mcdev.platform.sponge.inspection
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.platform.sponge.util.isValidSpongeListener
 import com.demonwav.mcdev.platform.sponge.util.resolveSpongeGetterTarget
-import com.demonwav.mcdev.util.invokeLater
-import com.intellij.codeInsight.completion.CodeCompletionHandlerBase
-import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.codeInsight.AutoPopupController
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
@@ -26,7 +24,6 @@ import com.intellij.structuralsearch.plugin.util.SmartPsiPointer
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
 import com.siyeh.ig.InspectionGadgetsFix
-import kotlin.concurrent.thread
 
 class SpongeInvalidGetterTargetInspection : BaseInspection() {
 
@@ -95,11 +92,7 @@ class SpongeInvalidGetterTargetInspection : BaseInspection() {
                 editor.caretModel.removeSecondaryCarets()
                 editor.selectionModel.removeSelection()
                 editor.caretModel.moveToOffset(newValue.textOffset + 1)
-                thread {
-                    invokeLater {
-                        CodeCompletionHandlerBase.createHandler(CompletionType.BASIC).invokeCompletion(project, editor)
-                    }
-                }
+                AutoPopupController.getInstance(project).scheduleAutoPopup(editor)
             }
         }
     }
