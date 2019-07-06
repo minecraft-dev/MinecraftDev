@@ -14,7 +14,13 @@ import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.platform.sponge.util.isValidSpongeListener
 import com.demonwav.mcdev.platform.sponge.util.resolveSpongeGetterTarget
 import com.intellij.lang.jvm.types.JvmReferenceType
-import com.intellij.psi.*
+import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiAnnotation
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiParameter
+import com.intellij.psi.PsiTypeElement
 import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
