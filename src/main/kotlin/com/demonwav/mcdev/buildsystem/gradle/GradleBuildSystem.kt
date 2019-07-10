@@ -161,7 +161,7 @@ class GradleBuildSystem(
         runWriteTask {
             val wrapperDirPath = VfsUtil.createDirectoryIfMissing(descriptor.rootDirectory, "gradle/wrapper").path
             FileUtils.writeLines(File(wrapperDirPath, "gradle-wrapper.properties"), listOf(
-                "distributionUrl=https\\://services.gradle.org/distributions/gradle-4.4.1-bin.zip"
+                "distributionUrl=https\\://services.gradle.org/distributions/gradle-5.5-bin.zip"
             ))
         }
 
@@ -190,8 +190,10 @@ class GradleBuildSystem(
 
         connection.use {
             val sdkPair = ExternalSystemJdkUtil.getAvailableJdk(project)
-            if (sdkPair.second?.homePath != null && ExternalSystemJdkUtil.USE_INTERNAL_JAVA != sdkPair.first) {
-                launcher.setJavaHome(File(sdkPair.second.homePath))
+            if (ExternalSystemJdkUtil.USE_INTERNAL_JAVA != sdkPair.first) {
+                sdkPair.second?.homePath?.let { homePath ->
+                    launcher.setJavaHome(File(homePath))
+                }
             }
 
             launcher.addProgressListener(ProgressListener { event ->

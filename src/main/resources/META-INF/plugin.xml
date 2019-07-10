@@ -54,6 +54,7 @@
         <!---->
 
         <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
+        <moduleBuilder id="MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.MinecraftModuleBuilder"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
 
         <!-- File templates are for project creations -->
