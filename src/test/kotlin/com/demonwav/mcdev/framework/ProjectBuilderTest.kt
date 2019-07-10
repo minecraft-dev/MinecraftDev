@@ -14,9 +14,9 @@ import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
 
-abstract class ProjectBuilderTest : LightCodeInsightFixtureTestCase() {
+abstract class ProjectBuilderTest : LightJavaCodeInsightFixtureTestCase() {
 
     protected fun buildProject(root: VirtualFile = myFixture.project.baseDirPath, builder: ProjectBuilder.() -> Unit) =
             ProjectBuilder(myFixture, root).build(builder)

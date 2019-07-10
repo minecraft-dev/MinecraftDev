@@ -24,7 +24,7 @@ plugins {
     kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.8"
+    id("org.jetbrains.intellij") version "0.4.9"
     id("net.minecrell.licenser") version "0.4.1"
 }
 
@@ -108,14 +108,14 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1))
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:LATEST-EAP-SNAPSHOT")
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:192.5728-EAP-CANDIDATE-SNAPSHOT")
 }
 
 intellij {
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies
-    setPlugins("maven", "gradle", "Groovy",
+    setPlugins("java", "maven", "gradle", "Groovy",
         // needed dependencies for unit tests
         "properties", "junit")
 
