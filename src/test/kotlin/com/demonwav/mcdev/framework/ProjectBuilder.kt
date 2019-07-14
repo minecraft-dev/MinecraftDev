@@ -64,7 +64,7 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
         intermediatePath = oldIntermediatePath
     }
 
-    private fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
+    fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
         check(path.endsWith(ext))
 
         val fullPath = if (intermediatePath.isEmpty()) path else "$intermediatePath/$path"
