@@ -156,6 +156,8 @@
         <!-- Sponge Line Marker Provider -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorLineMarkerProvider"/>
 
+        <implicitUsageProvider implementation="com.demonwav.mcdev.platform.sponge.insight.SpongeImplicitUsageProvider" />
+
         <!-- Sponge Annotator -->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
 
@@ -339,6 +341,21 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeWrongGetterTypeInspection"/>
+
+        <localInspection displayName="Invalid @Inject usage in Sponge plugin class"
+                         groupName="Minecraft Sponge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeInjectionInspection"/>
+        <localInspection displayName="Sponge plugin class validity"
+                         groupName="Minecraft Sponge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongePluginClassInspection"/>
         <!--endregion-->
 
         <!--region FORGE INSPECTIONS-->
