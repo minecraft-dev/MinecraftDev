@@ -111,7 +111,7 @@ class GradleBuildSystem(
             }
         }
 
-        setupWrapper(descriptor, indicator)
+        setupWrapper(descriptor, indicator, FG_WRAPPER_VERSION)
         setupDecompWorkspace(descriptor, indicator)
     }
 
@@ -124,7 +124,7 @@ class GradleBuildSystem(
             )
         }
 
-        setupWrapper(descriptor, indicator)
+        setupWrapper(descriptor, indicator, FG_WRAPPER_VERSION)
         setupDecompWorkspace(descriptor, indicator)
     }
 
@@ -155,13 +155,13 @@ class GradleBuildSystem(
         )
     }
 
-    private fun setupWrapper(descriptor: ProjectDescriptor, indicator: ProgressIndicator) {
+    private fun setupWrapper(descriptor: ProjectDescriptor, indicator: ProgressIndicator, wrapperVersion: String = DEFAULT_WRAPPER_VERSION) {
         // Setup gradle wrapper
         // We'll write the properties file to ensure it sets up with the right version
         runWriteTask {
             val wrapperDirPath = VfsUtil.createDirectoryIfMissing(descriptor.rootDirectory, "gradle/wrapper").path
             FileUtils.writeLines(File(wrapperDirPath, "gradle-wrapper.properties"), listOf(
-                "distributionUrl=https\\://services.gradle.org/distributions/gradle-5.5-bin.zip"
+                "distributionUrl=https\\://services.gradle.org/distributions/gradle-$wrapperVersion-bin.zip"
             ))
         }
 
@@ -513,5 +513,7 @@ class GradleBuildSystem(
 
     companion object {
         const val HELLO = ".hello_from_mcdev"
+        const val DEFAULT_WRAPPER_VERSION = "5.5"
+        const val FG_WRAPPER_VERSION = "4.9"
     }
 }
