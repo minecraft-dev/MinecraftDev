@@ -511,6 +511,6 @@ class GradleBuildSystem(
     companion object {
         const val HELLO = ".hello_from_mcdev"
         const val DEFAULT_WRAPPER_VERSION = "5.5"
-        const val FG_WRAPPER_VERSION = "4.9"
+        const val FG_WRAPPER_VERSION = "4.10.3"
     }
 }
