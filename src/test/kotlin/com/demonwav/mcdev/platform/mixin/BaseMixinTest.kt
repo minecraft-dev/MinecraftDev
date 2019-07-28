@@ -29,7 +29,7 @@ abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
             library = createLibrary(project, "mixin")
         }
 
-        ModuleRootModificationUtil.updateModel(myModule) { model ->
+        ModuleRootModificationUtil.updateModel(module) { model ->
             model.addLibraryEntry(library ?: throw IllegalStateException("Library not created"))
             val orderEntries = model.orderEntries
             val last = orderEntries.last()
@@ -41,7 +41,7 @@ abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
 
     override fun tearDown() {
         library?.let { l ->
-            ModuleRootModificationUtil.updateModel(myModule) { model ->
+            ModuleRootModificationUtil.updateModel(module) { model ->
                 model.removeOrderEntry(model.findLibraryOrderEntry(l) ?: throw IllegalStateException("Library not found"))
             }
 

@@ -28,13 +28,13 @@
       <div>
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
         <p>
-        v. 2019.1-1.2.23
+        v. 2019.2-1.2.23.1
       </div>
     ]]>
     </change-notes>
 
     <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="191" until-build="191.*"/>
+    <idea-version since-build="192.2840" until-build="192.*"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- This is grouped in the following order EXCEPT for localInspections and moduleTypes. All localInspections are grouped at the
@@ -54,6 +54,7 @@
         <!---->
 
         <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
+        <moduleBuilder id="MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.MinecraftModuleBuilder"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
 
         <!-- File templates are for project creations -->
@@ -87,12 +88,12 @@
                              instance="com.demonwav.mcdev.i18n.sorting.I18nTemplateConfigurable"/>
 
         <!-- NBT -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeFactory"/>
+        <fileType name="NBT" implementationClass="com.demonwav.mcdev.nbt.filetype.NbtFileType" fieldName="INSTANCE" extensions="nbt" />
         <fileTypeDetector implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeDetector"/>
         <fileEditorProvider implementation="com.demonwav.mcdev.nbt.editor.NbtFileEditorProvider" />
 
         <!-- Text representation of NBT -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.nbt.lang.NbttFileTypeFactory"/>
+        <fileType name="NBTT" language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttFileType" fieldName="INSTANCE" extensions="nbtt" />
         <lang.parserDefinition language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttParserDefinition"/>
         <lang.syntaxHighlighterFactory language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttBraceMatcher"/>
@@ -108,7 +109,7 @@
         <codeInsight.parameterNameHints language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttParameterNameHints" />
 
         <!-- Minecraft localization files -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.i18n.lang.I18nFileTypeFactory"/>
+        <fileType name="I18n" language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nFileType" fieldName="INSTANCE" extensions="lang" />
         <lang.parserDefinition language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nParserDefinition"/>
         <lang.syntaxHighlighterFactory language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.colors.I18nSyntaxHighlighterFactory"/>
         <lang.psiStructureViewFactory language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.structure.I18nStructureViewFactory"/>
@@ -205,7 +206,7 @@
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mcp.debug.McpRunConfigurationExtension"/>
 
         <!-- access transformer file type -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.platform.mcp.at.AtFileTypeFactory"/>
+        <fileType name="Access Transformers" language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtFileType" fieldName="INSTANCE" patterns="*_at.cfg" />
         <lang.parserDefinition language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.at.AtColorSettingsPage" />
@@ -246,7 +247,7 @@
                                order="before javaSkipAutopopupInStrings"/>
 
         <!-- Mixin configuration -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.platform.mixin.config.MixinConfigFileTypeFactory"/>
+        <fileType name="Mixin Configuration" language="JSON" implementationClass="com.demonwav.mcdev.platform.mixin.config.MixinConfigFileType" fieldName="INSTANCE" patterns="mixins.*.json" />
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.mixin.config.reference.MixinConfigReferenceContributor" />
         <lang.importOptimizer language="JSON" implementationClass="com.demonwav.mcdev.platform.mixin.config.MixinConfigImportOptimizer"/>
 
@@ -711,12 +712,12 @@
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.action.GenerateSoftImplementsAction" id="GenerateSoftImplementsAction"
-                text="Soft-implement Methods..."
+                text="Soft-Implement Methods..."
                 description="Add a soft implementation for the selected methods">
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.action.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
-                text="Copy Mixin target reference"
+                text="Copy Mixin Target Reference"
                 description="Copy the reference to the element for use in an injector">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
@@ -741,12 +742,12 @@
             <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
         </action>
         <action class="com.demonwav.mcdev.i18n.actions.ConvertToTranslationAction" id="ConvertToMcTranslationAction"
-                text="Convert string literal to translation"
+                text="Convert String Literal to Translation"
                 description="Converts any string literal into a Minecraft localization translation">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
         <action class="com.demonwav.mcdev.i18n.actions.SortTranslationsAction" id="SortMcTranslationsAction"
-                text="Sort translations by specified order"
+                text="Sort Translations by Specified Order"
                 description="Sorts translations by specified order">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>

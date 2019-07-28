@@ -22,7 +22,7 @@ import com.demonwav.mcdev.util.qualifiedMemberReference
 import com.demonwav.mcdev.util.simpleQualifiedMemberReference
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DataKeys
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -115,7 +115,7 @@ class GotoAtEntryAction : AnAction() {
             .setHideOnKeyOutside(true)
             .createBalloon()
 
-        val statusBar = WindowManager.getInstance().getStatusBar(DataKeys.PROJECT.getData(e.dataContext))
+        val statusBar = WindowManager.getInstance().getStatusBar(CommonDataKeys.PROJECT.getData(e.dataContext))
 
         invokeLater { balloon.show(RelativePoint.getCenterOf(statusBar.component), Balloon.Position.atRight) }
     }

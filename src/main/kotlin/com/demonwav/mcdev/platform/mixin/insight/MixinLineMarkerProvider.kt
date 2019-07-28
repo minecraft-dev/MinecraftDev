@@ -58,13 +58,21 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
         val targets = psiClass.mixinTargets
         if (targets.isNotEmpty()) {
             PsiElementListNavigator.openTargets(e, targets.toTypedArray(),
-                    "Choose target class of ${psiClass.name!!}", null, PsiClassListCellRenderer())
+                "Choose target class of ${psiClass.name!!}", null, PsiClassListCellRenderer())
         }
     }
 
-    private class LineMarker(identifier: PsiIdentifier, navHandler: GutterIconNavigationHandler<PsiIdentifier>)
-        : MergeableLineMarkerInfo<PsiIdentifier>(identifier, identifier.textRange, MixinAssets.MIXIN_CLASS_ICON,
-            Pass.LINE_MARKERS, TOOLTIP_FUNCTION, navHandler, GutterIconRenderer.Alignment.RIGHT) {
+    private class LineMarker(
+        identifier: PsiIdentifier,
+        navHandler: GutterIconNavigationHandler<PsiIdentifier>
+    ) : MergeableLineMarkerInfo<PsiIdentifier>(
+        identifier,
+        identifier.textRange,
+        MixinAssets.MIXIN_CLASS_ICON,
+        TOOLTIP_FUNCTION,
+        navHandler,
+        GutterIconRenderer.Alignment.RIGHT
+    ) {
 
         override fun canMergeWith(info: MergeableLineMarkerInfo<*>) = info is LineMarker
         override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<PsiElement>>) = TOOLTIP_FUNCTION

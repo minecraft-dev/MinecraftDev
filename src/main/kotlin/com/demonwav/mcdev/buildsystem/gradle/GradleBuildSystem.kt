@@ -32,10 +32,8 @@ import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.execution.RunManager
 import com.intellij.ide.actions.ImportModuleAction
 import com.intellij.ide.util.newProjectWizard.AddModuleWizard
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration
-import com.intellij.openapi.externalSystem.service.project.ProjectDataManager
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
@@ -52,8 +50,7 @@ import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProgressListener
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
-import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportBuilder
-import org.jetbrains.plugins.gradle.service.project.wizard.GradleProjectImportProvider
+import org.jetbrains.plugins.gradle.service.project.wizard.JavaGradleProjectImportProvider
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import org.jetbrains.plugins.groovy.GroovyLanguage
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
@@ -164,7 +161,7 @@ class GradleBuildSystem(
         runWriteTask {
             val wrapperDirPath = VfsUtil.createDirectoryIfMissing(descriptor.rootDirectory, "gradle/wrapper").path
             FileUtils.writeLines(File(wrapperDirPath, "gradle-wrapper.properties"), listOf(
-                "distributionUrl=https\\://services.gradle.org/distributions/gradle-4.4.1-bin.zip"
+                "distributionUrl=https\\://services.gradle.org/distributions/gradle-5.5-bin.zip"
             ))
         }
 
@@ -193,8 +190,10 @@ class GradleBuildSystem(
 
         connection.use {
             val sdkPair = ExternalSystemJdkUtil.getAvailableJdk(project)
-            if (sdkPair.second?.homePath != null && ExternalSystemJdkUtil.USE_INTERNAL_JAVA != sdkPair.first) {
-                launcher.setJavaHome(File(sdkPair.second.homePath))
+            if (ExternalSystemJdkUtil.USE_INTERNAL_JAVA != sdkPair.first) {
+                sdkPair.second?.homePath?.let { homePath ->
+                    launcher.setJavaHome(File(homePath))
+                }
             }
 
             launcher.addProgressListener(ProgressListener { event ->
@@ -303,14 +302,16 @@ class GradleBuildSystem(
         }
 
         // Tell Gradle to import this project
-        val projectDataManager = ServiceManager.getService(ProjectDataManager::class.java)
-        val gradleProjectImportBuilder = GradleProjectImportBuilder(projectDataManager)
-        val gradleProjectImportProvider = GradleProjectImportProvider(gradleProjectImportBuilder)
+//        val projectDataManager = ServiceManager.getService(ProjectDataManager::class.java)
+//        val gradleProjectImportBuilder = GradleProjectImportBuilder(projectDataManager)
+//        val gradleProjectImportProvider = GradleProjectImportProvider(gradleProjectImportBuilder)
 
         val buildGradle = rootDirectory.findChild("build.gradle") ?: return
+        val provider = JavaGradleProjectImportProvider()
+        provider.builder.fileToImport = buildGradle.path
 
         invokeLater {
-            val wizard = AddModuleWizard(project, buildGradle.path, gradleProjectImportProvider)
+            val wizard = AddModuleWizard(project, buildGradle.path, provider)
             if (wizard.showAndGet()) {
                 ImportModuleAction.createFromWizard(project, wizard)
             }
