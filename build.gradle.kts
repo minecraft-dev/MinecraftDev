@@ -108,7 +108,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1))
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:192.5728-EAP-CANDIDATE-SNAPSHOT")
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:192.5728.98")
 }
 
 intellij {
