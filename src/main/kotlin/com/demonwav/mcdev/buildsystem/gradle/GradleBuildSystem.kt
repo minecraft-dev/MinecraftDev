@@ -30,8 +30,6 @@ import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.execution.RunManager
-import com.intellij.ide.actions.ImportModuleAction
-import com.intellij.ide.util.newProjectWizard.AddModuleWizard
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -50,7 +48,7 @@ import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProgressListener
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
-import org.jetbrains.plugins.gradle.service.project.wizard.JavaGradleProjectImportProvider
+import org.jetbrains.plugins.gradle.service.project.open.importProject
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import org.jetbrains.plugins.groovy.GroovyLanguage
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
@@ -115,7 +113,7 @@ class GradleBuildSystem(
             }
         }
 
-        setupWrapper(descriptor, indicator)
+        setupWrapper(descriptor, indicator, FG_WRAPPER_VERSION)
         setupDecompWorkspace(descriptor, indicator)
     }
 
@@ -132,7 +130,7 @@ class GradleBuildSystem(
             )
         }
 
-        setupWrapper(descriptor, indicator)
+        setupWrapper(descriptor, indicator, FG_WRAPPER_VERSION)
         setupDecompWorkspace(descriptor, indicator)
     }
 
@@ -167,14 +165,18 @@ class GradleBuildSystem(
         )
     }
 
-    private fun setupWrapper(descriptor: ProjectDescriptor, indicator: ProgressIndicator) {
+    private fun setupWrapper(
+        descriptor: ProjectDescriptor,
+        indicator: ProgressIndicator,
+        wrapperVersion: String = DEFAULT_WRAPPER_VERSION
+    ) {
         // Setup gradle wrapper
         // We'll write the properties file to ensure it sets up with the right version
         runWriteTask {
             val wrapperDirPath = VfsUtil.createDirectoryIfMissing(descriptor.rootDirectory, "gradle/wrapper").path
             FileUtils.writeLines(
                 File(wrapperDirPath, "gradle-wrapper.properties"), listOf(
-                    "distributionUrl=https\\://services.gradle.org/distributions/gradle-5.5-bin.zip"
+                    "distributionUrl=https\\://services.gradle.org/distributions/gradle-$wrapperVersion-bin.zip"
                 )
             )
         }
@@ -320,21 +322,11 @@ class GradleBuildSystem(
             return
         }
 
-        // Tell Gradle to import this project
-//        val projectDataManager = ServiceManager.getService(ProjectDataManager::class.java)
-//        val gradleProjectImportBuilder = GradleProjectImportBuilder(projectDataManager)
-//        val gradleProjectImportProvider = GradleProjectImportProvider(gradleProjectImportBuilder)
-
-        val buildGradle = rootDirectory.findChild("build.gradle") ?: return
-        val provider = JavaGradleProjectImportProvider()
-        provider.builder.fileToImport = buildGradle.path
+        // Tell IntelliJ to import this project
+        @Suppress("UnstableApiUsage")
+        importProject(rootDirectory.path, project)
 
         invokeLater {
-            val wizard = AddModuleWizard(project, buildGradle.path, provider)
-            if (wizard.showAndGet()) {
-                ImportModuleAction.createFromWizard(project, wizard)
-            }
-
             // Set up the run config
             // Get the gradle external task type, this is what sets it as a gradle task
             val gradleType = GradleExternalTaskConfigurationType.getInstance()
@@ -397,7 +389,12 @@ class GradleBuildSystem(
     ): Map<GradleBuildSystem, ProjectConfiguration> {
         val map = mutableMapOf<GradleBuildSystem, ProjectConfiguration>()
 
-        setupWrapper(ProjectDescriptor(rootDirectory, project), indicator)
+        val wrapperVersion = if (configurations.any { configurationUsesForgeGradle(it) }) {
+            FG_WRAPPER_VERSION
+        } else {
+            DEFAULT_WRAPPER_VERSION
+        }
+        setupWrapper(ProjectDescriptor(rootDirectory, project), indicator, wrapperVersion)
 
         rootDirectory.refresh(false, true)
 
@@ -547,7 +544,13 @@ class GradleBuildSystem(
         }
     }
 
+    private fun configurationUsesForgeGradle(configuration: ProjectConfiguration): Boolean {
+        return configuration is ForgeProjectConfiguration || configuration is LiteLoaderProjectConfiguration
+    }
+
     companion object {
         const val HELLO = ".hello_from_mcdev"
+        const val DEFAULT_WRAPPER_VERSION = "5.5.1"
+        const val FG_WRAPPER_VERSION = "4.10.3"
     }
 }
