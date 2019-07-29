@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.liteloader
 
 import com.demonwav.mcdev.platform.BaseTemplate
-import com.demonwav.mcdev.platform.forge.ForgeTemplate
+import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.openapi.project.Project
@@ -33,7 +33,7 @@ object LiteLoaderTemplate {
         properties.setProperty("ARTIFACT_ID", artifactId)
         properties.setProperty("VERSION", configuration.base?.pluginVersion)
         properties.setProperty("MC_VERSION", configuration.mcVersion)
-        properties.setProperty("MCP_MAPPINGS", configuration.mcpVersion)
+        properties.setProperty("MCP_MAPPINGS", configuration.mcpVersion.mcpVersion)
 
         BaseTemplate.applyTemplate(
             project,
@@ -46,7 +46,7 @@ object LiteLoaderTemplate {
 
         // Fixes builds for MC1.12+, requires FG 2.3
         val mcVersion = SemanticVersion.parse(configuration.mcVersion)
-        if (mcVersion >= ForgeTemplate.MC_1_12) {
+        if (mcVersion >= ForgeModuleType.FG2_3_VERSION) {
             gradleProps.setProperty("FORGEGRADLE_VERSION", "2.3")
         } else {
             gradleProps.setProperty("FORGEGRADLE_VERSION", "2.2")
@@ -72,7 +72,7 @@ object LiteLoaderTemplate {
 
         // Fixes builds for MC1.12+, requires FG 2.3
         val mcVersion = SemanticVersion.parse(configuration.mcVersion)
-        if (mcVersion >= ForgeTemplate.MC_1_12) {
+        if (mcVersion >= ForgeModuleType.FG2_3_VERSION) {
             properties.setProperty("FORGEGRADLE_VERSION", "2.3")
         } else {
             properties.setProperty("FORGEGRADLE_VERSION", "2.2")
@@ -88,7 +88,7 @@ object LiteLoaderTemplate {
         val gradleProps = Properties()
         gradleProps.setProperty("VERSION", configuration.base?.pluginVersion)
         gradleProps.setProperty("MC_VERSION", configuration.mcVersion)
-        gradleProps.setProperty("MCP_MAPPINGS", configuration.mcpVersion)
+        gradleProps.setProperty("MCP_MAPPINGS", configuration.mcpVersion.mcpVersion)
 
         BaseTemplate.applyTemplate(
             project,

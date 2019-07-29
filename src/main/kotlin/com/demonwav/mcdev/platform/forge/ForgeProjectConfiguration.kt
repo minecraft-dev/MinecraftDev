@@ -16,8 +16,9 @@ import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
-import com.demonwav.mcdev.platform.mixin.reference.InjectionPointType.description
+import com.demonwav.mcdev.platform.mcp.McpVersionPair
 import com.demonwav.mcdev.update.PluginUtil.pluginVersion
+import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.ide.util.EditorHelper
 import com.intellij.openapi.progress.ProgressIndicator
@@ -26,20 +27,13 @@ import com.intellij.psi.PsiManager
 
 open class ForgeProjectConfiguration : ProjectConfiguration() {
 
-    val dependencies = mutableListOf<String>()
-    var updateUrl: String = ""
+    var updateUrl: String? = null
 
     override var type: PlatformType = PlatformType.FORGE
 
-    var mcpVersion: String = ""
+    var mcpVersion = McpVersionPair("", "")
     var forgeVersion: String = ""
     var mcVersion: String = ""
-
-    fun hasDependencies() = listContainsAtLeastOne(dependencies)
-    fun setDependencies(string: String) {
-        dependencies.clear()
-        dependencies.addAll(commaSplit(string))
-    }
 
     override fun create(project: Project, buildSystem: BuildSystem, indicator: ProgressIndicator) {
         if (project.isDisposed) {
@@ -57,7 +51,7 @@ open class ForgeProjectConfiguration : ProjectConfiguration() {
             val packageName = baseConfig.mainClass.substring(0, baseConfig.mainClass.length - className.length - 1)
             file = getMainClassDirectory(files, file)
 
-            val mainClassFile = file.findOrCreateChildData(this, className + ".java")
+            val mainClassFile = file.findOrCreateChildData(this, "$className.java")
             ForgeTemplate.applyMainClassTemplate(
                 project,
                 mainClassFile,
@@ -65,10 +59,11 @@ open class ForgeProjectConfiguration : ProjectConfiguration() {
                 buildSystem.artifactId,
                 baseConfig.pluginName,
                 pluginVersion,
-                className
+                className,
+                SemanticVersion.parse(mcVersion)
             )
 
-            writeMcmodInfo(project, baseConfig, buildSystem, dirs)
+            writeDescriptor(project, baseConfig, buildSystem, dirs)
 
             // Set the editor focus on the main class
             PsiManager.getInstance(project).findFile(mainClassFile)?.let { mainClassPsi ->
@@ -77,28 +72,43 @@ open class ForgeProjectConfiguration : ProjectConfiguration() {
         }
     }
 
-    protected fun writeMcmodInfo(
+    private fun writeDescriptor(
         project: Project,
         baseConfigs: BaseConfigs,
         buildSystem: BuildSystem,
         dirs: BuildSystem.DirectorySet
     ) {
         val file = dirs.resourceDirectory
-        val mcmodInfoFile = file.findOrCreateChildData(this, ForgeConstants.MCMOD_INFO)
+        val mcVer = SemanticVersion.parse(mcVersion)
+        val descriptorFile = if (mcVer < ForgeModuleType.FG3_VERSION) {
+            file.findOrCreateChildData(this, ForgeConstants.MCMOD_INFO)
+        } else {
+            var meta = file.findChild("META-INF")
+            if (meta == null) {
+                meta = file.createChildDirectory(this, ForgeConstants.META_INF)
+            }
+            meta.findOrCreateChildData(this, ForgeConstants.MODS_TOML)
+        }
 
         val authorsText = baseConfigs.authors.joinToString(", ") { "\"$it\"" }
-        val dependenciesText = dependencies.joinToString(", ") { "\"$it\"" }
 
-        ForgeTemplate.applyMcmodInfoTemplate(
+        ForgeTemplate.applyModDescriptorTemplate(
             project,
-            mcmodInfoFile,
+            descriptorFile,
             buildSystem.artifactId,
             baseConfigs.pluginName,
-            description,
-            baseConfigs.website ?: "",
+            baseConfigs.description ?: "",
+            baseConfigs.website,
             updateUrl,
             authorsText,
-            dependenciesText
+            mcVer
         )
+
+        if (mcVer >= ForgeModuleType.FG3_VERSION) {
+            val packFile = dirs.resourceDirectory.findOrCreateChildData(this, ForgeConstants.PACK_MCMETA)
+            ForgeTemplate.applyPackMcmetaTemplate(project, packFile, buildSystem.artifactId)
+        }
     }
+
+    override fun setupDependencies(buildSystem: BuildSystem) {}
 }

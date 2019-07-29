@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.platform.forge.version
 
-import com.demonwav.mcdev.util.getMajorVersion
 import com.demonwav.mcdev.util.sortVersions
 import java.io.IOException
 import java.net.URL
@@ -33,7 +32,7 @@ class ForgeVersion private constructor(val versions: List<String>) {
     }
 
     fun getForgeVersions(mcVersion: String): ArrayList<String> {
-        return versions.filterTo(ArrayList()) { it.startsWith(getMajorVersion(mcVersion)) }
+        return versions.filterTo(ArrayList()) { it.startsWith(mcVersion) }
     }
 
     companion object {

@@ -68,15 +68,12 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
                     .findClass(ForgeConstants.SIDED_PROXY_ANNOTATION, scope) ?: return@runSmart
                 val annotatedFields = AnnotatedElementsSearch.searchPsiFields(sidedProxy, scope).findAll()
 
-                var index = 0.0
-
                 for (field in annotatedFields) {
                     if (service.isDumb || project.isDisposed) {
                         return@runSmart
                     }
 
                     SidedProxyAnnotator.check(field)
-                    index++
                 }
             }
         }
@@ -177,8 +174,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
     override fun checkUselessCancelCheck(expression: PsiMethodCallExpression): IsCancelled? = null
 
     override fun dispose() {
-        super.dispose()
-
         mcmod = null
+        super.dispose()
     }
 }

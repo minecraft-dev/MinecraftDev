@@ -12,6 +12,8 @@
 
 package com.demonwav.mcdev.platform.bungeecord
 
+import com.demonwav.mcdev.buildsystem.BuildDependency
+import com.demonwav.mcdev.buildsystem.BuildRepository
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
@@ -68,6 +70,31 @@ class BungeeCordProjectConfiguration(override var type: PlatformType) : ProjectC
             PsiManager.getInstance(project).findFile(mainClassFile)?.let { mainClassPsi ->
                 EditorHelper.openInEditor(mainClassPsi)
             }
+        }
+    }
+
+    override fun setupDependencies(buildSystem: BuildSystem) {
+        addSonatype(buildSystem.repositories)
+        when (type) {
+            PlatformType.WATERFALL -> {
+                buildSystem.repositories.add(BuildRepository(
+                    "destroystokyo-repo",
+                    "https://repo.destroystokyo.com/repository/maven-public/"
+                ))
+                buildSystem.dependencies.add(BuildDependency(
+                    "io.github.waterfallmc",
+                    "waterfall-api",
+                    "$minecraftVersion-SNAPSHOT"
+                ))
+            }
+            PlatformType.BUNGEECORD -> {
+                buildSystem.dependencies.add(BuildDependency(
+                    "net.md-5",
+                    "bungeecord-api",
+                    "$minecraftVersion-SNAPSHOT"
+                ))
+            }
+            else -> {}
         }
     }
 }

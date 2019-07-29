@@ -220,7 +220,7 @@ class AtCompletionContributor : CompletionContributor() {
                 continue
             }
 
-            val memberReference = srgMap.findSrgField(field) ?: field.simpleQualifiedMemberReference
+            val memberReference = srgMap.getSrgField(field) ?: field.simpleQualifiedMemberReference
             srgResult.addElement(
                 PrioritizedLookupElement.withPriority(
                     LookupElementBuilder
@@ -253,7 +253,7 @@ class AtCompletionContributor : CompletionContributor() {
                 continue
             }
 
-            val memberReference = srgMap.findSrgMethod(method) ?: method.qualifiedMemberReference
+            val memberReference = srgMap.getSrgMethod(method) ?: method.qualifiedMemberReference
             srgResult.addElement(
                 PrioritizedLookupElement.withPriority(
                     LookupElementBuilder.create(method.nameAndParameterTypes)

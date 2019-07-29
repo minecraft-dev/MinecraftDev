@@ -33,14 +33,18 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
         private set
 
     override fun init() {
-        val files = getSettings().mappingFiles
-        if (!files.isEmpty()) {
-            srgManager = SrgManager.getInstance(files)
-            srgManager?.parse()
-        }
-
+        initSrg()
         connection = project.messageBus.connect()
         connection.subscribe(VirtualFileManager.VFS_CHANGES, I18nFileListener)
+    }
+
+    private fun initSrg() {
+        val settings = getSettings()
+        val file = settings.mappingFile ?: return
+        val srgType = settings.srgType ?: return
+
+        srgManager = SrgManager.getInstance(file, srgType)
+        srgManager?.parse()
     }
 
     override val moduleType = McpModuleType
@@ -49,11 +53,14 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) = ""
 
-    fun getSettings() = settings.state
+    private fun getSettings() = settings.state
 
     fun updateSettings(data: McpModuleSettings.State) {
         this.settings.loadState(data)
-        srgManager = SrgManager.getInstance(data.mappingFiles)
+        val mappingFile = data.mappingFile ?: return
+        val srgType = data.srgType ?: return
+
+        srgManager = SrgManager.getInstance(mappingFile, srgType)
         srgManager?.parse()
     }
 

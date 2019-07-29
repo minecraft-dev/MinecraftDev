@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mcp
 
+import com.demonwav.mcdev.platform.mcp.srg.SrgType
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
@@ -23,10 +24,11 @@ class McpModuleSettings : PersistentStateComponent<McpModuleSettings.State> {
     data class State(
         var minecraftVersion: String? = null,
         var mcpVersion: String? = null,
-        var mappingFiles: Set<String> = mutableSetOf()
+        var mappingFile: String? = null,
+        var srgType: SrgType? = null
     )
 
-    private var state: State = State()
+    private var state: State = State(srgType = SrgType.SRG)
 
     override fun getState(): State = state
 

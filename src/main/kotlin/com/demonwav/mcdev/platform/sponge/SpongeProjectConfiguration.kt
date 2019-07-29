@@ -10,6 +10,8 @@
 
 package com.demonwav.mcdev.platform.sponge
 
+import com.demonwav.mcdev.buildsystem.BuildDependency
+import com.demonwav.mcdev.buildsystem.BuildRepository
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.platform.PlatformType
@@ -82,6 +84,18 @@ class SpongeProjectConfiguration : ProjectConfiguration() {
 
             EditorHelper.openInEditor(mainClassPsi)
         }
+    }
+
+    override fun setupDependencies(buildSystem: BuildSystem) {
+        buildSystem.repositories.add(BuildRepository(
+            "spongepowered-repo",
+            "https://repo.spongepowered.org/maven/"
+        ))
+        buildSystem.dependencies.add(BuildDependency(
+            "org.spongepowered",
+            "spongeapi",
+            spongeApiVersion
+        ))
     }
 }
 

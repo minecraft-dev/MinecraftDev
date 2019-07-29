@@ -10,13 +10,15 @@
 
 package com.demonwav.mcdev.platform.mcp.version
 
-class McpVersionEntry(val text: String, val isRed: Boolean = false) {
+import com.demonwav.mcdev.platform.mcp.McpVersionPair
+
+class McpVersionEntry(val versionPair: McpVersionPair, val isRed: Boolean = false) {
 
     override fun toString(): String {
         return if (isRed) {
-            RED_START + text + RED_END
+            RED_START + versionPair.mcpVersion + RED_END
         } else {
-            text
+            versionPair.mcpVersion
         }
     }
 

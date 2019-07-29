@@ -64,13 +64,13 @@ class GotoAtEntryAction : AnAction() {
 
             when (parent) {
                 is PsiField -> {
-                    val reference = srgMap.findSrgField(parent) ?: parent.simpleQualifiedMemberReference
+                    val reference = srgMap.getSrgField(parent) ?: parent.simpleQualifiedMemberReference
                     ?: return@onSuccess showBalloon(e)
                     searchForText(e, data, reference.name)
                 }
                 is PsiMethod -> {
                     val reference =
-                        srgMap.findSrgMethod(parent) ?: parent.qualifiedMemberReference ?: return@onSuccess showBalloon(
+                        srgMap.getSrgMethod(parent) ?: parent.qualifiedMemberReference ?: return@onSuccess showBalloon(
                             e
                         )
                     searchForText(e, data, reference.name + reference.descriptor)

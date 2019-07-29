@@ -55,7 +55,7 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
         }
 
         val facet = MinecraftFacet.getInstance(module) ?: return
-        data.setIcon(facet.icon)
+        data.setIcon(facet.icon ?: return)
     }
 
     override fun decorate(node: PackageDependenciesNode, cellRenderer: ColoredTreeCellRenderer) {}

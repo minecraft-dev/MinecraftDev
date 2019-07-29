@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.forge.gradle.tooling
 
-import com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModelBuilderImpl
+import com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModelFG2BuilderImpl
 import org.gradle.api.Project
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.gradle.tooling.ErrorMessageBuilder
@@ -36,7 +36,7 @@ final class ForgePatcherModelBuilderImpl implements ModelBuilderService {
             return null
         }
 
-        def mcpModel = new McpModelBuilderImpl().buildAll(modelName, project)
+        def mcpModel = new McpModelFG2BuilderImpl().buildAll(modelName, project)
 
         def set = new HashSet<String>()
         for (p in extension.projects) {

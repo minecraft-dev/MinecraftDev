@@ -11,8 +11,8 @@
 package com.demonwav.mcdev.buildsystem
 
 data class BuildDependency(
-    var artifactId: String = "",
     var groupId: String = "",
+    var artifactId: String = "",
     var version: String = "",
     var scope: String = ""
 )

@@ -99,7 +99,6 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
         modulesProvider: ModulesProvider
     ): Array<ModuleWizardStep> {
         return arrayOf(
-            SpongeForgeChooser(creator),
             BuildSystemWizardStep(creator),
             BukkitProjectSettingsWizard(creator),
             SpongeProjectSettingsWizard(creator),

@@ -16,9 +16,6 @@ import com.demonwav.mcdev.facet.MinecraftFacetType.Companion.TYPE_ID
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.platform.forge.ForgeModuleType
-import com.demonwav.mcdev.platform.sponge.SpongeModuleType
-import com.demonwav.mcdev.util.containsAllKeys
 import com.demonwav.mcdev.util.filterNotNull
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.google.common.collect.HashMultimap
@@ -201,10 +198,6 @@ class MinecraftFacet(
             return when {
                 iconCount == 0 -> null
                 iconCount == 1 -> moduleMap.keys.firstOrNull { it.hasIcon }?.icon
-                iconCount == 2 && moduleMap.containsAllKeys(
-                    SpongeModuleType,
-                    ForgeModuleType
-                ) -> PlatformAssets.SPONGE_FORGE_ICON
                 moduleMap.size > 0 -> PlatformAssets.MINECRAFT_ICON
                 else -> null
             }

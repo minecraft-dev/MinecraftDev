@@ -51,7 +51,6 @@ enum class PlatformType(
     MCP(McpModuleType, "MCP");
 
     companion object {
-
         fun removeParents(types: MutableSet<PlatformType>) =
             types.filter { type -> type.children.isEmpty() || !types.any { type.children.contains(it) } }.toHashSet()
 

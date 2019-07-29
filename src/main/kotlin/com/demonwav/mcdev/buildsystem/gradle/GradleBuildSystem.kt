@@ -11,17 +11,20 @@
 package com.demonwav.mcdev.buildsystem.gradle
 
 import com.demonwav.mcdev.buildsystem.BuildSystem
-import com.demonwav.mcdev.creator.MinecraftProjectCreator
 import com.demonwav.mcdev.platform.BaseTemplate
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
+import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration
 import com.demonwav.mcdev.platform.forge.ForgeTemplate
-import com.demonwav.mcdev.platform.hybrid.SpongeForgeProjectConfiguration
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderTemplate
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.findDeclaredField
+import com.demonwav.mcdev.util.invokeDeclaredMethod
+import com.demonwav.mcdev.util.firstOfType
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.localFile
 import com.demonwav.mcdev.util.refreshFs
@@ -30,6 +33,7 @@ import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.execution.RunManager
+import com.intellij.ide.ui.UISettings
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -39,6 +43,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.wm.ex.WindowManagerEx
+import com.intellij.openapi.wm.impl.IdeRootPane
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileFactory
@@ -103,18 +109,25 @@ class GradleBuildSystem(
             val (buildGradle, gradleProp) = setupGradleFiles(rootDirectory)
 
             ForgeTemplate.applyBuildGradleTemplate(
-                project, buildGradle, gradleProp, groupId, artifactId, configuration, version
+                project,
+                buildGradle,
+                gradleProp,
+                this,
+                configuration,
+                transformModName(configuration.base?.pluginName)
             )
-            val newBuildGradle = buildGradle.refreshFs()
-
-            if (configuration is SpongeForgeProjectConfiguration) {
-                val buildGradlePsi = PsiManager.getInstance(project).findFile(newBuildGradle)
-                buildGradlePsi?.let { addBuildGradleDependencies(descriptor, it, false) }
-            }
+            buildGradle.refreshFs()
         }
 
         setupWrapper(descriptor, indicator, FG_WRAPPER_VERSION)
-        setupDecompWorkspace(descriptor, indicator)
+        if (SemanticVersion.parse(configuration.mcVersion) < ForgeModuleType.FG3_VERSION) {
+            setupDecompWorkspace(descriptor, indicator)
+        }
+    }
+
+    private fun transformModName(modName: String?): String {
+        modName ?: return "examplemod"
+        return modName.toLowerCase().replace(" ", "")
     }
 
     private fun handleLiteLoaderCreate(
@@ -144,9 +157,9 @@ class GradleBuildSystem(
             val (_, gradleProp) = setupGradleFiles(rootDirectory)
 
             val buildGradleText = if (configuration is SpongeProjectConfiguration) {
-                SpongeTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, artifactId, version)
+                SpongeTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, version, artifactId)
             } else {
-                BaseTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, artifactId, version)
+                BaseTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, version)
             } ?: return@runWriteTask
 
             addBuildGradleDependencies(descriptor, buildGradleText)
@@ -253,8 +266,7 @@ class GradleBuildSystem(
 
     private fun addBuildGradleDependencies(
         descriptor: ProjectDescriptor,
-        file: PsiFile,
-        addToDirectory: Boolean
+        file: PsiFile
     ) {
         val (rootDirectory, project) = descriptor
         // Write the repository and dependency data to the psi file
@@ -280,13 +292,11 @@ class GradleBuildSystem(
             )
 
             ReformatCodeProcessor(file, false).run()
-            if (addToDirectory) {
-                val rootDirectoryPsi = PsiManager.getInstance(project).findDirectory(rootDirectory)
-                if (rootDirectoryPsi != null) {
-                    buildGradle.delete(this)
+            val rootDirectoryPsi = PsiManager.getInstance(project).findDirectory(rootDirectory)
+            if (rootDirectoryPsi != null) {
+                buildGradle.delete(this)
 
-                    rootDirectoryPsi.add(file)
-                }
+                rootDirectoryPsi.add(file)
             }
 
             buildGradle = buildGradle.refreshFs()
@@ -301,7 +311,7 @@ class GradleBuildSystem(
         // Create the Psi file from the text, but don't write it until we are finished with it
         val buildGradlePsi = PsiFileFactory.getInstance(descriptor.project).createFileFromText(GroovyLanguage, text)
 
-        addBuildGradleDependencies(descriptor, buildGradlePsi, true)
+        addBuildGradleDependencies(descriptor, buildGradlePsi)
     }
 
     private fun saveFile(file: VirtualFile) {
@@ -327,11 +337,13 @@ class GradleBuildSystem(
         importProject(rootDirectory.path, project)
 
         invokeLater {
+            showProgress(project)
+
             // Set up the run config
             // Get the gradle external task type, this is what sets it as a gradle task
             val gradleType = GradleExternalTaskConfigurationType.getInstance()
 
-            if (configurations.any { it.type == PlatformType.FORGE || it is SpongeForgeProjectConfiguration }) {
+            if (configurations.any { it.type == PlatformType.FORGE }) {
                 requestCreateForgeRunConfigs(project, rootModule, configurations)
             }
 
@@ -365,18 +377,44 @@ class GradleBuildSystem(
         }
     }
 
+    // Try and show the background setup tasks, but I don't know of a way to do this without all this reflection and
+    // it's extremely likely this can fail - just do nothing if it does
+    private fun showProgress(project: Project) {
+        if (!UISettings.instance.showStatusBar || UISettings.instance.presentationMode) {
+            return
+        }
+        val pane = WindowManagerEx.getInstanceEx().getFrame(project).rootPane as? IdeRootPane ?: return
+        pane.findDeclaredField("myStatusBar")
+            ?.findDeclaredField("myInfoAndProgressPanel")
+            ?.invokeDeclaredMethod("openProcessPopup", arrayOf(Boolean::class.javaPrimitiveType), true)
+    }
+
     private fun requestCreateForgeRunConfigs(
         project: Project,
         rootModule: Module,
         configurations: Collection<ProjectConfiguration>
     ) {
+        val forgeMcVersion = configurations.firstOfType<ForgeProjectConfiguration>()?.mcVersion ?: return
+
         runWriteTaskLater {
             // Basically mark this as a newly created project
-            val basePath = project.basePath ?: return@runWriteTaskLater // If this is null there's not much we can do
+            val basePath =
+                project.basePath ?: return@runWriteTaskLater // If this is null there's not much we can do
             val gradleDir = VfsUtil.createDirectoryIfMissing("$basePath/.gradle")
             val hello = gradleDir?.findOrCreateChildData(this, HELLO) ?: return@runWriteTaskLater
 
-            hello.setBinaryContent((rootModule.name + "\n" + configurations.size).toByteArray(Charsets.UTF_8))
+            val task = if (configurations.size == 1) {
+                "genIntellijRuns"
+            } else {
+                ":${project.name}-forge:genIntellijRuns"
+            }
+
+            val fileContents = rootModule.name + "\n" +
+                configurations.size + "\n" +
+                forgeMcVersion + "\n" +
+                task
+
+            hello.setBinaryContent(fileContents.toByteArray(Charsets.UTF_8))
         }
     }
 
@@ -409,8 +447,14 @@ class GradleBuildSystem(
             val (buildGradle, gradleProp) = setupGradleFiles(rootDirectory)
             val settingsGradle = rootDirectory.createChildData(this, "settings.gradle")
 
+            val pluginId = if (configurations.any { it is SpongeProjectConfiguration }) {
+                artifactId
+            } else {
+                null
+            }
+
             BaseTemplate.applyMultiModuleBuildGradleTemplate(
-                project, buildGradle, gradleProp, groupId, artifactId, version, configurations
+                project, buildGradle, gradleProp, groupId, version, pluginId
             )
 
             BaseTemplate.applySettingsGradleTemplate(project, settingsGradle, artifactIdLower, includes)
@@ -425,10 +469,13 @@ class GradleBuildSystem(
             val gradleBuildSystem = GradleBuildSystem(artifactId, groupId, version)
 
             // it knows which dependencies are needed for each configuration
-            MinecraftProjectCreator.addDependencies(configuration, gradleBuildSystem)
+            configuration.setupDependencies(gradleBuildSystem)
 
             val newRootDir = runWriteTask {
-                rootDirectory.createChildDirectory(this, artifactIdLower + "-" + configuration.type.name.toLowerCase())
+                rootDirectory.createChildDirectory(
+                    this,
+                    artifactIdLower + "-" + configuration.type.name.toLowerCase()
+                )
             }
 
             // For each build system we initialize it, but not the same as a normal create. We need to know the common project name,
@@ -453,12 +500,14 @@ class GradleBuildSystem(
         }
 
         // This is mostly the same as a normal create, but we use different files and don't setup the wrapper
-        if (configuration.type == PlatformType.FORGE || configuration is SpongeForgeProjectConfiguration) {
-            handleForgeSubCreate(descriptor, configuration, commonProjectName, indicator)
-        } else if (configuration.type == PlatformType.LITELOADER) {
-            handleLiteLoaderSubCreate(descriptor, configuration, commonProjectName, indicator)
-        } else {
-            handleGeneralSubCreate(descriptor, configuration, commonProjectName)
+        when {
+            configuration.type == PlatformType.FORGE -> {
+                handleForgeSubCreate(descriptor, configuration, commonProjectName, indicator)
+            }
+            configuration.type == PlatformType.LITELOADER -> {
+                handleLiteLoaderSubCreate(descriptor, configuration, commonProjectName, indicator)
+            }
+            else -> handleGeneralSubCreate(descriptor, configuration, commonProjectName)
         }
 
         val buildGradle = descriptor.rootDirectory.findChild("build.gradle") ?: return
@@ -486,19 +535,14 @@ class GradleBuildSystem(
                 gradleProp,
                 artifactId,
                 configuration,
-                commonProjectName
+                commonProjectName,
+                transformModName(configuration.base?.pluginName)
             )
-
-            // We're only going to write the dependencies if it's a sponge forge project
-            if (configuration is SpongeForgeProjectConfiguration) {
-                val buildGradlePsi = PsiManager.getInstance(project).findFile(buildGradle)
-                if (buildGradlePsi != null) {
-                    addBuildGradleDependencies(descriptor, buildGradlePsi, false)
-                }
-            }
         }
 
-        setupDecompWorkspace(descriptor, indicator)
+        if (SemanticVersion.parse(configuration.mcVersion) < ForgeModuleType.FG3_VERSION) {
+            setupDecompWorkspace(descriptor, indicator)
+        }
     }
 
     private fun handleLiteLoaderSubCreate(
@@ -550,7 +594,7 @@ class GradleBuildSystem(
 
     companion object {
         const val HELLO = ".hello_from_mcdev"
-        const val DEFAULT_WRAPPER_VERSION = "5.5.1"
+        const val DEFAULT_WRAPPER_VERSION = "5.6.1"
         const val FG_WRAPPER_VERSION = "4.10.3"
     }
 }

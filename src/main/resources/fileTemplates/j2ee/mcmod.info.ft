@@ -5,8 +5,16 @@
         "description": "${DESCRIPTION}",
         "version": "${version}",
         "mcversion": "${mcversion}",
+#if (${URL})
         "url": "${URL}",
+#else
+        "url": "",
+#end
+#if (${UPDATE_URL})
         "updateUrl": "${UPDATE_URL}",
+#else
+        "updateUrl": "",
+#end
 #if (${HAS_AUTHOR_LIST})
         "authorList": [${AUTHOR_LIST}],
 #else
@@ -15,10 +23,6 @@
         "credits": "",
         "logoFile": "",
         "screenshots": [],
-#if (${HAS_DEPENDENCIES_LIST})
-        "dependencies": [${DEPENDENCIES_LIST}]
-#else
         "dependencies": []
-#end
     }
 ]

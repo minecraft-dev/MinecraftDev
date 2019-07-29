@@ -210,7 +210,7 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
         )
 
         conf.mcVersion = minecraftVersionBox.selectedItem as String
-        conf.mcpVersion = (mcpVersionBox.selectedItem as McpVersionEntry).text
+        conf.mcpVersion = (mcpVersionBox.selectedItem as McpVersionEntry).versionPair
     }
 
     override fun updateDataModel() {}

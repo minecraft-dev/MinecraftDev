@@ -55,16 +55,15 @@ object SpongeTemplate {
         project: Project,
         file: VirtualFile,
         groupId: String,
-        artifactId: String,
-        pluginVersion: String
+        pluginVersion: String,
+        artifactId: String
     ): String? {
         val properties = Properties()
 
         val manager = FileTemplateManager.getInstance(project)
         val template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.SPONGE_BUILD_GRADLE_TEMPLATE)
 
-        // Sponge \o/
-        BaseTemplate.applyGradlePropertiesTemplate(project, file, groupId, artifactId, pluginVersion, true)
+        BaseTemplate.applyGradlePropertiesTemplate(project, file, groupId, pluginVersion, artifactId)
 
         return template.getText(properties)
     }

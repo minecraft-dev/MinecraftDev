@@ -15,6 +15,7 @@ package com.demonwav.mcdev.platform.liteloader
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
+import com.demonwav.mcdev.platform.mcp.McpVersionPair
 import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.ide.util.EditorHelper
 import com.intellij.openapi.progress.ProgressIndicator
@@ -23,7 +24,7 @@ import com.intellij.psi.PsiManager
 
 class LiteLoaderProjectConfiguration : ProjectConfiguration() {
 
-    var mcpVersion = ""
+    var mcpVersion = McpVersionPair("", "")
     var mcVersion = ""
 
     override var type = PlatformType.LITELOADER
@@ -60,4 +61,6 @@ class LiteLoaderProjectConfiguration : ProjectConfiguration() {
             }
         }
     }
+
+    override fun setupDependencies(buildSystem: BuildSystem) {}
 }

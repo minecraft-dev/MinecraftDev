@@ -57,6 +57,8 @@ abstract class SrgActionBase : AnAction() {
             }
 
             withSrgTarget(parent, srgMap, e, data)
+        }?.onError {
+            showBalloon(it.message ?: "No MCP data available", e)
         } ?: showBalloon("No mappings found", e)
     }
 

@@ -25,7 +25,7 @@ class CopyAtAction : SrgActionBase() {
     override fun withSrgTarget(parent: PsiElement, srgMap: McpSrgMap, e: AnActionEvent, data: ActionData) {
         when (parent) {
             is PsiField -> {
-                val srg = srgMap.findSrgField(parent) ?: return showBalloon("No SRG name found", e)
+                val srg = srgMap.getSrgField(parent) ?: return showBalloon("No SRG name found", e)
                 copyToClipboard(
                     data.editor,
                     data.element,
@@ -33,7 +33,7 @@ class CopyAtAction : SrgActionBase() {
                 )
             }
             is PsiMethod -> {
-                val srg = srgMap.findSrgMethod(parent) ?: return showBalloon("No SRG name found", e)
+                val srg = srgMap.getSrgMethod(parent) ?: return showBalloon("No SRG name found", e)
                 copyToClipboard(
                     data.editor,
                     data.element,
@@ -41,7 +41,7 @@ class CopyAtAction : SrgActionBase() {
                 )
             }
             is PsiClass -> {
-                val classMcpToSrg = srgMap.findSrgClass(parent) ?: return showBalloon("No SRG name found", e)
+                val classMcpToSrg = srgMap.getSrgClass(parent) ?: return showBalloon("No SRG name found", e)
                 copyToClipboard(data.editor, data.element, classMcpToSrg)
             }
             else -> showBalloon("Not a valid element", e)

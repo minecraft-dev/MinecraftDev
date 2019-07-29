@@ -22,6 +22,6 @@ class McpUnscrambler : UnscrambleSupport<JComponent> {
 
     override fun unscramble(project: Project, text: String, logName: String, settings: JComponent?): String? {
         val srgMap = SrgManager.findAnyInstance(project)?.srgMapNow ?: return null
-        return srgPattern.replace(text) { srgMap.mapSrgName(it.value) ?: it.value }
+        return srgPattern.replace(text) { srgMap.mapMcpToSrgName(it.value) ?: it.value }
     }
 }

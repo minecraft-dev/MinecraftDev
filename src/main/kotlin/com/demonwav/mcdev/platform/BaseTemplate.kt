@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.platform
 
-import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.ide.fileTemplates.FileTemplateManager
@@ -29,18 +28,14 @@ object BaseTemplate {
         project: Project,
         file: VirtualFile,
         groupId: String,
-        artifactId: String,
         pluginVersion: String
     ): String? {
-        val buildGradleProps = Properties()
-
         val manager = FileTemplateManager.getInstance(project)
         val template = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.BUILD_GRADLE_TEMPLATE)
 
-        // This method should be never used for Sponge projects so we just pass false
-        applyGradlePropertiesTemplate(project, file, groupId, artifactId, pluginVersion, false)
+        applyGradlePropertiesTemplate(project, file, groupId, pluginVersion)
 
-        return template.getText(buildGradleProps)
+        return template.getText(manager.defaultProperties)
     }
 
     fun applyMultiModuleBuildGradleTemplate(
@@ -48,9 +43,8 @@ object BaseTemplate {
         file: VirtualFile,
         prop: VirtualFile,
         groupId: String,
-        artifactId: String,
         pluginVersion: String,
-        configurations: LinkedHashSet<ProjectConfiguration>
+        artifactId: String? = null
     ) {
         val properties = Properties()
 
@@ -58,9 +52,9 @@ object BaseTemplate {
             project,
             prop,
             groupId,
-            artifactId,
             pluginVersion,
-            configurations.any { it is SpongeProjectConfiguration })
+            artifactId
+        )
 
         applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MULTI_MODULE_BUILD_GRADLE_TEMPLATE, properties)
     }
@@ -69,17 +63,16 @@ object BaseTemplate {
         project: Project,
         file: VirtualFile,
         groupId: String,
-        artifactId: String,
         pluginVersion: String,
-        hasSponge: Boolean
+        artifactId: String? = null
     ) {
         val gradleProps = Properties()
 
         gradleProps.setProperty("GROUP_ID", groupId)
         gradleProps.setProperty("PLUGIN_VERSION", pluginVersion)
 
-        if (hasSponge) {
-            gradleProps.setProperty("PLUGIN_ID", artifactId.toLowerCase(Locale.ENGLISH))
+        if (!artifactId.isNullOrBlank()) {
+            gradleProps.setProperty("PLUGIN_ID", artifactId?.toLowerCase(Locale.ENGLISH))
         }
 
         // create gradle.properties
@@ -116,14 +109,14 @@ object BaseTemplate {
         project: Project,
         file: VirtualFile,
         templateName: String,
-        properties: Properties,
+        properties: Properties? = null,
         trimNewlines: Boolean = false
     ) {
         val manager = FileTemplateManager.getInstance(project)
         val template = manager.getJ2eeTemplate(templateName)
 
         val allProperties = manager.defaultProperties
-        allProperties.putAll(properties)
+        properties?.let { prop -> allProperties.putAll(prop) }
 
         var text = template.getText(allProperties)
         if (trimNewlines) {
