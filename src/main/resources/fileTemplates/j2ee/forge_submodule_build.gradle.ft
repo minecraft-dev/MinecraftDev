@@ -14,7 +14,7 @@ buildscript {
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:${FORGEGRADLE_VERSION}-SNAPSHOT"
 #if (${SPONGE_FORGE})
-        classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
+        classpath "gradle.plugin.org.spongepowered:spongegradle:0.9.0"
 #end
     }
 }

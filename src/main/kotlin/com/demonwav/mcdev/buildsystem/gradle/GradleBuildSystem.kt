@@ -109,7 +109,7 @@ class GradleBuildSystem(
 
             if (configuration is SpongeForgeProjectConfiguration) {
                 val buildGradlePsi = PsiManager.getInstance(project).findFile(newBuildGradle)
-                buildGradlePsi?.let { addBuildGradleDependencies(descriptor, it, false) }
+                buildGradlePsi?.let { addBuildGradleDependencies(descriptor, it, false, configuration) }
             }
         }
 
@@ -149,7 +149,7 @@ class GradleBuildSystem(
                 BaseTemplate.applyBuildGradleTemplate(project, gradleProp, groupId, artifactId, version)
             } ?: return@runWriteTask
 
-            addBuildGradleDependencies(descriptor, buildGradleText)
+            addBuildGradleDependencies(descriptor, buildGradleText, configuration)
             VirtualFileManager.getInstance().refreshWithoutFileWatcher(false)
         }
 
@@ -254,7 +254,8 @@ class GradleBuildSystem(
     private fun addBuildGradleDependencies(
         descriptor: ProjectDescriptor,
         file: PsiFile,
-        addToDirectory: Boolean
+        addToDirectory: Boolean,
+        configuration: ProjectConfiguration
     ) {
         val (rootDirectory, project) = descriptor
         // Write the repository and dependency data to the psi file
@@ -272,11 +273,20 @@ class GradleBuildSystem(
                 repositories.map { "maven {name = '${it.id}'\nurl = '${it.url}'\n}" }
             )
 
+            val dependencies =
+                this.dependencies.map { "compile '${it.groupId}:${it.artifactId}:${it.version}'" }.toMutableList()
+            if (configuration.type == PlatformType.SPONGE) {
+                // SpongeGradle requires spongeapi to be accessible during annotation processing to generate mcmod.info
+                this.dependencies.firstOrNull {
+                    it.groupId == "org.spongepowered" && it.artifactId == "spongeapi"
+                }?.let { dependencies += "annotationProcessor '${it.groupId}:${it.artifactId}:${it.version}'" }
+            }
+
             createRepositoriesOrDependencies(
                 project,
                 groovyFile,
                 "dependencies",
-                dependencies.map { "compile '${it.groupId}:${it.artifactId}:${it.version}'" }
+                dependencies
             )
 
             ReformatCodeProcessor(file, false).run()
@@ -297,11 +307,15 @@ class GradleBuildSystem(
         }
     }
 
-    private fun addBuildGradleDependencies(descriptor: ProjectDescriptor, text: String) {
+    private fun addBuildGradleDependencies(
+        descriptor: ProjectDescriptor,
+        text: String,
+        configuration: ProjectConfiguration
+    ) {
         // Create the Psi file from the text, but don't write it until we are finished with it
         val buildGradlePsi = PsiFileFactory.getInstance(descriptor.project).createFileFromText(GroovyLanguage, text)
 
-        addBuildGradleDependencies(descriptor, buildGradlePsi, true)
+        addBuildGradleDependencies(descriptor, buildGradlePsi, true, configuration)
     }
 
     private fun saveFile(file: VirtualFile) {
@@ -493,7 +507,7 @@ class GradleBuildSystem(
             if (configuration is SpongeForgeProjectConfiguration) {
                 val buildGradlePsi = PsiManager.getInstance(project).findFile(buildGradle)
                 if (buildGradlePsi != null) {
-                    addBuildGradleDependencies(descriptor, buildGradlePsi, false)
+                    addBuildGradleDependencies(descriptor, buildGradlePsi, false, configuration)
                 }
             }
         }
@@ -540,7 +554,7 @@ class GradleBuildSystem(
                 BaseTemplate.applySubmoduleBuildGradleTemplate(project, commonProjectName)
             } ?: return@runWriteTask
 
-            addBuildGradleDependencies(descriptor, buildGradleText)
+            addBuildGradleDependencies(descriptor, buildGradleText, configuration)
         }
     }
 
