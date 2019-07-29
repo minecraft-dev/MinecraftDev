@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -36,19 +36,26 @@ class SuperfluousFormatInspection : TranslationInspection() {
     private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
             val result = Translation.find(expression)
-            if (result != null && result.foldingElement is PsiCall && result.formattingError == FormattingError.SUPERFLUOUS) {
+            if (
+                result != null && result.foldingElement is PsiCall &&
+                result.formattingError == FormattingError.SUPERFLUOUS
+            ) {
                 registerProblem(expression, result)
             }
         }
 
         override fun visitLiteralExpression(expression: PsiLiteralExpression) {
             val result = Translation.find(expression)
-            if (result != null && result.foldingElement is PsiCall && result.formattingError == FormattingError.SUPERFLUOUS) {
+            if (
+                result != null && result.foldingElement is PsiCall &&
+                result.formattingError == FormattingError.SUPERFLUOUS
+            ) {
                 registerProblem(
                     expression,
                     result,
                     RemoveArgumentsQuickFix(
-                        SmartPointerManager.getInstance(holder.project).createSmartPsiElementPointer(result.foldingElement),
+                        SmartPointerManager.getInstance(holder.project)
+                            .createSmartPsiElementPointer(result.foldingElement),
                         result.superfluousVarargStart
                     ),
                     ChangeTranslationQuickFix("Use a different translation")
@@ -57,11 +64,19 @@ class SuperfluousFormatInspection : TranslationInspection() {
         }
 
         private fun registerProblem(expression: PsiExpression, result: Translation, vararg quickFixes: LocalQuickFix) {
-            holder.registerProblem(expression, "There are missing formatting arguments to satisfy '${result.text}'", ProblemHighlightType.GENERIC_ERROR, *quickFixes)
+            holder.registerProblem(
+                expression,
+                "There are missing formatting arguments to satisfy '${result.text}'",
+                ProblemHighlightType.GENERIC_ERROR,
+                *quickFixes
+            )
         }
     }
 
-    private class RemoveArgumentsQuickFix(private val call: SmartPsiElementPointer<PsiCall>, private val position: Int) : LocalQuickFix {
+    private class RemoveArgumentsQuickFix(
+        private val call: SmartPsiElementPointer<PsiCall>,
+        private val position: Int
+    ) : LocalQuickFix {
         override fun getName() = "Remove superfluous arguments"
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {

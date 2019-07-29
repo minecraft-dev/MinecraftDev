@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -95,7 +95,11 @@ class GradleBuildSystem(
         saveFile(buildGradle)
     }
 
-    private fun handleForgeCreate(descriptor: ProjectDescriptor, configuration: ForgeProjectConfiguration, indicator: ProgressIndicator) {
+    private fun handleForgeCreate(
+        descriptor: ProjectDescriptor,
+        configuration: ForgeProjectConfiguration,
+        indicator: ProgressIndicator
+    ) {
         val (rootDirectory, project) = descriptor
         runWriteTask {
             val (buildGradle, gradleProp) = setupGradleFiles(rootDirectory)
@@ -115,7 +119,11 @@ class GradleBuildSystem(
         setupDecompWorkspace(descriptor, indicator)
     }
 
-    private fun handleLiteLoaderCreate(descriptor: ProjectDescriptor, configuration: LiteLoaderProjectConfiguration, indicator: ProgressIndicator) {
+    private fun handleLiteLoaderCreate(
+        descriptor: ProjectDescriptor,
+        configuration: LiteLoaderProjectConfiguration,
+        indicator: ProgressIndicator
+    ) {
         runWriteTask {
             val (buildGradle, gradleProp) = setupGradleFiles(descriptor.rootDirectory)
 
@@ -128,7 +136,11 @@ class GradleBuildSystem(
         setupDecompWorkspace(descriptor, indicator)
     }
 
-    private fun handleGeneralCreate(descriptor: ProjectDescriptor, configuration: ProjectConfiguration, indicator: ProgressIndicator) {
+    private fun handleGeneralCreate(
+        descriptor: ProjectDescriptor,
+        configuration: ProjectConfiguration,
+        indicator: ProgressIndicator
+    ) {
         val (rootDirectory, project) = descriptor
         runWriteTask {
             val (_, gradleProp) = setupGradleFiles(rootDirectory)
@@ -160,9 +172,11 @@ class GradleBuildSystem(
         // We'll write the properties file to ensure it sets up with the right version
         runWriteTask {
             val wrapperDirPath = VfsUtil.createDirectoryIfMissing(descriptor.rootDirectory, "gradle/wrapper").path
-            FileUtils.writeLines(File(wrapperDirPath, "gradle-wrapper.properties"), listOf(
-                "distributionUrl=https\\://services.gradle.org/distributions/gradle-5.5-bin.zip"
-            ))
+            FileUtils.writeLines(
+                File(wrapperDirPath, "gradle-wrapper.properties"), listOf(
+                    "distributionUrl=https\\://services.gradle.org/distributions/gradle-5.5-bin.zip"
+                )
+            )
         }
 
         runGradleTask(descriptor, indicator) { launcher ->
@@ -204,7 +218,12 @@ class GradleBuildSystem(
         }
     }
 
-    private fun createRepositoriesOrDependencies(project: Project, file: GroovyFile, name: String, expressions: List<String>) {
+    private fun createRepositoriesOrDependencies(
+        project: Project,
+        file: GroovyFile,
+        name: String,
+        expressions: List<String>
+    ) {
         // Get the block so we can start working with it
         val block = getClosableBlockByName(file, name) ?: return
 
@@ -354,7 +373,11 @@ class GradleBuildSystem(
         }
     }
 
-    private fun requestCreateForgeRunConfigs(project: Project, rootModule: Module, configurations: Collection<ProjectConfiguration>) {
+    private fun requestCreateForgeRunConfigs(
+        project: Project,
+        rootModule: Module,
+        configurations: Collection<ProjectConfiguration>
+    ) {
         runWriteTaskLater {
             // Basically mark this as a newly created project
             val basePath = project.basePath ?: return@runWriteTaskLater // If this is null there's not much we can do
@@ -460,7 +483,14 @@ class GradleBuildSystem(
         runWriteTask {
             val (buildGradle, gradleProp) = setupGradleFiles(rootDirectory)
 
-            ForgeTemplate.applySubmoduleBuildGradleTemplate(project, buildGradle, gradleProp, artifactId, configuration, commonProjectName)
+            ForgeTemplate.applySubmoduleBuildGradleTemplate(
+                project,
+                buildGradle,
+                gradleProp,
+                artifactId,
+                configuration,
+                commonProjectName
+            )
 
             // We're only going to write the dependencies if it's a sponge forge project
             if (configuration is SpongeForgeProjectConfiguration) {
@@ -488,7 +518,13 @@ class GradleBuildSystem(
         runWriteTask {
             val (buildGradle, gradleProp) = setupGradleFiles(rootDirectory)
 
-            LiteLoaderTemplate.applySubmoduleBuildGradleTemplate(project, buildGradle, gradleProp, configuration, commonProjectName)
+            LiteLoaderTemplate.applySubmoduleBuildGradleTemplate(
+                project,
+                buildGradle,
+                gradleProp,
+                configuration,
+                commonProjectName
+            )
         }
 
         setupDecompWorkspace(descriptor, indicator)

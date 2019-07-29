@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -52,7 +52,9 @@ object I18nElementFactory {
                 JBPopupFactory.getInstance()
                     .createPopupChooserBuilder(choices)
                     .setTitle("Choose resource domain")
-                    .setAdText("There are multiple resource domains with localization files, choose one for this translation.")
+                    .setAdText(
+                        "There are multiple resource domains with localization files, choose one for this translation."
+                    )
                     .setItemChosenCallback {
                         val validPattern = Regex("^.*?/assets/${Regex.escape(it)}/lang.*?\$")
                         write(files.filter { validPattern.matches(it.path) })
@@ -79,7 +81,12 @@ object I18nElementFactory {
         return result
     }
 
-    private tailrec fun gatherComments(element: PsiElement, maxDepth: Int, acc: MutableList<String> = mutableListOf(), depth: Int = 0): List<String> {
+    private tailrec fun gatherComments(
+        element: PsiElement,
+        maxDepth: Int,
+        acc: MutableList<String> = mutableListOf(),
+        depth: Int = 0
+    ): List<String> {
         if (maxDepth != 0 && depth >= maxDepth) {
             return acc
         }

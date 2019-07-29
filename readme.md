@@ -49,21 +49,32 @@ Code is generated during the build task, to run the generation task without buil
 
 This task is necessary to work on the code without errors before the initial build.
 
+To format the code in this project:
+
+`./gradlew format`
+
+This will format using `ktlint` described below in the [style guide](#style-guide) section below.
+
 The [Gradle IntelliJ Plugin](https://github.com/JetBrains/gradle-intellij-plugin)
 will handle downloading the IntelliJ dependencies and packaging the
 plugin.
 
-IDE Setup
----------
-
-Copy the contents of the `idea-configs` directory into your `.idea` directory to quickly setup useful
-run configurations and copyright settings.
-
 Style Guide
 -----------
 
-This project will follow DemonWav's Java style guidelines (lol, Google's
-style slightly modified). Link [here](http://www.demonwav.com/style).
+This projects follows the opinionated [`ktlint`](https://ktlint.github.io/) linter and formatter. It uses the
+[`ktlint-gradle`](https://github.com/jlleitschuh/ktlint-gradle) plugin to automatically check and format the code in
+this repo.
+
+IDE Setup
+---------
+
+It's recommended to run the `ktlintApplyToIdea` and `addKtlintFormatGitPreCommitHook` tasks to configure your
+IDE with `ktlint` style settings and to automatically format this project's code before committing:
+
+```
+./gradlew ktlintApplyToIdea addKtlintFormatGitPreCommitHook
+```
 
 Developers
 ----------

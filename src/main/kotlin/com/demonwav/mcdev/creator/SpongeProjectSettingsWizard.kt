@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -52,7 +52,14 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun validate(): Boolean {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) &&
+        return validate(
+            pluginNameField,
+            pluginVersionField,
+            mainClassField,
+            authorsField,
+            dependField,
+            MinecraftModuleWizardStep.pattern
+        ) &&
             spongeApiVersionBox.selectedItem != null
     }
 

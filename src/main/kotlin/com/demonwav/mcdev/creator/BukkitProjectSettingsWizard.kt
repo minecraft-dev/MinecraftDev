@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -97,7 +97,8 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
                 title.icon = PlatformAssets.PAPER_ICON_2X
                 title.text = "<html><font size=\"5\">Paper Settings</font></html>"
             }
-            else -> {}
+            else -> {
+            }
         }
 
         CoroutineScope(Dispatchers.Swing).launch {
@@ -107,12 +108,17 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
                 errorLabel.isVisible = true
             }
         }
-
     }
 
     override fun validate(): Boolean {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) &&
-            minecraftVersionBox.selectedItem != null
+        return validate(
+            pluginNameField,
+            pluginVersionField,
+            mainClassField,
+            authorsField,
+            dependField,
+            pattern
+        ) && minecraftVersionBox.selectedItem != null
     }
 
     override fun onStepLeaving() {

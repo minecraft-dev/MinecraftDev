@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -21,7 +21,7 @@ import com.intellij.psi.FileViewProvider
 class AtFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, AtLanguage) {
 
     init {
-       setup()
+        setup()
     }
 
     private fun setup() {

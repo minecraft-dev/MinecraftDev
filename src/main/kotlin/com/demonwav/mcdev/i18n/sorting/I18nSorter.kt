@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -44,10 +44,28 @@ object I18nSorter {
     private fun sort(project: Project, file: PsiFile, ordering: Ordering, keepComments: Int) {
         val sorted = file.children.mapNotNull { it as? I18nEntry }.let {
             when (ordering) {
-                Ordering.ASCENDING -> I18nElementFactory.assembleElements(project, it.sortedWith(ascendingComparator), keepComments)
-                Ordering.DESCENDING -> I18nElementFactory.assembleElements(project, it.sortedWith(descendingComparator), keepComments)
-                Ordering.TEMPLATE -> sortByTemplate(project, TemplateManager.getProjectTemplate(project), it, keepComments)
-                else -> sortByTemplate(project, buildDefaultTemplate(project, file.virtualFile.mcDomain) ?: return, it, keepComments)
+                Ordering.ASCENDING -> I18nElementFactory.assembleElements(
+                    project,
+                    it.sortedWith(ascendingComparator),
+                    keepComments
+                )
+                Ordering.DESCENDING -> I18nElementFactory.assembleElements(
+                    project,
+                    it.sortedWith(descendingComparator),
+                    keepComments
+                )
+                Ordering.TEMPLATE -> sortByTemplate(
+                    project,
+                    TemplateManager.getProjectTemplate(project),
+                    it,
+                    keepComments
+                )
+                else -> sortByTemplate(
+                    project,
+                    buildDefaultTemplate(project, file.virtualFile.mcDomain) ?: return,
+                    it,
+                    keepComments
+                )
             }
         }
 
@@ -69,14 +87,20 @@ object I18nSorter {
             when {
                 child is I18nEntry ->
                     elements.add(Key(Regex.escape(child.key).toRegex()))
-                child.node.elementType == I18nTypes.LINE_ENDING && child.prevSibling.node.elementType == I18nTypes.LINE_ENDING ->
+                child.node.elementType == I18nTypes.LINE_ENDING &&
+                    child.prevSibling.node.elementType == I18nTypes.LINE_ENDING ->
                     elements.add(EmptyLine)
             }
         }
         return Template(elements)
     }
 
-    private fun sortByTemplate(project: com.intellij.openapi.project.Project, template: Template, entries: List<I18nEntry>, keepComments: Int): List<PsiElement> {
+    private fun sortByTemplate(
+        project: com.intellij.openapi.project.Project,
+        template: Template,
+        entries: List<I18nEntry>,
+        keepComments: Int
+    ): List<PsiElement> {
         val result = mutableListOf<PsiElement>()
         val tmp = entries.toMutableList()
         for (elem in template.elements) {
@@ -88,13 +112,25 @@ object I18nSorter {
                 EmptyLine -> result.add(I18nElementFactory.createLineEnding(project))
                 is Key -> {
                     val toWrite = tmp.filter { elem.matcher.matches(it.key) }
-                    result.addAll(I18nElementFactory.assembleElements(project, toWrite.sortedWith(ascendingComparator), keepComments))
+                    result.addAll(
+                        I18nElementFactory.assembleElements(
+                            project,
+                            toWrite.sortedWith(ascendingComparator),
+                            keepComments
+                        )
+                    )
                     tmp.removeAll(toWrite)
                 }
             }
         }
         if (tmp.isNotEmpty()) {
-            result.addAll(I18nElementFactory.assembleElements(project, tmp.sortedWith(ascendingComparator), keepComments))
+            result.addAll(
+                I18nElementFactory.assembleElements(
+                    project,
+                    tmp.sortedWith(ascendingComparator),
+                    keepComments
+                )
+            )
         }
         return result
     }

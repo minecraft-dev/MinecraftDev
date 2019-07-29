@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -61,9 +61,16 @@ class ShadowModifiersInspection : MixinInspection() {
                     "@Shadow target method is not static"
                 }
 
-                holder.registerProblem(shadowModifierList.findKeyword(PsiModifier.STATIC) ?: annotation, message,
+                holder.registerProblem(
+                    shadowModifierList.findKeyword(PsiModifier.STATIC) ?: annotation, message,
                     ProblemHighlightType.GENERIC_ERROR,
-                    QuickFixFactory.getInstance().createModifierListFix(shadowModifierList, PsiModifier.STATIC, targetStatic, false))
+                    QuickFixFactory.getInstance().createModifierListFix(
+                        shadowModifierList,
+                        PsiModifier.STATIC,
+                        targetStatic,
+                        false
+                    )
+                )
             }
 
             // Check access level
@@ -72,12 +79,13 @@ class ShadowModifiersInspection : MixinInspection() {
             if (targetAccessLevel != shadowAccessLevel) {
                 val targetModifier = PsiUtil.getAccessModifier(targetAccessLevel)
                 val shadowModifier = PsiUtil.getAccessModifier(shadowAccessLevel)
-                holder.registerProblem(shadowModifierList.findKeyword(shadowModifier) ?: annotation,
+                holder.registerProblem(
+                    shadowModifierList.findKeyword(shadowModifier) ?: annotation,
                     "Invalid access modifiers, has: $shadowModifier, but target member has: " +
                         PsiUtil.getAccessModifier(PsiUtil.getAccessLevel(target)),
-                    QuickFixFactory.getInstance().createModifierListFix(shadowModifierList, targetModifier, true, false))
+                    QuickFixFactory.getInstance().createModifierListFix(shadowModifierList, targetModifier, true, false)
+                )
             }
-
 
             // TODO: Would it make sense to apply the @Final check to methods?
             if (member !is PsiField) {
@@ -89,11 +97,15 @@ class ShadowModifiersInspection : MixinInspection() {
             val shadowFinal = shadowModifierList.findAnnotation(FINAL)
             if (targetFinal != (shadowFinal != null)) {
                 if (targetFinal) {
-                    holder.registerProblem(annotation, "@Shadow for final member should be annotated as @Final",
-                        AddAnnotationFix(FINAL, member))
+                    holder.registerProblem(
+                        annotation, "@Shadow for final member should be annotated as @Final",
+                        AddAnnotationFix(FINAL, member)
+                    )
                 } else {
-                    holder.registerProblem(shadowFinal!!, "Target method is not final",
-                        RemoveAnnotationQuickFix(shadowFinal, member))
+                    holder.registerProblem(
+                        shadowFinal!!, "Target method is not final",
+                        RemoveAnnotationQuickFix(shadowFinal, member)
+                    )
                 }
             }
         }

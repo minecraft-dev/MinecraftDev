@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -42,7 +42,9 @@ abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
     override fun tearDown() {
         library?.let { l ->
             ModuleRootModificationUtil.updateModel(module) { model ->
-                model.removeOrderEntry(model.findLibraryOrderEntry(l) ?: throw IllegalStateException("Library not found"))
+                model.removeOrderEntry(
+                    model.findLibraryOrderEntry(l) ?: throw IllegalStateException("Library not found")
+                )
             }
 
             runWriteTask {

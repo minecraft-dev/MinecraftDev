@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -35,7 +35,12 @@ object LiteLoaderTemplate {
         properties.setProperty("MC_VERSION", configuration.mcVersion)
         properties.setProperty("MCP_MAPPINGS", configuration.mcpVersion)
 
-        BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE, properties)
+        BaseTemplate.applyTemplate(
+            project,
+            prop,
+            MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE,
+            properties
+        )
 
         val gradleProps = Properties()
 
@@ -47,7 +52,12 @@ object LiteLoaderTemplate {
             gradleProps.setProperty("FORGEGRADLE_VERSION", "2.2")
         }
 
-        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_BUILD_GRADLE_TEMPLATE, gradleProps)
+        BaseTemplate.applyTemplate(
+            project,
+            file,
+            MinecraftFileTemplateGroupFactory.LITELOADER_BUILD_GRADLE_TEMPLATE,
+            gradleProps
+        )
     }
 
     fun applySubmoduleBuildGradleTemplate(
@@ -68,14 +78,24 @@ object LiteLoaderTemplate {
             properties.setProperty("FORGEGRADLE_VERSION", "2.2")
         }
 
-        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, properties)
+        BaseTemplate.applyTemplate(
+            project,
+            file,
+            MinecraftFileTemplateGroupFactory.LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE,
+            properties
+        )
 
         val gradleProps = Properties()
         gradleProps.setProperty("VERSION", configuration.base?.pluginVersion)
         gradleProps.setProperty("MC_VERSION", configuration.mcVersion)
         gradleProps.setProperty("MCP_MAPPINGS", configuration.mcpVersion)
 
-        BaseTemplate.applyTemplate(project, prop, MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE, gradleProps)
+        BaseTemplate.applyTemplate(
+            project,
+            prop,
+            MinecraftFileTemplateGroupFactory.LITELOADER_GRADLE_PROPERTIES_TEMPLATE,
+            gradleProps
+        )
     }
 
     fun applyMainClassTemplate(
@@ -92,6 +112,11 @@ object LiteLoaderTemplate {
         properties.setProperty("MOD_NAME", modName)
         properties.setProperty("MOD_VERSION", modVersion)
 
-        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.LITELOADER_MAIN_CLASS_TEMPLATE, properties)
+        BaseTemplate.applyTemplate(
+            project,
+            file,
+            MinecraftFileTemplateGroupFactory.LITELOADER_MAIN_CLASS_TEMPLATE,
+            properties
+        )
     }
 }

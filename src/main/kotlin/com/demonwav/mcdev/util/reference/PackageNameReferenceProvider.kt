@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -37,7 +37,11 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
 
     protected open fun canBindTo(element: PsiElement) = element is PsiPackage
 
-    protected open fun resolve(qualifiedName: String, element: PsiElement, facade: JavaPsiFacade): Array<ResolveResult> {
+    protected open fun resolve(
+        qualifiedName: String,
+        element: PsiElement,
+        facade: JavaPsiFacade
+    ): Array<ResolveResult> {
         facade.findPackage(qualifiedName)?.let { return arrayOf(PsiElementResolveResult(it)) }
         return ResolveResult.EMPTY_ARRAY
     }
@@ -48,8 +52,11 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
         return collectPackageChildren(context, classes) {}
     }
 
-    protected inline fun collectPackageChildren(context: PsiPackage, classes: Iterable<PsiClass>,
-                                                classFunc: (PsiClass) -> Any?): Array<Any> {
+    protected inline fun collectPackageChildren(
+        context: PsiPackage,
+        classes: Iterable<PsiClass>,
+        classFunc: (PsiClass) -> Any?
+    ): Array<Any> {
         val parentPackage = context.qualifiedName
         val subPackageStart = parentPackage.length + 1
 
@@ -67,7 +74,8 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
             }
 
             val end = packageName.indexOf('.', subPackageStart)
-            val nextName = if (end == -1) packageName.substring(subPackageStart) else packageName.substring(subPackageStart, end)
+            val nextName =
+                if (end == -1) packageName.substring(subPackageStart) else packageName.substring(subPackageStart, end)
 
             if (packages.add(nextName)) {
                 list.add(LookupElementBuilder.create(nextName).withIcon(PlatformIcons.PACKAGE_ICON))
@@ -118,8 +126,8 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
         return list.toTypedArray()
     }
 
-    private inner class Reference(element: PsiElement, range: TextRange, start: Int, val previous: Reference?)
-        : PsiReferenceBase.Poly<PsiElement>(element, range, false), InspectionReference {
+    private inner class Reference(element: PsiElement, range: TextRange, start: Int, val previous: Reference?) :
+        PsiReferenceBase.Poly<PsiElement>(element, range, false), InspectionReference {
 
         override val description: String
             get() = this@PackageNameReferenceProvider.description

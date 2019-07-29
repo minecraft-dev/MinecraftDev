@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -54,10 +54,32 @@ object MixinConstants {
         const val SURROGATE = "org.spongepowered.asm.mixin.injection.Surrogate"
 
         val METHOD_INJECTORS = listOf(INJECT, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT)
-        val ENTRY_POINTS = arrayOf(INJECT, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE, OVERWRITE)
+        val ENTRY_POINTS =
+            arrayOf(INJECT, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE, OVERWRITE)
         val MIXIN_ANNOTATIONS = setOf(
-            ACCESSOR, AT, DEBUG, DYNAMIC, FINAL, IMPLEMENTS, INTERFACE, INTRINSIC, MIXIN, MUTABLE, OVERWRITE, SHADOW, SLICE, SOFT_OVERRIDE,
-            UNIQUE, INJECT, INVOKER, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE)
-
+            ACCESSOR,
+            AT,
+            DEBUG,
+            DYNAMIC,
+            FINAL,
+            IMPLEMENTS,
+            INTERFACE,
+            INTRINSIC,
+            MIXIN,
+            MUTABLE,
+            OVERWRITE,
+            SHADOW,
+            SLICE,
+            SOFT_OVERRIDE,
+            UNIQUE,
+            INJECT,
+            INVOKER,
+            MODIFY_ARG,
+            MODIFY_ARGS,
+            MODIFY_CONSTANT,
+            MODIFY_VARIABLE,
+            REDIRECT,
+            SURROGATE
+        )
     }
 }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -16,5 +16,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
 class I18nSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
-    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?) = I18nSyntaxHighlighter(I18nLexerAdapter())
+    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?) =
+        I18nSyntaxHighlighter(I18nLexerAdapter())
 }

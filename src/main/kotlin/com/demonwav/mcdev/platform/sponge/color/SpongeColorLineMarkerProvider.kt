@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -45,21 +45,24 @@ class SpongeColorLineMarkerProvider : LineMarkerProvider {
     ) : ColorLineMarkerProvider.ColorInfo(
         element,
         color,
-        GutterIconNavigationHandler handler@ { _, _ ->
-        if (!element.isWritable) {
-            return@handler
-        }
-
-        val editor = PsiUtilBase.findEditor(element) ?: return@handler
-
-        val c = ColorChooser.chooseColor(editor.component, "Choose Color", color, false)
-        if (c != null) {
-            when (workElement) {
-                is PsiLiteralExpression -> workElement.setColor(c.rgb and 0xFFFFFF)
-                is PsiExpressionList -> workElement.setColor(c.red, c.green, c.blue)
-                is PsiNewExpression -> (workElement.getNode().findChildByType(JavaElementType.EXPRESSION_LIST) as PsiExpressionList?)
-                    ?.setColor(c.red, c.green, c.blue)
+        GutterIconNavigationHandler handler@{ _, _ ->
+            if (!element.isWritable) {
+                return@handler
             }
-        }
-    })
+
+            val editor = PsiUtilBase.findEditor(element) ?: return@handler
+
+            val c = ColorChooser.chooseColor(editor.component, "Choose Color", color, false)
+            if (c != null) {
+                when (workElement) {
+                    is PsiLiteralExpression -> workElement.setColor(c.rgb and 0xFFFFFF)
+                    is PsiExpressionList -> workElement.setColor(c.red, c.green, c.blue)
+                    is PsiNewExpression -> {
+                        val list = workElement.getNode().findChildByType(JavaElementType.EXPRESSION_LIST)
+                            as PsiExpressionList?
+                        list?.setColor(c.red, c.green, c.blue)
+                    }
+                }
+            }
+        })
 }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -23,7 +23,8 @@ import com.intellij.psi.PsiReferenceExpression
 
 class ShadowFinalInspection : MixinInspection() {
 
-    override fun getStaticDescription() = "@Final annotated fields cannot be modified, as the field it is targeting is final. " +
+    override fun getStaticDescription() =
+        "@Final annotated fields cannot be modified, as the field it is targeting is final. " +
             "This can be overridden with @Mutable."
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
@@ -36,8 +37,10 @@ class ShadowFinalInspection : MixinInspection() {
             val modifiers = resolved.modifierList ?: return
 
             if (modifiers.findAnnotation(FINAL) != null && modifiers.findAnnotation(MUTABLE) == null) {
-                holder.registerProblem(expression, "@Final fields cannot be modified",
-                    AddAnnotationFix(MUTABLE, resolved))
+                holder.registerProblem(
+                    expression, "@Final fields cannot be modified",
+                    AddAnnotationFix(MUTABLE, resolved)
+                )
             }
         }
     }

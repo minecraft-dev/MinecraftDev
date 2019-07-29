@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -22,7 +22,8 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiManager
 
-class BungeeCordProjectConfiguration(override var type: PlatformType) : ProjectConfiguration(), BukkitLikeConfiguration {
+class BungeeCordProjectConfiguration(override var type: PlatformType) : ProjectConfiguration(),
+    BukkitLikeConfiguration {
 
     override val dependencies = mutableListOf<String>()
     override val softDependencies = mutableListOf<String>()

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -19,8 +19,10 @@ class LiteralTranslationIdentifier : TranslationIdentifier<PsiLiteralExpression>
         val statement = element.parent
         if (element.value is String) {
             val result = identify(element.project, element, statement, element)
-            return result?.copy(key = result.key.replace(CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED, ""),
-                varKey = result.varKey.replace(CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED, ""))
+            return result?.copy(
+                key = result.key.replace(CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED, ""),
+                varKey = result.varKey.replace(CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED, "")
+            )
         }
         return null
     }

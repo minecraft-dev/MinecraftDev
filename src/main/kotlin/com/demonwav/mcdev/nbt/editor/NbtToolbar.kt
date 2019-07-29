@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -26,7 +26,8 @@ class NbtToolbar(nbtFile: NbtVirtualFile) {
     init {
         compressionBox.addItem(CompressionSelection.GZIP)
         compressionBox.addItem(CompressionSelection.UNCOMPRESSED)
-        compressionBox.selectedItem = if (nbtFile.isCompressed) CompressionSelection.GZIP else CompressionSelection.UNCOMPRESSED
+        compressionBox.selectedItem =
+            if (nbtFile.isCompressed) CompressionSelection.GZIP else CompressionSelection.UNCOMPRESSED
         lastSelection = selection
 
         saveButton.isVisible = false

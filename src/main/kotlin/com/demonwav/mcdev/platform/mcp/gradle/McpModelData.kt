@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -16,7 +16,8 @@ import com.intellij.openapi.externalSystem.model.ProjectKeys
 import com.intellij.openapi.externalSystem.model.project.AbstractExternalEntityData
 import com.intellij.openapi.externalSystem.model.project.ModuleData
 
-class McpModelData(val module: ModuleData, val settings: McpModuleSettings.State) : AbstractExternalEntityData(module.owner) {
+class McpModelData(val module: ModuleData, val settings: McpModuleSettings.State) :
+    AbstractExternalEntityData(module.owner) {
 
     companion object {
         // Process McpModelData after builtin services (e.g. dependency or module data)

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -35,7 +35,12 @@ object BukkitTemplate {
         properties.setProperty("PACKAGE", packageName)
         properties.setProperty("CLASS_NAME", className)
 
-        BaseTemplate.applyTemplate(project, file, MinecraftFileTemplateGroupFactory.BUKKIT_MAIN_CLASS_TEMPLATE, properties)
+        BaseTemplate.applyTemplate(
+            project,
+            file,
+            MinecraftFileTemplateGroupFactory.BUKKIT_MAIN_CLASS_TEMPLATE,
+            properties
+        )
     }
 
     fun applyPomTemplate(project: Project): String {

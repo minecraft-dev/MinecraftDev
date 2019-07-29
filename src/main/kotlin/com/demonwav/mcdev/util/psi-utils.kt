@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -58,11 +58,14 @@ fun PsiElement.findContainingMethod(): PsiMethod? = findParent({ it is PsiClass 
 
 @Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findParent(resolveReferences: Boolean): T? {
-    return findParent({false}, resolveReferences)
+    return findParent({ false }, resolveReferences)
 }
 
 @Contract(pure = true)
-private inline fun <reified T : PsiElement> PsiElement.findParent(stop: (PsiElement) -> Boolean, resolveReferences: Boolean): T? {
+private inline fun <reified T : PsiElement> PsiElement.findParent(
+    stop: (PsiElement) -> Boolean,
+    resolveReferences: Boolean
+): T? {
     var el: PsiElement = this
 
     while (true) {
@@ -153,7 +156,7 @@ fun <T : Any> Sequence<T>.filter(filter: ElementFilter?, context: PsiElement): S
 fun Stream<out PsiElement>.toResolveResults(): Array<ResolveResult> = map(::PsiElementResolveResult).toTypedArray()
 
 fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
-    ChangeSignatureUtil.synchronizeList(this, newParams, {it.parameters.asList()}, BooleanArray(newParams.size))
+    ChangeSignatureUtil.synchronizeList(this, newParams, { it.parameters.asList() }, BooleanArray(newParams.size))
 }
 
 @get:Contract(pure = true)
@@ -164,7 +167,8 @@ val PsiElement.constantValue: Any?
 val PsiElement.constantStringValue: String?
     get() = constantValue as? String
 
-private val ACCESS_MODIFIERS = listOf(PsiModifier.PUBLIC, PsiModifier.PROTECTED, PsiModifier.PRIVATE, PsiModifier.PACKAGE_LOCAL)
+private val ACCESS_MODIFIERS =
+    listOf(PsiModifier.PUBLIC, PsiModifier.PROTECTED, PsiModifier.PRIVATE, PsiModifier.PACKAGE_LOCAL)
 
 fun isAccessModifier(@ModifierConstant modifier: String): Boolean {
     return modifier in ACCESS_MODIFIERS
@@ -184,7 +188,6 @@ fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
 @get:Contract(pure = true)
 val PsiMethod.nameAndParameterTypes: String
     get() = "$name(${parameterList.parameters.joinToString(", ") { it.type.presentableText }})"
-
 
 @get:Contract(pure = true)
 val <T : PsiElement> T.manipulator: ElementManipulator<T>?

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -30,7 +30,11 @@ class AtCommenterTest : BaseMinecraftTest(PlatformType.MCP) {
 
     override fun getTestDataPath() = testDataPath.toString()
 
-    private fun doTest(actionId: String, @Language("Access Transformers") before: String, @Language("Access Transformers") after: String) {
+    private fun doTest(
+        actionId: String,
+        @Language("Access Transformers") before: String,
+        @Language("Access Transformers") after: String
+    ) {
         buildProject(VfsUtil.findFile(testDataPath, true)!!) {
             at("${fileName}_at.cfg", before, configure = true)
             at("${fileName}_after_at.cfg", after, configure = false)

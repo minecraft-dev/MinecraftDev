@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -214,11 +214,20 @@ fun PsiClass.findMatchingMethod(pattern: PsiMethod, checkBases: Boolean, name: S
     return findMethodsByName(name, checkBases).firstOrNull { it.isMatchingMethod(pattern) }
 }
 
-fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean, name: String = pattern.name): List<PsiMethod> {
+fun PsiClass.findMatchingMethods(
+    pattern: PsiMethod,
+    checkBases: Boolean,
+    name: String = pattern.name
+): List<PsiMethod> {
     return findMethodsByName(name, checkBases).filter { it.isMatchingMethod(pattern) }
 }
 
-inline fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean, name: String, func: (PsiMethod) -> Unit) {
+inline fun PsiClass.findMatchingMethods(
+    pattern: PsiMethod,
+    checkBases: Boolean,
+    name: String,
+    func: (PsiMethod) -> Unit
+) {
     for (method in findMethodsByName(name, checkBases)) {
         if (method.isMatchingMethod(pattern)) {
             func(method)
@@ -227,8 +236,8 @@ inline fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean,
 }
 
 fun PsiMethod.isMatchingMethod(pattern: PsiMethod): Boolean {
-    return areReallyOnlyParametersErasureEqual(this.parameterList, pattern.parameterList)
-        && this.returnType.isErasureEquivalentTo(pattern.returnType)
+    return areReallyOnlyParametersErasureEqual(this.parameterList, pattern.parameterList) &&
+        this.returnType.isErasureEquivalentTo(pattern.returnType)
 }
 
 fun PsiClass.findMatchingField(pattern: PsiField, checkBases: Boolean, name: String = pattern.name): PsiField? {
@@ -243,7 +252,10 @@ fun PsiField.isMatchingField(pattern: PsiField): Boolean {
     return type.isErasureEquivalentTo(pattern.type)
 }
 
-private fun areReallyOnlyParametersErasureEqual(parameterList1: PsiParameterList, parameterList2: PsiParameterList): Boolean {
+private fun areReallyOnlyParametersErasureEqual(
+    parameterList1: PsiParameterList,
+    parameterList2: PsiParameterList
+): Boolean {
     // Similar to MethodSignatureUtil.areParametersErasureEqual, but doesn't check method name
     if (parameterList1.parametersCount != parameterList2.parametersCount) {
         return false

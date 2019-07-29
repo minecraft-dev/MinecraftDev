@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -71,7 +71,6 @@ class SuperClassTest : BaseMixinTest() {
         """)
     }
 
-
     fun `test good mixin superclass`() {
         doTest("""
             package test;
@@ -110,5 +109,4 @@ class SuperClassTest : BaseMixinTest() {
             }
         """)
     }
-
 }

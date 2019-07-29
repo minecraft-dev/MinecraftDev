@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -42,6 +42,7 @@ class BukkitListenerImplementedInspection : BaseInspection() {
 
             @Nls
             override fun getName() = "Implement Listener"
+
             @Nls
             override fun getFamilyName() = name
         }
@@ -50,7 +51,11 @@ class BukkitListenerImplementedInspection : BaseInspection() {
     override fun buildVisitor(): BaseInspectionVisitor {
         return object : BaseInspectionVisitor() {
             override fun visitClass(aClass: PsiClass) {
-                if (aClass.methods.none { it.modifierList.findAnnotation(BukkitConstants.HANDLER_ANNOTATION) != null }) {
+                if (
+                    aClass.methods.none {
+                        it.modifierList.findAnnotation(BukkitConstants.HANDLER_ANNOTATION) != null
+                    }
+                ) {
                     return
                 }
 

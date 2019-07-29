@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -19,10 +19,13 @@ import com.intellij.psi.util.MethodSignatureBackedByPsiMethod
 import com.intellij.util.Processor
 import com.intellij.util.QueryExecutor
 
-class MixinSoftImplementMethodSuperSearcher : QueryExecutor<MethodSignatureBackedByPsiMethod, SuperMethodsSearch.SearchParameters> {
+class MixinSoftImplementMethodSuperSearcher :
+    QueryExecutor<MethodSignatureBackedByPsiMethod, SuperMethodsSearch.SearchParameters> {
 
-    override fun execute(queryParameters: SuperMethodsSearch.SearchParameters,
-                         consumer: Processor<in MethodSignatureBackedByPsiMethod>): Boolean {
+    override fun execute(
+        queryParameters: SuperMethodsSearch.SearchParameters,
+        consumer: Processor<in MethodSignatureBackedByPsiMethod>
+    ): Boolean {
 
         if (queryParameters.psiClass != null) {
             return true // Not entirely sure what this is used for
@@ -34,7 +37,7 @@ class MixinSoftImplementMethodSuperSearcher : QueryExecutor<MethodSignatureBacke
         // This is very simple and probably doesn't handle all cases
         // Right now we simply check for @Implements annotation on the class and look
         // for a similar method in the interface
-        runReadAction run@ {
+        runReadAction run@{
             if (!method.name.contains('$') || method.hasModifierProperty(PsiModifier.STATIC)) {
                 return@run true
             }

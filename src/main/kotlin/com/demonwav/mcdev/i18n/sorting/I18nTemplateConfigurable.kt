@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -27,7 +27,6 @@ import javax.swing.DefaultComboBoxModel
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JPanel
-
 
 class I18nTemplateConfigurable : Configurable {
     private lateinit var panel: JPanel
@@ -80,7 +79,13 @@ class I18nTemplateConfigurable : Configurable {
     }
 
     override fun isModified(): Boolean {
-        return templateEditor.document.text != getActiveTemplateText(CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(panel)))
+        return templateEditor.document.text != getActiveTemplateText(
+            CommonDataKeys.PROJECT.getData(
+                DataManager.getInstance().getDataContext(
+                    panel
+                )
+            )
+        )
     }
 
     override fun apply() {

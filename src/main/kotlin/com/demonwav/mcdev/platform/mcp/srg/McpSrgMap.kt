@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -29,32 +29,61 @@ class McpSrgMap private constructor(
     private val srgNames: Map<String, String>
 ) {
 
-    @Contract(pure = true) fun getSrgClass(fullQualifiedName: String) = classMap[fullQualifiedName]
-    @Contract(pure = true) fun mapToSrgClass(fullQualifiedName: String) = getSrgClass(fullQualifiedName) ?: fullQualifiedName
-    @Contract(pure = true) fun findSrgClass(psiClass: PsiClass): String? {
+    @Contract(pure = true)
+    fun getSrgClass(fullQualifiedName: String) = classMap[fullQualifiedName]
+
+    @Contract(pure = true)
+    fun mapToSrgClass(fullQualifiedName: String) = getSrgClass(fullQualifiedName) ?: fullQualifiedName
+
+    @Contract(pure = true)
+    fun findSrgClass(psiClass: PsiClass): String? {
         return getSrgClass(psiClass.fullQualifiedName ?: return null)
     }
 
-    @Contract(pure = true) fun getSrgField(reference: MemberReference) = fieldMap[reference]
-    @Contract(pure = true) fun mapToSrgField(reference: MemberReference) = getSrgField(reference) ?: reference
-    @Contract(pure = true) fun findSrgField(field: PsiField) = getSrgField(field.simpleQualifiedMemberReference)
+    @Contract(pure = true)
+    fun getSrgField(reference: MemberReference) = fieldMap[reference]
 
-    @Contract(pure = true) fun getSrgMethod(reference: MemberReference) = methodMap[reference]
-    @Contract(pure = true) fun mapToSrgMethod(reference: MemberReference) = methodMap[reference] ?: reference
-    @Contract(pure = true) fun findSrgMethod(method: PsiMethod) = getSrgMethod(method.qualifiedMemberReference)
+    @Contract(pure = true)
+    fun mapToSrgField(reference: MemberReference) = getSrgField(reference) ?: reference
 
-    @Contract(pure = true) fun getMcpClass(fullQualifiedName: String) = classMap.inverse()[fullQualifiedName]
-    @Contract(pure = true) fun mapToMcpClass(fullQualifiedName: String) = getMcpClass(fullQualifiedName) ?: fullQualifiedName
+    @Contract(pure = true)
+    fun findSrgField(field: PsiField) = getSrgField(field.simpleQualifiedMemberReference)
 
-    @Contract(pure = true) fun getMcpField(reference: MemberReference) = fieldMap.inverse()[reference]
-    @Contract(pure = true) fun mapToMcpField(reference: MemberReference) = getMcpField(reference) ?: reference
-    @Contract(pure = true) fun findMcpField(field: PsiField) = getMcpField(field.qualifiedMemberReference)
+    @Contract(pure = true)
+    fun getSrgMethod(reference: MemberReference) = methodMap[reference]
 
-    @Contract(pure = true) fun getMcpMethod(reference: MemberReference) = methodMap.inverse()[reference]
-    @Contract(pure = true) fun mapToMcpMethod(reference: MemberReference) = getMcpMethod(reference) ?: reference
-    @Contract(pure = true) fun findMcpMethod(method: PsiMethod) = getMcpMethod(method.qualifiedMemberReference)
+    @Contract(pure = true)
+    fun mapToSrgMethod(reference: MemberReference) = methodMap[reference] ?: reference
 
-    @Contract(pure = true) fun mapSrgName(name: String) = srgNames[name]
+    @Contract(pure = true)
+    fun findSrgMethod(method: PsiMethod) = getSrgMethod(method.qualifiedMemberReference)
+
+    @Contract(pure = true)
+    fun getMcpClass(fullQualifiedName: String) = classMap.inverse()[fullQualifiedName]
+
+    @Contract(pure = true)
+    fun mapToMcpClass(fullQualifiedName: String) = getMcpClass(fullQualifiedName) ?: fullQualifiedName
+
+    @Contract(pure = true)
+    fun getMcpField(reference: MemberReference) = fieldMap.inverse()[reference]
+
+    @Contract(pure = true)
+    fun mapToMcpField(reference: MemberReference) = getMcpField(reference) ?: reference
+
+    @Contract(pure = true)
+    fun findMcpField(field: PsiField) = getMcpField(field.qualifiedMemberReference)
+
+    @Contract(pure = true)
+    fun getMcpMethod(reference: MemberReference) = methodMap.inverse()[reference]
+
+    @Contract(pure = true)
+    fun mapToMcpMethod(reference: MemberReference) = getMcpMethod(reference) ?: reference
+
+    @Contract(pure = true)
+    fun findMcpMethod(method: PsiMethod) = getMcpMethod(method.qualifiedMemberReference)
+
+    @Contract(pure = true)
+    fun mapSrgName(name: String) = srgNames[name]
 
     companion object {
 
@@ -78,7 +107,7 @@ class McpSrgMap private constructor(
                         val mcp = SrgMemberReference.parse(parts[1], parts[2])
                         val srg = SrgMemberReference.parse(parts[3], parts[4])
                         methodMapBuilder.put(mcp, srg)
-                        srgNames[srg.name] =  mcp.name
+                        srgNames[srg.name] = mcp.name
                     }
                 }
             }

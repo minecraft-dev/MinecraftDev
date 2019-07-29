@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -32,7 +32,7 @@ fun <T> Comparator<in T>.lexicographical(): Comparator<in Iterable<T>> =
  */
 private val MC_1_8_8 = SemanticVersion.release(1, 8, 8)
 
-fun <T> sortVersions(versions: Collection<T>, convert: (T) -> String = {it.toString()}): List<T> {
+fun <T> sortVersions(versions: Collection<T>, convert: (T) -> String = { it.toString() }): List<T> {
     if (versions.isEmpty()) {
         return listOf()
     }

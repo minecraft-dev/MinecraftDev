@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -49,23 +49,27 @@ class FindMixinsAction : AnAction() {
         val classOfElement = element.findReferencedClass()?.qualifiedName ?: return
 
         invokeLater {
-            runBackgroundableTask("Searching for Mixins", project, true) run@ { indicator ->
+            runBackgroundableTask("Searching for Mixins", project, true) run@{ indicator ->
                 indicator.isIndeterminate = true
 
                 val classes = runReadAction {
-                    val mixinAnnotation = JavaPsiFacade.getInstance(project).findClass(MixinConstants.Annotations.MIXIN,
-                            GlobalSearchScope.allScope(project)) ?: return@runReadAction null
+                    val mixinAnnotation = JavaPsiFacade.getInstance(project).findClass(
+                        MixinConstants.Annotations.MIXIN,
+                        GlobalSearchScope.allScope(project)
+                    ) ?: return@runReadAction null
 
                     // Check all classes with the Mixin annotation
-                    val classes = AnnotatedElementsSearch.searchPsiClasses(mixinAnnotation,
-                            GlobalSearchScope.projectScope(project))
-                            .filter {
-                                indicator.text = "Checking ${it.name}..."
+                    val classes = AnnotatedElementsSearch.searchPsiClasses(
+                        mixinAnnotation,
+                        GlobalSearchScope.projectScope(project)
+                    )
+                        .filter {
+                            indicator.text = "Checking ${it.name}..."
 
-                                it.mixinTargets.any { c ->
-                                    c.qualifiedName == classOfElement
-                                }
+                            it.mixinTargets.any { c ->
+                                c.qualifiedName == classOfElement
                             }
+                        }
 
                     when (classes.size) {
                         0 -> null
@@ -81,7 +85,8 @@ class FindMixinsAction : AnAction() {
                         gotoTargetElement(classes.single(), editor, file)
                     } else {
                         ToolWindowManager.getInstance(project).unregisterToolWindow(TOOL_WINDOW_ID)
-                        val window = ToolWindowManager.getInstance(project).registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM)
+                        val window = ToolWindowManager.getInstance(project)
+                            .registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM)
                         window.icon = MixinAssets.MIXIN_CLASS_ICON
 
                         val component = FindMixinsComponent(classes)

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.mixin.insight
 
 import com.demonwav.mcdev.platform.mixin.util.findFirstOverwriteTarget
 import com.demonwav.mcdev.platform.mixin.util.findOverwriteTargets
-import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
@@ -56,8 +55,10 @@ class OverwriteLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNa
         val method = elt.parent as? PsiMethod ?: return
         val targets = method.findOverwriteTargets() ?: return
         if (targets.isNotEmpty()) {
-            PsiElementListNavigator.openTargets(e, targets.toTypedArray(),
-                "Choose target method of ${method.name}", null, MethodCellRenderer(false))
+            PsiElementListNavigator.openTargets(
+                e, targets.toTypedArray(),
+                "Choose target method of ${method.name}", null, MethodCellRenderer(false)
+            )
         }
     }
 

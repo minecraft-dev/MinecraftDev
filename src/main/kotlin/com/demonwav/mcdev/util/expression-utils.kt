@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -61,7 +61,11 @@ fun PsiAnnotationMemberValue.evaluate(defaultValue: String?, parameterReplacemen
     return eval(this, defaultValue)
 }
 
-fun PsiExpression.substituteParameter(substitutions: Map<Int, Array<String?>?>, allowReferences: Boolean, allowTranslations: Boolean): Array<String?>? {
+fun PsiExpression.substituteParameter(
+    substitutions: Map<Int, Array<String?>?>,
+    allowReferences: Boolean,
+    allowTranslations: Boolean
+): Array<String?>? {
     val visited = mutableSetOf<PsiExpression?>()
     fun substitute(expr: PsiExpression?): Array<String?>? {
         if (!visited.add(expr) && expr != null) {

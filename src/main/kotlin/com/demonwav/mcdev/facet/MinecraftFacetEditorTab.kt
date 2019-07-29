@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -89,13 +89,46 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             auto.addActionListener { checkAuto(auto, enabled, platformType) }
         }
 
-        bukkitEnabledCheckBox.addActionListener { unique(bukkitEnabledCheckBox, spigotEnabledCheckBox, paperEnabledCheckBox) }
-        spigotEnabledCheckBox.addActionListener { unique(spigotEnabledCheckBox, bukkitEnabledCheckBox, paperEnabledCheckBox) }
-        paperEnabledCheckBox.addActionListener { unique(paperEnabledCheckBox, bukkitEnabledCheckBox, spigotEnabledCheckBox) }
+        bukkitEnabledCheckBox.addActionListener {
+            unique(
+                bukkitEnabledCheckBox,
+                spigotEnabledCheckBox,
+                paperEnabledCheckBox
+            )
+        }
+        spigotEnabledCheckBox.addActionListener {
+            unique(
+                spigotEnabledCheckBox,
+                bukkitEnabledCheckBox,
+                paperEnabledCheckBox
+            )
+        }
+        paperEnabledCheckBox.addActionListener {
+            unique(
+                paperEnabledCheckBox,
+                bukkitEnabledCheckBox,
+                spigotEnabledCheckBox
+            )
+        }
 
-        bukkitAutoCheckBox.addActionListener { all(bukkitAutoCheckBox, spigotAutoCheckBox, paperAutoCheckBox)(SPIGOT, PAPER) }
-        spigotAutoCheckBox.addActionListener { all(spigotAutoCheckBox, bukkitAutoCheckBox, paperAutoCheckBox)(BUKKIT, PAPER) }
-        paperAutoCheckBox.addActionListener { all(paperAutoCheckBox, bukkitAutoCheckBox, spigotAutoCheckBox)(BUKKIT, SPIGOT) }
+        bukkitAutoCheckBox.addActionListener {
+            all(bukkitAutoCheckBox, spigotAutoCheckBox, paperAutoCheckBox)(
+                SPIGOT,
+                PAPER
+            )
+        }
+        spigotAutoCheckBox.addActionListener {
+            all(spigotAutoCheckBox, bukkitAutoCheckBox, paperAutoCheckBox)(
+                BUKKIT,
+                PAPER
+            )
+        }
+        paperAutoCheckBox.addActionListener {
+            all(paperAutoCheckBox, bukkitAutoCheckBox, spigotAutoCheckBox)(
+                BUKKIT,
+                SPIGOT
+            )
+        }
 
         forgeEnabledCheckBox.addActionListener { also(forgeEnabledCheckBox, mcpEnabledCheckBox) }
         liteloaderEnabledCheckBox.addActionListener { also(liteloaderEnabledCheckBox, mcpEnabledCheckBox) }
@@ -140,10 +173,18 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         }
     }
 
-    private inline fun runOnAll(run: (JCheckBox, JCheckBox, PlatformType, MutableMap<PlatformType, Boolean>, Set<PlatformType>) -> Unit) {
+    private inline fun runOnAll(
+        run: (JCheckBox, JCheckBox, PlatformType, MutableMap<PlatformType, Boolean>, Set<PlatformType>) -> Unit
+    ) {
         val state = configuration.state
         for (i in indexes) {
-            run(enableCheckBoxArray[i], autoCheckBoxArray[i], platformTypes[i], state.userChosenTypes, state.autoDetectTypes)
+            run(
+                enableCheckBoxArray[i],
+                autoCheckBoxArray[i],
+                platformTypes[i],
+                state.userChosenTypes,
+                state.autoDetectTypes
+            )
         }
     }
 
@@ -190,7 +231,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     }
 
     private fun checkAuto(auto: JCheckBox, enabled: JCheckBox, type: PlatformType) {
-        if (auto.isSelected){
+        if (auto.isSelected) {
             enabled.isEnabled = false
             enabled.isSelected = type in configuration.state.autoDetectTypes
         } else {
@@ -200,7 +241,9 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
 
     private operator fun Boolean.plus(n: Boolean) = this || n
     // This is here so we can use vararg. Can't use parameter modifiers in function type definitions for some reason
-    open class Invoker { open operator fun invoke(vararg indexes: Int) {} }
+    open class Invoker {
+        open operator fun invoke(vararg indexes: Int) {}
+    }
 
     companion object {
         private const val BUKKIT = 0
@@ -208,7 +251,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         private const val PAPER = SPIGOT + 1
         private const val SPONGE = PAPER + 1
         private const val FORGE = SPONGE + 1
-        private const val LITELOADER  = FORGE + 1
+        private const val LITELOADER = FORGE + 1
         private const val MCP = LITELOADER + 1
         private const val MIXIN = MCP + 1
         private const val BUNGEECORD = MIXIN + 1
@@ -227,6 +270,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             PlatformType.WATERFALL
         )
 
-        private val indexes = intArrayOf(BUKKIT, SPIGOT, PAPER, SPONGE, FORGE, LITELOADER, MCP, MIXIN, BUNGEECORD, WATERFALL)
+        private val indexes =
+            intArrayOf(BUKKIT, SPIGOT, PAPER, SPONGE, FORGE, LITELOADER, MCP, MIXIN, BUNGEECORD, WATERFALL)
     }
 }

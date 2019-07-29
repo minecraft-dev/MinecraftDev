@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -24,10 +24,12 @@ class McpDataService : AbstractProjectDataService<McpModelData, Module>() {
 
     override fun getTargetDataKey(): Key<McpModelData> = McpModelData.KEY
 
-    override fun importData(toImport: Collection<DataNode<McpModelData>>,
-                            projectData: ProjectData?,
-                            project: Project,
-                            modelsProvider: IdeModifiableModelsProvider) {
+    override fun importData(
+        toImport: Collection<DataNode<McpModelData>>,
+        projectData: ProjectData?,
+        project: Project,
+        modelsProvider: IdeModifiableModelsProvider
+    ) {
         if (projectData == null || toImport.isEmpty()) {
             return
         }

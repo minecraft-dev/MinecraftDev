@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -19,7 +19,8 @@ import com.intellij.psi.PsiMethod
 
 class SoftImplementOverridesInspection : MixinInspection() {
 
-    override fun getStaticDescription() = "Reports soft-implemented methods in Mixins that do not override a method in the target classes."
+    override fun getStaticDescription() =
+        "Reports soft-implemented methods in Mixins that do not override a method in the target classes."
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
@@ -27,7 +28,10 @@ class SoftImplementOverridesInspection : MixinInspection() {
 
         override fun visitMethod(method: PsiMethod) {
             if (method.isSoftImplementMissingParent()) {
-                holder.registerProblem(method.nameIdentifier ?: method, "Method does not soft-implement a method from its interfaces")
+                holder.registerProblem(
+                    method.nameIdentifier ?: method,
+                    "Method does not soft-implement a method from its interfaces"
+                )
             }
         }
     }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -18,7 +18,8 @@ import com.intellij.psi.PsiElementVisitor
 
 class MixinTargetInspection : MixinInspection() {
 
-    override fun getStaticDescription() = "A Mixin class must target either one or more classes or provide one or more string targets"
+    override fun getStaticDescription() =
+        "A Mixin class must target either one or more classes or provide one or more string targets"
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
@@ -28,7 +29,10 @@ class MixinTargetInspection : MixinInspection() {
             val mixin = psiClass.modifierList?.findAnnotation(MIXIN) ?: return
 
             // Check if @Mixin annotation has any targets defined
-            if (mixin.findDeclaredAttributeValue("value") == null && mixin.findDeclaredAttributeValue("targets") == null) {
+            if (
+                mixin.findDeclaredAttributeValue("value") == null &&
+                mixin.findDeclaredAttributeValue("targets") == null
+            ) {
                 holder.registerProblem(mixin, "@Mixin is missing a valid target class")
             }
         }

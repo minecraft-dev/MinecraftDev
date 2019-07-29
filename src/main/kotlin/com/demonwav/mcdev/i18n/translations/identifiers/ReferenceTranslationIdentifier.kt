@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -27,8 +27,10 @@ class ReferenceTranslationIdentifier : TranslationIdentifier<PsiReferenceExpress
 
         if (reference is PsiField) {
             val scope = GlobalSearchScope.allScope(element.project)
-            val stringClass = JavaPsiFacade.getInstance(element.project).findClass("java.lang.String", scope) ?: return null
-            val isConstant = reference.hasModifierProperty(PsiModifier.STATIC) && reference.hasModifierProperty(PsiModifier.FINAL)
+            val stringClass =
+                JavaPsiFacade.getInstance(element.project).findClass("java.lang.String", scope) ?: return null
+            val isConstant =
+                reference.hasModifierProperty(PsiModifier.STATIC) && reference.hasModifierProperty(PsiModifier.FINAL)
             val type = reference.type as? PsiClassReferenceType ?: return null
             val resolved = type.resolve() ?: return null
             if (isConstant && (resolved.isEquivalentTo(stringClass) || resolved.isInheritor(stringClass, true))) {

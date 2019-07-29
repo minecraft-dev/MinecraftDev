@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -20,8 +20,8 @@ object PluginUtil {
 
     val pluginVersion: String
         get() {
-            val plugin = PluginManager.getPlugin(PLUGIN_ID) ?:
-                error("Minecraft Development plugin not found: " + Arrays.toString(PluginManagerCore.getPlugins()))
+            val plugin = PluginManager.getPlugin(PLUGIN_ID)
+                ?: error("Minecraft Development plugin not found: " + Arrays.toString(PluginManagerCore.getPlugins()))
             return plugin.version
         }
 }

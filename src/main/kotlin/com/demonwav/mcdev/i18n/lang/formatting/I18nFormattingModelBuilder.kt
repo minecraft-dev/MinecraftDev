@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -27,12 +27,16 @@ import com.intellij.psi.codeStyle.CodeStyleSettings
 
 class I18nFormattingModelBuilder : FormattingModelBuilder {
     override fun createModel(element: PsiElement, settings: CodeStyleSettings): FormattingModel {
-        return FormattingModelProvider.createFormattingModelForPsiFile(element.containingFile,
-            I18nBlock(element.node,
+        return FormattingModelProvider.createFormattingModelForPsiFile(
+            element.containingFile,
+            I18nBlock(
+                element.node,
                 Wrap.createWrap(WrapType.NONE, false),
                 Alignment.createAlignment(),
-                createSpaceBuilder(settings)),
-            settings)
+                createSpaceBuilder(settings)
+            ),
+            settings
+        )
     }
 
     private fun createSpaceBuilder(settings: CodeStyleSettings): SpacingBuilder {

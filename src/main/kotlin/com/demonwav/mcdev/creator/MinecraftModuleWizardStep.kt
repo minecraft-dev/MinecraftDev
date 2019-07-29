@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -55,8 +55,8 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
             }
             // invalid character
             if (mainClassField.text.split('.').any {
-                !it.first().isJavaIdentifierStart() || !it.asSequence().drop(1).all { it.isJavaIdentifierPart() }
-            }) {
+                    !it.first().isJavaIdentifierStart() || !it.asSequence().drop(1).all { it.isJavaIdentifierPart() }
+                }) {
                 throw InvalidMainClassNameException(mainClassField)
             }
             // keyword identifier
@@ -85,10 +85,56 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
     companion object {
         val pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?".toRegex()
         val keywords = setOf(
-            "abstract", "continue", "for", "new", "switch", "assert", "default", "goto", "package", "synchronized", "boolean", "do", "if",
-            "private", "this", "break", "double", "implements", "protected", "throw", "byte", "else", "import", "public", "throws", "case",
-            "enum", "instanceof", "return", "transient", "catch", "extends", "int", "short", "try", "char", "final", "interface", "static",
-            "void", "class", "finally", "long", "strictfp", "volatile", "const", "float", "native", "super", "while"
+            "abstract",
+            "continue",
+            "for",
+            "new",
+            "switch",
+            "assert",
+            "default",
+            "goto",
+            "package",
+            "synchronized",
+            "boolean",
+            "do",
+            "if",
+            "private",
+            "this",
+            "break",
+            "double",
+            "implements",
+            "protected",
+            "throw",
+            "byte",
+            "else",
+            "import",
+            "public",
+            "throws",
+            "case",
+            "enum",
+            "instanceof",
+            "return",
+            "transient",
+            "catch",
+            "extends",
+            "int",
+            "short",
+            "try",
+            "char",
+            "final",
+            "interface",
+            "static",
+            "void",
+            "class",
+            "finally",
+            "long",
+            "strictfp",
+            "volatile",
+            "const",
+            "float",
+            "native",
+            "super",
+            "while"
         )
     }
 }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -37,8 +37,14 @@ class ChangeTranslationQuickFix(private val name: String) : LocalQuickFix {
                     val selectedEntry = element as I18nEntry
                     literal.containingFile.runWriteAction {
                         val match = translation?.regexPattern?.matchEntire(selectedEntry.key)
-                        val insertion = if (match == null || match.groups.size <= 1) selectedEntry.key else match.groupValues[1]
-                        literal.replace(JavaPsiFacade.getInstance(project).elementFactory.createExpressionFromText("\"$insertion\"", literal.context))
+                        val insertion =
+                            if (match == null || match.groups.size <= 1) selectedEntry.key else match.groupValues[1]
+                        literal.replace(
+                            JavaPsiFacade.getInstance(project).elementFactory.createExpressionFromText(
+                                "\"$insertion\"",
+                                literal.context
+                            )
+                        )
                     }
                 }
             }, ModalityState.current(), false)

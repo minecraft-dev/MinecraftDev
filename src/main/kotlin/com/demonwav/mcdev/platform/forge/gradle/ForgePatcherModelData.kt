@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -16,7 +16,8 @@ import com.intellij.openapi.externalSystem.model.ProjectKeys
 import com.intellij.openapi.externalSystem.model.project.AbstractExternalEntityData
 import com.intellij.openapi.externalSystem.model.project.ModuleData
 
-class ForgePatcherModelData(val module: ModuleData, val model: ForgePatcherModel) : AbstractExternalEntityData(module.owner) {
+class ForgePatcherModelData(val module: ModuleData, val model: ForgePatcherModel) :
+    AbstractExternalEntityData(module.owner) {
 
     companion object {
         val KEY = Key.create(ForgePatcherModelData::class.java, ProjectKeys.TASK.processingWeight + 1)

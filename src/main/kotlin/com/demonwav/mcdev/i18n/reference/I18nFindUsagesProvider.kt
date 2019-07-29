@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -36,5 +36,6 @@ class I18nFindUsagesProvider : FindUsagesProvider {
 
     override fun getDescriptiveName(element: PsiElement) = if (element is I18nEntry) element.key else ""
 
-    override fun getNodeText(element: PsiElement, useFullName: Boolean) = if (element is I18nEntry) "${element.key}=${element.value}" else ""
+    override fun getNodeText(element: PsiElement, useFullName: Boolean) =
+        if (element is I18nEntry) "${element.key}=${element.value}" else ""
 }

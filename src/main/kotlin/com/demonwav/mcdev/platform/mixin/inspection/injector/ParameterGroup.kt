@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -16,9 +16,11 @@ import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiParameter
 
-data class ParameterGroup(val parameters: List<Parameter>?,
-                          val required: Boolean = parameters != null,
-                          val default: Boolean = required) {
+data class ParameterGroup(
+    val parameters: List<Parameter>?,
+    val required: Boolean = parameters != null,
+    val default: Boolean = required
+) {
 
     val size
         get() = this.parameters?.size ?: 0

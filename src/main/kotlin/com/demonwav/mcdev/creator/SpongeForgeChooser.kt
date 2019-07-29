@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -43,8 +43,9 @@ class SpongeForgeChooser(private val creator: MinecraftProjectCreator) : ModuleW
 
     override fun isStepVisible(): Boolean {
         // Only show this if both Sponge and Forge are selected
-        return creator.configs.count { conf -> conf is ForgeProjectConfiguration || conf is SpongeProjectConfiguration } >= 2 ||
-                creator.configs.any { conf -> conf is SpongeForgeProjectConfiguration }
+        return creator.configs.count { conf ->
+            conf is ForgeProjectConfiguration || conf is SpongeProjectConfiguration
+        } >= 2 || creator.configs.any { conf -> conf is SpongeForgeProjectConfiguration }
     }
 
     override fun onStepLeaving() {

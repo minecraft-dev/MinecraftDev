@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -27,10 +27,18 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
 
     override fun getStaticDescription() = "Reports unnecessary qualified member references in @Inject annotations"
 
-    override fun visitAnnotationAttribute(annotation: PsiAnnotation, value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
+    override fun visitAnnotationAttribute(
+        annotation: PsiAnnotation,
+        value: PsiAnnotationMemberValue,
+        holder: ProblemsHolder
+    ) {
         val reference = MixinMemberReference.parse(value.constantStringValue) ?: return
         if (reference.qualified) {
-            holder.registerProblem(value, "Unnecessary qualified reference to '${reference.name}' in target class", QuickFix(reference))
+            holder.registerProblem(
+                value,
+                "Unnecessary qualified reference to '${reference.name}' in target class",
+                QuickFix(reference)
+            )
         }
     }
 
@@ -40,8 +48,10 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val element = descriptor.psiElement
-            element.replace(JavaPsiFacade.getElementFactory(project)
-                    .createExpressionFromText("\"${MixinMemberReference.toString(reference.withoutOwner)}\"", element))
+            element.replace(
+                JavaPsiFacade.getElementFactory(project)
+                    .createExpressionFromText("\"${MixinMemberReference.toString(reference.withoutOwner)}\"", element)
+            )
         }
     }
 }

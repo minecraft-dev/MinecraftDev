@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -48,17 +48,20 @@ data class MemberReference(
 
     @Contract(pure = true)
     fun match(method: PsiMethod, qualifier: PsiClass): Boolean {
-        return this.name == method.internalName && matchOwner(qualifier)
-                && (this.descriptor == null || this.descriptor == method.descriptor)
+        return this.name == method.internalName && matchOwner(qualifier) &&
+            (this.descriptor == null || this.descriptor == method.descriptor)
     }
 
     @Contract(pure = true)
     fun match(field: PsiField, qualifier: PsiClass): Boolean {
-        return this.name == field.name && matchOwner(qualifier)
-                && (this.descriptor == null || this.descriptor == field.descriptor)
+        return this.name == field.name && matchOwner(qualifier) &&
+            (this.descriptor == null || this.descriptor == field.descriptor)
     }
 
-    fun resolve(project: Project, scope: GlobalSearchScope = GlobalSearchScope.allScope(project)): Pair<PsiClass, PsiMember>? {
+    fun resolve(
+        project: Project,
+        scope: GlobalSearchScope = GlobalSearchScope.allScope(project)
+    ): Pair<PsiClass, PsiMember>? {
         return resolve(project, scope, ::Pair)
     }
 
@@ -84,7 +87,6 @@ data class MemberReference(
 
         return member?.let { ret(psiClass, member) }
     }
-
 }
 
 // Class
@@ -135,7 +137,6 @@ fun PsiMethod.getQualifiedMemberReference(owner: PsiClass): MemberReference {
 fun PsiMethod?.isSameReference(reference: PsiMethod?): Boolean =
     this != null && (this === reference || qualifiedMemberReference == reference?.qualifiedMemberReference)
 
-
 // Field
 @get:Contract(pure = true)
 val PsiField.simpleMemberReference
@@ -157,4 +158,3 @@ val PsiField.qualifiedMemberReference
 fun PsiField.getQualifiedMemberReference(owner: PsiClass): MemberReference {
     return MemberReference(name, descriptor, owner.fullQualifiedName)
 }
-

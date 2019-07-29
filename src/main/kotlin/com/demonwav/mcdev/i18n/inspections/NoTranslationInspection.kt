@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -55,19 +55,21 @@ class NoTranslationInspection : TranslationInspection() {
                 val translation = LiteralTranslationIdentifier().identify(literal)
                 val literalValue = literal.value as String
                 val key = translation?.varKey?.replace(I18nReference.VARIABLE_MARKER, literalValue) ?: literalValue
-                val result = Messages.showInputDialog("Enter default value for \"$key\":",
+                val result = Messages.showInputDialog(
+                    "Enter default value for \"$key\":",
                     "Create Translation",
-                    Messages.getQuestionIcon())
+                    Messages.getQuestionIcon()
+                )
                 if (result != null) {
                     I18nElementFactory.addTranslation(
-                        ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(literal.containingFile.virtualFile),
+                        ProjectRootManager.getInstance(project).fileIndex
+                            .getModuleForFile(literal.containingFile.virtualFile),
                         key,
                         result
                     )
                 }
             } catch (ignored: IncorrectOperationException) {
             }
-
         }
 
         override fun startInWriteAction() = false

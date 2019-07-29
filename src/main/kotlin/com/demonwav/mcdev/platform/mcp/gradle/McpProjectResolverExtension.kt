@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -28,11 +28,13 @@ class McpProjectResolverExtension : AbstractProjectResolverExtension() {
     override fun populateModuleExtraModels(gradleModule: IdeaModule, ideModule: DataNode<ModuleData>) {
         val model = resolverCtx.getExtraProject(gradleModule, McpModel::class.java)
         if (model != null) {
-            val data = McpModelData(ideModule.data, McpModuleSettings.State(
+            val data = McpModelData(
+                ideModule.data, McpModuleSettings.State(
                     model.minecraftVersion,
                     model.mcpVersion,
                     model.mappingFiles
-            ))
+                )
+            )
 
             // Register our data in the module
             ideModule.createChild(McpModelData.KEY, data)

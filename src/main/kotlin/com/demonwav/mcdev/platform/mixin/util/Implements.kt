@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -27,7 +27,8 @@ import kotlin.collections.set
 @Contract(pure = true)
 fun PsiClass.findSoftImplements(): Map<String, PsiClass>? {
     val implements = modifierList?.findAnnotation(IMPLEMENTS) ?: return null
-    val interfaces = (implements.findDeclaredAttributeValue(null) ?: return null).findAnnotations().ifEmpty { return null }
+    val interfaces =
+        (implements.findDeclaredAttributeValue(null) ?: return null).findAnnotations().ifEmpty { return null }
 
     val result = HashMap<String, PsiClass>()
     for (iface in interfaces) {

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -120,7 +120,12 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
         return collectUsages(context, handler, codeBlock, containingClass)
     }
 
-    private fun <T> collectUsages(context: PsiElement, handler: Handler<T>, codeBlock: PsiElement, targetClass: PsiClass): Array<Any> {
+    private fun <T> collectUsages(
+        context: PsiElement,
+        handler: Handler<T>,
+        codeBlock: PsiElement,
+        targetClass: PsiClass
+    ): Array<Any> {
         // Collect all possible targets
         val visitor = handler.createCollectUsagesVisitor()
         codeBlock.accept(visitor)
@@ -135,8 +140,12 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
         abstract fun resolveTarget(context: PsiElement): PsiElement?
 
-        abstract fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass,
-                                                      checkOnly: Boolean): CollectVisitor<out PsiElement>?
+        abstract fun createFindUsagesVisitor(
+            context: PsiElement,
+            targetClass: PsiClass,
+            checkOnly: Boolean
+        ): CollectVisitor<out PsiElement>?
+
         abstract fun createCollectUsagesVisitor(): CollectVisitor<T>
 
         abstract fun createLookup(targetClass: PsiClass, element: T): LookupElementBuilder?
@@ -160,10 +169,18 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
         }
 
         final override fun createLookup(targetClass: PsiClass, element: QualifiedMember<T>): LookupElementBuilder? {
-            return qualifyLookup(createLookup(targetClass, element.member, element.qualifier ?: targetClass), targetClass, element)
+            return qualifyLookup(
+                createLookup(targetClass, element.member, element.qualifier ?: targetClass),
+                targetClass,
+                element
+            )
         }
 
-        private fun qualifyLookup(builder: LookupElementBuilder, targetClass: PsiClass, m: QualifiedMember<T>): LookupElementBuilder {
+        private fun qualifyLookup(
+            builder: LookupElementBuilder,
+            targetClass: PsiClass,
+            m: QualifiedMember<T>
+        ): LookupElementBuilder {
             val owner = m.member.containingClass!!
             return if (targetClass equivalentTo owner) {
                 builder
@@ -177,10 +194,12 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
     abstract class MethodHandler : QualifiedHandler<PsiMethod>() {
 
         override fun createLookup(targetClass: PsiClass, m: PsiMethod, owner: PsiClass): LookupElementBuilder {
-            return JavaLookupElementBuilder.forMethod(m, MixinMemberReference.toString(m.getQualifiedMemberReference(owner)),
-                    PsiSubstitutor.EMPTY, targetClass)
-                    .withPresentableText(m.internalName) // Display internal name (e.g. <init> for constructors)
-                    .withLookupString(m.internalName) // Allow looking up targets by their method name
+            return JavaLookupElementBuilder.forMethod(
+                m, MixinMemberReference.toString(m.getQualifiedMemberReference(owner)),
+                PsiSubstitutor.EMPTY, targetClass
+            )
+                .withPresentableText(m.internalName) // Display internal name (e.g. <init> for constructors)
+                .withLookupString(m.internalName) // Allow looking up targets by their method name
         }
 
         override fun getInternalName(m: QualifiedMember<PsiMethod>): String {

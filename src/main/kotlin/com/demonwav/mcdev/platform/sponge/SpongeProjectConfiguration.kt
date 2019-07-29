@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -62,7 +62,8 @@ class SpongeProjectConfiguration : ProjectConfiguration() {
             val mainClassFile = file.findOrCreateChildData(this, "$className.java")
             SpongeTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className, hasDependencies())
 
-            val mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile) as PsiJavaFile? ?: return@runWriteTask
+            val mainClassPsi =
+                PsiManager.getInstance(project).findFile(mainClassFile) as PsiJavaFile? ?: return@runWriteTask
             val psiClass = mainClassPsi.classes[0]
 
             writeMainSpongeClass(
@@ -118,7 +119,8 @@ fun writeMainSpongeClass(
     }
 
     if (hasDependencies) {
-        annotationString + ",\ndependencies = {\n${dependencies.joinToString(",\n") { "@Dependency(id = ${escape(it)})" }}\n}"
+        val dep = dependencies.joinToString(",\n") { "@Dependency(id = ${escape(it)})" }
+        annotationString + ",\ndependencies = {\n$dep\n}"
     }
 
     annotationString + "\n)"

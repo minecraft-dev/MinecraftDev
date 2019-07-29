@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -32,5 +32,6 @@ class StaticListenerInspectionSuppressor : InspectionSuppressor {
         return facet.suppressStaticListener(method)
     }
 
-    override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> = SuppressQuickFix.EMPTY_ARRAY
+    override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> =
+        SuppressQuickFix.EMPTY_ARRAY
 }

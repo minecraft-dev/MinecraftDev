@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -50,10 +50,16 @@ class I18nAnnotator : Annotator {
     }
 
     private fun checkEntryMatchesDefault(entry: I18nEntry, annotations: AnnotationHolder) {
-        if (entry.project.findDefaultLangEntries(domain = entry.containingFile.virtualFile.mcDomain).any { it.key == entry.key }) {
+        if (
+            entry.project.findDefaultLangEntries(domain = entry.containingFile.virtualFile.mcDomain)
+                .any { it.key == entry.key }
+        ) {
             return
         }
-        annotations.createWarningAnnotation(entry.textRange, "Translation key not included in default localization file.")
+        annotations.createWarningAnnotation(
+            entry.textRange,
+            "Translation key not included in default localization file."
+        )
             .registerFix(RemoveUnmatchedEntryIntention())
     }
 }

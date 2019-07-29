@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -35,7 +35,9 @@ class OverwriteTargetInspection : OverwriteInspection() {
         }
 
         // TODO: Write quick fix and apply it for OverwriteTargetInspection and ShadowTargetInspection
-        holder.registerProblem(identifier, "Cannot resolve method '${method.name}' in target class",
-            RemoveAnnotationQuickFix(overwrite, method))
+        holder.registerProblem(
+            identifier, "Cannot resolve method '${method.name}' in target class",
+            RemoveAnnotationQuickFix(overwrite, method)
+        )
     }
 }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -46,7 +46,14 @@ class LiteLoaderProjectConfiguration : ProjectConfiguration() {
             file = getMainClassDirectory(files, file)
 
             val mainClassFile = file.findOrCreateChildData(this, className + ".java")
-            LiteLoaderTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className, baseConfig.pluginName, baseConfig.pluginVersion)
+            LiteLoaderTemplate.applyMainClassTemplate(
+                project,
+                mainClassFile,
+                packageName,
+                className,
+                baseConfig.pluginName,
+                baseConfig.pluginVersion
+            )
 
             PsiManager.getInstance(project).findFile(mainClassFile)?.let { mainClassPsi ->
                 EditorHelper.openInEditor(mainClassPsi)

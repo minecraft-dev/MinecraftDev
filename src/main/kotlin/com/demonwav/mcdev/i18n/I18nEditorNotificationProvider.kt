@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -31,20 +31,26 @@ import com.intellij.util.ui.UIUtil
 import java.awt.Color
 import java.util.Locale
 
-class I18nEditorNotificationProvider(private val project: Project) : EditorNotifications.Provider<I18nEditorNotificationProvider.InfoPanel>() {
+class I18nEditorNotificationProvider(private val project: Project) :
+    EditorNotifications.Provider<I18nEditorNotificationProvider.InfoPanel>() {
     private var show: Boolean = true
 
     override fun getKey() = KEY
 
     override fun createNotificationPanel(file: VirtualFile, fileEditor: FileEditor): InfoPanel? {
-        if (!show || file.fileType != I18nFileType || file.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE) {
+        if (
+            !show || file.fileType != I18nFileType ||
+            file.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE
+        ) {
             return null
         }
 
-        if (!getMissingEntries(file).isEmpty()) {
+        if (getMissingEntries(file).isNotEmpty()) {
             val panel = InfoPanel()
             panel.setText("Translation file doesn't match default one (${I18nConstants.DEFAULT_LOCALE_FILE}).")
-            panel.createActionLabel("Add missing default entries (won't reflect changes in original English localization)") {
+            panel.createActionLabel(
+                "Add missing default entries (won't reflect changes in original English localization)"
+            ) {
                 val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
                 val missingEntries = getMissingEntries(file)
                 psi.applyWriteAction {
@@ -83,7 +89,7 @@ class I18nEditorNotificationProvider(private val project: Project) : EditorNotif
         val defaultEntries = project.findDefaultLangEntries(scope = Scope.PROJECT, domain = file.mcDomain)
         val entries = project.findLangEntries(file = file, scope = Scope.PROJECT)
         val keys = entries.map { it.key }
-        val missingEntries = defaultEntries.associate { it.key to it }.toMutableMap()
+        val missingEntries = defaultEntries.associateBy { it.key }.toMutableMap()
         missingEntries.keys.removeAll(keys)
         return missingEntries
     }

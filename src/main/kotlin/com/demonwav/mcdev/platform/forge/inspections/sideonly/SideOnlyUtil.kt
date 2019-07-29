@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -44,13 +44,17 @@ object SideOnlyUtil {
     }
 
     fun checkMethod(method: PsiMethod): Side {
-        val methodAnnotation = method.modifierList.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION) ?: // It's not annotated, which would be invalid if the element was annotated
+        val methodAnnotation =
+            // It's not annotated, which would be invalid if the element was annotated
+            method.modifierList.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION)
             // (which, if we've gotten this far, is true)
-            return Side.NONE
+                ?: return Side.NONE
 
         // Check the value of the annotation
-        val methodValue = methodAnnotation.findAttributeValue("value") ?: // The annotation has no value yet, IntelliJ will give it's own error because a value is required
-            return Side.INVALID
+        val methodValue =
+            // The annotation has no value yet, IntelliJ will give it's own error because a value is required
+            methodAnnotation.findAttributeValue("value")
+                ?: return Side.INVALID
 
         // Return the value of the annotation
         return getFromName(methodValue.text)

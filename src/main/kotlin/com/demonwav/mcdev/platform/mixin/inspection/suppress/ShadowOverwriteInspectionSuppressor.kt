@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -21,8 +21,10 @@ import com.intellij.psi.PsiMethod
 
 class ShadowOverwriteInspectionSuppressor : InspectionSuppressor {
 
-    private val SUPPRESSED_INSPECTIONS = setOf("UnusedReturnValue", "SameParameterValue", "Guava", VisibilityInspection.SHORT_NAME,
-        "MethodMayBeStatic")
+    private val SUPPRESSED_INSPECTIONS = setOf(
+        "UnusedReturnValue", "SameParameterValue", "Guava", VisibilityInspection.SHORT_NAME,
+        "MethodMayBeStatic"
+    )
 
     override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {
         if (toolId !in SUPPRESSED_INSPECTIONS) {
@@ -33,5 +35,6 @@ class ShadowOverwriteInspectionSuppressor : InspectionSuppressor {
         return member.isShadow || (member is PsiMethod && member.isOverwrite)
     }
 
-    override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> = SuppressQuickFix.EMPTY_ARRAY
+    override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> =
+        SuppressQuickFix.EMPTY_ARRAY
 }

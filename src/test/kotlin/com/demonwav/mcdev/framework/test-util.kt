@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -29,7 +29,8 @@ val mockJdk by lazy {
 }
 
 private fun findLibraryPath(name: String) = FileUtil.toSystemIndependentName(System.getProperty("testLibs.$name")!!)
-private fun findLibrary(name: String) = StandardFileSystems.jar().refreshAndFindFileByPath(findLibraryPath(name) + JarFileSystem.JAR_SEPARATOR)
+private fun findLibrary(name: String) = StandardFileSystems.jar()
+    .refreshAndFindFileByPath(findLibraryPath(name) + JarFileSystem.JAR_SEPARATOR)
 
 fun createLibrary(project: Project, name: String): Library {
     val table = LibraryTablesRegistrar.getInstance().getLibraryTable(project)

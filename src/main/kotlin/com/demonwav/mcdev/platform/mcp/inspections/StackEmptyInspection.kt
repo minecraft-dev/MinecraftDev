@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -48,9 +48,9 @@ class StackEmptyInspection : BaseInspection() {
     }
 
     override fun getStaticDescription() =
-            "Comparing an ItemStack to ItemStack.EMPTY to query stack emptiness can cause unwanted issues." +
-                    "When a stack in an inventory is shrunk, the instance is not replaced with ItemStack.EMPTY, but" +
-                    " the stack should still be considered empty. Instead, isEmpty() should be called."
+        "Comparing an ItemStack to ItemStack.EMPTY to query stack emptiness can cause unwanted issues." +
+            "When a stack in an inventory is shrunk, the instance is not replaced with ItemStack.EMPTY, but" +
+            " the stack should still be considered empty. Instead, isEmpty() should be called."
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         return object : InspectionGadgetsFix() {
@@ -70,7 +70,8 @@ class StackEmptyInspection : BaseInspection() {
                     expressionText = "!$expressionText"
                 }
 
-                val replacedExpression = elementFactory.createExpressionFromText(expressionText, binaryExpression.context)
+                val replacedExpression =
+                    elementFactory.createExpressionFromText(expressionText, binaryExpression.context)
                 binaryExpression.replace(replacedExpression)
             }
         }

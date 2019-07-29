@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -14,7 +14,6 @@ import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.util.findFirstShadowTarget
 import com.demonwav.mcdev.platform.mixin.util.findShadowTargets
 import com.demonwav.mcdev.util.ifEmpty
-import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
@@ -72,8 +71,10 @@ class ShadowLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavig
             else -> return
         }
 
-        PsiElementListNavigator.openTargets(e, targets.toTypedArray(),
-            "Choose target class of ${member.name!!}", null, renderer)
+        PsiElementListNavigator.openTargets(
+            e, targets.toTypedArray(),
+            "Choose target class of ${member.name!!}", null, renderer
+        )
     }
 
     private class LineMarker(

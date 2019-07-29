@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -39,5 +39,4 @@ class McpRunConfigurationExtension : ModuleDebugRunConfigurationExtension(), Deb
         // We don't need any further events
         process.removeDebugProcessListener(this)
     }
-
 }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -37,4 +37,3 @@ class RemoveDuplicatesIntention(private val keep: I18nEntry) : BaseIntentionActi
         }
     }
 }
-

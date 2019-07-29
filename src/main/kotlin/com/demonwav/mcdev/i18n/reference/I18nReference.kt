@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -25,11 +25,13 @@ import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.util.IncorrectOperationException
 
-class I18nReference(element: PsiElement,
-                    textRange: TextRange,
-                    private val useDefault: Boolean,
-                    val key: String,
-                    private val varKey: String) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
+class I18nReference(
+    element: PsiElement,
+    textRange: TextRange,
+    private val useDefault: Boolean,
+    val key: String,
+    private val varKey: String
+) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         val project = myElement.project
         val entries = if (useDefault) project.findDefaultLangEntries(key = key) else project.findLangEntries(key = key)
@@ -74,7 +76,9 @@ class I18nReference(element: PsiElement,
             }
         val pattern = Regex(stringPattern)
         val match = pattern.matchEntire(newElementName)
-        return super.handleElementRename(if (match != null && match.groups.size > 1) match.groupValues[1] else newElementName)
+        return super.handleElementRename(
+            if (match != null && match.groups.size > 1) match.groupValues[1] else newElementName
+        )
     }
 
     override fun isReferenceTo(element: PsiElement): Boolean {

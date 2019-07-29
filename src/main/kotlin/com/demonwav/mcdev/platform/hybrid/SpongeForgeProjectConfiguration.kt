@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -57,7 +57,8 @@ class SpongeForgeProjectConfiguration : ForgeProjectConfiguration() {
 
             writeMcmodInfo(project, baseConfig, buildSystem, dirs)
 
-            val mainClassPsi = PsiManager.getInstance(project).findFile(mainClassFile) as? PsiJavaFile ?: return@runWriteTask
+            val mainClassPsi =
+                PsiManager.getInstance(project).findFile(mainClassFile) as? PsiJavaFile ?: return@runWriteTask
             val psiClass = mainClassPsi.classes[0]
 
             writeMainSpongeClass(

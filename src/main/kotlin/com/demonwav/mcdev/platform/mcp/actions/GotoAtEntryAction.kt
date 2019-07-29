@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -47,10 +47,10 @@ class GotoAtEntryAction : AnAction() {
             return
         }
 
-        val srgManager = data.instance.getModuleOfType(McpModuleType)?.srgManager ?:
-            // Not all ATs are in MCP modules, fallback to this if possible
-            // TODO try to find SRG references for all modules if current module isn't found?
-            SrgManager.findAnyInstance(data.project) ?: return showBalloon(e)
+        val srgManager = data.instance.getModuleOfType(McpModuleType)?.srgManager
+        // Not all ATs are in MCP modules, fallback to this if possible
+        // TODO try to find SRG references for all modules if current module isn't found?
+            ?: SrgManager.findAnyInstance(data.project) ?: return showBalloon(e)
 
         srgManager.srgMap.onSuccess { srgMap ->
             var parent = data.element.parent
@@ -64,11 +64,15 @@ class GotoAtEntryAction : AnAction() {
 
             when (parent) {
                 is PsiField -> {
-                    val reference = srgMap.findSrgField(parent) ?: parent.simpleQualifiedMemberReference ?: return@onSuccess showBalloon(e)
+                    val reference = srgMap.findSrgField(parent) ?: parent.simpleQualifiedMemberReference
+                    ?: return@onSuccess showBalloon(e)
                     searchForText(e, data, reference.name)
                 }
                 is PsiMethod -> {
-                    val reference = srgMap.findSrgMethod(parent) ?: parent.qualifiedMemberReference ?: return@onSuccess showBalloon(e)
+                    val reference =
+                        srgMap.findSrgMethod(parent) ?: parent.qualifiedMemberReference ?: return@onSuccess showBalloon(
+                            e
+                        )
                     searchForText(e, data, reference.name + reference.descriptor)
                 }
                 else ->

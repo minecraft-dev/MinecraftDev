@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -49,4 +49,4 @@ class NullableDelegate<T>(supplier: () -> T?) {
     private class Lock
 }
 
-fun <T> nullable(supplier: () -> T?): NullableDelegate<T>  = NullableDelegate(supplier)
+fun <T> nullable(supplier: () -> T?): NullableDelegate<T> = NullableDelegate(supplier)

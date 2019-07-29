@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -33,7 +33,8 @@ class MethodCallSideOnlyInspection : BaseInspection() {
     }
 
     override fun getStaticDescription() =
-        "Methods which are declared with a @SideOnly annotation can only be used in matching @SideOnly classes and methods."
+        "Methods which are declared with a @SideOnly annotation can only be " +
+            "used in matching @SideOnly classes and methods."
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         val method = infos[3] as PsiMethod
@@ -59,7 +60,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                 // If this field is a @SidedProxy field, don't check. This is because people often are naughty and use the server impl as
                 // the base class for their @SidedProxy class, and client extends it. this messes up our checks, so we will just assume the
                 // right class is loaded for @SidedProxy's
-                run skip@ {
+                run skip@{
                     if (qualifierExpression is PsiReferenceExpression) {
                         val resolve = qualifierExpression.resolve() as? PsiField ?: return@skip
 
@@ -181,12 +182,14 @@ class MethodCallSideOnlyInspection : BaseInspection() {
         },
         ANNOTATED_CLASS_METHOD_IN_UNANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method declared in a class annotated with " + infos[0] + " cannot be referenced in an un-annotated method."
+                return "Method declared in a class annotated with " + infos[0] +
+                    " cannot be referenced in an un-annotated method."
             }
         },
         ANNOTATED_METHOD_IN_CROSS_ANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method annotated with " + infos[0] + " cannot be referenced in a method annotated with " + infos[1] + "."
+                return "Method annotated with " + infos[0] +
+                    " cannot be referenced in a method annotated with " + infos[1] + "."
             }
         },
         ANNOTATED_CLASS_METHOD_IN_CROSS_ANNOTATED_METHOD {
@@ -197,7 +200,8 @@ class MethodCallSideOnlyInspection : BaseInspection() {
         },
         ANNOTATED_METHOD_IN_CROSS_ANNOTATED_CLASS_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method annotated with " + infos[0] + " cannot be referenced in a class annotated with " + infos[1] + "."
+                return "Method annotated with " + infos[0] +
+                    " cannot be referenced in a class annotated with " + infos[1] + "."
             }
         },
         ANNOTATED_CLASS_METHOD_IN_CROSS_ANNOTATED_CLASS_METHOD {

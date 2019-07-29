@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -18,10 +18,10 @@ sealed class PluginUpdateStatus {
     fun mergeWith(other: PluginUpdateStatus): PluginUpdateStatus {
         // Jesus wept. https://github.com/JetBrains/kotlin/blob/master/idea/src/org/jetbrains/kotlin/idea/KotlinPluginUpdater.kt#L61-L63
         if (other is Update && (
-            this is LatestVersionInstalled || this is Update && VersionComparatorUtil.compare(
-                other.pluginDescriptor.version,
-                this.pluginDescriptor.version
-            ) > 0)
+                this is LatestVersionInstalled || this is Update && VersionComparatorUtil.compare(
+                    other.pluginDescriptor.version,
+                    this.pluginDescriptor.version
+                ) > 0)
         ) {
             return other
         }

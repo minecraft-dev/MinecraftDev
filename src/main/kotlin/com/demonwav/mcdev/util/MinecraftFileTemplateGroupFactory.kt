@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -48,7 +48,12 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
 
         group.addTemplate(FileTemplateDescriptor(LITELOADER_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.LITELOADER_ICON))
         group.addTemplate(FileTemplateDescriptor(LITELOADER_BUILD_GRADLE_TEMPLATE, PlatformAssets.LITELOADER_ICON))
-        group.addTemplate(FileTemplateDescriptor(LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.LITELOADER_ICON))
+        group.addTemplate(
+            FileTemplateDescriptor(
+                LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE,
+                PlatformAssets.LITELOADER_ICON
+            )
+        )
         group.addTemplate(FileTemplateDescriptor(LITELOADER_MAIN_CLASS_TEMPLATE, PlatformAssets.LITELOADER_ICON))
 
         group.addTemplate(FileTemplateDescriptor(MIXIN_OVERWRITE_FALLBACK, PlatformAssets.MIXIN_ICON))
@@ -89,5 +94,4 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
 
         const val MIXIN_OVERWRITE_FALLBACK = "Mixin Overwrite Fallback.java"
     }
-
 }

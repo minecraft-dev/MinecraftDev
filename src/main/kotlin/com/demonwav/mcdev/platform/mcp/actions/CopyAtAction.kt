@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -26,11 +26,19 @@ class CopyAtAction : SrgActionBase() {
         when (parent) {
             is PsiField -> {
                 val srg = srgMap.findSrgField(parent) ?: return showBalloon("No SRG name found", e)
-                copyToClipboard(data.editor, data.element, parent.containingClass?.qualifiedName+" "+srg.name+" #"+parent.name)
+                copyToClipboard(
+                    data.editor,
+                    data.element,
+                    parent.containingClass?.qualifiedName + " " + srg.name + " #" + parent.name
+                )
             }
             is PsiMethod -> {
                 val srg = srgMap.findSrgMethod(parent) ?: return showBalloon("No SRG name found", e)
-                copyToClipboard(data.editor, data.element, parent.containingClass?.qualifiedName+" "+srg.name+srg.descriptor+" #"+parent.name)
+                copyToClipboard(
+                    data.editor,
+                    data.element,
+                    parent.containingClass?.qualifiedName + " " + srg.name + srg.descriptor + " #" + parent.name
+                )
             }
             is PsiClass -> {
                 val classMcpToSrg = srgMap.findSrgClass(parent) ?: return showBalloon("No SRG name found", e)
@@ -44,7 +52,6 @@ class CopyAtAction : SrgActionBase() {
         val stringSelection = StringSelection(text)
         val clpbrd = Toolkit.getDefaultToolkit().systemClipboard
         clpbrd.setContents(stringSelection, null)
-        showSuccessBalloon(editor, element, "Copied "+text)
+        showSuccessBalloon(editor, element, "Copied " + text)
     }
-
 }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -63,13 +63,15 @@ object ConfigProperty : PsiReferenceProvider() {
 
     private inline fun forEachProperty(configClass: PsiClass, func: (PsiField, String) -> Unit) {
         for (field in configClass.fields) {
-            val name = field.findAnnotation(SERIALIZED_NAME)?.findDeclaredAttributeValue(null)?.constantStringValue ?: continue
+            val name =
+                field.findAnnotation(SERIALIZED_NAME)?.findDeclaredAttributeValue(null)?.constantStringValue ?: continue
             func(field, name)
         }
     }
 
     private fun findConfigClass(context: PsiElement): PsiClass? {
-        val mixinConfig = JavaPsiFacade.getInstance(context.project).findClass(MIXIN_CONFIG, context.resolveScope) ?: return null
+        val mixinConfig =
+            JavaPsiFacade.getInstance(context.project).findClass(MIXIN_CONFIG, context.resolveScope) ?: return null
 
         val property = context.parent as JsonProperty
 
@@ -93,7 +95,8 @@ object ConfigProperty : PsiReferenceProvider() {
         return currentClass
     }
 
-    private class Reference(element: JsonStringLiteral) : PsiReferenceBase<JsonStringLiteral>(element), InspectionReference {
+    private class Reference(element: JsonStringLiteral) : PsiReferenceBase<JsonStringLiteral>(element),
+        InspectionReference {
 
         override val description: String
             get() = "config property '%s'"

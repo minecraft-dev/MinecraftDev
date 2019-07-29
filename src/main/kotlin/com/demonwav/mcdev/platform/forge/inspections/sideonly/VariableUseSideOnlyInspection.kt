@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -28,7 +28,8 @@ class VariableUseSideOnlyInspection : BaseInspection() {
     }
 
     override fun getStaticDescription() =
-        "Variables which are declared with a @SideOnly annotation can only be used in matching @SideOnly classes and methods."
+        "Variables which are declared with a @SideOnly annotation can only be used " +
+            "in matching @SideOnly classes and methods."
 
     override fun buildVisitor(): BaseInspectionVisitor {
         return object : BaseInspectionVisitor() {
@@ -147,12 +148,14 @@ class VariableUseSideOnlyInspection : BaseInspection() {
         },
         ANNOTATED_CLASS_VAR_IN_UNANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Variable declared in a class annotated with ${infos[0]} cannot be referenced in an un-annotated method."
+                return "Variable declared in a class annotated with ${infos[0]} " +
+                    "cannot be referenced in an un-annotated method."
             }
         },
         ANNOTATED_VAR_IN_CROSS_ANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Variable annotated with ${infos[0]} cannot be referenced in a method annotated with ${infos[1]}."
+                return "Variable annotated with ${infos[0]} " +
+                    "cannot be referenced in a method annotated with ${infos[1]}."
             }
         },
         ANNOTATED_CLASS_VAR_IN_CROSS_ANNOTATED_METHOD {
@@ -163,7 +166,8 @@ class VariableUseSideOnlyInspection : BaseInspection() {
         },
         ANNOTATED_VAR_IN_CROSS_ANNOTATED_CLASS_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Variable annotated with ${infos[0]} cannot be referenced in a class annotated with ${infos[1]}."
+                return "Variable annotated with ${infos[0]} " +
+                    "cannot be referenced in a class annotated with ${infos[1]}."
             }
         },
         ANNOTATED_CLASS_VAR_IN_CROSS_ANNOTATED_CLASS_METHOD {

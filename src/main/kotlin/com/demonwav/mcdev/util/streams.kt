@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -25,7 +25,8 @@ fun <T> Stream<T?>.filterNotNull(): Stream<T> = filter { it != null } as Stream<
  * returned `null` elements from the [Stream].
  */
 @Contract(pure = true)
-inline fun <T, R> Stream<T>.mapNotNull(crossinline transform: (T) -> R?): Stream<R> = map { transform(it) }.filterNotNull()
+inline fun <T, R> Stream<T>.mapNotNull(crossinline transform: (T) -> R?): Stream<R> =
+    map { transform(it) }.filterNotNull()
 
 /**
  * Creates a typed [Array] of [T] for the elements in the [Stream].

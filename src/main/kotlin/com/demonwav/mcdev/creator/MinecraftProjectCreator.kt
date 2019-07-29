@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -147,14 +147,16 @@ class MinecraftProjectCreator {
                     buildRepository.url = "https://oss.sonatype.org/content/groups/public/"
                     buildDependency.groupId = "net.md-5"
                     buildDependency.artifactId = "bungeecord-api"
-                    buildDependency.version = (configuration as BungeeCordProjectConfiguration).minecraftVersion + "-SNAPSHOT"
+                    buildDependency.version =
+                        (configuration as BungeeCordProjectConfiguration).minecraftVersion + "-SNAPSHOT"
                 }
                 PlatformType.WATERFALL -> {
                     buildRepository.id = "destroystokyo-repo"
                     buildRepository.url = "https://repo.destroystokyo.com/repository/maven-public/"
                     buildDependency.groupId = "io.github.waterfallmc"
                     buildDependency.artifactId = "waterfall-api"
-                    buildDependency.version = (configuration as BungeeCordProjectConfiguration).minecraftVersion + "-SNAPSHOT"
+                    buildDependency.version =
+                        (configuration as BungeeCordProjectConfiguration).minecraftVersion + "-SNAPSHOT"
                     addSonatype(buildSystem.repositories)
                 }
                 PlatformType.SPONGE -> {
@@ -168,7 +170,8 @@ class MinecraftProjectCreator {
                         buildDependency.version = (configuration as SpongeForgeProjectConfiguration).spongeApiVersion
                     }
                 }
-                else -> {}
+                else -> {
+                }
             }
             buildDependency.scope = "provided"
         }

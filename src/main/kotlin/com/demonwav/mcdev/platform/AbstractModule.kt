@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -56,10 +56,12 @@ abstract class AbstractModule(protected val facet: MinecraftFacet) {
 
     open fun doPreEventGenerate(psiClass: PsiClass, data: GenerationData?) {}
 
-    open fun generateEventListenerMethod(containingClass: PsiClass,
-                                         chosenClass: PsiClass,
-                                         chosenName: String,
-                                         data: GenerationData?): PsiMethod? = null
+    open fun generateEventListenerMethod(
+        containingClass: PsiClass,
+        chosenClass: PsiClass,
+        chosenName: String,
+        data: GenerationData?
+    ): PsiMethod? = null
 
     @Contract(value = "null -> false", pure = true)
     open fun shouldShowPluginIcon(element: PsiElement?) = false

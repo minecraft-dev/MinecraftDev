@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -26,9 +26,9 @@ class NestedClassSideOnlyInspection : BaseInspection() {
             "\nEither remove the nested class's @SideOnly annotation, or change it to match it's parent's side."
 
     override fun getStaticDescription(): String? {
-        return "Classes which are annotated with @SideOnly cannot contain any nested classes which are annotated with a different " +
-            "@SideOnly annotation. Since a class that is annotated with @SideOnly brings everything with it, @SideOnly annotated nested " +
-            "classes are usually useless."
+        return "Classes which are annotated with @SideOnly cannot contain any nested classes which are " +
+            "annotated with a different @SideOnly annotation. Since a class that is annotated with @SideOnly " +
+            "brings everything with it, @SideOnly annotated nested classes are usually useless."
     }
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {

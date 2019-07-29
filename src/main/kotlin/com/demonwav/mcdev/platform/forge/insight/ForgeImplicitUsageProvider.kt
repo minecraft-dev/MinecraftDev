@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -26,5 +26,4 @@ class ForgeImplicitUsageProvider : ImplicitUsageProvider {
 
     override fun isImplicitRead(element: PsiElement) = false
     override fun isImplicitWrite(element: PsiElement) = false
-
 }

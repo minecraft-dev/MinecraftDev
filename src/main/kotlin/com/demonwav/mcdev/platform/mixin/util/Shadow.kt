@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -40,7 +40,11 @@ fun PsiMember.findFirstShadowTarget(): PsiMember? {
 }
 
 @Contract(pure = true)
-fun resolveFirstShadowTarget(shadow: PsiAnnotation, targetClasses: Collection<PsiClass>, member: PsiMember): PsiMember? {
+fun resolveFirstShadowTarget(
+    shadow: PsiAnnotation,
+    targetClasses: Collection<PsiClass>,
+    member: PsiMember
+): PsiMember? {
     if (hasAliases(shadow)) return null
     val name = stripPrefix(shadow, member) ?: return null
     return when (member) {
@@ -59,7 +63,11 @@ fun PsiMember.findShadowTargets(): List<PsiMember> {
 }
 
 @Contract(pure = true)
-fun resolveShadowTargets(shadow: PsiAnnotation, targetClasses: Collection<PsiClass>, member: PsiMember): List<PsiMember>? {
+fun resolveShadowTargets(
+    shadow: PsiAnnotation,
+    targetClasses: Collection<PsiClass>,
+    member: PsiMember
+): List<PsiMember>? {
     if (hasAliases(shadow)) return null
     val name = stripPrefix(shadow, member) ?: return null
     return when (member) {

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -42,7 +42,7 @@ class SrgManager(val files: Set<String>) {
 
     @Synchronized
     fun parse() {
-        if (srgMap.state == Promise.State.PENDING)  {
+        if (srgMap.state == Promise.State.PENDING) {
             return
         }
 

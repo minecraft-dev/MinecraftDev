@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -106,7 +106,8 @@ class MixinConfigImportOptimizer : ImportOptimizer {
         private val file: JsonFile,
         private val mixins: JsonArray?,
         private val server: JsonArray?,
-        private val client: JsonArray?) : Runnable {
+        private val client: JsonArray?
+    ) : Runnable {
 
         override fun run() {
             val manager = PsiDocumentManager.getInstance(file.project)

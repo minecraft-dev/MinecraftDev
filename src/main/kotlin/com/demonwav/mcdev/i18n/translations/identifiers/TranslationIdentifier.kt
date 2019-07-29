@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -34,7 +34,12 @@ abstract class TranslationIdentifier<T : PsiElement> {
     abstract fun elementClass(): Class<T>
 
     companion object {
-        fun identify(project: Project, element: PsiExpression, container: PsiElement, referenceElement: PsiElement): Translation? {
+        fun identify(
+            project: Project,
+            element: PsiExpression,
+            container: PsiElement,
+            referenceElement: PsiElement
+        ): Translation? {
             if (container is PsiPolyadicExpression) {
                 return identify(project, container, container.parent, referenceElement)
             }
@@ -56,7 +61,8 @@ abstract class TranslationIdentifier<T : PsiElement> {
                         }
                         if (translation != null) {
                             try {
-                                val (formatted, superfluousParams) = function.format(translation, call) ?: (translation to -1)
+                                val (formatted, superfluousParams) = function.format(translation, call)
+                                    ?: (translation to -1)
                                 return Translation(
                                     if (function.foldParameters) container else call,
                                     if (result.first) referenceElement else null,

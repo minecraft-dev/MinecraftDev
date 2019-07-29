@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -33,7 +33,8 @@ class NbttFoldingBuilder : FoldingBuilder {
                 }
                 val tag = tagList[0].tag
                 if (tagList.size == 1 && tag?.getList() == null && tag?.getCompound() == null &&
-                    tag?.getIntArray() == null && tag?.getByteArray() == null) {
+                    tag?.getIntArray() == null && tag?.getByteArray() == null
+                ) {
                     tagList[0].text
                 } else {
                     "..."
@@ -56,7 +57,12 @@ class NbttFoldingBuilder : FoldingBuilder {
                 val rbrace = node.findChildByType(NbttTypes.RBRACE)
                 if (lbrace != null && rbrace != null) {
                     if (lbrace.textRange.endOffset != rbrace.textRange.startOffset) {
-                        list.add(FoldingDescriptor(node, TextRange(lbrace.textRange.endOffset, rbrace.textRange.startOffset)))
+                        list.add(
+                            FoldingDescriptor(
+                                node,
+                                TextRange(lbrace.textRange.endOffset, rbrace.textRange.startOffset)
+                            )
+                        )
                     }
                 }
             }
@@ -65,7 +71,12 @@ class NbttFoldingBuilder : FoldingBuilder {
                 val rbracket = node.findChildByType(NbttTypes.RBRACKET)
                 if (lbracket != null && rbracket != null) {
                     if (lbracket.textRange.endOffset != rbracket.textRange.startOffset) {
-                        list.add(FoldingDescriptor(node, TextRange(lbracket.textRange.endOffset, rbracket.textRange.startOffset)))
+                        list.add(
+                            FoldingDescriptor(
+                                node,
+                                TextRange(lbracket.textRange.endOffset, rbracket.textRange.startOffset)
+                            )
+                        )
                     }
                 }
             }
@@ -74,7 +85,12 @@ class NbttFoldingBuilder : FoldingBuilder {
                 val rparen = node.findChildByType(NbttTypes.RPAREN)
                 if (lparen != null && rparen != null) {
                     if (lparen.textRange.endOffset != rparen.textRange.startOffset) {
-                        list.add(FoldingDescriptor(node, TextRange(lparen.textRange.endOffset, rparen.textRange.startOffset)))
+                        list.add(
+                            FoldingDescriptor(
+                                node,
+                                TextRange(lparen.textRange.endOffset, rparen.textRange.startOffset)
+                            )
+                        )
                     }
                 }
             }
@@ -94,7 +110,12 @@ class NbttFoldingBuilder : FoldingBuilder {
             is NbttCompound -> {
                 if (psi.getNamedTagList().size == 1) {
                     val tag = psi.getNamedTagList()[0].tag
-                    if (tag?.getList() == null && tag?.getCompound() == null && tag?.getIntArray() == null && tag?.getByteArray() == null) {
+                    if (
+                        tag?.getList() == null &&
+                        tag?.getCompound() == null &&
+                        tag?.getIntArray() == null &&
+                        tag?.getByteArray() == null
+                    ) {
                         return true
                     }
                 }

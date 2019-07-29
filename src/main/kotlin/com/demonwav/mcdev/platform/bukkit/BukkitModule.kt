@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -89,7 +89,10 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
             val annotation = list.findAnnotation(BukkitConstants.HANDLER_ANNOTATION) ?: return method
 
             val value = JavaPsiFacade.getElementFactory(project)
-                .createExpressionFromText(BukkitConstants.EVENT_PRIORITY_CLASS + "." + bukkitData.eventPriority, annotation)
+                .createExpressionFromText(
+                    BukkitConstants.EVENT_PRIORITY_CLASS + "." + bukkitData.eventPriority,
+                    annotation
+                )
 
             annotation.setDeclaredAttributeValue("priority", value)
         }
@@ -146,7 +149,14 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
 
         return IsCancelled(
             errorString = "Cancellable.isCancelled() check is useless in a method annotated with ignoreCancelled=true.",
-            fix = { expression.replace(JavaPsiFacade.getElementFactory(project).createExpressionFromText("false", expression)) }
+            fix = {
+                expression.replace(
+                    JavaPsiFacade.getElementFactory(project).createExpressionFromText(
+                        "false",
+                        expression
+                    )
+                )
+            }
         )
     }
 
@@ -162,9 +172,14 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
 
         val project = element.project
         val psiClass = element.parent as PsiClass
-        val javaPluginClass = JavaPsiFacade.getInstance(project).findClass(BukkitConstants.JAVA_PLUGIN, GlobalSearchScope.allScope(project))
+        val javaPluginClass = JavaPsiFacade.getInstance(project)
+            .findClass(BukkitConstants.JAVA_PLUGIN, GlobalSearchScope.allScope(project))
 
-        return javaPluginClass != null && psiClass.extendsListTypes.any { c -> c == PsiTypesUtil.getClassType(javaPluginClass) }
+        return javaPluginClass != null && psiClass.extendsListTypes.any { c ->
+            c == PsiTypesUtil.getClassType(
+                javaPluginClass
+            )
+        }
     }
 
     override fun dispose() {

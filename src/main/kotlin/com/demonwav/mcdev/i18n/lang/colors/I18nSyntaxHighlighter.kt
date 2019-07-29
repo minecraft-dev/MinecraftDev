@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -31,9 +31,11 @@ class I18nSyntaxHighlighter(private val lexer: Lexer) : SyntaxHighlighterBase() 
 
     companion object {
         val KEY = TextAttributesKey.createTextAttributesKey("I18N_KEY", DefaultLanguageHighlighterColors.KEYWORD)
-        val EQUALS = TextAttributesKey.createTextAttributesKey("I18N_EQUALS", DefaultLanguageHighlighterColors.OPERATION_SIGN)
+        val EQUALS =
+            TextAttributesKey.createTextAttributesKey("I18N_EQUALS", DefaultLanguageHighlighterColors.OPERATION_SIGN)
         val VALUE = TextAttributesKey.createTextAttributesKey("I18N_VALUE", DefaultLanguageHighlighterColors.STRING)
-        val COMMENT = TextAttributesKey.createTextAttributesKey("I18N_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
+        val COMMENT =
+            TextAttributesKey.createTextAttributesKey("I18N_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
 
         val KEY_KEYS = arrayOf(KEY)
         val EQUALS_KEYS = arrayOf(EQUALS)

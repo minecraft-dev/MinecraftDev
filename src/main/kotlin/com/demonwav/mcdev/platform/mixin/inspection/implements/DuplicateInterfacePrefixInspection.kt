@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -23,7 +23,11 @@ class DuplicateInterfacePrefixInspection : MixinAnnotationAttributeInspection(IM
 
     override fun getStaticDescription() = "Reports duplicate @Interface prefixes in an @Implements annotation."
 
-    override fun visitAnnotationAttribute(annotation: PsiAnnotation, value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
+    override fun visitAnnotationAttribute(
+        annotation: PsiAnnotation,
+        value: PsiAnnotationMemberValue,
+        holder: ProblemsHolder
+    ) {
         val interfaces = value.findAnnotations().ifEmpty { return }
 
         val prefixes = ArrayList<String>()

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -47,8 +47,13 @@ class ShadowFieldPrefixInspection : MixinInspection() {
             // Check if field name starts with default shadow prefix
             val fieldName = field.name
             if (fieldName.startsWith(DEFAULT_SHADOW_PREFIX)) {
-                holder.registerProblem(field.nameIdentifier, "Cannot use prefix for @Shadow fields",
-                    QuickFixFactory.getInstance().createRenameElementFix(field, fieldName.removePrefix(DEFAULT_SHADOW_PREFIX)))
+                holder.registerProblem(
+                    field.nameIdentifier, "Cannot use prefix for @Shadow fields",
+                    QuickFixFactory.getInstance().createRenameElementFix(
+                        field,
+                        fieldName.removePrefix(DEFAULT_SHADOW_PREFIX)
+                    )
+                )
             }
         }
     }
@@ -75,7 +80,8 @@ class ShadowFieldPrefixInspection : MixinInspection() {
             val fieldName = field.name
             if (fieldName.startsWith(prefixName)) {
                 // Rename field
-                QuickFixFactory.getInstance().createRenameElementFix(field, fieldName.removePrefix(prefixName)).applyFix()
+                QuickFixFactory.getInstance().createRenameElementFix(field, fieldName.removePrefix(prefixName))
+                    .applyFix()
             }
         }
     }

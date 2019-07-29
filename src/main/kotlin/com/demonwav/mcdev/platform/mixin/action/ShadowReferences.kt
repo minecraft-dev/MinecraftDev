@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -29,7 +29,8 @@ fun collectRequiredMembers(element: PsiElement, psiClass: PsiClass): List<PsiMem
     return visitor.members
 }
 
-private class CollectRequiredClassMembersVisitor(private val psiClass: PsiClass) : JavaRecursiveElementWalkingVisitor() {
+private class CollectRequiredClassMembersVisitor(private val psiClass: PsiClass) :
+    JavaRecursiveElementWalkingVisitor() {
 
     val members = ArrayList<PsiMember>()
 
@@ -52,7 +53,7 @@ private class CollectRequiredClassMembersVisitor(private val psiClass: PsiClass)
 
 fun filterNewShadows(requiredMembers: Collection<PsiMember>, psiClass: PsiClass): Stream<PsiMember> {
     return requiredMembers.stream().filter { m ->
-        when(m) {
+        when (m) {
             is PsiMethod -> psiClass.findMethods(m.memberReference).isEmpty()
             is PsiField -> psiClass.findField(m.memberReference) == null
             else -> throw UnsupportedOperationException("Unsupported member type: ${m::class.java.name}")

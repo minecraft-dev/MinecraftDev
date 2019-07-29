@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -65,7 +65,8 @@ object InjectionPointType : ReferenceResolver(), MixinReference {
             }
         } else {
             // Older Mixin version. Resolve based on inheritors of InjectionPoint with a static final "CODE" field
-            val baseClass = JavaPsiFacade.getInstance(context.project).findClass(INJECTION_POINT, context.resolveScope) ?: return
+            val baseClass =
+                JavaPsiFacade.getInstance(context.project).findClass(INJECTION_POINT, context.resolveScope) ?: return
             for (c in ClassInheritorsSearch.search(baseClass)) {
                 (c.findFieldByName("CODE", false)?.computeConstantValue() as? String)
                     ?.let { code -> consume(code, c) }

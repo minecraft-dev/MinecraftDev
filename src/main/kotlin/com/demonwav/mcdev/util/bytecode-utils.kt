@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -69,7 +69,8 @@ fun getPrimitiveWrapperClass(internalName: Char, project: Project): PsiClass? {
 private fun PsiClassType.erasure() = TypeConversionUtil.erasure(this) as PsiClassType
 
 @Throws(ClassNameResolutionFailedException::class)
-private fun PsiClassType.appendInternalName(builder: StringBuilder): StringBuilder = erasure().resolve()?.appendInternalName(builder) ?: builder
+private fun PsiClassType.appendInternalName(builder: StringBuilder): StringBuilder =
+    erasure().resolve()?.appendInternalName(builder) ?: builder
 
 @Throws(ClassNameResolutionFailedException::class)
 private fun PsiType.appendDescriptor(builder: StringBuilder): StringBuilder {

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -23,7 +23,11 @@ class UnqualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection(
 
     override fun getStaticDescription() = "Reports unqualified member references in @At targets"
 
-    override fun visitAnnotationAttribute(annotation: PsiAnnotation, value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
+    override fun visitAnnotationAttribute(
+        annotation: PsiAnnotation,
+        value: PsiAnnotationMemberValue,
+        holder: ProblemsHolder
+    ) {
         // Check if the specified target reference uses member descriptors
         if (!TargetReference.usesMemberReference(value)) {
             return

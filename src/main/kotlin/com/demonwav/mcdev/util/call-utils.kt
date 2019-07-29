@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -42,7 +42,10 @@ fun PsiCall.getSupers(reference: PsiMethod, paramIndex: Int, referenceParamIndex
     }
 
     fun findFirstMethodCall(elem: PsiElement): PsiMethodCallExpression? =
-        if (elem is PsiMethodCallExpression && (elem.methodExpression.text == "super" || elem.methodExpression.text == "this")) {
+        if (
+            elem is PsiMethodCallExpression &&
+            (elem.methodExpression.text == "super" || elem.methodExpression.text == "this")
+        ) {
             elem
         } else {
             elem.children.mapFirstNotNull { findFirstMethodCall(it) }
@@ -80,7 +83,11 @@ fun PsiCall.getCalls(reference: PsiMethod, paramIndex: Int, referenceParamIndex:
     } ?: emptyList()
 }
 
-fun PsiCall.getCallsReturningResult(reference: PsiMethod, paramIndex: Int, referenceParamIndex: Int): Iterable<PsiCall> {
+fun PsiCall.getCallsReturningResult(
+    reference: PsiMethod,
+    paramIndex: Int,
+    referenceParamIndex: Int
+): Iterable<PsiCall> {
     val method = this.referencedMethod ?: return emptyList()
     if (method.isSameReference(reference) && paramIndex == referenceParamIndex) {
         return listOf(this)
@@ -157,7 +164,12 @@ inline fun PsiMethodCallExpression.extractReferences(
     return emptyList()
 }
 
-fun PsiCall.extractVarArgs(index: Int, substitutions: Map<Int, Array<String?>?>, allowReferences: Boolean, allowTranslations: Boolean): Array<String?> {
+fun PsiCall.extractVarArgs(
+    index: Int,
+    substitutions: Map<Int, Array<String?>?>,
+    allowReferences: Boolean,
+    allowTranslations: Boolean
+): Array<String?> {
     val method = this.referencedMethod
     val args = this.argumentList?.expressions ?: return emptyArray()
     if (method == null || args.size < (index + 1)) {
@@ -172,7 +184,13 @@ fun PsiCall.extractVarArgs(index: Int, substitutions: Map<Int, Array<String?>?>,
     return extractVarArgs(varargType, elements, substitutions, allowReferences, allowTranslations)
 }
 
-fun extractVarArgs(type: PsiType, elements: List<PsiExpression>, substitutions: Map<Int, Array<String?>?>, allowReferences: Boolean, allowTranslations: Boolean): Array<String?> {
+fun extractVarArgs(
+    type: PsiType,
+    elements: List<PsiExpression>,
+    substitutions: Map<Int, Array<String?>?>,
+    allowReferences: Boolean,
+    allowTranslations: Boolean
+): Array<String?> {
     fun convertExpression(expression: PsiExpression): Array<String?>? =
         expression.substituteParameter(substitutions, allowReferences, allowTranslations)
 

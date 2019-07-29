@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -34,8 +34,10 @@ class EmptyImplementsInspection : MixinInspection() {
 
             val interfaces = annotation.findDeclaredAttributeValue(null)?.findAnnotations()
             if (interfaces == null || interfaces.isEmpty()) {
-                holder.registerProblem(annotation, "@Implements is redundant",
-                    RemoveAnnotationQuickFix(annotation, null))
+                holder.registerProblem(
+                    annotation, "@Implements is redundant",
+                    RemoveAnnotationQuickFix(annotation, null)
+                )
             }
         }
     }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -58,5 +58,4 @@ object MixinPackage : PackageNameReferenceProvider() {
         val scope = PackageScope(context, true, true).intersectWith(element.resolveScope)
         return collectSubpackages(context, AnnotatedElementsSearch.searchPsiClasses(mixinAnnotation, scope))
     }
-
 }

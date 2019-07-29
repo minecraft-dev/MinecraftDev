@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -73,12 +73,18 @@ class SidedProxyAnnotator : Annotator {
 
                 val resolve = value.resolve() as? PsiField ?: return
 
-                text = JavaConstantExpressionEvaluator.computeConstantExpression(resolve.initializer, null, false) as? String ?: return
+                text = JavaConstantExpressionEvaluator.computeConstantExpression(
+                    resolve.initializer,
+                    null,
+                    false
+                ) as? String ?: return
             } else {
                 return
             }
 
-            val psiClass = JavaPsiFacade.getInstance(value.project).findClass(text, GlobalSearchScope.allScope(value.project)) ?: return
+            val psiClass =
+                JavaPsiFacade.getInstance(value.project).findClass(text, GlobalSearchScope.allScope(value.project))
+                    ?: return
 
             psiClass.putUserData(Side.KEY, side)
         }

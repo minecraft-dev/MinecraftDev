@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -28,37 +28,53 @@ enum class Scope {
 }
 
 private fun Project.files(scope: Scope): Sequence<I18nFile> {
-    val searchScope = if (scope == Scope.GLOBAL) GlobalSearchScope.allScope(this) else GlobalSearchScope.projectScope(this)
+    val searchScope =
+        if (scope == Scope.GLOBAL) GlobalSearchScope.allScope(this) else GlobalSearchScope.projectScope(this)
     return FileTypeIndex.getFiles(I18nFileType, searchScope)
         .asSequence()
         .mapNotNull { PsiManager.getInstance(this).findFile(it) as? I18nFile }
 }
 
-private fun Project.findEntriesImpl(scope: Scope, fileFilter: (I18nFile) -> Boolean = { true }, entryFilter: (I18nEntry) -> Boolean = { true }) =
+private fun Project.findEntriesImpl(
+    scope: Scope,
+    fileFilter: (I18nFile) -> Boolean = { true },
+    entryFilter: (I18nEntry) -> Boolean = { true }
+) =
     files(scope)
         .filter(fileFilter)
         .flatMap { PsiTreeUtil.getChildrenOfType(it, I18nEntry::class.java)?.asSequence() ?: emptySequence() }
         .filter(entryFilter)
         .toList()
 
-fun Project.findLangEntries(scope: Scope = Scope.GLOBAL, key: String? = null, file: VirtualFile? = null, domain: String? = null) =
+fun Project.findLangEntries(
+    scope: Scope = Scope.GLOBAL,
+    key: String? = null,
+    file: VirtualFile? = null,
+    domain: String? = null
+) =
     findEntriesImpl(
         scope,
         {
-            it.virtualFile != null
-                && (file == null || it.virtualFile.path == file.path)
-                && (domain == null || it.virtualFile.mcDomain == domain)
+            it.virtualFile != null &&
+                (file == null || it.virtualFile.path == file.path) &&
+                (domain == null || it.virtualFile.mcDomain == domain)
         },
         { key == null || it.key == key }
     )
 
-fun Project.findDefaultLangEntries(scope: Scope = Scope.GLOBAL, key: String? = null, file: VirtualFile? = null, domain: String? = null) =
+fun Project.findDefaultLangEntries(
+    scope: Scope = Scope.GLOBAL,
+    key: String? = null,
+    file: VirtualFile? = null,
+    domain: String? = null
+) =
     findEntriesImpl(
         scope,
         {
-            it.virtualFile != null && it.virtualFile.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE
-                && (file == null || it.virtualFile.path == file.path)
-                && (domain == null || it.virtualFile.mcDomain == domain)
+            it.virtualFile != null &&
+                it.virtualFile.nameWithoutExtension.toLowerCase(Locale.ROOT) == I18nConstants.DEFAULT_LOCALE &&
+                (file == null || it.virtualFile.path == file.path) &&
+                (domain == null || it.virtualFile.mcDomain == domain)
         },
         { key == null || it.key == key }
     )

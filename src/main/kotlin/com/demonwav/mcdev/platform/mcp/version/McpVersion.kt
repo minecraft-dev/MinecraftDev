@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -84,7 +84,8 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
                 val mcpVersion = McpVersion(map)
                 mcpVersion.versions
                 return mcpVersion
-            } catch (ignored: IOException) {}
+            } catch (ignored: IOException) {
+            }
 
             return null
         }

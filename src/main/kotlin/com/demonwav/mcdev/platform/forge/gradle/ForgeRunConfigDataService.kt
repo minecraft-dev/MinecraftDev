@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -32,10 +32,12 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
 
     override fun getTargetDataKey() = ProjectKeys.PROJECT
 
-    override fun postProcess(toImport: Collection<DataNode<ProjectData>>,
-                             projectData: ProjectData?,
-                             project: Project,
-                             modelsProvider: IdeModifiableModelsProvider) {
+    override fun postProcess(
+        toImport: Collection<DataNode<ProjectData>>,
+        projectData: ProjectData?,
+        project: Project,
+        modelsProvider: IdeModifiableModelsProvider
+    ) {
 
         if (projectData == null || projectData.owner != GradleConstants.SYSTEM_ID) {
             return

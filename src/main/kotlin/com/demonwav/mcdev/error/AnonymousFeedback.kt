@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -37,7 +37,8 @@ object AnonymousFeedback {
         val duplicateId = findDuplicateIssue(envDetails, factory)
         if (duplicateId != null) {
             // This is a duplicate
-            val commentUrl = sendCommentOnDuplicateIssue(duplicateId, factory, convertToGitHubIssueFormat(envDetails, attachments))
+            val commentUrl =
+                sendCommentOnDuplicateIssue(duplicateId, factory, convertToGitHubIssueFormat(envDetails, attachments))
             return FeedbackData(commentUrl, duplicateId, true)
         }
 
@@ -229,7 +230,7 @@ object AnonymousFeedback {
             }
 
             val parts = line.split(";")
-            return parts[0].substring(1, parts[0].length-1)
+            return parts[0].substring(1, parts[0].length - 1)
         }
 
         return null

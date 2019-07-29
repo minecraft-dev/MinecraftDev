@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -60,7 +60,11 @@ class TranslationSortOrderDialog(excludeDefaultOption: Boolean, defaultSelection
         )
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction({ onCancel() }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+        contentPane.registerKeyboardAction(
+            { onCancel() },
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        )
     }
 
     private fun onOK() {
@@ -73,7 +77,13 @@ class TranslationSortOrderDialog(excludeDefaultOption: Boolean, defaultSelection
     }
 
     object CellRenderer : DefaultListCellRenderer() {
-        override fun getListCellRendererComponent(list: JList<*>?, value: Any?, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
+        override fun getListCellRendererComponent(
+            list: JList<*>?,
+            value: Any?,
+            index: Int,
+            isSelected: Boolean,
+            cellHasFocus: Boolean
+        ): Component {
             val displayValue = (value as? Ordering)?.text
             return super.getListCellRendererComponent(list, displayValue, index, isSelected, cellHasFocus)
         }

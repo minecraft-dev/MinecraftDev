@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -74,7 +74,8 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                             element.context
                         )
                         if (psi.language === JavaLanguage.INSTANCE) {
-                            JavaCodeStyleManager.getInstance(project).shortenClassReferences(element.parent.replace(expression))
+                            JavaCodeStyleManager.getInstance(project)
+                                .shortenClassReferences(element.parent.replace(expression))
                         } else {
                             element.parent.replace(expression)
                         }

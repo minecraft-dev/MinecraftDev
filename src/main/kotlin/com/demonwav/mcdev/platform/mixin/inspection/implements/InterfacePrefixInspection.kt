@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -22,7 +22,11 @@ class InterfacePrefixInspection : MixinAnnotationAttributeInspection(INTERFACE, 
     override fun getStaticDescription() = "Reports invalid prefixes in @Interface annotations. " +
         "The prefixes must end with a dollar sign ($)."
 
-    override fun visitAnnotationAttribute(annotation: PsiAnnotation, value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
+    override fun visitAnnotationAttribute(
+        annotation: PsiAnnotation,
+        value: PsiAnnotationMemberValue,
+        holder: ProblemsHolder
+    ) {
         val prefix = value.constantStringValue ?: return
         if (!prefix.endsWith('$')) {
             holder.registerProblem(value, "@Interface prefix must end with a dollar sign ($)")

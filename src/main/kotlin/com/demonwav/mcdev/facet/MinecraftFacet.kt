@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -42,7 +42,12 @@ import org.jetbrains.jps.model.java.JavaSourceRootType
 import java.util.concurrent.ConcurrentHashMap
 import javax.swing.Icon
 
-class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacetConfiguration, underlyingFacet: Facet<*>?) :
+class MinecraftFacet(
+    module: Module,
+    name: String,
+    configuration: MinecraftFacetConfiguration,
+    underlyingFacet: Facet<*>?
+) :
     Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, underlyingFacet) {
 
     private val moduleMap = ConcurrentHashMap<AbstractModuleType<*>, AbstractModule>()
@@ -196,7 +201,10 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
             return when {
                 iconCount == 0 -> null
                 iconCount == 1 -> moduleMap.keys.firstOrNull { it.hasIcon }?.icon
-                iconCount == 2 && moduleMap.containsAllKeys(SpongeModuleType, ForgeModuleType) -> PlatformAssets.SPONGE_FORGE_ICON
+                iconCount == 2 && moduleMap.containsAllKeys(
+                    SpongeModuleType,
+                    ForgeModuleType
+                ) -> PlatformAssets.SPONGE_FORGE_ICON
                 moduleMap.size > 0 -> PlatformAssets.MINECRAFT_ICON
                 else -> null
             }
@@ -244,8 +252,8 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
             return@run result
         }
 
-
-        fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>) = getInstance(module)?.getModuleOfType(type)
+        fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>) =
+            getInstance(module)?.getModuleOfType(type)
 
         fun <T : AbstractModule> getInstance(module: Module, vararg types: AbstractModuleType<T>): T? {
             val instance = getInstance(module) ?: return null

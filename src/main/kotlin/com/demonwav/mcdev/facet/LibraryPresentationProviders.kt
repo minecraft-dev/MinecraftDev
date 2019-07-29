@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -21,8 +21,12 @@ import com.intellij.openapi.vfs.VirtualFile
 import java.util.jar.Attributes.Name.IMPLEMENTATION_TITLE
 import java.util.jar.Attributes.Name.IMPLEMENTATION_VERSION
 
-abstract class ManifestLibraryPresentationProvider(kind: LibraryKind, private val title: String, private val startsWith: Boolean = false)
-    : LibraryPresentationProvider<LibraryVersionProperties>(kind) {
+abstract class ManifestLibraryPresentationProvider(
+    kind: LibraryKind,
+    private val title: String,
+    private val startsWith: Boolean = false
+) :
+    LibraryPresentationProvider<LibraryVersionProperties>(kind) {
 
     final override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
         for (classesRoot in classesRoots) {
@@ -47,8 +51,12 @@ abstract class ManifestLibraryPresentationProvider(kind: LibraryKind, private va
     }
 }
 
-abstract class MavenLibraryPresentationProvider(kind: LibraryKind, private val groupId: String, private val artifactId: String)
-    : LibraryPresentationProvider<LibraryVersionProperties>(kind) {
+abstract class MavenLibraryPresentationProvider(
+    kind: LibraryKind,
+    private val groupId: String,
+    private val artifactId: String
+) :
+    LibraryPresentationProvider<LibraryVersionProperties>(kind) {
 
     private val propertiesPath = "META-INF/maven/$groupId/$artifactId/pom.properties"
 

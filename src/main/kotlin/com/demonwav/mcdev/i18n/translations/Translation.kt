@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -28,14 +28,16 @@ import com.intellij.psi.PsiReferenceRegistrar
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 
-data class Translation(val foldingElement: PsiElement?,
-                       val referenceElement: PsiElement?,
-                       val key: String,
-                       val varKey: String,
-                       val text: String?,
-                       val formattingError: FormattingError? = null,
-                       val superfluousVarargStart: Int = -1,
-                       val containsVariable: Boolean = false) {
+data class Translation(
+    val foldingElement: PsiElement?,
+    val referenceElement: PsiElement?,
+    val key: String,
+    val varKey: String,
+    val text: String?,
+    val formattingError: FormattingError? = null,
+    val superfluousVarargStart: Int = -1,
+    val containsVariable: Boolean = false
+) {
     val regexPattern = Regex(varKey.split(I18nReference.VARIABLE_MARKER).joinToString("(.*?)") { Regex.escape(it) })
 
     companion object {
@@ -45,37 +47,61 @@ data class Translation(val foldingElement: PsiElement?,
 
         val translationFunctions = listOf(
             TranslationFunction(
-                MemberReference(I18nConstants.FORMAT, "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;", I18nConstants.I18N_CLIENT_CLASS),
+                MemberReference(
+                    I18nConstants.FORMAT,
+                    "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;",
+                    I18nConstants.I18N_CLIENT_CLASS
+                ),
                 0,
                 formatting = true,
                 obfuscatedName = true
             ),
             TranslationFunction(
-                MemberReference(I18nConstants.TRANSLATE_TO_LOCAL, "(Ljava/lang/String;)Ljava/lang/String;", I18nConstants.I18N_COMMON_CLASS),
+                MemberReference(
+                    I18nConstants.TRANSLATE_TO_LOCAL,
+                    "(Ljava/lang/String;)Ljava/lang/String;",
+                    I18nConstants.I18N_COMMON_CLASS
+                ),
                 0,
                 formatting = false,
                 obfuscatedName = true
             ),
             TranslationFunction(
-                MemberReference(I18nConstants.TRANSLATE_TO_LOCAL_FORMATTED, "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;", I18nConstants.I18N_COMMON_CLASS),
+                MemberReference(
+                    I18nConstants.TRANSLATE_TO_LOCAL_FORMATTED,
+                    "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;",
+                    I18nConstants.I18N_COMMON_CLASS
+                ),
                 0,
                 formatting = true,
                 obfuscatedName = true
             ),
             TranslationFunction(
-                MemberReference(I18nConstants.CONSTRUCTOR, "(Ljava/lang/String;[Ljava/lang/Object;)V", I18nConstants.TRANSLATION_COMPONENT_CLASS),
+                MemberReference(
+                    I18nConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;[Ljava/lang/Object;)V",
+                    I18nConstants.TRANSLATION_COMPONENT_CLASS
+                ),
                 0,
                 formatting = true,
                 foldParameters = true
             ),
             TranslationFunction(
-                MemberReference(I18nConstants.CONSTRUCTOR, "(Ljava/lang/String;[Ljava/lang/Object;)V", I18nConstants.COMMAND_EXCEPTION_CLASS),
+                MemberReference(
+                    I18nConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;[Ljava/lang/Object;)V",
+                    I18nConstants.COMMAND_EXCEPTION_CLASS
+                ),
                 0,
                 formatting = true,
                 foldParameters = true
             ),
             TranslationFunction(
-                MemberReference(I18nConstants.SET_BLOCK_NAME, "(Ljava/lang/String;)Lnet/minecraft/block/Block;", McpConstants.BLOCK),
+                MemberReference(
+                    I18nConstants.SET_BLOCK_NAME,
+                    "(Ljava/lang/String;)Lnet/minecraft/block/Block;",
+                    McpConstants.BLOCK
+                ),
                 0,
                 formatting = false,
                 setter = true,
@@ -85,7 +111,11 @@ data class Translation(val foldingElement: PsiElement?,
                 obfuscatedName = true
             ),
             TranslationFunction(
-                MemberReference(I18nConstants.SET_ITEM_NAME, "(Ljava/lang/String;)Lnet/minecraft/item/Item;", McpConstants.ITEM),
+                MemberReference(
+                    I18nConstants.SET_ITEM_NAME,
+                    "(Ljava/lang/String;)Lnet/minecraft/item/Item;",
+                    McpConstants.ITEM
+                ),
                 0,
                 formatting = false,
                 setter = true,
@@ -115,9 +145,11 @@ data class Translation(val foldingElement: PsiElement?,
                                 translation.foldingElement.textRange
                             }
                         descriptors.add(
-                            object : FoldingDescriptor(translation.foldingElement.node,
+                            object : FoldingDescriptor(
+                                translation.foldingElement.node,
                                 range,
-                                FoldingGroup.newGroup("mc.i18n." + translation.key)) {
+                                FoldingGroup.newGroup("mc.i18n." + translation.key)
+                            ) {
                                 override fun getPlaceholderText(): String? {
                                     if (translation.formattingError == FormattingError.MISSING) {
                                         return "\"Insufficient parameters for formatting '${translation.text}'\""
@@ -137,12 +169,21 @@ data class Translation(val foldingElement: PsiElement?,
                 registrar.registerReferenceProvider(
                     PlatformPatterns.psiElement(identifier.elementClass()),
                     object : PsiReferenceProvider() {
-                        override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
+                        override fun getReferencesByElement(
+                            element: PsiElement,
+                            context: ProcessingContext
+                        ): Array<PsiReference> {
                             val result = identifier.identifyUnsafe(element)
                             if (result != null) {
                                 val referenceElement = result.referenceElement ?: return emptyArray()
                                 return arrayOf(
-                                    I18nReference(referenceElement, TextRange(1, referenceElement.textLength - 1), false, result.key, result.varKey)
+                                    I18nReference(
+                                        referenceElement,
+                                        TextRange(1, referenceElement.textLength - 1),
+                                        false,
+                                        result.key,
+                                        result.varKey
+                                    )
                                 )
                             }
                             return emptyArray()
@@ -153,4 +194,3 @@ data class Translation(val foldingElement: PsiElement?,
         }
     }
 }
-

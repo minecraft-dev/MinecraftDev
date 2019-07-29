@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -26,6 +26,7 @@ plugins {
     idea
     id("org.jetbrains.intellij") version "0.4.9"
     id("net.minecrell.licenser") version "0.4.1"
+    id("org.jlleitschuh.gradle.ktlint") version "8.2.0"
 }
 
 val coroutineVersion = "1.2.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
@@ -115,9 +116,11 @@ intellij {
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies
-    setPlugins("java", "maven", "gradle", "Groovy",
+    setPlugins(
+        "java", "maven", "gradle", "Groovy",
         // needed dependencies for unit tests
-        "properties", "junit")
+        "properties", "junit"
+    )
 
     pluginName = "Minecraft Development"
     updateSinceUntilBuild = true
@@ -206,6 +209,14 @@ license {
     }
 }
 
+tasks.register("format") {
+    group = "minecraft"
+    description = "Formats source code according to project style"
+    val licenseFormat by tasks.existing
+    val ktlintFormat by tasks.existing
+    dependsOn(licenseFormat, ktlintFormat)
+}
+
 // Credit for this intellij-rust
 // https://github.com/intellij-rust/intellij-rust/blob/d6b82e6aa2f64b877a95afdd86ec7b84394678c3/build.gradle#L131-L181
 fun generateLexer(name: String, flex: String, pack: String) = tasks.register<JavaExec>(name) {
@@ -248,10 +259,12 @@ fun generatePsiAndParser(name: String, bnf: String, pack: String) = tasks.regist
     args(dstRoot, src)
 
     inputs.file(src)
-    outputs.dirs(mapOf(
-        "psi" to psiDir,
-        "parser" to parserDir
-    ))
+    outputs.dirs(
+        mapOf(
+            "psi" to psiDir,
+            "parser" to parserDir
+        )
+    )
 }
 
 val generateAtLexer = generateLexer("generateAtLexer", "AtLexer", "platform/mcp/at/gen/")
@@ -295,4 +308,5 @@ runIde {
 }
 
 inline fun <reified T : Task> TaskContainer.existing() = existing(T::class)
-inline fun <reified T : Task> TaskContainer.register(name: String, configuration: Action<in T>) = register(name, T::class, configuration)
+inline fun <reified T : Task> TaskContainer.register(name: String, configuration: Action<in T>) =
+    register(name, T::class, configuration)

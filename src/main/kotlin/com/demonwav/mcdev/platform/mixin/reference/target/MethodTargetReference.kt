@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -25,14 +25,23 @@ import com.intellij.psi.PsiNewExpression
 
 object MethodTargetReference : TargetReference.MethodHandler() {
 
-    override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass, checkOnly: Boolean): CollectVisitor<out PsiElement>? {
-        return MixinMemberReference.parse(context.constantStringValue)?.let { FindUsagesVisitor(targetClass, it, checkOnly) }
+    override fun createFindUsagesVisitor(
+        context: PsiElement,
+        targetClass: PsiClass,
+        checkOnly: Boolean
+    ): CollectVisitor<out PsiElement>? {
+        return MixinMemberReference.parse(context.constantStringValue)
+            ?.let { FindUsagesVisitor(targetClass, it, checkOnly) }
     }
 
     override fun createCollectUsagesVisitor(): CollectVisitor<QualifiedMember<PsiMethod>> = CollectUsagesVisitor()
 
-    private class FindUsagesVisitor(private val targetClass: PsiClass, private val target: MemberReference, checkOnly: Boolean)
-        : CompiledMethodsVisitor<PsiElement>(checkOnly) {
+    private class FindUsagesVisitor(
+        private val targetClass: PsiClass,
+        private val target: MemberReference,
+        checkOnly: Boolean
+    ) :
+        CompiledMethodsVisitor<PsiElement>(checkOnly) {
 
         override fun visitMethodUsage(method: PsiMethod, qualifier: PsiClass?, source: PsiElement) {
             if (target.match(method, qualifier ?: targetClass)) {
@@ -61,8 +70,9 @@ object MethodTargetReference : TargetReference.MethodHandler() {
                 // However, if the method is part of java.lang.Object (e.g. equals or toString)
                 // and no class in the hierarchy of the instance overrides the method, Java will
                 // insert the call using java.lang.Object as the owner
-                val qualifier = if (method.isConstructor || containingClass?.qualifiedName == CommonClassNames.JAVA_LANG_OBJECT)
-                    containingClass else QualifiedMember.resolveQualifier(expression.methodExpression)
+                val qualifier =
+                    if (method.isConstructor || containingClass?.qualifiedName == CommonClassNames.JAVA_LANG_OBJECT)
+                        containingClass else QualifiedMember.resolveQualifier(expression.methodExpression)
 
                 visitMethodUsage(method, qualifier, expression)
             }
@@ -99,12 +109,14 @@ object MethodTargetReference : TargetReference.MethodHandler() {
                 .findClass(CommonClassNames.JAVA_UTIL_ITERATOR, statement.resolveScope)
 
             if (iteratorClass != null) {
-                val hasNext = iteratorClass.findMethodsByName("hasNext", false).first { it.parameterList.parametersCount == 0 }
+                val hasNext =
+                    iteratorClass.findMethodsByName("hasNext", false).first { it.parameterList.parametersCount == 0 }
                 if (hasNext != null) {
                     visitMethodUsage(hasNext, iteratorClass, statement)
                 }
 
-                val next = iteratorClass.findMethodsByName("next", false).first { it.parameterList.parametersCount == 0 }
+                val next =
+                    iteratorClass.findMethodsByName("next", false).first { it.parameterList.parametersCount == 0 }
                 if (next != null) {
                     visitMethodUsage(next, iteratorClass, statement)
                 }

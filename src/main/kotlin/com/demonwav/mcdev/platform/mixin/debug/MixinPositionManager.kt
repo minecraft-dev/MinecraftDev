@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -60,15 +60,20 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
             val className = path.removeSuffix(".java")
                 .replace('/', '.').replace('\\', '.')
 
-            val psiFile = findAlternativeSource(className, debugProcess.project) ?:
-                // Lookup class based on its qualified name (TODO: Support for anonymous classes)
-                DebuggerUtils.findClass(className, debugProcess.project, debugProcess.searchScope)?.navigationElement?.containingFile
+            val psiFile = findAlternativeSource(className, debugProcess.project)
+            // Lookup class based on its qualified name (TODO: Support for anonymous classes)
+                ?: DebuggerUtils.findClass(
+                    className,
+                    debugProcess.project,
+                    debugProcess.searchScope
+                )?.navigationElement?.containingFile
 
             if (psiFile != null) {
                 // File found, return correct source file
                 return SourcePosition.createFromLine(psiFile, location.lineNumber() - 1)
             }
-        } catch (ignored: AbsentInformationException) {}
+        } catch (ignored: AbsentInformationException) {
+        }
 
         throw NoDataException.INSTANCE
     }
@@ -93,17 +98,24 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
             try {
                 // Return the line numbers from the correct source file
                 return type.locationsOfLine(MixinConstants.SMAP_STRATUM, position.file.name, position.line + 1)
-            } catch (ignored: AbsentInformationException) {}
+            } catch (ignored: AbsentInformationException) {
+            }
         }
 
         throw NoDataException.INSTANCE
     }
 
     override fun createPrepareRequest(requestor: ClassPrepareRequestor, position: SourcePosition): ClassPrepareRequest {
-        throw UnsupportedOperationException("This class implements MultiRequestPositionManager, corresponding createPrepareRequests version should be used")
+        throw UnsupportedOperationException(
+            "This class implements MultiRequestPositionManager, " +
+                "corresponding createPrepareRequests version should be used"
+        )
     }
 
-    override fun createPrepareRequests(requestor: ClassPrepareRequestor, position: SourcePosition): List<ClassPrepareRequest> {
+    override fun createPrepareRequests(
+        requestor: ClassPrepareRequestor,
+        position: SourcePosition
+    ): List<ClassPrepareRequest> {
         return runReadAction {
             findMatchingClasses(position)
                 .mapNotNull { name -> debugProcess.requestsManager.createClassPrepareRequest(requestor, name) }

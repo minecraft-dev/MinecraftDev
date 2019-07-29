@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -21,7 +21,11 @@ class AmbiguousReferenceInspection : MixinAnnotationAttributeInspection(METHOD_I
 
     override fun getStaticDescription() = "Reports ambiguous references in Mixin annotations"
 
-    override fun visitAnnotationAttribute(annotation: PsiAnnotation, value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
+    override fun visitAnnotationAttribute(
+        annotation: PsiAnnotation,
+        value: PsiAnnotationMemberValue,
+        holder: ProblemsHolder
+    ) {
         val ambiguousReference = MethodReference.getReferenceIfAmbiguous(value) ?: return
 
         // TODO: Quick fix

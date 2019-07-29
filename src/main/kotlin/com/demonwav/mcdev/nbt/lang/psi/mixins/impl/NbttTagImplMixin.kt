@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -57,6 +57,7 @@ abstract class NbttTagImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), Nbt
         }
         return NbtTypeId.END // Shouldn't actually ever happen
     }
+
     override fun getTag(): NbttElement? {
         return when (getType()) {
             NbtTypeId.END -> null

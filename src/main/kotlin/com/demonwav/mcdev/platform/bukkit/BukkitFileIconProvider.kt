@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -28,7 +28,8 @@ class BukkitFileIconProvider : FileIconProvider {
         }
 
         val module = ModuleUtilCore.findModuleForFile(file, project) ?: return null
-        val bukkitModule = MinecraftFacet.getInstance(module, BukkitModuleType, SpigotModuleType, PaperModuleType) ?: return null
+        val bukkitModule =
+            MinecraftFacet.getInstance(module, BukkitModuleType, SpigotModuleType, PaperModuleType) ?: return null
 
         if (file == bukkitModule.pluginYml) {
             return bukkitModule.icon

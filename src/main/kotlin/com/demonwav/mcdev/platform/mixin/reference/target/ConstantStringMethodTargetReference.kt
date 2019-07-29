@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -25,8 +25,13 @@ import com.intellij.psi.PsiVariable
 
 object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
 
-    override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass, checkOnly: Boolean): CollectVisitor<out PsiElement>? {
-        return MixinMemberReference.parse(context.constantStringValue)?.let { FindUsagesVisitor(targetClass, it, checkOnly) }
+    override fun createFindUsagesVisitor(
+        context: PsiElement,
+        targetClass: PsiClass,
+        checkOnly: Boolean
+    ): CollectVisitor<out PsiElement>? {
+        return MixinMemberReference.parse(context.constantStringValue)
+            ?.let { FindUsagesVisitor(targetClass, it, checkOnly) }
     }
 
     override fun createCollectUsagesVisitor(): CollectVisitor<QualifiedMember<PsiMethod>> = CollectUsagesVisitor()
@@ -39,7 +44,11 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
 
         val arguments = expression.argumentList
         val argumentTypes = arguments.expressionTypes
-        if (argumentTypes.size != 1 || argumentTypes[0] != PsiType.getJavaLangString(expression.manager, expression.resolveScope)) {
+        if (argumentTypes.size != 1 || argumentTypes[0] != PsiType.getJavaLangString(
+                expression.manager,
+                expression.resolveScope
+            )
+        ) {
             // Must have one String parameter
             return false
         }
@@ -53,14 +62,21 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
         }
     }
 
-    private class FindUsagesVisitor(private val targetClass: PsiClass, private val target: MemberReference, checkOnly: Boolean)
-        : CollectVisitor<PsiExpression>(checkOnly) {
+    private class FindUsagesVisitor(
+        private val targetClass: PsiClass,
+        private val target: MemberReference,
+        checkOnly: Boolean
+    ) :
+        CollectVisitor<PsiExpression>(checkOnly) {
 
         override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
             if (isConstantStringMethodCall(expression)) {
                 val method = expression.resolveMethod()
-                if (method != null && target.match(method,
-                        QualifiedMember.resolveQualifier(expression.methodExpression) ?: targetClass)) {
+                if (method != null && target.match(
+                        method,
+                        QualifiedMember.resolveQualifier(expression.methodExpression) ?: targetClass
+                    )
+                ) {
                     addResult(expression)
                 }
             }

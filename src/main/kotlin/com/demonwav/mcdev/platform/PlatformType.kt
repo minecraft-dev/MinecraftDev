@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -53,7 +53,7 @@ enum class PlatformType(
     companion object {
 
         fun removeParents(types: MutableSet<PlatformType>) =
-            types.filter { type -> type.children.isEmpty() || !types.any { type.children.contains(it) }}.toHashSet()
+            types.filter { type -> type.children.isEmpty() || !types.any { type.children.contains(it) } }.toHashSet()
 
         fun fromLibraryKind(kind: LibraryKind) = when (kind) {
             BUKKIT_LIBRARY_KIND -> BUKKIT

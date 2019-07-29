@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -44,10 +44,10 @@ fun findMethods(psiClass: PsiClass): Sequence<PsiMethod>? {
     return when (targets.size) {
         0 -> null
         1 -> targets.single().methods.asSequence()
-            .filter({!it.isConstructor})
+            .filter({ !it.isConstructor })
         else -> targets.asSequence()
             .flatMap { target -> target.methods.asSequence() }
-            .filter({!it.isConstructor})
+            .filter({ !it.isConstructor })
             .groupBy { it.memberReference }
             .values.asSequence()
             .filter { it.size >= targets.size }
@@ -131,7 +131,7 @@ private fun PsiClass.streamMixinHierarchy(): Sequence<PsiClass> {
 
 private class MethodSignature(private val method: PsiMethod) {
 
-    override fun equals(other: Any?): Boolean{
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
         other as MethodSignature

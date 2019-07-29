@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -57,7 +57,9 @@ object PluginUpdater {
         val buildNumber = ApplicationInfo.getInstance().build.asString()
         val currentVersion = PluginUtil.pluginVersion
         val os = URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, CharsetToolkit.UTF8)
-        val url = "https://plugins.jetbrains.com/plugins/list?pluginId=8327&build=$buildNumber&pluginVersion=$currentVersion&os=$os"
+        val url =
+            "https://plugins.jetbrains.com/plugins/list?pluginId=8327&build=" +
+                "$buildNumber&pluginVersion=$currentVersion&os=$os"
 
         val responseDoc = HttpRequests.request(url).connect<Element> { request ->
             try {
@@ -76,8 +78,8 @@ object PluginUpdater {
             return PluginUpdateStatus.LatestVersionInstalled()
         }
 
-        val newVersion = responseDoc.getChild("category")?.getChild("idea-plugin")?.getChild("version")?.text ?:
-            return PluginUpdateStatus.CheckFailed("Couldn't find plugin version in repository response")
+        val newVersion = responseDoc.getChild("category")?.getChild("idea-plugin")?.getChild("version")?.text
+            ?: return PluginUpdateStatus.CheckFailed("Couldn't find plugin version in repository response")
 
         val plugin = PluginManager.getPlugin(PluginUtil.PLUGIN_ID)!!
         val pluginNode = PluginNode(PluginUtil.PLUGIN_ID)

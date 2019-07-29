@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -58,7 +58,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
 
             // Index @SideOnly
             val service = DumbService.getInstance(project)
-            service.runReadActionInSmartMode runSmart@ {
+            service.runReadActionInSmartMode runSmart@{
                 if (service.isDumb || project.isDisposed) {
                     return@runSmart
                 }
@@ -84,7 +84,8 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?): Boolean {
         if (method == null) {
-            return ForgeConstants.FML_EVENT == eventClass.qualifiedName || ForgeConstants.EVENT == eventClass.qualifiedName
+            return ForgeConstants.FML_EVENT == eventClass.qualifiedName ||
+                ForgeConstants.EVENT == eventClass.qualifiedName
         }
 
         var annotation = method.modifierList.findAnnotation(ForgeConstants.EVENT_HANDLER_ANNOTATION)
@@ -105,12 +106,16 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         val annotation = method.modifierList.findAnnotation(ForgeConstants.EVENT_HANDLER_ANNOTATION)
 
         if (annotation != null) {
-            return formatWrongEventMessage(ForgeConstants.FML_EVENT, ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION,
-                    ForgeConstants.EVENT == eventClass.qualifiedName)
+            return formatWrongEventMessage(
+                ForgeConstants.FML_EVENT, ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION,
+                ForgeConstants.EVENT == eventClass.qualifiedName
+            )
         }
 
-        return formatWrongEventMessage(ForgeConstants.EVENT, ForgeConstants.EVENT_HANDLER_ANNOTATION,
-                ForgeConstants.FML_EVENT == eventClass.qualifiedName)
+        return formatWrongEventMessage(
+            ForgeConstants.EVENT, ForgeConstants.EVENT_HANDLER_ANNOTATION,
+            ForgeConstants.FML_EVENT == eventClass.qualifiedName
+        )
     }
 
     private fun formatWrongEventMessage(expected: String, suggested: String, wrong: Boolean): String {
@@ -123,10 +128,12 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
 
     override fun isStaticListenerSupported(method: PsiMethod) = true
 
-    override fun generateEventListenerMethod(containingClass: PsiClass,
-                                             chosenClass: PsiClass,
-                                             chosenName: String,
-                                             data: GenerationData?): PsiMethod? {
+    override fun generateEventListenerMethod(
+        containingClass: PsiClass,
+        chosenClass: PsiClass,
+        chosenName: String,
+        data: GenerationData?
+    ): PsiMethod? {
         val isFmlEvent = chosenClass.extendsOrImplements(ForgeConstants.FML_EVENT)
 
         val method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)

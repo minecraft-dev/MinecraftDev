@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -28,14 +28,21 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiSubstitutor
 
-class TranslationFunction(private val memberReference: MemberReference,
-                          private val matchedIndex: Int, val formatting: Boolean, val setter: Boolean = false,
-                          val foldParameters: Boolean = false, val prefix: String = "", val suffix: String = "",
-                          val obfuscatedName: Boolean = false) {
+class TranslationFunction(
+    private val memberReference: MemberReference,
+    private val matchedIndex: Int,
+    val formatting: Boolean,
+    val setter: Boolean = false,
+    val foldParameters: Boolean = false,
+    val prefix: String = "",
+    val suffix: String = "",
+    val obfuscatedName: Boolean = false
+) {
     private fun getMethod(context: PsiElement): PsiMethod? {
         var reference = memberReference
         if (obfuscatedName) {
-            val moduleSrgManager = context.findModule()?.let { MinecraftFacet.getInstance(it, McpModuleType)?.srgManager }
+            val moduleSrgManager =
+                context.findModule()?.let { MinecraftFacet.getInstance(it, McpModuleType)?.srgManager }
             val srgManager = moduleSrgManager ?: SrgManager.findAnyInstance(context.project)
             srgManager?.srgMapNow?.mapToMcpMethod(memberReference)?.let {
                 reference = it
@@ -72,7 +79,14 @@ class TranslationFunction(private val memberReference: MemberReference,
                 if (!result.contains(I18nReference.VARIABLE_MARKER) && (depth > 0 || isReferencedMethod)) {
                     return Step(true, single, result)
                 }
-                return Step(false, true, if (acc.key.contains(I18nReference.VARIABLE_MARKER)) result.replace(I18nReference.VARIABLE_MARKER, acc.key) else result)
+                return Step(
+                    false,
+                    true,
+                    if (acc.key.contains(I18nReference.VARIABLE_MARKER)) result.replace(
+                        I18nReference.VARIABLE_MARKER,
+                        acc.key
+                    ) else result
+                )
             }
             return null
         }
@@ -110,10 +124,17 @@ class TranslationFunction(private val memberReference: MemberReference,
 
         val calls = getCalls(topCall, matchedIndex)
         val paramCount = STRING_FORMATTING_PATTERN.findAll(format).count()
-        val substitutions = if (calls.count() > 1) calls.take(calls.count() - 1).fold(emptyMap<Int, Array<String?>?>(), { acc, v -> resolveCall(v, acc) }) else emptyMap()
+        val substitutions = if (calls.count() > 1) calls.take(calls.count() - 1).fold(
+            emptyMap<Int, Array<String?>?>(),
+            { acc, v -> resolveCall(v, acc) }) else emptyMap()
         val referenceCall = if (calls.count() > 1) calls.last() else calls.first()
         val method = referenceCall.referencedMethod ?: return translation to -1
-        val varargs = referenceCall.extractVarArgs(method.parameterList.parametersCount - 1, substitutions, calls.count() <= 1, true)
+        val varargs = referenceCall.extractVarArgs(
+            method.parameterList.parametersCount - 1,
+            substitutions,
+            calls.count() <= 1,
+            true
+        )
         val varargStart = if (varargs.size > paramCount) method.parameterList.parametersCount - 1 + paramCount else -1
         return String.format(format, *varargs) to varargStart
     }

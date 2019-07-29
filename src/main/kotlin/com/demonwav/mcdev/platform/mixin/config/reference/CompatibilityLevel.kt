@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -24,7 +24,8 @@ import com.intellij.util.ProcessingContext
 
 object CompatibilityLevel : PsiReferenceProvider() {
 
-    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> = arrayOf(Reference(element))
+    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> =
+        arrayOf(Reference(element))
 
     private class Reference(element: PsiElement) : PsiReferenceBase<PsiElement>(element), InspectionReference {
 

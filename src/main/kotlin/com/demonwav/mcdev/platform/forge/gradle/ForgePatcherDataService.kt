@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -28,10 +28,12 @@ class ForgePatcherDataService : AbstractProjectDataService<ForgePatcherModelData
 
     override fun getTargetDataKey() = ForgePatcherModelData.KEY
 
-    override fun importData(toImport: Collection<DataNode<ForgePatcherModelData>>,
-                            projectData: ProjectData?,
-                            project: Project,
-                            modelsProvider: IdeModifiableModelsProvider) {
+    override fun importData(
+        toImport: Collection<DataNode<ForgePatcherModelData>>,
+        projectData: ProjectData?,
+        project: Project,
+        modelsProvider: IdeModifiableModelsProvider
+    ) {
         if (projectData == null || toImport.isEmpty()) {
             return
         }
@@ -62,7 +64,13 @@ class ForgePatcherDataService : AbstractProjectDataService<ForgePatcherModelData
                 for (child in children) {
                     val mcpModule = MinecraftFacet.getInstance(child, McpModuleType) ?: continue
                     val mcp = data.model.mcpModel
-                    mcpModule.updateSettings(McpModuleSettings.State(mcp.minecraftVersion, mcp.mcpVersion, mcp.mappingFiles))
+                    mcpModule.updateSettings(
+                        McpModuleSettings.State(
+                            mcp.minecraftVersion,
+                            mcp.mcpVersion,
+                            mcp.mappingFiles
+                        )
+                    )
                 }
             }
         }

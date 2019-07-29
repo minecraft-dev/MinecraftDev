@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -59,7 +59,9 @@ inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
 inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T): T {
     val result = WriteCommandAction.writeCommandAction(this).withGlobalUndo().compute<T, Throwable> { func() }
     PsiDocumentManager.getInstance(project)
-        .doPostponedOperationsAndUnblockDocument(FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return result)
+        .doPostponedOperationsAndUnblockDocument(
+            FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return result
+        )
     return result
 }
 
@@ -151,7 +153,7 @@ inline fun String.span(predicate: (Char) -> Boolean): Pair<String, String> {
 
 fun String.getSimilarity(text: String, bonus: Int = 0): Int {
     if (this == text) {
-        return 1_000_000 + bonus// exact match
+        return 1_000_000 + bonus // exact match
     }
 
     val lowerCaseThis = this.toLowerCase()

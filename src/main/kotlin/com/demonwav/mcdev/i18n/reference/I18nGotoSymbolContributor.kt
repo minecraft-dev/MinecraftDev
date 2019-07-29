@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -23,8 +23,16 @@ class I18nGotoSymbolContributor : ChooseByNameContributor {
         return entries.filter { it.key.isNotEmpty() }.mapToArray { it.key }
     }
 
-    override fun getItemsByName(name: String, pattern: String, project: Project, includeNonProjectItems: Boolean): Array<NavigationItem> {
-        val entries = if (includeNonProjectItems) project.findLangEntries(key = name) else project.findLangEntries(Scope.PROJECT, name)
+    override fun getItemsByName(
+        name: String,
+        pattern: String,
+        project: Project,
+        includeNonProjectItems: Boolean
+    ): Array<NavigationItem> {
+        val entries = if (includeNonProjectItems) project.findLangEntries(key = name) else project.findLangEntries(
+            Scope.PROJECT,
+            name
+        )
         return entries.mapToArray { it as NavigationItem }
     }
 }

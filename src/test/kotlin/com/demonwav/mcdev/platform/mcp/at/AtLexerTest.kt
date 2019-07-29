@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -23,7 +23,8 @@ class AtLexerTest : LexerTestCase() {
     override fun getDirPath() = "src/test/resources/com/demonwav/mcdev/platform/mcp/at/lexer/fixtures"
     override fun createLexer() = AtLexerAdapter()
 
-    override fun getTestName(lowercaseFirstLetter: Boolean) = super.getTestName(lowercaseFirstLetter).substring(1).toSnakeCase("_at")
+    override fun getTestName(lowercaseFirstLetter: Boolean) =
+        super.getTestName(lowercaseFirstLetter).substring(1).toSnakeCase("_at")
 
     // Copied because it wasn't handling the paths correctly
     private fun doTest() {

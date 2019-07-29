@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -23,16 +23,22 @@ class MixinReferenceContributor : PsiReferenceContributor() {
 
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         // Method references
-        registrar.registerReferenceProvider(PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationAttribute(
-                StandardPatterns.string().oneOf(METHOD_INJECTORS), "method"), MethodReference)
+        registrar.registerReferenceProvider(
+            PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationAttribute(
+                StandardPatterns.string().oneOf(METHOD_INJECTORS), "method"
+            ), MethodReference
+        )
 
         // Injection point types
-        registrar.registerReferenceProvider(PsiJavaPatterns.psiLiteral(StandardPatterns.string())
-                .insideAnnotationAttribute(AT), InjectionPointType)
+        registrar.registerReferenceProvider(
+            PsiJavaPatterns.psiLiteral(StandardPatterns.string())
+                .insideAnnotationAttribute(AT), InjectionPointType
+        )
 
         // Target references
-        registrar.registerReferenceProvider(PsiJavaPatterns.psiLiteral(StandardPatterns.string())
-                .insideAnnotationAttribute(AT, "target"), TargetReference)
+        registrar.registerReferenceProvider(
+            PsiJavaPatterns.psiLiteral(StandardPatterns.string())
+                .insideAnnotationAttribute(AT, "target"), TargetReference
+        )
     }
-
 }

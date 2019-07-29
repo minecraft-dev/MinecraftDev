@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -72,14 +72,19 @@ class MixinCompletionContributor : CompletionContributor() {
                         else -> {
                             // As a fallback, we also support all other expressions
                             // However, it must point to another Mixin in the hierarchy (i.e. a super mixin)
-                            val qualifierClass = (qualifierExpression.type as? PsiClassType)?.resolve() ?: return@processReferences
+                            val qualifierClass =
+                                (qualifierExpression.type as? PsiClassType)?.resolve() ?: return@processReferences
 
                             // Quick check in case it's the current Mixin
                             if (qualifierClass equivalentTo psiClass) {
                                 psiClass
                             } else {
                                 // Qualifier class is valid if it's a Mixin and it's in our hierarchy
-                                if (qualifierClass.isWritable && qualifierClass.isMixin && psiClass.isInheritor(qualifierClass, true)) {
+                                if (qualifierClass.isWritable && qualifierClass.isMixin && psiClass.isInheritor(
+                                        qualifierClass,
+                                        true
+                                    )
+                                ) {
                                     qualifierClass
                                 } else {
                                     return@processReferences

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -43,7 +43,7 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
         connection.subscribe(VirtualFileManager.VFS_CHANGES, I18nFileListener)
     }
 
-    override val moduleType  = McpModuleType
+    override val moduleType = McpModuleType
     override val type = PlatformType.MCP
     override val icon: Icon? = null
 

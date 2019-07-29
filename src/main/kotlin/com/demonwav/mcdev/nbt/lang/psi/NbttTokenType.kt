@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -15,4 +15,3 @@ import com.intellij.psi.tree.IElementType
 import org.jetbrains.annotations.NonNls
 
 class NbttTokenType(@NonNls debugName: String) : IElementType(debugName, NbttLanguage)
-

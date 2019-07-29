@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -39,14 +39,17 @@ class ConfigValueInspection : MixinConfigInspection() {
 
         override fun visitProperty(property: JsonProperty) {
             val value = property.value ?: return
-            val targetField = ConfigProperty.resolveReference(property.nameElement as? JsonStringLiteral ?: return) as? PsiField ?: return
+            val targetField =
+                ConfigProperty.resolveReference(property.nameElement as? JsonStringLiteral ?: return) as? PsiField
+                    ?: return
             checkValue(targetField.type, value)
         }
 
         private fun checkValue(type: PsiType, value: JsonValue) {
             val valid = when (type) {
                 PsiType.BOOLEAN -> value is JsonBooleanLiteral
-                PsiType.BYTE, PsiType.DOUBLE, PsiType.FLOAT, PsiType.INT, PsiType.LONG, PsiType.SHORT -> value is JsonNumberLiteral
+                PsiType.BYTE, PsiType.DOUBLE, PsiType.FLOAT, PsiType.INT, PsiType.LONG, PsiType.SHORT ->
+                    value is JsonNumberLiteral
                 is PsiArrayType -> checkArray(type.componentType, value)
                 else -> checkObject(type, value)
             }

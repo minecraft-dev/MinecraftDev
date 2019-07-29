@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -18,7 +18,10 @@ import com.intellij.util.ThreeState
 
 class I18nReferenceCompletionConfidence : CompletionConfidence() {
     override fun shouldSkipAutopopup(element: PsiElement, psiFile: PsiFile, offset: Int): ThreeState {
-        return if (SkipAutopopupInStrings.isInStringLiteral(element) && element.parent.references.any { it is I18nReference }) {
+        return if (
+            SkipAutopopupInStrings.isInStringLiteral(element) &&
+            element.parent.references.any { it is I18nReference }
+        ) {
             ThreeState.NO
         } else {
             ThreeState.UNSURE

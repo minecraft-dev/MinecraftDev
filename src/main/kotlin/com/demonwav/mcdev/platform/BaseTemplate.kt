@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -50,11 +50,17 @@ object BaseTemplate {
         groupId: String,
         artifactId: String,
         pluginVersion: String,
-        configurations:  LinkedHashSet<ProjectConfiguration>
+        configurations: LinkedHashSet<ProjectConfiguration>
     ) {
         val properties = Properties()
 
-        applyGradlePropertiesTemplate(project, prop, groupId, artifactId, pluginVersion, configurations.any { it is SpongeProjectConfiguration })
+        applyGradlePropertiesTemplate(
+            project,
+            prop,
+            groupId,
+            artifactId,
+            pluginVersion,
+            configurations.any { it is SpongeProjectConfiguration })
 
         applyTemplate(project, file, MinecraftFileTemplateGroupFactory.MULTI_MODULE_BUILD_GRADLE_TEMPLATE, properties)
     }

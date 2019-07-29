@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -78,7 +78,13 @@ class GenerateSoftImplementsAction : MixinCodeInsightAction() {
                     val method = it.element
                     val prefix = methods[it]
 
-                    OverrideImplementUtil.overrideOrImplementMethod(psiClass, method, it.substitutor, chooser.isCopyJavadoc, false)
+                    OverrideImplementUtil.overrideOrImplementMethod(
+                        psiClass,
+                        method,
+                        it.substitutor,
+                        chooser.isCopyJavadoc,
+                        false
+                    )
                         .map { m ->
                             // Apply prefix
                             m.name = prefix + m.name
