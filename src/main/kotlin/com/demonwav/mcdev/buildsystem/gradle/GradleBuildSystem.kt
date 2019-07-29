@@ -237,7 +237,7 @@ class GradleBuildSystem(
         project: Project,
         file: GroovyFile,
         name: String,
-        expressions: List<String>
+        expressions: Iterable<String>
     ) {
         // Get the block so we can start working with it
         val block = getClosableBlockByName(file, name) ?: return
@@ -288,7 +288,10 @@ class GradleBuildSystem(
                 project,
                 groovyFile,
                 "dependencies",
-                dependencies.map { "compile '${it.groupId}:${it.artifactId}:${it.version}'" }
+                this.dependencies.asSequence()
+                    .filter { it.gradleConfiguration != null }
+                    .map { "${it.gradleConfiguration} '${it.groupId}:${it.artifactId}:${it.version}'" }
+                    .asIterable()
             )
 
             ReformatCodeProcessor(file, false).run()
@@ -307,7 +310,10 @@ class GradleBuildSystem(
         }
     }
 
-    private fun addBuildGradleDependencies(descriptor: ProjectDescriptor, text: String) {
+    private fun addBuildGradleDependencies(
+        descriptor: ProjectDescriptor,
+        text: String
+    ) {
         // Create the Psi file from the text, but don't write it until we are finished with it
         val buildGradlePsi = PsiFileFactory.getInstance(descriptor.project).createFileFromText(GroovyLanguage, text)
 

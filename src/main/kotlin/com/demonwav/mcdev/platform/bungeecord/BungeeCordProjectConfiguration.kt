@@ -84,14 +84,18 @@ class BungeeCordProjectConfiguration(override var type: PlatformType) : ProjectC
                 buildSystem.dependencies.add(BuildDependency(
                     "io.github.waterfallmc",
                     "waterfall-api",
-                    "$minecraftVersion-SNAPSHOT"
+                    "$minecraftVersion-SNAPSHOT",
+                    mavenScope = "provided",
+                    gradleConfiguration = "compileOnly"
                 ))
             }
             PlatformType.BUNGEECORD -> {
                 buildSystem.dependencies.add(BuildDependency(
                     "net.md-5",
                     "bungeecord-api",
-                    "$minecraftVersion-SNAPSHOT"
+                    "$minecraftVersion-SNAPSHOT",
+                    mavenScope = "provided",
+                    gradleConfiguration = "compileOnly"
                 ))
             }
             else -> {}

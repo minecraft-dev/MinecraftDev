@@ -132,16 +132,6 @@
         </plugins>
     </build>
 
-    <repositories></repositories>
-
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
     <reporting>
         <plugins>
             <plugin>
@@ -151,4 +141,8 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <repositories></repositories>
+
+    <dependencies></dependencies>
 </project>

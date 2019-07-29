@@ -103,7 +103,10 @@ class MavenBuildSystem(
                     repository.url.value = url
                 }
 
-                for ((depArtifactId, depGroupId, depVersion, scope) in dependencies) {
+                for ((depGroupId, depArtifactId, depVersion, scope) in dependencies) {
+                    if (scope == null) {
+                        continue
+                    }
                     val dependency = mavenProjectXml.dependencies.addDependency()
                     dependency.groupId.value = depGroupId
                     dependency.artifactId.value = depArtifactId

@@ -104,7 +104,9 @@ class BukkitProjectConfiguration(override var type: PlatformType) : ProjectConfi
                 buildSystem.dependencies.add(BuildDependency(
                     "com.destroystokyo.paper",
                     "paper-api",
-                    "$mcVersion-R0.1-SNAPSHOT"
+                    "$mcVersion-R0.1-SNAPSHOT",
+                    mavenScope = "provided",
+                    gradleConfiguration = "compileOnly"
                 ))
                 addSonatype(buildSystem.repositories)
             }
@@ -113,7 +115,9 @@ class BukkitProjectConfiguration(override var type: PlatformType) : ProjectConfi
                 buildSystem.dependencies.add(BuildDependency(
                     "org.spigotmc",
                     "spigot-api",
-                    "$mcVersion-R0.1-SNAPSHOT"
+                    "$mcVersion-R0.1-SNAPSHOT",
+                    mavenScope = "provided",
+                    gradleConfiguration = "compileOnly"
                 ))
                 addSonatype(buildSystem.repositories)
             }
@@ -122,7 +126,9 @@ class BukkitProjectConfiguration(override var type: PlatformType) : ProjectConfi
                 buildSystem.dependencies.add(BuildDependency(
                     "org.bukkit",
                     "bukkit",
-                    "$mcVersion-R0.1-SNAPSHOT"
+                    "$mcVersion-R0.1-SNAPSHOT",
+                    mavenScope = "provided",
+                    gradleConfiguration = "compileOnly"
                 ))
             }
             else -> {}

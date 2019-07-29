@@ -94,7 +94,15 @@ class SpongeProjectConfiguration : ProjectConfiguration() {
         buildSystem.dependencies.add(BuildDependency(
             "org.spongepowered",
             "spongeapi",
-            spongeApiVersion
+            spongeApiVersion,
+            mavenScope = "provided",
+            gradleConfiguration = "compileOnly"
+        ))
+        buildSystem.dependencies.add(BuildDependency(
+            "org.spongepowered",
+            "spongeapi",
+            spongeApiVersion,
+            gradleConfiguration = "annotationProcessor"
         ))
     }
 }

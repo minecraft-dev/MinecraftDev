@@ -14,5 +14,6 @@ data class BuildDependency(
     var groupId: String = "",
     var artifactId: String = "",
     var version: String = "",
-    var scope: String = ""
+    var mavenScope: String? = null,
+    var gradleConfiguration: String? = null
 )
