@@ -12,15 +12,15 @@ package com.demonwav.mcdev.platform.mixin.shadow
 
 import com.demonwav.mcdev.framework.ProjectBuilder
 import com.demonwav.mcdev.platform.mixin.BaseMixinTest
+import org.junit.jupiter.api.BeforeEach
 
 abstract class BaseShadowTest : BaseMixinTest() {
 
     protected var mixins: ProjectBuilder.() -> Unit = {}
     protected abstract fun createMixins()
 
-    override fun setUp() {
-        super.setUp()
-
+    @BeforeEach
+    fun setupProject() {
         createMixins()
         buildProject {
             src {

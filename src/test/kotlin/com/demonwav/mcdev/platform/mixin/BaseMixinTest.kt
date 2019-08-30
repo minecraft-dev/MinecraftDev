@@ -17,14 +17,15 @@ import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 
 abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
 
     private var library: Library? = null
 
-    override fun setUp() {
-        super.setUp()
-
+    @BeforeEach
+    fun initMixin() {
         runWriteTask {
             library = createLibrary(project, "mixin")
         }
@@ -39,7 +40,8 @@ abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
         }
     }
 
-    override fun tearDown() {
+    @AfterEach
+    fun cleanupMixin() {
         library?.let { l ->
             ModuleRootModificationUtil.updateModel(module) { model ->
                 model.removeOrderEntry(
@@ -55,7 +57,5 @@ abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
                 }
             }
         }
-
-        super.tearDown()
     }
 }

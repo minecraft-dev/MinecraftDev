@@ -19,6 +19,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture
+import com.intellij.testFramework.runInEdtAndWait
 import com.intellij.util.PathUtil
 import org.intellij.lang.annotations.Language
 import java.lang.ref.WeakReference
@@ -61,7 +62,7 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
         intermediatePath = oldIntermediatePath
     }
 
-    private fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
+    fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
         check(path.endsWith(ext))
 
         val fullPath = if (intermediatePath.isEmpty()) path else "$intermediatePath/$path"
@@ -83,14 +84,16 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
     }
 
     fun build(builder: ProjectBuilder.() -> Unit) {
-        runWriteAction {
-            VfsUtil.markDirtyAndRefresh(false, true, true, root)
-            // Make sure to always add the module content root
-            if (fixture.module.rootManager.contentEntries.none { it.file == project.baseDirPath }) {
-                ModuleRootModificationUtil.addContentRoot(fixture.module, project.baseDirPath)
-            }
+        runInEdtAndWait {
+            runWriteAction {
+                VfsUtil.markDirtyAndRefresh(false, true, true, root)
+                // Make sure to always add the module content root
+                if (fixture.module.rootManager.contentEntries.none { it.file == project.baseDirPath }) {
+                    ModuleRootModificationUtil.addContentRoot(fixture.module, project.baseDirPath)
+                }
 
-            builder()
+                builder()
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ plugins {
     kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.9"
+    id("org.jetbrains.intellij") version "0.4.10"
     id("net.minecrell.licenser") version "0.4.1"
     id("org.jlleitschuh.gradle.ktlint") version "8.2.0"
 }
@@ -49,13 +49,13 @@ val clean by tasks.existing<Delete>()
 
 // configurations
 val idea by configurations
-val gradleToolingExtension by configurations.creating {
+val gradleToolingExtension: Configuration by configurations.creating {
     extendsFrom(idea)
 }
-val jflex by configurations.creating
-val jflexSkeleton by configurations.creating
-val grammarKit by configurations.creating
-val testLibs by configurations.creating {
+val jflex: Configuration by configurations.creating
+val jflexSkeleton: Configuration by configurations.creating
+val grammarKit: Configuration by configurations.creating
+val testLibs: Configuration by configurations.creating {
     isTransitive = false
 }
 
@@ -92,11 +92,11 @@ dependencies {
 
 dependencies {
     // Add tools.jar for the JDI API
-    compile(files(Jvm.current().toolsJar))
+    implementation(files(Jvm.current().toolsJar))
 
-    compile(files(gradleToolingExtensionJar))
+    implementation(files(gradleToolingExtensionJar))
 
-    compile("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutineVersion") {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutineVersion") {
         isTransitive = false
     }
 
@@ -110,6 +110,9 @@ dependencies {
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1))
     gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:192.5728.98")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.1")
 }
 
 intellij {
@@ -162,6 +165,7 @@ processResources {
 
 test {
     dependsOn(testLibs)
+    useJUnitPlatform()
     doFirst {
         testLibs.resolvedConfiguration.resolvedArtifacts.forEach {
             systemProperty("testLibs.${it.name}", it.file.absolutePath)
