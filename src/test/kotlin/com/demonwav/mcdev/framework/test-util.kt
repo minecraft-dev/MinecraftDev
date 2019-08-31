@@ -36,7 +36,7 @@ val mockJdk by lazy {
     MockJdk("1.7", rt, home)
 }
 
-private fun findLibraryPath(name: String) = FileUtil.toSystemIndependentName(System.getProperty("testLibs.$name")!!)
+fun findLibraryPath(name: String) = FileUtil.toSystemIndependentName(System.getProperty("testLibs.$name")!!)
 private fun findLibrary(name: String) = StandardFileSystems.jar()
     .refreshAndFindFileByPath(findLibraryPath(name) + JarFileSystem.JAR_SEPARATOR)
 

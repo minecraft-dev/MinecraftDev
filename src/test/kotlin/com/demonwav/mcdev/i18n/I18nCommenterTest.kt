@@ -10,52 +10,21 @@
 
 package com.demonwav.mcdev.i18n
 
-import com.demonwav.mcdev.framework.BaseMinecraftTest
+import com.demonwav.mcdev.framework.CommenterTest
 import com.demonwav.mcdev.framework.EdtInterceptor
+import com.demonwav.mcdev.framework.ProjectBuilder
 import com.demonwav.mcdev.platform.PlatformType
-import com.intellij.openapi.actionSystem.IdeActions
-import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.util.io.delete
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
-import java.nio.file.Files
-import java.nio.file.Path
 
 @ExtendWith(EdtInterceptor::class)
 @DisplayName("I18n Commenter Tests")
-class I18nCommenterTest : BaseMinecraftTest(PlatformType.MCP) {
-
-    private val _testDataPath: Path by lazy {
-        Files.createTempDirectory("mcdev")
-    }
-
-    override val testDataPath = _testDataPath.toString()
-
-    private lateinit var fileName: String
+class I18nCommenterTest : CommenterTest(PlatformType.MCP) {
 
     private fun doTest(@Language("I18n") before: String, @Language("I18n") after: String) {
-        buildProject(VfsUtil.findFile(_testDataPath, true)!!) {
-            i18n("$fileName.lang", before, configure = true)
-            i18n("${fileName}_after.lang", after, configure = false)
-        }
-
-        fixture.performEditorAction(IdeActions.ACTION_COMMENT_LINE)
-        fixture.checkResultByFile("${fileName}_after.lang", true)
-    }
-
-    @BeforeEach
-    fun info(info: TestInfo) {
-        fileName = info.displayName
-    }
-
-    @AfterEach
-    fun cleanup() {
-        _testDataPath.delete()
+        doTest(before, after, ".lang", ProjectBuilder::i18n)
     }
 
     @Test

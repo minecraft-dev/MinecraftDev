@@ -50,6 +50,8 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
         file(path, code, "_at.cfg", configure)
     fun i18n(path: String, @Language("I18n") code: String, configure: Boolean = true) =
         file(path, code, ".${I18nConstants.FILE_EXTENSION}", configure)
+    fun nbtt(path: String, @Language("NBTT") code: String, configure: Boolean = true) =
+        file(path, code, ".nbtt", configure)
 
     inline fun dir(path: String, block: ProjectBuilder.() -> Unit) {
         val oldIntermediatePath = intermediatePath
@@ -62,7 +64,7 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
         intermediatePath = oldIntermediatePath
     }
 
-    fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
+    private fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
         check(path.endsWith(ext))
 
         val fullPath = if (intermediatePath.isEmpty()) path else "$intermediatePath/$path"

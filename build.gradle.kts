@@ -106,6 +106,7 @@ dependencies {
 
     testLibs("org.jetbrains.idea:mockJDK:1.7-4d76c50")
     testLibs("org.spongepowered:mixin:0.7-SNAPSHOT:thin")
+    testLibs("com.demonwav.mcdev:all-types-nbt:1.0@nbt")
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1))
