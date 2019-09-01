@@ -16,6 +16,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiTypeElement
+import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.intellij.structuralsearch.plugin.util.SmartPsiPointer
 import com.siyeh.ig.InspectionGadgetsFix
 import com.siyeh.ig.psiutils.ImportUtils
@@ -35,7 +36,7 @@ class UseGetterReturnTypeInspectionGadgetsFix(
 
         val newTypeRef = newType.type as JvmReferenceType
         for (typeParam in newTypeRef.typeArguments()) {
-            val resolvedTypeParam = (typeParam as JvmReferenceType).resolve() as? PsiClass ?: return
+            val resolvedTypeParam = (typeParam as? PsiClassReferenceType)?.resolve() ?: continue
             ImportUtils.addImportIfNeeded(resolvedTypeParam, parameter)
         }
 

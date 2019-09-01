@@ -12,12 +12,9 @@ package com.demonwav.mcdev.platform.sponge.inspection.suppress
 
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.platform.sponge.util.isValidSpongeListener
-import com.demonwav.mcdev.platform.sponge.util.resolveSpongeGetterTarget
 import com.demonwav.mcdev.util.findContainingMethod
 import com.intellij.codeInspection.InspectionSuppressor
 import com.intellij.codeInspection.SuppressQuickFix
-import com.intellij.lang.jvm.types.JvmReferenceType
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiTypeElement
@@ -36,15 +33,7 @@ class SpongeGetterParamOptionalInspectionSuppressor : InspectionSuppressor {
             return false
         }
 
-        val getterAnnotation = param.getAnnotation(SpongeConstants.GETTER_ANNOTATION) ?: return false
-        val targetMethod = getterAnnotation.resolveSpongeGetterTarget() ?: return false
-
-        if (targetMethod.returnType != param.type) {
-            return false
-        }
-
-        val parameterType = (param.type as JvmReferenceType).resolve()
-        return parameterType != null && (parameterType as PsiClass).qualifiedName == SpongeConstants.OPTIONAL
+        return param.hasAnnotation(SpongeConstants.GETTER_ANNOTATION)
     }
 
     override fun getSuppressActions(element: PsiElement?, toolId: String): Array<out SuppressQuickFix> =

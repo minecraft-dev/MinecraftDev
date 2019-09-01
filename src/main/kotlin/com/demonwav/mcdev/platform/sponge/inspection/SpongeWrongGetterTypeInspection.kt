@@ -13,15 +13,16 @@ package com.demonwav.mcdev.platform.sponge.inspection
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.platform.sponge.util.isValidSpongeListener
 import com.demonwav.mcdev.platform.sponge.util.resolveSpongeGetterTarget
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.lang.jvm.types.JvmReferenceType
 import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiParameter
+import com.intellij.psi.PsiPrimitiveType
+import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypeElement
-import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
 import com.siyeh.ig.InspectionGadgetsFix
@@ -33,7 +34,7 @@ class SpongeWrongGetterTypeInspection : BaseInspection() {
     override fun buildErrorString(vararg infos: Any?) = staticDescription
 
     override fun getStaticDescription() =
-        "@Getter requires the parameter's type to be the same as the return type of the annotation's target method"
+        "@Getter requires the parameter's type to be assignable from the annotation's target method return type"
 
     override fun buildVisitor(): BaseInspectionVisitor {
         return object : BaseInspectionVisitor() {
@@ -42,39 +43,56 @@ class SpongeWrongGetterTypeInspection : BaseInspection() {
                     return
                 }
 
+                // We start at 1 because the first parameter is the event
                 for (i in 1 until method.parameters.size) {
-                    val parameter = method.parameters[i]
+                    val parameter = method.parameterList.parameters[i]
                     val getterAnnotation =
-                        parameter.getAnnotation(SpongeConstants.GETTER_ANNOTATION) as? PsiAnnotation ?: continue
+                        parameter.getAnnotation(SpongeConstants.GETTER_ANNOTATION) ?: continue
 
-                    val getterMethod = getterAnnotation.resolveSpongeGetterTarget() ?: return
-                    if (getterMethod.returnType != parameter.type) {
-                        val getterMethodReturnClass = (getterMethod.returnType as JvmReferenceType)
-                            .resolve() as? PsiClass ?: continue
+                    val getterMethod = getterAnnotation.resolveSpongeGetterTarget() ?: continue
+                    val getterReturnType = getterMethod.returnType ?: continue
+                    val parameterType = parameter.type
+                    if (getterReturnType.isAssignableFrom(parameterType)) {
+                        continue
+                    }
 
-                        val paramType = (parameter.type as JvmReferenceType)
-                            .resolve() as? PsiClass ?: continue
+                    if (isOptional(getterReturnType)) {
+                        val getterOptionalType = getterMethod.returnTypeElement?.let(::getFirstGenericType)
+                        if (getterOptionalType != null && areInSameHierarchy(getterOptionalType, parameterType)) {
+                            continue
+                        }
 
-                        if (
-                            getterMethodReturnClass.qualifiedName == SpongeConstants.OPTIONAL &&
-                            getterMethodReturnClass.hasTypeParameters()
-                        ) {
-                            val getterMethodRetRef = getterMethod.returnTypeElement?.type as JvmReferenceType
-                            val optionalParamType = getterMethodRetRef.typeArguments().firstOrNull() as? PsiClassType
-                            if (
-                                optionalParamType != null &&
-                                paramType.qualifiedName == optionalParamType.canonicalText
+                        if (getterOptionalType != null && isOptional(parameterType)) {
+                            val paramOptionalType = parameter.typeElement?.let(::getFirstGenericType)
+                            if (paramOptionalType != null
+                                && areInSameHierarchy(getterOptionalType, paramOptionalType)
                             ) {
                                 continue
                             }
                         }
-
-                        val paramRefType = (parameter.type as PsiClassReferenceType)
-                        registerError(paramRefType.reference, parameter, getterMethod.returnTypeElement!!)
                     }
+
+                    registerError(parameter.typeElement ?: parameter, parameter, getterMethod.returnTypeElement!!)
                 }
             }
         }
+    }
+
+    private fun areInSameHierarchy(aType: PsiType, otherType: PsiType): Boolean =
+        aType.isAssignableFrom(otherType) || otherType.isAssignableFrom(aType)
+
+    private fun isOptional(type: PsiType): Boolean {
+        if (type is PsiPrimitiveType) {
+            return false
+        }
+
+        val typeClass = (type as? JvmReferenceType)?.resolve() as? PsiClass ?: return false
+        return typeClass.qualifiedName == SpongeConstants.OPTIONAL && typeClass.hasTypeParameters()
+    }
+
+    private fun getFirstGenericType(typeElement: PsiTypeElement): PsiType? {
+        val paramRefType = typeElement.type as? JvmReferenceType ?: return null
+        return paramRefType.typeArguments().firstOrNull() as? PsiType
     }
 
     override fun buildFixes(vararg infos: Any?): Array<out InspectionGadgetsFix> {
@@ -83,30 +101,37 @@ class SpongeWrongGetterTypeInspection : BaseInspection() {
             return InspectionGadgetsFix.EMPTY_ARRAY
         }
 
-        val newType = infos[1] as PsiTypeElement
-        val newTypeRef = newType.type as JvmReferenceType
-        val newTypeClass = (newTypeRef.resolve() as? PsiClass)?.let {
-            if (it.qualifiedName == SpongeConstants.OPTIONAL && newTypeRef.typeArguments().count() > 0) {
-                val wrappedType = newTypeRef.typeArguments().first()
-                return@let (wrappedType as? PsiClassType)?.resolve()
-            }
-
-            return@let it
-        } ?: return InspectionGadgetsFix.EMPTY_ARRAY
+        val newTypeElement = infos[1] as PsiTypeElement
+        val newType = newTypeElement.type
+        if (newType is PsiPrimitiveType || newType is PsiClassType && newType.hasParameters() && newType.fullQualifiedName != SpongeConstants.OPTIONAL) {
+            return arrayOf(createFix(param, newTypeElement))
+        }
 
         val elementFactory = JavaPsiFacade.getElementFactory(param.project)
-        val unwrappedNewType = elementFactory.createTypeElement(elementFactory.createType(newTypeClass))
+
+        val newTypeRef = newTypeElement.type as? JvmReferenceType
+        val newClassType = (newTypeRef?.resolve() as? PsiClass)?.let {
+            if (it.qualifiedName == SpongeConstants.OPTIONAL && newTypeRef.typeArguments().count() > 0) {
+                val wrappedType = newTypeRef.typeArguments().first()
+                val resolveResult = (wrappedType as? PsiClassType)?.resolveGenerics() ?: return@let null
+                val element = resolveResult.element ?: return@let null
+                return@let elementFactory.createType(element, resolveResult.substitutor)
+            }
+
+            return@let elementFactory.createType(it)
+        } ?: return InspectionGadgetsFix.EMPTY_ARRAY
+
+        val unwrappedNewTypeElement = elementFactory.createTypeElement(newClassType)
         return arrayOf(
-            UseGetterReturnTypeInspectionGadgetsFix(
-                param,
-                newType,
-                "Set parameter type to ${newType.type.presentableText}"
-            ),
-            UseGetterReturnTypeInspectionGadgetsFix(
-                param,
-                unwrappedNewType,
-                "Set parameter type to ${unwrappedNewType.type.presentableText}"
-            )
+            createFix(param, newTypeElement),
+            createFix(param, unwrappedNewTypeElement)
         )
     }
+
+    private fun createFix(parameter: PsiParameter, typeElement: PsiTypeElement): InspectionGadgetsFix =
+        UseGetterReturnTypeInspectionGadgetsFix(
+            parameter,
+            typeElement,
+            "Set parameter type to ${typeElement.type.presentableText}"
+        )
 }

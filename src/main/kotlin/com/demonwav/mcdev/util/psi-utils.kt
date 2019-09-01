@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.util
 
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.ElementManipulator
@@ -35,6 +36,7 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
+import com.siyeh.ig.psiutils.ImportUtils
 import org.jetbrains.annotations.Contract
 import java.util.stream.Stream
 
@@ -197,3 +199,8 @@ val <T : PsiElement> T.manipulator: ElementManipulator<T>?
 inline fun <T> PsiElement.cached(crossinline compute: () -> T): T {
     return CachedValuesManager.getCachedValue(this) { CachedValueProvider.Result.create(compute(), this) }
 }
+
+fun LookupElementBuilder.withImportInsertion(toImport: List<PsiClass>): LookupElementBuilder =
+    this.withInsertHandler { insertionContext, _ ->
+        toImport.forEach { ImportUtils.addImportIfNeeded(it, insertionContext.file) }
+    }
