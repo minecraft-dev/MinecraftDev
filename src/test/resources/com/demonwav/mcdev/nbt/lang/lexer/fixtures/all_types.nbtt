@@ -27,16 +27,18 @@ root: {
     "double3": 127D
     "double4": 127.0d
     "double5": 127.0D
-    "double5": Infinity
-    "double5": Infinityd
-    "double5": InfinityD
-    "double6": -Infinityd
-    "double7": -InfinityD
-    "double8": +Infinityd
-    "double9": +InfinityD
-    "double10": NaN
-    "double11": NaNd
-    "double12": NaND
+    "double6": Infinity
+    "double7": Infinityd
+    "double8": InfinityD
+    "double9": -Infinity
+    "double10": -Infinityd
+    "double11": -InfinityD
+    "double12": +Infinity
+    "double13": +Infinityd
+    "double14": +InfinityD
+    "double15": NaN
+    "double16": NaNd
+    "double17": NaND
     "string1": "this is a string with quotes"
     "string2": this is a string without quotes
     quoteless key: quoteless value
