@@ -17,6 +17,7 @@ import com.demonwav.mcdev.util.reference.ReferenceResolver
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.AutoCompletionPolicy
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.lang.jvm.JvmModifier
 import com.intellij.lang.jvm.types.JvmReferenceType
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.PsiAnnotation
@@ -65,7 +66,7 @@ object GetterEventListenerReferenceResolver : ReferenceResolver() {
         val eventClass = eventReferenceType.resolve() as? PsiClass ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
         val methods = mutableListOf<LookupElement>()
         for (method in eventClass.allMethods) {
-            if (method.returnType != PsiType.VOID && !method.hasParameters()
+            if (method.returnType != PsiType.VOID && method.hasModifier(JvmModifier.PUBLIC) && !method.hasParameters()
                 && method.containingClass?.qualifiedName != CommonClassNames.JAVA_LANG_OBJECT
             ) {
                 methods += JavaLookupElementBuilder.forMethod(method, PsiSubstitutor.EMPTY)
