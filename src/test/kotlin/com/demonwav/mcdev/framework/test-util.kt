@@ -28,6 +28,8 @@ import com.intellij.testFramework.LexerTestCase
 import com.intellij.util.ReflectionUtil
 import org.junit.jupiter.api.Assertions
 
+typealias ProjectBuilderFunc = ProjectBuilder.(String, String, Boolean) -> VirtualFile
+
 val mockJdk by lazy {
     val path = findLibraryPath("mockJDK")
     val rtFile = StandardFileSystems.local().findFileByPath(path)!!
@@ -69,10 +71,7 @@ fun testLexer(basePath: String, lexer: Lexer) {
     Assertions.assertLinesMatch(expectedLines, actualLines)
 }
 
-fun ProjectBuilderTest.testParser(
-    basePath: String,
-    func: ProjectBuilder.(String, String, Boolean) -> VirtualFile
-) {
+fun ProjectBuilderTest.testParser(basePath: String, func: ProjectBuilderFunc) {
     val caller = ReflectionUtil.getCallerClass(3)!!
     val text = caller.getResource(basePath).readText().trim()
     val expected = caller.getResource("${basePath.substringBeforeLast('.')}.txt").readText().trim()

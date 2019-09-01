@@ -13,7 +13,6 @@ package com.demonwav.mcdev.framework
 import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.io.delete
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -31,12 +30,7 @@ open class CommenterTest(vararg platformTypes: PlatformType) : BaseMinecraftTest
 
     private lateinit var fileName: String
 
-    protected fun doTest(
-        before: String,
-        after: String,
-        postfix: String,
-        func: ProjectBuilder.(String, String, Boolean) -> VirtualFile
-    ) {
+    protected fun doTest(before: String, after: String, postfix: String, func: ProjectBuilderFunc) {
         buildProject(VfsUtil.findFile(_testDataPath, true)!!) {
             func(fileName + postfix, before, true)
             func("${fileName}_after$postfix", after, false)
