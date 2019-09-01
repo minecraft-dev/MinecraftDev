@@ -21,5 +21,4 @@ object SpongeConstants {
     const val IS_CANCELLED_ANNOTATION = "org.spongepowered.api.event.filter.IsCancelled"
     const val CANCELLABLE = "org.spongepowered.api.event.Cancellable"
     const val EVENT_ISCANCELLED_METHOD_NAME = "isCancelled"
-    const val OPTIONAL = "java.util.Optional"
 }
