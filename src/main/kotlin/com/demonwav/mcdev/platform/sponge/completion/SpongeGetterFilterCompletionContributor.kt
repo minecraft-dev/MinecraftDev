@@ -24,15 +24,16 @@ import com.intellij.codeInsight.completion.JavaCompletionContributor
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.lang.jvm.types.JvmReferenceType
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.JavaTokenType
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiJavaToken
 import com.intellij.psi.PsiModifierList
+import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypeElement
+import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.intellij.psi.search.ProjectScope
 import com.intellij.psi.util.PropertyUtil
 import com.intellij.psi.util.PsiTreeUtil
@@ -105,15 +106,13 @@ class SpongeGetterFilterCompletionContributor : CompletionContributor() {
 
     private fun completeGetterParameterType(annotation: PsiAnnotation, result: CompletionResultSet) {
         val getterTarget = annotation.resolveSpongeGetterTarget()
-        val classType = getterTarget?.returnType
-        if (classType != null) {
-            suggestGetterParameter(classType, result)
-        }
+        val classType = getterTarget?.returnType ?: return
+        suggestGetterParameter(classType, result)
 
-        val getterTargetClass = (getterTarget?.returnType as? PsiClassType)?.resolve()
-        if (getterTargetClass != null && getterTargetClass.isJavaOptional()) {
-            val paramRefType = getterTarget.returnTypeElement?.type as JvmReferenceType
-            val psiType = paramRefType.typeArguments().firstOrNull() as? PsiType
+        val classReferenceType = classType as? PsiClassReferenceType ?: return
+        val getterTargetClass = classReferenceType.resolve() ?: return
+        if (getterTargetClass.isJavaOptional()) {
+            val psiType = classReferenceType.parameters.firstOrNull()
             if (psiType != null) {
                 suggestGetterParameter(psiType, result)
             }
@@ -121,7 +120,12 @@ class SpongeGetterFilterCompletionContributor : CompletionContributor() {
     }
 
     private fun suggestGetterParameter(psiType: PsiType, result: CompletionResultSet) {
-        if (psiType is PsiClassType) {
+        if (psiType is PsiPrimitiveType) {
+            val element = LookupElementBuilder.create(psiType.name)
+                .bold()
+                .withTypeText("@Getter target type")
+            result.addElement(element)
+        } else if (psiType is PsiClassType) {
             val resolveResult = psiType.resolveGenerics()
             val resolvedClass = resolveResult.element ?: return
             val genericTypes = resolveResult.substitutor.substitutionMap.values
