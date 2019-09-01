@@ -15,6 +15,7 @@ import com.intellij.lang.jvm.types.JvmReferenceType
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiParameter
+import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiTypeElement
 import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.intellij.structuralsearch.plugin.util.SmartPsiPointer
@@ -32,9 +33,14 @@ class UseGetterReturnTypeInspectionGadgetsFix(
 
     override fun doFix(project: Project, descriptor: ProblemDescriptor) {
         val parameter = paramPointer.element as? PsiParameter ?: return
-        val newType = newTypePointer.element as? PsiTypeElement ?: return
+        val newTypeElement = newTypePointer.element as? PsiTypeElement ?: return
+        val newType = newTypeElement.type
+        if (newType is PsiPrimitiveType) {
+            parameter.typeElement!!.replace(newTypeElement)
+            return
+        }
 
-        val newTypeRef = newType.type as JvmReferenceType
+        val newTypeRef = newTypeElement.type as JvmReferenceType
         for (typeParam in newTypeRef.typeArguments()) {
             val resolvedTypeParam = (typeParam as? PsiClassReferenceType)?.resolve() ?: continue
             ImportUtils.addImportIfNeeded(resolvedTypeParam, parameter)
@@ -42,7 +48,7 @@ class UseGetterReturnTypeInspectionGadgetsFix(
 
         val newTypeClass = newTypeRef.resolve() as? PsiClass ?: return
         ImportUtils.addImportIfNeeded(newTypeClass, parameter)
-        parameter.typeElement!!.replace(newType)
+        parameter.typeElement!!.replace(newTypeElement)
     }
 
     override fun getName() = name
