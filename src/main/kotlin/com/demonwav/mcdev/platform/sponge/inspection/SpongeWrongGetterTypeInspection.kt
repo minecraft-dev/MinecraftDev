@@ -13,7 +13,7 @@ package com.demonwav.mcdev.platform.sponge.inspection
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.platform.sponge.util.isValidSpongeListener
 import com.demonwav.mcdev.platform.sponge.util.resolveSpongeGetterTarget
-import com.demonwav.mcdev.util.fullQualifiedName
+import com.demonwav.mcdev.util.isJavaOptional
 import com.intellij.lang.jvm.types.JvmReferenceType
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -87,7 +87,7 @@ class SpongeWrongGetterTypeInspection : BaseInspection() {
         }
 
         val typeClass = (type as? JvmReferenceType)?.resolve() as? PsiClass ?: return false
-        return typeClass.qualifiedName == SpongeConstants.OPTIONAL && typeClass.hasTypeParameters()
+        return typeClass.isJavaOptional() && typeClass.hasTypeParameters()
     }
 
     private fun getFirstGenericType(typeElement: PsiTypeElement): PsiType? {
@@ -103,7 +103,8 @@ class SpongeWrongGetterTypeInspection : BaseInspection() {
 
         val newTypeElement = infos[1] as PsiTypeElement
         val newType = newTypeElement.type
-        if (newType is PsiPrimitiveType || newType is PsiClassType && newType.hasParameters() && newType.fullQualifiedName != SpongeConstants.OPTIONAL) {
+        if (newType is PsiPrimitiveType
+            || newType is PsiClassType && newType.hasParameters() && !newType.isJavaOptional()) {
             return arrayOf(createFix(param, newTypeElement))
         }
 
@@ -111,7 +112,7 @@ class SpongeWrongGetterTypeInspection : BaseInspection() {
 
         val newTypeRef = newTypeElement.type as? JvmReferenceType
         val newClassType = (newTypeRef?.resolve() as? PsiClass)?.let {
-            if (it.qualifiedName == SpongeConstants.OPTIONAL && newTypeRef.typeArguments().count() > 0) {
+            if (it.isJavaOptional() && newTypeRef.typeArguments().count() > 0) {
                 val wrappedType = newTypeRef.typeArguments().first()
                 val resolveResult = (wrappedType as? PsiClassType)?.resolveGenerics() ?: return@let null
                 val element = resolveResult.element ?: return@let null

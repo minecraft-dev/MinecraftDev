@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.platform.sponge.util.isValidSpongeListener
 import com.demonwav.mcdev.platform.sponge.util.resolveSpongeGetterTarget
 import com.demonwav.mcdev.util.findContainingMethod
+import com.demonwav.mcdev.util.isJavaOptional
 import com.demonwav.mcdev.util.withImportInsertion
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionParameters
@@ -110,7 +111,7 @@ class SpongeGetterFilterCompletionContributor : CompletionContributor() {
         }
 
         val getterTargetClass = (getterTarget?.returnType as? PsiClassType)?.resolve()
-        if (getterTargetClass != null && getterTargetClass.qualifiedName == SpongeConstants.OPTIONAL) {
+        if (getterTargetClass != null && getterTargetClass.isJavaOptional()) {
             val paramRefType = getterTarget.returnTypeElement?.type as JvmReferenceType
             val psiType = paramRefType.typeArguments().firstOrNull() as? PsiType
             if (psiType != null) {

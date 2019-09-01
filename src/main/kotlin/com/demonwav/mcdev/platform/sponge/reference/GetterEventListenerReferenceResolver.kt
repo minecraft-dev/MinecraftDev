@@ -18,6 +18,7 @@ import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.AutoCompletionPolicy
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.lang.jvm.types.JvmReferenceType
+import com.intellij.psi.CommonClassNames
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -65,7 +66,7 @@ object GetterEventListenerReferenceResolver : ReferenceResolver() {
         val methods = mutableListOf<LookupElement>()
         for (method in eventClass.allMethods) {
             if (method.returnType != PsiType.VOID && !method.hasParameters()
-                && method.containingClass?.qualifiedName != "java.lang.Object"
+                && method.containingClass?.qualifiedName != CommonClassNames.JAVA_LANG_OBJECT
             ) {
                 methods += JavaLookupElementBuilder.forMethod(method, PsiSubstitutor.EMPTY)
                     .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE)
