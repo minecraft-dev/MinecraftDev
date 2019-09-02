@@ -31,7 +31,8 @@ box, simply search for `Minecraft`. You can install it from there and restart In
 Building
 --------
 
-Make sure you have Java 8 installed.
+JDK 11 is required. Download it [here](https://adoptopenjdk.net/) if you don't already have it. Jetbrains has moved
+IntelliJ on to Java 11 internally, so this project takes advantage of that.
 
 Build the plugin with:
 

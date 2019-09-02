@@ -59,26 +59,26 @@ val testLibs: Configuration by configurations.creating {
     isTransitive = false
 }
 
-repositories {
-    mavenCentral()
-    maven("https://dl.bintray.com/minecraft-dev/maven")
-    maven("https://repo.spongepowered.org/maven")
-    maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 val gradleToolingExtensionSourceSet = sourceSets.create("gradle-tooling-extension") {
     configurations.named(compileOnlyConfigurationName) {
         extendsFrom(gradleToolingExtension)
+    }
+    // The gradle stuff is Java 8, everything else (which runs in intellij) is Java 11
+    tasks.named<JavaCompile>(compileJavaTaskName).configure {
+        sourceCompatibility = JavaVersion.VERSION_1_8.toString()
+        targetCompatibility = JavaVersion.VERSION_1_8.toString()
     }
 }
 val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSourceSet.jarTaskName) {
     from(gradleToolingExtensionSourceSet.output)
     archiveClassifier.set("gradle-tooling-extension")
+}
+
+repositories {
+    mavenCentral()
+    maven("https://dl.bintray.com/minecraft-dev/maven")
+    maven("https://repo.spongepowered.org/maven")
+    maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
 }
 
 // Sources aren't provided through the gradle intellij plugin for bundled libs, use compileOnly to attach them
@@ -143,13 +143,18 @@ publishPlugin {
     }
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.compilerArgs = listOf("-proc:none")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
 }
 
 tasks.withType<GroovyCompile>().configureEach {
@@ -260,6 +265,14 @@ fun generatePsiAndParser(name: String, bnf: String, pack: String) = tasks.regist
 
     classpath = grammarKit
     main = "org.intellij.grammar.Main"
+
+    // JDK 11 is required to build and this jar reflects into some internal Java APIs
+    // Easiest to not break what's working and just use some JVM args to fix it
+    jvmArgs(
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util=ALL-UNNAMED"
+    )
 
     args(dstRoot, src)
 

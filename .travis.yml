@@ -4,9 +4,10 @@ dist: trusty
 matrix:
   include:
     - os: linux
-      jdk: openjdk8
+      jdk: openjdk11
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode10.1
+      jdk: openjdk11
 
 language: java
 
