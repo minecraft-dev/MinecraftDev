@@ -11,7 +11,7 @@ matrix:
 language: java
 
 install: unset _JAVA_OPTIONS
-script: ./gradlew build
+script: ./gradlew build --no-daemon --stacktrace
 
 before_cache:
   - rm -f $HOME/.gradle/caches/{modules-2,transforms-1}/*.lock
