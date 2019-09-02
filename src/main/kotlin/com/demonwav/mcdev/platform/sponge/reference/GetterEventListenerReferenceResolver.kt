@@ -66,8 +66,8 @@ object GetterEventListenerReferenceResolver : ReferenceResolver() {
         val eventClass = eventReferenceType.resolve() as? PsiClass ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
         val methods = mutableListOf<LookupElement>()
         for (method in eventClass.allMethods) {
-            if (method.returnType != PsiType.VOID && method.hasModifier(JvmModifier.PUBLIC) && !method.hasParameters()
-                && method.containingClass?.qualifiedName != CommonClassNames.JAVA_LANG_OBJECT
+            if (method.returnType != PsiType.VOID && method.hasModifier(JvmModifier.PUBLIC) &&
+                !method.hasParameters() && method.containingClass?.qualifiedName != CommonClassNames.JAVA_LANG_OBJECT
             ) {
                 methods += JavaLookupElementBuilder.forMethod(method, PsiSubstitutor.EMPTY)
                     .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE)

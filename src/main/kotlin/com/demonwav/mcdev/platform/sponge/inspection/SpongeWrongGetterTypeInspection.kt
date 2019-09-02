@@ -64,8 +64,8 @@ class SpongeWrongGetterTypeInspection : BaseInspection() {
 
                         if (getterOptionalType != null && isOptional(parameterType)) {
                             val paramOptionalType = parameter.typeElement?.let(::getFirstGenericType)
-                            if (paramOptionalType != null
-                                && areInSameHierarchy(getterOptionalType, paramOptionalType)
+                            if (paramOptionalType != null &&
+                                areInSameHierarchy(getterOptionalType, paramOptionalType)
                             ) {
                                 continue
                             }
@@ -103,8 +103,9 @@ class SpongeWrongGetterTypeInspection : BaseInspection() {
 
         val newTypeElement = infos[1] as PsiTypeElement
         val newType = newTypeElement.type
-        if (newType is PsiPrimitiveType
-            || newType is PsiClassType && newType.hasParameters() && !newType.isJavaOptional()) {
+        if (newType is PsiPrimitiveType ||
+            newType is PsiClassType && newType.hasParameters() && !newType.isJavaOptional()
+        ) {
             return arrayOf(createFix(param, newTypeElement))
         }
 
