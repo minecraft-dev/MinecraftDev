@@ -3,7 +3,8 @@ environment:
   JAVA_HOME: C:\Program Files\Java\jdk1.8.0
 
 build_script:
-  - gradlew.bat build --no-daemon --stacktrace
+  - gradlew.bat build -x ktlintMainSourceSetCheck --no-daemon --stacktrace
+  # ktlintMainSourceSetCheck currently fails on windows due to command line length issues
 
 on_success:
   - ps: Get-ChildItem C:\Users\appveyor\.gradle\caches\modules-2 -Include *.lock -ErrorAction SilentlyContinue | Remove-Item -Force
