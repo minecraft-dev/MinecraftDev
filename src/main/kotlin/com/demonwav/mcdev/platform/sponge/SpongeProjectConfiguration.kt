@@ -54,7 +54,7 @@ class SpongeProjectConfiguration : ProjectConfiguration() {
             indicator.text = "Writing main class"
 
             var file = dirs.sourceDirectory
-            val files = baseConfig.mainClass.split("\\.".toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
+            val files = baseConfig.mainClass.split(Regex("\\.")).dropLastWhile(String::isEmpty).toTypedArray()
             val className = files[files.size - 1]
             val packageName = baseConfig.mainClass.substring(0, baseConfig.mainClass.length - className.length - 1)
             file = getMainClassDirectory(files, file)

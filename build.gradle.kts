@@ -88,6 +88,7 @@ repositories {
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
+    compileOnly("org.apache.commons:commons-lang3:3.9")
 }
 
 dependencies {

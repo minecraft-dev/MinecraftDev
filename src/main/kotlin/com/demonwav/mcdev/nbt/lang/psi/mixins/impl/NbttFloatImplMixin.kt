@@ -26,6 +26,6 @@ abstract class NbttFloatImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), N
     }
 
     companion object {
-        private val fRegex = "[fF]".toRegex()
+        private val fRegex = Regex("[fF]")
     }
 }

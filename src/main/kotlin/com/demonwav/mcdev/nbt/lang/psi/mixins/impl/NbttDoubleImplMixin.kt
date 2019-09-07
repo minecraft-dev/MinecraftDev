@@ -14,14 +14,11 @@ import com.demonwav.mcdev.nbt.lang.psi.mixins.NbttDoubleMixin
 import com.demonwav.mcdev.nbt.tags.TagDouble
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
+import org.apache.commons.lang3.StringUtils
 
 abstract class NbttDoubleImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttDoubleMixin {
 
     override fun getDoubleTag(): TagDouble {
-        return TagDouble(text.trim().replace(dRegex, "").toDouble())
-    }
-
-    companion object {
-        private val dRegex = "[dD]".toRegex()
+        return TagDouble(StringUtils.replaceChars(text.trim(), "dD", null).toDouble())
     }
 }

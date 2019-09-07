@@ -83,7 +83,7 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
     }
 
     companion object {
-        val pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?".toRegex()
+        val pattern = Regex("""(\s*(\w+)\s*(,\s*\w+\s*)*,?|\[?\s*(\w+)\s*(,\s*\w+\s*)*])?""")
         val keywords = setOf(
             "abstract",
             "continue",

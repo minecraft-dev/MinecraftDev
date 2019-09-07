@@ -111,6 +111,6 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
     }
 
     companion object {
-        val NO_WHITESPACE = "\\S+".toRegex()
+        val NO_WHITESPACE = Regex("\\S+")
     }
 }

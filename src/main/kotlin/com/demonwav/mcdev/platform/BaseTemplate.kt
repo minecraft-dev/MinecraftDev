@@ -23,7 +23,7 @@ import java.util.Properties
 
 object BaseTemplate {
 
-    private val NEW_LINE = "\\n+".toRegex()
+    private val NEW_LINE = Regex("\\n+")
 
     fun applyBuildGradleTemplate(
         project: Project,

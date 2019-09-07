@@ -17,11 +17,13 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.search.GlobalSearchScope
 
+private val bracket = Regex("\\[")
+
 fun getClassFromString(text: String?, project: Project): PsiClass? {
     var newText = text ?: return null
 
     // We don't care about arrays
-    newText = newText.replace("\\[".toRegex(), "")
+    newText = newText.replace(bracket, "")
 
     val scope = GlobalSearchScope.allScope(project)
 

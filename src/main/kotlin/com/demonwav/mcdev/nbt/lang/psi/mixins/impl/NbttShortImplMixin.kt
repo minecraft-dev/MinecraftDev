@@ -14,14 +14,11 @@ import com.demonwav.mcdev.nbt.lang.psi.mixins.NbttShortMixin
 import com.demonwav.mcdev.nbt.tags.TagShort
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
+import org.apache.commons.lang3.StringUtils
 
 abstract class NbttShortImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttShortMixin {
 
     override fun getShortTag(): TagShort {
-        return TagShort(text.trim().replace(sRegex, "").toShort())
-    }
-
-    companion object {
-        private val sRegex = "[sS]".toRegex()
+        return TagShort(StringUtils.replaceChars(text.trim(), "sS", null).toShort())
     }
 }

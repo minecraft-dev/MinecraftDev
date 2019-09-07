@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.nbt.tags
 
+import org.apache.commons.lang3.StringUtils
 import java.io.DataOutputStream
 import java.io.OutputStream
 
@@ -48,8 +49,8 @@ interface NbtTag {
 val NbtTag.typeIdByte
     get() = typeId.typeIdByte
 
-val forbiddenCharacters = "[:(){}\\[\\],]".toRegex()
-val badFormat = "^[\\d+\\-\\\\\\s\\n:{}\\[\\](),].*|.*[\"\\\\:{}\\[\\]()\\s\\n,]$".toRegex()
+val forbiddenCharacters = Regex("""[:(){}\[\],]""")
+val badFormat = Regex("""^[\d+\-\\\s\n:{}\[\](),].*|.*["\\:{}\[\]()\s\n,]${'$'}""")
 
 fun writeString(sb: StringBuilder, s: String): StringBuilder {
     if (s.isBlank()) {
@@ -61,7 +62,7 @@ fun writeString(sb: StringBuilder, s: String): StringBuilder {
         return sb.append('"').append(s).append('"')
     }
 
-    val replaced = s.replace("\\", "\\\\").replace("\n", "\\n").replace("\"", "\\\"").replace("\t", "\\t")
+    val replaced = StringUtils.replaceEach(s, arrayOf("\\", "\n", "\"", "\t"), arrayOf("\\\\", "\\n", "\\\"", "\\t"))
 
     if (forbiddenCharacters in s || s.matches(badFormat)) {
         // Use quotes around this awful string

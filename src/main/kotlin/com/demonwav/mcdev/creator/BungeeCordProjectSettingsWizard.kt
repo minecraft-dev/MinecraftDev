@@ -124,6 +124,6 @@ class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreat
     override fun updateDataModel() {}
 
     companion object {
-        private val pattern = "(\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*,?|\\[?\\s*(\\w+)\\s*(,\\s*\\w+\\s*)*])?".toRegex()
+        private val pattern = Regex("""(\s*(\w+)\s*(,\s*\w+\s*)*,?|\[?\s*(\w+)\s*(,\s*\w+\s*)*])?""")
     }
 }
