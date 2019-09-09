@@ -695,7 +695,6 @@
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
-        <projectResolve implementation="com.demonwav.mcdev.platform.forge.gradle.ForgePatcherProjectResolverExtension"/>
     </extensions>
 
     <application-components>

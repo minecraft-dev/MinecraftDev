@@ -124,7 +124,9 @@ intellij {
     setPlugins(
         "java", "maven", "gradle", "Groovy",
         // needed dependencies for unit tests
-        "properties", "junit"
+        "properties", "junit",
+        // useful to have when running for mods.toml
+        "org.toml.lang:0.2.0.25"
     )
 
     pluginName = "Minecraft Development"
