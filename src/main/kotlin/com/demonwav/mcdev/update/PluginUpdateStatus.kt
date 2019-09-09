@@ -16,19 +16,22 @@ import com.intellij.util.text.VersionComparatorUtil
 sealed class PluginUpdateStatus {
 
     fun mergeWith(other: PluginUpdateStatus): PluginUpdateStatus {
-        // Jesus wept. https://github.com/JetBrains/kotlin/blob/master/idea/src/org/jetbrains/kotlin/idea/KotlinPluginUpdater.kt#L61-L63
-        if (other is Update && (
-                this is LatestVersionInstalled || this is Update && VersionComparatorUtil.compare(
-                    other.pluginDescriptor.version,
-                    this.pluginDescriptor.version
-                ) > 0)
-        ) {
-            return other
+        if (other is Update) {
+            when (this) {
+                is LatestVersionInstalled -> return other
+                is Update -> {
+                    val otherVersion = other.pluginDescriptor.version
+                    val thisVersion = this.pluginDescriptor.version
+                    if (VersionComparatorUtil.compare(otherVersion, thisVersion) > 0) {
+                        return other
+                    }
+                }
+            }
         }
         return this
     }
 
-    class LatestVersionInstalled : PluginUpdateStatus()
+    object LatestVersionInstalled : PluginUpdateStatus()
     class Update(val pluginDescriptor: IdeaPluginDescriptor, val hostToInstallFrom: String?) : PluginUpdateStatus()
     class CheckFailed(val message: String) : PluginUpdateStatus()
 }

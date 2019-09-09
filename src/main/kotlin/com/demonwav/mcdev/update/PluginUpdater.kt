@@ -75,7 +75,7 @@ object PluginUpdater {
             return PluginUpdateStatus.CheckFailed("Unexpected plugin repository response")
         }
         if (responseDoc.children.isEmpty()) {
-            return PluginUpdateStatus.LatestVersionInstalled()
+            return PluginUpdateStatus.LatestVersionInstalled
         }
 
         val newVersion = responseDoc.getChild("category")?.getChild("idea-plugin")?.getChild("version")?.text
@@ -88,7 +88,7 @@ object PluginUpdater {
         pluginNode.description = plugin.description
 
         if (pluginNode.version == PluginUtil.pluginVersion) {
-            return PluginUpdateStatus.LatestVersionInstalled()
+            return PluginUpdateStatus.LatestVersionInstalled
         }
 
         return PluginUpdateStatus.Update(pluginNode, null)
@@ -102,14 +102,14 @@ object PluginUpdater {
         }
 
         val minecraftPlugin = plugins.firstOrNull { plugin -> plugin.pluginId == PluginUtil.PLUGIN_ID }
-            ?: return PluginUpdateStatus.LatestVersionInstalled()
+            ?: return PluginUpdateStatus.LatestVersionInstalled
 
         return updateIfNotLatest(minecraftPlugin, host)
     }
 
     private fun updateIfNotLatest(plugin: IdeaPluginDescriptor, host: String): PluginUpdateStatus {
         if (plugin.version == PluginUtil.pluginVersion) {
-            return PluginUpdateStatus.LatestVersionInstalled()
+            return PluginUpdateStatus.LatestVersionInstalled
         }
         return PluginUpdateStatus.Update(plugin, host)
     }
