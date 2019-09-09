@@ -15,14 +15,12 @@ import com.intellij.util.text.VersionComparatorUtil
 
 sealed class PluginUpdateStatus : Comparable<PluginUpdateStatus> {
 
-    fun mergeWith(other: PluginUpdateStatus): PluginUpdateStatus {
-        return maxOf(this, other)
-    }
-
     protected abstract fun getVersionString(): String?
 
+    fun mergeWith(other: PluginUpdateStatus): PluginUpdateStatus = maxOf(this, other)
+
     override fun compareTo(other: PluginUpdateStatus): Int {
-        val thisVersion = other.getVersionString() ?: return 1
+        val thisVersion = this.getVersionString() ?: return 1
         val otherVersion = other.getVersionString() ?: return -1
         return VersionComparatorUtil.compare(thisVersion, otherVersion)
     }
