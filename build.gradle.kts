@@ -29,6 +29,8 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "8.2.0"
 }
 
+group = "com.demonwav.minecraft-dev"
+
 val coroutineVersion = "1.2.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
 defaultTasks("build")
