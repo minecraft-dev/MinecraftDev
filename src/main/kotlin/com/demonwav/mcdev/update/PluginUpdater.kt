@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.update
 
+import com.demonwav.mcdev.util.findDeclaredField
 import com.demonwav.mcdev.util.forEachNotNull
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.invokeLaterAny
@@ -120,12 +121,17 @@ object PluginUpdater {
         ProgressManager.getInstance().run(object : Task.Backgroundable(null, "Downloading Plugin", true) {
             override fun run(indicator: ProgressIndicator) {
                 try {
-                    if (downloader.prepareToInstall(indicator)) {
-                        downloader.install()
+                    val status = downloader.prepareToInstall(indicator)
+                    // If the download failed, quit
+                    // But otherwise force the install
+                    if (!status && downloader.findDeclaredField("myFile") == null) {
+                        return
+                    }
 
-                        invokeLater {
-                            PluginManagerMain.notifyPluginsUpdated(null)
-                        }
+                    downloader.install()
+
+                    invokeLater {
+                        PluginManagerMain.notifyPluginsUpdated(null)
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
