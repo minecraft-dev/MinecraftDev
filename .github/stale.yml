@@ -1,7 +1,7 @@
 # Number of days of inactivity before an issue becomes stale
-daysUntilStale: 30
+daysUntilStale: 60
 # Number of days of inactivity before a stale issue is closed
-daysUntilClose: 14
+daysUntilClose: 60
 # we only want issues
 only: 'issues'
 # Issues with these labels will never be considered stale
@@ -9,7 +9,10 @@ exemptLabels:
   - 'status: accepted'
   - 'status: future'
   - 'status: wip'
+  - 'status: needs investigation'
+  - 'status: help wanted'
   - 'type: bug'
+  - 'type: task'
 # Label to use when marking an issue as stale
 staleLabel: 'status: stale'
 # Comment to post when marking an issue as stale. Set to `false` to disable
