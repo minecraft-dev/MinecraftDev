@@ -17,15 +17,14 @@ sealed class PluginUpdateStatus {
 
     fun mergeWith(other: PluginUpdateStatus): PluginUpdateStatus {
         if (other is Update) {
-            when (this) {
-                is LatestVersionInstalled -> return other
-                is Update -> {
-                    val otherVersion = other.pluginDescriptor.version
-                    val thisVersion = this.pluginDescriptor.version
-                    if (VersionComparatorUtil.compare(otherVersion, thisVersion) > 0) {
-                        return other
-                    }
-                }
+            val otherVersion = other.pluginDescriptor.version
+            val thisVersion = when (this) {
+                is LatestVersionInstalled -> PluginUtil.pluginVersion
+                is Update -> this.pluginDescriptor.version
+                is CheckFailed -> return this
+            }
+            if (VersionComparatorUtil.compare(otherVersion, thisVersion) > 0) {
+                return other
             }
         }
         return this
