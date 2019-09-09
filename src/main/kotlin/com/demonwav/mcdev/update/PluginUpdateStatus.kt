@@ -13,24 +13,29 @@ package com.demonwav.mcdev.update
 import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.util.text.VersionComparatorUtil
 
-sealed class PluginUpdateStatus {
+sealed class PluginUpdateStatus : Comparable<PluginUpdateStatus> {
 
     fun mergeWith(other: PluginUpdateStatus): PluginUpdateStatus {
-        if (other is Update) {
-            val otherVersion = other.pluginDescriptor.version
-            val thisVersion = when (this) {
-                is LatestVersionInstalled -> PluginUtil.pluginVersion
-                is Update -> this.pluginDescriptor.version
-                is CheckFailed -> return this
-            }
-            if (VersionComparatorUtil.compare(otherVersion, thisVersion) > 0) {
-                return other
-            }
-        }
-        return this
+        return maxOf(this, other)
     }
 
-    object LatestVersionInstalled : PluginUpdateStatus()
-    class Update(val pluginDescriptor: IdeaPluginDescriptor, val hostToInstallFrom: String?) : PluginUpdateStatus()
-    class CheckFailed(val message: String) : PluginUpdateStatus()
+    protected abstract fun getVersionString(): String?
+
+    override fun compareTo(other: PluginUpdateStatus): Int {
+        val thisVersion = other.getVersionString() ?: return 1
+        val otherVersion = other.getVersionString() ?: return -1
+        return VersionComparatorUtil.compare(thisVersion, otherVersion)
+    }
+
+    object LatestVersionInstalled : PluginUpdateStatus() {
+        override fun getVersionString(): String? = PluginUtil.pluginVersion
+    }
+
+    class Update(val pluginDescriptor: IdeaPluginDescriptor, val hostToInstallFrom: String?) : PluginUpdateStatus() {
+        override fun getVersionString(): String? = this.pluginDescriptor.version
+    }
+
+    class CheckFailed(val message: String) : PluginUpdateStatus() {
+        override fun getVersionString(): String? = null
+    }
 }
