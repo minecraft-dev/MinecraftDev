@@ -25,6 +25,8 @@ class McpProjectResolverExtension : AbstractProjectResolverExtension() {
     override fun getExtraProjectModelClasses(): Set<Class<out Any>> =
         setOf(McpModelFG2::class.java, McpModelFG3::class.java)
 
+    override fun getToolingExtensionsClasses() = extraProjectModelClasses
+
     override fun populateModuleExtraModels(gradleModule: IdeaModule, ideModule: DataNode<ModuleData>) {
         var data: McpModelData? = null
         for (handler in handlers) {

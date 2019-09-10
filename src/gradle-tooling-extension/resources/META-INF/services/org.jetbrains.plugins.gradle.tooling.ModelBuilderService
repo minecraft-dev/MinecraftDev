@@ -1,3 +1,2 @@
 com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModelFG2BuilderImpl
 com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModelFG3BuilderImpl
-com.demonwav.mcdev.platform.forge.gradle.tooling.ForgePatcherModelBuilderImpl
