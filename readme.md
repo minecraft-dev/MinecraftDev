@@ -89,6 +89,7 @@ Developers
 - [**@gabizou** - Gabriel Harris-Rouquette](https://github.com/gabizou)
 - [**@kashike**](https://github.com/kashike)
 - [**@jamierocks** - Jamie Mansfield](https://github.com/jamierocks)
+- [**@RedNesto**](https://github.com/RedNesto)
 
 Issues
 ------
