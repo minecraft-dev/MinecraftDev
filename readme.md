@@ -91,15 +91,6 @@ Developers
 - [**@jamierocks** - Jamie Mansfield](https://github.com/jamierocks)
 - [**@RedNesto**](https://github.com/RedNesto)
 
-Issues
-------
-
-We have a few ambiguous labels on the issues page, so here are their definitions:
- * `platform: all` - An issue which applies to all supported platforms (`Bukkit`, `Sponge`, `BungeeCord`, `Forge`, `LiteLoader`)
- * `platform: main` - Multiple platforms, containing at least `Bukkit`, `Sponge`, and `Forge`. It can contain either of the other two as
-   well, as long as it doesn't contain all of them. In that case, `platform: all` would be more appropriate, of course.
- * `platform: multi` - Any issue with more than two platforms which doesn't fall under the first two categories.
-
 License
 -------
 
