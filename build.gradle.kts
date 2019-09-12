@@ -113,7 +113,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1))
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:192.5728.98")
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:193-EAP-SNAPSHOT")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.1")

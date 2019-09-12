@@ -54,7 +54,7 @@ import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProgressListener
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
-import org.jetbrains.plugins.gradle.service.project.open.importProject
+import org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import org.jetbrains.plugins.groovy.GroovyLanguage
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
@@ -337,7 +337,7 @@ class GradleBuildSystem(
 
         // Tell IntelliJ to import this project
         @Suppress("UnstableApiUsage")
-        importProject(rootDirectory.path, project)
+        linkAndRefreshGradleProject(rootDirectory.path, project)
 
         invokeLater {
             showProgress(project)

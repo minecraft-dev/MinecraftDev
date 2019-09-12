@@ -18,7 +18,6 @@ import com.demonwav.mcdev.util.getDataFromActionEvent
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -72,7 +71,8 @@ abstract class SrgActionBase : AnAction() {
             .setHideOnKeyOutside(true)
             .createBalloon()
 
-        val statusBar = WindowManager.getInstance().getStatusBar(CommonDataKeys.PROJECT.getData(e.dataContext))
+        val project = e.project ?: return
+        val statusBar = WindowManager.getInstance().getStatusBar(project)
 
         invokeLater {
             balloon.show(RelativePoint.getCenterOf(statusBar.component), Balloon.Position.atRight)
