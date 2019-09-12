@@ -72,7 +72,7 @@ object BaseTemplate {
         gradleProps.setProperty("PLUGIN_VERSION", pluginVersion)
 
         if (!artifactId.isNullOrBlank()) {
-            gradleProps.setProperty("PLUGIN_ID", artifactId?.toLowerCase(Locale.ENGLISH))
+            gradleProps.setProperty("PLUGIN_ID", artifactId.toLowerCase(Locale.ENGLISH))
         }
 
         // create gradle.properties

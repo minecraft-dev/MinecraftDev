@@ -310,10 +310,7 @@ class GradleBuildSystem(
         }
     }
 
-    private fun addBuildGradleDependencies(
-        descriptor: ProjectDescriptor,
-        text: String
-    ) {
+    private fun addBuildGradleDependencies(descriptor: ProjectDescriptor, text: String) {
         // Create the Psi file from the text, but don't write it until we are finished with it
         val buildGradlePsi = PsiFileFactory.getInstance(descriptor.project).createFileFromText(GroovyLanguage, text)
 
