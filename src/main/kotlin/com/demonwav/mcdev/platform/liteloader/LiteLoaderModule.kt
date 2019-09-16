@@ -11,11 +11,11 @@
 package com.demonwav.mcdev.platform.liteloader
 
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.buildsystem.SourceType
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.liteloader.util.LiteLoaderConstants
+import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement

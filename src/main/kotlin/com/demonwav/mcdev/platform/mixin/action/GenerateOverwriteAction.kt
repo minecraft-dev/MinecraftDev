@@ -13,7 +13,7 @@ package com.demonwav.mcdev.platform.mixin.action
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.platform.mixin.util.findSource
-import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory.Companion.MIXIN_OVERWRITE_FALLBACK
+import com.demonwav.mcdev.util.MinecraftTemplates.Companion.MIXIN_OVERWRITE_FALLBACK
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.toTypedArray

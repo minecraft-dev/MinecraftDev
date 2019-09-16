@@ -1,0 +1,3 @@
+rootProject.name = '${ARTIFACT_ID}'
+
+include ${INCLUDES}

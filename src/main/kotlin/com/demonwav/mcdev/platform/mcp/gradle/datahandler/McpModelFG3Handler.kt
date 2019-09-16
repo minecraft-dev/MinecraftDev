@@ -10,11 +10,11 @@
 
 package com.demonwav.mcdev.platform.mcp.gradle.datahandler
 
-import com.demonwav.mcdev.buildsystem.gradle.runGradleTask
 import com.demonwav.mcdev.platform.mcp.McpModuleSettings
 import com.demonwav.mcdev.platform.mcp.gradle.McpModelData
 import com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModelFG3
 import com.demonwav.mcdev.platform.mcp.srg.SrgType
+import com.demonwav.mcdev.util.runGradleTask
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.externalSystem.model.project.ModuleData
 import com.intellij.openapi.progress.ProgressIndicator
@@ -56,6 +56,10 @@ object McpModelFG3Handler : McpModelDataHandler {
                 DumbService.getInstance(openProject).waitForSmartMode()
             }
             val project = ProjectManager.getInstance().openProjects.firstOrNull { it.name == gradleModule.project.name }
+                ?: return@executeOnPooledThread
+            if (project.isDisposed) {
+                return@executeOnPooledThread
+            }
 
             var gradleProject = gradleModule.gradleProject
             val task = StringBuilder(data.taskName)
@@ -72,8 +76,10 @@ object McpModelFG3Handler : McpModelDataHandler {
                 override fun run(indicator: ProgressIndicator) {
                     indicator.isIndeterminate = true
 
-                    runGradleTask(project, gradleProject.projectDirectory, indicator) { launcher ->
-                        launcher.forTasks(data.taskName)
+                    indicator.text = "Creating SRG map"
+                    indicator.text2 = "Running Gradle task: '${data.taskName}'"
+                    runGradleTask(project, gradleProject.projectDirectory.toPath()) { settings ->
+                        settings.taskNames = listOf(data.taskName)
                     }
                 }
             })

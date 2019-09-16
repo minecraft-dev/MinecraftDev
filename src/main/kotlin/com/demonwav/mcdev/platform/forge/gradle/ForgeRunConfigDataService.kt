@@ -10,21 +10,18 @@
 
 package com.demonwav.mcdev.platform.forge.gradle
 
-import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem
-import com.demonwav.mcdev.buildsystem.gradle.runGradleTask
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
+import com.demonwav.mcdev.platform.forge.creator.ForgeRunConfigsStep
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.invokeAndWait
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.localFile
-import com.demonwav.mcdev.util.runWriteTaskLater
-import com.intellij.application.subscribe
+import com.demonwav.mcdev.util.runGradleTask
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunManagerListener
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.application.ApplicationConfiguration
 import com.intellij.execution.application.ApplicationConfigurationType
-import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.ProjectKeys
 import com.intellij.openapi.externalSystem.model.project.ProjectData
@@ -38,8 +35,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VfsUtil
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.concurrent.atomic.AtomicInteger
 import org.jetbrains.plugins.gradle.util.GradleConstants
 
@@ -57,48 +55,38 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             return
         }
 
-        val basePath = project.basePath ?: return
-        val baseDir = LocalFileSystem.getInstance().findFileByPath(basePath)
-        val hello = VfsUtil.findRelativeFile(baseDir, ".gradle", GradleBuildSystem.HELLO) ?: return
-        if (!hello.exists()) {
+        val baseDir = project.guessProjectDir() ?: return
+        val baseDirPath = baseDir.localFile.toPath()
+        val hello = baseDirPath.resolve(Paths.get(".gradle", ForgeRunConfigsStep.HELLO))
+        if (!Files.isRegularFile(hello)) {
             return
         }
 
-        val (moduleName, sizeText, forgeVersion, task) = try {
-            runReadAction {
-                hello.inputStream.bufferedReader().use { it.readText() }.split("\n")
-            }
-        } finally {
-            // Request this file be deleted
-            // We only want to do this action one time
-            runWriteTaskLater {
-                hello.delete(this)
-            }
-        }
-
-        val size = sizeText.toIntOrNull() ?: return
+        val (moduleName, mcVersion, forgeVersion, task) = Files.readAllLines(hello, Charsets.UTF_8)
+        val mcVersionParsed = SemanticVersion.parse(mcVersion)
+        val forgeVersionParsed = SemanticVersion.parse(forgeVersion)
 
         val moduleMap = modelsProvider.modules.associateBy { it.name }
+        val module = moduleMap[moduleName] ?: return
 
-        // Different versions of IntelliJ seem to have different ways of naming modules...this is probably unnecessary
-        // but I don't really know the correct way to do this. Also not totally confident this will always work
-        val rootModule = moduleMap[moduleName]
-            ?: moduleMap[projectData.internalName + "." + moduleName]
-            ?: moduleMap[projectData.internalName]
-            ?: return
+        // We've found the module we were expecting, so we can assume the project imported correctly
+        Files.delete(hello)
 
-        val module = moduleMap[rootModule.name + "-forge"] ?: rootModule
-
-        if (SemanticVersion.parse(forgeVersion) < ForgeModuleType.FG3_VERSION) {
-            manualCreate(project, moduleMap, module, size)
+        val isPre113 = mcVersionParsed < ForgeModuleType.FG3_MC_VERSION
+        if (isPre113 && forgeVersionParsed < ForgeModuleType.FG3_FORGE_VERSION) {
+            manualCreate(project, moduleMap, module)
         } else {
-            genIntellijRuns(project, moduleMap, module, size, task)
+            genIntellijRuns(project, moduleMap, module, task, hasData = !isPre113)
         }
     }
 
-    private fun manualCreate(project: Project, moduleMap: Map<String, Module>, module: Module, size: Int) {
+    private fun manualCreate(
+        project: Project,
+        moduleMap: Map<String, Module>,
+        module: Module
+    ) {
         invokeLater {
-            val mainModule = findMainModule(moduleMap, module, size)
+            val mainModule = findMainModule(moduleMap, module)
 
             val runManager = RunManager.getInstance(project)
             val factory = ApplicationConfigurationType.getInstance().configurationFactories.first()
@@ -115,12 +103,8 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
 
             runClientConfig.workingDirectory = project.basePath + File.separator + "run"
             runClientConfig.mainClassName = "GradleStart"
+            runClientConfig.setModule(mainModule)
 
-            if (size == 1) {
-                runClientConfig.setModule(mainModule)
-            } else {
-                runClientConfig.setModule(mainModule)
-            }
             clientSettings.isActivateToolWindowBeforeRun = true
 
             runManager.addConfiguration(clientSettings, false)
@@ -134,12 +118,7 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             runServerConfig.mainClassName = "GradleStartServer"
             runServerConfig.programParameters = "nogui"
             runServerConfig.workingDirectory = project.basePath + File.separator + "run"
-
-            if (size == 1) {
-                runServerConfig.setModule(mainModule)
-            } else {
-                runServerConfig.setModule(mainModule)
-            }
+            runServerConfig.setModule(mainModule)
 
             serverSettings.isActivateToolWindowBeforeRun = true
             runManager.addConfiguration(serverSettings, false)
@@ -150,28 +129,30 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
         project: Project,
         moduleMap: Map<String, Module>,
         module: Module,
-        size: Int,
-        task: String
+        task: String,
+        hasData: Boolean
     ) {
-        val mainModule = findMainModule(moduleMap, module, size)
+        val mainModule = findMainModule(moduleMap, module)
 
         ProgressManager.getInstance().run(object : Task.Backgroundable(project, "genIntellijRuns", false) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
 
                 val projectDir = project.guessProjectDir() ?: return
-                runGradleTask(project, projectDir.localFile, indicator) { launcher ->
-                    launcher.forTasks(task)
+                indicator.text = "Creating run configurations"
+                indicator.text2 = "Running Gradle task: '$task'"
+                runGradleTask(project, projectDir.localFile.toPath()) { settings ->
+                    settings.taskNames = listOf(task)
                 }
 
-                cleanupGeneratedRuns(project, mainModule)
+                cleanupGeneratedRuns(project, mainModule, hasData)
             }
         })
     }
 
-    private fun cleanupGeneratedRuns(project: Project, module: Module) {
+    private fun cleanupGeneratedRuns(project: Project, module: Module, hasData: Boolean) {
         invokeAndWait {
-            ForgeRunManagerListener(module)
+            ForgeRunManagerListener(module, hasData)
         }
 
         project.guessProjectDir()?.let { dir ->
@@ -179,30 +160,30 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
         }
     }
 
-    private fun findMainModule(moduleMap: Map<String, Module>, module: Module, size: Int): Module {
-        return if (size == 1) {
-            moduleMap[module.name + "_main"] ?: moduleMap[module.name + ".main"]
-        } else {
-            moduleMap[module.name + "-forge_main"] ?: moduleMap[module.name + "-forge.main"]
-        } ?: module
+    private fun findMainModule(moduleMap: Map<String, Module>, module: Module): Module {
+        return moduleMap[module.name + ".main"] ?: module
     }
 }
 
-class ForgeRunManagerListener(private val module: Module) : RunManagerListener {
+class ForgeRunManagerListener(private val module: Module, hasData: Boolean) : RunManagerListener {
     private val count = AtomicInteger(3)
     private val disposable = Disposer.newDisposable()
 
     init {
         Disposer.register(module, disposable)
         module.project.messageBus.connect(disposable).subscribe(RunManagerListener.TOPIC, this)
+        // If we don't have a data run, don't wait for it
+        if (!hasData) {
+            count.decrementAndGet()
+        }
     }
 
     override fun runConfigurationAdded(settings: RunnerAndConfigurationSettings) {
         val config = settings.configuration as? ApplicationConfiguration ?: return
 
-        when (settings.name) {
-            "runClient", "runServer", "runData" -> {}
-            else -> return
+        val postFixes = arrayOf("runClient", "runServer", "runData")
+        if (postFixes.none { settings.name.endsWith(it) }) {
+            return
         }
 
         config.isAllowRunningInParallel = false

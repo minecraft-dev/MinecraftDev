@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.forge
 
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.buildsystem.SourceType
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.GenerationData
 import com.demonwav.mcdev.inspection.IsCancelled
@@ -19,6 +18,7 @@ import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.SidedProxyAnnotator
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
+import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.nullable
 import com.demonwav.mcdev.util.runWriteTaskLater

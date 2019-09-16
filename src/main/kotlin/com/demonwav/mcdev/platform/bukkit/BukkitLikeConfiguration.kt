@@ -11,6 +11,8 @@
 package com.demonwav.mcdev.platform.bukkit
 
 interface BukkitLikeConfiguration {
+    val mainClass: String
+
     fun hasDependencies(): Boolean
     fun setDependencies(string: String)
 

@@ -36,23 +36,34 @@ enum class PlatformType(
     val type: AbstractModuleType<*>,
     val normalName: String,
     val versionJson: String? = null,
-    val children: Array<PlatformType> = arrayOf()
+    private val parent: PlatformType? = null
 ) {
 
-    PAPER(PaperModuleType, "Paper", "paper.json"),
-    SPIGOT(SpigotModuleType, "Spigot", "spigot.json", arrayOf(PAPER)),
-    BUKKIT(BukkitModuleType, "Bukkit", "bukkit.json", arrayOf(SPIGOT, PAPER)),
+    BUKKIT(BukkitModuleType, "Bukkit", "bukkit.json"),
+    SPIGOT(SpigotModuleType, "Spigot", "spigot.json", BUKKIT),
+    PAPER(PaperModuleType, "Paper", "paper.json", SPIGOT),
     FORGE(ForgeModuleType, "Forge"),
     SPONGE(SpongeModuleType, "Sponge"),
-    WATERFALL(WaterfallModuleType, "Waterfall", "waterfall.json"),
-    BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord.json", arrayOf(WATERFALL)),
+    BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord.json"),
+    WATERFALL(WaterfallModuleType, "Waterfall", "waterfall.json", BUNGEECORD),
     LITELOADER(LiteLoaderModuleType, "LiteLoader"),
     MIXIN(MixinModuleType, "Mixin"),
     MCP(McpModuleType, "MCP");
 
+    private val children = mutableListOf<PlatformType>()
+
+    init {
+        parent?.addChild(this)
+    }
+
+    private fun addChild(child: PlatformType) {
+        children += child
+        parent?.addChild(child)
+    }
+
     companion object {
         fun removeParents(types: MutableSet<PlatformType>) =
-            types.filter { type -> type.children.isEmpty() || !types.any { type.children.contains(it) } }.toHashSet()
+            types.filter { type -> type.children.isEmpty() || types.none { type.children.contains(it) } }.toHashSet()
 
         fun fromLibraryKind(kind: LibraryKind) = when (kind) {
             BUKKIT_LIBRARY_KIND -> BUKKIT

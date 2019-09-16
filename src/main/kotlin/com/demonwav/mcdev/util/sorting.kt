@@ -32,24 +32,14 @@ fun <T> Comparator<in T>.lexicographical(): Comparator<in Iterable<T>> =
  */
 private val MC_1_12 = SemanticVersion.release(1, 12)
 
-fun <T> sortVersions(versions: Collection<T>, convert: (T) -> String = { it.toString() }): List<T> {
+fun <T> sortVersions(versions: Collection<T>, convert: (T) -> String = { it.toString() }): List<SemanticVersion> {
     if (versions.isEmpty()) {
         return listOf()
     }
     return versions.asSequence()
-        .map { convert(it) to it }
-        .map { SemanticVersion.parse(it.first) to it.second }
-        .sortedByDescending { it.first }
-        .filter { it.first >= MC_1_12 }
-        .map { it.second }
+        .map { convert(it) }
+        .map { SemanticVersion.parse(it) }
+        .sortedDescending()
+        .filter { it >= MC_1_12 }
         .toList()
-}
-
-fun getMajorVersion(version: String): String {
-    val index = version.lastIndexOf('.')
-    return if (index != -1 && index != version.indexOf('.')) {
-        version.substring(0, index)
-    } else {
-        version
-    }
 }

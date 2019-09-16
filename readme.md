@@ -97,6 +97,18 @@ IDE with `ktlint` style settings and to automatically format this project's code
 ./gradlew ktlintApplyToIdea addKtlintFormatGitPreCommitHook
 ```
 
+IntelliJ includes a lot of dependencies transitively, including common dependencies that are used a lot, such as Kotlin,
+Commons Lang3, Guava, etc. Unfortunately, the source distribution for IntelliJ does not contain sources for libraries as
+well, so these libraries are imported into the IDE without sources by default. If you want to attach sources for (most)
+of the dependencies IntelliJ includes, run the `resolveIntellijLibSources` task and refresh the Gradle project in
+IntelliJ:
+
+```
+./gradlew resolveIntellijLibSources
+```
+
+If you're curious about that task, it is implemented in `gradle/attach-sources.gradle.kts`
+
 Developers
 ----------
 

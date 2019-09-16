@@ -53,7 +53,7 @@
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
 
         <!-- File templates are for project creations -->
-        <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
+        <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftTemplates"/>
 
         <!-- Project-independent Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
@@ -140,7 +140,7 @@
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
-        <errorHandler implementation="com.demonwav.mcdev.error.ErrorReporter"/>
+        <errorHandler implementation="com.demonwav.mcdev.errorreporter.ErrorReporter"/>
         <!--endregion-->
 
         <!--region BUKKIT-->
@@ -346,14 +346,14 @@
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeWrongGetterTypeInspection"/>
 
         <localInspection displayName="Invalid @Inject usage in Sponge plugin class"
-                         groupName="Minecraft Sponge"
+                         groupName="Sponge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeInjectionInspection"/>
         <localInspection displayName="Sponge plugin class validity"
-                         groupName="Minecraft Sponge"
+                         groupName="Sponge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"

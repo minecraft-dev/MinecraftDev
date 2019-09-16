@@ -1,5 +1,0 @@
-pluginGroup = ${GROUP_ID}
-#if (${PLUGIN_ID})
-pluginId = ${PLUGIN_ID}
-#end
-pluginVersion = ${PLUGIN_VERSION}
