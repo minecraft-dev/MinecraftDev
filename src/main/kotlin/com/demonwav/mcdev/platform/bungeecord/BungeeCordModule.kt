@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Contract
 class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, override val moduleType: T) :
     AbstractModule(facet) {
 
-    var pluginYml by nullable { facet.findFile("plugin.yml", SourceType.RESOURCE) }
+    var pluginYml by nullable { facet.findFile("bungee.yml", SourceType.RESOURCE) }
         private set
 
     override val type = PlatformType.BUNGEECORD

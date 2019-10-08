@@ -63,7 +63,7 @@ class BungeeCordProjectConfiguration(override var type: PlatformType) : ProjectC
             val mainClassFile = file.findOrCreateChildData(this, "$className.java")
 
             BungeeCordTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className)
-            val pluginYml = dirs.resourceDirectory.findOrCreateChildData(this, "plugin.yml")
+            val pluginYml = dirs.resourceDirectory.findOrCreateChildData(this, "bungee.yml")
             BungeeCordTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this, buildSystem)
 
             // Set the editor focus on the main class
