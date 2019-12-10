@@ -24,9 +24,9 @@ plugins {
     kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.10"
+    id("org.jetbrains.intellij") version "0.4.15"
     id("net.minecrell.licenser") version "0.4.1"
-    id("org.jlleitschuh.gradle.ktlint") version "8.2.0"
+    id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
 }
 
 group = "com.demonwav.minecraft-dev"
@@ -265,6 +265,12 @@ fun generatePsiAndParser(name: String, bnf: String, pack: String) = tasks.regist
 
     classpath = grammarKit
     main = "org.intellij.grammar.Main"
+
+    jvmArgs(
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util=ALL-UNNAMED"
+    )
 
     args(dstRoot, src)
 

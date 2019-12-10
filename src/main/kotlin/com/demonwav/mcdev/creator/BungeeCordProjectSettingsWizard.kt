@@ -17,17 +17,17 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration
 import com.demonwav.mcdev.util.firstOfType
+import javax.swing.JComboBox
+import javax.swing.JComponent
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JTextField
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.apache.commons.lang.WordUtils
-import javax.swing.JComboBox
-import javax.swing.JComponent
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JTextField
 
 class BungeeCordProjectSettingsWizard(private val creator: MinecraftProjectCreator) : MinecraftModuleWizardStep() {
 

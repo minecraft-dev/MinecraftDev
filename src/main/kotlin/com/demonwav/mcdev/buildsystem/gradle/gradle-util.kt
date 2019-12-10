@@ -13,10 +13,10 @@ package com.demonwav.mcdev.buildsystem.gradle
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemJdkUtil
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
+import java.io.File
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProgressListener
-import java.io.File
 
 inline fun runGradleTask(
     project: Project?,

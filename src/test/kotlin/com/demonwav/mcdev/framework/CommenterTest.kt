@@ -14,11 +14,11 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.util.io.delete
+import java.nio.file.Files
+import java.nio.file.Path
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
-import java.nio.file.Files
-import java.nio.file.Path
 
 open class CommenterTest(vararg platformTypes: PlatformType) : BaseMinecraftTest(*platformTypes) {
 

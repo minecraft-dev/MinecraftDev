@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.asset
 
 import com.intellij.openapi.util.IconLoader
-
 import javax.swing.Icon
 
 abstract class Assets protected constructor() {

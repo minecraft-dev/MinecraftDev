@@ -21,8 +21,8 @@ import com.intellij.psi.PsiManager
 import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture
 import com.intellij.testFramework.runInEdtAndWait
 import com.intellij.util.PathUtil
-import org.intellij.lang.annotations.Language
 import java.lang.ref.WeakReference
+import org.intellij.lang.annotations.Language
 
 /**
  * Like most things in this project at this point, taken from the intellij-rust folks

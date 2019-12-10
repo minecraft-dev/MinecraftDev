@@ -21,12 +21,12 @@ import com.intellij.openapi.editor.ex.util.LexerEditorHighlighter
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
 import com.intellij.util.ui.JBUI
-import org.jetbrains.annotations.Nls
 import java.awt.BorderLayout
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JPanel
+import org.jetbrains.annotations.Nls
 
 class I18nTemplateConfigurable : Configurable {
     private lateinit var panel: JPanel

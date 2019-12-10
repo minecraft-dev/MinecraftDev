@@ -20,11 +20,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import org.apache.commons.lang.builder.ToStringBuilder
-import org.jetbrains.annotations.Contract
 import java.awt.Color
 import java.util.LinkedHashMap
 import javax.swing.Icon
+import org.apache.commons.lang.builder.ToStringBuilder
+import org.jetbrains.annotations.Contract
 
 abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, val artifactId: String) {
 

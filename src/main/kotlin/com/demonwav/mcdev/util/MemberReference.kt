@@ -17,9 +17,9 @@ import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.containers.stream
-import org.jetbrains.annotations.Contract
 import java.io.Serializable
 import java.util.stream.Stream
+import org.jetbrains.annotations.Contract
 
 /**
  * Represents a reference to a class member (a method or a field). It may

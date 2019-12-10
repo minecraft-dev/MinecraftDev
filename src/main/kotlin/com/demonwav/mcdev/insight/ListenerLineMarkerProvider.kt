@@ -29,8 +29,8 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.util.PsiExpressionTrimRenderer
 import com.intellij.psi.util.PsiUtilCore
 import com.intellij.util.Function
-import org.jetbrains.annotations.Contract
 import javax.swing.Icon
+import org.jetbrains.annotations.Contract
 
 /**
  * A [LineMarkerProviderDescriptor] that will provide a line marker info icon

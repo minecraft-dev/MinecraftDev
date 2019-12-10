@@ -20,8 +20,8 @@ import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiReferenceExpression
-import org.jetbrains.annotations.Contract
 import javax.swing.Icon
+import org.jetbrains.annotations.Contract
 
 abstract class AbstractModule(protected val facet: MinecraftFacet) {
 

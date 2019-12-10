@@ -33,11 +33,11 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
+import java.util.concurrent.ConcurrentHashMap
+import javax.swing.Icon
 import org.jetbrains.annotations.Contract
 import org.jetbrains.jps.model.java.JavaResourceRootType
 import org.jetbrains.jps.model.java.JavaSourceRootType
-import java.util.concurrent.ConcurrentHashMap
-import javax.swing.Icon
 
 class MinecraftFacet(
     module: Module,

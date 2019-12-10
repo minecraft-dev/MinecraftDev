@@ -39,9 +39,9 @@ import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
-import org.jetbrains.plugins.gradle.util.GradleConstants
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
+import org.jetbrains.plugins.gradle.util.GradleConstants
 
 class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Project>() {
 

@@ -37,8 +37,8 @@ import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import com.siyeh.ig.psiutils.ImportUtils
-import org.jetbrains.annotations.Contract
 import java.util.stream.Stream
+import org.jetbrains.annotations.Contract
 
 // Parent
 fun PsiElement.findModule(): Module? = ModuleUtilCore.findModuleForPsiElement(this)

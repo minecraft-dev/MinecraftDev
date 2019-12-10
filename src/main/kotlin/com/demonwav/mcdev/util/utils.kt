@@ -25,8 +25,8 @@ import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
-import org.jetbrains.annotations.Contract
 import java.lang.Exception
+import org.jetbrains.annotations.Contract
 
 inline fun <T : Any?> runWriteTask(crossinline func: () -> T): T {
     return invokeAndWait {

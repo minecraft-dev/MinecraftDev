@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.util
 
-import org.jetbrains.annotations.Contract
 import java.util.stream.Stream
+import org.jetbrains.annotations.Contract
 
 /**
  * Filters all `null` elements from the [Stream].

@@ -19,10 +19,10 @@ import com.demonwav.mcdev.util.resolveClass
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
-import org.jetbrains.annotations.Contract
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import org.jetbrains.annotations.Contract
 
 @Contract(pure = true)
 fun PsiClass.findSoftImplements(): Map<String, PsiClass>? {
