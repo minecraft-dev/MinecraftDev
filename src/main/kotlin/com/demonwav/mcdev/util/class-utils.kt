@@ -114,12 +114,10 @@ inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (PsiClass) -
     }
 }
 
-@Contract(pure = true)
 fun findQualifiedClass(fullQualifiedName: String, context: PsiElement): PsiClass? {
     return findQualifiedClass(context.project, fullQualifiedName, context.resolveScope)
 }
 
-@Contract(pure = true)
 fun findQualifiedClass(
     project: Project,
     fullQualifiedName: String,
@@ -160,7 +158,6 @@ private fun PsiClass.findInnerClass(name: String): PsiClass? {
     }
 }
 
-@Contract(pure = true)
 @Throws(ClassNameResolutionFailedException::class)
 fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int? {
     // Attempt to find name for anonymous class
@@ -188,7 +185,6 @@ val PsiElement.anonymousElements: Array<PsiElement>
 
 // Inheritance
 
-@Contract(pure = true)
 fun PsiClass.extendsOrImplements(qualifiedClassName: String): Boolean {
     val aClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, resolveScope) ?: return false
     return equivalentTo(aClass) || this.isInheritor(aClass, true)

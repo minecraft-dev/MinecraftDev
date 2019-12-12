@@ -58,7 +58,6 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
             .forEach { annotations.add(it) }
     }
 
-    @Contract(pure = true)
     open fun getEventGenerationPanel(chosenClass: PsiClass): EventGenerationPanel {
         return EventGenerationPanel(chosenClass)
     }
@@ -67,7 +66,6 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
     open val isEventGenAvailable: Boolean
         get() = false
 
-    @Contract(pure = true)
     open fun getDefaultListenerName(psiClass: PsiClass) = "on" + psiClass.name!!.replace("Event", "")
 
     override fun toString(): String {

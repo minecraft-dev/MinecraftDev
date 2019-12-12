@@ -35,7 +35,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import java.util.concurrent.ConcurrentHashMap
 import javax.swing.Icon
-import org.jetbrains.annotations.Contract
 import org.jetbrains.jps.model.java.JavaResourceRootType
 import org.jetbrains.jps.model.java.JavaSourceRootType
 
@@ -133,41 +132,34 @@ class MinecraftFacet(
     val modules get() = moduleMap.values
     val types get() = moduleMap.keys
 
-    @Contract(pure = true)
     fun isOfType(type: AbstractModuleType<*>) = moduleMap.containsKey(type)
 
-    @Contract(pure = true)
     fun <T : AbstractModule> getModuleOfType(type: AbstractModuleType<T>): T? {
         @Suppress("UNCHECKED_CAST")
         return moduleMap[type] as? T
     }
 
-    @Contract(value = "null -> false", pure = true)
     fun isEventClassValidForModule(eventClass: PsiClass?) =
         eventClass != null && moduleMap.values.any { it.isEventClassValid(eventClass, null) }
 
-    @Contract(pure = true)
     fun isEventClassValid(eventClass: PsiClass, method: PsiMethod): Boolean {
         return doIfGood(method) {
             it.isEventClassValid(eventClass, method)
         } == true
     }
 
-    @Contract(pure = true)
     fun writeErrorMessageForEvent(eventClass: PsiClass, method: PsiMethod): String? {
         return doIfGood(method) {
             it.writeErrorMessageForEventParameter(eventClass, method)
         }
     }
 
-    @Contract(pure = true)
     fun isStaticListenerSupported(method: PsiMethod): Boolean {
         return doIfGood(method) {
             it.isStaticListenerSupported(method)
         } == true
     }
 
-    @Contract(pure = true)
     fun suppressStaticListener(method: PsiMethod): Boolean {
         return doIfGood(method) {
             !it.isStaticListenerSupported(method)
@@ -189,7 +181,6 @@ class MinecraftFacet(
 
     val isEventGenAvailable get() = moduleMap.keys.any { it.isEventGenAvailable }
 
-    @Contract(pure = true)
     fun shouldShowPluginIcon(element: PsiElement?) = moduleMap.values.any { it.shouldShowPluginIcon(element) }
 
     val icon: Icon?

@@ -41,18 +41,15 @@ data class MemberReference(
     val withoutOwner
         get() = if (this.owner == null) this else MemberReference(this.name, this.descriptor, null, this.matchAll)
 
-    @Contract(pure = true)
     fun matchOwner(psiClass: PsiClass): Boolean {
         return this.owner == null || this.owner == psiClass.fullQualifiedName
     }
 
-    @Contract(pure = true)
     fun match(method: PsiMethod, qualifier: PsiClass): Boolean {
         return this.name == method.internalName && matchOwner(qualifier) &&
             (this.descriptor == null || this.descriptor == method.descriptor)
     }
 
-    @Contract(pure = true)
     fun match(field: PsiField, qualifier: PsiClass): Boolean {
         return this.name == field.name && matchOwner(qualifier) &&
             (this.descriptor == null || this.descriptor == field.descriptor)
@@ -69,7 +66,6 @@ data class MemberReference(
         return resolve(project, scope) { _, member -> member }
     }
 
-    @Contract(pure = true)
     private inline fun <R> resolve(project: Project, scope: GlobalSearchScope, ret: (PsiClass, PsiMember) -> R): R? {
         if (this.owner == null) {
             throw IllegalStateException("Cannot resolve unqualified member reference (owner == null)")
@@ -91,7 +87,6 @@ data class MemberReference(
 
 // Class
 
-@Contract(pure = true)
 fun PsiClass.findMethods(member: MemberReference, checkBases: Boolean = false): Stream<PsiMethod> {
     if (!member.matchOwner(this)) {
         return Stream.empty()
@@ -105,7 +100,6 @@ fun PsiClass.findMethods(member: MemberReference, checkBases: Boolean = false): 
     }
 }
 
-@Contract(pure = true)
 fun PsiClass.findField(member: MemberReference, checkBases: Boolean = false): PsiField? {
     if (!member.matchOwner(this)) {
         return null
@@ -129,7 +123,6 @@ val PsiMethod.memberReference
 val PsiMethod.qualifiedMemberReference
     get() = MemberReference(internalName, descriptor, containingClass!!.fullQualifiedName)
 
-@Contract(pure = true)
 fun PsiMethod.getQualifiedMemberReference(owner: PsiClass): MemberReference {
     return MemberReference(internalName, descriptor, owner.fullQualifiedName)
 }
@@ -154,7 +147,6 @@ val PsiField.simpleQualifiedMemberReference
 val PsiField.qualifiedMemberReference
     get() = MemberReference(name, descriptor, containingClass!!.fullQualifiedName)
 
-@Contract(pure = true)
 fun PsiField.getQualifiedMemberReference(owner: PsiClass): MemberReference {
     return MemberReference(name, descriptor, owner.fullQualifiedName)
 }

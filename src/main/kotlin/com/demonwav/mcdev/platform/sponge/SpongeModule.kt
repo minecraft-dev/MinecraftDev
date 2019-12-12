@@ -30,7 +30,6 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
-import org.jetbrains.annotations.Contract
 
 class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
@@ -89,7 +88,6 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         return method
     }
 
-    @Contract(value = "null -> false", pure = true)
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
         if (element !is PsiIdentifier) {
             return false

@@ -29,7 +29,6 @@ import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
 import org.jetbrains.annotations.Contract
 
-@Contract(pure = true)
 fun PsiMember.findUpstreamMixin(): PsiClass? {
     return findAnnotation(DYNAMIC)?.findDeclaredAttributeValue("mixin")?.resolveClass()
 }
@@ -38,7 +37,6 @@ fun PsiMember.findUpstreamMixin(): PsiClass? {
 val PsiElement.isWithinDynamicMixin: Boolean
     get() = findContainingMethod()?.findAnnotation(DYNAMIC) != null
 
-@Contract(pure = true)
 fun findMethods(psiClass: PsiClass): Sequence<PsiMethod>? {
     val targets = psiClass.mixinTargets
     return when (targets.size) {
@@ -58,7 +56,6 @@ fun findMethods(psiClass: PsiClass): Sequence<PsiMethod>? {
     }
 }
 
-@Contract(pure = true)
 fun findFields(psiClass: PsiClass): Sequence<PsiField>? {
     val targets = psiClass.mixinTargets
     return when (targets.size) {
@@ -76,7 +73,6 @@ fun findFields(psiClass: PsiClass): Sequence<PsiField>? {
     }
 }
 
-@Contract(pure = true)
 fun findShadowTargets(psiClass: PsiClass, start: PsiClass, superMixin: Boolean): Sequence<ShadowTarget> {
     return if (superMixin) {
         findShadowTargetsDeep(psiClass, start)
@@ -86,7 +82,6 @@ fun findShadowTargets(psiClass: PsiClass, start: PsiClass, superMixin: Boolean):
     }
 }
 
-@Contract(pure = true)
 private fun findShadowTargetsDeep(psiClass: PsiClass, start: PsiClass): Sequence<ShadowTarget> {
     return start.streamMixinHierarchy()
         .flatMap { mixin ->
@@ -104,7 +99,6 @@ private fun findShadowTargetsDeep(psiClass: PsiClass, start: PsiClass): Sequence
         }
 }
 
-@Contract(pure = true)
 fun PsiMethod.findSource(): PsiMethod {
     val body = body
     if (body != null) {

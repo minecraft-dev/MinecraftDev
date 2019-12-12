@@ -102,11 +102,9 @@ val PsiClass.isAccessorMixin: Boolean
         return targets.isNotEmpty() && !targets.any(PsiClass::isInterface)
     }
 
-@Contract(pure = true)
 fun callbackInfoType(project: Project): PsiType? =
     PsiType.getTypeByName(CALLBACK_INFO, project, GlobalSearchScope.allScope(project))
 
-@Contract(pure = true)
 fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType: PsiType): PsiType? {
     val boxedType = if (returnType is PsiPrimitiveType) returnType.getBoxedType(context)!! else returnType
 

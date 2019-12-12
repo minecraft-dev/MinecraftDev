@@ -35,7 +35,6 @@ import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTypesUtil
-import org.jetbrains.annotations.Contract
 
 class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
@@ -160,7 +159,6 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
         )
     }
 
-    @Contract(value = "null -> false", pure = true)
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
         if (element !is PsiIdentifier) {
             return false

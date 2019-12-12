@@ -31,7 +31,6 @@ import org.jetbrains.annotations.Contract
 val PsiMember.isShadow
     get() = findAnnotation(SHADOW) != null
 
-@Contract(pure = true)
 fun PsiMember.findFirstShadowTarget(): PsiMember? {
     val shadow = findAnnotation(SHADOW) ?: return null
     val containingClass = containingClass ?: return null
@@ -39,7 +38,6 @@ fun PsiMember.findFirstShadowTarget(): PsiMember? {
     return resolveFirstShadowTarget(shadow, targetClasses, this)
 }
 
-@Contract(pure = true)
 fun resolveFirstShadowTarget(
     shadow: PsiAnnotation,
     targetClasses: Collection<PsiClass>,
@@ -54,7 +52,6 @@ fun resolveFirstShadowTarget(
     }
 }
 
-@Contract(pure = true)
 fun PsiMember.findShadowTargets(): List<PsiMember> {
     val shadow = findAnnotation(SHADOW) ?: return emptyList()
     val containingClass = containingClass ?: return emptyList()
@@ -62,7 +59,6 @@ fun PsiMember.findShadowTargets(): List<PsiMember> {
     return resolveShadowTargets(shadow, targetClasses, this) ?: emptyList()
 }
 
-@Contract(pure = true)
 fun resolveShadowTargets(
     shadow: PsiAnnotation,
     targetClasses: Collection<PsiClass>,
@@ -79,7 +75,6 @@ fun resolveShadowTargets(
 
 private fun hasAliases(shadow: PsiAnnotation): Boolean = shadow.findDeclaredAttributeValue("aliases").isNotEmpty()
 
-@Contract(pure = true)
 private fun stripPrefix(shadow: PsiAnnotation, member: PsiMember): String? {
     // Strip prefix
     val prefix = shadow.findDeclaredAttributeValue("prefix")?.constantStringValue ?: DEFAULT_SHADOW_PREFIX
