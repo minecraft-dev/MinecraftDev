@@ -82,7 +82,6 @@
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
         <projectConfigurable displayName="Language Template"
                              id="Settings.Minecraft.I18nTemplate"
-                             groupId="language"
                              parentId="Settings.Minecraft"
                              instance="com.demonwav.mcdev.i18n.sorting.I18nTemplateConfigurable"/>
 
