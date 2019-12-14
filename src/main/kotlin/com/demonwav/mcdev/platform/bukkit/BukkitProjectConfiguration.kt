@@ -137,8 +137,8 @@ class BukkitProjectConfiguration(override var type: PlatformType) : ProjectConfi
 
     private fun spigotRepo(list: MutableList<BuildRepository>) {
         list.add(BuildRepository(
-            "papermc-repo",
-            "https://papermc.io/repo/repository/maven-public/"
+            "spigotmc-repo",
+            "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
         ))
     }
 }
