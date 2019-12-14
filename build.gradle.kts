@@ -110,7 +110,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1))
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:193-EAP-SNAPSHOT")
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:193.5233.102")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.1")
@@ -125,7 +125,7 @@ intellij {
         // needed dependencies for unit tests
         "properties", "junit",
         // useful to have when running for mods.toml
-        "org.toml.lang:0.2.0.25"
+        "org.toml.lang:0.2.111.34-193"
     )
 
     pluginName = "Minecraft Development"

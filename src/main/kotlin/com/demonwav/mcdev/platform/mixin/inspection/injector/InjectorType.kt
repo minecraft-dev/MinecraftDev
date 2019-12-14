@@ -28,7 +28,7 @@ import com.intellij.psi.PsiModifier.STATIC
 import com.intellij.psi.PsiNameHelper
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiType
-import org.objectweb.asm.Opcodes
+import org.jetbrains.org.objectweb.asm.Opcodes
 
 enum class InjectorType(private val annotation: String) {
     INJECT(MixinConstants.Annotations.INJECT) {

@@ -386,7 +386,7 @@ class GradleBuildSystem(
         if (!UISettings.instance.showStatusBar || UISettings.instance.presentationMode) {
             return
         }
-        val pane = WindowManagerEx.getInstanceEx().getFrame(project).rootPane as? IdeRootPane ?: return
+        val pane = WindowManagerEx.getInstanceEx().getFrame(project)?.rootPane as? IdeRootPane ?: return
         pane.findDeclaredField("myStatusBar")
             ?.findDeclaredField("myInfoAndProgressPanel")
             ?.invokeDeclaredMethod("openProcessPopup", arrayOf(Boolean::class.javaPrimitiveType), true)
@@ -503,11 +503,11 @@ class GradleBuildSystem(
         }
 
         // This is mostly the same as a normal create, but we use different files and don't setup the wrapper
-        when {
-            configuration.type == PlatformType.FORGE -> {
+        when (configuration.type) {
+            PlatformType.FORGE -> {
                 handleForgeSubCreate(descriptor, configuration, commonProjectName, indicator)
             }
-            configuration.type == PlatformType.LITELOADER -> {
+            PlatformType.LITELOADER -> {
                 handleLiteLoaderSubCreate(descriptor, configuration, commonProjectName, indicator)
             }
             else -> handleGeneralSubCreate(descriptor, configuration, commonProjectName)

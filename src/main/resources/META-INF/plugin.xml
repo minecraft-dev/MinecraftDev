@@ -12,7 +12,7 @@
 
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.idea.maven</depends>
-    <depends>org.jetbrains.plugins.gradle</depends>
+    <depends>com.intellij.gradle</depends>
     <depends>org.intellij.groovy</depends>
 
     <id>com.demonwav.minecraft-dev</id>
