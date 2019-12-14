@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.util.MemberReference
-import org.jetbrains.annotations.Contract
 
 object MixinMemberReference {
 
@@ -39,7 +38,6 @@ object MixinMemberReference {
      * Parses a [MemberReference] based on the specifications of Mixin's
      * MemberInfo.
      */
-    @Contract(value = "null -> null", pure = true)
     fun parse(reference: String?): MemberReference? {
         reference ?: return null
         val owner: String?

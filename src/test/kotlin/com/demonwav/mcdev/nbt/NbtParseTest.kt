@@ -26,12 +26,12 @@ import com.demonwav.mcdev.nbt.tags.TagLongArray
 import com.demonwav.mcdev.nbt.tags.TagShort
 import com.demonwav.mcdev.nbt.tags.TagString
 import com.intellij.util.io.inputStream
+import java.nio.file.Path
+import java.nio.file.Paths
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import java.nio.file.Path
-import java.nio.file.Paths
 
 @DisplayName("NBT Parse Tests")
 class NbtParseTest {

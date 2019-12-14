@@ -10,9 +10,9 @@
 
 package com.demonwav.mcdev.nbt.tags
 
-import org.apache.commons.lang3.StringUtils
 import java.io.DataOutputStream
 import java.io.OutputStream
+import org.apache.commons.lang3.StringUtils
 
 interface NbtTag {
 

@@ -12,10 +12,10 @@ package com.demonwav.mcdev.framework
 
 import com.intellij.openapi.util.Ref
 import com.intellij.testFramework.runInEdtAndWait
+import java.lang.reflect.Method
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.InvocationInterceptor
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext
-import java.lang.reflect.Method
 
 class EdtInterceptor : InvocationInterceptor {
     override fun interceptBeforeEachMethod(

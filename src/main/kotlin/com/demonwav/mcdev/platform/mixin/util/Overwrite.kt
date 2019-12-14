@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Contract
 val PsiMethod.isOverwrite
     get() = findAnnotation(OVERWRITE) != null
 
-@Contract(pure = true)
 fun PsiMethod.findFirstOverwriteTarget(): PsiMethod? {
     findAnnotation(OVERWRITE) ?: return null
     val containingClass = containingClass ?: return null

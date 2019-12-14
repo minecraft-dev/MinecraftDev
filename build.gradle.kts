@@ -10,6 +10,7 @@
 
 import net.minecrell.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
+import org.jetbrains.intellij.tasks.BuildSearchableOptionsTask
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -24,9 +25,9 @@ plugins {
     kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.10"
+    id("org.jetbrains.intellij") version "0.4.15"
     id("net.minecrell.licenser") version "0.4.1"
-    id("org.jlleitschuh.gradle.ktlint") version "8.2.0"
+    id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
 }
 
 group = "com.demonwav.minecraft-dev"
@@ -46,6 +47,7 @@ val compileKotlin by tasks.existing
 val processResources by tasks.existing<AbstractCopyTask>()
 val test by tasks.existing<Test>()
 val runIde by tasks.existing<RunIdeTask>()
+val buildSearchableOptions by tasks.existing<BuildSearchableOptionsTask>()
 val publishPlugin by tasks.existing<PublishTask>()
 val clean by tasks.existing<Delete>()
 
@@ -177,6 +179,18 @@ test {
             systemProperty("testLibs.${it.name}", it.file.absolutePath)
         }
     }
+    if (JavaVersion.current().isJava9Compatible) {
+        jvmArgs(
+            "--add-opens", "java.base/java.io=ALL-UNNAMED",
+            "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+            "--add-opens", "java.desktop/sun.awt=ALL-UNNAMED",
+            "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
+            "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
+            "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
+            "--add-opens", "java.desktop/sun.font=ALL-UNNAMED",
+            "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED"
+        )
+    }
 }
 
 idea {
@@ -265,6 +279,14 @@ fun generatePsiAndParser(name: String, bnf: String, pack: String) = tasks.regist
 
     classpath = grammarKit
     main = "org.intellij.grammar.Main"
+
+    if (JavaVersion.current().isJava9Compatible) {
+        jvmArgs(
+            "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+            "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
+            "--add-opens", "java.base/java.util=ALL-UNNAMED"
+        )
+    }
 
     args(dstRoot, src)
 

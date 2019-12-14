@@ -25,7 +25,6 @@ import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
-import org.jetbrains.annotations.Contract
 import java.lang.Exception
 
 inline fun <T : Any?> runWriteTask(crossinline func: () -> T): T {
@@ -75,7 +74,6 @@ fun waitForAllSmart() {
 /**
  * Returns an untyped array for the specified [Collection].
  */
-@Contract(pure = true)
 fun Collection<*>.toArray(): Array<Any?> {
     @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
     return (this as java.util.Collection<*>).toArray()
@@ -88,13 +86,11 @@ inline fun <T : Collection<*>> T.ifEmpty(func: () -> Unit): T {
     return this
 }
 
-@Contract(pure = true)
 inline fun <T, R> Iterable<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     forEach { element -> transform(element)?.let { return it } }
     return null
 }
 
-@Contract(pure = true)
 inline fun <T, R> Array<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     forEach { element -> transform(element)?.let { return it } }
     return null

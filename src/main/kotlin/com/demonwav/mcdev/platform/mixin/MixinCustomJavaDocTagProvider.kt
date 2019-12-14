@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.mixin
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiReference

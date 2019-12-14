@@ -18,9 +18,7 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.ProjectScope
-import org.jetbrains.annotations.Contract
 
-@Contract(pure = true)
 fun PsiMethod.isValidSpongeListener(): Boolean {
     if (!this.hasAnnotation(SpongeConstants.LISTENER_ANNOTATION) || this.isConstructor || !this.hasParameters()) {
         return false
@@ -33,7 +31,6 @@ fun PsiMethod.isValidSpongeListener(): Boolean {
     return eventClass.isInheritor(baseEventClass, true)
 }
 
-@Contract(pure = true)
 fun PsiMethod.resolveSpongeEventClass(): PsiClass? {
     if (this.parameters.isEmpty()) {
         return null
@@ -42,7 +39,6 @@ fun PsiMethod.resolveSpongeEventClass(): PsiClass? {
     return ((this.parameters[0].type as JvmReferenceType).resolve() as? PsiClass)
 }
 
-@Contract(pure = true)
 fun PsiAnnotation.resolveSpongeGetterTarget(): PsiMethod? {
     val method = this.findContainingMethod() ?: return null
     val eventClass = method.resolveSpongeEventClass() ?: return null

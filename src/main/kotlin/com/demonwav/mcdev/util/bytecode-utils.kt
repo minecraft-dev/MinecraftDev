@@ -42,7 +42,6 @@ val PsiPrimitiveType.internalName: Char
         else -> throw IllegalArgumentException("Unsupported primitive type: $this")
     }
 
-@Contract(pure = true)
 fun getPrimitiveType(internalName: Char): PsiPrimitiveType? {
     return when (internalName) {
         'B' -> PsiType.BYTE
@@ -58,14 +57,12 @@ fun getPrimitiveType(internalName: Char): PsiPrimitiveType? {
     }
 }
 
-@Contract(pure = true)
 fun getPrimitiveWrapperClass(internalName: Char, project: Project): PsiClass? {
     val type = getPrimitiveType(internalName) ?: return null
     val boxedTypeName = type.boxedTypeName ?: return null
     return JavaPsiFacade.getInstance(project).findClass(boxedTypeName, GlobalSearchScope.allScope(project))
 }
 
-@Contract(pure = true)
 private fun PsiClassType.erasure() = TypeConversionUtil.erasure(this) as PsiClassType
 
 @Throws(ClassNameResolutionFailedException::class)
@@ -120,7 +117,6 @@ val PsiClass.descriptor: String?
         }
     }
 
-@Contract(pure = true)
 fun PsiClass.findMethodsByInternalName(internalName: String, checkBases: Boolean = false): Array<PsiMethod> {
     return if (internalName == INTERNAL_CONSTRUCTOR_NAME) {
         constructors

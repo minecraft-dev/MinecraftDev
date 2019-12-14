@@ -23,8 +23,8 @@ import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.findDeclaredField
-import com.demonwav.mcdev.util.invokeDeclaredMethod
 import com.demonwav.mcdev.util.firstOfType
+import com.demonwav.mcdev.util.invokeDeclaredMethod
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.localFile
 import com.demonwav.mcdev.util.refreshFs
@@ -49,6 +49,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
+import java.io.File
 import org.apache.commons.io.FileUtils
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
@@ -61,7 +62,6 @@ import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.GroovyPsiElementFactory
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlock
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression
-import java.io.File
 
 class GradleBuildSystem(
     artifactId: String,

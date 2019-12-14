@@ -20,7 +20,6 @@ import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiReferenceExpression
-import org.jetbrains.annotations.Contract
 import javax.swing.Icon
 
 abstract class AbstractModule(protected val facet: MinecraftFacet) {
@@ -63,17 +62,14 @@ abstract class AbstractModule(protected val facet: MinecraftFacet) {
         data: GenerationData?
     ): PsiMethod? = null
 
-    @Contract(value = "null -> false", pure = true)
     open fun shouldShowPluginIcon(element: PsiElement?) = false
 
-    @Contract(pure = true)
     open fun checkUselessCancelCheck(expression: PsiMethodCallExpression): IsCancelled? {
         return null
     }
 
     open fun isStaticListenerSupported(method: PsiMethod) = false
 
-    @Contract(pure = true)
     protected fun standardSkip(method: PsiMethod, qualifierExpression: PsiExpression): Boolean {
         if (qualifierExpression !is PsiReferenceExpression) {
             return false

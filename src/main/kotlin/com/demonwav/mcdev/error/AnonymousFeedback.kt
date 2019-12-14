@@ -17,11 +17,11 @@ import com.google.gson.Gson
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.util.io.readCharSequence
-import org.apache.commons.io.IOUtils
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
+import org.apache.commons.io.IOUtils
 
 object AnonymousFeedback {
 

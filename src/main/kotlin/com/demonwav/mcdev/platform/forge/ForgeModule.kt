@@ -37,7 +37,6 @@ import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedElementsSearch
-import org.jetbrains.annotations.Contract
 
 class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
@@ -155,7 +154,6 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         return method
     }
 
-    @Contract(value = "null -> false", pure = true)
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
         if (element !is PsiIdentifier) {
             return false

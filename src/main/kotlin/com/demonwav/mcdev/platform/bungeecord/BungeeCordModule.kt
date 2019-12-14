@@ -30,7 +30,6 @@ import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTypesUtil
-import org.jetbrains.annotations.Contract
 
 class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, override val moduleType: T) :
     AbstractModule(facet) {
@@ -90,7 +89,6 @@ class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, ove
         return method
     }
 
-    @Contract(value = "null -> false", pure = true)
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
         if (element !is PsiIdentifier) {
             return false

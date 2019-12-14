@@ -29,7 +29,6 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.util.PsiExpressionTrimRenderer
 import com.intellij.psi.util.PsiUtilCore
 import com.intellij.util.Function
-import org.jetbrains.annotations.Contract
 import javax.swing.Icon
 
 /**
@@ -113,10 +112,8 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
             return otherElement != null && myElement != null
         }
 
-        @Contract(pure = true)
         override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<*>>) = myIcon!!
 
-        @Contract(pure = true)
         override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<*>>): Function<in PsiElement, String> =
             Function { "Multiple method overrides" }
 

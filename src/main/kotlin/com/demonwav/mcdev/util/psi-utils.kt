@@ -37,33 +37,26 @@ import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import com.siyeh.ig.psiutils.ImportUtils
-import org.jetbrains.annotations.Contract
 import java.util.stream.Stream
+import org.jetbrains.annotations.Contract
 
 // Parent
 fun PsiElement.findModule(): Module? = ModuleUtilCore.findModuleForPsiElement(this)
 
-@Contract(pure = true)
 fun PsiElement.findContainingClass(): PsiClass? = findParent(resolveReferences = false)
 
-@Contract(pure = true)
 fun PsiElement.findReferencedClass(): PsiClass? = findParent(resolveReferences = true)
 
-@Contract(pure = true)
 fun PsiElement.findReferencedMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = true)
 
-@Contract(pure = true)
 fun PsiElement.findContainingMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = false)
 
-@Contract(pure = true)
 fun PsiElement.findContainingMethod(): PsiMethod? = findParent({ it is PsiClass }, resolveReferences = false)
 
-@Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findParent(resolveReferences: Boolean): T? {
     return findParent({ false }, resolveReferences)
 }
 
-@Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findParent(
     stop: (PsiElement) -> Boolean,
     resolveReferences: Boolean
@@ -88,18 +81,14 @@ private inline fun <reified T : PsiElement> PsiElement.findParent(
 }
 
 // Children
-@Contract(pure = true)
 fun PsiClass.findFirstMember(): PsiMember? = findChild()
 
-@Contract(pure = true)
 fun PsiElement.findNextMember(): PsiMember? = findSibling(true)
 
-@Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findChild(): T? {
     return firstChild?.findSibling(strict = false)
 }
 
-@Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findSibling(strict: Boolean): T? {
     var sibling = if (strict) nextSibling ?: return null else this
     while (true) {
@@ -120,12 +109,10 @@ fun PsiElement.findKeyword(name: String): PsiKeyword? {
     return null
 }
 
-@Contract(pure = true)
 private inline fun PsiElement.forEachChild(func: (PsiElement) -> Unit) {
     firstChild?.forEachSibling(func, strict = false)
 }
 
-@Contract(pure = true)
 private inline fun PsiElement.forEachSibling(func: (PsiElement) -> Unit, strict: Boolean) {
     var sibling = if (strict) nextSibling ?: return else this
     while (true) {
@@ -134,7 +121,6 @@ private inline fun PsiElement.forEachSibling(func: (PsiElement) -> Unit, strict:
     }
 }
 
-@Contract(pure = true)
 inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElement? {
     var child = firstChild ?: return null
     var lastChild: PsiElement? = null
@@ -148,13 +134,11 @@ inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElem
     }
 }
 
-@Contract(pure = true)
 fun <T : Any> Sequence<T>.filter(filter: ElementFilter?, context: PsiElement): Sequence<T> {
     filter ?: return this
     return filter { filter.isAcceptable(it, context) }
 }
 
-@Contract(pure = true)
 fun Stream<out PsiElement>.toResolveResults(): Array<ResolveResult> = map(::PsiElementResolveResult).toTypedArray()
 
 fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
@@ -176,12 +160,10 @@ fun isAccessModifier(@ModifierConstant modifier: String): Boolean {
     return modifier in ACCESS_MODIFIERS
 }
 
-@Contract(pure = true)
 infix fun PsiElement.equivalentTo(other: PsiElement): Boolean {
     return manager.areElementsEquivalent(this, other)
 }
 
-@Contract(pure = true)
 fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
     // TODO: Do more checks for generics instead
     return TypeConversionUtil.erasure(this) == TypeConversionUtil.erasure(other)
@@ -195,7 +177,6 @@ val PsiMethod.nameAndParameterTypes: String
 val <T : PsiElement> T.manipulator: ElementManipulator<T>?
     get() = ElementManipulators.getManipulator(this)
 
-@Contract(pure = true)
 inline fun <T> PsiElement.cached(crossinline compute: () -> T): T {
     return CachedValuesManager.getCachedValue(this) { CachedValueProvider.Result.create(compute(), this) }
 }
