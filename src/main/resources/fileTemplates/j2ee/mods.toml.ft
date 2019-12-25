@@ -29,7 +29,7 @@ updateJSONURL="${UPDATE_URL}" #optional
 #credits="Thanks for this example mod goes to Java" #optional
 # A text field displayed in the mod UI
 #if (${HAS_AUTHOR_LIST})
-authors="${AUTHOR_LIST}" #optional
+authors=${AUTHOR_LIST} #optional
 #else
 #authors="Love, Cheese and small house plants" #optional
 #end
