@@ -12,10 +12,8 @@ package com.demonwav.mcdev.facet
 
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
-import com.demonwav.mcdev.util.AbstractProjectComponent
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.runWriteTaskLater
-import com.intellij.ProjectTopics
 import com.intellij.facet.FacetManager
 import com.intellij.facet.impl.ui.libraries.LibrariesValidatorContextImpl
 import com.intellij.openapi.module.Module
@@ -25,22 +23,12 @@ import com.intellij.openapi.roots.ModuleRootEvent
 import com.intellij.openapi.roots.ModuleRootListener
 import com.intellij.openapi.roots.libraries.LibraryKind
 import com.intellij.openapi.roots.ui.configuration.libraries.LibraryPresentationManager
-import com.intellij.openapi.startup.StartupManager
+import com.intellij.openapi.startup.StartupActivity
 
-class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(project) {
+class MinecraftFacetDetector : StartupActivity {
 
-    override fun projectOpened() {
-        val manager = StartupManager.getInstance(project)
-        val connection = project.messageBus.connect()
-
-        manager.registerStartupActivity {
-            MinecraftModuleRootListener.doCheck(project)
-        }
-
-        // Register a module root listener to check when things change
-        manager.registerPostStartupActivity {
-            connection.subscribe(ProjectTopics.PROJECT_ROOTS, MinecraftModuleRootListener)
-        }
+    override fun runActivity(project: Project) {
+        MinecraftModuleRootListener.doCheck(project)
     }
 
     private object MinecraftModuleRootListener : ModuleRootListener {

@@ -34,7 +34,7 @@
     </change-notes>
 
     <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="193.2956" until-build="193.*"/>
+    <idea-version since-build="201.3803" until-build="201.*"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- This is grouped in the following order EXCEPT for localInspections and moduleTypes. All localInspections are grouped at the
@@ -55,6 +55,7 @@
         <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
         <moduleBuilder id="MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.MinecraftModuleBuilder"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
+        <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
 
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
@@ -696,18 +697,15 @@
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
     </extensions>
 
-    <application-components>
-        <component>
-            <implementation-class>com.demonwav.mcdev.i18n.I18nFileListener</implementation-class>
-        </component>
-    </application-components>
+    <applicationListeners>
+        <listener class="com.demonwav.mcdev.i18n.I18nFileListener"
+                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    </applicationListeners>
 
-    <project-components>
-        <component>
-            <implementation-class>com.demonwav.mcdev.facet.MinecraftFacetDetector</implementation-class>
-            <loadForDefaultProject/>
-        </component>
-    </project-components>
+    <projectListeners>
+        <listener class="com.demonwav.mcdev.facet.MinecraftFacetDetector$MinecraftModuleRootListener"
+                  topic="com.intellij.openapi.roots.ModuleRootListener"/>
+    </projectListeners>
 
     <actions>
         <action class="com.demonwav.mcdev.insight.generation.GenerateEventListenerAction"

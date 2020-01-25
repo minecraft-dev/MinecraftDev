@@ -336,7 +336,6 @@ class GradleBuildSystem(
         }
 
         // Tell IntelliJ to import this project
-        @Suppress("UnstableApiUsage")
         linkAndRefreshGradleProject(rootDirectory.path, project)
 
         invokeLater {

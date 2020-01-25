@@ -25,7 +25,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys.PROJECT
 import com.intellij.openapi.actionSystem.CommonDataKeys.PSI_FILE
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.progress.runBackgroundableTask
-import com.intellij.openapi.wm.ToolWindowAnchor
+import com.intellij.openapi.wm.RegisterToolWindowTask
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -84,10 +84,13 @@ class FindMixinsAction : AnAction() {
                     if (classes.size == 1) {
                         gotoTargetElement(classes.single(), editor, file)
                     } else {
-                        ToolWindowManager.getInstance(project).unregisterToolWindow(TOOL_WINDOW_ID)
-                        val window = ToolWindowManager.getInstance(project)
-                            .registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM)
-                        window.icon = MixinAssets.MIXIN_CLASS_ICON
+                        val twManager = ToolWindowManager.getInstance(project)
+                        var window = twManager.getToolWindow(TOOL_WINDOW_ID)
+                        if (window == null) {
+                            val task = RegisterToolWindowTask.closable(TOOL_WINDOW_ID)
+                            window = twManager.registerToolWindow(task)
+                        }
+                        window.setIcon(MixinAssets.MIXIN_CLASS_ICON)
 
                         val component = FindMixinsComponent(classes)
                         val content = ContentFactory.SERVICE.getInstance().createContent(component.panel, null, false)
