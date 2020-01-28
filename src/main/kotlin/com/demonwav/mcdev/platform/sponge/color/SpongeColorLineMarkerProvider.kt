@@ -21,7 +21,7 @@ import com.intellij.psi.PsiExpressionList
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiNewExpression
 import com.intellij.psi.impl.source.tree.JavaElementType
-import com.intellij.psi.util.PsiUtilBase
+import com.intellij.psi.util.PsiEditorUtil
 import com.intellij.ui.ColorChooser
 import java.awt.Color
 
@@ -50,7 +50,7 @@ class SpongeColorLineMarkerProvider : LineMarkerProvider {
                 return@handler
             }
 
-            val editor = PsiUtilBase.findEditor(element) ?: return@handler
+            val editor = PsiEditorUtil.findEditor(element) ?: return@handler
 
             val c = ColorChooser.chooseColor(editor.component, "Choose Color", color, false)
             if (c != null) {

@@ -14,7 +14,7 @@ import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.HttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
-import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.util.io.readCharSequence
 import java.io.InputStreamReader
@@ -275,7 +275,7 @@ object AnonymousFeedback {
     private val userAgent by lazy {
         var agent = "Minecraft Development IntelliJ IDEA plugin"
 
-        val pluginDescription = PluginManager.getPlugin(PluginUtil.PLUGIN_ID)
+        val pluginDescription = PluginManagerCore.getPlugin(PluginUtil.PLUGIN_ID)
         if (pluginDescription != null) {
             val name = pluginDescription.name
             val version = pluginDescription.version

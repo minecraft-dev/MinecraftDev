@@ -15,7 +15,7 @@ import com.demonwav.mcdev.util.forEachNotNull
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.invokeLaterAny
 import com.intellij.ide.plugins.IdeaPluginDescriptor
-import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.ide.plugins.PluginManagerMain
 import com.intellij.ide.plugins.PluginNode
 import com.intellij.ide.plugins.RepositoryHelper
@@ -82,7 +82,7 @@ object PluginUpdater {
         val newVersion = responseDoc.getChild("category")?.getChild("idea-plugin")?.getChild("version")?.text
             ?: return PluginUpdateStatus.CheckFailed("Couldn't find plugin version in repository response")
 
-        val plugin = PluginManager.getPlugin(PluginUtil.PLUGIN_ID)!!
+        val plugin = PluginManagerCore.getPlugin(PluginUtil.PLUGIN_ID)!!
         val pluginNode = PluginNode(PluginUtil.PLUGIN_ID)
         pluginNode.version = newVersion
         pluginNode.name = plugin.name
