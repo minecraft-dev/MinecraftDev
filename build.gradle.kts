@@ -34,9 +34,7 @@ group = "com.demonwav.minecraft-dev"
 
 val coroutineVersion = "1.2.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
-// We can't sync the project with Intellij IDEA if the build task fails
-// Right now a large part of the tests are failing so let's comment it for now
-// defaultTasks("build")
+defaultTasks("build")
 
 val ideaVersion: String by project
 val downloadIdeaSources: String by project
