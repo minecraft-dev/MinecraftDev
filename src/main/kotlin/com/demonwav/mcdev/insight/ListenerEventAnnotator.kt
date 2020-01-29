@@ -14,12 +14,14 @@ import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
+import com.intellij.psi.PsiParameter
 import com.intellij.psi.impl.source.PsiClassReferenceType
 
 class ListenerEventAnnotator : Annotator {
@@ -31,11 +33,12 @@ class ListenerEventAnnotator : Annotator {
 
         // Since we want to line up with the method declaration, not the annotation
         // declaration, we need to target identifiers, not just PsiMethods.
-        if (!(element is PsiIdentifier && element.getParent() is PsiMethod)) {
-            return
+        val method = when (element) {
+            is PsiIdentifier -> element.parent as? PsiMethod ?: return
+            is PsiParameter -> element.parent.parent as? PsiMethod ?: return
+            else -> return
         }
-        // The PsiIdentifier is going to be a method of course!
-        val method = element.getParent() as PsiMethod
+
         if (method.hasModifierProperty(PsiModifier.ABSTRACT)) {
             // I don't think any implementation allows for abstract
             return
@@ -80,12 +83,20 @@ class ListenerEventAnnotator : Annotator {
 
         if (!instance.isStaticListenerSupported(method) && method.hasModifierProperty(PsiModifier.STATIC)) {
             if (method.nameIdentifier != null) {
-                holder.createErrorAnnotation(method.nameIdentifier!!, "Event listener method must not be static")
+                holder.newAnnotation(HighlightSeverity.ERROR, "Event listener method must not be static")
+                    .range(method.nameIdentifier!!)
+                    .create()
             }
         }
 
-        if (!isSuperEventListenerAllowed(eventClass, method, instance)) {
-            holder.createErrorAnnotation(eventParameter, instance.writeErrorMessageForEvent(eventClass, method))
+        if (element == eventParameter && !isSuperEventListenerAllowed(eventClass, method, instance)) {
+            // Only annotate the first parameter
+            val errorMessage = instance.writeErrorMessageForEvent(eventClass, method)
+            if (errorMessage == null) {
+                holder.newSilentAnnotation(HighlightSeverity.ERROR).create()
+            } else {
+                holder.newAnnotation(HighlightSeverity.ERROR, errorMessage).create()
+            }
         }
     }
 

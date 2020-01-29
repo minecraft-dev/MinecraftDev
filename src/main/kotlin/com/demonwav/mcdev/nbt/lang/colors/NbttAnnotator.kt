@@ -36,13 +36,16 @@ class NbttAnnotator : Annotator {
             return
         }
 
-        val annotation = holder.createAnnotation(HighlightSeverity.INFORMATION, element.textRange, null)
-        annotation.textAttributes = NbttSyntaxHighlighter.STRING_NAME
-
-        if (!element.text.startsWith('"')) {
-            // is unquoted
-            annotation.textAttributes = NbttSyntaxHighlighter.UNQUOTED_STRING_NAME
+        val attributes = if (!element.text.startsWith('"')) {
+            NbttSyntaxHighlighter.UNQUOTED_STRING_NAME
+        } else {
+            NbttSyntaxHighlighter.STRING_NAME
         }
+
+        holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+            .range(element)
+            .textAttributes(attributes)
+            .create()
     }
 
     private fun annotateMaterials(element: PsiElement, holder: AnnotationHolder) {
@@ -58,19 +61,21 @@ class NbttAnnotator : Annotator {
             // won't even let you escape them
 
             val range = TextRange(element.textRange.startOffset + index + 2, element.textRange.endOffset - 1)
-            val annotation = holder.createAnnotation(HighlightSeverity.INFORMATION, range, "Material")
-            annotation.textAttributes = NbttSyntaxHighlighter.MATERIAL
+            holder.newAnnotation(HighlightSeverity.INFORMATION, "Material")
+                .range(range)
+                .textAttributes(NbttSyntaxHighlighter.MATERIAL)
+                .create()
         }
     }
 
     private fun annotateTypes(element: PsiElement, holder: AnnotationHolder) {
         when (element) {
-            is NbttByte -> holder.createInfoAnnotation(element, "byte")
-            is NbttShort -> holder.createInfoAnnotation(element, "short")
-            is NbttInt -> holder.createInfoAnnotation(element, "int")
-            is NbttLong -> holder.createInfoAnnotation(element, "long")
-            is NbttFloat -> holder.createInfoAnnotation(element, "float")
-            is NbttDouble -> holder.createInfoAnnotation(element, "double")
+            is NbttByte -> holder.newAnnotation(HighlightSeverity.INFORMATION, "byte").range(element).create()
+            is NbttShort -> holder.newAnnotation(HighlightSeverity.INFORMATION, "short").range(element).create()
+            is NbttInt -> holder.newAnnotation(HighlightSeverity.INFORMATION, "int").range(element).create()
+            is NbttLong -> holder.newAnnotation(HighlightSeverity.INFORMATION, "long").range(element).create()
+            is NbttFloat -> holder.newAnnotation(HighlightSeverity.INFORMATION, "float").range(element).create()
+            is NbttDouble -> holder.newAnnotation(HighlightSeverity.INFORMATION, "double").range(element).create()
         }
     }
 }

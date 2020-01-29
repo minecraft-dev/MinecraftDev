@@ -18,6 +18,7 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
 import com.demonwav.mcdev.platform.mcp.at.psi.AtElement
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.module.ModuleUtilCore
@@ -64,14 +65,17 @@ class AtAnnotator : Annotator {
     }
 
     private fun underline(element: AtElement, holder: AnnotationHolder) {
-        val annotation = holder.createInfoAnnotation(element, null)
-        annotation.enforcedTextAttributes =
-            TextAttributes(
-                null,
-                null,
-                AtSyntaxHighlighter.ELEMENT_NAME.defaultAttributes.foregroundColor,
-                EffectType.BOLD_LINE_UNDERSCORE,
-                Font.PLAIN
+        holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+            .range(element)
+            .enforcedTextAttributes(
+                TextAttributes(
+                    null,
+                    null,
+                    AtSyntaxHighlighter.ELEMENT_NAME.defaultAttributes.foregroundColor,
+                    EffectType.BOLD_LINE_UNDERSCORE,
+                    Font.PLAIN
+                )
             )
+            .create()
     }
 }

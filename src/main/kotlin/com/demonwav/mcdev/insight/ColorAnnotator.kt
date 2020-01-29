@@ -13,6 +13,7 @@ package com.demonwav.mcdev.insight
 import com.demonwav.mcdev.MinecraftSettings
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.psi.PsiElement
 import java.awt.Color
@@ -32,9 +33,12 @@ class ColorAnnotator : Annotator {
 
     companion object {
         fun setColorAnnotator(color: Color, element: PsiElement, holder: AnnotationHolder) {
-            val annotation = holder.createInfoAnnotation(element, null)
-            annotation.enforcedTextAttributes =
+            val textAttributes =
                 TextAttributes(null, null, color, MinecraftSettings.instance.underlineType.effectType, Font.PLAIN)
+            holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                .range(element)
+                .enforcedTextAttributes(textAttributes)
+                .create()
         }
     }
 }
