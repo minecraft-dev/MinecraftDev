@@ -23,7 +23,7 @@ import com.intellij.psi.search.searches.AnnotatedElementsSearch
 
 object MixinClass : ClassNameReferenceProvider() {
 
-    override fun getBasePackage(element: PsiElement): String? {
+    public override fun getBasePackage(element: PsiElement): String? {
         // Literal -> Array -> Property -> Object
         val obj = element.parent?.parent?.parent as? JsonObject ?: return null
         return (obj.findProperty("package")?.value as? JsonStringLiteral)?.value
