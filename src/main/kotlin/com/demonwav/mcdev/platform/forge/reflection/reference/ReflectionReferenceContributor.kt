@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -18,11 +18,19 @@ import com.intellij.psi.PsiReferenceRegistrar
 class ReflectionReferenceContributor : PsiReferenceContributor() {
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         registrar.registerReferenceProvider(
-            PsiJavaPatterns.psiLiteral(StandardPatterns.string()).and(PsiJavaPatterns.psiElement().methodCallParameter(PsiJavaPatterns.psiMethod().withName("findField"))),
+            PsiJavaPatterns.psiLiteral(StandardPatterns.string())
+                .and(
+                    PsiJavaPatterns.psiElement()
+                        .methodCallParameter(PsiJavaPatterns.psiMethod().withName("findField"))
+                ),
             ReflectedFieldReference
         )
         registrar.registerReferenceProvider(
-            PsiJavaPatterns.psiLiteral(StandardPatterns.string()).and(PsiJavaPatterns.psiElement().methodCallParameter(PsiJavaPatterns.psiMethod().withName("findMethod"))),
+            PsiJavaPatterns.psiLiteral(StandardPatterns.string())
+                .and(
+                    PsiJavaPatterns.psiElement()
+                        .methodCallParameter(PsiJavaPatterns.psiMethod().withName("findMethod"))
+                ),
             ReflectedMethodReference
         )
     }

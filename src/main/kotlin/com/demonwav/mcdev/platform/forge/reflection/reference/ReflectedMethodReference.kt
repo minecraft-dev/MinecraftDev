@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -15,8 +15,8 @@ import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.qualifiedMemberReference
+import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
-import com.intellij.codeInsight.hint.HintManager
 import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.CommandProcessor
@@ -58,20 +58,26 @@ object ReflectedMethodReference : PsiReferenceProvider() {
         override fun getVariants(): Array<Any> {
             val typeClass = findReferencedClass() ?: return arrayOf()
 
-            return typeClass.allMethods.filter { !it.hasModifier(JvmModifier.PUBLIC) }
+            return typeClass.allMethods
+                .asSequence()
+                .filter { !it.hasModifier(JvmModifier.PUBLIC) }
                 .map { method ->
                     JavaLookupElementBuilder.forMethod(method, PsiSubstitutor.EMPTY).withInsertHandler { context, _ ->
-                        val literal = context.file.findElementAt(context.startOffset)?.parent as? PsiLiteral ?: return@withInsertHandler
+                        val literal = context.file.findElementAt(context.startOffset)?.parent as? PsiLiteral
+                            ?: return@withInsertHandler
                         val params = literal.parent as? PsiExpressionList ?: return@withInsertHandler
-                        val srgManager = literal.findModule()?.let { MinecraftFacet.getInstance(it) }?.getModuleOfType(McpModuleType)?.srgManager
+                        val srgManager = literal.findModule()?.let { MinecraftFacet.getInstance(it) }
+                            ?.getModuleOfType(McpModuleType)?.srgManager
                         val srgMap = srgManager?.srgMapNow
 
                         val signature = method.getSignature(PsiSubstitutor.EMPTY)
-                        val returnType = method.returnType?.let { TypeConversionUtil.erasure(it).canonicalText } ?: return@withInsertHandler
-                        val paramTypes = MethodSignatureUtil.calcErasedParameterTypes(signature).map { it.canonicalText }
+                        val returnType = method.returnType?.let { TypeConversionUtil.erasure(it).canonicalText }
+                            ?: return@withInsertHandler
+                        val paramTypes = MethodSignatureUtil.calcErasedParameterTypes(signature)
+                            .map { it.canonicalText }
 
                         val memberRef = method.qualifiedMemberReference
-                        val srgMethod = srgMap?.mapToSrgMethod(memberRef) ?: memberRef
+                        val srgMethod = srgMap?.getSrgMethod(memberRef) ?: memberRef
 
                         context.setLaterRunnable {
                             // Commit changes made by code completion
@@ -81,34 +87,38 @@ object ReflectedMethodReference : PsiReferenceProvider() {
                             CommandProcessor.getInstance().runUndoTransparentAction {
                                 runWriteAction {
                                     val elementFactory = JavaPsiFacade.getElementFactory(context.project)
-                                    val mcpLiteral = elementFactory.createExpressionFromText("\"${memberRef.name}\"", params)
-                                    val srgLiteral = elementFactory.createExpressionFromText("\"${srgMethod.name}\"", params)
+                                    val srgLiteral = elementFactory.createExpressionFromText(
+                                        "\"${srgMethod.name}\"",
+                                        params
+                                    )
 
                                     if (params.expressionCount > 1) {
-                                        params.expressions[1].replace(mcpLiteral)
-                                    } else {
-                                        params.add(mcpLiteral)
-                                    }
-
-                                    if (params.expressionCount > 2) {
-                                        params.expressions[2].replace(srgLiteral)
+                                        params.expressions[1].replace(srgLiteral)
                                     } else {
                                         params.add(srgLiteral)
                                     }
 
-                                    if (params.expressionCount > 3) {
-                                        params.deleteChildRange(params.expressions[3], params.expressions.last())
+                                    if (params.expressionCount > 2) {
+                                        params.deleteChildRange(params.expressions[2], params.expressions.last())
                                     }
-                                    val returnTypeRef = elementFactory.createExpressionFromText("$returnType.class", params)
+                                    val returnTypeRef = elementFactory.createExpressionFromText(
+                                        "$returnType.class",
+                                        params
+                                    )
                                     params.add(returnTypeRef)
 
                                     for (paramType in paramTypes) {
-                                        val paramTypeRef = elementFactory.createExpressionFromText("$paramType.class", params)
+                                        val paramTypeRef = elementFactory.createExpressionFromText(
+                                            "$paramType.class",
+                                            params
+                                        )
                                         params.add(paramTypeRef)
                                     }
 
                                     JavaCodeStyleManager.getInstance(context.project).shortenClassReferences(params)
                                     CodeStyleManager.getInstance(context.project).reformat(params, true)
+
+                                    context.editor.caretModel.moveToOffset(params.textRange.endOffset)
                                 }
                             }
                         }
@@ -120,15 +130,16 @@ object ReflectedMethodReference : PsiReferenceProvider() {
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
             val typeClass = findReferencedClass() ?: return arrayOf()
 
-            val srgManager = element.findModule()?.let { MinecraftFacet.getInstance(it) }?.getModuleOfType(McpModuleType)?.srgManager
+            val name = methodName
+            val srgManager = element.findModule()?.let { MinecraftFacet.getInstance(it) }
+                ?.getModuleOfType(McpModuleType)?.srgManager
             val srgMap = srgManager?.srgMapNow
-            val mcpName = srgMap?.mapSrgName(methodName)
+            val mcpName = srgMap?.mapMcpToSrgName(name) ?: name
 
-            if (mcpName != null) {
-                return typeClass.allMethods.filter { it.name == mcpName }.map(::PsiElementResolveResult).toTypedArray()
-            }
-
-            return typeClass.allMethods.filter { it.name == methodName }.map(::PsiElementResolveResult).toTypedArray()
+            return typeClass.allMethods.asSequence()
+                .filter { it.name == mcpName }
+                .map(::PsiElementResolveResult)
+                .toTypedArray()
         }
 
         private fun findReferencedClass(): PsiClass? {

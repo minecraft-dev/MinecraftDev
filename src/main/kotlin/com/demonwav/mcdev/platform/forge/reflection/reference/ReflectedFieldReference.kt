@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -15,8 +15,8 @@ import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.simpleQualifiedMemberReference
+import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
-import com.intellij.codeInsight.hint.HintManager
 import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.CommandProcessor
@@ -51,14 +51,19 @@ object ReflectedFieldReference : PsiReferenceProvider() {
         override fun getVariants(): Array<Any> {
             val typeClass = findReferencedClass() ?: return arrayOf()
 
-            return typeClass.allFields.filter { !it.hasModifier(JvmModifier.PUBLIC) }
+            return typeClass.allFields
+                .asSequence()
+                .filter { !it.hasModifier(JvmModifier.PUBLIC) }
                 .map { field ->
                     JavaLookupElementBuilder.forField(field).withInsertHandler { context, _ ->
-                        val literal = context.file.findElementAt(context.startOffset)?.parent as? PsiLiteral ?: return@withInsertHandler
+                        val literal = context.file.findElementAt(context.startOffset)?.parent as? PsiLiteral
+                            ?: return@withInsertHandler
 
-                        val srgManager = literal.findModule()?.let { MinecraftFacet.getInstance(it) }?.getModuleOfType(McpModuleType)?.srgManager
+                        val srgManager = literal.findModule()?.let { MinecraftFacet.getInstance(it) }
+                            ?.getModuleOfType(McpModuleType)?.srgManager
                         val srgMap = srgManager?.srgMapNow
-                        val srgField = srgMap?.getSrgField(field.simpleQualifiedMemberReference) ?: return@withInsertHandler
+                        val srgField = srgMap?.getSrgField(field.simpleQualifiedMemberReference)
+                            ?: return@withInsertHandler
 
                         context.setLaterRunnable {
                             // Commit changes made by code completion
@@ -67,10 +72,17 @@ object ReflectedFieldReference : PsiReferenceProvider() {
                             // Run command to replace PsiElement
                             CommandProcessor.getInstance().runUndoTransparentAction {
                                 runWriteAction {
+                                    val params = literal.parent
                                     val elementFactory = JavaPsiFacade.getElementFactory(context.project)
-                                    val srgLiteral = elementFactory.createExpressionFromText("\"${srgField.name}\"", literal.parent)
-                                    literal.parent.addBefore(srgLiteral, literal)
-                                    CodeStyleManager.getInstance(context.project).reformat(literal.parent, true)
+                                    val srgLiteral = elementFactory.createExpressionFromText(
+                                        "\"${srgField.name}\"",
+                                        literal.parent
+                                    )
+                                    literal.replace(srgLiteral)
+
+                                    CodeStyleManager.getInstance(context.project).reformat(srgLiteral.parent, true)
+
+                                    context.editor.caretModel.moveToOffset(params.textRange.endOffset)
                                 }
                             }
                         }
@@ -82,15 +94,16 @@ object ReflectedFieldReference : PsiReferenceProvider() {
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
             val typeClass = findReferencedClass() ?: return arrayOf()
 
-            val srgManager = element.findModule()?.let { MinecraftFacet.getInstance(it) }?.getModuleOfType(McpModuleType)?.srgManager
+            val name = fieldName
+            val srgManager = element.findModule()?.let { MinecraftFacet.getInstance(it) }
+                ?.getModuleOfType(McpModuleType)?.srgManager
             val srgMap = srgManager?.srgMapNow
-            val mcpName = srgMap?.mapSrgName(fieldName)
+            val mcpName = srgMap?.mapMcpToSrgName(name) ?: name
 
-            if (mcpName != null) {
-                return typeClass.allFields.filter { it.name == mcpName }.map(::PsiElementResolveResult).toTypedArray()
-            }
-
-            return typeClass.allFields.filter { it.name == fieldName }.map(::PsiElementResolveResult).toTypedArray()
+            return typeClass.allFields.asSequence()
+                .filter { it.name == mcpName }
+                .map(::PsiElementResolveResult)
+                .toTypedArray()
         }
 
         private fun findReferencedClass(): PsiClass? {

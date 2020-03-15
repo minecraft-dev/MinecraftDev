@@ -51,8 +51,8 @@ import com.intellij.psi.util.createSmartPointer
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspection.formatString
 import com.siyeh.ig.ui.UiUtils
-import org.jdom.Element
 import javax.swing.JComponent
+import org.jdom.Element
 
 class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
 
