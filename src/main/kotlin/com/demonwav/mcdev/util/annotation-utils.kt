@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -20,27 +20,22 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiModifierListOwner
 import org.jetbrains.annotations.Contract
 
-@Contract(pure = true)
 fun PsiModifierListOwner.findAnnotation(qualifiedName: String): PsiAnnotation? {
     return modifierList?.findAnnotation(qualifiedName)
 }
 
-@Contract(pure = true)
 fun PsiAnnotationMemberValue.findAnnotations(): List<PsiAnnotation> {
     return parseArray { it as? PsiAnnotation }
 }
 
-@Contract(pure = true)
 fun PsiAnnotationMemberValue.computeStringArray(): List<String> {
     return parseArray { it.constantStringValue }
 }
 
-@Contract(pure = true)
 fun PsiAnnotationMemberValue.resolveClassArray(): List<PsiClass> {
     return parseArray { it.resolveClass() }
 }
 
-@Contract(pure = true)
 fun PsiAnnotationMemberValue.resolveClass(): PsiClass? {
     if (this !is PsiClassObjectAccessExpression) {
         return null
@@ -60,7 +55,6 @@ fun PsiAnnotationMemberValue?.isNotEmpty(): Boolean {
     return this != null && (this !is PsiArrayInitializerMemberValue || initializers.isNotEmpty())
 }
 
-@Contract(pure = true)
 private inline fun <T : Any> PsiAnnotationMemberValue.parseArray(func: (PsiAnnotationMemberValue) -> T?): List<T> {
     return if (this is PsiArrayInitializerMemberValue) {
         initializers.mapNotNull(func)

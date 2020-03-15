@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -48,16 +48,21 @@ class MixinSuperClassInspection : MixinInspection() {
                     if (targetClass equivalentTo superClass) {
                         reportSuperClass(psiClass, "Cannot extend target class")
                     } else if (!targetClass.isInheritor(superClass, true)) {
-                        reportSuperClass(psiClass,
-                            "Cannot find '${superClass.shortName}' in the hierarchy of target class '${targetClass.shortName}'")
+                        reportSuperClass(
+                            psiClass,
+                            "Cannot find '${superClass.shortName}' " +
+                                "in the hierarchy of target class '${targetClass.shortName}'"
+                        )
                     }
                 }
             } else {
                 // At least one of the target classes of the super mixin must be in the hierarchy of the target class(es)
                 for (targetClass in targetClasses) {
                     if (!superTargets.any { superTarget -> targetClass.isInheritor(superTarget, true) }) {
-                        reportSuperClass(psiClass,
-                            "Cannot find '${targetClass.shortName}' in the hierarchy of the super mixin")
+                        reportSuperClass(
+                            psiClass,
+                            "Cannot find '${targetClass.shortName}' in the hierarchy of the super mixin"
+                        )
                     }
                 }
             }

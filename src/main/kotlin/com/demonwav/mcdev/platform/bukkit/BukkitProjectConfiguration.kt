@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -12,6 +12,8 @@
 
 package com.demonwav.mcdev.platform.bukkit
 
+import com.demonwav.mcdev.buildsystem.BuildDependency
+import com.demonwav.mcdev.buildsystem.BuildRepository
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
@@ -89,5 +91,54 @@ class BukkitProjectConfiguration(override var type: PlatformType) : ProjectConfi
                 EditorHelper.openInEditor(mainClassPsi)
             }
         }
+    }
+
+    override fun setupDependencies(buildSystem: BuildSystem) {
+        val mcVersion = data?.minecraftVersion ?: return
+        when (type) {
+            PlatformType.PAPER -> {
+                buildSystem.repositories.add(BuildRepository(
+                    "papermc-repo",
+                    "https://papermc.io/repo/repository/maven-public/"
+                ))
+                buildSystem.dependencies.add(BuildDependency(
+                    "com.destroystokyo.paper",
+                    "paper-api",
+                    "$mcVersion-R0.1-SNAPSHOT",
+                    mavenScope = "provided",
+                    gradleConfiguration = "compileOnly"
+                ))
+                addSonatype(buildSystem.repositories)
+            }
+            PlatformType.SPIGOT -> {
+                spigotRepo(buildSystem.repositories)
+                buildSystem.dependencies.add(BuildDependency(
+                    "org.spigotmc",
+                    "spigot-api",
+                    "$mcVersion-R0.1-SNAPSHOT",
+                    mavenScope = "provided",
+                    gradleConfiguration = "compileOnly"
+                ))
+                addSonatype(buildSystem.repositories)
+            }
+            PlatformType.BUKKIT -> {
+                spigotRepo(buildSystem.repositories)
+                buildSystem.dependencies.add(BuildDependency(
+                    "org.bukkit",
+                    "bukkit",
+                    "$mcVersion-R0.1-SNAPSHOT",
+                    mavenScope = "provided",
+                    gradleConfiguration = "compileOnly"
+                ))
+            }
+            else -> {}
+        }
+    }
+
+    private fun spigotRepo(list: MutableList<BuildRepository>) {
+        list.add(BuildRepository(
+            "spigotmc-repo",
+            "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+        ))
     }
 }

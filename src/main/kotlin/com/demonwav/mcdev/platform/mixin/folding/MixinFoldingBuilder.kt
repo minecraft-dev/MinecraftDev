@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -52,11 +52,15 @@ class MixinFoldingBuilder : CustomFoldingBuilder() {
 
     private fun formatElement(element: PsiElement): String? {
         return when (element) {
-            is PsiMethod -> PsiFormatUtil.formatMethod(element, PsiSubstitutor.EMPTY,
+            is PsiMethod -> PsiFormatUtil.formatMethod(
+                element, PsiSubstitutor.EMPTY,
                 PsiFormatUtilBase.SHOW_NAME or PsiFormatUtilBase.SHOW_PARAMETERS or SHOW_CONTAINING_CLASS,
-                PsiFormatUtilBase.SHOW_TYPE)
-            is PsiVariable -> PsiFormatUtil.formatVariable(element,
-                PsiFormatUtilBase.SHOW_NAME or SHOW_CONTAINING_CLASS, PsiSubstitutor.EMPTY)
+                PsiFormatUtilBase.SHOW_TYPE
+            )
+            is PsiVariable -> PsiFormatUtil.formatVariable(
+                element,
+                PsiFormatUtilBase.SHOW_NAME or SHOW_CONTAINING_CLASS, PsiSubstitutor.EMPTY
+            )
             is NavigationItem -> element.presentation?.presentableText
             else -> null
         }
@@ -66,12 +70,18 @@ class MixinFoldingBuilder : CustomFoldingBuilder() {
         val element = node.psi
         return when (element) {
             is PsiTypeCastExpression -> "(${element.castType?.text ?: return node.text})"
-            is PsiAnnotationMemberValue -> TargetReference.resolveTarget(element)?.let { formatElement(it) } ?: node.text
+            is PsiAnnotationMemberValue -> TargetReference.resolveTarget(element)?.let { formatElement(it) }
+                ?: node.text
             else -> node.text
         }
     }
 
-    override fun buildLanguageFoldRegions(descriptors: MutableList<FoldingDescriptor>, root: PsiElement, document: Document, quick: Boolean) {
+    override fun buildLanguageFoldRegions(
+        descriptors: MutableList<FoldingDescriptor>,
+        root: PsiElement,
+        document: Document,
+        quick: Boolean
+    ) {
         if (root !is PsiJavaFile || !MixinModuleType.isInModule(root)) {
             return
         }
@@ -79,7 +89,8 @@ class MixinFoldingBuilder : CustomFoldingBuilder() {
         root.accept(Visitor(descriptors))
     }
 
-    private class Visitor(private val descriptors: MutableList<FoldingDescriptor>) : JavaRecursiveElementWalkingVisitor() {
+    private class Visitor(private val descriptors: MutableList<FoldingDescriptor>) :
+        JavaRecursiveElementWalkingVisitor() {
 
         val settings = MixinFoldingSettings.instance.state
 
@@ -113,10 +124,13 @@ class MixinFoldingBuilder : CustomFoldingBuilder() {
                 val start = (expression as? CompositeElement)?.findChildByRole(ChildRole.LPARENTH) ?: return
                 val end = (innerCast as? CompositeElement)?.findChildByRole(ChildRole.RPARENTH) ?: return
 
-                descriptors.add(FoldingDescriptor(expression.node, TextRange(start.startOffset, end.startOffset + end.textLength)))
+                descriptors.add(
+                    FoldingDescriptor(
+                        expression.node,
+                        TextRange(start.startOffset, end.startOffset + end.textLength)
+                    )
+                )
             }
         }
-
     }
-
 }

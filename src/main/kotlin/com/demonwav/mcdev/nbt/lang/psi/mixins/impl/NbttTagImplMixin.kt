@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -19,59 +19,35 @@ import com.intellij.lang.ASTNode
 abstract class NbttTagImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttTagMixin {
 
     override fun getType(): NbtTypeId {
-        if (getByte() != null) {
-            return NbtTypeId.BYTE
+        return when {
+            getByte() != null -> NbtTypeId.BYTE
+            getShort() != null -> NbtTypeId.SHORT
+            getInt() != null -> NbtTypeId.INT
+            getLong() != null -> NbtTypeId.LONG
+            getFloat() != null -> NbtTypeId.FLOAT
+            getDouble() != null -> NbtTypeId.DOUBLE
+            getByteArray() != null -> NbtTypeId.BYTE_ARRAY
+            getIntArray() != null -> NbtTypeId.INT_ARRAY
+            getLongArray() != null -> NbtTypeId.LONG_ARRAY
+            getList() != null -> NbtTypeId.LIST
+            getCompound() != null -> NbtTypeId.COMPOUND
+            getString() != null -> NbtTypeId.STRING
+            else -> NbtTypeId.END // Shouldn't actually ever happen
         }
-        if (getShort() != null) {
-            return NbtTypeId.SHORT
-        }
-        if (getInt() != null) {
-            return NbtTypeId.INT
-        }
-        if (getLong() != null) {
-            return NbtTypeId.LONG
-        }
-        if (getFloat() != null) {
-            return NbtTypeId.FLOAT
-        }
-        if (getDouble() != null) {
-            return NbtTypeId.DOUBLE
-        }
-        if (getByteArray() != null) {
-            return NbtTypeId.BYTE_ARRAY
-        }
-        if (getIntArray() != null) {
-            return NbtTypeId.INT_ARRAY
-        }
-        if (getLongArray() != null) {
-            return NbtTypeId.LONG_ARRAY
-        }
-        if (getList() != null) {
-            return NbtTypeId.LIST
-        }
-        if (getCompound() != null) {
-            return NbtTypeId.COMPOUND
-        }
-        if (getString() != null) {
-            return NbtTypeId.STRING
-        }
-        return NbtTypeId.END // Shouldn't actually ever happen
     }
+
     override fun getTag(): NbttElement? {
-        return when (getType()) {
-            NbtTypeId.END -> null
-            NbtTypeId.BYTE -> getByte()
-            NbtTypeId.SHORT -> getShort()
-            NbtTypeId.INT -> getInt()
-            NbtTypeId.LONG -> getLong()
-            NbtTypeId.FLOAT -> getFloat()
-            NbtTypeId.DOUBLE -> getDouble()
-            NbtTypeId.BYTE_ARRAY -> getByteArray()
-            NbtTypeId.STRING -> getString()
-            NbtTypeId.LIST -> getList()
-            NbtTypeId.COMPOUND -> getCompound()
-            NbtTypeId.INT_ARRAY -> getIntArray()
-            NbtTypeId.LONG_ARRAY -> getLongArray()
-        }
+        return getByte()
+            ?: getShort()
+            ?: getInt()
+            ?: getLong()
+            ?: getFloat()
+            ?: getDouble()
+            ?: getByteArray()
+            ?: getString()
+            ?: getList()
+            ?: getCompound()
+            ?: getIntArray()
+            ?: getLongArray()
     }
 }

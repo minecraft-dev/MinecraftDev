@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.util
 
 import com.demonwav.mcdev.asset.PlatformAssets
-
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory
@@ -36,9 +35,14 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
 
         group.addTemplate(FileTemplateDescriptor(FORGE_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.FORGE_ICON))
         group.addTemplate(FileTemplateDescriptor(FORGE_BUILD_GRADLE_TEMPLATE, PlatformAssets.FORGE_ICON))
+        group.addTemplate(FileTemplateDescriptor(FG3_BUILD_GRADLE_TEMPLATE, PlatformAssets.FORGE_ICON))
         group.addTemplate(FileTemplateDescriptor(FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.FORGE_ICON))
+        group.addTemplate(FileTemplateDescriptor(FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.FORGE_ICON))
         group.addTemplate(FileTemplateDescriptor(FORGE_MAIN_CLASS_TEMPLATE, PlatformAssets.FORGE_ICON))
+        group.addTemplate(FileTemplateDescriptor(FG3_MAIN_CLASS_TEMPLATE, PlatformAssets.FORGE_ICON))
         group.addTemplate(FileTemplateDescriptor(MCMOD_INFO_TEMPLATE, PlatformAssets.FORGE_ICON))
+        group.addTemplate(FileTemplateDescriptor(MODS_TOML_TEMPLATE, PlatformAssets.FORGE_ICON))
+        group.addTemplate(FileTemplateDescriptor(PACK_MCMETA_TEMPLATE, PlatformAssets.FORGE_ICON))
 
         group.addTemplate(FileTemplateDescriptor(GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.MINECRAFT_ICON))
         group.addTemplate(FileTemplateDescriptor(BUILD_GRADLE_TEMPLATE, PlatformAssets.MINECRAFT_ICON))
@@ -48,7 +52,12 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
 
         group.addTemplate(FileTemplateDescriptor(LITELOADER_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.LITELOADER_ICON))
         group.addTemplate(FileTemplateDescriptor(LITELOADER_BUILD_GRADLE_TEMPLATE, PlatformAssets.LITELOADER_ICON))
-        group.addTemplate(FileTemplateDescriptor(LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.LITELOADER_ICON))
+        group.addTemplate(
+            FileTemplateDescriptor(
+                LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE,
+                PlatformAssets.LITELOADER_ICON
+            )
+        )
         group.addTemplate(FileTemplateDescriptor(LITELOADER_MAIN_CLASS_TEMPLATE, PlatformAssets.LITELOADER_ICON))
 
         group.addTemplate(FileTemplateDescriptor(MIXIN_OVERWRITE_FALLBACK, PlatformAssets.MIXIN_ICON))
@@ -72,9 +81,14 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
 
         const val FORGE_GRADLE_PROPERTIES_TEMPLATE = "forge_gradle.properties"
         const val FORGE_BUILD_GRADLE_TEMPLATE = "forge_build.gradle"
+        const val FG3_BUILD_GRADLE_TEMPLATE = "fg3_build.gradle"
         const val FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE = "forge_submodule_build.gradle"
+        const val FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE = "fg3_submodule_build.gradle"
         const val FORGE_MAIN_CLASS_TEMPLATE = "forge_main_class.java"
+        const val FG3_MAIN_CLASS_TEMPLATE = "fg3_main_class.java"
         const val MCMOD_INFO_TEMPLATE = "mcmod.info"
+        const val MODS_TOML_TEMPLATE = "mods.toml"
+        const val PACK_MCMETA_TEMPLATE = "pack.mcmeta"
 
         const val GRADLE_PROPERTIES_TEMPLATE = "gradle.properties"
         const val MULTI_MODULE_BUILD_GRADLE_TEMPLATE = "multi_module_build.gradle"
@@ -89,5 +103,4 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
 
         const val MIXIN_OVERWRITE_FALLBACK = "Mixin Overwrite Fallback.java"
     }
-
 }

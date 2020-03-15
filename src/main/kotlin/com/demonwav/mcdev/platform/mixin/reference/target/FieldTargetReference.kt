@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -24,27 +24,43 @@ import com.intellij.psi.PsiReferenceExpression
 
 object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
 
-    override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass,
-                                         checkOnly: Boolean): CollectVisitor<PsiReferenceExpression>? {
-        return MixinMemberReference.parse(context.constantStringValue)?.let({ FindUsagesVisitor(targetClass, it, checkOnly) })
+    override fun createFindUsagesVisitor(
+        context: PsiElement,
+        targetClass: PsiClass,
+        checkOnly: Boolean
+    ): CollectVisitor<PsiReferenceExpression>? {
+        return MixinMemberReference.parse(context.constantStringValue)
+            ?.let({ FindUsagesVisitor(targetClass, it, checkOnly) })
     }
 
     override fun createCollectUsagesVisitor(): CollectVisitor<QualifiedMember<PsiField>> = CollectUsagesVisitor()
 
     override fun createLookup(targetClass: PsiClass, m: PsiField, owner: PsiClass): LookupElementBuilder {
-        return JavaLookupElementBuilder.forField(m, MixinMemberReference.toString(m.getQualifiedMemberReference(owner)), targetClass)
-                .withPresentableText(m.name)
-                .withLookupString(m.name)
+        return JavaLookupElementBuilder.forField(
+            m,
+            MixinMemberReference.toString(m.getQualifiedMemberReference(owner)),
+            targetClass
+        )
+            .withPresentableText(m.name)
+            .withLookupString(m.name)
     }
 
-    private class FindUsagesVisitor(private val targetClass: PsiClass, private val target: MemberReference, checkOnly: Boolean)
-        : CollectVisitor<PsiReferenceExpression>(checkOnly) {
+    private class FindUsagesVisitor(
+        private val targetClass: PsiClass,
+        private val target: MemberReference,
+        checkOnly: Boolean
+    ) :
+        CollectVisitor<PsiReferenceExpression>(checkOnly) {
 
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
             if (expression !is PsiMethodReferenceExpression) {
                 // TODO: Optimize this so we don't need to resolve all fields to find a reference
                 val resolved = expression.resolve()
-                if (resolved is PsiField && target.match(resolved, QualifiedMember.resolveQualifier(expression) ?: targetClass)) {
+                if (resolved is PsiField && target.match(
+                        resolved,
+                        QualifiedMember.resolveQualifier(expression) ?: targetClass
+                    )
+                ) {
                     addResult(expression)
                 }
             }

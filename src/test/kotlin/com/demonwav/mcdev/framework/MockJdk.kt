@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -21,7 +21,9 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ArrayUtil
 import com.intellij.util.IncorrectOperationException
 
-class MockJdk(private val name: String, jar: VirtualFile, private val home: VirtualFile) : UserDataHolderBase(), Sdk, RootProvider {
+@Suppress("NonExtendableApiUsage")
+class MockJdk(private val name: String, jar: VirtualFile, private val home: VirtualFile) :
+    UserDataHolderBase(), Sdk, RootProvider {
 
     private val urls = arrayOf(jar.url)
     private val roots = arrayOf(jar)
@@ -51,7 +53,11 @@ class MockJdk(private val name: String, jar: VirtualFile, private val home: Virt
         if (rootType == OrderRootType.CLASSES) roots else VirtualFile.EMPTY_ARRAY
 
     override fun addRootSetChangedListener(listener: RootProvider.RootSetChangedListener) {}
-    override fun addRootSetChangedListener(listener: RootProvider.RootSetChangedListener, parentDisposable: Disposable) {}
-    override fun removeRootSetChangedListener(listener: RootProvider.RootSetChangedListener) {}
+    override fun addRootSetChangedListener(
+        listener: RootProvider.RootSetChangedListener,
+        parentDisposable: Disposable
+    ) {
+    }
 
+    override fun removeRootSetChangedListener(listener: RootProvider.RootSetChangedListener) {}
 }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -18,7 +18,6 @@ import com.demonwav.mcdev.util.getDataFromActionEvent
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DataKeys
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -57,6 +56,8 @@ abstract class SrgActionBase : AnAction() {
             }
 
             withSrgTarget(parent, srgMap, e, data)
+        }?.onError {
+            showBalloon(it.message ?: "No MCP data available", e)
         } ?: showBalloon("No mappings found", e)
     }
 
@@ -70,7 +71,8 @@ abstract class SrgActionBase : AnAction() {
             .setHideOnKeyOutside(true)
             .createBalloon()
 
-        val statusBar = WindowManager.getInstance().getStatusBar(DataKeys.PROJECT.getData(e.dataContext))
+        val project = e.project ?: return
+        val statusBar = WindowManager.getInstance().getStatusBar(project)
 
         invokeLater {
             balloon.show(RelativePoint.getCenterOf(statusBar.component), Balloon.Position.atRight)

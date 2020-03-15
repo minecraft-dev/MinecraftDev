@@ -3,15 +3,21 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mixin.shadow
 
+import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowTargetInspection
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(EdtInterceptor::class)
+@DisplayName("Shadow Target Inspection Tests")
 class ShadowTargetInspectionTest : BaseShadowTest() {
 
     override fun createMixins() {
@@ -48,8 +54,10 @@ class ShadowTargetInspectionTest : BaseShadowTest() {
         }
     }
 
-    fun `test shadow target inspection`() {
-        myFixture.enableInspections(ShadowTargetInspection::class.java)
-        myFixture.checkHighlighting(true, false, false)
+    @Test
+    @DisplayName("Shadow Target Inspection Test")
+    fun shadowTargetInspectionTest() {
+        fixture.enableInspections(ShadowTargetInspection::class.java)
+        fixture.checkHighlighting(true, false, false)
     }
 }

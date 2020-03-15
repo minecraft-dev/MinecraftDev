@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -17,19 +17,20 @@ import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 
 abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
 
     private var library: Library? = null
 
-    override fun setUp() {
-        super.setUp()
-
+    @BeforeEach
+    fun initMixin() {
         runWriteTask {
             library = createLibrary(project, "mixin")
         }
 
-        ModuleRootModificationUtil.updateModel(myModule) { model ->
+        ModuleRootModificationUtil.updateModel(module) { model ->
             model.addLibraryEntry(library ?: throw IllegalStateException("Library not created"))
             val orderEntries = model.orderEntries
             val last = orderEntries.last()
@@ -39,10 +40,13 @@ abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
         }
     }
 
-    override fun tearDown() {
+    @AfterEach
+    fun cleanupMixin() {
         library?.let { l ->
-            ModuleRootModificationUtil.updateModel(myModule) { model ->
-                model.removeOrderEntry(model.findLibraryOrderEntry(l) ?: throw IllegalStateException("Library not found"))
+            ModuleRootModificationUtil.updateModel(module) { model ->
+                model.removeOrderEntry(
+                    model.findLibraryOrderEntry(l) ?: throw IllegalStateException("Library not found")
+                )
             }
 
             runWriteTask {
@@ -53,7 +57,5 @@ abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
                 }
             }
         }
-
-        super.tearDown()
     }
 }

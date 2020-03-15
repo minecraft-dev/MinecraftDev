@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -29,7 +29,6 @@ import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
 import org.jetbrains.annotations.Contract
 
-@Contract(pure = true)
 fun PsiMember.findUpstreamMixin(): PsiClass? {
     return findAnnotation(DYNAMIC)?.findDeclaredAttributeValue("mixin")?.resolveClass()
 }
@@ -38,16 +37,15 @@ fun PsiMember.findUpstreamMixin(): PsiClass? {
 val PsiElement.isWithinDynamicMixin: Boolean
     get() = findContainingMethod()?.findAnnotation(DYNAMIC) != null
 
-@Contract(pure = true)
 fun findMethods(psiClass: PsiClass): Sequence<PsiMethod>? {
     val targets = psiClass.mixinTargets
     return when (targets.size) {
         0 -> null
         1 -> targets.single().methods.asSequence()
-            .filter({!it.isConstructor})
+            .filter({ !it.isConstructor })
         else -> targets.asSequence()
             .flatMap { target -> target.methods.asSequence() }
-            .filter({!it.isConstructor})
+            .filter({ !it.isConstructor })
             .groupBy { it.memberReference }
             .values.asSequence()
             .filter { it.size >= targets.size }
@@ -58,7 +56,6 @@ fun findMethods(psiClass: PsiClass): Sequence<PsiMethod>? {
     }
 }
 
-@Contract(pure = true)
 fun findFields(psiClass: PsiClass): Sequence<PsiField>? {
     val targets = psiClass.mixinTargets
     return when (targets.size) {
@@ -76,7 +73,6 @@ fun findFields(psiClass: PsiClass): Sequence<PsiField>? {
     }
 }
 
-@Contract(pure = true)
 fun findShadowTargets(psiClass: PsiClass, start: PsiClass, superMixin: Boolean): Sequence<ShadowTarget> {
     return if (superMixin) {
         findShadowTargetsDeep(psiClass, start)
@@ -86,7 +82,6 @@ fun findShadowTargets(psiClass: PsiClass, start: PsiClass, superMixin: Boolean):
     }
 }
 
-@Contract(pure = true)
 private fun findShadowTargetsDeep(psiClass: PsiClass, start: PsiClass): Sequence<ShadowTarget> {
     return start.streamMixinHierarchy()
         .flatMap { mixin ->
@@ -104,7 +99,6 @@ private fun findShadowTargetsDeep(psiClass: PsiClass, start: PsiClass): Sequence
         }
 }
 
-@Contract(pure = true)
 fun PsiMethod.findSource(): PsiMethod {
     val body = body
     if (body != null) {
@@ -131,7 +125,7 @@ private fun PsiClass.streamMixinHierarchy(): Sequence<PsiClass> {
 
 private class MethodSignature(private val method: PsiMethod) {
 
-    override fun equals(other: Any?): Boolean{
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
         other as MethodSignature

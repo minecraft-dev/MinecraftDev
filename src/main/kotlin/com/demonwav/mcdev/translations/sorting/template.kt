@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -41,11 +41,13 @@ data class Template(val elements: List<TemplateElement>) {
                 }
             )
 
-        private val keyRegex = "([?!]?[+*]?)([^+*!?]*)([?!]?[+*]?)".toRegex()
+        private val keyRegex = Regex("([?!]?[+*]?)([^+*!?]*)([?!]?[+*]?)")
 
         private fun parseKey(s: String) =
             keyRegex.findAll(s).map {
-                parseQuantifier(it.groupValues[1]) + Regex.escape(it.groupValues[2]) + parseQuantifier(it.groupValues[3])
+                parseQuantifier(it.groupValues[1]) +
+                    Regex.escape(it.groupValues[2]) +
+                    parseQuantifier(it.groupValues[3])
             }.joinToString("", "^", "$").toRegex()
 
         private fun parseQuantifier(q: String?) =
@@ -75,7 +77,8 @@ object TemplateManager {
 
     fun getGlobalTemplateText() = if (globalFile().exists()) globalFile().readText() else ""
 
-    fun getProjectTemplateText(project: Project) = projectFile(project).let { if (it.exists()) it.readText() else getGlobalTemplateText() }
+    fun getProjectTemplateText(project: Project) =
+        projectFile(project).let { if (it.exists()) it.readText() else getGlobalTemplateText() }
 
     fun getGlobalTemplate() = Template.parse(getGlobalTemplateText())
 

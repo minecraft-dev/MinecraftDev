@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -21,5 +21,10 @@ object ForgeConstants {
     const val SUBSCRIBE_EVENT_ANNOTATION = "net.minecraftforge.fml.common.eventhandler.SubscribeEvent"
     const val FML_EVENT = "net.minecraftforge.fml.common.event.FMLEvent"
     const val EVENT = "net.minecraftforge.fml.common.eventhandler.Event"
+    const val NETWORK_MESSAGE = "net.minecraftforge.fml.common.network.simpleimpl.IMessage"
+    const val NETWORK_MESSAGE_HANDLER = "net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler"
     const val MCMOD_INFO = "mcmod.info"
+    const val META_INF = "META-INF"
+    const val MODS_TOML = "mods.toml"
+    const val PACK_MCMETA = "pack.mcmeta"
 }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -52,38 +52,56 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                         val static = targetMethod.hasModifierProperty(PsiModifier.STATIC)
                         if (static && !modifiers.hasModifierProperty(PsiModifier.STATIC)) {
                             reportedStatic = true
-                            holder.registerProblem(identifier, "Method must be static",
-                                    QuickFixFactory.getInstance().createModifierListFix(modifiers, PsiModifier.STATIC, true, false))
+                            holder.registerProblem(
+                                identifier, "Method must be static",
+                                QuickFixFactory.getInstance().createModifierListFix(
+                                    modifiers,
+                                    PsiModifier.STATIC,
+                                    true,
+                                    false
+                                )
+                            )
                         }
                     }
 
                     if (!reportedSignature) {
                         // Check method parameters
                         val parameters = method.parameterList
-                        val (expectedParameters, expectedReturnType) = type.expectedMethodSignature(annotation, targetMethod) ?: continue
+                        val (expectedParameters, expectedReturnType) = type.expectedMethodSignature(
+                            annotation,
+                            targetMethod
+                        ) ?: continue
 
                         if (!checkParameters(parameters, expectedParameters)) {
                             reportedSignature = true
 
-                            holder.registerProblem(parameters,
-                                    "Method parameters do not match expected parameters for ${type.annotationName}",
-                                    createMethodParametersFix(parameters, expectedParameters))
+                            holder.registerProblem(
+                                parameters,
+                                "Method parameters do not match expected parameters for ${type.annotationName}",
+                                createMethodParametersFix(parameters, expectedParameters)
+                            )
                         }
 
                         val methodReturnType = method.returnType
                         if (methodReturnType == null || !methodReturnType.isErasureEquivalentTo(expectedReturnType)) {
                             reportedSignature = true
 
-                            holder.registerProblem(method.returnTypeElement ?: identifier,
-                                    "Expected return type '${expectedReturnType.presentableText}' for ${type.annotationName} method",
-                                    QuickFixFactory.getInstance().createMethodReturnFix(method, expectedReturnType, false))
+                            holder.registerProblem(
+                                method.returnTypeElement ?: identifier,
+                                "Expected return type '${expectedReturnType.presentableText}' " +
+                                    "for ${type.annotationName} method",
+                                QuickFixFactory.getInstance().createMethodReturnFix(method, expectedReturnType, false)
+                            )
                         }
                     }
                 }
             }
         }
 
-        private fun createMethodParametersFix(parameters: PsiParameterList, expected: List<ParameterGroup>): LocalQuickFix? {
+        private fun createMethodParametersFix(
+            parameters: PsiParameterList,
+            expected: List<ParameterGroup>
+        ): LocalQuickFix? {
             // TODO: Someone should improve this: Right now we can only automatically fix if the parameters are empty
             return if (parameters.parametersCount == 0) ParametersQuickFix(expected) else null
         }
@@ -113,10 +131,13 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             val parameters = descriptor.psiElement as PsiParameterList
             parameters.synchronize(expected.flatMap {
                 if (it.default) {
-                    it.parameters?.map { JavaPsiFacade.getElementFactory(project).createParameter(
+                    it.parameters?.map {
+                        JavaPsiFacade.getElementFactory(project).createParameter(
                             it.name ?: JavaCodeStyleManager.getInstance(project)
-                                    .suggestVariableName(VariableKind.PARAMETER, null, null, it.type).names
-                                    .firstOrNull() ?: "unknown", it.type) } ?: listOf()
+                                .suggestVariableName(VariableKind.PARAMETER, null, null, it.type).names
+                                .firstOrNull() ?: "unknown", it.type
+                        )
+                    } ?: listOf()
                 } else {
                     listOf()
                 }
@@ -124,4 +145,3 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
         }
     }
 }
-

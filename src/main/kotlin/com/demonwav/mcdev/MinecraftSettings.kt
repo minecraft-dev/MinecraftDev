@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -15,7 +15,6 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.editor.markup.EffectType
-import org.jetbrains.annotations.Contract
 
 @State(name = "MinecraftSettings", storages = [Storage("minecraft_dev.xml")])
 class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
@@ -84,7 +83,6 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         ROUNDED_BOXED("Rounded Boxed", EffectType.ROUNDED_BOX),
         WAVED("Waved", EffectType.WAVE_UNDERSCORE);
 
-        @Contract(pure = true)
         override fun toString(): String {
             return regular
         }

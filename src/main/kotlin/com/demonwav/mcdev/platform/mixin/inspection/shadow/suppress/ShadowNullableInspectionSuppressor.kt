@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -29,5 +29,6 @@ class ShadowNullableInspectionSuppressor : InspectionSuppressor {
         return field.modifierList?.findAnnotation(SHADOW) != null
     }
 
-    override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> = SuppressQuickFix.EMPTY_ARRAY
+    override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> =
+        SuppressQuickFix.EMPTY_ARRAY
 }

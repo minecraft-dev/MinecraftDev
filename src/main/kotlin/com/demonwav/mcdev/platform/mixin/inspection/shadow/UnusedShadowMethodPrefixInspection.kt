@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -34,7 +34,11 @@ class UnusedShadowMethodPrefixInspection : MixinInspection() {
             val prefix = prefixValue.constantStringValue ?: return
 
             if (!method.name.startsWith(prefix)) {
-                holder.registerProblem(prefixValue, "Unused @Shadow prefix", RemoveAnnotationAttributeQuickFix("@Shadow", "prefix"))
+                holder.registerProblem(
+                    prefixValue,
+                    "Unused @Shadow prefix",
+                    RemoveAnnotationAttributeQuickFix("@Shadow", "prefix")
+                )
             }
         }
     }

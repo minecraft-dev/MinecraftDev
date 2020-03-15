@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -22,6 +22,7 @@ class SpigotPresentationProvider : MavenLibraryPresentationProvider(SPIGOT_LIBRA
     override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.SPIGOT_ICON
 }
 
-class PaperPresentationProvider : MavenLibraryPresentationProvider(PAPER_LIBRARY_KIND, "com.destroystokyo.paper", "paper-api") {
+class PaperPresentationProvider :
+    MavenLibraryPresentationProvider(PAPER_LIBRARY_KIND, "com.destroystokyo.paper", "paper-api") {
     override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.PAPER_ICON
 }

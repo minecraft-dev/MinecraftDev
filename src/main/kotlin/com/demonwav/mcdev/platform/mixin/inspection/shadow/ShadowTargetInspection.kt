@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -49,8 +49,10 @@ class ShadowTargetInspection : MixinInspection() {
 
             // Oh :(, maybe we can help? (TODO: Maybe later)
             // Write quick fix and apply it for OverwriteTargetInspection and ShadowTargetInspection
-            holder.registerProblem(annotation, "Cannot resolve member '${member.name}' in target class",
-                RemoveAnnotationQuickFix(annotation, member))
+            holder.registerProblem(
+                annotation, "Cannot resolve member '${member.name}' in target class",
+                RemoveAnnotationQuickFix(annotation, member)
+            )
         }
     }
 }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -37,13 +37,20 @@ class AtSyntaxHighlighter : SyntaxHighlighterBase() {
 
     companion object {
         val KEYWORD = TextAttributesKey.createTextAttributesKey("AT_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
-        val CLASS_NAME = TextAttributesKey.createTextAttributesKey("AT_CLASS_NAME", DefaultLanguageHighlighterColors.STRING)
-        val CLASS_VALUE = TextAttributesKey.createTextAttributesKey("AT_CLASS_VALUE", DefaultLanguageHighlighterColors.STATIC_METHOD)
-        val ELEMENT_NAME = TextAttributesKey.createTextAttributesKey("AT_ELEMENT_NAME", DefaultLanguageHighlighterColors.STATIC_FIELD)
-        val ASTERISK = TextAttributesKey.createTextAttributesKey("AT_ASTERISK", DefaultLanguageHighlighterColors.KEYWORD)
-        val PRIMITIVE = TextAttributesKey.createTextAttributesKey("AT_PRIMITIVE", DefaultLanguageHighlighterColors.NUMBER)
-        val COMMENT = TextAttributesKey.createTextAttributesKey("AT_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
-        val BAD_CHARACTER = TextAttributesKey.createTextAttributesKey("AT_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER)
+        val CLASS_NAME =
+            TextAttributesKey.createTextAttributesKey("AT_CLASS_NAME", DefaultLanguageHighlighterColors.STRING)
+        val CLASS_VALUE =
+            TextAttributesKey.createTextAttributesKey("AT_CLASS_VALUE", DefaultLanguageHighlighterColors.STATIC_METHOD)
+        val ELEMENT_NAME =
+            TextAttributesKey.createTextAttributesKey("AT_ELEMENT_NAME", DefaultLanguageHighlighterColors.STATIC_FIELD)
+        val ASTERISK =
+            TextAttributesKey.createTextAttributesKey("AT_ASTERISK", DefaultLanguageHighlighterColors.KEYWORD)
+        val PRIMITIVE =
+            TextAttributesKey.createTextAttributesKey("AT_PRIMITIVE", DefaultLanguageHighlighterColors.NUMBER)
+        val COMMENT =
+            TextAttributesKey.createTextAttributesKey("AT_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
+        val BAD_CHARACTER =
+            TextAttributesKey.createTextAttributesKey("AT_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER)
 
         private val KEYWORD_KEYS = arrayOf(KEYWORD)
         private val CLASS_NAME_KEYS = arrayOf(CLASS_NAME)

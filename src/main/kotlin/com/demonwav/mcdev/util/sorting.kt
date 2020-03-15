@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -30,9 +30,9 @@ fun <T> Comparator<in T>.lexicographical(): Comparator<in Iterable<T>> =
 /**
  * This is the lowest version value we will let users choose, to make our lives easier.
  */
-private val MC_1_8_8 = SemanticVersion.release(1, 8, 8)
+private val MC_1_12 = SemanticVersion.release(1, 12)
 
-fun <T> sortVersions(versions: Collection<T>, convert: (T) -> String = {it.toString()}): List<T> {
+fun <T> sortVersions(versions: Collection<T>, convert: (T) -> String = { it.toString() }): List<T> {
     if (versions.isEmpty()) {
         return listOf()
     }
@@ -40,7 +40,7 @@ fun <T> sortVersions(versions: Collection<T>, convert: (T) -> String = {it.toStr
         .map { convert(it) to it }
         .map { SemanticVersion.parse(it.first) to it.second }
         .sortedByDescending { it.first }
-        .filter { it.first >= MC_1_8_8 }
+        .filter { it.first >= MC_1_12 }
         .map { it.second }
         .toList()
 }

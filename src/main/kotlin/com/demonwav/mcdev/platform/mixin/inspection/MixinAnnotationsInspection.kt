@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -36,10 +36,14 @@ class MixinAnnotationsInspection : MixinInspection() {
             }
 
             // Annotation must be either on or in a Mixin class
-            val containingClass = (annotation.owner as? PsiModifierList)?.parent as? PsiClass ?: annotation.findContainingClass() ?: return
+            val containingClass =
+                (annotation.owner as? PsiModifierList)?.parent as? PsiClass ?: annotation.findContainingClass()
+                ?: return
             if (!containingClass.isMixin) {
-                holder.registerProblem(annotation, "@${annotation.nameReferenceElement?.text} can be only used in a @Mixin class",
-                    RemoveAnnotationQuickFix(annotation, null))
+                holder.registerProblem(
+                    annotation, "@${annotation.nameReferenceElement?.text} can be only used in a @Mixin class",
+                    RemoveAnnotationQuickFix(annotation, null)
+                )
             }
         }
     }

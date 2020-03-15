@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -31,7 +31,6 @@ import org.jetbrains.annotations.Contract
 val PsiMember.isShadow
     get() = findAnnotation(SHADOW) != null
 
-@Contract(pure = true)
 fun PsiMember.findFirstShadowTarget(): PsiMember? {
     val shadow = findAnnotation(SHADOW) ?: return null
     val containingClass = containingClass ?: return null
@@ -39,8 +38,11 @@ fun PsiMember.findFirstShadowTarget(): PsiMember? {
     return resolveFirstShadowTarget(shadow, targetClasses, this)
 }
 
-@Contract(pure = true)
-fun resolveFirstShadowTarget(shadow: PsiAnnotation, targetClasses: Collection<PsiClass>, member: PsiMember): PsiMember? {
+fun resolveFirstShadowTarget(
+    shadow: PsiAnnotation,
+    targetClasses: Collection<PsiClass>,
+    member: PsiMember
+): PsiMember? {
     if (hasAliases(shadow)) return null
     val name = stripPrefix(shadow, member) ?: return null
     return when (member) {
@@ -50,7 +52,6 @@ fun resolveFirstShadowTarget(shadow: PsiAnnotation, targetClasses: Collection<Ps
     }
 }
 
-@Contract(pure = true)
 fun PsiMember.findShadowTargets(): List<PsiMember> {
     val shadow = findAnnotation(SHADOW) ?: return emptyList()
     val containingClass = containingClass ?: return emptyList()
@@ -58,8 +59,11 @@ fun PsiMember.findShadowTargets(): List<PsiMember> {
     return resolveShadowTargets(shadow, targetClasses, this) ?: emptyList()
 }
 
-@Contract(pure = true)
-fun resolveShadowTargets(shadow: PsiAnnotation, targetClasses: Collection<PsiClass>, member: PsiMember): List<PsiMember>? {
+fun resolveShadowTargets(
+    shadow: PsiAnnotation,
+    targetClasses: Collection<PsiClass>,
+    member: PsiMember
+): List<PsiMember>? {
     if (hasAliases(shadow)) return null
     val name = stripPrefix(shadow, member) ?: return null
     return when (member) {
@@ -71,7 +75,6 @@ fun resolveShadowTargets(shadow: PsiAnnotation, targetClasses: Collection<PsiCla
 
 private fun hasAliases(shadow: PsiAnnotation): Boolean = shadow.findDeclaredAttributeValue("aliases").isNotEmpty()
 
-@Contract(pure = true)
 private fun stripPrefix(shadow: PsiAnnotation, member: PsiMember): String? {
     // Strip prefix
     val prefix = shadow.findDeclaredAttributeValue("prefix")?.constantStringValue ?: DEFAULT_SHADOW_PREFIX

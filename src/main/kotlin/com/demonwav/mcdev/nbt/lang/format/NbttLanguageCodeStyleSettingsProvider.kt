@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -77,7 +77,8 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                 consumer.renameStandardOption("SPACE_WITHIN_BRACKETS", "List brackets")
                 consumer.renameStandardOption("SPACE_WITHIN_PARENTHESES", "Array parentheses")
             }
-            else -> {}
+            else -> {
+            }
         }
     }
 
@@ -85,7 +86,10 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
 
     override fun getLanguage() = NbttLanguage
 
-    override fun customizeDefaults(commonSettings: CommonCodeStyleSettings, indentOptions: CommonCodeStyleSettings.IndentOptions) {
+    override fun customizeDefaults(
+        commonSettings: CommonCodeStyleSettings,
+        indentOptions: CommonCodeStyleSettings.IndentOptions
+    ) {
         commonSettings.RIGHT_MARGIN = 150
         indentOptions.CONTINUATION_INDENT_SIZE = indentOptions.INDENT_SIZE
     }
@@ -93,7 +97,8 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
 
 private fun sample(@Language("NBTT") code: String) = code.trim()
 
-private val SAMPLE = sample("""
+private val SAMPLE = sample(
+    """
 "": {
     list: [
         {
@@ -107,4 +112,5 @@ private val SAMPLE = sample("""
         },
     ]
 }
-""")
+"""
+)

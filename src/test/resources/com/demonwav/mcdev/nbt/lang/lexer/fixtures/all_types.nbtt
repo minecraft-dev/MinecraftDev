@@ -1,0 +1,68 @@
+root: {
+    "byte1": 127b
+    "byte2": 127B
+    "byte3": true
+    "byte4": false
+    "short1": 127s
+    "short2": 127S
+    "int1": 127
+    "int2": 127i
+    "int3": 127I
+    "long1": 127l
+    "long2": 127L
+    "float1": 127f
+    "float2": 127F
+    "float3": 127.0f
+    "float4": 127.0F
+    "float5": Infinityf
+    "float6": InfinityF
+    "float7": +Infinityf
+    "float8": +InfinityF
+    "float9": -Infinityf
+    "float10": -InfinityF
+    "float11": NaNf
+    "float12": NaNF
+    "double1": 127.0
+    "double2": 127d
+    "double3": 127D
+    "double4": 127.0d
+    "double5": 127.0D
+    "double6": Infinity
+    "double7": Infinityd
+    "double8": InfinityD
+    "double9": -Infinity
+    "double10": -Infinityd
+    "double11": -InfinityD
+    "double12": +Infinity
+    "double13": +Infinityd
+    "double14": +InfinityD
+    "double15": NaN
+    "double16": NaNd
+    "double17": NaND
+    "string1": "this is a string with quotes"
+    "string2": this is a string without quotes
+    quoteless key: quoteless value
+    byteArray: bytes(true, false, 127b, 127B, 127)
+    intArray: ints(127, 127i, 127I)
+    longArray: longs(127, 127l, 127L)
+    byteList: [ true, false ]
+    shortList: [ 127s, 127S ]
+    intList: [ 127, 127i, 127I ]
+    longList: [ 127l, 127L ]
+    floatList: [ 127f, 127F, 127.0f, 127.0F, Infinityf, InfinityF, +InfinityF, +Infinityf, -Infinityf, -InfinityF, NaNf, NaNF ]
+    doubleList: [ 127d, 127D, 127.0, 127.0d, 127.0D, Infinity, Infinityd, InfinityD, +Infinity, +Infinityd, +InfinityD, -Infinityd, -InfinityD, NaN, NaNd, NaND ]
+    "compound1": {
+        "compound2": {
+            "compound3": {
+                list: [
+                    {
+                        key: value
+                    },
+                    {
+                        key: value
+                    }
+                ]
+            }
+        }
+    }
+}

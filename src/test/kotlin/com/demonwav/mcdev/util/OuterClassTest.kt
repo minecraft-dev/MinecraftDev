@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -15,6 +15,8 @@ import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiJavaFile
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 
 abstract class OuterClassTest : ProjectBuilderTest() {
 
@@ -25,9 +27,8 @@ abstract class OuterClassTest : ProjectBuilderTest() {
     protected lateinit var innerAnonymousInnerClass: PsiClass
     protected lateinit var selfReferencingGeneric: PsiClass
 
-    override fun setUp() {
-        super.setUp()
-
+    @BeforeEach
+    fun setupProject() {
         buildProject {
             src {
                 outerClass = java("com/example/test/OuterClass.java", """
@@ -66,6 +67,6 @@ abstract class OuterClassTest : ProjectBuilderTest() {
     }
 
     protected fun assertEquivalent(a: PsiElement, b: PsiElement?) {
-        assertTrue("Expected $a == $b", a.manager.areElementsEquivalent(a, b))
+        Assertions.assertTrue(a.manager.areElementsEquivalent(a, b), "Expected $a == $b")
     }
 }

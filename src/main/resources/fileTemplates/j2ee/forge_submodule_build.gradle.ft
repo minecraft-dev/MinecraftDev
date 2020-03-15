@@ -5,23 +5,12 @@ buildscript {
             name = "forge"
             url = "https://files.minecraftforge.net/maven"
         }
-#if (${SPONGE_FORGE})
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-#end
     }
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:${FORGEGRADLE_VERSION}-SNAPSHOT"
-#if (${SPONGE_FORGE})
-        classpath "gradle.plugin.org.spongepowered:spongegradle:0.8.1"
-#end
     }
 }
 apply plugin: "net.minecraftforge.gradle.forge"
-#if (${SPONGE_FORGE})
-apply plugin: "org.spongepowered.plugin"
-#end
 
 archivesBaseName = modBaseName
 

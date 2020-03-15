@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -61,7 +61,11 @@ class NbttBlock(
         if (NbttTypes.COMPOUND == node.elementType) {
             return lastChildNode != null && lastChildNode != NbttTypes.RBRACE
         }
-        if (NbttTypes.INT_ARRAY == node.elementType || NbttTypes.BYTE_ARRAY == node.elementType || NbttTypes.LONG_ARRAY == node.elementType) {
+        if (
+            NbttTypes.INT_ARRAY == node.elementType ||
+            NbttTypes.BYTE_ARRAY == node.elementType ||
+            NbttTypes.LONG_ARRAY == node.elementType
+        ) {
             return lastChildNode != null && lastChildNode.elementType != NbttTypes.RPAREN
         }
         if (NbttTypes.LIST == node.elementType) {

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -64,8 +64,8 @@ class ListenerEventAnnotator : Annotator {
         if (parameters.isEmpty()) {
             return
         }
-        val eventParameter = parameters[0] ?: // Listeners must have at least a single parameter
-            return
+        val eventParameter = parameters[0] // Listeners must have at least a single parameter
+            ?: return
         // Get the type of the parameter so we can start resolving it
         val psiEventElement = eventParameter.typeElement ?: return
         val type = psiEventElement.type as? PsiClassReferenceType ?: return

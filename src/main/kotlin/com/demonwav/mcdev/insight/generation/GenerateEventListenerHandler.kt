@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -40,14 +40,14 @@ import com.intellij.refactoring.RefactoringBundle
 class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event Listener") {
 
     private data class GenerateData(
-         var editor: Editor,
-         var position: LogicalPosition,
-         var method: PsiMethod?,
-         var model: CaretModel,
-         var data: GenerationData?,
-         var chosenClass: PsiClass,
-         var chosenName: String,
-         var relevantModule: AbstractModule
+        var editor: Editor,
+        var position: LogicalPosition,
+        var method: PsiMethod?,
+        var model: CaretModel,
+        var data: GenerationData?,
+        var chosenClass: PsiClass,
+        var chosenName: String,
+        var relevantModule: AbstractModule
     )
 
     private var data: GenerateData? = null
@@ -60,9 +60,10 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event 
         val facet = MinecraftFacet.getInstance(moduleForPsiElement) ?: return null
 
         val chooser = TreeClassChooserFactory.getInstance(project)
-            .createWithInnerClassesScopeChooser(RefactoringBundle.message("choose.destination.class"),
-                                                GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(moduleForPsiElement, false),
-                                                { aClass1 -> isSuperEventListenerAllowed(aClass1, facet) }, null
+            .createWithInnerClassesScopeChooser(
+                RefactoringBundle.message("choose.destination.class"),
+                GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(moduleForPsiElement, false),
+                { aClass1 -> isSuperEventListenerAllowed(aClass1, facet) }, null
             )
 
         chooser.showDialog()
@@ -92,9 +93,21 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event 
 
         val position = editor.caretModel.logicalPosition
 
-        val method = PsiTreeUtil.getParentOfType(aClass.containingFile.findElementAt(editor.caretModel.offset), PsiMethod::class.java)
+        val method = PsiTreeUtil.getParentOfType(
+            aClass.containingFile.findElementAt(editor.caretModel.offset),
+            PsiMethod::class.java
+        )
 
-        this.data = GenerateData(editor, position, method, editor.caretModel, dialogDAta, chosenClass, chosenName, relevantModule)
+        this.data = GenerateData(
+            editor,
+            position,
+            method,
+            editor.caretModel,
+            dialogDAta,
+            chosenClass,
+            chosenName,
+            relevantModule
+        )
 
         return DUMMY_RESULT
     }
@@ -111,7 +124,8 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event 
 
             data.model.moveToLogicalPosition(data.position)
 
-            val newMethod = data.relevantModule.generateEventListenerMethod(aClass, data.chosenClass, data.chosenName, data.data)
+            val newMethod =
+                data.relevantModule.generateEventListenerMethod(aClass, data.chosenClass, data.chosenName, data.data)
 
             if (newMethod != null) {
                 val info = PsiGenerationInfo(newMethod)
@@ -161,6 +175,8 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event 
     }
 
     companion object {
-        private val DUMMY_RESULT = arrayOfNulls<ClassMember>(1).castNotNull() //cannot return empty array, but this result won't be used anyway
+        private val DUMMY_RESULT =
+            // cannot return empty array, but this result won't be used anyway
+            arrayOfNulls<ClassMember>(1).castNotNull()
     }
 }

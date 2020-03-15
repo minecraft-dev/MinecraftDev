@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -63,7 +63,12 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
         // So the operand of the first cast `(SomeClass)` must be `(Object) this`, another cast
         val operand = castExpression.operand as? PsiTypeCastExpression ?: return false
 
-        if (operand.castType?.type != PsiType.getTypeByName(CommonClassNames.JAVA_LANG_OBJECT, project, GlobalSearchScope.allScope(project))) {
+        if (operand.castType?.type != PsiType.getTypeByName(
+                CommonClassNames.JAVA_LANG_OBJECT,
+                project,
+                GlobalSearchScope.allScope(project)
+            )
+        ) {
             return false
         }
 
@@ -71,7 +76,8 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
         return operand.operand is PsiThisExpression
     }
 
-    override fun getSuppressActions(element: PsiElement?, toolId: String): Array<out SuppressQuickFix> = SuppressQuickFix.EMPTY_ARRAY
+    override fun getSuppressActions(element: PsiElement?, toolId: String): Array<out SuppressQuickFix> =
+        SuppressQuickFix.EMPTY_ARRAY
 
     companion object {
         private const val INSPECTION = "ConstantConditions"

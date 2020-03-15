@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -39,12 +39,14 @@ class AtColorSettingsPage : ColorSettingsPage {
     override fun getDisplayName() = "Access Transformers"
 
     companion object {
-        private val DESCRIPTORS = arrayOf(AttributesDescriptor("Keyword", AtSyntaxHighlighter.KEYWORD),
-                                          AttributesDescriptor("Class Name", AtSyntaxHighlighter.CLASS_NAME),
-                                          AttributesDescriptor("Class Value", AtSyntaxHighlighter.CLASS_VALUE),
-                                          AttributesDescriptor("Primitive Value", AtSyntaxHighlighter.PRIMITIVE),
-                                          AttributesDescriptor("Element Name", AtSyntaxHighlighter.ELEMENT_NAME),
-                                          AttributesDescriptor("Asterisk", AtSyntaxHighlighter.ASTERISK),
-                                          AttributesDescriptor("Comment", AtSyntaxHighlighter.COMMENT))
+        private val DESCRIPTORS = arrayOf(
+            AttributesDescriptor("Keyword", AtSyntaxHighlighter.KEYWORD),
+            AttributesDescriptor("Class Name", AtSyntaxHighlighter.CLASS_NAME),
+            AttributesDescriptor("Class Value", AtSyntaxHighlighter.CLASS_VALUE),
+            AttributesDescriptor("Primitive Value", AtSyntaxHighlighter.PRIMITIVE),
+            AttributesDescriptor("Element Name", AtSyntaxHighlighter.ELEMENT_NAME),
+            AttributesDescriptor("Asterisk", AtSyntaxHighlighter.ASTERISK),
+            AttributesDescriptor("Comment", AtSyntaxHighlighter.COMMENT)
+        )
     }
 }

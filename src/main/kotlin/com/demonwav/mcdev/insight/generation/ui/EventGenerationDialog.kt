@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -15,10 +15,12 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 
-class EventGenerationDialog(editor: Editor,
-                            private val panel: EventGenerationPanel,
-                            className: String,
-                            defaultListenerName: String) : DialogWrapper(editor.component, false) {
+class EventGenerationDialog(
+    editor: Editor,
+    private val panel: EventGenerationPanel,
+    className: String,
+    defaultListenerName: String
+) : DialogWrapper(editor.component, false) {
 
     private val wizard: EventListenerWizard = EventListenerWizard(panel.panel, className, defaultListenerName)
 

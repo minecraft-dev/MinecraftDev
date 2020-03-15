@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -21,7 +21,11 @@ class InterfaceIsInterfaceInspection : MixinAnnotationAttributeInspection(INTERF
 
     override fun getStaticDescription() = "Reports usages of @Interface with a regular class instead of an interface."
 
-    override fun visitAnnotationAttribute(annotation: PsiAnnotation, value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
+    override fun visitAnnotationAttribute(
+        annotation: PsiAnnotation,
+        value: PsiAnnotationMemberValue,
+        holder: ProblemsHolder
+    ) {
         val psiClass = value.resolveClass() ?: return
         if (!psiClass.isInterface) {
             holder.registerProblem(value, "Interface expected here")

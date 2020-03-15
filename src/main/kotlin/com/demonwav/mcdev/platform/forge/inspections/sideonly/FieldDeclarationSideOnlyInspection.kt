@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -28,9 +28,10 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
     }
 
     override fun getStaticDescription(): String? {
-        return "A field in a class annotated for one side cannot be declared as being in the other side. For example, a class which is " +
-            "annotated as @SideOnly(Side.SERVER) cannot contain a field which is annotated as @SideOnly(Side.CLIENT). Since a class that " +
-            "is annotated with @SideOnly brings everything with it, @SideOnly annotated fields are usually useless"
+        return "A field in a class annotated for one side cannot be declared as being in the other side. " +
+            "For example, a class which is annotated as @SideOnly(Side.SERVER) cannot contain a field which is " +
+            "annotated as @SideOnly(Side.CLIENT). Since a class that is annotated with @SideOnly brings " +
+            "everything with it, @SideOnly annotated fields are usually useless"
     }
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
@@ -61,7 +62,13 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
 
                 if (fieldSide !== Side.NONE && fieldSide !== classSide) {
                     if (classSide !== Side.NONE && classSide !== Side.INVALID) {
-                        registerFieldError(field, Error.CLASS_CROSS_ANNOTATED, fieldSide.annotation, classSide.annotation, field)
+                        registerFieldError(
+                            field,
+                            Error.CLASS_CROSS_ANNOTATED,
+                            fieldSide.annotation,
+                            classSide.annotation,
+                            field
+                        )
                     } else if (classSide !== Side.NONE) {
                         registerFieldError(field, Error.CLASS_UNANNOTATED, fieldSide.annotation, null, field)
                     }
@@ -85,7 +92,13 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
                 }
 
                 if (fieldClassSide !== fieldSide) {
-                    registerFieldError(field, Error.FIELD_CROSS_ANNOTATED, fieldClassSide.annotation, fieldSide.annotation, field)
+                    registerFieldError(
+                        field,
+                        Error.FIELD_CROSS_ANNOTATED,
+                        fieldClassSide.annotation,
+                        fieldSide.annotation,
+                        field
+                    )
                 }
             }
         }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -64,7 +64,8 @@ val PsiClass.mixinTargets: List<PsiClass>
             val mixinAnnotation = mixinAnnotation ?: return@cached emptyList()
 
             // Read class targets (value)
-            val classTargets = mixinAnnotation.findDeclaredAttributeValue(null)?.resolveClassArray()?.toMutableList() ?: ArrayList()
+            val classTargets =
+                mixinAnnotation.findDeclaredAttributeValue(null)?.resolveClassArray()?.toMutableList() ?: ArrayList()
 
             // Read and add string targets (targets)
             mixinAnnotation.findDeclaredAttributeValue("targets")?.computeStringArray()
@@ -87,10 +88,13 @@ val PsiClass.mixinTargets: List<PsiClass>
 @get:Contract(pure = true)
 val PsiClass.isAccessorMixin: Boolean
     get() {
-        if (!isInterface){
+        if (!isInterface) {
             return false
         }
-        if (methods.any { it.modifierList.findAnnotation(ACCESSOR) == null && it.modifierList.findAnnotation(INVOKER) == null }) {
+        if (
+            methods.any { it.modifierList.findAnnotation(ACCESSOR) == null &&
+                it.modifierList.findAnnotation(INVOKER) == null }
+        ) {
             return false
         }
 
@@ -98,14 +102,15 @@ val PsiClass.isAccessorMixin: Boolean
         return targets.isNotEmpty() && !targets.any(PsiClass::isInterface)
     }
 
-@Contract(pure = true)
-fun callbackInfoType(project: Project): PsiType? = PsiType.getTypeByName(CALLBACK_INFO, project, GlobalSearchScope.allScope(project))
+fun callbackInfoType(project: Project): PsiType? =
+    PsiType.getTypeByName(CALLBACK_INFO, project, GlobalSearchScope.allScope(project))
 
-@Contract(pure = true)
 fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType: PsiType): PsiType? {
     val boxedType = if (returnType is PsiPrimitiveType) returnType.getBoxedType(context)!! else returnType
 
     // TODO: Can we do this without looking up the PsiClass?
-    val psiClass = JavaPsiFacade.getInstance(project).findClass(CALLBACK_INFO_RETURNABLE, GlobalSearchScope.allScope(project)) ?: return null
+    val psiClass =
+        JavaPsiFacade.getInstance(project).findClass(CALLBACK_INFO_RETURNABLE, GlobalSearchScope.allScope(project))
+            ?: return null
     return JavaPsiFacade.getElementFactory(project).createType(psiClass, boxedType)
 }

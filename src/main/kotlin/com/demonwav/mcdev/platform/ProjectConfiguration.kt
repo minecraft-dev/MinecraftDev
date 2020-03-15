@@ -3,13 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform
 
+import com.demonwav.mcdev.buildsystem.BuildRepository
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
@@ -35,6 +36,8 @@ abstract class ProjectConfiguration {
     abstract var type: PlatformType
 
     abstract fun create(project: Project, buildSystem: BuildSystem, indicator: ProgressIndicator)
+
+    abstract fun setupDependencies(buildSystem: BuildSystem)
 
     fun hasAuthors() = listContainsAtLeastOne(base?.authors)
     fun setAuthors(string: String) {
@@ -77,5 +80,9 @@ abstract class ProjectConfiguration {
         }
 
         return movingFile
+    }
+
+    protected fun addSonatype(buildRepositories: MutableList<BuildRepository>) {
+        buildRepositories.add(BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/"))
     }
 }

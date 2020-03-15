@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -26,7 +26,7 @@ class NbtFileTypeDetector : FileTypeRegistry.FileTypeDetector {
             // Won't parse very large files, but if we fail on timeout then those files probably are NBT anyways
             Nbt.buildTagTree(file.inputStream, 20)
             NbtFileType
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             if (e is NbtFileParseTimeoutException) {
                 // If a timeout occurred then no file structure errors were detected in the parse time, so we can
                 // probably assume it's a (very big) NBT file

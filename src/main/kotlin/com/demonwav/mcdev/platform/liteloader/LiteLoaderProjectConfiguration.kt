@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -15,6 +15,7 @@ package com.demonwav.mcdev.platform.liteloader
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
+import com.demonwav.mcdev.platform.mcp.McpVersionPair
 import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.ide.util.EditorHelper
 import com.intellij.openapi.progress.ProgressIndicator
@@ -23,7 +24,7 @@ import com.intellij.psi.PsiManager
 
 class LiteLoaderProjectConfiguration : ProjectConfiguration() {
 
-    var mcpVersion = ""
+    var mcpVersion = McpVersionPair("", "")
     var mcVersion = ""
 
     override var type = PlatformType.LITELOADER
@@ -46,11 +47,20 @@ class LiteLoaderProjectConfiguration : ProjectConfiguration() {
             file = getMainClassDirectory(files, file)
 
             val mainClassFile = file.findOrCreateChildData(this, className + ".java")
-            LiteLoaderTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className, baseConfig.pluginName, baseConfig.pluginVersion)
+            LiteLoaderTemplate.applyMainClassTemplate(
+                project,
+                mainClassFile,
+                packageName,
+                className,
+                baseConfig.pluginName,
+                baseConfig.pluginVersion
+            )
 
             PsiManager.getInstance(project).findFile(mainClassFile)?.let { mainClassPsi ->
                 EditorHelper.openInEditor(mainClassPsi)
             }
         }
     }
+
+    override fun setupDependencies(buildSystem: BuildSystem) {}
 }

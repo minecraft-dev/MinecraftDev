@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -19,7 +19,8 @@ import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants
 import com.demonwav.mcdev.util.CommonColors
 import com.intellij.psi.PsiClass
 
-object WaterfallModuleType : AbstractModuleType<BungeeCordModule<WaterfallModuleType>>("io.github.waterfallmc", "waterfall-api") {
+object WaterfallModuleType :
+    AbstractModuleType<BungeeCordModule<WaterfallModuleType>>("io.github.waterfallmc", "waterfall-api") {
 
     private const val ID = "WATERFALL_MODULE_TYPE"
 
@@ -35,5 +36,4 @@ object WaterfallModuleType : AbstractModuleType<BungeeCordModule<WaterfallModule
 
     override fun generateModule(facet: MinecraftFacet) = BungeeCordModule(facet, this)
     override fun getEventGenerationPanel(chosenClass: PsiClass) = BungeeCordEventGenerationPanel(chosenClass)
-
 }

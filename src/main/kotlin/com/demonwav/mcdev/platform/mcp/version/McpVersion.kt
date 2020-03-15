@@ -3,13 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mcp.version
 
+import com.demonwav.mcdev.platform.mcp.McpVersionPair
 import com.demonwav.mcdev.util.fromJson
 import com.demonwav.mcdev.util.getMajorVersion
 import com.demonwav.mcdev.util.sortVersions
@@ -25,31 +26,36 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
         sortVersions(map.keys)
     }
 
-    private fun getSnapshot(version: String): Pair<List<Int>, List<Int>> {
+    data class McpVersionSet(val goodVersions: List<McpVersionPair>, val badVersions: List<McpVersionPair>)
+
+    private fun getSnapshot(version: String): McpVersionSet {
         return get(version, "snapshot")
     }
 
-    private fun getStable(version: String): Pair<List<Int>, List<Int>> {
+    private fun getStable(version: String): McpVersionSet {
         return get(version, "stable")
     }
 
-    private operator fun get(version: String, type: String): Pair<List<Int>, List<Int>> {
-        val good = ArrayList<Int>()
-        val bad = ArrayList<Int>()
+    private operator fun get(version: String, type: String): McpVersionSet {
+        val good = ArrayList<McpVersionPair>()
+        val bad = ArrayList<McpVersionPair>()
 
         val keySet = map.keys
-        for (key in keySet) {
-            val versions = map[key]
+        for (mcVersion in keySet) {
+            val versions = map[mcVersion]
             if (versions != null) {
-                if (key.startsWith(version)) {
-                    good.addAll(versions[type]!!.map(Int::toInt))
-                } else {
-                    bad.addAll(versions[type]!!.map(Int::toInt))
+                versions[type]?.let { vers ->
+                    val pairs = vers.map { McpVersionPair("${type}_$it", mcVersion) }
+                    if (mcVersion.startsWith(version)) {
+                        good.addAll(pairs)
+                    } else {
+                        bad.addAll(pairs)
+                    }
                 }
             }
         }
 
-        return good to bad
+        return McpVersionSet(good, bad)
     }
 
     fun getMcpVersionList(version: String): List<McpVersionEntry> {
@@ -58,20 +64,20 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
         val majorVersion = getMajorVersion(version)
 
         val stable = getStable(majorVersion)
-        stable.first.asSequence().sortedWith(Comparator.reverseOrder())
-            .mapTo(result) { s -> McpVersionEntry("stable_$s") }
+        stable.goodVersions.asSequence().sortedWith(Comparator.reverseOrder())
+            .mapTo(result) { s -> McpVersionEntry(s) }
 
         val snapshot = getSnapshot(majorVersion)
-        snapshot.first.asSequence().sortedWith(Comparator.reverseOrder())
-            .mapTo(result) { s -> McpVersionEntry("snapshot_$s") }
+        snapshot.goodVersions.asSequence().sortedWith(Comparator.reverseOrder())
+            .mapTo(result) { s -> McpVersionEntry(s) }
 
         // The "seconds" in the pairs are bad, but still available to the user
         // We will color them read
 
-        stable.second.asSequence().sortedWith(Comparator.reverseOrder())
-            .mapTo(result) { s -> McpVersionEntry("stable_$s", true) }
-        snapshot.second.asSequence().sortedWith(Comparator.reverseOrder())
-            .mapTo(result) { s -> McpVersionEntry("snapshot_$s", true) }
+        stable.badVersions.asSequence().sortedWith(Comparator.reverseOrder())
+            .mapTo(result) { s -> McpVersionEntry(s, true) }
+        snapshot.badVersions.asSequence().sortedWith(Comparator.reverseOrder())
+            .mapTo(result) { s -> McpVersionEntry(s, true) }
 
         return result
     }
@@ -84,7 +90,8 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
                 val mcpVersion = McpVersion(map)
                 mcpVersion.versions
                 return mcpVersion
-            } catch (ignored: IOException) {}
+            } catch (ignored: IOException) {
+            }
 
             return null
         }

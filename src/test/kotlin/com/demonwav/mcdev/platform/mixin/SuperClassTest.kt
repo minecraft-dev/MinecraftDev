@@ -3,21 +3,27 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mixin
 
+import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.platform.mixin.inspection.MixinSuperClassInspection
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(EdtInterceptor::class)
+@DisplayName("Mixin Super Class Inspection Tests")
 class SuperClassTest : BaseMixinTest() {
 
-    override fun setUp() {
-        super.setUp()
-
+    @BeforeEach
+    fun setupProject() {
         buildProject {
             src {
                 java("test/Entity.java", """
@@ -54,11 +60,13 @@ class SuperClassTest : BaseMixinTest() {
             }
         }
 
-        myFixture.enableInspections(MixinSuperClassInspection::class.java)
-        myFixture.checkHighlighting(true, false, false)
+        fixture.enableInspections(MixinSuperClassInspection::class.java)
+        fixture.checkHighlighting(true, false, false)
     }
 
-    fun `test no mixin superclass`() {
+    @Test
+    @DisplayName("No Mixin Superclass Test")
+    fun noMixinSuperclassTest() {
         doTest("""
             package test;
 
@@ -71,8 +79,9 @@ class SuperClassTest : BaseMixinTest() {
         """)
     }
 
-
-    fun `test good mixin superclass`() {
+    @Test
+    @DisplayName("Good Mixin Superclass Test")
+    fun goodMixinSuperclassTest() {
         doTest("""
             package test;
 
@@ -85,7 +94,9 @@ class SuperClassTest : BaseMixinTest() {
         """)
     }
 
-    fun `test mixin not its own superclass`() {
+    @Test
+    @DisplayName("Mixin Class Cannot Extend Itself Test")
+    fun mixinClassNotItsOwnSuperclassTest() {
         doTest("""
             package test;
 
@@ -98,7 +109,9 @@ class SuperClassTest : BaseMixinTest() {
         """)
     }
 
-    fun `test mixin class hierarchy not found`() {
+    @Test
+    @DisplayName("Mixin Superclass Not Found In Hierarchy Test")
+    fun mixinClassHierarchyNotFoundTest() {
         doTest("""
             package test;
 
@@ -110,5 +123,4 @@ class SuperClassTest : BaseMixinTest() {
             }
         """)
     }
-
 }

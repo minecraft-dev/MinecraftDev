@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -21,7 +21,8 @@ import com.intellij.psi.PsiTypeElement
 
 class MixinClassReferenceInspection : MixinInspection() {
 
-    override fun getStaticDescription() = "A Mixin class doesn't exist at runtime, and thus cannot be referenced directly."
+    override fun getStaticDescription() =
+        "A Mixin class doesn't exist at runtime, and thus cannot be referenced directly."
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 

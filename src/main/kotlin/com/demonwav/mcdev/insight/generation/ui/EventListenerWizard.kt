@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -35,7 +35,8 @@ class EventListenerWizard(panel: JPanel?, className: String, defaultListenerName
         if (UIUtil.isUnderDarcula()) {
             publicVoidLabel.foreground = JavaHighlightingColors.KEYWORD.defaultAttributes.foregroundColor
         } else {
-            publicVoidLabel.foreground = JavaHighlightingColors.KEYWORD.fallbackAttributeKey!!.defaultAttributes.foregroundColor
+            publicVoidLabel.foreground =
+                JavaHighlightingColors.KEYWORD.fallbackAttributeKey!!.defaultAttributes.foregroundColor
         }
 
         if (panel != null) {

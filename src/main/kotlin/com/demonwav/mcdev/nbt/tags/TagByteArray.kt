@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.nbt.tags
 
 import java.io.DataOutputStream
-import java.util.Arrays
 
 class TagByteArray(override val value: ByteArray) : NbtValueTag<ByteArray>(ByteArray::class.java) {
     override val payloadSize = 4 + value.size
@@ -32,14 +31,14 @@ class TagByteArray(override val value: ByteArray) : NbtValueTag<ByteArray>(ByteA
     }
 
     override fun valueEquals(otherValue: ByteArray): Boolean {
-        return Arrays.equals(this.value, otherValue)
+        return this.value.contentEquals(otherValue)
     }
 
     // This makes IntelliJ happy - and angry at the same time
     @Suppress("RedundantOverride")
     override fun equals(other: Any?) = super.equals(other)
 
-    override fun hashCode() = Arrays.hashCode(this.value)
+    override fun hashCode() = this.value.contentHashCode()
 
-    override fun valueCopy() = Arrays.copyOf(value, value.size)!!
+    override fun valueCopy() = value.copyOf(value.size)
 }

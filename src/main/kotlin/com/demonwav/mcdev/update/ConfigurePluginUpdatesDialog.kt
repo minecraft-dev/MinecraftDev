@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -56,7 +56,7 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
         form.installButton.isVisible = false
         form.installButton.addActionListener {
             update?.let { update ->
-                close(DialogWrapper.OK_EXIT_CODE)
+                close(OK_EXIT_CODE)
                 try {
                     PluginUpdater.installPluginUpdate(update)
                 } catch (e: IOException) {

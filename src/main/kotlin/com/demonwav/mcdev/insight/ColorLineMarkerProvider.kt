@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
-import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -51,9 +50,8 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             element,
             element.textRange,
             ColorIcon(12, color),
-            Pass.UPDATE_ALL,
             FunctionUtil.nullConstant<Any, String>(),
-            GutterIconNavigationHandler handler@ { _, psiElement ->
+            GutterIconNavigationHandler handler@{ _, psiElement ->
                 if (!psiElement.isWritable || !element.isValid) {
                     return@handler
                 }
@@ -75,7 +73,6 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             element,
             element.textRange,
             ColorIcon(12, color),
-            Pass.UPDATE_ALL,
             FunctionUtil.nullConstant<Any, String>(),
             handler,
             GutterIconRenderer.Alignment.RIGHT
@@ -84,7 +81,8 @@ class ColorLineMarkerProvider : LineMarkerProvider {
         }
 
         override fun canMergeWith(info: MergeableLineMarkerInfo<*>) = info is ColorInfo
-        override fun getCommonIconAlignment(infos: List<MergeableLineMarkerInfo<*>>) = GutterIconRenderer.Alignment.RIGHT
+        override fun getCommonIconAlignment(infos: List<MergeableLineMarkerInfo<*>>) =
+            GutterIconRenderer.Alignment.RIGHT
 
         override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<*>>): Icon {
             if (infos.size == 2 && infos[0] is ColorInfo && infos[1] is ColorInfo) {
@@ -93,6 +91,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             return AllIcons.Gutter.Colors
         }
 
-        override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<*>>) = FunctionUtil.nullConstant<PsiElement, String>()
+        override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<*>>) =
+            FunctionUtil.nullConstant<PsiElement, String>()
     }
 }

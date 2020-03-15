@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -16,9 +16,6 @@ import com.demonwav.mcdev.facet.MinecraftFacetType.Companion.TYPE_ID
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.platform.forge.ForgeModuleType
-import com.demonwav.mcdev.platform.sponge.SpongeModuleType
-import com.demonwav.mcdev.util.containsAllKeys
 import com.demonwav.mcdev.util.filterNotNull
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.google.common.collect.HashMultimap
@@ -36,13 +33,17 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
-import org.jetbrains.annotations.Contract
-import org.jetbrains.jps.model.java.JavaResourceRootType
-import org.jetbrains.jps.model.java.JavaSourceRootType
 import java.util.concurrent.ConcurrentHashMap
 import javax.swing.Icon
+import org.jetbrains.jps.model.java.JavaResourceRootType
+import org.jetbrains.jps.model.java.JavaSourceRootType
 
-class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacetConfiguration, underlyingFacet: Facet<*>?) :
+class MinecraftFacet(
+    module: Module,
+    name: String,
+    configuration: MinecraftFacetConfiguration,
+    underlyingFacet: Facet<*>?
+) :
     Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, underlyingFacet) {
 
     private val moduleMap = ConcurrentHashMap<AbstractModuleType<*>, AbstractModule>()
@@ -131,41 +132,34 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
     val modules get() = moduleMap.values
     val types get() = moduleMap.keys
 
-    @Contract(pure = true)
     fun isOfType(type: AbstractModuleType<*>) = moduleMap.containsKey(type)
 
-    @Contract(pure = true)
     fun <T : AbstractModule> getModuleOfType(type: AbstractModuleType<T>): T? {
         @Suppress("UNCHECKED_CAST")
         return moduleMap[type] as? T
     }
 
-    @Contract(value = "null -> false", pure = true)
     fun isEventClassValidForModule(eventClass: PsiClass?) =
         eventClass != null && moduleMap.values.any { it.isEventClassValid(eventClass, null) }
 
-    @Contract(pure = true)
     fun isEventClassValid(eventClass: PsiClass, method: PsiMethod): Boolean {
         return doIfGood(method) {
             it.isEventClassValid(eventClass, method)
         } == true
     }
 
-    @Contract(pure = true)
     fun writeErrorMessageForEvent(eventClass: PsiClass, method: PsiMethod): String? {
         return doIfGood(method) {
             it.writeErrorMessageForEventParameter(eventClass, method)
         }
     }
 
-    @Contract(pure = true)
     fun isStaticListenerSupported(method: PsiMethod): Boolean {
         return doIfGood(method) {
             it.isStaticListenerSupported(method)
         } == true
     }
 
-    @Contract(pure = true)
     fun suppressStaticListener(method: PsiMethod): Boolean {
         return doIfGood(method) {
             !it.isStaticListenerSupported(method)
@@ -187,7 +181,6 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
 
     val isEventGenAvailable get() = moduleMap.keys.any { it.isEventGenAvailable }
 
-    @Contract(pure = true)
     fun shouldShowPluginIcon(element: PsiElement?) = moduleMap.values.any { it.shouldShowPluginIcon(element) }
 
     val icon: Icon?
@@ -196,7 +189,6 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
             return when {
                 iconCount == 0 -> null
                 iconCount == 1 -> moduleMap.keys.firstOrNull { it.hasIcon }?.icon
-                iconCount == 2 && moduleMap.containsAllKeys(SpongeModuleType, ForgeModuleType) -> PlatformAssets.SPONGE_FORGE_ICON
                 moduleMap.size > 0 -> PlatformAssets.MINECRAFT_ICON
                 else -> null
             }
@@ -244,8 +236,8 @@ class MinecraftFacet(module: Module, name: String, configuration: MinecraftFacet
             return@run result
         }
 
-
-        fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>) = getInstance(module)?.getModuleOfType(type)
+        fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>) =
+            getInstance(module)?.getModuleOfType(type)
 
         fun <T : AbstractModule> getInstance(module: Module, vararg types: AbstractModuleType<T>): T? {
             val instance = getInstance(module) ?: return null

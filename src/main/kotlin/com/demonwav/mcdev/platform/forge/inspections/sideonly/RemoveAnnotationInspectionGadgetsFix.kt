@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -18,7 +18,8 @@ import com.intellij.structuralsearch.plugin.util.SmartPsiPointer
 import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
-class RemoveAnnotationInspectionGadgetsFix(element: PsiModifierListOwner, private val name: String) : InspectionGadgetsFix() {
+class RemoveAnnotationInspectionGadgetsFix(element: PsiModifierListOwner, private val name: String) :
+    InspectionGadgetsFix() {
 
     private val pointer: SmartPsiPointer = SmartPsiPointer(element)
 

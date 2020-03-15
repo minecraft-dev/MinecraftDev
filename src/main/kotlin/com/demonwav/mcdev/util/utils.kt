@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -25,7 +25,7 @@ import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
-import org.jetbrains.annotations.Contract
+import java.lang.Exception
 
 inline fun <T : Any?> runWriteTask(crossinline func: () -> T): T {
     return invokeAndWait {
@@ -59,7 +59,9 @@ inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
 inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T): T {
     val result = WriteCommandAction.writeCommandAction(this).withGlobalUndo().compute<T, Throwable> { func() }
     PsiDocumentManager.getInstance(project)
-        .doPostponedOperationsAndUnblockDocument(FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return result)
+        .doPostponedOperationsAndUnblockDocument(
+            FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return result
+        )
     return result
 }
 
@@ -72,7 +74,6 @@ fun waitForAllSmart() {
 /**
  * Returns an untyped array for the specified [Collection].
  */
-@Contract(pure = true)
 fun Collection<*>.toArray(): Array<Any?> {
     @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
     return (this as java.util.Collection<*>).toArray()
@@ -85,13 +86,11 @@ inline fun <T : Collection<*>> T.ifEmpty(func: () -> Unit): T {
     return this
 }
 
-@Contract(pure = true)
 inline fun <T, R> Iterable<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     forEach { element -> transform(element)?.let { return it } }
     return null
 }
 
-@Contract(pure = true)
 inline fun <T, R> Array<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     forEach { element -> transform(element)?.let { return it } }
     return null
@@ -151,7 +150,7 @@ inline fun String.span(predicate: (Char) -> Boolean): Pair<String, String> {
 
 fun String.getSimilarity(text: String, bonus: Int = 0): Int {
     if (this == text) {
-        return 1_000_000 + bonus// exact match
+        return 1_000_000 + bonus // exact match
     }
 
     val lowerCaseThis = this.toLowerCase()
@@ -172,4 +171,31 @@ fun String.getSimilarity(text: String, bonus: Int = 0): Int {
 
 inline fun <reified T> Iterable<*>.firstOfType(): T? {
     return this.firstOrNull { it is T } as? T
+}
+
+fun Any.findDeclaredField(name: String): Any? {
+    return javaClass.getDeclaredField(name)?.let { field ->
+        try {
+            field.isAccessible = true
+            field.get(this)
+        } catch (_: Exception) {
+            return null
+        }
+    }
+}
+
+fun Any.invokeDeclaredMethod(name: String, types: Array<Class<*>?>, vararg params: Any?): Any? {
+    return javaClass.getDeclaredMethod(name, *types)?.let { method ->
+        try {
+            method.isAccessible = true
+            method(this, *params)
+        } catch (_: Exception) {
+            null
+        }
+    }
+}
+
+private fun Any.toClassType(): Class<*> {
+    val clazz = this::class
+    return clazz.javaPrimitiveType ?: clazz.javaObjectType
 }

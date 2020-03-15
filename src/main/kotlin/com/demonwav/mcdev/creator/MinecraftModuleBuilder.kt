@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -54,7 +54,6 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
             modifiableRootModel.sdk = moduleJdk
         }
 
-
         val r = DumbAwareRunnable {
             creator.create(root, modifiableRootModel.module)
         }
@@ -63,7 +62,10 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
             return
         }
 
-        if (ApplicationManager.getApplication().isUnitTestMode || ApplicationManager.getApplication().isHeadlessEnvironment) {
+        if (
+            ApplicationManager.getApplication().isUnitTestMode ||
+            ApplicationManager.getApplication().isHeadlessEnvironment
+        ) {
             r.run()
             return
         }
@@ -92,9 +94,11 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
     override fun getModuleType(): ModuleType<*> = JavaModuleType.getModuleType()
     override fun getParentGroup() = MinecraftModuleType.NAME
 
-    override fun createWizardSteps(wizardContext: WizardContext, modulesProvider: ModulesProvider): Array<ModuleWizardStep> {
+    override fun createWizardSteps(
+        wizardContext: WizardContext,
+        modulesProvider: ModulesProvider
+    ): Array<ModuleWizardStep> {
         return arrayOf(
-            SpongeForgeChooser(creator),
             BuildSystemWizardStep(creator),
             BukkitProjectSettingsWizard(creator),
             SpongeProjectSettingsWizard(creator),
@@ -104,6 +108,8 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
         )
     }
 
-    override fun getCustomOptionsStep(context: WizardContext?, parentDisposable: Disposable?) = ProjectChooserWizardStep(creator)
+    override fun getCustomOptionsStep(context: WizardContext?, parentDisposable: Disposable?) =
+        ProjectChooserWizardStep(creator)
+
     override fun validate(current: Project?, dest: Project?) = true
 }

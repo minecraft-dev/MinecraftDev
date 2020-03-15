@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -62,8 +62,10 @@ class UnresolvedReferenceInspection : MixinInspection() {
 
         private fun checkResolved(resolver: MixinReference, value: PsiAnnotationMemberValue) {
             if (resolver.isUnresolved(value) && !value.isWithinDynamicMixin) {
-                holder.registerProblem(value, "Cannot resolve ${resolver.description}".format(value.constantStringValue),
-                    ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
+                holder.registerProblem(
+                    value, "Cannot resolve ${resolver.description}".format(value.constantStringValue),
+                    ProblemHighlightType.LIKE_UNKNOWN_SYMBOL
+                )
             }
         }
     }

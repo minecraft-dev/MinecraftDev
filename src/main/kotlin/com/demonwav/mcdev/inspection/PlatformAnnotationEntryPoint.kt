@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -23,11 +23,14 @@ class PlatformAnnotationEntryPoint : EntryPoint() {
     override fun isEntryPoint(psiElement: PsiElement) = false
     override fun isSelected() = false
     override fun setSelected(selected: Boolean) {}
-    override fun getIgnoreAnnotations() = arrayOf("org.spongepowered.api.event.Listener", "org.bukkit.event.EventHandler")
+    override fun getIgnoreAnnotations() =
+        arrayOf("org.spongepowered.api.event.Listener", "org.bukkit.event.EventHandler")
 
     @Throws(InvalidDataException::class)
-    override fun readExternal(element: Element) {}
+    override fun readExternal(element: Element) {
+    }
 
     @Throws(WriteExternalException::class)
-    override fun writeExternal(element: Element) {}
+    override fun writeExternal(element: Element) {
+    }
 }

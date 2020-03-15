@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -86,7 +86,9 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
     override fun isDirectory() = false
     override fun getTimeStamp() = backingFile.timeStamp
     override fun getModificationStamp() = 0L
-    override fun getName() = backingFile.name + (if (parseSuccessful) ".nbtt" else ".txt") // don't highlight syntax on bad files
+    override fun getName() =
+        backingFile.name + (if (parseSuccessful) ".nbtt" else ".txt") // don't highlight syntax on bad files
+
     override fun contentsToByteArray() = bytes
     override fun isValid() = backingFile.isValid
     override fun getInputStream() = ByteArrayInputStream(bytes)
@@ -110,8 +112,9 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
             return
         }
 
-        this.bytes = PsiDocumentManager.getInstance(project).getDocument(nbttFile)?.immutableCharSequence?.toString()?.toByteArray()
-            ?: byteArrayOf()
+        this.bytes =
+            PsiDocumentManager.getInstance(project).getDocument(nbttFile)
+                ?.immutableCharSequence?.toString()?.toByteArray() ?: byteArrayOf()
 
         // just to be safe
         this.parent.bom = null

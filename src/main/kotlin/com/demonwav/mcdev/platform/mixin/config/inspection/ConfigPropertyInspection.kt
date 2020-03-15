@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -21,7 +21,8 @@ abstract class ConfigPropertyInspection(private vararg val names: String) : Mixi
 
     protected abstract fun visitValue(literal: JsonStringLiteral, holder: ProblemsHolder)
 
-    protected open fun findProperty(literal: PsiElement) = (literal.parent as? JsonProperty)?.takeIf { it.value === literal }
+    protected open fun findProperty(literal: PsiElement) =
+        (literal.parent as? JsonProperty)?.takeIf { it.value === literal }
 
     final override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 

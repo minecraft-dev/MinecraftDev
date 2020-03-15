@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -13,7 +13,6 @@ package com.demonwav.mcdev.insight
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.GeneralAssets
 import com.demonwav.mcdev.util.gotoTargetElement
-import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.TargetElementUtil
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -30,7 +29,6 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.util.PsiExpressionTrimRenderer
 import com.intellij.psi.util.PsiUtilCore
 import com.intellij.util.Function
-import org.jetbrains.annotations.Contract
 import javax.swing.Icon
 
 /**
@@ -53,7 +51,6 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
             element,
             element.textRange,
             icon,
-            Pass.UPDATE_ALL,
             createHandler(listener.second)
         )
     }
@@ -61,7 +58,7 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
     // This is a navigation handler that just simply goes and opens up the event's declaration,
     // even if the event target is a nested class.
     private fun createHandler(method: PsiMethod): GutterIconNavigationHandler<PsiElement> {
-        return GutterIconNavigationHandler handler@ { _, element1 ->
+        return GutterIconNavigationHandler handler@{ _, element1 ->
             // We need to re-evaluate the targeted method, because if the method signature slightly changes before
             // IntelliJ decides to re-evaluate the method, but the class is no longer valid.
             // In this circumstance, we can find the class anyways because it's still a valid listener.
@@ -95,13 +92,11 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
         element: PsiElement,
         range: TextRange,
         icon: Icon,
-        passId: Int,
         handler: GutterIconNavigationHandler<PsiElement>
     ) : MergeableLineMarkerInfo<PsiElement>(
         element,
         range,
         icon,
-        passId,
         Function { "Go to Event declaration" },
         handler,
         GutterIconRenderer.Alignment.RIGHT
@@ -117,11 +112,9 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
             return otherElement != null && myElement != null
         }
 
-        @Contract(pure = true)
         override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<*>>) = myIcon!!
 
-        @Contract(pure = true)
-        override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<*>>): Function<in PsiElement, String>  =
+        override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<*>>): Function<in PsiElement, String> =
             Function { "Multiple method overrides" }
 
         override fun getElementPresentation(element: PsiElement): String {

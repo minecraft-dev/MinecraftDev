@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -19,9 +19,10 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture
+import com.intellij.testFramework.runInEdtAndWait
 import com.intellij.util.PathUtil
-import org.intellij.lang.annotations.Language
 import java.lang.ref.WeakReference
+import org.intellij.lang.annotations.Language
 
 /**
  * Like most things in this project at this point, taken from the intellij-rust folks
@@ -43,9 +44,14 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
 
     var intermediatePath = ""
 
-    fun java(path: String, @Language("JAVA") code: String, configure: Boolean = true) = file(path, code, ".java", configure)
-    fun at(path: String, @Language("Access Transformers") code: String, configure: Boolean = true) = file(path, code, "_at.cfg", configure)
-    fun lang(path: String, @Language("MCLang") code: String, configure: Boolean = true) = file(path, code, ".${LangFileType.FILE_EXTENSION}", configure)
+    fun java(path: String, @Language("JAVA") code: String, configure: Boolean = true) =
+        file(path, code, ".java", configure)
+    fun at(path: String, @Language("Access Transformers") code: String, configure: Boolean = true) =
+        file(path, code, "_at.cfg", configure)
+    fun i18n(path: String, @Language("MCLang") code: String, configure: Boolean = true) =
+        file(path, code, ".${LangFileType.FILE_EXTENSION}", configure)
+    fun nbtt(path: String, @Language("NBTT") code: String, configure: Boolean = true) =
+        file(path, code, ".nbtt", configure)
 
     inline fun dir(path: String, block: ProjectBuilder.() -> Unit) {
         val oldIntermediatePath = intermediatePath
@@ -58,7 +64,7 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
         intermediatePath = oldIntermediatePath
     }
 
-    private fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
+    fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
         check(path.endsWith(ext))
 
         val fullPath = if (intermediatePath.isEmpty()) path else "$intermediatePath/$path"
@@ -80,14 +86,16 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
     }
 
     fun build(builder: ProjectBuilder.() -> Unit) {
-        runWriteAction {
-            VfsUtil.markDirtyAndRefresh(false, true, true, root)
-            // Make sure to always add the module content root
-            if (fixture.module.rootManager.contentEntries.none { it.file == project.baseDirPath }) {
-                ModuleRootModificationUtil.addContentRoot(fixture.module, project.baseDirPath)
-            }
+        runInEdtAndWait {
+            runWriteAction {
+                VfsUtil.markDirtyAndRefresh(false, true, true, root)
+                // Make sure to always add the module content root
+                if (fixture.module.rootManager.contentEntries.none { it.file == project.baseDirPath }) {
+                    ModuleRootModificationUtil.addContentRoot(fixture.module, project.baseDirPath)
+                }
 
-            builder()
+                builder()
+            }
         }
     }
 }

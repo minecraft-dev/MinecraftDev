@@ -11,7 +11,7 @@ Minecraft Development for IntelliJ
 |   **Travis (macOS)**   |[![Travis macOS Build Status](https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/2)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
 | **AppVeyor (Windows)** |[![AppVeyor Windows Build Status](https://ci.appveyor.com/api/projects/status/iuxeewnxgu4afmo6?svg=true)](https://ci.appveyor.com/project/DemonWav/minecraftdev)|
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-2019.1--1.2.21-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-2019.3--1.3.2-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 <a href="https://discord.gg/j6UNcfr"><img src="https://i.imgur.com/JXu9C1G.png" height="48px"></img></a>
@@ -31,7 +31,7 @@ box, simply search for `Minecraft`. You can install it from there and restart In
 Building
 --------
 
-Make sure you have Java 8 installed.
+JDK 8 is required.
 
 Build the plugin with:
 
@@ -49,21 +49,32 @@ Code is generated during the build task, to run the generation task without buil
 
 This task is necessary to work on the code without errors before the initial build.
 
+To format the code in this project:
+
+`./gradlew format`
+
+This will format using `ktlint` described below in the [style guide](#style-guide) section below.
+
 The [Gradle IntelliJ Plugin](https://github.com/JetBrains/gradle-intellij-plugin)
 will handle downloading the IntelliJ dependencies and packaging the
 plugin.
 
-IDE Setup
----------
-
-Copy the contents of the `idea-configs` directory into your `.idea` directory to quickly setup useful
-run configurations and copyright settings.
-
 Style Guide
 -----------
 
-This project will follow DemonWav's Java style guidelines (lol, Google's
-style slightly modified). Link [here](http://www.demonwav.com/style).
+This projects follows the opinionated [`ktlint`](https://ktlint.github.io/) linter and formatter. It uses the
+[`ktlint-gradle`](https://github.com/jlleitschuh/ktlint-gradle) plugin to automatically check and format the code in
+this repo.
+
+IDE Setup
+---------
+
+It's recommended to run the `ktlintApplyToIdea` and `addKtlintFormatGitPreCommitHook` tasks to configure your
+IDE with `ktlint` style settings and to automatically format this project's code before committing:
+
+```
+./gradlew ktlintApplyToIdea addKtlintFormatGitPreCommitHook
+```
 
 Developers
 ----------
@@ -77,15 +88,7 @@ Developers
 - [**@gabizou** - Gabriel Harris-Rouquette](https://github.com/gabizou)
 - [**@kashike**](https://github.com/kashike)
 - [**@jamierocks** - Jamie Mansfield](https://github.com/jamierocks)
-
-Issues
-------
-
-We have a few ambiguous labels on the issues page, so here are their definitions:
- * `platform: all` - An issue which applies to all supported platforms (`Bukkit`, `Sponge`, `BungeeCord`, `Forge`, `LiteLoader`)
- * `platform: main` - Multiple platforms, containing at least `Bukkit`, `Sponge`, and `Forge`. It can contain either of the other two as
-   well, as long as it doesn't contain all of them. In that case, `platform: all` would be more appropriate, of course.
- * `platform: multi` - Any issue with more than two platforms which doesn't fall under the first two categories.
+- [**@RedNesto**](https://github.com/RedNesto)
 
 License
 -------

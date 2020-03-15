@@ -3,10 +3,12 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
+
+@file:Suppress("unused") // this file represents an API
 
 package com.demonwav.mcdev.platform.mcp.at
 
@@ -34,7 +36,8 @@ object AtElementFactory {
         val line = "public c.c f($text)V"
         val file = createFile(project, line)
 
-        return file.firstChild.node.findChildByType(AtTypes.FUNCTION)!!.findChildByType(AtTypes.ARGUMENT)!!.psi as AtArgument
+        return file.firstChild.node.findChildByType(AtTypes.FUNCTION)!!
+            .findChildByType(AtTypes.ARGUMENT)!!.psi as AtArgument
     }
 
     fun createClassName(project: Project, name: String): AtClassName {
@@ -50,7 +53,7 @@ object AtElementFactory {
     }
 
     fun createFieldName(project: Project, name: String): AtFieldName {
-        val line = "public c.c " + name
+        val line = "public c.c $name"
         val file = createFile(project, line)
 
         return file.firstChild.node.findChildByType(AtTypes.FIELD_NAME)!!.psi as AtFieldName
@@ -60,11 +63,12 @@ object AtElementFactory {
         val line = "public c.c $name(Z)V"
         val file = createFile(project, line)
 
-        return file.firstChild.node.findChildByType(AtTypes.FUNCTION)!!.findChildByType(AtTypes.FUNC_NAME)!!.psi as AtFuncName
+        return file.firstChild.node.findChildByType(AtTypes.FUNCTION)!!
+            .findChildByType(AtTypes.FUNC_NAME)!!.psi as AtFuncName
     }
 
     fun createFunction(project: Project, function: String): AtFunction {
-        val line = "public c.c " + function
+        val line = "public c.c $function"
         val file = createFile(project, line)
 
         return file.firstChild.node.findChildByType(AtTypes.FUNCTION)!!.psi as AtFunction
@@ -74,7 +78,8 @@ object AtElementFactory {
         val line = "public c.c *"
         val file = createFile(project, line)
 
-        return file.firstChild.node.findChildByType(AtTypes.FUNCTION)!!.findChildByType(AtTypes.ASTERISK)!!.psi as AtAsterisk
+        return file.firstChild.node.findChildByType(AtTypes.FUNCTION)!!
+            .findChildByType(AtTypes.ASTERISK)!!.psi as AtAsterisk
     }
 
     fun createKeyword(project: Project, keyword: Keyword): AtKeyword {
@@ -85,14 +90,15 @@ object AtElementFactory {
     }
 
     fun createReturnValue(project: Project, returnValue: String): AtReturnValue {
-        val line = "public c.c f(Z)" + returnValue
+        val line = "public c.c f(Z)$returnValue"
         val file = createFile(project, line)
 
-        return file.firstChild.node.findChildByType(AtTypes.FUNCTION)!!.findChildByType(AtTypes.RETURN_VALUE)!!.psi as AtReturnValue
+        return file.firstChild.node.findChildByType(AtTypes.FUNCTION)!!
+            .findChildByType(AtTypes.RETURN_VALUE)!!.psi as AtReturnValue
     }
 
     fun createComment(project: Project, comment: String): PsiComment {
-        val line = "# " + comment
+        val line = "# $comment"
         val file = createFile(project, line)
 
         return file.node.findChildByType(AtTypes.COMMENT)!!.psi as PsiComment
@@ -111,7 +117,7 @@ object AtElementFactory {
         DEFAULT("default"),
         DEFAULT_MINUS_F("default-f"),
         DEFAULT_PLUS_F("default+f");
-        
+
         companion object {
             fun match(s: String) = values().firstOrNull { it.text == s }
             fun softMatch(s: String) = values().filter { it.text.contains(s) }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -24,14 +24,6 @@ import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.awt.RelativePoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
-import kotlinx.coroutines.withContext
-import org.apache.commons.lang.WordUtils
 import java.awt.event.ActionListener
 import java.util.regex.Pattern
 import javax.swing.JComboBox
@@ -42,6 +34,14 @@ import javax.swing.JProgressBar
 import javax.swing.JTextField
 import javax.swing.event.DocumentEvent
 import javax.swing.text.AbstractDocument
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
+import org.apache.commons.lang.WordUtils
 
 class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreator) : MinecraftModuleWizardStep() {
 
@@ -210,7 +210,7 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
         )
 
         conf.mcVersion = minecraftVersionBox.selectedItem as String
-        conf.mcpVersion = (mcpVersionBox.selectedItem as McpVersionEntry).text
+        conf.mcpVersion = (mcpVersionBox.selectedItem as McpVersionEntry).versionPair
     }
 
     override fun updateDataModel() {}

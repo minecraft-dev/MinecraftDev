@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -73,7 +73,8 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) 
         }
     }
 
-    private class ColorPickerDialog constructor(parent: JComponent, private val component: JComponent) : DialogWrapper(parent, false) {
+    private class ColorPickerDialog constructor(parent: JComponent, private val component: JComponent) :
+        DialogWrapper(parent, false) {
 
         init {
             title = "Choose Color"

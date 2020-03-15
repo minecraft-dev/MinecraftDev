@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -103,7 +103,11 @@ fun insertShadows(psiClass: PsiClass, shadows: List<GenerationInfo>) {
     GenerateMembersUtil.insertMembersBeforeAnchor(psiClass, anchor, shadows)
 }
 
-fun createShadowMembers(project: Project, psiClass: PsiClass, members: Stream<PsiMember>): List<PsiGenerationInfo<PsiMember>> {
+fun createShadowMembers(
+    project: Project,
+    psiClass: PsiClass,
+    members: Stream<PsiMember>
+): List<PsiGenerationInfo<PsiMember>> {
     var methodAdded = false
 
     val result = members.map { m ->

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -28,7 +28,7 @@ import com.intellij.psi.PsiModifier.STATIC
 import com.intellij.psi.PsiNameHelper
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiType
-import org.objectweb.asm.Opcodes
+import org.jetbrains.org.objectweb.asm.Opcodes
 
 enum class InjectorType(private val annotation: String) {
     INJECT(MixinConstants.Annotations.INJECT) {
@@ -42,17 +42,27 @@ enum class InjectorType(private val annotation: String) {
             result.add(ParameterGroup(collectTargetMethodParameters(targetMethod), required = false, default = true))
 
             // Callback info (required)
-            result.add(ParameterGroup(listOf(if (returnType == null || returnType == PsiType.VOID) {
-                Parameter("ci", callbackInfoType(targetMethod.project)!!)
-            } else {
-                Parameter("cir", callbackInfoReturnableType(targetMethod.project, targetMethod, returnType)!!)
-            })))
+            result.add(
+                ParameterGroup(
+                    listOf(
+                        if (returnType == null || returnType == PsiType.VOID) {
+                            Parameter("ci", callbackInfoType(targetMethod.project)!!)
+                        } else {
+                            Parameter(
+                                "cir",
+                                callbackInfoReturnableType(targetMethod.project, targetMethod, returnType)!!
+                            )
+                        }
+                    )
+                )
+            )
 
             // Captured locals (only if local capture is enabled)
             // Right now we allow any parameters here since we can't easily
             // detect the local variables that can be captured
             if (((annotation.findDeclaredAttributeValue("locals") as? PsiQualifiedReference)
-                    ?.referenceName ?: "NO_CAPTURE") != "NO_CAPTURE") {
+                    ?.referenceName ?: "NO_CAPTURE") != "NO_CAPTURE"
+            ) {
                 result.add(ParameterGroup(null))
             }
 
@@ -117,7 +127,11 @@ enum class InjectorType(private val annotation: String) {
             return Pair(parameters, returnType)
         }
 
-        private fun collectFieldParameters(at: PsiAnnotation, owner: PsiClass, field: PsiField): Pair<List<Parameter>, PsiType>? {
+        private fun collectFieldParameters(
+            at: PsiAnnotation,
+            owner: PsiClass,
+            field: PsiField
+        ): Pair<List<Parameter>, PsiType>? {
             // TODO: Report if opcode isn't set
             val opcode = at.findDeclaredAttributeValue("opcode")?.constantValue as? Int ?: return null
 
@@ -164,7 +178,12 @@ enum class InjectorType(private val annotation: String) {
             if (targetMethod.isConstructor) {
                 val containingClass = targetMethod.containingClass
                 if (containingClass != null && containingClass.isEnum) {
-                    list.add(Parameter("enumName", PsiType.getJavaLangString(targetMethod.manager, targetMethod.resolveScope)))
+                    list.add(
+                        Parameter(
+                            "enumName",
+                            PsiType.getJavaLangString(targetMethod.manager, targetMethod.resolveScope)
+                        )
+                    )
                     list.add(Parameter("ordinal", PsiType.INT))
                 }
             }

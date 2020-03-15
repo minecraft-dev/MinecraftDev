@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -15,8 +15,8 @@ import com.intellij.openapi.fileTypes.LanguageFileType
 
 object AtFileType : LanguageFileType(AtLanguage) {
 
-    override fun getName() = "Access Transformers File"
-    override fun getDescription() = "Access Transformers"
+    override fun getName() = "Access Transformers"
+    override fun getDescription() = "Access Transformers File"
     override fun getDefaultExtension() = ""
     override fun getIcon() = PlatformAssets.MCP_ICON
 }

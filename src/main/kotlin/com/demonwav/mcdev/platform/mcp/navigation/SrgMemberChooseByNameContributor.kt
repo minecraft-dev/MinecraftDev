@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -50,7 +50,12 @@ class SrgMemberChooseByNameContributor : ChooseByNameContributor {
         return names.toTypedArray()
     }
 
-    override fun getItemsByName(name: String, pattern: String, project: Project, includeNonProjectItems: Boolean): Array<NavigationItem> {
+    override fun getItemsByName(
+        name: String,
+        pattern: String,
+        project: Project,
+        includeNonProjectItems: Boolean
+    ): Array<NavigationItem> {
         if (!includeNonProjectItems || srgMap == null || module == null) {
             return emptyArray()
         }
@@ -74,8 +79,9 @@ class SrgMemberChooseByNameContributor : ChooseByNameContributor {
 
         try {
             memberRef?.let {
-                val member = it.resolveMember(project, GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module!!)) ?:
-                    return emptyArray()
+                val member =
+                    it.resolveMember(project, GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module!!))
+                        ?: return emptyArray()
                 return arrayOf(member)
             }
             return emptyArray()

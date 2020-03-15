@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -17,12 +17,15 @@ import com.intellij.openapi.module.JavaModuleType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 
-class MinecraftFacetType : FacetType<MinecraftFacet, MinecraftFacetConfiguration>(MinecraftFacet.ID, TYPE_ID, "Minecraft") {
+class MinecraftFacetType :
+    FacetType<MinecraftFacet, MinecraftFacetConfiguration>(MinecraftFacet.ID, TYPE_ID, "Minecraft") {
 
-    override fun createFacet(module: Module,
-                             name: String,
-                             configuration: MinecraftFacetConfiguration,
-                             underlyingFacet: Facet<*>?) = MinecraftFacet(module, name, configuration, underlyingFacet)
+    override fun createFacet(
+        module: Module,
+        name: String,
+        configuration: MinecraftFacetConfiguration,
+        underlyingFacet: Facet<*>?
+    ) = MinecraftFacet(module, name, configuration, underlyingFacet)
 
     override fun createDefaultConfiguration() = MinecraftFacetConfiguration()
     override fun isSuitableModuleType(moduleType: ModuleType<*>?) = moduleType is JavaModuleType

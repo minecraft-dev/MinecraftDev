@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.asset
 
 import com.intellij.openapi.util.IconLoader
-
 import javax.swing.Icon
 
 abstract class Assets protected constructor() {

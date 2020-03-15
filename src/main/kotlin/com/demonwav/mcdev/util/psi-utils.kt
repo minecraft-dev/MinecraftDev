@@ -3,13 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.util
 
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModule
 import com.demonwav.mcdev.platform.mcp.McpModuleType
@@ -43,34 +44,31 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
-import org.jetbrains.annotations.Contract
+import com.siyeh.ig.psiutils.ImportUtils
 import java.util.stream.Stream
+import org.jetbrains.annotations.Contract
 
 // Parent
 fun PsiElement.findModule(): Module? = ModuleUtilCore.findModuleForPsiElement(this)
 
-@Contract(pure = true)
 fun PsiElement.findContainingClass(): PsiClass? = findParent(resolveReferences = false)
 
-@Contract(pure = true)
 fun PsiElement.findReferencedClass(): PsiClass? = findParent(resolveReferences = true)
 
-@Contract(pure = true)
 fun PsiElement.findReferencedMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = true)
 
-@Contract(pure = true)
 fun PsiElement.findContainingMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = false)
 
-@Contract(pure = true)
 fun PsiElement.findContainingMethod(): PsiMethod? = findParent({ it is PsiClass }, resolveReferences = false)
 
-@Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findParent(resolveReferences: Boolean): T? {
-    return findParent({false}, resolveReferences)
+    return findParent({ false }, resolveReferences)
 }
 
-@Contract(pure = true)
-private inline fun <reified T : PsiElement> PsiElement.findParent(stop: (PsiElement) -> Boolean, resolveReferences: Boolean): T? {
+private inline fun <reified T : PsiElement> PsiElement.findParent(
+    stop: (PsiElement) -> Boolean,
+    resolveReferences: Boolean
+): T? {
     var el: PsiElement = this
 
     while (true) {
@@ -91,18 +89,14 @@ private inline fun <reified T : PsiElement> PsiElement.findParent(stop: (PsiElem
 }
 
 // Children
-@Contract(pure = true)
 fun PsiClass.findFirstMember(): PsiMember? = findChild()
 
-@Contract(pure = true)
 fun PsiElement.findNextMember(): PsiMember? = findSibling(true)
 
-@Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findChild(): T? {
     return firstChild?.findSibling(strict = false)
 }
 
-@Contract(pure = true)
 private inline fun <reified T : PsiElement> PsiElement.findSibling(strict: Boolean): T? {
     var sibling = if (strict) nextSibling ?: return null else this
     while (true) {
@@ -123,12 +117,10 @@ fun PsiElement.findKeyword(name: String): PsiKeyword? {
     return null
 }
 
-@Contract(pure = true)
 private inline fun PsiElement.forEachChild(func: (PsiElement) -> Unit) {
     firstChild?.forEachSibling(func, strict = false)
 }
 
-@Contract(pure = true)
 private inline fun PsiElement.forEachSibling(func: (PsiElement) -> Unit, strict: Boolean) {
     var sibling = if (strict) nextSibling ?: return else this
     while (true) {
@@ -137,7 +129,6 @@ private inline fun PsiElement.forEachSibling(func: (PsiElement) -> Unit, strict:
     }
 }
 
-@Contract(pure = true)
 inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElement? {
     var child = firstChild ?: return null
     var lastChild: PsiElement? = null
@@ -151,17 +142,15 @@ inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElem
     }
 }
 
-@Contract(pure = true)
 fun <T : Any> Sequence<T>.filter(filter: ElementFilter?, context: PsiElement): Sequence<T> {
     filter ?: return this
     return filter { filter.isAcceptable(it, context) }
 }
 
-@Contract(pure = true)
 fun Stream<out PsiElement>.toResolveResults(): Array<ResolveResult> = map(::PsiElementResolveResult).toTypedArray()
 
 fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
-    ChangeSignatureUtil.synchronizeList(this, newParams, {it.parameters.asList()}, BooleanArray(newParams.size))
+    ChangeSignatureUtil.synchronizeList(this, newParams, { it.parameters.asList() }, BooleanArray(newParams.size))
 }
 
 @get:Contract(pure = true)
@@ -172,18 +161,17 @@ val PsiElement.constantValue: Any?
 val PsiElement.constantStringValue: String?
     get() = constantValue as? String
 
-private val ACCESS_MODIFIERS = listOf(PsiModifier.PUBLIC, PsiModifier.PROTECTED, PsiModifier.PRIVATE, PsiModifier.PACKAGE_LOCAL)
+private val ACCESS_MODIFIERS =
+    listOf(PsiModifier.PUBLIC, PsiModifier.PROTECTED, PsiModifier.PRIVATE, PsiModifier.PACKAGE_LOCAL)
 
 fun isAccessModifier(@ModifierConstant modifier: String): Boolean {
     return modifier in ACCESS_MODIFIERS
 }
 
-@Contract(pure = true)
 infix fun PsiElement.equivalentTo(other: PsiElement): Boolean {
     return manager.areElementsEquivalent(this, other)
 }
 
-@Contract(pure = true)
 fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
     // TODO: Do more checks for generics instead
     return TypeConversionUtil.erasure(this) == TypeConversionUtil.erasure(other)
@@ -193,15 +181,18 @@ fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
 val PsiMethod.nameAndParameterTypes: String
     get() = "$name(${parameterList.parameters.joinToString(", ") { it.type.presentableText }})"
 
-
 @get:Contract(pure = true)
 val <T : PsiElement> T.manipulator: ElementManipulator<T>?
     get() = ElementManipulators.getManipulator(this)
 
-@Contract(pure = true)
 inline fun <T> PsiElement.cached(crossinline compute: () -> T): T {
     return CachedValuesManager.getCachedValue(this) { CachedValueProvider.Result.create(compute(), this) }
 }
+
+fun LookupElementBuilder.withImportInsertion(toImport: List<PsiClass>): LookupElementBuilder =
+    this.withInsertHandler { insertionContext, _ ->
+        toImport.forEach { ImportUtils.addImportIfNeeded(it, insertionContext.file) }
+    }
 
 fun PsiElement.findMcpModule() = this.cached {
     val file = containingFile?.virtualFile ?: return@cached null

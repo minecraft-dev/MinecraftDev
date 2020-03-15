@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -82,7 +82,7 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
 
     private fun resolve(targets: Collection<PsiClass>, targetReference: MemberReference): Stream<PsiMethod> {
         return targets.stream()
-                .flatMap { it.findMethods(targetReference) }
+            .flatMap { it.findMethods(targetReference) }
     }
 
     fun resolveIfUnique(context: PsiElement): PsiMethod? {
@@ -130,9 +130,9 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
 
     private fun collectVariants(context: PsiElement, targets: Collection<PsiClass>): Array<Any> {
         val groupedMethods = targets.stream()
-                .flatMap { target -> target.methods.stream() }
-                .collect(Collectors.groupingBy(PsiMethod::memberReference))
-                .values
+            .flatMap { target -> target.methods.stream() }
+            .collect(Collectors.groupingBy(PsiMethod::memberReference))
+            .values
 
         // All methods which are not unique by their name need to be qualified with the descriptor
         val visitedMethods = HashSet<String>()
@@ -162,16 +162,21 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
 
     private fun createLookup(context: PsiElement, methods: Stream<PsiMethod>, uniqueMethods: Set<String>): Array<Any> {
         return methods
-                .map { m ->
-                    val targetMethodInfo = if (m.internalName in uniqueMethods) {
-                        MemberReference(m.internalName)
-                    } else {
-                        m.memberReference
-                    }
+            .map { m ->
+                val targetMethodInfo = if (m.internalName in uniqueMethods) {
+                    MemberReference(m.internalName)
+                } else {
+                    m.memberReference
+                }
 
-                    JavaLookupElementBuilder.forMethod(m, MixinMemberReference.toString(targetMethodInfo), PsiSubstitutor.EMPTY, null)
-                            .withPresentableText(m.internalName)
-                            .completeToLiteral(context)
-                }.toArray()
+                JavaLookupElementBuilder.forMethod(
+                    m,
+                    MixinMemberReference.toString(targetMethodInfo),
+                    PsiSubstitutor.EMPTY,
+                    null
+                )
+                    .withPresentableText(m.internalName)
+                    .completeToLiteral(context)
+            }.toArray()
     }
 }

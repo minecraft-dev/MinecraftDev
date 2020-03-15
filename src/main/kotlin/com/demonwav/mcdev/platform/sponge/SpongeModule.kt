@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -30,7 +30,6 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
-import org.jetbrains.annotations.Contract
 
 class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
@@ -43,12 +42,14 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) =
         "Parameter is not an instance of org.spongepowered.api.event.Event\n" +
-        "Compiling and running this listener may result in a runtime exception"
+            "Compiling and running this listener may result in a runtime exception"
 
-    override fun generateEventListenerMethod(containingClass: PsiClass,
-                                             chosenClass: PsiClass,
-                                             chosenName: String,
-                                             data: GenerationData?): PsiMethod? {
+    override fun generateEventListenerMethod(
+        containingClass: PsiClass,
+        chosenClass: PsiClass,
+        chosenName: String,
+        data: GenerationData?
+    ): PsiMethod? {
         val method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)
         val parameterList = method.parameterList
 
@@ -76,7 +77,10 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
         if (generationData.eventOrder != "DEFAULT") {
             val value = JavaPsiFacade.getElementFactory(project)
-                .createExpressionFromText("org.spongepowered.api.event.Order." + generationData.eventOrder, listenerAnnotation)
+                .createExpressionFromText(
+                    "org.spongepowered.api.event.Order." + generationData.eventOrder,
+                    listenerAnnotation
+                )
 
             listenerAnnotation.setDeclaredAttributeValue<PsiAnnotationMemberValue>("order", value)
         }
@@ -84,7 +88,6 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         return method
     }
 
-    @Contract(value = "null -> false", pure = true)
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
         if (element !is PsiIdentifier) {
             return false
@@ -143,10 +146,13 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         }
 
         return IsCancelled(
-            errorString = "Cancellable.isCancelled() check is useless in a method not annotated with @IsCancelled(Tristate.UNDEFINED)",
+            errorString = "Cancellable.isCancelled() check is useless in a method not " +
+                "annotated with @IsCancelled(Tristate.UNDEFINED)",
             fix = {
-                expression.replace(JavaPsiFacade.getElementFactory(project)
-                                       .createExpressionFromText(if (isCancelled) "true" else "false", expression))
+                expression.replace(
+                    JavaPsiFacade.getElementFactory(project)
+                        .createExpressionFromText(if (isCancelled) "true" else "false", expression)
+                )
             }
         )
     }

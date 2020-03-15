@@ -3,22 +3,27 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mixin.implements
 
+import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.platform.mixin.BaseMixinTest
 import com.demonwav.mcdev.platform.mixin.inspection.implements.SoftImplementOverridesInspection
-import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(EdtInterceptor::class)
+@DisplayName("@Implements Soft Implementation Inspection Test")
 class SoftImplementTest : BaseMixinTest() {
 
-    override fun setUp() {
-        super.setUp()
-
+    @BeforeEach
+    fun setupProject() {
         buildProject {
             src {
                 java("test/DummyFace.java", """
@@ -31,7 +36,7 @@ class SoftImplementTest : BaseMixinTest() {
                     }
                 """)
 
-                java("test/SoftImplementMixin.java", fixPrefix("""
+                java("test/SoftImplementMixin.java", """
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -39,29 +44,27 @@ class SoftImplementTest : BaseMixinTest() {
                     import org.spongepowered.asm.mixin.Interface;
 
                     @Mixin
-                    @Implements(@Interface(iface = DummyFace.class, prefix = "dummy_"))
+                    @Implements(@Interface(iface = DummyFace.class, prefix = "dummy$"))
                     class SoftImplementMixin {
 
                         public String dummy_thisMethodExists() {
                             return "test";
                         }
 
-                        public int <error descr="Method does not soft-implement a method from its interfaces">dummy_thisMethodDoesntExist</error>() {
+                        public int <error descr="Method does not soft-implement a method from its interfaces">dummy${'$'}thisMethodDoesntExist</error>() {
                             return 0;
                         }
 
                     }
-                """))
+                """)
             }
         }
     }
 
-    private fun fixPrefix(@Language("JAVA") code: String): String {
-        return code.replace('_', '$')
-    }
-
-    fun `test soft implements`() {
-        myFixture.enableInspections(SoftImplementOverridesInspection::class.java)
-        myFixture.checkHighlighting(true, false, false)
+    @Test
+    @DisplayName("Highlight Prefixed Method Not Implementing @Interface Test")
+    fun highlightPrefixedMethodNotImplementingInterfaceTest() {
+        fixture.enableInspections(SoftImplementOverridesInspection::class.java)
+        fixture.checkHighlighting(true, false, false)
     }
 }

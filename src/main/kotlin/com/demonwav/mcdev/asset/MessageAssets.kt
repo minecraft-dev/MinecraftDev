@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -11,12 +11,12 @@
 package com.demonwav.mcdev.asset
 
 import com.intellij.CommonBundle
-import org.jetbrains.annotations.NonNls
-import org.jetbrains.annotations.PropertyKey
+import com.intellij.reference.SoftReference as IJSoftReference
 import java.lang.ref.Reference
 import java.lang.ref.SoftReference
 import java.util.ResourceBundle
-import com.intellij.reference.SoftReference as IJSoftReference
+import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.PropertyKey
 
 object MessageAssets : Assets() {
     fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any): String {

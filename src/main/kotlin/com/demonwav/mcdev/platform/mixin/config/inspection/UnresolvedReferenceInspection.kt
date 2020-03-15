@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -32,8 +32,10 @@ class UnresolvedReferenceInspection : MixinConfigInspection() {
                 }
 
                 if (reference.unresolved) {
-                    holder.registerProblem(literal,"Cannot resolve ${reference.description}".format(reference.canonicalText),
-                        ProblemHighlightType.LIKE_UNKNOWN_SYMBOL, reference.rangeInElement)
+                    holder.registerProblem(
+                        literal, "Cannot resolve ${reference.description}".format(reference.canonicalText),
+                        ProblemHighlightType.LIKE_UNKNOWN_SYMBOL, reference.rangeInElement
+                    )
                 }
             }
         }

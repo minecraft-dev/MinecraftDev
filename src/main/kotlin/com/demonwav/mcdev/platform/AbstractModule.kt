@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -20,7 +20,6 @@ import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiReferenceExpression
-import org.jetbrains.annotations.Contract
 import javax.swing.Icon
 
 abstract class AbstractModule(protected val facet: MinecraftFacet) {
@@ -56,22 +55,21 @@ abstract class AbstractModule(protected val facet: MinecraftFacet) {
 
     open fun doPreEventGenerate(psiClass: PsiClass, data: GenerationData?) {}
 
-    open fun generateEventListenerMethod(containingClass: PsiClass,
-                                         chosenClass: PsiClass,
-                                         chosenName: String,
-                                         data: GenerationData?): PsiMethod? = null
+    open fun generateEventListenerMethod(
+        containingClass: PsiClass,
+        chosenClass: PsiClass,
+        chosenName: String,
+        data: GenerationData?
+    ): PsiMethod? = null
 
-    @Contract(value = "null -> false", pure = true)
     open fun shouldShowPluginIcon(element: PsiElement?) = false
 
-    @Contract(pure = true)
     open fun checkUselessCancelCheck(expression: PsiMethodCallExpression): IsCancelled? {
         return null
     }
 
     open fun isStaticListenerSupported(method: PsiMethod) = false
 
-    @Contract(pure = true)
     protected fun standardSkip(method: PsiMethod, qualifierExpression: PsiExpression): Boolean {
         if (qualifierExpression !is PsiReferenceExpression) {
             return false

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -23,7 +23,7 @@ import com.intellij.psi.javadoc.PsiDocComment
 class OverwriteAuthorInspection : OverwriteInspection() {
 
     override fun getStaticDescription() =
-            "For maintainability reasons, the Sponge project requires @Overwrite methods to declare an @author JavaDoc tag."
+        "For maintainability reasons, the Sponge project requires @Overwrite methods to declare an @author JavaDoc tag."
 
     override fun visitOverwrite(holder: ProblemsHolder, method: PsiMethod, overwrite: PsiAnnotation) {
         val javadoc = method.docComment
@@ -39,7 +39,11 @@ class OverwriteAuthorInspection : OverwriteInspection() {
     }
 
     private fun registerMissingTag(holder: ProblemsHolder, element: PsiElement) {
-        holder.registerProblem(element, "@Overwrite methods must have an associated JavaDoc with a filled in @author tag", QuickFix)
+        holder.registerProblem(
+            element,
+            "@Overwrite methods must have an associated JavaDoc with a filled in @author tag",
+            QuickFix
+        )
     }
 
     private object QuickFix : LocalQuickFix {
@@ -53,8 +57,10 @@ class OverwriteAuthorInspection : OverwriteInspection() {
             val javadoc = method.docComment
             if (javadoc == null) {
                 // Create new Javadoc comment
-                method.addBefore(JavaPsiFacade.getElementFactory(project).createDocCommentFromText("/**\n * @author \n */"),
-                        method.modifierList)
+                method.addBefore(
+                    JavaPsiFacade.getElementFactory(project).createDocCommentFromText("/**\n * @author \n */"),
+                    method.modifierList
+                )
                 return
             }
 

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -39,11 +39,11 @@ abstract class ReferenceResolver : PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<out PsiReference> =
         arrayOf(Reference(element as PsiLiteral, this))
 
-    private class Reference(element: PsiLiteral, private val resolver: ReferenceResolver) : PsiReferenceBase<PsiLiteral>(element) {
+    private class Reference(element: PsiLiteral, private val resolver: ReferenceResolver) :
+        PsiReferenceBase<PsiLiteral>(element) {
 
         override fun resolve() = resolver.resolveReference(element.findContextElement())
         override fun getVariants() = resolver.collectVariants(element.findContextElement())
-
     }
 }
 
@@ -59,11 +59,11 @@ abstract class PolyReferenceResolver : PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<out PsiReference> =
         arrayOf(Reference(element as PsiLiteral, this))
 
-    private class Reference(element: PsiLiteral, private val resolver: PolyReferenceResolver) : PsiReferenceBase.Poly<PsiLiteral>(element) {
+    private class Reference(element: PsiLiteral, private val resolver: PolyReferenceResolver) :
+        PsiReferenceBase.Poly<PsiLiteral>(element) {
 
         override fun multiResolve(incompleteCode: Boolean) = resolver.resolveReference(element.findContextElement())
         override fun getVariants() = resolver.collectVariants(element.findContextElement())
-
     }
 }
 
@@ -95,11 +95,16 @@ fun LookupElementBuilder.completeToLiteral(context: PsiElement): LookupElementBu
     // TODO: Currently we replace everything with a single PsiLiteral,
     // not sure how you would keep line breaks after completion
     return withInsertHandler { insertionContext, item ->
-        insertionContext.laterRunnable = ReplaceElementWithLiteral(insertionContext.editor, insertionContext.file, item.lookupString)
+        insertionContext.laterRunnable =
+            ReplaceElementWithLiteral(insertionContext.editor, insertionContext.file, item.lookupString)
     }
 }
 
-private class ReplaceElementWithLiteral(private val editor: Editor, private val file: PsiFile, private val text: String) : Runnable {
+private class ReplaceElementWithLiteral(
+    private val editor: Editor,
+    private val file: PsiFile,
+    private val text: String
+) : Runnable {
 
     override fun run() {
         // Commit changes made by code completion
@@ -109,7 +114,12 @@ private class ReplaceElementWithLiteral(private val editor: Editor, private val 
         CommandProcessor.getInstance().runUndoTransparentAction {
             runWriteAction {
                 val element = file.findElementAt(editor.caretModel.offset)!!.findContextElement()
-                element.replace(JavaPsiFacade.getElementFactory(element.project).createExpressionFromText("\"$text\"", element.parent))
+                element.replace(
+                    JavaPsiFacade.getElementFactory(element.project).createExpressionFromText(
+                        "\"$text\"",
+                        element.parent
+                    )
+                )
             }
         }
     }

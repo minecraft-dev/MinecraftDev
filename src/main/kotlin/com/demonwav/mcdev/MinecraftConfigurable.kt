@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -12,12 +12,12 @@ package com.demonwav.mcdev
 
 import com.demonwav.mcdev.update.ConfigurePluginUpdatesDialog
 import com.intellij.openapi.options.Configurable
-import org.jetbrains.annotations.Nls
 import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JPanel
+import org.jetbrains.annotations.Nls
 
 class MinecraftConfigurable : Configurable {
 
@@ -31,6 +31,7 @@ class MinecraftConfigurable : Configurable {
 
     @Nls
     override fun getDisplayName() = "Minecraft Development"
+
     override fun getHelpTopic(): String? = null
 
     override fun createComponent(): JComponent {

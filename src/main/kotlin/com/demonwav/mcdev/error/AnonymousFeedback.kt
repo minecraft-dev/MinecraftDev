@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -17,11 +17,11 @@ import com.google.gson.Gson
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.util.io.readCharSequence
-import org.apache.commons.io.IOUtils
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
+import org.apache.commons.io.IOUtils
 
 object AnonymousFeedback {
 
@@ -37,7 +37,8 @@ object AnonymousFeedback {
         val duplicateId = findDuplicateIssue(envDetails, factory)
         if (duplicateId != null) {
             // This is a duplicate
-            val commentUrl = sendCommentOnDuplicateIssue(duplicateId, factory, convertToGitHubIssueFormat(envDetails, attachments))
+            val commentUrl =
+                sendCommentOnDuplicateIssue(duplicateId, factory, convertToGitHubIssueFormat(envDetails, attachments))
             return FeedbackData(commentUrl, duplicateId, true)
         }
 
@@ -229,7 +230,7 @@ object AnonymousFeedback {
             }
 
             val parts = line.split(";")
-            return parts[0].substring(1, parts[0].length-1)
+            return parts[0].substring(1, parts[0].length - 1)
         }
 
         return null

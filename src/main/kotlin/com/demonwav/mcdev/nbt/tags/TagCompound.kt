@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -34,7 +34,7 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
     }
 
     override fun equals(other: Any?): Boolean {
-        if (other !is TagList) {
+        if (other !is TagCompound) {
             return false
         }
 
@@ -42,11 +42,11 @@ open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
             return true
         }
 
-        if (other.tags.size != this.tagMap.size) {
+        if (other.tagMap.size != this.tagMap.size) {
             return false
         }
 
-        return this.tagMap == other.tags
+        return this.tagMap == other.tagMap
     }
 
     override fun hashCode() = tagMap.hashCode()

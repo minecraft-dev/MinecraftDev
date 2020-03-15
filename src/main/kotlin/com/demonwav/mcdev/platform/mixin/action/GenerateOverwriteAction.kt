@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -70,7 +70,8 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
                 }
 
                 // Create temporary (dummy) method
-                var tmpMethod = JavaPsiFacade.getElementFactory(project).createMethod(method.name, method.returnType!!, psiClass)
+                var tmpMethod =
+                    JavaPsiFacade.getElementFactory(project).createMethod(method.name, method.returnType!!, psiClass)
 
                 // Replace temporary method with a copy of the original method
                 tmpMethod = tmpMethod.replace(method) as PsiMethod
@@ -83,8 +84,10 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
 
                 if (codeBlock == null) {
                     // Generate fallback method body if source is not available
-                    OverrideImplementUtil.setupMethodBody(newMethod, method, psiClass,
-                        FileTemplateManager.getInstance(project).getCodeTemplate(MIXIN_OVERWRITE_FALLBACK))
+                    OverrideImplementUtil.setupMethodBody(
+                        newMethod, method, psiClass,
+                        FileTemplateManager.getInstance(project).getCodeTemplate(MIXIN_OVERWRITE_FALLBACK)
+                    )
                 }
 
                 // TODO: Automatically add Javadoc comment for @Overwrite? - yes please

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -27,14 +27,15 @@ import com.intellij.psi.impl.source.PostprocessReformattingAspect
 import java.util.stream.Stream
 
 fun ShadowTarget.createLookupElement(): LookupElement {
-    return when(member) {
+    return when (member) {
         is PsiMethod -> MixinMethodLookupItem(this)
         is PsiField -> MixinFieldLookupItem(this)
         else -> throw AssertionError()
     }
 }
 
-private class MixinMethodLookupItem(private val shadow: ShadowTarget) : JavaMethodCallElement(shadow.member as PsiMethod) {
+private class MixinMethodLookupItem(private val shadow: ShadowTarget) :
+    JavaMethodCallElement(shadow.member as PsiMethod) {
 
     override fun handleInsert(context: InsertionContext) {
         insertShadow(context, shadow)
@@ -67,7 +68,11 @@ private fun insertShadow(context: InsertionContext, shadow: ShadowTarget) {
     if (shadow.mixin == null) {
         context.commitDocument()
     } else {
-        context.setLaterRunnable { HintManager.getInstance().showInformationHint(context.editor,
-            "Added @Shadow for '${shadow.member.name}' to super mixin ${mixinClass.shortName}") }
+        context.setLaterRunnable {
+            HintManager.getInstance().showInformationHint(
+                context.editor,
+                "Added @Shadow for '${shadow.member.name}' to super mixin ${mixinClass.shortName}"
+            )
+        }
     }
 }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -60,9 +60,27 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         }
 
         // Set types
-        bukkitPluginCheckBox.addActionListener { toggle(bukkitPluginCheckBox, spigotPluginCheckBox, paperPluginCheckBox) }
-        spigotPluginCheckBox.addActionListener { toggle(spigotPluginCheckBox, bukkitPluginCheckBox, paperPluginCheckBox) }
-        paperPluginCheckBox.addActionListener { toggle(paperPluginCheckBox, bukkitPluginCheckBox, spigotPluginCheckBox) }
+        bukkitPluginCheckBox.addActionListener {
+            toggle(
+                bukkitPluginCheckBox,
+                spigotPluginCheckBox,
+                paperPluginCheckBox
+            )
+        }
+        spigotPluginCheckBox.addActionListener {
+            toggle(
+                spigotPluginCheckBox,
+                bukkitPluginCheckBox,
+                paperPluginCheckBox
+            )
+        }
+        paperPluginCheckBox.addActionListener {
+            toggle(
+                paperPluginCheckBox,
+                bukkitPluginCheckBox,
+                spigotPluginCheckBox
+            )
+        }
         spongePluginCheckBox.addActionListener { fillInInfoPane() }
         forgeModCheckBox.addActionListener { fillInInfoPane() }
         liteLoaderModCheckBox.addActionListener { fillInInfoPane() }

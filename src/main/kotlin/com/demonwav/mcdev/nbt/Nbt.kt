@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -53,7 +53,8 @@ object Nbt {
 
             stream.use {
                 val tagIdByte = stream.readByte()
-                val tagId = NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
+                val tagId = NbtTypeId.getById(tagIdByte)
+                    ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
 
                 if (tagId != NbtTypeId.COMPOUND) {
                     throw MalformedNbtFileException("Root tag in NBT file is not a compound.")
@@ -76,30 +77,46 @@ object Nbt {
         val tagMap = HashMap<String, NbtTag>()
 
         var tagIdByte = this.readByte()
-        var tagId = NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
+        var tagId =
+            NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
         while (tagId != NbtTypeId.END) {
             val name = this.readUTF()
 
             tagMap[name] = this.readTag(tagId, start, timeout)
 
             tagIdByte = this.readByte()
-            tagId = NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
+            tagId =
+                NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
         }
 
         return@checkTimeout TagCompound(tagMap)
     }
 
-    private fun DataInputStream.readByteTag(start: Long, timeout: Long) = checkTimeout(start, timeout) { TagByte(this.readByte()) }
-    private fun DataInputStream.readShortTag(start: Long, timeout: Long) = checkTimeout(start, timeout) { TagShort(this.readShort()) }
-    private fun DataInputStream.readIntTag(start: Long, timeout: Long) = checkTimeout(start, timeout) { TagInt(this.readInt()) }
-    private fun DataInputStream.readLongTag(start: Long, timeout: Long) = checkTimeout(start, timeout) { TagLong(this.readLong()) }
-    private fun DataInputStream.readFloatTag(start: Long, timeout: Long) = checkTimeout(start, timeout) { TagFloat(this.readFloat()) }
-    private fun DataInputStream.readDoubleTag(start: Long, timeout: Long) = checkTimeout(start, timeout) { TagDouble(this.readDouble()) }
-    private fun DataInputStream.readStringTag(start: Long, timeout: Long) = checkTimeout(start, timeout) { TagString(this.readUTF()) }
+    private fun DataInputStream.readByteTag(start: Long, timeout: Long) =
+        checkTimeout(start, timeout) { TagByte(this.readByte()) }
+
+    private fun DataInputStream.readShortTag(start: Long, timeout: Long) =
+        checkTimeout(start, timeout) { TagShort(this.readShort()) }
+
+    private fun DataInputStream.readIntTag(start: Long, timeout: Long) =
+        checkTimeout(start, timeout) { TagInt(this.readInt()) }
+
+    private fun DataInputStream.readLongTag(start: Long, timeout: Long) =
+        checkTimeout(start, timeout) { TagLong(this.readLong()) }
+
+    private fun DataInputStream.readFloatTag(start: Long, timeout: Long) =
+        checkTimeout(start, timeout) { TagFloat(this.readFloat()) }
+
+    private fun DataInputStream.readDoubleTag(start: Long, timeout: Long) =
+        checkTimeout(start, timeout) { TagDouble(this.readDouble()) }
+
+    private fun DataInputStream.readStringTag(start: Long, timeout: Long) =
+        checkTimeout(start, timeout) { TagString(this.readUTF()) }
 
     private fun DataInputStream.readListTag(start: Long, timeout: Long) = checkTimeout(start, timeout) {
         val tagIdByte = this.readByte()
-        val tagId = NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
+        val tagId =
+            NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
 
         val length = this.readInt()
         if (length <= 0) {

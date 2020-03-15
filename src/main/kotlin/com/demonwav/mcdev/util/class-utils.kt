@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -12,6 +12,7 @@ package com.demonwav.mcdev.util
 
 import com.intellij.navigation.AnonymousElementProvider
 import com.intellij.openapi.project.Project
+import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
@@ -113,12 +114,10 @@ inline fun PsiClass.buildInnerName(builder: StringBuilder, getName: (PsiClass) -
     }
 }
 
-@Contract(pure = true)
 fun findQualifiedClass(fullQualifiedName: String, context: PsiElement): PsiClass? {
     return findQualifiedClass(context.project, fullQualifiedName, context.resolveScope)
 }
 
-@Contract(pure = true)
 fun findQualifiedClass(
     project: Project,
     fullQualifiedName: String,
@@ -159,7 +158,6 @@ private fun PsiClass.findInnerClass(name: String): PsiClass? {
     }
 }
 
-@Contract(pure = true)
 @Throws(ClassNameResolutionFailedException::class)
 fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int? {
     // Attempt to find name for anonymous class
@@ -187,7 +185,6 @@ val PsiElement.anonymousElements: Array<PsiElement>
 
 // Inheritance
 
-@Contract(pure = true)
 fun PsiClass.extendsOrImplements(qualifiedClassName: String): Boolean {
     val aClass = JavaPsiFacade.getInstance(project).findClass(qualifiedClassName, resolveScope) ?: return false
     return equivalentTo(aClass) || this.isInheritor(aClass, true)
@@ -214,11 +211,20 @@ fun PsiClass.findMatchingMethod(pattern: PsiMethod, checkBases: Boolean, name: S
     return findMethodsByName(name, checkBases).firstOrNull { it.isMatchingMethod(pattern) }
 }
 
-fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean, name: String = pattern.name): List<PsiMethod> {
+fun PsiClass.findMatchingMethods(
+    pattern: PsiMethod,
+    checkBases: Boolean,
+    name: String = pattern.name
+): List<PsiMethod> {
     return findMethodsByName(name, checkBases).filter { it.isMatchingMethod(pattern) }
 }
 
-inline fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean, name: String, func: (PsiMethod) -> Unit) {
+inline fun PsiClass.findMatchingMethods(
+    pattern: PsiMethod,
+    checkBases: Boolean,
+    name: String,
+    func: (PsiMethod) -> Unit
+) {
     for (method in findMethodsByName(name, checkBases)) {
         if (method.isMatchingMethod(pattern)) {
             func(method)
@@ -227,8 +233,8 @@ inline fun PsiClass.findMatchingMethods(pattern: PsiMethod, checkBases: Boolean,
 }
 
 fun PsiMethod.isMatchingMethod(pattern: PsiMethod): Boolean {
-    return areReallyOnlyParametersErasureEqual(this.parameterList, pattern.parameterList)
-        && this.returnType.isErasureEquivalentTo(pattern.returnType)
+    return areReallyOnlyParametersErasureEqual(this.parameterList, pattern.parameterList) &&
+        this.returnType.isErasureEquivalentTo(pattern.returnType)
 }
 
 fun PsiClass.findMatchingField(pattern: PsiField, checkBases: Boolean, name: String = pattern.name): PsiField? {
@@ -243,7 +249,10 @@ fun PsiField.isMatchingField(pattern: PsiField): Boolean {
     return type.isErasureEquivalentTo(pattern.type)
 }
 
-private fun areReallyOnlyParametersErasureEqual(parameterList1: PsiParameterList, parameterList2: PsiParameterList): Boolean {
+private fun areReallyOnlyParametersErasureEqual(
+    parameterList1: PsiParameterList,
+    parameterList2: PsiParameterList
+): Boolean {
     // Similar to MethodSignatureUtil.areParametersErasureEqual, but doesn't check method name
     if (parameterList1.parametersCount != parameterList2.parametersCount) {
         return false
@@ -266,6 +275,10 @@ private fun areReallyOnlyParametersErasureEqual(parameterList1: PsiParameterList
 
     return true
 }
+
+fun PsiClass.isJavaOptional(): Boolean = this.qualifiedName == CommonClassNames.JAVA_UTIL_OPTIONAL
+
+fun PsiClassType.isJavaOptional(): Boolean = this.fullQualifiedName == CommonClassNames.JAVA_UTIL_OPTIONAL
 
 class ClassNameResolutionFailedException : Exception {
     constructor() : super()

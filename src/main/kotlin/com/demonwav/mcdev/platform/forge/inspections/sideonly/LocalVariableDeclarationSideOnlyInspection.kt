@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -31,13 +31,16 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
 
     override fun getStaticDescription() =
         "A variable whose class declaration is annotated with @SideOnly for one side cannot be declared in a class" +
-        " or method that does not match the same side."
+            " or method that does not match the same side."
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         val variableClass = infos[3] as PsiClass
 
         return if (variableClass.isWritable) {
-            RemoveAnnotationInspectionGadgetsFix(variableClass, "Remove @SideOnly annotation from variable class declaration")
+            RemoveAnnotationInspectionGadgetsFix(
+                variableClass,
+                "Remove @SideOnly annotation from variable class declaration"
+            )
         } else {
             null
         }
@@ -111,17 +114,20 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
     enum class Error {
         VAR_CROSS_ANNOTATED_CLASS {
             override fun getErrorString(vararg infos: Any): String {
-                return "A local variable whose class is annotated with ${infos[0]} cannot be used in a class annotated with ${infos[1]}"
+                return "A local variable whose class is annotated with ${infos[0]} " +
+                    "cannot be used in a class annotated with ${infos[1]}"
             }
         },
         VAR_CROSS_ANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "A local variable whose class is annotated with ${infos[0]} cannot be used in a method annotated with ${infos[1]}"
+                return "A local variable whose class is annotated with ${infos[0]} " +
+                    "cannot be used in a method annotated with ${infos[1]}"
             }
         },
         VAR_UNANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "A local variable whose class is annotated with ${infos[0]} cannot be used in an un-annotated method."
+                return "A local variable whose class is annotated with ${infos[0]} " +
+                    "cannot be used in an un-annotated method."
             }
         };
 

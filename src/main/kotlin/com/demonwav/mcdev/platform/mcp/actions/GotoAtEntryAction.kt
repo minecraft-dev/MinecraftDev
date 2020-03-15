@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -22,7 +22,6 @@ import com.demonwav.mcdev.util.qualifiedMemberReference
 import com.demonwav.mcdev.util.simpleQualifiedMemberReference
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DataKeys
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -47,10 +46,10 @@ class GotoAtEntryAction : AnAction() {
             return
         }
 
-        val srgManager = data.instance.getModuleOfType(McpModuleType)?.srgManager ?:
-            // Not all ATs are in MCP modules, fallback to this if possible
-            // TODO try to find SRG references for all modules if current module isn't found?
-            SrgManager.findAnyInstance(data.project) ?: return showBalloon(e)
+        val srgManager = data.instance.getModuleOfType(McpModuleType)?.srgManager
+        // Not all ATs are in MCP modules, fallback to this if possible
+        // TODO try to find SRG references for all modules if current module isn't found?
+            ?: SrgManager.findAnyInstance(data.project) ?: return showBalloon(e)
 
         srgManager.srgMap.onSuccess { srgMap ->
             var parent = data.element.parent
@@ -64,11 +63,15 @@ class GotoAtEntryAction : AnAction() {
 
             when (parent) {
                 is PsiField -> {
-                    val reference = srgMap.findSrgField(parent) ?: parent.simpleQualifiedMemberReference ?: return@onSuccess showBalloon(e)
+                    val reference = srgMap.getSrgField(parent) ?: parent.simpleQualifiedMemberReference
+                    ?: return@onSuccess showBalloon(e)
                     searchForText(e, data, reference.name)
                 }
                 is PsiMethod -> {
-                    val reference = srgMap.findSrgMethod(parent) ?: parent.qualifiedMemberReference ?: return@onSuccess showBalloon(e)
+                    val reference =
+                        srgMap.getSrgMethod(parent) ?: parent.qualifiedMemberReference ?: return@onSuccess showBalloon(
+                            e
+                        )
                     searchForText(e, data, reference.name + reference.descriptor)
                 }
                 else ->
@@ -115,7 +118,8 @@ class GotoAtEntryAction : AnAction() {
             .setHideOnKeyOutside(true)
             .createBalloon()
 
-        val statusBar = WindowManager.getInstance().getStatusBar(DataKeys.PROJECT.getData(e.dataContext))
+        val project = e.project ?: return
+        val statusBar = WindowManager.getInstance().getStatusBar(project)
 
         invokeLater { balloon.show(RelativePoint.getCenterOf(statusBar.component), Balloon.Position.atRight) }
     }

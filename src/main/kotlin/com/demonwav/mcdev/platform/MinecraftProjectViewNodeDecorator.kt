@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -55,7 +55,7 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
         }
 
         val facet = MinecraftFacet.getInstance(module) ?: return
-        data.setIcon(facet.icon)
+        data.setIcon(facet.icon ?: return)
     }
 
     override fun decorate(node: PackageDependenciesNode, cellRenderer: ColoredTreeCellRenderer) {}

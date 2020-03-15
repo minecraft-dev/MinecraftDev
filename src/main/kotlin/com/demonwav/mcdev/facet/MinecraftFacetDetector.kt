@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -116,7 +116,7 @@ class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(projec
                 .using(context.modulesProvider)
                 .recursively()
                 .librariesOnly()
-                .forEachLibrary forEach@ { library ->
+                .forEachLibrary forEach@{ library ->
                     MINECRAFT_LIBRARY_KINDS.forEach { kind ->
                         if (presentationManager.isLibraryOfKind(library, context.librariesContainer, setOf(kind))) {
                             platformKinds.add(kind)
@@ -131,7 +131,7 @@ class MinecraftFacetDetector(project: Project) : AbstractProjectComponent(projec
                 .recursively()
                 .withoutLibraries()
                 .withoutSdk()
-                .forEachModule forEach@ { m ->
+                .forEachModule forEach@{ m ->
                     if (m.name.startsWith("SpongeAPI")) {
                         // We don't want want to add parent modules in module groups
                         val moduleManager = ModuleManager.getInstance(m.project)

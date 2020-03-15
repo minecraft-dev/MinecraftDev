@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -29,7 +29,7 @@ val PsiElement.eventListener: Pair<PsiClass, PsiMethod>?
         }
         // The PsiIdentifier is going to be a method of course!
         val method = this.getParent() as PsiMethod
-        if (method.hasModifierProperty(PsiModifier.ABSTRACT) || method.hasModifierProperty(PsiModifier.PRIVATE)) {
+        if (method.hasModifierProperty(PsiModifier.ABSTRACT)) {
             // I don't think any implementation allows for abstract method listeners.
             return null
         }
@@ -53,8 +53,8 @@ val PsiElement.eventListener: Pair<PsiClass, PsiMethod>?
         if (parameters.isEmpty()) {
             return null
         }
-        val psiParameter = parameters[0] ?: // Listeners must have at least a single parameter
-            return null
+        val psiParameter = parameters[0] // Listeners must have at least a single parameter
+            ?: return null
         // Get the type of the parameter so we can start resolving it
         val psiEventElement = psiParameter.typeElement ?: return null
         val type = psiEventElement.type as? PsiClassReferenceType ?: return null
@@ -76,8 +76,8 @@ val PsiMethod.eventParameterPair: Pair<PsiParameter, PsiClass>?
         if (parameters.isEmpty()) {
             return null
         }
-        val psiParameter = parameters[0] ?: // Listeners must have at least a single parameter
-            return null
+        val psiParameter = parameters[0] // Listeners must have at least a single parameter
+            ?: return null
         // Get the type of the parameter so we can start resolving it
         val psiEventElement = psiParameter.typeElement ?: return null
         val type = psiEventElement.type as? PsiClassReferenceType ?: return null

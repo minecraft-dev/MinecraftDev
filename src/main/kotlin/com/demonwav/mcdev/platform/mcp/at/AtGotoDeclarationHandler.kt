@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -30,7 +30,11 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 
 class AtGotoDeclarationHandler : GotoDeclarationHandler {
-    override fun getGotoDeclarationTargets(sourceElement: PsiElement?, offset: Int, editor: Editor): Array<out PsiElement>? {
+    override fun getGotoDeclarationTargets(
+        sourceElement: PsiElement?,
+        offset: Int,
+        editor: Editor
+    ): Array<out PsiElement>? {
         if (sourceElement?.language !== AtLanguage) {
             return null
         }
@@ -82,8 +86,10 @@ class AtGotoDeclarationHandler : GotoDeclarationHandler {
 
                 val boxedType = type.boxedTypeName ?: return null
 
-                val psiClass = JavaPsiFacade.getInstance(sourceElement.project).findClass(boxedType,
-                    GlobalSearchScope.allScope(sourceElement.project)) ?: return null
+                val psiClass = JavaPsiFacade.getInstance(sourceElement.project).findClass(
+                    boxedType,
+                    GlobalSearchScope.allScope(sourceElement.project)
+                ) ?: return null
                 arrayOf(psiClass)
             }
             else -> null

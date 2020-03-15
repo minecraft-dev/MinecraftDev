@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -27,13 +27,23 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
         when (element) {
             is NbttCompound -> {
                 val size = element.getNamedTagList().size
-                list.add(InlayInfo("$size ${if (size == 1) "child" else "children"}", element.textRange.startOffset + 1))
+                list.add(
+                    InlayInfo(
+                        "$size ${if (size == 1) "child" else "children"}",
+                        element.textRange.startOffset + 1
+                    )
+                )
             }
             is NbttList -> {
                 // Size hint
                 val size = element.getTagList().size
                 if (size > 50) {
-                    list.add(InlayInfo("$size ${if (size == 1) "child" else "children"}", element.textRange.startOffset + 1))
+                    list.add(
+                        InlayInfo(
+                            "$size ${if (size == 1) "child" else "children"}",
+                            element.textRange.startOffset + 1
+                        )
+                    )
                 }
 
                 if (size > 5) {
@@ -46,9 +56,12 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
             is NbttByteArray -> {
                 val size = element.getByteList().size
                 if (size > 50) {
-                    list.add(InlayInfo(
-                        "$size ${if (size == 1) "child" else "children"}", element.node.getChildren(null)[1].textRange.startOffset + 1
-                    ))
+                    list.add(
+                        InlayInfo(
+                            "$size ${if (size == 1) "child" else "children"}",
+                            element.node.getChildren(null)[1].textRange.startOffset + 1
+                        )
+                    )
                 }
 
                 if (size > 5) {
@@ -61,9 +74,12 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
             is NbttIntArray -> {
                 val size = element.getIntList().size
                 if (size > 50) {
-                    list.add(InlayInfo(
-                        "$size ${if (size == 1) "child" else "children"}", element.node.getChildren(null)[1].textRange.startOffset + 1
-                    ))
+                    list.add(
+                        InlayInfo(
+                            "$size ${if (size == 1) "child" else "children"}",
+                            element.node.getChildren(null)[1].textRange.startOffset + 1
+                        )
+                    )
                 }
 
                 if (size > 5) {
@@ -75,9 +91,12 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
             }
             is NbttLongArray -> {
                 val size = element.getLongList().size
-                list.add(InlayInfo(
-                    "$size ${if (size == 1) "child" else "children"}", element.node.getChildren(null)[1].textRange.startOffset + 1
-                ))
+                list.add(
+                    InlayInfo(
+                        "$size ${if (size == 1) "child" else "children"}",
+                        element.node.getChildren(null)[1].textRange.startOffset + 1
+                    )
+                )
 
                 // Index hints
                 element.getLongList().forEachIndexed { i, param ->

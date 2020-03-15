@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -27,7 +27,11 @@ object ConstructorTargetReference : TargetReference.Handler<PsiClass>() {
         return findQualifiedClass(name, context)
     }
 
-    override fun createFindUsagesVisitor(context: PsiElement, targetClass: PsiClass, checkOnly: Boolean): CollectVisitor<out PsiElement>? {
+    override fun createFindUsagesVisitor(
+        context: PsiElement,
+        targetClass: PsiClass,
+        checkOnly: Boolean
+    ): CollectVisitor<out PsiElement>? {
         val name = context.constantStringValue?.replace('/', '.') ?: return null
         return FindUsagesVisitor(name, checkOnly)
     }
@@ -36,14 +40,15 @@ object ConstructorTargetReference : TargetReference.Handler<PsiClass>() {
 
     override fun createLookup(targetClass: PsiClass, element: PsiClass): LookupElementBuilder? {
         return JavaLookupElementBuilder.forClass(element, element.internalName)
-                .withPresentableText(element.shortName ?: return null)
+            .withPresentableText(element.shortName ?: return null)
     }
 
     private fun resolveConstructedClass(expression: PsiNewExpression): PsiClass? {
         return expression.anonymousClass ?: expression.classReference?.resolve() as PsiClass
     }
 
-    private class FindUsagesVisitor(private val qualifiedName: String, checkOnly: Boolean) : CollectVisitor<PsiNewExpression>(checkOnly) {
+    private class FindUsagesVisitor(private val qualifiedName: String, checkOnly: Boolean) :
+        CollectVisitor<PsiNewExpression>(checkOnly) {
 
         override fun visitNewExpression(expression: PsiNewExpression) {
             val psiClass = resolveConstructedClass(expression)

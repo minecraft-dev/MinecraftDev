@@ -3,20 +3,26 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mixin
 
+import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInnerClassInspection
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(EdtInterceptor::class)
+@DisplayName("Mixin Inner Class Inspection Tests")
 class InnerClassTest : BaseMixinTest() {
 
-    override fun setUp() {
-        super.setUp()
-
+    @BeforeEach
+    fun setupProject() {
         buildProject {
             src {
                 java("test/InnerClassMixin.java", """
@@ -53,8 +59,10 @@ class InnerClassTest : BaseMixinTest() {
         }
     }
 
-    fun `test inner class inspection`() {
-        myFixture.enableInspections(MixinInnerClassInspection::class.java)
-        myFixture.checkHighlighting(true, false, false)
+    @Test
+    @DisplayName("Mixin Inner Class Inspection Test")
+    fun mixinInnerClassInspectionTest() {
+        fixture.enableInspections(MixinInnerClassInspection::class.java)
+        fixture.checkHighlighting(true, false, false)
     }
 }

@@ -3,13 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.update
 
+import com.demonwav.mcdev.util.findDeclaredField
 import com.demonwav.mcdev.util.forEachNotNull
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.invokeLaterAny
@@ -28,10 +29,10 @@ import com.intellij.openapi.util.JDOMUtil
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.CharsetToolkit
 import com.intellij.util.io.HttpRequests
-import org.jdom.Element
-import org.jdom.JDOMException
 import java.io.IOException
 import java.net.URLEncoder
+import org.jdom.Element
+import org.jdom.JDOMException
 
 object PluginUpdater {
     fun runUpdateCheck(callback: (PluginUpdateStatus) -> Boolean) {
@@ -57,7 +58,9 @@ object PluginUpdater {
         val buildNumber = ApplicationInfo.getInstance().build.asString()
         val currentVersion = PluginUtil.pluginVersion
         val os = URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, CharsetToolkit.UTF8)
-        val url = "https://plugins.jetbrains.com/plugins/list?pluginId=8327&build=$buildNumber&pluginVersion=$currentVersion&os=$os"
+        val url =
+            "https://plugins.jetbrains.com/plugins/list?pluginId=8327&build=" +
+                "$buildNumber&pluginVersion=$currentVersion&os=$os"
 
         val responseDoc = HttpRequests.request(url).connect<Element> { request ->
             try {
@@ -73,11 +76,11 @@ object PluginUpdater {
             return PluginUpdateStatus.CheckFailed("Unexpected plugin repository response")
         }
         if (responseDoc.children.isEmpty()) {
-            return PluginUpdateStatus.LatestVersionInstalled()
+            return PluginUpdateStatus.LatestVersionInstalled
         }
 
-        val newVersion = responseDoc.getChild("category")?.getChild("idea-plugin")?.getChild("version")?.text ?:
-            return PluginUpdateStatus.CheckFailed("Couldn't find plugin version in repository response")
+        val newVersion = responseDoc.getChild("category")?.getChild("idea-plugin")?.getChild("version")?.text
+            ?: return PluginUpdateStatus.CheckFailed("Couldn't find plugin version in repository response")
 
         val plugin = PluginManager.getPlugin(PluginUtil.PLUGIN_ID)!!
         val pluginNode = PluginNode(PluginUtil.PLUGIN_ID)
@@ -86,7 +89,7 @@ object PluginUpdater {
         pluginNode.description = plugin.description
 
         if (pluginNode.version == PluginUtil.pluginVersion) {
-            return PluginUpdateStatus.LatestVersionInstalled()
+            return PluginUpdateStatus.LatestVersionInstalled
         }
 
         return PluginUpdateStatus.Update(pluginNode, null)
@@ -100,14 +103,14 @@ object PluginUpdater {
         }
 
         val minecraftPlugin = plugins.firstOrNull { plugin -> plugin.pluginId == PluginUtil.PLUGIN_ID }
-            ?: return PluginUpdateStatus.LatestVersionInstalled()
+            ?: return PluginUpdateStatus.LatestVersionInstalled
 
         return updateIfNotLatest(minecraftPlugin, host)
     }
 
     private fun updateIfNotLatest(plugin: IdeaPluginDescriptor, host: String): PluginUpdateStatus {
         if (plugin.version == PluginUtil.pluginVersion) {
-            return PluginUpdateStatus.LatestVersionInstalled()
+            return PluginUpdateStatus.LatestVersionInstalled
         }
         return PluginUpdateStatus.Update(plugin, host)
     }
@@ -118,12 +121,17 @@ object PluginUpdater {
         ProgressManager.getInstance().run(object : Task.Backgroundable(null, "Downloading Plugin", true) {
             override fun run(indicator: ProgressIndicator) {
                 try {
-                    if (downloader.prepareToInstall(indicator)) {
-                        downloader.install()
+                    val status = downloader.prepareToInstall(indicator)
+                    // If the download failed, quit
+                    // But otherwise force the install
+                    if (!status && downloader.findDeclaredField("myFile") == null) {
+                        return
+                    }
 
-                        invokeLater {
-                            PluginManagerMain.notifyPluginsUpdated(null)
-                        }
+                    downloader.install()
+
+                    invokeLater {
+                        PluginManagerMain.notifyPluginsUpdated(null)
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()

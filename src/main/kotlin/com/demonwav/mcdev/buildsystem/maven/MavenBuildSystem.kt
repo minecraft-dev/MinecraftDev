@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -103,7 +103,10 @@ class MavenBuildSystem(
                     repository.url.value = url
                 }
 
-                for ((depArtifactId, depGroupId, depVersion, scope) in dependencies) {
+                for ((depGroupId, depArtifactId, depVersion, scope) in dependencies) {
+                    if (scope == null) {
+                        continue
+                    }
                     val dependency = mavenProjectXml.dependencies.addDependency()
                     dependency.groupId.value = depGroupId
                     dependency.artifactId.value = depArtifactId

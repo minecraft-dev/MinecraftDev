@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -14,6 +14,7 @@ import com.demonwav.mcdev.nbt.lang.psi.mixins.NbttStringMixin
 import com.demonwav.mcdev.nbt.tags.TagString
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
+import org.apache.commons.lang3.StringUtils
 
 abstract class NbttStringImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), NbttStringMixin {
 
@@ -31,9 +32,5 @@ fun getNbtStringValue(text: String): String {
         text
     }
 
-    return noQuotes
-        .replace("\\\\", "\\")
-        .replace("\\n", "\n")
-        .replace("\\\"", "\"")
-        .replace("\\t", "\t")
+    return StringUtils.replaceEach(noQuotes, arrayOf("\\\\", "\\n", "\\\"", "\\t"), arrayOf("\\", "\n", "\"", "\t"))
 }

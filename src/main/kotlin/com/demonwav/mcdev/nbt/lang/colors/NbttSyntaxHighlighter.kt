@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -37,7 +37,8 @@ class NbttSyntaxHighlighter : SyntaxHighlighterBase() {
     }
 
     companion object {
-        val KEYWORD = TextAttributesKey.createTextAttributesKey("NBTT_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
+        val KEYWORD =
+            TextAttributesKey.createTextAttributesKey("NBTT_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
         val STRING = TextAttributesKey.createTextAttributesKey("NBTT_STRING", DefaultLanguageHighlighterColors.STRING)
         val UNQUOTED_STRING = TextAttributesKey.createTextAttributesKey("NBTT_UNQUOTED_STRING", STRING)
         val STRING_NAME = TextAttributesKey.createTextAttributesKey("NBTT_STRING_NAME", STRING)

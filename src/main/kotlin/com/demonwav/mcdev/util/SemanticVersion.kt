@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -76,7 +76,8 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
                     val versionNumber = if (number.isEmpty()) -1 else parseInt(number)
                     TextPart(version, separator, text, versionNumber)
                 } else {
-                    throw IllegalArgumentException("Failed to split text version part into two: ${subParts.first()}$separator")
+                    throw IllegalArgumentException("Failed to split text version part into two: " +
+                        "${subParts.first()}$separator")
                 }
 
             val parts = value.split('.').map { part ->
@@ -103,7 +104,8 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
                     }
             }
 
-            data class TextPart(val version: Int, val separator: Char, val text: String, val number: Int) : VersionPart() {
+            data class TextPart(val version: Int, val separator: Char, val text: String, val number: Int) :
+                VersionPart() {
                 private val priority = TEXT_PRIORITIES[text.toLowerCase()] ?: -1
 
                 override val versionString = "$version$separator$text${if (number == -1) "" else number.toString()}"

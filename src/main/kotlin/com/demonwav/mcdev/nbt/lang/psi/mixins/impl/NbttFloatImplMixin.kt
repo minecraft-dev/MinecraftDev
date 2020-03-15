@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -26,6 +26,6 @@ abstract class NbttFloatImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), N
     }
 
     companion object {
-        private val fRegex = "[fF]".toRegex()
+        private val fRegex = Regex("[fF]")
     }
 }

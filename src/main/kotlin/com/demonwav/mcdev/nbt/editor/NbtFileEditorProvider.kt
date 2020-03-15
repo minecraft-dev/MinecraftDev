@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -35,7 +35,7 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
     override fun accept(project: Project, file: VirtualFile) = file.fileType == NbtFileType
     override fun getPolicy() = FileEditorPolicy.NONE
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {
-        val fileEditor = NbtFileEditor { nbtFile ->  super.createEditor(project, nbtFile) }
+        val fileEditor = NbtFileEditor { nbtFile -> super.createEditor(project, nbtFile) }
 
         ApplicationManager.getApplication().executeOnPooledThread {
             val nbtFile = NbtVirtualFile(file, project)
@@ -86,6 +86,7 @@ private class NbtFileEditor(private val editorProvider: (NbtVirtualFile) -> File
     override fun addPropertyChangeListener(listener: PropertyChangeListener) {
         editor.exec { addPropertyChangeListener(listener) }
     }
+
     override fun getName() = editor.exec { name } ?: ""
     override fun setState(state: FileEditorState) {
         editor.exec { setState(state) }
@@ -115,6 +116,7 @@ private class NbtFileEditor(private val editorProvider: (NbtVirtualFile) -> File
     override fun removePropertyChangeListener(listener: PropertyChangeListener) {
         editor.exec { removePropertyChangeListener(listener) }
     }
+
     override fun dispose() {}
 
     override fun getStructureViewBuilder() = editor.exec { structureViewBuilder }

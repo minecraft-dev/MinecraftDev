@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -38,8 +38,10 @@ class MixinInnerClassInspection : MixinInspection() {
             if (psiClass.isMixin) {
                 // Ensure inner class is static
                 if (!psiClass.hasModifierProperty(PsiModifier.STATIC)) {
-                    holder.registerProblem(psiClass.modifierList!!, "@Mixin inner class must be static",
-                        QuickFixFactory.getInstance().createModifierListFix(psiClass, PsiModifier.STATIC, true, false))
+                    holder.registerProblem(
+                        psiClass.modifierList!!, "@Mixin inner class must be static",
+                        QuickFixFactory.getInstance().createModifierListFix(psiClass, PsiModifier.STATIC, true, false)
+                    )
                 }
             } else {
                 holder.registerProblem(psiClass, "Inner classes are only allowed if they are also @Mixin classes")
@@ -54,7 +56,5 @@ class MixinInnerClassInspection : MixinInspection() {
 
             holder.registerProblem(psiClass, "Anonymous classes are not allowed in a @Mixin class")
         }
-
     }
-
 }

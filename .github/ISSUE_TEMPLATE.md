@@ -1,4 +1,4 @@
-Please include the following information in all issues:
+Please include the following information in all bug reports:
 
 * Minecraft Development for IntelliJ plugin version
 * IntelliJ version

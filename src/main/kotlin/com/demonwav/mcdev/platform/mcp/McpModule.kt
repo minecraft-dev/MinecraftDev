@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -33,27 +33,34 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
         private set
 
     override fun init() {
-        val files = getSettings().mappingFiles
-        if (!files.isEmpty()) {
-            srgManager = SrgManager.getInstance(files)
-            srgManager?.parse()
-        }
-
+        initSrg()
         connection = project.messageBus.connect()
         connection.subscribe(VirtualFileManager.VFS_CHANGES, TranslationFileListener)
     }
 
-    override val moduleType  = McpModuleType
+    private fun initSrg() {
+        val settings = getSettings()
+        val file = settings.mappingFile ?: return
+        val srgType = settings.srgType ?: return
+
+        srgManager = SrgManager.getInstance(file, srgType)
+        srgManager?.parse()
+    }
+
+    override val moduleType = McpModuleType
     override val type = PlatformType.MCP
     override val icon: Icon? = null
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) = ""
 
-    fun getSettings() = settings.state
+    private fun getSettings() = settings.state
 
     fun updateSettings(data: McpModuleSettings.State) {
         this.settings.loadState(data)
-        srgManager = SrgManager.getInstance(data.mappingFiles)
+        val mappingFile = data.mappingFile ?: return
+        val srgType = data.srgType ?: return
+
+        srgManager = SrgManager.getInstance(mappingFile, srgType)
         srgManager?.parse()
     }
 

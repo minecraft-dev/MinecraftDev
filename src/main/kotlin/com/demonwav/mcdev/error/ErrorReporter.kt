@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -65,7 +65,8 @@ class ErrorReporter : ErrorReportSubmitter() {
         val task = AnonymousFeedbackTask(
             project, "Submitting error report", true, reportValues, attachments,
             { htmlUrl, token, isDuplicate ->
-                val reportInfo = SubmittedReportInfo(htmlUrl, "Issue #$token", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE)
+                val reportInfo =
+                    SubmittedReportInfo(htmlUrl, "Issue #$token", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE)
                 consumer.consume(reportInfo)
 
                 val message = if (!isDuplicate) {

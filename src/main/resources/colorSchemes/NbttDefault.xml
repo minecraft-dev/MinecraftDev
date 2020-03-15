@@ -4,7 +4,7 @@
 
     https://minecraftdev.org
 
-    Copyright (c) 2018 minecraft-dev
+    Copyright (c) 2019 minecraft-dev
 
     MIT License
 -->
@@ -15,7 +15,7 @@
             <option name="FOREGROUND" value="008000" />
             <option name="FONT_TYPE" value="1" />
             <option name="EFFECT_COLOR" value="4D9D93" />
-            <option name="EFFECT_TYPE" value="2" />
+            <option name="EFFECT_TYPE" value="4" />
         </value>
     </option>
     <option name="NBTT_STRING_NAME">
@@ -28,7 +28,7 @@
             <option name="FOREGROUND" value="674F72" />
             <option name="FONT_TYPE" value="1" />
             <option name="EFFECT_COLOR" value="A443BF" />
-            <option name="EFFECT_TYPE" value="2" />
+            <option name="EFFECT_TYPE" value="4" />
         </value>
     </option>
     <option name="NBTT_MATERIAL">

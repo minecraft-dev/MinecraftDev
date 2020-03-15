@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -25,8 +25,12 @@ class BungeeCordListenerImplementedInspection : BaseInspection() {
 
     @Nls
     override fun getDisplayName() = "BungeeCord @EventHandler in class not implementing Listener"
-    override fun buildErrorString(vararg infos: Any) = "This class contains @EventHandler methods but does not implement Listener"
-    override fun getStaticDescription() ="All BungeeCord @EventHandler methods must reside in a class that implements Listener."
+
+    override fun buildErrorString(vararg infos: Any) =
+        "This class contains @EventHandler methods but does not implement Listener"
+
+    override fun getStaticDescription() =
+        "All BungeeCord @EventHandler methods must reside in a class that implements Listener."
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         return object : InspectionGadgetsFix() {
@@ -37,6 +41,7 @@ class BungeeCordListenerImplementedInspection : BaseInspection() {
 
             @Nls
             override fun getName() = "Implement Listener"
+
             @Nls
             override fun getFamilyName() = name
         }
@@ -46,7 +51,8 @@ class BungeeCordListenerImplementedInspection : BaseInspection() {
         return object : BaseInspectionVisitor() {
             override fun visitClass(aClass: PsiClass) {
                 val methods = aClass.methods
-                val isEventHandler = methods.any { it.modifierList.findAnnotation(BungeeCordConstants.HANDLER_ANNOTATION) != null }
+                val isEventHandler =
+                    methods.any { it.modifierList.findAnnotation(BungeeCordConstants.HANDLER_ANNOTATION) != null }
 
                 if (!isEventHandler) {
                     return

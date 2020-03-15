@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Contract
 val PsiMethod.isOverwrite
     get() = findAnnotation(OVERWRITE) != null
 
-@Contract(pure = true)
 fun PsiMethod.findFirstOverwriteTarget(): PsiMethod? {
     findAnnotation(OVERWRITE) ?: return null
     val containingClass = containingClass ?: return null

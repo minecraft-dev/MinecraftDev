@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -22,5 +22,6 @@ class TagByte(override val value: Byte) : NbtValueTag<Byte>(Byte::class.java) {
 
     override fun toString() = toString(StringBuilder(), 0, WriterState.COMPOUND).toString()
 
-    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState) = sb.append(value).append('B')!!
+    override fun toString(sb: StringBuilder, indentLevel: Int, writerState: WriterState) =
+        sb.append(value).append('B')!!
 }

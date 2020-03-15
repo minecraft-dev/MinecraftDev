@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -12,6 +12,8 @@
 
 package com.demonwav.mcdev.platform.bungeecord
 
+import com.demonwav.mcdev.buildsystem.BuildDependency
+import com.demonwav.mcdev.buildsystem.BuildRepository
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
@@ -22,7 +24,8 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiManager
 
-class BungeeCordProjectConfiguration(override var type: PlatformType) : ProjectConfiguration(), BukkitLikeConfiguration {
+class BungeeCordProjectConfiguration(override var type: PlatformType) : ProjectConfiguration(),
+    BukkitLikeConfiguration {
 
     override val dependencies = mutableListOf<String>()
     override val softDependencies = mutableListOf<String>()
@@ -60,13 +63,42 @@ class BungeeCordProjectConfiguration(override var type: PlatformType) : ProjectC
             val mainClassFile = file.findOrCreateChildData(this, "$className.java")
 
             BungeeCordTemplate.applyMainClassTemplate(project, mainClassFile, packageName, className)
-            val pluginYml = dirs.resourceDirectory.findOrCreateChildData(this, "plugin.yml")
+            val pluginYml = dirs.resourceDirectory.findOrCreateChildData(this, "bungee.yml")
             BungeeCordTemplate.applyPluginDescriptionFileTemplate(project, pluginYml, this, buildSystem)
 
             // Set the editor focus on the main class
             PsiManager.getInstance(project).findFile(mainClassFile)?.let { mainClassPsi ->
                 EditorHelper.openInEditor(mainClassPsi)
             }
+        }
+    }
+
+    override fun setupDependencies(buildSystem: BuildSystem) {
+        addSonatype(buildSystem.repositories)
+        when (type) {
+            PlatformType.WATERFALL -> {
+                buildSystem.repositories.add(BuildRepository(
+                    "destroystokyo-repo",
+                    "https://repo.destroystokyo.com/repository/maven-public/"
+                ))
+                buildSystem.dependencies.add(BuildDependency(
+                    "io.github.waterfallmc",
+                    "waterfall-api",
+                    "$minecraftVersion-SNAPSHOT",
+                    mavenScope = "provided",
+                    gradleConfiguration = "compileOnly"
+                ))
+            }
+            PlatformType.BUNGEECORD -> {
+                buildSystem.dependencies.add(BuildDependency(
+                    "net.md-5",
+                    "bungeecord-api",
+                    "$minecraftVersion-SNAPSHOT",
+                    mavenScope = "provided",
+                    gradleConfiguration = "compileOnly"
+                ))
+            }
+            else -> {}
         }
     }
 }

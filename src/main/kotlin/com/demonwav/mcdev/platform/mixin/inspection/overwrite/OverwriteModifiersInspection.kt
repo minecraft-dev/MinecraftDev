@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -42,9 +42,12 @@ class OverwriteModifiersInspection : OverwriteInspection() {
         if (currentAccessLevel < targetAccessLevel) {
             val targetModifier = PsiUtil.getAccessModifier(targetAccessLevel)
             val currentModifier = PsiUtil.getAccessModifier(currentAccessLevel)
-            holder.registerProblem(modifierList.findKeyword(currentModifier) ?: nameIdentifier,
-                "$currentModifier @Overwrite cannot reduce visibility of ${PsiUtil.getAccessModifier(targetAccessLevel)} target method",
-                QuickFixFactory.getInstance().createModifierListFix(modifierList, targetModifier, true, false))
+            holder.registerProblem(
+                modifierList.findKeyword(currentModifier) ?: nameIdentifier,
+                "$currentModifier @Overwrite cannot reduce visibility of " +
+                    "${PsiUtil.getAccessModifier(targetAccessLevel)} target method",
+                QuickFixFactory.getInstance().createModifierListFix(modifierList, targetModifier, true, false)
+            )
         }
 
         for (modifier in PsiModifier.MODIFIERS) {
@@ -65,8 +68,10 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                     "'$modifier' modifier does not match target method"
                 }
 
-                holder.registerProblem(marker, message,
-                    QuickFixFactory.getInstance().createModifierListFix(modifierList, modifier, targetModifier, false))
+                holder.registerProblem(
+                    marker, message,
+                    QuickFixFactory.getInstance().createModifierListFix(modifierList, modifier, targetModifier, false)
+                )
             }
         }
 
@@ -74,8 +79,10 @@ class OverwriteModifiersInspection : OverwriteInspection() {
             val qualifiedName = annotation.qualifiedName ?: continue
             val overwriteAnnotation = modifierList.findAnnotation(qualifiedName)
             if (overwriteAnnotation == null) {
-                holder.registerProblem(nameIdentifier, "Missing @${annotation.nameReferenceElement?.text} annotation",
-                    AddAnnotationFix(qualifiedName, method, annotation.parameterList.attributes))
+                holder.registerProblem(
+                    nameIdentifier, "Missing @${annotation.nameReferenceElement?.text} annotation",
+                    AddAnnotationFix(qualifiedName, method, annotation.parameterList.attributes)
+                )
             }
 
             // TODO: Check if attributes are specified correctly?

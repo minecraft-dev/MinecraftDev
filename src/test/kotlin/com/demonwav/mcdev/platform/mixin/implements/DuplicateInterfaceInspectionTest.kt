@@ -3,22 +3,28 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mixin.implements
 
+import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.platform.mixin.BaseMixinTest
 import com.demonwav.mcdev.platform.mixin.inspection.implements.DuplicateInterfaceInspection
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(EdtInterceptor::class)
+@DisplayName("Duplicate Interface Inspection Tests")
 class DuplicateInterfaceInspectionTest : BaseMixinTest() {
 
-    override fun setUp() {
-        super.setUp()
-
+    @BeforeEach
+    fun setupProject() {
         buildProject {
             src {
                 java("test/DummyFace.java", """
@@ -47,11 +53,13 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
             }
         }
 
-        myFixture.enableInspections(DuplicateInterfaceInspection::class.java)
-        myFixture.checkHighlighting(true, false, false)
+        fixture.enableInspections(DuplicateInterfaceInspection::class.java)
+        fixture.checkHighlighting(true, false, false)
     }
 
-    fun `test no highlight on no duplicate interface`() {
+    @Test
+    @DisplayName("No Highlight On No Duplicate Interface Test")
+    fun noHighlightOnNoDuplicateInterfaceTest() {
         doTest("""
             package test;
 
@@ -70,7 +78,9 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
         """)
     }
 
-    fun `test highlight on duplicate interface`() {
+    @Test
+    @DisplayName("Highlight On Duplicate Interface Test")
+    fun highlightOnDuplicateInterfaceTest() {
         doTest("""
             package test;
 

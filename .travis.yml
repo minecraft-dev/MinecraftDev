@@ -4,14 +4,15 @@ dist: trusty
 matrix:
   include:
     - os: linux
-      jdk: openjdk8
+      jdk: openjdk11
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode10.1
+      jdk: openjdk11
 
 language: java
 
 install: unset _JAVA_OPTIONS
-script: ./gradlew build
+script: ./gradlew build --no-daemon --stacktrace
 
 before_cache:
   - rm -f $HOME/.gradle/caches/{modules-2,transforms-1}/*.lock

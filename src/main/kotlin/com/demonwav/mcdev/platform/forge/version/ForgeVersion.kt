@@ -3,14 +3,13 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.forge.version
 
-import com.demonwav.mcdev.util.getMajorVersion
 import com.demonwav.mcdev.util.sortVersions
 import java.io.IOException
 import java.net.URL
@@ -21,7 +20,7 @@ class ForgeVersion private constructor(val versions: List<String>) {
 
     val sortedMcVersions: List<String> by lazy {
         val unsortedVersions = versions.asSequence()
-            .mapNotNull(fun (version: String): String? {
+            .mapNotNull(fun(version: String): String? {
                 val index = version.indexOf('-')
                 if (index == -1) {
                     return null
@@ -33,7 +32,7 @@ class ForgeVersion private constructor(val versions: List<String>) {
     }
 
     fun getForgeVersions(mcVersion: String): ArrayList<String> {
-        return versions.filterTo(ArrayList()) { it.startsWith(getMajorVersion(mcVersion)) }
+        return versions.filterTo(ArrayList()) { it.startsWith(mcVersion) }
     }
 
     companion object {

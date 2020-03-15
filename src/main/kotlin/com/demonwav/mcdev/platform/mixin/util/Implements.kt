@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -19,15 +19,14 @@ import com.demonwav.mcdev.util.resolveClass
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
-import org.jetbrains.annotations.Contract
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
 
-@Contract(pure = true)
 fun PsiClass.findSoftImplements(): Map<String, PsiClass>? {
     val implements = modifierList?.findAnnotation(IMPLEMENTS) ?: return null
-    val interfaces = (implements.findDeclaredAttributeValue(null) ?: return null).findAnnotations().ifEmpty { return null }
+    val interfaces =
+        (implements.findDeclaredAttributeValue(null) ?: return null).findAnnotations().ifEmpty { return null }
 
     val result = HashMap<String, PsiClass>()
     for (iface in interfaces) {
@@ -39,7 +38,6 @@ fun PsiClass.findSoftImplements(): Map<String, PsiClass>? {
     return result
 }
 
-@Contract(pure = true)
 fun PsiMethod.isSoftImplementedMethod(): Boolean {
     val methodName = name
     if ('$' !in methodName) {
@@ -55,12 +53,10 @@ fun PsiMethod.isSoftImplementedMethod(): Boolean {
     return softImplements.any { (prefix, _) -> methodName.startsWith(prefix) }
 }
 
-@Contract(pure = true)
 fun PsiMethod.isSoftImplementMissingParent(): Boolean {
     return findSoftImplementedMethods(true) { return false }
 }
 
-@Contract(pure = true)
 inline fun PsiMethod.findSoftImplementedMethods(checkBases: Boolean, func: (PsiMethod) -> Unit): Boolean {
     val methodName = name
     if ('$' !in methodName) {

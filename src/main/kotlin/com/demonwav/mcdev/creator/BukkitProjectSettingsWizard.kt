@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -18,17 +18,17 @@ import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder
 import com.demonwav.mcdev.util.firstOfType
+import javax.swing.JComboBox
+import javax.swing.JComponent
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JTextField
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.apache.commons.lang.WordUtils
-import javax.swing.JComboBox
-import javax.swing.JComponent
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JTextField
 
 class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) : MinecraftModuleWizardStep() {
 
@@ -97,7 +97,8 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
                 title.icon = PlatformAssets.PAPER_ICON_2X
                 title.text = "<html><font size=\"5\">Paper Settings</font></html>"
             }
-            else -> {}
+            else -> {
+            }
         }
 
         CoroutineScope(Dispatchers.Swing).launch {
@@ -107,12 +108,17 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
                 errorLabel.isVisible = true
             }
         }
-
     }
 
     override fun validate(): Boolean {
-        return validate(pluginNameField, pluginVersionField, mainClassField, authorsField, dependField, MinecraftModuleWizardStep.pattern) &&
-            minecraftVersionBox.selectedItem != null
+        return validate(
+            pluginNameField,
+            pluginVersionField,
+            mainClassField,
+            authorsField,
+            dependField,
+            pattern
+        ) && minecraftVersionBox.selectedItem != null
     }
 
     override fun onStepLeaving() {

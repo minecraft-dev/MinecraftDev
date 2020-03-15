@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -14,6 +14,7 @@ object McpConstants {
 
     const val TEXT_FORMATTING = "net.minecraft.util.text.TextFormatting"
     const val ENTITY = "net.minecraft.entity.Entity"
+    const val ENTITY_FX = "net.minecraft.client.particle.EntityFX"
     const val WORLD = "net.minecraft.world.World"
     const val ITEM_STACK = "net.minecraft.item.ItemStack"
     const val BLOCK = "net.minecraft.block.Block"

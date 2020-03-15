@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -37,7 +37,6 @@ import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedElementsSearch
-import org.jetbrains.annotations.Contract
 
 class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
@@ -58,7 +57,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
 
             // Index @SideOnly
             val service = DumbService.getInstance(project)
-            service.runReadActionInSmartMode runSmart@ {
+            service.runReadActionInSmartMode runSmart@{
                 if (service.isDumb || project.isDisposed) {
                     return@runSmart
                 }
@@ -68,15 +67,12 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
                     .findClass(ForgeConstants.SIDED_PROXY_ANNOTATION, scope) ?: return@runSmart
                 val annotatedFields = AnnotatedElementsSearch.searchPsiFields(sidedProxy, scope).findAll()
 
-                var index = 0.0
-
                 for (field in annotatedFields) {
                     if (service.isDumb || project.isDisposed) {
                         return@runSmart
                     }
 
                     SidedProxyAnnotator.check(field)
-                    index++
                 }
             }
         }
@@ -84,7 +80,8 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?): Boolean {
         if (method == null) {
-            return ForgeConstants.FML_EVENT == eventClass.qualifiedName || ForgeConstants.EVENT == eventClass.qualifiedName
+            return ForgeConstants.FML_EVENT == eventClass.qualifiedName ||
+                ForgeConstants.EVENT == eventClass.qualifiedName
         }
 
         var annotation = method.modifierList.findAnnotation(ForgeConstants.EVENT_HANDLER_ANNOTATION)
@@ -105,12 +102,16 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         val annotation = method.modifierList.findAnnotation(ForgeConstants.EVENT_HANDLER_ANNOTATION)
 
         if (annotation != null) {
-            return formatWrongEventMessage(ForgeConstants.FML_EVENT, ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION,
-                    ForgeConstants.EVENT == eventClass.qualifiedName)
+            return formatWrongEventMessage(
+                ForgeConstants.FML_EVENT, ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION,
+                ForgeConstants.EVENT == eventClass.qualifiedName
+            )
         }
 
-        return formatWrongEventMessage(ForgeConstants.EVENT, ForgeConstants.EVENT_HANDLER_ANNOTATION,
-                ForgeConstants.FML_EVENT == eventClass.qualifiedName)
+        return formatWrongEventMessage(
+            ForgeConstants.EVENT, ForgeConstants.EVENT_HANDLER_ANNOTATION,
+            ForgeConstants.FML_EVENT == eventClass.qualifiedName
+        )
     }
 
     private fun formatWrongEventMessage(expected: String, suggested: String, wrong: Boolean): String {
@@ -123,10 +124,12 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
 
     override fun isStaticListenerSupported(method: PsiMethod) = true
 
-    override fun generateEventListenerMethod(containingClass: PsiClass,
-                                             chosenClass: PsiClass,
-                                             chosenName: String,
-                                             data: GenerationData?): PsiMethod? {
+    override fun generateEventListenerMethod(
+        containingClass: PsiClass,
+        chosenClass: PsiClass,
+        chosenName: String,
+        data: GenerationData?
+    ): PsiMethod? {
         val isFmlEvent = chosenClass.extendsOrImplements(ForgeConstants.FML_EVENT)
 
         val method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)
@@ -151,7 +154,6 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         return method
     }
 
-    @Contract(value = "null -> false", pure = true)
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
         if (element !is PsiIdentifier) {
             return false
@@ -170,8 +172,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
     override fun checkUselessCancelCheck(expression: PsiMethodCallExpression): IsCancelled? = null
 
     override fun dispose() {
-        super.dispose()
-
         mcmod = null
+        super.dispose()
     }
 }
