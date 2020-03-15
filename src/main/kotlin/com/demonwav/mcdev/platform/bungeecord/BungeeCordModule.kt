@@ -18,6 +18,9 @@ import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.BukkitModule
+import com.demonwav.mcdev.platform.bukkit.BukkitModuleType
+import com.demonwav.mcdev.platform.bukkit.PaperModuleType
+import com.demonwav.mcdev.platform.bukkit.SpigotModuleType
 import com.demonwav.mcdev.platform.bungeecord.generation.BungeeCordGenerationData
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants
 import com.demonwav.mcdev.util.addImplements
@@ -34,7 +37,18 @@ import com.intellij.psi.util.PsiTypesUtil
 class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, override val moduleType: T) :
     AbstractModule(facet) {
 
-    var pluginYml by nullable { facet.findFile("plugin.yml", SourceType.RESOURCE) }
+    var pluginYml by nullable {
+        val file = facet.findFile("bungee.yml", SourceType.RESOURCE)
+        if (file != null) {
+            return@nullable file
+        }
+        if (facet.isOfType(BukkitModuleType) || facet.isOfType(SpigotModuleType) || facet.isOfType(PaperModuleType)) {
+            // If this module is _both_ a bungeecord and a bukkit module, then `plugin.yml` defaults to that platform
+            // So we don't check
+            return@nullable null
+        }
+        return@nullable facet.findFile("plugin.yml", SourceType.RESOURCE)
+    }
         private set
 
     override val type = PlatformType.BUNGEECORD
