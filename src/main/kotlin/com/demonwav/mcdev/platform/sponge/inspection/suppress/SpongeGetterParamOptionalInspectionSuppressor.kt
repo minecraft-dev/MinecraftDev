@@ -18,7 +18,7 @@ import com.intellij.codeInspection.SuppressQuickFix
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiTypeElement
-import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.parentOfTypes
 
 class SpongeGetterParamOptionalInspectionSuppressor : InspectionSuppressor {
 
@@ -27,7 +27,7 @@ class SpongeGetterParamOptionalInspectionSuppressor : InspectionSuppressor {
             return false
         }
 
-        val param = element.parentOfType(PsiParameter::class) ?: return false
+        val param = element.parentOfTypes(PsiParameter::class) ?: return false
         val method = param.findContainingMethod() ?: return false
         if (!method.isValidSpongeListener()) {
             return false

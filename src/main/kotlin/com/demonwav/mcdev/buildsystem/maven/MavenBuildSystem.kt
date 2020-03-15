@@ -155,7 +155,8 @@ class MavenBuildSystem(
             val runnerSettings = MavenRunConfigurationType
                 .createRunnerAndConfigurationSettings(null, null, params, project)
             runnerSettings.name = rootModule.name + " build"
-            RunManager.getInstance(project).addConfiguration(runnerSettings, false)
+            runnerSettings.storeInLocalWorkspace()
+            RunManager.getInstance(project).addConfiguration(runnerSettings)
         }
     }
 }

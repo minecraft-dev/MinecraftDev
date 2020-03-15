@@ -18,7 +18,7 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.parentOfTypes
 import com.intellij.util.ThreeState
 
 class SpongeCompletionConfidence : CompletionConfidence() {
@@ -28,8 +28,8 @@ class SpongeCompletionConfidence : CompletionConfidence() {
             return ThreeState.UNSURE
         }
 
-        val memberValue = element.parentOfType(PsiAnnotationMemberValue::class) ?: return ThreeState.UNSURE
-        val annotation = memberValue.parentOfType(PsiAnnotation::class) ?: return ThreeState.UNSURE
+        val memberValue = element.parentOfTypes(PsiAnnotationMemberValue::class) ?: return ThreeState.UNSURE
+        val annotation = memberValue.parentOfTypes(PsiAnnotation::class) ?: return ThreeState.UNSURE
 
         val method = element.findContainingMethod() ?: return ThreeState.UNSURE
         return if (

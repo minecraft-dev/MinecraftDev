@@ -372,7 +372,8 @@ class GradleBuildSystem(
 
             settings.isActivateToolWindowBeforeRun = true
 
-            runManager.addConfiguration(settings, false)
+            settings.storeInLocalWorkspace()
+            runManager.addConfiguration(settings)
             if (runManager.selectedConfiguration == null) {
                 runManager.selectedConfiguration = settings
             }

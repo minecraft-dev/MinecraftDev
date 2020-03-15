@@ -27,7 +27,7 @@ import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiNameValuePair
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.PsiType
-import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.parentOfTypes
 import com.intellij.util.ArrayUtil
 
 object GetterEventListenerReferenceResolver : ReferenceResolver() {
@@ -46,12 +46,12 @@ object GetterEventListenerReferenceResolver : ReferenceResolver() {
     }
 
     override fun collectVariants(context: PsiElement): Array<Any> {
-        val memberValue = context.parentOfType(PsiNameValuePair::class) ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
+        val memberValue = context.parentOfTypes(PsiNameValuePair::class) ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
         if (memberValue.attributeName != "value") {
             return ArrayUtil.EMPTY_OBJECT_ARRAY
         }
 
-        val annotation = memberValue.parentOfType(PsiAnnotation::class)
+        val annotation = memberValue.parentOfTypes(PsiAnnotation::class)
         if (annotation?.hasQualifiedName(SpongeConstants.GETTER_ANNOTATION) == false) {
             return ArrayUtil.EMPTY_OBJECT_ARRAY
         }

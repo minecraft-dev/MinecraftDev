@@ -25,9 +25,9 @@ plugins {
     kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.15"
+    id("org.jetbrains.intellij") version "0.4.16"
     id("net.minecrell.licenser") version "0.4.1"
-    id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
+    id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
 }
 
 group = "com.demonwav.minecraft-dev"

@@ -85,12 +85,11 @@ class FindMixinsAction : AnAction() {
                         gotoTargetElement(classes.single(), editor, file)
                     } else {
                         val twManager = ToolWindowManager.getInstance(project)
-                        var window = twManager.getToolWindow(TOOL_WINDOW_ID)
-                        if (window == null) {
-                            val task = RegisterToolWindowTask.closable(TOOL_WINDOW_ID)
-                            window = twManager.registerToolWindow(task)
+                        val window = twManager.getToolWindow(TOOL_WINDOW_ID) ?: run {
+                            val task =
+                                RegisterToolWindowTask.closable(TOOL_WINDOW_ID, icon = MixinAssets.MIXIN_CLASS_ICON)
+                            twManager.registerToolWindow(task)
                         }
-                        window.setIcon(MixinAssets.MIXIN_CLASS_ICON)
 
                         val component = FindMixinsComponent(classes)
                         val content = ContentFactory.SERVICE.getInstance().createContent(component.panel, null, false)

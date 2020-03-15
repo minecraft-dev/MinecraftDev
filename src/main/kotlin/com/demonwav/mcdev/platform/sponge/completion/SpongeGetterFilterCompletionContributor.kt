@@ -38,6 +38,7 @@ import com.intellij.psi.search.ProjectScope
 import com.intellij.psi.util.PropertyUtil
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.parentOfTypes
 import org.jetbrains.plugins.groovy.lang.psi.util.childrenOfType
 
 class SpongeGetterFilterCompletionContributor : CompletionContributor() {
@@ -71,7 +72,7 @@ class SpongeGetterFilterCompletionContributor : CompletionContributor() {
                         }
 
                         val inserted = context.file.findElementAt(context.startOffset)
-                            ?.parentOfType(PsiAnnotation::class) ?: return@withInsertHandler
+                            ?.parentOfTypes(PsiAnnotation::class) ?: return@withInsertHandler
                         SpongeInvalidGetterTargetInspection.QuickFix.doFix(getterAnnoClass.project, inserted)
                     }
                 )

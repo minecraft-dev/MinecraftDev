@@ -123,7 +123,8 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             }
             clientSettings.isActivateToolWindowBeforeRun = true
 
-            runManager.addConfiguration(clientSettings, false)
+            clientSettings.storeInLocalWorkspace()
+            runManager.addConfiguration(clientSettings)
             runManager.selectedConfiguration = clientSettings
 
             // Server run config
@@ -142,7 +143,8 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             }
 
             serverSettings.isActivateToolWindowBeforeRun = true
-            runManager.addConfiguration(serverSettings, false)
+            serverSettings.storeInLocalWorkspace()
+            runManager.addConfiguration(serverSettings)
         }
     }
 

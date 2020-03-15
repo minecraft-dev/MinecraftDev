@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.asset
 
-import com.intellij.CommonBundle
+import com.intellij.AbstractBundle
 import com.intellij.reference.SoftReference as IJSoftReference
 import java.lang.ref.Reference
 import java.lang.ref.SoftReference
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.PropertyKey
 
 object MessageAssets : Assets() {
     fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any): String {
-        return CommonBundle.message(bundle, key, *params)
+        return AbstractBundle.message(bundle, key, *params)
     }
 
     private var ourBundle: Reference<ResourceBundle>? = null
@@ -31,7 +31,7 @@ object MessageAssets : Assets() {
         get() = message("generate.event_listener")
 
     fun message(@PropertyKey(resourceBundle = BUNDLE) key: String): String {
-        return CommonBundle.message(bundle, key)
+        return AbstractBundle.message(bundle, key)
     }
 
     private val bundle: ResourceBundle
