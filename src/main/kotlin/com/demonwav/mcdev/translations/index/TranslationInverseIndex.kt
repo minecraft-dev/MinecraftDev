@@ -19,13 +19,12 @@ import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.util.indexing.FileBasedIndexExtension
 import com.intellij.util.indexing.FileContent
 import com.intellij.util.indexing.ID
-import com.intellij.util.indexing.PsiDependentIndex
 import com.intellij.util.io.DataExternalizer
 import com.intellij.util.io.EnumeratorStringDescriptor
 import com.intellij.util.io.KeyDescriptor
 import com.intellij.util.io.VoidDataExternalizer
 
-class TranslationInverseIndex : FileBasedIndexExtension<String, Void>(), PsiDependentIndex {
+class TranslationInverseIndex : FileBasedIndexExtension<String, Void>() {
     override fun getName() = NAME
 
     override fun getVersion() = 1

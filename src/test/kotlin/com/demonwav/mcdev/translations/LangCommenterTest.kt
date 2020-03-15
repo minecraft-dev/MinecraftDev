@@ -10,81 +10,83 @@
 
 package com.demonwav.mcdev.translations
 
-import com.demonwav.mcdev.framework.BaseMinecraftTest
+import com.demonwav.mcdev.framework.CommenterTest
+import com.demonwav.mcdev.framework.EdtInterceptor
+import com.demonwav.mcdev.framework.ProjectBuilder
 import com.demonwav.mcdev.platform.PlatformType
-import com.intellij.openapi.actionSystem.IdeActions
-import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.util.io.delete
-import java.nio.file.Files
-import java.nio.file.Path
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
-class LangCommenterTest : BaseMinecraftTest(PlatformType.MCP) {
-    private val fileName: String
-        get() = getTestName(true)
-
-    private val testDataPath: Path by lazy {
-        Files.createTempDirectory("mcdev")
+@ExtendWith(EdtInterceptor::class)
+@DisplayName("Minecraft Lang Commenter Tests")
+class LangCommenterTest : CommenterTest(PlatformType.MCP) {
+    private fun doTest(@Language("I18n") before: String, @Language("I18n") after: String) {
+        doTest(before, after, ".lang", ProjectBuilder::lang)
     }
 
-    override fun getTestDataPath() = testDataPath.toString()
-
-    private fun doTest(actionId: String, @Language("I18n") before: String, @Language("I18n") after: String) {
-        buildProject(VfsUtil.findFile(testDataPath, true)!!) {
-            lang("$fileName.lang", before, configure = true)
-            lang("${fileName}_after.lang", after, configure = false)
-        }
-
-        myFixture.performEditorAction(actionId)
-        myFixture.checkResultByFile("${fileName}_after.lang", true)
-    }
-
-    override fun tearDown() {
-        testDataPath.delete()
-        super.tearDown()
-    }
-
-    fun testSingleLineComment() = doTest(IdeActions.ACTION_COMMENT_LINE, """
+    @Test
+    @DisplayName("Single Line Comment Test")
+    fun singleLineCommentTest() = doTest(
+        """
         test.<caret>key1=value1
         test.key2=value2
-    """, """
+        """,
+        """
         #test.key1=value1
         test.k<caret>ey2=value2
-    """)
+        """
+    )
 
-    fun testMultiLineComment() = doTest(IdeActions.ACTION_COMMENT_LINE, """
+    @Test
+    @DisplayName("Multi Line Comment Test")
+    fun multiLineCommentTest() = doTest(
+        """
         test.key1=value1
         test.<selection>key2=value2
         test</selection>.key3=value3
         test.key4=value4
-    """, """
+        """,
+        """
         test.key1=value1
         #test.<selection>key2=value2
         #test</selection>.key3=value3
         test.key4=value4
-    """)
+        """
+    )
 
-    fun testSingleLineUncomment() = doTest(IdeActions.ACTION_COMMENT_LINE, """
+    @Test
+    @DisplayName("Single Line Uncomment Test")
+    fun singleLineUncommentTest() = doTest(
+        """
         test.key1=value1
         test.key2=value2
         #test<caret>.key3=value3
         #test.key4=value4
-    """, """
+        """,
+        """
         test.key1=value1
         test.key2=value2
         test.key3=value3
         #tes<caret>t.key4=value4
-    """)
+        """
+    )
 
-    fun testMultiLineUncomment() = doTest(IdeActions.ACTION_COMMENT_LINE, """
+    @Test
+    @DisplayName("Multi Line Uncomment Test")
+    fun multiLineUncommentTest() = doTest(
+        """
         #test.<selection>key1=value1
         #test.key2=</selection>value2
         #test.key3=value3
         test.key4=value4
-    """, """
+        """,
+        """
         test.<selection>key1=value1
         test.key2=</selection>value2
         #test.key3=value3
         test.key4=value4
-    """)
+        """
+    )
 }

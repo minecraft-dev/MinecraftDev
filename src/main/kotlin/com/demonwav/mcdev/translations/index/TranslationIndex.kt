@@ -23,14 +23,13 @@ import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.util.indexing.FileBasedIndexExtension
 import com.intellij.util.indexing.FileContent
 import com.intellij.util.indexing.ID
-import com.intellij.util.indexing.PsiDependentIndex
 import com.intellij.util.io.DataExternalizer
 import com.intellij.util.io.EnumeratorStringDescriptor
 import com.intellij.util.io.KeyDescriptor
 import java.io.DataInput
 import java.io.DataOutput
 
-class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(), PsiDependentIndex {
+class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>() {
     override fun getName() = NAME
 
     override fun getVersion() = 6

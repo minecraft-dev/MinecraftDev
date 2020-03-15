@@ -107,7 +107,7 @@
         <codeInsight.parameterNameHints language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttParameterNameHints" />
 
         <!-- Minecraft localization files -->
-        <fileType name="MCLang" language="MCLAng" implementationClass="com.demonwav.mcdev.translations.lang.LangFileType" fieldName="INSTANCE" extensions="lang"/>
+        <fileType name="MCLang" language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.LangFileType" fieldName="INSTANCE" extensions="lang"/>
         <lang.parserDefinition language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.LangParserDefinition"/>
         <lang.syntaxHighlighterFactory language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.colors.LangSyntaxHighlighterFactory"/>
         <lang.psiStructureViewFactory language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.structure.LangStructureViewFactory"/>
