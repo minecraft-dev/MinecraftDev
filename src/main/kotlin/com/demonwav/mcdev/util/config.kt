@@ -43,7 +43,9 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
         registerTypeAdapter(ConfigFile::class.java, ConfigFileDeserializer())
         setup()
     }.create()
-    private val builtinFiles by lazy { load(javaClass.getResource("/configs/$name").toURI()).entries.sortedBy { it.key } }
+    private val builtinFiles by lazy {
+        load(javaClass.getResource("/configs/$name").toURI()).entries.sortedBy { it.key }
+    }
     private val globalModificationTracker = ConfigModificationTracker()
     private val globalConfigDirectory = Paths.get(PathManager.getConfigPath(), "mcdev_configs", name)
 
@@ -52,7 +54,10 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
         return getProjectEntries(element.project).floorEntry(version)?.value ?: emptyList()
     }
 
-    private fun build(global: Map<SemanticVersion, ConfigFile>, project: Map<SemanticVersion, ConfigFile>): TreeMap<SemanticVersion, List<V>> {
+    private fun build(
+        global: Map<SemanticVersion, ConfigFile>,
+        project: Map<SemanticVersion, ConfigFile>
+    ): TreeMap<SemanticVersion, List<V>> {
         fun getRelevant(version: SemanticVersion, files: List<Map.Entry<SemanticVersion, ConfigFile>>) =
             files.filter { it.key <= version }
                 .takeLastUntil { !it.value.inherit }
@@ -84,7 +89,8 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
             if (current == null) {
                 result.add(merged)
             } else {
-                current.entries = current.entries.filter { lower -> merged.entries.none { higher -> higher.overrides(lower) } } + merged.entries
+                current.entries = current.entries
+                    .filter { lower -> merged.entries.none { higher -> higher.overrides(lower) } } + merged.entries
             }
         }
         return result.asSequence()
@@ -145,7 +151,11 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
                 val globalFiles = getGlobalConfigFiles()
                 val projectFiles = getProjectConfigFiles(project)
                 val merged = build(globalFiles, projectFiles)
-                CachedValueProvider.Result.create(merged, getProjectModificationTracker(project), globalModificationTracker)
+                CachedValueProvider.Result.create(
+                    merged,
+                    getProjectModificationTracker(project),
+                    globalModificationTracker
+                )
             },
             false
         )
@@ -173,10 +183,22 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
     }
 
     fun saveProjectConfig(project: Project, version: SemanticVersion, inherit: Boolean, entries: List<V>) {
-        saveConfig(version, getProjectConfigDirectory(project), inherit, entries, getProjectModificationTracker(project))
+        saveConfig(
+            version,
+            getProjectConfigDirectory(project),
+            inherit,
+            entries,
+            getProjectModificationTracker(project)
+        )
     }
 
-    private fun saveConfig(version: SemanticVersion, configDirectory: Path, inherit: Boolean, entries: List<V>, modificationTracker: ConfigModificationTracker) {
+    private fun saveConfig(
+        version: SemanticVersion,
+        configDirectory: Path,
+        inherit: Boolean,
+        entries: List<V>,
+        modificationTracker: ConfigModificationTracker
+    ) {
         if (!Files.exists(configDirectory)) {
             Files.createDirectories(configDirectory)
         }

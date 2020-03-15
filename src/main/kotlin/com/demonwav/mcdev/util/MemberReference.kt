@@ -98,7 +98,10 @@ data class MemberReference(
             val ref = json.asString
             val descriptorStart = ref.indexOf('(')
             val owner = ref.substringBefore('#', "").takeIf { it.isNotEmpty() }
-            val methodName = ref.substring(ref.indexOf('#') + 1, if (descriptorStart >= 0) descriptorStart else ref.length)
+            val methodName = ref.substring(
+                ref.indexOf('#') + 1,
+                if (descriptorStart >= 0) descriptorStart else ref.length
+            )
             val methodDesc = if (descriptorStart >= 0) ref.substring(descriptorStart) else null
             return MemberReference(methodName, methodDesc, owner)
         }

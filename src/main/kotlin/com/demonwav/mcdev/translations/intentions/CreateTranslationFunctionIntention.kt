@@ -43,7 +43,11 @@ class CreateTranslationFunctionIntention : PsiElementBaseIntentionAction() {
         }
 
         if (method.parameters.isEmpty()) {
-            HintManager.getInstance().showErrorHint(editor, "Method does not take any parameters. Must at least accept translation key")
+            HintManager.getInstance()
+                .showErrorHint(
+                    editor,
+                    "Method does not take any parameters. Must at least accept translation key"
+                )
             return
         }
 
@@ -75,7 +79,8 @@ class CreateTranslationFunctionIntention : PsiElementBaseIntentionAction() {
             }
             val alreadyExists = currentConfigs[version]?.entries?.any { it.member == member } == true
             if (alreadyExists) {
-                HintManager.getInstance().showErrorHint(editor, "The method is already configured as translation function")
+                HintManager.getInstance()
+                    .showErrorHint(editor, "The method is already configured as translation function")
                 return ListPopupStep.FINAL_CHOICE
             }
 
@@ -129,7 +134,16 @@ class CreateTranslationFunctionIntention : PsiElementBaseIntentionAction() {
         override fun getTextFor(value: Boolean) = if (value) "Yes" else "No"
 
         override fun onChosen(foldParametersOnly: Boolean, finalChoice: Boolean) =
-            PrefixSuffixStep(context, version, projectScope, member, srgName, paramIndex, formatting, foldParametersOnly)
+            PrefixSuffixStep(
+                context,
+                version,
+                projectScope,
+                member,
+                srgName,
+                paramIndex,
+                formatting,
+                foldParametersOnly
+            )
     }
 
     private class PrefixSuffixStep(
@@ -165,7 +179,15 @@ class CreateTranslationFunctionIntention : PsiElementBaseIntentionAction() {
                     ""
                 }
 
-                val function = TranslationFunction(member, srgName, paramIndex, prefix, suffix, formatting, foldParametersOnly)
+                val function = TranslationFunction(
+                    member,
+                    srgName,
+                    paramIndex,
+                    prefix,
+                    suffix,
+                    formatting,
+                    foldParametersOnly
+                )
                 if (projectScope) {
                     TranslationFunctionRepository.addToProjectConfig(context.project, version, function)
                 } else {

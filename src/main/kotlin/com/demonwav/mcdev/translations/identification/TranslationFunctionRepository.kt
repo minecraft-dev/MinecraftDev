@@ -16,7 +16,10 @@ import com.google.gson.GsonBuilder
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 
-object TranslationFunctionRepository : VersionedConfig<TranslationFunction>("translationFunctions", TranslationFunction::class.java) {
+object TranslationFunctionRepository : VersionedConfig<TranslationFunction>(
+    "translationFunctions",
+    TranslationFunction::class.java
+) {
     override fun GsonBuilder.setup() {
         registerTypeAdapter(MemberReference::class.java, MemberReference.JsonAdapter)
     }

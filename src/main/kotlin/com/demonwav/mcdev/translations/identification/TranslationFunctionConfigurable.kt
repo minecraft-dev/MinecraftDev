@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -62,7 +62,6 @@ import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.ListTableModel
 import com.intellij.util.ui.StatusText
-import org.jetbrains.annotations.Nls
 import java.awt.BorderLayout
 import java.util.Comparator
 import javax.swing.BorderFactory
@@ -76,6 +75,7 @@ import javax.swing.border.EmptyBorder
 import javax.swing.event.DocumentEvent
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
+import org.jetbrains.annotations.Nls
 
 class TranslationFunctionConfigurable(private val project: Project) : MasterDetailsComponent() {
     private val scopeComboBox = ComboBox(
@@ -185,7 +185,15 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
                 }
 
                 override fun actionPerformed(e: AnActionEvent) {
-                    val node = MyNode(VersionConfigurable(VersionConfiguration("Version Number", true, mutableListOf())))
+                    val node = MyNode(
+                        VersionConfigurable(
+                            VersionConfiguration(
+                                "Version Number",
+                                true,
+                                mutableListOf()
+                            )
+                        )
+                    )
                     addNode(node, myRoot)
                     selectNodeInTree(node, true)
                 }
@@ -210,26 +218,37 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
         }
     }
 
-    private class VersionConfiguration(var version: String, var inherit: Boolean, val functions: MutableList<FunctionEntry>) {
+    private class VersionConfiguration(
+        var version: String,
+        var inherit: Boolean,
+        val functions: MutableList<FunctionEntry>
+    ) {
         var initialVersion = version
         var initialInherit = inherit
     }
 
     private data class FunctionEntry(
-        var className: String, var methodName: String, var methodDescriptor: String, var srgName: Boolean, var paramIndex: Int,
-        var keyPrefix: String, var keySuffix: String,
-        var formatting: Boolean, var foldParametersOnly: Boolean
+        var className: String,
+        var methodName: String,
+        var methodDescriptor: String,
+        var srgName: Boolean,
+        var paramIndex: Int,
+        var keyPrefix: String,
+        var keySuffix: String,
+        var formatting: Boolean,
+        var foldParametersOnly: Boolean
     ) {
         val member: MemberReference
             get() = MemberReference(methodName, methodDescriptor, className)
 
-        fun findClass(project: Project) = JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope.allScope(project))
+        fun findClass(project: Project) =
+            JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope.allScope(project))
 
         fun findMethod(project: Project) = findClass(project)?.findMethods(member)?.findFirst()?.orElse(null)
     }
 
-    private inner class VersionConfigurable(val config: VersionConfiguration)
-        : NamedConfigurable<VersionConfiguration>(true, TREE_UPDATER) {
+    private inner class VersionConfigurable(val config: VersionConfiguration) :
+        NamedConfigurable<VersionConfiguration>(true, TREE_UPDATER) {
         val component: JComponent
         private val inheritCheckBox = JBCheckBox("Inherit from older versions")
         private val table = FunctionTable()
@@ -259,9 +278,10 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
         init {
             val decorator = ToolbarDecorator.createDecorator(table)
             decorator.setRemoveAction {
-                table.listTableModel.removeRow(table.selectedRow)
-                table.clearSelection()
-            }.setRemoveActionName("Remove function")
+                    table.listTableModel.removeRow(table.selectedRow)
+                    table.clearSelection()
+                }
+                .setRemoveActionName("Remove function")
                 .setAddAction { addNewFunction() }
                 .setAddActionName("Add function")
                 .disableUpDownActions()
@@ -272,7 +292,10 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
             inheritCheckBox.addActionListener {
                 config.inherit = inheritCheckBox.isSelected
             }
-            inheritCheckBox.border = BorderFactory.createCompoundBorder(JBUI.Borders.empty(0, 8), inheritCheckBox.border)
+            inheritCheckBox.border = BorderFactory.createCompoundBorder(
+                JBUI.Borders.empty(0, 8),
+                inheritCheckBox.border
+            )
             builder.addComponent(inheritCheckBox, 5)
 
             val tablePanel = decorator.createPanel()
@@ -468,17 +491,28 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
             if (psiClass != null && method == null) {
                 val methods = psiClass.findMethodsByInternalName(currentEntry.methodName)
                 if (methods.isEmpty()) {
-                    methodLabel.setErrorText("${currentEntry.methodName} is not a method in ${currentEntry.className}", JBColor.YELLOW)
+                    methodLabel.setErrorText(
+                        "${currentEntry.methodName} is not a method in ${currentEntry.className}",
+                        JBColor.YELLOW
+                    )
                 } else {
-                    descriptorLabel.setErrorText("There is no override of ${currentEntry.methodName} in ${currentEntry.className} with this signature", JBColor.YELLOW)
+                    descriptorLabel.setErrorText(
+                        "There is no override of ${currentEntry.methodName} in " +
+                            "${currentEntry.className} with this signature",
+                        JBColor.YELLOW
+                    )
                 }
             }
 
             if (method != null && method.parameters.isEmpty()) {
-                methodLabel.setErrorText("${method.name} does not take any arguments and cannot be used as translation function", JBColor.RED)
+                methodLabel.setErrorText(
+                    "${method.name} does not take any arguments and cannot be used as translation function",
+                    JBColor.RED
+                )
             }
 
-            val conflicts = config.functions.asSequence().any { it !== currentEntry && it.member == currentEntry.member }
+            val conflicts = config.functions.asSequence()
+                .any { it !== currentEntry && it.member == currentEntry.member }
             if (conflicts) {
                 methodLabel.setErrorText("A function with this method is already specified", JBColor.RED)
             }
@@ -505,7 +539,8 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
         }
 
         private fun selectMethod(psiClass: PsiClass): PsiMethod? {
-            val methods = (psiClass.constructors + psiClass.methods).filter { it.parameters.isNotEmpty() }.toTypedArray()
+            val methods = (psiClass.constructors + psiClass.methods).filter { it.parameters.isNotEmpty() }
+                .toTypedArray()
             val dialog = object : AbstractTreeClassChooserDialog<PsiMethod>(
                 "Choose Method",
                 psiClass.project,
@@ -517,7 +552,12 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
                 false,
                 false
             ) {
-                override fun getClassesByName(name: String, checkBoxState: Boolean, pattern: String, searchScope: GlobalSearchScope) =
+                override fun getClassesByName(
+                    name: String,
+                    checkBoxState: Boolean,
+                    pattern: String,
+                    searchScope: GlobalSearchScope
+                ) =
                     emptyList<PsiMethod>()
 
                 override fun getSelectedFromTreeUserObject(node: DefaultMutableTreeNode?) =
@@ -541,7 +581,11 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
                 newFunction.srgName = srgManager?.srgMapNow?.getMcpMethod(method.memberReference) != null
                 newFunction.foldParametersOnly = newFunction.methodName.startsWith("set")
                 if (config.functions.any { it.member == newFunction.member }) {
-                    Messages.showErrorDialog(table, "The specified method is already configured as translation function in this version!", "Function already exists")
+                    Messages.showErrorDialog(
+                        table,
+                        "The specified method is already configured as translation function in this version!",
+                        "Function already exists"
+                    )
                     return
                 }
             }
@@ -564,7 +608,9 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
 
             val conflicts = config.functions.groupBy { it.member }.any { it.value.size > 1 }
 
-            return (config.version != config.initialVersion || config.inherit != config.initialInherit || difference.any()) && !conflicts
+            return (config.version != config.initialVersion ||
+                config.inherit != config.initialInherit ||
+                difference.any()) && !conflicts
         }
 
         override fun getDisplayName() = config.version
@@ -614,9 +660,15 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
     private inner class MethodGotoModel(project: Project, private val methods: Array<PsiMethod>) : GotoSymbolModel2(
         project,
         arrayOf(object : ChooseByNameContributor {
-            override fun getItemsByName(name: String?, pattern: String?, project: Project?, includeNonProjectItems: Boolean) = methods
+            override fun getItemsByName(
+                name: String?,
+                pattern: String?,
+                project: Project?,
+                includeNonProjectItems: Boolean
+            ) = methods
 
-            override fun getNames(project: Project?, includeNonProjectItems: Boolean) = methods.map { it.name }.toTypedArray()
+            override fun getNames(project: Project?, includeNonProjectItems: Boolean) =
+                methods.map { it.name }.toTypedArray()
         })
     ) {
         override fun getPromptText() = ""
@@ -631,10 +683,16 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
                 return null
             }
             val method = entry.findMethod(project)
-            val className = method?.containingClass?.let { ClassPresentationUtil.getNameForClass(it, false) } ?: entry.className
+            val className = method?.containingClass?.let { ClassPresentationUtil.getNameForClass(it, false) }
+                ?: entry.className
             val methodName = method?.internalName ?: entry.methodName
             val descriptor = method?.let {
-                PsiFormatUtil.formatMethod(it, PsiSubstitutor.EMPTY, PsiFormatUtilBase.SHOW_PARAMETERS, PsiFormatUtilBase.SHOW_TYPE)
+                PsiFormatUtil.formatMethod(
+                    it,
+                    PsiSubstitutor.EMPTY,
+                    PsiFormatUtilBase.SHOW_PARAMETERS,
+                    PsiFormatUtilBase.SHOW_TYPE
+                )
             } ?: entry.methodDescriptor
             val result = StringBuilder()
             result.append(className.trim())
