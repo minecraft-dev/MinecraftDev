@@ -18,6 +18,7 @@ import com.demonwav.mcdev.platform.sponge.util.spongePluginClassId
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.fullQualifiedName
+import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.codeInsight.intention.AddAnnotationFix
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool
@@ -133,136 +134,161 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                 return
             }
 
-            if (name == "org.spongepowered.api.asset.Asset") {
-                val assetId = variable.getAnnotation(SpongeConstants.ASSET_ID_ANNOTATION)
-                if (assetId == null) {
-                    holder.registerProblem(
-                        variable.nameIdentifier ?: variable,
-                        "Injected Assets must be annotated with @AssetId.",
-                        ProblemHighlightType.GENERIC_ERROR,
-                        AddAnnotationFix(SpongeConstants.ASSET_ID_ANNOTATION, annotationsOwner)
-                    )
-                } else {
-                    variable.findModule()?.let { module ->
-                        val assetPathAttributeValue = assetId.findAttributeValue(null)
-                        val assetPath = assetPathAttributeValue?.constantStringValue?.replace('\\', '/') ?: return@let
+            checkAssetId(name, variable, annotationsOwner)
 
-                        val pluginId = variable.spongePluginClassId() ?: return@let
-                        val relativeAssetPath = "assets/$pluginId/$assetPath"
+            // @ConfigDir and @DefaultConfig usages
+            checkConfig(variable, name, classType, annotationsOwner)
+        }
 
-                        val roots = ModuleRootManager.getInstance(module).getSourceRoots(false)
-                        val pathIsDirectory = roots.any { root ->
-                            root.findFileByRelativePath(relativeAssetPath)?.isDirectory == true
-                        }
-                        if (pathIsDirectory || relativeAssetPath.endsWith('/')) {
-                            holder.registerProblem(
-                                assetPathAttributeValue,
-                                "AssetId must point to a file.",
-                                ProblemHighlightType.GENERIC_ERROR
-                            )
-                            return@let
-                        }
+        private fun checkAssetId(
+            name: String,
+            variable: PsiVariable,
+            annotationsOwner: PsiModifierListOwner
+        ) {
+            if (name != "org.spongepowered.api.asset.Asset") {
+                return
+            }
 
-                        if (roots.none { it.findFileByRelativePath(relativeAssetPath) != null }) {
-                            val fix = roots.firstOrNull()?.let { contentRoot ->
-                                variable.manager.findDirectory(contentRoot)?.let { directory ->
-                                    CreateAssetFileFix(assetPath, module, pluginId, directory)
-                                }
+            val assetId = variable.getAnnotation(SpongeConstants.ASSET_ID_ANNOTATION)
+            if (assetId == null) {
+                holder.registerProblem(
+                    variable.nameIdentifier ?: variable,
+                    "Injected Assets must be annotated with @AssetId.",
+                    ProblemHighlightType.GENERIC_ERROR,
+                    AddAnnotationFix(SpongeConstants.ASSET_ID_ANNOTATION, annotationsOwner)
+                )
+            } else {
+                variable.findModule()?.let { module ->
+                    val assetPathAttributeValue = assetId.findAttributeValue(null)
+                    val assetPath = assetPathAttributeValue?.constantStringValue?.replace('\\', '/') ?: return@let
+
+                    val pluginId = variable.spongePluginClassId() ?: return@let
+                    val relativeAssetPath = "assets/$pluginId/$assetPath"
+
+                    val roots = ModuleRootManager.getInstance(module).getSourceRoots(false)
+                    val assetFile = roots.mapFirstNotNull { root ->
+                        root.findFileByRelativePath(relativeAssetPath)
+                    }
+                    if (assetFile?.isDirectory == true || relativeAssetPath.endsWith('/')) {
+                        holder.registerProblem(
+                            assetPathAttributeValue,
+                            "AssetId must reference a file.",
+                            ProblemHighlightType.GENERIC_ERROR
+                        )
+                        return@let
+                    }
+
+                    if (assetFile == null) {
+                        val fix = roots.firstOrNull()?.let { contentRoot ->
+                            variable.manager.findDirectory(contentRoot)?.let { directory ->
+                                CreateAssetFileFix(assetPath, module, pluginId, directory)
                             }
-
-                            holder.registerProblem(
-                                assetPathAttributeValue,
-                                "Asset '$assetPath' does not exist.",
-                                ProblemHighlightType.GENERIC_ERROR,
-                                fix
-                            )
                         }
+
+                        holder.registerProblem(
+                            assetPathAttributeValue,
+                            "Asset '$assetPath' does not exist.",
+                            ProblemHighlightType.GENERIC_ERROR,
+                            fix
+                        )
                     }
                 }
             }
+        }
 
-            // @ConfigDir and @DefaultConfig usages
+        private fun checkConfig(
+            variable: PsiVariable,
+            name: String,
+            classType: PsiClassReferenceType,
+            annotationsOwner: PsiModifierListOwner
+        ) {
             val configDir = variable.getAnnotation(SpongeConstants.CONFIG_DIR_ANNOTATION)
             val defaultConfig = variable.getAnnotation(SpongeConstants.DEFAULT_CONFIG_ANNOTATION)
-            if (name == "java.io.File" || name == "java.nio.file.Path") {
-                if (configDir != null && defaultConfig != null) {
-                    val quickFixFactory = QuickFixFactory.getInstance()
-                    holder.registerProblem(
-                        variable.nameIdentifier ?: variable,
-                        "@ConfigDir and @DefaultConfig cannot be used on the same field.",
-                        ProblemHighlightType.GENERIC_ERROR,
-                        quickFixFactory.createDeleteFix(configDir, "Remove @ConfigDir"),
-                        quickFixFactory.createDeleteFix(defaultConfig, "Remove @DefaultConfig")
-                    )
-                } else if (configDir == null && defaultConfig == null) {
-                    holder.registerProblem(
-                        variable.nameIdentifier ?: variable,
-                        "An injected ${classType.name} must be annotated with either @ConfigDir or @DefaultConfig.",
-                        ProblemHighlightType.GENERIC_ERROR,
-                        AddAnnotationFix(SpongeConstants.CONFIG_DIR_ANNOTATION, annotationsOwner),
-                        AddAnnotationFix(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner)
-                    )
-                }
-            } else if (name == "ninja.leaping.configurate.loader.ConfigurationLoader") {
-                if (defaultConfig == null) {
-                    holder.registerProblem(
-                        variable.nameIdentifier ?: variable,
-                        "Injected ConfigurationLoader must be annotated with @DefaultConfig.",
-                        ProblemHighlightType.GENERIC_ERROR,
-                        AddAnnotationFix(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner)
-                    )
-                }
 
-                if (configDir != null) {
-                    holder.registerProblem(
-                        configDir,
-                        "Injected ConfigurationLoader cannot be annotated with @ConfigDir.",
-                        ProblemHighlightType.GENERIC_ERROR,
-                        QuickFixFactory.getInstance().createDeleteFix(configDir, "Remove @ConfigDir")
-                    )
+            when (name) {
+                "java.io.File", "java.nio.file.Path" -> {
+                    if (configDir != null && defaultConfig != null) {
+                        val quickFixFactory = QuickFixFactory.getInstance()
+                        holder.registerProblem(
+                            variable.nameIdentifier ?: variable,
+                            "@ConfigDir and @DefaultConfig cannot be used on the same field.",
+                            ProblemHighlightType.GENERIC_ERROR,
+                            quickFixFactory.createDeleteFix(configDir, "Remove @ConfigDir"),
+                            quickFixFactory.createDeleteFix(defaultConfig, "Remove @DefaultConfig")
+                        )
+                    } else if (configDir == null && defaultConfig == null) {
+                        holder.registerProblem(
+                            variable.nameIdentifier ?: variable,
+                            "An injected ${classType.name} must be annotated with either @ConfigDir or @DefaultConfig.",
+                            ProblemHighlightType.GENERIC_ERROR,
+                            AddAnnotationFix(SpongeConstants.CONFIG_DIR_ANNOTATION, annotationsOwner),
+                            AddAnnotationFix(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner)
+                        )
+                    }
                 }
+                "ninja.leaping.configurate.loader.ConfigurationLoader" -> {
+                    if (defaultConfig == null) {
+                        holder.registerProblem(
+                            variable.nameIdentifier ?: variable,
+                            "Injected ConfigurationLoader must be annotated with @DefaultConfig.",
+                            ProblemHighlightType.GENERIC_ERROR,
+                            AddAnnotationFix(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner)
+                        )
+                    }
 
-                if (classType.isRaw) {
-                    val ref = classType.reference
-                    holder.registerProblem(
-                        ref,
-                        "Injected ConfigurationLoader must have a generic parameter.",
-                        ProblemHighlightType.GENERIC_ERROR,
-                        MissingConfLoaderTypeParamFix(ref)
-                    )
-                } else {
-                    classType.parameters.firstOrNull()?.let { param ->
-                        val paramType = param as? PsiClassReferenceType ?: return@let
-                        val paramTypeFQName = paramType.fullQualifiedName ?: return@let
-                        if (paramTypeFQName != "ninja.leaping.configurate.commented.CommentedConfigurationNode") {
-                            val ref = param.reference
-                            holder.registerProblem(
-                                ref,
-                                "Injected ConfigurationLoader generic parameter must be CommentedConfigurationNode.",
-                                ProblemHighlightType.GENERIC_ERROR,
-                                WrongConfLoaderTypeParamFix(ref)
-                            )
+                    if (configDir != null) {
+                        holder.registerProblem(
+                            configDir,
+                            "Injected ConfigurationLoader cannot be annotated with @ConfigDir.",
+                            ProblemHighlightType.GENERIC_ERROR,
+                            QuickFixFactory.getInstance().createDeleteFix(configDir, "Remove @ConfigDir")
+                        )
+                    }
+
+                    if (classType.isRaw) {
+                        val ref = classType.reference
+                        holder.registerProblem(
+                            ref,
+                            "Injected ConfigurationLoader must have a generic parameter.",
+                            ProblemHighlightType.GENERIC_ERROR,
+                            MissingConfLoaderTypeParamFix(ref)
+                        )
+                    } else {
+                        classType.parameters.firstOrNull()?.let { param ->
+                            val paramType = param as? PsiClassReferenceType ?: return@let
+                            val paramTypeFQName = paramType.fullQualifiedName ?: return@let
+                            if (paramTypeFQName != "ninja.leaping.configurate.commented.CommentedConfigurationNode") {
+                                val ref = param.reference
+                                holder.registerProblem(
+                                    ref,
+                                    "Injected ConfigurationLoader generic parameter must be " +
+                                        "CommentedConfigurationNode.",
+                                    ProblemHighlightType.GENERIC_ERROR,
+                                    WrongConfLoaderTypeParamFix(ref)
+                                )
+                            }
                         }
                     }
                 }
-            } else {
-                val quickFixFactory = QuickFixFactory.getInstance()
-                if (configDir != null) {
-                    holder.registerProblem(
-                        configDir,
-                        "${classType.name} cannot be annotated with @ConfigDir.",
-                        ProblemHighlightType.GENERIC_ERROR,
-                        quickFixFactory.createDeleteFix(configDir, "Remove @ConfigDir")
-                    )
-                }
+                else -> {
+                    val quickFixFactory = QuickFixFactory.getInstance()
+                    if (configDir != null) {
+                        holder.registerProblem(
+                            configDir,
+                            "${classType.name} cannot be annotated with @ConfigDir.",
+                            ProblemHighlightType.GENERIC_ERROR,
+                            quickFixFactory.createDeleteFix(configDir, "Remove @ConfigDir")
+                        )
+                    }
 
-                if (defaultConfig != null) {
-                    holder.registerProblem(
-                        defaultConfig,
-                        "${classType.name} cannot be annotated with @DefaultConfig.",
-                        ProblemHighlightType.GENERIC_ERROR,
-                        quickFixFactory.createDeleteFix(defaultConfig, "Remove @DefaultConfig")
-                    )
+                    if (defaultConfig != null) {
+                        holder.registerProblem(
+                            defaultConfig,
+                            "${classType.name} cannot be annotated with @DefaultConfig.",
+                            ProblemHighlightType.GENERIC_ERROR,
+                            quickFixFactory.createDeleteFix(defaultConfig, "Remove @DefaultConfig")
+                        )
+                    }
                 }
             }
         }
