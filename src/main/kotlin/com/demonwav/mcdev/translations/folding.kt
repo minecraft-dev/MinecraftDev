@@ -85,17 +85,16 @@ class TranslationFoldingBuilder : FoldingBuilderEx() {
                         foldingElement.textRange
                     }
                 descriptors.add(
-                    object : FoldingDescriptor(
+                    FoldingDescriptor(
                         translation.foldingElement.node,
                         range,
-                        FoldingGroup.newGroup("mc.translation." + translation.key)) {
-                        override fun getPlaceholderText(): String? {
-                            if (translation.formattingError == TranslationInstance.Companion.FormattingError.MISSING) {
-                                return "\"Insufficient parameters for formatting '${translation.text}'\""
-                            }
-                            return "\"${translation.text}\""
+                        FoldingGroup.newGroup("mc.translation." + translation.key),
+                        if (translation.formattingError == TranslationInstance.Companion.FormattingError.MISSING) {
+                            "\"Insufficient parameters for formatting '${translation.text}'\""
+                        } else {
+                            "\"${translation.text}\""
                         }
-                    }
+                    )
                 )
             }
         }
