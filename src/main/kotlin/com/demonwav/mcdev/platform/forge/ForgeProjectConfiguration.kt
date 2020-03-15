@@ -90,7 +90,11 @@ open class ForgeProjectConfiguration : ProjectConfiguration() {
             meta.findOrCreateChildData(this, ForgeConstants.MODS_TOML)
         }
 
-        val authorsText = baseConfigs.authors.joinToString(", ") { "\"$it\"" }
+        val authorsText = if (mcVer < ForgeModuleType.FG3_VERSION) {
+            baseConfigs.authors.joinToString(", ") { "\"$it\"" }
+        } else {
+            baseConfigs.authors.joinToString(",")
+        }
 
         ForgeTemplate.applyModDescriptorTemplate(
             project,
