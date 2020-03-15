@@ -62,12 +62,12 @@ abstract class VersionedConfig<V>(private val name: String, private val valueTyp
         val globalSorted = global.entries.sortedBy { it.key }
         val projectSorted = project.entries.sortedBy { it.key }
         return TreeMap(
-            project.mapValues { ref ->
+            (global.keys + project.keys).associateWith { ref ->
                 // For each version, we want to inherit the values from the older version, unless the config specifies otherwise
                 // Hence, for each entry, collect all older versions and merge their lists of config values
-                val builtinRelevant = getRelevant(ref.key, builtinFiles)
-                val globalRelevant = getRelevant(ref.key, globalSorted)
-                val projectRelevant = getRelevant(ref.key, projectSorted)
+                val builtinRelevant = getRelevant(ref, builtinFiles)
+                val globalRelevant = getRelevant(ref, globalSorted)
+                val projectRelevant = getRelevant(ref, projectSorted)
                 merge(merge(builtinRelevant, globalRelevant), projectRelevant)
                     .map { it.entries }
                     .reduce { acc, cur ->

@@ -59,7 +59,7 @@ class CreateTranslationFunctionIntention : PsiElementBaseIntentionAction() {
 
         override fun onChosen(projectScope: Boolean, finalChoice: Boolean): PopupStep<*>? {
             val srgManager = context.findMcpModule()?.srgManager
-            val srgMember = srgManager?.srgMapNow?.findSrgMethod(method)
+            val srgMember = srgManager?.srgMapNow?.getSrgMethod(method)
             val member = srgMember ?: method.qualifiedMemberReference
             val version = context.mcVersion
 

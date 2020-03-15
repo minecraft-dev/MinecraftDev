@@ -22,7 +22,6 @@ import com.demonwav.mcdev.util.memberReference
 import com.google.common.collect.Sets
 import com.intellij.ide.projectView.impl.nodes.PsiMethodNode
 import com.intellij.ide.util.AbstractTreeClassChooserDialog
-import com.intellij.ide.util.MethodCellRenderer
 import com.intellij.ide.util.TreeClassChooserFactory
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.navigation.ChooseByNameContributor
@@ -79,7 +78,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 
 class TranslationFunctionConfigurable(private val project: Project) : MasterDetailsComponent() {
-    private val scopeComboBox = ComboBox<String>(
+    private val scopeComboBox = ComboBox(
         DefaultComboBoxModel(if (!project.isDefault) arrayOf("Global", "Project") else arrayOf("Global"))
     )
 
@@ -153,7 +152,7 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
     private fun mapEntry(entry: FunctionEntry): TranslationFunction {
         val srgManager = SrgManager.findAnyInstance(project)
         val member = entry.member.let {
-            srgManager.takeIf { entry.srgName }?.srgMapNow?.mapToSrgMethod(it) ?: it
+            srgManager.takeIf { entry.srgName }?.srgMapNow?.getMcpMethod(it) ?: it
         }
         return TranslationFunction(
             member,
@@ -414,7 +413,7 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
             entry.keySuffix = keySuffixField.text.trim()
             validate()
             val srgManager = SrgManager.findAnyInstance(project)
-            srgNameCheckBox.isEnabled = srgManager?.srgMapNow?.mapToSrgMethod(entry.member) == null
+            srgNameCheckBox.isEnabled = srgManager?.srgMapNow?.getMcpMethod(entry.member) == null
         }
 
         private fun updateFields(entry: FunctionEntry?) {
@@ -433,7 +432,7 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
             swapParamInput(method, entry?.paramIndex)
             method?.also {
                 val srgManager = SrgManager.findAnyInstance(project)
-                srgNameCheckBox.isEnabled = srgManager?.srgMapNow?.mapToSrgMethod(it.memberReference) == null
+                srgNameCheckBox.isEnabled = srgManager?.srgMapNow?.getMcpMethod(it.memberReference) == null
                 formattingCheckBox.isEnabled = it.isVarArgs
             }
             updatingFields = false
@@ -539,7 +538,7 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
                 newFunction.methodName = method.internalName
                 newFunction.methodDescriptor = method.descriptor ?: ""
                 val srgManager = SrgManager.findAnyInstance(project)
-                newFunction.srgName = srgManager?.srgMapNow?.mapToSrgMethod(method.memberReference) != null
+                newFunction.srgName = srgManager?.srgMapNow?.getMcpMethod(method.memberReference) != null
                 newFunction.foldParametersOnly = newFunction.methodName.startsWith("set")
                 if (config.functions.any { it.member == newFunction.member }) {
                     Messages.showErrorDialog(table, "The specified method is already configured as translation function in this version!", "Function already exists")
@@ -623,9 +622,6 @@ class TranslationFunctionConfigurable(private val project: Project) : MasterDeta
         override fun getPromptText() = ""
 
         override fun getElementsByName(name: String, parameters: FindSymbolParameters, canceled: ProgressIndicator) =
-            methods
-
-        override fun getElementsByName(name: String?, checkBoxState: Boolean, pattern: String?) =
             methods
     }
 
