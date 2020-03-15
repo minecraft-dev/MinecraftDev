@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -27,7 +27,6 @@ import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.json.JsonElementTypes
 import com.intellij.json.JsonLanguage
-import com.intellij.json.psi.JsonProperty
 import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
@@ -77,7 +76,10 @@ class JsonCompletionContributor : TranslationCompletionContributor() {
         }
 
         val file = position.containingFile.originalFile.virtualFile
-        if (!TranslationFiles.isTranslationFile(file) || TranslationFiles.getLocale(file) == TranslationConstants.DEFAULT_LOCALE) {
+        if (
+            !TranslationFiles.isTranslationFile(file) ||
+            TranslationFiles.getLocale(file) == TranslationConstants.DEFAULT_LOCALE
+        ) {
             return
         }
 
@@ -89,7 +91,7 @@ class JsonCompletionContributor : TranslationCompletionContributor() {
     }
 
     private tailrec fun getKey(element: PsiElement): String? {
-        if (element.node.elementType  == JsonElementTypes.DOUBLE_QUOTED_STRING) {
+        if (element.node.elementType == JsonElementTypes.DOUBLE_QUOTED_STRING) {
             return getKey(element.parent)
         }
         if (element is JsonStringLiteral && element.isPropertyName) {
@@ -111,7 +113,10 @@ class LangCompletionContributor : TranslationCompletionContributor() {
         }
 
         val file = position.containingFile.originalFile.virtualFile
-        if (!TranslationFiles.isTranslationFile(file) || TranslationFiles.getLocale(file) == TranslationConstants.DEFAULT_LOCALE) {
+        if (
+            !TranslationFiles.isTranslationFile(file) ||
+            TranslationFiles.getLocale(file) == TranslationConstants.DEFAULT_LOCALE
+        ) {
             return
         }
 
@@ -123,7 +128,9 @@ class LangCompletionContributor : TranslationCompletionContributor() {
     }
 
     companion object {
-        val KEY_PATTERN = PlatformPatterns.psiElement().withElementType(PlatformPatterns.elementType().oneOf(LangTypes.KEY))
-        val DUMMY_PATTERN = PlatformPatterns.psiElement().withElementType(PlatformPatterns.elementType().oneOf(LangTypes.DUMMY))
+        val KEY_PATTERN = PlatformPatterns.psiElement()
+            .withElementType(PlatformPatterns.elementType().oneOf(LangTypes.KEY))
+        val DUMMY_PATTERN = PlatformPatterns.psiElement()
+            .withElementType(PlatformPatterns.elementType().oneOf(LangTypes.DUMMY))
     }
 }

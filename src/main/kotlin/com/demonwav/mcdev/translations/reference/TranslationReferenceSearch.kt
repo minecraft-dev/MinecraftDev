@@ -54,7 +54,8 @@ class TranslationReferenceSearch : QueryExecutor<PsiReference, ReferencesSearch.
                 {
                     if (it.file != null && it.element != null && it.rangeInElement != null) {
                         val highlighted = it.file?.findElementAt(it.rangeInElement!!.startOffset)
-                        val ref = highlighted?.parent?.references?.find { it is TranslationReference } as TranslationReference?
+                        val ref = highlighted?.parent?.references
+                            ?.find { ref -> ref is TranslationReference } as TranslationReference?
                         if (ref?.key?.full == key) {
                             consumer.process(ref)
                         }

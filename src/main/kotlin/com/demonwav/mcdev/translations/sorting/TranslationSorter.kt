@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -48,9 +48,25 @@ object TranslationSorter {
         val translations = TranslationIndex.getTranslations(file)
         val sorted = translations.let {
             when (ordering) {
-                Ordering.ASCENDING -> TranslationFiles.buildFileEntries(project, locale, it.sortedWith(ascendingComparator), keepComments)
-                Ordering.DESCENDING -> TranslationFiles.buildFileEntries(project, locale, it.sortedWith(descendingComparator), keepComments)
-                Ordering.TEMPLATE -> sortByTemplate(project, locale, TemplateManager.getProjectTemplate(project), it, keepComments)
+                Ordering.ASCENDING -> TranslationFiles.buildFileEntries(
+                    project,
+                    locale,
+                    it.sortedWith(ascendingComparator),
+                    keepComments
+                )
+                Ordering.DESCENDING -> TranslationFiles.buildFileEntries(
+                    project,
+                    locale,
+                    it.sortedWith(descendingComparator),
+                    keepComments
+                )
+                Ordering.TEMPLATE -> sortByTemplate(
+                    project,
+                    locale,
+                    TemplateManager.getProjectTemplate(project),
+                    it,
+                    keepComments
+                )
                 else -> sortByTemplate(
                     project,
                     locale,
@@ -67,22 +83,43 @@ object TranslationSorter {
         }
     }
 
-    private fun sortByTemplate(project: Project, locale: String, template: Template, entries: Sequence<Translation>, keepComments: Int) =
-        sequence {
-            val tmp = entries.toMutableList()
-            for (elem in template.elements) {
-                when (elem) {
-                    is Comment -> yield(TranslationFiles.FileEntry.Comment(elem.text))
-                    EmptyLine -> yield(TranslationFiles.FileEntry.EmptyLine)
-                    is Key -> {
-                        val toWrite = tmp.asSequence().filter { elem.matcher.matches(it.key) }
-                        yieldAll(TranslationFiles.buildFileEntries(project, locale, toWrite.sortedWith(ascendingComparator), keepComments))
-                        tmp.removeAll(toWrite)
-                    }
+    private fun sortByTemplate(
+        project: Project,
+        locale: String,
+        template: Template,
+        entries: Sequence<Translation>,
+        keepComments: Int
+    ) = sequence {
+        val tmp = entries.toMutableList()
+
+        for (elem in template.elements) {
+            when (elem) {
+                is Comment -> yield(TranslationFiles.FileEntry.Comment(elem.text))
+                EmptyLine -> yield(TranslationFiles.FileEntry.EmptyLine)
+                is Key -> {
+                    val toWrite = tmp.asSequence().filter { elem.matcher.matches(it.key) }
+                    yieldAll(
+                        TranslationFiles.buildFileEntries(
+                            project,
+                            locale,
+                            toWrite.sortedWith(ascendingComparator),
+                            keepComments
+                        )
+                    )
+                    tmp.removeAll(toWrite)
                 }
             }
-            if (tmp.isNotEmpty()) {
-                yieldAll(TranslationFiles.buildFileEntries(project, locale, tmp.sortedWith(ascendingComparator).asSequence(), keepComments))
-            }
         }
+
+        if (tmp.isNotEmpty()) {
+            yieldAll(
+                TranslationFiles.buildFileEntries(
+                    project,
+                    locale,
+                    tmp.sortedWith(ascendingComparator).asSequence(),
+                    keepComments
+                )
+            )
+        }
+    }
 }

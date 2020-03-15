@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -33,7 +33,12 @@ abstract class TranslationIdentifier<T : PsiElement> {
     companion object {
         val INSTANCES = listOf(LiteralTranslationIdentifier(), ReferenceTranslationIdentifier())
 
-        fun identify(project: Project, element: PsiExpression, container: PsiElement, referenceElement: PsiElement): TranslationInstance? {
+        fun identify(
+            project: Project,
+            element: PsiExpression,
+            container: PsiElement,
+            referenceElement: PsiElement
+        ): TranslationInstance? {
             if (container is PsiExpressionList && container.parent is PsiCallExpression) {
                 val call = container.parent as PsiCallExpression
                 val index = container.expressions.indexOf(element)
@@ -45,7 +50,8 @@ abstract class TranslationIdentifier<T : PsiElement> {
                         val translation = entries[translationKey.full]?.text
                         if (translation != null) {
                             try {
-                                val (formatted, superfluousParams) = function.format(translation, call) ?: (translation to -1)
+                                val (formatted, superfluousParams) = function.format(translation, call)
+                                    ?: (translation to -1)
                                 return TranslationInstance(
                                     if (function.foldParameters) container else call,
                                     function.matchedIndex,

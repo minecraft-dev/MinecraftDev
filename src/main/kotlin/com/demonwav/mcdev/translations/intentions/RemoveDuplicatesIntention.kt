@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -28,7 +28,10 @@ class RemoveDuplicatesIntention(private val translation: Translation) : PsiEleme
 
     override fun invoke(project: Project, editor: Editor?, element: PsiElement) {
         val keep = TranslationFiles.seekTranslation(element) ?: return
-        val entries = TranslationInverseIndex.findElements(translation.key, GlobalSearchScope.fileScope(element.containingFile))
+        val entries = TranslationInverseIndex.findElements(
+            translation.key,
+            GlobalSearchScope.fileScope(element.containingFile)
+        )
         for (other in entries) {
             if (other !== keep) {
                 TranslationFiles.remove(other)
@@ -36,4 +39,3 @@ class RemoveDuplicatesIntention(private val translation: Translation) : PsiEleme
         }
     }
 }
-

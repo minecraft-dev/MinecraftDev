@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -79,10 +79,10 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
 
         fun getEntries(scope: GlobalSearchScope, locale: String, domain: String? = null) =
             FileBasedIndex.getInstance().getValues(
-                TranslationIndex.NAME,
-                locale,
-                scope
-            ).asSequence()
+                    TranslationIndex.NAME,
+                    locale,
+                    scope
+                ).asSequence()
                 .filter { domain == null || it.sourceDomain == domain }
 
         private fun Sequence<TranslationIndexEntry>.flatten() = this.flatMap { it.translations.asSequence() }
@@ -109,7 +109,8 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
     private object Indexer : DataIndexer<String, TranslationIndexEntry, FileContent> {
         override fun map(inputData: FileContent): MutableMap<String, TranslationIndexEntry> {
             val domain = inputData.file.mcDomain ?: return mutableMapOf()
-            val entry = TranslationProvider.INSTANCES[inputData.fileType]?.map(domain, inputData) ?: return mutableMapOf()
+            val entry = TranslationProvider.INSTANCES[inputData.fileType]?.map(domain, inputData)
+                ?: return mutableMapOf()
             val locale = TranslationFiles.getLocale(inputData.file) ?: return mutableMapOf()
             return mutableMapOf(locale to entry)
         }

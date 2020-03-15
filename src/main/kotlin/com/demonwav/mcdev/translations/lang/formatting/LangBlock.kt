@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -22,14 +22,25 @@ import com.intellij.psi.TokenType
 import com.intellij.psi.formatter.common.AbstractBlock
 import java.util.ArrayList
 
-class LangBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, private val spacingBuilder: SpacingBuilder) : AbstractBlock(node, wrap, alignment) {
+class LangBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, private val spacingBuilder: SpacingBuilder) :
+    AbstractBlock(node, wrap, alignment) {
     override fun buildChildren(): List<Block> {
         val blocks = ArrayList<Block>()
         var child: ASTNode? = myNode.firstChildNode
         var previousChild: ASTNode? = null
         while (child != null) {
-            if (child.elementType !== TokenType.WHITE_SPACE && (previousChild == null || previousChild.elementType !== LangTypes.LINE_ENDING || child.elementType !== LangTypes.LINE_ENDING)) {
-                val block = LangBlock(child, Wrap.createWrap(WrapType.NONE, false), Alignment.createAlignment(), spacingBuilder)
+            if (
+                child.elementType !== TokenType.WHITE_SPACE &&
+                (previousChild == null ||
+                    previousChild.elementType !== LangTypes.LINE_ENDING ||
+                    child.elementType !== LangTypes.LINE_ENDING)
+            ) {
+                val block = LangBlock(
+                    child,
+                    Wrap.createWrap(WrapType.NONE, false),
+                    Alignment.createAlignment(),
+                    spacingBuilder
+                )
                 blocks.add(block)
             }
             previousChild = child

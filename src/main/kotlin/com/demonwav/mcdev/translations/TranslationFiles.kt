@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -52,13 +52,14 @@ object TranslationFiles {
     private val MC_1_12_2 = SemanticVersion.release(1, 12, 2)
 
     fun isTranslationFile(file: VirtualFile?) =
-        file?.mcDomain != null && file.mcPath?.startsWith("lang/") == true && file.fileType in listOf(LangFileType, JsonFileType.INSTANCE)
+        file?.mcDomain != null && file.mcPath?.startsWith("lang/") == true &&
+            file.fileType in listOf(LangFileType, JsonFileType.INSTANCE)
 
     fun getLocale(file: VirtualFile?) =
         file?.nameWithoutExtension?.toLowerCase(Locale.ROOT)
 
     tailrec fun seekTranslation(element: PsiElement): PsiNamedElement? {
-        return TranslationFiles.toTranslation(element)?.let { element as? PsiNamedElement }
+        return toTranslation(element)?.let { element as? PsiNamedElement }
             ?: seekTranslation(element.parent ?: return null)
     }
 
@@ -92,15 +93,17 @@ object TranslationFiles {
     }
 
     fun add(context: PsiElement, key: String, text: String) {
-        val module = context.findModule() ?: throw IllegalArgumentException("Cannot add translation for element outside of module")
-        val version = context.mcVersion ?: throw IllegalArgumentException("Cannot determine MC version for element $context")
+        val module = context.findModule()
+            ?: throw IllegalArgumentException("Cannot add translation for element outside of module")
+        val version =
+            context.mcVersion ?: throw IllegalArgumentException("Cannot determine MC version for element $context")
         val jsonVersion = version > MC_1_12_2
 
         fun write(files: Iterable<VirtualFile>) {
             for (file in files) {
                 val psiFile = PsiManager.getInstance(context.project).findFile(file) ?: continue
                 psiFile.applyWriteAction {
-                    val entries = listOf(TranslationFiles.FileEntry.Translation(key, text))
+                    val entries = listOf(FileEntry.Translation(key, text))
                     if (jsonVersion) {
                         this.persistAsJson(entries)
                     } else {
@@ -119,7 +122,9 @@ object TranslationFiles {
                 JBPopupFactory.getInstance()
                     .createPopupChooserBuilder(domains)
                     .setTitle("Choose resource domain")
-                    .setAdText("There are multiple resource domains with localization files, choose one for this translation.")
+                    .setAdText(
+                        "There are multiple resource domains with localization files, choose one for this translation."
+                    )
                     .setItemChosenCallback { domain ->
                         write(files.filter { f -> f.mcDomain == domain })
                     }
@@ -133,33 +138,39 @@ object TranslationFiles {
     }
 
     fun addAll(file: PsiFile, entries: Iterable<FileEntry>) {
-        when {
-            file.fileType == LangFileType -> file.persistAsLang(entries)
-            file.fileType == JsonFileType.INSTANCE -> file.persistAsJson(entries)
+        when (file.fileType) {
+            LangFileType -> file.persistAsLang(entries)
+            JsonFileType.INSTANCE -> file.persistAsJson(entries)
             else -> throw IllegalArgumentException("Cannot add translations to file '${file.name}' of unknown type!")
         }
     }
 
     fun replaceAll(file: PsiFile, entries: Iterable<FileEntry>) {
         val doc = FileDocumentManager.getInstance().getDocument(file.virtualFile) ?: return
-        when {
-            file.fileType == LangFileType -> {
+        when (file.fileType) {
+            LangFileType -> {
                 val content = generateLangFile(false, entries)
                 doc.setText(content)
             }
-            file.fileType == JsonFileType.INSTANCE -> {
+            JsonFileType.INSTANCE -> {
                 val rootObject = file.firstChild as? JsonObject ?: return
-                val indent = rootObject.propertyList.firstOrNull()?.let { DocumentUtil.getIndent(doc, it.textOffset) } ?: "  "
+                val indent = rootObject.propertyList.firstOrNull()
+                    ?.let { DocumentUtil.getIndent(doc, it.textOffset) } ?: "  "
                 val content = generateJsonFile(false, indent, entries)
                 doc.setText("{\n$content\n}")
             }
-            else -> throw IllegalArgumentException("Cannot replace translations in file '${file.name}' of unknown type!")
+            else -> throw IllegalArgumentException(
+                "Cannot replace translations in file '${file.name}' of unknown type!"
+            )
         }
     }
 
     private fun PsiFile.persistAsLang(entries: Iterable<FileEntry>) {
         val doc = FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return
-        val content = generateLangFile(this.lastChild != null && this.lastChild.node.elementType != LangTypes.LINE_ENDING, entries)
+        val content = generateLangFile(
+            this.lastChild != null && this.lastChild.node.elementType != LangTypes.LINE_ENDING,
+            entries
+        )
         doc.insertString(this.lastChild?.textOffset ?: 0, content)
     }
 
@@ -174,7 +185,7 @@ object TranslationFiles {
             when (entry) {
                 is FileEntry.Comment -> result.append("# ${entry.text}\n")
                 is FileEntry.Translation -> result.append("${entry.key}=${entry.text}\n")
-                TranslationFiles.FileEntry.EmptyLine -> result.append('\n')
+                FileEntry.EmptyLine -> result.append('\n')
             }
         }
 
@@ -190,7 +201,11 @@ object TranslationFiles {
         doc.insertString(rootObject.lastChild.prevSibling.textOffset, content)
     }
 
-    private fun generateJsonFile(leadingComma: Boolean, indent: CharSequence, entries: Iterable<FileEntry>): CharSequence {
+    private fun generateJsonFile(
+        leadingComma: Boolean,
+        indent: CharSequence,
+        entries: Iterable<FileEntry>
+    ): CharSequence {
         val result = StringBuilder()
 
         if (leadingComma && entries.any { it is FileEntry.Translation }) {
@@ -205,7 +220,7 @@ object TranslationFiles {
                     result.append("$indent\"${StringUtil.escapeStringCharacters(entry.key)}\": ")
                     result.append("\"${StringUtil.escapeStringCharacters(entry.text)}\",\n")
                 }
-                TranslationFiles.FileEntry.EmptyLine -> result.append('\n')
+                FileEntry.EmptyLine -> result.append('\n')
             }
         }
 
@@ -215,17 +230,26 @@ object TranslationFiles {
     fun buildFileEntries(project: Project, locale: String, entries: Sequence<Translation>, keepComments: Int) =
         sequence {
             for (entry in entries) {
-                val langElement = TranslationInverseIndex.findElements(entry.key, GlobalSearchScope.allScope(project), locale)
+                val langElement = TranslationInverseIndex.findElements(
+                        entry.key,
+                        GlobalSearchScope.allScope(project),
+                        locale
+                    )
                     .asSequence()
                     .mapNotNull { it as? LangEntry }
                     .firstOrNull()
                 val comments = langElement?.let { gatherLangComments(it, keepComments) } ?: emptyList()
-                yieldAll(comments.asReversed().map { TranslationFiles.FileEntry.Comment(it) })
-                yield(TranslationFiles.FileEntry.Translation(entry.key, entry.text))
+                yieldAll(comments.asReversed().map { FileEntry.Comment(it) })
+                yield(FileEntry.Translation(entry.key, entry.text))
             }
         }
 
-    private tailrec fun gatherLangComments(element: PsiElement, maxDepth: Int, acc: MutableList<String> = mutableListOf(), depth: Int = 0): List<String> {
+    private tailrec fun gatherLangComments(
+        element: PsiElement,
+        maxDepth: Int,
+        acc: MutableList<String> = mutableListOf(),
+        depth: Int = 0
+    ): List<String> {
         if (maxDepth != 0 && depth >= maxDepth) {
             return acc
         }
@@ -242,13 +266,19 @@ object TranslationFiles {
     }
 
     fun buildSortingTemplateFromDefault(context: PsiElement, domain: String? = null): Template? {
-        val module = context.findModule() ?: throw IllegalArgumentException("Cannot add translation for element outside of module")
-        val version = context.mcVersion ?: throw IllegalArgumentException("Cannot determine MC version for element $context")
+        val module = context.findModule()
+            ?: throw IllegalArgumentException("Cannot add translation for element outside of module")
+        val version =
+            context.mcVersion ?: throw IllegalArgumentException("Cannot determine MC version for element $context")
         val jsonVersion = version > MC_1_12_2
 
-        val defaultTranslationFile = FileBasedIndex.getInstance().getContainingFiles(
-            TranslationIndex.NAME, TranslationConstants.DEFAULT_LOCALE, GlobalSearchScope.moduleScope(module)
-        ).asSequence()
+        val defaultTranslationFile = FileBasedIndex.getInstance()
+            .getContainingFiles(
+                TranslationIndex.NAME,
+                TranslationConstants.DEFAULT_LOCALE,
+                GlobalSearchScope.moduleScope(module)
+            )
+            .asSequence()
             .filter { domain == null || it.mcDomain == domain }
             .filter { (jsonVersion && it.fileType == JsonFileType.INSTANCE) || it.fileType == LangFileType }
             .firstOrNull() ?: return null
@@ -260,7 +290,8 @@ object TranslationFiles {
                 when {
                     child is LangEntry ->
                         elements.add(Key(Regex.escape(child.key).toRegex()))
-                    child.node.elementType == LangTypes.LINE_ENDING && child.prevSibling.node.elementType == LangTypes.LINE_ENDING ->
+                    child.node.elementType == LangTypes.LINE_ENDING
+                        && child.prevSibling.node.elementType == LangTypes.LINE_ENDING ->
                         elements.add(EmptyLine)
                 }
             }

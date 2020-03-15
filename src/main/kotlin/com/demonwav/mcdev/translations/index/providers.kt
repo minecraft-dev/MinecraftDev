@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -75,10 +75,13 @@ object JsonTranslationProvider : TranslationProvider {
 
 object LangTranslationProvider : TranslationProvider {
     override fun map(domain: String, input: FileContent): TranslationIndexEntry? {
-        val translations = input.contentAsText.lineSequence().filter { !it.startsWith("#") && it.isNotEmpty() }.mapTo(mutableListOf()) {
-            val entry = it.split("=")
-            Translation(entry.first(), entry.getOrNull(1) ?: "")
-        }
+        val translations = input.contentAsText
+            .lineSequence()
+            .filter { !it.startsWith("#") && it.isNotEmpty() }
+            .mapTo(mutableListOf()) {
+                val entry = it.split("=")
+                Translation(entry.first(), entry.getOrNull(1) ?: "")
+            }
         return TranslationIndexEntry(domain, translations)
     }
 

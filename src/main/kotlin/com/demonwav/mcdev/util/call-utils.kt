@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -11,19 +11,13 @@
 package com.demonwav.mcdev.util
 
 import com.intellij.psi.PsiCall
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiNewExpression
-import com.intellij.psi.PsiParameter
-import com.intellij.psi.PsiParameterList
-import com.intellij.psi.PsiPolyadicExpression
-import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypeCastExpression
-import com.intellij.psi.util.PsiUtil
 
 val PsiCall.referencedMethod: PsiMethod?
     get() = when (this) {
@@ -47,8 +41,13 @@ fun PsiCall.extractVarArgs(index: Int, allowReferences: Boolean, allowTranslatio
     return extractVarArgs(varargType, elements, allowReferences, allowTranslations)
 }
 
-private fun extractVarArgs(type: PsiType, elements: List<PsiExpression>, allowReferences: Boolean, allowTranslations: Boolean): Array<String?> {
-     tailrec fun resolveReference(expression: PsiExpression): Array<String?> {
+private fun extractVarArgs(
+    type: PsiType,
+    elements: List<PsiExpression>,
+    allowReferences: Boolean,
+    allowTranslations: Boolean
+): Array<String?> {
+    tailrec fun resolveReference(expression: PsiExpression): Array<String?> {
         if (expression is PsiTypeCastExpression && expression.operand != null) {
             return resolveReference(expression.operand!!)
         }
@@ -59,7 +58,10 @@ private fun extractVarArgs(type: PsiType, elements: List<PsiExpression>, allowRe
         // We're dealing with an array initializer, let's analyse it!
         val initializer = elements[0]
         if (initializer is PsiNewExpression && initializer.arrayInitializer != null) {
-            initializer.arrayInitializer!!.initializers.asSequence().map { it.evaluate(allowReferences, allowTranslations) }.toTypedArray()
+            initializer.arrayInitializer!!.initializers
+                .asSequence()
+                .map { it.evaluate(allowReferences, allowTranslations) }
+                .toTypedArray()
         } else {
             resolveReference(initializer)
         }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -15,9 +15,9 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.util.io.delete
-import org.intellij.lang.annotations.Language
 import java.nio.file.Files
 import java.nio.file.Path
+import org.intellij.lang.annotations.Language
 
 class LangCommenterTest : BaseMinecraftTest(PlatformType.MCP) {
     private val fileName: String

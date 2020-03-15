@@ -35,11 +35,18 @@ class ReferenceTranslationIdentifier : TranslationIdentifier<PsiReferenceExpress
             if (isConstant && (resolved.isEquivalentTo(stringClass) || resolved.isInheritor(stringClass, true))) {
                 val referenceElement = reference.initializer as? PsiLiteral ?: return null
                 val result = identify(element.project, element, statement, referenceElement)
+
                 return result?.copy(
-                    key = result.key.copy(infix = result.key.infix.replace(CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED, ""))
+                    key = result.key.copy(
+                        infix = result.key.infix.replace(
+                            CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED,
+                            ""
+                        )
+                    )
                 )
             }
         }
+
         return null
     }
 

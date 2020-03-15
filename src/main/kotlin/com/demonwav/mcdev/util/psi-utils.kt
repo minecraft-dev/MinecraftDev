@@ -10,10 +10,10 @@
 
 package com.demonwav.mcdev.util
 
-import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModule
 import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
@@ -198,10 +198,15 @@ fun PsiElement.findMcpModule() = this.cached {
     val file = containingFile?.virtualFile ?: return@cached null
     val index = ProjectFileIndex.getInstance(project)
     val modules = if (index.isInLibrary(file)) {
-        val library = index.getOrderEntriesForFile(file).asSequence().mapNotNull { it as? LibraryOrderEntry }.first().library
+        val library = index.getOrderEntriesForFile(file)
+            .asSequence()
+            .mapNotNull { it as? LibraryOrderEntry }
+            .first()
+            .library
         ModuleManager.getInstance(project).modules.asSequence()
             .filter { OrderEntryUtil.findLibraryOrderEntry(ModuleRootManager.getInstance(it), library) != null }
     } else sequenceOf(this.findModule())
+
     modules.mapNotNull { it?.findMcpModule() }.firstOrNull()
 }
 
@@ -215,4 +220,8 @@ private fun Module.findMcpModule(): McpModule? {
 }
 
 val PsiElement.mcVersion: SemanticVersion?
-    get() = this.cached { findMcpModule()?.let { SemanticVersion.parse(it.getSettings().minecraftVersion ?: return@let null) } }
+    get() = this.cached {
+        findMcpModule()?.let {
+            SemanticVersion.parse(it.getSettings().minecraftVersion ?: return@let null)
+        }
+    }

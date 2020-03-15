@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -58,7 +58,8 @@ class TranslationInverseIndex : FileBasedIndexExtension<String, Void>(), PsiDepe
     private object Indexer : DataIndexer<String, Void, FileContent> {
         override fun map(inputData: FileContent): MutableMap<String, Void?> {
             val domain = inputData.file.mcDomain ?: return mutableMapOf()
-            val entry = TranslationProvider.INSTANCES[inputData.fileType]?.map(domain, inputData) ?: return mutableMapOf()
+            val entry = TranslationProvider.INSTANCES[inputData.fileType]?.map(domain, inputData)
+                ?: return mutableMapOf()
             return entry.translations.associateTo(mutableMapOf()) { it.key to null }
         }
     }

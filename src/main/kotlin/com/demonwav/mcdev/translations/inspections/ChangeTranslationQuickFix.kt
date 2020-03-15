@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -31,13 +31,22 @@ class ChangeTranslationQuickFix(private val name: String) : LocalQuickFix {
         try {
             val literal = descriptor.psiElement as PsiLiteralExpression
             val key = LiteralTranslationIdentifier().identify(literal)?.key ?: return
-            val popup = ChooseByNamePopup.createPopup(project, TranslationGotoModel(project, key.prefix, key.suffix), null)
+            val popup = ChooseByNamePopup.createPopup(
+                project,
+                TranslationGotoModel(project, key.prefix, key.suffix),
+                null
+            )
             popup.invoke(object : ChooseByNamePopupComponent.Callback() {
                 override fun elementChosen(element: Any) {
                     val selectedKey = (element as PsiNamedElement).name ?: return
                     literal.containingFile.runWriteAction {
                         val insertion = selectedKey.substring(key.prefix.length, selectedKey.length - key.suffix.length)
-                        literal.replace(JavaPsiFacade.getInstance(project).elementFactory.createExpressionFromText("\"$insertion\"", literal.context))
+                        literal.replace(
+                            JavaPsiFacade.getInstance(project).elementFactory.createExpressionFromText(
+                                "\"$insertion\"",
+                                literal.context
+                            )
+                        )
                     }
                 }
             }, ModalityState.current(), false)

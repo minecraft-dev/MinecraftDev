@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -15,7 +15,12 @@ import com.demonwav.mcdev.translations.lang.LangFileType
 import com.demonwav.mcdev.translations.lang.LangParserDefinition
 import com.intellij.testFramework.ParsingTestCase
 
-class LangParsingTest : ParsingTestCase("com/demonwav/mcdev/lang/parser/fixtures", LangFileType.FILE_EXTENSION, true, LangParserDefinition()) {
+class LangParsingTest : ParsingTestCase(
+    "com/demonwav/mcdev/lang/parser/fixtures",
+    LangFileType.FILE_EXTENSION,
+    true,
+    LangParserDefinition()
+) {
     override fun getTestDataPath() = "src/test/resources"
     override fun getTestName(lowercaseFirstLetter: Boolean) = super.getTestName(lowercaseFirstLetter).toSnakeCase()
     override fun includeRanges() = true

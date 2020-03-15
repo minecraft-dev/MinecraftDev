@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -23,15 +23,29 @@ import com.intellij.util.indexing.FileBasedIndex
 
 class TranslationGotoSymbolContributor : ChooseByNameContributor {
     override fun getNames(project: Project, includeNonProjectItems: Boolean): Array<String> {
-        val scope = if (includeNonProjectItems) GlobalSearchScope.allScope(project) else GlobalSearchScope.projectScope(project)
+        val scope = if (includeNonProjectItems) GlobalSearchScope.allScope(project) else GlobalSearchScope.projectScope(
+            project
+        )
         val keys = FileBasedIndex.getInstance().getAllKeys(TranslationIndex.NAME, project)
-        val translations = keys.asSequence().flatMap { TranslationIndex.getEntries(scope, it).merge("").translations.asSequence() }
+        val translations = keys
+            .asSequence()
+            .flatMap { TranslationIndex.getEntries(scope, it).merge("").translations.asSequence() }
+
         return translations.map { it.key }.distinct().filter { it.isNotEmpty() }.toTypedArray()
     }
 
-    override fun getItemsByName(name: String, pattern: String, project: Project, includeNonProjectItems: Boolean): Array<NavigationItem> {
-        val scope = if (includeNonProjectItems) GlobalSearchScope.allScope(project) else GlobalSearchScope.projectScope(project)
+    override fun getItemsByName(
+        name: String,
+        pattern: String,
+        project: Project,
+        includeNonProjectItems: Boolean
+    ): Array<NavigationItem> {
+        val scope = if (includeNonProjectItems)
+            GlobalSearchScope.allScope(project)
+        else
+            GlobalSearchScope.projectScope(project)
         val elements = TranslationInverseIndex.findElements(name, scope)
+
         return elements.mapToArray { it as NavigationItem }
     }
 }

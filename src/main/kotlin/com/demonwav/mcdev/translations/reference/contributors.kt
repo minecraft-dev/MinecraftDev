@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -32,12 +32,19 @@ class JavaReferenceContributor : PsiReferenceContributor() {
             registrar.registerReferenceProvider(
                 PlatformPatterns.psiElement(identifier.elementClass()),
                 object : PsiReferenceProvider() {
-                    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
+                    override fun getReferencesByElement(
+                        element: PsiElement,
+                        context: ProcessingContext
+                    ): Array<PsiReference> {
                         val result = identifier.identifyUnsafe(element)
                         if (result != null) {
                             val referenceElement = result.referenceElement ?: return emptyArray()
                             return arrayOf(
-                                TranslationReference(referenceElement, TextRange(1, referenceElement.textLength - 1), result.key)
+                                TranslationReference(
+                                    referenceElement,
+                                    TextRange(1, referenceElement.textLength - 1),
+                                    result.key
+                                )
                             )
                         }
                         return emptyArray()
@@ -53,7 +60,10 @@ class JsonReferenceContributor : PsiReferenceContributor() {
         registrar.registerReferenceProvider(
             PlatformPatterns.psiElement().withElementType(JsonElementTypes.PROPERTY),
             object : PsiReferenceProvider() {
-                override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
+                override fun getReferencesByElement(
+                    element: PsiElement,
+                    context: ProcessingContext
+                ): Array<PsiReference> {
                     if (!TranslationFiles.isTranslationFile(element.containingFile?.virtualFile)) {
                         return arrayOf()
                     }
@@ -78,7 +88,10 @@ class LangReferenceContributor : PsiReferenceContributor() {
         registrar.registerReferenceProvider(
             PlatformPatterns.psiElement().withChild(PlatformPatterns.psiElement().withElementType(LangTypes.KEY)),
             object : PsiReferenceProvider() {
-                override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
+                override fun getReferencesByElement(
+                    element: PsiElement,
+                    context: ProcessingContext
+                ): Array<PsiReference> {
                     val entry = element as LangEntry
                     return arrayOf(
                         TranslationReference(

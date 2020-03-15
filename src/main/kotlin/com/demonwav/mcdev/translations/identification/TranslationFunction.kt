@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -23,8 +23,12 @@ import com.intellij.psi.PsiMethod
 
 class TranslationFunction(
     private val memberReference: MemberReference,
-    val matchedIndex: Int, val formatting: Boolean, val setter: Boolean = false,
-    val foldParameters: Boolean = false, val prefix: String = "", val suffix: String = "",
+    val matchedIndex: Int,
+    val formatting: Boolean,
+    val setter: Boolean = false,
+    val foldParameters: Boolean = false,
+    val prefix: String = "",
+    val suffix: String = "",
     val obfuscatedName: Boolean = false
 ) {
     private fun getMethod(context: PsiElement): PsiMethod? {

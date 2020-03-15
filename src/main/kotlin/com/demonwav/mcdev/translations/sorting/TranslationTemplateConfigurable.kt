@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -21,12 +21,12 @@ import com.intellij.openapi.editor.ex.util.LexerEditorHighlighter
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
 import com.intellij.util.ui.JBUI
-import org.jetbrains.annotations.Nls
 import java.awt.BorderLayout
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JPanel
+import org.jetbrains.annotations.Nls
 
 class TranslationTemplateConfigurable(private val project: Project) : Configurable {
     private lateinit var panel: JPanel
@@ -67,7 +67,10 @@ class TranslationTemplateConfigurable(private val project: Project) : Configurab
     private fun setupEditor() {
         templateEditor = TemplateEditorUtil.createEditor(false, getActiveTemplateText())
         val editorColorsScheme = EditorColorsManager.getInstance().globalScheme
-        val highlighter = LexerEditorHighlighter(LangSyntaxHighlighter(TranslationTemplateLexerAdapter()), editorColorsScheme)
+        val highlighter = LexerEditorHighlighter(
+            LangSyntaxHighlighter(TranslationTemplateLexerAdapter()),
+            editorColorsScheme
+        )
         (templateEditor as EditorEx).highlighter = highlighter
         templateEditor.settings.isLineNumbersShown = true
 

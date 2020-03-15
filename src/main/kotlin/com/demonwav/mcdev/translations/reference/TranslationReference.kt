@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -35,13 +35,18 @@ class TranslationReference(
     element: PsiElement,
     textRange: TextRange,
     val key: TranslationInstance.Key,
-    private val renameHandler: (element: PsiElement, range: TextRange, newName: String) -> PsiElement = { elem, range, newName ->
-        ElementManipulators.getManipulator(elem).handleContentChange(elem, range, newName)!!
-    }
+    private val renameHandler: (element: PsiElement, range: TextRange, newName: String) -> PsiElement =
+        { elem, range, newName ->
+            ElementManipulators.getManipulator(elem).handleContentChange(elem, range, newName)!!
+        }
 ) : PsiReferenceBase.Poly<PsiElement>(element, textRange, false), PsiPolyVariantReference {
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         val project = myElement.project
-        val entries = TranslationInverseIndex.findElements(key.full, GlobalSearchScope.allScope(project), TranslationConstants.DEFAULT_LOCALE)
+        val entries = TranslationInverseIndex.findElements(
+            key.full,
+            GlobalSearchScope.allScope(project),
+            TranslationConstants.DEFAULT_LOCALE
+        )
         return entries.mapToArray(::PsiElementResolveResult)
     }
 
@@ -72,6 +77,7 @@ class TranslationReference(
             return false
         }
 
-        return (element is LangEntry && element.key == key.full) || (element is JsonProperty && element.name == key.full)
+        return (element is LangEntry && element.key == key.full) ||
+            (element is JsonProperty && element.name == key.full)
     }
 }

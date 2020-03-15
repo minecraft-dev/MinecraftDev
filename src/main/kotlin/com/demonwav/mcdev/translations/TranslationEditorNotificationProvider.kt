@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -28,7 +28,8 @@ import com.intellij.ui.EditorNotifications
 import com.intellij.util.ui.UIUtil
 import java.awt.Color
 
-class TranslationEditorNotificationProvider() : EditorNotifications.Provider<TranslationEditorNotificationProvider.InfoPanel>() {
+class TranslationEditorNotificationProvider :
+    EditorNotifications.Provider<TranslationEditorNotificationProvider.InfoPanel>() {
     private var show: Boolean = true
 
     override fun getKey() = KEY
@@ -43,10 +44,14 @@ class TranslationEditorNotificationProvider() : EditorNotifications.Provider<Tra
         if (missingTranslations.any()) {
             val panel = InfoPanel()
             panel.setText("Translation file doesn't match default one (${TranslationConstants.DEFAULT_LOCALE} locale).")
-            panel.createActionLabel("Add missing default entries (won't reflect changes in original English localization)") {
+            panel.createActionLabel(
+                "Add missing default entries (won't reflect changes in original English localization)"
+            ) {
                 val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
                 psi.applyWriteAction {
-                    val fileEntries = missingTranslations.map { TranslationFiles.FileEntry.Translation(it.key, it.text) }
+                    val fileEntries = missingTranslations.map {
+                        TranslationFiles.FileEntry.Translation(it.key, it.text)
+                    }
                     TranslationFiles.addAll(psi, fileEntries.asIterable())
                     EditorNotifications.updateAll()
                 }

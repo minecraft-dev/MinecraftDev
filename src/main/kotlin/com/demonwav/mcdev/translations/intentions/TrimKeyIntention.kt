@@ -24,7 +24,10 @@ class TrimKeyIntention : PsiElementBaseIntentionAction() {
     override fun getFamilyName() = "Minecraft"
 
     override fun isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean {
-        val translation = TranslationFiles.toTranslation(TranslationFiles.seekTranslation(element) ?: return false) ?: return false
+        val translation = TranslationFiles.toTranslation(
+            TranslationFiles.seekTranslation(element) ?: return false
+        ) ?: return false
+
         return translation.key != translation.trimmedKey
     }
 
@@ -34,6 +37,7 @@ class TrimKeyIntention : PsiElementBaseIntentionAction() {
         if (!FileModificationService.getInstance().preparePsiElementForWrite(entry)) {
             return
         }
+
         val translation = TranslationFiles.toTranslation(entry) ?: return
         entry.setName(translation.trimmedKey)
     }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2019 minecraft-dev
  *
  * MIT License
  */
@@ -27,9 +27,15 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpressionList
 import com.intellij.psi.util.PsiTreeUtil
 
-class TranslationCodeFoldingOptionsProvider : BeanConfigurable<TranslationFoldingSettings>(TranslationFoldingSettings.instance), CodeFoldingOptionsProvider {
+class TranslationCodeFoldingOptionsProvider :
+    BeanConfigurable<TranslationFoldingSettings>(TranslationFoldingSettings.instance), CodeFoldingOptionsProvider {
     init {
-        checkBox("Minecraft Translations", instance::shouldFoldTranslations) { instance.shouldFoldTranslations = it }
+        checkBox(
+            "Minecraft Translations",
+            TranslationFoldingSettings.instance::shouldFoldTranslations
+        ) {
+            TranslationFoldingSettings.instance.shouldFoldTranslations = it
+        }
     }
 }
 

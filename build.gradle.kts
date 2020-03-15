@@ -309,7 +309,11 @@ val generateNbttPsiAndParser = generatePsiAndParser("generateNbttPsiAndParser", 
 val generateLangLexer = generateLexer("generateLangLexer", "LangLexer", "translations/lang/gen/")
 val generateLangPsiAndParser = generatePsiAndParser("generateLangPsiAndParser", "LangParser", "translations/lang/gen")
 
-val generateTranslationTemplateLexer = generateLexer("generateTranslationTemplateLexer", "TranslationTemplateLexer", "translations/lang/gen/")
+val generateTranslationTemplateLexer = generateLexer(
+    "generateTranslationTemplateLexer",
+    "TranslationTemplateLexer",
+    "translations/lang/gen/"
+)
 
 val generate by tasks.registering {
     group = "minecraft"

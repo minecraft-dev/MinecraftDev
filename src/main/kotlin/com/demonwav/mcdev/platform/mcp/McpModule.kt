@@ -11,10 +11,10 @@
 package com.demonwav.mcdev.platform.mcp
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.translations.TranslationFileListener
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.mcp.srg.SrgManager
+import com.demonwav.mcdev.translations.TranslationFileListener
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiClass
@@ -53,7 +53,7 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) = ""
 
-    private fun getSettings() = settings.state
+    fun getSettings() = settings.state
 
     fun updateSettings(data: McpModuleSettings.State) {
         this.settings.loadState(data)

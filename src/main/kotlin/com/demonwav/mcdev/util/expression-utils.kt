@@ -12,13 +12,9 @@ package com.demonwav.mcdev.util
 
 import com.demonwav.mcdev.translations.identification.TranslationInstance
 import com.demonwav.mcdev.translations.identification.TranslationInstance.Companion.FormattingError
-import com.intellij.psi.JavaTokenType
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiCall
-import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLiteral
-import com.intellij.psi.PsiParameter
-import com.intellij.psi.PsiPolyadicExpression
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiTypeCastExpression
 import com.intellij.psi.PsiVariable
@@ -48,6 +44,7 @@ fun PsiAnnotationMemberValue.evaluate(allowReferences: Boolean, allowTranslation
                     if (translation.formattingError == FormattingError.MISSING) {
                         return "{ERROR: Missing formatting arguments for '${translation.text}'}"
                     }
+
                     return translation.text
                 }
         }
