@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.inspection
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.ACCESSOR
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INVOKER
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SHADOW
 import com.demonwav.mcdev.platform.mixin.util.isMixin
@@ -62,7 +63,8 @@ class StaticMemberInspection : MixinInspection() {
                 modifiers.hasModifierProperty(PsiModifier.STATIC) &&
                 modifiers.findAnnotation(SHADOW) == null &&
                 modifiers.findAnnotation(OVERWRITE) == null &&
-                modifiers.findAnnotation(ACCESSOR) == null
+                modifiers.findAnnotation(ACCESSOR) == null &&
+                modifiers.findAnnotation(INVOKER) == null
         }
     }
 }
