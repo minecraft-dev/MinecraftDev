@@ -10,6 +10,9 @@
 
 package com.demonwav.mcdev.util
 
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
@@ -18,6 +21,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.containers.stream
 import java.io.Serializable
+import java.lang.reflect.Type
 import java.util.stream.Stream
 import org.jetbrains.annotations.Contract
 
@@ -82,6 +86,16 @@ data class MemberReference(
         }
 
         return member?.let { ret(psiClass, member) }
+    }
+
+    object Deserializer : JsonDeserializer<MemberReference> {
+        override fun deserialize(json: JsonElement, type: Type, ctx: JsonDeserializationContext): MemberReference {
+            val ref = json.asString
+            val className = ref.substringBefore('#')
+            val methodName = ref.substring(className.length + 1, ref.indexOf("("))
+            val methodDesc = ref.substring(className.length + methodName.length + 1)
+            return MemberReference(methodName, methodDesc, className)
+        }
     }
 }
 

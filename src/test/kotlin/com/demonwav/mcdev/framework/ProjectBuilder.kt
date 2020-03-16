@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.framework
 
-import com.demonwav.mcdev.i18n.I18nConstants
+import com.demonwav.mcdev.translations.lang.LangFileType
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
@@ -48,8 +48,8 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
         file(path, code, ".java", configure)
     fun at(path: String, @Language("Access Transformers") code: String, configure: Boolean = true) =
         file(path, code, "_at.cfg", configure)
-    fun i18n(path: String, @Language("I18n") code: String, configure: Boolean = true) =
-        file(path, code, ".${I18nConstants.FILE_EXTENSION}", configure)
+    fun lang(path: String, @Language("MCLang") code: String, configure: Boolean = true) =
+        file(path, code, ".${LangFileType.FILE_EXTENSION}", configure)
     fun nbtt(path: String, @Language("NBTT") code: String, configure: Boolean = true) =
         file(path, code, ".nbtt", configure)
 
@@ -64,7 +64,7 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
         intermediatePath = oldIntermediatePath
     }
 
-    private fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
+    fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
         check(path.endsWith(ext))
 
         val fullPath = if (intermediatePath.isEmpty()) path else "$intermediatePath/$path"
