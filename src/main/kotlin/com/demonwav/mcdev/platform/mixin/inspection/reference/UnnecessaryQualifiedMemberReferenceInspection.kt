@@ -22,6 +22,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationMemberValue
+import com.intellij.psi.PsiArrayInitializerMemberValue
+import com.intellij.psi.PsiLiteral
 
 class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection(METHOD_INJECTORS, "method") {
 
@@ -32,13 +34,27 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
         value: PsiAnnotationMemberValue,
         holder: ProblemsHolder
     ) {
-        val reference = MixinMemberReference.parse(value.constantStringValue) ?: return
-        if (reference.qualified) {
-            holder.registerProblem(
-                value,
-                "Unnecessary qualified reference to '${reference.name}' in target class",
-                QuickFix(reference)
-            )
+        when (value) {
+            is PsiLiteral -> {
+                val reference = MixinMemberReference.parse(value.constantStringValue) ?: return
+                if (reference.qualified) {
+                    holder.registerProblem(
+                        value,
+                        "Unnecessary qualified reference to '${reference.name}' in target class",
+                        QuickFix(reference)
+                    )
+                }
+            }
+            is PsiArrayInitializerMemberValue -> value.initializers.forEach {
+                val reference = MixinMemberReference.parse(it.constantStringValue) ?: return
+                if (reference.qualified) {
+                    holder.registerProblem(
+                        it,
+                        "Unnecessary qualified reference to '${reference.name}' in target class",
+                        QuickFix(reference)
+                    )
+                }
+            }
         }
     }
 

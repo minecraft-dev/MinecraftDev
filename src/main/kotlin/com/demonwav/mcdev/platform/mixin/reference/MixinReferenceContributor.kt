@@ -24,7 +24,7 @@ class MixinReferenceContributor : PsiReferenceContributor() {
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         // Method references
         registrar.registerReferenceProvider(
-            PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationAttribute(
+            PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationParam(
                 StandardPatterns.string().oneOf(METHOD_INJECTORS), "method"
             ), MethodReference
         )

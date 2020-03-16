@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.util
 
-import com.intellij.patterns.ElementPattern
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PsiAnnotationPattern
 import com.intellij.patterns.PsiJavaElementPattern
@@ -34,13 +33,6 @@ fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPatter
                     .withParent(annotation)
             ), ANNOTATION_ATTRIBUTE_STOP
     )
-}
-
-fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPattern<T, Self>.insideAnnotationAttribute(
-    annotation: ElementPattern<String>,
-    attribute: String
-): Self {
-    return insideAnnotationAttribute(PsiJavaPatterns.psiAnnotation().qName(annotation), attribute)
 }
 
 fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPattern<T, Self>.insideAnnotationAttribute(
