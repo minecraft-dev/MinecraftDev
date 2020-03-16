@@ -1,14 +1,12 @@
-os: linux
-dist: bionic
-jdk: openjdk11
+os:
+  - linux
+  - osx
 
-jobs:
-  include:
-    - os: osx
-      osx_image: xcode10.1
-      jdk: openjdk11
+dist: bionic
+osx_image: xcode10.1
 
 language: java
+jdk: openjdk11
 
 install: unset _JAVA_OPTIONS
 script: ./gradlew build --no-daemon --stacktrace
