@@ -25,6 +25,7 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
+import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
@@ -47,7 +48,7 @@ interface TranslationProvider {
 object JsonTranslationProvider : TranslationProvider {
     override fun map(domain: String, input: FileContent): TranslationIndexEntry? {
         val json = try {
-            JsonParser().parse(input.contentAsText.toString())
+            JsonParser.parseString(input.contentAsText.toString())
         } catch (_: JsonSyntaxException) {
             return null
         }
@@ -62,7 +63,7 @@ object JsonTranslationProvider : TranslationProvider {
         val psiFile = PsiManager.getInstance(project).findFile(file) as? JsonFile ?: return emptyList()
         return CachedValuesManager.getCachedValue(
             psiFile,
-            Key("translation_lookup.$key")
+            Key<CachedValue<List<JsonProperty>>>("translation_lookup.$key")
         ) {
             val value = psiFile.topLevelValue as? JsonObject
             CachedValueProvider.Result.create(
