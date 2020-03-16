@@ -1,8 +1,9 @@
+os: linux
+dist: bionic
+jdk: openjdk11
+
 jobs:
   include:
-    - os: linux
-      dist: bionic
-      jdk: openjdk11
     - os: osx
       osx_image: xcode10.1
       jdk: openjdk11
