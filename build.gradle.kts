@@ -221,7 +221,7 @@ license {
     exclude(
         "com/demonwav/mcdev/platform/mcp/at/gen/**",
         "com/demonwav/mcdev/nbt/lang/gen/**",
-        "com/demonwav/mcdev/i18n/lang/gen/**"
+        "com/demonwav/mcdev/translations/lang/gen/**"
     )
 
     tasks {
@@ -306,10 +306,14 @@ val generateAtPsiAndParser = generatePsiAndParser("generateAtPsiAndParser", "AtP
 val generateNbttLexer = generateLexer("generateNbttLexer", "NbttLexer", "nbt/lang/gen/")
 val generateNbttPsiAndParser = generatePsiAndParser("generateNbttPsiAndParser", "NbttParser", "nbt/lang/gen")
 
-val generateI18nLexer = generateLexer("generateI18nLexer", "I18nLexer", "i18n/lang/gen/")
-val generateI18nPsiAndParser = generatePsiAndParser("generateI18nPsiAndParser", "I18nParser", "i18n/lang/gen")
+val generateLangLexer = generateLexer("generateLangLexer", "LangLexer", "translations/lang/gen/")
+val generateLangPsiAndParser = generatePsiAndParser("generateLangPsiAndParser", "LangParser", "translations/lang/gen")
 
-val generateI18nTemplateLexer = generateLexer("generateI18nTemplateLexer", "I18nTemplateLexer", "i18n/lang/gen/")
+val generateTranslationTemplateLexer = generateLexer(
+    "generateTranslationTemplateLexer",
+    "TranslationTemplateLexer",
+    "translations/lang/gen/"
+)
 
 val generate by tasks.registering {
     group = "minecraft"
@@ -319,9 +323,9 @@ val generate by tasks.registering {
         generateAtPsiAndParser,
         generateNbttLexer,
         generateNbttPsiAndParser,
-        generateI18nLexer,
-        generateI18nPsiAndParser,
-        generateI18nTemplateLexer
+        generateLangLexer,
+        generateLangPsiAndParser,
+        generateTranslationTemplateLexer
     )
     outputs.dir("gen")
 }

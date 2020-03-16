@@ -29,10 +29,12 @@ val VirtualFile.manifest: Manifest?
     }
 
 // Technically resource domains are much more restricted ([a-z0-9_-]+) in modern versions, but we want to support as much as possible
-private val DOMAIN_PATTERN = Regex("^.*?/assets/([^/]+)/lang.*?$")
+private val RESOURCE_LOCATION_PATTERN = Regex("^.*?/(assets|data)/([^/]+)/(.*?)$")
 
 val VirtualFile.mcDomain: String?
-    get() = DOMAIN_PATTERN.matchEntire(this.path)?.groupValues?.get(1)
+    get() = RESOURCE_LOCATION_PATTERN.matchEntire(this.path)?.groupValues?.get(2)
+val VirtualFile.mcPath: String?
+    get() = RESOURCE_LOCATION_PATTERN.matchEntire(this.path)?.groupValues?.get(3)
 
 operator fun Manifest.get(attribute: String): String? = mainAttributes.getValue(attribute)
 operator fun Manifest.get(attribute: Attributes.Name): String? = mainAttributes.getValue(attribute)
