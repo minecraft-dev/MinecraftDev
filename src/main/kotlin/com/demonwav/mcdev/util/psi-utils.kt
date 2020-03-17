@@ -201,8 +201,9 @@ fun PsiElement.findMcpModule() = this.cached {
         val library = index.getOrderEntriesForFile(file)
             .asSequence()
             .mapNotNull { it as? LibraryOrderEntry }
-            .first()
-            .library
+            .firstOrNull()
+            ?.library
+            ?: return@cached null
         ModuleManager.getInstance(project).modules.asSequence()
             .filter { OrderEntryUtil.findLibraryOrderEntry(ModuleRootManager.getInstance(it), library) != null }
     } else sequenceOf(this.findModule())
