@@ -10,17 +10,18 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
-import com.demonwav.mcdev.inspection.sideonly.Side
-import com.demonwav.mcdev.inspection.sideonly.SideOnlyUtil
-import com.demonwav.mcdev.platform.mixin.config.MixinConfig
+import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
+import com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyUtil
 import com.demonwav.mcdev.platform.mixin.MixinModule
+import com.demonwav.mcdev.platform.mixin.config.MixinConfig
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.json.psi.*
+import com.intellij.json.psi.JsonFile
+import com.intellij.json.psi.JsonObject
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaElementVisitor
@@ -47,7 +48,11 @@ class UnusedMixinInspection : MixinInspection() {
                         return
                 }
 
-                val bestQuickFixConfig = MixinModule.getBestWritableConfigForMixinClass(module.project, GlobalSearchScope.moduleScope(module), clazz.fullQualifiedName ?: "")
+                val bestQuickFixConfig = MixinModule.getBestWritableConfigForMixinClass(
+                    module.project,
+                    GlobalSearchScope.moduleScope(module),
+                    clazz.fullQualifiedName ?: ""
+                )
                 val problematicElement = clazz.nameIdentifier
                 if (problematicElement != null) {
                     val bestQuickFixFile = bestQuickFixConfig?.file
@@ -63,7 +68,11 @@ class UnusedMixinInspection : MixinInspection() {
         }
     }
 
-    private class QuickFix(private val quickFixFile: VirtualFile, private val qualifiedName: String, private val side: Side) : LocalQuickFix {
+    private class QuickFix(
+        private val quickFixFile: VirtualFile,
+        private val qualifiedName: String,
+        private val side: Side
+    ) : LocalQuickFix {
         override fun getName() = "Add to mixin config"
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
@@ -80,5 +89,4 @@ class UnusedMixinInspection : MixinInspection() {
 
         override fun getFamilyName() = name
     }
-
 }

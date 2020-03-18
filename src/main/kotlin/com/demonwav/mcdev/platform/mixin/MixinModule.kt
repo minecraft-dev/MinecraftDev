@@ -33,28 +33,41 @@ class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
     override val icon: Icon? = null
 
     companion object {
-        private val mixinFileType = lazy { FileTypeManager.getInstance().findFileTypeByName("Mixin Configuration") ?: FileTypes.UNKNOWN }
-
-        fun getMixinConfigs(project: Project, scope: GlobalSearchScope): Collection<MixinConfig> {
-            return FileTypeIndex.getFiles(mixinFileType.value, scope).
-                    mapNotNull { (PsiManager.getInstance(project).findFile(it) as? JsonFile)?.topLevelValue as? JsonObject }.
-                    map { MixinConfig(project, it) }
+        private val mixinFileType by lazy {
+            FileTypeManager.getInstance().findFileTypeByName("Mixin Configuration") ?: FileTypes.UNKNOWN
         }
 
-        fun getAllMixins(project: Project, scope: GlobalSearchScope): Collection<PsiClass> {
-            return getMixinConfigs(project, scope).asSequence().
-                    flatMap { (it.qualifiedMixins + it.qualifiedClient + it.qualifiedServer).asSequence() }.
-                    filterNotNull().
-                    distinct().
-                    flatMap { JavaPsiFacade.getInstance(project).findClasses(it, scope).asSequence() }.
-                    toList()
+        fun getMixinConfigs(
+            project: Project,
+            scope: GlobalSearchScope
+        ): Collection<MixinConfig> {
+            return FileTypeIndex.getFiles(mixinFileType, scope)
+                .mapNotNull {
+                    (PsiManager.getInstance(project).findFile(it) as? JsonFile)?.topLevelValue as? JsonObject
+                }
+                .map { MixinConfig(project, it) }
         }
 
-        fun getBestWritableConfigForMixinClass(project: Project, scope: GlobalSearchScope, mixinClassName: String): MixinConfig? {
-            return getMixinConfigs(project, scope).
-                    filter { it.isWritable && mixinClassName.startsWith("${it.pkg}.") }.
-                    maxBy { it.pkg?.length ?: 0 }
+        fun getAllMixins(
+            project: Project,
+            scope: GlobalSearchScope
+        ): Collection<PsiClass> {
+            return getMixinConfigs(project, scope).asSequence()
+                .flatMap { (it.qualifiedMixins + it.qualifiedClient + it.qualifiedServer).asSequence() }
+                .filterNotNull()
+                .distinct()
+                .flatMap { JavaPsiFacade.getInstance(project).findClasses(it, scope).asSequence() }
+                .toList()
+        }
+
+        fun getBestWritableConfigForMixinClass(
+            project: Project,
+            scope: GlobalSearchScope,
+            mixinClassName: String
+        ): MixinConfig? {
+            return getMixinConfigs(project, scope)
+                .filter { it.isWritable && mixinClassName.startsWith("${it.pkg}.") }
+                .maxBy { it.pkg?.length ?: 0 }
         }
     }
-
 }

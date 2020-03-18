@@ -11,11 +11,22 @@
 package com.demonwav.mcdev.platform.mixin.config
 
 import com.intellij.json.JsonElementTypes
-import com.intellij.json.psi.*
+import com.intellij.json.psi.JsonArray
+import com.intellij.json.psi.JsonElementGenerator
+import com.intellij.json.psi.JsonFile
+import com.intellij.json.psi.JsonObject
+import com.intellij.json.psi.JsonProperty
+import com.intellij.json.psi.JsonPsiUtil
+import com.intellij.json.psi.JsonStringLiteral
+import com.intellij.json.psi.JsonValue
 import com.intellij.lang.LanguageImportStatements
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.*
+import com.intellij.psi.PsiComment
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiErrorElement
+import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.codeStyle.CodeStyleManager
 
 class MixinConfig(private val project: Project, private var json: JsonObject) {
@@ -39,7 +50,9 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
             } else {
                 val prop = json.findProperty("package")
                 if (prop == null) {
-                    JsonPsiUtil.addProperty(json, generator.createProperty("package", generator.createStringLiteral(value).text), false)
+                    val packageValue = generator.createStringLiteral(value).text
+                    val packageProperty = generator.createProperty("package", packageValue)
+                    JsonPsiUtil.addProperty(json, packageProperty, false)
                 } else {
                     prop.value?.replace(generator.createStringLiteral(value))
                 }
@@ -150,7 +163,6 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
         }
 
         private fun prependPackage(result: String?) = result?.let { "$pkg.$result" }
-
     }
 
     private inner class MixinList(private val key: String) : AbstractMutableList<String?>() {
@@ -166,7 +178,10 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
             if (index < 0 || index > oldSize)
                 throw IndexOutOfBoundsException(index.toString())
             val arr = getOrCreateJsonArray()
-            val newValue = if (element == null) generator.createValue("null") else generator.createStringLiteral(element)
+            val newValue = if (element == null)
+                generator.createValue("null")
+            else
+                generator.createStringLiteral(element)
             when {
                 oldSize == 0 -> {
                     // No comma added
@@ -212,7 +227,11 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
                 throw IndexOutOfBoundsException(index.toString())
             val toReplace = array?.get(index) ?: return null
             val oldStr = (toReplace as? JsonStringLiteral)?.value
-            toReplace.replace(if (element == null) generator.createValue("null") else generator.createStringLiteral(element))
+            val newValue = if (element == null)
+                generator.createValue("null")
+            else
+                generator.createStringLiteral(element)
+            toReplace.replace(newValue)
             if (autoReformat)
                 reformat()
             return oldStr
@@ -225,7 +244,5 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
             val added = JsonPsiUtil.addProperty(json, generator.createProperty(key, "[]"), false)
             return (added as JsonProperty).value as JsonArray
         }
-
     }
-
 }
