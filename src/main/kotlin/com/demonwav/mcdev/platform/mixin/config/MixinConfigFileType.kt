@@ -18,7 +18,7 @@ import com.intellij.openapi.vfs.VirtualFile
 
 object MixinConfigFileType : LanguageFileType(JsonLanguage.INSTANCE), FileTypeIdentifiableByVirtualFile {
 
-    private val filenameRegex = "(^|\\.)mixins?\\.".toRegex()
+    private val filenameRegex = "(^|\\.)mixins?(\\.[^.]+)*\\.json\$".toRegex()
 
     // Dynamic file type detection is sadly needed as we're overriding the built-in json file type.
     // Simply using an extension pattern is not sufficient as there is no way to bump the version to tell
