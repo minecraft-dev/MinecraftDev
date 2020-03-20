@@ -73,7 +73,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
             val hasInjectedCtor = ctorInjectAnnos.isNotEmpty()
 
             val emptyCtor = aClass.constructors.find { !it.hasParameters() }
-            if (emptyCtor == null && !hasInjectedCtor) {
+            if (emptyCtor == null && !hasInjectedCtor && aClass.constructors.isNotEmpty()) {
                 val classIdentifier = aClass.nameIdentifier
                 if (classIdentifier != null) {
                     holder.registerProblem(
