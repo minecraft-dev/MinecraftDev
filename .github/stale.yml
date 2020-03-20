@@ -7,6 +7,7 @@ only: 'issues'
 # Issues with these labels will never be considered stale
 exemptLabels:
   - 'status: accepted'
+  - 'status: possibility'
   - 'status: future'
   - 'status: wip'
   - 'status: needs investigation'

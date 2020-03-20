@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -73,7 +73,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
             val hasInjectedCtor = ctorInjectAnnos.isNotEmpty()
 
             val emptyCtor = aClass.constructors.find { !it.hasParameters() }
-            if (emptyCtor == null && !hasInjectedCtor) {
+            if (emptyCtor == null && !hasInjectedCtor && aClass.constructors.isNotEmpty()) {
                 val classIdentifier = aClass.nameIdentifier
                 if (classIdentifier != null) {
                     holder.registerProblem(
