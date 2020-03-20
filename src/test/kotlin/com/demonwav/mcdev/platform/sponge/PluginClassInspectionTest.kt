@@ -36,86 +36,86 @@ class PluginClassInspectionTest : BaseSpongeTest() {
     @DisplayName("Invalid Plugin Id Test")
     fun invalidPluginIdTest() {
         doTest("""
-package test;
-
-import org.spongepowered.api.plugin.Plugin;
-
-@Plugin(id = <error descr="Plugin IDs should be lowercase, and only contain characters from a-z, dashes or underscores, start with a lowercase letter, and not exceed 64 characters.">"a plugin"</error>)
-public class ASpongePlugin {
-    ASpongePlugin() {
-    }
-}
-""")
+            package test;
+            
+            import org.spongepowered.api.plugin.Plugin;
+            
+            @Plugin(id = <error descr="Plugin IDs should be lowercase, and only contain characters from a-z, dashes or underscores, start with a lowercase letter, and not exceed 64 characters.">"a plugin"</error>)
+            public class ASpongePlugin {
+                ASpongePlugin() {
+                }
+            }
+        """)
     }
 
     @Test
-    @DisplayName("No Empty Constructor Test")
-    fun noEmptyConstructorTest() {
+    @DisplayName("Default Constructor Test")
+    fun defaultConstructorTest() {
         doTest("""
-package test;
-
-import org.spongepowered.api.plugin.Plugin;
-
-@Plugin(id = "a-plugin")
-public class <error descr="Plugin class must have an empty constructor or an @Inject constructor.">ASpongePlugin</error> {
-}
-""")
+            package test;
+            
+            import org.spongepowered.api.plugin.Plugin;
+            
+            @Plugin(id = "a-plugin")
+            public class ASpongePlugin {
+            }
+        """)
     }
 
     @Test
     @DisplayName("Private Constructor Test")
     fun privateConstructorTest() {
         doTest("""
-package test;
-
-import org.spongepowered.api.plugin.Plugin;
-
-@Plugin(id = "a-plugin")
-public class ASpongePlugin {
-    private <error descr="Plugin class empty constructor must not be private.">ASpongePlugin</error>() {
-    }
-}
-""")
+            package test;
+            
+            import org.spongepowered.api.plugin.Plugin;
+            
+            @Plugin(id = "a-plugin")
+            public class ASpongePlugin {
+                private <error descr="Plugin class empty constructor must not be private.">ASpongePlugin</error>() {
+                }
+            }
+        """)
     }
 
     @Test
     @DisplayName("Private Constructor With Injected Constructor Test")
     fun privateConstructorWithInjectedConstructorTest() {
         doTest("""
-package test;
-
-import com.google.inject.Inject;
-import org.slf4j.Logger;
-import org.spongepowered.api.plugin.Plugin;
-
-@Plugin(id = "a-plugin")
-public class ASpongePlugin {
-    private ASpongePlugin() {
-    }
-
-    @Inject
-    private ASpongePlugin(Logger logger) {
-    }
-}
-""")
+            package test;
+            
+            import com.google.inject.Inject;
+            import org.slf4j.Logger;
+            import org.spongepowered.api.plugin.Plugin;
+            
+            @Plugin(id = "a-plugin")
+            public class ASpongePlugin {
+                private ASpongePlugin() {
+                }
+            
+                @Inject
+                private ASpongePlugin(Logger logger) {
+                }
+            }
+        """)
     }
 
     @Test
     @DisplayName("No Private Constructor With Injected Constructor Test")
     fun noPrivateConstructorWithInjectedConstructorTest() {
         doTest("""
-package test;
-
-import com.google.inject.Inject;
-import org.slf4j.Logger;
-import org.spongepowered.api.plugin.Plugin;
-
-@Plugin(id = "a-plugin")
-public class ASpongePlugin {
-    @Inject
-    private ASpongePlugin(Logger logger) {
-    }
-}
-""")
+            package test;
+            
+            import com.google.inject.Inject;
+            import org.slf4j.Logger;
+            import org.spongepowered.api.plugin.Plugin;
+            
+            @Plugin(id = "a-plugin")
+            public class ASpongePlugin {
+                @Inject
+                private ASpongePlugin(Logger logger) {
+                }
+            }
+        """)
     }
 }
