@@ -82,13 +82,13 @@ Developers
 - Project Owner - [**@DemonWav** - Kyle Wood](https://github.com/DemonWav)
 - [**@Minecrell**](https://github.com/Minecrell)
 - [**@PaleoCrafter** - Marvin Rösch](https://github.com/PaleoCrafter)
+- [**@RedNesto**](https://github.com/RedNesto)
 
-#### **Contributors**
+#### **Significant Contributors**
 
 - [**@gabizou** - Gabriel Harris-Rouquette](https://github.com/gabizou)
 - [**@kashike**](https://github.com/kashike)
 - [**@jamierocks** - Jamie Mansfield](https://github.com/jamierocks)
-- [**@RedNesto**](https://github.com/RedNesto)
 
 License
 -------
