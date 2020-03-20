@@ -35,26 +35,19 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
         holder: ProblemsHolder
     ) {
         when (value) {
-            is PsiLiteral -> {
-                val reference = MixinMemberReference.parse(value.constantStringValue) ?: return
-                if (reference.qualified) {
-                    holder.registerProblem(
-                        value,
-                        "Unnecessary qualified reference to '${reference.name}' in target class",
-                        QuickFix(reference)
-                    )
-                }
-            }
-            is PsiArrayInitializerMemberValue -> value.initializers.forEach {
-                val reference = MixinMemberReference.parse(it.constantStringValue) ?: return
-                if (reference.qualified) {
-                    holder.registerProblem(
-                        it,
-                        "Unnecessary qualified reference to '${reference.name}' in target class",
-                        QuickFix(reference)
-                    )
-                }
-            }
+            is PsiLiteral -> checkMemberReference(value, holder)
+            is PsiArrayInitializerMemberValue -> value.initializers.forEach { checkMemberReference(it, holder) }
+        }
+    }
+
+    private fun checkMemberReference(value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
+        val reference = MixinMemberReference.parse(value.constantStringValue) ?: return
+        if (reference.qualified) {
+            holder.registerProblem(
+                value,
+                "Unnecessary qualified reference to '${reference.name}' in target class",
+                QuickFix(reference)
+            )
         }
     }
 
