@@ -64,7 +64,7 @@ class SoftImplementTest : BaseMixinTest() {
     @Test
     @DisplayName("Highlight Prefixed Method Not Implementing @Interface Test")
     fun highlightPrefixedMethodNotImplementingInterfaceTest() {
-        fixture.enableInspections(SoftImplementOverridesInspection::class.java)
+        fixture.enableInspections(SoftImplementOverridesInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }

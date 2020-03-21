@@ -28,7 +28,7 @@ class PluginClassInspectionTest : BaseSpongeTest() {
             }
         }
 
-        fixture.enableInspections(SpongePluginClassInspection::class.java)
+        fixture.enableInspections(SpongePluginClassInspection::class)
         fixture.checkHighlighting(false, false, false)
     }
 

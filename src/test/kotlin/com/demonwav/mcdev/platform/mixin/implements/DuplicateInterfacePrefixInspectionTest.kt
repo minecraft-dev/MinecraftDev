@@ -53,7 +53,7 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
             }
         }
 
-        fixture.enableInspections(DuplicateInterfacePrefixInspection::class.java)
+        fixture.enableInspections(DuplicateInterfacePrefixInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 

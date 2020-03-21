@@ -57,7 +57,7 @@ class InterfacePrefixTest : BaseMixinTest() {
     @Test
     @DisplayName("Highlight On @Interface With Bad Prefix Test")
     fun highlightOnInterfaceWithBadPrefixTest() {
-        fixture.enableInspections(InterfacePrefixInspection::class.java)
+        fixture.enableInspections(InterfacePrefixInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }

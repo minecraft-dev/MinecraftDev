@@ -40,7 +40,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
             }
         }
 
-        fixture.enableInspections(UnnecessaryQualifiedMemberReferenceInspection::class.java)
+        fixture.enableInspections(UnnecessaryQualifiedMemberReferenceInspection::class)
         fixture.checkHighlighting(false, false, true)
     }
 

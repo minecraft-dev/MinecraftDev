@@ -62,7 +62,7 @@ class InnerClassTest : BaseMixinTest() {
     @Test
     @DisplayName("Mixin Inner Class Inspection Test")
     fun mixinInnerClassInspectionTest() {
-        fixture.enableInspections(MixinInnerClassInspection::class.java)
+        fixture.enableInspections(MixinInnerClassInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }

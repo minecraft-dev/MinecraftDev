@@ -65,7 +65,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
     @Test
     @DisplayName("Highlight On @Interface Test")
     fun highlightOnInterfaceTest() {
-        fixture.enableInspections(InterfaceIsInterfaceInspection::class.java)
+        fixture.enableInspections(InterfaceIsInterfaceInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }

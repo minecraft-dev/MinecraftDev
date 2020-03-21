@@ -43,7 +43,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             }
         }
 
-        fixture.enableInspections(AmbiguousReferenceInspection::class.java)
+        fixture.enableInspections(AmbiguousReferenceInspection::class)
         fixture.checkHighlighting(false, false, false)
     }
 

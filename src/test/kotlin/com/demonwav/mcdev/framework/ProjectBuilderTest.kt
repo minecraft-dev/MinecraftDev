@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.framework
 
+import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.rootManager
@@ -21,6 +22,7 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture
 import com.intellij.testFramework.fixtures.JavaTestFixtureFactory
 import com.intellij.util.ReflectionUtil
+import kotlin.reflect.KClass
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 
@@ -53,6 +55,10 @@ abstract class ProjectBuilderTest(descriptor: LightProjectDescriptor? = null) {
         }
 
         dir("src", block)
+    }
+
+    fun JavaCodeInsightTestFixture.enableInspections(vararg classes: KClass<out LocalInspectionTool>) {
+        this.enableInspections(classes.map { it.java })
     }
 
     @NoEdt

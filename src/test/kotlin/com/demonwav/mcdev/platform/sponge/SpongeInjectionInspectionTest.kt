@@ -29,7 +29,7 @@ class SpongeInjectionInspectionTest : BaseSpongeTest() {
             }
         }
 
-        fixture.enableInspections(SpongeInjectionInspection::class.java)
+        fixture.enableInspections(SpongeInjectionInspection::class)
         fixture.checkHighlighting(false, false, false)
     }
 

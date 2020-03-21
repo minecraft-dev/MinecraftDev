@@ -60,7 +60,7 @@ class SuperClassTest : BaseMixinTest() {
             }
         }
 
-        fixture.enableInspections(MixinSuperClassInspection::class.java)
+        fixture.enableInspections(MixinSuperClassInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 

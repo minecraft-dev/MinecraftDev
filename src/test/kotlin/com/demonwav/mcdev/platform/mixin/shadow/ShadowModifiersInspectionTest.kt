@@ -57,7 +57,7 @@ class ShadowModifiersInspectionTest : BaseShadowTest() {
     @Test
     @DisplayName("Shadow Modifiers Inspection Test")
     fun shadowModifiersInspectionTest() {
-        fixture.enableInspections(ShadowModifiersInspection::class.java)
+        fixture.enableInspections(ShadowModifiersInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }

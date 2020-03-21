@@ -45,7 +45,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             }
         }
 
-        fixture.enableInspections(EmptyImplementsInspection::class.java)
+        fixture.enableInspections(EmptyImplementsInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 
