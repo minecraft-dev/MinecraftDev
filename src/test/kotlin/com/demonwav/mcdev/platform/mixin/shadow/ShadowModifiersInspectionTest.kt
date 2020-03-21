@@ -22,7 +22,9 @@ class ShadowModifiersInspectionTest : BaseShadowTest() {
 
     override fun createMixins() {
         mixins = {
-            java("test/ShadowData.java", """
+            java(
+                "test/ShadowData.java",
+                """
                 package test;
 
                 import org.spongepowered.asm.mixin.Mixin;
@@ -50,7 +52,8 @@ class ShadowModifiersInspectionTest : BaseShadowTest() {
 
                     <warning descr="@Shadow for final member should be annotated as @Final">@Shadow</warning> <warning descr="Invalid access modifiers, has: protected, but target member has: public">protected</warning> String twoIssues;
                 }
-            """)
+            """
+            )
         }
     }
 

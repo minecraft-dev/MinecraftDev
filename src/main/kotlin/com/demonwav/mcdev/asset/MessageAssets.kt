@@ -19,7 +19,11 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 object MessageAssets : Assets() {
-    fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any): String {
+    fun message(
+        @PropertyKey(resourceBundle = BUNDLE)
+        key: String,
+        vararg params: Any
+    ): String {
         return CommonBundle.message(bundle, key, *params)
     }
 
@@ -30,7 +34,10 @@ object MessageAssets : Assets() {
     val generateEventListenerTitle: String
         get() = message("generate.event_listener")
 
-    fun message(@PropertyKey(resourceBundle = BUNDLE) key: String): String {
+    fun message(
+        @PropertyKey(resourceBundle = BUNDLE)
+        key: String
+    ): String {
         return CommonBundle.message(bundle, key)
     }
 

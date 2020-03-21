@@ -60,36 +60,52 @@ class NbtParseTest {
     }
 
     private val expected: RootCompound =
-        RootCompound("root", mapOf(
-            "byte" to TagByte(1),
-            "short" to TagShort(127),
-            "int" to TagInt(127),
-            "long" to TagLong(127),
-            "float" to TagFloat(127F),
-            "double" to TagDouble(127.0),
-            "byteArray" to TagByteArray(byteArrayOf(1)),
-            "intArray" to TagIntArray(intArrayOf(127)),
-            "longArray" to TagLongArray(longArrayOf(127)),
-            "byteList" to TagList(NbtTypeId.BYTE, listOf(TagByte(1))),
-            "shortList" to TagList(NbtTypeId.SHORT, listOf(TagShort(127))),
-            "intList" to TagList(NbtTypeId.INT, listOf(TagInt(127))),
-            "longList" to TagList(NbtTypeId.LONG, listOf(TagLong(127))),
-            "floatList" to TagList(NbtTypeId.FLOAT, listOf(TagFloat(127F))),
-            "doubleList" to TagList(NbtTypeId.DOUBLE, listOf(TagDouble(127.0))),
-            "string" to TagString("this is a string"),
-            "compound1" to TagCompound(mapOf(
-                "compound2" to TagCompound(mapOf(
-                    "compound3" to TagCompound(mapOf(
-                        "list" to TagList(NbtTypeId.COMPOUND, listOf(
-                            TagCompound(mapOf(
-                                "key" to TagString("value")
-                            )),
-                            TagCompound(mapOf(
-                                "key" to TagString("value")
-                            ))
-                        ))
-                    ))
-                ))
-            ))
-        ))
+        RootCompound(
+            "root",
+            mapOf(
+                "byte" to TagByte(1),
+                "short" to TagShort(127),
+                "int" to TagInt(127),
+                "long" to TagLong(127),
+                "float" to TagFloat(127F),
+                "double" to TagDouble(127.0),
+                "byteArray" to TagByteArray(byteArrayOf(1)),
+                "intArray" to TagIntArray(intArrayOf(127)),
+                "longArray" to TagLongArray(longArrayOf(127)),
+                "byteList" to TagList(NbtTypeId.BYTE, listOf(TagByte(1))),
+                "shortList" to TagList(NbtTypeId.SHORT, listOf(TagShort(127))),
+                "intList" to TagList(NbtTypeId.INT, listOf(TagInt(127))),
+                "longList" to TagList(NbtTypeId.LONG, listOf(TagLong(127))),
+                "floatList" to TagList(NbtTypeId.FLOAT, listOf(TagFloat(127F))),
+                "doubleList" to TagList(NbtTypeId.DOUBLE, listOf(TagDouble(127.0))),
+                "string" to TagString("this is a string"),
+                "compound1" to TagCompound(
+                    mapOf(
+                        "compound2" to TagCompound(
+                            mapOf(
+                                "compound3" to TagCompound(
+                                    mapOf(
+                                        "list" to TagList(
+                                            NbtTypeId.COMPOUND,
+                                            listOf(
+                                                TagCompound(
+                                                    mapOf(
+                                                        "key" to TagString("value")
+                                                    )
+                                                ),
+                                                TagCompound(
+                                                    mapOf(
+                                                        "key" to TagString("value")
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
 }

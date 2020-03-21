@@ -390,9 +390,11 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val index = assetPath.lastIndexOf('/')
-            val assetDir = if (index > 0)
+            val assetDir = if (index > 0) {
                 "." + assetPath.substring(0, index).replace('/', '.')
-            else ""
+            } else {
+                ""
+            }
             val fileName = assetPath.substring(index + 1)
             val createdDir = PackageUtil.findOrCreateDirectoryForPackage(
                 module,

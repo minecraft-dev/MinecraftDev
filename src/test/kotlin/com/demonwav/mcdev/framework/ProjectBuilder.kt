@@ -44,14 +44,30 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
 
     var intermediatePath = ""
 
-    fun java(path: String, @Language("JAVA") code: String, configure: Boolean = true) =
-        file(path, code, ".java", configure)
-    fun at(path: String, @Language("Access Transformers") code: String, configure: Boolean = true) =
-        file(path, code, "_at.cfg", configure)
-    fun lang(path: String, @Language("MCLang") code: String, configure: Boolean = true) =
-        file(path, code, ".${LangFileType.FILE_EXTENSION}", configure)
-    fun nbtt(path: String, @Language("NBTT") code: String, configure: Boolean = true) =
-        file(path, code, ".nbtt", configure)
+    fun java(
+        path: String,
+        @Language("JAVA")
+        code: String,
+        configure: Boolean = true
+    ) = file(path, code, ".java", configure)
+    fun at(
+        path: String,
+        @Language("Access Transformers")
+        code: String,
+        configure: Boolean = true
+    ) = file(path, code, "_at.cfg", configure)
+    fun lang(
+        path: String,
+        @Language("MCLang")
+        code: String,
+        configure: Boolean = true
+    ) = file(path, code, ".${LangFileType.FILE_EXTENSION}", configure)
+    fun nbtt(
+        path: String,
+        @Language("NBTT")
+        code: String,
+        configure: Boolean = true
+    ) = file(path, code, ".nbtt", configure)
 
     inline fun dir(path: String, block: ProjectBuilder.() -> Unit) {
         val oldIntermediatePath = intermediatePath

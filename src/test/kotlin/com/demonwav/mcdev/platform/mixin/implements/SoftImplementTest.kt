@@ -26,7 +26,9 @@ class SoftImplementTest : BaseMixinTest() {
     fun setupProject() {
         buildProject {
             src {
-                java("test/DummyFace.java", """
+                java(
+                    "test/DummyFace.java",
+                    """
                     package test;
 
                     interface DummyFace {
@@ -34,9 +36,12 @@ class SoftImplementTest : BaseMixinTest() {
                         String thisMethodExists();
 
                     }
-                """)
+                """
+                )
 
-                java("test/SoftImplementMixin.java", """
+                java(
+                    "test/SoftImplementMixin.java",
+                    """
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -56,7 +61,8 @@ class SoftImplementTest : BaseMixinTest() {
                         }
 
                     }
-                """)
+                """
+                )
             }
         }
     }

@@ -21,7 +21,12 @@ import javax.swing.Icon
 
 class BungeeCordFileIconProvider : FileIconProvider {
 
-    override fun getIcon(file: VirtualFile, @Iconable.IconFlags flags: Int, project: Project?): Icon? {
+    override fun getIcon(
+        file: VirtualFile,
+        @Iconable.IconFlags
+        flags: Int,
+        project: Project?
+    ): Icon? {
         project ?: return null
 
         if (!MinecraftSettings.instance.isShowProjectPlatformIcons) {

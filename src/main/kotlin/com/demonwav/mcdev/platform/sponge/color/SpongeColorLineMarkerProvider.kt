@@ -64,5 +64,6 @@ class SpongeColorLineMarkerProvider : LineMarkerProvider {
                     }
                 }
             }
-        })
+        }
+    )
 }

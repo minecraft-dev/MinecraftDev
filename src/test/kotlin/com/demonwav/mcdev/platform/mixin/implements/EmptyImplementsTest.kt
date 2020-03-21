@@ -27,18 +27,24 @@ class EmptyImplementsTest : BaseMixinTest() {
     fun setupProject() {
         buildProject {
             src {
-                java("test/DummyFace.java", """
+                java(
+                    "test/DummyFace.java",
+                    """
                     package test;
 
                     interface DummyFace {
 
                     }
-                """)
+                """
+                )
             }
         }
     }
 
-    private fun doTest(@Language("JAVA") mixinCode: String) {
+    private fun doTest(
+        @Language("JAVA")
+        mixinCode: String
+    ) {
         buildProject {
             src {
                 java("test/EmptyImplementsMixin.java", mixinCode)
@@ -52,7 +58,8 @@ class EmptyImplementsTest : BaseMixinTest() {
     @Test
     @DisplayName("Highlight On Empty @Implements Test")
     fun highlightOnEmptyImplementsTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -64,13 +71,15 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("No Highlight Wish Single @Implements Test")
     fun noHighlightWithSingleImplementsTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -82,13 +91,15 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("No Highlight With Multi @Implements Test")
     fun noHighlightWithMutliImplementsTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -103,6 +114,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """)
+        """
+        )
     }
 }

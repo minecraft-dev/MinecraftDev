@@ -29,20 +29,31 @@ class AccessorMixinTest : BaseMixinTest() {
     fun setupProject() {
         buildProject {
             src {
-                java("test/BaseMixin.java", """
+                java(
+                    "test/BaseMixin.java",
+                    """
                     package test;
                     public class BaseMixin {}
-                """)
+                """
+                )
 
-                java("test/BaseMixinInterface.java", """
+                java(
+                    "test/BaseMixinInterface.java",
+                    """
                     package test;
                     public interface BaseMixinInterface {}
-                """)
+                """
+                )
             }
         }
     }
 
-    private fun doTest(className: String, @Language("JAVA") code: String, test: (psiClass: PsiClass) -> Unit) {
+    private fun doTest(
+        className: String,
+        @Language("JAVA")
+        code: String,
+        test: (psiClass: PsiClass) -> Unit
+    ) {
         var psiClass: PsiClass? = null
         buildProject {
             src {
@@ -55,7 +66,9 @@ class AccessorMixinTest : BaseMixinTest() {
 
     @Test
     @DisplayName("Valid Accessor Mixin Test")
-    fun validAccessorMixinTest() = doTest("AccessorMixin", """
+    fun validAccessorMixinTest() = doTest(
+        "AccessorMixin",
+        """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;
@@ -69,13 +82,16 @@ class AccessorMixinTest : BaseMixinTest() {
             @Invoker void invoke();
             @Invoker double doThing();
         }
-    """) { psiClass ->
+    """
+    ) { psiClass ->
         Assertions.assertTrue(psiClass.isAccessorMixin)
     }
 
     @Test
     @DisplayName("Missing Annotation Accessor Mixin Test")
-    fun missingAnnotationAccessorMixinTest() = doTest("MissingAnnotationAccessorMixin", """
+    fun missingAnnotationAccessorMixinTest() = doTest(
+        "MissingAnnotationAccessorMixin",
+        """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;
@@ -89,13 +105,16 @@ class AccessorMixinTest : BaseMixinTest() {
             @Invoker void invoke();
             double doThing();
         }
-    """) { psiClass ->
+    """
+    ) { psiClass ->
         Assertions.assertFalse(psiClass.isAccessorMixin)
     }
 
     @Test
     @DisplayName("Target Interface Accessor Mixin Test")
-    fun targetInterfaceAccessorMixinTest() = doTest("TargetInterface", """
+    fun targetInterfaceAccessorMixinTest() = doTest(
+        "TargetInterface",
+        """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;
@@ -109,13 +128,16 @@ class AccessorMixinTest : BaseMixinTest() {
             @Invoker void invoke();
             @Invoker double doThing();
         }
-    """) { psiClass ->
+    """
+    ) { psiClass ->
         Assertions.assertFalse(psiClass.isAccessorMixin)
     }
 
     @Test
     @DisplayName("Accessors Only Accessor Mixin Test")
-    fun accessorsOnlyAccessorMixinTest() = doTest("AccessorMixin", """
+    fun accessorsOnlyAccessorMixinTest() = doTest(
+        "AccessorMixin",
+        """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;
@@ -126,13 +148,16 @@ class AccessorMixinTest : BaseMixinTest() {
             @Accessor String getString();
             @Accessor int getInt();
         }
-    """) { psiClass ->
+    """
+    ) { psiClass ->
         Assertions.assertTrue(psiClass.isAccessorMixin)
     }
 
     @Test
     @DisplayName("Invokers Only Accessor Mixin Test")
-    fun invokersOnlyAccessorMixinTest() = doTest("AccessorMixin", """
+    fun invokersOnlyAccessorMixinTest() = doTest(
+        "AccessorMixin",
+        """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Invoker;
@@ -143,13 +168,16 @@ class AccessorMixinTest : BaseMixinTest() {
             @Invoker void invoke();
             @Invoker double doThing();
         }
-    """) { psiClass ->
+    """
+    ) { psiClass ->
         Assertions.assertTrue(psiClass.isAccessorMixin)
     }
 
     @Test
     @DisplayName("Non-Interface Accessor Mixin Test")
-    fun nonInterfaceAccessorMixinTest() = doTest("NonInterfaceAccessorMixin", """
+    fun nonInterfaceAccessorMixinTest() = doTest(
+        "NonInterfaceAccessorMixin",
+        """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;
@@ -161,13 +189,16 @@ class AccessorMixinTest : BaseMixinTest() {
             @Accessor String getString();
             @Invoker void invoke();
         }
-    """) { psiClass ->
+    """
+    ) { psiClass ->
         Assertions.assertFalse(psiClass.isAccessorMixin)
     }
 
     @Test
     @DisplayName("Non-Interface Targeting Interface Accessor Mixin Test")
-    fun nonInterfaceTargetingInterfaceAccessorMixinTest() = doTest("NonInterfaceTargetInterface", """
+    fun nonInterfaceTargetingInterfaceAccessorMixinTest() = doTest(
+        "NonInterfaceTargetInterface",
+        """
         package test;
 
         import org.spongepowered.asm.mixin.gen.Accessor;
@@ -179,7 +210,8 @@ class AccessorMixinTest : BaseMixinTest() {
             @Accessor String getString();
             @Invoker void invoke();
         }
-    """) { psiClass ->
+    """
+    ) { psiClass ->
         Assertions.assertFalse(psiClass.isAccessorMixin)
     }
 }

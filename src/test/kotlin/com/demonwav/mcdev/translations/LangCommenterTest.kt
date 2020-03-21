@@ -22,7 +22,12 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(EdtInterceptor::class)
 @DisplayName("Minecraft Lang Commenter Tests")
 class LangCommenterTest : CommenterTest(PlatformType.MCP) {
-    private fun doTest(@Language("I18n") before: String, @Language("I18n") after: String) {
+    private fun doTest(
+        @Language("I18n")
+        before: String,
+        @Language("I18n")
+        after: String
+    ) {
         doTest(before, after, ".lang", ProjectBuilder::lang)
     }
 

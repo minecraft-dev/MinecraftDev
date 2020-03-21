@@ -95,7 +95,10 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
     }
 }
 
-private fun sample(@Language("NBTT") code: String) = code.trim()
+private fun sample(
+    @Language("NBTT")
+    code: String
+) = code.trim()
 
 private val SAMPLE = sample(
     """

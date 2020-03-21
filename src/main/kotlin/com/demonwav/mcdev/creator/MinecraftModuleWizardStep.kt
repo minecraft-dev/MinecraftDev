@@ -50,7 +50,8 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
             }
             // crazy dots
             if (mainClassField?.text?.split('.')?.any { it.isEmpty() } == true ||
-                mainClassField?.text?.first() == '.' || mainClassField?.text?.last() == '.') {
+                mainClassField?.text?.first() == '.' || mainClassField?.text?.last() == '.'
+            ) {
                 throw InvalidMainClassNameException(mainClassField)
             }
             // invalid character

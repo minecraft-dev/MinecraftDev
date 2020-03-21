@@ -26,34 +26,46 @@ class SuperClassTest : BaseMixinTest() {
     fun setupProject() {
         buildProject {
             src {
-                java("test/Entity.java", """
+                java(
+                    "test/Entity.java",
+                    """
                     package test;
 
                     public class Entity {
 
                     }
-                """)
+                """
+                )
 
-                java("test/DemonWav.java", """
+                java(
+                    "test/DemonWav.java",
+                    """
                     package test;
 
                     public class DemonWav extends Entity {
 
                     }
-                """)
+                """
+                )
 
-                java("test/Minecrell.java", """
+                java(
+                    "test/Minecrell.java",
+                    """
                     package test;
 
                     public class Minecrell extends Entity {
 
                     }
-                """)
+                """
+                )
             }
         }
     }
 
-    private fun doTest(@Language("JAVA") mixinCode: String) {
+    private fun doTest(
+        @Language("JAVA")
+        mixinCode: String
+    ) {
         buildProject {
             src {
                 java("test/SuperClassMixin.java", mixinCode)
@@ -67,7 +79,8 @@ class SuperClassTest : BaseMixinTest() {
     @Test
     @DisplayName("No Mixin Superclass Test")
     fun noMixinSuperclassTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -76,13 +89,15 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin {
 
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("Good Mixin Superclass Test")
     fun goodMixinSuperclassTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -91,13 +106,15 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin extends Entity {
 
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("Mixin Class Cannot Extend Itself Test")
     fun mixinClassNotItsOwnSuperclassTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -106,13 +123,15 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin extends <error descr="Cannot extend target class">DemonWav</error> {
 
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("Mixin Superclass Not Found In Hierarchy Test")
     fun mixinClassHierarchyNotFoundTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -121,6 +140,7 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin extends <error descr="Cannot find 'Minecrell' in the hierarchy of target class 'DemonWav'">Minecrell</error> {
 
             }
-        """)
+        """
+        )
     }
 }

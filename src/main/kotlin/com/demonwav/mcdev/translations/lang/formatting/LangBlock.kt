@@ -31,9 +31,11 @@ class LangBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, private val s
         while (child != null) {
             if (
                 child.elementType !== TokenType.WHITE_SPACE &&
-                (previousChild == null ||
-                    previousChild.elementType !== LangTypes.LINE_ENDING ||
-                    child.elementType !== LangTypes.LINE_ENDING)
+                (
+                    previousChild == null ||
+                        previousChild.elementType !== LangTypes.LINE_ENDING ||
+                        child.elementType !== LangTypes.LINE_ENDING
+                    )
             ) {
                 val block = LangBlock(
                     child,

@@ -22,7 +22,9 @@ class ShadowTargetInspectionTest : BaseShadowTest() {
 
     override fun createMixins() {
         mixins = {
-            java("test/ShadowData.java", """
+            java(
+                "test/ShadowData.java",
+                """
                 package test;
 
                 import org.spongepowered.asm.mixin.Mixin;
@@ -50,7 +52,8 @@ class ShadowTargetInspectionTest : BaseShadowTest() {
 
                     @Shadow protected String twoIssues;
                 }
-            """)
+            """
+            )
         }
     }
 

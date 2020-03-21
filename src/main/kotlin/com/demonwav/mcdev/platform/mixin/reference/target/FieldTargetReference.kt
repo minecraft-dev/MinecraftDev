@@ -57,9 +57,9 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
                 // TODO: Optimize this so we don't need to resolve all fields to find a reference
                 val resolved = expression.resolve()
                 if (resolved is PsiField && target.match(
-                        resolved,
-                        QualifiedMember.resolveQualifier(expression) ?: targetClass
-                    )
+                    resolved,
+                    QualifiedMember.resolveQualifier(expression) ?: targetClass
+                )
                 ) {
                     addResult(expression)
                 }

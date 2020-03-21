@@ -21,7 +21,8 @@ class MixinFoldingOptionsProvider :
         checkBox(
             "Mixin: Target descriptors",
             { settings.state.foldTargetDescriptors },
-            { b -> settings.state.foldTargetDescriptors = b })
+            { b -> settings.state.foldTargetDescriptors = b }
+        )
         checkBox("Mixin: Object casts", { settings.state.foldObjectCasts }, { b -> settings.state.foldObjectCasts = b })
     }
 }

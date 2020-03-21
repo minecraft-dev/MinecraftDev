@@ -70,8 +70,9 @@ class MixinFoldingBuilder : CustomFoldingBuilder() {
         val element = node.psi
         return when (element) {
             is PsiTypeCastExpression -> "(${element.castType?.text ?: return node.text})"
-            is PsiAnnotationMemberValue -> TargetReference.resolveTarget(element)?.let { formatElement(it) }
-                ?: node.text
+            is PsiAnnotationMemberValue ->
+                TargetReference.resolveTarget(element)?.let { formatElement(it) }
+                    ?: node.text
             else -> node.text
         }
     }

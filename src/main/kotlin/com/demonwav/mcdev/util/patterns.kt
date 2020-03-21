@@ -27,11 +27,13 @@ fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPatter
     attribute: String
 ): Self {
     return inside(
-        true, PsiJavaPatterns.psiNameValuePair().withName(attribute)
+        true,
+        PsiJavaPatterns.psiNameValuePair().withName(attribute)
             .withParent(
                 PlatformPatterns.psiElement(PsiAnnotationParameterList::class.java)
                     .withParent(annotation)
-            ), ANNOTATION_ATTRIBUTE_STOP
+            ),
+        ANNOTATION_ATTRIBUTE_STOP
     )
 }
 

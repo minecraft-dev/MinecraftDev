@@ -38,7 +38,7 @@ class MixinAnnotationsInspection : MixinInspection() {
             // Annotation must be either on or in a Mixin class
             val containingClass =
                 (annotation.owner as? PsiModifierList)?.parent as? PsiClass ?: annotation.findContainingClass()
-                ?: return
+                    ?: return
             if (!containingClass.isMixin) {
                 holder.registerProblem(
                     annotation, "@${annotation.nameReferenceElement?.text} can be only used in a @Mixin class",

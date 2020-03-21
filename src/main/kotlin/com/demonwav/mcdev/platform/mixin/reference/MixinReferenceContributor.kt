@@ -26,19 +26,22 @@ class MixinReferenceContributor : PsiReferenceContributor() {
         registrar.registerReferenceProvider(
             PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationParam(
                 StandardPatterns.string().oneOf(METHOD_INJECTORS), "method"
-            ), MethodReference
+            ),
+            MethodReference
         )
 
         // Injection point types
         registrar.registerReferenceProvider(
             PsiJavaPatterns.psiLiteral(StandardPatterns.string())
-                .insideAnnotationAttribute(AT), InjectionPointType
+                .insideAnnotationAttribute(AT),
+            InjectionPointType
         )
 
         // Target references
         registrar.registerReferenceProvider(
             PsiJavaPatterns.psiLiteral(StandardPatterns.string())
-                .insideAnnotationAttribute(AT, "target"), TargetReference
+                .insideAnnotationAttribute(AT, "target"),
+            TargetReference
         )
     }
 }

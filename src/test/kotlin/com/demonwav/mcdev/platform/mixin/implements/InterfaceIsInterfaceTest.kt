@@ -26,23 +26,31 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
     fun setupProject() {
         buildProject {
             src {
-                java("test/DummyFace.java", """
+                java(
+                    "test/DummyFace.java",
+                    """
                     package test;
 
                     interface DummyFace {
 
                     }
-                """)
+                """
+                )
 
-                java("test/DummyClass.java", """
+                java(
+                    "test/DummyClass.java",
+                    """
                     package test;
 
                     class DummyClass {
 
                     }
-                """)
+                """
+                )
 
-                java("test/InterfaceIsInterfaceMixin.java", """
+                java(
+                    "test/InterfaceIsInterfaceMixin.java",
+                    """
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -57,7 +65,8 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
                     class InterfaceIsInterfaceMixin {
 
                     }
-                """)
+                """
+                )
             }
         }
     }

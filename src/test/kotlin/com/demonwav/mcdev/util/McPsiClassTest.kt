@@ -59,9 +59,9 @@ class McPsiClassTest : OuterClassTest() {
     @DisplayName("fullQualifiedName Of Inner Anonymous Inner Class Test")
     fun innerAnonymousInnerFullQualifiedNameTest() =
         Assertions.assertEquals(
-                "com.example.test.OuterClass\$InnerClass$1\$AnonymousInnerClass",
-                innerAnonymousInnerClass.fullQualifiedName
-            )
+            "com.example.test.OuterClass\$InnerClass$1\$AnonymousInnerClass",
+            innerAnonymousInnerClass.fullQualifiedName
+        )
     @Test
     @DisplayName("shortName Of Inner Anonymous Inner Class Test")
     fun innerAnonymousInnerShortNameTest() =
@@ -89,16 +89,16 @@ class McPsiClassTest : OuterClassTest() {
         assertEquivalent(
             innerAnonymousClass,
             findQualifiedClass(
-            "com.example.test.OuterClass\$InnerClass$1"
+                "com.example.test.OuterClass\$InnerClass$1"
             )
         )
     @Test
     @DisplayName("findQualifiedClass Of Inner Anonymous Inner Class Test")
     fun innerAnonymousInnerFindTest() =
-            assertEquivalent(
-                innerAnonymousInnerClass,
-                findQualifiedClass("com.example.test.OuterClass\$InnerClass$1\$AnonymousInnerClass")
-            )
+        assertEquivalent(
+            innerAnonymousInnerClass,
+            findQualifiedClass("com.example.test.OuterClass\$InnerClass$1\$AnonymousInnerClass")
+        )
 
     @Test
     @DisplayName("fullQualifiedName Of Self-Referencing Generic Class Test")

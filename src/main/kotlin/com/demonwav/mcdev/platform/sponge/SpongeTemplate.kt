@@ -20,7 +20,6 @@ import java.util.Properties
 object SpongeTemplate {
 
     fun applyPomTemplate(project: Project): String {
-
         val properties = Properties()
 
         val manager = FileTemplateManager.getInstance(project)

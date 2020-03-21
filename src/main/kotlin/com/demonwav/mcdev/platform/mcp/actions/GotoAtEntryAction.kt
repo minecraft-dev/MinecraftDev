@@ -47,8 +47,8 @@ class GotoAtEntryAction : AnAction() {
         }
 
         val srgManager = data.instance.getModuleOfType(McpModuleType)?.srgManager
-        // Not all ATs are in MCP modules, fallback to this if possible
-        // TODO try to find SRG references for all modules if current module isn't found?
+            // Not all ATs are in MCP modules, fallback to this if possible
+            // TODO try to find SRG references for all modules if current module isn't found?
             ?: SrgManager.findAnyInstance(data.project) ?: return showBalloon(e)
 
         srgManager.srgMap.onSuccess { srgMap ->
@@ -64,7 +64,7 @@ class GotoAtEntryAction : AnAction() {
             when (parent) {
                 is PsiField -> {
                     val reference = srgMap.getSrgField(parent) ?: parent.simpleQualifiedMemberReference
-                    ?: return@onSuccess showBalloon(e)
+                        ?: return@onSuccess showBalloon(e)
                     searchForText(e, data, reference.name)
                 }
                 is PsiMethod -> {

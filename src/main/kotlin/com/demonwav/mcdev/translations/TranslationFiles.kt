@@ -231,10 +231,10 @@ object TranslationFiles {
         sequence {
             for (entry in entries) {
                 val langElement = TranslationInverseIndex.findElements(
-                        entry.key,
-                        GlobalSearchScope.allScope(project),
-                        locale
-                    )
+                    entry.key,
+                    GlobalSearchScope.allScope(project),
+                    locale
+                )
                     .asSequence()
                     .mapNotNull { it as? LangEntry }
                     .firstOrNull()

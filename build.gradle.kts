@@ -234,6 +234,10 @@ license {
     }
 }
 
+ktlint {
+    enableExperimentalRules.set(true)
+}
+
 tasks.register("format") {
     group = "minecraft"
     description = "Formats source code according to project style"

@@ -21,10 +21,15 @@ import org.junit.jupiter.api.extension.ExtendWith
 @DisplayName("Unnecessary Qualified Member Reference Inspection Tests")
 class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
 
-    private fun doTest(@Language("JAVA") code: String) {
+    private fun doTest(
+        @Language("JAVA")
+        code: String
+    ) {
         buildProject {
             src {
-                java("test/MixedIn.java", """
+                java(
+                    "test/MixedIn.java",
+                    """
                     package test;
 
                     class MixedIn {
@@ -35,7 +40,8 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                         public void otherMethod() {
                         }
                     }
-                """)
+                """
+                )
                 java("test/UnnecessaryQualifiedMemberReferenceMixin.java", code)
             }
         }
@@ -47,7 +53,8 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
     @Test
     @DisplayName("Unnecessary Qualification")
     fun unnecessaryQualification() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -61,13 +68,15 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("No unnecessary Qualification")
     fun noUnnecessaryQualification() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -81,13 +90,15 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("Unnecessary Qualification Multiple Targets")
     fun unnecessaryQualificationMultipleTargets() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -101,13 +112,15 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("No Unnecessary Qualification Multiple Targets")
     fun noUnnecessaryQualificationMultipleTargets() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -121,6 +134,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """)
+        """
+        )
     }
 }

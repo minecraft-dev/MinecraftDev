@@ -41,15 +41,17 @@ fun findMethods(psiClass: PsiClass): Sequence<PsiMethod>? {
     val targets = psiClass.mixinTargets
     return when (targets.size) {
         0 -> null
-        1 -> targets.single().methods.asSequence()
-            .filter({ !it.isConstructor })
-        else -> targets.asSequence()
-            .flatMap { target -> target.methods.asSequence() }
-            .filter({ !it.isConstructor })
-            .groupBy { it.memberReference }
-            .values.asSequence()
-            .filter { it.size >= targets.size }
-            .map { it.first() }
+        1 ->
+            targets.single().methods.asSequence()
+                .filter({ !it.isConstructor })
+        else ->
+            targets.asSequence()
+                .flatMap { target -> target.methods.asSequence() }
+                .filter({ !it.isConstructor })
+                .groupBy { it.memberReference }
+                .values.asSequence()
+                .filter { it.size >= targets.size }
+                .map { it.first() }
     }?.filter { m ->
         // Filter methods which are already in the Mixin class
         psiClass.findMatchingMethods(m, false).isEmpty()
@@ -61,12 +63,13 @@ fun findFields(psiClass: PsiClass): Sequence<PsiField>? {
     return when (targets.size) {
         0 -> null
         1 -> targets.single().fields.asSequence()
-        else -> targets.asSequence()
-            .flatMap { target -> target.fields.asSequence() }
-            .groupBy { it.memberReference }
-            .values.asSequence()
-            .filter { it.size >= targets.size }
-            .map { it.first() }
+        else ->
+            targets.asSequence()
+                .flatMap { target -> target.fields.asSequence() }
+                .groupBy { it.memberReference }
+                .values.asSequence()
+                .filter { it.size >= targets.size }
+                .map { it.first() }
     }?.filter {
         // Filter fields which are already in the Mixin class
         psiClass.findFieldByName(it.name, false) == null

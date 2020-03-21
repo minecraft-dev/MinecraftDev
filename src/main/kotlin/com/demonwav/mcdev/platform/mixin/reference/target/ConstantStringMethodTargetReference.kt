@@ -45,9 +45,9 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
         val arguments = expression.argumentList
         val argumentTypes = arguments.expressionTypes
         if (argumentTypes.size != 1 || argumentTypes[0] != PsiType.getJavaLangString(
-                expression.manager,
-                expression.resolveScope
-            )
+            expression.manager,
+            expression.resolveScope
+        )
         ) {
             // Must have one String parameter
             return false
@@ -73,9 +73,9 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
             if (isConstantStringMethodCall(expression)) {
                 val method = expression.resolveMethod()
                 if (method != null && target.match(
-                        method,
-                        QualifiedMember.resolveQualifier(expression.methodExpression) ?: targetClass
-                    )
+                    method,
+                    QualifiedMember.resolveQualifier(expression.methodExpression) ?: targetClass
+                )
                 ) {
                     addResult(expression)
                 }

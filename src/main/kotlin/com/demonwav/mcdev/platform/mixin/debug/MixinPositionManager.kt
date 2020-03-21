@@ -61,7 +61,7 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
                 .replace('/', '.').replace('\\', '.')
 
             val psiFile = findAlternativeSource(className, debugProcess.project)
-            // Lookup class based on its qualified name (TODO: Support for anonymous classes)
+                // Lookup class based on its qualified name (TODO: Support for anonymous classes)
                 ?: DebuggerUtils.findClass(
                     className,
                     debugProcess.project,

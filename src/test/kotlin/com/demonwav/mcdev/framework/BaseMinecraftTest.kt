@@ -25,7 +25,8 @@ abstract class BaseMinecraftTest(
     vararg platformTypes: PlatformType
 ) : ProjectBuilderTest(
     getProjectDescriptor(platformTypes)
-), CustomDataPath {
+),
+    CustomDataPath {
     protected open val resourcePath = "src/test/resources"
     protected open val packagePath = "com/demonwav/mcdev"
     protected open val dataPath = ""

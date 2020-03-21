@@ -92,8 +92,10 @@ val PsiClass.isAccessorMixin: Boolean
             return false
         }
         if (
-            methods.any { it.modifierList.findAnnotation(ACCESSOR) == null &&
-                it.modifierList.findAnnotation(INVOKER) == null }
+            methods.any {
+                it.modifierList.findAnnotation(ACCESSOR) == null &&
+                    it.modifierList.findAnnotation(INVOKER) == null
+            }
         ) {
             return false
         }

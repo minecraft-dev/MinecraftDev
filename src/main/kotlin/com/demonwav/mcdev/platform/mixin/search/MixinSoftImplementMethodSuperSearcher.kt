@@ -26,7 +26,6 @@ class MixinSoftImplementMethodSuperSearcher :
         queryParameters: SuperMethodsSearch.SearchParameters,
         consumer: Processor<in MethodSignatureBackedByPsiMethod>
     ): Boolean {
-
         if (queryParameters.psiClass != null) {
             return true // Not entirely sure what this is used for
         }

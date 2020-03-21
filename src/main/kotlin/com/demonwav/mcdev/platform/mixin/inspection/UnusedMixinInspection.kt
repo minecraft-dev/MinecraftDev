@@ -40,12 +40,15 @@ class UnusedMixinInspection : MixinInspection() {
             val module = clazz?.findModule() ?: return
             if (clazz.isMixin) {
                 for (config in MixinModule.getMixinConfigs(module.project, GlobalSearchScope.moduleScope(module))) {
-                    if (config.qualifiedMixins.any { it == clazz.fullQualifiedName })
+                    if (config.qualifiedMixins.any { it == clazz.fullQualifiedName }) {
                         return
-                    if (config.qualifiedClient.any { it == clazz.fullQualifiedName })
+                    }
+                    if (config.qualifiedClient.any { it == clazz.fullQualifiedName }) {
                         return
-                    if (config.qualifiedServer.any { it == clazz.fullQualifiedName })
+                    }
+                    if (config.qualifiedServer.any { it == clazz.fullQualifiedName }) {
                         return
+                    }
                 }
 
                 val bestQuickFixConfig = MixinModule.getBestWritableConfigForMixinClass(

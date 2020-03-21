@@ -194,7 +194,6 @@ class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet,
             annotationName: String,
             setIgnoreCancelled: Boolean
         ): PsiMethod? {
-
             val newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)
 
             val list = newMethod.parameterList

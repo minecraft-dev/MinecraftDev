@@ -27,12 +27,16 @@ import com.intellij.psi.codeStyle.CodeStyleSettings
 
 class LangFormattingModelBuilder : FormattingModelBuilder {
     override fun createModel(element: PsiElement, settings: CodeStyleSettings): FormattingModel {
-        return FormattingModelProvider.createFormattingModelForPsiFile(element.containingFile,
-            LangBlock(element.node,
+        return FormattingModelProvider.createFormattingModelForPsiFile(
+            element.containingFile,
+            LangBlock(
+                element.node,
                 Wrap.createWrap(WrapType.NONE, false),
                 Alignment.createAlignment(),
-                createSpaceBuilder(settings)),
-            settings)
+                createSpaceBuilder(settings)
+            ),
+            settings
+        )
     }
 
     private fun createSpaceBuilder(settings: CodeStyleSettings): SpacingBuilder {

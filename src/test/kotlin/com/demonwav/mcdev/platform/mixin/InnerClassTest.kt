@@ -25,7 +25,9 @@ class InnerClassTest : BaseMixinTest() {
     fun setupProject() {
         buildProject {
             src {
-                java("test/InnerClassMixin.java", """
+                java(
+                    "test/InnerClassMixin.java",
+                    """
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -54,7 +56,8 @@ class InnerClassTest : BaseMixinTest() {
                         }</error>
 
                     }
-                """)
+                """
+                )
             }
         }
     }

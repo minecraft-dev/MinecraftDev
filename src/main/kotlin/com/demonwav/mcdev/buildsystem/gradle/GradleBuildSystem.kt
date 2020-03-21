@@ -188,7 +188,8 @@ class GradleBuildSystem(
         runWriteTask {
             val wrapperDirPath = VfsUtil.createDirectoryIfMissing(descriptor.rootDirectory, "gradle/wrapper").path
             FileUtils.writeLines(
-                File(wrapperDirPath, "gradle-wrapper.properties"), listOf(
+                File(wrapperDirPath, "gradle-wrapper.properties"),
+                listOf(
                     "distributionUrl=https\\://services.gradle.org/distributions/gradle-$wrapperVersion-bin.zip"
                 )
             )
@@ -225,9 +226,11 @@ class GradleBuildSystem(
                 }
             }
 
-            launcher.addProgressListener(ProgressListener { event ->
-                indicator.text = event.description
-            })
+            launcher.addProgressListener(
+                ProgressListener { event ->
+                    indicator.text = event.description
+                }
+            )
             func(launcher)
             launcher.run()
         }
@@ -259,9 +262,9 @@ class GradleBuildSystem(
                 // We want to find the child which has a GrReferenceExpression with the right name
                 it.children.any { child -> child is GrReferenceExpression && child.text == name }
             }.map {
-                // We want to find the grandchild which is a GrClosable block
-                it.children.mapNotNull { child -> child as? GrClosableBlock }.firstOrNull()
-            }.filterNotNull()
+            // We want to find the grandchild which is a GrClosable block
+            it.children.mapNotNull { child -> child as? GrClosableBlock }.firstOrNull()
+        }.filterNotNull()
             .firstOrNull()
 
     private fun addBuildGradleDependencies(

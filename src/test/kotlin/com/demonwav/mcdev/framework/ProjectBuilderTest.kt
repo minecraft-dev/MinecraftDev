@@ -43,7 +43,7 @@ abstract class ProjectBuilderTest(descriptor: LightProjectDescriptor? = null) {
     }
 
     fun buildProject(root: VirtualFile = fixture.project.baseDirPath, builder: ProjectBuilder.() -> Unit) =
-            ProjectBuilder(fixture, root).build(builder)
+        ProjectBuilder(fixture, root).build(builder)
 
     fun ProjectBuilder.src(block: ProjectBuilder.() -> Unit) {
         val srcFolder = VfsUtil.createDirectoryIfMissing(project.baseDirPath, "src")

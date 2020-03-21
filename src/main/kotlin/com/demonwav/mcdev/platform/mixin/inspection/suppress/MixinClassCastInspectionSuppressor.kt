@@ -64,10 +64,10 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
         val operand = castExpression.operand as? PsiTypeCastExpression ?: return false
 
         if (operand.castType?.type != PsiType.getTypeByName(
-                CommonClassNames.JAVA_LANG_OBJECT,
-                project,
-                GlobalSearchScope.allScope(project)
-            )
+            CommonClassNames.JAVA_LANG_OBJECT,
+            project,
+            GlobalSearchScope.allScope(project)
+        )
         ) {
             return false
         }

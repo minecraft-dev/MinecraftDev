@@ -21,10 +21,15 @@ import org.junit.jupiter.api.extension.ExtendWith
 @DisplayName("Ambiguous Reference Inspection Tests")
 class AmbiguousReferenceInspectionTest : BaseMixinTest() {
 
-    private fun doTest(@Language("JAVA") code: String) {
+    private fun doTest(
+        @Language("JAVA")
+        code: String
+    ) {
         buildProject {
             src {
-                java("test/MixedIn.java", """
+                java(
+                    "test/MixedIn.java",
+                    """
                     package test;
 
                     class MixedIn {
@@ -38,7 +43,8 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                         public void uniqueMethod(String string) {
                         }
                     }
-                """)
+                """
+                )
                 java("test/AmbiguousReferenceMixin.java", code)
             }
         }
@@ -50,7 +56,8 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
     @Test
     @DisplayName("Ambiguous Reference")
     fun ambiguousReference() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -64,13 +71,15 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("No Ambiguous Reference")
     fun noAmbiguousReference() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -84,13 +93,15 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("Ambiguous Reference Multiple Targets")
     fun ambiguousReferenceMultipleTargets() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -104,13 +115,15 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("No Ambiguous Qualified Reference")
     fun noAmbiguousQualifiedReference() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -124,13 +137,15 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("No Ambiguous Reference Multiple Targets")
     fun noAmbiguousReferenceMultipleTargets() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -144,6 +159,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """)
+        """
+        )
     }
 }

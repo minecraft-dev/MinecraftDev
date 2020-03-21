@@ -27,26 +27,35 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
     fun setupProject() {
         buildProject {
             src {
-                java("test/DummyFace.java", """
+                java(
+                    "test/DummyFace.java",
+                    """
                     package test;
 
                     interface DummyFace {
 
                     }
-                """)
+                """
+                )
 
-                java("test/DummyFace2.java", """
+                java(
+                    "test/DummyFace2.java",
+                    """
                     package test;
 
                     interface DummyFace2 {
 
                     }
-                """)
+                """
+                )
             }
         }
     }
 
-    private fun doTest(@Language("JAVA") mixinCode: String) {
+    private fun doTest(
+        @Language("JAVA")
+        mixinCode: String
+    ) {
         buildProject {
             src {
                 java("test/DuplicateInterfacePrefixMixin.java", mixinCode)
@@ -60,7 +69,8 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
     @Test
     @DisplayName("No Highlight On No Duplicate Interface Prefix Test")
     fun noHighlightOnNoDuplicateInterfacePrefixTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -75,13 +85,15 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
             class DuplicateInterfacePrefixMixin {
 
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("Highlight On Duplicate Interface Prefix Test")
     fun highlightOnDuplicateInterfacePrefixTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -96,6 +108,7 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
             class DuplicateInterfacePrefixMixin {
 
             }
-        """)
+        """
+        )
     }
 }

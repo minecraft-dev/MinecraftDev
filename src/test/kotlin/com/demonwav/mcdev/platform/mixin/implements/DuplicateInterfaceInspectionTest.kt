@@ -27,26 +27,35 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
     fun setupProject() {
         buildProject {
             src {
-                java("test/DummyFace.java", """
+                java(
+                    "test/DummyFace.java",
+                    """
                     package test;
 
                     interface DummyFace {
 
                     }
-                """)
+                """
+                )
 
-                java("test/DummyFace2.java", """
+                java(
+                    "test/DummyFace2.java",
+                    """
                     package test;
 
                     interface DummyFace2 {
 
                     }
-                """)
+                """
+                )
             }
         }
     }
 
-    private fun doTest(@Language("JAVA") mixinCode: String) {
+    private fun doTest(
+        @Language("JAVA")
+        mixinCode: String
+    ) {
         buildProject {
             src {
                 java("test/DuplicateInterfaceMixin.java", mixinCode)
@@ -60,7 +69,8 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
     @Test
     @DisplayName("No Highlight On No Duplicate Interface Test")
     fun noHighlightOnNoDuplicateInterfaceTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -75,13 +85,15 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
             class DuplicateInterfaceMixin {
 
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("Highlight On Duplicate Interface Test")
     fun highlightOnDuplicateInterfaceTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -96,6 +108,7 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
             class DuplicateInterfaceMixin {
 
             }
-        """)
+        """
+        )
     }
 }

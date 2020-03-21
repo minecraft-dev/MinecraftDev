@@ -31,7 +31,9 @@ abstract class OuterClassTest : ProjectBuilderTest() {
     fun setupProject() {
         buildProject {
             src {
-                outerClass = java("com/example/test/OuterClass.java", """
+                outerClass = java(
+                    "com/example/test/OuterClass.java",
+                    """
                     package com.example.test;
 
                     class OuterClass {
@@ -53,7 +55,8 @@ abstract class OuterClassTest : ProjectBuilderTest() {
                             public C doSomething() {}
                         }
                     }
-                """).toPsiFile<PsiJavaFile>().classes.single()
+                """
+                ).toPsiFile<PsiJavaFile>().classes.single()
             }
         }
 

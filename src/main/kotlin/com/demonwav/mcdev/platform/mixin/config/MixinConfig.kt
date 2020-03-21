@@ -57,8 +57,9 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
                     prop.value?.replace(generator.createStringLiteral(value))
                 }
             }
-            if (autoReformat)
+            if (autoReformat) {
                 reformat()
+            }
         }
 
     var mixins: MutableList<String?>
@@ -70,8 +71,9 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
             v.clear()
             v.addAll(value)
             autoReformat = prevAutoReformat
-            if (autoReformat)
+            if (autoReformat) {
                 reformat()
+            }
         }
 
     var client: MutableList<String?>
@@ -83,8 +85,9 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
             v.clear()
             v.addAll(value)
             autoReformat = prevAutoReformat
-            if (autoReformat)
+            if (autoReformat) {
                 reformat()
+            }
         }
 
     var server: MutableList<String?>
@@ -96,8 +99,9 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
             v.clear()
             v.addAll(value)
             autoReformat = prevAutoReformat
-            if (autoReformat)
+            if (autoReformat) {
                 reformat()
+            }
         }
 
     val qualifiedMixins: MutableList<String?>
@@ -175,13 +179,15 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
 
         override fun add(index: Int, element: String?) {
             val oldSize = size
-            if (index < 0 || index > oldSize)
+            if (index < 0 || index > oldSize) {
                 throw IndexOutOfBoundsException(index.toString())
+            }
             val arr = getOrCreateJsonArray()
-            val newValue = if (element == null)
+            val newValue = if (element == null) {
                 generator.createValue("null")
-            else
+            } else {
                 generator.createStringLiteral(element)
+            }
             when {
                 oldSize == 0 -> {
                     // No comma added
@@ -200,47 +206,55 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
                     arr.addBefore(generator.createComma(), anchor)
                 }
             }
-            if (autoReformat)
+            if (autoReformat) {
                 reformat()
+            }
         }
 
         override fun get(index: Int): String? {
-            if (index < 0 || index >= size)
+            if (index < 0 || index >= size) {
                 throw IndexOutOfBoundsException(index.toString())
+            }
             return (array?.get(index) as? JsonStringLiteral)?.value
         }
 
         override fun removeAt(index: Int): String? {
-            if (index < 0 || index >= size)
+            if (index < 0 || index >= size) {
                 throw IndexOutOfBoundsException(index.toString())
+            }
             val toDelete = array?.get(index) ?: return null
             val oldStr = (toDelete as? JsonStringLiteral)?.value
             deleteCommaAround(toDelete)
             toDelete.delete()
-            if (autoReformat)
+            if (autoReformat) {
                 reformat()
+            }
             return oldStr
         }
 
         override fun set(index: Int, element: String?): String? {
-            if (index < 0 || index >= size)
+            if (index < 0 || index >= size) {
                 throw IndexOutOfBoundsException(index.toString())
+            }
             val toReplace = array?.get(index) ?: return null
             val oldStr = (toReplace as? JsonStringLiteral)?.value
-            val newValue = if (element == null)
+            val newValue = if (element == null) {
                 generator.createValue("null")
-            else
+            } else {
                 generator.createStringLiteral(element)
+            }
             toReplace.replace(newValue)
-            if (autoReformat)
+            if (autoReformat) {
                 reformat()
+            }
             return oldStr
         }
 
         private fun getOrCreateJsonArray(): JsonArray {
             val existingArray = json.findProperty(key)?.value as? JsonArray
-            if (existingArray != null)
+            if (existingArray != null) {
                 return existingArray
+            }
             val added = JsonPsiUtil.addProperty(json, generator.createProperty(key, "[]"), false)
             return (added as JsonProperty).value as JsonArray
         }

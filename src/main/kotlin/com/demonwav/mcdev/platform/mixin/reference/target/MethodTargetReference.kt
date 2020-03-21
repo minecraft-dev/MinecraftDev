@@ -71,8 +71,11 @@ object MethodTargetReference : TargetReference.MethodHandler() {
                 // and no class in the hierarchy of the instance overrides the method, Java will
                 // insert the call using java.lang.Object as the owner
                 val qualifier =
-                    if (method.isConstructor || containingClass?.qualifiedName == CommonClassNames.JAVA_LANG_OBJECT)
-                        containingClass else QualifiedMember.resolveQualifier(expression.methodExpression)
+                    if (method.isConstructor || containingClass?.qualifiedName == CommonClassNames.JAVA_LANG_OBJECT) {
+                        containingClass
+                    } else {
+                        QualifiedMember.resolveQualifier(expression.methodExpression)
+                    }
 
                 visitMethodUsage(method, qualifier, expression)
             }

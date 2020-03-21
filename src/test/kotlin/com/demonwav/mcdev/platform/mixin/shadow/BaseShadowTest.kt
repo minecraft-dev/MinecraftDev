@@ -24,7 +24,9 @@ abstract class BaseShadowTest : BaseMixinTest() {
         createMixins()
         buildProject {
             src {
-                java("test/MixinBase.java", """
+                java(
+                    "test/MixinBase.java",
+                    """
                     package test;
 
                     public class MixinBase {
@@ -60,7 +62,8 @@ abstract class BaseShadowTest : BaseMixinTest() {
 
                         public final String twoIssues = "";
                     }
-                """)
+                """
+                )
 
                 mixins()
             }

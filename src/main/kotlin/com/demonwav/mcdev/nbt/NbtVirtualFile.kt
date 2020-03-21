@@ -114,7 +114,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
 
         this.bytes =
             PsiDocumentManager.getInstance(project).getDocument(nbttFile)
-                ?.immutableCharSequence?.toString()?.toByteArray() ?: byteArrayOf()
+            ?.immutableCharSequence?.toString()?.toByteArray() ?: byteArrayOf()
 
         // just to be safe
         this.parent.bom = null

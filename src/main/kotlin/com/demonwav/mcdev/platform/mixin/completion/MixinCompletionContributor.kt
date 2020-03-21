@@ -81,9 +81,9 @@ class MixinCompletionContributor : CompletionContributor() {
                             } else {
                                 // Qualifier class is valid if it's a Mixin and it's in our hierarchy
                                 if (qualifierClass.isWritable && qualifierClass.isMixin && psiClass.isInheritor(
-                                        qualifierClass,
-                                        true
-                                    )
+                                    qualifierClass,
+                                    true
+                                )
                                 ) {
                                     qualifierClass
                                 } else {

@@ -38,9 +38,11 @@ inline fun runGradleTask(
         }
 
         indicator?.let {
-            launcher.addProgressListener(ProgressListener { event ->
-                indicator.text = event.description
-            })
+            launcher.addProgressListener(
+                ProgressListener { event ->
+                    indicator.text = event.description
+                }
+            )
         }
 
         func(launcher)

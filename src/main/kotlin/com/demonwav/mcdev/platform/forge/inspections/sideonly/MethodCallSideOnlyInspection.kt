@@ -48,7 +48,6 @@ class MethodCallSideOnlyInspection : BaseInspection() {
 
     override fun buildVisitor(): BaseInspectionVisitor {
         return object : BaseInspectionVisitor() {
-
             override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
                 if (!SideOnlyUtil.beginningCheck(expression)) {
                     return

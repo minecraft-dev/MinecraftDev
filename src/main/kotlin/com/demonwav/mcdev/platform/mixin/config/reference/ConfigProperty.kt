@@ -95,7 +95,8 @@ object ConfigProperty : PsiReferenceProvider() {
         return currentClass
     }
 
-    private class Reference(element: JsonStringLiteral) : PsiReferenceBase<JsonStringLiteral>(element),
+    private class Reference(element: JsonStringLiteral) :
+        PsiReferenceBase<JsonStringLiteral>(element),
         InspectionReference {
 
         override val description: String

@@ -27,7 +27,8 @@ import com.intellij.psi.PsiNameValuePair
 
 class InvalidMemberReferenceInspection : MixinInspection() {
 
-    override fun getStaticDescription() = """
+    override fun getStaticDescription() =
+        """
         |Reports invalid usages of member references in Mixin annotations. Two different formats are supported by Mixin:
         | - Lcom/example/ExampleClass;execute(II)V
         | - com.example.ExampleClass.execute(II)V

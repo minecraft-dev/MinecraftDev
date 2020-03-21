@@ -25,10 +25,15 @@ import org.junit.jupiter.api.extension.ExtendWith
 @DisplayName("Multiple targets test")
 class MultipleTargetTest : BaseMixinTest() {
 
-    private fun doTest(@Language("JAVA") code: String) {
+    private fun doTest(
+        @Language("JAVA")
+        code: String
+    ) {
         buildProject {
             src {
-                java("test/MixedIn.java", """
+                java(
+                    "test/MixedIn.java",
+                    """
                     package test;
 
                     class MixedIn {
@@ -38,7 +43,8 @@ class MultipleTargetTest : BaseMixinTest() {
                         public void method2() {
                         }
                     }
-                """)
+                """
+                )
                 java("test/AmbiguousReferenceMixin.java", code)
             }
         }
@@ -50,7 +56,8 @@ class MultipleTargetTest : BaseMixinTest() {
     @Test
     @DisplayName("Single Target")
     fun singleTarget() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -64,13 +71,15 @@ class MultipleTargetTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """)
+        """
+        )
     }
 
     @Test
     @DisplayName("Multiple Targets")
     fun multipleTargets() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -84,6 +93,7 @@ class MultipleTargetTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """)
+        """
+        )
     }
 }

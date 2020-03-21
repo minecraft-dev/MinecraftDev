@@ -92,7 +92,6 @@ class MethodSideOnlyInspection : BaseInspection() {
                         }
                         if (returnSide !== Side.NONE && returnSide !== Side.INVALID) {
                             if (returnSide !== classHierarchySide.first) {
-
                                 registerMethodError(
                                     method,
                                     Error.RETURN_TYPE_IN_WRONG_CLASS,

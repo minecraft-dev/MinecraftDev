@@ -19,7 +19,7 @@ import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.TextPart
  * to the version ranking with decreasing priority from left to right.
  */
 class SemanticVersion(private val parts: List<VersionPart>) : Comparable<SemanticVersion> {
-    val versionString = parts.joinToString(".") { it.versionString }
+    private val versionString = parts.joinToString(".") { it.versionString }
 
     override fun compareTo(other: SemanticVersion): Int =
         naturalOrder<VersionPart>().lexicographical().compare(parts, other.parts)
@@ -61,10 +61,11 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
          */
         fun parse(value: String): SemanticVersion {
             fun parseInt(part: String): Int =
-                if (part.all { it.isDigit() })
+                if (part.all { it.isDigit() }) {
                     part.toInt()
-                else
+                } else {
                     throw IllegalArgumentException("Failed to parse version part as integer: $part")
+                }
 
             // We need to support pre-releases/RCs and snapshots as well
             fun parseTextPart(subParts: List<String>, separator: Char): VersionPart =
@@ -76,8 +77,9 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
                     val versionNumber = if (number.isEmpty()) -1 else parseInt(number)
                     TextPart(version, separator, text, versionNumber)
                 } else {
-                    throw IllegalArgumentException("Failed to split text version part into two: " +
-                        "${subParts.first()}$separator")
+                    throw IllegalArgumentException(
+                        "Failed to split text version part into two: ${subParts.first()}$separator"
+                    )
                 }
 
             val parts = value.split('.').map { part ->
