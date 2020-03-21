@@ -93,7 +93,9 @@ class ConfigValueInspection : MixinConfigInspection() {
                 return value is JsonBooleanLiteral || value is JsonNullLiteral
             }
 
-            if (shortNumberNames.contains(type.className) && qualifiedNumberNames.contains(type.resolve()?.qualifiedName)) {
+            if (shortNumberNames.contains(type.className) &&
+                qualifiedNumberNames.contains(type.resolve()?.qualifiedName)
+            ) {
                 return value is JsonNumberLiteral || value is JsonNullLiteral
             }
 
