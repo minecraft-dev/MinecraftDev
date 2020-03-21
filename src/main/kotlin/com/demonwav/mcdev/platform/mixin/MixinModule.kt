@@ -55,6 +55,7 @@ class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
             return getMixinConfigs(project, scope).asSequence()
                 .flatMap { (it.qualifiedMixins + it.qualifiedClient + it.qualifiedServer).asSequence() }
                 .filterNotNull()
+                .map { it.replace('$', '.') }
                 .distinct()
                 .flatMap { JavaPsiFacade.getInstance(project).findClasses(it, scope).asSequence() }
                 .toList()
