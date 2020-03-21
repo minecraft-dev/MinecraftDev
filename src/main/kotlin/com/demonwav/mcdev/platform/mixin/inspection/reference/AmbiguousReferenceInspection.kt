@@ -16,6 +16,8 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationMemberValue
+import com.intellij.psi.PsiArrayInitializerMemberValue
+import com.intellij.psi.PsiLiteral
 
 class AmbiguousReferenceInspection : MixinAnnotationAttributeInspection(METHOD_INJECTORS, "method") {
 
@@ -26,8 +28,14 @@ class AmbiguousReferenceInspection : MixinAnnotationAttributeInspection(METHOD_I
         value: PsiAnnotationMemberValue,
         holder: ProblemsHolder
     ) {
-        val ambiguousReference = MethodReference.getReferenceIfAmbiguous(value) ?: return
+        when (value) {
+            is PsiLiteral -> checkMember(value, holder)
+            is PsiArrayInitializerMemberValue -> value.initializers.forEach { checkMember(it, holder) }
+        }
+    }
 
+    private fun checkMember(value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
+        val ambiguousReference = MethodReference.getReferenceIfAmbiguous(value) ?: return
         // TODO: Quick fix
         holder.registerProblem(value, "Ambiguous reference to method '${ambiguousReference.name}' in target class")
     }

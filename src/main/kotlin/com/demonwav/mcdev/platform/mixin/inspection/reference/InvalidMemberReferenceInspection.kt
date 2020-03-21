@@ -19,7 +19,10 @@ import com.demonwav.mcdev.util.annotationFromNameValuePair
 import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
+import com.intellij.psi.PsiArrayInitializerMemberValue
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiNameValuePair
 
 class InvalidMemberReferenceInspection : MixinInspection() {
@@ -52,8 +55,17 @@ class InvalidMemberReferenceInspection : MixinInspection() {
             val value = pair.value ?: return
 
             // Attempt to parse the reference
-            if (MixinMemberReference.parse(value.constantStringValue) == null) {
-                holder.registerProblem(value, "Invalid member reference")
+            when (value) {
+                is PsiLiteral -> checkMemberReference(value, value.constantStringValue)
+                is PsiArrayInitializerMemberValue -> value.initializers.forEach {
+                    checkMemberReference(it, it.constantStringValue)
+                }
+            }
+        }
+
+        private fun checkMemberReference(element: PsiElement, value: String?) {
+            if (MixinMemberReference.parse(value) == null) {
+                holder.registerProblem(element, "Invalid member reference")
             }
         }
     }
