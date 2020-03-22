@@ -55,6 +55,8 @@ import javax.swing.JComponent
 
 class GenerateAccessorAction : NonMixinCodeInsightAction() {
 
+    override fun startInTransaction() = true
+
     override fun invoke(project: Project, editor: Editor, file: PsiFile) {
         val offset = editor.caretModel.offset
         val element = file.findElementAt(offset) ?: return
@@ -83,37 +85,35 @@ class GenerateAccessorAction : NonMixinCodeInsightAction() {
             }.toTypedArray()
         )
 
-        invokeLater {
-            if (!chooser.showAndGet()) {
-                return@invokeLater
-            }
-            val selectedMembers = chooser.selectedElements
-            if (selectedMembers.isNullOrEmpty()) {
-                return@invokeLater
-            }
-            val generateGetters = headerPanel.gettersCheckbox.isSelected
-            val generateSetters = headerPanel.settersCheckbox.isSelected
+        if (!chooser.showAndGet()) {
+            return
+        }
+        val selectedMembers = chooser.selectedElements
+        if (selectedMembers.isNullOrEmpty()) {
+            return
+        }
+        val generateGetters = headerPanel.gettersCheckbox.isSelected
+        val generateSetters = headerPanel.settersCheckbox.isSelected
 
-            val mixin = getOrCreateAccessorMixin(project, targetClass) ?: return@invokeLater
+        val mixin = getOrCreateAccessorMixin(project, targetClass) ?: return
 
-            WriteCommandAction.writeCommandAction(project)
-                .withName("Generate Accessor/Invoker")
-                .withGroupId("Generate Accessor/Invoker")
-                .run<RuntimeException> {
-                    IdeDocumentHistory.getInstance(project).includeCurrentPlaceAsChangePlace()
+        WriteCommandAction.writeCommandAction(project)
+            .withName("Generate Accessor/Invoker")
+            .withGroupId("Generate Accessor/Invoker")
+            .run<RuntimeException> {
+                IdeDocumentHistory.getInstance(project).includeCurrentPlaceAsChangePlace()
 
-                    for (member in selectedMembers) {
-                        @Suppress("MoveVariableDeclarationIntoWhen")
-                        val elem = (member as? PsiElementClassMember<*>)?.element ?: continue
-                        when (elem) {
-                            is PsiField -> generateAccessor(project, elem, mixin, generateGetters, generateSetters)
-                            is PsiMethod -> generateInvoker(project, elem, mixin)
-                        }
+                for (member in selectedMembers) {
+                    @Suppress("MoveVariableDeclarationIntoWhen")
+                    val elem = (member as? PsiElementClassMember<*>)?.element ?: continue
+                    when (elem) {
+                        is PsiField -> generateAccessor(project, elem, mixin, generateGetters, generateSetters)
+                        is PsiMethod -> generateInvoker(project, elem, mixin)
                     }
                 }
+            }
 
-            EditorHelper.openInEditor(mixin)
-        }
+        EditorHelper.openInEditor(mixin)
     }
 
     private fun getOrCreateAccessorMixin(project: Project, targetClass: PsiClass): PsiClass? {
