@@ -136,7 +136,15 @@ class GenerateAccessorAction : NonMixinCodeInsightAction() {
             return@maxBy countAccessorMixins(project, it.qualifiedMixins) +
                 countAccessorMixins(project, it.qualifiedClient) +
                 countAccessorMixins(project, it.qualifiedServer)
-        } ?: return null
+        }
+
+        if (config == null) {
+            // TODO: generate the mixin configuration file (modding platform dependent)
+            val message = "There is no matching mixin configuration file found in the project. " +
+                "Please create one and try again."
+            Messages.showInfoMessage(project, message, "Generate Accessor/Invoker")
+            return null
+        }
 
         val defaultPkg = config.pkg ?: ""
         val defaultName = "${targetClass.name}Accessor"
