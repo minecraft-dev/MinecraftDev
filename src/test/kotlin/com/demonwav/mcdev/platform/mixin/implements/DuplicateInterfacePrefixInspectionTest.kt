@@ -35,7 +35,7 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
                     interface DummyFace {
 
                     }
-                """
+                    """
                 )
 
                 java(
@@ -46,7 +46,7 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
                     interface DummyFace2 {
 
                     }
-                """
+                    """
                 )
             }
         }
@@ -85,7 +85,7 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
             class DuplicateInterfacePrefixMixin {
 
             }
-        """
+            """
         )
     }
 
@@ -108,7 +108,7 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
             class DuplicateInterfacePrefixMixin {
 
             }
-        """
+            """
         )
     }
 }

@@ -52,7 +52,7 @@ class ShadowTargetInspectionTest : BaseShadowTest() {
 
                     @Shadow protected String twoIssues;
                 }
-            """
+                """
             )
         }
     }

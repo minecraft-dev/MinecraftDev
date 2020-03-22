@@ -34,7 +34,7 @@ class SuperClassTest : BaseMixinTest() {
                     public class Entity {
 
                     }
-                """
+                    """
                 )
 
                 java(
@@ -45,7 +45,7 @@ class SuperClassTest : BaseMixinTest() {
                     public class DemonWav extends Entity {
 
                     }
-                """
+                    """
                 )
 
                 java(
@@ -56,7 +56,7 @@ class SuperClassTest : BaseMixinTest() {
                     public class Minecrell extends Entity {
 
                     }
-                """
+                    """
                 )
             }
         }
@@ -89,7 +89,7 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin {
 
             }
-        """
+            """
         )
     }
 
@@ -106,7 +106,7 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin extends Entity {
 
             }
-        """
+            """
         )
     }
 
@@ -123,7 +123,7 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin extends <error descr="Cannot extend target class">DemonWav</error> {
 
             }
-        """
+            """
         )
     }
 
@@ -140,7 +140,7 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin extends <error descr="Cannot find 'Minecrell' in the hierarchy of target class 'DemonWav'">Minecrell</error> {
 
             }
-        """
+            """
         )
     }
 }

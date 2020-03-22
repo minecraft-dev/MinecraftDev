@@ -40,7 +40,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                         public void otherMethod() {
                         }
                     }
-                """
+                    """
                 )
                 java("test/UnnecessaryQualifiedMemberReferenceMixin.java", code)
             }
@@ -68,7 +68,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -90,7 +90,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -112,7 +112,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -134,7 +134,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 }

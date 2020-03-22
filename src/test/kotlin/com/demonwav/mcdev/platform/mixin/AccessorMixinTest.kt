@@ -34,7 +34,7 @@ class AccessorMixinTest : BaseMixinTest() {
                     """
                     package test;
                     public class BaseMixin {}
-                """
+                    """
                 )
 
                 java(
@@ -42,7 +42,7 @@ class AccessorMixinTest : BaseMixinTest() {
                     """
                     package test;
                     public interface BaseMixinInterface {}
-                """
+                    """
                 )
             }
         }
@@ -82,7 +82,7 @@ class AccessorMixinTest : BaseMixinTest() {
             @Invoker void invoke();
             @Invoker double doThing();
         }
-    """
+        """
     ) { psiClass ->
         Assertions.assertTrue(psiClass.isAccessorMixin)
     }
@@ -105,7 +105,7 @@ class AccessorMixinTest : BaseMixinTest() {
             @Invoker void invoke();
             double doThing();
         }
-    """
+        """
     ) { psiClass ->
         Assertions.assertFalse(psiClass.isAccessorMixin)
     }
@@ -128,7 +128,7 @@ class AccessorMixinTest : BaseMixinTest() {
             @Invoker void invoke();
             @Invoker double doThing();
         }
-    """
+        """
     ) { psiClass ->
         Assertions.assertFalse(psiClass.isAccessorMixin)
     }
@@ -148,7 +148,7 @@ class AccessorMixinTest : BaseMixinTest() {
             @Accessor String getString();
             @Accessor int getInt();
         }
-    """
+        """
     ) { psiClass ->
         Assertions.assertTrue(psiClass.isAccessorMixin)
     }
@@ -168,7 +168,7 @@ class AccessorMixinTest : BaseMixinTest() {
             @Invoker void invoke();
             @Invoker double doThing();
         }
-    """
+        """
     ) { psiClass ->
         Assertions.assertTrue(psiClass.isAccessorMixin)
     }
@@ -189,7 +189,7 @@ class AccessorMixinTest : BaseMixinTest() {
             @Accessor String getString();
             @Invoker void invoke();
         }
-    """
+        """
     ) { psiClass ->
         Assertions.assertFalse(psiClass.isAccessorMixin)
     }
@@ -210,7 +210,7 @@ class AccessorMixinTest : BaseMixinTest() {
             @Accessor String getString();
             @Invoker void invoke();
         }
-    """
+        """
     ) { psiClass ->
         Assertions.assertFalse(psiClass.isAccessorMixin)
     }

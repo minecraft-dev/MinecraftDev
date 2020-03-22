@@ -36,7 +36,7 @@ class SoftImplementTest : BaseMixinTest() {
                         String thisMethodExists();
 
                     }
-                """
+                    """
                 )
 
                 java(
@@ -61,7 +61,7 @@ class SoftImplementTest : BaseMixinTest() {
                         }
 
                     }
-                """
+                    """
                 )
             }
         }

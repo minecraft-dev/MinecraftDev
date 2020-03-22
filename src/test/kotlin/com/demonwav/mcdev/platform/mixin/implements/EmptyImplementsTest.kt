@@ -35,7 +35,7 @@ class EmptyImplementsTest : BaseMixinTest() {
                     interface DummyFace {
 
                     }
-                """
+                    """
                 )
             }
         }
@@ -71,7 +71,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """
+            """
         )
     }
 
@@ -91,7 +91,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """
+            """
         )
     }
 
@@ -114,7 +114,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """
+            """
         )
     }
 }

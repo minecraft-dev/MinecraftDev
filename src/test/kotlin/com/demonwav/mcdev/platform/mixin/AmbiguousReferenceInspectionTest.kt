@@ -43,7 +43,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                         public void uniqueMethod(String string) {
                         }
                     }
-                """
+                    """
                 )
                 java("test/AmbiguousReferenceMixin.java", code)
             }
@@ -71,7 +71,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -93,7 +93,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -115,7 +115,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -137,7 +137,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -159,7 +159,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 }

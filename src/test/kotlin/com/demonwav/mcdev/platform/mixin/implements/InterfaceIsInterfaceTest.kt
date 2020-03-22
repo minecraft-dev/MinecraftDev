@@ -34,7 +34,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
                     interface DummyFace {
 
                     }
-                """
+                    """
                 )
 
                 java(
@@ -45,7 +45,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
                     class DummyClass {
 
                     }
-                """
+                    """
                 )
 
                 java(
@@ -65,7 +65,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
                     class InterfaceIsInterfaceMixin {
 
                     }
-                """
+                    """
                 )
             }
         }

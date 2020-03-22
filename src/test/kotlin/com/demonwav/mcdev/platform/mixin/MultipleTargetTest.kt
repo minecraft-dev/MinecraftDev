@@ -43,7 +43,7 @@ class MultipleTargetTest : BaseMixinTest() {
                         public void method2() {
                         }
                     }
-                """
+                    """
                 )
                 java("test/AmbiguousReferenceMixin.java", code)
             }
@@ -71,7 +71,7 @@ class MultipleTargetTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -93,7 +93,7 @@ class MultipleTargetTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 }

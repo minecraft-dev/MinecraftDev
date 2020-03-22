@@ -62,7 +62,7 @@ abstract class BaseShadowTest : BaseMixinTest() {
 
                         public final String twoIssues = "";
                     }
-                """
+                    """
                 )
 
                 mixins()
