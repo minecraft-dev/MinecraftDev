@@ -17,7 +17,6 @@ import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.JarFileSystem
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.StandardFileSystems
@@ -64,10 +63,10 @@ fun testLexer(basePath: String, lexer: Lexer) {
     val text = caller.getResource(basePath).readText().trim()
 
     val expected = caller.getResource("${basePath.substringBeforeLast('.')}.txt").readText().trim()
-    val actual = LexerTestCase.printTokens(text, 0, lexer)
+    val actual = LexerTestCase.printTokens(text.filter { it != '\r' }, 0, lexer)
 
-    val expectedLines = StringUtil.splitByLines(expected, true).toList()
-    val actualLines = StringUtil.splitByLines(actual, true).toList()
+    val expectedLines = expected.lineSequence().filter { it.isNotBlank() }.toList()
+    val actualLines = actual.lineSequence().filter { it.isNotBlank() }.toList()
     Assertions.assertLinesMatch(expectedLines, actualLines)
 }
 
@@ -83,7 +82,7 @@ fun ProjectBuilderTest.testParser(basePath: String, func: ProjectBuilderFunc) {
 
     val actual = DebugUtil.psiToString(file!!, false, true)
 
-    val expectedLines = StringUtil.splitByLines(expected, true).toList()
-    val actualLines = StringUtil.splitByLines(actual, true).toList()
+    val expectedLines = expected.lineSequence().filter { it.isNotBlank() }.toList()
+    val actualLines = actual.lineSequence().filter { it.isNotBlank() }.toList()
     Assertions.assertLinesMatch(expectedLines, actualLines)
 }
