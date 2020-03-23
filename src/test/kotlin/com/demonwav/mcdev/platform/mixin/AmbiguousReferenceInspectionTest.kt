@@ -144,10 +144,10 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
         )
     }
 
-    // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360007730639-Test-fails-with-Access-to-tree-elements-not-allowed-inconsistently-when-not-run-on-Linux
     @Disabled(
         "This test for whatever reason fails frequently (but not always) when on Windows or macOS with " +
-            "the following error: 'Access to tree elements not allowed.'"
+            "the following error: 'Access to tree elements not allowed.'" +
+            "Issue link: https://youtrack.jetbrains.com/issue/IDEA-235803"
     )
     @Test
     @DisplayName("No Ambiguous Reference Multiple Targets")
