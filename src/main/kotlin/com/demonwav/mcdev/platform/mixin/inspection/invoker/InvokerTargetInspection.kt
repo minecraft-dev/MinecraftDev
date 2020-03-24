@@ -12,9 +12,9 @@ package com.demonwav.mcdev.platform.mixin.inspection.invoker
 
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.getInvokerTargetName
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.platform.mixin.util.resolveInvokerTarget
-import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.codeInspection.RemoveAnnotationQuickFix
@@ -43,10 +43,10 @@ class InvokerTargetInspection : MixinInspection() {
             val targetClasses = psiClass.mixinTargets.ifEmpty { return }
 
             if (resolveInvokerTarget(annotation, targetClasses, member) == null) {
-                val value = annotation.findDeclaredAttributeValue("value")?.constantStringValue
+                val name = getInvokerTargetName(annotation, member) ?: return
 
                 holder.registerProblem(
-                    annotation, "Cannot resolve member '$value' in target class",
+                    annotation, "Cannot resolve member '$name' in target class",
                     RemoveAnnotationQuickFix(annotation, member)
                 )
             }

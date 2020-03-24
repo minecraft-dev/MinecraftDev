@@ -22,6 +22,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
 import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.util.createSmartPointer
+import java.util.Locale
 
 fun PsiMember.findAccessorTarget(): SmartPsiElementPointer<PsiMember>? {
     val accessor = findAnnotation(MixinConstants.Annotations.ACCESSOR) ?: return null
@@ -35,15 +36,15 @@ fun resolveAccessorTarget(
     targetClasses: Collection<PsiClass>,
     member: PsiMember
 ): PsiMember? {
-    val value = accessor.findDeclaredAttributeValue("value")?.constantStringValue ?: return null
+    val accessorInfo = getAccessorInfo(accessor, member) ?: return null
     return when (member) {
         is PsiMethod -> targetClasses.mapFirstNotNull { psiClass ->
-            psiClass.findFieldByName(value, false)?.takeIf {
+            psiClass.findFieldByName(accessorInfo.name, false)?.takeIf {
                 // Accessors either have a return value (field getter) or a parameter (field setter)
-                if (!member.hasParameters()) {
+                if (!member.hasParameters() && accessorInfo.type.allowGetters) {
                     it.type.isErasureEquivalentTo(member.returnType)
-                } else if (PsiType.VOID == member.returnType) {
-                    it.type.isErasureEquivalentTo(member.parameterList.parameters.get(0).type)
+                } else if (PsiType.VOID == member.returnType && accessorInfo.type.allowSetters) {
+                    it.type.isErasureEquivalentTo(member.parameterList.parameters[0].type)
                 } else {
                     false
                 }
@@ -51,4 +52,35 @@ fun resolveAccessorTarget(
         }
         else -> null
     }
+}
+
+fun getAccessorInfo(accessor: PsiAnnotation, member: PsiMember): AccessorInfo? {
+    val value = accessor.findDeclaredAttributeValue("value")?.constantStringValue
+    if (value != null) {
+        return AccessorInfo(value, AccessorType.UNKNOWN)
+    }
+
+    val memberName = member.name ?: return null
+    val result = PATTERN.matchEntire(memberName) ?: return null
+    val prefix = result.groupValues[1]
+    var name = result.groupValues[2]
+    if (name.toUpperCase(Locale.ROOT) != name) {
+        name = name.decapitalize()
+    }
+    val type = if (prefix == "set") {
+        AccessorType.SETTER
+    } else {
+        AccessorType.GETTER
+    }
+    return AccessorInfo(name, type)
+}
+
+private val PATTERN = Regex("(get|is|set)([A-Z].*?)(_\\\$md.*)?")
+
+data class AccessorInfo(val name: String, val type: AccessorType)
+
+enum class AccessorType(val allowGetters: Boolean, val allowSetters: Boolean) {
+    GETTER(true, false),
+    SETTER(false, true),
+    UNKNOWN(true, true);
 }
