@@ -145,7 +145,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
     }
 
     @Disabled(
-        "This test for whatever reason fails frequently (but not always) when on Windows or macOS with " +
+        "This test for whatever reason fails frequently (but not always) with " +
             "the following error: 'Access to tree elements not allowed.'" +
             "Issue link: https://youtrack.jetbrains.com/issue/IDEA-235803"
     )
