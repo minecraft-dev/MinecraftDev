@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.search
 
-import com.demonwav.mcdev.platform.mixin.util.findSoftImplementedMethods
+import com.demonwav.mcdev.platform.mixin.util.forEachSoftImplementedMethods
 import com.intellij.openapi.application.runReadAction
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.PsiModifier
@@ -46,7 +46,7 @@ class MixinSoftImplementMethodSuperSearcher :
                 return@run true
             }
 
-            method.findSoftImplementedMethods(checkBases) {
+            method.forEachSoftImplementedMethods(checkBases) {
                 if (!consumer.process(it.hierarchicalMethodSignature)) {
                     return@run false
                 }

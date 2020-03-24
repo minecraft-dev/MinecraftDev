@@ -18,17 +18,19 @@ import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.psi.util.createSmartPointer
 import org.jetbrains.annotations.Contract
 
 @get:Contract(pure = true)
 val PsiMethod.isOverwrite
     get() = findAnnotation(OVERWRITE) != null
 
-fun PsiMethod.findFirstOverwriteTarget(): PsiMethod? {
+fun PsiMethod.findFirstOverwriteTarget(): SmartPsiElementPointer<PsiMethod>? {
     findAnnotation(OVERWRITE) ?: return null
     val containingClass = containingClass ?: return null
     val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
-    return resolveFirstOverwriteTarget(targetClasses, this)
+    return resolveFirstOverwriteTarget(targetClasses, this)?.createSmartPointer()
 }
 
 fun resolveFirstOverwriteTarget(targetClasses: Collection<PsiClass>, method: PsiMethod): PsiMethod? {

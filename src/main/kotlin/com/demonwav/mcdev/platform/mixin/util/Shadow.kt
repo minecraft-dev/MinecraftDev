@@ -25,17 +25,19 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.psi.util.createSmartPointer
 import org.jetbrains.annotations.Contract
 
 @get:Contract(pure = true)
 val PsiMember.isShadow
     get() = findAnnotation(SHADOW) != null
 
-fun PsiMember.findFirstShadowTarget(): PsiMember? {
+fun PsiMember.findFirstShadowTarget(): SmartPsiElementPointer<PsiMember>? {
     val shadow = findAnnotation(SHADOW) ?: return null
     val containingClass = containingClass ?: return null
     val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
-    return resolveFirstShadowTarget(shadow, targetClasses, this)
+    return resolveFirstShadowTarget(shadow, targetClasses, this)?.createSmartPointer()
 }
 
 fun resolveFirstShadowTarget(

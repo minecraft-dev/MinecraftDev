@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -46,8 +46,8 @@ class InvokerTargetInspection : MixinInspection() {
                 val value = annotation.findDeclaredAttributeValue("value")?.constantStringValue
 
                 holder.registerProblem(
-                        annotation, "Cannot resolve member '${value}' in target class",
-                        RemoveAnnotationQuickFix(annotation, member)
+                    annotation, "Cannot resolve member '$value' in target class",
+                    RemoveAnnotationQuickFix(annotation, member)
                 )
             }
         }

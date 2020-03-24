@@ -108,7 +108,11 @@ fun callbackInfoType(project: Project): PsiType? =
     PsiType.getTypeByName(CALLBACK_INFO, project, GlobalSearchScope.allScope(project))
 
 fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType: PsiType): PsiType? {
-    val boxedType = if (returnType is PsiPrimitiveType) returnType.getBoxedType(context)!! else returnType
+    val boxedType = if (returnType is PsiPrimitiveType) {
+        returnType.getBoxedType(context) ?: return null
+    } else {
+        returnType
+    }
 
     // TODO: Can we do this without looking up the PsiClass?
     val psiClass =

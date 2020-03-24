@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.util
 
+@Suppress("MemberVisibilityCanBePrivate")
 object MixinConstants {
     const val PACKAGE = "org.spongepowered.asm.mixin."
     const val SMAP_STRATUM = "Mixin"
