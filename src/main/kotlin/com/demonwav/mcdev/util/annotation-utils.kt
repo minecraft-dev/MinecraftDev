@@ -18,7 +18,6 @@ import com.intellij.psi.PsiClassObjectAccessExpression
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiModifierListOwner
-import org.jetbrains.annotations.Contract
 
 fun PsiModifierListOwner.findAnnotation(qualifiedName: String): PsiAnnotation? {
     return modifierList?.findAnnotation(qualifiedName)
@@ -64,17 +63,14 @@ private inline fun <T : Any> PsiAnnotationMemberValue.parseArray(func: (PsiAnnot
 }
 
 // PsiNameValuePair -> PsiAnnotationParameterList -> PsiAnnotation
-@get:Contract(pure = true)
 val PsiElement.annotationFromNameValuePair
     get() = parent?.parent as? PsiAnnotation
 
 // value -> PsiNameValuePair -> see above
-@get:Contract(pure = true)
 val PsiElement.annotationFromValue
     get() = parent?.annotationFromNameValuePair
 
 // value -> PsiArrayInitializerMemberValue -> PsiNameValuePair -> see above
-@get:Contract(pure = true)
 val PsiElement.annotationFromArrayValue: PsiAnnotation?
     get() {
         val parent = parent ?: return null

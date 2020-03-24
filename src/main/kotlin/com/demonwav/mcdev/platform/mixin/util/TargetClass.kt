@@ -27,13 +27,11 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.compiled.ClsMethodImpl
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
-import org.jetbrains.annotations.Contract
 
 fun PsiMember.findUpstreamMixin(): PsiClass? {
     return findAnnotation(DYNAMIC)?.findDeclaredAttributeValue("mixin")?.resolveClass()
 }
 
-@get:Contract(pure = true)
 val PsiElement.isWithinDynamicMixin: Boolean
     get() = findContainingMethod()?.findAnnotation(DYNAMIC) != null
 

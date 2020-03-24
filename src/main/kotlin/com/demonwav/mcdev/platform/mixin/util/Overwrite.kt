@@ -20,9 +20,7 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.util.createSmartPointer
-import org.jetbrains.annotations.Contract
 
-@get:Contract(pure = true)
 val PsiMethod.isOverwrite
     get() = findAnnotation(OVERWRITE) != null
 
@@ -35,13 +33,6 @@ fun PsiMethod.findFirstOverwriteTarget(): SmartPsiElementPointer<PsiMethod>? {
 
 fun resolveFirstOverwriteTarget(targetClasses: Collection<PsiClass>, method: PsiMethod): PsiMethod? {
     return targetClasses.mapFirstNotNull { it.findMatchingMethod(method, false) }
-}
-
-fun PsiMethod.findOverwriteTargets(): List<PsiMethod>? {
-    findAnnotation(OVERWRITE) ?: return null
-    val containingClass = containingClass ?: return null
-    val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
-    return resolveOverwriteTargets(targetClasses, this)
 }
 
 fun resolveOverwriteTargets(targetClasses: Collection<PsiClass>, method: PsiMethod): List<PsiMethod> {

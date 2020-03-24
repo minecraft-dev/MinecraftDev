@@ -27,9 +27,7 @@ import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.util.createSmartPointer
-import org.jetbrains.annotations.Contract
 
-@get:Contract(pure = true)
 val PsiMember.isShadow
     get() = findAnnotation(SHADOW) != null
 

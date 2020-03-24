@@ -25,25 +25,20 @@ import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiTypeParameter
 import com.intellij.psi.search.GlobalSearchScope
-import org.jetbrains.annotations.Contract
 
-@get:Contract(pure = true)
 val PsiClass.packageName
     get() = (containingFile as? PsiJavaFile)?.packageName
 
 // Type
 
-@get:Contract(pure = true)
 val PsiClassType.fullQualifiedName
     get() = resolve()?.fullQualifiedName // this can be null if the type import is missing
 
 // Class
 
-@get:Contract(pure = true)
 val PsiClass.outerQualifiedName
     get() = if (containingClass == null) qualifiedName else null
 
-@get:Contract(pure = true)
 val PsiClass.fullQualifiedName
     get(): String? {
         return try {
@@ -62,11 +57,9 @@ private fun PsiClass.buildQualifiedName(builder: StringBuilder): StringBuilder {
     return builder
 }
 
-@get:Contract(pure = true)
 private val PsiClass.outerShortName
     get() = if (containingClass == null) name else null
 
-@get:Contract(pure = true)
 val PsiClass.shortName: String?
     get() {
         if (this is PsiTypeParameter) {
@@ -170,7 +163,6 @@ fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int? {
     throw ClassNameResolutionFailedException("Failed to determine anonymous class for $anonymousElement")
 }
 
-@get:Contract(pure = true)
 val PsiElement.anonymousElements: Array<PsiElement>
     get() {
         for (provider in AnonymousElementProvider.EP_NAME.extensionList) {

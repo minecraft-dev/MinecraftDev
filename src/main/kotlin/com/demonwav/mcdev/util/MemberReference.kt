@@ -23,7 +23,6 @@ import com.intellij.util.containers.stream
 import java.io.Serializable
 import java.lang.reflect.Type
 import java.util.stream.Stream
-import org.jetbrains.annotations.Contract
 
 /**
  * Represents a reference to a class member (a method or a field). It may
@@ -37,11 +36,9 @@ data class MemberReference(
     val matchAll: Boolean = false
 ) : Serializable {
 
-    @get:Contract(pure = true)
     val qualified
         get() = this.owner != null
 
-    @get:Contract(pure = true)
     val withoutOwner
         get() = if (this.owner == null) this else MemberReference(this.name, this.descriptor, null, this.matchAll)
 
@@ -129,11 +126,9 @@ fun PsiClass.findField(member: MemberReference, checkBases: Boolean = false): Ps
 
 // Method
 
-@get:Contract(pure = true)
 val PsiMethod.memberReference
     get() = MemberReference(internalName, descriptor)
 
-@get:Contract(pure = true)
 val PsiMethod.qualifiedMemberReference
     get() = MemberReference(internalName, descriptor, containingClass!!.fullQualifiedName)
 
@@ -145,19 +140,15 @@ fun PsiMethod?.isSameReference(reference: PsiMethod?): Boolean =
     this != null && (this === reference || qualifiedMemberReference == reference?.qualifiedMemberReference)
 
 // Field
-@get:Contract(pure = true)
 val PsiField.simpleMemberReference
     get() = MemberReference(name)
 
-@get:Contract(pure = true)
 val PsiField.memberReference
     get() = MemberReference(name, descriptor)
 
-@get:Contract(pure = true)
 val PsiField.simpleQualifiedMemberReference
     get() = MemberReference(name, null, containingClass!!.fullQualifiedName)
 
-@get:Contract(pure = true)
 val PsiField.qualifiedMemberReference
     get() = MemberReference(name, descriptor, containingClass!!.fullQualifiedName)
 
