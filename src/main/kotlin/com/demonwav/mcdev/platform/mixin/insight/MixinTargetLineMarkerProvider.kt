@@ -46,7 +46,8 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
             else -> null
         } ?: return null
 
-        // Check if @Accessor or @Invoker actually has a target
+        // Check if this is a Mixin target element
+        // TODO add more target types, @Inject, etc
         val targetInfo = element.findShadow()
             ?: (element as? PsiMethod)?.findOverwrite()
             ?: element.findInvoker()
