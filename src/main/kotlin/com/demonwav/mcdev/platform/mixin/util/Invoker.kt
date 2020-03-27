@@ -19,8 +19,8 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.createSmartPointer
 import java.util.Locale
 
@@ -40,8 +40,9 @@ fun resolveInvokerTarget(
     val constructor = name == "<init>"
     return when (member) {
         is PsiMethod -> targetClasses.mapFirstNotNull {
-            if (constructor && PsiUtil.resolveClassInType(member.returnType)?.qualifiedName != it.qualifiedName)
+            if (constructor && PsiUtil.resolveClassInType(member.returnType)?.qualifiedName != it.qualifiedName) {
                 return null
+            }
             it.findMatchingMethod(
                 member,
                 false,
