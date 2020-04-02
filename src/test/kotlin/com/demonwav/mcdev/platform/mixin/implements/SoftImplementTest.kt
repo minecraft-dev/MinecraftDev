@@ -25,9 +25,9 @@ class SoftImplementTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
+            dir("test") {
                 java(
-                    "test/DummyFace.java",
+                    "DummyFace.java",
                     """
                     package test;
 
@@ -36,11 +36,12 @@ class SoftImplementTest : BaseMixinTest() {
                         String thisMethodExists();
 
                     }
-                    """
+                    """,
+                    configure = false
                 )
 
                 java(
-                    "test/SoftImplementMixin.java",
+                    "SoftImplementMixin.java",
                     """
                     package test;
 

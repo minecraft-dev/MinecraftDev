@@ -23,7 +23,7 @@ class ShadowTargetInspectionTest : BaseShadowTest() {
     override fun createMixins() {
         mixins = {
             java(
-                "test/ShadowData.java",
+                "ShadowData.java",
                 """
                 package test;
 

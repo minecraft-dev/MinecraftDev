@@ -24,9 +24,9 @@ class InnerClassTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
+            dir("test") {
                 java(
-                    "test/InnerClassMixin.java",
+                    "InnerClassMixin.java",
                     """
                     package test;
 

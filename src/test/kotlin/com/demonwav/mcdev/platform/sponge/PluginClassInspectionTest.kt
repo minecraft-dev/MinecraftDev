@@ -26,8 +26,8 @@ class PluginClassInspectionTest : BaseSpongeTest() {
         code: String
     ) {
         buildProject {
-            src {
-                java("test/ASpongePlugin.java", code)
+            dir("test") {
+                java("ASpongePlugin.java", code)
             }
         }
 

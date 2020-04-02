@@ -10,22 +10,27 @@
 
 package com.demonwav.mcdev.translations
 
-import com.demonwav.mcdev.framework.toSnakeCase
-import com.demonwav.mcdev.translations.lang.LangFileType
-import com.demonwav.mcdev.translations.lang.LangParserDefinition
-import com.intellij.testFramework.ParsingTestCase
+import com.demonwav.mcdev.framework.EdtInterceptor
+import com.demonwav.mcdev.framework.ProjectBuilder
+import com.demonwav.mcdev.framework.ProjectBuilderTest
+import com.demonwav.mcdev.framework.testParser
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
-class LangParsingTest : ParsingTestCase(
-    "com/demonwav/mcdev/lang/parser/fixtures",
-    LangFileType.FILE_EXTENSION,
-    true,
-    LangParserDefinition()
-) {
-    override fun getTestDataPath() = "src/test/resources"
-    override fun getTestName(lowercaseFirstLetter: Boolean) = super.getTestName(lowercaseFirstLetter).toSnakeCase()
-    override fun includeRanges() = true
+@ExtendWith(EdtInterceptor::class)
+@DisplayName("MCLang Parsing Tests")
+class LangParsingTest : ProjectBuilderTest() {
 
-    fun testProperties() = doTest(true)
-    fun testComments() = doTest(true)
-    fun testMixed() = doTest(true)
+    @Test
+    @DisplayName("Properties Parsing Test")
+    fun propertiesTest() = testParser("parser/fixtures/properties.lang", ProjectBuilder::lang)
+
+    @Test
+    @DisplayName("Comments Parsing Test")
+    fun commentsTest() = testParser("parser/fixtures/comments.lang", ProjectBuilder::lang)
+
+    @Test
+    @DisplayName("Mixed Parsing Test")
+    fun mixedTest() = testParser("parser/fixtures/mixed.lang", ProjectBuilder::lang)
 }

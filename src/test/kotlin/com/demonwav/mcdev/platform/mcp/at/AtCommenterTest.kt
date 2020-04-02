@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.mcp.at
 import com.demonwav.mcdev.framework.CommenterTest
 import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.framework.ProjectBuilder
-import com.demonwav.mcdev.platform.PlatformType
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -21,7 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(EdtInterceptor::class)
 @DisplayName("Access Transformer Commenter Tests")
-class AtCommenterTest : CommenterTest(PlatformType.MCP) {
+class AtCommenterTest : CommenterTest() {
 
     private fun doTest(
         @Language("Access Transformers")

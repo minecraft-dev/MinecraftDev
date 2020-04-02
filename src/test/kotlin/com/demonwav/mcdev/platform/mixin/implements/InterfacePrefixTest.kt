@@ -25,20 +25,21 @@ class InterfacePrefixTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
+            dir("test") {
                 java(
-                    "test/DummyFace.java",
+                    "DummyFace.java",
                     """
                     package test;
 
                     interface DummyFace {
 
                     }
-                    """
+                    """,
+                    configure = false
                 )
 
                 java(
-                    "test/InterfacePrefixMixin.java",
+                    "InterfacePrefixMixin.java",
                     """
                     package test;
 

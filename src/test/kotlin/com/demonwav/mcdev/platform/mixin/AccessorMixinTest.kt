@@ -28,21 +28,23 @@ class AccessorMixinTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
+            dir("test") {
                 java(
-                    "test/BaseMixin.java",
+                    "BaseMixin.java",
                     """
                     package test;
                     public class BaseMixin {}
-                    """
+                    """,
+                    configure = false
                 )
 
                 java(
-                    "test/BaseMixinInterface.java",
+                    "BaseMixinInterface.java",
                     """
                     package test;
                     public interface BaseMixinInterface {}
-                    """
+                    """,
+                    configure = false
                 )
             }
         }
@@ -56,8 +58,8 @@ class AccessorMixinTest : BaseMixinTest() {
     ) {
         var psiClass: PsiClass? = null
         buildProject {
-            src {
-                psiClass = java("test/$className.java", code).toPsiFile<PsiJavaFile>().classes[0]
+            dir("test") {
+                psiClass = java("$className.java", code).toPsiFile<PsiJavaFile>().classes[0]
             }
         }
 

@@ -27,8 +27,8 @@ class SpongeInjectionInspectionTest : BaseSpongeTest() {
         vararg resourceFiles: String
     ) {
         buildProject {
-            src {
-                java("test/ASpongePlugin.java", code)
+            dir("test") {
+                java("ASpongePlugin.java", code)
                 resourceFiles.forEach { file(it, "", "", true) }
             }
         }

@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.mixin
 import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.platform.mixin.inspection.reference.AmbiguousReferenceInspection
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -27,28 +26,27 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
         code: String
     ) {
         buildProject {
-            src {
-                dir("test") {
-                    java(
-                        "MixedIn.java",
-                        """
-                        package test;
+            dir("test") {
+                java(
+                    "MixedIn.java",
+                    """
+                    package test;
 
-                        class MixedIn {
+                    class MixedIn {
 
-                            public void method() {
-                            }
-
-                            public void method(String string) {
-                            }
-
-                            public void uniqueMethod(String string) {
-                            }
+                        public void method() {
                         }
-                        """
-                    )
-                    java("AmbiguousReferenceMixin.java", code)
-                }
+
+                        public void method(String string) {
+                        }
+
+                        public void uniqueMethod(String string) {
+                        }
+                    }
+                    """,
+                    configure = false
+                )
+                java("AmbiguousReferenceMixin.java", code)
             }
         }
 
@@ -144,11 +142,6 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
         )
     }
 
-    @Disabled(
-        "This test for whatever reason fails frequently (but not always) with " +
-            "the following error: 'Access to tree elements not allowed.'" +
-            "Issue link: https://youtrack.jetbrains.com/issue/IDEA-235803"
-    )
     @Test
     @DisplayName("No Ambiguous Reference Multiple Targets")
     fun noAmbiguousReferenceMultipleTargets() {

@@ -10,35 +10,20 @@
 
 package com.demonwav.mcdev.framework
 
-import com.demonwav.mcdev.translations.lang.LangFileType
 import com.intellij.openapi.application.runWriteAction
-import com.intellij.openapi.project.rootManager
-import com.intellij.openapi.roots.ModuleRootModificationUtil
-import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture
+import com.intellij.testFramework.fixtures.TempDirTestFixture
 import com.intellij.testFramework.runInEdtAndWait
-import com.intellij.util.PathUtil
-import java.lang.ref.WeakReference
 import org.intellij.lang.annotations.Language
 
 /**
  * Like most things in this project at this point, taken from the intellij-rust folks
  * https://github.com/intellij-rust/intellij-rust/blob/master/src/test/kotlin/org/rust/ProjectBuilder.kt
  */
-class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: VirtualFile) {
-    private val fixtureRef = WeakReference(fixture)
-
-    private val fixture: JavaCodeInsightTestFixture
-        get() {
-            val fix = fixtureRef.get() ?: throw Exception("Reference collected")
-            if (fix.project.isDisposed) {
-                throw Exception("Project disposed")
-            }
-            return fix
-        }
+class ProjectBuilder(private val fixture: JavaCodeInsightTestFixture, private val tempDirFixture: TempDirTestFixture) {
     private val project
         get() = fixture.project
 
@@ -61,7 +46,7 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
         @Language("MCLang")
         code: String,
         configure: Boolean = true
-    ) = file(path, code, ".${LangFileType.FILE_EXTENSION}", configure)
+    ) = file(path, code, ".lang", configure)
     fun nbtt(
         path: String,
         @Language("NBTT")
@@ -84,16 +69,14 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
         check(path.endsWith(ext))
 
         val fullPath = if (intermediatePath.isEmpty()) path else "$intermediatePath/$path"
+        val newFile = tempDirFixture.createFile(fullPath, code.trimIndent())
 
-        val dir = PathUtil.getParentPath(fullPath)
-        val vDir = VfsUtil.createDirectoryIfMissing(root, dir)
-        val vFile = vDir.findOrCreateChildData(this, PathUtil.getFileName(fullPath))
-        VfsUtil.saveText(vFile, code.trimIndent())
-
+        fixture.allowTreeAccessForFile(newFile)
         if (configure) {
-            fixture.configureFromExistingVirtualFile(vFile)
+            fixture.configureFromExistingVirtualFile(newFile)
         }
-        return vFile
+
+        return newFile
     }
 
     fun <T : PsiFile> VirtualFile.toPsiFile(): T {
@@ -104,12 +87,6 @@ class ProjectBuilder(fixture: JavaCodeInsightTestFixture, private val root: Virt
     fun build(builder: ProjectBuilder.() -> Unit) {
         runInEdtAndWait {
             runWriteAction {
-                VfsUtil.markDirtyAndRefresh(false, true, true, root)
-                // Make sure to always add the module content root
-                if (fixture.module.rootManager.contentEntries.none { it.file == project.baseDirPath }) {
-                    ModuleRootModificationUtil.addContentRoot(fixture.module, project.baseDirPath)
-                }
-
                 builder()
             }
         }

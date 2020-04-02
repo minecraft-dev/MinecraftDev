@@ -30,9 +30,9 @@ class MultipleTargetTest : BaseMixinTest() {
         code: String
     ) {
         buildProject {
-            src {
+            dir("test") {
                 java(
-                    "test/MixedIn.java",
+                    "MixedIn.java",
                     """
                     package test;
 
@@ -43,9 +43,10 @@ class MultipleTargetTest : BaseMixinTest() {
                         public void method2() {
                         }
                     }
-                    """
+                    """,
+                    configure = false
                 )
-                java("test/AmbiguousReferenceMixin.java", code)
+                java("AmbiguousReferenceMixin.java", code)
             }
         }
 

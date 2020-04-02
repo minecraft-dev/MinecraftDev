@@ -26,27 +26,29 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
+            dir("test") {
                 java(
-                    "test/DummyFace.java",
+                    "DummyFace.java",
                     """
                     package test;
 
                     interface DummyFace {
 
                     }
-                    """
+                    """,
+                    configure = false
                 )
 
                 java(
-                    "test/DummyFace2.java",
+                    "DummyFace2.java",
                     """
                     package test;
 
                     interface DummyFace2 {
 
                     }
-                    """
+                    """,
+                    configure = false
                 )
             }
         }
@@ -57,8 +59,8 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
         mixinCode: String
     ) {
         buildProject {
-            src {
-                java("test/DuplicateInterfaceMixin.java", mixinCode)
+            dir("test") {
+                java("DuplicateInterfaceMixin.java", mixinCode)
             }
         }
 
