@@ -29,7 +29,7 @@ class SpongeInjectionInspectionTest : BaseSpongeTest() {
         buildProject {
             dir("test") {
                 java("ASpongePlugin.java", code)
-                resourceFiles.forEach { file(it, "", "", true) }
+                resourceFiles.forEach { file(it, "", "", configure = true, allowAst = false) }
             }
         }
 

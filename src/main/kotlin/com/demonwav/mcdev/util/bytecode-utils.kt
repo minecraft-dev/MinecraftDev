@@ -139,7 +139,7 @@ val PsiMethod.descriptor: String?
 private fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
     builder.append('(')
     for (parameter in parameterList.parameters) {
-        parameter.typeElement?.type?.appendDescriptor(builder)
+        parameter.type.appendDescriptor(builder)
     }
     builder.append(')')
     return (returnType ?: PsiType.VOID).appendDescriptor(builder)

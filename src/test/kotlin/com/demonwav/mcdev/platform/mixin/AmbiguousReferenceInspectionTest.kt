@@ -44,7 +44,8 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                         }
                     }
                     """,
-                    configure = false
+                    configure = false,
+                    allowAst = true
                 )
                 java("AmbiguousReferenceMixin.java", code)
             }

@@ -33,26 +33,30 @@ class ProjectBuilder(private val fixture: JavaCodeInsightTestFixture, private va
         path: String,
         @Language("JAVA")
         code: String,
-        configure: Boolean = true
-    ) = file(path, code, ".java", configure)
+        configure: Boolean = true,
+        allowAst: Boolean = false
+    ) = file(path, code, ".java", configure, allowAst)
     fun at(
         path: String,
         @Language("Access Transformers")
         code: String,
-        configure: Boolean = true
-    ) = file(path, code, "_at.cfg", configure)
+        configure: Boolean = true,
+        allowAst: Boolean = false
+    ) = file(path, code, "_at.cfg", configure, allowAst)
     fun lang(
         path: String,
         @Language("MCLang")
         code: String,
-        configure: Boolean = true
-    ) = file(path, code, ".lang", configure)
+        configure: Boolean = true,
+        allowAst: Boolean = false
+    ) = file(path, code, ".lang", configure, allowAst)
     fun nbtt(
         path: String,
         @Language("NBTT")
         code: String,
-        configure: Boolean = true
-    ) = file(path, code, ".nbtt", configure)
+        configure: Boolean = true,
+        allowAst: Boolean = false
+    ) = file(path, code, ".nbtt", configure, allowAst)
 
     inline fun dir(path: String, block: ProjectBuilder.() -> Unit) {
         val oldIntermediatePath = intermediatePath
@@ -65,13 +69,15 @@ class ProjectBuilder(private val fixture: JavaCodeInsightTestFixture, private va
         intermediatePath = oldIntermediatePath
     }
 
-    fun file(path: String, code: String, ext: String, configure: Boolean): VirtualFile {
+    fun file(path: String, code: String, ext: String, configure: Boolean, allowAst: Boolean): VirtualFile {
         check(path.endsWith(ext))
 
         val fullPath = if (intermediatePath.isEmpty()) path else "$intermediatePath/$path"
         val newFile = tempDirFixture.createFile(fullPath, code.trimIndent())
 
-        fixture.allowTreeAccessForFile(newFile)
+        if (allowAst) {
+            fixture.allowTreeAccessForFile(newFile)
+        }
         if (configure) {
             fixture.configureFromExistingVirtualFile(newFile)
         }

@@ -20,7 +20,7 @@ abstract class CommenterTest : BaseMinecraftTest() {
 
     protected fun doTest(before: String, after: String, postfix: String, func: ProjectBuilderFunc) {
         buildProject {
-            func(fileName + postfix, before.trimIndent(), true)
+            func(fileName + postfix, before.trimIndent(), true, false)
         }
 
         fixture.performEditorAction(IdeActions.ACTION_COMMENT_LINE)

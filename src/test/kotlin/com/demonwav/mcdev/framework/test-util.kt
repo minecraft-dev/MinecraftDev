@@ -18,7 +18,6 @@ import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.JarFileSystem
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
@@ -27,7 +26,8 @@ import com.intellij.testFramework.LexerTestCase
 import com.intellij.util.ReflectionUtil
 import org.junit.jupiter.api.Assertions
 
-typealias ProjectBuilderFunc = ProjectBuilder.(String, String, Boolean) -> VirtualFile
+typealias ProjectBuilderFunc =
+    ProjectBuilder.(path: String, code: String, configure: Boolean, allowAst: Boolean) -> VirtualFile
 
 val mockJdk by lazy {
     val path = findLibraryPath("mockJDK")
@@ -52,12 +52,6 @@ fun createLibrary(project: Project, name: String): Library {
     }
 }
 
-val Project.baseDirPath
-    get() = LocalFileSystem.getInstance().findFileByPath(this.basePath!!)!!
-
-fun String.toSnakeCase(postFix: String = "") =
-    replace(" ", "_") + postFix
-
 fun testLexer(basePath: String, lexer: Lexer) {
     val caller = ReflectionUtil.getCallerClass(3)!!
     val text = caller.getResource(basePath).readText().trim()
@@ -77,7 +71,7 @@ fun ProjectBuilderTest.testParser(basePath: String, func: ProjectBuilderFunc) {
 
     var file: PsiFile? = null
     buildProject {
-        file = func(basePath.substringAfterLast('/'), text, true).toPsiFile()
+        file = func(basePath.substringAfterLast('/'), text, true, false).toPsiFile()
     }
 
     val actual = DebugUtil.psiToString(file!!, false, true)
