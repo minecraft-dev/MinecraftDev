@@ -185,7 +185,16 @@ fun Any.findDeclaredField(name: String): Any? {
 }
 
 fun Any.invokeDeclaredMethod(name: String, types: Array<Class<*>?>, vararg params: Any?): Any? {
-    return javaClass.getDeclaredMethod(name, *types)?.let { method ->
+    return invokeDeclaredMethod(javaClass, name, types, *params)
+}
+
+fun Any.invokeDeclaredMethod(
+    owner: Class<*>,
+    name: String,
+    types: Array<Class<*>?>,
+    vararg params: Any?
+): Any? {
+    return owner.getDeclaredMethod(name, *types)?.let { method ->
         try {
             method.isAccessible = true
             method(this, *params)

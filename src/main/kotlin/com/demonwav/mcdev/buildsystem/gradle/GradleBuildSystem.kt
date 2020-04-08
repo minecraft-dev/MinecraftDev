@@ -392,7 +392,7 @@ class GradleBuildSystem(
         val pane = WindowManagerEx.getInstanceEx().getFrame(project)?.rootPane as? IdeRootPane ?: return
         pane.findDeclaredField("myStatusBar")
             ?.findDeclaredField("myInfoAndProgressPanel")
-            ?.invokeDeclaredMethod("openProcessPopup", arrayOf(Boolean::class.javaPrimitiveType), true)
+            ?.invokeDeclaredMethod("openProcessPopup", arrayOf<Class<*>?>(Boolean::class.javaPrimitiveType), true)
     }
 
     private fun requestCreateForgeRunConfigs(
