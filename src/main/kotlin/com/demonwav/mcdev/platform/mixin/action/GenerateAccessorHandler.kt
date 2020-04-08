@@ -61,9 +61,9 @@ import com.intellij.ui.components.JBCheckBox
 import com.intellij.uiDesigner.core.GridConstraints
 import com.intellij.uiDesigner.core.GridLayoutManager
 import com.intellij.util.IncorrectOperationException
-import org.jetbrains.java.generate.exception.GenerateCodeException
 import java.awt.event.ItemEvent
 import javax.swing.JComponent
+import org.jetbrains.java.generate.exception.GenerateCodeException
 
 class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/Invoker") {
 
@@ -81,7 +81,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
     ) {
         val aClass = OverrideImplementUtil.getContextClass(project, editor, file, false)
         if (aClass == null || aClass.isInterface) {
-            return //?
+            return // ?
         }
         log.assertTrue(aClass.isValid)
         log.assertTrue(aClass.containingFile != null)
@@ -98,33 +98,41 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                 return
             }
 
-            CommandProcessor.getInstance().executeCommand(project, {
-                val offset = mixinEditor.caretModel.offset
-                try {
-                    this.invokeDeclaredMethod(
-                        GenerateMembersHandlerBase::class.java,
-                        "doGenerate",
-                        arrayOf<Class<*>?>(
-                            Project::class.java,
-                            Editor::class.java,
-                            PsiClass::class.java,
-                            Array<ClassMember>::class.java
-                        ),
-                        project,
-                        mixinEditor,
-                        mixinClass,
-                        members
-                    )
-                } catch (e: GenerateCodeException) {
-                    val message = e.message
-                    ApplicationManager.getApplication().invokeLater(Runnable {
-                        if (!mixinEditor.isDisposed) {
-                            mixinEditor.caretModel.moveToOffset(offset)
-                            HintManager.getInstance().showErrorHint(editor, message!!)
-                        }
-                    }, project.disposed)
-                }
-            }, null, null)
+            CommandProcessor.getInstance().executeCommand(
+                project,
+                {
+                    val offset = mixinEditor.caretModel.offset
+                    try {
+                        this.invokeDeclaredMethod(
+                            GenerateMembersHandlerBase::class.java,
+                            "doGenerate",
+                            arrayOf<Class<*>?>(
+                                Project::class.java,
+                                Editor::class.java,
+                                PsiClass::class.java,
+                                Array<ClassMember>::class.java
+                            ),
+                            project,
+                            mixinEditor,
+                            mixinClass,
+                            members
+                        )
+                    } catch (e: GenerateCodeException) {
+                        val message = e.message
+                        ApplicationManager.getApplication().invokeLater(
+                            Runnable {
+                                if (!mixinEditor.isDisposed) {
+                                    mixinEditor.caretModel.moveToOffset(offset)
+                                    HintManager.getInstance().showErrorHint(editor, message!!)
+                                }
+                            },
+                            project.disposed
+                        )
+                    }
+                },
+                null,
+                null
+            )
         } finally {
             cleanup()
         }
@@ -377,7 +385,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
         mixin: PsiClass,
         generateGetter: Boolean,
         generateSetter: Boolean
-    ) : List<PsiMethod> {
+    ): List<PsiMethod> {
         val factory = JavaPsiFacade.getElementFactory(project)
 
         val isStatic = target.modifierList?.hasExplicitModifier(PsiModifier.STATIC) == true
@@ -414,7 +422,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
         return accessors
     }
 
-    private fun generateInvoker(project: Project, target: PsiMethod, mixin: PsiClass) : PsiMethod? {
+    private fun generateInvoker(project: Project, target: PsiMethod, mixin: PsiClass): PsiMethod? {
         val factory = JavaPsiFacade.getElementFactory(project)
 
         val isStatic = target.modifierList.hasExplicitModifier(PsiModifier.STATIC) || target.isConstructor
@@ -485,5 +493,4 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
             return constraints
         }
     }
-
 }
