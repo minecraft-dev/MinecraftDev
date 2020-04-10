@@ -120,12 +120,12 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                             owner = GenerateMembersHandlerBase::class.java
                         )
                     } catch (e: GenerateCodeException) {
-                        val message = e.message
+                        val message = e.message ?: "Unknown error"
                         ApplicationManager.getApplication().invokeLater(
                             Runnable {
                                 if (!mixinEditor.isDisposed) {
                                     mixinEditor.caretModel.moveToOffset(offset)
-                                    HintManager.getInstance().showErrorHint(editor, message!!)
+                                    HintManager.getInstance().showErrorHint(editor, message)
                                 }
                             },
                             project.disposed
