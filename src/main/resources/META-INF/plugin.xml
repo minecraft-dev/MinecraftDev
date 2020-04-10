@@ -25,16 +25,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
-      <div>
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
-        <p>
-        v. 2020.1-1.3.5
-      </div>
     ]]>
     </change-notes>
 
-    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="201.6251" until-build="201.*"/>
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="201.6668" until-build="201.*"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- This is grouped in the following order EXCEPT for localInspections and moduleTypes. All localInspections are grouped at the
