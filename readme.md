@@ -11,7 +11,7 @@ Minecraft Development for IntelliJ
 | **macOS**    |[![macOS GitHub Action Status](https://github.com/minecraft-dev/MinecraftDev/workflows/macOS%20Build/badge.svg?branch=dev&event=push)](https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22macOS+Build%22)|
 | **Windows**  |[![Windows GitHub Action Status](https://github.com/minecraft-dev/MinecraftDev/workflows/Windows%20Build/badge.svg?branch=dev&event=push)](https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Windows+Build%22)|
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-2019.3--1.3.5-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.3.5-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 <a href="https://discord.gg/j6UNcfr"><img src="https://i.imgur.com/JXu9C1G.png" height="48px"></img></a>
