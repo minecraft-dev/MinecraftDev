@@ -38,36 +38,37 @@ fun PsiClass.findSoftImplements(): Map<String, PsiClass>? {
     return result
 }
 
-fun PsiMethod.isSoftImplementedMethod(): Boolean {
+fun PsiMethod.findSoftImplements(): Map<String, PsiClass>? {
     val methodName = name
     if ('$' !in methodName) {
+        return null
+    }
+
+    val containingClass = containingClass ?: return null
+    return containingClass.findSoftImplements()
+}
+
+fun PsiMethod.isSoftImplementedMethod(): Boolean {
+    val softImplements = this.findSoftImplements()
+    if (softImplements.isNullOrEmpty()) {
         return false
     }
 
-    val containingClass = containingClass ?: return false
-    val softImplements = containingClass.findSoftImplements() ?: return false
-    if (softImplements.isEmpty()) {
-        return false
-    }
-
+    val methodName = name
     return softImplements.any { (prefix, _) -> methodName.startsWith(prefix) }
 }
 
 fun PsiMethod.isSoftImplementMissingParent(): Boolean {
-    return findSoftImplementedMethods(true) { return false }
+    return forEachSoftImplementedMethods(true) { return false }
 }
 
-inline fun PsiMethod.findSoftImplementedMethods(checkBases: Boolean, func: (PsiMethod) -> Unit): Boolean {
-    val methodName = name
-    if ('$' !in methodName) {
+inline fun PsiMethod.forEachSoftImplementedMethods(checkBases: Boolean, func: (PsiMethod) -> Unit): Boolean {
+    val softImplements = this.findSoftImplements()
+    if (softImplements.isNullOrEmpty()) {
         return false
     }
 
-    val containingClass = containingClass ?: return false
-    val softImplements = containingClass.findSoftImplements() ?: return false
-    if (softImplements.isEmpty()) {
-        return false
-    }
+    val methodName = name
 
     var foundPrefix = false
 

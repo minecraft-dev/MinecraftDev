@@ -25,38 +25,41 @@ class SuperClassTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
+            dir("test") {
                 java(
-                    "test/Entity.java",
+                    "Entity.java",
                     """
                     package test;
 
                     public class Entity {
 
                     }
-                """
+                    """,
+                    configure = false
                 )
 
                 java(
-                    "test/DemonWav.java",
+                    "DemonWav.java",
                     """
                     package test;
 
                     public class DemonWav extends Entity {
 
                     }
-                """
+                    """,
+                    configure = false
                 )
 
                 java(
-                    "test/Minecrell.java",
+                    "Minecrell.java",
                     """
                     package test;
 
                     public class Minecrell extends Entity {
 
                     }
-                """
+                    """,
+                    configure = false
                 )
             }
         }
@@ -67,8 +70,8 @@ class SuperClassTest : BaseMixinTest() {
         mixinCode: String
     ) {
         buildProject {
-            src {
-                java("test/SuperClassMixin.java", mixinCode)
+            dir("test") {
+                java("SuperClassMixin.java", mixinCode)
             }
         }
 
@@ -89,7 +92,7 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin {
 
             }
-        """
+            """
         )
     }
 
@@ -106,7 +109,7 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin extends Entity {
 
             }
-        """
+            """
         )
     }
 
@@ -123,7 +126,7 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin extends <error descr="Cannot extend target class">DemonWav</error> {
 
             }
-        """
+            """
         )
     }
 
@@ -140,7 +143,7 @@ class SuperClassTest : BaseMixinTest() {
             public class SuperClassMixin extends <error descr="Cannot find 'Minecrell' in the hierarchy of target class 'DemonWav'">Minecrell</error> {
 
             }
-        """
+            """
         )
     }
 }

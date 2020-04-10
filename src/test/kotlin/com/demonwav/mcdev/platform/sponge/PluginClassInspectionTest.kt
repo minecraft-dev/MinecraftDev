@@ -26,8 +26,8 @@ class PluginClassInspectionTest : BaseSpongeTest() {
         code: String
     ) {
         buildProject {
-            src {
-                java("test/ASpongePlugin.java", code)
+            dir("test") {
+                java("ASpongePlugin.java", code)
             }
         }
 
@@ -49,7 +49,7 @@ class PluginClassInspectionTest : BaseSpongeTest() {
                 ASpongePlugin() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -65,7 +65,7 @@ class PluginClassInspectionTest : BaseSpongeTest() {
             @Plugin(id = "a-plugin")
             public class ASpongePlugin {
             }
-        """
+            """
         )
     }
 
@@ -83,7 +83,7 @@ class PluginClassInspectionTest : BaseSpongeTest() {
                 private <error descr="Plugin class empty constructor must not be private.">ASpongePlugin</error>() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -107,7 +107,7 @@ class PluginClassInspectionTest : BaseSpongeTest() {
                 private ASpongePlugin(Logger logger) {
                 }
             }
-        """
+            """
         )
     }
 
@@ -128,7 +128,7 @@ class PluginClassInspectionTest : BaseSpongeTest() {
                 private ASpongePlugin(Logger logger) {
                 }
             }
-        """
+            """
         )
     }
 }

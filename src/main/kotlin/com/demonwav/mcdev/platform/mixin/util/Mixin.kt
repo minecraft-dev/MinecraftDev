@@ -27,7 +27,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
-import org.jetbrains.annotations.Contract
 
 /**
  * Returns whether the given [PsiClass] is a Mixin class with a `@Mixin` annotation.
@@ -35,7 +34,6 @@ import org.jetbrains.annotations.Contract
  * @receiver The class to check
  * @return True if the given class is a Mixin
  */
-@get:Contract(pure = true)
 val PsiClass.isMixin
     get() = mixinAnnotation != null
 
@@ -46,7 +44,6 @@ val PsiClass.isMixin
  * @receiver The [PsiClass] to check.
  * @return The Mixin [PsiAnnotation] for the provided Mixin [PsiClass].
  */
-@get:Contract(pure = true)
 val PsiClass.mixinAnnotation
     get() = modifierList?.findAnnotation(MIXIN)
 
@@ -57,7 +54,6 @@ val PsiClass.mixinAnnotation
  * @receiver The [PsiClass] to check.
  * @return A list of resolved classes defined in the Mixin targets.
  */
-@get:Contract(pure = true)
 val PsiClass.mixinTargets: List<PsiClass>
     get() {
         return cached {
@@ -85,7 +81,6 @@ val PsiClass.mixinTargets: List<PsiClass>
  * @receiver The class to check
  * @return True if the above checks are satisfied.
  */
-@get:Contract(pure = true)
 val PsiClass.isAccessorMixin: Boolean
     get() {
         if (!isInterface) {
@@ -108,7 +103,11 @@ fun callbackInfoType(project: Project): PsiType? =
     PsiType.getTypeByName(CALLBACK_INFO, project, GlobalSearchScope.allScope(project))
 
 fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType: PsiType): PsiType? {
-    val boxedType = if (returnType is PsiPrimitiveType) returnType.getBoxedType(context)!! else returnType
+    val boxedType = if (returnType is PsiPrimitiveType) {
+        returnType.getBoxedType(context) ?: return null
+    } else {
+        returnType
+    }
 
     // TODO: Can we do this without looking up the PsiClass?
     val psiClass =

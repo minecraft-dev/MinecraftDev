@@ -17,9 +17,7 @@ import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.JarFileSystem
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
@@ -28,7 +26,8 @@ import com.intellij.testFramework.LexerTestCase
 import com.intellij.util.ReflectionUtil
 import org.junit.jupiter.api.Assertions
 
-typealias ProjectBuilderFunc = ProjectBuilder.(String, String, Boolean) -> VirtualFile
+typealias ProjectBuilderFunc =
+    ProjectBuilder.(path: String, code: String, configure: Boolean, allowAst: Boolean) -> VirtualFile
 
 val mockJdk by lazy {
     val path = findLibraryPath("mockJDK")
@@ -53,21 +52,15 @@ fun createLibrary(project: Project, name: String): Library {
     }
 }
 
-val Project.baseDirPath
-    get() = LocalFileSystem.getInstance().findFileByPath(this.basePath!!)!!
-
-fun String.toSnakeCase(postFix: String = "") =
-    replace(" ", "_") + postFix
-
 fun testLexer(basePath: String, lexer: Lexer) {
     val caller = ReflectionUtil.getCallerClass(3)!!
     val text = caller.getResource(basePath).readText().trim()
 
     val expected = caller.getResource("${basePath.substringBeforeLast('.')}.txt").readText().trim()
-    val actual = LexerTestCase.printTokens(text, 0, lexer)
+    val actual = LexerTestCase.printTokens(text.filter { it != '\r' }, 0, lexer)
 
-    val expectedLines = StringUtil.splitByLines(expected, true).toList()
-    val actualLines = StringUtil.splitByLines(actual, true).toList()
+    val expectedLines = expected.lineSequence().filter { it.isNotBlank() }.toList()
+    val actualLines = actual.lineSequence().filter { it.isNotBlank() }.toList()
     Assertions.assertLinesMatch(expectedLines, actualLines)
 }
 
@@ -78,12 +71,12 @@ fun ProjectBuilderTest.testParser(basePath: String, func: ProjectBuilderFunc) {
 
     var file: PsiFile? = null
     buildProject {
-        file = func(basePath.substringAfterLast('/'), text, true).toPsiFile()
+        file = func(basePath.substringAfterLast('/'), text, true, false).toPsiFile()
     }
 
     val actual = DebugUtil.psiToString(file!!, false, true)
 
-    val expectedLines = StringUtil.splitByLines(expected, true).toList()
-    val actualLines = StringUtil.splitByLines(actual, true).toList()
+    val expectedLines = expected.lineSequence().filter { it.isNotBlank() }.toList()
+    val actualLines = actual.lineSequence().filter { it.isNotBlank() }.toList()
     Assertions.assertLinesMatch(expectedLines, actualLines)
 }

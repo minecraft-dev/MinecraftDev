@@ -22,6 +22,7 @@ import com.demonwav.mcdev.platform.liteloader.LiteLoaderTemplate
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
 import com.demonwav.mcdev.platform.sponge.SpongeTemplate
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.asPrimitiveType
 import com.demonwav.mcdev.util.findDeclaredField
 import com.demonwav.mcdev.util.firstOfType
 import com.demonwav.mcdev.util.invokeDeclaredMethod
@@ -45,6 +46,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ex.WindowManagerEx
 import com.intellij.openapi.wm.impl.IdeRootPane
+import com.intellij.openapi.wm.impl.status.IdeStatusBarImpl
+import com.intellij.openapi.wm.impl.status.InfoAndProgressPanel
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileFactory
@@ -262,9 +265,9 @@ class GradleBuildSystem(
                 // We want to find the child which has a GrReferenceExpression with the right name
                 it.children.any { child -> child is GrReferenceExpression && child.text == name }
             }.map {
-            // We want to find the grandchild which is a GrClosable block
-            it.children.mapNotNull { child -> child as? GrClosableBlock }.firstOrNull()
-        }.filterNotNull()
+                // We want to find the grandchild which is a GrClosable block
+                it.children.mapNotNull { child -> child as? GrClosableBlock }.firstOrNull()
+            }.filterNotNull()
             .firstOrNull()
 
     private fun addBuildGradleDependencies(
@@ -389,10 +392,15 @@ class GradleBuildSystem(
         if (!UISettings.instance.showStatusBar || UISettings.instance.presentationMode) {
             return
         }
-        val pane = WindowManagerEx.getInstanceEx().getFrame(project)?.rootPane as? IdeRootPane ?: return
-        pane.findDeclaredField("myStatusBar")
-            ?.findDeclaredField("myInfoAndProgressPanel")
-            ?.invokeDeclaredMethod("openProcessPopup", arrayOf<Class<*>?>(Boolean::class.javaPrimitiveType), true)
+        val pane = WindowManagerEx.getInstanceEx().getFrame(project)?.rootPane ?: return
+        pane.findDeclaredField("myStatusBar", owner = IdeRootPane::class.java)
+            ?.findDeclaredField("myInfoAndProgressPanel", owner = IdeStatusBarImpl::class.java)
+            ?.invokeDeclaredMethod(
+                "openProcessPopup",
+                params = arrayOf(Boolean::class.asPrimitiveType),
+                args = arrayOf(true),
+                owner = InfoAndProgressPanel::class.java
+            )
     }
 
     private fun requestCreateForgeRunConfigs(

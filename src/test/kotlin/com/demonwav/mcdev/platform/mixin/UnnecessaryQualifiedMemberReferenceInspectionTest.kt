@@ -26,9 +26,9 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
         code: String
     ) {
         buildProject {
-            src {
+            dir("test") {
                 java(
-                    "test/MixedIn.java",
+                    "MixedIn.java",
                     """
                     package test;
 
@@ -40,9 +40,10 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                         public void otherMethod() {
                         }
                     }
-                """
+                    """,
+                    configure = false
                 )
-                java("test/UnnecessaryQualifiedMemberReferenceMixin.java", code)
+                java("UnnecessaryQualifiedMemberReferenceMixin.java", code)
             }
         }
 
@@ -68,7 +69,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -90,7 +91,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -112,7 +113,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -134,7 +135,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 }

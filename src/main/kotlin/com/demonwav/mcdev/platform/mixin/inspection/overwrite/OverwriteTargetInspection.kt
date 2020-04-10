@@ -30,7 +30,6 @@ class OverwriteTargetInspection : OverwriteInspection() {
 
         val targets = resolveOverwriteTargets(targetClasses, method)
         if (targets.size >= targetClasses.size) {
-            // OK, bye
             return
         }
 

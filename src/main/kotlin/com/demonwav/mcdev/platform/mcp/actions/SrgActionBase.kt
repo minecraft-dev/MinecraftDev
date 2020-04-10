@@ -45,7 +45,7 @@ abstract class SrgActionBase : AnAction() {
             var parent = data.element.parent
 
             if (parent is PsiMember) {
-                val shadowTarget = parent.findFirstShadowTarget()
+                val shadowTarget = parent.findFirstShadowTarget()?.element
                 if (shadowTarget != null) {
                     parent = shadowTarget
                 }

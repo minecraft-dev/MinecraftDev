@@ -13,7 +13,6 @@ package com.demonwav.mcdev.translations
 import com.demonwav.mcdev.framework.CommenterTest
 import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.framework.ProjectBuilder
-import com.demonwav.mcdev.platform.PlatformType
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -21,11 +20,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(EdtInterceptor::class)
 @DisplayName("Minecraft Lang Commenter Tests")
-class LangCommenterTest : CommenterTest(PlatformType.MCP) {
+class LangCommenterTest : CommenterTest() {
     private fun doTest(
-        @Language("I18n")
+        @Language("MCLang")
         before: String,
-        @Language("I18n")
+        @Language("MCLang")
         after: String
     ) {
         doTest(before, after, ".lang", ProjectBuilder::lang)

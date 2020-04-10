@@ -26,26 +26,28 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
         code: String
     ) {
         buildProject {
-            src {
+            dir("test") {
                 java(
-                    "test/MixedIn.java",
+                    "MixedIn.java",
                     """
                     package test;
 
                     class MixedIn {
-                    
+
                         public void method() {
                         }
-                        
+
                         public void method(String string) {
                         }
-                        
+
                         public void uniqueMethod(String string) {
                         }
                     }
-                """
+                    """,
+                    configure = false,
+                    allowAst = true
                 )
-                java("test/AmbiguousReferenceMixin.java", code)
+                java("AmbiguousReferenceMixin.java", code)
             }
         }
 
@@ -71,7 +73,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -93,7 +95,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -115,7 +117,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -137,7 +139,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 
@@ -159,7 +161,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-        """
+            """
         )
     }
 }

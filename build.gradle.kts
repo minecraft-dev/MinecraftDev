@@ -25,18 +25,15 @@ plugins {
     kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.15"
+    id("org.jetbrains.intellij") version "0.4.18"
     id("net.minecrell.licenser") version "0.4.1"
-    id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
+    id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
 }
-
-group = "com.demonwav.minecraft-dev"
 
 val coroutineVersion = "1.2.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
-defaultTasks("build")
-
 val ideaVersion: String by project
+val coreVersion: String by project
 val downloadIdeaSources: String by project
 
 // for publishing nightlies
@@ -62,6 +59,9 @@ val grammarKit: Configuration by configurations.creating
 val testLibs: Configuration by configurations.creating {
     isTransitive = false
 }
+
+group = "com.demonwav.minecraft-dev"
+version = "$ideaVersion-$coreVersion"
 
 val gradleToolingExtensionSourceSet = sourceSets.create("gradle-tooling-extension") {
     configurations.named(compileOnlyConfigurationName) {

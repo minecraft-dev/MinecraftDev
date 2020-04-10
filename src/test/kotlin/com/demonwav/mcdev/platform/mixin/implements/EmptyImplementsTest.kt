@@ -26,16 +26,17 @@ class EmptyImplementsTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
+            dir("test") {
                 java(
-                    "test/DummyFace.java",
+                    "DummyFace.java",
                     """
                     package test;
 
                     interface DummyFace {
 
                     }
-                """
+                    """,
+                    configure = false
                 )
             }
         }
@@ -46,8 +47,8 @@ class EmptyImplementsTest : BaseMixinTest() {
         mixinCode: String
     ) {
         buildProject {
-            src {
-                java("test/EmptyImplementsMixin.java", mixinCode)
+            dir("test") {
+                java("EmptyImplementsMixin.java", mixinCode)
             }
         }
 
@@ -71,7 +72,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """
+            """
         )
     }
 
@@ -91,7 +92,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """
+            """
         )
     }
 
@@ -114,7 +115,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """
+            """
         )
     }
 }

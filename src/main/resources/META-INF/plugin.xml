@@ -25,15 +25,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
-      <div>
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
-        <p>
-        v. 2019.3-1.3.4
-      </div>
     ]]>
     </change-notes>
 
-    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <idea-version since-build="193.2956" until-build="193.*"/>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -259,8 +255,8 @@
 
         <!-- Mixin Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.MixinLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.ShadowLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.OverwriteLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.MixinTargetLineMarkerProvider"/>
+
 
         <customJavadocTagProvider implementation="com.demonwav.mcdev.platform.mixin.MixinCustomJavaDocTagProvider"/>
 
@@ -676,6 +672,26 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFinalInspection"/>
+
+        <!-- Accessor Inspection-->
+        <localInspection displayName="Unresolved @Accessor target"
+                         shortName="AccessorTarget"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.accessor.AccessorTargetInspection"/>
+
+        <!-- Invoker Inspection-->
+        <localInspection displayName="Unresolved @Invoker target"
+                         shortName="InvokerTarget"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.invoker.InvokerTargetInspection"/>
 
         <!-- Configuration -->
         <localInspection displayName="Unresolved config reference"

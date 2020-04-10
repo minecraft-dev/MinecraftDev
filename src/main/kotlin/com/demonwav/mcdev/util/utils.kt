@@ -25,7 +25,6 @@ import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
-import java.lang.Exception
 
 inline fun <T : Any?> runWriteTask(crossinline func: () -> T): T {
     return invokeAndWait {
@@ -171,40 +170,4 @@ fun String.getSimilarity(text: String, bonus: Int = 0): Int {
 
 inline fun <reified T> Iterable<*>.firstOfType(): T? {
     return this.firstOrNull { it is T } as? T
-}
-
-fun Any.findDeclaredField(name: String): Any? {
-    return javaClass.getDeclaredField(name)?.let { field ->
-        try {
-            field.isAccessible = true
-            field.get(this)
-        } catch (_: Exception) {
-            return null
-        }
-    }
-}
-
-fun Any.invokeDeclaredMethod(name: String, types: Array<Class<*>?>, vararg params: Any?): Any? {
-    return invokeDeclaredMethod(javaClass, name, types, *params)
-}
-
-fun Any.invokeDeclaredMethod(
-    owner: Class<*>,
-    name: String,
-    types: Array<Class<*>?>,
-    vararg params: Any?
-): Any? {
-    return owner.getDeclaredMethod(name, *types)?.let { method ->
-        try {
-            method.isAccessible = true
-            method(this, *params)
-        } catch (_: Exception) {
-            null
-        }
-    }
-}
-
-private fun Any.toClassType(): Class<*> {
-    val clazz = this::class
-    return clazz.javaPrimitiveType ?: clazz.javaObjectType
 }

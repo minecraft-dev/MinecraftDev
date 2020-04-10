@@ -8,12 +8,13 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.inspection.shadow
+package com.demonwav.mcdev.platform.mixin.inspection.accessor
 
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SHADOW
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.getAccessorInfo
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
-import com.demonwav.mcdev.platform.mixin.util.resolveShadowTargets
+import com.demonwav.mcdev.platform.mixin.util.resolveAccessorTarget
 import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.codeInspection.RemoveAnnotationQuickFix
@@ -23,16 +24,16 @@ import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiModifierList
 
-class ShadowTargetInspection : MixinInspection() {
+class AccessorTargetInspection : MixinInspection() {
 
-    override fun getStaticDescription() = "Validates targets of @Shadow members"
+    override fun getStaticDescription() = "Validates targets of @Accessor members"
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
     private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
 
         override fun visitAnnotation(annotation: PsiAnnotation) {
-            if (annotation.qualifiedName != SHADOW) {
+            if (annotation.qualifiedName != MixinConstants.Annotations.ACCESSOR) {
                 return
             }
 
@@ -41,17 +42,14 @@ class ShadowTargetInspection : MixinInspection() {
             val psiClass = member.containingClass ?: return
             val targetClasses = psiClass.mixinTargets.ifEmpty { return }
 
-            val targets = resolveShadowTargets(annotation, targetClasses, member) ?: return
-            if (targets.size >= targetClasses.size) {
-                // Everything is fine, bye
-                return
-            }
+            if (resolveAccessorTarget(annotation, targetClasses, member) == null) {
+                val name = getAccessorInfo(annotation, member)?.name ?: return
 
-            // TODO Write quick fix and apply it for OverwriteTargetInspection and ShadowTargetInspection
-            holder.registerProblem(
-                annotation, "Cannot resolve member '${member.name}' in target class",
-                RemoveAnnotationQuickFix(annotation, member)
-            )
+                holder.registerProblem(
+                    annotation, "Cannot resolve member '$name' in target class",
+                    RemoveAnnotationQuickFix(annotation, member)
+                )
+            }
         }
     }
 }
