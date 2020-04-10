@@ -104,18 +104,20 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                     val offset = mixinEditor.caretModel.offset
                     try {
                         this.invokeDeclaredMethod(
-                            GenerateMembersHandlerBase::class.java,
                             "doGenerate",
-                            arrayOf<Class<*>?>(
+                            params = arrayOf(
                                 Project::class.java,
                                 Editor::class.java,
                                 PsiClass::class.java,
                                 Array<ClassMember>::class.java
                             ),
-                            project,
-                            mixinEditor,
-                            mixinClass,
-                            members
+                            args = arrayOf(
+                                project,
+                                mixinEditor,
+                                mixinClass,
+                                members
+                            ),
+                            owner = GenerateMembersHandlerBase::class.java
                         )
                     } catch (e: GenerateCodeException) {
                         val message = e.message
