@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -43,6 +43,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.PsiThisExpression
 import com.intellij.psi.ResolveResult
+import com.intellij.psi.util.parentOfType
 import com.intellij.util.ArrayUtil
 
 object TargetReference : PolyReferenceResolver(), MixinReference {
@@ -98,7 +99,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
     }
 
     private fun resolve(context: PsiElement, checkOnly: Boolean): List<PsiElement>? {
-        val at = context.annotationFromValue!! // @At
+        val at = context.parentOfType<PsiAnnotation>() ?: return null // @At
         val handler = getHandler(at) ?: return null
 
         val targetMethod = getTargetMethod(at) ?: return null

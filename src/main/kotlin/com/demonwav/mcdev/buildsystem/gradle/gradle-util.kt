@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -38,9 +38,11 @@ inline fun runGradleTask(
         }
 
         indicator?.let {
-            launcher.addProgressListener(ProgressListener { event ->
-                indicator.text = event.description
-            })
+            launcher.addProgressListener(
+                ProgressListener { event ->
+                    indicator.text = event.description
+                }
+            )
         }
 
         func(launcher)

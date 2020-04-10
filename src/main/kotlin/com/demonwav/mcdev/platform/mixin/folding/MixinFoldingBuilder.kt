@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -70,8 +70,9 @@ class MixinFoldingBuilder : CustomFoldingBuilder() {
         val element = node.psi
         return when (element) {
             is PsiTypeCastExpression -> "(${element.castType?.text ?: return node.text})"
-            is PsiAnnotationMemberValue -> TargetReference.resolveTarget(element)?.let { formatElement(it) }
-                ?: node.text
+            is PsiAnnotationMemberValue ->
+                TargetReference.resolveTarget(element)?.let { formatElement(it) }
+                    ?: node.text
             else -> node.text
         }
     }

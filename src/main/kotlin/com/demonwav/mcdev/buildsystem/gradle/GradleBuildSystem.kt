@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -188,7 +188,8 @@ class GradleBuildSystem(
         runWriteTask {
             val wrapperDirPath = VfsUtil.createDirectoryIfMissing(descriptor.rootDirectory, "gradle/wrapper").path
             FileUtils.writeLines(
-                File(wrapperDirPath, "gradle-wrapper.properties"), listOf(
+                File(wrapperDirPath, "gradle-wrapper.properties"),
+                listOf(
                     "distributionUrl=https\\://services.gradle.org/distributions/gradle-$wrapperVersion-bin.zip"
                 )
             )
@@ -225,9 +226,11 @@ class GradleBuildSystem(
                 }
             }
 
-            launcher.addProgressListener(ProgressListener { event ->
-                indicator.text = event.description
-            })
+            launcher.addProgressListener(
+                ProgressListener { event ->
+                    indicator.text = event.description
+                }
+            )
             func(launcher)
             launcher.run()
         }

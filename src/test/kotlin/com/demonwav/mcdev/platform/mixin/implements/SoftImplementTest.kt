@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -25,8 +25,10 @@ class SoftImplementTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
-                java("test/DummyFace.java", """
+            dir("test") {
+                java(
+                    "DummyFace.java",
+                    """
                     package test;
 
                     interface DummyFace {
@@ -34,9 +36,13 @@ class SoftImplementTest : BaseMixinTest() {
                         String thisMethodExists();
 
                     }
-                """)
+                    """,
+                    configure = false
+                )
 
-                java("test/SoftImplementMixin.java", """
+                java(
+                    "SoftImplementMixin.java",
+                    """
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -56,7 +62,8 @@ class SoftImplementTest : BaseMixinTest() {
                         }
 
                     }
-                """)
+                    """
+                )
             }
         }
     }
@@ -64,7 +71,7 @@ class SoftImplementTest : BaseMixinTest() {
     @Test
     @DisplayName("Highlight Prefixed Method Not Implementing @Interface Test")
     fun highlightPrefixedMethodNotImplementingInterfaceTest() {
-        fixture.enableInspections(SoftImplementOverridesInspection::class.java)
+        fixture.enableInspections(SoftImplementOverridesInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }

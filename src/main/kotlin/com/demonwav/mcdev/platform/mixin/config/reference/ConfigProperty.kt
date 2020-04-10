@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -95,7 +95,8 @@ object ConfigProperty : PsiReferenceProvider() {
         return currentClass
     }
 
-    private class Reference(element: JsonStringLiteral) : PsiReferenceBase<JsonStringLiteral>(element),
+    private class Reference(element: JsonStringLiteral) :
+        PsiReferenceBase<JsonStringLiteral>(element),
         InspectionReference {
 
         override val description: String

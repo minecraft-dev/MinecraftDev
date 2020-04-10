@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -40,10 +40,11 @@ class TranslationGotoSymbolContributor : ChooseByNameContributor {
         project: Project,
         includeNonProjectItems: Boolean
     ): Array<NavigationItem> {
-        val scope = if (includeNonProjectItems)
+        val scope = if (includeNonProjectItems) {
             GlobalSearchScope.allScope(project)
-        else
+        } else {
             GlobalSearchScope.projectScope(project)
+        }
         val elements = TranslationInverseIndex.findElements(name, scope)
 
         return elements.mapToArray { it as NavigationItem }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -26,41 +26,53 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
-                java("test/DummyFace.java", """
+            dir("test") {
+                java(
+                    "DummyFace.java",
+                    """
                     package test;
 
                     interface DummyFace {
 
                     }
-                """)
+                    """,
+                    configure = false
+                )
 
-                java("test/DummyFace2.java", """
+                java(
+                    "DummyFace2.java",
+                    """
                     package test;
 
                     interface DummyFace2 {
 
                     }
-                """)
+                    """,
+                    configure = false
+                )
             }
         }
     }
 
-    private fun doTest(@Language("JAVA") mixinCode: String) {
+    private fun doTest(
+        @Language("JAVA")
+        mixinCode: String
+    ) {
         buildProject {
-            src {
-                java("test/DuplicateInterfaceMixin.java", mixinCode)
+            dir("test") {
+                java("DuplicateInterfaceMixin.java", mixinCode)
             }
         }
 
-        fixture.enableInspections(DuplicateInterfaceInspection::class.java)
+        fixture.enableInspections(DuplicateInterfaceInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 
     @Test
     @DisplayName("No Highlight On No Duplicate Interface Test")
     fun noHighlightOnNoDuplicateInterfaceTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -75,13 +87,15 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
             class DuplicateInterfaceMixin {
 
             }
-        """)
+            """
+        )
     }
 
     @Test
     @DisplayName("Highlight On Duplicate Interface Test")
     fun highlightOnDuplicateInterfaceTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -96,6 +110,7 @@ class DuplicateInterfaceInspectionTest : BaseMixinTest() {
             class DuplicateInterfaceMixin {
 
             }
-        """)
+            """
+        )
     }
 }

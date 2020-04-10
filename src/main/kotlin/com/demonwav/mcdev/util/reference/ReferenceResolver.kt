@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -15,6 +15,7 @@ import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
@@ -74,7 +75,7 @@ private fun PsiElement.findContextElement(): PsiElement {
     do {
         current = parent
         parent = current.parent
-        if (parent is PsiNameValuePair) {
+        if (parent is PsiNameValuePair || parent is PsiAnnotationMemberValue) {
             return current
         }
     } while (parent is PsiExpression)

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -24,8 +24,10 @@ class InnerClassTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
-                java("test/InnerClassMixin.java", """
+            dir("test") {
+                java(
+                    "InnerClassMixin.java",
+                    """
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -54,7 +56,8 @@ class InnerClassTest : BaseMixinTest() {
                         }</error>
 
                     }
-                """)
+                    """
+                )
             }
         }
     }
@@ -62,7 +65,7 @@ class InnerClassTest : BaseMixinTest() {
     @Test
     @DisplayName("Mixin Inner Class Inspection Test")
     fun mixinInnerClassInspectionTest() {
-        fixture.enableInspections(MixinInnerClassInspection::class.java)
+        fixture.enableInspections(MixinInnerClassInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }

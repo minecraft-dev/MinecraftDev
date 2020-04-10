@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -19,24 +19,31 @@ import com.intellij.debugger.engine.DebugProcessImpl
 import com.intellij.debugger.engine.DebugProcessListener
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModulePointer
+import com.intellij.openapi.module.ModulePointerManager
 
-class McpRunConfigurationExtension : ModuleDebugRunConfigurationExtension(), DebugProcessListener {
+class McpRunConfigurationExtension : ModuleDebugRunConfigurationExtension() {
 
     override fun attachToProcess(handler: ProcessHandler, module: Module) {
         if (MinecraftFacet.getInstance(module)?.isOfType(McpModuleType) == true) {
-            DebuggerManager.getInstance(module.project).addDebugProcessListener(handler, this)
+            val modulePointer = ModulePointerManager.getInstance(module.project).create(module)
+            DebuggerManager.getInstance(module.project)
+                .addDebugProcessListener(handler, MyProcessListener(modulePointer))
         }
     }
 
-    override fun processAttached(process: DebugProcess) {
-        if (process !is DebugProcessImpl) {
-            return
+    private inner class MyProcessListener(private val modulePointer: ModulePointer) : DebugProcessListener {
+
+        override fun processAttached(process: DebugProcess) {
+            if (process !is DebugProcessImpl) {
+                return
+            }
+
+            // Add session listener
+            process.xdebugProcess?.session?.addSessionListener(UngrabMouseDebugSessionListener(process, modulePointer))
+
+            // We don't need any further events
+            process.removeDebugProcessListener(this)
         }
-
-        // Add session listener
-        process.xdebugProcess?.session?.addSessionListener(UngrabMouseDebugSessionListener(process))
-
-        // We don't need any further events
-        process.removeDebugProcessListener(this)
     }
 }

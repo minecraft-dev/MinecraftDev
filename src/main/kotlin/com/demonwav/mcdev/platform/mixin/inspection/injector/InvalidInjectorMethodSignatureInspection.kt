@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -129,19 +129,22 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val parameters = descriptor.psiElement as PsiParameterList
-            parameters.synchronize(expected.flatMap {
-                if (it.default) {
-                    it.parameters?.map {
-                        JavaPsiFacade.getElementFactory(project).createParameter(
-                            it.name ?: JavaCodeStyleManager.getInstance(project)
-                                .suggestVariableName(VariableKind.PARAMETER, null, null, it.type).names
-                                .firstOrNull() ?: "unknown", it.type
-                        )
-                    } ?: listOf()
-                } else {
-                    listOf()
+            parameters.synchronize(
+                expected.flatMap {
+                    if (it.default) {
+                        it.parameters?.map {
+                            JavaPsiFacade.getElementFactory(project).createParameter(
+                                it.name ?: JavaCodeStyleManager.getInstance(project)
+                                    .suggestVariableName(VariableKind.PARAMETER, null, null, it.type).names
+                                    .firstOrNull() ?: "unknown",
+                                it.type
+                            )
+                        } ?: listOf()
+                    } else {
+                        listOf()
+                    }
                 }
-            })
+            )
         }
     }
 }

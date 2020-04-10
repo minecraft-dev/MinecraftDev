@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -73,23 +73,23 @@ fun PsiElement.findColor(): Pair<Color, PsiElement>? {
 
         // Single Vector3* Argument
     } else if (types.size == 1 && (
+        types[0] == PsiType.getTypeByName(
+            "com.flowpowered.math.vector.Vector3i",
+            project,
+            GlobalSearchScope.allScope(project)
+        ) ||
             types[0] == PsiType.getTypeByName(
-                "com.flowpowered.math.vector.Vector3i",
-                project,
-                GlobalSearchScope.allScope(project)
-            ) ||
-                types[0] == PsiType.getTypeByName(
-                "com.flowpowered.math.vector.Vector3f",
-                project,
-                GlobalSearchScope.allScope(project)
-            ) ||
-                types[0] == PsiType.getTypeByName(
-                "com.flowpowered.math.vector.Vector3d",
-                project,
-                GlobalSearchScope.allScope(project)
-            ))
+            "com.flowpowered.math.vector.Vector3f",
+            project,
+            GlobalSearchScope.allScope(project)
+        ) ||
+            types[0] == PsiType.getTypeByName(
+            "com.flowpowered.math.vector.Vector3d",
+            project,
+            GlobalSearchScope.allScope(project)
+        )
+        )
     ) {
-
         try {
             pair =
                 handleVectorArgument(expressionList.expressions[0] as PsiNewExpression) to expressionList.expressions[0]

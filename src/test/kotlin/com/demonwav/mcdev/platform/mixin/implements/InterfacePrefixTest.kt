@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -25,16 +25,22 @@ class InterfacePrefixTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
-                java("test/DummyFace.java", """
+            dir("test") {
+                java(
+                    "DummyFace.java",
+                    """
                     package test;
 
                     interface DummyFace {
 
                     }
-                """)
+                    """,
+                    configure = false
+                )
 
-                java("test/InterfacePrefixMixin.java", """
+                java(
+                    "InterfacePrefixMixin.java",
+                    """
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -49,7 +55,8 @@ class InterfacePrefixTest : BaseMixinTest() {
                     class InterfacePrefixMixin {
 
                     }
-                """)
+                    """
+                )
             }
         }
     }
@@ -57,7 +64,7 @@ class InterfacePrefixTest : BaseMixinTest() {
     @Test
     @DisplayName("Highlight On @Interface With Bad Prefix Test")
     fun highlightOnInterfaceWithBadPrefixTest() {
-        fixture.enableInspections(InterfacePrefixInspection::class.java)
+        fixture.enableInspections(InterfacePrefixInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -231,10 +231,10 @@ object TranslationFiles {
         sequence {
             for (entry in entries) {
                 val langElement = TranslationInverseIndex.findElements(
-                        entry.key,
-                        GlobalSearchScope.allScope(project),
-                        locale
-                    )
+                    entry.key,
+                    GlobalSearchScope.allScope(project),
+                    locale
+                )
                     .asSequence()
                     .mapNotNull { it as? LangEntry }
                     .firstOrNull()

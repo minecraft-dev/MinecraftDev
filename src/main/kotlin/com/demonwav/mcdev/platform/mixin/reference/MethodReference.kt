@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -25,8 +25,10 @@ import com.demonwav.mcdev.util.reference.PolyReferenceResolver
 import com.demonwav.mcdev.util.reference.completeToLiteral
 import com.demonwav.mcdev.util.toResolveResults
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
+import com.intellij.psi.PsiArrayInitializerMemberValue
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.ResolveResult
@@ -75,9 +77,17 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
     }
 
     private fun resolve(context: PsiElement): Stream<PsiMethod>? {
-        val targetReference = MixinMemberReference.parse(context.constantStringValue) ?: return null
         val targets = getTargets(context) ?: return null
-        return resolve(targets, targetReference)
+        val targetedMethods = when (context) {
+            is PsiLiteral -> context.constantStringValue?.let { listOf(it) } ?: emptyList()
+            is PsiArrayInitializerMemberValue -> context.initializers.mapNotNull { it.constantStringValue }
+            else -> emptyList()
+        }
+
+        return targetedMethods.stream().flatMap { method ->
+            val targetReference = MixinMemberReference.parse(method) ?: return@flatMap null
+            return@flatMap resolve(targets, targetReference)
+        }
     }
 
     private fun resolve(targets: Collection<PsiClass>, targetReference: MemberReference): Stream<PsiMethod> {
@@ -90,14 +100,21 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
     }
 
     fun resolveAllIfNotAmbiguous(context: PsiElement): List<PsiMethod>? {
-        val targetReference = MixinMemberReference.parse(context.constantStringValue) ?: return null
         val targets = getTargets(context) ?: return null
 
-        if (targetReference.descriptor == null && isAmbiguous(targets, targetReference)) {
-            return null
+        val targetedMethods = when (context) {
+            is PsiLiteral -> context.constantStringValue?.let { listOf(it) } ?: emptyList()
+            is PsiArrayInitializerMemberValue -> context.initializers.mapNotNull { it.constantStringValue }
+            else -> emptyList()
         }
 
-        return resolve(targets, targetReference).toList()
+        return targetedMethods.stream().flatMap { method ->
+            val targetReference = MixinMemberReference.parse(method) ?: return@flatMap null
+            if (targetReference.descriptor == null && isAmbiguous(targets, targetReference)) {
+                return@flatMap null
+            }
+            return@flatMap resolve(targets, targetReference)
+        }.toList()
     }
 
     override fun resolveReference(context: PsiElement): Array<ResolveResult> {

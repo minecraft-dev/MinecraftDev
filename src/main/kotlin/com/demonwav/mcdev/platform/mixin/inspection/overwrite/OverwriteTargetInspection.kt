@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -30,7 +30,6 @@ class OverwriteTargetInspection : OverwriteInspection() {
 
         val targets = resolveOverwriteTargets(targetClasses, method)
         if (targets.size >= targetClasses.size) {
-            // OK, bye
             return
         }
 

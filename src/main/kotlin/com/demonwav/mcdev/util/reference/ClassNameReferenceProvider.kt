@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -36,12 +36,13 @@ abstract class ClassNameReferenceProvider : PackageNameReferenceProvider() {
     override fun canBindTo(element: PsiElement) = super.canBindTo(element) || element is PsiClass
 
     override fun resolve(qualifiedName: String, element: PsiElement, facade: JavaPsiFacade): Array<ResolveResult> {
-        val classes = facade.findClasses(qualifiedName, element.resolveScope)
+        val actualName = qualifiedName.replace('$', '.')
+        val classes = facade.findClasses(actualName, element.resolveScope)
         if (classes.isNotEmpty()) {
             return classes.mapToArray(::PsiElementResolveResult)
         }
 
-        return super.resolve(qualifiedName, element, facade)
+        return super.resolve(actualName, element, facade)
     }
 
     override fun collectVariants(element: PsiElement, context: PsiElement?): Array<Any> {

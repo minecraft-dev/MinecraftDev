@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -114,7 +114,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
 
         this.bytes =
             PsiDocumentManager.getInstance(project).getDocument(nbttFile)
-                ?.immutableCharSequence?.toString()?.toByteArray() ?: byteArrayOf()
+            ?.immutableCharSequence?.toString()?.toByteArray() ?: byteArrayOf()
 
         // just to be safe
         this.parent.bom = null

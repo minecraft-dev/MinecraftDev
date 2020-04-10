@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -47,7 +47,7 @@ object SideOnlyUtil {
         val methodAnnotation =
             // It's not annotated, which would be invalid if the element was annotated
             method.modifierList.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION)
-            // (which, if we've gotten this far, is true)
+                // (which, if we've gotten this far, is true)
                 ?: return Side.NONE
 
         // Check the value of the annotation

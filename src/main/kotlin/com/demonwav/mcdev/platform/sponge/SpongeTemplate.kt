@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -20,7 +20,6 @@ import java.util.Properties
 object SpongeTemplate {
 
     fun applyPomTemplate(project: Project): String {
-
         val properties = Properties()
 
         val manager = FileTemplateManager.getInstance(project)

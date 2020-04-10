@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -27,13 +27,11 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.compiled.ClsMethodImpl
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
-import org.jetbrains.annotations.Contract
 
 fun PsiMember.findUpstreamMixin(): PsiClass? {
     return findAnnotation(DYNAMIC)?.findDeclaredAttributeValue("mixin")?.resolveClass()
 }
 
-@get:Contract(pure = true)
 val PsiElement.isWithinDynamicMixin: Boolean
     get() = findContainingMethod()?.findAnnotation(DYNAMIC) != null
 
@@ -41,15 +39,17 @@ fun findMethods(psiClass: PsiClass): Sequence<PsiMethod>? {
     val targets = psiClass.mixinTargets
     return when (targets.size) {
         0 -> null
-        1 -> targets.single().methods.asSequence()
-            .filter({ !it.isConstructor })
-        else -> targets.asSequence()
-            .flatMap { target -> target.methods.asSequence() }
-            .filter({ !it.isConstructor })
-            .groupBy { it.memberReference }
-            .values.asSequence()
-            .filter { it.size >= targets.size }
-            .map { it.first() }
+        1 ->
+            targets.single().methods.asSequence()
+                .filter({ !it.isConstructor })
+        else ->
+            targets.asSequence()
+                .flatMap { target -> target.methods.asSequence() }
+                .filter({ !it.isConstructor })
+                .groupBy { it.memberReference }
+                .values.asSequence()
+                .filter { it.size >= targets.size }
+                .map { it.first() }
     }?.filter { m ->
         // Filter methods which are already in the Mixin class
         psiClass.findMatchingMethods(m, false).isEmpty()
@@ -61,12 +61,13 @@ fun findFields(psiClass: PsiClass): Sequence<PsiField>? {
     return when (targets.size) {
         0 -> null
         1 -> targets.single().fields.asSequence()
-        else -> targets.asSequence()
-            .flatMap { target -> target.fields.asSequence() }
-            .groupBy { it.memberReference }
-            .values.asSequence()
-            .filter { it.size >= targets.size }
-            .map { it.first() }
+        else ->
+            targets.asSequence()
+                .flatMap { target -> target.fields.asSequence() }
+                .groupBy { it.memberReference }
+                .values.asSequence()
+                .filter { it.size >= targets.size }
+                .map { it.first() }
     }?.filter {
         // Filter fields which are already in the Mixin class
         psiClass.findFieldByName(it.name, false) == null

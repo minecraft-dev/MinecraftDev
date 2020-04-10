@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -45,7 +45,7 @@ abstract class SrgActionBase : AnAction() {
             var parent = data.element.parent
 
             if (parent is PsiMember) {
-                val shadowTarget = parent.findFirstShadowTarget()
+                val shadowTarget = parent.findFirstShadowTarget()?.element
                 if (shadowTarget != null) {
                     parent = shadowTarget
                 }

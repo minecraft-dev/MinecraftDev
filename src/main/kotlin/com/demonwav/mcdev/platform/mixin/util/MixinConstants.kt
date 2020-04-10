@@ -3,13 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mixin.util
 
+@Suppress("MemberVisibilityCanBePrivate")
 object MixinConstants {
     const val PACKAGE = "org.spongepowered.asm.mixin."
     const val SMAP_STRATUM = "Mixin"

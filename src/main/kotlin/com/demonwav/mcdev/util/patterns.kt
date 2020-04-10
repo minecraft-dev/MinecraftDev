@@ -3,14 +3,13 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.util
 
-import com.intellij.patterns.ElementPattern
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PsiAnnotationPattern
 import com.intellij.patterns.PsiJavaElementPattern
@@ -28,19 +27,14 @@ fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPatter
     attribute: String
 ): Self {
     return inside(
-        true, PsiJavaPatterns.psiNameValuePair().withName(attribute)
+        true,
+        PsiJavaPatterns.psiNameValuePair().withName(attribute)
             .withParent(
                 PlatformPatterns.psiElement(PsiAnnotationParameterList::class.java)
                     .withParent(annotation)
-            ), ANNOTATION_ATTRIBUTE_STOP
+            ),
+        ANNOTATION_ATTRIBUTE_STOP
     )
-}
-
-fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPattern<T, Self>.insideAnnotationAttribute(
-    annotation: ElementPattern<String>,
-    attribute: String
-): Self {
-    return insideAnnotationAttribute(PsiJavaPatterns.psiAnnotation().qName(annotation), attribute)
 }
 
 fun <T : PsiElement, Self : PsiJavaElementPattern<T, Self>> PsiJavaElementPattern<T, Self>.insideAnnotationAttribute(

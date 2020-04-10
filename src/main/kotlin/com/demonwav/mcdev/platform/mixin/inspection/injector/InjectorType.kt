@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -60,8 +60,10 @@ enum class InjectorType(private val annotation: String) {
             // Captured locals (only if local capture is enabled)
             // Right now we allow any parameters here since we can't easily
             // detect the local variables that can be captured
-            if (((annotation.findDeclaredAttributeValue("locals") as? PsiQualifiedReference)
-                    ?.referenceName ?: "NO_CAPTURE") != "NO_CAPTURE"
+            if ((
+                (annotation.findDeclaredAttributeValue("locals") as? PsiQualifiedReference)
+                    ?.referenceName ?: "NO_CAPTURE"
+                ) != "NO_CAPTURE"
             ) {
                 result.add(ParameterGroup(null))
             }

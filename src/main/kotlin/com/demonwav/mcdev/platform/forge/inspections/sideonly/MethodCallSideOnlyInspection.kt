@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -48,7 +48,6 @@ class MethodCallSideOnlyInspection : BaseInspection() {
 
     override fun buildVisitor(): BaseInspectionVisitor {
         return object : BaseInspectionVisitor() {
-
             override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
                 if (!SideOnlyUtil.beginningCheck(expression)) {
                     return

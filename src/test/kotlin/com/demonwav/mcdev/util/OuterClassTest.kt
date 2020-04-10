@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -30,31 +30,32 @@ abstract class OuterClassTest : ProjectBuilderTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
-                outerClass = java("com/example/test/OuterClass.java", """
-                    package com.example.test;
+            outerClass = java(
+                "com/example/test/OuterClass.java",
+                """
+                package com.example.test;
 
-                    class OuterClass {
+                class OuterClass {
 
-                        private static final Object ANONYMOUS_CLASS = new Object() {
-                        };
+                    private static final Object ANONYMOUS_CLASS = new Object() {
+                    };
 
-                        class InnerClass {
-                            public void test() {
-                                new Object() {
-                                    class AnonymousInnerClass {
+                    class InnerClass {
+                        public void test() {
+                            new Object() {
+                                class AnonymousInnerClass {
 
-                                    }
-                                };
-                            }
-                        }
-
-                        class SelfReferencingGeneric<C extends SelfReferencingGeneric<C>> {
-                            public C doSomething() {}
+                                }
+                            };
                         }
                     }
-                """).toPsiFile<PsiJavaFile>().classes.single()
-            }
+
+                    class SelfReferencingGeneric<C extends SelfReferencingGeneric<C>> {
+                        public C doSomething() {}
+                    }
+                }
+            """
+            ).toPsiFile<PsiJavaFile>().classes.single()
         }
 
         this.outerAnonymousClass = outerClass.anonymousElements.single() as PsiAnonymousClass

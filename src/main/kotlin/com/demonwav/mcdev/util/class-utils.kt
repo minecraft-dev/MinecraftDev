@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -25,25 +25,20 @@ import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiTypeParameter
 import com.intellij.psi.search.GlobalSearchScope
-import org.jetbrains.annotations.Contract
 
-@get:Contract(pure = true)
 val PsiClass.packageName
     get() = (containingFile as? PsiJavaFile)?.packageName
 
 // Type
 
-@get:Contract(pure = true)
 val PsiClassType.fullQualifiedName
     get() = resolve()?.fullQualifiedName // this can be null if the type import is missing
 
 // Class
 
-@get:Contract(pure = true)
 val PsiClass.outerQualifiedName
     get() = if (containingClass == null) qualifiedName else null
 
-@get:Contract(pure = true)
 val PsiClass.fullQualifiedName
     get(): String? {
         return try {
@@ -62,11 +57,9 @@ private fun PsiClass.buildQualifiedName(builder: StringBuilder): StringBuilder {
     return builder
 }
 
-@get:Contract(pure = true)
 private val PsiClass.outerShortName
     get() = if (containingClass == null) name else null
 
-@get:Contract(pure = true)
 val PsiClass.shortName: String?
     get() {
         if (this is PsiTypeParameter) {
@@ -170,7 +163,6 @@ fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int? {
     throw ClassNameResolutionFailedException("Failed to determine anonymous class for $anonymousElement")
 }
 
-@get:Contract(pure = true)
 val PsiElement.anonymousElements: Array<PsiElement>
     get() {
         for (provider in AnonymousElementProvider.EP_NAME.extensionList) {
@@ -207,16 +199,22 @@ fun PsiClass.addImplements(qualifiedClassName: String) {
 
 // Member
 
-fun PsiClass.findMatchingMethod(pattern: PsiMethod, checkBases: Boolean, name: String = pattern.name): PsiMethod? {
-    return findMethodsByName(name, checkBases).firstOrNull { it.isMatchingMethod(pattern) }
+fun PsiClass.findMatchingMethod(
+    pattern: PsiMethod,
+    checkBases: Boolean,
+    name: String = pattern.name,
+    constructor: Boolean = pattern.isConstructor
+): PsiMethod? {
+    return findMethodsByName(name, checkBases).firstOrNull { it.isMatchingMethod(pattern, constructor) }
 }
 
 fun PsiClass.findMatchingMethods(
     pattern: PsiMethod,
     checkBases: Boolean,
-    name: String = pattern.name
+    name: String = pattern.name,
+    constructor: Boolean = pattern.isConstructor
 ): List<PsiMethod> {
-    return findMethodsByName(name, checkBases).filter { it.isMatchingMethod(pattern) }
+    return findMethodsByName(name, checkBases).filter { it.isMatchingMethod(pattern, constructor) }
 }
 
 inline fun PsiClass.findMatchingMethods(
@@ -232,9 +230,10 @@ inline fun PsiClass.findMatchingMethods(
     }
 }
 
-fun PsiMethod.isMatchingMethod(pattern: PsiMethod): Boolean {
-    return areReallyOnlyParametersErasureEqual(this.parameterList, pattern.parameterList) &&
-        this.returnType.isErasureEquivalentTo(pattern.returnType)
+fun PsiMethod.isMatchingMethod(pattern: PsiMethod, constructor: Boolean = pattern.isConstructor): Boolean {
+    return this.isConstructor == constructor &&
+        areReallyOnlyParametersErasureEqual(this.parameterList, pattern.parameterList) &&
+        (this.isConstructor || constructor || this.returnType.isErasureEquivalentTo(pattern.returnType))
 }
 
 fun PsiClass.findMatchingField(pattern: PsiField, checkBases: Boolean, name: String = pattern.name): PsiField? {

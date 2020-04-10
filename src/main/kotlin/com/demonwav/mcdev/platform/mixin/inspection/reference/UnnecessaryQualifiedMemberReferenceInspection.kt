@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -22,6 +22,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationMemberValue
+import com.intellij.psi.PsiArrayInitializerMemberValue
+import com.intellij.psi.PsiLiteral
 
 class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection(METHOD_INJECTORS, "method") {
 
@@ -32,6 +34,13 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
         value: PsiAnnotationMemberValue,
         holder: ProblemsHolder
     ) {
+        when (value) {
+            is PsiLiteral -> checkMemberReference(value, holder)
+            is PsiArrayInitializerMemberValue -> value.initializers.forEach { checkMemberReference(it, holder) }
+        }
+    }
+
+    private fun checkMemberReference(value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
         val reference = MixinMemberReference.parse(value.constantStringValue) ?: return
         if (reference.qualified) {
             holder.registerProblem(

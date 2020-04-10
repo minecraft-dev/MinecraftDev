@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -27,7 +27,8 @@ object McpModelFG2Handler : McpModelDataHandler {
     ): McpModelData? {
         val data = resolverCtx.getExtraProject(gradleModule, McpModelFG2::class.java) ?: return null
         return McpModelData(
-            module, McpModuleSettings.State(
+            module,
+            McpModuleSettings.State(
                 data.minecraftVersion,
                 data.mcpVersion,
                 data.mappingFiles.find { it.endsWith("mcp-srg.srg") },

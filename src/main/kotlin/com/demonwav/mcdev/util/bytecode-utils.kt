@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -21,13 +21,11 @@ import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.TypeConversionUtil
-import org.jetbrains.annotations.Contract
 
 private const val INTERNAL_CONSTRUCTOR_NAME = "<init>"
 
 // Type
 
-@get:Contract(pure = true)
 val PsiPrimitiveType.internalName: Char
     get() = when (this) {
         PsiType.BYTE -> 'B'
@@ -86,7 +84,6 @@ fun parseClassDescriptor(descriptor: String): String {
 
 // Class
 
-@get:Contract(pure = true)
 val PsiClass.internalName: String?
     get() {
         return try {
@@ -107,7 +104,6 @@ private fun PsiClass.buildInternalName(builder: StringBuilder): StringBuilder {
     return builder
 }
 
-@get:Contract(pure = true)
 val PsiClass.descriptor: String?
     get() {
         return try {
@@ -127,11 +123,9 @@ fun PsiClass.findMethodsByInternalName(internalName: String, checkBases: Boolean
 
 // Method
 
-@get:Contract(pure = true)
 val PsiMethod.internalName: String
     get() = if (isConstructor) INTERNAL_CONSTRUCTOR_NAME else name
 
-@get:Contract(pure = true)
 val PsiMethod.descriptor: String?
     get() {
         return try {
@@ -145,14 +139,13 @@ val PsiMethod.descriptor: String?
 private fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
     builder.append('(')
     for (parameter in parameterList.parameters) {
-        parameter.typeElement?.type?.appendDescriptor(builder)
+        parameter.type.appendDescriptor(builder)
     }
     builder.append(')')
     return (returnType ?: PsiType.VOID).appendDescriptor(builder)
 }
 
 // Field
-@get:Contract(pure = true)
 val PsiField.descriptor: String?
     get() {
         return try {

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -21,21 +21,25 @@ import org.junit.jupiter.api.extension.ExtendWith
 @DisplayName("Sponge Plugin Class Inspection Tests")
 class PluginClassInspectionTest : BaseSpongeTest() {
 
-    private fun doTest(@Language("JAVA") code: String) {
+    private fun doTest(
+        @Language("JAVA")
+        code: String
+    ) {
         buildProject {
-            src {
-                java("test/ASpongePlugin.java", code)
+            dir("test") {
+                java("ASpongePlugin.java", code)
             }
         }
 
-        fixture.enableInspections(SpongePluginClassInspection::class.java)
+        fixture.enableInspections(SpongePluginClassInspection::class)
         fixture.checkHighlighting(false, false, false)
     }
 
     @Test
     @DisplayName("Invalid Plugin Id Test")
     fun invalidPluginIdTest() {
-        doTest("""
+        doTest(
+            """
             package test;
             
             import org.spongepowered.api.plugin.Plugin;
@@ -45,13 +49,15 @@ class PluginClassInspectionTest : BaseSpongeTest() {
                 ASpongePlugin() {
                 }
             }
-        """)
+            """
+        )
     }
 
     @Test
     @DisplayName("Default Constructor Test")
     fun defaultConstructorTest() {
-        doTest("""
+        doTest(
+            """
             package test;
             
             import org.spongepowered.api.plugin.Plugin;
@@ -59,13 +65,15 @@ class PluginClassInspectionTest : BaseSpongeTest() {
             @Plugin(id = "a-plugin")
             public class ASpongePlugin {
             }
-        """)
+            """
+        )
     }
 
     @Test
     @DisplayName("Private Constructor Test")
     fun privateConstructorTest() {
-        doTest("""
+        doTest(
+            """
             package test;
             
             import org.spongepowered.api.plugin.Plugin;
@@ -75,13 +83,15 @@ class PluginClassInspectionTest : BaseSpongeTest() {
                 private <error descr="Plugin class empty constructor must not be private.">ASpongePlugin</error>() {
                 }
             }
-        """)
+            """
+        )
     }
 
     @Test
     @DisplayName("Private Constructor With Injected Constructor Test")
     fun privateConstructorWithInjectedConstructorTest() {
-        doTest("""
+        doTest(
+            """
             package test;
             
             import com.google.inject.Inject;
@@ -97,13 +107,15 @@ class PluginClassInspectionTest : BaseSpongeTest() {
                 private ASpongePlugin(Logger logger) {
                 }
             }
-        """)
+            """
+        )
     }
 
     @Test
     @DisplayName("No Private Constructor With Injected Constructor Test")
     fun noPrivateConstructorWithInjectedConstructorTest() {
-        doTest("""
+        doTest(
+            """
             package test;
             
             import com.google.inject.Inject;
@@ -116,6 +128,7 @@ class PluginClassInspectionTest : BaseSpongeTest() {
                 private ASpongePlugin(Logger logger) {
                 }
             }
-        """)
+            """
+        )
     }
 }

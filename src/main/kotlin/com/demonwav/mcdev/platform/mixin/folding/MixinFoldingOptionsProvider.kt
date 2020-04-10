@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -21,7 +21,8 @@ class MixinFoldingOptionsProvider :
         checkBox(
             "Mixin: Target descriptors",
             { settings.state.foldTargetDescriptors },
-            { b -> settings.state.foldTargetDescriptors = b })
+            { b -> settings.state.foldTargetDescriptors = b }
+        )
         checkBox("Mixin: Object casts", { settings.state.foldObjectCasts }, { b -> settings.state.foldObjectCasts = b })
     }
 }

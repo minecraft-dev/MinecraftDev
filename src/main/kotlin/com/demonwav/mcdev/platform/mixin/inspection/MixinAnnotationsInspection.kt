@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -38,7 +38,7 @@ class MixinAnnotationsInspection : MixinInspection() {
             // Annotation must be either on or in a Mixin class
             val containingClass =
                 (annotation.owner as? PsiModifierList)?.parent as? PsiClass ?: annotation.findContainingClass()
-                ?: return
+                    ?: return
             if (!containingClass.isMixin) {
                 holder.registerProblem(
                     annotation, "@${annotation.nameReferenceElement?.text} can be only used in a @Mixin class",

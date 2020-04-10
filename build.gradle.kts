@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -22,17 +22,17 @@ buildscript {
 }
 
 plugins {
-    kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
+    kotlin("jvm") version "1.3.70" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.16"
+    id("org.jetbrains.intellij") version "0.4.18"
     id("net.minecrell.licenser") version "0.4.1"
     id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
 }
 
 group = "com.demonwav.minecraft-dev"
 
-val coroutineVersion = "1.2.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
+val coroutineVersion = "1.3.4" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
 defaultTasks("build")
 
@@ -111,7 +111,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1))
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:$ideaVersion")
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:201.6668.121")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.1")
@@ -237,6 +237,10 @@ license {
             files = project.fileTree("src/main/grammars")
         }
     }
+}
+
+ktlint {
+    enableExperimentalRules.set(true)
 }
 
 tasks.register("format") {

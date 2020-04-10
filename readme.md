@@ -3,15 +3,15 @@
 Minecraft Development for IntelliJ
 ==================================
 
-|        Service         |Status|
-|------------------------|------|
-|      **TeamCity**      |[![TeamCity Build Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
-|      **Nightly**       |[![TeamCity Nightly Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly)|
-|   **Travis (Linux)**   |[![Travis Linux Build Status](https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/1)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
-|   **Travis (macOS)**   |[![Travis macOS Build Status](https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/2)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
-| **AppVeyor (Windows)** |[![AppVeyor Windows Build Status](https://ci.appveyor.com/api/projects/status/iuxeewnxgu4afmo6?svg=true)](https://ci.appveyor.com/project/DemonWav/minecraftdev)|
+|    Build     | Status |
+|--------------|--------|
+| **TeamCity** |[![TeamCity Build Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
+| **Nightly**  |[![TeamCity Nightly Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly)|
+| **Linux**    |[![Linux GitHub Action Status](https://github.com/minecraft-dev/MinecraftDev/workflows/Linux%20Build/badge.svg?branch=dev&event=push)](https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Linux+Build%22)|
+| **macOS**    |[![macOS GitHub Action Status](https://github.com/minecraft-dev/MinecraftDev/workflows/macOS%20Build/badge.svg?branch=dev&event=push)](https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22macOS+Build%22)|
+| **Windows**  |[![Windows GitHub Action Status](https://github.com/minecraft-dev/MinecraftDev/workflows/Windows%20Build/badge.svg?branch=dev&event=push)](https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Windows+Build%22)|
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-2020.1--1.3.4-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-2020.1--1.3.5-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 <a href="https://discord.gg/j6UNcfr"><img src="https://i.imgur.com/JXu9C1G.png" height="48px"></img></a>
@@ -82,13 +82,13 @@ Developers
 - Project Owner - [**@DemonWav** - Kyle Wood](https://github.com/DemonWav)
 - [**@Minecrell**](https://github.com/Minecrell)
 - [**@PaleoCrafter** - Marvin Rösch](https://github.com/PaleoCrafter)
+- [**@RedNesto**](https://github.com/RedNesto)
 
-#### **Contributors**
+#### **Significant Contributors**
 
 - [**@gabizou** - Gabriel Harris-Rouquette](https://github.com/gabizou)
-- [**@kashike**](https://github.com/kashike)
+- [**@kashike** - Riley Park](https://github.com/kashike)
 - [**@jamierocks** - Jamie Mansfield](https://github.com/jamierocks)
-- [**@RedNesto**](https://github.com/RedNesto)
 
 License
 -------

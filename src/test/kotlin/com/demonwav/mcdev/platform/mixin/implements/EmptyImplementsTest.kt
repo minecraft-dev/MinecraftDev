@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -26,33 +26,41 @@ class EmptyImplementsTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
-                java("test/DummyFace.java", """
+            dir("test") {
+                java(
+                    "DummyFace.java",
+                    """
                     package test;
 
                     interface DummyFace {
 
                     }
-                """)
+                    """,
+                    configure = false
+                )
             }
         }
     }
 
-    private fun doTest(@Language("JAVA") mixinCode: String) {
+    private fun doTest(
+        @Language("JAVA")
+        mixinCode: String
+    ) {
         buildProject {
-            src {
-                java("test/EmptyImplementsMixin.java", mixinCode)
+            dir("test") {
+                java("EmptyImplementsMixin.java", mixinCode)
             }
         }
 
-        fixture.enableInspections(EmptyImplementsInspection::class.java)
+        fixture.enableInspections(EmptyImplementsInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 
     @Test
     @DisplayName("Highlight On Empty @Implements Test")
     fun highlightOnEmptyImplementsTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -64,13 +72,15 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """)
+            """
+        )
     }
 
     @Test
     @DisplayName("No Highlight Wish Single @Implements Test")
     fun noHighlightWithSingleImplementsTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -82,13 +92,15 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """)
+            """
+        )
     }
 
     @Test
     @DisplayName("No Highlight With Multi @Implements Test")
     fun noHighlightWithMutliImplementsTest() {
-        doTest("""
+        doTest(
+            """
             package test;
 
             import org.spongepowered.asm.mixin.Mixin;
@@ -103,6 +115,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-        """)
+            """
+        )
     }
 }

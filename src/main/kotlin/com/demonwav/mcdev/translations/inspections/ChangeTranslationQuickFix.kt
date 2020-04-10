@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -36,20 +36,25 @@ class ChangeTranslationQuickFix(private val name: String) : LocalQuickFix {
                 TranslationGotoModel(project, key.prefix, key.suffix),
                 null
             )
-            popup.invoke(object : ChooseByNamePopupComponent.Callback() {
-                override fun elementChosen(element: Any) {
-                    val selectedKey = (element as PsiNamedElement).name ?: return
-                    literal.containingFile.runWriteAction {
-                        val insertion = selectedKey.substring(key.prefix.length, selectedKey.length - key.suffix.length)
-                        literal.replace(
-                            JavaPsiFacade.getInstance(project).elementFactory.createExpressionFromText(
-                                "\"$insertion\"",
-                                literal.context
+            popup.invoke(
+                object : ChooseByNamePopupComponent.Callback() {
+                    override fun elementChosen(element: Any) {
+                        val selectedKey = (element as PsiNamedElement).name ?: return
+                        literal.containingFile.runWriteAction {
+                            val insertion = selectedKey.substring(
+                                key.prefix.length, selectedKey.length - key.suffix.length
                             )
-                        )
+                            literal.replace(
+                                JavaPsiFacade.getInstance(project).elementFactory.createExpressionFromText(
+                                    "\"$insertion\"",
+                                    literal.context
+                                )
+                            )
+                        }
                     }
-                }
-            }, ModalityState.current(), false)
+                },
+                ModalityState.current(), false
+            )
         } catch (ignored: IncorrectOperationException) {
         }
     }

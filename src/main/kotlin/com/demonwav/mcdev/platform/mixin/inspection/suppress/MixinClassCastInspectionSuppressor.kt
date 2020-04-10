@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -64,10 +64,10 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
         val operand = castExpression.operand as? PsiTypeCastExpression ?: return false
 
         if (operand.castType?.type != PsiType.getTypeByName(
-                CommonClassNames.JAVA_LANG_OBJECT,
-                project,
-                GlobalSearchScope.allScope(project)
-            )
+            CommonClassNames.JAVA_LANG_OBJECT,
+            project,
+            GlobalSearchScope.allScope(project)
+        )
         ) {
             return false
         }

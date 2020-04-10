@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -22,7 +22,9 @@ class ShadowTargetInspectionTest : BaseShadowTest() {
 
     override fun createMixins() {
         mixins = {
-            java("test/ShadowData.java", """
+            java(
+                "ShadowData.java",
+                """
                 package test;
 
                 import org.spongepowered.asm.mixin.Mixin;
@@ -50,14 +52,15 @@ class ShadowTargetInspectionTest : BaseShadowTest() {
 
                     @Shadow protected String twoIssues;
                 }
-            """)
+                """
+            )
         }
     }
 
     @Test
     @DisplayName("Shadow Target Inspection Test")
     fun shadowTargetInspectionTest() {
-        fixture.enableInspections(ShadowTargetInspection::class.java)
+        fixture.enableInspections(ShadowTargetInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }

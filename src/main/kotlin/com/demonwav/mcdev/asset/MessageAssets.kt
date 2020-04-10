@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -19,7 +19,11 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 object MessageAssets : Assets() {
-    fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any): String {
+    fun message(
+        @PropertyKey(resourceBundle = BUNDLE)
+        key: String,
+        vararg params: Any
+    ): String {
         return AbstractBundle.message(bundle, key, *params)
     }
 
@@ -30,7 +34,10 @@ object MessageAssets : Assets() {
     val generateEventListenerTitle: String
         get() = message("generate.event_listener")
 
-    fun message(@PropertyKey(resourceBundle = BUNDLE) key: String): String {
+    fun message(
+        @PropertyKey(resourceBundle = BUNDLE)
+        key: String
+    ): String {
         return AbstractBundle.message(bundle, key)
     }
 

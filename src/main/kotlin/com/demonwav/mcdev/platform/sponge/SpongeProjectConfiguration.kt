@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -87,23 +87,29 @@ class SpongeProjectConfiguration : ProjectConfiguration() {
     }
 
     override fun setupDependencies(buildSystem: BuildSystem) {
-        buildSystem.repositories.add(BuildRepository(
-            "spongepowered-repo",
-            "https://repo.spongepowered.org/maven/"
-        ))
-        buildSystem.dependencies.add(BuildDependency(
-            "org.spongepowered",
-            "spongeapi",
-            spongeApiVersion,
-            mavenScope = "provided",
-            gradleConfiguration = "compileOnly"
-        ))
-        buildSystem.dependencies.add(BuildDependency(
-            "org.spongepowered",
-            "spongeapi",
-            spongeApiVersion,
-            gradleConfiguration = "annotationProcessor"
-        ))
+        buildSystem.repositories.add(
+            BuildRepository(
+                "spongepowered-repo",
+                "https://repo.spongepowered.org/maven/"
+            )
+        )
+        buildSystem.dependencies.add(
+            BuildDependency(
+                "org.spongepowered",
+                "spongeapi",
+                spongeApiVersion,
+                mavenScope = "provided",
+                gradleConfiguration = "compileOnly"
+            )
+        )
+        buildSystem.dependencies.add(
+            BuildDependency(
+                "org.spongepowered",
+                "spongeapi",
+                spongeApiVersion,
+                gradleConfiguration = "annotationProcessor"
+            )
+        )
     }
 }
 

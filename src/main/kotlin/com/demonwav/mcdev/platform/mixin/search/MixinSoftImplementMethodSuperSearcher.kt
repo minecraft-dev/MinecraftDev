@@ -3,14 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mixin.search
 
-import com.demonwav.mcdev.platform.mixin.util.findSoftImplementedMethods
+import com.demonwav.mcdev.platform.mixin.util.forEachSoftImplementedMethods
 import com.intellij.openapi.application.runReadAction
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.PsiModifier
@@ -26,7 +26,6 @@ class MixinSoftImplementMethodSuperSearcher :
         queryParameters: SuperMethodsSearch.SearchParameters,
         consumer: Processor<in MethodSignatureBackedByPsiMethod>
     ): Boolean {
-
         if (queryParameters.psiClass != null) {
             return true // Not entirely sure what this is used for
         }
@@ -47,7 +46,7 @@ class MixinSoftImplementMethodSuperSearcher :
                 return@run true
             }
 
-            method.findSoftImplementedMethods(checkBases) {
+            method.forEachSoftImplementedMethods(checkBases) {
                 if (!consumer.process(it.hierarchicalMethodSignature)) {
                     return@run false
                 }

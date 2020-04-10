@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -31,9 +31,11 @@ class LangBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, private val s
         while (child != null) {
             if (
                 child.elementType !== TokenType.WHITE_SPACE &&
-                (previousChild == null ||
-                    previousChild.elementType !== LangTypes.LINE_ENDING ||
-                    child.elementType !== LangTypes.LINE_ENDING)
+                (
+                    previousChild == null ||
+                        previousChild.elementType !== LangTypes.LINE_ENDING ||
+                        child.elementType !== LangTypes.LINE_ENDING
+                    )
             ) {
                 val block = LangBlock(
                     child,

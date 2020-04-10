@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -46,7 +46,6 @@ import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import com.siyeh.ig.psiutils.ImportUtils
 import java.util.stream.Stream
-import org.jetbrains.annotations.Contract
 
 // Parent
 fun PsiElement.findModule(): Module? = ModuleUtilCore.findModuleForPsiElement(this)
@@ -153,11 +152,9 @@ fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
     ChangeSignatureUtil.synchronizeList(this, newParams, { it.parameters.asList() }, BooleanArray(newParams.size))
 }
 
-@get:Contract(pure = true)
 val PsiElement.constantValue: Any?
     get() = JavaPsiFacade.getInstance(project).constantEvaluationHelper.computeConstantExpression(this)
 
-@get:Contract(pure = true)
 val PsiElement.constantStringValue: String?
     get() = constantValue as? String
 
@@ -177,11 +174,9 @@ fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
     return TypeConversionUtil.erasure(this) == TypeConversionUtil.erasure(other)
 }
 
-@get:Contract(pure = true)
 val PsiMethod.nameAndParameterTypes: String
     get() = "$name(${parameterList.parameters.joinToString(", ") { it.type.presentableText }})"
 
-@get:Contract(pure = true)
 val <T : PsiElement> T.manipulator: ElementManipulator<T>?
     get() = ElementManipulators.getManipulator(this)
 

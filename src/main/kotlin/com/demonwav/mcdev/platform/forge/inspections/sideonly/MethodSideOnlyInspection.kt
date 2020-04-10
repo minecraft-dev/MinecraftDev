@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -92,7 +92,6 @@ class MethodSideOnlyInspection : BaseInspection() {
                         }
                         if (returnSide !== Side.NONE && returnSide !== Side.INVALID) {
                             if (returnSide !== classHierarchySide.first) {
-
                                 registerMethodError(
                                     method,
                                     Error.RETURN_TYPE_IN_WRONG_CLASS,

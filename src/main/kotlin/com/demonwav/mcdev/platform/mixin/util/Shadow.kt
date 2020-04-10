@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -25,17 +25,17 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
-import org.jetbrains.annotations.Contract
+import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.psi.util.createSmartPointer
 
-@get:Contract(pure = true)
 val PsiMember.isShadow
     get() = findAnnotation(SHADOW) != null
 
-fun PsiMember.findFirstShadowTarget(): PsiMember? {
+fun PsiMember.findFirstShadowTarget(): SmartPsiElementPointer<PsiMember>? {
     val shadow = findAnnotation(SHADOW) ?: return null
     val containingClass = containingClass ?: return null
     val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
-    return resolveFirstShadowTarget(shadow, targetClasses, this)
+    return resolveFirstShadowTarget(shadow, targetClasses, this)?.createSmartPointer()
 }
 
 fun resolveFirstShadowTarget(

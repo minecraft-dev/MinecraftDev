@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -95,7 +95,10 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
     }
 }
 
-private fun sample(@Language("NBTT") code: String) = code.trim()
+private fun sample(
+    @Language("NBTT")
+    code: String
+) = code.trim()
 
 private val SAMPLE = sample(
     """

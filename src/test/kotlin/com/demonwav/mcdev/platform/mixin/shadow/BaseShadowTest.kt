@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -23,8 +23,10 @@ abstract class BaseShadowTest : BaseMixinTest() {
     fun setupProject() {
         createMixins()
         buildProject {
-            src {
-                java("test/MixinBase.java", """
+            dir("test") {
+                java(
+                    "MixinBase.java",
+                    """
                     package test;
 
                     public class MixinBase {
@@ -60,7 +62,9 @@ abstract class BaseShadowTest : BaseMixinTest() {
 
                         public final String twoIssues = "";
                     }
-                """)
+                    """,
+                    configure = false
+                )
 
                 mixins()
             }

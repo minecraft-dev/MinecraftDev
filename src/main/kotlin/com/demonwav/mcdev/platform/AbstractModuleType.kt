@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -24,7 +24,6 @@ import java.awt.Color
 import java.util.LinkedHashMap
 import javax.swing.Icon
 import org.apache.commons.lang.builder.ToStringBuilder
-import org.jetbrains.annotations.Contract
 
 abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, val artifactId: String) {
 
@@ -62,7 +61,6 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
         return EventGenerationPanel(chosenClass)
     }
 
-    @get:Contract(pure = true)
     open val isEventGenAvailable: Boolean
         get() = false
 

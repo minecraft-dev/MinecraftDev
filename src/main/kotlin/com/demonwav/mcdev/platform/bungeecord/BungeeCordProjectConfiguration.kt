@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -24,7 +24,8 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiManager
 
-class BungeeCordProjectConfiguration(override var type: PlatformType) : ProjectConfiguration(),
+class BungeeCordProjectConfiguration(override var type: PlatformType) :
+    ProjectConfiguration(),
     BukkitLikeConfiguration {
 
     override val dependencies = mutableListOf<String>()
@@ -77,26 +78,32 @@ class BungeeCordProjectConfiguration(override var type: PlatformType) : ProjectC
         addSonatype(buildSystem.repositories)
         when (type) {
             PlatformType.WATERFALL -> {
-                buildSystem.repositories.add(BuildRepository(
-                    "destroystokyo-repo",
-                    "https://repo.destroystokyo.com/repository/maven-public/"
-                ))
-                buildSystem.dependencies.add(BuildDependency(
-                    "io.github.waterfallmc",
-                    "waterfall-api",
-                    "$minecraftVersion-SNAPSHOT",
-                    mavenScope = "provided",
-                    gradleConfiguration = "compileOnly"
-                ))
+                buildSystem.repositories.add(
+                    BuildRepository(
+                        "destroystokyo-repo",
+                        "https://repo.destroystokyo.com/repository/maven-public/"
+                    )
+                )
+                buildSystem.dependencies.add(
+                    BuildDependency(
+                        "io.github.waterfallmc",
+                        "waterfall-api",
+                        "$minecraftVersion-SNAPSHOT",
+                        mavenScope = "provided",
+                        gradleConfiguration = "compileOnly"
+                    )
+                )
             }
             PlatformType.BUNGEECORD -> {
-                buildSystem.dependencies.add(BuildDependency(
-                    "net.md-5",
-                    "bungeecord-api",
-                    "$minecraftVersion-SNAPSHOT",
-                    mavenScope = "provided",
-                    gradleConfiguration = "compileOnly"
-                ))
+                buildSystem.dependencies.add(
+                    BuildDependency(
+                        "net.md-5",
+                        "bungeecord-api",
+                        "$minecraftVersion-SNAPSHOT",
+                        mavenScope = "provided",
+                        gradleConfiguration = "compileOnly"
+                    )
+                )
             }
             else -> {}
         }

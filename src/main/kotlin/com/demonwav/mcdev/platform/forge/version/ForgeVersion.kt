@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -20,13 +20,15 @@ class ForgeVersion private constructor(val versions: List<String>) {
 
     val sortedMcVersions: List<String> by lazy {
         val unsortedVersions = versions.asSequence()
-            .mapNotNull(fun(version: String): String? {
-                val index = version.indexOf('-')
-                if (index == -1) {
-                    return null
+            .mapNotNull(
+                fun(version: String): String? {
+                    val index = version.indexOf('-')
+                    if (index == -1) {
+                        return null
+                    }
+                    return version.substring(0, index)
                 }
-                return version.substring(0, index)
-            }).distinct()
+            ).distinct()
             .toList()
         return@lazy sortVersions(unsortedVersions)
     }

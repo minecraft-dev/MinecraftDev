@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -25,24 +25,34 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
     @BeforeEach
     fun setupProject() {
         buildProject {
-            src {
-                java("test/DummyFace.java", """
+            dir("test") {
+                java(
+                    "DummyFace.java",
+                    """
                     package test;
 
                     interface DummyFace {
 
                     }
-                """)
+                    """,
+                    configure = false
+                )
 
-                java("test/DummyClass.java", """
+                java(
+                    "DummyClass.java",
+                    """
                     package test;
 
                     class DummyClass {
 
                     }
-                """)
+                    """,
+                    configure = false
+                )
 
-                java("test/InterfaceIsInterfaceMixin.java", """
+                java(
+                    "InterfaceIsInterfaceMixin.java",
+                    """
                     package test;
 
                     import org.spongepowered.asm.mixin.Mixin;
@@ -57,7 +67,8 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
                     class InterfaceIsInterfaceMixin {
 
                     }
-                """)
+                    """
+                )
             }
         }
     }
@@ -65,7 +76,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
     @Test
     @DisplayName("Highlight On @Interface Test")
     fun highlightOnInterfaceTest() {
-        fixture.enableInspections(InterfaceIsInterfaceInspection::class.java)
+        fixture.enableInspections(InterfaceIsInterfaceInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }

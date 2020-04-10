@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -61,7 +61,7 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
                 .replace('/', '.').replace('\\', '.')
 
             val psiFile = findAlternativeSource(className, debugProcess.project)
-            // Lookup class based on its qualified name (TODO: Support for anonymous classes)
+                // Lookup class based on its qualified name (TODO: Support for anonymous classes)
                 ?: DebuggerUtils.findClass(
                     className,
                     debugProcess.project,

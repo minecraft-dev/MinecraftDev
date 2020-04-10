@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -64,13 +64,11 @@ class SidedProxyAnnotator : Annotator {
         private fun annotateClass(value: PsiAnnotationMemberValue, side: Side) {
             val text: String?
             if (value is PsiLiteralExpressionImpl) {
-
                 text = value.innerText
                 if (text == null) {
                     return
                 }
             } else if (value is PsiReferenceExpression) {
-
                 val resolve = value.resolve() as? PsiField ?: return
 
                 text = JavaConstantExpressionEvaluator.computeConstantExpression(

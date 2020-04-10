@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -62,19 +62,20 @@ class SpongeGetterFilterCompletionContributor : CompletionContributor() {
                 .findClass(SpongeConstants.GETTER_ANNOTATION, projectScope)
 
             if (getterAnnoClass != null) {
-                result.addElement(JavaLookupElementBuilder.forClass(getterAnnoClass, getterAnnoClass.name, true)
-                    .withTypeText("Event filter")
-                    .withInsertHandler { context, _ ->
-                        val at = context.document.text[context.startOffset - 1]
-                        if (at != '@') {
-                            context.document.insertString(context.startOffset, "@")
-                            context.commitDocument()
-                        }
+                result.addElement(
+                    JavaLookupElementBuilder.forClass(getterAnnoClass, getterAnnoClass.name, true)
+                        .withTypeText("Event filter")
+                        .withInsertHandler { context, _ ->
+                            val at = context.document.text[context.startOffset - 1]
+                            if (at != '@') {
+                                context.document.insertString(context.startOffset, "@")
+                                context.commitDocument()
+                            }
 
-                        val inserted = context.file.findElementAt(context.startOffset)
-                            ?.parentOfTypes(PsiAnnotation::class) ?: return@withInsertHandler
-                        SpongeInvalidGetterTargetInspection.QuickFix.doFix(getterAnnoClass.project, inserted)
-                    }
+                            val inserted = context.file.findElementAt(context.startOffset)
+                                ?.parentOfTypes(PsiAnnotation::class) ?: return@withInsertHandler
+                            SpongeInvalidGetterTargetInspection.QuickFix.doFix(getterAnnoClass.project, inserted)
+                        }
                 )
             }
         } else if (prevVisibleLeaf is PsiJavaToken && prevVisibleLeaf.tokenType != JavaTokenType.AT) {

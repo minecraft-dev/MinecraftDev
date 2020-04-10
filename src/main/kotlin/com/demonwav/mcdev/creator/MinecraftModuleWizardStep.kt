@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -50,7 +50,8 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
             }
             // crazy dots
             if (mainClassField?.text?.split('.')?.any { it.isEmpty() } == true ||
-                mainClassField?.text?.first() == '.' || mainClassField?.text?.last() == '.') {
+                mainClassField?.text?.first() == '.' || mainClassField?.text?.last() == '.'
+            ) {
                 throw InvalidMainClassNameException(mainClassField)
             }
             // invalid character

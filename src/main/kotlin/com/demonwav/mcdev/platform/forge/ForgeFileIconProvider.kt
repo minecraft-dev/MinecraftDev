@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -21,7 +21,12 @@ import javax.swing.Icon
 
 class ForgeFileIconProvider : FileIconProvider {
 
-    override fun getIcon(file: VirtualFile, @Iconable.IconFlags flags: Int, project: Project?): Icon? {
+    override fun getIcon(
+        file: VirtualFile,
+        @Iconable.IconFlags
+        flags: Int,
+        project: Project?
+    ): Icon? {
         project ?: return null
 
         if (!MinecraftSettings.instance.isShowProjectPlatformIcons) {

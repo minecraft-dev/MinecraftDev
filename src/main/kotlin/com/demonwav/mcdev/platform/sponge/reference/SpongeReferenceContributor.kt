@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -20,7 +20,10 @@ import com.intellij.psi.PsiReferenceRegistrar
 class SpongeReferenceContributor : PsiReferenceContributor() {
 
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
-        registrar.registerReferenceProvider(PsiJavaPatterns.psiLiteral(StandardPatterns.string())
-                .insideAnnotationAttribute(SpongeConstants.GETTER_ANNOTATION), GetterEventListenerReferenceResolver)
+        registrar.registerReferenceProvider(
+            PsiJavaPatterns.psiLiteral(StandardPatterns.string())
+                .insideAnnotationAttribute(SpongeConstants.GETTER_ANNOTATION),
+            GetterEventListenerReferenceResolver
+        )
     }
 }

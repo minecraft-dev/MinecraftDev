@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -390,9 +390,11 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val index = assetPath.lastIndexOf('/')
-            val assetDir = if (index > 0)
+            val assetDir = if (index > 0) {
                 "." + assetPath.substring(0, index).replace('/', '.')
-            else ""
+            } else {
+                ""
+            }
             val fileName = assetPath.substring(index + 1)
             val createdDir = PackageUtil.findOrCreateDirectoryForPackage(
                 module,

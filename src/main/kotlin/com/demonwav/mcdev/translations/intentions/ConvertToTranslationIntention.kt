@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2019 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
@@ -30,7 +30,8 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
     override fun invoke(project: Project, editor: Editor, element: PsiElement) {
         if (element.parent is PsiLiteral) {
             val value = (element.parent as PsiLiteral).value as? String ?: return
-            val result = Messages.showInputDialogWithCheckBox("Enter translation key:",
+            val result = Messages.showInputDialogWithCheckBox(
+                "Enter translation key:",
                 "Convert String Literal to Translation",
                 "Replace literal with call to I18n (only works on clients!)",
                 true,
@@ -39,10 +40,12 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                 null,
                 object : InputValidatorEx {
                     override fun getErrorText(inputString: String): String? {
-                        if (inputString.isEmpty())
+                        if (inputString.isEmpty()) {
                             return "Key must not be empty"
-                        if (inputString.contains('='))
+                        }
+                        if (inputString.contains('=')) {
                             return "Key must not contain separator character ('=')"
+                        }
                         return null
                     }
 
@@ -53,7 +56,8 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                     override fun canClose(inputString: String): Boolean {
                         return !inputString.isEmpty() && !inputString.contains('=')
                     }
-                })
+                }
+            )
             val key = result.first
             val replaceLiteral = result.second
             if (key != null) {
