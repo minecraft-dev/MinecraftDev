@@ -3,13 +3,14 @@
 Minecraft Development for IntelliJ
 ==================================
 
-|    Build     | Status |
-|--------------|--------|
-| **TeamCity** |[![TeamCity Build Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
-| **Nightly**  |[![TeamCity Nightly Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly)|
-| **Linux**    |[![Linux GitHub Action Status](https://github.com/minecraft-dev/MinecraftDev/workflows/Linux%20Build/badge.svg?branch=dev&event=push)](https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Linux+Build%22)|
-| **macOS**    |[![macOS GitHub Action Status](https://github.com/minecraft-dev/MinecraftDev/workflows/macOS%20Build/badge.svg?branch=dev&event=push)](https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22macOS+Build%22)|
-| **Windows**  |[![Windows GitHub Action Status](https://github.com/minecraft-dev/MinecraftDev/workflows/Windows%20Build/badge.svg?branch=dev&event=push)](https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Windows+Build%22)|
+|        Build        | Status |
+|---------------------|--------|
+| **TeamCity**        |[![TeamCity Build Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
+| **2019.3 Nightly**  |[![2019.3 Nightly Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20193)/statusIcon.svg)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20193)|
+| **2020.1 Nightly**  |[![2020.1 Nightly Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20201)/statusIcon.svg)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20201)|
+| **Linux**           |[![Linux GitHub Action Status](https://github.com/minecraft-dev/MinecraftDev/workflows/Linux%20Build/badge.svg?branch=dev&event=push)](https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Linux+Build%22)|
+| **macOS**           |[![macOS GitHub Action Status](https://github.com/minecraft-dev/MinecraftDev/workflows/macOS%20Build/badge.svg?branch=dev&event=push)](https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22macOS+Build%22)|
+| **Windows**         |[![Windows GitHub Action Status](https://github.com/minecraft-dev/MinecraftDev/workflows/Windows%20Build/badge.svg?branch=dev&event=push)](https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Windows+Build%22)|
 
 Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.3.5-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
