@@ -44,6 +44,7 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
     private lateinit var bungeeCordPluginCheckBox: JCheckBox
     private lateinit var waterfallPluginCheckBox: JCheckBox
     private lateinit var liteLoaderModCheckBox: JCheckBox
+    private lateinit var papiExpansionCheckBox: JCheckBox
 
     override fun getComponent(): JComponent {
         chooserPanel.border = IdeBorderFactory.createBorder()
@@ -86,6 +87,7 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         liteLoaderModCheckBox.addActionListener { fillInInfoPane() }
         bungeeCordPluginCheckBox.addActionListener { toggle(bungeeCordPluginCheckBox, waterfallPluginCheckBox) }
         waterfallPluginCheckBox.addActionListener { toggle(waterfallPluginCheckBox, bungeeCordPluginCheckBox) }
+        papiExpansionCheckBox.addActionListener { fillInInfoPane() }
 
         if (UIUtil.isUnderDarcula()) {
             spongeIcon.icon = PlatformAssets.SPONGE_ICON_2X_DARK
@@ -121,6 +123,7 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         sb.append(liteLoaderModCheckBox, liteLoaderInfo)
         sb.append(bungeeCordPluginCheckBox, bungeeCordInfo)
         sb.append(waterfallPluginCheckBox, waterfallInfo)
+        sb.append(papiExpansionCheckBox, papiInfo)
 
         sb.append("</font></html>")
 
@@ -199,5 +202,7 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         private const val liteLoaderInfo = "Create a standard " +
             "<a href=\"http://www.liteloader.com/\">LiteLoader</a> mod, for use " +
             "on LiteLoader clients."
+        private const val papiInfo = "Create a standard " + "<a href=\"https://placeholderapi.com\">PlaceholderAPI</a> expansion, for use " +
+                "on servers running PlaceholderAPI."
     }
 }
