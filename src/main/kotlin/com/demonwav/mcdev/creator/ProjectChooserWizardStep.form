@@ -188,6 +188,7 @@
             </constraints>
             <properties>
               <icon value="assets/icons/platform/PlaceholderAPI@2x.png"/>
+              <iconTextGap value="0"/>
               <text value=""/>
             </properties>
           </component>

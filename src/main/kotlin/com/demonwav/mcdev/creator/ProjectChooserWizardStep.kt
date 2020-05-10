@@ -16,6 +16,7 @@ import com.demonwav.mcdev.platform.bukkit.BukkitProjectConfiguration
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordProjectConfiguration
 import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
+import com.demonwav.mcdev.platform.placeholderapi.PlaceholderApiProjectConfiguration
 import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ui.IdeBorderFactory
@@ -164,6 +165,10 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         if (waterfallPluginCheckBox.isSelected) {
             creator.configs += BungeeCordProjectConfiguration(PlatformType.WATERFALL)
         }
+
+        if (papiExpansionCheckBox.isSelected) {
+            creator.configs += PlaceholderApiProjectConfiguration()
+        }
     }
 
     override fun validate(): Boolean {
@@ -174,7 +179,8 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
             forgeModCheckBox.isSelected ||
             liteLoaderModCheckBox.isSelected ||
             bungeeCordPluginCheckBox.isSelected ||
-            waterfallPluginCheckBox.isSelected
+            waterfallPluginCheckBox.isSelected ||
+            papiExpansionCheckBox.isSelected
     }
 
     companion object {
@@ -203,6 +209,6 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
             "<a href=\"http://www.liteloader.com/\">LiteLoader</a> mod, for use " +
             "on LiteLoader clients."
         private const val papiInfo = "Create a standard " + "<a href=\"https://placeholderapi.com\">PlaceholderAPI</a> expansion, for use " +
-                "on servers running PlaceholderAPI."
+            "on servers running PlaceholderAPI."
     }
 }

@@ -62,6 +62,7 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
 
         group.addTemplate(FileTemplateDescriptor(MIXIN_OVERWRITE_FALLBACK, PlatformAssets.MIXIN_ICON))
 
+        group.addTemplate(FileTemplateDescriptor(PLACEHOLDERAPI_MAIN_CLASS_TEMPLATE, PlatformAssets.PLACEHOLDERAPI_ICON))
         return group
     }
 
@@ -102,5 +103,7 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
         const val LITELOADER_MAIN_CLASS_TEMPLATE = "liteloader_main_class.java"
 
         const val MIXIN_OVERWRITE_FALLBACK = "Mixin Overwrite Fallback.java"
+
+        const val PLACEHOLDERAPI_MAIN_CLASS_TEMPLATE = "placeholderapi_main_class.java"
     }
 }
