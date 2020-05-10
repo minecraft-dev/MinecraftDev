@@ -51,7 +51,7 @@ enum class PlatformType(
     LITELOADER(LiteLoaderModuleType, "LiteLoader"),
     MIXIN(MixinModuleType, "Mixin"),
     MCP(McpModuleType, "MCP"),
-    PLACEHOLDERAPI(PlaceholderApiModuleType, "PlaceholderAPI");
+    PLACEHOLDERAPI(PlaceholderApiModuleType, "PlaceholderAPI", "spigot.json");
 
     companion object {
         fun removeParents(types: MutableSet<PlatformType>) =

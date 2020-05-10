@@ -28,8 +28,6 @@ class PlaceholderApiProjectSettingsWizard(private val creator: MinecraftProjectC
         return panel
     }
 
-    override fun updateDataModel() {}
-
     override fun updateStep() {
         config = creator.configs.firstOfType()
         if (config == null) {
@@ -56,6 +54,7 @@ class PlaceholderApiProjectSettingsWizard(private val creator: MinecraftProjectC
             try {
                 withContext(Dispatchers.IO) { getVersionSelector(conf.type) }.set(minecraftVersionBox)
             } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
@@ -63,4 +62,6 @@ class PlaceholderApiProjectSettingsWizard(private val creator: MinecraftProjectC
     override fun isStepVisible(): Boolean {
         return creator.configs.any { it is PlaceholderApiProjectConfiguration }
     }
+
+    override fun updateDataModel() {}
 }

@@ -12,9 +12,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiManager
 
 class PlaceholderApiProjectConfiguration : ProjectConfiguration() {
-    override var type: PlatformType = PlatformType.PLACEHOLDERAPI
 
-    var mcVersion: String = ""
+    var mcVersion = ""
+
+    override var type: PlatformType = PlatformType.PLACEHOLDERAPI
 
     override fun create(project: Project, buildSystem: BuildSystem, indicator: ProgressIndicator) {
         if (project.isDisposed) {
@@ -28,8 +29,8 @@ class PlaceholderApiProjectConfiguration : ProjectConfiguration() {
             indicator.text = "Writing main class"
 
             var file = dirs.sourceDirectory
-            var files = baseConfig.mainClass.split(".").toTypedArray()
-            var className = files.last()
+            val files = baseConfig.mainClass.split(".").toTypedArray()
+            val className = files.last()
             val packageName = baseConfig.mainClass.substring(0, baseConfig.mainClass.length - className.length - 1)
             file = getMainClassDirectory(files, file)
 

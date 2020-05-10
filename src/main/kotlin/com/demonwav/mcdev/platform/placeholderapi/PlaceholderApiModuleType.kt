@@ -4,13 +4,12 @@ import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.platform.placeholderapi.util.PlaceholderApiConstants
 
 object PlaceholderApiModuleType : AbstractModuleType<PlaceholderApiModule>("", "") {
     private const val ID = "PLACEHOLDERAPI_MODULE_TYPE"
 
-    val IGNORED_ANNOTATIONS = listOf(PlaceholderApiConstants.HANDLER_ANNOTATION)
-    val LISTENER_ANNOTATIONS = listOf(PlaceholderApiConstants.HANDLER_ANNOTATION)
+    val IGNORED_ANNOTATIONS = emptyList<String>()
+    val LISTENER_ANNOTATIONS = emptyList<String>()
 
     override val platformType = PlatformType.PLACEHOLDERAPI
     override val icon = PlatformAssets.PLACEHOLDERAPI_ICON
