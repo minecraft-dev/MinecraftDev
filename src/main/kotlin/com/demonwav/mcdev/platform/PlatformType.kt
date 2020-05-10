@@ -29,6 +29,7 @@ import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
 import com.demonwav.mcdev.platform.placeholderapi.PlaceholderApiModuleType
+import com.demonwav.mcdev.platform.placeholderapi.framework.PLACEHOLDERAPI_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.intellij.openapi.roots.libraries.LibraryKind
@@ -67,6 +68,7 @@ enum class PlatformType(
             MIXIN_LIBRARY_KIND -> MIXIN
             BUNGEECORD_LIBRARY_KIND -> BUNGEECORD
             WATERFALL_LIBRARY_KIND -> WATERFALL
+            PLACEHOLDERAPI_LIBRARY_KIND -> PLACEHOLDERAPI
             else -> null
         }
     }

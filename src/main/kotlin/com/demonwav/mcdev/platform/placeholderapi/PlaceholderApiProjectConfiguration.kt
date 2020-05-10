@@ -14,7 +14,6 @@ import com.intellij.psi.PsiManager
 class PlaceholderApiProjectConfiguration : ProjectConfiguration() {
     override var type: PlatformType = PlatformType.PLACEHOLDERAPI
 
-    var papiVersion: String = ""
     var mcVersion: String = ""
 
     override fun create(project: Project, buildSystem: BuildSystem, indicator: ProgressIndicator) {
