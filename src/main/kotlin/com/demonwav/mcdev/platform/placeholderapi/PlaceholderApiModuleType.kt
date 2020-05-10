@@ -4,7 +4,6 @@ import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.platform.bukkit.BukkitModuleType
 import com.demonwav.mcdev.platform.placeholderapi.util.PlaceholderApiConstants
 
 object PlaceholderApiModuleType : AbstractModuleType<PlaceholderApiModule>("", "") {
@@ -16,8 +15,8 @@ object PlaceholderApiModuleType : AbstractModuleType<PlaceholderApiModule>("", "
     override val platformType = PlatformType.PLACEHOLDERAPI
     override val icon = PlatformAssets.PLACEHOLDERAPI_ICON
     override val id = ID
-    override val ignoredAnnotations = BukkitModuleType.IGNORED_ANNOTATIONS
-    override val listenerAnnotations = BukkitModuleType.LISTENER_ANNOTATIONS
+    override val ignoredAnnotations = IGNORED_ANNOTATIONS
+    override val listenerAnnotations = LISTENER_ANNOTATIONS
 
     override fun generateModule(facet: MinecraftFacet) = PlaceholderApiModule(facet)
 }
