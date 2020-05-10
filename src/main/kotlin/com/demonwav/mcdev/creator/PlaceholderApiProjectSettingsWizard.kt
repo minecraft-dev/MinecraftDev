@@ -2,6 +2,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.platform.ProjectConfiguration
 import com.demonwav.mcdev.platform.placeholderapi.PlaceholderApiProjectConfiguration
 import com.demonwav.mcdev.util.firstOfType
 import javax.swing.JComboBox
@@ -57,6 +58,15 @@ class PlaceholderApiProjectSettingsWizard(private val creator: MinecraftProjectC
                 e.printStackTrace()
             }
         }
+    }
+
+    override fun onStepLeaving() {
+        val conf = config ?: return
+        conf.base = ProjectConfiguration.BaseConfigs(
+            expansionNameField.text,
+            expansionVersionField.text,
+            mainClassField.text
+        )
     }
 
     override fun isStepVisible(): Boolean {

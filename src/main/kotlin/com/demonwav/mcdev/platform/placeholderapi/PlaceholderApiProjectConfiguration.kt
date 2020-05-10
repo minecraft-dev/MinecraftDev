@@ -39,7 +39,10 @@ class PlaceholderApiProjectConfiguration : ProjectConfiguration() {
                 project,
                 mainClassFile,
                 packageName,
-                className
+                className,
+                baseConfig.pluginName,
+                baseConfig.pluginVersion,
+                baseConfig.authors
             )
 
             PsiManager.getInstance(project).findFile(mainClassFile)?.let { mainClassPsi ->

@@ -12,12 +12,18 @@ object PlaceholderApiTemplate {
         project: Project,
         mainClassFile: VirtualFile,
         packageName: String,
-        className: String
+        className: String,
+        expansionName: String,
+        expansionVersion: String,
+        author: MutableList<String>
     ) {
         val properties = Properties()
 
         properties.setProperty("PACKAGE", packageName)
         properties.setProperty("CLASS_NAME", className)
+        properties.setProperty("EXPANSION_NAME", expansionName)
+        properties.setProperty("EXPANSION_VERSION", expansionVersion)
+        properties.setProperty("EXPANSION_AUTHOR", author.toString())
 
         BaseTemplate.applyTemplate(
             project,

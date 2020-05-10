@@ -33,7 +33,7 @@ public class ${CLASS_NAME} extends PlaceholderExpansion {
      */
     @Override
     public String getAuthor(){
-        return "someauthor";
+        return "${EXPANSION_AUTHOR}";
     }
 
     /**
@@ -47,7 +47,7 @@ public class ${CLASS_NAME} extends PlaceholderExpansion {
      */
     @Override
     public String getIdentifier(){
-        return "example";
+        return "${EXPANSION_NAME}";
     }
 
     /**
@@ -58,7 +58,7 @@ public class ${CLASS_NAME} extends PlaceholderExpansion {
      */
     @Override
     public String getVersion(){
-        return "1.0.0";
+        return "${EXPANSION_VERSION}";
     }
 
     /**
