@@ -56,7 +56,7 @@ class MavenBuildSystem(
             directories = createDirectories(rootDirectory)
 
             val text = when (configuration.type) {
-                PlatformType.BUKKIT, PlatformType.SPIGOT, PlatformType.PAPER ->
+                PlatformType.BUKKIT, PlatformType.SPIGOT, PlatformType.PAPER, PlatformType.PLACEHOLDERAPI ->
                     BukkitTemplate.applyPomTemplate(project)
                 PlatformType.BUNGEECORD, PlatformType.WATERFALL ->
                     BungeeCordTemplate.applyPomTemplate(project)

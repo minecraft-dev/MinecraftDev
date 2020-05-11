@@ -104,7 +104,8 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
             SpongeProjectSettingsWizard(creator),
             ForgeProjectSettingsWizard(creator),
             LiteLoaderProjectSettingsWizard(creator),
-            BungeeCordProjectSettingsWizard(creator)
+            BungeeCordProjectSettingsWizard(creator),
+            PlaceholderApiProjectSettingsWizard(creator)
         )
     }
 
