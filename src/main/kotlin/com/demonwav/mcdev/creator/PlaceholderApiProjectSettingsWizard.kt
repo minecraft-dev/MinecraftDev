@@ -31,8 +31,8 @@ class PlaceholderApiProjectSettingsWizard(private val creator: MinecraftProjectC
     private lateinit var expansionNameField: JTextField
     private lateinit var expansionVersionField: JTextField
     private lateinit var mainClassField: JTextField
-    private lateinit var minecraftVersionBox: JComboBox<String>
     private lateinit var expansionAuthorField: JTextField
+    private lateinit var minecraftVersionBox: JComboBox<String>
 
     private var config: PlaceholderApiProjectConfiguration? = null
 
@@ -76,9 +76,11 @@ class PlaceholderApiProjectSettingsWizard(private val creator: MinecraftProjectC
         conf.base = ProjectConfiguration.BaseConfigs(
             expansionNameField.text,
             expansionVersionField.text,
-            mainClassField.text,
-            expansionAuthorField.text
+            mainClassField.text
         )
+
+        conf.setAuthors(this.expansionAuthorField.text)
+        conf.mcVersion = minecraftVersionBox.selectedItem as? String ?: ""
     }
 
     override fun isStepVisible(): Boolean {

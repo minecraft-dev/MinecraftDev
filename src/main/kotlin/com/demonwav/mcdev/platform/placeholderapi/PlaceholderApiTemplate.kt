@@ -34,7 +34,7 @@ object PlaceholderApiTemplate {
         properties.setProperty("CLASS_NAME", className)
         properties.setProperty("EXPANSION_NAME", expansionName)
         properties.setProperty("EXPANSION_VERSION", expansionVersion)
-        properties.setProperty("EXPANSION_AUTHOR", author.toString())
+        properties.setProperty("EXPANSION_AUTHOR", author[0])
 
         BaseTemplate.applyTemplate(
             project,

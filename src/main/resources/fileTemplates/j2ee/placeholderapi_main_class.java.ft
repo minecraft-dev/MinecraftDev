@@ -75,7 +75,7 @@ public class ${CLASS_NAME} extends PlaceholderExpansion {
      * @return Possibly-null String of the requested identifier.
      */
     @Override
-    public String onRequest(Player player, String identifier){
+    public String onPlaceholderRequest(Player player, String identifier){
 
         // %example_placeholder1%
         if(identifier.equals("placeholder1")){
