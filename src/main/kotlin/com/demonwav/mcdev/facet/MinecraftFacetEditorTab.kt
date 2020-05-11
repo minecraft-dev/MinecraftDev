@@ -279,6 +279,9 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         )
 
         private val indexes =
-            intArrayOf(BUKKIT, SPIGOT, PAPER, SPONGE, FORGE, LITELOADER, MCP, MIXIN, BUNGEECORD, WATERFALL, PLACEHOLDERAPI)
+            intArrayOf(
+                BUKKIT, SPIGOT, PAPER, SPONGE, FORGE, LITELOADER, MCP, MIXIN, BUNGEECORD, WATERFALL,
+                PLACEHOLDERAPI
+            )
     }
 }

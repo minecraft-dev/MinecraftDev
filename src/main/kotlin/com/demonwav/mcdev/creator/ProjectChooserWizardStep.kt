@@ -208,7 +208,8 @@ class ProjectChooserWizardStep(private val creator: MinecraftProjectCreator) : M
         private const val liteLoaderInfo = "Create a standard " +
             "<a href=\"http://www.liteloader.com/\">LiteLoader</a> mod, for use " +
             "on LiteLoader clients."
-        private const val papiInfo = "Create a standard " + "<a href=\"https://placeholderapi.com\">PlaceholderAPI</a> expansion, for use " +
+        private const val papiInfo = "Create a standard " +
+            "<a href=\"https://placeholderapi.com\">PlaceholderAPI</a> expansion, for use " +
             "on servers running PlaceholderAPI."
     }
 }

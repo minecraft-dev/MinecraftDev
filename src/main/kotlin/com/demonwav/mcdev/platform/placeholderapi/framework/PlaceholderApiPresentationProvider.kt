@@ -18,7 +18,8 @@ import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
 import com.intellij.openapi.util.io.JarUtil
 import com.intellij.openapi.vfs.VirtualFile
 
-class PlaceholderApiPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(PLACEHOLDERAPI_LIBRARY_KIND) {
+class PlaceholderApiPresentationProvider :
+    LibraryPresentationProvider<LibraryVersionProperties>(PLACEHOLDERAPI_LIBRARY_KIND) {
     override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.PLACEHOLDERAPI_ICON
 
     override fun detect(classesRoots: MutableList<VirtualFile>): LibraryVersionProperties? {

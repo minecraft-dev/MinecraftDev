@@ -62,7 +62,12 @@ class MinecraftFileTemplateGroupFactory : FileTemplateGroupDescriptorFactory {
 
         group.addTemplate(FileTemplateDescriptor(MIXIN_OVERWRITE_FALLBACK, PlatformAssets.MIXIN_ICON))
 
-        group.addTemplate(FileTemplateDescriptor(PLACEHOLDERAPI_MAIN_CLASS_TEMPLATE, PlatformAssets.PLACEHOLDERAPI_ICON))
+        group.addTemplate(
+            FileTemplateDescriptor(
+                PLACEHOLDERAPI_MAIN_CLASS_TEMPLATE,
+                PlatformAssets.PLACEHOLDERAPI_ICON
+            )
+        )
         group.addTemplate(FileTemplateDescriptor(PLACEHOLDERAPI_POM_TEMPLATE, PlatformAssets.PLACEHOLDERAPI_ICON))
         return group
     }
