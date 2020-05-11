@@ -2,6 +2,7 @@ package com.demonwav.mcdev.platform.placeholderapi
 
 import com.demonwav.mcdev.platform.BaseTemplate
 import com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory
+import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import java.util.Properties
@@ -31,5 +32,13 @@ object PlaceholderApiTemplate {
             MinecraftFileTemplateGroupFactory.PLACEHOLDERAPI_MAIN_CLASS_TEMPLATE,
             properties
         )
+    }
+
+    fun applyPomTemplate(project: Project): String {
+        val properties = Properties()
+
+        val manager = FileTemplateManager.getInstance(project)
+        val fileTemplate = manager.getJ2eeTemplate(MinecraftFileTemplateGroupFactory.PLACEHOLDERAPI_POM_TEMPLATE)
+        return fileTemplate.getText(properties)
     }
 }

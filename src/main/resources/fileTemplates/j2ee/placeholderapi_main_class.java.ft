@@ -1,6 +1,6 @@
 package ${PACKAGE};
 
-import org.bukkit.Player;
+import org.bukkit.entity.Player;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 
 /**

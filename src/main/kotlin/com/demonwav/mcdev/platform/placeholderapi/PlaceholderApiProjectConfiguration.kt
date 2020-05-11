@@ -2,6 +2,8 @@
 @file:Suppress("Duplicates")
 package com.demonwav.mcdev.platform.placeholderapi
 
+import com.demonwav.mcdev.buildsystem.BuildDependency
+import com.demonwav.mcdev.buildsystem.BuildRepository
 import com.demonwav.mcdev.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.ProjectConfiguration
@@ -51,5 +53,41 @@ class PlaceholderApiProjectConfiguration : ProjectConfiguration() {
         }
     }
 
-    override fun setupDependencies(buildSystem: BuildSystem) {}
+    override fun setupDependencies(buildSystem: BuildSystem) {
+        addRepos(buildSystem.repositories)
+        buildSystem.dependencies.add(
+            BuildDependency(
+                "org.spigotmc",
+                "spigot-api",
+                "$mcVersion-R0.1-SNAPSHOT",
+                mavenScope = "provided",
+                gradleConfiguration = "compileOnly"
+            )
+        )
+        addSonatype(buildSystem.repositories)
+        buildSystem.dependencies.add(
+            BuildDependency(
+                "me.clip",
+                "placeholderapi",
+                "LATEST",
+                mavenScope = "provided",
+                gradleConfiguration = "compileOnly"
+            )
+        )
+    }
+
+    private fun addRepos(list: MutableList<BuildRepository>) {
+        list.add(
+            BuildRepository(
+                "spigotmc-repo",
+                "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+            )
+        )
+        list.add(
+            BuildRepository(
+                "placeholderapi-repo",
+                "https://repo.extendedclip.com/content/repositories/placeholderapi/"
+            )
+        )
+    }
 }
