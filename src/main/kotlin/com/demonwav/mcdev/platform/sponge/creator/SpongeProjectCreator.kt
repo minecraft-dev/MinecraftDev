@@ -21,11 +21,13 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
+import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.virtualFileOrError
@@ -80,6 +82,7 @@ class SpongeMavenCreator(
             BasicMavenStep(project, rootDirectory, buildSystem, config, pomText),
             mainClassStep,
             modifyStep,
+            MavenGitignoreStep(project, rootDirectory),
             BasicMavenFinalizerStep(rootModule, rootDirectory)
         )
     }
@@ -130,6 +133,7 @@ class SpongeGradleCreator(
             mainClassStep,
             modifyStep,
             GradleWrapperStep(project, rootDirectory, buildSystem),
+            GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
         )
     }

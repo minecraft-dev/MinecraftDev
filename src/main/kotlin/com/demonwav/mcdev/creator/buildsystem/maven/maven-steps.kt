@@ -15,10 +15,12 @@ import com.demonwav.mcdev.creator.MinecraftProjectCreator
 import com.demonwav.mcdev.creator.ProjectConfig
 import com.demonwav.mcdev.creator.buildsystem.BuildDependency
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemTemplate
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.creator.buildsystem.DirectorySet
 import com.demonwav.mcdev.creator.getVersionJson
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.virtualFile
@@ -35,6 +37,9 @@ import com.intellij.psi.xml.XmlTag
 import com.intellij.util.xml.DomManager
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardOpenOption.CREATE
+import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
+import java.nio.file.StandardOpenOption.WRITE
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters
@@ -185,23 +190,25 @@ class BasicMavenFinalizerStep(
         val vPomFile = pomFile.virtualFile ?: throw IllegalStateException("Could not find file: $pomFile")
 
         // Force Maven to setup the project
-        val manager = MavenProjectsManager.getInstance(project)
-        manager.addManagedFilesOrUnignore(listOf(vPomFile))
-        manager.importingSettings.isDownloadDocsAutomatically = true
-        manager.importingSettings.isDownloadSourcesAutomatically = true
+        invokeLater {
+            val manager = MavenProjectsManager.getInstance(project)
+            manager.addManagedFilesOrUnignore(listOf(vPomFile))
+            manager.importingSettings.isDownloadDocsAutomatically = true
+            manager.importingSettings.isDownloadSourcesAutomatically = true
 
-        // Setup the default Maven run config
-        val params = MavenRunnerParameters()
-        params.workingDirPath = rootDirectory.toAbsolutePath().toString()
-        params.goals = listOf("clean", "package")
-        val runnerSettings = MavenRunConfigurationType
-            .createRunnerAndConfigurationSettings(null, null, params, project)
-        runnerSettings.name = rootModule.name + " build"
+            // Setup the default Maven run config
+            val params = MavenRunnerParameters()
+            params.workingDirPath = rootDirectory.toAbsolutePath().toString()
+            params.goals = listOf("clean", "package")
+            val runnerSettings = MavenRunConfigurationType
+                .createRunnerAndConfigurationSettings(null, null, params, project)
+            runnerSettings.name = rootModule.name + " build"
 
-        val runManager = RunManager.getInstance(project)
-        runManager.addConfiguration(runnerSettings, false)
-        if (runManager.selectedConfiguration == null) {
-            runManager.selectedConfiguration = runnerSettings
+            val runManager = RunManager.getInstance(project)
+            runManager.addConfiguration(runnerSettings, false)
+            if (runManager.selectedConfiguration == null) {
+                runManager.selectedConfiguration = runnerSettings
+            }
         }
     }
 }
@@ -216,5 +223,18 @@ class CommonModuleDependencyStep(private val buildSystem: BuildSystem) : Creator
                 mavenScope = "compile"
             )
         )
+    }
+}
+
+class MavenGitignoreStep(
+    private val project: Project,
+    private val rootDirectory: Path
+) : CreatorStep {
+    override fun runStep(indicator: ProgressIndicator) {
+        val gitignoreFile = rootDirectory.resolve(".gitignore")
+
+        val fileText = BuildSystemTemplate.applyMavenGitignore(project)
+
+        Files.write(gitignoreFile, fileText.toByteArray(Charsets.UTF_8), CREATE, WRITE, TRUNCATE_EXISTING)
     }
 }

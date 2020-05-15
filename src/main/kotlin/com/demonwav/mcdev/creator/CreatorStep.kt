@@ -94,18 +94,17 @@ class BasicJavaClassStep(
         val dirs = buildSystem.dirsOrError
 
         runWriteTask {
-            indicator.text = "Writing main class"
-            // Create plugin main class
+            indicator.text = "Writing class: $className"
             val files = className.split(".")
             val className = files.last()
 
             val sourceDir = getMainClassDirectory(dirs.sourceDirectory, files)
 
-            val mainClassFile = CreatorStep.writeTextToFile(project, sourceDir, "$className.java", classText)
+            val classFile = CreatorStep.writeTextToFile(project, sourceDir, "$className.java", classText)
 
-            // Set the editor focus on the main class
-            PsiManager.getInstance(project).findFile(mainClassFile)?.let { mainClassPsi ->
-                EditorHelper.openInEditor(mainClassPsi)
+            // Set the editor focus on the created class
+            PsiManager.getInstance(project).findFile(classFile)?.let { classPsi ->
+                EditorHelper.openInEditor(classPsi)
             }
         }
     }

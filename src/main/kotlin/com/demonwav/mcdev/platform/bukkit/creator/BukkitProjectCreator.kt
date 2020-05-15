@@ -21,11 +21,13 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
+import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
 import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
@@ -69,6 +71,7 @@ class BukkitMavenCreator(
             BasicMavenStep(project, rootDirectory, buildSystem, config, pomText),
             setupMainClassStep(),
             setupYmlStep(),
+            MavenGitignoreStep(project, rootDirectory),
             BasicMavenFinalizerStep(rootModule, rootDirectory)
         )
     }
@@ -118,6 +121,7 @@ class BukkitGradleCreator(
             setupMainClassStep(),
             setupYmlStep(),
             GradleWrapperStep(project, rootDirectory, buildSystem),
+            GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
         )
     }

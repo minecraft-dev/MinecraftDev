@@ -59,7 +59,10 @@ class MavenBuildSystem(
     }
 
     override fun multiModuleBaseFinalizer(module: Module, rootDirectory: Path): Iterable<CreatorStep> {
-        return listOf(BasicMavenFinalizerStep(module, rootDirectory))
+        return listOf(
+            MavenGitignoreStep(module.project, rootDirectory),
+            BasicMavenFinalizerStep(module, rootDirectory)
+        )
     }
 
     override fun multiModuleCommonSteps(module: Module, rootDirectory: Path): Iterable<CreatorStep> {

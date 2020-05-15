@@ -95,6 +95,12 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             mixinGroup.addTemplate(FileTemplateDescriptor(MIXIN_OVERWRITE_FALLBACK))
         }
 
+        FileTemplateGroupDescriptor("Common", PlatformAssets.MINECRAFT_ICON).let { commonGroup ->
+            group.addTemplate(commonGroup)
+            commonGroup.addTemplate(FileTemplateDescriptor(GRADLE_GITIGNORE_TEMPLATE))
+            commonGroup.addTemplate(FileTemplateDescriptor(MAVEN_GITIGNORE_TEMPLATE))
+        }
+
         return group
     }
 
@@ -152,5 +158,8 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val MULTI_MODULE_COMMON_POM_TEMPLATE = "Multi-Module Common pom.xml"
 
         const val MIXIN_OVERWRITE_FALLBACK = "Mixin Overwrite Fallback.java"
+
+        const val GRADLE_GITIGNORE_TEMPLATE = "Gradle.gitignore"
+        const val MAVEN_GITIGNORE_TEMPLATE = "Maven.gitignore"
     }
 }

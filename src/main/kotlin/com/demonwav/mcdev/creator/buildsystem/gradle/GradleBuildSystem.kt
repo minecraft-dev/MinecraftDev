@@ -60,7 +60,10 @@ class GradleBuildSystem(
     }
 
     override fun multiModuleBaseFinalizer(module: Module, rootDirectory: Path): Iterable<CreatorStep> {
-        return listOf(BasicGradleFinalizerStep(module, rootDirectory, this))
+        return listOf(
+            GradleGitignoreStep(module.project, rootDirectory),
+            BasicGradleFinalizerStep(module, rootDirectory, this)
+        )
     }
 
     override fun multiModuleCommonSteps(module: Module, rootDirectory: Path): Iterable<CreatorStep> {

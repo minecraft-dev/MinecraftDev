@@ -18,6 +18,7 @@ import com.demonwav.mcdev.creator.buildsystem.DirectorySet
 import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.setupGradleFiles
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
@@ -60,6 +61,7 @@ class Fg2ProjectCreator(
             GradleWrapperStep(project, rootDirectory, buildSystem),
             McmodInfoStep(project, buildSystem, config),
             SetupDecompWorkspaceStep(project, rootDirectory),
+            GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem),
             ForgeRunConfigsStep(buildSystem, rootDirectory, config, CreatedModuleType.SINGLE)
         )
@@ -119,6 +121,7 @@ open class Fg3ProjectCreator(
             GradleWrapperStep(project, rootDirectory, buildSystem),
             Fg3ProjectFilesStep(project, buildSystem, config),
             Fg3CompileJavaStep(project, rootDirectory),
+            GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem),
             ForgeRunConfigsStep(buildSystem, rootDirectory, config, CreatedModuleType.SINGLE)
         )
@@ -161,6 +164,7 @@ class Fg3Mc112ProjectCreator(
             GradleWrapperStep(project, rootDirectory, buildSystem),
             McmodInfoStep(project, buildSystem, config),
             Fg3CompileJavaStep(project, rootDirectory),
+            GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem),
             ForgeRunConfigsStep(buildSystem, rootDirectory, config, CreatedModuleType.SINGLE)
         )

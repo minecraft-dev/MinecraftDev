@@ -13,6 +13,7 @@ package com.demonwav.mcdev.creator.buildsystem.gradle
 import com.demonwav.mcdev.creator.CreatorStep
 import com.demonwav.mcdev.creator.CreatorStep.Companion.writeText
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemTemplate
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.util.asPrimitiveType
 import com.demonwav.mcdev.util.findDeclaredField
@@ -254,4 +255,17 @@ private fun showProgress(project: Project) {
     pane.findDeclaredField("myStatusBar")
         ?.findDeclaredField("myInfoAndProgressPanel")
         ?.invokeDeclaredMethod("openProcessPopup", arrayOf(Boolean::class.asPrimitiveType), arrayOf(true))
+}
+
+class GradleGitignoreStep(
+    private val project: Project,
+    private val rootDirectory: Path
+) : CreatorStep {
+    override fun runStep(indicator: ProgressIndicator) {
+        val gitignoreFile = rootDirectory.resolve(".gitignore")
+
+        val fileText = BuildSystemTemplate.applyGradleGitignore(project)
+
+        Files.write(gitignoreFile, fileText.toByteArray(Charsets.UTF_8), CREATE, WRITE, TRUNCATE_EXISTING)
+    }
 }
