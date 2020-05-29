@@ -21,10 +21,12 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
+import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.impl.JavaConstantExpressionEvaluator
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.util.PsiLiteralUtil
 
 class SidedProxyAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
@@ -63,8 +65,8 @@ class SidedProxyAnnotator : Annotator {
 
         private fun annotateClass(value: PsiAnnotationMemberValue, side: Side) {
             val text: String?
-            if (value is PsiLiteralExpressionImpl) {
-                text = value.innerText
+            if (value is PsiLiteralExpression) {
+                text = PsiLiteralUtil.getStringLiteralContent(value)
                 if (text == null) {
                     return
                 }

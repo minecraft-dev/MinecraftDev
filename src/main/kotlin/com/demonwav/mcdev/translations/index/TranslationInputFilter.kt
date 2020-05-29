@@ -17,7 +17,7 @@ import com.intellij.util.Consumer
 import com.intellij.util.indexing.FileBasedIndex
 
 object TranslationInputFilter : FileBasedIndex.FileTypeSpecificInputFilter {
-    override fun registerFileTypesUsedForIndexing(fileTypeSink: Consumer<FileType>) {
+    override fun registerFileTypesUsedForIndexing(fileTypeSink: Consumer<in FileType>) {
         for (fileType in TranslationProvider.INSTANCES.keys) {
             fileTypeSink.consume(fileType)
         }

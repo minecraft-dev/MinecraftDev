@@ -41,8 +41,6 @@ class ColorLineMarkerProvider : LineMarkerProvider {
         return info
     }
 
-    override fun collectSlowLineMarkers(elements: List<PsiElement>, result: Collection<LineMarkerInfo<*>>) {}
-
     open class ColorInfo : MergeableLineMarkerInfo<PsiElement> {
         protected val color: Color
 

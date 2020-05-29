@@ -84,7 +84,6 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
         }
     }
 
-    override fun collectSlowLineMarkers(elements: List<PsiElement>, result: Collection<LineMarkerInfo<*>>) {}
     override fun getName() = "Event Listener line marker"
     override fun getIcon() = GeneralAssets.LISTENER
 

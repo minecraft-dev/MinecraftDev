@@ -40,6 +40,4 @@ class PluginLineMarkerProvider : LineMarkerProviderDescriptor() {
             GutterIconRenderer.Alignment.RIGHT
         )
     }
-
-    override fun collectSlowLineMarkers(elements: List<PsiElement>, result: Collection<LineMarkerInfo<*>>) {}
 }

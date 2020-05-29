@@ -36,8 +36,6 @@ class SpongeColorLineMarkerProvider : LineMarkerProvider {
         return info
     }
 
-    override fun collectSlowLineMarkers(elements: List<PsiElement>, result: Collection<LineMarkerInfo<*>>) {}
-
     private class SpongeColorInfo(
         element: PsiElement,
         color: Color,

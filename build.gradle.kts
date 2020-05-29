@@ -73,6 +73,7 @@ repositories {
     maven("https://repo.spongepowered.org/maven")
     maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
     maven("https://repo.gradle.org/gradle/libs-releases-local/")
+    maven("https://www.jetbrains.com/intellij-repository/snapshots")
 }
 
 dependencies {
@@ -97,7 +98,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:201.6668.121")
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:202-EAP-SNAPSHOT")
     gradleToolingExtension("org.jetbrains:annotations:19.0.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
@@ -111,9 +112,9 @@ intellij {
     setPlugins(
         "java", "maven", "gradle", "Groovy",
         // needed dependencies for unit tests
-        "properties", "junit", "repository-search",
+        "properties", "junit", "repository-search"
         // useful to have when running for mods.toml
-        "org.toml.lang:0.2.114.35-193"
+        // "org.toml.lang:0.2.114.35-193"
     )
 
     pluginName = "Minecraft Development"
