@@ -35,6 +35,7 @@ group = "com.demonwav.minecraft-dev"
 val coroutineVersion = "1.3.4" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
 val ideaVersion: String by project
+val ideaVersionName: String by project
 val coreVersion: String by project
 val downloadIdeaSources: String by project
 
@@ -55,7 +56,7 @@ val testLibs: Configuration by configurations.creating {
 }
 
 group = "com.demonwav.minecraft-dev"
-version = "$ideaVersion-$coreVersion"
+version = "$ideaVersionName-$coreVersion"
 
 val gradleToolingExtensionSourceSet = sourceSets.create("gradle-tooling-extension") {
     configurations.named(compileOnlyConfigurationName) {
