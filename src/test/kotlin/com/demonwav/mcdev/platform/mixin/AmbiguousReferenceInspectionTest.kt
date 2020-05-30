@@ -21,10 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @DisplayName("Ambiguous Reference Inspection Tests")
 class AmbiguousReferenceInspectionTest : BaseMixinTest() {
 
-    private fun doTest(
-        @Language("JAVA")
-        code: String
-    ) {
+    private fun doTest(@Language("JAVA") code: String) {
         buildProject {
             dir("test") {
                 java(

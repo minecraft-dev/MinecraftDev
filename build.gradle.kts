@@ -10,9 +10,6 @@
 
 import net.minecrell.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
-import org.jetbrains.intellij.tasks.BuildSearchableOptionsTask
-import org.jetbrains.intellij.tasks.PublishTask
-import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -25,7 +22,7 @@ plugins {
     kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.18"
+    id("org.jetbrains.intellij") version "0.4.21"
     id("net.minecrell.licenser") version "0.4.1"
     id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
 }
@@ -43,14 +40,6 @@ val downloadIdeaSources: String by project
 // for publishing nightlies
 val repoToken: String by project
 val repoChannel: String by project
-
-val compileKotlin by tasks.existing
-val processResources by tasks.existing<AbstractCopyTask>()
-val test by tasks.existing<Test>()
-val runIde by tasks.existing<RunIdeTask>()
-val buildSearchableOptions by tasks.existing<BuildSearchableOptionsTask>()
-val publishPlugin by tasks.existing<PublishTask>()
-val clean by tasks.existing<Delete>()
 
 // configurations
 val idea by configurations
@@ -108,6 +97,7 @@ dependencies {
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
     gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:193.5233.102")
+    gradleToolingExtension("org.jetbrains:annotations:19.0.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.1")
@@ -133,7 +123,7 @@ intellij {
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
-publishPlugin {
+tasks.publishPlugin {
     if (properties["publish"] != null) {
         project.version = "${project.version}-${properties["buildNumber"]}"
 
@@ -163,7 +153,7 @@ tasks.withType<GroovyCompile>().configureEach {
     options.compilerArgs = listOf("-proc:none")
 }
 
-processResources {
+tasks.processResources {
     for (lang in arrayOf("", "_en")) {
         from("src/main/resources/messages.MinecraftDevelopment_en_US.properties") {
             rename { "messages.MinecraftDevelopment$lang.properties" }
@@ -180,7 +170,7 @@ processResources {
     }
 }
 
-test {
+tasks.test {
     dependsOn(testLibs)
     useJUnitPlatform()
     doFirst {
@@ -348,9 +338,9 @@ val generate by tasks.registering {
 sourceSets.named("main") { java.srcDir(generate) }
 
 // Remove gen directory on clean
-clean { delete(generate) }
+tasks.clean { delete(generate) }
 
-runIde {
+tasks.runIde {
     maxHeapSize = "2G"
 
     System.getProperty("debug")?.let {

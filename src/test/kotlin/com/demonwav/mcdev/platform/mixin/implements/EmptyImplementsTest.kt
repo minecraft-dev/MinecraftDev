@@ -42,10 +42,7 @@ class EmptyImplementsTest : BaseMixinTest() {
         }
     }
 
-    private fun doTest(
-        @Language("JAVA")
-        mixinCode: String
-    ) {
+    private fun doTest(@Language("JAVA") mixinCode: String) {
         buildProject {
             dir("test") {
                 java("EmptyImplementsMixin.java", mixinCode)

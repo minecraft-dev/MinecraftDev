@@ -21,10 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @DisplayName("Unnecessary Qualified Member Reference Inspection Tests")
 class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
 
-    private fun doTest(
-        @Language("JAVA")
-        code: String
-    ) {
+    private fun doTest(@Language("JAVA") code: String) {
         buildProject {
             dir("test") {
                 java(

@@ -38,12 +38,11 @@ buildscript {
  */
 
 val fileName = ".gradle/intellij-deps.json"
-val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
 val jsonFile = file("$projectDir/$fileName")
 if (jsonFile.exists()) {
     val deps = jsonFile.bufferedReader().use { reader ->
-        gson.fromJson<List<Dep>>(reader)
+        Gson().fromJson<List<Dep>>(reader)
     }
     dependencies {
         for ((groupId, artifactId, version) in deps) {
@@ -106,7 +105,7 @@ tasks.register("resolveIntellijLibSources") {
             }.toList()
 
         jsonFile.bufferedWriter().use { writer ->
-            gson.toJson(deps, writer)
+            GsonBuilder().setPrettyPrinting().create().toJson(deps, writer)
         }
     }
 }
