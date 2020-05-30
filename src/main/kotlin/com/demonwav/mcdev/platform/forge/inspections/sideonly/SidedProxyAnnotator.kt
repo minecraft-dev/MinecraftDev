@@ -24,7 +24,6 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.impl.JavaConstantExpressionEvaluator
-import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiLiteralUtil
 
