@@ -11,11 +11,11 @@
 package com.demonwav.mcdev.facet
 
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.buildsystem.SourceType
 import com.demonwav.mcdev.facet.MinecraftFacetType.Companion.TYPE_ID
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.filterNotNull
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.google.common.collect.HashMultimap

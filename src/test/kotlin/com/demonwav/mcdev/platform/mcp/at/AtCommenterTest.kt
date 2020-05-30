@@ -23,10 +23,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 class AtCommenterTest : CommenterTest() {
 
     private fun doTest(
-        @Language("Access Transformers")
-        before: String,
-        @Language("Access Transformers")
-        after: String
+        @Language("Access Transformers") before: String,
+        @Language("Access Transformers") after: String
     ) {
         doTest(before, after, "_at.cfg", ProjectBuilder::at)
     }

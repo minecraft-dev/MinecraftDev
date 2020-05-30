@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.platform.bukkit
 
-import com.demonwav.mcdev.buildsystem.SourceType
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.GenerationData
 import com.demonwav.mcdev.inspection.IsCancelled
@@ -19,6 +18,7 @@ import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
+import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
@@ -36,21 +36,14 @@ import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTypesUtil
 
-class BukkitModule<T : AbstractModuleType<*>> constructor(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
+class BukkitModule<out T : AbstractModuleType<*>> constructor(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
     var pluginYml by nullable { facet.findFile("plugin.yml", SourceType.RESOURCE) }
         private set
 
-    override lateinit var type: PlatformType
-        private set
+    override val type: PlatformType = type.platformType
 
-    override lateinit var moduleType: T
-        private set
-
-    init {
-        this.moduleType = type
-        this.type = type.platformType
-    }
+    override val moduleType: T = type
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) =
         BukkitConstants.EVENT_CLASS == eventClass.qualifiedName

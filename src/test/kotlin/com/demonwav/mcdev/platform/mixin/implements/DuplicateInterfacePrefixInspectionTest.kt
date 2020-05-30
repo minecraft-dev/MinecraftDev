@@ -54,10 +54,7 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
         }
     }
 
-    private fun doTest(
-        @Language("JAVA")
-        mixinCode: String
-    ) {
+    private fun doTest(@Language("JAVA") mixinCode: String) {
         buildProject {
             dir("test") {
                 java("DuplicateInterfacePrefixMixin.java", mixinCode)

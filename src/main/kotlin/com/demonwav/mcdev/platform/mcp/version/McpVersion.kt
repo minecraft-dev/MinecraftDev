@@ -11,32 +11,33 @@
 package com.demonwav.mcdev.platform.mcp.version
 
 import com.demonwav.mcdev.platform.mcp.McpVersionPair
+import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.fromJson
-import com.demonwav.mcdev.util.getMajorVersion
 import com.demonwav.mcdev.util.sortVersions
 import com.google.gson.Gson
 import java.io.IOException
 import java.net.URL
 import java.util.ArrayList
 import kotlin.Int
+import kotlin.math.min
 
 class McpVersion private constructor(private val map: Map<String, Map<String, List<Int>>>) {
 
-    val versions: List<String> by lazy {
+    val versions: List<SemanticVersion> by lazy {
         sortVersions(map.keys)
     }
 
     data class McpVersionSet(val goodVersions: List<McpVersionPair>, val badVersions: List<McpVersionPair>)
 
-    private fun getSnapshot(version: String): McpVersionSet {
+    private fun getSnapshot(version: SemanticVersion): McpVersionSet {
         return get(version, "snapshot")
     }
 
-    private fun getStable(version: String): McpVersionSet {
+    private fun getStable(version: SemanticVersion): McpVersionSet {
         return get(version, "stable")
     }
 
-    private operator fun get(version: String, type: String): McpVersionSet {
+    private operator fun get(version: SemanticVersion, type: String): McpVersionSet {
         val good = ArrayList<McpVersionPair>()
         val bad = ArrayList<McpVersionPair>()
 
@@ -45,8 +46,9 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
             val versions = map[mcVersion]
             if (versions != null) {
                 versions[type]?.let { vers ->
-                    val pairs = vers.map { McpVersionPair("${type}_$it", mcVersion) }
-                    if (mcVersion.startsWith(version)) {
+                    val mcVersionParsed = SemanticVersion.parse(mcVersion)
+                    val pairs = vers.map { McpVersionPair("${type}_$it", mcVersionParsed) }
+                    if (mcVersionParsed.startsWith(version)) {
                         good.addAll(pairs)
                     } else {
                         bad.addAll(pairs)
@@ -58,28 +60,36 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
         return McpVersionSet(good, bad)
     }
 
-    fun getMcpVersionList(version: String): List<McpVersionEntry> {
-        val result = mutableListOf<McpVersionEntry>()
+    fun getMcpVersionList(version: SemanticVersion): List<McpVersionEntry> {
+        val limit = 50
 
-        val majorVersion = getMajorVersion(version)
+        val result = ArrayList<McpVersionEntry>(limit * 4)
 
+        val majorVersion = version.take(2)
         val stable = getStable(majorVersion)
-        stable.goodVersions.asSequence().sortedWith(Comparator.reverseOrder())
-            .mapTo(result) { s -> McpVersionEntry(s) }
-
         val snapshot = getSnapshot(majorVersion)
-        snapshot.goodVersions.asSequence().sortedWith(Comparator.reverseOrder())
-            .mapTo(result) { s -> McpVersionEntry(s) }
 
-        // The "seconds" in the pairs are bad, but still available to the user
-        // We will color them read
+        fun mapTopTo(source: List<McpVersionPair>, dest: MutableList<McpVersionEntry>, limit: Int, isRed: Boolean) {
+            val tempList = ArrayList(source).apply { sortDescending() }
+            for (i in 0 until min(limit, tempList.size)) {
+                dest += McpVersionEntry(tempList[i], isRed)
+            }
+        }
 
-        stable.badVersions.asSequence().sortedWith(Comparator.reverseOrder())
-            .mapTo(result) { s -> McpVersionEntry(s, true) }
-        snapshot.badVersions.asSequence().sortedWith(Comparator.reverseOrder())
-            .mapTo(result) { s -> McpVersionEntry(s, true) }
+        mapTopTo(stable.goodVersions, result, limit, false)
+        mapTopTo(snapshot.goodVersions, result, limit, false)
 
-        return result
+        // If we're already at the limit we don't need to go through the bad list
+        if (result.size >= limit) {
+            return result.subList(0, min(limit, result.size))
+        }
+
+        // The bad pairs don't match the current MC version, but are still available to the user
+        // We will color them red
+        mapTopTo(stable.badVersions, result, limit, true)
+        mapTopTo(snapshot.badVersions, result, limit, true)
+
+        return result.subList(0, min(limit, result.size))
     }
 
     companion object {

@@ -31,29 +31,25 @@ class ProjectBuilder(private val fixture: JavaCodeInsightTestFixture, private va
 
     fun java(
         path: String,
-        @Language("JAVA")
-        code: String,
+        @Language("JAVA") code: String,
         configure: Boolean = true,
         allowAst: Boolean = false
     ) = file(path, code, ".java", configure, allowAst)
     fun at(
         path: String,
-        @Language("Access Transformers")
-        code: String,
+        @Language("Access Transformers") code: String,
         configure: Boolean = true,
         allowAst: Boolean = false
     ) = file(path, code, "_at.cfg", configure, allowAst)
     fun lang(
         path: String,
-        @Language("MCLang")
-        code: String,
+        @Language("MCLang") code: String,
         configure: Boolean = true,
         allowAst: Boolean = false
     ) = file(path, code, ".lang", configure, allowAst)
     fun nbtt(
         path: String,
-        @Language("NBTT")
-        code: String,
+        @Language("NBTT") code: String,
         configure: Boolean = true,
         allowAst: Boolean = false
     ) = file(path, code, ".nbtt", configure, allowAst)

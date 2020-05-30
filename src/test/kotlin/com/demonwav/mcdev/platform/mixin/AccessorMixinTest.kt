@@ -50,12 +50,7 @@ class AccessorMixinTest : BaseMixinTest() {
         }
     }
 
-    private fun doTest(
-        className: String,
-        @Language("JAVA")
-        code: String,
-        test: (psiClass: PsiClass) -> Unit
-    ) {
+    private fun doTest(className: String, @Language("JAVA") code: String, test: (psiClass: PsiClass) -> Unit) {
         var psiClass: PsiClass? = null
         buildProject {
             dir("test") {

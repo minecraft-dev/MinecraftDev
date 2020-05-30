@@ -12,6 +12,7 @@ package com.demonwav.mcdev.util
 
 import java.awt.Color
 
+@Suppress("MemberVisibilityCanBePrivate")
 object CommonColors {
 
     val DARK_RED = Color(0xAA0000)

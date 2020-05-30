@@ -12,9 +12,10 @@ package com.demonwav.mcdev.platform.mcp
 
 import com.demonwav.mcdev.util.SemanticVersion
 
-data class McpVersionPair(val mcpVersion: String, val mcVersion: String) : Comparable<McpVersionPair> {
+data class McpVersionPair(val mcpVersion: String, val mcVersion: SemanticVersion) : Comparable<McpVersionPair> {
+
     override fun compareTo(other: McpVersionPair): Int {
-        val mcRes = SemanticVersion.parse(mcVersion).compareTo(SemanticVersion.parse(other.mcVersion))
+        val mcRes = mcVersion.compareTo(other.mcVersion)
         if (mcRes != 0) {
             return mcRes
         }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.demonwav.mcdev.creator.ProjectChooserWizardStep">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.demonwav.mcdev.creator.PlatformChooserWizardStep">
   <grid id="27dc6" binding="panel" layout-manager="BorderLayout" hgap="5" vgap="5">
     <constraints>
       <xy x="20" y="20" width="500" height="649"/>

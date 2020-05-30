@@ -11,8 +11,6 @@
 import net.minecrell.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.intellij.tasks.BuildSearchableOptionsTask
-import org.jetbrains.intellij.tasks.PublishTask
-import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -25,10 +23,14 @@ plugins {
     kotlin("jvm") version "1.3.70" // kept in sync with IntelliJ's bundled dep
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.18"
+    id("org.jetbrains.intellij") version "0.4.21"
     id("net.minecrell.licenser") version "0.4.1"
     id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
 }
+
+apply(from = "gradle/attach-sources.gradle.kts")
+
+group = "com.demonwav.minecraft-dev"
 
 val coroutineVersion = "1.3.4" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
@@ -39,14 +41,6 @@ val downloadIdeaSources: String by project
 // for publishing nightlies
 val repoToken: String by project
 val repoChannel: String by project
-
-val compileKotlin by tasks.existing
-val processResources by tasks.existing<AbstractCopyTask>()
-val test by tasks.existing<Test>()
-val runIde by tasks.existing<RunIdeTask>()
-val buildSearchableOptions by tasks.existing<BuildSearchableOptionsTask>()
-val publishPlugin by tasks.existing<PublishTask>()
-val clean by tasks.existing<Delete>()
 
 // configurations
 val idea by configurations
@@ -78,16 +72,7 @@ repositories {
     maven("https://dl.bintray.com/minecraft-dev/maven")
     maven("https://repo.spongepowered.org/maven")
     maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
-}
-
-// Sources aren't provided through the gradle intellij plugin for bundled libs, use compileOnly to attach them
-// but not include them in the output artifact
-//
-// Kept in a separate block for readability
-dependencies {
-    compileOnly(kotlin("stdlib-jdk8"))
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
-    compileOnly("org.apache.commons:commons-lang3:3.9")
+    maven("https://repo.gradle.org/gradle/libs-releases-local/")
 }
 
 dependencies {
@@ -99,6 +84,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutineVersion") {
         isTransitive = false
     }
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
 
     jflex("org.jetbrains.idea:jflex:1.7.0-b7f882a")
     jflexSkeleton("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
@@ -110,8 +96,9 @@ dependencies {
     testLibs("org.spongepowered:spongeapi:7.0.0:shaded")
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
-    // println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1))
+    // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
     gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:201.6668.121")
+    gradleToolingExtension("org.jetbrains:annotations:19.0.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.1")
@@ -137,7 +124,7 @@ intellij {
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
-publishPlugin {
+tasks.publishPlugin {
     if (properties["publish"] != null) {
         project.version = "${project.version}-${properties["buildNumber"]}"
 
@@ -157,7 +144,10 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        freeCompilerArgs = listOf("-Xjvm-default=enable")
+    }
 }
 
 tasks.withType<GroovyCompile>().configureEach {
@@ -169,15 +159,24 @@ tasks.withType<BuildSearchableOptionsTask>().configureEach {
     enabled = false
 }
 
-processResources {
+tasks.processResources {
     for (lang in arrayOf("", "_en")) {
         from("src/main/resources/messages.MinecraftDevelopment_en_US.properties") {
             rename { "messages.MinecraftDevelopment$lang.properties" }
         }
     }
+    // These templates aren't allowed to be in a directory structure in the output jar
+    // But we have a lot of templates that would get real hard to deal with if we didn't have some structure
+    // So this just flattens out the fileTemplates/j2ee directory in the jar, while still letting us have directories
+    exclude("fileTemplates/j2ee/**")
+    from(fileTree("src/main/resources/fileTemplates/j2ee").files) {
+        eachFile {
+            this.relativePath = RelativePath(true, "fileTemplates", "j2ee", this.name)
+        }
+    }
 }
 
-test {
+tasks.test {
     dependsOn(testLibs)
     useJUnitPlatform()
     doFirst {
@@ -231,7 +230,10 @@ license {
 
     tasks {
         register("gradle") {
-            files = project.files("build.gradle.kts", "settings.gradle.kts", "gradle.properties")
+            files = project.fileTree(
+                "dir" to project.projectDir,
+                "includes" to listOf("**/*.gradle.kts", "gradle.properties")
+            )
         }
         register("grammars") {
             files = project.fileTree("src/main/grammars")
@@ -342,9 +344,9 @@ val generate by tasks.registering {
 sourceSets.named("main") { java.srcDir(generate) }
 
 // Remove gen directory on clean
-clean { delete(generate) }
+tasks.clean { delete(generate) }
 
-runIde {
+tasks.runIde {
     maxHeapSize = "2G"
 
     System.getProperty("debug")?.let {

@@ -64,7 +64,7 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
     open val isEventGenAvailable: Boolean
         get() = false
 
-    open fun getDefaultListenerName(psiClass: PsiClass) = "on" + psiClass.name!!.replace("Event", "")
+    open fun getDefaultListenerName(psiClass: PsiClass) = "on" + psiClass.name?.replace("Event", "")
 
     override fun toString(): String {
         return ToStringBuilder(this)

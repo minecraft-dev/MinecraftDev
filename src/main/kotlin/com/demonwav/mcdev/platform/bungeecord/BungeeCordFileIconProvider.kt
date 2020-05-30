@@ -21,12 +21,7 @@ import javax.swing.Icon
 
 class BungeeCordFileIconProvider : FileIconProvider {
 
-    override fun getIcon(
-        file: VirtualFile,
-        @Iconable.IconFlags
-        flags: Int,
-        project: Project?
-    ): Icon? {
+    override fun getIcon(file: VirtualFile, @Iconable.IconFlags flags: Int, project: Project?): Icon? {
         project ?: return null
 
         if (!MinecraftSettings.instance.isShowProjectPlatformIcons) {
@@ -34,7 +29,8 @@ class BungeeCordFileIconProvider : FileIconProvider {
         }
 
         val module = ModuleUtilCore.findModuleForFile(file, project) ?: return null
-        val bungeecordModule = MinecraftFacet.getInstance(module, BungeeCordModuleType) ?: return null
+        val bungeecordModule =
+            MinecraftFacet.getInstance(module, BungeeCordModuleType, WaterfallModuleType) ?: return null
 
         if (file == bungeecordModule.pluginYml) {
             return bungeecordModule.icon

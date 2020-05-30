@@ -12,6 +12,11 @@ package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.MinecraftModuleType
+import com.demonwav.mcdev.platform.bukkit.creator.BukkitProjectSettingsWizard
+import com.demonwav.mcdev.platform.bungeecord.creator.BungeeCordProjectSettingsWizard
+import com.demonwav.mcdev.platform.forge.creator.ForgeProjectSettingsWizard
+import com.demonwav.mcdev.platform.liteloader.creator.LiteLoaderProjectSettingsWizard
+import com.demonwav.mcdev.platform.sponge.creator.SpongeProjectSettingsWizard
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
@@ -21,17 +26,14 @@ import com.intellij.openapi.module.JavaModuleType
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.project.DumbAwareRunnable
 import com.intellij.openapi.project.DumbService
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.projectRoots.JavaSdk
-import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
 import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
-import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 
 class MinecraftModuleBuilder : JavaModuleBuilder() {
@@ -41,17 +43,18 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
     override fun getPresentableName() = MinecraftModuleType.NAME
     override fun getNodeIcon() = PlatformAssets.MINECRAFT_ICON
     override fun getGroupName() = MinecraftModuleType.NAME
-    override fun getWeight() = JavaModuleBuilder.BUILD_SYSTEM_WEIGHT - 1
+    override fun getWeight() = BUILD_SYSTEM_WEIGHT - 1
     override fun getBuilderId() = "MINECRAFT_MODULE"
-    override fun isSuitableSdkType(sdk: SdkTypeId?) = sdk === JavaSdk.getInstance()
 
     override fun setupRootModel(modifiableRootModel: ModifiableRootModel) {
         val project = modifiableRootModel.project
-        val root = createAndGetRoot() ?: return
-        modifiableRootModel.addContentEntry(root)
+        val (root, vFile) = createAndGetRoot()
+        modifiableRootModel.addContentEntry(vFile)
 
         if (moduleJdk != null) {
             modifiableRootModel.sdk = moduleJdk
+        } else {
+            modifiableRootModel.inheritSdk()
         }
 
         val r = DumbAwareRunnable {
@@ -78,17 +81,17 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
         DumbService.getInstance(project).runWhenSmart(r)
     }
 
-    private fun createAndGetRoot(): VirtualFile? {
-        val temp = contentEntryPath ?: return null
+    private fun createAndGetRoot(): Pair<Path, VirtualFile> {
+        val temp = contentEntryPath ?: throw IllegalStateException("Failed to get content entry path")
 
-        val path = FileUtil.toSystemIndependentName(temp)
+        val pathName = FileUtil.toSystemIndependentName(temp)
 
-        return try {
-            Files.createDirectories(Paths.get(path))
-            LocalFileSystem.getInstance().refreshAndFindFileByPath(path)
-        } catch (e: IOException) {
-            null
-        }
+        val path = Paths.get(pathName)
+        Files.createDirectories(path)
+        val vFile = LocalFileSystem.getInstance().refreshAndFindFileByPath(pathName)
+            ?: throw IllegalStateException("Failed to refresh and file file: $path")
+
+        return path to vFile
     }
 
     override fun getModuleType(): ModuleType<*> = JavaModuleType.getModuleType()
@@ -109,7 +112,5 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
     }
 
     override fun getCustomOptionsStep(context: WizardContext?, parentDisposable: Disposable?) =
-        ProjectChooserWizardStep(creator)
-
-    override fun validate(current: Project?, dest: Project?) = true
+        PlatformChooserWizardStep(creator)
 }

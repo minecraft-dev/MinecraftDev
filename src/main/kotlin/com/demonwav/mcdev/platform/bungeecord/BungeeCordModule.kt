@@ -10,8 +10,6 @@
 
 package com.demonwav.mcdev.platform.bungeecord
 
-import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.buildsystem.SourceType
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.GenerationData
 import com.demonwav.mcdev.platform.AbstractModule
@@ -23,6 +21,7 @@ import com.demonwav.mcdev.platform.bukkit.PaperModuleType
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType
 import com.demonwav.mcdev.platform.bungeecord.generation.BungeeCordGenerationData
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants
+import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.nullable
@@ -34,8 +33,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTypesUtil
 
-class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, override val moduleType: T) :
-    AbstractModule(facet) {
+class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
     var pluginYml by nullable {
         val file = facet.findFile("bungee.yml", SourceType.RESOURCE)
@@ -51,8 +49,9 @@ class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, ove
     }
         private set
 
-    override val type = PlatformType.BUNGEECORD
-    override val icon = PlatformAssets.BUNGEECORD_ICON
+    override val type: PlatformType = type.platformType
+
+    override val moduleType: T = type
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) =
         BungeeCordConstants.EVENT_CLASS == eventClass.qualifiedName

@@ -21,10 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @DisplayName("Sponge Plugin Class Inspection Tests")
 class PluginClassInspectionTest : BaseSpongeTest() {
 
-    private fun doTest(
-        @Language("JAVA")
-        code: String
-    ) {
+    private fun doTest(@Language("JAVA") code: String) {
         buildProject {
             dir("test") {
                 java("ASpongePlugin.java", code)

@@ -25,10 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @DisplayName("Multiple targets test")
 class MultipleTargetTest : BaseMixinTest() {
 
-    private fun doTest(
-        @Language("JAVA")
-        code: String
-    ) {
+    private fun doTest(@Language("JAVA") code: String) {
         buildProject {
             dir("test") {
                 java(

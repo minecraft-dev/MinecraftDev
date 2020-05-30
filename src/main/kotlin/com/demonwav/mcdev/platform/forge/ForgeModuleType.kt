@@ -42,6 +42,7 @@ object ForgeModuleType : AbstractModuleType<ForgeModule>("", "") {
     override fun generateModule(facet: MinecraftFacet) = ForgeModule(facet)
     override fun getDefaultListenerName(psiClass: PsiClass): String = defaultNameForSubClassEvents(psiClass)
 
-    val FG2_3_VERSION = SemanticVersion.release(1, 12)
-    val FG3_VERSION = SemanticVersion.release(1, 13)
+    val FG23_MC_VERSION = SemanticVersion.release(1, 12)
+    val FG3_MC_VERSION = SemanticVersion.release(1, 13)
+    val FG3_FORGE_VERSION = SemanticVersion.release(14, 23, 5, 2851)
 }

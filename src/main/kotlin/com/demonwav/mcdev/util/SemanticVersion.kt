@@ -34,6 +34,22 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
 
     override fun toString() = versionString
 
+    fun take(count: Int): SemanticVersion {
+        return SemanticVersion(parts.take(count))
+    }
+
+    fun startsWith(other: SemanticVersion): Boolean {
+        if (other.parts.size > this.parts.size) {
+            return false
+        }
+        for (i in other.parts.indices) {
+            if (this.parts[i] != other.parts[i]) {
+                return false
+            }
+        }
+        return true
+    }
+
     companion object {
         /**
          * The higher the priority value associated with a certain part, the higher it is ranked in comparisons.
@@ -53,7 +69,7 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
         /**
          * Creates a simple release version where each provided value forms a part (read from left to right).
          */
-        fun release(vararg parts: Int) = SemanticVersion(parts.map(::ReleasePart))
+        fun release(vararg parts: Int) = SemanticVersion(parts.map { ReleasePart(it, it.toString()) })
 
         /**
          * Parses a version string into a comparable representation.
@@ -64,7 +80,10 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
                 if (part.all { it.isDigit() }) {
                     part.toInt()
                 } else {
-                    throw IllegalArgumentException("Failed to parse version part as integer: $part")
+                    throw IllegalArgumentException(
+                        "Failed to parse version part as integer: $part " +
+                            "(whole version text: $value)"
+                    )
                 }
 
             // We need to support pre-releases/RCs and snapshots as well
@@ -87,7 +106,13 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
                 if (separator != null) {
                     parseTextPart(part.split(separator, limit = 2), separator)
                 } else {
-                    ReleasePart(parseInt(part))
+                    // Forge has a single version which should be 14.8.* but is actually 14.v8.*
+                    val numberPart = if (part.startsWith('v')) {
+                        part.substring(1)
+                    } else {
+                        part
+                    }
+                    ReleasePart(parseInt(numberPart), part)
                 }
             }
             return SemanticVersion(parts)
@@ -96,9 +121,7 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
         sealed class VersionPart : Comparable<VersionPart> {
             abstract val versionString: String
 
-            data class ReleasePart(val version: Int) : VersionPart() {
-                override val versionString = version.toString()
-
+            data class ReleasePart(val version: Int, override val versionString: String) : VersionPart() {
                 override fun compareTo(other: VersionPart) =
                     when (other) {
                         is ReleasePart -> version - other.version

@@ -10,15 +10,11 @@
 
 package com.demonwav.mcdev.creator
 
-import com.demonwav.mcdev.buildsystem.BuildSystem
-import com.demonwav.mcdev.buildsystem.gradle.GradleBuildSystem
-import com.demonwav.mcdev.buildsystem.maven.MavenBuildSystem
-import com.demonwav.mcdev.exception.EmptyFieldSetupException
-import com.demonwav.mcdev.exception.OtherSetupException
-import com.demonwav.mcdev.exception.SetupException
-import com.demonwav.mcdev.platform.forge.ForgeProjectConfiguration
-import com.demonwav.mcdev.platform.liteloader.LiteLoaderProjectConfiguration
-import com.demonwav.mcdev.platform.sponge.SpongeProjectConfiguration
+import com.demonwav.mcdev.creator.buildsystem.BuildSystem
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
+import com.demonwav.mcdev.creator.exception.EmptyFieldSetupException
+import com.demonwav.mcdev.creator.exception.OtherSetupException
+import com.demonwav.mcdev.creator.exception.SetupException
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.ui.popup.Balloon
@@ -34,44 +30,59 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
     private lateinit var artifactIdField: JTextField
     private lateinit var versionField: JTextField
     private lateinit var panel: JPanel
-    private lateinit var buildSystemBox: JComboBox<String>
+    private lateinit var buildSystemBox: JComboBox<BuildSystemType>
 
     override fun getComponent() = panel
 
     override fun updateStep() {
-        if (creator.configs.size > 1) {
-            buildSystemBox.selectedIndex = 1
-            buildSystemBox.isVisible = false
+        buildSystemBox.removeAllItems()
+        buildSystemBox.isEnabled = true
+
+        val types = BuildSystemType.values().filter { type ->
+            creator.configs.all { type.creatorType.isInstance(it) }
+        }
+
+        for (type in types) {
+            buildSystemBox.addItem(type)
+        }
+
+        buildSystemBox.selectedIndex = 0
+        if (buildSystemBox.itemCount == 1) {
+            buildSystemBox.isEnabled = false
             return
         }
-        when {
-            creator.configs.any { s -> s is ForgeProjectConfiguration || s is LiteLoaderProjectConfiguration } -> {
-                buildSystemBox.selectedIndex = 1
-                buildSystemBox.setVisible(false)
-            }
-            creator.configs.any { s -> s is SpongeProjectConfiguration } -> {
-                buildSystemBox.selectedIndex = 1
-                buildSystemBox.setVisible(true)
-            }
-            else -> {
-                buildSystemBox.selectedIndex = 0
-                buildSystemBox.setVisible(true)
-            }
+
+        // We prefer Gradle, so if it's included, choose it
+        // If Gradle is not included, luck of the draw
+        if (creator.configs.any { it.preferredBuildSystem == BuildSystemType.GRADLE }) {
+            buildSystemBox.selectedItem = BuildSystemType.GRADLE
+            return
         }
+
+        val counts = creator.configs.asSequence()
+            .mapNotNull { it.preferredBuildSystem }
+            .groupingBy { it }
+            .eachCount()
+
+        val maxValue = counts.maxBy { it.value }?.value ?: return
+        counts.asSequence()
+            .filter { it.value == maxValue }
+            .map { it.key }
+            .firstOrNull()
+            ?.let { mostPopularType ->
+                buildSystemBox.selectedItem = mostPopularType
+            }
     }
 
-    override fun updateDataModel() {}
-
-    override fun onStepLeaving() {
+    override fun updateDataModel() {
         creator.buildSystem = createBuildSystem()
     }
 
     private fun createBuildSystem(): BuildSystem {
-        return if (buildSystemBox.selectedIndex == 0) {
-            MavenBuildSystem(artifactIdField.text, groupIdField.text, versionField.text)
-        } else {
-            GradleBuildSystem(artifactIdField.text, groupIdField.text, versionField.text)
-        }
+        val type = buildSystemBox.selectedItem as? BuildSystemType
+            ?: throw IllegalStateException("Selected item is not a ${BuildSystemType::class.java.name}")
+
+        return type.create(groupIdField.text, artifactIdField.text, versionField.text)
     }
 
     override fun validate(): Boolean {
@@ -94,10 +105,6 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
 
             if (!artifactIdField.text.matches(NO_WHITESPACE)) {
                 throw OtherSetupException("The ArtifactId field cannot contain any whitespace", artifactIdField)
-            }
-
-            if (creator.configs.any { s -> s is ForgeProjectConfiguration } && buildSystemBox.selectedIndex == 0) {
-                throw OtherSetupException("Forge does not support Maven", buildSystemBox)
             }
         } catch (e: SetupException) {
             JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(e.error, MessageType.ERROR, null)

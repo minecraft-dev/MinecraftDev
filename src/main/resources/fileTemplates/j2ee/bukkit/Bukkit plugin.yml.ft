@@ -1,0 +1,30 @@
+name: ${NAME}
+version: ${VERSION}
+main: ${MAIN}
+#if (${API_VERSION})
+api-version: ${API_VERSION}
+#end
+#if (${PREFIX})
+prefix: ${PREFIX}
+#end
+#if (${LOAD})
+load: ${LOAD}
+#end
+#if (${LOAD_BEFORE})
+loadbefore: ${LOAD_BEFORE}
+#end
+#if (${DEPEND})
+depend: ${DEPEND}
+#end
+#if (${SOFT_DEPEND})
+softdepend: ${SOFT_DEPEND}
+#end
+#if (${AUTHOR_LIST})
+authors: ${AUTHOR_LIST}
+#end
+#if (${DESCRIPTION})
+description: ${DESCRIPTION}
+#end
+#if (${WEBSITE})
+website: ${WEBSITE}
+#end
