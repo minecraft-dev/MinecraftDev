@@ -48,7 +48,7 @@ interface TranslationProvider {
 object JsonTranslationProvider : TranslationProvider {
     override fun map(domain: String, input: FileContent): TranslationIndexEntry? {
         val json = try {
-            JsonParser().parse(input.contentAsText.toString())
+            JsonParser.parseString(input.contentAsText.toString())
         } catch (_: JsonSyntaxException) {
             return null
         }
