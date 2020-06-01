@@ -32,7 +32,7 @@ class GenerateAccessorAction : BaseGenerateAction(GenerateAccessorHandler()) {
             return
         }
         val psiFile = PsiUtilBase.getPsiFileInEditor(editor, project) ?: return
-        val handler = handler as GenerateAccessorHandler
+        val handler = this.handler as GenerateAccessorHandler
         val elementToMakeWritable = handler.getElementToMakeWritable(psiFile)
         if (elementToMakeWritable != null) {
             if (!EditorModificationUtil.checkModificationAllowed(editor) ||

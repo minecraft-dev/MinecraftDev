@@ -268,14 +268,13 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
         val pkg = dialog.targetDirectory ?: return null
         val name = dialog.className
 
-        var clazz: PsiClass? = null
-        WriteCommandAction.writeCommandAction(project)
+        return WriteCommandAction.writeCommandAction(project)
             .withName("Generate Accessor/Invoker")
             .withGroupId("Generate Accessor/Invoker")
-            .run<RuntimeException> {
+            .compute<PsiClass, RuntimeException> {
                 IdeDocumentHistory.getInstance(project).includeCurrentPlaceAsChangePlace()
-                try {
-                    clazz = JavaDirectoryService.getInstance().createInterface(pkg, name)
+                val clazz = try {
+                    JavaDirectoryService.getInstance().createInterface(pkg, name)
                 } catch (e: IncorrectOperationException) {
                     invokeLater {
                         val message = "${CodeInsightBundle.message(
@@ -288,7 +287,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                             CodeInsightBundle.message("intention.error.cannot.create.class.title")
                         )
                     }
-                    return@run
+                    return@compute null
                 }
                 val factory = JavaPsiFacade.getElementFactory(project)
                 val targetAccessible = targetClass.modifierList?.hasExplicitModifier(PsiModifier.PUBLIC) == true &&
@@ -299,19 +298,19 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                     "@${MixinConstants.Annotations.MIXIN}(targets=\"${targetClass.fullQualifiedName}\")"
                 }
                 val annotation = factory.createAnnotationFromText(annotationText, clazz)
-                AddAnnotationFix(MixinConstants.Annotations.MIXIN, clazz!!, annotation.parameterList.attributes)
+                AddAnnotationFix(MixinConstants.Annotations.MIXIN, clazz, annotation.parameterList.attributes)
                     .applyFix()
 
-                val module = clazz!!.findModule() ?: return@run
+                val module = clazz.findModule() ?: return@compute null
                 val configToWrite = MixinModule.getBestWritableConfigForMixinClass(
                     project,
                     GlobalSearchScope.moduleScope(module),
-                    clazz!!.fullQualifiedName ?: ""
+                    clazz.fullQualifiedName ?: ""
                 )
-                configToWrite?.qualifiedMixins?.add(clazz!!.fullQualifiedName)
-            }
+                configToWrite?.qualifiedMixins?.add(clazz.fullQualifiedName)
 
-        return clazz
+                return@compute clazz
+            }
     }
 
     private fun countAccessorMixins(project: Project, names: List<String?>): Int {
