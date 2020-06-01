@@ -798,6 +798,11 @@
                 description="Copy the reference to the element for use in an injector">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
+        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateAccessorAction" id="GenerateAccessorAction"
+                text="Generate Accessor/Invoker"
+                description="Generate an accessor for the selected member">
+            <add-to-group group-id="GenerateGroup" anchor="last" />
+        </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.FindSrgMappingAction" id="FindSrgMappingAction"
                 text="Get SRG Name"
                 description="Find the associated SRG mapping for this element">
