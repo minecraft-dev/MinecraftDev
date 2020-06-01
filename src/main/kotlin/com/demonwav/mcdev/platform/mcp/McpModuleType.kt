@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.mcp.util.McpConstants
 import com.demonwav.mcdev.util.CommonColors
+import com.demonwav.mcdev.util.SemanticVersion
 import javax.swing.Icon
 
 object McpModuleType : AbstractModuleType<McpModule>("", "") {
@@ -33,4 +34,6 @@ object McpModuleType : AbstractModuleType<McpModule>("", "") {
     override val hasIcon = false
 
     override fun generateModule(facet: MinecraftFacet) = McpModule(facet)
+
+    val MC_1_12_2 = SemanticVersion.release(1, 12, 2)
 }

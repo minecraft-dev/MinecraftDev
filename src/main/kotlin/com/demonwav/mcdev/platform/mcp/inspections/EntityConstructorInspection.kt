@@ -14,6 +14,7 @@ import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.util.McpConstants
 import com.demonwav.mcdev.platform.mixin.util.isMixin
+import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiClass
@@ -49,10 +50,9 @@ class EntityConstructorInspection : BaseInspection() {
                 }
 
                 val module = ModuleUtilCore.findModuleForPsiElement(aClass) ?: return
-
-                val instance = MinecraftFacet.getInstance(module) ?: return
-
-                if (!instance.isOfType(McpModuleType)) {
+                val mcpModule = MinecraftFacet.getInstance(module, McpModuleType) ?: return
+                val mcVersion = mcpModule.getSettings().minecraftVersion
+                if (mcVersion != null && SemanticVersion.parse(mcVersion) > McpModuleType.MC_1_12_2) {
                     return
                 }
 
