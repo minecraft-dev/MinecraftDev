@@ -125,10 +125,11 @@ object BukkitTemplate : BaseTemplate() {
         }
 
         // Plugins targeting 1.13 or newer need an explicit api declaration flag
-        // Unfortunately this flag has no contract to match any specific API version
+        // This is the major and minor version separated by a dot without the patch version. ex: 1.15 even for 1.15.2
         config.minecraftVersion?.let { mcVersion ->
-            if (SemanticVersion.parse(mcVersion) >= BukkitModuleType.API_TAG_VERSION) {
-                props["API_VERSION"] = mcVersion
+            val semVer = SemanticVersion.parse(mcVersion)
+            if (semVer >= BukkitModuleType.API_TAG_VERSION) {
+                props["API_VERSION"] = semVer.take(2).toString()
             }
         }
 
