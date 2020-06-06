@@ -48,7 +48,7 @@ enum class PlatformType(
     SPONGE(SpongeModuleType, "Sponge"),
     BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord.json"),
     WATERFALL(WaterfallModuleType, "Waterfall", "waterfall.json", BUNGEECORD),
-    VELOCITY(VelocityModuleType, "Velocity"),
+    VELOCITY(VelocityModuleType, "Velocity", "velocity.json"),
     LITELOADER(LiteLoaderModuleType, "LiteLoader"),
     MIXIN(MixinModuleType, "Mixin"),
     MCP(McpModuleType, "MCP");

@@ -27,6 +27,7 @@ import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
+import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.virtualFileOrError
@@ -215,17 +216,36 @@ class VelocityMainClassModifyStep(
     private operator fun StringBuilder.plus(text: String) = this.append(text)
 }
 
+private val VELOCITY_1_1_0_SNAPSHOT = SemanticVersion.parse("1.1.0-SNAPSHOT")
+
 class VelocityDependenciesSetup(
     private val buildSystem: BuildSystem,
     private val velocityApiVersion: String
 ) : CreatorStep {
     override fun runStep(indicator: ProgressIndicator) {
+        val velocityRepo = if (velocityApiVersion.endsWith("-SNAPSHOT")) "snapshots" else "releases"
         buildSystem.repositories.add(
             BuildRepository(
                 "velocitypowered-repo",
-                "https://repo.velocitypowered.com/snapshots/"
+                "https://repo.velocitypowered.com/$velocityRepo/"
             )
         )
+
+        if (SemanticVersion.parse(velocityApiVersion) >= VELOCITY_1_1_0_SNAPSHOT) {
+            buildSystem.repositories.add(
+                BuildRepository(
+                    "minecraft-libraries",
+                    "https://libraries.minecraft.net/"
+                )
+            )
+            buildSystem.repositories.add(
+                BuildRepository(
+                    "spongepowered-repo",
+                    "https://repo.spongepowered.org/maven"
+                )
+            )
+        }
+
         buildSystem.dependencies.add(
             BuildDependency(
                 "com.velocitypowered",

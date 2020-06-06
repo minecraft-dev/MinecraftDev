@@ -16,7 +16,13 @@ import com.demonwav.mcdev.creator.ValidatedField
 import com.demonwav.mcdev.creator.ValidatedFieldType.CLASS_NAME
 import com.demonwav.mcdev.creator.ValidatedFieldType.LIST
 import com.demonwav.mcdev.creator.ValidatedFieldType.NON_BLANK
+import com.demonwav.mcdev.creator.getVersionSelector
 import com.demonwav.mcdev.util.firstOfType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -62,14 +68,13 @@ class VelocityProjectSettingsWizard(private val creator: MinecraftProjectCreator
 
         basicUpdateStep(creator, conf, pluginNameField, mainClassField)
 
-        velocityApiVersionBox.addItem("1.0.0-SNAPSHOT")
-        // CoroutineScope(Dispatchers.Swing).launch {
-        //     try {
-        //         TODO withContext(Dispatchers.IO) { SpongeVersion.downloadData() }?.set(velocityApiVersionBox)
-        //     } catch (e: Exception) {
-        //         errorLabel.isVisible = true
-        //     }
-        // }
+        CoroutineScope(Dispatchers.Swing).launch {
+            try {
+                withContext(Dispatchers.IO) { getVersionSelector(conf.type) }.set(velocityApiVersionBox)
+            } catch (e: Exception) {
+                errorLabel.isVisible = true
+            }
+        }
     }
 
     override fun isStepVisible(): Boolean {
