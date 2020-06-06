@@ -22,6 +22,11 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenFinalizerStep
+import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
+import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
+import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
+import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.virtualFileOrError
@@ -50,10 +55,55 @@ sealed class VelocityProjectCreator<T : BuildSystem>(
 
     protected fun setupMainClassSteps(): Pair<CreatorStep, CreatorStep> {
         val mainClassStep = createJavaClassStep(config.mainClass) { packageName, className ->
-            VelocityTemplate.applyMainClass(project, packageName, className, false)
+            VelocityTemplate.applyMainClass(project, packageName, className, config.hasDependencies())
         }
 
         return mainClassStep to VelocityMainClassModifyStep(project, buildSystem, config.mainClass, config)
+    }
+}
+
+class VelocityMavenCreator(
+    rootDirectory: Path,
+    rootModule: Module,
+    buildSystem: MavenBuildSystem,
+    config: VelocityProjectConfig
+) : VelocityProjectCreator<MavenBuildSystem>(rootDirectory, rootModule, buildSystem, config) {
+    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+        val (mainClassStep, modifyStep) = setupMainClassSteps()
+
+        val pomText = VelocityTemplate.applyPom(project)
+
+        return listOf(
+            setupDependencyStep(),
+            BasicMavenStep(project, rootDirectory, buildSystem, config, pomText),
+            mainClassStep,
+            modifyStep,
+            MavenGitignoreStep(project, rootDirectory),
+            BasicMavenFinalizerStep(rootModule, rootDirectory)
+        )
+    }
+
+    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
+        val depStep = setupDependencyStep()
+        val commonDepStep = CommonModuleDependencyStep(buildSystem)
+        val (mainClassStep, modifyStep) = setupMainClassSteps()
+
+        val pomText = VelocityTemplate.applySubPom(project)
+        val mavenStep = BasicMavenStep(
+            project,
+            rootDirectory,
+            buildSystem,
+            config,
+            pomText,
+            listOf(
+                BasicMavenStep.setupDirs(),
+                BasicMavenStep.setupSubCore(buildSystem.parentOrError.artifactId),
+                BasicMavenStep.setupSubName(config.type),
+                BasicMavenStep.setupInfo(),
+                BasicMavenStep.setupDependencies()
+            )
+        )
+        return listOf(depStep, commonDepStep, mavenStep, mainClassStep, modifyStep)
     }
 }
 
@@ -120,7 +170,13 @@ class VelocityMainClassModifyStep(
             val annotationBuilder = StringBuilder("@Plugin(")
             annotationBuilder + "\nid = ${literal(buildSystem.artifactId)}"
             annotationBuilder + ",\nname = ${literal(config.pluginName)}"
-            annotationBuilder + ",\nversion = \"@version@\""
+
+            if (buildSystem is GradleBuildSystem) {
+                annotationBuilder + ",\nversion = \"@version@\""
+            } else {
+                annotationBuilder + ",\nversion = \"${buildSystem.version}\""
+            }
+
             if (config.hasDescription()) {
                 annotationBuilder + ",\ndescription = ${literal(config.description)}"
             }
@@ -130,7 +186,12 @@ class VelocityMainClassModifyStep(
             }
 
             if (config.hasAuthors()) {
-                annotationBuilder + ",\nauthors = {${config.authors.joinToString(",\n", transform = ::literal)}}"
+                annotationBuilder + ",\nauthors = {${config.authors.joinToString(", ", transform = ::literal)}}"
+            }
+
+            if (config.hasDependencies()) {
+                val deps = config.dependencies.joinToString(",\n") { "@Dependency(id = ${literal(it)})" }
+                annotationBuilder + ",\ndependencies = {\n$deps\n}"
             }
 
             annotationBuilder + "\n)"

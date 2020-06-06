@@ -86,7 +86,7 @@ class VelocityProjectSettingsWizard(private val creator: MinecraftProjectCreator
         conf.velocityApiVersion = this.velocityApiVersionBox.selectedItem as String
 
         conf.setAuthors(this.authorsField.text)
-        // conf.setDependencies(this.dependField.text) TODO
+        conf.setDependencies(this.dependField.text)
     }
 
     override fun updateDataModel() {}
