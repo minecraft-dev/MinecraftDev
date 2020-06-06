@@ -17,6 +17,7 @@ import com.demonwav.mcdev.platform.bungeecord.creator.BungeeCordProjectSettingsW
 import com.demonwav.mcdev.platform.forge.creator.ForgeProjectSettingsWizard
 import com.demonwav.mcdev.platform.liteloader.creator.LiteLoaderProjectSettingsWizard
 import com.demonwav.mcdev.platform.sponge.creator.SpongeProjectSettingsWizard
+import com.demonwav.mcdev.platform.velocity.creator.VelocityProjectSettingsWizard
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
@@ -107,7 +108,8 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
             SpongeProjectSettingsWizard(creator),
             ForgeProjectSettingsWizard(creator),
             LiteLoaderProjectSettingsWizard(creator),
-            BungeeCordProjectSettingsWizard(creator)
+            BungeeCordProjectSettingsWizard(creator),
+            VelocityProjectSettingsWizard(creator)
         )
     }
 

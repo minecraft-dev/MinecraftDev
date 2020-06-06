@@ -30,6 +30,8 @@ import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
+import com.demonwav.mcdev.platform.velocity.VelocityModuleType
+import com.demonwav.mcdev.platform.velocity.framework.VELOCITY_LIBRARY_KIND
 import com.intellij.openapi.roots.libraries.LibraryKind
 
 enum class PlatformType(
@@ -46,6 +48,7 @@ enum class PlatformType(
     SPONGE(SpongeModuleType, "Sponge"),
     BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord.json"),
     WATERFALL(WaterfallModuleType, "Waterfall", "waterfall.json", BUNGEECORD),
+    VELOCITY(VelocityModuleType, "Velocity"),
     LITELOADER(LiteLoaderModuleType, "LiteLoader"),
     MIXIN(MixinModuleType, "Mixin"),
     MCP(McpModuleType, "MCP");
@@ -76,6 +79,7 @@ enum class PlatformType(
             MIXIN_LIBRARY_KIND -> MIXIN
             BUNGEECORD_LIBRARY_KIND -> BUNGEECORD
             WATERFALL_LIBRARY_KIND -> WATERFALL
+            VELOCITY_LIBRARY_KIND -> VELOCITY
             else -> null
         }
     }

@@ -35,6 +35,9 @@ object PlatformAssets : Assets() {
     val WATERFALL_ICON = loadIcon("/assets/icons/platform/Waterfall.png")
     val WATERFALL_ICON_2X = loadIcon("/assets/icons/platform/Waterfall@2x.png")
 
+    val VELOCITY_ICON = loadIcon("/assets/icons/platform/Velocity.png")
+    val VELOCITY_ICON_2X = loadIcon("/assets/icons/platform/Velocity@2x.png")
+
     val LITELOADER_ICON = loadIcon("/assets/icons/platform/LiteLoader.png")
     val LITELOADER_ICON_2X = loadIcon("/assets/icons/platform/LiteLoader@2x.png")
 

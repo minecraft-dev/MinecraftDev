@@ -44,6 +44,17 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             bungeeGroup.addTemplate(FileTemplateDescriptor(BUNGEECORD_SUBMODULE_POM_TEMPLATE))
         }
 
+        FileTemplateGroupDescriptor("Velocity", PlatformAssets.VELOCITY_ICON).let { velocityGroup ->
+            group.addTemplate(velocityGroup)
+            velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_MAIN_CLASS_TEMPLATE))
+            velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_BUILD_GRADLE_TEMPLATE))
+            velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_SUBMODULE_BUILD_GRADLE_TEMPLATE))
+            velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_GRADLE_PROPERTIES_TEMPLATE))
+            velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_SETTINGS_GRADLE_TEMPLATE))
+            velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_POM_TEMPLATE))
+            velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_SUBMODULE_POM_TEMPLATE))
+        }
+
         FileTemplateGroupDescriptor("Sponge", PlatformAssets.SPONGE_ICON).let { spongeGroup ->
             group.addTemplate(spongeGroup)
             spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_MAIN_CLASS_TEMPLATE))
@@ -122,6 +133,14 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val BUNGEECORD_SETTINGS_GRADLE_TEMPLATE = "BungeeCord settings.gradle"
         const val BUNGEECORD_POM_TEMPLATE = "BungeeCord pom.xml"
         const val BUNGEECORD_SUBMODULE_POM_TEMPLATE = "BungeeCord Submodule pom.xml"
+
+        const val VELOCITY_MAIN_CLASS_TEMPLATE = "Velocity Main Class.java"
+        const val VELOCITY_BUILD_GRADLE_TEMPLATE = "Velocity build.gradle"
+        const val VELOCITY_SUBMODULE_BUILD_GRADLE_TEMPLATE = "Velocity Submodule build.gradle"
+        const val VELOCITY_GRADLE_PROPERTIES_TEMPLATE = "Velocity gradle.properties"
+        const val VELOCITY_SETTINGS_GRADLE_TEMPLATE = "Velocity settings.gradle"
+        const val VELOCITY_POM_TEMPLATE = "Velocity pom.xml"
+        const val VELOCITY_SUBMODULE_POM_TEMPLATE = "Velocity Submodule pom.xml"
 
         const val SPONGE_MAIN_CLASS_TEMPLATE = "Sponge Main Class.java"
         const val SPONGE_BUILD_GRADLE_TEMPLATE = "Sponge build.gradle"
