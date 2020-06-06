@@ -18,16 +18,16 @@ import com.demonwav.mcdev.creator.ValidatedFieldType.LIST
 import com.demonwav.mcdev.creator.ValidatedFieldType.NON_BLANK
 import com.demonwav.mcdev.creator.getVersionSelector
 import com.demonwav.mcdev.util.firstOfType
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
-import kotlinx.coroutines.withContext
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextField
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 
 class VelocityProjectSettingsWizard(private val creator: MinecraftProjectCreator) : MinecraftModuleWizardStep() {
 
