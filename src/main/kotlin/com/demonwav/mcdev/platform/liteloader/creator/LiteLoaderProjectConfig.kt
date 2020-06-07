@@ -45,6 +45,6 @@ class LiteLoaderProjectConfig : ProjectConfig(), GradleCreator {
         rootDirectory: Path,
         buildSystem: GradleBuildSystem
     ) {
-        buildSystem.gradleVersion = Fg2ProjectCreator.FG2_WRAPPER_VERSION
+        buildSystem.gradleVersion = Fg2ProjectCreator.FG_WRAPPER_VERSION
     }
 }
