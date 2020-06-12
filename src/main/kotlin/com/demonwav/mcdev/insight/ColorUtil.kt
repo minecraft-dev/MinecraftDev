@@ -14,25 +14,23 @@ import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.JavaTokenType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpressionList
+import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiReferenceExpression
 import java.awt.Color
 
 fun <T> PsiElement.findColor(function: (Map<String, Color>, Map.Entry<String, Color>) -> T): T? {
-    if (this !is PsiReferenceExpression) {
+    if (this !is PsiIdentifier) {
         return null
     }
 
-    val module = ModuleUtilCore.findModuleForPsiElement(this) ?: return null
-
-    val facet = MinecraftFacet.getInstance(module) ?: return null
-
-    val expression = this
+    val expression = this.parent as? PsiReferenceExpression ?: return null
     val type = expression.type ?: return null
 
+    val module = ModuleUtilCore.findModuleForPsiElement(this) ?: return null
+    val facet = MinecraftFacet.getInstance(module) ?: return null
     for (abstractModuleType in facet.types) {
         val map = abstractModuleType.classToColorMappings
         for (entry in map.entries) {
@@ -53,12 +51,9 @@ fun PsiElement.setColor(color: String) {
         val split = color.split(".").dropLastWhile(String::isEmpty).toTypedArray()
         val newColorBase = split.last()
 
-        val node = this.node
-        val child = node.findChildByType(JavaTokenType.IDENTIFIER) ?: return@runWriteAction
-
         val identifier = JavaPsiFacade.getElementFactory(this.project).createIdentifier(newColorBase)
 
-        child.psi.replace(identifier)
+        this.replace(identifier)
     }
 }
 
