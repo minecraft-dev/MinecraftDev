@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpressionList
+import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiNewExpression
@@ -25,7 +26,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import java.awt.Color
 
 fun PsiElement.findColor(): Pair<Color, PsiElement>? {
-    if (this !is PsiMethodCallExpression) {
+    if (this !is PsiIdentifier) {
         return null
     }
 
@@ -39,18 +40,13 @@ fun PsiElement.findColor(): Pair<Color, PsiElement>? {
         return null
     }
 
-    val methodCallExpression = this
-
-    if (methodCallExpression.methodExpression.qualifier !is PsiReferenceExpression) {
-        return null
-    }
-
-    val qualifier = methodCallExpression.methodExpression.qualifier as PsiReferenceExpression? ?: return null
-
+    val methodExpression = this.parent as? PsiReferenceExpression ?: return null
+    val qualifier = methodExpression.qualifier as? PsiReferenceExpression ?: return null
     if (qualifier.qualifiedName != "org.spongepowered.api.util.Color") {
         return null
     }
 
+    val methodCallExpression = methodExpression.parent as? PsiMethodCallExpression ?: return null
     val expressionList = methodCallExpression.argumentList
     val types = expressionList.expressionTypes
 
