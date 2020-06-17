@@ -36,6 +36,4 @@ class NbtFileTypeDetector : FileTypeRegistry.FileTypeDetector {
             }
         }
     }
-
-    override fun getDetectedFileTypes() = listOf(NbtFileType)
 }
