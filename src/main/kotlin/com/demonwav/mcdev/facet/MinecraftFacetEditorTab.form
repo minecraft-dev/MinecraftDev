@@ -100,7 +100,7 @@
       </component>
       <component id="39d5b" class="javax.swing.JLabel">
         <constraints>
-          <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <icon value="assets/icons/platform/BungeeCord@2x.png"/>
@@ -173,7 +173,7 @@
       </component>
       <component id="59796" class="javax.swing.JLabel">
         <constraints>
-          <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="BungeeCord"/>
@@ -274,7 +274,7 @@
       </component>
       <component id="cb2d9" class="javax.swing.JCheckBox" binding="bungeecordEnabledCheckBox">
         <constraints>
-          <grid row="10" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="11" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <enabled value="true"/>
@@ -356,7 +356,7 @@
       </component>
       <component id="b7266" class="javax.swing.JCheckBox" binding="bungeecordAutoCheckBox">
         <constraints>
-          <grid row="10" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="11" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <selected value="false"/>
@@ -365,7 +365,7 @@
       </component>
       <component id="82f90" class="javax.swing.JLabel">
         <constraints>
-          <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="12" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Waterfall"/>
@@ -373,7 +373,7 @@
       </component>
       <component id="b8445" class="javax.swing.JLabel">
         <constraints>
-          <grid row="12" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Velocity"/>
@@ -381,7 +381,7 @@
       </component>
       <component id="65657" class="javax.swing.JLabel">
         <constraints>
-          <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <icon value="assets/icons/platform/Waterfall@2x.png"/>
@@ -390,7 +390,7 @@
       </component>
       <component id="1bd23" class="javax.swing.JLabel">
         <constraints>
-          <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <icon value="assets/icons/platform/Velocity@2x.png"/>
@@ -399,7 +399,7 @@
       </component>
       <component id="73379" class="javax.swing.JCheckBox" binding="waterfallEnabledCheckBox">
         <constraints>
-          <grid row="11" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="12" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <enabled value="true"/>
@@ -408,7 +408,7 @@
       </component>
       <component id="c10f3" class="javax.swing.JCheckBox" binding="velocityEnabledCheckBox">
         <constraints>
-          <grid row="12" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="10" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <enabled value="true"/>
@@ -417,7 +417,7 @@
       </component>
       <component id="35938" class="javax.swing.JCheckBox" binding="waterfallAutoCheckBox">
         <constraints>
-          <grid row="11" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="12" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <selected value="false"/>
@@ -426,7 +426,7 @@
       </component>
       <component id="a5eb2" class="javax.swing.JCheckBox" binding="velocityAutoCheckBox">
         <constraints>
-          <grid row="12" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="10" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <selected value="false"/>
