@@ -20,8 +20,8 @@
     <vendor email="demonwav@gmail.com" url="https://minecraftdev.org/">DemonWav</vendor>
 
     <description><![CDATA[
-      Brings support for Bukkit, Spigot, Paper, Sponge, Forge, MCP, Mixins, BungeeCord, Waterfall, and LiteLoader projects
-      to Intellij IDEA.
+      Brings support for Bukkit, Spigot, Paper, Sponge, Forge, MCP, Mixins, Velocity, BungeeCord, Waterfall, and
+      LiteLoader projects to Intellij IDEA.
     ]]></description>
 
     <change-notes><![CDATA[
