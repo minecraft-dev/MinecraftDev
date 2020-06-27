@@ -18,6 +18,7 @@ import com.demonwav.mcdev.platform.bungeecord.creator.BungeeCordProjectConfig
 import com.demonwav.mcdev.platform.forge.creator.ForgeProjectConfig
 import com.demonwav.mcdev.platform.liteloader.creator.LiteLoaderProjectConfig
 import com.demonwav.mcdev.platform.sponge.creator.SpongeProjectConfig
+import com.demonwav.mcdev.platform.velocity.creator.VelocityProjectConfig
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -48,6 +49,7 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
     private lateinit var forgeModCheckBox: JCheckBox
     private lateinit var bungeeCordPluginCheckBox: JCheckBox
     private lateinit var waterfallPluginCheckBox: JCheckBox
+    private lateinit var velocityPluginCheckBox: JCheckBox
     private lateinit var liteLoaderModCheckBox: JCheckBox
 
     override fun getComponent(): JComponent {
@@ -91,6 +93,7 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
         liteLoaderModCheckBox.addActionListener { toggle(liteLoaderModCheckBox, forgeModCheckBox) }
         bungeeCordPluginCheckBox.addActionListener { toggle(bungeeCordPluginCheckBox, waterfallPluginCheckBox) }
         waterfallPluginCheckBox.addActionListener { toggle(waterfallPluginCheckBox, bungeeCordPluginCheckBox) }
+        velocityPluginCheckBox.addActionListener { fillInInfoPane() }
 
         if (UIUtil.isUnderDarcula()) {
             spongeIcon.icon = PlatformAssets.SPONGE_ICON_2X_DARK
@@ -126,6 +129,7 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
         sb.append(liteLoaderModCheckBox, liteLoaderInfo)
         sb.append(bungeeCordPluginCheckBox, bungeeCordInfo)
         sb.append(waterfallPluginCheckBox, waterfallInfo)
+        sb.append(velocityPluginCheckBox, velocityInfo)
 
         sb.append("</font></html>")
 
@@ -162,7 +166,8 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
             forgeModCheckBox.isSelected ||
             liteLoaderModCheckBox.isSelected ||
             bungeeCordPluginCheckBox.isSelected ||
-            waterfallPluginCheckBox.isSelected
+            waterfallPluginCheckBox.isSelected ||
+            velocityPluginCheckBox.isSelected
     }
 
     private fun buildConfigs(): LinkedHashSet<ProjectConfig> {
@@ -199,6 +204,10 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
             result += BungeeCordProjectConfig(PlatformType.WATERFALL)
         }
 
+        if (velocityPluginCheckBox.isSelected) {
+            result += VelocityProjectConfig()
+        }
+
         return result
     }
 
@@ -218,6 +227,9 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
         private const val waterfallInfo = "Create a standard " +
             "<a href=\"https://aquifermc.org/\">Waterfall</a> plugin, for use " +
             "on Waterfall servers."
+        private const val velocityInfo = "Create a standard " +
+            "<a href=\"https://www.velocitypowered.com//\">Velocity</a> plugin, for use " +
+            "on Velocity servers."
         private const val spongeInfo = "Create a standard " +
             "<a href=\"https://www.spongepowered.org/\">Sponge</a> plugin, for use " +
             "on Sponge servers."

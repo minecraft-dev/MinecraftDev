@@ -20,6 +20,7 @@ import com.demonwav.mcdev.platform.liteloader.framework.LITELOADER_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
+import com.demonwav.mcdev.platform.velocity.framework.VELOCITY_LIBRARY_KIND
 
 val MINECRAFT_LIBRARY_KINDS = setOf(
     BUKKIT_LIBRARY_KIND,
@@ -31,5 +32,6 @@ val MINECRAFT_LIBRARY_KINDS = setOf(
     MCP_LIBRARY_KIND,
     MIXIN_LIBRARY_KIND,
     BUNGEECORD_LIBRARY_KIND,
-    WATERFALL_LIBRARY_KIND
+    WATERFALL_LIBRARY_KIND,
+    VELOCITY_LIBRARY_KIND
 )
