@@ -12,13 +12,17 @@ Minecraft Development for IntelliJ
         <td colspan="2"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
     </tr>
     <tr>
-        <td align="right" rowspan="2" ><b>Nightly Builds</b></td>
+        <td align="right" rowspan="3" ><b>Nightly Builds</b></td>
         <td align="left">2019.3</td>
         <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20193"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20193)/statusIcon.svg" alt="2019.3 Nightly Status" /></a></td>
     </tr>
     <tr>
         <td align="left">2020.1</td>
         <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20201"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20201)/statusIcon.svg" alt="2020.1 Nightly Status" /></a></td>
+    </tr>
+    <tr>
+        <td align="left">2020.2</td>
+        <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20202"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20202)/statusIcon.svg" alt="2020.2 Nightly Status" /></a></td>
     </tr>
     <tr>
         <td align="right" rowspan="3"><b>OS Tests</b></td>
@@ -32,7 +36,7 @@ Minecraft Development for IntelliJ
     </tr>
 </table>
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.4.0-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.4.1-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 <a href="https://discord.gg/j6UNcfr"><img src="https://i.imgur.com/JXu9C1G.png" height="48px"></img></a>

@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':${COMMON_PROJECT_NAME}')
+}
+
+shadowJar {
+    dependencies {
+        include(dependency(':${COMMON_PROJECT_NAME}'))
+    }
+}
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+task processSources(type: Sync) {
+    from sourceSets.main.java.srcDirs
+    inputs.property 'version', version
+    filter ReplaceTokens, tokens: [version: version]
+    into "$buildDir/src"
+}
+
+compileJava.source = processSources.outputs
+
+tasks.build.dependsOn tasks.shadowJar

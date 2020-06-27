@@ -82,7 +82,7 @@ class Fg2ProjectCreator(
     }
 
     companion object {
-        val FG2_WRAPPER_VERSION = SemanticVersion.release(4, 10, 3)
+        val FG_WRAPPER_VERSION = SemanticVersion.release(4, 10, 3)
     }
 }
 

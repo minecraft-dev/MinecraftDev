@@ -43,6 +43,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     private lateinit var bungeecordAutoCheckBox: JCheckBox
     private lateinit var waterfallEnabledCheckBox: JCheckBox
     private lateinit var waterfallAutoCheckBox: JCheckBox
+    private lateinit var velocityEnabledCheckBox: JCheckBox
+    private lateinit var velocityAutoCheckBox: JCheckBox
 
     private lateinit var spongeIcon: JLabel
     private lateinit var mcpIcon: JLabel
@@ -59,7 +61,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             mcpEnabledCheckBox,
             mixinEnabledCheckBox,
             bungeecordEnabledCheckBox,
-            waterfallEnabledCheckBox
+            waterfallEnabledCheckBox,
+            velocityEnabledCheckBox
         )
     }
 
@@ -74,7 +77,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             mcpAutoCheckBox,
             mixinAutoCheckBox,
             bungeecordAutoCheckBox,
-            waterfallAutoCheckBox
+            waterfallAutoCheckBox,
+            velocityAutoCheckBox
         )
     }
 
@@ -256,6 +260,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         private const val MIXIN = MCP + 1
         private const val BUNGEECORD = MIXIN + 1
         private const val WATERFALL = BUNGEECORD + 1
+        private const val VELOCITY = WATERFALL + 1
 
         private val platformTypes = arrayOf(
             PlatformType.BUKKIT,
@@ -267,10 +272,11 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             PlatformType.MCP,
             PlatformType.MIXIN,
             PlatformType.BUNGEECORD,
-            PlatformType.WATERFALL
+            PlatformType.WATERFALL,
+            PlatformType.VELOCITY
         )
 
         private val indexes =
-            intArrayOf(BUKKIT, SPIGOT, PAPER, SPONGE, FORGE, LITELOADER, MCP, MIXIN, BUNGEECORD, WATERFALL)
+            intArrayOf(BUKKIT, SPIGOT, PAPER, SPONGE, FORGE, LITELOADER, MCP, MIXIN, BUNGEECORD, WATERFALL, VELOCITY)
     }
 }

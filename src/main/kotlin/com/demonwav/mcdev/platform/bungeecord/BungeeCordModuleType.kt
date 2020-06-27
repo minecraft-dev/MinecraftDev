@@ -35,6 +35,7 @@ object BungeeCordModuleType : AbstractModuleType<BungeeCordModule<BungeeCordModu
     override val id = ID
     override val ignoredAnnotations = IGNORED_ANNOTATIONS
     override val listenerAnnotations = LISTENER_ANNOTATIONS
+    override val isEventGenAvailable = true
 
     override fun generateModule(facet: MinecraftFacet) = BungeeCordModule(facet, this)
     override fun getEventGenerationPanel(chosenClass: PsiClass) = BungeeCordEventGenerationPanel(chosenClass)
