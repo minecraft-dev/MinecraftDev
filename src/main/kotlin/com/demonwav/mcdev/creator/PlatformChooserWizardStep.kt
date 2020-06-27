@@ -22,25 +22,19 @@ import com.demonwav.mcdev.platform.velocity.creator.VelocityProjectConfig
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.ui.IdeBorderFactory
 import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.ui.UIUtil
-import java.awt.Desktop
 import javax.swing.JCheckBox
 import javax.swing.JComponent
-import javax.swing.JEditorPane
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.event.HyperlinkEvent
 
 class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : ModuleWizardStep() {
 
     private lateinit var chooserPanel: JPanel
     private lateinit var panel: JPanel
-    private lateinit var infoPanel: JPanel
 
-    private lateinit var infoPane: JEditorPane
     private lateinit var spongeIcon: JLabel
     private lateinit var bukkitPluginCheckBox: JCheckBox
     private lateinit var spigotPluginCheckBox: JCheckBox
@@ -53,19 +47,6 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
     private lateinit var liteLoaderModCheckBox: JCheckBox
 
     override fun getComponent(): JComponent {
-        chooserPanel.border = IdeBorderFactory.createBorder()
-        infoPanel.border = IdeBorderFactory.createBorder()
-
-        // HTML parsing and hyperlink support
-        infoPane.contentType = "text/html"
-        infoPane.addHyperlinkListener { e ->
-            if (e.eventType == HyperlinkEvent.EventType.ACTIVATED) {
-                if (Desktop.isDesktopSupported()) {
-                    Desktop.getDesktop().browse(e.url.toURI())
-                }
-            }
-        }
-
         // Set types
         bukkitPluginCheckBox.addActionListener {
             toggle(
@@ -88,12 +69,10 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
                 spigotPluginCheckBox
             )
         }
-        spongePluginCheckBox.addActionListener { fillInInfoPane() }
         forgeModCheckBox.addActionListener { toggle(forgeModCheckBox, liteLoaderModCheckBox) }
         liteLoaderModCheckBox.addActionListener { toggle(liteLoaderModCheckBox, forgeModCheckBox) }
         bungeeCordPluginCheckBox.addActionListener { toggle(bungeeCordPluginCheckBox, waterfallPluginCheckBox) }
         waterfallPluginCheckBox.addActionListener { toggle(waterfallPluginCheckBox, bungeeCordPluginCheckBox) }
-        velocityPluginCheckBox.addActionListener { fillInInfoPane() }
 
         if (UIUtil.isUnderDarcula()) {
             spongeIcon.icon = PlatformAssets.SPONGE_ICON_2X_DARK
@@ -108,32 +87,6 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
         if (one.isSelected) {
             others.forEach { it.isSelected = false }
         }
-        fillInInfoPane()
-    }
-
-    private fun fillInInfoPane() {
-        val sb = StringBuilder("<html><font size=\"4\">")
-
-        fun StringBuilder.append(checkbox: JCheckBox, text: String) {
-            if (checkbox.isSelected) {
-                append(text)
-                append("<p/>")
-            }
-        }
-
-        sb.append(bukkitPluginCheckBox, bukkitInfo)
-        sb.append(spigotPluginCheckBox, spigotInfo)
-        sb.append(paperPluginCheckBox, paperInfo)
-        sb.append(spongePluginCheckBox, spongeInfo)
-        sb.append(forgeModCheckBox, forgeInfo)
-        sb.append(liteLoaderModCheckBox, liteLoaderInfo)
-        sb.append(bungeeCordPluginCheckBox, bungeeCordInfo)
-        sb.append(waterfallPluginCheckBox, waterfallInfo)
-        sb.append(velocityPluginCheckBox, velocityInfo)
-
-        sb.append("</font></html>")
-
-        infoPane.text = sb.toString()
     }
 
     override fun updateDataModel() {
@@ -209,35 +162,5 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
         }
 
         return result
-    }
-
-    companion object {
-        private const val bukkitInfo = "Create a standard " +
-            "<a href=\"https://bukkit.org/\">Bukkit</a> plugin, for use " +
-            "on CraftBukkit, Spigot, and Paper servers."
-        private const val spigotInfo = "Create a standard " +
-            "<a href=\"https://www.spigotmc.org/\">Spigot</a> plugin, for use " +
-            "on Spigot and Paper servers."
-        private const val paperInfo = "Create a standard " +
-            "<a href=\"https://paper.emc.gs\">Paper</a> plugin, for use " +
-            "on Paper servers."
-        private const val bungeeCordInfo = "Create a standard " +
-            "<a href=\"https://www.spigotmc.org/wiki/bungeecord/\">BungeeCord</a> plugin, for use " +
-            "on BungeeCord and Waterfall servers."
-        private const val waterfallInfo = "Create a standard " +
-            "<a href=\"https://aquifermc.org/\">Waterfall</a> plugin, for use " +
-            "on Waterfall servers."
-        private const val velocityInfo = "Create a standard " +
-            "<a href=\"https://www.velocitypowered.com//\">Velocity</a> plugin, for use " +
-            "on Velocity servers."
-        private const val spongeInfo = "Create a standard " +
-            "<a href=\"https://www.spongepowered.org/\">Sponge</a> plugin, for use " +
-            "on Sponge servers."
-        private const val forgeInfo = "Create a standard " +
-            "<a href=\"https://files.minecraftforge.net/\">Forge</a> mod, for use " +
-            "on Forge servers and clients."
-        private const val liteLoaderInfo = "Create a standard " +
-            "<a href=\"http://www.liteloader.com/\">LiteLoader</a> mod, for use " +
-            "on LiteLoader clients."
     }
 }
