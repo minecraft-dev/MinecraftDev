@@ -17,7 +17,7 @@ import com.demonwav.mcdev.creator.buildsystem.BuildDependency
 import com.demonwav.mcdev.creator.buildsystem.BuildRepository
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleSetupStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
@@ -125,7 +125,7 @@ class VelocityGradleCreator(
         return listOf(
             setupDependencyStep(),
             CreateDirectoriesStep(buildSystem, rootDirectory),
-            BasicGradleStep(project, rootDirectory, buildSystem, files),
+            GradleSetupStep(project, rootDirectory, buildSystem, files),
             mainClassStep,
             modifyStep,
             GradleWrapperStep(project, rootDirectory, buildSystem),
@@ -143,7 +143,7 @@ class VelocityGradleCreator(
         return listOf(
             setupDependencyStep(),
             CreateDirectoriesStep(buildSystem, rootDirectory),
-            BasicGradleStep(project, rootDirectory, buildSystem, files),
+            GradleSetupStep(project, rootDirectory, buildSystem, files),
             mainClassStep,
             modifyStep
         )

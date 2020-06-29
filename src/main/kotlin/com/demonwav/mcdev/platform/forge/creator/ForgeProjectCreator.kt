@@ -14,13 +14,12 @@ import com.demonwav.mcdev.creator.BaseProjectCreator
 import com.demonwav.mcdev.creator.BasicJavaClassStep
 import com.demonwav.mcdev.creator.CreatorStep
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
-import com.demonwav.mcdev.creator.buildsystem.DirectorySet
 import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.setupGradleFiles
+import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.runGradleTask
@@ -28,7 +27,6 @@ import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiManager
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption.CREATE
@@ -56,7 +54,12 @@ class Fg2ProjectCreator(
         val files = GradleFiles(buildText, propText, settingsText)
 
         return listOf(
-            GradleSetupStep(project, rootDirectory, buildSystem, files),
+            SimpleGradleSetupStep(
+                project,
+                rootDirectory,
+                buildSystem,
+                files
+            ),
             setupMainClassStep(),
             GradleWrapperStep(project, rootDirectory, buildSystem),
             McmodInfoStep(project, buildSystem, config),
@@ -73,7 +76,12 @@ class Fg2ProjectCreator(
         val files = GradleFiles(buildText, propText, null)
 
         return listOf(
-            GradleSetupStep(project, rootDirectory, buildSystem, files),
+            SimpleGradleSetupStep(
+                project,
+                rootDirectory,
+                buildSystem,
+                files
+            ),
             setupMainClassStep(),
             McmodInfoStep(project, buildSystem, config),
             SetupDecompWorkspaceStep(project, rootDirectory),
@@ -116,7 +124,12 @@ open class Fg3ProjectCreator(
         val files = createGradleFiles(hasData = true)
 
         return listOf(
-            GradleSetupStep(project, rootDirectory, buildSystem, files),
+            SimpleGradleSetupStep(
+                project,
+                rootDirectory,
+                buildSystem,
+                files
+            ),
             setupMainClassStep(),
             GradleWrapperStep(project, rootDirectory, buildSystem),
             Fg3ProjectFilesStep(project, buildSystem, config),
@@ -133,7 +146,12 @@ open class Fg3ProjectCreator(
         val files = GradleFiles(buildText, null, null)
 
         return listOf(
-            GradleSetupStep(project, rootDirectory, buildSystem, files),
+            SimpleGradleSetupStep(
+                project,
+                rootDirectory,
+                buildSystem,
+                files
+            ),
             setupMainClassStep(),
             Fg3ProjectFilesStep(project, buildSystem, config),
             Fg3CompileJavaStep(project, rootDirectory),
@@ -159,7 +177,12 @@ class Fg3Mc112ProjectCreator(
         val files = createGradleFiles(hasData = false)
 
         return listOf(
-            GradleSetupStep(project, rootDirectory, buildSystem, files),
+            SimpleGradleSetupStep(
+                project,
+                rootDirectory,
+                buildSystem,
+                files
+            ),
             setupMainClassStep(),
             GradleWrapperStep(project, rootDirectory, buildSystem),
             McmodInfoStep(project, buildSystem, config),
@@ -176,7 +199,12 @@ class Fg3Mc112ProjectCreator(
         val files = GradleFiles(buildText, null, null)
 
         return listOf(
-            GradleSetupStep(project, rootDirectory, buildSystem, files),
+            SimpleGradleSetupStep(
+                project,
+                rootDirectory,
+                buildSystem,
+                files
+            ),
             setupMainClassStep(),
             McmodInfoStep(project, buildSystem, config),
             Fg3CompileJavaStep(project, rootDirectory),
@@ -198,30 +226,6 @@ class SetupDecompWorkspaceStep(
             settings.vmOptions = "-Xmx2G"
         }
         indicator.text2 = null
-    }
-}
-
-class GradleSetupStep(
-    private val project: Project,
-    private val rootDirectory: Path,
-    private val buildSystem: BuildSystem,
-    private val gradleFiles: GradleFiles<String>
-) : CreatorStep {
-
-    override fun runStep(indicator: ProgressIndicator) {
-        runWriteTask {
-            buildSystem.directories = DirectorySet.create(rootDirectory)
-            val (buildGradle, gradleProp, settingsGradle) = setupGradleFiles(rootDirectory, gradleFiles)
-
-            val psiManager = PsiManager.getInstance(project)
-            CreatorStep.writeText(buildGradle, gradleFiles.buildGradle, psiManager)
-            if (gradleProp != null && gradleFiles.gradleProperties != null) {
-                CreatorStep.writeText(gradleProp, gradleFiles.gradleProperties, psiManager)
-            }
-            if (settingsGradle != null && gradleFiles.settingsGradle != null) {
-                CreatorStep.writeText(settingsGradle, gradleFiles.settingsGradle, psiManager)
-            }
-        }
     }
 }
 

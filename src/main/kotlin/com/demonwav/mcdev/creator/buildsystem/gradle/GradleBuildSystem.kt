@@ -54,7 +54,7 @@ class GradleBuildSystem(
         val files = GradleFiles(buildText, propText, settingsText)
 
         return listOf(
-            BasicGradleStep(project, rootDirectory, this, files),
+            GradleSetupStep(project, rootDirectory, this, files),
             GradleWrapperStep(project, rootDirectory, this)
         )
     }

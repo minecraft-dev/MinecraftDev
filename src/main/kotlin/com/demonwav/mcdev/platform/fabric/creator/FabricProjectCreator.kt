@@ -20,7 +20,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
-import com.demonwav.mcdev.platform.forge.creator.GradleSetupStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.addMethod
@@ -74,7 +74,12 @@ class FabricProjectCreator(
         val files = GradleFiles(buildText, propText, settingsText)
 
         val steps = mutableListOf(
-            GradleSetupStep(project, rootDirectory, buildSystem, files),
+            SimpleGradleSetupStep(
+                project,
+                rootDirectory,
+                buildSystem,
+                files
+            ),
             GradleWrapperStep(project, rootDirectory, buildSystem)
         )
         if (config.genSources) {
