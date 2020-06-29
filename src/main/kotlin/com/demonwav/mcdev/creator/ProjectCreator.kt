@@ -53,7 +53,10 @@ abstract class BaseProjectCreator(
     protected val project
         get() = rootModule.project
 
-    protected fun createJavaClassStep(qualifiedClassName: String, mapper: JavaClassTextMapper): BasicJavaClassStep {
+    protected fun createJavaClassStep(
+        qualifiedClassName: String,
+        mapper: JavaClassTextMapper
+    ): BasicJavaClassStep {
         val (packageName, className) = splitPackage(qualifiedClassName)
         val classText = mapper(packageName, className)
         return BasicJavaClassStep(project, buildSystem, qualifiedClassName, classText)

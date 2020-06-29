@@ -33,6 +33,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     private lateinit var spongeAutoCheckBox: JCheckBox
     private lateinit var forgeEnabledCheckBox: JCheckBox
     private lateinit var forgeAutoCheckBox: JCheckBox
+    private lateinit var fabricEnabledCheckBox: JCheckBox
+    private lateinit var fabricAutoCheckBox: JCheckBox
     private lateinit var liteloaderEnabledCheckBox: JCheckBox
     private lateinit var liteloaderAutoCheckBox: JCheckBox
     private lateinit var mcpEnabledCheckBox: JCheckBox
@@ -57,6 +59,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             paperEnabledCheckBox,
             spongeEnabledCheckBox,
             forgeEnabledCheckBox,
+            fabricEnabledCheckBox,
             liteloaderEnabledCheckBox,
             mcpEnabledCheckBox,
             mixinEnabledCheckBox,
@@ -73,6 +76,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             paperAutoCheckBox,
             spongeAutoCheckBox,
             forgeAutoCheckBox,
+            fabricAutoCheckBox,
             liteloaderAutoCheckBox,
             mcpAutoCheckBox,
             mixinAutoCheckBox,
@@ -135,6 +139,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         }
 
         forgeEnabledCheckBox.addActionListener { also(forgeEnabledCheckBox, mcpEnabledCheckBox) }
+        fabricEnabledCheckBox.addActionListener { also(fabricEnabledCheckBox, mixinEnabledCheckBox, mcpEnabledCheckBox) }
         liteloaderEnabledCheckBox.addActionListener { also(liteloaderEnabledCheckBox, mcpEnabledCheckBox) }
         mixinEnabledCheckBox.addActionListener { also(mixinEnabledCheckBox, mcpEnabledCheckBox) }
 
@@ -255,7 +260,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         private const val PAPER = SPIGOT + 1
         private const val SPONGE = PAPER + 1
         private const val FORGE = SPONGE + 1
-        private const val LITELOADER = FORGE + 1
+        private const val FABRIC = FORGE + 1
+        private const val LITELOADER = FABRIC + 1
         private const val MCP = LITELOADER + 1
         private const val MIXIN = MCP + 1
         private const val BUNGEECORD = MIXIN + 1
@@ -268,6 +274,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             PlatformType.PAPER,
             PlatformType.SPONGE,
             PlatformType.FORGE,
+            PlatformType.FABRIC,
             PlatformType.LITELOADER,
             PlatformType.MCP,
             PlatformType.MIXIN,
@@ -276,7 +283,19 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             PlatformType.VELOCITY
         )
 
-        private val indexes =
-            intArrayOf(BUKKIT, SPIGOT, PAPER, SPONGE, FORGE, LITELOADER, MCP, MIXIN, BUNGEECORD, WATERFALL, VELOCITY)
+        private val indexes = intArrayOf(
+            BUKKIT,
+            SPIGOT,
+            PAPER,
+            SPONGE,
+            FORGE,
+            FABRIC,
+            LITELOADER,
+            MCP,
+            MIXIN,
+            BUNGEECORD,
+            WATERFALL,
+            VELOCITY
+        )
     }
 }

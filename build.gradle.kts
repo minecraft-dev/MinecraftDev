@@ -73,6 +73,7 @@ repositories {
     maven("https://repo.spongepowered.org/maven")
     maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
     maven("https://repo.gradle.org/gradle/libs-releases-local/")
+    maven("https://maven.extracraftx.com")
 }
 
 dependencies {
@@ -85,6 +86,8 @@ dependencies {
         isTransitive = false
     }
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
+
+    implementation("com.extracraftx.minecraft:TemplateMakerFabric:0.3.0")
 
     jflex("org.jetbrains.idea:jflex:1.7.0-b7f882a")
     jflexSkeleton("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")

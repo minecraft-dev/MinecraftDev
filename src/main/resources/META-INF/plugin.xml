@@ -190,6 +190,11 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeRunConfigDataService" />
         <!--endregion-->
 
+        <!--region FABRIC-->
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.fabric.framework.FabricPresentationProvider" />
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.fabric.FabricFileIconProvider"/>
+        <!--endregion-->
+
         <!--region LITELOADER -->
         <!---->
 

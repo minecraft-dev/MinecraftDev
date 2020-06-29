@@ -15,6 +15,7 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.creator.BukkitProjectConfig
 import com.demonwav.mcdev.platform.bungeecord.creator.BungeeCordProjectConfig
+import com.demonwav.mcdev.platform.fabric.creator.FabricProjectConfig
 import com.demonwav.mcdev.platform.forge.creator.ForgeProjectConfig
 import com.demonwav.mcdev.platform.liteloader.creator.LiteLoaderProjectConfig
 import com.demonwav.mcdev.platform.sponge.creator.SpongeProjectConfig
@@ -41,6 +42,7 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
     private lateinit var paperPluginCheckBox: JCheckBox
     private lateinit var spongePluginCheckBox: JCheckBox
     private lateinit var forgeModCheckBox: JCheckBox
+    private lateinit var fabricModCheckBox: JCheckBox
     private lateinit var bungeeCordPluginCheckBox: JCheckBox
     private lateinit var waterfallPluginCheckBox: JCheckBox
     private lateinit var velocityPluginCheckBox: JCheckBox
@@ -117,6 +119,7 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
             paperPluginCheckBox.isSelected ||
             spongePluginCheckBox.isSelected ||
             forgeModCheckBox.isSelected ||
+            fabricModCheckBox.isSelected ||
             liteLoaderModCheckBox.isSelected ||
             bungeeCordPluginCheckBox.isSelected ||
             waterfallPluginCheckBox.isSelected ||
@@ -143,6 +146,10 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
 
         if (forgeModCheckBox.isSelected) {
             result += ForgeProjectConfig()
+        }
+
+        if (fabricModCheckBox.isSelected) {
+            result += FabricProjectConfig()
         }
 
         if (liteLoaderModCheckBox.isSelected) {

@@ -18,8 +18,21 @@ import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.TextPart
  * Each constituent part (delimited by periods in a version string) contributes
  * to the version ranking with decreasing priority from left to right.
  */
-class SemanticVersion(private val parts: List<VersionPart>) : Comparable<SemanticVersion> {
-    private val versionString = parts.joinToString(".") { it.versionString }
+class SemanticVersion(
+    private val parts: List<VersionPart>,
+    private val buildMetadata: String = ""
+) : Comparable<SemanticVersion> {
+
+    private fun createVersionString(): String {
+        val mainPart = parts.joinToString(".") { it.versionString }
+        return if (buildMetadata.isBlank()) {
+            mainPart
+        } else {
+            "$mainPart+$buildMetadata"
+        }
+    }
+
+    private val versionString = createVersionString()
 
     override fun compareTo(other: SemanticVersion): Int =
         naturalOrder<VersionPart>().lexicographical().compare(parts, other.parts)
@@ -101,7 +114,11 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
                     )
                 }
 
-            val parts = value.split('.').map { part ->
+            val mainPartAndMetadata = value.split("+", limit = 2)
+            val mainPart = mainPartAndMetadata[0]
+            val metadata = mainPartAndMetadata.getOrNull(1) ?: ""
+
+            val parts = mainPart.split('.').map { part ->
                 val separator = SEPARATORS.find { it in part }
                 if (separator != null) {
                     parseTextPart(part.split(separator, limit = 2), separator)
@@ -115,7 +132,7 @@ class SemanticVersion(private val parts: List<VersionPart>) : Comparable<Semanti
                     ReleasePart(parseInt(numberPart), part)
                 }
             }
-            return SemanticVersion(parts)
+            return SemanticVersion(parts, metadata)
         }
 
         sealed class VersionPart : Comparable<VersionPart> {
