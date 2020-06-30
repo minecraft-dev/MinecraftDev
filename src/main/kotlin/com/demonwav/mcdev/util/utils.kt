@@ -19,7 +19,9 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Ref
@@ -37,6 +39,33 @@ fun runWriteTaskLater(func: () -> Unit) {
     invokeLater {
         ApplicationManager.getApplication().runWriteAction(func)
     }
+}
+
+inline fun <T : Any?> Project.runWriteTaskInSmartMode(crossinline func: () -> T): T {
+    if (ApplicationManager.getApplication().isReadAccessAllowed) {
+        println("WARNING: not supposed to do this!")
+        return runWriteTask { func() }
+    }
+
+    val dumbService = DumbService.getInstance(this)
+    val ref = Ref<T>()
+    while (true) {
+        dumbService.waitForSmartMode()
+        val success = runWriteTask {
+            if (isDisposed) {
+                throw ProcessCanceledException()
+            }
+            if (dumbService.isDumb) {
+                return@runWriteTask false
+            }
+            ref.set(func())
+            return@runWriteTask true
+        }
+        if (success) {
+            break
+        }
+    }
+    return ref.get()
 }
 
 fun <T : Any?> invokeAndWait(func: () -> T): T {

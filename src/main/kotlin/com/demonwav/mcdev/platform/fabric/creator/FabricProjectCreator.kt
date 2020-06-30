@@ -28,6 +28,7 @@ import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.runGradleTask
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
+import com.demonwav.mcdev.util.runWriteTaskInSmartMode
 import com.demonwav.mcdev.util.virtualFile
 import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.codeInsight.daemon.impl.quickfix.CreateFromUsageUtils
@@ -240,7 +241,9 @@ class CreateEntryPointStep(
     override fun runStep(indicator: ProgressIndicator) {
         val dirs = buildSystem.dirsOrError
 
-        runWriteTask {
+        indicator.text = "Indexing"
+
+        project.runWriteTaskInSmartMode {
             val dotIndex = qualifiedClassName.lastIndexOf('.')
             val packageName = if (dotIndex == -1) {
                 ""
@@ -260,7 +263,7 @@ class CreateEntryPointStep(
             }
 
             val clazz = try {
-                val psiDir = directory.virtualFile?.let { PsiManager.getInstance(project).findDirectory(it) } ?: return@runWriteTask
+                val psiDir = directory.virtualFile?.let { PsiManager.getInstance(project).findDirectory(it) } ?: return@runWriteTaskInSmartMode
                 JavaDirectoryService.getInstance().createClass(psiDir, className)
             } catch (e: IncorrectOperationException) {
                 invokeLater {
@@ -274,7 +277,7 @@ class CreateEntryPointStep(
                         CodeInsightBundle.message("intention.error.cannot.create.class.title")
                     )
                 }
-                return@runWriteTask
+                return@runWriteTaskInSmartMode
             }
 
             val editor = EditorHelper.openInEditor(clazz)
