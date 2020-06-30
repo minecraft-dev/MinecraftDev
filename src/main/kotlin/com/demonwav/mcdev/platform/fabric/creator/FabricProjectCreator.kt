@@ -18,9 +18,9 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
-import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.addMethod
@@ -66,7 +66,7 @@ class FabricProjectCreator(
     private val rootModule: Module,
     private val buildSystem: GradleBuildSystem,
     private val config: FabricProjectConfig
-): BaseProjectCreator(rootModule, buildSystem) {
+) : BaseProjectCreator(rootModule, buildSystem) {
 
     override fun getSingleModuleSteps(): Iterable<CreatorStep> {
         val buildText = FabricTemplate.applyBuildGradle(project, buildSystem, config)
@@ -104,7 +104,6 @@ class FabricProjectCreator(
     override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
         TODO("Not yet implemented")
     }
-
 }
 
 class GenSourcesStep(
@@ -295,8 +294,9 @@ class CreateEntryPointStep(
                     .sortedBy { it.key }
                 val entryPointsByMethodNameAndSig = entryPoints
                     .filter { it.type == EntryPoint.Type.METHOD }
-                    .groupBy {entryPoint ->
-                        val functionalMethod = findFunctionalMethod(clazz, entryPoint.interfaceName) ?: return@groupBy null
+                    .groupBy { entryPoint ->
+                        val functionalMethod = findFunctionalMethod(clazz, entryPoint.interfaceName)
+                            ?: return@groupBy null
                         val paramTypes = functionalMethod.parameterList.parameters.map { it.type.canonicalText }
                         (entryPoint.methodName ?: functionalMethod.name) to paramTypes
                     }
@@ -304,7 +304,6 @@ class CreateEntryPointStep(
                     .filter { it.key != null }
                     .map { it.key!! to it.value }
                     .sortedBy { it.first.first }
-
 
                 val elementFactory = JavaPsiFacade.getElementFactory(project)
 
@@ -391,9 +390,9 @@ class CreateEntryPointStep(
     ) {
         val elementFactory = JavaPsiFacade.getElementFactory(project)
         val annotationText = "@${FabricConstants.ENVIRONMENT_INTERFACE_ANNOTATION}(" +
-                "value=${FabricConstants.ENV_TYPE}.$envType," +
-                "itf=$interfaceQualifiedName.class" +
-                ")"
+            "value=${FabricConstants.ENV_TYPE}.$envType," +
+            "itf=$interfaceQualifiedName.class" +
+            ")"
         val annotation = elementFactory.createAnnotationFromText(annotationText, owner)
         AddAnnotationFix(FabricConstants.ENVIRONMENT_INTERFACE_ANNOTATION, owner, annotation.parameterList.attributes)
             .applyFix()
@@ -419,8 +418,8 @@ class CreateEntryPointStep(
         }
         val functionalMethods = interfaceClass.allMethods
             .filter {
-                !it.hasModifierProperty(PsiModifier.STATIC)
-                    && !it.hasModifierProperty(PsiModifier.DEFAULT)
+                !it.hasModifierProperty(PsiModifier.STATIC) &&
+                    !it.hasModifierProperty(PsiModifier.DEFAULT)
             }
         return if (functionalMethods.size != 1) {
             null
