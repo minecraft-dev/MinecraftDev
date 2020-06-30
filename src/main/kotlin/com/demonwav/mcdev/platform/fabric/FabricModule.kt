@@ -44,7 +44,10 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
 
         // TODO: check the mod json, and support method entrypoints
         val interfaces = psiClass.interfaces
-        return interfaces.any { it.qualifiedName == FabricConstants.MOD_INITIALIZER || it.qualifiedName == FabricConstants.CLIENT_MOD_INITIALIZER }
+        return interfaces.any {
+            it.qualifiedName == FabricConstants.MOD_INITIALIZER ||
+                it.qualifiedName == FabricConstants.CLIENT_MOD_INITIALIZER
+        }
     }
 
     override fun dispose() {

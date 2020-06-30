@@ -17,10 +17,10 @@ import com.demonwav.mcdev.creator.buildsystem.BuildDependency
 import com.demonwav.mcdev.creator.buildsystem.BuildRepository
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleSetupStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleSetupStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep

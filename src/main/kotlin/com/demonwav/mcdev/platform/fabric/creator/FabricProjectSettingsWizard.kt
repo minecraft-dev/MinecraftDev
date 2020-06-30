@@ -30,16 +30,27 @@ import com.intellij.ui.CollectionComboBoxModel
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.EditableModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.swing.Swing
-import org.apache.commons.lang.WordUtils
 import java.awt.event.ActionListener
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
-import java.io.IOException
-import java.util.*
-import javax.swing.*
+import java.util.Collections
+import java.util.Locale
+import javax.swing.JCheckBox
+import javax.swing.JComboBox
+import javax.swing.JComponent
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JProgressBar
+import javax.swing.JTextField
 import javax.swing.table.AbstractTableModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import org.apache.commons.lang.WordUtils
 
 class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) : MinecraftModuleWizardStep() {
 
@@ -66,8 +77,8 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     private lateinit var loadingBar: JProgressBar
     private lateinit var minecraftVersionLabel: JLabel
     private lateinit var entryPointsTable: JPanel
-    private lateinit var entryPoints : ArrayList<EntryPoint>
-    private lateinit var tableModel : EntryPointTableModel
+    private lateinit var entryPoints: ArrayList<EntryPoint>
+    private lateinit var tableModel: EntryPointTableModel
     private lateinit var yarnWarning: JLabel
     private lateinit var errorLabel: JLabel
 
@@ -137,10 +148,25 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         if (!initializedEntryPointsTable) {
             val packageName = "${buildSystem.groupId.toPackageName()}.${buildSystem.artifactId.toPackageName()}"
             var className = buildSystem.artifactId.replace('-', ' ').let { WordUtils.capitalize(it) }.replace(" ", "")
-            if (creator.configs.size > 1)
+            if (creator.configs.size > 1) {
                 className += PlatformType.FABRIC.normalName
-            entryPoints.add(EntryPoint("main", EntryPoint.Type.CLASS, "$packageName.$className", FabricConstants.MOD_INITIALIZER))
-            entryPoints.add(EntryPoint("client", EntryPoint.Type.CLASS,"$packageName.client.${className}Client", FabricConstants.CLIENT_MOD_INITIALIZER))
+            }
+            entryPoints.add(
+                EntryPoint(
+                    "main",
+                    EntryPoint.Type.CLASS,
+                    "$packageName.$className",
+                    FabricConstants.MOD_INITIALIZER
+                )
+            )
+            entryPoints.add(
+                EntryPoint(
+                    "client",
+                    EntryPoint.Type.CLASS,
+                    "$packageName.client.${className}Client",
+                    FabricConstants.CLIENT_MOD_INITIALIZER
+                )
+            )
             tableModel.fireTableDataChanged()
             entryPointsTable.revalidate()
             initializedEntryPointsTable = true
@@ -200,13 +226,24 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         conf.modRepo = repositoryField.text
 
         conf.yarnVersion = yarnVersion?.let { SemanticVersion.parse(it) } ?: SemanticVersion.release()
-        conf.yarnClassifier = if (dataProvider?.yarnVersions?.firstOrNull { it.name == yarnVersion }?.hasV2Mappings == false) null else "v2"
+        val yarnVersionObj = dataProvider?.yarnVersions?.firstOrNull { it.name == yarnVersion }
+        conf.yarnClassifier = if (yarnVersionObj?.hasV2Mappings == false) {
+            null
+        } else {
+            "v2"
+        }
         conf.mcVersion = mcVersion ?: ""
-        conf.semanticMcVersion = dataProvider?.getNormalizedMinecraftVersion(mcVersion)?.normalized?.let { SemanticVersion.parse(it) } ?: SemanticVersion.release()
+        val normalizedMcVersion = dataProvider?.getNormalizedMinecraftVersion(mcVersion)?.normalized
+        conf.semanticMcVersion = normalizedMcVersion?.let { SemanticVersion.parse(it) } ?: SemanticVersion.release()
         val loaderVer = loaderVersion
-        if (loaderVer != null)
+        if (loaderVer != null) {
             conf.loaderVersion = SemanticVersion.parse(loaderVer)
-        val api = if (useFabricApiCheckbox.isSelected) dataProvider?.fabricApiVersions?.firstOrNull { it.name == fabricApiVersion } else null
+        }
+        val api = if (useFabricApiCheckbox.isSelected) {
+            dataProvider?.fabricApiVersions?.firstOrNull { it.name == fabricApiVersion }
+        } else {
+            null
+        }
         conf.apiVersion = api?.mavenVersion?.let { SemanticVersion.parse(it) }
         conf.apiMavenLocation = api?.mavenLocation
         conf.gradleVersion = when (dataProvider?.loomVersions?.firstOrNull { it.name == loomVersion }?.gradle) {
@@ -214,8 +251,9 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             else -> SemanticVersion.release(5, 5, 1)
         }
         val loomVer = loomVersion
-        if (loomVer != null)
+        if (loomVer != null) {
             conf.loomVersion = SemanticVersion.parse(loomVer)
+        }
         conf.environment = when ((environmentBox.selectedItem as? String)?.toLowerCase(Locale.ROOT)) {
             "client" -> Side.CLIENT
             "server" -> Side.SERVER
@@ -245,12 +283,13 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     private suspend fun downloadVersions(): DataProvider? = coroutineScope {
+        // prefetch the data
         val dataProvider = DataProvider()
-        val minecraftVersionJob = async(Dispatchers.IO) { try { dataProvider.minecraftVersions } catch (e: IOException) { null } }
-        val fabricApiVersionJob = async(Dispatchers.IO) { try { dataProvider.fabricApiVersions } catch (e: IOException) { null } }
-        val yarnVersionJob = async(Dispatchers.IO) { try { dataProvider.yarnVersions } catch (e: IOException) { null } }
-        val loomVersionJob = async(Dispatchers.IO) { try { dataProvider.loomVersions } catch (e: IOException) { null } }
-        val loaderVersionJob = async(Dispatchers.IO) { try { dataProvider.loaderVersions } catch (e: IOException) { null } }
+        val minecraftVersionJob = async(Dispatchers.IO) { runCatching { dataProvider.minecraftVersions }.getOrNull() }
+        val fabricApiVersionJob = async(Dispatchers.IO) { runCatching { dataProvider.fabricApiVersions }.getOrNull() }
+        val yarnVersionJob = async(Dispatchers.IO) { runCatching { dataProvider.yarnVersions }.getOrNull() }
+        val loomVersionJob = async(Dispatchers.IO) { runCatching { dataProvider.loomVersions }.getOrNull() }
+        val loaderVersionJob = async(Dispatchers.IO) { runCatching { dataProvider.loaderVersions }.getOrNull() }
 
         minecraftVersionJob.await() ?: return@coroutineScope null
         fabricApiVersionJob.await() ?: return@coroutineScope null
@@ -371,7 +410,12 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         }
 
         private fun parseEntryPointType(value: Any?): EntryPoint.Type {
-            return value as? EntryPoint.Type ?: EntryPoint.Type.values().firstOrNull { it.name.equals(value.toString(), ignoreCase = true) } ?: EntryPoint.Type.CLASS
+            return when (value) {
+                is EntryPoint.Type -> value
+                else -> enumValues<EntryPoint.Type>().firstOrNull {
+                    it.name.equals(value.toString(), ignoreCase = true)
+                } ?: EntryPoint.Type.CLASS
+            }
         }
 
         override fun removeRow(idx: Int) {
@@ -396,5 +440,4 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             }
         }
     }
-
 }

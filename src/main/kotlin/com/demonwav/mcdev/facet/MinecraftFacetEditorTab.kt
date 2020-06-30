@@ -139,7 +139,9 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         }
 
         forgeEnabledCheckBox.addActionListener { also(forgeEnabledCheckBox, mcpEnabledCheckBox) }
-        fabricEnabledCheckBox.addActionListener { also(fabricEnabledCheckBox, mixinEnabledCheckBox, mcpEnabledCheckBox) }
+        fabricEnabledCheckBox.addActionListener {
+            also(fabricEnabledCheckBox, mixinEnabledCheckBox, mcpEnabledCheckBox)
+        }
         liteloaderEnabledCheckBox.addActionListener { also(liteloaderEnabledCheckBox, mcpEnabledCheckBox) }
         mixinEnabledCheckBox.addActionListener { also(mixinEnabledCheckBox, mcpEnabledCheckBox) }
 
