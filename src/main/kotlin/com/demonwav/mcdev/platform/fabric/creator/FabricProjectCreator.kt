@@ -243,27 +243,29 @@ class CreateEntryPointStep(
 
         indicator.text = "Indexing"
 
+        val dotIndex = qualifiedClassName.lastIndexOf('.')
+        val packageName = if (dotIndex == -1) {
+            ""
+        } else {
+            qualifiedClassName.substring(0, dotIndex)
+        }
+        val className = qualifiedClassName.substring(dotIndex + 1)
+
+        indicator.text = "Writing class: $className"
+
+        var directory = dirs.sourceDirectory
+        for (part in packageName.split(".")) {
+            directory = directory.resolve(part)
+        }
+        if (Files.notExists(directory)) {
+            Files.createDirectories(directory)
+        }
+
+        val virtualDir = directory.virtualFile ?: return
+
         project.runWriteTaskInSmartMode {
-            val dotIndex = qualifiedClassName.lastIndexOf('.')
-            val packageName = if (dotIndex == -1) {
-                ""
-            } else {
-                qualifiedClassName.substring(0, dotIndex)
-            }
-            val className = qualifiedClassName.substring(dotIndex + 1)
-
-            indicator.text = "Writing class: $className"
-
-            var directory = dirs.sourceDirectory
-            for (part in packageName.split(".")) {
-                directory = directory.resolve(part)
-            }
-            if (Files.notExists(directory)) {
-                Files.createDirectories(directory)
-            }
-
+            val psiDir = PsiManager.getInstance(project).findDirectory(virtualDir) ?: return@runWriteTaskInSmartMode
             val clazz = try {
-                val psiDir = directory.virtualFile?.let { PsiManager.getInstance(project).findDirectory(it) } ?: return@runWriteTaskInSmartMode
                 JavaDirectoryService.getInstance().createClass(psiDir, className)
             } catch (e: IncorrectOperationException) {
                 invokeLater {
@@ -282,64 +284,67 @@ class CreateEntryPointStep(
 
             val editor = EditorHelper.openInEditor(clazz)
 
-            val clientEntryPoints = entryPoints.filter { it.category == "client" }
-            val serverEntryPoints = entryPoints.filter { it.category == "server" }
-            val otherEntryPoints = entryPoints.filter { it.category != "client" && it.category != "server" }
-            val entryPointsByInterface = entryPoints
-                .filter { it.type == EntryPoint.Type.CLASS }
-                .groupBy { it.interfaceName }
-                .entries
-                .sortedBy { it.key }
-            val entryPointsByMethodNameAndSig = entryPoints
-                .filter { it.type == EntryPoint.Type.METHOD }
-                .groupBy {entryPoint ->
-                    val functionalMethod = findFunctionalMethod(clazz, entryPoint.interfaceName) ?: return@groupBy null
-                    val paramTypes = functionalMethod.parameterList.parameters.map { it.type.canonicalText }
-                    (entryPoint.methodName ?: functionalMethod.name) to paramTypes
+            clazz.containingFile.runWriteAction {
+                val clientEntryPoints = entryPoints.filter { it.category == "client" }
+                val serverEntryPoints = entryPoints.filter { it.category == "server" }
+                val otherEntryPoints = entryPoints.filter { it.category != "client" && it.category != "server" }
+                val entryPointsByInterface = entryPoints
+                    .filter { it.type == EntryPoint.Type.CLASS }
+                    .groupBy { it.interfaceName }
+                    .entries
+                    .sortedBy { it.key }
+                val entryPointsByMethodNameAndSig = entryPoints
+                    .filter { it.type == EntryPoint.Type.METHOD }
+                    .groupBy {entryPoint ->
+                        val functionalMethod = findFunctionalMethod(clazz, entryPoint.interfaceName) ?: return@groupBy null
+                        val paramTypes = functionalMethod.parameterList.parameters.map { it.type.canonicalText }
+                        (entryPoint.methodName ?: functionalMethod.name) to paramTypes
+                    }
+                    .entries
+                    .filter { it.key != null }
+                    .map { it.key!! to it.value }
+                    .sortedBy { it.first.first }
+
+
+                val elementFactory = JavaPsiFacade.getElementFactory(project)
+
+                var isClientClass = false
+                var isServerClass = false
+                if (clientEntryPoints.isNotEmpty()) {
+                    if (serverEntryPoints.isEmpty() && otherEntryPoints.isEmpty()) {
+                        addEnvironmentAnnotation(clazz, "CLIENT")
+                        isClientClass = true
+                    } else {
+                        addSidedInterfaceEntryPoints(entryPointsByInterface, clazz, editor, "client")
+                    }
+                } else if (serverEntryPoints.isNotEmpty()) {
+                    if (clientEntryPoints.isEmpty() && otherEntryPoints.isEmpty()) {
+                        addEnvironmentAnnotation(clazz, "SERVER")
+                        isServerClass = true
+                    } else {
+                        addSidedInterfaceEntryPoints(entryPointsByInterface, clazz, editor, "server")
+                    }
                 }
-                .entries
-                .filter { it.key != null }
-                .map { it.key!! to it.value }
-                .sortedBy { it.first.first }
 
-            val elementFactory = JavaPsiFacade.getElementFactory(project)
-
-            var isClientClass = false
-            var isServerClass = false
-            if (clientEntryPoints.isNotEmpty()) {
-                if (serverEntryPoints.isEmpty() && otherEntryPoints.isEmpty()) {
-                    addEnvironmentAnnotation(clazz, "CLIENT")
-                    isClientClass = true
-                } else {
-                    addSidedInterfaceEntryPoints(entryPointsByInterface, clazz, editor, "client")
+                for (eps in entryPointsByInterface) {
+                    clazz.addImplements(eps.key)
                 }
-            } else if (serverEntryPoints.isNotEmpty()) {
-                if (clientEntryPoints.isEmpty() && otherEntryPoints.isEmpty()) {
-                    addEnvironmentAnnotation(clazz, "SERVER")
-                    isServerClass = true
-                } else {
-                    addSidedInterfaceEntryPoints(entryPointsByInterface, clazz, editor, "server")
-                }
-            }
+                implementAll(clazz, editor)
 
-            for (eps in entryPointsByInterface) {
-                clazz.addImplements(eps.key)
-            }
-            implementAll(clazz, editor)
-
-            for (eps in entryPointsByMethodNameAndSig) {
-                val functionalMethod = findFunctionalMethod(clazz, eps.second.first().interfaceName) ?: continue
-                val newMethod = clazz.addMethod(functionalMethod) ?: continue
-                val methodName = eps.first.first
-                newMethod.nameIdentifier?.replace(elementFactory.createIdentifier(methodName))
-                newMethod.modifierList.setModifierProperty(PsiModifier.PUBLIC, true)
-                newMethod.modifierList.setModifierProperty(PsiModifier.STATIC, true)
-                newMethod.modifierList.setModifierProperty(PsiModifier.ABSTRACT, false)
-                CreateFromUsageUtils.setupMethodBody(newMethod)
-                if (!isClientClass && eps.second.all { it.category == "client" }) {
-                    addEnvironmentAnnotation(newMethod, "CLIENT")
-                } else if (!isServerClass && eps.second.all { it.category == "server" }) {
-                    addEnvironmentAnnotation(newMethod, "SERVER")
+                for (eps in entryPointsByMethodNameAndSig) {
+                    val functionalMethod = findFunctionalMethod(clazz, eps.second.first().interfaceName) ?: continue
+                    val newMethod = clazz.addMethod(functionalMethod) ?: continue
+                    val methodName = eps.first.first
+                    newMethod.nameIdentifier?.replace(elementFactory.createIdentifier(methodName))
+                    newMethod.modifierList.setModifierProperty(PsiModifier.PUBLIC, true)
+                    newMethod.modifierList.setModifierProperty(PsiModifier.STATIC, true)
+                    newMethod.modifierList.setModifierProperty(PsiModifier.ABSTRACT, false)
+                    CreateFromUsageUtils.setupMethodBody(newMethod)
+                    if (!isClientClass && eps.second.all { it.category == "client" }) {
+                        addEnvironmentAnnotation(newMethod, "CLIENT")
+                    } else if (!isServerClass && eps.second.all { it.category == "server" }) {
+                        addEnvironmentAnnotation(newMethod, "SERVER")
+                    }
                 }
             }
         }

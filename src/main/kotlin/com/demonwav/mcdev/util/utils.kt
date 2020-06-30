@@ -43,7 +43,6 @@ fun runWriteTaskLater(func: () -> Unit) {
 
 inline fun <T : Any?> Project.runWriteTaskInSmartMode(crossinline func: () -> T): T {
     if (ApplicationManager.getApplication().isReadAccessAllowed) {
-        println("WARNING: not supposed to do this!")
         return runWriteTask { func() }
     }
 
