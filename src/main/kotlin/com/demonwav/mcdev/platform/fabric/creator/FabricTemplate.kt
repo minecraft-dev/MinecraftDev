@@ -85,7 +85,7 @@ object FabricTemplate : BaseTemplate() {
             "YEAR" to ZonedDateTime.now().year.toString(),
             "AUTHOR" to config.authors.joinToString(", ")
         )
-        return project.applyTemplate(license.id, props)
+        return project.applyTemplate("${license.id}.txt", props)
     }
 
     fun applyFabricModJsonTemplate(

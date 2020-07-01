@@ -250,8 +250,6 @@ class CreateEntryPointStep(
         }
         val className = qualifiedClassName.substring(dotIndex + 1)
 
-        indicator.text = "Writing class: $className"
-
         var directory = dirs.sourceDirectory
         for (part in packageName.split(".")) {
             directory = directory.resolve(part)
@@ -263,6 +261,8 @@ class CreateEntryPointStep(
         val virtualDir = directory.virtualFile ?: return
 
         project.runWriteTaskInSmartMode {
+            indicator.text = "Writing class: $className"
+
             val psiDir = PsiManager.getInstance(project).findDirectory(virtualDir) ?: return@runWriteTaskInSmartMode
             val clazz = try {
                 JavaDirectoryService.getInstance().createClass(psiDir, className)
