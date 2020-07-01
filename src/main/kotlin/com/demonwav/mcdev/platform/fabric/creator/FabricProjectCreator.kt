@@ -134,7 +134,9 @@ class LicenseStep(
 
         val fileText = FabricTemplate.applyLicenseTemplate(project, license, config)
 
-        Files.write(licenseFile, fileText.toByteArray(Charsets.UTF_8),
+        Files.write(
+            licenseFile,
+            fileText.toByteArray(Charsets.UTF_8),
             StandardOpenOption.CREATE,
             StandardOpenOption.WRITE,
             StandardOpenOption.TRUNCATE_EXISTING
