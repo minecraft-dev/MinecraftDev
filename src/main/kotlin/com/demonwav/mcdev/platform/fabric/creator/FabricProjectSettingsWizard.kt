@@ -30,6 +30,7 @@ import com.intellij.ui.CollectionComboBoxModel
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.EditableModel
+import com.intellij.util.ui.table.ComboBoxTableCellEditor
 import java.awt.event.ActionListener
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -107,6 +108,7 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
 
         tableModel = EntryPointTableModel(entryPoints)
         val entryPointsTable = JBTable(tableModel)
+        entryPointsTable.setDefaultEditor(EntryPoint.Type::class.java, ComboBoxTableCellEditor.INSTANCE)
         fun resizeColumns() {
             val model = entryPointsTable.columnModel
             val totalWidth = model.totalColumnWidth
