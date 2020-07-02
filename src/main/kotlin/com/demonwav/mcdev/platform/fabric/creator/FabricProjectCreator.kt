@@ -52,7 +52,6 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierListOwner
 import com.intellij.util.IncorrectOperationException
@@ -91,13 +90,13 @@ class FabricProjectCreator(
             steps += LicenseStep(project, rootDirectory, it, config)
         }
         steps += BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
-        steps += FabricModJsonStep(project, buildSystem, config)
         if (config.mixins) {
             steps += MixinConfigStep(project, buildSystem)
         }
         for (entry in config.entryPoints.groupBy { it.className }.entries.sortedBy { it.key }) {
             steps += CreateEntryPointStep(project, buildSystem, entry.key, entry.value)
         }
+        steps += FabricModJsonStep(project, buildSystem, config)
         return steps
     }
 
@@ -153,7 +152,12 @@ class FabricModJsonStep(
     override fun runStep(indicator: ProgressIndicator) {
         val text = FabricTemplate.applyFabricModJsonTemplate(project, buildSystem, config)
         val dir = buildSystem.dirsOrError.resourceDirectory
-        runWriteTask {
+
+        indicator.text = "Indexing"
+
+        project.runWriteTaskInSmartMode {
+            indicator.text = "Creating 'fabric.mod.json'"
+
             val file = PsiFileFactory.getInstance(project).createFileFromText(JsonLanguage.INSTANCE, text)
             file.runWriteAction {
                 val jsonFile = file as JsonFile
@@ -205,7 +209,8 @@ class FabricModJsonStep(
                             if (j != 0) {
                                 values.addBefore(generator.createComma(), values.lastChild)
                             }
-                            val value = generator.createStringLiteral(entryPointCategory.value[j].reference)
+                            val entryPointReference = entryPointCategory.value[j].computeReference(project)
+                            val value = generator.createStringLiteral(entryPointReference)
                             values.addBefore(value, values.lastChild)
                         }
                         val key = StringUtil.escapeStringCharacters(entryPointCategory.key)
@@ -297,8 +302,7 @@ class CreateEntryPointStep(
                 val entryPointsByMethodNameAndSig = entryPoints
                     .filter { it.type == EntryPoint.Type.METHOD }
                     .groupBy { entryPoint ->
-                        val functionalMethod = findFunctionalMethod(clazz, entryPoint.interfaceName)
-                            ?: return@groupBy null
+                        val functionalMethod = entryPoint.findFunctionalMethod(project) ?: return@groupBy null
                         val paramTypes = functionalMethod.parameterList.parameters.map { it.type.canonicalText }
                         (entryPoint.methodName ?: functionalMethod.name) to paramTypes
                     }
@@ -333,7 +337,7 @@ class CreateEntryPointStep(
                 implementAll(clazz, editor)
 
                 for (eps in entryPointsByMethodNameAndSig) {
-                    val functionalMethod = findFunctionalMethod(clazz, eps.second.first().interfaceName) ?: continue
+                    val functionalMethod = eps.second.first().findFunctionalMethod(project) ?: continue
                     val newMethod = clazz.addMethod(functionalMethod) ?: continue
                     val methodName = eps.first.first
                     newMethod.nameIdentifier?.replace(elementFactory.createIdentifier(methodName))
@@ -410,23 +414,5 @@ class CreateEntryPointStep(
             false,
             true
         )
-    }
-
-    private fun findFunctionalMethod(clazz: PsiClass, interfaceName: String): PsiMethod? {
-        val interfaceClass = JavaPsiFacade.getInstance(project)
-            .findClass(interfaceName, clazz.resolveScope) ?: return null
-        if (!interfaceClass.isInterface) {
-            return null
-        }
-        val functionalMethods = interfaceClass.allMethods
-            .filter {
-                !it.hasModifierProperty(PsiModifier.STATIC) &&
-                    !it.hasModifierProperty(PsiModifier.DEFAULT)
-            }
-        return if (functionalMethods.size != 1) {
-            null
-        } else {
-            functionalMethods[0]
-        }
     }
 }
