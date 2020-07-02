@@ -19,6 +19,8 @@ import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_GRADLE_PROPER
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_MIXINS_JSON_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_MOD_JSON_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_SETTINGS_GRADLE_TEMPLATE
+import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_SUBMODULE_BUILD_GRADLE_TEMPLATE
+import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_SUBMODULE_GRADLE_PROPERTIES_TEMPLATE
 import com.demonwav.mcdev.util.toPackageName
 import com.intellij.openapi.project.Project
 import java.time.ZonedDateTime
@@ -60,6 +62,14 @@ object FabricTemplate : BaseTemplate() {
         return project.applyGradleTemplate(FABRIC_BUILD_GRADLE_TEMPLATE, buildSystem, config)
     }
 
+    fun applyMultiModuleBuildGradle(
+        project: Project,
+        buildSystem: BuildSystem,
+        config: FabricProjectConfig
+    ): String {
+        return project.applyGradleTemplate(FABRIC_SUBMODULE_BUILD_GRADLE_TEMPLATE, buildSystem, config)
+    }
+
     fun applySettingsGradle(
         project: Project,
         buildSystem: BuildSystem,
@@ -74,6 +84,14 @@ object FabricTemplate : BaseTemplate() {
         config: FabricProjectConfig
     ): String {
         return project.applyGradleTemplate(FABRIC_GRADLE_PROPERTIES_TEMPLATE, buildSystem, config)
+    }
+
+    fun applyMultiModuleGradleProp(
+        project: Project,
+        buildSystem: BuildSystem,
+        config: FabricProjectConfig
+    ): String {
+        return project.applyGradleTemplate(FABRIC_SUBMODULE_GRADLE_PROPERTIES_TEMPLATE, buildSystem, config)
     }
 
     fun applyLicenseTemplate(

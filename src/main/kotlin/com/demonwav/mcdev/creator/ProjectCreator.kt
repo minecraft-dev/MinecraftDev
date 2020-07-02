@@ -69,3 +69,16 @@ abstract class BaseProjectCreator(
         return packageName to className
     }
 }
+
+/**
+ * Implement this interface on your [ProjectCreator] if you need to do extra setup work after all modules are built
+ * and the project is imported, e.g. if some of the creation needs to be done in smart mode. Only gets used in
+ * multi-project builds; single-module builds are expected to run these tasks themselves in the correct order, such
+ * that they happen after the project is imported.
+ *
+ * Note: just because this interface can be used to utilize smart mode, doesn't mean that the steps will be called in
+ * smart mode. If a step needs smart mode, it should wait for it itself.
+ */
+interface PostMultiModuleAware {
+    fun getPostMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep>
+}

@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.fabric.creator
 
 import com.demonwav.mcdev.creator.BaseProjectCreator
 import com.demonwav.mcdev.creator.CreatorStep
+import com.demonwav.mcdev.creator.PostMultiModuleAware
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
@@ -65,7 +66,7 @@ class FabricProjectCreator(
     private val rootModule: Module,
     private val buildSystem: GradleBuildSystem,
     private val config: FabricProjectConfig
-) : BaseProjectCreator(rootModule, buildSystem) {
+) : BaseProjectCreator(rootModule, buildSystem), PostMultiModuleAware {
 
     override fun getSingleModuleSteps(): Iterable<CreatorStep> {
         val buildText = FabricTemplate.applyBuildGradle(project, buildSystem, config)
@@ -74,12 +75,7 @@ class FabricProjectCreator(
         val files = GradleFiles(buildText, propText, settingsText)
 
         val steps = mutableListOf(
-            SimpleGradleSetupStep(
-                project,
-                rootDirectory,
-                buildSystem,
-                files
-            ),
+            SimpleGradleSetupStep(project, rootDirectory, buildSystem, files),
             GradleWrapperStep(project, rootDirectory, buildSystem)
         )
         if (config.genSources) {
@@ -101,7 +97,33 @@ class FabricProjectCreator(
     }
 
     override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        TODO("Not yet implemented")
+        val buildText = FabricTemplate.applyMultiModuleBuildGradle(project, buildSystem, config)
+        val propText = FabricTemplate.applyMultiModuleGradleProp(project, buildSystem, config)
+        val settingsText = FabricTemplate.applySettingsGradle(project, buildSystem, config)
+        val files = GradleFiles(buildText, propText, settingsText)
+
+        val steps = mutableListOf<CreatorStep>(
+            SimpleGradleSetupStep(project, rootDirectory, buildSystem, files)
+        )
+        if (config.genSources) {
+            steps += GenSourcesStep(project, rootDirectory)
+        }
+        config.license?.let {
+            steps += LicenseStep(project, rootDirectory, it, config)
+        }
+        if (config.mixins) {
+            steps += MixinConfigStep(project, buildSystem)
+        }
+        return steps
+    }
+
+    override fun getPostMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
+        val steps = mutableListOf<CreatorStep>()
+        for (entry in config.entryPoints.groupBy { it.className }.entries.sortedBy { it.key }) {
+            steps += CreateEntryPointStep(project, buildSystem, entry.key, entry.value)
+        }
+        steps += FabricModJsonStep(project, buildSystem, config)
+        return steps
     }
 }
 

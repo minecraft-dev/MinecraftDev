@@ -110,6 +110,8 @@ class MinecraftProjectCreator {
                         }
                     }
 
+                    val postMultiModuleAwares = mutableListOf<PostMultiModuleAware>()
+
                     for (config in configs) {
                         val log = newLog(config, workLog)
 
@@ -118,10 +120,14 @@ class MinecraftProjectCreator {
                         val dir = Files.createDirectories(root.resolve(newArtifactId))
 
                         val newBuild = build.createSub(newArtifactId)
-                        if (!newBuild.buildCreator(config, dir, module).getMultiModuleSteps(root).run(indicator, log)) {
+                        val creator = newBuild.buildCreator(config, dir, module)
+                        if (!creator.getMultiModuleSteps(root).run(indicator, log)) {
                             return
                         }
                         config.type.type.performCreationSettingSetup(module.project)
+                        if (creator is PostMultiModuleAware) {
+                            postMultiModuleAwares += creator
+                        }
                     }
 
                     val commonArtifactId = "${build.artifactId}-common"
@@ -138,6 +144,13 @@ class MinecraftProjectCreator {
 
                     newLog(build.javaClass.name + "::multiModuleBaseFinalizer", workLog).let { log ->
                         build.multiModuleBaseFinalizer(module, root).run(indicator, log)
+                    }
+
+                    for (postMultiModuleAware in postMultiModuleAwares) {
+                        val log = newLog(postMultiModuleAware, workLog)
+                        if (!postMultiModuleAware.getPostMultiModuleSteps(root).run(indicator, log)) {
+                            return
+                        }
                     }
                 }
 

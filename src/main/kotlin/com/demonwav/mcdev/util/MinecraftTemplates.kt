@@ -92,6 +92,12 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MIXINS_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MOD_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_SETTINGS_GRADLE_TEMPLATE, PlatformAssets.FABRIC_ICON))
+            fabricGroup.addTemplate(
+                FileTemplateDescriptor(FABRIC_SUBMODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.FABRIC_ICON)
+            )
+            fabricGroup.addTemplate(
+                FileTemplateDescriptor(FABRIC_SUBMODULE_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.FABRIC_ICON)
+            )
         }
 
         FileTemplateGroupDescriptor("LiteLoader", PlatformAssets.LITELOADER_ICON).let { liteGroup ->
@@ -187,6 +193,8 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FABRIC_MIXINS_JSON_TEMPLATE = "fabric_mixins.json"
         const val FABRIC_MOD_JSON_TEMPLATE = "fabric_mod.json"
         const val FABRIC_SETTINGS_GRADLE_TEMPLATE = "fabric_settings.gradle"
+        const val FABRIC_SUBMODULE_BUILD_GRADLE_TEMPLATE = "fabric_submodule_build.gradle"
+        const val FABRIC_SUBMODULE_GRADLE_PROPERTIES_TEMPLATE = "fabric_submodule_gradle.properties"
 
         const val LITELOADER_MAIN_CLASS_TEMPLATE = "LiteLoader Main Class.java"
         const val LITELOADER_BUILD_GRADLE_TEMPLATE = "LiteLoader build.gradle"
