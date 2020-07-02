@@ -193,6 +193,7 @@
         <!--region FABRIC-->
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.fabric.framework.FabricPresentationProvider" />
         <fileIconProvider implementation="com.demonwav.mcdev.platform.fabric.FabricFileIconProvider"/>
+        <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.fabric.reference.FabricReferenceContributor" />
         <!--endregion-->
 
         <!--region LITELOADER -->
@@ -431,6 +432,17 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.simpleimpl.MissingMessageConstructorInspection"/>
+        <!--endregion-->
+
+        <!--region FABRIC INSPECTIONS-->
+        <localInspection displayName="Unresolved Fabric mod JSON reference"
+                         shortName="UnresolvedFabricModJsonReference"
+                         groupName="Fabric"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.fabric.inspection.UnresolvedReferenceInspection"/>
         <!--endregion-->
 
         <!--region MCP INSPECTIONS-->
