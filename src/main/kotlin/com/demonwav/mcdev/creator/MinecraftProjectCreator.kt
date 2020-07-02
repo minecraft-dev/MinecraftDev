@@ -101,6 +101,7 @@ class MinecraftProjectCreator {
                         return
                     }
                     config.type.type.performCreationSettingSetup(module.project)
+                    CreatorStep.runAllReformats()
                 } else {
                     val types = configs.map { it.type }
                     newLog(build.javaClass.name + "::multiModuleBaseSteps", workLog).let { log ->
