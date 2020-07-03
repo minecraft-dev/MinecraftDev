@@ -37,7 +37,7 @@ object FabricTemplate : BaseTemplate() {
             "ARTIFACT_ID" to buildSystem.artifactId,
             "VERSION" to buildSystem.version,
             "MC_VERSION" to config.mcVersion,
-            "YARN_MAPPINGS" to config.yarnVersion.toString(),
+            "YARN_MAPPINGS" to config.yarnVersion,
             "LOADER_VERSION" to config.loaderVersion.toString(),
             "LOOM_VERSION" to config.loomVersion.toString()
         )

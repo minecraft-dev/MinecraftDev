@@ -25,7 +25,7 @@ import java.nio.file.Path
 
 class FabricProjectConfig : ProjectConfig(), GradleCreator {
 
-    var yarnVersion = SemanticVersion.release()
+    var yarnVersion = ""
     var yarnClassifier: String? = "v2"
     // Minecraft does not follow semver in the snapshots
     var mcVersion = ""

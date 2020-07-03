@@ -10,8 +10,7 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.ReleasePart
-import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.TextPart
+import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.*
 
 /**
  * Represents a comparable and generalised "semantic version".
@@ -100,28 +99,41 @@ class SemanticVersion(
                 }
 
             // We need to support pre-releases/RCs and snapshots as well
-            fun parseTextPart(subParts: List<String>, separator: Char): VersionPart =
-                if (subParts.size == 2) {
-                    val version = parseInt(subParts[0])
-                    val (text, number) = subParts[1].span { !it.isDigit() }
-                    // Pure text parts always are considered older than numbered ones
-                    // Since we don't handle negative version numbers, -1 is guaranteed to be smaller than any numbered part
-                    val versionNumber = if (number.isEmpty()) -1 else parseInt(number)
-                    TextPart(version, separator, text, versionNumber)
+            fun parsePreReleasePart(versionPart: String, preReleasePart: String, separator: Char, versionString: String): VersionPart {
+                val version = parseInt(versionPart)
+                if (!preReleasePart.contains('.')) {
+                    // support the case where pre-releases etc aren't separated by a dot
+                    val (text, number) = preReleasePart.span { !it.isDigit() }
+                    val subParts = when {
+                        text.isEmpty() -> listOf(ReleasePart(parseInt(number), number))
+                        number.isEmpty() -> listOf(TextPart(text))
+                        else -> listOf(TextPart(text), ReleasePart(parseInt(number), number))
+                    }
+                    return PreReleasePart(version, separator, subParts, versionString)
                 } else {
-                    throw IllegalArgumentException(
-                        "Failed to split text version part into two: ${subParts.first()}$separator"
-                    )
+                    val subParts = preReleasePart.split(".").map { subPart ->
+                        val number = subPart.toIntOrNull()
+                        if (number == null) {
+                            TextPart(subPart)
+                        } else {
+                            ReleasePart(number, subPart)
+                        }
+                    }
+                    return PreReleasePart(version, separator, subParts, versionString)
                 }
+            }
 
             val mainPartAndMetadata = value.split("+", limit = 2)
             val mainPart = mainPartAndMetadata[0]
             val metadata = mainPartAndMetadata.getOrNull(1) ?: ""
 
-            val parts = mainPart.split('.').map { part ->
-                val separator = SEPARATORS.find { it in part }
-                if (separator != null) {
-                    parseTextPart(part.split(separator, limit = 2), separator)
+            val separator = SEPARATORS.find { it in mainPart }
+            val beforeSeparator = if (separator == null) mainPart else mainPart.substringBefore(separator)
+            val partCount = beforeSeparator.count { it == '.' } + 1
+            val parts = mainPart.split('.', limit = partCount).map { part ->
+                if (separator != null && separator in part) {
+                    val subParts = part.split(separator, limit = 2)
+                    parsePreReleasePart(subParts[0], subParts[1], separator, part)
                 } else {
                     // Forge has a single version which should be 14.8.* but is actually 14.v8.*
                     val numberPart = if (part.startsWith('v')) {
@@ -142,34 +154,61 @@ class SemanticVersion(
                 override fun compareTo(other: VersionPart) =
                     when (other) {
                         is ReleasePart -> version - other.version
-                        is TextPart -> if (version != other.version) version - other.version else 1
+                        is TextPart -> 1
+                        is PreReleasePart -> if (version != other.version) version - other.version else 1
                     }
             }
 
-            data class TextPart(val version: Int, val separator: Char, val text: String, val number: Int) :
-                VersionPart() {
-                private val priority = TEXT_PRIORITIES[text.toLowerCase()] ?: -1
-
-                override val versionString = "$version$separator$text${if (number == -1) "" else number.toString()}"
+            data class TextPart(override val versionString: String): VersionPart() {
+                private val priority = TEXT_PRIORITIES[versionString] ?: -1
 
                 override fun compareTo(other: VersionPart) =
                     when (other) {
-                        is ReleasePart -> if (version != other.version) version - other.version else -1
+                        is ReleasePart -> -1
+                        is PreReleasePart -> -1
                         is TextPart ->
-                            when {
-                                version != other.version -> version - other.version
-                                text != other.text -> priority - other.priority
-                                else -> number - other.number
+                            if (priority != other.priority) {
+                                priority - other.priority
+                            } else {
+                                versionString.compareTo(other.versionString)
+                            }
+                    }
+
+                override fun hashCode() = versionString.hashCode()
+
+                override fun equals(other: Any?) =
+                    when (other) {
+                        is TextPart -> versionString == other.versionString
+                        else -> false
+                    }
+            }
+
+            data class PreReleasePart(
+                val version: Int,
+                val separator: Char,
+                val subParts: List<VersionPart>,
+                override val versionString: String
+            ) : VersionPart() {
+
+                override fun compareTo(other: VersionPart): Int =
+                    when (other) {
+                        is ReleasePart -> if (version != other.version) version - other.version else -1
+                        is TextPart -> 1
+                        is PreReleasePart ->
+                            if (version != other.version) {
+                                version - other.version
+                            } else {
+                                naturalOrder<VersionPart>().lexicographical().compare(subParts, other.subParts)
                             }
                     }
 
                 override fun hashCode(): Int {
-                    return version + 31 * text.hashCode() + 31 * number
+                    return version + 31 * subParts.hashCode()
                 }
 
                 override fun equals(other: Any?): Boolean {
                     return when (other) {
-                        is TextPart -> other.version == version && other.text == text && other.number == number
+                        is PreReleasePart -> other.version == version && other.subParts == subParts
                         else -> false
                     }
                 }

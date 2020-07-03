@@ -227,7 +227,7 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         conf.setAuthors(authorsField.text)
         conf.modRepo = repositoryField.text
 
-        conf.yarnVersion = yarnVersion?.let { SemanticVersion.parse(it) } ?: SemanticVersion.release()
+        conf.yarnVersion = yarnVersion ?: "$mcVersion+build.1"
         val yarnVersionObj = dataProvider?.yarnVersions?.firstOrNull { it.name == yarnVersion }
         conf.yarnClassifier = if (yarnVersionObj?.hasV2Mappings == false) {
             null
