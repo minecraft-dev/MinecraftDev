@@ -43,6 +43,8 @@ object EntryPointReference : PsiReferenceProvider() {
         }.toTypedArray()
     }
 
+    fun isEntryPointReference(reference: PsiReference) = reference is Reference
+
     private class Reference(element: JsonStringLiteral) :
         PsiReferenceBase<JsonStringLiteral>(element),
         PsiPolyVariantReference,
