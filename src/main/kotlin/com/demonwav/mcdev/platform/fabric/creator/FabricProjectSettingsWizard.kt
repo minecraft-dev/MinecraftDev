@@ -250,7 +250,8 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         conf.apiMavenLocation = api?.mavenLocation
         conf.gradleVersion = when (dataProvider?.loomVersions?.firstOrNull { it.name == loomVersion }?.gradle) {
             4 -> SemanticVersion.release(4, 10, 3)
-            else -> SemanticVersion.release(5, 5, 1)
+            5 -> SemanticVersion.release(5, 6, 4)
+            else -> SemanticVersion.release(6, 5, 1)
         }
         val loomVer = loomVersion
         if (loomVer != null) {
