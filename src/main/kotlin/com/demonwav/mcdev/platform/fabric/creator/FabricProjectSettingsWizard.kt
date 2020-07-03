@@ -306,59 +306,24 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     private fun updateForm() {
         val dp = dataProvider ?: return
 
-        val mcVer = when {
-            mcVersion != null -> {
-                mcVersion ?: return
-            }
-            else -> {
-                dp.minecraftVersions.firstOrNull { it.stable }?.name
-            }
-        }
+        val mcVer = mcVersion ?: dp.minecraftVersions.firstOrNull { it.stable }?.name
         val mcVerObj = dp.minecraftVersions.firstOrNull { it.name == mcVer }
 
-        val yarnVer = when {
-            yarnVersion != null -> {
-                yarnVersion ?: return
-            }
-            else -> {
-                mcVerObj?.let { mvo ->
-                    dp.getFilteredYarnVersions(mvo).firstOrNull()?.name
-                }
-            }
+        val yarnVer = yarnVersion ?: mcVerObj?.let { mvo ->
+            dp.getFilteredYarnVersions(mvo).firstOrNull()?.name
         }
         val yarnVerObj = dp.yarnVersions.firstOrNull { it.name == yarnVer }
 
-        val loomVer = when {
-            loomVersion != null -> {
-                loomVersion ?: return
-            }
-            else -> {
-                yarnVerObj?.let { dp.getDefaultLoomVersion(it) }?.name
-            }
-        }
+        val loomVer = loomVersion ?: yarnVerObj?.let { dp.getDefaultLoomVersion(it) }?.name
         val loomVerObj = dp.loomVersions.firstOrNull { it.name == loomVer }
 
-        val loaderVer = when {
-            loaderVersion != null -> {
-                loaderVersion ?: return
-            }
-            else -> {
-                loomVerObj?.let { lvo ->
-                    dp.getFilteredLoaderVersions(lvo).firstOrNull()?.name
-                }
-            }
+        val loaderVer = loaderVersion ?: loomVerObj?.let { lvo ->
+            dp.getFilteredLoaderVersions(lvo).firstOrNull()?.name
         }
 
-        val fabricVer = when {
-            fabricApiVersion != null -> {
-                fabricApiVersion ?: return
-            }
-            else -> {
-                mcVerObj?.let { mvo ->
-                    dp.getDefaultFabricApiVersion(mvo)
-                }?.let { dp.sortedFabricApiVersions[it] }?.name
-            }
-        }
+        val fabricVer = fabricApiVersion ?: mcVerObj?.let { mvo ->
+            dp.getDefaultFabricApiVersion(mvo)
+        }?.let { dp.sortedFabricApiVersions[it] }?.name
 
         minecraftVersionBox.removeActionListener(minecraftBoxActionListener)
         minecraftVersionBox.model = CollectionComboBoxModel(dp.minecraftVersions.map { it.name })

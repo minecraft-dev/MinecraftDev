@@ -37,7 +37,7 @@ class UnresolvedReferenceInspection : LocalInspectionTool() {
         if (file.name == FabricConstants.FABRIC_MOD_JSON) {
             return super.processFile(file, manager)
         }
-        return listOf()
+        return emptyList()
     }
 
     private class Visitor(private val holder: ProblemsHolder) : JsonElementVisitor() {

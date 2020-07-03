@@ -24,8 +24,9 @@ class FabricPresentationProvider : LibraryPresentationProvider<LibraryVersionPro
     override fun detect(classesRoots: MutableList<VirtualFile>): LibraryVersionProperties? {
         for (classesRoot in classesRoots) {
             if (classesRoot.name.endsWith(".jar")) {
-                JarFile(classesRoot.localFile).runCatching {
-                    val isFabricLib = entries().asSequence().any {
+                runCatching {
+                    val jar = JarFile(classesRoot.localFile)
+                    val isFabricLib = jar.entries().asSequence().any {
                         it.name.startsWith("net/fabricmc/") && it.name.endsWith(".class")
                     }
                     if (isFabricLib) {

@@ -210,7 +210,7 @@ class FabricModJsonStep(
                             contactObject.addBefore(generator.createComma(), contactObject.lastChild)
                         }
                         val key = StringUtil.escapeStringCharacters(properties[i].first)
-                        val value = "\"${StringUtil.escapeStringCharacters(properties[i].second)}\""
+                        val value = "\"" + StringUtil.escapeStringCharacters(properties[i].second) + "\""
                         contactObject.addBefore(generator.createProperty(key, value), contactObject.lastChild)
                     }
                 }
