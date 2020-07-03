@@ -10,7 +10,9 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.*
+import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.PreReleasePart
+import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.ReleasePart
+import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.TextPart
 
 /**
  * Represents a comparable and generalised "semantic version".
@@ -99,7 +101,12 @@ class SemanticVersion(
                 }
 
             // We need to support pre-releases/RCs and snapshots as well
-            fun parsePreReleasePart(versionPart: String, preReleasePart: String, separator: Char, versionString: String): VersionPart {
+            fun parsePreReleasePart(
+                versionPart: String,
+                preReleasePart: String,
+                separator: Char,
+                versionString: String
+            ): VersionPart {
                 val version = parseInt(versionPart)
                 if (!preReleasePart.contains('.')) {
                     // support the case where pre-releases etc aren't separated by a dot
@@ -159,7 +166,7 @@ class SemanticVersion(
                     }
             }
 
-            data class TextPart(override val versionString: String): VersionPart() {
+            data class TextPart(override val versionString: String) : VersionPart() {
                 private val priority = TEXT_PRIORITIES[versionString] ?: -1
 
                 override fun compareTo(other: VersionPart) =
