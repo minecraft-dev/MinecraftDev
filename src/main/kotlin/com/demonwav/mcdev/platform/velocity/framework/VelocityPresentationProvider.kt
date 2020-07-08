@@ -16,6 +16,7 @@ import com.intellij.framework.library.LibraryVersionProperties
 import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
 import com.intellij.openapi.vfs.VirtualFile
 import java.io.BufferedReader
+import java.io.IOException
 import java.util.jar.JarFile
 
 class VelocityPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(VELOCITY_LIBRARY_KIND) {
@@ -23,15 +24,18 @@ class VelocityPresentationProvider : LibraryPresentationProvider<LibraryVersionP
 
     override fun detect(classesRoots: MutableList<VirtualFile>): LibraryVersionProperties? {
         for (classesRoot in classesRoots) {
-            // Velocity API jar has no Manifest entries, so we search for their annotation processor instead
-            val registeredAPs = JarFile(classesRoot.localFile).use { jar ->
-                val aps = jar.getEntry("META-INF/services/javax.annotation.processing.Processor")
-                    ?: return@use null
-                jar.getInputStream(aps).bufferedReader().use(BufferedReader::readLines)
-            } ?: continue
+            try {
+                // Velocity API jar has no Manifest entries, so we search for their annotation processor instead
+                val registeredAPs = JarFile(classesRoot.localFile).use { jar ->
+                    val aps = jar.getEntry("META-INF/services/javax.annotation.processing.Processor")
+                        ?: return@use null
+                    jar.getInputStream(aps).bufferedReader().use(BufferedReader::readLines)
+                } ?: continue
 
-            if (registeredAPs.contains("com.velocitypowered.api.plugin.ap.PluginAnnotationProcessor")) {
-                return LibraryVersionProperties()
+                if (registeredAPs.contains("com.velocitypowered.api.plugin.ap.PluginAnnotationProcessor")) {
+                    return LibraryVersionProperties()
+                }
+            } catch (ignored: IOException) {
             }
         }
         return null
