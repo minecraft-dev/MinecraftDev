@@ -18,6 +18,7 @@ import com.demonwav.mcdev.platform.mixin.util.callbackInfoType
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
+import com.intellij.lang.jvm.JvmModifier
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationOwner
@@ -37,6 +38,16 @@ enum class InjectorType(private val annotation: String) {
             val returnType = targetMethod.returnType
 
             val result = ArrayList<ParameterGroup>()
+
+            if (targetMethod.isConstructor) {
+                val containingClass = targetMethod.containingClass
+                val outerClass = containingClass?.containingClass
+                if (outerClass != null && !containingClass.hasModifier(JvmModifier.STATIC)) {
+                    val outerClassType = JavaPsiFacade.getElementFactory(outerClass.project).createType(outerClass)
+                    // Inner classes ctors take their outer class as first parameter (required)
+                    result.add(ParameterGroup(listOf(Parameter("outer", outerClassType))))
+                }
+            }
 
             // Parameters from injected method (optional)
             result.add(ParameterGroup(collectTargetMethodParameters(targetMethod), required = false, default = true))
