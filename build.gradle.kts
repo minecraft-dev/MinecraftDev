@@ -24,7 +24,7 @@ plugins {
     idea
     id("org.jetbrains.intellij") version "0.4.21"
     id("net.minecrell.licenser") version "0.4.1"
-    id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
+    id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
 }
 
 apply(from = "gradle/attach-sources.gradle.kts")

@@ -89,9 +89,7 @@ class FabricProjectCreator(
         if (config.mixins) {
             steps += MixinConfigStep(project, buildSystem)
         }
-        for (entry in config.entryPoints.groupBy { it.className }.entries.sortedBy { it.key }) {
-            steps += CreateEntryPointStep(project, buildSystem, entry.key, entry.value)
-        }
+        createPostSteps(steps)
         steps += FabricModJsonStep(project, buildSystem, config)
         return steps
     }
@@ -119,11 +117,15 @@ class FabricProjectCreator(
 
     override fun getPostMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
         val steps = mutableListOf<CreatorStep>()
+        createPostSteps(steps)
+        steps += FabricModJsonStep(project, buildSystem, config)
+        return steps
+    }
+
+    private fun createPostSteps(steps: MutableList<CreatorStep>) {
         for (entry in config.entryPoints.groupBy { it.className }.entries.sortedBy { it.key }) {
             steps += CreateEntryPointStep(project, buildSystem, entry.key, entry.value)
         }
-        steps += FabricModJsonStep(project, buildSystem, config)
-        return steps
     }
 }
 
@@ -297,10 +299,10 @@ class CreateEntryPointStep(
                 JavaDirectoryService.getInstance().createClass(psiDir, className)
             } catch (e: IncorrectOperationException) {
                 invokeLater {
-                    val message = "${CodeInsightBundle.message(
+                    val message = CodeInsightBundle.message(
                         "intention.error.cannot.create.class.message",
                         className
-                    )}\n${e.localizedMessage}"
+                    ) + '\n' + e.localizedMessage
                     Messages.showErrorDialog(
                         project,
                         message,
@@ -329,8 +331,7 @@ class CreateEntryPointStep(
                         (entryPoint.methodName ?: functionalMethod.name) to paramTypes
                     }
                     .entries
-                    .filter { it.key != null }
-                    .map { it.key!! to it.value }
+                    .mapNotNull { it.key?.let { k -> k to it.value } }
                     .sortedBy { it.first.first }
 
                 val elementFactory = JavaPsiFacade.getElementFactory(project)

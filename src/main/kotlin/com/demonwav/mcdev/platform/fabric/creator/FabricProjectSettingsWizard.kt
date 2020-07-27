@@ -22,7 +22,7 @@ import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.SemanticVersion
-import com.demonwav.mcdev.util.firstOfType
+import com.demonwav.mcdev.util.modUpdateStep
 import com.demonwav.mcdev.util.toPackageName
 import com.extracraftx.minecraft.templatemakerfabric.data.DataProvider
 import com.intellij.openapi.ui.ComboBox
@@ -135,13 +135,8 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun updateStep() {
-        config = creator.configs.firstOfType()
-
-        val buildSystem = creator.buildSystem ?: return
-
-        modNameField.text = WordUtils.capitalize(buildSystem.artifactId.replace('-', ' '))
-
-        val conf = config ?: return
+        val (conf, buildSystem) = modUpdateStep<FabricProjectConfig>(creator, modNameField) ?: return
+        config = conf
 
         if (creator.configs.indexOf(conf) != 0) {
             modNameField.isEditable = false
@@ -354,7 +349,7 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
 
         override fun getColumnCount() = 5
 
-        override fun getValueAt(row: Int, col: Int) = when (col) {
+        override fun getValueAt(row: Int, col: Int): Any? = when (col) {
             0 -> entryPoints[row].category
             1 -> entryPoints[row].type
             2 -> entryPoints[row].className

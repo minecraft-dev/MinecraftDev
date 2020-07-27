@@ -22,7 +22,7 @@ import com.demonwav.mcdev.platform.forge.version.ForgeVersion
 import com.demonwav.mcdev.platform.mcp.version.McpVersion
 import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry
 import com.demonwav.mcdev.util.SemanticVersion
-import com.demonwav.mcdev.util.firstOfType
+import com.demonwav.mcdev.util.modUpdateStep
 import com.intellij.ui.CollectionComboBoxModel
 import java.awt.event.ActionListener
 import javax.swing.JComboBox
@@ -39,7 +39,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
-import org.apache.commons.lang.WordUtils
 
 class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) : MinecraftModuleWizardStep() {
 
@@ -98,13 +97,8 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     }
 
     override fun updateStep() {
-        config = creator.configs.firstOfType()
-
-        val buildSystem = creator.buildSystem ?: return
-
-        modNameField.text = WordUtils.capitalize(buildSystem.artifactId.replace('-', ' '))
-
-        val conf = config ?: return
+        val (conf, buildSystem) = modUpdateStep<ForgeProjectConfig>(creator, modNameField) ?: return
+        config = conf
 
         if (creator.configs.indexOf(conf) != 0) {
             modNameField.isEditable = false

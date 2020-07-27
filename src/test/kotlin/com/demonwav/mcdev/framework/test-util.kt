@@ -9,6 +9,7 @@
  */
 
 @file:JvmName("TestUtil")
+
 package com.demonwav.mcdev.framework
 
 import com.intellij.lexer.Lexer
