@@ -20,6 +20,8 @@ import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType
 import com.demonwav.mcdev.platform.bungeecord.WaterfallModuleType
 import com.demonwav.mcdev.platform.bungeecord.framework.BUNGEECORD_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bungeecord.framework.WATERFALL_LIBRARY_KIND
+import com.demonwav.mcdev.platform.fabric.FabricModuleType
+import com.demonwav.mcdev.platform.fabric.framework.FABRIC_LIBRARY_KIND
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.forge.framework.FORGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.liteloader.LiteLoaderModuleType
@@ -45,6 +47,7 @@ enum class PlatformType(
     SPIGOT(SpigotModuleType, "Spigot", "spigot.json", BUKKIT),
     PAPER(PaperModuleType, "Paper", "paper.json", SPIGOT),
     FORGE(ForgeModuleType, "Forge"),
+    FABRIC(FabricModuleType, "Fabric"),
     SPONGE(SpongeModuleType, "Sponge"),
     BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord.json"),
     WATERFALL(WaterfallModuleType, "Waterfall", "waterfall.json", BUNGEECORD),
@@ -74,6 +77,7 @@ enum class PlatformType(
             PAPER_LIBRARY_KIND -> PAPER
             SPONGE_LIBRARY_KIND -> SPONGE
             FORGE_LIBRARY_KIND -> FORGE
+            FABRIC_LIBRARY_KIND -> FABRIC
             LITELOADER_LIBRARY_KIND -> LITELOADER
             MCP_LIBRARY_KIND -> MCP
             MIXIN_LIBRARY_KIND -> MIXIN

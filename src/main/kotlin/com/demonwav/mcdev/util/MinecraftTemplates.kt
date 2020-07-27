@@ -83,6 +83,23 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             forgeGroup.addTemplate(FileTemplateDescriptor(PACK_MCMETA_TEMPLATE))
         }
 
+        FileTemplateGroupDescriptor("Fabric", PlatformAssets.FABRIC_ICON).let { fabricGroup ->
+            group.addTemplate(fabricGroup)
+            fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_BUILD_GRADLE_TEMPLATE, PlatformAssets.FABRIC_ICON))
+            fabricGroup.addTemplate(
+                FileTemplateDescriptor(FABRIC_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.FABRIC_ICON)
+            )
+            fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MIXINS_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))
+            fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MOD_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))
+            fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_SETTINGS_GRADLE_TEMPLATE, PlatformAssets.FABRIC_ICON))
+            fabricGroup.addTemplate(
+                FileTemplateDescriptor(FABRIC_SUBMODULE_BUILD_GRADLE_TEMPLATE, PlatformAssets.FABRIC_ICON)
+            )
+            fabricGroup.addTemplate(
+                FileTemplateDescriptor(FABRIC_SUBMODULE_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.FABRIC_ICON)
+            )
+        }
+
         FileTemplateGroupDescriptor("LiteLoader", PlatformAssets.LITELOADER_ICON).let { liteGroup ->
             group.addTemplate(liteGroup)
             liteGroup.addTemplate(FileTemplateDescriptor(LITELOADER_MAIN_CLASS_TEMPLATE))
@@ -110,6 +127,13 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             group.addTemplate(commonGroup)
             commonGroup.addTemplate(FileTemplateDescriptor(GRADLE_GITIGNORE_TEMPLATE))
             commonGroup.addTemplate(FileTemplateDescriptor(MAVEN_GITIGNORE_TEMPLATE))
+        }
+
+        FileTemplateGroupDescriptor("Licenses", null).let { licenseGroup ->
+            group.addTemplate(licenseGroup)
+            enumValues<License>().forEach { license ->
+                licenseGroup.addTemplate(FileTemplateDescriptor(license.id))
+            }
         }
 
         return group
@@ -163,6 +187,14 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val MCMOD_INFO_TEMPLATE = "mcmod.info"
         const val MODS_TOML_TEMPLATE = "mods.toml"
         const val PACK_MCMETA_TEMPLATE = "pack.mcmeta"
+
+        const val FABRIC_BUILD_GRADLE_TEMPLATE = "fabric_build.gradle"
+        const val FABRIC_GRADLE_PROPERTIES_TEMPLATE = "fabric_gradle.properties"
+        const val FABRIC_MIXINS_JSON_TEMPLATE = "fabric_mixins.json"
+        const val FABRIC_MOD_JSON_TEMPLATE = "fabric_mod.json"
+        const val FABRIC_SETTINGS_GRADLE_TEMPLATE = "fabric_settings.gradle"
+        const val FABRIC_SUBMODULE_BUILD_GRADLE_TEMPLATE = "fabric_submodule_build.gradle"
+        const val FABRIC_SUBMODULE_GRADLE_PROPERTIES_TEMPLATE = "fabric_submodule_gradle.properties"
 
         const val LITELOADER_MAIN_CLASS_TEMPLATE = "LiteLoader Main Class.java"
         const val LITELOADER_BUILD_GRADLE_TEMPLATE = "LiteLoader build.gradle"

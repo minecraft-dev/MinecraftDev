@@ -1,0 +1,31 @@
+#set ( $d = "$" )
+{
+  "schemaVersion": 1,
+  "id": "${ARTIFACT_ID}",
+  "version": "${d}{version}",
+
+  "name": "${MOD_NAME}",
+  "description": "${MOD_DESCRIPTION}",
+  "authors": [],
+  "contact": {},
+
+  "license": "${LICENSE}",
+  "icon": "assets/${ARTIFACT_ID}/icon.png",
+
+  "environment": "${MOD_ENVIRONMENT}",
+  "entrypoints": {},
+
+    #if (${MIXINS})
+      "mixins": [
+        "${ARTIFACT_ID}.mixins.json"
+      ],
+    #end
+
+  "depends": {
+    "fabricloader": ">=${LOADER_VERSION}",
+      #if (${API_VERSION})
+        "fabric": "*",
+      #end
+    "minecraft": "${MC_VERSION}"
+  }
+}

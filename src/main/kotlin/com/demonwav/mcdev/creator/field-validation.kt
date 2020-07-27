@@ -29,26 +29,7 @@ enum class ValidatedFieldType {
     },
     CLASS_NAME {
         override fun validate(field: JTextField) {
-            // default package
-            if (!field.text.contains('.')) {
-                throw InvalidClassNameException(field)
-            }
-            val fieldNameSplit = field.text.split('.')
-            // crazy dots
-            if (fieldNameSplit.any { it.isBlank() } || field.text.first() == '.' || field.text.last() == '.') {
-                throw InvalidClassNameException(field)
-            }
-            // invalid character
-            if (
-                fieldNameSplit.any { part ->
-                    !part.first().isJavaIdentifierStart() ||
-                        !part.asSequence().drop(1).all { it.isJavaIdentifierPart() }
-                }
-            ) {
-                throw InvalidClassNameException(field)
-            }
-            // keyword identifier
-            if (fieldNameSplit.any { javaKeywords.contains(it) }) {
+            if (!isValidClassName(field.text)) {
                 throw InvalidClassNameException(field)
             }
         }
@@ -62,6 +43,33 @@ enum class ValidatedFieldType {
     };
 
     abstract fun validate(field: JTextField)
+}
+
+fun isValidClassName(className: String): Boolean {
+    // default package
+    if (!className.contains('.')) {
+        return false
+    }
+    val fieldNameSplit = className.split('.')
+    // crazy dots
+    if (fieldNameSplit.any { it.isBlank() } || className.first() == '.' || className.last() == '.') {
+        return false
+    }
+    // invalid character
+    if (
+        fieldNameSplit.any { part ->
+            !part.first().isJavaIdentifierStart() ||
+                !part.asSequence().drop(1).all { it.isJavaIdentifierPart() }
+        }
+    ) {
+        return false
+    }
+    // keyword identifier
+    if (fieldNameSplit.any { javaKeywords.contains(it) }) {
+        return false
+    }
+
+    return true
 }
 
 private val listPattern = Regex("""(\s*(\w+)\s*(,\s*\w+\s*)*,?|\[?\s*(\w+)\s*(,\s*\w+\s*)*])?""")

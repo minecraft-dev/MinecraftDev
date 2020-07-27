@@ -15,6 +15,7 @@ import com.demonwav.mcdev.creator.CreatorStep.Companion.writeText
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemTemplate
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
+import com.demonwav.mcdev.creator.buildsystem.DirectorySet
 import com.demonwav.mcdev.util.asPrimitiveType
 import com.demonwav.mcdev.util.findDeclaredField
 import com.demonwav.mcdev.util.invokeDeclaredMethod
@@ -51,7 +52,47 @@ import org.jetbrains.plugins.groovy.lang.psi.GroovyPsiElementFactory
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlock
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression
 
-class BasicGradleStep(
+class SimpleGradleSetupStep(
+    private val project: Project,
+    private val rootDirectory: Path,
+    private val buildSystem: BuildSystem,
+    private val gradleFiles: GradleFiles<String>
+) : CreatorStep {
+
+    override fun runStep(indicator: ProgressIndicator) {
+        runWriteTask {
+            buildSystem.directories =
+                DirectorySet.create(rootDirectory)
+            val (buildGradle, gradleProp, settingsGradle) = setupGradleFiles(
+                rootDirectory,
+                gradleFiles
+            )
+
+            val psiManager = PsiManager.getInstance(project)
+            writeText(
+                buildGradle,
+                gradleFiles.buildGradle,
+                psiManager
+            )
+            if (gradleProp != null && gradleFiles.gradleProperties != null) {
+                writeText(
+                    gradleProp,
+                    gradleFiles.gradleProperties,
+                    psiManager
+                )
+            }
+            if (settingsGradle != null && gradleFiles.settingsGradle != null) {
+                writeText(
+                    settingsGradle,
+                    gradleFiles.settingsGradle,
+                    psiManager
+                )
+            }
+        }
+    }
+}
+
+class GradleSetupStep(
     private val project: Project,
     private val rootDirectory: Path,
     private val buildSystem: BuildSystem,
