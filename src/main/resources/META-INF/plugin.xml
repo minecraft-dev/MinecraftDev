@@ -39,9 +39,11 @@
                * Bukkit
                * Sponge
                * Forge
+               * Fabric
                * LiteLoader
                * MCP
                * Mixin
+               * Velocity
                * BungeeCord
         -->
 
@@ -273,6 +275,13 @@
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.mixin.framework.MixinPresentationProvider" />
         <!--endregion-->
 
+        <!--region VELOCITY-->
+        <!---->
+
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.velocity.framework.VelocityPresentationProvider"/>
+
+        <!--endregion-->
+
         <!--region BUNGEECORD-->
         <!---->
 
@@ -281,14 +290,6 @@
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.bungeecord.framework.BungeeCordPresentationProvider" />
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.bungeecord.framework.WaterfallPresentationProvider" />
         <!--endregion-->
-
-        <!--region VELOCITY-->
-        <!---->
-
-        <library.presentationProvider implementation="com.demonwav.mcdev.platform.velocity.framework.VelocityPresentationProvider"/>
-
-        <!--endregion-->
-
 
         <!--region LOCAL INSPECTIONS-->
         <!---->
