@@ -12,6 +12,7 @@ package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.exception.SetupException
+import com.demonwav.mcdev.util.toPackageName
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.ui.popup.Balloon
@@ -48,8 +49,8 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
         name: String,
         classNameModifier: (String) -> String = { it }
     ): String {
-        val packageNameStart = buildSystem.groupId.replace("-", "").toLowerCase()
-        val packageNameEnd = buildSystem.artifactId.replace("-", "").toLowerCase()
+        val packageNameStart = buildSystem.groupId.toPackageName()
+        val packageNameEnd = buildSystem.artifactId.toPackageName()
         val className = classNameModifier(name.replace(" ", ""))
         return "$packageNameStart.$packageNameEnd.$className"
     }

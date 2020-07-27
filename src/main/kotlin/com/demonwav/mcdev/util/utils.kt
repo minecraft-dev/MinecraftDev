@@ -19,12 +19,15 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
+import java.util.Locale
 
 inline fun <T : Any?> runWriteTask(crossinline func: () -> T): T {
     return invokeAndWait {
@@ -36,6 +39,32 @@ fun runWriteTaskLater(func: () -> Unit) {
     invokeLater {
         ApplicationManager.getApplication().runWriteAction(func)
     }
+}
+
+inline fun <T : Any?> Project.runWriteTaskInSmartMode(crossinline func: () -> T): T {
+    if (ApplicationManager.getApplication().isReadAccessAllowed) {
+        return runWriteTask { func() }
+    }
+
+    val dumbService = DumbService.getInstance(this)
+    val ref = Ref<T>()
+    while (true) {
+        dumbService.waitForSmartMode()
+        val success = runWriteTask {
+            if (isDisposed) {
+                throw ProcessCanceledException()
+            }
+            if (dumbService.isDumb) {
+                return@runWriteTask false
+            }
+            ref.set(func())
+            return@runWriteTask true
+        }
+        if (success) {
+            break
+        }
+    }
+    return ref.get()
 }
 
 fun <T : Any?> invokeAndWait(func: () -> T): T {
@@ -118,7 +147,7 @@ fun Module.findChildren(): Set<Module> {
             }
 
             val path = manager.getModuleGroupPath(m) ?: continue
-            val namedModule = manager.findModuleByName(path.last()) ?: continue
+            val namedModule = path.last()?.let { manager.findModuleByName(it) } ?: continue
 
             if (namedModule != this) {
                 continue
@@ -166,6 +195,30 @@ fun String.getSimilarity(text: String, bonus: Int = 0): Int {
         }
     }
     return distance + bonus
+}
+
+fun String.toPackageName(): String {
+    if (this.isEmpty()) {
+        return "_"
+    }
+
+    val firstChar = this.first().let {
+        if (it.isJavaIdentifierStart()) {
+            "$it"
+        } else {
+            ""
+        }
+    }
+    val packageName = firstChar + this.asSequence()
+        .drop(1)
+        .filter { it.isJavaIdentifierPart() || it == '.' }
+        .joinToString("")
+
+    return if (packageName.isEmpty()) {
+        "_"
+    } else {
+        packageName.toLowerCase(Locale.ROOT)
+    }
 }
 
 inline fun <reified T> Iterable<*>.firstOfType(): T? {

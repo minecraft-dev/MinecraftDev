@@ -18,7 +18,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
-import com.demonwav.mcdev.platform.forge.creator.FgSetupStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.forge.creator.SetupDecompWorkspaceStep
 import com.intellij.openapi.module.Module
 import java.nio.file.Path
@@ -44,7 +44,12 @@ class LiteLoaderProjectCreator(
         val files = GradleFiles(buildText, propText, settingsText)
 
         return listOf(
-            FgSetupStep(project, rootDirectory, buildSystem, files),
+            SimpleGradleSetupStep(
+                project,
+                rootDirectory,
+                buildSystem,
+                files
+            ),
             setupMainClassStep(),
             GradleWrapperStep(project, rootDirectory, buildSystem),
             SetupDecompWorkspaceStep(project, rootDirectory),
@@ -59,7 +64,12 @@ class LiteLoaderProjectCreator(
         val files = GradleFiles(buildText, propText, null)
 
         return listOf(
-            FgSetupStep(project, rootDirectory, buildSystem, files),
+            SimpleGradleSetupStep(
+                project,
+                rootDirectory,
+                buildSystem,
+                files
+            ),
             setupMainClassStep(),
             SetupDecompWorkspaceStep(project, rootDirectory)
         )
