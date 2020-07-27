@@ -29,8 +29,6 @@ plugins {
 
 apply(from = "gradle/attach-sources.gradle.kts")
 
-group = "com.demonwav.minecraft-dev"
-
 val coroutineVersion = "1.2.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
 val ideaVersion: String by project
