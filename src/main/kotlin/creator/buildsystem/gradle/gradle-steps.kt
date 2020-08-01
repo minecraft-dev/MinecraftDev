@@ -16,9 +16,6 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemTemplate
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.creator.buildsystem.DirectorySet
-import com.demonwav.mcdev.util.asPrimitiveType
-import com.demonwav.mcdev.util.findDeclaredField
-import com.demonwav.mcdev.util.invokeDeclaredMethod
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.runGradleTask
 import com.demonwav.mcdev.util.runWriteAction
@@ -32,8 +29,8 @@ import com.intellij.openapi.externalSystem.service.project.manage.ExternalProjec
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.wm.ex.WindowManagerEx
-import com.intellij.openapi.wm.impl.IdeRootPane
+import com.intellij.openapi.wm.WindowManager
+import com.intellij.openapi.wm.ex.StatusBarEx
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileFactory
@@ -285,17 +282,14 @@ class GradleWrapperStep(
     }
 }
 
-// Try and show the background setup tasks, but I don't know of a way to do this without all this reflection and
-// it's extremely likely this can fail - just do nothing if it does
+// Show the background processes window for setup tasks
 private fun showProgress(project: Project) {
     if (!UISettings.instance.showStatusBar || UISettings.instance.presentationMode) {
         return
     }
-    @Suppress("UnstableApiUsage")
-    val pane = WindowManagerEx.getInstanceEx().getFrame(project)?.rootPane as? IdeRootPane ?: return
-    pane.findDeclaredField("myStatusBar")
-        ?.findDeclaredField("myInfoAndProgressPanel")
-        ?.invokeDeclaredMethod("openProcessPopup", arrayOf(Boolean::class.asPrimitiveType), arrayOf(true))
+
+    val statusBar = WindowManager.getInstance().getStatusBar(project) as? StatusBarEx ?: return
+    statusBar.isProcessWindowOpen = true
 }
 
 class GradleGitignoreStep(
