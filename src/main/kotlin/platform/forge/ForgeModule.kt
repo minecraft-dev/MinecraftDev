@@ -18,6 +18,8 @@ import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.SidedProxyAnnotator
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
+import com.demonwav.mcdev.platform.mcp.McpModuleSettings
+import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.nullable
@@ -81,7 +83,8 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?): Boolean {
         if (method == null) {
             return ForgeConstants.FML_EVENT == eventClass.qualifiedName ||
-                ForgeConstants.EVENT == eventClass.qualifiedName
+                ForgeConstants.EVENT == eventClass.qualifiedName ||
+                ForgeConstants.EVENTBUS_EVENT == eventClass.qualifiedName
         }
 
         var annotation = method.modifierList.findAnnotation(ForgeConstants.EVENT_HANDLER_ANNOTATION)
@@ -90,8 +93,9 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         }
 
         annotation = method.modifierList.findAnnotation(ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION)
-        if (annotation != null) {
-            return ForgeConstants.EVENT == eventClass.qualifiedName
+        if (annotation != null || method.hasAnnotation(ForgeConstants.EVENTBUS_SUBSCRIBE_EVENT_ANNOTATION)) {
+            return ForgeConstants.EVENT == eventClass.qualifiedName ||
+                ForgeConstants.EVENTBUS_EVENT == eventClass.qualifiedName
         }
 
         // just default to true
@@ -99,6 +103,15 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
     }
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod): String {
+        val mcVersion = McpModuleSettings.getInstance(module).state.minecraftVersion
+            ?.let { SemanticVersion.parse(it) }
+        if (mcVersion != null && mcVersion >= ForgeModuleType.FG3_MC_VERSION) {
+            return formatWrongEventMessage(
+                ForgeConstants.EVENTBUS_EVENT, ForgeConstants.EVENTBUS_SUBSCRIBE_EVENT_ANNOTATION,
+                ForgeConstants.EVENTBUS_EVENT == eventClass.qualifiedName
+            )
+        }
+
         val annotation = method.modifierList.findAnnotation(ForgeConstants.EVENT_HANDLER_ANNOTATION)
 
         if (annotation != null) {
@@ -148,7 +161,13 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         if (isFmlEvent) {
             modifierList.addAnnotation(ForgeConstants.EVENT_HANDLER_ANNOTATION)
         } else {
-            modifierList.addAnnotation(ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION)
+            val mcVersion = McpModuleSettings.getInstance(module).state.minecraftVersion
+                ?.let { SemanticVersion.parse(it) }
+            if (mcVersion != null && mcVersion >= ForgeModuleType.FG3_MC_VERSION) {
+                modifierList.addAnnotation(ForgeConstants.EVENTBUS_SUBSCRIBE_EVENT_ANNOTATION)
+            } else {
+                modifierList.addAnnotation(ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION)
+            }
         }
 
         return method
