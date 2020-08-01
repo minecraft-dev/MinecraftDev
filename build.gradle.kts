@@ -36,10 +36,6 @@ val ideaVersionName: String by project
 val coreVersion: String by project
 val downloadIdeaSources: String by project
 
-// for publishing nightlies
-val repoToken: String by project
-val repoChannel: String by project
-
 // configurations
 val idea by configurations
 val gradleToolingExtension: Configuration by configurations.creating {
@@ -126,12 +122,14 @@ intellij {
 }
 
 tasks.publishPlugin {
-    if (properties["publish"] != null) {
-        project.version = "${project.version}-${properties["buildNumber"]}"
-
-        token(repoToken)
-        channels(repoChannel)
+    // Build numbers are used for
+    properties["buildNumber"]?.let { buildNumber ->
+        project.version = "${project.version}-$buildNumber"
     }
+    properties["mcdev.deploy.token"]?.let { deployToken ->
+        token(deployToken)
+    }
+    channels(properties["mcdev.deploy.channel"] ?: "Stable")
 }
 
 java {
