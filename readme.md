@@ -120,6 +120,7 @@ Developers
 - [**@Minecrell**](https://github.com/Minecrell)
 - [**@PaleoCrafter** - Marvin Rösch](https://github.com/PaleoCrafter)
 - [**@RedNesto**](https://github.com/RedNesto)
+- [**@Earthcomputer** - Joseph Burton](https://github.com/Earthcomputer)
 
 #### **Significant Contributors**
 
