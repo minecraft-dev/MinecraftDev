@@ -27,7 +27,7 @@ class FabricPresentationProvider : LibraryPresentationProvider<LibraryVersionPro
                 runCatching {
                     val jar = JarFile(classesRoot.localFile)
                     val isFabricLib = jar.entries().asSequence().any {
-                        it.name.startsWith("net/fabricmc/") && it.name.endsWith(".class")
+                        it.name == "net/fabricmc/loader/api/FabricLoader.class"
                     }
                     if (isFabricLib) {
                         return LibraryVersionProperties()
