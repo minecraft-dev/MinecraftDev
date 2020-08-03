@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.platform.fabric.reference
 
-import com.demonwav.mcdev.util.reference.InspectionReference
 import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.rootManager
@@ -31,11 +30,7 @@ object LicenseReference : PsiReferenceProvider() {
 
     private class Reference(element: JsonStringLiteral) :
         PsiReferenceBase<JsonStringLiteral>(element),
-        PsiPolyVariantReference,
-        InspectionReference {
-
-        override val description = "LICENSE file"
-        override val unresolved = resolve() == null
+        PsiPolyVariantReference {
 
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
             val modules = ModuleManager.getInstance(element.project).modules
