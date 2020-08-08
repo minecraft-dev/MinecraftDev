@@ -23,10 +23,12 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationOwner
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier.STATIC
 import com.intellij.psi.PsiNameHelper
+import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiType
 import org.jetbrains.org.objectweb.asm.Opcodes
@@ -136,7 +138,7 @@ enum class InjectorType(private val annotation: String) {
                 method.returnType!!
             }
 
-            parameterList.parameters.mapTo(parameters, ::Parameter)
+            parameterList.parameters.mapTo(parameters, ::sanitizedParameter)
             return Pair(parameters, returnType)
         }
 
@@ -202,8 +204,18 @@ enum class InjectorType(private val annotation: String) {
             }
 
             // Add method parameters to list
-            parameters.mapTo(list, ::Parameter)
+            parameters.mapTo(list, ::sanitizedParameter)
             return list
+        }
+
+        private fun sanitizedParameter(parameter: PsiParameter): Parameter {
+            // Parameters should not use ellipsis because others like CallbackInfo may follow
+            val type = parameter.type
+            return if (type is PsiEllipsisType) {
+                Parameter(parameter.name, type.toArrayType())
+            } else {
+                Parameter(parameter)
+            }
         }
 
         fun findAnnotations(element: PsiAnnotationOwner): List<Pair<InjectorType, PsiAnnotation>> {
