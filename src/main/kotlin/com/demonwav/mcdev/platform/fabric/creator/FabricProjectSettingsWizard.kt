@@ -271,6 +271,7 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             dataProvider = downloadVersions()
             updateForm()
         } catch (e: Exception) {
+            e.printStackTrace()
             error()
         }
 
