@@ -83,6 +83,9 @@
                              parentId="Settings.Minecraft"
                              instance="com.demonwav.mcdev.translations.sorting.TranslationTemplateConfigurable"/>
 
+        <!-- Project-independent Inferred Annotation Providers -->
+        <lang.inferredAnnotationProvider implementation="com.demonwav.mcdev.sideonly.SideOnlyInferredAnnotationProvider" />
+
         <!-- NBT -->
         <fileType name="NBT" implementationClass="com.demonwav.mcdev.nbt.filetype.NbtFileType" fieldName="INSTANCE" extensions="nbt" />
         <fileTypeDetector implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeDetector"/>
@@ -322,6 +325,13 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.SuperfluousFormatInspection"/>
+        <localInspection displayName="SideOnly problems"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.sideonly.SideOnlyInspection"/>
         <!--endregion-->
 
         <!--region BUKKIT INSPECTIONS-->
