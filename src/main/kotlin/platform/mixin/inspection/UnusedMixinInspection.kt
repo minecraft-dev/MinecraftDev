@@ -10,11 +10,12 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
-import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
-import com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyUtil
 import com.demonwav.mcdev.platform.mixin.MixinModule
 import com.demonwav.mcdev.platform.mixin.config.MixinConfig
 import com.demonwav.mcdev.platform.mixin.util.isMixin
+import com.demonwav.mcdev.sideonly.Side
+import com.demonwav.mcdev.sideonly.SideHardness
+import com.demonwav.mcdev.sideonly.SideOnlyUtil
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInspection.LocalQuickFix
@@ -61,7 +62,11 @@ class UnusedMixinInspection : MixinInspection() {
                     val bestQuickFixFile = bestQuickFixConfig?.file
                     val qualifiedName = clazz.fullQualifiedName
                     if (bestQuickFixFile != null && qualifiedName != null) {
-                        val quickFix = QuickFix(bestQuickFixFile, qualifiedName, SideOnlyUtil.getSideForClass(clazz))
+                        val quickFix = QuickFix(
+                            bestQuickFixFile,
+                            qualifiedName,
+                            SideOnlyUtil.getContextSide(clazz, SideHardness.EITHER)?.side ?: Side.BOTH
+                        )
                         holder.registerProblem(problematicElement, "Mixin not found in any mixin config", quickFix)
                     } else {
                         holder.registerProblem(problematicElement, "Mixin not found in any mixin config")

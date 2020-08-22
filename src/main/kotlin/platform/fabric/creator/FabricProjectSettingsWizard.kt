@@ -19,7 +19,7 @@ import com.demonwav.mcdev.creator.ValidatedFieldType.NON_BLANK
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
-import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
+import com.demonwav.mcdev.sideonly.Side
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.modUpdateStep
@@ -255,7 +255,7 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         conf.environment = when ((environmentBox.selectedItem as? String)?.toLowerCase(Locale.ROOT)) {
             "client" -> Side.CLIENT
             "server" -> Side.SERVER
-            else -> Side.NONE
+            else -> Side.BOTH
         }
         conf.license = licenseBox.selectedItem as? License
         conf.entryPoints = entryPoints.filter { it.valid }

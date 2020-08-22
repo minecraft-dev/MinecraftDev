@@ -188,8 +188,6 @@
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.forge.insight.ForgeImplicitUsageProvider" />
 
         <!-- Forge Annotator -->
-        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.SidedProxyAnnotator"/>
-
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.forge.framework.ForgePresentationProvider" />
 
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeRunConfigDataService" />
@@ -385,56 +383,6 @@
         <!--endregion-->
 
         <!--region FORGE INSPECTIONS-->
-        <localInspection displayName="Invalid usage of @SideOnly in nested class declaration"
-                         groupName="MinecraftForge"
-                         language="JAVA"
-                         enabledByDefault="false"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NestedClassSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of @SideOnly in field declaration"
-                         groupName="MinecraftForge"
-                         language="JAVA"
-                         enabledByDefault="false"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.FieldDeclarationSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of @SideOnly in method declaration"
-                         groupName="MinecraftForge"
-                         language="JAVA"
-                         enabledByDefault="false"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of variable annotated with @SideOnly"
-                         groupName="MinecraftForge"
-                         language="JAVA"
-                         enabledByDefault="false"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.VariableUseSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of method annotated with @SideOnly"
-                         groupName="MinecraftForge"
-                         language="JAVA"
-                         enabledByDefault="false"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodCallSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of new object annotated with @SideOnly"
-                         groupName="MinecraftForge"
-                         language="JAVA"
-                         enabledByDefault="false"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NewExpressionSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of local variable declaration annotated with @SideOnly"
-                         groupName="MinecraftForge"
-                         language="JAVA"
-                         enabledByDefault="false"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.LocalVariableDeclarationSideOnlyInspection"/>
-
         <localInspection displayName="IMessage or IMessageHandler implementation without empty constructor"
                          groupName="MinecraftForge"
                          language="JAVA"
