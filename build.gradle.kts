@@ -229,10 +229,17 @@ license {
 
     tasks {
         register("gradle") {
-            files = project.fileTree(
-                "dir" to project.projectDir,
-                "includes" to listOf("**/*.gradle.kts", "gradle.properties")
-            )
+            files = project.fileTree(project.projectDir) {
+                include("**/*.gradle.kts", "gradle.properties")
+                exclude("**/buildSrc/**", "**/build/**")
+            }
+        }
+        register("buildSrc") {
+            val buildSrc = project.projectDir.resolve("buildSrc")
+            files = project.fileTree(buildSrc) {
+                include("**/*.kt", "**/*.kts")
+                exclude("**/build/**")
+            }
         }
         register("grammars") {
             files = project.fileTree("src/main/grammars")
@@ -278,7 +285,7 @@ val generate by tasks.registering {
     )
 }
 
-sourceSets.named("main") { java.srcDir(generate) }
+sourceSets.main { java.srcDir(generate) }
 
 // Remove gen directory on clean
 tasks.clean { delete(generate) }
