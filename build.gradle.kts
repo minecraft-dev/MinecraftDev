@@ -19,16 +19,15 @@ buildscript {
 }
 
 plugins {
-    mcdev
     kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
+    java
+    mcdev
     groovy
     idea
     id("org.jetbrains.intellij") version "0.4.21"
     id("net.minecrell.licenser") version "0.4.1"
     id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
 }
-
-// apply(from = "gradle/attach-sources.gradle.kts")
 
 val coroutineVersion = "1.2.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
