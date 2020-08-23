@@ -8,62 +8,56 @@
  * MIT License
  */
 
-import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.Properties
 import java.util.zip.ZipFile
-import java.net.URL
-import java.net.HttpURLConnection
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("com.google.code.gson:gson:2.8.6")
-        classpath("com.github.salomonbrys.kotson:kotson:2.5.0")
-    }
-}
+val jflex: Configuration by configurations.creating
+val jflexSkeleton: Configuration by configurations.creating
+val grammarKit: Configuration by configurations.creating
+val compileOnly by configurations
 
-/*
- * This file and the task `resolveIntellijLibSources` below attempts to find sources for IntelliJ's dependencies (the
- * jars in its lib/ dir) which are in Maven Central. This check isn't perfect and may miss some, but grabs most of them.
- * The task writes the result to `.gradle/intellij-deps.json`.
- *
- * At configuration time if `.gradle/intellij-deps.json` exists the below code not in a task will add those dependencies
- * explicitly, causing Gradle to download the sources for those dependencies, and allowing IntelliJ to pick up those
- * sources. None of this affects the actual build or any of the code, this only exists to help ease development by
- * making library sources available in the dev environment.
- */
-
+// Analyze dependencies
 val fileName = ".gradle/intellij-deps.json"
-
 val jsonFile = file("$projectDir/$fileName")
+
+val ideaVersion: String by project
+val ideaVersionName: String by project
+
+data class DepList(val intellijVersion: String, val intellijVersionName: String, val deps: List<Dep>)
+data class Dep(val groupId: String, val artifactId: String, val version: String)
+
 if (jsonFile.exists()) {
-    val deps = jsonFile.bufferedReader().use { reader ->
-        Gson().fromJson<List<Dep>>(reader)
+    val deps: DepList = jsonFile.bufferedReader().use { reader ->
+        Gson().fromJson(reader, object : TypeToken<DepList>() {}.type)
     }
-    dependencies {
-        for ((groupId, artifactId, version) in deps) {
-            "compileOnly"(
-                group = groupId,
-                name = artifactId,
-                version = version
-            )
+    if (ideaVersion != deps.intellijVersion || ideaVersionName != deps.intellijVersionName) {
+        println("IntelliJ library sources file definition is out of date, deleting")
+        jsonFile.delete()
+    } else {
+        dependencies {
+            for ((groupId, artifactId, version) in deps.deps) {
+                compileOnly(
+                    group = groupId,
+                    name = artifactId,
+                    version = version
+                )
+            }
         }
     }
 }
 
-data class Dep(val groupId: String, val artifactId: String, val version: String)
-
 tasks.register("resolveIntellijLibSources") {
     group = "minecraft"
-    val config = project.configurations["compileClasspath"]
-    dependsOn(config)
+    val compileClasspath by project.configurations
+    dependsOn(compileClasspath)
 
     doLast {
-        val files = config.resolvedConfiguration.files
+        val files = compileClasspath.resolvedConfiguration.files
         val deps = files.asSequence()
             .map { it.toPath() }
             .filter {
@@ -104,8 +98,9 @@ tasks.register("resolveIntellijLibSources") {
                 }
             }.toList()
 
+        val depList = DepList(ideaVersion, ideaVersionName, deps.sortedWith(compareBy<Dep> { it.groupId }.thenBy { it.artifactId }))
         jsonFile.bufferedWriter().use { writer ->
-            GsonBuilder().setPrettyPrinting().create().toJson(deps, writer)
+            GsonBuilder().setPrettyPrinting().create().toJson(depList, writer)
         }
     }
 }

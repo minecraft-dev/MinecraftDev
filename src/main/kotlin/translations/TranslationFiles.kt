@@ -238,7 +238,7 @@ object TranslationFiles {
                     .asSequence()
                     .mapNotNull { it as? LangEntry }
                     .firstOrNull()
-                val comments = langElement?.let { gatherLangComments(it, keepComments) } ?: emptyList()
+                val comments: List<String> = langElement?.let { gatherLangComments(it, keepComments) } ?: emptyList()
                 yieldAll(comments.asReversed().map { FileEntry.Comment(it) })
                 yield(FileEntry.Translation(entry.key, entry.text))
             }
