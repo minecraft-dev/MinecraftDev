@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.mcp.debug
 
 import com.demonwav.mcdev.facet.MinecraftFacet
+import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.intellij.debugger.engine.DebugProcessImpl
 import com.intellij.debugger.engine.evaluation.EvaluationContextImpl
@@ -65,19 +66,26 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl, pri
         debugProcess: DebugProcessImpl,
         evaluationContext: EvaluationContextImpl
     ) {
+        val isFabric = modulePointer.module?.let { MinecraftFacet.getInstance(it, FabricModuleType) } != null
         val srgMap = modulePointer.module?.let { module ->
             MinecraftFacet.getInstance(module, McpModuleType)?.srgManager?.srgMapNow
         }
 
-        fun mcp(srg: String, mcp: String): String {
-            return srgMap?.getMcpClass(srg) ?: mcp
+        fun mapping(mcp: String, yarn: String): String {
+            return if (isFabric) yarn else mcp
         }
 
-        val minecraftClass = virtualMachine.classesByName("net.minecraft.client.Minecraft")
-            ?.singleOrNull() as? ClassType ?: return
-        val minecraftGetter =
-            minecraftClass.methodsByName(mcp("func_71410_x", "getInstance"), "()Lnet/minecraft/client/Minecraft;")
-                ?.singleOrNull() ?: return
+        fun mapping(srg: String, mcp: String, yarn: String): String {
+            return if (isFabric) yarn else srgMap?.getMcpClass(srg) ?: mcp
+        }
+
+        val minecraftClass = virtualMachine.classesByName(
+            mapping("net.minecraft.client.Minecraft", "net.minecraft.client.MinecraftClient")
+        )?.singleOrNull() as? ClassType ?: return
+        val minecraftGetter = minecraftClass.methodsByName(
+            mapping("func_71410_x", "getInstance", "getInstance"),
+            mapping("()Lnet/minecraft/client/Minecraft;", "()Lnet/minecraft/client/MinecraftClient;")
+        )?.singleOrNull() ?: return
         val minecraft = debugProcess.invokeMethod(
             evaluationContext,
             minecraftClass,
@@ -85,11 +93,11 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl, pri
             emptyList()
         ) as? ObjectReference ?: return
 
-        val mouseHelperField = minecraftClass.fieldByName(mcp("field_71417_B", "mouseHelper")) ?: return
+        val mouseHelperField = minecraftClass.fieldByName(mapping("field_71417_B", "mouseHelper", "mouse")) ?: return
         val mouseHelper = minecraft.getValue(mouseHelperField) as? ObjectReference ?: return
 
         val grabMouse = mouseHelper.referenceType()
-            .methodsByName(mcp("func_198032_j", "ungrabMouse"), "()V")
+            .methodsByName(mapping("func_198032_j", "ungrabMouse", "unlockCursor"), "()V")
             ?.singleOrNull() ?: return
 
         debugProcess.invokeMethod(evaluationContext, mouseHelper, grabMouse, emptyList())
