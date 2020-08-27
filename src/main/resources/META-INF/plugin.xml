@@ -330,6 +330,13 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.sideonly.SideOnlyInspection"/>
+        <localInspection displayName="Usage of hard-SideOnly annotations"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.sideonly.HardSideOnlyUsageInspection"/>
         <!--endregion-->
 
         <!--region BUKKIT INSPECTIONS-->

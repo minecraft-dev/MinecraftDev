@@ -16,7 +16,6 @@ import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
-import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.packageName
 import com.intellij.codeInspection.ProblemsHolder
@@ -25,6 +24,7 @@ import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonObject
 import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassObjectAccessExpression
@@ -49,63 +49,53 @@ object SideOnlyUtil {
     const val MCDEV_SIDEONLY_ANNOTATION = "com.demonwav.mcdev.annotations.CheckEnv"
     const val MCDEV_SIDE = "com.demonwav.mcdev.annotations.Env"
 
-    internal fun getExplicitAnnotation(element: PsiModifierListOwner, hardness: SideHardness): SideInstance? {
+    internal fun getAnnotationSide(annotation: PsiAnnotation, hardness: SideHardness): Side {
+        var isSideAnnotation = false
+
         if (hardness != SideHardness.HARD) {
-            val mcDevAnnotation = element.findAnnotation(MCDEV_SIDEONLY_ANNOTATION)
-            if (mcDevAnnotation != null) {
-                val side = mcDevAnnotation.findAttributeValue("value") as? PsiReferenceExpression
-                    ?: return null
-                val sideConstant = side.resolve() as? PsiEnumConstant ?: return null
-                return when (sideConstant.name) {
-                    "CLIENT" -> SideInstance.createMcDev(Side.CLIENT, element)
-                    "SERVER" -> SideInstance.createMcDev(Side.SERVER, element)
-                    else -> null
-                }
+            if (annotation.hasQualifiedName(MCDEV_SIDEONLY_ANNOTATION)) {
+                isSideAnnotation = true
             }
         }
 
         if (hardness != SideHardness.SOFT) {
-            val sideOnlyAnnotation = element.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION)
-            if (sideOnlyAnnotation != null) {
-                val side = sideOnlyAnnotation.findAttributeValue("value") as? PsiReferenceExpression
-                    ?: return null
-                val sideConstant = side.resolve() as? PsiEnumConstant ?: return null
-                return when (sideConstant.name) {
-                    "CLIENT" -> SideInstance.createSideOnly(Side.CLIENT, element)
-                    "SERVER" -> SideInstance.createSideOnly(Side.SERVER, element)
-                    else -> null
-                }
-            }
-
-            val environmentAnnotation = element.findAnnotation(FabricConstants.ENVIRONMENT_ANNOTATION)
-            if (environmentAnnotation != null) {
-                val env = environmentAnnotation.findAttributeValue("value") as? PsiReferenceExpression
-                    ?: return null
-                val envConstant = env.resolve() as? PsiEnumConstant ?: return null
-                return when (envConstant.name) {
-                    "CLIENT" -> SideInstance.createEnvironment(Side.CLIENT, element)
-                    "SERVER" -> SideInstance.createEnvironment(Side.SERVER, element)
-                    else -> null
-                }
-            }
-
-            val onlyInAnnotation = element.annotations.firstOrNull {
-                it.hasQualifiedName(ForgeConstants.ONLY_IN_ANNOTATION) &&
-                    it.findAttributeValue("_interface") == null
-            }
-            if (onlyInAnnotation != null) {
-                val dist = onlyInAnnotation.findAttributeValue("value") as? PsiReferenceExpression
-                    ?: return null
-                val distConstant = dist.resolve() as? PsiEnumConstant ?: return null
-                return when (distConstant.name) {
-                    "CLIENT" -> SideInstance.createOnlyIn(Side.CLIENT, element)
-                    "DEDICATED_SERVER" -> SideInstance.createOnlyIn(Side.SERVER, element)
-                    else -> null
+            if (annotation.hasQualifiedName(ForgeConstants.SIDE_ONLY_ANNOTATION) ||
+                annotation.hasQualifiedName(FabricConstants.ENVIRONMENT_ANNOTATION)
+            ) {
+                isSideAnnotation = true
+            } else if (annotation.hasQualifiedName(ForgeConstants.ONLY_IN_ANNOTATION)) {
+                if (annotation.findAttributeValue("_interface") != null) {
+                    isSideAnnotation = true
                 }
             }
         }
 
-        return null
+        if (!isSideAnnotation) {
+            return Side.BOTH
+        }
+
+        val side = annotation.findAttributeValue("value") as? PsiReferenceExpression ?: return Side.BOTH
+        val sideConstant = side.resolve() as? PsiEnumConstant ?: return Side.BOTH
+        return when (sideConstant.name) {
+            "CLIENT" -> Side.CLIENT
+            "SERVER", "DEDICATED_SERVER" -> Side.SERVER
+            else -> Side.BOTH
+        }
+    }
+
+    internal fun getExplicitAnnotation(element: PsiModifierListOwner, hardness: SideHardness): SideInstance? {
+        return element.annotations.asSequence()
+            .map { it to getAnnotationSide(it, hardness) }
+            .firstOrNull { it.second != Side.BOTH }
+            ?.let {
+                when (it.first.qualifiedName) {
+                    MCDEV_SIDEONLY_ANNOTATION -> SideInstance.createMcDev(it.second, element)
+                    ForgeConstants.SIDE_ONLY_ANNOTATION -> SideInstance.createSideOnly(it.second, element)
+                    ForgeConstants.ONLY_IN_ANNOTATION -> SideInstance.createOnlyIn(it.second, element)
+                    FabricConstants.ENVIRONMENT_ANNOTATION -> SideInstance.createEnvironment(it.second, element)
+                    else -> null
+                }
+            }
     }
 
     internal fun getExplicitOrInferredAnnotation(element: PsiModifierListOwner, hardness: SideHardness): SideInstance? {
