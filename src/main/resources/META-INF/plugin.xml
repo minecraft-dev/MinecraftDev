@@ -397,6 +397,13 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.simpleimpl.MissingMessageConstructorInspection"/>
+        <localInspection displayName="DistExecutor problems"
+                         groupName="MinecraftForge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.forge.inspections.DistExecutorInspection"/>
         <!--endregion-->
 
         <!--region FABRIC INSPECTIONS-->
