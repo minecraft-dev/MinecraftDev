@@ -14,6 +14,7 @@
     <depends>org.jetbrains.idea.maven</depends>
     <depends>com.intellij.gradle</depends>
     <depends>org.intellij.groovy</depends>
+    <depends>org.jetbrains.kotlin</depends>
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
@@ -57,10 +58,18 @@
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftTemplates"/>
 
+        <!-- Project-independent intention actions -->
+        <intentionAction>
+            <className>com.demonwav.mcdev.sideonly.MakeInferredMcdevAnnotationExplicit</className>
+            <category>Minecraft</category>
+            <descriptionDirectoryName>MakeInferredMcdevAnnotationExplicit</descriptionDirectoryName>
+        </intentionAction>
+
         <!-- Project-independent Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ColorLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.insight.PluginLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.sideonly.SideOnlyLineMarkerProvider"/>
 
         <!-- Project-independent Annotators-->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
@@ -82,9 +91,6 @@
                              id="Settings.Minecraft.TranslationTemplate"
                              parentId="Settings.Minecraft"
                              instance="com.demonwav.mcdev.translations.sorting.TranslationTemplateConfigurable"/>
-
-        <!-- Project-independent Inferred Annotation Providers -->
-        <lang.inferredAnnotationProvider implementation="com.demonwav.mcdev.sideonly.SideOnlyInferredAnnotationProvider" />
 
         <!-- NBT -->
         <fileType name="NBT" implementationClass="com.demonwav.mcdev.nbt.filetype.NbtFileType" fieldName="INSTANCE" extensions="nbt" />

@@ -10,7 +10,11 @@
 
 package com.demonwav.mcdev.sideonly
 
+import com.demonwav.mcdev.util.findModule
+import com.demonwav.mcdev.util.runInSmartModeFromReadAction
 import com.intellij.codeInspection.ProblemDescriptor
+import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.openapi.progress.util.ProgressWindow
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
@@ -57,19 +61,29 @@ class HardSideOnlyUsageInspection : BaseInspection() {
     private class Fix(private val annotation: SmartPsiElementPointer<PsiAnnotation>) : InspectionGadgetsFix() {
         override fun doFix(project: Project, descriptor: ProblemDescriptor) {
             val annotation = this.annotation.element ?: return
-            val oldSide = SideOnlyUtil.getAnnotationSide(annotation, SideHardness.HARD)
-            val newAnnotation = JavaPsiFacade.getElementFactory(project).createAnnotationFromText(
-                "@${SideOnlyUtil.MCDEV_SIDEONLY_ANNOTATION}(${SideOnlyUtil.MCDEV_SIDE}.$oldSide)",
-                annotation
-            )
-            val createdAnnotation = annotation.replace(newAnnotation)
-            val codeStyleManager = JavaCodeStyleManager.getInstance(project)
-            codeStyleManager.shortenClassReferences(createdAnnotation)
-            createdAnnotation.containingFile?.let { codeStyleManager.optimizeImports(it) }
+            val module = annotation.findModule() ?: return
+            if (!SideOnlyUtil.ensureMcdevDependencyPresent(project, module, name, annotation.resolveScope)) {
+                return
+            }
+            project.runInSmartModeFromReadAction(ProgressWindow(true, project)) {
+                val oldSide = SideOnlyUtil.getAnnotationSide(annotation, SideHardness.HARD)
+                val newAnnotation = JavaPsiFacade.getElementFactory(project).createAnnotationFromText(
+                    "@${SideOnlyUtil.MCDEV_SIDEONLY_ANNOTATION}(${SideOnlyUtil.MCDEV_SIDE}.$oldSide)",
+                    annotation
+                )
+                WriteCommandAction.runWriteCommandAction(project) {
+                    val createdAnnotation = annotation.replace(newAnnotation)
+                    val codeStyleManager = JavaCodeStyleManager.getInstance(project)
+                    codeStyleManager.shortenClassReferences(createdAnnotation)
+                    createdAnnotation.containingFile?.let { codeStyleManager.optimizeImports(it) }
+                }
+            }
         }
 
         override fun getName() = "Replace with @CheckEnv"
 
         override fun getFamilyName() = name
+
+        override fun startInWriteAction() = false
     }
 }

@@ -109,7 +109,7 @@ intellij {
     version = ideaVersion
     // Bundled plugin dependencies
     setPlugins(
-        "java", "maven", "gradle", "Groovy",
+        "java", "maven", "gradle", "Groovy", "Kotlin",
         // needed dependencies for unit tests
         "properties", "junit",
         // useful to have when running for mods.toml

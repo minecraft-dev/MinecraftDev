@@ -16,6 +16,8 @@ import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.addGradleDependency
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.packageName
 import com.intellij.codeInspection.ProblemsHolder
@@ -23,6 +25,9 @@ import com.intellij.codeInspection.dataFlow.StandardDataFlowRunner
 import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonObject
 import com.intellij.json.psi.JsonStringLiteral
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiArrayType
@@ -43,13 +48,63 @@ import com.intellij.psi.PsiPackage
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiResolveHelper
 import com.intellij.psi.PsiType
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.parentOfType
 
 object SideOnlyUtil {
     const val MCDEV_SIDEONLY_ANNOTATION = "com.demonwav.mcdev.annotations.CheckEnv"
     const val MCDEV_SIDE = "com.demonwav.mcdev.annotations.Env"
 
-    internal fun getAnnotationSide(annotation: PsiAnnotation, hardness: SideHardness): Side {
+    fun ensureMcdevDependencyPresent(
+        project: Project,
+        module: Module,
+        title: String,
+        scope: GlobalSearchScope
+    ): Boolean {
+        if (JavaPsiFacade.getInstance(project).findClass(MCDEV_SIDEONLY_ANNOTATION, scope) != null) {
+            return true
+        }
+
+        if (addMcdevAnnotationsDependency(project, module, title)) {
+            return true
+        }
+
+        return false
+    }
+
+    private fun addMcdevAnnotationsDependency(project: Project, module: Module, title: String): Boolean {
+        val message = "MinecraftDev annotations library is missing. " +
+            "Without the library, MinecraftDev cannot run the analysis.\n" +
+            "Would you like to add it to the project buildscript automatically?"
+        if (Messages.showOkCancelDialog(
+            project,
+            message,
+            title,
+            Messages.OK_BUTTON,
+            Messages.CANCEL_BUTTON,
+            Messages.getErrorIcon()
+        ) == Messages.OK
+        ) {
+            // TODO: fetch the latest version
+            if (addGradleDependency(
+                project,
+                module,
+                "com.demonwav.mcdev",
+                "annotations",
+                SemanticVersion.release(1, 0)
+            )
+            ) {
+                return true
+            } else {
+                val errorMessage = "Failed to add MinecraftDev annotations library automatically. " +
+                    "Please add it to your buildscript manually."
+                Messages.showMessageDialog(project, errorMessage, title, Messages.getErrorIcon())
+            }
+        }
+        return false
+    }
+
+    fun getAnnotationSide(annotation: PsiAnnotation, hardness: SideHardness): Side {
         var isSideAnnotation = false
 
         if (hardness != SideHardness.HARD) {
@@ -83,7 +138,7 @@ object SideOnlyUtil {
         }
     }
 
-    internal fun getExplicitAnnotation(element: PsiModifierListOwner, hardness: SideHardness): SideInstance? {
+    fun getExplicitAnnotation(element: PsiModifierListOwner, hardness: SideHardness): SideInstance? {
         return element.annotations.asSequence()
             .map { it to getAnnotationSide(it, hardness) }
             .firstOrNull { it.second != Side.BOTH }
@@ -98,17 +153,21 @@ object SideOnlyUtil {
             }
     }
 
-    internal fun getExplicitOrInferredAnnotation(element: PsiModifierListOwner, hardness: SideHardness): SideInstance? {
-        val explicitAnnotation = getExplicitAnnotation(element, hardness)
-        if (explicitAnnotation != null) {
-            return explicitAnnotation
-        }
-
+    private fun getInferredAnnotation(element: PsiModifierListOwner, hardness: SideHardness): SideInstance? {
         return when (element) {
             is PsiClass -> getInferredClassAnnotation(element, hardness)
             is PsiMethod -> getInferredMethodAnnotation(element, hardness)
             else -> null
         }
+    }
+
+    fun getExplicitOrInferredAnnotation(element: PsiModifierListOwner, hardness: SideHardness): SideInstance? {
+        return getExplicitAnnotation(element, hardness) ?: getInferredAnnotation(element, hardness)
+    }
+
+    fun getInferredAnnotationOnly(element: PsiModifierListOwner, hardness: SideHardness): SideInstance? {
+        if (getExplicitAnnotation(element, hardness) != null) return null
+        return getInferredAnnotation(element, hardness)
     }
 
     private fun getInferredClassAnnotation(cls: PsiClass, hardness: SideHardness): SideInstance? {
