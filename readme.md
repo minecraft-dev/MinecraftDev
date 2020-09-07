@@ -111,7 +111,7 @@ IntelliJ:
 ./gradlew resolveIntellijLibSources
 ```
 
-If you're curious about that task, it is implemented in `gradle/attach-sources.gradle.kts`
+If you're curious about that task, it is implemented in `buildSrc`.
 
 Developers
 ----------
@@ -120,6 +120,7 @@ Developers
 - [**@Minecrell**](https://github.com/Minecrell)
 - [**@PaleoCrafter** - Marvin Rösch](https://github.com/PaleoCrafter)
 - [**@RedNesto**](https://github.com/RedNesto)
+- [**@Earthcomputer** - Joseph Burton](https://github.com/Earthcomputer)
 
 #### **Significant Contributors**
 

@@ -10,7 +10,6 @@
 
 import net.minecrell.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
-import org.jetbrains.intellij.tasks.BuildSearchableOptionsTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -21,14 +20,14 @@ buildscript {
 
 plugins {
     kotlin("jvm") version "1.3.70" // kept in sync with IntelliJ's bundled dep
+    java
+    mcdev
     groovy
     idea
     id("org.jetbrains.intellij") version "0.4.21"
     id("net.minecrell.licenser") version "0.4.1"
     id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
 }
-
-apply(from = "gradle/attach-sources.gradle.kts")
 
 val coroutineVersion = "1.3.4" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
@@ -37,18 +36,15 @@ val ideaVersionName: String by project
 val coreVersion: String by project
 val downloadIdeaSources: String by project
 
-// for publishing nightlies
-val repoToken: String by project
-val repoChannel: String by project
-
 // configurations
 val idea by configurations
+val jflex by configurations
+val jflexSkeleton by configurations
+val grammarKit by configurations
+
 val gradleToolingExtension: Configuration by configurations.creating {
     extendsFrom(idea)
 }
-val jflex: Configuration by configurations.creating
-val jflexSkeleton: Configuration by configurations.creating
-val grammarKit: Configuration by configurations.creating
 val testLibs: Configuration by configurations.creating {
     isTransitive = false
 }
@@ -56,7 +52,7 @@ val testLibs: Configuration by configurations.creating {
 group = "com.demonwav.minecraft-dev"
 version = "$ideaVersionName-$coreVersion"
 
-val gradleToolingExtensionSourceSet = sourceSets.create("gradle-tooling-extension") {
+val gradleToolingExtensionSourceSet: SourceSet = sourceSets.create("gradle-tooling-extension") {
     configurations.named(compileOnlyConfigurationName) {
         extendsFrom(gradleToolingExtension)
     }
@@ -80,12 +76,14 @@ dependencies {
     // Add tools.jar for the JDI API
     implementation(files(Jvm.current().toolsJar))
 
-    implementation(files(gradleToolingExtensionJar))
-
+    // Kotlin
+    compileOnly(kotlin("stdlib-jdk8"))
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutineVersion") {
         isTransitive = false
     }
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
+
+    implementation(files(gradleToolingExtensionJar))
 
     implementation("com.extracraftx.minecraft:TemplateMakerFabric:0.3.0")
 
@@ -100,7 +98,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:202-EAP-SNAPSHOT")
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:202.6397.94")
     gradleToolingExtension("org.jetbrains:annotations:19.0.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
@@ -128,12 +126,14 @@ intellij {
 }
 
 tasks.publishPlugin {
-    if (properties["publish"] != null) {
-        project.version = "${project.version}-${properties["buildNumber"]}"
-
-        token(repoToken)
-        channels(repoChannel)
+    // Build numbers are used for
+    properties["buildNumber"]?.let { buildNumber ->
+        project.version = "${project.version}-$buildNumber"
     }
+    properties["mcdev.deploy.token"]?.let { deployToken ->
+        token(deployToken)
+    }
+    channels(properties["mcdev.deploy.channel"] ?: "Stable")
 }
 
 java {
@@ -151,15 +151,11 @@ tasks.withType<KotlinCompile>().configureEach {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
         freeCompilerArgs = listOf("-Xjvm-default=enable")
     }
+    this.javaPackagePrefix
 }
 
 tasks.withType<GroovyCompile>().configureEach {
     options.compilerArgs = listOf("-proc:none")
-}
-
-tasks.withType<BuildSearchableOptionsTask>().configureEach {
-    // These tasks are failing for some reason with IDEA 2020.1
-    enabled = false
 }
 
 tasks.processResources {
@@ -233,10 +229,17 @@ license {
 
     tasks {
         register("gradle") {
-            files = project.fileTree(
-                "dir" to project.projectDir,
-                "includes" to listOf("**/*.gradle.kts", "gradle.properties")
-            )
+            files = project.fileTree(project.projectDir) {
+                include("**/*.gradle.kts", "gradle.properties")
+                exclude("**/buildSrc/**", "**/build/**")
+            }
+        }
+        register("buildSrc") {
+            val buildSrc = project.projectDir.resolve("buildSrc")
+            files = project.fileTree(buildSrc) {
+                include("**/*.kt", "**/*.kts")
+                exclude("**/build/**")
+            }
         }
         register("grammars") {
             files = project.fileTree("src/main/grammars")
@@ -256,95 +259,33 @@ tasks.register("format") {
     dependsOn(licenseFormat, ktlintFormat)
 }
 
-// Credit for this intellij-rust
-// https://github.com/intellij-rust/intellij-rust/blob/d6b82e6aa2f64b877a95afdd86ec7b84394678c3/build.gradle#L131-L181
-fun generateLexer(name: String, flex: String, pack: String) = tasks.register<JavaExec>(name) {
-    val src = "src/main/grammars/$flex.flex"
-    val dst = "gen/com/demonwav/mcdev/$pack"
-    val output = "$dst/$flex.java"
+val generateAtLexer by lexer("AtLexer", "com/demonwav/mcdev/platform/mcp/at/gen")
+val generateAtParser by parser("AtParser", "com/demonwav/mcdev/platform/mcp/at/gen")
 
-    classpath = jflex
-    main = "jflex.Main"
+val generateNbttLexer by lexer("NbttLexer", "com/demonwav/mcdev/nbt/lang/gen")
+val generateNbttParser by parser("NbttParser", "com/demonwav/mcdev/nbt/lang/gen")
 
-    doFirst {
-        args(
-            "--skel", jflexSkeleton.singleFile.absolutePath,
-            "-d", dst,
-            src
-        )
+val generateLangLexer by lexer("LangLexer", "com/demonwav/mcdev/translations/lang/gen")
+val generateLangParser by parser("LangParser", "com/demonwav/mcdev/translations/lang/gen")
 
-        // Delete current lexer
-        delete(output)
-    }
-
-    inputs.files(src, jflexSkeleton)
-    outputs.file(output)
-}
-
-fun generatePsiAndParser(name: String, bnf: String, pack: String) = tasks.register<JavaExec>(name) {
-    val src = "src/main/grammars/$bnf.bnf".replace('/', File.separatorChar)
-    val dstRoot = "gen"
-    val dst = "$dstRoot/com/demonwav/mcdev/$pack".replace('/', File.separatorChar)
-    val psiDir = "$dst/psi/".replace('/', File.separatorChar)
-    val parserDir = "$dst/parser/".replace('/', File.separatorChar)
-
-    doFirst {
-        delete(psiDir, parserDir)
-    }
-
-    classpath = grammarKit
-    main = "org.intellij.grammar.Main"
-
-    if (JavaVersion.current().isJava9Compatible) {
-        jvmArgs(
-            "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-            "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
-            "--add-opens", "java.base/java.util=ALL-UNNAMED"
-        )
-    }
-
-    args(dstRoot, src)
-
-    inputs.file(src)
-    outputs.dirs(
-        mapOf(
-            "psi" to psiDir,
-            "parser" to parserDir
-        )
-    )
-}
-
-val generateAtLexer = generateLexer("generateAtLexer", "AtLexer", "platform/mcp/at/gen/")
-val generateAtPsiAndParser = generatePsiAndParser("generateAtPsiAndParser", "AtParser", "platform/mcp/at/gen")
-
-val generateNbttLexer = generateLexer("generateNbttLexer", "NbttLexer", "nbt/lang/gen/")
-val generateNbttPsiAndParser = generatePsiAndParser("generateNbttPsiAndParser", "NbttParser", "nbt/lang/gen")
-
-val generateLangLexer = generateLexer("generateLangLexer", "LangLexer", "translations/lang/gen/")
-val generateLangPsiAndParser = generatePsiAndParser("generateLangPsiAndParser", "LangParser", "translations/lang/gen")
-
-val generateTranslationTemplateLexer = generateLexer(
-    "generateTranslationTemplateLexer",
-    "TranslationTemplateLexer",
-    "translations/lang/gen/"
-)
+val generateTranslationTemplateLexer by lexer("TranslationTemplateLexer", "com/demonwav/mcdev/translations/lang/gen")
 
 val generate by tasks.registering {
     group = "minecraft"
     description = "Generates sources needed to compile the plugin."
+    outputs.dir("gen")
     dependsOn(
         generateAtLexer,
-        generateAtPsiAndParser,
+        generateAtParser,
         generateNbttLexer,
-        generateNbttPsiAndParser,
+        generateNbttParser,
         generateLangLexer,
-        generateLangPsiAndParser,
+        generateLangParser,
         generateTranslationTemplateLexer
     )
-    outputs.dir("gen")
 }
 
-sourceSets.named("main") { java.srcDir(generate) }
+sourceSets.main { java.srcDir(generate) }
 
 // Remove gen directory on clean
 tasks.clean { delete(generate) }
@@ -352,12 +293,9 @@ tasks.clean { delete(generate) }
 tasks.runIde {
     maxHeapSize = "2G"
 
+    jvmArgs("--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED")
     System.getProperty("debug")?.let {
         systemProperty("idea.ProcessCanceledException", "disabled")
         systemProperty("idea.debug.mode", "true")
     }
 }
-
-inline fun <reified T : Task> TaskContainer.existing() = existing(T::class)
-inline fun <reified T : Task> TaskContainer.register(name: String, configuration: Action<in T>) =
-    register(name, T::class, configuration)
