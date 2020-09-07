@@ -10,7 +10,6 @@
 
 import net.minecrell.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
-import org.jetbrains.intellij.tasks.BuildSearchableOptionsTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -156,11 +155,6 @@ tasks.withType<KotlinCompile>().configureEach {
 
 tasks.withType<GroovyCompile>().configureEach {
     options.compilerArgs = listOf("-proc:none")
-}
-
-tasks.withType<BuildSearchableOptionsTask>().configureEach {
-    // These tasks are failing for some reason with IDEA 2020.1
-    enabled = false
 }
 
 tasks.processResources {
