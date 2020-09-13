@@ -1,0 +1,10 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+#parse("File Header.java")
+
+import net.minecraft.block.Block;
+
+public class ${NAME} extends Block {
+    public ${NAME}(Settings settings) {
+		super(settings);
+    }
+}
