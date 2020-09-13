@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.util
 
+import com.demonwav.mcdev.asset.GeneralAssets
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor
@@ -129,6 +130,21 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             commonGroup.addTemplate(FileTemplateDescriptor(MAVEN_GITIGNORE_TEMPLATE))
         }
 
+        FileTemplateGroupDescriptor("Skeletons", GeneralAssets.MC_TEMPLATE).let { skeletonGroup ->
+            group.addTemplate(skeletonGroup)
+            FileTemplateGroupDescriptor("Forge", PlatformAssets.FORGE_ICON).let { forgeSkeletonGroup ->
+                skeletonGroup.addTemplate(forgeSkeletonGroup)
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_PACKET_TEMPLATE))
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_BLOCK_TEMPLATE))
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_ITEM_TEMPLATE))
+            }
+            FileTemplateGroupDescriptor("Fabric", PlatformAssets.FABRIC_ICON).let { fabricSkeletonGroup ->
+                skeletonGroup.addTemplate(fabricSkeletonGroup)
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_BLOCK_TEMPLATE))
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_ITEM_TEMPLATE))
+            }
+        }
+
         FileTemplateGroupDescriptor("Licenses", null).let { licenseGroup ->
             group.addTemplate(licenseGroup)
             enumValues<License>().forEach { license ->
@@ -212,5 +228,12 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
 
         const val GRADLE_GITIGNORE_TEMPLATE = "Gradle.gitignore"
         const val MAVEN_GITIGNORE_TEMPLATE = "Maven.gitignore"
+
+        const val FORGE_BLOCK_TEMPLATE = "ForgeBlock.java"
+        const val FORGE_ITEM_TEMPLATE = "ForgeItem.java"
+        const val FORGE_PACKET_TEMPLATE = "ForgePacket.java"
+
+        const val FABRIC_BLOCK_TEMPLATE = "FabricBlock.java"
+        const val FABRIC_ITEM_TEMPLATE = "FabricItem.java"
     }
 }
