@@ -171,23 +171,25 @@
         <!---->
 
         <!-- Sponge Line Marker Provider -->
-        <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language=""
+                                        implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorLineMarkerProvider"/>
 
-        <implicitUsageProvider implementation="com.demonwav.mcdev.platform.sponge.insight.SpongeImplicitUsageProvider" />
+        <implicitUsageProvider implementation="com.demonwav.mcdev.platform.sponge.insight.SpongeImplicitUsageProvider"/>
 
         <!-- Sponge Annotator -->
         <annotator language="UAST" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
 
-        <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.completion.SpongeGetterFilterCompletionContributor" />
-        <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.sponge.reference.SpongeReferenceContributor" />
-        <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.completion.SpongeCompletionConfidence"
-                               order="before javaSkipAutopopupInStrings" />
+        <psi.referenceContributor language="UAST"
+                                  implementation="com.demonwav.mcdev.platform.sponge.reference.SpongeReferenceContributor"/>
 
-        <library.presentationProvider implementation="com.demonwav.mcdev.platform.sponge.framework.SpongePresentationProvider" />
-        <importFilter implementation="com.demonwav.mcdev.platform.sponge.SpongeImportFilter" />
+        <library.presentationProvider
+            implementation="com.demonwav.mcdev.platform.sponge.framework.SpongePresentationProvider"/>
+        <importFilter implementation="com.demonwav.mcdev.platform.sponge.SpongeImportFilter"/>
 
-        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.inspection.suppress.SpongeGetterParamOptionalInspectionSuppressor" />
-        <daemon.highlightInfoFilter implementation="com.demonwav.mcdev.platform.sponge.codeInsight.highlighting.SpongeGetterFilterInfoFilter" />
+        <lang.inspectionSuppressor language="JAVA"
+                                   implementationClass="com.demonwav.mcdev.platform.sponge.inspection.suppress.SpongeGetterParamOptionalInspectionSuppressor"/>
+        <daemon.highlightInfoFilter
+            implementation="com.demonwav.mcdev.platform.sponge.codeInsight.highlighting.SpongeGetterFilterInfoFilter"/>
         <!--endregion-->
 
         <!--region FORGE-->
@@ -358,14 +360,14 @@
 
         <localInspection displayName="@Getter targeted method does not exist"
                          groupName="Sponge"
-                         language="JAVA"
+                         language="UAST"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeInvalidGetterTargetInspection"/>
         <localInspection displayName="Parameter's type is not assignable to its @Getter method return type"
                          groupName="Sponge"
-                         language="JAVA"
+                         language="UAST"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
