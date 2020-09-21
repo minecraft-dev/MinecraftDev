@@ -16,7 +16,6 @@ import com.demonwav.mcdev.insight.generation.GenerationData
 import com.demonwav.mcdev.inspection.IsCancelled
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.platform.forge.inspections.sideonly.SidedProxyAnnotator
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.mcp.McpModuleSettings
 import com.demonwav.mcdev.util.SemanticVersion
@@ -28,7 +27,6 @@ import com.demonwav.mcdev.util.waitForAllSmart
 import com.intellij.json.JsonFileType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileTypes.FileTypeManager
-import com.intellij.openapi.project.DumbService
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
@@ -38,7 +36,6 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.search.searches.AnnotatedElementsSearch
 
 class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
@@ -55,27 +52,6 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
             // Set mcmod.info icon
             runWriteTaskLater {
                 FileTypeManager.getInstance().associatePattern(JsonFileType.INSTANCE, ForgeConstants.MCMOD_INFO)
-            }
-
-            // Index @SideOnly
-            val service = DumbService.getInstance(project)
-            service.runReadActionInSmartMode runSmart@{
-                if (service.isDumb || project.isDisposed) {
-                    return@runSmart
-                }
-
-                val scope = GlobalSearchScope.projectScope(project)
-                val sidedProxy = JavaPsiFacade.getInstance(project)
-                    .findClass(ForgeConstants.SIDED_PROXY_ANNOTATION, scope) ?: return@runSmart
-                val annotatedFields = AnnotatedElementsSearch.searchPsiFields(sidedProxy, scope).findAll()
-
-                for (field in annotatedFields) {
-                    if (service.isDumb || project.isDisposed) {
-                        return@runSmart
-                    }
-
-                    SidedProxyAnnotator.check(field)
-                }
             }
         }
     }

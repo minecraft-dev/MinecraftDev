@@ -1,0 +1,7 @@
+import com.demonwav.mcdev.annotations.CheckEnv;
+import com.demonwav.mcdev.annotations.Env;
+
+<spot>@CheckEnv(Env.CLIENT)</spot>
+class A extends ClientOnlyClass {
+    // stuff
+}

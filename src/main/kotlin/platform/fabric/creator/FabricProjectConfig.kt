@@ -17,7 +17,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleCreator
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.fabric.EntryPoint
-import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
+import com.demonwav.mcdev.sideonly.Side
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.openapi.module.Module
@@ -35,7 +35,7 @@ class FabricProjectConfig : ProjectConfig(), GradleCreator {
     var apiMavenLocation: String? = null
     var loomVersion = SemanticVersion.release()
     var gradleVersion = SemanticVersion.release()
-    var environment = Side.NONE
+    var environment = Side.BOTH
     var entryPoints: List<EntryPoint> = arrayListOf()
     var modRepo: String? = null
     var mixins = false

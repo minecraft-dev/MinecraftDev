@@ -12,7 +12,7 @@ package com.demonwav.mcdev.platform.fabric.creator
 
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.BaseTemplate
-import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
+import com.demonwav.mcdev.sideonly.Side
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_GRADLE_PROPERTIES_TEMPLATE

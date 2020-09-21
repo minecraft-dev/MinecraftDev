@@ -24,6 +24,7 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         var isShowEventListenerGutterIcons: Boolean = true,
         var isShowChatColorGutterIcons: Boolean = true,
         var isShowChatColorUnderlines: Boolean = false,
+        var isShowSideOnlyGutterIcons: Boolean = true,
         var underlineType: MinecraftSettings.UnderlineType = MinecraftSettings.UnderlineType.DOTTED
     )
 
@@ -60,6 +61,12 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         get() = state.isShowChatColorUnderlines
         set(showChatColorUnderlines) {
             state.isShowChatColorUnderlines = showChatColorUnderlines
+        }
+
+    var isShowSideOnlyGutterIcons: Boolean
+        get() = state.isShowSideOnlyGutterIcons
+        set(showSideOnlyGutterIcons) {
+            state.isShowSideOnlyGutterIcons = showSideOnlyGutterIcons
         }
 
     var underlineType: UnderlineType

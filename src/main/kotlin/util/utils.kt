@@ -20,6 +20,8 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
@@ -65,6 +67,29 @@ inline fun <T : Any?> Project.runWriteTaskInSmartMode(crossinline func: () -> T)
         }
     }
     return ref.get()
+}
+
+fun Project.runInSmartModeFromReadAction(
+    progressIndicator: ProgressIndicator? = null,
+    func: () -> Unit
+) {
+    val dumbService = DumbService.getInstance(this)
+    if (dumbService.isDumb) {
+        ApplicationManager.getApplication().executeOnPooledThread {
+            ProgressManager.getInstance().runProcess(
+                {
+                    ProgressManager.progress("Indexing")
+                    dumbService.runReadActionInSmartMode {
+                        ProgressManager.checkCanceled()
+                        invokeLater(func)
+                    }
+                },
+                progressIndicator
+            )
+        }
+    } else {
+        func()
+    }
 }
 
 fun <T : Any?> invokeAndWait(func: () -> T): T {
