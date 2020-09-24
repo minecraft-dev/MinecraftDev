@@ -56,8 +56,11 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
         val targets = psiClass.mixinTargets
         if (targets.isNotEmpty()) {
             PsiElementListNavigator.openTargets(
-                e, targets.toTypedArray(),
-                "Choose target class of $name", null, PsiClassListCellRenderer()
+                e,
+                targets.toTypedArray(),
+                "Choose target class of $name",
+                null,
+                PsiClassListCellRenderer()
             )
         }
     }

@@ -137,14 +137,16 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                 registerError(
                                     referenceExpression.element,
                                     Error.ANNOTATED_CLASS_METHOD_IN_UNANNOTATED_METHOD,
-                                    elementSide.annotation, null,
+                                    elementSide.annotation,
+                                    null,
                                     declaration
                                 )
                             } else {
                                 registerError(
                                     referenceExpression.element,
                                     Error.ANNOTATED_METHOD_IN_UNANNOTATED_METHOD,
-                                    elementSide.annotation, null,
+                                    elementSide.annotation,
+                                    null,
                                     declaration
                                 )
                             }

@@ -118,25 +118,27 @@ object PluginUpdater {
     fun installPluginUpdate(update: PluginUpdateStatus.Update) {
         val plugin = update.pluginDescriptor
         val downloader = PluginDownloader.createDownloader(plugin, update.hostToInstallFrom, null)
-        ProgressManager.getInstance().run(object : Task.Backgroundable(null, "Downloading Plugin", true) {
-            override fun run(indicator: ProgressIndicator) {
-                try {
-                    val status = downloader.prepareToInstall(indicator)
-                    // If the download failed, quit
-                    // But otherwise force the install
-                    if (!status && downloader.findDeclaredField("myFile") == null) {
-                        return
-                    }
+        ProgressManager.getInstance().run(
+            object : Task.Backgroundable(null, "Downloading plugin", true) {
+                override fun run(indicator: ProgressIndicator) {
+                    try {
+                        val status = downloader.prepareToInstall(indicator)
+                        // If the download failed, quit
+                        // But otherwise force the install
+                        if (!status && downloader.findDeclaredField("myFile") == null) {
+                            return
+                        }
 
-                    downloader.install()
+                        downloader.install()
 
-                    invokeLater {
-                        PluginManagerMain.notifyPluginsUpdated(null)
+                        invokeLater {
+                            PluginManagerMain.notifyPluginsUpdated(null)
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
                     }
-                } catch (e: IOException) {
-                    e.printStackTrace()
                 }
             }
-        })
+        )
     }
 }

@@ -39,7 +39,8 @@ class MixinInnerClassInspection : MixinInspection() {
                 // Ensure inner class is static
                 if (!psiClass.hasModifierProperty(PsiModifier.STATIC)) {
                     holder.registerProblem(
-                        psiClass.modifierList!!, "@Mixin inner class must be static",
+                        psiClass.modifierList!!,
+                        "@Mixin inner class must be static",
                         QuickFixFactory.getInstance().createModifierListFix(psiClass, PsiModifier.STATIC, true, false)
                     )
                 }

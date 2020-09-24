@@ -20,6 +20,7 @@ import com.intellij.openapi.fileEditor.FileEditorState
 import com.intellij.openapi.fileEditor.FileEditorStateLevel
 import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
 import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider
+import com.intellij.openapi.fileEditor.impl.text.TextEditorState
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
@@ -93,7 +94,7 @@ private class NbtFileEditor(private val editorProvider: (NbtVirtualFile) -> File
     }
 
     override fun getState(level: FileEditorStateLevel): FileEditorState = editor.exec { getState(level) }
-        ?: FileEditorState.INSTANCE
+        ?: TextEditorState()
 
     override fun getComponent() = component
     override fun getPreferredFocusedComponent() = editor.exec { preferredFocusedComponent }

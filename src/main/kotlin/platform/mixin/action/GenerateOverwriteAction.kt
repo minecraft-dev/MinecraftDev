@@ -85,7 +85,9 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
                 if (codeBlock == null) {
                     // Generate fallback method body if source is not available
                     OverrideImplementUtil.setupMethodBody(
-                        newMethod, method, psiClass,
+                        newMethod,
+                        method,
+                        psiClass,
                         FileTemplateManager.getInstance(project).getCodeTemplate(MIXIN_OVERWRITE_FALLBACK)
                     )
                 }

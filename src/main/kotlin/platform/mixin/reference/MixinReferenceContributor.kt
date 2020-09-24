@@ -25,7 +25,8 @@ class MixinReferenceContributor : PsiReferenceContributor() {
         // Method references
         registrar.registerReferenceProvider(
             PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationParam(
-                StandardPatterns.string().oneOf(METHOD_INJECTORS), "method"
+                StandardPatterns.string().oneOf(METHOD_INJECTORS),
+                "method"
             ),
             MethodReference
         )

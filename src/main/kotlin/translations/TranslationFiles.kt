@@ -67,7 +67,8 @@ object TranslationFiles {
         if (element.containingFile?.virtualFile?.let { isTranslationFile(it) } == true) {
             when {
                 element is JsonProperty && element.value is JsonStringLiteral -> Translation(
-                    element.name, (element.value as JsonStringLiteral).value
+                    element.name,
+                    (element.value as JsonStringLiteral).value
                 )
                 element is LangEntry -> Translation(element.key, element.value)
                 else -> null
@@ -114,7 +115,8 @@ object TranslationFiles {
         }
 
         val files = FileTypeIndex.getFiles(
-            if (jsonVersion) JsonFileType.INSTANCE else LangFileType, GlobalSearchScope.moduleScope(module)
+            if (jsonVersion) JsonFileType.INSTANCE else LangFileType,
+            GlobalSearchScope.moduleScope(module)
         ).filter { getLocale(it) == TranslationConstants.DEFAULT_LOCALE }
         val domains = files.asSequence().mapNotNull { it.mcDomain }.distinct().sorted().toList()
         if (domains.size > 1) {
