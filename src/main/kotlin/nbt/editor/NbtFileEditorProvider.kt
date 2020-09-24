@@ -125,7 +125,7 @@ private class NbtFileEditor(private val editorProvider: (NbtVirtualFile) -> File
     override fun toString() = editor.toString()
 
     private inline fun <T : Any?> FileEditor?.exec(action: FileEditor.() -> T): T? {
-        if (editor?.let { ed -> Disposer.isDisposed(ed) || Disposer.isDisposing(ed) } == true) {
+        if (editor?.let { ed -> Disposer.isDisposed(ed) } == true) {
             return null
         }
         return this?.action()

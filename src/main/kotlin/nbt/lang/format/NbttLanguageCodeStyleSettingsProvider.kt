@@ -14,6 +14,7 @@ import com.demonwav.mcdev.nbt.lang.NbttLanguage
 import com.intellij.application.options.IndentOptionsEditor
 import com.intellij.application.options.SmartIndentOptionsEditor
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable
+import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizableOptions
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
 import org.intellij.lang.annotations.Language
@@ -29,7 +30,7 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                     NbttCodeStyleSettings::class.java,
                     "LIST_WRAPPING",
                     "Wrap list items",
-                    CodeStyleSettingsCustomizable.WRAPPING_BRACES,
+                    CodeStyleSettingsCustomizableOptions.getInstance().WRAPPING_BRACES,
                     arrayOf(
                         "Do not wrap",
                         "Wrap always"
@@ -43,7 +44,7 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                     NbttCodeStyleSettings::class.java,
                     "ARRAY_WRAPPING",
                     "Wrap array items",
-                    CodeStyleSettingsCustomizable.WRAPPING_BRACES,
+                    CodeStyleSettingsCustomizableOptions.getInstance().WRAPPING_BRACES,
                     arrayOf(
                         "Do not wrap",
                         "Wrap always"
@@ -65,13 +66,13 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                     NbttCodeStyleSettings::class.java,
                     "SPACE_BEFORE_COLON",
                     "Space before colon",
-                    CodeStyleSettingsCustomizable.SPACES_AROUND_OPERATORS
+                    CodeStyleSettingsCustomizableOptions.getInstance().SPACES_AROUND_OPERATORS
                 )
                 consumer.showCustomOption(
                     NbttCodeStyleSettings::class.java,
                     "SPACE_AFTER_COLON",
                     "Space after colon",
-                    CodeStyleSettingsCustomizable.SPACES_AROUND_OPERATORS
+                    CodeStyleSettingsCustomizableOptions.getInstance().SPACES_AROUND_OPERATORS
                 )
 
                 consumer.renameStandardOption("SPACE_WITHIN_BRACKETS", "List brackets")
@@ -95,6 +96,7 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
     }
 }
 
+@Suppress("SameParameterValue")
 private fun sample(@Language("NBTT") code: String) = code.trim()
 
 private val SAMPLE = sample(

@@ -24,6 +24,7 @@ import com.intellij.psi.PsiType
 import com.intellij.psi.impl.source.tree.JavaElementType
 import com.intellij.psi.search.GlobalSearchScope
 import java.awt.Color
+import kotlin.math.roundToInt
 
 fun PsiElement.findColor(): Pair<Color, PsiElement>? {
     if (this !is PsiIdentifier) {
@@ -53,7 +54,7 @@ fun PsiElement.findColor(): Pair<Color, PsiElement>? {
     var pair: Pair<Color, PsiElement>? = null
 
     // Single Integer Argument
-    if (types.size == 1 && types[0] === PsiType.INT && expressionList.expressions[0] is PsiLiteralExpression) {
+    if (types.size == 1 && types[0] == PsiType.INT && expressionList.expressions[0] is PsiLiteralExpression) {
         try {
             val expr = expressionList.expressions[0] as PsiLiteralExpression
             pair = handleSingleArgument(expr) to expressionList.expressions[0]
@@ -61,7 +62,7 @@ fun PsiElement.findColor(): Pair<Color, PsiElement>? {
         }
 
         // Triple Integer Argument
-    } else if (types.size == 3 && types[0] === PsiType.INT && types[1] === PsiType.INT && types[2] === PsiType.INT) {
+    } else if (types.size == 3 && types[0] == PsiType.INT && types[1] == PsiType.INT && types[2] == PsiType.INT) {
         try {
             pair = handleThreeArguments(expressionList) to expressionList
         } catch (ignored: Exception) {
@@ -97,7 +98,7 @@ fun PsiElement.findColor(): Pair<Color, PsiElement>? {
 }
 
 private fun handleSingleArgument(expression: PsiLiteralExpression): Color {
-    val value = Integer.decode(expression.text)!!
+    val value = Integer.decode(expression.text)
 
     return Color(value)
 }
@@ -114,9 +115,9 @@ private fun handleThreeArguments(expressionList: PsiExpressionList): Color {
     val expressionTwo = expressionList.expressions[1] as PsiLiteralExpression
     val expressionThree = expressionList.expressions[2] as PsiLiteralExpression
 
-    val one = Math.round(expressionOne.text.toDouble()).toInt()
-    val two = Math.round(expressionTwo.text.toDouble()).toInt()
-    val three = Math.round(expressionThree.text.toDouble()).toInt()
+    val one = expressionOne.text.toDouble().roundToInt()
+    val two = expressionTwo.text.toDouble().roundToInt()
+    val three = expressionThree.text.toDouble().roundToInt()
 
     return Color(one, two, three)
 }

@@ -49,19 +49,7 @@ val PsiElement.eventListener: Pair<PsiClass, PsiMethod>?
         if (!contains) {
             return null
         }
-        val parameters = method.parameterList.parameters
-        if (parameters.isEmpty()) {
-            return null
-        }
-        val psiParameter = parameters[0] // Listeners must have at least a single parameter
-            ?: return null
-        // Get the type of the parameter so we can start resolving it
-        val psiEventElement = psiParameter.typeElement ?: return null
-        val type = psiEventElement.type as? PsiClassReferenceType ?: return null
-        // Validate that it is a class reference type
-        // And again, make sure that we can at least resolve the type, otherwise it's not a valid
-        // class reference.
-        val resolve = type.resolve() ?: return null
+        val (_, resolve) = method.eventParameterPair ?: return null
 
         if (!instance.isStaticListenerSupported(method) && method.hasModifierProperty(PsiModifier.STATIC)) {
             return null

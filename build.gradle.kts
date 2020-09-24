@@ -19,17 +19,17 @@ buildscript {
 }
 
 plugins {
-    kotlin("jvm") version "1.3.70" // kept in sync with IntelliJ's bundled dep
+    kotlin("jvm") version "1.4.0" // kept in sync with IntelliJ's bundled dep
     java
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.21"
+    id("org.jetbrains.intellij") version "0.4.26"
     id("net.minecrell.licenser") version "0.4.1"
     id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
 }
 
-val coroutineVersion = "1.3.4" // Coroutine version also kept in sync with IntelliJ's bundled dep
+val coroutineVersion = "1.3.9" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
 val ideaVersion: String by project
 val ideaVersionName: String by project
@@ -98,7 +98,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:202.6397.94")
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:203-EAP-SNAPSHOT")
     gradleToolingExtension("org.jetbrains:annotations:19.0.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")

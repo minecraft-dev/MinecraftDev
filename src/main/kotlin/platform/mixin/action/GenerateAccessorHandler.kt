@@ -235,8 +235,8 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
     }
 
     private fun createAccessorMixin(project: Project, targetClass: PsiClass): PsiClass? {
-        val config = MixinModule.getMixinConfigs(project, GlobalSearchScope.projectScope(project)).maxBy {
-            return@maxBy countAccessorMixins(project, it.qualifiedMixins) +
+        val config = MixinModule.getMixinConfigs(project, GlobalSearchScope.projectScope(project)).maxByOrNull {
+            return@maxByOrNull countAccessorMixins(project, it.qualifiedMixins) +
                 countAccessorMixins(project, it.qualifiedClient) +
                 countAccessorMixins(project, it.qualifiedServer)
         }

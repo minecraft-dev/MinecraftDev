@@ -36,8 +36,10 @@ class PluginLineMarkerProvider : LineMarkerProviderDescriptor() {
             element,
             element.textRange,
             GeneralAssets.PLUGIN,
-            FunctionUtil.nullConstant<PsiElement, String>(), null,
-            GutterIconRenderer.Alignment.RIGHT
+            FunctionUtil.nullConstant(),
+            null,
+            GutterIconRenderer.Alignment.RIGHT,
+            { "minecraft plugin entry point indicator" }
         )
     }
 }

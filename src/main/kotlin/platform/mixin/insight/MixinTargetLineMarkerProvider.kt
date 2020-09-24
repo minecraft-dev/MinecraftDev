@@ -26,7 +26,6 @@ import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.util.createSmartPointer
-import com.intellij.util.Function
 import com.intellij.util.PsiNavigateUtil
 import java.awt.event.MouseEvent
 
@@ -58,17 +57,18 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
             identifier,
             identifier.textRange,
             icon,
-            Function { "Go to ${targetInfo.target} element" },
+            { "Go to ${targetInfo.target} element" },
             AccessorGutterIconNavigationHandler(identifier.createSmartPointer(), targetInfo.target),
-            GutterIconRenderer.Alignment.LEFT
+            GutterIconRenderer.Alignment.LEFT,
+            { "mixin ${targetInfo.text} target indicator" }
         )
     }
 
     private class TargetInfo(val target: SmartPsiElementPointer<out PsiMember>, val text: String)
 
-    private fun PsiMember.findShadow(): TargetInfo? = this.findFirstShadowTarget()?.let { TargetInfo(it, "@Shadow") }
-    private fun PsiMember.findAccessor(): TargetInfo? = this.findAccessorTarget()?.let { TargetInfo(it, "@Accessor") }
-    private fun PsiMember.findInvoker(): TargetInfo? = this.findInvokerTarget()?.let { TargetInfo(it, "@Invoker") }
+    private fun PsiMember.findShadow(): TargetInfo? = this.findFirstShadowTarget()?.let { TargetInfo(it, "shadow") }
+    private fun PsiMember.findAccessor(): TargetInfo? = this.findAccessorTarget()?.let { TargetInfo(it, "accessor") }
+    private fun PsiMember.findInvoker(): TargetInfo? = this.findInvokerTarget()?.let { TargetInfo(it, "invoker") }
     private fun PsiMethod.findOverwrite(): TargetInfo? =
         this.findFirstOverwriteTarget()?.let { TargetInfo(it, "@Overwrite") }
 

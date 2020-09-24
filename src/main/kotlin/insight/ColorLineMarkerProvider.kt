@@ -33,9 +33,9 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             return null
         }
 
-        val info = element.findColor { map, chosen -> ColorInfo(element, chosen.value, map) }
+        val info = element.findColor { map, chosen -> ColorInfo(element, chosen.value, map, chosen.key) }
         if (info != null) {
-            NavigateAction.setNavigateAction(info, "Change color", null)
+            NavigateAction.setNavigateAction(info, "Change Color", null)
         }
 
         return info
@@ -44,7 +44,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
     open class ColorInfo : MergeableLineMarkerInfo<PsiElement> {
         protected val color: Color
 
-        constructor(element: PsiElement, color: Color, map: Map<String, Color>) : super(
+        constructor(element: PsiElement, color: Color, map: Map<String, Color>, colorName: String) : super(
             element,
             element.textRange,
             ColorIcon(12, color),
@@ -62,7 +62,8 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                     element.setColor(newColor)
                 }
             },
-            GutterIconRenderer.Alignment.RIGHT
+            GutterIconRenderer.Alignment.RIGHT,
+            { "$colorName color indicator" }
         ) {
             this.color = color
         }
@@ -73,7 +74,8 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             ColorIcon(12, color),
             FunctionUtil.nullConstant<Any, String>(),
             handler,
-            GutterIconRenderer.Alignment.RIGHT
+            GutterIconRenderer.Alignment.RIGHT,
+            { "color indicator" }
         ) {
             this.color = color
         }

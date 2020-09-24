@@ -12,7 +12,6 @@ package com.demonwav.mcdev.translations.sorting
 
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.io.FileUtil
 import com.intellij.project.stateStore
 import java.io.File
 
@@ -26,9 +25,9 @@ object EmptyLine : TemplateElement()
 
 data class Template(val elements: List<TemplateElement>) {
     companion object {
-        fun parse(s: String): Template =
+        fun parse(s: String?): Template =
             Template(
-                if (s.isNotEmpty()) {
+                if (!s.isNullOrEmpty()) {
                     s.split('\n').map {
                         when {
                             it.isEmpty() -> EmptyLine
@@ -72,19 +71,17 @@ object TemplateManager {
 
     private fun globalFile(): File = File(PathManager.getConfigPath(), FILE_NAME)
 
-    private fun projectFile(project: Project): File =
-        File(FileUtil.toSystemDependentName(project.stateStore.getDirectoryStorePath(false)!!), FILE_NAME)
+    private fun projectFile(project: Project): File? =
+        project.stateStore.directoryStorePath?.resolve(FILE_NAME)?.toFile()
 
     fun getGlobalTemplateText() = if (globalFile().exists()) globalFile().readText() else ""
 
-    fun getProjectTemplateText(project: Project) =
-        projectFile(project).let { if (it.exists()) it.readText() else getGlobalTemplateText() }
-
-    fun getGlobalTemplate() = Template.parse(getGlobalTemplateText())
+    fun getProjectTemplateText(project: Project): String? =
+        projectFile(project)?.let { if (it.exists()) it.readText() else getGlobalTemplateText() }
 
     fun getProjectTemplate(project: Project) = Template.parse(getProjectTemplateText(project))
 
     fun writeGlobalTemplate(text: String) = globalFile().writeText(text)
 
-    fun writeProjectTemplate(project: Project, text: String) = projectFile(project).writeText(text)
+    fun writeProjectTemplate(project: Project, text: String) = projectFile(project)?.writeText(text)
 }

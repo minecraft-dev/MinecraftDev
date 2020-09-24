@@ -64,7 +64,7 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
             .groupingBy { it }
             .eachCount()
 
-        val maxValue = counts.maxBy { it.value }?.value ?: return
+        val maxValue = counts.maxByOrNull { it.value }?.value ?: return
         counts.asSequence()
             .filter { it.value == maxValue }
             .map { it.key }

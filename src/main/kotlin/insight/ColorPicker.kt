@@ -43,12 +43,12 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) 
 
     private fun init() {
         val iterator = colorMap.entries.iterator()
-        addToPanel(0, 8, panel, iterator)
-        addToPanel(1, 8, panel, iterator)
+        addToPanel(0, panel, iterator)
+        addToPanel(1, panel, iterator)
     }
 
-    private fun addToPanel(row: Int, cols: Int, panel: JPanel, iterator: Iterator<Map.Entry<String, Color>>) {
-        for (i in 0 until cols) {
+    private fun addToPanel(row: Int, panel: JPanel, iterator: Iterator<Map.Entry<String, Color>>) {
+        for (i in 0 until 8) {
             if (!iterator.hasNext()) {
                 break
             }

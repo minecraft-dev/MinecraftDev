@@ -98,7 +98,8 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
         icon,
         Function { "Go to Event declaration" },
         handler,
-        GutterIconRenderer.Alignment.RIGHT
+        GutterIconRenderer.Alignment.RIGHT,
+        { "event listener indicator" }
     ) {
 
         override fun canMergeWith(info: MergeableLineMarkerInfo<*>): Boolean {

@@ -68,7 +68,7 @@ class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
         ): MixinConfig? {
             return getMixinConfigs(project, scope)
                 .filter { it.isWritable && mixinClassName.startsWith("${it.pkg}.") }
-                .maxBy { it.pkg?.length ?: 0 }
+                .maxByOrNull { it.pkg?.length ?: 0 }
         }
     }
 }

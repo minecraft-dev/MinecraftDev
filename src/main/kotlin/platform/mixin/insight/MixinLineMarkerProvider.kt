@@ -22,7 +22,6 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIdentifier
-import com.intellij.util.Function
 import java.awt.event.MouseEvent
 
 class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavigationHandler<PsiIdentifier> {
@@ -44,9 +43,10 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
             identifier,
             identifier.textRange,
             icon,
-            Function { "Go to target class" },
+            { "Go to target class" },
             this,
-            GutterIconRenderer.Alignment.LEFT
+            GutterIconRenderer.Alignment.LEFT,
+            { "mixin target class indicator" }
         )
     }
 

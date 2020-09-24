@@ -31,7 +31,7 @@ class SpongeColorLineMarkerProvider : LineMarkerProvider {
         val pair = element.findColor() ?: return null
 
         val info = SpongeColorInfo(element, pair.first, pair.second)
-        NavigateAction.setNavigateAction(info, "Change color", null)
+        NavigateAction.setNavigateAction(info, "Change Color", null)
 
         return info
     }
