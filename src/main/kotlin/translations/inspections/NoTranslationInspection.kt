@@ -38,7 +38,8 @@ class NoTranslationInspection : TranslationInspection() {
                     expression,
                     "The given translation key does not exist",
                     ProblemHighlightType.GENERIC_ERROR,
-                    CreateTranslationQuickFix, ChangeTranslationQuickFix("Use existing translation")
+                    CreateTranslationQuickFix,
+                    ChangeTranslationQuickFix("Use existing translation")
                 )
             }
         }

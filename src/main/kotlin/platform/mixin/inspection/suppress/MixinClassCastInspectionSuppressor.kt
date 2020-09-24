@@ -63,12 +63,12 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
         // So the operand of the first cast `(SomeClass)` must be `(Object) this`, another cast
         val operand = castExpression.operand as? PsiTypeCastExpression ?: return false
 
-        if (operand.castType?.type != PsiType.getTypeByName(
+        val type = PsiType.getTypeByName(
             CommonClassNames.JAVA_LANG_OBJECT,
             project,
             GlobalSearchScope.allScope(project)
         )
-        ) {
+        if (operand.castType?.type != type) {
             return false
         }
 

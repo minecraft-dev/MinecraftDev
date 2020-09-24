@@ -24,7 +24,7 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         var isShowEventListenerGutterIcons: Boolean = true,
         var isShowChatColorGutterIcons: Boolean = true,
         var isShowChatColorUnderlines: Boolean = false,
-        var underlineType: MinecraftSettings.UnderlineType = MinecraftSettings.UnderlineType.DOTTED
+        var underlineType: UnderlineType = UnderlineType.DOTTED
     )
 
     private var state = State()
@@ -71,7 +71,7 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
     val underlineTypeIndex: Int
         get() {
             val type = underlineType
-            return (0 until UnderlineType.values().size).firstOrNull { type == UnderlineType.values()[it] } ?: 0
+            return UnderlineType.values().indices.firstOrNull { type == UnderlineType.values()[it] } ?: 0
         }
 
     enum class UnderlineType(private val regular: String, val effectType: EffectType) {

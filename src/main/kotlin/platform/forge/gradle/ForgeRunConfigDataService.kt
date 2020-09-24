@@ -136,20 +136,22 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
     ) {
         val mainModule = findMainModule(moduleMap, module)
 
-        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "genIntellijRuns", false) {
-            override fun run(indicator: ProgressIndicator) {
-                indicator.isIndeterminate = true
+        ProgressManager.getInstance().run(
+            object : Task.Backgroundable(project, "genIntellijRuns", false) {
+                override fun run(indicator: ProgressIndicator) {
+                    indicator.isIndeterminate = true
 
-                val projectDir = project.guessProjectDir() ?: return
-                indicator.text = "Creating run configurations"
-                indicator.text2 = "Running Gradle task: '$task'"
-                runGradleTask(project, projectDir.localFile.toPath()) { settings ->
-                    settings.taskNames = listOf(task)
+                    val projectDir = project.guessProjectDir() ?: return
+                    indicator.text = "Creating run configurations"
+                    indicator.text2 = "Running Gradle task: '$task'"
+                    runGradleTask(project, projectDir.localFile.toPath()) { settings ->
+                        settings.taskNames = listOf(task)
+                    }
+
+                    cleanupGeneratedRuns(project, mainModule, hasData)
                 }
-
-                cleanupGeneratedRuns(project, mainModule, hasData)
             }
-        })
+        )
     }
 
     private fun cleanupGeneratedRuns(project: Project, module: Module, hasData: Boolean) {

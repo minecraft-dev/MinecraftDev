@@ -63,7 +63,11 @@ class ErrorReporter : ErrorReportSubmitter() {
         val project = CommonDataKeys.PROJECT.getData(dataContext)
 
         val task = AnonymousFeedbackTask(
-            project, "Submitting error report", true, reportValues, attachments,
+            project,
+            "Submitting error report",
+            true,
+            reportValues,
+            attachments,
             { htmlUrl, token, isDuplicate ->
                 val reportInfo =
                     SubmittedReportInfo(htmlUrl, "Issue #$token", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE)

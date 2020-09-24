@@ -36,7 +36,8 @@ class PluginLineMarkerProvider : LineMarkerProviderDescriptor() {
             element,
             element.textRange,
             GeneralAssets.PLUGIN,
-            FunctionUtil.nullConstant<PsiElement, String>(), null,
+            FunctionUtil.nullConstant<PsiElement, String>(),
+            null,
             GutterIconRenderer.Alignment.RIGHT
         )
     }

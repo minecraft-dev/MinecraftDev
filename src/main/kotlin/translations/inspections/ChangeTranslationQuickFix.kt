@@ -42,7 +42,8 @@ class ChangeTranslationQuickFix(private val name: String) : LocalQuickFix {
                         val selectedKey = (element as PsiNamedElement).name ?: return
                         literal.containingFile.runWriteAction {
                             val insertion = selectedKey.substring(
-                                key.prefix.length, selectedKey.length - key.suffix.length
+                                key.prefix.length,
+                                selectedKey.length - key.suffix.length
                             )
                             literal.replace(
                                 JavaPsiFacade.getInstance(project).elementFactory.createExpressionFromText(
@@ -53,7 +54,8 @@ class ChangeTranslationQuickFix(private val name: String) : LocalQuickFix {
                         }
                     }
                 },
-                ModalityState.current(), false
+                ModalityState.current(),
+                false
             )
         } catch (ignored: IncorrectOperationException) {
         }

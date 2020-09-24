@@ -196,8 +196,10 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
         override fun createLookup(targetClass: PsiClass, m: PsiMethod, owner: PsiClass): LookupElementBuilder {
             return JavaLookupElementBuilder.forMethod(
-                m, MixinMemberReference.toString(m.getQualifiedMemberReference(owner)),
-                PsiSubstitutor.EMPTY, targetClass
+                m,
+                MixinMemberReference.toString(m.getQualifiedMemberReference(owner)),
+                PsiSubstitutor.EMPTY,
+                targetClass
             )
                 .withPresentableText(m.internalName) // Display internal name (e.g. <init> for constructors)
                 .withLookupString(m.internalName) // Allow looking up targets by their method name

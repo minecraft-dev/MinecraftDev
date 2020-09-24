@@ -44,18 +44,18 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
 
         val arguments = expression.argumentList
         val argumentTypes = arguments.expressionTypes
-        if (argumentTypes.size != 1 || argumentTypes[0] != PsiType.getJavaLangString(
+        val javaStringType = PsiType.getJavaLangString(
             expression.manager,
             expression.resolveScope
         )
-        ) {
+
+        if (argumentTypes.size != 1 || argumentTypes[0] != javaStringType) {
             // Must have one String parameter
             return false
         }
 
-        val expr = arguments.expressions[0]
         // Expression must be constant, so either a literal or a constant field reference
-        return when (expr) {
+        return when (val expr = arguments.expressions[0]) {
             is PsiLiteral -> true
             is PsiReference -> (expr.resolve() as? PsiVariable)?.computeConstantValue() != null
             else -> false
@@ -71,13 +71,14 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
 
         override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
             if (isConstantStringMethodCall(expression)) {
-                val method = expression.resolveMethod()
-                if (method != null && target.match(
-                    method,
-                    QualifiedMember.resolveQualifier(expression.methodExpression) ?: targetClass
-                )
-                ) {
-                    addResult(expression)
+                expression.resolveMethod()?.let { method ->
+                    val matches = target.match(
+                        method,
+                        QualifiedMember.resolveQualifier(expression.methodExpression) ?: targetClass
+                    )
+                    if (matches) {
+                        addResult(expression)
+                    }
                 }
             }
 

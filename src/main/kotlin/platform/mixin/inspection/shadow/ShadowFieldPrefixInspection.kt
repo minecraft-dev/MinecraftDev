@@ -48,7 +48,8 @@ class ShadowFieldPrefixInspection : MixinInspection() {
             val fieldName = field.name
             if (fieldName.startsWith(DEFAULT_SHADOW_PREFIX)) {
                 holder.registerProblem(
-                    field.nameIdentifier, "Cannot use prefix for @Shadow fields",
+                    field.nameIdentifier,
+                    "Cannot use prefix for @Shadow fields",
                     QuickFixFactory.getInstance().createRenameElementFix(
                         field,
                         fieldName.removePrefix(DEFAULT_SHADOW_PREFIX)
