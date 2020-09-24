@@ -53,7 +53,8 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                         if (static && !modifiers.hasModifierProperty(PsiModifier.STATIC)) {
                             reportedStatic = true
                             holder.registerProblem(
-                                identifier, "Method must be static",
+                                identifier,
+                                "Method must be static",
                                 QuickFixFactory.getInstance().createModifierListFix(
                                     modifiers,
                                     PsiModifier.STATIC,

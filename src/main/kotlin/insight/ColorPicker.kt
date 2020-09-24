@@ -57,12 +57,14 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) 
             val icon = ColorIcon(28, entry.value, true)
 
             val label = JLabel(icon)
-            label.addMouseListener(object : MouseAdapter() {
-                override fun mouseClicked(e: MouseEvent?) {
-                    chosenColor = entry.key
-                    dialog.close(0)
+            label.addMouseListener(
+                object : MouseAdapter() {
+                    override fun mouseClicked(e: MouseEvent?) {
+                        chosenColor = entry.key
+                        dialog.close(0)
+                    }
                 }
-            })
+            )
 
             val constraints = GridBagConstraints()
             constraints.gridy = row

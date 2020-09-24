@@ -46,7 +46,8 @@ class AccessorTargetInspection : MixinInspection() {
                 val name = getAccessorInfo(annotation, member)?.name ?: return
 
                 holder.registerProblem(
-                    annotation, "Cannot resolve member '$name' in target class",
+                    annotation,
+                    "Cannot resolve member '$name' in target class",
                     RemoveAnnotationQuickFix(annotation, member)
                 )
             }

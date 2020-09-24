@@ -118,22 +118,24 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
             }
         }
 
-        modNameField.document.addDocumentListener(object : DocumentAdapter() {
-            override fun textChanged(e: DocumentEvent) {
-                if (mainClassModified) {
-                    return
+        modNameField.document.addDocumentListener(
+            object : DocumentAdapter() {
+                override fun textChanged(e: DocumentEvent) {
+                    if (mainClassModified) {
+                        return
+                    }
+
+                    val word = modNameField.text.split(Regex("\\s+")).joinToString("") { WordUtils.capitalize(it) }
+
+                    val mainClassWords = mainClassField.text.split('.').toTypedArray()
+                    mainClassWords[mainClassWords.size - 1] = LITEMOD + word
+
+                    mainClassField.document.removeDocumentListener(listener)
+                    mainClassField.text = mainClassWords.joinToString(".")
+                    mainClassField.document.addDocumentListener(listener)
                 }
-
-                val word = modNameField.text.split(Regex("\\s+")).joinToString("") { WordUtils.capitalize(it) }
-
-                val mainClassWords = mainClassField.text.split('.').toTypedArray()
-                mainClassWords[mainClassWords.size - 1] = LITEMOD + word
-
-                mainClassField.document.removeDocumentListener(listener)
-                mainClassField.text = mainClassWords.joinToString(".")
-                mainClassField.document.addDocumentListener(listener)
             }
-        })
+        )
 
         mainClassField.document.addDocumentListener(listener)
     }

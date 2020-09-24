@@ -24,9 +24,9 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.21"
+    id("org.jetbrains.intellij") version "0.4.26"
     id("net.minecrell.licenser") version "0.4.1"
-    id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
+    id("org.jlleitschuh.gradle.ktlint") version "9.4.0"
 }
 
 val coroutineVersion = "1.2.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
@@ -109,9 +109,13 @@ intellij {
     version = ideaVersion
     // Bundled plugin dependencies
     setPlugins(
-        "java", "maven", "gradle", "Groovy",
+        "java",
+        "maven",
+        "gradle",
+        "Groovy",
         // needed dependencies for unit tests
-        "properties", "junit",
+        "properties",
+        "junit",
         // useful to have when running for mods.toml
         "org.toml.lang:0.2.111.34-193"
     )

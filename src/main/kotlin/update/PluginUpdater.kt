@@ -15,7 +15,7 @@ import com.demonwav.mcdev.util.forEachNotNull
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.invokeLaterAny
 import com.intellij.ide.plugins.IdeaPluginDescriptor
-import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.ide.plugins.PluginManagerMain
 import com.intellij.ide.plugins.PluginNode
 import com.intellij.ide.plugins.RepositoryHelper
@@ -82,7 +82,7 @@ object PluginUpdater {
         val newVersion = responseDoc.getChild("category")?.getChild("idea-plugin")?.getChild("version")?.text
             ?: return PluginUpdateStatus.CheckFailed("Couldn't find plugin version in repository response")
 
-        val plugin = PluginManager.getPlugin(PluginUtil.PLUGIN_ID)!!
+        val plugin = PluginManagerCore.getPlugin(PluginUtil.PLUGIN_ID)!!
         val pluginNode = PluginNode(PluginUtil.PLUGIN_ID)
         pluginNode.version = newVersion
         pluginNode.name = plugin.name
@@ -118,25 +118,27 @@ object PluginUpdater {
     fun installPluginUpdate(update: PluginUpdateStatus.Update) {
         val plugin = update.pluginDescriptor
         val downloader = PluginDownloader.createDownloader(plugin, update.hostToInstallFrom, null)
-        ProgressManager.getInstance().run(object : Task.Backgroundable(null, "Downloading Plugin", true) {
-            override fun run(indicator: ProgressIndicator) {
-                try {
-                    val status = downloader.prepareToInstall(indicator)
-                    // If the download failed, quit
-                    // But otherwise force the install
-                    if (!status && downloader.findDeclaredField("myFile") == null) {
-                        return
-                    }
+        ProgressManager.getInstance().run(
+            object : Task.Backgroundable(null, "Downloading plugin", true) {
+                override fun run(indicator: ProgressIndicator) {
+                    try {
+                        val status = downloader.prepareToInstall(indicator)
+                        // If the download failed, quit
+                        // But otherwise force the install
+                        if (!status && downloader.findDeclaredField("myFile") == null) {
+                            return
+                        }
 
-                    downloader.install()
+                        downloader.install()
 
-                    invokeLater {
-                        PluginManagerMain.notifyPluginsUpdated(null)
+                        invokeLater {
+                            PluginManagerMain.notifyPluginsUpdated(null)
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
                     }
-                } catch (e: IOException) {
-                    e.printStackTrace()
                 }
             }
-        })
+        )
     }
 }

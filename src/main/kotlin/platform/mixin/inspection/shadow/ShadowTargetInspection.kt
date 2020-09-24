@@ -49,7 +49,8 @@ class ShadowTargetInspection : MixinInspection() {
 
             // TODO Write quick fix and apply it for OverwriteTargetInspection and ShadowTargetInspection
             holder.registerProblem(
-                annotation, "Cannot resolve member '${member.name}' in target class",
+                annotation,
+                "Cannot resolve member '${member.name}' in target class",
                 RemoveAnnotationQuickFix(annotation, member)
             )
         }

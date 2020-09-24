@@ -46,7 +46,8 @@ class InvokerTargetInspection : MixinInspection() {
                 val name = getInvokerTargetName(annotation, member) ?: return
 
                 holder.registerProblem(
-                    annotation, "Cannot resolve member '$name' in target class",
+                    annotation,
+                    "Cannot resolve member '$name' in target class",
                     RemoveAnnotationQuickFix(annotation, member)
                 )
             }

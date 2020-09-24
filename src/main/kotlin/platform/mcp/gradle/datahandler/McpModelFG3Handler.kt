@@ -72,17 +72,19 @@ object McpModelFG3Handler : McpModelDataHandler {
                 task.insert(0, ':')
             }
 
-            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Generating SRG map", false) {
-                override fun run(indicator: ProgressIndicator) {
-                    indicator.isIndeterminate = true
+            ProgressManager.getInstance().run(
+                object : Task.Backgroundable(project, "Generating SRG map", false) {
+                    override fun run(indicator: ProgressIndicator) {
+                        indicator.isIndeterminate = true
 
-                    indicator.text = "Creating SRG map"
-                    indicator.text2 = "Running Gradle task: '${data.taskName}'"
-                    runGradleTask(project, gradleProject.projectDirectory.toPath()) { settings ->
-                        settings.taskNames = listOf(data.taskName)
+                        indicator.text = "Creating SRG map"
+                        indicator.text2 = "Running Gradle task: '${data.taskName}'"
+                        runGradleTask(project, gradleProject.projectDirectory.toPath()) { settings ->
+                            settings.taskNames = listOf(data.taskName)
+                        }
                     }
                 }
-            })
+            )
         }
 
         return McpModelData(module, state)

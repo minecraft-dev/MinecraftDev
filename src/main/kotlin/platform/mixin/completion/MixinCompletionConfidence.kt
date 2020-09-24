@@ -24,7 +24,8 @@ class MixinCompletionConfidence : CompletionConfidence() {
 
     private val mixinAnnotation = PlatformPatterns.psiElement()
         .inside(
-            false, PsiJavaPatterns.psiAnnotation().qName(StandardPatterns.string().startsWith(MixinConstants.PACKAGE)),
+            false,
+            PsiJavaPatterns.psiAnnotation().qName(StandardPatterns.string().startsWith(MixinConstants.PACKAGE)),
             PlatformPatterns.psiFile()
         )!!
 

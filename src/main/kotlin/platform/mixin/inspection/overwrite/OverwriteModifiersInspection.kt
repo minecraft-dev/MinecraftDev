@@ -69,7 +69,8 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                 }
 
                 holder.registerProblem(
-                    marker, message,
+                    marker,
+                    message,
                     QuickFixFactory.getInstance().createModifierListFix(modifierList, modifier, targetModifier, false)
                 )
             }
@@ -80,7 +81,8 @@ class OverwriteModifiersInspection : OverwriteInspection() {
             val overwriteAnnotation = modifierList.findAnnotation(qualifiedName)
             if (overwriteAnnotation == null) {
                 holder.registerProblem(
-                    nameIdentifier, "Missing @${annotation.nameReferenceElement?.text} annotation",
+                    nameIdentifier,
+                    "Missing @${annotation.nameReferenceElement?.text} annotation",
                     AddAnnotationFix(qualifiedName, method, annotation.parameterList.attributes)
                 )
             }

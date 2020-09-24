@@ -30,7 +30,7 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
         checkOnly: Boolean
     ): CollectVisitor<PsiReferenceExpression>? {
         return MixinMemberReference.parse(context.constantStringValue)
-            ?.let({ FindUsagesVisitor(targetClass, it, checkOnly) })
+            ?.let { FindUsagesVisitor(targetClass, it, checkOnly) }
     }
 
     override fun createCollectUsagesVisitor(): CollectVisitor<QualifiedMember<PsiField>> = CollectUsagesVisitor()
@@ -55,13 +55,14 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
             if (expression !is PsiMethodReferenceExpression) {
                 // TODO: Optimize this so we don't need to resolve all fields to find a reference
-                val resolved = expression.resolve()
-                if (resolved is PsiField && target.match(
-                    resolved,
-                    QualifiedMember.resolveQualifier(expression) ?: targetClass
-                )
-                ) {
-                    addResult(expression)
+                (expression.resolve() as? PsiField)?.let { resolved ->
+                    val matches = target.match(
+                        resolved,
+                        QualifiedMember.resolveQualifier(expression) ?: targetClass
+                    )
+                    if (matches) {
+                        addResult(expression)
+                    }
                 }
             }
 

@@ -22,7 +22,10 @@ import com.intellij.psi.PsiMethod
 class ShadowOverwriteInspectionSuppressor : InspectionSuppressor {
 
     private val SUPPRESSED_INSPECTIONS = setOf(
-        "UnusedReturnValue", "SameParameterValue", "Guava", VisibilityInspection.SHORT_NAME,
+        "UnusedReturnValue",
+        "SameParameterValue",
+        "Guava",
+        VisibilityInspection.SHORT_NAME,
         "MethodMayBeStatic"
     )
 

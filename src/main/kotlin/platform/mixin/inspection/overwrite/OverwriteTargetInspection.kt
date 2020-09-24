@@ -35,7 +35,8 @@ class OverwriteTargetInspection : OverwriteInspection() {
 
         // TODO: Write quick fix and apply it for OverwriteTargetInspection and ShadowTargetInspection
         holder.registerProblem(
-            identifier, "Cannot resolve method '${method.name}' in target class",
+            identifier,
+            "Cannot resolve method '${method.name}' in target class",
             RemoveAnnotationQuickFix(overwrite, method)
         )
     }
