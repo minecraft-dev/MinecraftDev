@@ -107,7 +107,8 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
             ?.let { SemanticVersion.parse(it) }
         if (mcVersion != null && mcVersion >= ForgeModuleType.FG3_MC_VERSION) {
             return formatWrongEventMessage(
-                ForgeConstants.EVENTBUS_EVENT, ForgeConstants.EVENTBUS_SUBSCRIBE_EVENT_ANNOTATION,
+                ForgeConstants.EVENTBUS_EVENT,
+                ForgeConstants.EVENTBUS_SUBSCRIBE_EVENT_ANNOTATION,
                 ForgeConstants.EVENTBUS_EVENT == eventClass.qualifiedName
             )
         }
@@ -116,13 +117,15 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
 
         if (annotation != null) {
             return formatWrongEventMessage(
-                ForgeConstants.FML_EVENT, ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION,
+                ForgeConstants.FML_EVENT,
+                ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION,
                 ForgeConstants.EVENT == eventClass.qualifiedName
             )
         }
 
         return formatWrongEventMessage(
-            ForgeConstants.EVENT, ForgeConstants.EVENT_HANDLER_ANNOTATION,
+            ForgeConstants.EVENT,
+            ForgeConstants.EVENT_HANDLER_ANNOTATION,
             ForgeConstants.FML_EVENT == eventClass.qualifiedName
         )
     }

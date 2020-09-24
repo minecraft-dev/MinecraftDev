@@ -63,7 +63,8 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event 
             .createWithInnerClassesScopeChooser(
                 RefactoringBundle.message("choose.destination.class"),
                 GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(moduleForPsiElement, false),
-                { aClass1 -> isSuperEventListenerAllowed(aClass1, facet) }, null
+                { aClass1 -> isSuperEventListenerAllowed(aClass1, facet) },
+                null
             )
 
         chooser.showDialog()

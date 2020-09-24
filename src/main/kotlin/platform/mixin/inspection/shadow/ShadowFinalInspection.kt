@@ -38,7 +38,8 @@ class ShadowFinalInspection : MixinInspection() {
 
             if (modifiers.findAnnotation(FINAL) != null && modifiers.findAnnotation(MUTABLE) == null) {
                 holder.registerProblem(
-                    expression, "@Final fields cannot be modified",
+                    expression,
+                    "@Final fields cannot be modified",
                     AddAnnotationFix(MUTABLE, resolved)
                 )
             }

@@ -62,7 +62,8 @@ class ShadowModifiersInspection : MixinInspection() {
                 }
 
                 holder.registerProblem(
-                    shadowModifierList.findKeyword(PsiModifier.STATIC) ?: annotation, message,
+                    shadowModifierList.findKeyword(PsiModifier.STATIC) ?: annotation,
+                    message,
                     ProblemHighlightType.GENERIC_ERROR,
                     QuickFixFactory.getInstance().createModifierListFix(
                         shadowModifierList,
@@ -98,12 +99,14 @@ class ShadowModifiersInspection : MixinInspection() {
             if (targetFinal != (shadowFinal != null)) {
                 if (targetFinal) {
                     holder.registerProblem(
-                        annotation, "@Shadow for final member should be annotated as @Final",
+                        annotation,
+                        "@Shadow for final member should be annotated as @Final",
                         AddAnnotationFix(FINAL, member)
                     )
                 } else {
                     holder.registerProblem(
-                        shadowFinal!!, "Target method is not final",
+                        shadowFinal!!,
+                        "Target method is not final",
                         RemoveAnnotationQuickFix(shadowFinal, member)
                     )
                 }

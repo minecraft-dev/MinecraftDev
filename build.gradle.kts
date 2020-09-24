@@ -26,7 +26,7 @@ plugins {
     idea
     id("org.jetbrains.intellij") version "0.4.26"
     id("net.minecrell.licenser") version "0.4.1"
-    id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
+    id("org.jlleitschuh.gradle.ktlint") version "9.4.0"
 }
 
 val coroutineVersion = "1.3.9" // Coroutine version also kept in sync with IntelliJ's bundled dep
@@ -110,9 +110,14 @@ intellij {
     version = ideaVersion
     // Bundled plugin dependencies
     setPlugins(
-        "java", "maven", "gradle", "Groovy",
+        "java",
+        "maven",
+        "gradle",
+        "Groovy",
         // needed dependencies for unit tests
-        "properties", "junit", "repository-search"
+        "properties",
+        "junit",
+        "repository-search"
         // useful to have when running for mods.toml
         // "org.toml.lang:0.2.114.35-193"
     )

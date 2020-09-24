@@ -119,11 +119,13 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             model.getColumn(4).preferredWidth = (totalWidth * 0.2).toInt()
         }
         resizeColumns()
-        entryPointsTable.addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent?) {
-                resizeColumns()
+        entryPointsTable.addComponentListener(
+            object : ComponentAdapter() {
+                override fun componentResized(e: ComponentEvent?) {
+                    resizeColumns()
+                }
             }
-        })
+        )
         this.entryPointsTable = ToolbarDecorator.createDecorator(entryPointsTable).createPanel()
 
         licenseBox = ComboBox(CollectionComboBoxModel(enumValues<License>().toList()))

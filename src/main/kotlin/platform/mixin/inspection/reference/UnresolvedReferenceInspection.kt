@@ -63,7 +63,8 @@ class UnresolvedReferenceInspection : MixinInspection() {
         private fun checkResolved(resolver: MixinReference, value: PsiAnnotationMemberValue) {
             if (resolver.isUnresolved(value) && !value.isWithinDynamicMixin) {
                 holder.registerProblem(
-                    value, "Cannot resolve ${resolver.description}".format(value.constantStringValue),
+                    value,
+                    "Cannot resolve ${resolver.description}".format(value.constantStringValue),
                     ProblemHighlightType.LIKE_UNKNOWN_SYMBOL
                 )
             }

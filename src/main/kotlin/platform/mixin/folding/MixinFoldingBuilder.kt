@@ -53,13 +53,15 @@ class MixinFoldingBuilder : CustomFoldingBuilder() {
     private fun formatElement(element: PsiElement): String? {
         return when (element) {
             is PsiMethod -> PsiFormatUtil.formatMethod(
-                element, PsiSubstitutor.EMPTY,
+                element,
+                PsiSubstitutor.EMPTY,
                 PsiFormatUtilBase.SHOW_NAME or PsiFormatUtilBase.SHOW_PARAMETERS or SHOW_CONTAINING_CLASS,
                 PsiFormatUtilBase.SHOW_TYPE
             )
             is PsiVariable -> PsiFormatUtil.formatVariable(
                 element,
-                PsiFormatUtilBase.SHOW_NAME or SHOW_CONTAINING_CLASS, PsiSubstitutor.EMPTY
+                PsiFormatUtilBase.SHOW_NAME or SHOW_CONTAINING_CLASS,
+                PsiSubstitutor.EMPTY
             )
             is NavigationItem -> element.presentation?.presentableText
             else -> null

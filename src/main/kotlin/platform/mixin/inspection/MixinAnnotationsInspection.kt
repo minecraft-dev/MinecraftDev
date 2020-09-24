@@ -41,7 +41,8 @@ class MixinAnnotationsInspection : MixinInspection() {
                     ?: return
             if (!containingClass.isMixin) {
                 holder.registerProblem(
-                    annotation, "@${annotation.nameReferenceElement?.text} can be only used in a @Mixin class",
+                    annotation,
+                    "@${annotation.nameReferenceElement?.text} can be only used in a @Mixin class",
                     RemoveAnnotationQuickFix(annotation, null)
                 )
             }

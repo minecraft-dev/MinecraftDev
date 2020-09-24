@@ -51,50 +51,37 @@ fun PsiElement.findColor(): Pair<Color, PsiElement>? {
     val expressionList = methodCallExpression.argumentList
     val types = expressionList.expressionTypes
 
-    var pair: Pair<Color, PsiElement>? = null
-
-    // Single Integer Argument
-    if (types.size == 1 && types[0] == PsiType.INT && expressionList.expressions[0] is PsiLiteralExpression) {
-        try {
-            val expr = expressionList.expressions[0] as PsiLiteralExpression
-            pair = handleSingleArgument(expr) to expressionList.expressions[0]
-        } catch (ignored: Exception) {
+    when {
+        // Single Integer Argument
+        types.size == 1 && types[0] == PsiType.INT && expressionList.expressions[0] is PsiLiteralExpression -> {
+            try {
+                val expr = expressionList.expressions[0] as PsiLiteralExpression
+                return handleSingleArgument(expr) to expressionList.expressions[0]
+            } catch (ignored: Exception) {}
         }
-
         // Triple Integer Argument
-    } else if (types.size == 3 && types[0] == PsiType.INT && types[1] == PsiType.INT && types[2] == PsiType.INT) {
-        try {
-            pair = handleThreeArguments(expressionList) to expressionList
-        } catch (ignored: Exception) {
+        types.size == 3 && types[0] == PsiType.INT && types[1] == PsiType.INT && types[2] == PsiType.INT -> {
+            try {
+                return handleThreeArguments(expressionList) to expressionList
+            } catch (ignored: Exception) {}
         }
-
         // Single Vector3* Argument
-    } else if (types.size == 1 && (
-        types[0] == PsiType.getTypeByName(
-            "com.flowpowered.math.vector.Vector3i",
-            project,
-            GlobalSearchScope.allScope(project)
-        ) ||
-            types[0] == PsiType.getTypeByName(
-            "com.flowpowered.math.vector.Vector3f",
-            project,
-            GlobalSearchScope.allScope(project)
-        ) ||
-            types[0] == PsiType.getTypeByName(
-            "com.flowpowered.math.vector.Vector3d",
-            project,
-            GlobalSearchScope.allScope(project)
-        )
-        )
-    ) {
-        try {
-            pair =
-                handleVectorArgument(expressionList.expressions[0] as PsiNewExpression) to expressionList.expressions[0]
-        } catch (ignored: Exception) {
+        types.size == 1 -> {
+            val scope = GlobalSearchScope.allScope(project)
+            when (types[0]) {
+                PsiType.getTypeByName("com.flowpowered.math.vector.Vector3i", project, scope),
+                PsiType.getTypeByName("com.flowpowered.math.vector.Vector3f", project, scope),
+                PsiType.getTypeByName("com.flowpowered.math.vector.Vector3d", project, scope) -> {
+                    try {
+                        val color = handleVectorArgument(expressionList.expressions[0] as PsiNewExpression)
+                        return color to expressionList.expressions[0]
+                    } catch (ignored: Exception) {}
+                }
+            }
         }
     }
 
-    return pair
+    return null
 }
 
 private fun handleSingleArgument(expression: PsiLiteralExpression): Color {

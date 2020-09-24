@@ -398,7 +398,9 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
             val method = factory.createMethodFromText(
                 """
                 @${MixinConstants.Annotations.ACCESSOR}
-                ${staticPrefix(isStatic)}ReturnType $prefix${target.name.capitalize()}()${methodBody(isStatic)}
+                ${staticPrefix(isStatic)}ReturnType $prefix${target.name.capitalize()}()${methodBody(
+                    isStatic
+                )}
                 """.trimIndent(),
                 mixin
             )
@@ -409,7 +411,9 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
             val method = factory.createMethodFromText(
                 """
                 @${MixinConstants.Annotations.ACCESSOR}
-                ${staticPrefix(isStatic)}void set${target.name.capitalize()}(ParamType ${target.name})${methodBody(isStatic)}
+                ${staticPrefix(isStatic)}void set${target.name.capitalize()}(ParamType ${target.name})${methodBody(
+                    isStatic
+                )}
                 """.trimIndent(),
                 mixin
             )
@@ -436,7 +440,9 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
         val method = factory.createMethodFromText(
             """
             @${MixinConstants.Annotations.INVOKER}
-            ${staticPrefix(isStatic)}ReturnType $name()${methodBody(isStatic)}
+            ${staticPrefix(isStatic)}ReturnType $name()${methodBody(
+                isStatic
+            )}
             """.trimIndent(),
             mixin
         )
