@@ -87,6 +87,6 @@ class MinecraftClassCreateAction :
     }
 
     private companion object {
-        private const val CAPTION = "MinecraftDev"
+        private const val CAPTION = "Minecraft Class"
     }
 }
