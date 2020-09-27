@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2020 minecraft-dev
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.translations.lang.spellcheck
 
 import com.intellij.openapi.util.TextRange
