@@ -16,7 +16,7 @@ import com.intellij.spellchecker.inspections.IdentifierSplitter
 import com.intellij.util.Consumer
 
 object LangKeySplitter : BaseSplitter() {
-    override fun split(text: String?, range: TextRange, consumer: Consumer<TextRange>?) {
+    override fun split(text: String?, range: TextRange, consumer: Consumer<TextRange>) {
         if (text == null) {
             return
         }

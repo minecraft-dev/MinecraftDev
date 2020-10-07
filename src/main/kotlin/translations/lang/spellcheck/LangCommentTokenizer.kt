@@ -17,13 +17,13 @@ import com.intellij.spellchecker.tokenizer.TokenConsumer
 import com.intellij.spellchecker.tokenizer.Tokenizer
 
 class LangCommentTokenizer : Tokenizer<LeafPsiElement>() {
-    override fun tokenize(element: LeafPsiElement, consumer: TokenConsumer?) {
+    override fun tokenize(element: LeafPsiElement, consumer: TokenConsumer) {
         val text = element.text
         val startOffset = when {
             text.startsWith('#') -> 1
             else -> 0
         }
         val range = TextRange(startOffset, text.length)
-        consumer?.consumeToken(element, text, false, 0, range, PlainTextSplitter.getInstance())
+        consumer.consumeToken(element, text, false, 0, range, PlainTextSplitter.getInstance())
     }
 }
