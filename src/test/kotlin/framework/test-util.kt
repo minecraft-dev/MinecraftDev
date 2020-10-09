@@ -86,8 +86,8 @@ fun ProjectBuilderTest.testParser(basePath: String, func: ProjectBuilderFunc) {
 
 fun testInspectionFix(fixture: JavaCodeInsightTestFixture, basePath: String, fixName: String) {
     val caller = ReflectionUtil.getCallerClass(4)!!
-    val original = caller.getResource("$basePath.java").readText().trim()
-    val expected = caller.getResource("$basePath.after.java").readText().trim()
+    val original = caller.getResource("$basePath.java").readText().trim().lineSequence().joinToString("\n")
+    val expected = caller.getResource("$basePath.after.java").readText().trim().lineSequence().joinToString("\n")
 
     fixture.configureByText(JavaFileType.INSTANCE, original)
     val intention = fixture.findSingleIntention(fixName)
