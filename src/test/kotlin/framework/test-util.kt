@@ -12,6 +12,7 @@
 
 package com.demonwav.mcdev.framework
 
+import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.OrderRootType
@@ -24,6 +25,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import com.intellij.psi.impl.DebugUtil
 import com.intellij.testFramework.LexerTestCase
+import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture
 import com.intellij.util.ReflectionUtil
 import org.junit.jupiter.api.Assertions
 
@@ -80,4 +82,15 @@ fun ProjectBuilderTest.testParser(basePath: String, func: ProjectBuilderFunc) {
     val expectedLines = expected.lineSequence().filter { it.isNotBlank() }.toList()
     val actualLines = actual.lineSequence().filter { it.isNotBlank() }.toList()
     Assertions.assertLinesMatch(expectedLines, actualLines)
+}
+
+fun testInspectionFix(fixture: JavaCodeInsightTestFixture, basePath: String, fixName: String) {
+    val caller = ReflectionUtil.getCallerClass(4)!!
+    val original = caller.getResource("$basePath.java").readText().trim()
+    val expected = caller.getResource("$basePath.after.java").readText().trim()
+
+    fixture.configureByText(JavaFileType.INSTANCE, original)
+    val intention = fixture.findSingleIntention(fixName)
+    fixture.launchAction(intention)
+    fixture.checkResult(expected)
 }
