@@ -12,6 +12,8 @@ package com.demonwav.mcdev.platform.mixin.inspection.injector
 
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.isErasureEquivalentTo
 import com.demonwav.mcdev.util.synchronize
 import com.intellij.codeInsight.intention.QuickFixFactory
@@ -21,9 +23,11 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
+import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.codeStyle.VariableKind
@@ -79,7 +83,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                             holder.registerProblem(
                                 parameters,
                                 "Method parameters do not match expected parameters for ${type.annotationName}",
-                                createMethodParametersFix(parameters, expectedParameters)
+                                ParametersQuickFix(expectedParameters)
                             )
                         }
 
@@ -97,14 +101,6 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                     }
                 }
             }
-        }
-
-        private fun createMethodParametersFix(
-            parameters: PsiParameterList,
-            expected: List<ParameterGroup>
-        ): LocalQuickFix? {
-            // TODO: Someone should improve this: Right now we can only automatically fix if the parameters are empty
-            return if (parameters.parametersCount == 0) ParametersQuickFix(expected) else null
         }
 
         private fun checkParameters(parameterList: PsiParameterList, expected: List<ParameterGroup>): Boolean {
@@ -130,22 +126,30 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val parameters = descriptor.psiElement as PsiParameterList
-            parameters.synchronize(
-                expected.flatMap {
-                    if (it.default) {
-                        it.parameters?.map {
-                            JavaPsiFacade.getElementFactory(project).createParameter(
-                                it.name ?: JavaCodeStyleManager.getInstance(project)
-                                    .suggestVariableName(VariableKind.PARAMETER, null, null, it.type).names
-                                    .firstOrNull() ?: "unknown",
-                                it.type
-                            )
-                        } ?: listOf()
-                    } else {
-                        listOf()
-                    }
+            // We want to preserve captured locals
+            val locals = parameters.parameters.dropWhile {
+                val type = it.type as? PsiClassType ?: return@dropWhile true
+                val fqname = type.fullQualifiedName ?: return@dropWhile true
+                return@dropWhile fqname != MixinConstants.Classes.CALLBACK_INFO &&
+                    fqname != MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
+            }.drop(1) // the first element in the list is the CallbackInfo but we don't want it
+            val newParams = expected.flatMapTo(mutableListOf<PsiParameter>()) {
+                if (it.default) {
+                    it.parameters?.map {
+                        JavaPsiFacade.getElementFactory(project).createParameter(
+                            it.name ?: JavaCodeStyleManager.getInstance(project)
+                                .suggestVariableName(VariableKind.PARAMETER, null, null, it.type).names
+                                .firstOrNull() ?: "unknown",
+                            it.type
+                        )
+                    } ?: emptyList()
+                } else {
+                    emptyList()
                 }
-            )
+            }
+            // Restore the captured locals before applying the fix
+            newParams.addAll(locals)
+            parameters.synchronize(newParams)
         }
     }
 }

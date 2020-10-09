@@ -227,6 +227,7 @@ license {
     exclude(
         "com/demonwav/mcdev/platform/mcp/at/gen/**",
         "com/demonwav/mcdev/nbt/lang/gen/**",
+        "com/demonwav/mcdev/platform/mixin/invalidInjectorMethodSignature/*.java",
         "com/demonwav/mcdev/translations/lang/gen/**"
     )
 
