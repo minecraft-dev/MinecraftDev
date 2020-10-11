@@ -83,7 +83,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                             holder.registerProblem(
                                 parameters,
                                 "Method parameters do not match expected parameters for ${type.annotationName}",
-                                ParametersQuickFix(expectedParameters)
+                                ParametersQuickFix(expectedParameters, type)
                             )
                         }
 
@@ -120,9 +120,17 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
         }
     }
 
-    private class ParametersQuickFix(private val expected: List<ParameterGroup>) : LocalQuickFix {
+    private class ParametersQuickFix(
+        private val expected: List<ParameterGroup>,
+        injectorType: InjectorType
+    ) : LocalQuickFix {
 
-        override fun getFamilyName() = "Fix method parameters"
+        private val fixName = when (injectorType) {
+            InjectorType.INJECT -> "Fix method parameters"
+            else -> "Fix method parameters (won't keep captured locals)"
+        }
+
+        override fun getFamilyName() = fixName
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val parameters = descriptor.psiElement as PsiParameterList
