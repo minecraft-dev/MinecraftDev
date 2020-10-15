@@ -24,6 +24,8 @@
       LiteLoader projects to Intellij IDEA.
     ]]></description>
 
+    <resource-bundle>messages.MinecraftDevelopment</resource-bundle>
+
     <change-notes><![CDATA[
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
     ]]>
@@ -792,9 +794,7 @@
 
     <actions>
         <action class="com.demonwav.mcdev.insight.generation.GenerateEventListenerAction"
-                id="GenerateEventListener"
-                text="Event Listener"
-                description="Generates a new Event Listener for the appropriate platform">
+                id="GenerateEventListener">
             <add-to-group group-id="GenerateGroup" anchor="last"/>
         </action>
 
