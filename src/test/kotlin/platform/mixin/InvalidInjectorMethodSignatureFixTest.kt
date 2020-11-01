@@ -79,4 +79,8 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
     @Test
     @DisplayName("Inner ctor with locals")
     fun innerCtorWithLocals() = doTest("innerCtorWithLocals")
+
+    @Test
+    @DisplayName("Inject without CallbackInfo")
+    fun injectWithoutCI() = doTest("injectWithoutCI")
 }

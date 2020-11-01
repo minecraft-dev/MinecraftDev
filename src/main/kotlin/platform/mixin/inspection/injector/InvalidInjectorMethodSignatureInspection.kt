@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.injector
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.isErasureEquivalentTo
 import com.demonwav.mcdev.util.synchronize
@@ -136,19 +137,18 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             val parameters = descriptor.psiElement as PsiParameterList
             // We want to preserve captured locals
             val locals = parameters.parameters.dropWhile {
-                val type = it.type as? PsiClassType ?: return@dropWhile true
-                val fqname = type.fullQualifiedName ?: return@dropWhile true
+                val fqname = (it.type as? PsiClassType)?.fullQualifiedName ?: return@dropWhile true
                 return@dropWhile fqname != MixinConstants.Classes.CALLBACK_INFO &&
                     fqname != MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
             }.drop(1) // the first element in the list is the CallbackInfo but we don't want it
             val newParams = expected.flatMapTo(mutableListOf<PsiParameter>()) {
                 if (it.default) {
-                    it.parameters?.map {
+                    it.parameters?.mapIndexed { i: Int, p: Parameter ->
                         JavaPsiFacade.getElementFactory(project).createParameter(
-                            it.name ?: JavaCodeStyleManager.getInstance(project)
-                                .suggestVariableName(VariableKind.PARAMETER, null, null, it.type).names
-                                .firstOrNull() ?: "unknown",
-                            it.type
+                            p.name ?: JavaCodeStyleManager.getInstance(project)
+                                .suggestVariableName(VariableKind.PARAMETER, null, null, p.type).names
+                                .firstOrNull() ?: "var$i",
+                            p.type
                         )
                     } ?: emptyList()
                 } else {
