@@ -34,7 +34,9 @@ import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes
 class MinecraftClassCreateAction :
     CreateTemplateInPackageAction<PsiClass>(
         CAPTION,
-        "Class generation for modders", GeneralAssets.MC_TEMPLATE, JavaModuleSourceRootTypes.SOURCES
+        "Class generation for modders",
+        GeneralAssets.MC_TEMPLATE,
+        JavaModuleSourceRootTypes.SOURCES
     ),
     DumbAware {
 
