@@ -114,6 +114,7 @@
         <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.translations.TranslationFoldingBuilder"/>
         <lang.formatter language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.formatting.LangFormattingModelBuilder"/>
         <lang.commenter language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.LangCommenter" />
+        <spellchecker.support language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.spellcheck.LangSpellcheckingStrategy"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.translations.reference.JavaReferenceContributor"/>
         <psi.referenceContributor language="MCLang" implementation="com.demonwav.mcdev.translations.reference.LangReferenceContributor"/>
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.translations.reference.JsonReferenceContributor"/>
