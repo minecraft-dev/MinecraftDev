@@ -12,36 +12,30 @@ package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiIdentifier
-import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiModifier
-import com.intellij.psi.PsiParameter
-import com.intellij.psi.impl.source.PsiClassReferenceType
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.UParameter
+import org.jetbrains.uast.toUElementOfType
 
-val PsiElement.eventListener: Pair<PsiClass, PsiMethod>?
+val UElement.uastEventListener: Pair<UClass, UMethod>?
     get() {
-        // Since we want to line up with the method declaration, not the annotation
-        // declaration, we need to target identifiers, not just PsiMethods.
-        if (!(this is PsiIdentifier && this.getParent() is PsiMethod)) {
-            return null
-        }
         // The PsiIdentifier is going to be a method of course!
-        val method = this.getParent() as PsiMethod
-        if (method.hasModifierProperty(PsiModifier.ABSTRACT)) {
+        val method = this.uastParent as? UMethod ?: return null
+        if (method.javaPsi.hasModifierProperty(PsiModifier.ABSTRACT)) {
             // I don't think any implementation allows for abstract method listeners.
             return null
         }
-        val modifierList = method.modifierList
-        val module = ModuleUtilCore.findModuleForPsiElement(this) ?: return null
+        val module = ModuleUtilCore.findModuleForPsiElement(this.sourcePsi ?: return null) ?: return null
         val instance = MinecraftFacet.getInstance(module) ?: return null
         // Since each platform has their own valid listener annotations,
         // some platforms may have multiple allowed annotations for various cases
         val listenerAnnotations = instance.types.flatMap { it.listenerAnnotations }
         var contains = false
         for (listenerAnnotation in listenerAnnotations) {
-            if (modifierList.findAnnotation(listenerAnnotation) != null) {
+            if (method.findAnnotation(listenerAnnotation) != null) {
                 contains = true
                 break
             }
@@ -49,29 +43,25 @@ val PsiElement.eventListener: Pair<PsiClass, PsiMethod>?
         if (!contains) {
             return null
         }
-        val (_, resolve) = method.eventParameterPair ?: return null
+        val (_, resolve) = method.uastEventParameterPair ?: return null
 
-        if (!instance.isStaticListenerSupported(method) && method.hasModifierProperty(PsiModifier.STATIC)) {
+        if (!instance.isStaticListenerSupported(method.javaPsi) && method.isStatic) {
             return null
         }
 
         return resolve to method
     }
 
-val PsiMethod.eventParameterPair: Pair<PsiParameter, PsiClass>?
+val UMethod.uastEventParameterPair: Pair<UParameter, UClass>?
     get() {
-        val parameters = this.parameterList.parameters
-        if (parameters.isEmpty()) {
-            return null
-        }
-        val psiParameter = parameters[0] // Listeners must have at least a single parameter
-            ?: return null
+        val firstParameter = this.uastParameters.firstOrNull()
+            ?: return null // Listeners must have at least a single parameter
         // Get the type of the parameter so we can start resolving it
-        val psiEventElement = psiParameter.typeElement ?: return null
-        val type = psiEventElement.type as? PsiClassReferenceType ?: return null
+        @Suppress("UElementAsPsi") // UVariable overrides getType so it should be fine to use on UElements...
+        val type = firstParameter.type as? PsiClassType ?: return null
         // Validate that it is a class reference type
         // And again, make sure that we can at least resolve the type, otherwise it's not a valid
         // class reference.
-        val resolve = type.resolve() ?: return null
-        return psiParameter to resolve
+        val resolve = type.resolve()?.toUElementOfType<UClass>() ?: return null
+        return firstParameter to resolve
     }

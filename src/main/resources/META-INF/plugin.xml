@@ -68,8 +68,8 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.insight.PluginLineMarkerProvider"/>
 
         <!-- Project-independent Annotators-->
-        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
-        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.insight.ColorAnnotator"/>
+        <annotator language="UAST" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
+        <annotator language="UAST" implementationClass="com.demonwav.mcdev.insight.ColorAnnotator"/>
 
         <!-- Project-independent Inspection Suppressors -->
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.inspection.StaticListenerInspectionSuppressor"/>
@@ -176,7 +176,7 @@
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.sponge.insight.SpongeImplicitUsageProvider" />
 
         <!-- Sponge Annotator -->
-        <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
+        <annotator language="UAST" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
 
         <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.completion.SpongeGetterFilterCompletionContributor" />
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.sponge.reference.SpongeReferenceContributor" />

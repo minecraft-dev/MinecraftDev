@@ -15,6 +15,9 @@ import com.demonwav.mcdev.platform.adventure.AdventureConstants
 import com.demonwav.mcdev.platform.adventure.AdventureModuleType
 import com.intellij.psi.PsiElement
 import java.awt.Color
+import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UIdentifier
+import org.jetbrains.uast.toUElementOfType
 
-fun PsiElement.findAdventureColor(): Pair<Color, PsiElement>? =
-    findColor(AdventureModuleType, AdventureConstants.TEXT_COLOR_CLASS, null)
+fun PsiElement.findAdventureColor(): Pair<Color, UElement>? =
+    this.toUElementOfType<UIdentifier>()?.findColor(AdventureModuleType, AdventureConstants.TEXT_COLOR_CLASS, null)
