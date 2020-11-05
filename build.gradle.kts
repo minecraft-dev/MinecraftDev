@@ -35,6 +35,7 @@ val ideaVersion: String by project
 val ideaVersionName: String by project
 val coreVersion: String by project
 val downloadIdeaSources: String by project
+val pluginTomlVersion: String by project
 
 // configurations
 val idea by configurations
@@ -116,8 +117,7 @@ intellij {
         // needed dependencies for unit tests
         "properties",
         "junit",
-        // useful to have when running for mods.toml
-        "org.toml.lang:0.2.111.34-193"
+        "org.toml.lang:$pluginTomlVersion"
     )
 
     pluginName = "Minecraft Development"

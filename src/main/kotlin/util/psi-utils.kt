@@ -42,6 +42,7 @@ import com.intellij.psi.ResolveResult
 import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import com.siyeh.ig.psiutils.ImportUtils
@@ -59,6 +60,11 @@ fun PsiElement.findReferencedMember(): PsiMember? = findParent({ it is PsiClass 
 fun PsiElement.findContainingMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = false)
 
 fun PsiElement.findContainingMethod(): PsiMethod? = findParent({ it is PsiClass }, resolveReferences = false)
+
+private val PsiElement.ancestors: Sequence<PsiElement>
+    get() = generateSequence(this) { if (it is PsiFile) null else it.parent }
+
+fun PsiElement.isAncestorOf(child: PsiElement): Boolean = child.ancestors.contains(this)
 
 private inline fun <reified T : PsiElement> PsiElement.findParent(resolveReferences: Boolean): T? {
     return findParent({ false }, resolveReferences)
@@ -140,6 +146,9 @@ inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElem
         child = child.nextSibling ?: return lastChild
     }
 }
+
+inline fun <reified T : PsiElement> PsiElement.childrenOfType(): Collection<T> =
+    PsiTreeUtil.findChildrenOfType(this, T::class.java)
 
 fun <T : Any> Sequence<T>.filter(filter: ElementFilter?, context: PsiElement): Sequence<T> {
     filter ?: return this
