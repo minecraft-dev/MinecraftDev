@@ -1,0 +1,7 @@
+[[mods]]
+modId="declared_mod_1"
+
+[[mods]]
+modId="declared_mod_2"
+
+[[dependencies.<caret>]]

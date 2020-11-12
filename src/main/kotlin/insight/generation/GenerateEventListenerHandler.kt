@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.insight.generation
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationDialog
 import com.demonwav.mcdev.platform.AbstractModule
@@ -37,7 +38,7 @@ import com.intellij.refactoring.RefactoringBundle
  * Note that this is a psuedo generator as it relies on a wizard and the
  * [.cleanup] to complete
  */
-class GenerateEventListenerHandler : GenerateMembersHandlerBase("Generate Event Listener") {
+class GenerateEventListenerHandler : GenerateMembersHandlerBase(MCDevBundle.message("generate.event_listener.title")) {
 
     private data class GenerateData(
         var editor: Editor,

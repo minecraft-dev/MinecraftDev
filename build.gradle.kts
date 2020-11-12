@@ -24,9 +24,9 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.4.26"
+    id("org.jetbrains.intellij") version "0.6.3"
     id("net.minecrell.licenser") version "0.4.1"
-    id("org.jlleitschuh.gradle.ktlint") version "9.4.0"
+    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
 }
 
 val coroutineVersion = "1.3.4" // Coroutine version also kept in sync with IntelliJ's bundled dep
@@ -35,6 +35,7 @@ val ideaVersion: String by project
 val ideaVersionName: String by project
 val coreVersion: String by project
 val downloadIdeaSources: String by project
+val pluginTomlVersion: String by project
 
 // configurations
 val idea by configurations
@@ -116,9 +117,7 @@ intellij {
         // needed dependencies for unit tests
         "properties",
         "junit",
-        "repository-search",
-        // useful to have when running for mods.toml
-        "org.toml.lang:0.2.114.35-193"
+        "org.toml.lang:$pluginTomlVersion"
     )
 
     pluginName = "Minecraft Development"
@@ -228,6 +227,7 @@ license {
     exclude(
         "com/demonwav/mcdev/platform/mcp/at/gen/**",
         "com/demonwav/mcdev/nbt/lang/gen/**",
+        "com/demonwav/mcdev/platform/mixin/invalidInjectorMethodSignature/*.java",
         "com/demonwav/mcdev/translations/lang/gen/**"
     )
 
@@ -302,4 +302,7 @@ tasks.runIde {
         systemProperty("idea.ProcessCanceledException", "disabled")
         systemProperty("idea.debug.mode", "true")
     }
+    // Set these properties to test different languages
+    // systemProperty("user.language", "en")
+    // systemProperty("user.country", "US")
 }
