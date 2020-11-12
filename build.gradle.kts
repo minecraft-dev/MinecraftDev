@@ -69,7 +69,6 @@ repositories {
     maven("https://repo.spongepowered.org/maven")
     maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
     maven("https://repo.gradle.org/gradle/libs-releases-local/")
-    maven("https://www.jetbrains.com/intellij-repository/snapshots")
     maven("https://maven.extracraftx.com")
 }
 
