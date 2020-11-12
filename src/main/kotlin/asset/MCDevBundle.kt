@@ -10,14 +10,14 @@
 
 package com.demonwav.mcdev.asset
 
-import com.intellij.AbstractBundle
+import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
 private const val BUNDLE = "messages.MinecraftDevelopment"
 
-object MCDevBundle : AbstractBundle(BUNDLE) {
+object MCDevBundle : DynamicBundle(BUNDLE) {
 
     fun message(@PropertyKey(resourceBundle = BUNDLE) key: String): String {
         return getMessage(key)
