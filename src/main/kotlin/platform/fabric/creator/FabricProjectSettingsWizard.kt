@@ -101,6 +101,7 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
 
     init {
         yarnWarning.isVisible = false
+        errorLabel.isVisible = false
     }
 
     fun createUIComponents() {

@@ -14,6 +14,7 @@
     <depends>org.jetbrains.idea.maven</depends>
     <depends>com.intellij.gradle</depends>
     <depends>org.intellij.groovy</depends>
+    <depends optional="true" config-file="toml-support.xml">org.toml.lang</depends>
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
@@ -23,6 +24,8 @@
       Brings support for Bukkit, Spigot, Paper, Sponge, Forge, Fabric, MCP, Mixins, Velocity, BungeeCord, Waterfall, and
       LiteLoader projects to Intellij IDEA.
     ]]></description>
+
+    <resource-bundle>messages.MinecraftDevelopment</resource-bundle>
 
     <change-notes><![CDATA[
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
@@ -115,6 +118,7 @@
         <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.translations.TranslationFoldingBuilder"/>
         <lang.formatter language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.formatting.LangFormattingModelBuilder"/>
         <lang.commenter language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.LangCommenter" />
+        <spellchecker.support language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.spellcheck.LangSpellcheckingStrategy"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.translations.reference.JavaReferenceContributor"/>
         <psi.referenceContributor language="MCLang" implementation="com.demonwav.mcdev.translations.reference.LangReferenceContributor"/>
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.translations.reference.JsonReferenceContributor"/>
@@ -487,6 +491,14 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationsInspection"/>
+        <localInspection displayName="Callback cancellation in non-cancellable @Inject"
+                         shortName="CancelInNotCancellableInjection"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinCancellableInspection"/>
         <localInspection displayName="Invalid @Mixin Target"
                          shortName="InvalidMixinTarget"
                          groupName="Mixin"
@@ -781,9 +793,7 @@
 
     <actions>
         <action class="com.demonwav.mcdev.insight.generation.GenerateEventListenerAction"
-                id="GenerateEventListener"
-                text="Event Listener"
-                description="Generates a new Event Listener for the appropriate platform">
+                id="GenerateEventListener">
             <add-to-group group-id="GenerateGroup" anchor="last"/>
         </action>
 
@@ -854,6 +864,10 @@
                 text="Sort Translations by Specified Order"
                 description="Sorts translations by specified order">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+        </action>
+        <action class="com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction" id="CreateMinecraftClass"
+                text="Minecraft Class" description="Create skeleton classes used in Minecraft Mods">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
         </action>
     </actions>
 </idea-plugin>

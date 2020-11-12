@@ -1,0 +1,27 @@
+<!--
+    Minecraft Dev for IntelliJ
+
+    https://minecraftdev.org
+
+    Copyright (c) 2020 minecraft-dev
+
+    MIT License
+-->
+
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <completion.contributor language="TOML"
+                                implementationClass="com.demonwav.mcdev.toml.platform.forge.completion.ModsTomlCompletionContributor"/>
+        <lang.documentationProvider language="TOML"
+                                    implementationClass="com.demonwav.mcdev.toml.platform.forge.ModsTomlDocumentationProvider"/>
+        <psi.referenceContributor language="TOML"
+                                  implementation="com.demonwav.mcdev.toml.platform.forge.reference.ModsTomlReferenceContributor"/>
+        <localInspection displayName="Forge's mods.toml validation"
+                         groupName="MinecraftForge"
+                         language="TOML"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.toml.platform.forge.inspections.ModsTomlValidationInspection"/>
+    </extensions>
+</idea-plugin>
