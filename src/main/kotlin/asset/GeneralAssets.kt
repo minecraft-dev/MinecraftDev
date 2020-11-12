@@ -14,4 +14,6 @@ package com.demonwav.mcdev.asset
 object GeneralAssets : Assets() {
     val LISTENER = loadIcon("/assets/icons/general/EventListener_dark.png")
     val PLUGIN = loadIcon("/assets/icons/general/plugin.png")
+
+    val MC_TEMPLATE = loadIcon("/assets/icons/general/MinecraftTemplate.png")
 }

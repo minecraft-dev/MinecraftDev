@@ -1,6 +1,8 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-apply plugin: 'java'
+plugins {
+    id 'java'
+}
 
 group = '${GROUP_ID}'
 version = '${PLUGIN_VERSION}'

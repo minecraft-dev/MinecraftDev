@@ -29,4 +29,14 @@ object ForgeConstants {
     const val META_INF = "META-INF"
     const val MODS_TOML = "mods.toml"
     const val PACK_MCMETA = "pack.mcmeta"
+
+    const val JAR_VERSION_VAR = "\${file.jarVersion}"
+    // From https://github.com/MinecraftForge/MinecraftForge/blob/0ff8a596fc1ef33d4070be89dd5cb4851f93f731/src/fmllauncher/java/net/minecraftforge/fml/loading/StringSubstitutor.java
+    val KNOWN_SUBSTITUTIONS = setOf(JAR_VERSION_VAR, "\${global.mcVersion}", "\${global.forgeVersion}")
+
+    val DEPENDENCY_SIDES = setOf("BOTH", "CLIENT", "SERVER")
+    val DEPENDENCY_ORDER = setOf("NONE", "BEFORE", "AFTER")
+
+    // From https://github.com/MinecraftForge/MinecraftForge/blob/38a5400a8c878fe39cd389e6d4f68619d2738b88/src/fmllauncher/java/net/minecraftforge/fml/loading/moddiscovery/ModInfo.java#L45
+    val MOD_ID_REGEX = "^[a-z][a-z0-9_-]{1,63}$".toRegex()
 }

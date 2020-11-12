@@ -12,7 +12,7 @@ Minecraft Development for IntelliJ
         <td colspan="2"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
     </tr>
     <tr>
-        <td align="right" rowspan="3" ><b>Nightly Builds</b></td>
+        <td align="right" rowspan="4" ><b>Nightly Builds</b></td>
         <td align="left">2019.3</td>
         <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20193"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20193)/statusIcon.svg" alt="2019.3 Nightly Status" /></a></td>
     </tr>
@@ -25,18 +25,22 @@ Minecraft Development for IntelliJ
         <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20202"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20202)/statusIcon.svg" alt="2020.2 Nightly Status" /></a></td>
     </tr>
     <tr>
+        <td align="left">2020.3</td>
+        <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20203"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20203)/statusIcon.svg" alt="2020.3 Nightly Status" /></a></td>
+    </tr>
+    <tr>
         <td align="right" rowspan="3"><b>OS Tests</b></td>
         <td align="left" colspan="2">
-            <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Linux+Build%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/Linux%20Build/badge.svg?branch=dev&event=push" alt="Linux GitHub Action Status" /></a>
+            <a href="https://travis-ci.org/minecraft-dev/MinecraftDev/"><img src="https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/1" alt="Linux Travis Build Status" /></a>
             <br/>
-            <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22macOS+Build%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/macOS%20Build/badge.svg?branch=dev&event=push" alt="macOS GitHub Action Status" /></a>
+            <a href="https://travis-ci.org/minecraft-dev/MinecraftDev/"><img src="https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/2" alt="macOS Travis Build Status" /></a>
             <br/>
-            <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Windows+Build%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/Windows%20Build/badge.svg?branch=dev&event=push" alt="Windows GitHub Action Status" /></a>        
+            <a href="https://ci.appveyor.com/project/DemonWav/minecraftdev"><img src="https://ci.appveyor.com/api/projects/status/iuxeewnxgu4afmo6?svg=true" alt="Windows AppVeyor Build Status" /></a>        
         </td>
     </tr>
 </table>
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.5.0-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.5.1-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 <a href="https://discord.gg/j6UNcfr"><img src="https://i.imgur.com/JXu9C1G.png" height="48px"></img></a>
@@ -138,9 +142,9 @@ Supported Platforms
 
 - [![Bukkit Icon](src/main/resources/assets/icons/platform/Bukkit.png?raw=true) **Bukkit**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse) ([![Spigot Icon](src/main/resources/assets/icons/platform/Spigot.png?raw=true) Spigot](https://spigotmc.org/) and [![Paper Icon](src/main/resources/assets/icons/platform/Paper.png?raw=true) Paper](https://papermc.io/))
 - [![Sponge Icon](src/main/resources/assets/icons/platform/Sponge_dark.png?raw=true) **Sponge**](https://www.spongepowered.org/)
-- [![Forge Icon](src/main/resources/assets/icons/platform/Forge.png?raw=true) **Minecraft Forge**](http://minecraftforge.net/forum)
+- [![Forge Icon](src/main/resources/assets/icons/platform/Forge.png?raw=true) **Minecraft Forge**](https://forums.minecraftforge.net/)
 - [![Fabric Icon](src/main/resources/assets/icons/platform/Fabric.png?raw=true) **Fabric**](https://fabricmc.net)
 - [![LiteLoader Icon](src/main/resources/assets/icons/platform/LiteLoader.png?raw=true) **LiteLoader**](http://www.liteloader.com/)
 - [![MCP Icon](src/main/resources/assets/icons/platform/MCP.png?raw=true) **MCP**](http://www.modcoderpack.com/)
 - [![Mixins Icon](src/main/resources/assets/icons/platform/Mixins_dark.png?raw=true) **Mixins**](https://github.com/SpongePowered/Mixin)
-- [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/) ([![Waterfall Icon](src/main/resources/assets/icons/platform/Waterfall.png?raw=true) Waterfall](https://github.com/WaterfallMC))
+- [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/) ([![Waterfall Icon](src/main/resources/assets/icons/platform/Waterfall.png?raw=true) Waterfall](https://github.com/PaperMC/Waterfall))
