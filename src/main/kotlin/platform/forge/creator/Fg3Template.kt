@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.forge.creator
 
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.BaseTemplate
+import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_GRADLE_PROPERTIES_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_MAIN_CLASS_TEMPLATE
@@ -19,6 +20,7 @@ import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_SETTINGS_GRADLE_
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.MODS_TOML_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.PACK_MCMETA_TEMPLATE
+import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.openapi.project.Project
 
 object Fg3Template : BaseTemplate() {
@@ -62,6 +64,9 @@ object Fg3Template : BaseTemplate() {
         if (hasData) {
             props["HAS_DATA"] = "true"
         }
+        if (config.hasAuthors()) {
+            props["AUTHOR_LIST"] = config.authors.joinToString(", ")
+        }
 
         return project.applyTemplate(FG3_BUILD_GRADLE_TEMPLATE, props)
     }
@@ -98,14 +103,27 @@ object Fg3Template : BaseTemplate() {
         if (hasData) {
             props["HAS_DATA"] = "true"
         }
+        if (config.hasAuthors()) {
+            props["AUTHOR_LIST"] = config.authors.joinToString(", ")
+        }
 
         return project.applyTemplate(FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE, props)
     }
 
     fun applyModsToml(project: Project, buildSystem: BuildSystem, config: ForgeProjectConfig): String {
+        val nextMcVersion = when (val part = config.mcVersion.parts.getOrNull(1)) {
+            // Mimics the code used to get the next Minecraft version in Forge's MDK
+            // https://github.com/MinecraftForge/MinecraftForge/blob/0ff8a596fc1ef33d4070be89dd5cb4851f93f731/build.gradle#L884
+            is SemanticVersion.Companion.VersionPart.ReleasePart -> (part.version + 1).toString()
+            null -> "?"
+            else -> part.versionString
+        }
         val props = mutableMapOf(
             "ARTIFACT_ID" to buildSystem.artifactId,
-            "MOD_NAME" to config.pluginName
+            "MOD_NAME" to config.pluginName,
+            "FORGE_SPEC_VERSION" to config.forgeVersion.parts[0].versionString,
+            "MC_VERSION" to config.mcVersion.toString(),
+            "MC_NEXT_VERSION" to "1.$nextMcVersion"
         )
         props["DESCRIPTION"] = config.description ?: ""
         config.updateUrl?.let { url ->
@@ -120,9 +138,11 @@ object Fg3Template : BaseTemplate() {
         return project.applyTemplate(MODS_TOML_TEMPLATE, props)
     }
 
-    fun applyPackMcmeta(project: Project, artifactId: String): String {
+    fun applyPackMcmeta(project: Project, artifactId: String, pack: ForgePackDescriptor): String {
         val props = mapOf(
-            "ARTIFACT_ID" to artifactId
+            "ARTIFACT_ID" to artifactId,
+            "PACK_FORMAT" to pack.format.toString(),
+            "PACK_COMMENT" to pack.comment
         )
 
         return project.applyTemplate(PACK_MCMETA_TEMPLATE, props)
