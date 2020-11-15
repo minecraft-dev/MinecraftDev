@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.framework
 
+import com.demonwav.mcdev.util.libraryKind
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-val MIXIN_LIBRARY_KIND: LibraryKind = LibraryKind.create("mixin-library")
+val MIXIN_LIBRARY_KIND: LibraryKind = libraryKind("mixin-library")
