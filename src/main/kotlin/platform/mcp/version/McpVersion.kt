@@ -96,7 +96,21 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
         fun downloadData(): McpVersion? {
             try {
                 val text = URL("http://export.mcpbot.bspk.rs/versions.json").readText()
-                val map = Gson().fromJson<Map<String, Map<String, List<Int>>>>(text)
+                val map = Gson().fromJson<MutableMap<String, MutableMap<String, MutableList<Int>>>>(text)
+
+                val tempMappings = URL("https://assets.tterrag.com/temp_mappings.json").readText()
+                val tempMappingsMap = Gson()
+                    .fromJson<MutableMap<String, MutableMap<String, MutableList<Int>>>>(tempMappings)
+
+                // Merge the temporary mappings list into the main one, temporary solution for 1.16
+                tempMappingsMap.forEach { (mcVersion, channels) ->
+                    val existingChannels = map.getOrPut(mcVersion, ::mutableMapOf)
+                    channels.forEach { (channelName, newVersions) ->
+                        val existingVersions = existingChannels.getOrPut(channelName, ::mutableListOf)
+                        existingVersions.addAll(newVersions)
+                    }
+                }
+
                 val mcpVersion = McpVersion(map)
                 mcpVersion.versions
                 return mcpVersion
