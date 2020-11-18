@@ -71,7 +71,7 @@ private fun insertShadow(context: InsertionContext, shadow: ShadowTarget) {
         context.setLaterRunnable {
             HintManager.getInstance().showInformationHint(
                 context.editor,
-                "Added @Shadow for '${shadow.member.name}' to super mixin ${mixinClass.shortName}"
+                "Added @Shadow for '${shadow.member.name}' to super Mixin ${mixinClass.shortName}"
             )
         }
     }
