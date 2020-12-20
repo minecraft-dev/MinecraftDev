@@ -1,0 +1,7 @@
+{
+    "pack": {
+        "description": "${ARTIFACT_ID} resources",
+        "pack_format": ${PACK_FORMAT},
+        "_comment": "${PACK_COMMENT}"
+    }
+}

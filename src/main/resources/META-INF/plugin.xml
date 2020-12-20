@@ -3,7 +3,7 @@
 
     https://minecraftdev.org
 
-    Copyright (c) 2018 minecraft-dev
+    Copyright (c) 2020 minecraft-dev
 
     MIT License
 -->
@@ -12,52 +12,53 @@
 
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.idea.maven</depends>
-    <depends>org.jetbrains.plugins.gradle</depends>
+    <depends>com.intellij.gradle</depends>
     <depends>org.intellij.groovy</depends>
+    <depends optional="true" config-file="toml-support.xml">org.toml.lang</depends>
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
     <vendor email="demonwav@gmail.com" url="https://minecraftdev.org/">DemonWav</vendor>
 
     <description><![CDATA[
-      Brings support for Bukkit, Spigot, Paper, Sponge, Forge, MCP, Mixins, BungeeCord, Waterfall, LiteLoader, Canary and Neptune projects
-      to Intellij IDEA.
+      Brings support for Bukkit, Spigot, Paper, Sponge, Forge, Fabric, MCP, Mixin, Velocity, BungeeCord, Waterfall, and
+      LiteLoader projects to Intellij IDEA.
     ]]></description>
 
+    <resource-bundle>messages.MinecraftDevelopment</resource-bundle>
+
     <change-notes><![CDATA[
-      <div>
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!
-        <p>
-        v. 2018.2-1.2.10
-      </div>
     ]]>
     </change-notes>
 
-    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="182" until-build="182.*"/>
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="193.2956" until-build="193.*"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- This is grouped in the following order EXCEPT for localInspections and moduleTypes. All localInspections are grouped at the
-             end, but the individual local inspections themselves should also be ordered in this way. moduleTypes are only for there for
-             legacy reasons, and are placed after the localInspections.
-                * No platform
-                * Bukkit
-                * Sponge
-                * Forge
-                * LiteLoader
-                * MCP
-                * Mixin
-                * Canary
-                * BungeeCord
+             end, but the individual local inspections themselves should also be ordered in this way.
+               * No platform
+               * Bukkit
+               * Sponge
+               * Forge
+               * Fabric
+               * LiteLoader
+               * MCP
+               * Mixin
+               * Velocity
+               * BungeeCord
         -->
 
         <!--region NO PLATFORM-->
         <!---->
 
+        <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
+        <moduleBuilder id="MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.MinecraftModuleBuilder"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
 
         <!-- File templates are for project creations -->
-        <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftFileTemplateGroupFactory"/>
+        <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftTemplates"/>
 
         <!-- Project-independent Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.insight.ListenerLineMarkerProvider"/>
@@ -81,18 +82,17 @@
                                  groupId="language"
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
         <projectConfigurable displayName="Language Template"
-                             id="Settings.Minecraft.I18nTemplate"
-                             groupId="language"
+                             id="Settings.Minecraft.TranslationTemplate"
                              parentId="Settings.Minecraft"
-                             instance="com.demonwav.mcdev.i18n.sorting.I18nTemplateConfigurable"/>
+                             instance="com.demonwav.mcdev.translations.sorting.TranslationTemplateConfigurable"/>
 
         <!-- NBT -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeFactory"/>
+        <fileType name="NBT" implementationClass="com.demonwav.mcdev.nbt.filetype.NbtFileType" fieldName="INSTANCE" extensions="nbt" />
         <fileTypeDetector implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeDetector"/>
         <fileEditorProvider implementation="com.demonwav.mcdev.nbt.editor.NbtFileEditorProvider" />
 
         <!-- Text representation of NBT -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.nbt.lang.NbttFileTypeFactory"/>
+        <fileType name="NBTT" language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttFileType" fieldName="INSTANCE" extensions="nbtt" />
         <lang.parserDefinition language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttParserDefinition"/>
         <lang.syntaxHighlighterFactory language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttBraceMatcher"/>
@@ -108,37 +108,45 @@
         <codeInsight.parameterNameHints language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttParameterNameHints" />
 
         <!-- Minecraft localization files -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.i18n.lang.I18nFileTypeFactory"/>
-        <lang.parserDefinition language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nParserDefinition"/>
-        <lang.syntaxHighlighterFactory language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.colors.I18nSyntaxHighlighterFactory"/>
-        <lang.psiStructureViewFactory language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.structure.I18nStructureViewFactory"/>
-        <lang.findUsagesProvider language="I18n" implementationClass="com.demonwav.mcdev.i18n.reference.I18nFindUsagesProvider"/>
-        <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.i18n.I18nFoldingBuilder"/>
-        <lang.formatter language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.formatting.I18nFormattingModelBuilder"/>
-        <lang.commenter language="I18n" implementationClass="com.demonwav.mcdev.i18n.I18nCommenter" />
-        <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.i18n.reference.I18nJavaReferenceContributor"/>
-        <psi.referenceContributor language="I18n" implementation="com.demonwav.mcdev.i18n.reference.I18nReferenceContributor"/>
-        <gotoSymbolContributor implementation="com.demonwav.mcdev.i18n.reference.I18nGotoSymbolContributor"/>
-        <colorSettingsPage implementation="com.demonwav.mcdev.i18n.lang.colors.I18nColorSettingsPage"/>
-        <renameInputValidator implementation="com.demonwav.mcdev.i18n.lang.I18nRenameInputValidator"/>
-        <editorNotificationProvider implementation="com.demonwav.mcdev.i18n.I18nEditorNotificationProvider"/>
-        <elementDescriptionProvider implementation="com.demonwav.mcdev.i18n.reference.I18nDescriptionProvider"/>
-        <referencesSearch implementation="com.demonwav.mcdev.i18n.reference.I18nReferencesSearcher"/>
-        <annotator language="I18n" implementationClass="com.demonwav.mcdev.i18n.I18nAnnotator"/>
+        <fileType name="MCLang" language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.LangFileType" fieldName="INSTANCE" extensions="lang"/>
+        <lang.parserDefinition language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.LangParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.colors.LangSyntaxHighlighterFactory"/>
+        <lang.psiStructureViewFactory language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.structure.LangStructureViewFactory"/>
+        <lang.findUsagesProvider language="MCLang" implementationClass="com.demonwav.mcdev.translations.reference.LangFindUsagesProvider"/>
+        <lang.findUsagesProvider language="JSON" implementationClass="com.demonwav.mcdev.translations.reference.JsonFindUsagesProvider" order="first"/>
+        <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.translations.TranslationFoldingBuilder"/>
+        <lang.formatter language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.formatting.LangFormattingModelBuilder"/>
+        <lang.commenter language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.LangCommenter" />
+        <spellchecker.support language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.spellcheck.LangSpellcheckingStrategy"/>
+        <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.translations.reference.JavaReferenceContributor"/>
+        <psi.referenceContributor language="MCLang" implementation="com.demonwav.mcdev.translations.reference.LangReferenceContributor"/>
+        <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.translations.reference.JsonReferenceContributor"/>
+        <gotoSymbolContributor implementation="com.demonwav.mcdev.translations.reference.TranslationGotoSymbolContributor"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.translations.lang.colors.LangColorSettingsPage"/>
+        <renameInputValidator implementation="com.demonwav.mcdev.translations.lang.LangRenameInputValidator"/>
+        <editorNotificationProvider implementation="com.demonwav.mcdev.translations.TranslationEditorNotificationProvider"/>
+        <elementDescriptionProvider implementation="com.demonwav.mcdev.translations.reference.TranslationDescriptionProvider"/>
+        <referencesSearch implementation="com.demonwav.mcdev.translations.reference.TranslationReferenceSearch"/>
+        <annotator language="MCLang" implementationClass="com.demonwav.mcdev.translations.intentions.TranslationFileAnnotator"/>
+        <annotator language="JSON" implementationClass="com.demonwav.mcdev.translations.intentions.TranslationFileAnnotator"/>
         <intentionAction>
-            <className>com.demonwav.mcdev.i18n.intentions.ConvertToTranslationIntention</className>
+            <className>com.demonwav.mcdev.translations.intentions.ConvertToTranslationIntention</className>
             <category>Minecraft</category>
             <descriptionDirectoryName>convertToTranslation</descriptionDirectoryName>
         </intentionAction>
-        <codeFoldingOptionsProvider instance="com.demonwav.mcdev.i18n.I18nCodeFoldingOptionsProvider"/>
-        <applicationService serviceImplementation="com.demonwav.mcdev.i18n.I18nFoldingSettings"/>
-        <completion.contributor language="I18n" implementationClass="com.demonwav.mcdev.i18n.lang.I18nCompletionContributor" />
-        <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.i18n.reference.I18nReferenceCompletionConfidence"
+        <codeFoldingOptionsProvider instance="com.demonwav.mcdev.translations.TranslationCodeFoldingOptionsProvider"/>
+        <applicationService serviceImplementation="com.demonwav.mcdev.translations.TranslationFoldingSettings"/>
+        <typedHandler implementation="com.demonwav.mcdev.translations.lang.LangTypedHandlerDelegate" />
+        <completion.contributor language="MCLang" implementationClass="com.demonwav.mcdev.translations.reference.LangCompletionContributor" />
+        <completion.contributor language="JSON" implementationClass="com.demonwav.mcdev.translations.reference.JsonCompletionContributor" />
+        <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.translations.reference.TranslationReferenceCompletionConfidence"
                                order="before javaSkipAutopopupInStrings"/>
+        <fileBasedIndex implementation="com.demonwav.mcdev.translations.index.TranslationIndex"/>
+        <fileBasedIndex implementation="com.demonwav.mcdev.translations.index.TranslationInverseIndex"/>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
-        <errorHandler implementation="com.demonwav.mcdev.error.ErrorReporter"/>
+        <errorHandler implementation="com.demonwav.mcdev.errorreporter.ErrorReporter"/>
         <!--endregion-->
 
         <!--region BUKKIT-->
@@ -156,23 +164,26 @@
         <!-- Sponge Line Marker Provider -->
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorLineMarkerProvider"/>
 
+        <implicitUsageProvider implementation="com.demonwav.mcdev.platform.sponge.insight.SpongeImplicitUsageProvider" />
+
         <!-- Sponge Annotator -->
         <annotator language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.color.SpongeColorAnnotator"/>
+
+        <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.completion.SpongeGetterFilterCompletionContributor" />
+        <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.sponge.reference.SpongeReferenceContributor" />
+        <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.completion.SpongeCompletionConfidence"
+                               order="before javaSkipAutopopupInStrings" />
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.sponge.framework.SpongePresentationProvider" />
         <importFilter implementation="com.demonwav.mcdev.platform.sponge.SpongeImportFilter" />
 
-        <localInspection displayName="Wrong Sponge logger implementation"
-                         groupName="Minecraft"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="WARNING"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeLoggingInspection"/>
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.inspection.suppress.SpongeGetterParamOptionalInspectionSuppressor" />
+        <daemon.highlightInfoFilter implementation="com.demonwav.mcdev.platform.sponge.codeInsight.highlighting.SpongeGetterFilterInfoFilter" />
         <!--endregion-->
 
         <!--region FORGE-->
-        <!---->
+        <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.forge.reflection.reference.ReflectionReferenceContributor"/>
+        <!--endregion-->
 
         <fileIconProvider implementation="com.demonwav.mcdev.platform.forge.ForgeFileIconProvider"/>
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.forge.insight.ForgeImplicitUsageProvider" />
@@ -183,7 +194,12 @@
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.forge.framework.ForgePresentationProvider" />
 
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeRunConfigDataService" />
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgePatcherDataService"/>
+        <!--endregion-->
+
+        <!--region FABRIC-->
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.fabric.framework.FabricPresentationProvider" />
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.fabric.FabricFileIconProvider"/>
+        <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.fabric.reference.FabricReferenceContributor" />
         <!--endregion-->
 
         <!--region LITELOADER -->
@@ -204,11 +220,12 @@
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mcp.debug.McpRunConfigurationExtension"/>
 
         <!-- access transformer file type -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.platform.mcp.at.AtFileTypeFactory"/>
+        <fileType name="Access Transformers" language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtFileType" fieldName="INSTANCE" patterns="*_at.cfg" />
         <lang.parserDefinition language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.at.AtColorSettingsPage" />
         <lang.commenter language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCommenter" />
+        <typedHandler implementation="com.demonwav.mcdev.platform.mcp.at.completion.AtTypedHandlerDelegate" />
         <completion.contributor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.completion.AtCompletionContributor" />
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.at.AtGotoDeclarationHandler" />
         <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
@@ -244,31 +261,28 @@
                                order="before javaSkipAutopopupInStrings"/>
 
         <!-- Mixin configuration -->
-        <fileTypeFactory implementation="com.demonwav.mcdev.platform.mixin.config.MixinConfigFileTypeFactory"/>
+        <fileType name="Mixin Configuration" language="JSON" implementationClass="com.demonwav.mcdev.platform.mixin.config.MixinConfigFileType" fieldName="INSTANCE" />
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.mixin.config.reference.MixinConfigReferenceContributor" />
         <lang.importOptimizer language="JSON" implementationClass="com.demonwav.mcdev.platform.mixin.config.MixinConfigImportOptimizer"/>
 
         <!-- Mixin Line Marker Providers -->
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.MixinLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.ShadowLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.OverwriteLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.insight.MixinTargetLineMarkerProvider"/>
+
 
         <customJavadocTagProvider implementation="com.demonwav.mcdev.platform.mixin.MixinCustomJavaDocTagProvider"/>
 
-        <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mixin.debug.MixinRunConfigurationExtension"/>
         <debugger.positionManagerFactory implementation="com.demonwav.mcdev.platform.mixin.debug.MixinPositionManagerFactory"/>
         <debuggerClassFilterProvider implementation="com.demonwav.mcdev.platform.mixin.debug.MixinDebuggerClassFilterProvider"/>
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.mixin.framework.MixinPresentationProvider" />
         <!--endregion-->
 
-        <!--region CANARY-->
+        <!--region VELOCITY-->
         <!---->
 
-        <fileIconProvider implementation="com.demonwav.mcdev.platform.canary.CanaryFileIconProvider"/>
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.velocity.framework.VelocityPresentationProvider"/>
 
-        <library.presentationProvider implementation="com.demonwav.mcdev.platform.canary.framework.CanaryPresentationProvider" />
-        <library.presentationProvider implementation="com.demonwav.mcdev.platform.canary.framework.NeptunePresentationProvider" />
         <!--endregion-->
 
         <!--region BUNGEECORD-->
@@ -279,7 +293,6 @@
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.bungeecord.framework.BungeeCordPresentationProvider" />
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.bungeecord.framework.WaterfallPresentationProvider" />
         <!--endregion-->
-
 
         <!--region LOCAL INSPECTIONS-->
         <!---->
@@ -298,26 +311,26 @@
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.i18n.inspections.NoTranslationInspection"/>
+                         implementationClass="com.demonwav.mcdev.translations.inspections.NoTranslationInspection"/>
         <localInspection displayName="Missing format arguments"
                          groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.i18n.inspections.MissingFormatInspection"/>
+                         implementationClass="com.demonwav.mcdev.translations.inspections.MissingFormatInspection"/>
         <localInspection displayName="Superfluous format arguments"
                          groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.i18n.inspections.SuperfluousFormatInspection"/>
+                         implementationClass="com.demonwav.mcdev.translations.inspections.SuperfluousFormatInspection"/>
         <!--endregion-->
 
         <!--region BUKKIT INSPECTIONS-->
         <localInspection displayName="Bukkit @EventHandler in class not implementing Listener"
-                         groupName="Minecraft Bukkit"
+                         groupName="Bukkit"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
@@ -325,56 +338,115 @@
                          implementationClass="com.demonwav.mcdev.platform.bukkit.inspection.BukkitListenerImplementedInspection"/>
         <!--endregion-->
 
+        <!--region SPONGE INSPECTIONS-->
+        <localInspection displayName="Wrong Sponge logger implementation"
+                         groupName="Sponge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeLoggingInspection"/>
+
+        <localInspection displayName="@Getter targeted method does not exist"
+                         groupName="Sponge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeInvalidGetterTargetInspection"/>
+        <localInspection displayName="Parameter's type is not assignable to its @Getter method return type"
+                         groupName="Sponge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeWrongGetterTypeInspection"/>
+
+        <localInspection displayName="Invalid @Inject usage in Sponge plugin class"
+                         groupName="Sponge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeInjectionInspection"/>
+        <localInspection displayName="Sponge plugin class validity"
+                         groupName="Sponge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongePluginClassInspection"/>
+        <!--endregion-->
+
         <!--region FORGE INSPECTIONS-->
         <localInspection displayName="Invalid usage of @SideOnly in nested class declaration"
-                         groupName="Minecraft Forge"
+                         groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NestedClassSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of @SideOnly in field declaration"
-                         groupName="Minecraft Forge"
+                         groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.FieldDeclarationSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of @SideOnly in method declaration"
-                         groupName="Minecraft Forge"
+                         groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of variable annotated with @SideOnly"
-                         groupName="Minecraft Forge"
+                         groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.VariableUseSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of method annotated with @SideOnly"
-                         groupName="Minecraft Forge"
+                         groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodCallSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of new object annotated with @SideOnly"
-                         groupName="Minecraft Forge"
+                         groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NewExpressionSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of local variable declaration annotated with @SideOnly"
-                         groupName="Minecraft Forge"
+                         groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.LocalVariableDeclarationSideOnlyInspection"/>
+
+        <localInspection displayName="IMessage or IMessageHandler implementation without empty constructor"
+                         groupName="MinecraftForge"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.forge.inspections.simpleimpl.MissingMessageConstructorInspection"/>
+        <!--endregion-->
+
+        <!--region FABRIC INSPECTIONS-->
+        <localInspection displayName="Unresolved Fabric mod JSON reference"
+                         shortName="UnresolvedFabricModJsonReference"
+                         groupName="Fabric"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.fabric.inspection.UnresolvedReferenceInspection"/>
         <!--endregion-->
 
         <!--region MCP INSPECTIONS-->
@@ -402,6 +474,14 @@
         <!--endregion-->
 
         <!--region MIXIN INSPECTIONS-->
+        <localInspection displayName="Mixin not in a mixin config"
+                          shortName="UnusedMixin"
+                          groupName="Mixin"
+                          language="JAVA"
+                          enabledByDefault="true"
+                          level="WARNING"
+                          hasStaticDescription="true"
+                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.UnusedMixinInspection"/>
         <localInspection displayName="Mixin annotation outside of @Mixin class"
                          shortName="AnnotationOutsideOfMixin"
                          groupName="Mixin"
@@ -410,6 +490,14 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationsInspection"/>
+        <localInspection displayName="Callback cancellation in non-cancellable @Inject"
+                         shortName="CancelInNotCancellableInjection"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinCancellableInspection"/>
         <localInspection displayName="Invalid @Mixin Target"
                          shortName="InvalidMixinTarget"
                          groupName="Mixin"
@@ -621,6 +709,26 @@
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFinalInspection"/>
 
+        <!-- Accessor Inspection-->
+        <localInspection displayName="Unresolved @Accessor target"
+                         shortName="AccessorTarget"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.accessor.AccessorTargetInspection"/>
+
+        <!-- Invoker Inspection-->
+        <localInspection displayName="Unresolved @Invoker target"
+                         shortName="InvokerTarget"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.invoker.InvokerTargetInspection"/>
+
         <!-- Configuration -->
         <localInspection displayName="Unresolved config reference"
                          shortName="UnresolvedConfigReference"
@@ -656,33 +764,9 @@
                          implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.MixinPluginInspection"/>
         <!--endregion-->
 
-        <!--region CANARY INSPECTIONS-->
-        <localInspection displayName="Canary @Command in class not implementing CommandListener"
-                         groupName="Minecraft Canary"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="WARNING"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.canary.inspection.CanaryCommandImplementedInspection"/>
-        <localInspection displayName="Canary @HookHandler in class not implementing PluginListener"
-                         groupName="Minecraft Canary"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="WARNING"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.canary.inspection.CanaryListenerImplementedInspection"/>
-        <localInspection displayName="Canary @TabComplete in class not implementing PluginListener"
-                         groupName="Minecraft Canary"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="WARNING"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.canary.inspection.CanaryTabCompleteImplementedInspection"/>
-        <!--endregion-->
-
         <!--region BUNGEECORD INSPECTIONS-->
         <localInspection displayName="BungeeCord @EventHandler in class not implementing Listener"
-                         groupName="Minecraft BungeeCord"
+                         groupName="BungeeCord"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
@@ -690,27 +774,15 @@
                          implementationClass="com.demonwav.mcdev.platform.bungeecord.inspection.BungeeCordListenerImplementedInspection"/>
         <!--endregion-->
         <!--endregion-->
-
-
-        <!--region Module types are for transitions from old versions only -->
-        <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
-        <moduleType id="BUKKIT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BukkitModuleTypeTransition"/>
-        <moduleType id="SPIGOT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.SpigotModuleTypeTransition"/>
-        <moduleType id="PAPER_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.PaperModuleTypeTransition"/>
-        <moduleType id="BUNGEECORD_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.BungeeCordModuleTypeTransition"/>
-        <moduleType id="SPONGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.SpongeModuleTypeTransition"/>
-        <moduleType id="FORGE_MODULE_TYPE" implementationClass="com.demonwav.mcdev.transition.ForgeModuleTypeTransition"/>
-        <!--endregion-->
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
-        <projectResolve implementation="com.demonwav.mcdev.platform.forge.gradle.ForgePatcherProjectResolverExtension"/>
     </extensions>
 
     <application-components>
         <component>
-            <implementation-class>com.demonwav.mcdev.i18n.I18nFileListener</implementation-class>
+            <implementation-class>com.demonwav.mcdev.translations.TranslationFileListener</implementation-class>
         </component>
     </application-components>
 
@@ -719,17 +791,11 @@
             <implementation-class>com.demonwav.mcdev.facet.MinecraftFacetDetector</implementation-class>
             <loadForDefaultProject/>
         </component>
-        <component>
-            <implementation-class>com.demonwav.mcdev.transition.TransitionProjectComponent</implementation-class>
-            <loadForDefaultProject/>
-        </component>
     </project-components>
 
     <actions>
         <action class="com.demonwav.mcdev.insight.generation.GenerateEventListenerAction"
-                id="GenerateEventListener"
-                text="Event Listener"
-                description="Generates a new Event Listener for the appropriate platform">
+                id="GenerateEventListener">
             <add-to-group group-id="GenerateGroup" anchor="last"/>
         </action>
 
@@ -757,14 +823,19 @@
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.action.GenerateSoftImplementsAction" id="GenerateSoftImplementsAction"
-                text="Soft-implement Methods..."
+                text="Soft-Implement Methods..."
                 description="Add a soft implementation for the selected methods">
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.action.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
-                text="Copy Mixin target reference"
+                text="Copy Mixin Target Reference"
                 description="Copy the reference to the element for use in an injector">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+        </action>
+        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateAccessorAction" id="GenerateAccessorAction"
+                text="Generate Accessor/Invoker"
+                description="Generate an accessor for the selected member">
+            <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.FindSrgMappingAction" id="FindSrgMappingAction"
                 text="Get SRG Name"
@@ -786,15 +857,19 @@
                 description="Lookup MCP mapping info on a SRG field or method">
             <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
         </action>
-        <action class="com.demonwav.mcdev.i18n.actions.ConvertToTranslationAction" id="ConvertToMcTranslationAction"
-                text="Convert string literal to translation"
+        <action class="com.demonwav.mcdev.translations.actions.ConvertToTranslationAction" id="ConvertToMcTranslationAction"
+                text="Convert String Literal to Translation"
                 description="Converts any string literal into a Minecraft localization translation">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
-        <action class="com.demonwav.mcdev.i18n.actions.SortTranslationsAction" id="SortMcTranslationsAction"
-                text="Sort translations by specified order"
+        <action class="com.demonwav.mcdev.translations.actions.SortTranslationsAction" id="SortMcTranslationsAction"
+                text="Sort Translations by Specified Order"
                 description="Sorts translations by specified order">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+        </action>
+        <action class="com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction" id="CreateMinecraftClass"
+                text="Minecraft Class" description="Create skeleton classes used in Minecraft Mods">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
         </action>
     </actions>
 </idea-plugin>

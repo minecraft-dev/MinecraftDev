@@ -1,0 +1,24 @@
+plugins {
+    id 'com.github.johnrengelman.shadow'
+}
+
+repositories {
+}
+
+dependencies {
+    compile project(':${COMMON_PROJECT_NAME}')
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        expand 'version': project.version
+    }
+}
+
+shadowJar {
+    dependencies {
+        include(dependency(':${COMMON_PROJECT_NAME}'))
+    }
+}
+
+tasks.build.dependsOn tasks.shadowJar

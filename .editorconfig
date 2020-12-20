@@ -1,0 +1,4 @@
+[*.{kt,kts}]
+max_line_length=120
+# noinspection EditorConfigKeyCorrectness
+kotlin_imports_layout=ascii

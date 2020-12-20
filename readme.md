@@ -1,17 +1,46 @@
-<p align="center"><a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.svg" height="120"></img></a></p>
+<p align="center"><a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.svg" height="120" alt="logo"/></a></p>
 
 Minecraft Development for IntelliJ
 ==================================
 
-|        Service         |Status|
-|------------------------|------|
-|      **TeamCity**      |[![TeamCity Build Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build)|
-|      **Nightly**       |[![TeamCity Nightly Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly)|
-|   **Travis (Linux)**   |[![Travis Linux Build Status](https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/1)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
-|   **Travis (macOS)**   |[![Travis macOS Build Status](https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/2)](https://travis-ci.org/minecraft-dev/MinecraftDev/)|
-| **TeamCity (Windows)** |[![TeamCity Windows Build Status](https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_WindowsBuild)/statusIcon)](https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_WindowsBuild)|
+<table>
+    <tr>
+        <td align="center" colspan="3"><b>Build Status</b></td>
+    </tr>
+    <tr>
+        <td align="right"><b>Main Build</b></td>
+        <td colspan="2"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
+    </tr>
+    <tr>
+        <td align="right" rowspan="4" ><b>Nightly Builds</b></td>
+        <td align="left">2019.3</td>
+        <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20193"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20193)/statusIcon.svg" alt="2019.3 Nightly Status" /></a></td>
+    </tr>
+    <tr>
+        <td align="left">2020.1</td>
+        <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20201"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20201)/statusIcon.svg" alt="2020.1 Nightly Status" /></a></td>
+    </tr>
+    <tr>
+        <td align="left">2020.2</td>
+        <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20202"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20202)/statusIcon.svg" alt="2020.2 Nightly Status" /></a></td>
+    </tr>
+    <tr>
+        <td align="left">2020.3</td>
+        <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20203"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20203)/statusIcon.svg" alt="2020.3 Nightly Status" /></a></td>
+    </tr>
+    <tr>
+        <td align="right" rowspan="3"><b>OS Tests</b></td>
+        <td align="left" colspan="2">
+            <a href="https://travis-ci.org/minecraft-dev/MinecraftDev/"><img src="https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/1" alt="Linux Travis Build Status" /></a>
+            <br/>
+            <a href="https://travis-ci.org/minecraft-dev/MinecraftDev/"><img src="https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/2" alt="macOS Travis Build Status" /></a>
+            <br/>
+            <a href="https://ci.appveyor.com/project/DemonWav/minecraftdev"><img src="https://ci.appveyor.com/api/projects/status/iuxeewnxgu4afmo6?svg=true" alt="Windows AppVeyor Build Status" /></a>        
+        </td>
+    </tr>
+</table>
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-2018.2--1.2.10-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.5.1-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 <a href="https://discord.gg/j6UNcfr"><img src="https://i.imgur.com/JXu9C1G.png" height="48px"></img></a>
@@ -31,7 +60,7 @@ box, simply search for `Minecraft`. You can install it from there and restart In
 Building
 --------
 
-Make sure you have Java 8 installed.
+JDK 8 is required.
 
 Build the plugin with:
 
@@ -49,21 +78,44 @@ Code is generated during the build task, to run the generation task without buil
 
 This task is necessary to work on the code without errors before the initial build.
 
+To format the code in this project:
+
+`./gradlew format`
+
+This will format using `ktlint` described below in the [style guide](#style-guide) section below.
+
 The [Gradle IntelliJ Plugin](https://github.com/JetBrains/gradle-intellij-plugin)
 will handle downloading the IntelliJ dependencies and packaging the
 plugin.
 
-IDE Setup
----------
-
-Copy the contents of the `idea-configs` directory into your `.idea` directory to quickly setup useful
-run configurations and copyright settings.
-
 Style Guide
 -----------
 
-This project will follow DemonWav's Java style guidelines (lol, Google's
-style slightly modified). Link [here](http://www.demonwav.com/style).
+This projects follows the opinionated [`ktlint`](https://ktlint.github.io/) linter and formatter. It uses the
+[`ktlint-gradle`](https://github.com/jlleitschuh/ktlint-gradle) plugin to automatically check and format the code in
+this repo.
+
+IDE Setup
+---------
+
+It's recommended to run the `ktlintApplyToIdea` and `addKtlintFormatGitPreCommitHook` tasks to configure your
+IDE with `ktlint` style settings and to automatically format this project's code before committing:
+
+```
+./gradlew ktlintApplyToIdea addKtlintFormatGitPreCommitHook
+```
+
+IntelliJ includes a lot of dependencies transitively, including common dependencies that are used a lot, such as Kotlin,
+Commons Lang3, Guava, etc. Unfortunately, the source distribution for IntelliJ does not contain sources for libraries as
+well, so these libraries are imported into the IDE without sources by default. If you want to attach sources for (most)
+of the dependencies IntelliJ includes, run the `resolveIntellijLibSources` task and refresh the Gradle project in
+IntelliJ:
+
+```
+./gradlew resolveIntellijLibSources
+```
+
+If you're curious about that task, it is implemented in `buildSrc`.
 
 Developers
 ----------
@@ -71,21 +123,14 @@ Developers
 - Project Owner - [**@DemonWav** - Kyle Wood](https://github.com/DemonWav)
 - [**@Minecrell**](https://github.com/Minecrell)
 - [**@PaleoCrafter** - Marvin Rösch](https://github.com/PaleoCrafter)
+- [**@RedNesto**](https://github.com/RedNesto)
+- [**@Earthcomputer** - Joseph Burton](https://github.com/Earthcomputer)
 
-#### **Contributors**
+#### **Significant Contributors**
 
 - [**@gabizou** - Gabriel Harris-Rouquette](https://github.com/gabizou)
-- [**@kashike**](https://github.com/kashike)
+- [**@kashike** - Riley Park](https://github.com/kashike)
 - [**@jamierocks** - Jamie Mansfield](https://github.com/jamierocks)
-
-Issues
-------
-
-We have a few ambiguous labels on the issues page, so here are their definitions:
- * `platform: all` - An issue which applies to all supported platforms (`Bukkit`, `Sponge`, `BungeeCord`, `Forge`, `LiteLoader`, and `Canary`)
- * `platform: main` - Multiple platforms, containing at least `Bukkit`, `Sponge`, and `Forge`. It can contain either of the other two as
-   well, as long as it doesn't contain all of them. In that case, `platform: all` would be more appropriate, of course.
- * `platform: multi` - Any issue with more than two platforms which doesn't fall under the first two categories.
 
 License
 -------
@@ -95,11 +140,11 @@ This project is licensed under [MIT](license.txt).
 Supported Platforms
 -------------------
 
-- [![Bukkit Icon](src/main/resources/assets/icons/platform/Bukkit.png?raw=true) **Bukkit**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse) ([![Spigot Icon](src/main/resources/assets/icons/platform/Spigot.png?raw=true) Spigot](https://spigotmc.org/) and [![Paper Icon](src/main/resources/assets/icons/platform/Paper.png?raw=true) Paper](https://paper.emc.gs))
+- [![Bukkit Icon](src/main/resources/assets/icons/platform/Bukkit.png?raw=true) **Bukkit**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse) ([![Spigot Icon](src/main/resources/assets/icons/platform/Spigot.png?raw=true) Spigot](https://spigotmc.org/) and [![Paper Icon](src/main/resources/assets/icons/platform/Paper.png?raw=true) Paper](https://papermc.io/))
 - [![Sponge Icon](src/main/resources/assets/icons/platform/Sponge_dark.png?raw=true) **Sponge**](https://www.spongepowered.org/)
-- [![Forge Icon](src/main/resources/assets/icons/platform/Forge.png?raw=true) **Minecraft Forge**](http://minecraftforge.net/forum)
+- [![Forge Icon](src/main/resources/assets/icons/platform/Forge.png?raw=true) **Minecraft Forge**](https://forums.minecraftforge.net/)
+- [![Fabric Icon](src/main/resources/assets/icons/platform/Fabric.png?raw=true) **Fabric**](https://fabricmc.net)
 - [![LiteLoader Icon](src/main/resources/assets/icons/platform/LiteLoader.png?raw=true) **LiteLoader**](http://www.liteloader.com/)
 - [![MCP Icon](src/main/resources/assets/icons/platform/MCP.png?raw=true) **MCP**](http://www.modcoderpack.com/)
 - [![Mixins Icon](src/main/resources/assets/icons/platform/Mixins_dark.png?raw=true) **Mixins**](https://github.com/SpongePowered/Mixin)
-- [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/) ([![Waterfall Icon](src/main/resources/assets/icons/platform/Waterfall.png?raw=true) Waterfall](https://github.com/WaterfallMC))
-- [![Canary Icon](src/main/resources/assets/icons/platform/Canary.png?raw=true) **Canary**](https://canarymod.net/) ([![Neptune Icon](src/main/resources/assets/icons/platform/Neptune.png?raw=true) **Neptune**](https://www.neptunepowered.org/))
+- [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/) ([![Waterfall Icon](src/main/resources/assets/icons/platform/Waterfall.png?raw=true) Waterfall](https://github.com/PaperMC/Waterfall))

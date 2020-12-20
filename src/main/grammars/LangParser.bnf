@@ -1,0 +1,35 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2020 minecraft-dev
+ *
+ * MIT License
+ */
+
+{
+    parserClass="com.demonwav.mcdev.translations.lang.gen.parser.LangParser"
+
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="Lang"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.demonwav.mcdev.translations.lang.gen.psi"
+    psiImplPackage="com.demonwav.mcdev.translations.lang.gen.psi.impl"
+
+    elementTypeHolderClass="com.demonwav.mcdev.translations.lang.gen.psi.LangTypes"
+    elementTypeClass="com.demonwav.mcdev.translations.lang.psi.LangElementType"
+    tokenTypeClass="com.demonwav.mcdev.translations.lang.psi.LangTokenType"
+
+    consumeTokenMethod="consumeTokenFast"
+}
+
+lang_file ::= line*
+
+private line ::= entry | COMMENT | DUMMY | LINE_ENDING
+
+entry ::= KEY EQUALS VALUE? {
+    mixin="com.demonwav.mcdev.translations.lang.psi.mixins.LangEntryImplMixin"
+    implements="com.demonwav.mcdev.translations.lang.psi.mixins.LangEntryMixin"
+}

@@ -1,8 +1,0 @@
-#if (${GROUP_ID})
-modGroup = ${GROUP_ID}
-modVersion = ${MOD_VERSION}
-#end
-modBaseName = ${ARTIFACT_ID}
-
-forgeVersion = ${FORGE_VERSION}
-mcpVersion = ${MCP_VERSION}

@@ -3,18 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2018 minecraft-dev
+ * Copyright (c) 2020 minecraft-dev
  *
  * MIT License
  */
 
-import net.minecrell.gradle.licenser.header.HeaderFormat
-import net.minecrell.gradle.licenser.header.HeaderFormatRegistry
 import net.minecrell.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
-import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import kotlin.reflect.KClass
 
 buildscript {
     repositories {
@@ -23,38 +19,48 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.2.51" // kept in sync with IntelliJ's bundled dep
+    kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
+    java
+    mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.3.5"
+    id("org.jetbrains.intellij") version "0.6.3"
     id("net.minecrell.licenser") version "0.4.1"
+    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
 }
 
-defaultTasks("build")
-
-val CI = System.getenv("CI") != null
+val coroutineVersion = "1.2.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
 val ideaVersion: String by project
+val ideaVersionName: String by project
+val coreVersion: String by project
 val downloadIdeaSources: String by project
+val pluginTomlVersion: String by project
 
-// for publishing nightlies
-val repoUsername: String by project
-val repoPassword: String by project
-val repoChannel: String by project
+// configurations
+val idea by configurations
+val jflex by configurations
+val jflexSkeleton by configurations
+val grammarKit by configurations
 
-val compileKotlin by tasks.existing
-val processResources by tasks.existing<AbstractCopyTask>()
-val test by tasks.existing<Test>()
-val runIde by tasks.existing<JavaExec>()
-val publishPlugin by tasks.existing<PublishTask>()
-val clean by tasks.existing<Delete>()
+val gradleToolingExtension: Configuration by configurations.creating {
+    extendsFrom(idea)
+}
+val testLibs: Configuration by configurations.creating {
+    isTransitive = false
+}
 
-configurations {
-    register("gradle-tooling-extension") { extendsFrom(configurations["idea"]) }
-    register("jflex")
-    register("jflex-skeleton")
-    register("grammar-kit")
-    register("testLibs") { isTransitive = false }
+group = "com.demonwav.minecraft-dev"
+version = "$ideaVersionName-$coreVersion"
+
+val gradleToolingExtensionSourceSet: SourceSet = sourceSets.create("gradle-tooling-extension") {
+    configurations.named(compileOnlyConfigurationName) {
+        extendsFrom(gradleToolingExtension)
+    }
+}
+val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSourceSet.jarTaskName) {
+    from(gradleToolingExtensionSourceSet.output)
+    archiveClassifier.set("gradle-tooling-extension")
 }
 
 repositories {
@@ -62,69 +68,80 @@ repositories {
     maven("https://dl.bintray.com/minecraft-dev/maven")
     maven("https://repo.spongepowered.org/maven")
     maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-val gradleToolingExtension = sourceSets.create("gradle-tooling-extension") {
-    configurations.named<Configuration>(compileOnlyConfigurationName) {
-        extendsFrom(configurations["gradle-tooling-extension"])
-    }
-}
-val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtension.jarTaskName) {
-    from(gradleToolingExtension.output)
-    classifier = "gradle-tooling-extension"
+    maven("https://repo.gradle.org/gradle/libs-releases-local/")
+    maven("https://maven.extracraftx.com")
 }
 
 dependencies {
     // Add tools.jar for the JDI API
-    compile(files(Jvm.current().toolsJar))
+    implementation(files(Jvm.current().toolsJar))
 
-    compile(files(gradleToolingExtensionJar))
-
-    // gradle-intellij-plugin doesn't attach sources properly for Kotlin unless it's manually defined here
-    // compileOnly since it's only here for reference
+    // Kotlin
     compileOnly(kotlin("stdlib-jdk8"))
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutineVersion") {
+        isTransitive = false
+    }
 
-    "jflex"("org.jetbrains.idea:jflex:1.7.0-b7f882a")
-    "jflex-skeleton"("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
-    "grammar-kit"("org.jetbrains.idea:grammar-kit:1.5.1")
+    implementation(files(gradleToolingExtensionJar))
 
-    "testLibs"("org.jetbrains.idea:mockJDK:1.7-4d76c50")
-    "testLibs"("org.spongepowered:mixin:0.7-SNAPSHOT:thin")
+    implementation("com.extracraftx.minecraft:TemplateMakerFabric:0.3.0")
+
+    jflex("org.jetbrains.idea:jflex:1.7.0-b7f882a")
+    jflexSkeleton("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
+    grammarKit("org.jetbrains.idea:grammar-kit:1.5.1")
+
+    testLibs("org.jetbrains.idea:mockJDK:1.7-4d76c50")
+    testLibs("org.spongepowered:mixin:0.7-SNAPSHOT:thin")
+    testLibs("com.demonwav.mcdev:all-types-nbt:1.0@nbt")
+    testLibs("org.spongepowered:spongeapi:7.0.0:shaded")
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
-    // intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)
-    "gradle-tooling-extension"("com.jetbrains.intellij.gradle:gradle-tooling-extension:182.3684.90")
+    // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:193.5233.102")
+    gradleToolingExtension("org.jetbrains:annotations:19.0.0")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.1")
 }
 
 intellij {
     // IntelliJ IDEA dependency
     version = ideaVersion
     // Bundled plugin dependencies
-    setPlugins("maven", "gradle", "Groovy",
+    setPlugins(
+        "java",
+        "maven",
+        "gradle",
+        "Groovy",
         // needed dependencies for unit tests
-        "properties", "junit")
+        "properties",
+        "junit",
+        "org.toml.lang:$pluginTomlVersion"
+    )
 
     pluginName = "Minecraft Development"
     updateSinceUntilBuild = true
 
-    downloadSources = !CI && downloadIdeaSources.toBoolean()
+    downloadSources = downloadIdeaSources.toBoolean()
 
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
 
-publishPlugin {
-    if (properties["publish"] != null) {
-        project.version = "${project.version}-${properties["buildNumber"]}"
-
-        username(repoUsername)
-        password(repoPassword)
-        channels(repoChannel)
+tasks.publishPlugin {
+    // Build numbers are used for
+    properties["buildNumber"]?.let { buildNumber ->
+        project.version = "${project.version}-$buildNumber"
     }
+    properties["mcdev.deploy.token"]?.let { deployToken ->
+        token(deployToken)
+    }
+    channels(properties["mcdev.deploy.channel"] ?: "Stable")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -133,27 +150,53 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        freeCompilerArgs = listOf("-Xjvm-default=enable")
+    }
+    this.javaPackagePrefix
 }
 
 tasks.withType<GroovyCompile>().configureEach {
     options.compilerArgs = listOf("-proc:none")
 }
 
-processResources {
+tasks.processResources {
     for (lang in arrayOf("", "_en")) {
         from("src/main/resources/messages.MinecraftDevelopment_en_US.properties") {
             rename { "messages.MinecraftDevelopment$lang.properties" }
         }
     }
+    // These templates aren't allowed to be in a directory structure in the output jar
+    // But we have a lot of templates that would get real hard to deal with if we didn't have some structure
+    // So this just flattens out the fileTemplates/j2ee directory in the jar, while still letting us have directories
+    exclude("fileTemplates/j2ee/**")
+    from(fileTree("src/main/resources/fileTemplates/j2ee").files) {
+        eachFile {
+            this.relativePath = RelativePath(true, "fileTemplates", "j2ee", this.name)
+        }
+    }
 }
 
-test {
-    dependsOn(configurations["testLibs"])
+tasks.test {
+    dependsOn(testLibs)
+    useJUnitPlatform()
     doFirst {
-        configurations["testLibs"].resolvedConfiguration.resolvedArtifacts.forEach {
+        testLibs.resolvedConfiguration.resolvedArtifacts.forEach {
             systemProperty("testLibs.${it.name}", it.file.absolutePath)
         }
+    }
+    if (JavaVersion.current().isJava9Compatible) {
+        jvmArgs(
+            "--add-opens", "java.base/java.io=ALL-UNNAMED",
+            "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+            "--add-opens", "java.desktop/sun.awt=ALL-UNNAMED",
+            "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
+            "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
+            "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
+            "--add-opens", "java.desktop/sun.font=ALL-UNNAMED",
+            "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED"
+        )
     }
 }
 
@@ -184,12 +227,23 @@ license {
     exclude(
         "com/demonwav/mcdev/platform/mcp/at/gen/**",
         "com/demonwav/mcdev/nbt/lang/gen/**",
-        "com/demonwav/mcdev/i18n/lang/gen/**"
+        "com/demonwav/mcdev/platform/mixin/invalidInjectorMethodSignature/*.java",
+        "com/demonwav/mcdev/translations/lang/gen/**"
     )
 
     tasks {
         register("gradle") {
-            files = project.files("build.gradle.kts", "settings.gradle.kts", "gradle.properties")
+            files = project.fileTree(project.projectDir) {
+                include("**/*.gradle.kts", "gradle.properties")
+                exclude("**/buildSrc/**", "**/build/**")
+            }
+        }
+        register("buildSrc") {
+            val buildSrc = project.projectDir.resolve("buildSrc")
+            files = project.fileTree(buildSrc) {
+                include("**/*.kt", "**/*.kts")
+                exclude("**/build/**")
+            }
         }
         register("grammars") {
             files = project.fileTree("src/main/grammars")
@@ -197,93 +251,58 @@ license {
     }
 }
 
-// Credit for this intellij-rust
-// https://github.com/intellij-rust/intellij-rust/blob/d6b82e6aa2f64b877a95afdd86ec7b84394678c3/build.gradle#L131-L181
-fun generateLexer(name: String, flex: String, pack: String) = tasks.register<JavaExec>(name) {
-    val src = "src/main/grammars/$flex.flex"
-    val dst = "gen/com/demonwav/mcdev/$pack"
-    val output = "$dst/$flex.java"
-
-    classpath = configurations["jflex"]
-    main = "jflex.Main"
-
-    doFirst {
-        args(
-            "--skel", configurations["jflex-skeleton"].singleFile.absolutePath,
-            "-d", dst,
-            src
-        )
-
-        // Delete current lexer
-        delete(output)
-    }
-
-    inputs.files(src, configurations["jflex-skeleton"])
-    outputs.file(output)
+ktlint {
+    enableExperimentalRules.set(true)
 }
 
-fun generatePsiAndParser(name: String, bnf: String, pack: String) = tasks.register<JavaExec>(name) {
-    val src = "src/main/grammars/$bnf.bnf".replace('/', File.separatorChar)
-    val dstRoot = "gen"
-    val dst = "$dstRoot/com/demonwav/mcdev/$pack".replace('/', File.separatorChar)
-    val psiDir = "$dst/psi/".replace('/', File.separatorChar)
-    val parserDir = "$dst/parser/".replace('/', File.separatorChar)
-
-    doFirst {
-        delete(psiDir, parserDir)
-    }
-
-    classpath = configurations["grammar-kit"]
-    main = "org.intellij.grammar.Main"
-
-    args(dstRoot, src)
-
-    inputs.file(src)
-    outputs.dirs(mapOf(
-        "psi" to psiDir,
-        "parser" to parserDir
-    ))
+tasks.register("format") {
+    group = "minecraft"
+    description = "Formats source code according to project style"
+    val licenseFormat by tasks.existing
+    val ktlintFormat by tasks.existing
+    dependsOn(licenseFormat, ktlintFormat)
 }
 
-val generateAtLexer = generateLexer("generateAtLexer", "AtLexer", "platform/mcp/at/gen/")
-val generateAtPsiAndParser = generatePsiAndParser("generateAtPsiAndParser", "AtParser", "platform/mcp/at/gen")
+val generateAtLexer by lexer("AtLexer", "com/demonwav/mcdev/platform/mcp/at/gen")
+val generateAtParser by parser("AtParser", "com/demonwav/mcdev/platform/mcp/at/gen")
 
-val generateNbttLexer = generateLexer("generateNbttLexer", "NbttLexer", "nbt/lang/gen/")
-val generateNbttPsiAndParser = generatePsiAndParser("generateNbttPsiAndParser", "NbttParser", "nbt/lang/gen")
+val generateNbttLexer by lexer("NbttLexer", "com/demonwav/mcdev/nbt/lang/gen")
+val generateNbttParser by parser("NbttParser", "com/demonwav/mcdev/nbt/lang/gen")
 
-val generateI18nLexer = generateLexer("generateI18nLexer", "I18nLexer", "i18n/lang/gen/")
-val generateI18nPsiAndParser = generatePsiAndParser("generateI18nPsiAndParser", "I18nParser", "i18n/lang/gen")
+val generateLangLexer by lexer("LangLexer", "com/demonwav/mcdev/translations/lang/gen")
+val generateLangParser by parser("LangParser", "com/demonwav/mcdev/translations/lang/gen")
 
-val generateI18nTemplateLexer = generateLexer("generateI18nTemplateLexer", "I18nTemplateLexer", "i18n/lang/gen/")
+val generateTranslationTemplateLexer by lexer("TranslationTemplateLexer", "com/demonwav/mcdev/translations/lang/gen")
 
-val generate = tasks.register("generate") {
+val generate by tasks.registering {
     group = "minecraft"
     description = "Generates sources needed to compile the plugin."
+    outputs.dir("gen")
     dependsOn(
         generateAtLexer,
-        generateAtPsiAndParser,
+        generateAtParser,
         generateNbttLexer,
-        generateNbttPsiAndParser,
-        generateI18nLexer,
-        generateI18nPsiAndParser,
-        generateI18nTemplateLexer
+        generateNbttParser,
+        generateLangLexer,
+        generateLangParser,
+        generateTranslationTemplateLexer
     )
-    outputs.dir("gen")
 }
 
-sourceSets.named<SourceSet>("main") { java.srcDir(generate) }
+sourceSets.main { java.srcDir(generate) }
 
 // Remove gen directory on clean
-clean { delete(generate) }
+tasks.clean { delete(generate) }
 
-runIde {
+tasks.runIde {
     maxHeapSize = "2G"
 
+    jvmArgs("--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED")
     System.getProperty("debug")?.let {
         systemProperty("idea.ProcessCanceledException", "disabled")
         systemProperty("idea.debug.mode", "true")
     }
+    // Set these properties to test different languages
+    // systemProperty("user.language", "en")
+    // systemProperty("user.country", "US")
 }
-
-inline fun <reified T : Task> TaskContainer.existing() = existing(T::class)
-inline fun <reified T : Task> TaskContainer.register(name: String, configuration: Action<in T>) = register(name, T::class, configuration)
