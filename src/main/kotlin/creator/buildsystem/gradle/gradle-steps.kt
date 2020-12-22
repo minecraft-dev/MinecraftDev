@@ -213,10 +213,10 @@ class BasicGradleFinalizerStep(
     override fun runStep(indicator: ProgressIndicator) {
         // Tell IntelliJ to import this project
         rootDirectory.virtualFileOrError.refresh(false, true)
-        @Suppress("UnstableApiUsage")
-        linkAndRefreshGradleProject(rootDirectory.toAbsolutePath().toString(), project)
 
         invokeLater {
+            @Suppress("UnstableApiUsage")
+            linkAndRefreshGradleProject(rootDirectory.toAbsolutePath().toString(), project)
             showProgress(project)
         }
 
