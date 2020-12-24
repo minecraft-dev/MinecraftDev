@@ -69,7 +69,6 @@ repositories {
     maven("https://repo.spongepowered.org/maven")
     maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
     maven("https://repo.gradle.org/gradle/libs-releases-local/")
-    maven("https://www.jetbrains.com/intellij-repository/snapshots")
     maven("https://maven.extracraftx.com")
 }
 
@@ -99,7 +98,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:203-EAP-SNAPSHOT")
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:203.5981.155")
     gradleToolingExtension("org.jetbrains:annotations:19.0.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
