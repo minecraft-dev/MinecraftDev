@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.forge.framework
 
+import com.demonwav.mcdev.util.libraryKind
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-val FORGE_LIBRARY_KIND: LibraryKind = LibraryKind.create("forge-library")
+val FORGE_LIBRARY_KIND: LibraryKind = libraryKind("forge-library")

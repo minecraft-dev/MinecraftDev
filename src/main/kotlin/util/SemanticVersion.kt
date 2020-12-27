@@ -20,7 +20,7 @@ import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.TextPart
  * to the version ranking with decreasing priority from left to right.
  */
 class SemanticVersion(
-    private val parts: List<VersionPart>,
+    val parts: List<VersionPart>,
     private val buildMetadata: String = ""
 ) : Comparable<SemanticVersion> {
 
