@@ -8,7 +8,7 @@
  * MIT License
  */
 
-import net.minecrell.gradle.licenser.header.HeaderStyle
+import org.cadixdev.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -24,8 +24,8 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.6.3"
-    id("net.minecrell.licenser") version "0.4.1"
+    id("org.jetbrains.intellij") version "0.6.5"
+    id("org.cadixdev.licenser") version "0.5.0"
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
 }
 
