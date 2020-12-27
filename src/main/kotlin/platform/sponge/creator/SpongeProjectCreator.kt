@@ -29,7 +29,7 @@ import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
 import com.demonwav.mcdev.util.runWriteAction
-import com.demonwav.mcdev.util.runWriteTask
+import com.demonwav.mcdev.util.runWriteTaskInSmartMode
 import com.demonwav.mcdev.util.virtualFileOrError
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
@@ -164,7 +164,7 @@ class SpongeMainClassModifyStep(
     override fun runStep(indicator: ProgressIndicator) {
         val dirs = buildSystem.dirsOrError
 
-        runWriteTask {
+        project.runWriteTaskInSmartMode {
             val targetDir = dirs.sourceDirectory.resolve(Paths.get(packageName.replace('.', '/')))
             if (!Files.isDirectory(targetDir)) {
                 throw IllegalStateException("$targetDir is not an existing directory")

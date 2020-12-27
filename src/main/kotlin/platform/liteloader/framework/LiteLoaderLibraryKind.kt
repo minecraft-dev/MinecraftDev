@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.liteloader.framework
 
+import com.demonwav.mcdev.util.libraryKind
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-val LITELOADER_LIBRARY_KIND: LibraryKind = LibraryKind.create("liteloader-library")
+val LITELOADER_LIBRARY_KIND: LibraryKind = libraryKind("liteloader-library")

@@ -55,6 +55,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
             // Set mcmod.info icon
             runWriteTaskLater {
                 FileTypeManager.getInstance().associatePattern(JsonFileType.INSTANCE, ForgeConstants.MCMOD_INFO)
+                FileTypeManager.getInstance().associatePattern(JsonFileType.INSTANCE, ForgeConstants.PACK_MCMETA)
             }
 
             // Index @SideOnly

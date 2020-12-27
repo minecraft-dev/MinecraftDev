@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mcp.framework
 
+import com.demonwav.mcdev.util.libraryKind
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-val MCP_LIBRARY_KIND: LibraryKind = LibraryKind.create("mcp-library")
+val MCP_LIBRARY_KIND: LibraryKind = libraryKind("mcp-library")

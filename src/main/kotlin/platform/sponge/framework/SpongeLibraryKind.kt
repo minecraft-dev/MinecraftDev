@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.sponge.framework
 
+import com.demonwav.mcdev.util.libraryKind
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-val SPONGE_LIBRARY_KIND: LibraryKind = LibraryKind.create("sponge-api")
+val SPONGE_LIBRARY_KIND: LibraryKind = libraryKind("sponge-api")

@@ -16,13 +16,17 @@ import com.demonwav.mcdev.platform.BaseTemplate
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_GRADLE_PROPERTIES_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_MAIN_CLASS_TEMPLATE
+import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_MAIN_CLASS_V2_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_POM_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_SETTINGS_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_SUBMODULE_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_SUBMODULE_POM_TEMPLATE
+import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.openapi.project.Project
 
 object VelocityTemplate : BaseTemplate() {
+
+    private val VELOCITY_2_SNAPSHOT = SemanticVersion.parse("2.0.0-SNAPSHOT")
 
     fun applyPom(project: Project): String =
         project.applyTemplate(VELOCITY_POM_TEMPLATE, BasicMavenStep.pluginVersions)
@@ -34,7 +38,8 @@ object VelocityTemplate : BaseTemplate() {
         project: Project,
         packageName: String,
         className: String,
-        hasDependencies: Boolean
+        hasDependencies: Boolean,
+        version: SemanticVersion
     ): String {
         val props = mutableMapOf(
             "PACKAGE" to packageName,
@@ -45,7 +50,13 @@ object VelocityTemplate : BaseTemplate() {
             props["HAS_DEPENDENCIES"] = "true"
         }
 
-        return project.applyTemplate(VELOCITY_MAIN_CLASS_TEMPLATE, props)
+        val template = if (version < VELOCITY_2_SNAPSHOT) {
+            VELOCITY_MAIN_CLASS_TEMPLATE
+        } else {
+            VELOCITY_MAIN_CLASS_V2_TEMPLATE
+        }
+
+        return project.applyTemplate(template, props)
     }
 
     fun applyBuildGradle(project: Project, buildSystem: BuildSystem): String {
