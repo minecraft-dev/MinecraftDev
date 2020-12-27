@@ -2,6 +2,7 @@ name: Windows Build
 on: [push, pull_request]
 jobs:
   build:
+    name: Build
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -16,4 +17,4 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - uses: gradle/wrapper-validation-action@v1
-      - run: gradlew.bat build --no-daemon --stacktrace
+      - run: .\gradlew.bat build --no-daemon --stacktrace

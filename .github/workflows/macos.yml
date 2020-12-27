@@ -2,6 +2,7 @@ name: macOS Build
 on: [push, pull_request]
 jobs:
   build:
+    name: Build
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
