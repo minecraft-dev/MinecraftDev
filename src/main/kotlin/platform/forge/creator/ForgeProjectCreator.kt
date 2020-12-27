@@ -21,6 +21,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
+import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.runGradleTask
 import com.demonwav.mcdev.util.runWriteTask
@@ -252,7 +253,8 @@ class Fg3ProjectFilesStep(
 
     override fun runStep(indicator: ProgressIndicator) {
         val modsTomlText = Fg3Template.applyModsToml(project, buildSystem, config)
-        val packMcmetaText = Fg3Template.applyPackMcmeta(project, buildSystem.artifactId)
+        val packDescriptor = ForgePackDescriptor.forMcVersion(config.mcVersion) ?: ForgePackDescriptor.FORMAT_3
+        val packMcmetaText = Fg3Template.applyPackMcmeta(project, buildSystem.artifactId, packDescriptor)
         val dir = buildSystem.dirsOrError.resourceDirectory
         runWriteTask {
             CreatorStep.writeTextToFile(project, dir, ForgeConstants.PACK_MCMETA, packMcmetaText)

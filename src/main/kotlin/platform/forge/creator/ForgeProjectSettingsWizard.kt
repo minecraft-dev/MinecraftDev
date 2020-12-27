@@ -213,26 +213,15 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     private suspend fun updateForm(): Data? = coroutineScope {
         val vers = versions ?: return@coroutineScope null
 
-        val finalVersion = when {
-            version != null -> {
-                // selected version
-                version ?: return@coroutineScope null
-            }
-            else -> {
-                // Default Forge
-                vers.forgeVersion.sortedMcVersions.firstOrNull() ?: return@coroutineScope null
-            }
-        }
+        val selectedVersion = version ?: vers.forgeVersion.sortedMcVersions.firstOrNull() ?: return@coroutineScope null
 
-        val mcpVersionListJob = async(Dispatchers.IO) { vers.mcpVersion.getMcpVersionList(finalVersion) }
-        val forgeVersionsJob = async(Dispatchers.IO) { vers.forgeVersion.getForgeVersions(finalVersion) }
+        val mcpVersionListJob = async(Dispatchers.IO) { vers.mcpVersion.getMcpVersionList(selectedVersion) }
+        val forgeVersionsJob = async(Dispatchers.IO) { vers.forgeVersion.getForgeVersions(selectedVersion) }
 
         val mcpVersionList = mcpVersionListJob.await()
         val forgeVersions = forgeVersionsJob.await()
 
-        val forgeIndex = 0
-
-        val data = Data(0, mcpVersionList, forgeVersions, forgeIndex)
+        val data = Data(0, mcpVersionList, forgeVersions, 0)
 
         mcVersionUpdate(data)
 

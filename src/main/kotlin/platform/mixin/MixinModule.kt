@@ -48,7 +48,7 @@ class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
                 .map { MixinConfig(project, it) }
         }
 
-        fun getAllMixins(
+        fun getAllMixinClasses(
             project: Project,
             scope: GlobalSearchScope
         ): Collection<PsiClass> {

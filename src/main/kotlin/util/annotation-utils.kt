@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.util
 
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiArrayInitializerMemberValue
@@ -18,6 +19,7 @@ import com.intellij.psi.PsiClassObjectAccessExpression
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.codeStyle.JavaCodeStyleManager
 
 fun PsiModifierListOwner.findAnnotation(qualifiedName: String): PsiAnnotation? {
     return modifierList?.findAnnotation(qualifiedName)
@@ -80,3 +82,20 @@ val PsiElement.annotationFromArrayValue: PsiAnnotation?
             parent.annotationFromNameValuePair
         }
     }
+
+fun PsiModifierListOwner.addAnnotation(annotationText: String): PsiAnnotation? {
+    val annotation = JavaPsiFacade.getElementFactory(this.project).createAnnotationFromText(annotationText, this)
+    return this.addAnnotation(annotation)
+}
+
+fun PsiModifierListOwner.addAnnotation(annotation: PsiAnnotation): PsiAnnotation? {
+    val modifierList = this.modifierList ?: return null
+    val fqn = annotation.qualifiedName ?: return null
+    val inserted = modifierList.addAnnotation(fqn)
+    for (pair in annotation.parameterList.attributes) {
+        inserted.setDeclaredAttributeValue(pair.name, pair.value)
+    }
+
+    JavaCodeStyleManager.getInstance(project).shortenClassReferences(inserted)
+    return inserted
+}

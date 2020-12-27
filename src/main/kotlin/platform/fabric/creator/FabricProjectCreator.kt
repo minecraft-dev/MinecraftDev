@@ -23,6 +23,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.util.License
+import com.demonwav.mcdev.util.addAnnotation
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.addMethod
 import com.demonwav.mcdev.util.invokeLater
@@ -35,7 +36,6 @@ import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.codeInsight.daemon.impl.quickfix.CreateFromUsageUtils
 import com.intellij.codeInsight.generation.OverrideImplementUtil
 import com.intellij.codeInsight.generation.PsiMethodMember
-import com.intellij.codeInsight.intention.AddAnnotationFix
 import com.intellij.ide.util.EditorHelper
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi.JsonArray
@@ -404,12 +404,7 @@ class CreateEntryPointStep(
     }
 
     private fun addEnvironmentAnnotation(owner: PsiModifierListOwner, envType: String) {
-        val elementFactory = JavaPsiFacade.getElementFactory(project)
-        val annotationText =
-            "@${FabricConstants.ENVIRONMENT_ANNOTATION}(${FabricConstants.ENV_TYPE}.$envType)"
-        val annotation = elementFactory.createAnnotationFromText(annotationText, owner)
-        AddAnnotationFix(FabricConstants.ENVIRONMENT_ANNOTATION, owner, annotation.parameterList.attributes)
-            .applyFix()
+        owner.addAnnotation("@${FabricConstants.ENVIRONMENT_ANNOTATION}(${FabricConstants.ENV_TYPE}.$envType)")
     }
 
     private fun addEnvironmentInterfaceAnnotation(
@@ -417,14 +412,11 @@ class CreateEntryPointStep(
         envType: String,
         interfaceQualifiedName: String
     ) {
-        val elementFactory = JavaPsiFacade.getElementFactory(project)
         val annotationText = "@${FabricConstants.ENVIRONMENT_INTERFACE_ANNOTATION}(" +
             "value=${FabricConstants.ENV_TYPE}.$envType," +
             "itf=$interfaceQualifiedName.class" +
             ")"
-        val annotation = elementFactory.createAnnotationFromText(annotationText, owner)
-        AddAnnotationFix(FabricConstants.ENVIRONMENT_INTERFACE_ANNOTATION, owner, annotation.parameterList.attributes)
-            .applyFix()
+        owner.addAnnotation(annotationText)
     }
 
     private fun implementAll(clazz: PsiClass, editor: Editor) {

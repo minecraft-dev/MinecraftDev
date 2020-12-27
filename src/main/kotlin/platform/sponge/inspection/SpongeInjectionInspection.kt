@@ -121,7 +121,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
             }
 
             val classType = variable.type as? PsiClassReferenceType ?: return
-            val name = classType.fullQualifiedName ?: return
+            val name = classType.resolve()?.qualifiedName ?: return
 
             // Check if injection is possible with the current type
             if (name !in injectableTypesList) {
@@ -324,7 +324,10 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
             "ninja.leaping.configurate.objectmapping.GuiceObjectMapperFactory",
             "com.google.inject.Injector",
             "org.spongepowered.api.plugin.PluginContainer",
-            "org.spongepowered.api.asset.Asset"
+            "org.spongepowered.api.asset.Asset",
+
+            "org.bstats.sponge.MetricsLite2.Factory",
+            "org.bstats.sponge.Metrics2.Factory"
         )
 
         val serializedDefaultInjectableTypes: String = formatString(defaultInjectableTypes)

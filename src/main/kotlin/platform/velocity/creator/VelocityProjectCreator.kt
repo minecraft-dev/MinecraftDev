@@ -29,7 +29,7 @@ import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.runWriteAction
-import com.demonwav.mcdev.util.runWriteTask
+import com.demonwav.mcdev.util.runWriteTaskInSmartMode
 import com.demonwav.mcdev.util.virtualFileOrError
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
@@ -56,7 +56,8 @@ sealed class VelocityProjectCreator<T : BuildSystem>(
 
     protected fun setupMainClassSteps(): Pair<CreatorStep, CreatorStep> {
         val mainClassStep = createJavaClassStep(config.mainClass) { packageName, className ->
-            VelocityTemplate.applyMainClass(project, packageName, className, config.hasDependencies())
+            val version = SemanticVersion.parse(config.velocityApiVersion)
+            VelocityTemplate.applyMainClass(project, packageName, className, config.hasDependencies(), version)
         }
 
         return mainClassStep to VelocityMainClassModifyStep(project, buildSystem, config.mainClass, config)
@@ -159,7 +160,7 @@ class VelocityMainClassModifyStep(
     override fun runStep(indicator: ProgressIndicator) {
         val dirs = buildSystem.dirsOrError
 
-        runWriteTask {
+        project.runWriteTaskInSmartMode {
             val classFile = dirs.sourceDirectory.resolve(Paths.get(classFullName.replace('.', '/') + ".java"))
             if (!Files.isRegularFile(classFile)) {
                 throw IllegalStateException("$classFile is not an existing file")

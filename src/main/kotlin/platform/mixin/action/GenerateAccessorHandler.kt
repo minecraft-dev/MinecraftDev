@@ -220,7 +220,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
     }
 
     private fun getOrCreateAccessorMixin(project: Project, targetClass: PsiClass): PsiClass? {
-        val mixins = MixinModule.getAllMixins(project, GlobalSearchScope.projectScope(project))
+        val mixins = MixinModule.getAllMixinClasses(project, GlobalSearchScope.projectScope(project))
             .asSequence()
             .filter { it.isWritable }
             .filter { it.isAccessorMixin }
@@ -243,7 +243,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
 
         if (config == null) {
             // TODO: generate the mixin configuration file (modding platform dependent)
-            val message = "There is no matching mixin configuration file found in the project. " +
+            val message = "There is no matching Mixin configuration file found in the project. " +
                 "Please create one and try again."
             Messages.showInfoMessage(project, message, "Generate Accessor/Invoker")
             return null

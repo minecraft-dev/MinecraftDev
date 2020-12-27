@@ -31,7 +31,7 @@ import com.intellij.psi.search.GlobalSearchScope
 
 class UnusedMixinInspection : MixinInspection() {
 
-    override fun getStaticDescription() = "Ensures that all mixin classes are referenced from a mixin configuration"
+    override fun getStaticDescription() = "Ensures that all Mixin classes are referenced from a Mixin configuration"
 
     override fun buildVisitor(holder: ProblemsHolder) = Visitor(holder)
 
@@ -76,7 +76,7 @@ class UnusedMixinInspection : MixinInspection() {
         private val qualifiedName: String,
         private val side: Side
     ) : LocalQuickFix {
-        override fun getName() = "Add to mixin config"
+        override fun getName() = "Add to Mixin config"
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val psiFile = PsiManager.getInstance(project).findFile(quickFixFile) as? JsonFile ?: return
