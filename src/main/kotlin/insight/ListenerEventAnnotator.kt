@@ -80,12 +80,10 @@ class ListenerEventAnnotator : Annotator {
             return
         }
 
-        if (!instance.isStaticListenerSupported(method.javaPsi) && method.isStatic) {
-            method.javaPsi.nameIdentifier?.let {
-                holder.newAnnotation(HighlightSeverity.ERROR, "Event listener method must not be static")
-                    .range(it)
-                    .create()
-            }
+        if (method.isStatic && element.toUElement()?.uastParent is UMethod &&
+            !instance.isStaticListenerSupported(method.javaPsi)
+        ) {
+            holder.newAnnotation(HighlightSeverity.ERROR, "Event listener method must not be static").create()
         }
 
         if (element.getUastParentOfType<UParameter>()?.sourcePsi == eventParameter.sourcePsi &&
