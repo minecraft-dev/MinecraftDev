@@ -18,14 +18,17 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.velocity.generation.VelocityGenerationData
 import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
 import com.demonwav.mcdev.platform.velocity.util.VelocityConstants.SUBSCRIBE_ANNOTATION
+import com.intellij.lang.jvm.JvmModifier
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UIdentifier
+import org.jetbrains.uast.toUElementOfType
 
 class VelocityModule(facet: MinecraftFacet) : AbstractModule(facet) {
     override val moduleType = VelocityModuleType
@@ -71,11 +74,13 @@ class VelocityModule(facet: MinecraftFacet) : AbstractModule(facet) {
     }
 
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
-        if (element !is PsiIdentifier) {
-            return false
-        }
+        val identifier = element?.toUElementOfType<UIdentifier>()
+            ?: return false
 
-        val psiClass = element.parent as? PsiClass ?: return false
-        return psiClass.hasAnnotation(VelocityConstants.PLUGIN_ANNOTATION)
+        val psiClass = identifier.uastParent as? UClass
+            ?: return false
+
+        return !psiClass.hasModifier(JvmModifier.ABSTRACT) &&
+            psiClass.findAnnotation(VelocityConstants.PLUGIN_ANNOTATION) != null
     }
 }

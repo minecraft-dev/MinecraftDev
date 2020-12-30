@@ -20,16 +20,19 @@ import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
+import com.intellij.lang.jvm.JvmModifier
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UIdentifier
+import org.jetbrains.uast.toUElementOfType
 
 class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
@@ -89,18 +92,14 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
     }
 
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
-        if (element !is PsiIdentifier) {
-            return false
-        }
+        val identifier = element?.toUElementOfType<UIdentifier>()
+            ?: return false
 
-        if (element.parent !is PsiClass) {
-            return false
-        }
+        val psiClass = identifier.uastParent as? UClass
+            ?: return false
 
-        val psiClass = element.parent as PsiClass
-
-        val modifierList = psiClass.modifierList
-        return modifierList?.findAnnotation(SpongeConstants.PLUGIN_ANNOTATION) != null
+        return !psiClass.hasModifier(JvmModifier.ABSTRACT) &&
+            psiClass.findAnnotation(SpongeConstants.PLUGIN_ANNOTATION) != null
     }
 
     override fun checkUselessCancelCheck(expression: PsiMethodCallExpression): IsCancelled? {

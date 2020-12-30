@@ -17,7 +17,7 @@ object BukkitConstants {
     const val LISTENER_CLASS = "org.bukkit.event.Listener"
     const val CHAT_COLOR_CLASS = "org.bukkit.ChatColor"
     const val EVENT_CLASS = "org.bukkit.event.Event"
-    const val JAVA_PLUGIN = "org.bukkit.plugin.java.JavaPlugin"
+    const val PLUGIN = "org.bukkit.plugin.Plugin"
     const val EVENT_ISCANCELLED_METHOD_NAME = "isCancelled"
     const val CANCELLABLE_CLASS = "org.bukkit.event.Cancellable"
 }

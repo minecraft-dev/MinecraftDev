@@ -25,13 +25,14 @@ import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.nullable
+import com.intellij.lang.jvm.JvmModifier
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.util.PsiTypesUtil
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UIdentifier
+import org.jetbrains.uast.toUElementOfType
 
 class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
@@ -103,20 +104,17 @@ class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, typ
     }
 
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
-        if (element !is PsiIdentifier) {
-            return false
-        }
+        val identifier = element?.toUElementOfType<UIdentifier>()
+            ?: return false
 
-        if (element.parent !is PsiClass) {
-            return false
-        }
+        val psiClass = (identifier.uastParent as? UClass)?.javaPsi
+            ?: return false
 
-        val project = element.project
-        val psiClass = element.parent as PsiClass
-        val pluginClass = JavaPsiFacade.getInstance(project)
-            .findClass(BungeeCordConstants.PLUGIN, GlobalSearchScope.allScope(project))
+        val pluginInterface = JavaPsiFacade.getInstance(element.project)
+            .findClass(BungeeCordConstants.PLUGIN, module.getModuleWithDependenciesAndLibrariesScope(false))
+            ?: return false
 
-        return pluginClass != null && psiClass.extendsListTypes.any { c -> c == PsiTypesUtil.getClassType(pluginClass) }
+        return !psiClass.hasModifier(JvmModifier.ABSTRACT) && psiClass.isInheritor(pluginInterface, true)
     }
 
     override fun dispose() {
