@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INVOKER
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MIXIN
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.ARGS
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.findQualifiedClass
@@ -115,3 +116,6 @@ fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType
             ?: return null
     return JavaPsiFacade.getElementFactory(project).createType(psiClass, boxedType)
 }
+
+fun argsType(project: Project): PsiType =
+    PsiType.getTypeByName(ARGS, project, GlobalSearchScope.allScope(project))
