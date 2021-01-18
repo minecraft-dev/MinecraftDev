@@ -13,9 +13,9 @@ package com.demonwav.mcdev.platform.mixin.inspection.injector
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.platform.mixin.util.argsType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoReturnableType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoType
-import com.demonwav.mcdev.platform.mixin.util.argsType
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
@@ -78,9 +78,9 @@ enum class InjectorType(private val annotation: String) {
             // Right now we allow any parameters here since we can't easily
             // detect the local variables that can be captured
             if ((
-                        (annotation.findDeclaredAttributeValue("locals") as? PsiQualifiedReference)
-                            ?.referenceName ?: "NO_CAPTURE"
-                        ) != "NO_CAPTURE"
+                (annotation.findDeclaredAttributeValue("locals") as? PsiQualifiedReference)
+                    ?.referenceName ?: "NO_CAPTURE"
+                ) != "NO_CAPTURE"
             ) {
                 result.add(ParameterGroup(null))
             }
