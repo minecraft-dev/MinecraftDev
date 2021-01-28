@@ -19,7 +19,7 @@ buildscript {
 }
 
 plugins {
-    kotlin("jvm") version "1.4.0" // kept in sync with IntelliJ's bundled dep
+    kotlin("jvm") version "1.4.21" // kept in sync with IntelliJ's bundled dep
     java
     mcdev
     groovy
@@ -29,7 +29,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
 }
 
-val coroutineVersion = "1.3.9" // Coroutine version also kept in sync with IntelliJ's bundled dep
+val coroutineVersion = "1.4.2" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
 val ideaVersion: String by project
 val ideaVersionName: String by project
@@ -98,8 +98,8 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:203.5981.155")
-    gradleToolingExtension("org.jetbrains:annotations:19.0.0")
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:211-EAP-SNAPSHOT")
+    gradleToolingExtension("org.jetbrains:annotations:20.1.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.1")
@@ -151,7 +151,7 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
         freeCompilerArgs = listOf("-Xjvm-default=enable")
     }
     this.javaPackagePrefix
