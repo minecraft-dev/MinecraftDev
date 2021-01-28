@@ -11,11 +11,12 @@
 package com.demonwav.mcdev.errorreporter
 
 import com.demonwav.mcdev.update.PluginUtil
+import com.intellij.diagnostic.DiagnosticBundle
 import com.intellij.diagnostic.LogMessage
-import com.intellij.diagnostic.ReportMessages
 import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.idea.IdeaLogger
+import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -81,8 +82,8 @@ class ErrorReporter : ErrorReportSubmitter() {
                         "<a href=\"$htmlUrl\">View comment.</a></html>"
                 }
 
-                ReportMessages.GROUP.createNotification(
-                    ReportMessages.getErrorReport(),
+                NotificationGroupManager.getInstance().getNotificationGroup("Error Report").createNotification(
+                    DiagnosticBundle.message("error.report.title"),
                     message,
                     NotificationType.INFORMATION,
                     NotificationListener.URL_OPENING_LISTENER
@@ -91,8 +92,8 @@ class ErrorReporter : ErrorReportSubmitter() {
             { e ->
                 val message = "<html>Error Submitting Issue: ${e.message}<br>Consider opening an issue on " +
                     "<a href=\"$baseUrl\">the GitHub issue tracker.</a></html>"
-                ReportMessages.GROUP.createNotification(
-                    ReportMessages.getErrorReport(),
+                NotificationGroupManager.getInstance().getNotificationGroup("Error Report").createNotification(
+                    DiagnosticBundle.message("error.report.title"),
                     message,
                     NotificationType.ERROR,
                     NotificationListener.URL_OPENING_LISTENER
