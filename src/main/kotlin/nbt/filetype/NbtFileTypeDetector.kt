@@ -18,8 +18,6 @@ import com.intellij.openapi.util.io.ByteSequence
 import com.intellij.openapi.vfs.VirtualFile
 
 class NbtFileTypeDetector : FileTypeRegistry.FileTypeDetector {
-    override fun getVersion() = 1
-
     override fun detect(file: VirtualFile, firstBytes: ByteSequence, firstCharsIfText: CharSequence?): FileType? {
         return try {
             // 20 ms is plenty of time to parse most files
