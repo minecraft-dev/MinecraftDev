@@ -12,18 +12,22 @@ package com.demonwav.mcdev.nbt.lang.format
 
 import com.demonwav.mcdev.nbt.lang.NbttLanguage
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttTypes
+import com.intellij.formatting.FormattingContext
 import com.intellij.formatting.FormattingModel
 import com.intellij.formatting.FormattingModelBuilder
 import com.intellij.formatting.FormattingModelProvider
 import com.intellij.formatting.Indent
 import com.intellij.formatting.SpacingBuilder
-import com.intellij.psi.PsiElement
 import com.intellij.psi.codeStyle.CodeStyleSettings
 
 class NbttFormattingModelBuilder : FormattingModelBuilder {
-    override fun createModel(element: PsiElement, settings: CodeStyleSettings): FormattingModel {
-        val block = NbttBlock(element.node, settings, Indent.getNoneIndent(), null)
-        return FormattingModelProvider.createFormattingModelForPsiFile(element.containingFile, block, settings)
+    override fun createModel(formattingContext: FormattingContext): FormattingModel {
+        val block = NbttBlock(formattingContext.node, formattingContext.codeStyleSettings, Indent.getNoneIndent(), null)
+        return FormattingModelProvider.createFormattingModelForPsiFile(
+            formattingContext.containingFile,
+            block,
+            formattingContext.codeStyleSettings
+        )
     }
 
     companion object {
