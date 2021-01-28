@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.mixin.MixinModule
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
@@ -21,7 +22,6 @@ import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.invokeDeclaredMethod
 import com.demonwav.mcdev.util.invokeLater
-import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.codeInsight.daemon.impl.quickfix.CreateClassKind
 import com.intellij.codeInsight.generation.ClassMember
 import com.intellij.codeInsight.generation.GenerateMembersHandlerBase
@@ -277,14 +277,15 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                     JavaDirectoryService.getInstance().createInterface(pkg, name)
                 } catch (e: IncorrectOperationException) {
                     invokeLater {
-                        val message = "${CodeInsightBundle.message(
+                        val message = MCDevBundle.message(
                             "intention.error.cannot.create.class.message",
-                            name
-                        )}\n${e.localizedMessage}"
+                            name,
+                            e.localizedMessage
+                        )
                         Messages.showErrorDialog(
                             project,
                             message,
-                            CodeInsightBundle.message("intention.error.cannot.create.class.title")
+                            MCDevBundle.message("intention.error.cannot.create.class.title")
                         )
                     }
                     return@compute null

@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.fabric.creator
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.BaseProjectCreator
 import com.demonwav.mcdev.creator.CreatorStep
 import com.demonwav.mcdev.creator.PostMultiModuleAware
@@ -32,7 +33,6 @@ import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.runWriteTaskInSmartMode
 import com.demonwav.mcdev.util.virtualFile
-import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.codeInsight.daemon.impl.quickfix.CreateFromUsageUtils
 import com.intellij.codeInsight.generation.OverrideImplementUtil
 import com.intellij.codeInsight.generation.PsiMethodMember
@@ -299,14 +299,15 @@ class CreateEntryPointStep(
                 JavaDirectoryService.getInstance().createClass(psiDir, className)
             } catch (e: IncorrectOperationException) {
                 invokeLater {
-                    val message = CodeInsightBundle.message(
+                    val message = MCDevBundle.message(
                         "intention.error.cannot.create.class.message",
-                        className
-                    ) + '\n' + e.localizedMessage
+                        className,
+                        e.localizedMessage
+                    )
                     Messages.showErrorDialog(
                         project,
                         message,
-                        CodeInsightBundle.message("intention.error.cannot.create.class.title")
+                        MCDevBundle.message("intention.error.cannot.create.class.title")
                     )
                 }
                 return@runWriteTaskInSmartMode
