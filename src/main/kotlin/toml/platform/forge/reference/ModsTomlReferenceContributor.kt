@@ -39,7 +39,7 @@ import org.jetbrains.uast.getContainingUClass
 import org.jetbrains.uast.getParentOfType
 import org.jetbrains.uast.toUElement
 import org.toml.lang.psi.TomlArrayTable
-import org.toml.lang.psi.TomlKey
+import org.toml.lang.psi.TomlKeySegment
 import org.toml.lang.psi.TomlPsiFactory
 import org.toml.lang.psi.TomlValue
 
@@ -54,8 +54,8 @@ class ModsTomlReferenceContributor : PsiReferenceContributor() {
 
 object ModsTomlDependencyIdReferenceProvider : PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
-        val key = element as? TomlKey ?: return PsiReference.EMPTY_ARRAY
-        return arrayOf(ModsTomlDependencyIdReference(key))
+        val keySegment = element as? TomlKeySegment ?: return PsiReference.EMPTY_ARRAY
+        return arrayOf(ModsTomlDependencyIdReference(keySegment))
     }
 }
 
@@ -81,11 +81,11 @@ class LogoFileReferenceSet(element: PsiElement, text: String, offset: Int, provi
         Condition { it.virtualFile.fileType.name == "Image" }
 }
 
-class ModsTomlDependencyIdReference(key: TomlKey) : PsiReferenceBase<TomlKey>(key) {
+class ModsTomlDependencyIdReference(keySegment: TomlKeySegment) : PsiReferenceBase<TomlKeySegment>(keySegment) {
     override fun resolve(): PsiElement? {
         val referencedId = element.text
         return element.containingFile.childrenOfType<TomlArrayTable>()
-            .filter { it.header.names.firstOrNull()?.text == "mods" }
+            .filter { it.header.key?.segments?.firstOrNull()?.text == "mods" }
             .mapNotNull { table ->
                 table.entries.find {
                     it.key.text == "modId" && it.value?.stringValue() == referencedId
@@ -96,7 +96,7 @@ class ModsTomlDependencyIdReference(key: TomlKey) : PsiReferenceBase<TomlKey>(ke
 
     override fun getVariants(): Array<Any> =
         element.containingFile.childrenOfType<TomlArrayTable>()
-            .filter { it.header.names.firstOrNull()?.text == "mods" }
+            .filter { it.header.key?.segments?.firstOrNull()?.text == "mods" }
             .mapNotNull { table -> table.entries.find { it.key.text == "modId" }?.value?.stringValue() }
             .toTypedArray()
 

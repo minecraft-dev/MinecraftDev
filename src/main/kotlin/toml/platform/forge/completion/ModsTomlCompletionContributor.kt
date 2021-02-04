@@ -29,6 +29,7 @@ import com.intellij.util.ProcessingContext
 import org.toml.lang.psi.TomlArrayTable
 import org.toml.lang.psi.TomlHeaderOwner
 import org.toml.lang.psi.TomlKey
+import org.toml.lang.psi.TomlKeySegment
 import org.toml.lang.psi.TomlKeyValue
 import org.toml.lang.psi.TomlKeyValueOwner
 import org.toml.lang.psi.TomlLiteral
@@ -71,11 +72,12 @@ object ModsTomlKeyCompletionProvider : CompletionProvider<CompletionParameters>(
     ) {
         val schema = ModsTomlSchema.get(parameters.position.project)
 
-        val key = parameters.position.parent as? TomlKey ?: return
+        val keySegment = parameters.position.parent as? TomlKeySegment ?: return
+        val key = keySegment.parent as? TomlKey ?: return
         val table = key.parentOfType<TomlKeyValueOwner>()
         val variants = when (val parent = key.parent) {
             is TomlTableHeader -> {
-                if (key != parent.names.firstOrNull()) {
+                if (key != parent.key?.segments?.firstOrNull()) {
                     return
                 }
                 val isArray = when (table) {
@@ -91,7 +93,7 @@ object ModsTomlKeyCompletionProvider : CompletionProvider<CompletionParameters>(
                         key.containingFile.children.filterIsInstance<TomlKeyValue>().map { it.key.text }
                 }
                 is TomlHeaderOwner -> {
-                    val tableName = table.header.names.firstOrNull()?.text ?: return
+                    val tableName = table.header.key?.segments?.firstOrNull()?.text ?: return
                     schema.keysForTable(tableName) - table.entries.map { it.key.text }
                 }
                 else -> return

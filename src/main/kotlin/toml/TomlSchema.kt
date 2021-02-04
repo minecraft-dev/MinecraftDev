@@ -61,8 +61,8 @@ class TomlSchema private constructor(
 private val TomlKeyValueOwner.schema: TomlTableSchema?
     get() {
         val (name, isArray) = when (this) {
-            is TomlTable -> header.names.firstOrNull()?.text to false
-            is TomlArrayTable -> header.names.firstOrNull()?.text to true
+            is TomlTable -> header.key?.segments?.firstOrNull()?.text to false
+            is TomlArrayTable -> header.key?.segments?.firstOrNull()?.text to true
             else -> return null
         }
         if (name == null) return null
