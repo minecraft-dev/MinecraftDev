@@ -26,10 +26,12 @@ import com.intellij.psi.util.parentOfType
 import org.toml.lang.psi.TomlArrayTable
 import org.toml.lang.psi.TomlHeaderOwner
 import org.toml.lang.psi.TomlKey
+import org.toml.lang.psi.TomlKeySegment
 import org.toml.lang.psi.TomlKeyValue
 import org.toml.lang.psi.TomlKeyValueOwner
 import org.toml.lang.psi.TomlTableHeader
 import org.toml.lang.psi.TomlValue
+import org.toml.lang.psi.ext.name
 
 class ModsTomlValidationInspection : LocalInspectionTool() {
 
@@ -79,19 +81,19 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
             }
         }
 
-        override fun visitKey(key: TomlKey) {
-            val parent = key.parent
-            if (parent is TomlTableHeader &&
-                parent.names.getOrNull(1) == key && // We are visiting the second key of the header
-                parent.names.firstOrNull()?.text == "dependencies" // We are visiting a dependencies list
+        override fun visitKeySegment(keySegment: TomlKeySegment) {
+            val key = keySegment.parent as? TomlKey ?: return
+            if (key.parent is TomlTableHeader &&
+                key.segments.indexOf(keySegment) == 1 &&
+                key.segments.first().text == "dependencies" // We are visiting a dependency table
             ) {
-                val targetId = key.text
-                val isDeclaredId = key.containingFile.children
+                val targetId = keySegment.text
+                val isDeclaredId = keySegment.containingFile.children
                     .filterIsInstance<TomlArrayTable>()
-                    .filter { it.header.names.singleOrNull()?.text == "mods" }
+                    .filter { it.header.key?.name == "mods" }
                     .any { it.entries.find { it.key.text == "modId" }?.value?.stringValue() == targetId }
                 if (!isDeclaredId) {
-                    holder.registerProblem(key, "Mod $targetId is not declared in this file")
+                    holder.registerProblem(keySegment, "Mod $targetId is not declared in this file")
                 }
             }
         }
@@ -102,7 +104,7 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
             val (expectedType, actualType) = when (val parent = value.parent) {
                 is TomlKeyValue -> when (val table = value.parentOfType<TomlKeyValueOwner>()) {
                     is TomlHeaderOwner ->
-                        table.header.names.firstOrNull()?.text?.let { schema.tableEntry(it, key)?.type }
+                        table.header.key?.segments?.firstOrNull()?.text?.let { schema.tableEntry(it, key)?.type }
                     null -> schema.topLevelEntries.find { it.key == key }?.type
                     else -> return
                 } to parent.value?.tomlType

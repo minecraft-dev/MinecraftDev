@@ -16,6 +16,7 @@ import com.intellij.patterns.PsiElementPattern
 import com.intellij.patterns.VirtualFilePattern
 import com.intellij.psi.PsiElement
 import org.toml.lang.psi.TomlKey
+import org.toml.lang.psi.TomlKeySegment
 import org.toml.lang.psi.TomlKeyValue
 import org.toml.lang.psi.TomlTableHeader
 
@@ -24,7 +25,7 @@ inline fun <reified E : PsiElement> inModsToml(): PsiElementPattern.Capture<E> =
 fun <E : PsiElement> inModsToml(clazz: Class<E>): PsiElementPattern.Capture<E> =
     PlatformPatterns.psiElement(clazz).inVirtualFile(VirtualFilePattern().withName(ForgeConstants.MODS_TOML))
 
-fun inModsTomlKey() = inModsToml<PsiElement>().withParent(TomlKey::class.java)
+fun inModsTomlKey() = inModsToml<PsiElement>().withParent(TomlKeySegment::class.java)
 
 fun tomlKeyValue(key: String) = PlatformPatterns.psiElement(TomlKeyValue::class.java)
     .withChild(PlatformPatterns.psiElement(TomlKey::class.java).withText(key))
