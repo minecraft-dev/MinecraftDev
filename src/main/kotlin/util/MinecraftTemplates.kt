@@ -143,6 +143,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
                 skeletonGroup.addTemplate(fabricSkeletonGroup)
                 fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_BLOCK_TEMPLATE))
                 fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_ITEM_TEMPLATE))
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_ENCHANTMENT_TEMPLATE))
             }
         }
 
