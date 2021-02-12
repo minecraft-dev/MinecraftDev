@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2020 minecraft-dev
+ * Copyright (c) 2021 minecraft-dev
  *
  * MIT License
  */
@@ -143,6 +143,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
                 skeletonGroup.addTemplate(fabricSkeletonGroup)
                 fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_BLOCK_TEMPLATE))
                 fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_ITEM_TEMPLATE))
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_ENCHANTMENT_TEMPLATE))
             }
         }
 
@@ -237,5 +238,6 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
 
         const val FABRIC_BLOCK_TEMPLATE = "FabricBlock.java"
         const val FABRIC_ITEM_TEMPLATE = "FabricItem.java"
+        const val FABRIC_ENCHANTMENT_TEMPLATE = "FabricEnchantment.java"
     }
 }

@@ -1,0 +1,20 @@
+name: macOS Build
+on: [push, pull_request]
+jobs:
+  build:
+    name: Build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - uses: gradle/wrapper-validation-action@v1
+      - run: ./gradlew build --no-daemon --stacktrace

@@ -126,7 +126,7 @@ jar {
             #end
                 "Specification-Version": "1", // We are version 1 of ourselves
                 "Implementation-Title": project.name,
-                "Implementation-Version": version,
+                "Implementation-Version": project.version,
             #if (${AUTHOR_LIST})
                 "Implementation-Vendor": "${AUTHOR_LIST}",
             #else
