@@ -12,7 +12,7 @@ package com.demonwav.mcdev.toml.platform.forge
 
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.intellij.lang.documentation.DocumentationMarkup
-import com.intellij.lang.documentation.DocumentationProviderEx
+import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -24,12 +24,13 @@ import org.toml.lang.psi.TomlKeyValue
 import org.toml.lang.psi.TomlKeyValueOwner
 import org.toml.lang.psi.TomlTableHeader
 
-class ModsTomlDocumentationProvider : DocumentationProviderEx() {
+class ModsTomlDocumentationProvider : DocumentationProvider {
 
     override fun getCustomDocumentationElement(
         editor: Editor,
         file: PsiFile,
-        contextElement: PsiElement?
+        contextElement: PsiElement?,
+        targetOffset: Int
     ): PsiElement? {
         if (!isModsToml(contextElement)) {
             return null
