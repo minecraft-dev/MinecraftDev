@@ -31,16 +31,16 @@ Minecraft Development for IntelliJ
     <tr>
         <td align="right" rowspan="3"><b>OS Tests</b></td>
         <td align="left" colspan="2">
-            <a href="https://travis-ci.org/minecraft-dev/MinecraftDev/"><img src="https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/1" alt="Linux Travis Build Status" /></a>
+            <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Linux+Build%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/Linux%20Build/badge.svg?branch=dev&event=push" alt="Linux GitHub Action Status" /></a>
             <br/>
-            <a href="https://travis-ci.org/minecraft-dev/MinecraftDev/"><img src="https://travis-matrix-badges.herokuapp.com/repos/minecraft-dev/MinecraftDev/branches/dev/2" alt="macOS Travis Build Status" /></a>
+            <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22macOS+Build%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/macOS%20Build/badge.svg?branch=dev&event=push" alt="macOS GitHub Action Status" /></a>
             <br/>
-            <a href="https://ci.appveyor.com/project/DemonWav/minecraftdev"><img src="https://ci.appveyor.com/api/projects/status/iuxeewnxgu4afmo6?svg=true" alt="Windows AppVeyor Build Status" /></a>        
+            <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Windows+Build%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/Windows%20Build/badge.svg?branch=dev&event=push" alt="Windows GitHub Action Status" /></a>        
         </td>
     </tr>
 </table>
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.5.2-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.5.3-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 <a href="https://discord.gg/j6UNcfr"><img src="https://i.imgur.com/JXu9C1G.png" height="48px"></img></a>
