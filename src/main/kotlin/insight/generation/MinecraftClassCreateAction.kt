@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2020 minecraft-dev
+ * Copyright (c) 2021 minecraft-dev
  *
  * MIT License
  */
@@ -61,6 +61,7 @@ class MinecraftClassCreateAction :
 
             builder.addKind("Block", icon, MinecraftTemplates.FABRIC_BLOCK_TEMPLATE)
             builder.addKind("Item", icon, MinecraftTemplates.FABRIC_ITEM_TEMPLATE)
+            builder.addKind("Enchantment", icon, MinecraftTemplates.FABRIC_ENCHANTMENT_TEMPLATE)
         }
     }
 

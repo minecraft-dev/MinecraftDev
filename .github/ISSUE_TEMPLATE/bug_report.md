@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+DO NOT REQUEST SUPPORT FOR OLDER VERSIONS OF MINECRAFT.
+
 Please include the following information in all bug reports:
 
 * Minecraft Development for IntelliJ plugin version

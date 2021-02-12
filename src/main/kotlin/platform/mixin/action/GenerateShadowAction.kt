@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2020 minecraft-dev
+ * Copyright (c) 2021 minecraft-dev
  *
  * MIT License
  */
@@ -128,7 +128,11 @@ fun createShadowMembers(
 
     // Make the class abstract (if not already)
     if (methodAdded && !psiClass.hasModifierProperty(PsiModifier.ABSTRACT)) {
-        psiClass.modifierList!!.setModifierProperty(PsiModifier.ABSTRACT, true)
+        val classModifiers = psiClass.modifierList!!
+        if (classModifiers.hasModifierProperty(PsiModifier.FINAL)) {
+            classModifiers.setModifierProperty(PsiModifier.FINAL, false)
+        }
+        classModifiers.setModifierProperty(PsiModifier.ABSTRACT, true)
     }
 
     return result
