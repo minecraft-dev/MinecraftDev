@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2020 minecraft-dev
+ * Copyright (c) 2021 minecraft-dev
  *
  * MIT License
  */
