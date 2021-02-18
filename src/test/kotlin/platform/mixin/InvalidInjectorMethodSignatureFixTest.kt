@@ -33,7 +33,7 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
 
                     class MixedInSimple {
                         public void simpleMethod(String string, int i) {
-                            int i = Integer.parseInt("FF", 16);
+                            int testInt = Integer.parseInt("FF", 16);
                         }
                     }
                     """,
