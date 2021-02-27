@@ -15,6 +15,9 @@ object PlatformAssets : Assets() {
     val MINECRAFT_ICON = loadIcon("/assets/icons/platform/Minecraft.png")
     val MINECRAFT_ICON_2X = loadIcon("/assets/icons/platform/Minecraft@2x.png")
 
+    val ADVENTURE_ICON = loadIcon("/assets/icons/platform/Adventure.png")
+    val ADVENTURE_ICON_2X = loadIcon("/assets/icons/platform/Adventure@2x.png")
+
     val BUKKIT_ICON = loadIcon("/assets/icons/platform/Bukkit.png")
     val BUKKIT_ICON_2X = loadIcon("/assets/icons/platform/Bukkit@2x.png")
     val SPIGOT_ICON = loadIcon("/assets/icons/platform/Spigot.png")
