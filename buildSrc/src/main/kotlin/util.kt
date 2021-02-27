@@ -8,16 +8,13 @@
  * MIT License
  */
 
+import java.io.File
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.provideDelegate
-import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
-import java.io.File
-import kotlin.reflect.KProperty
 
 fun Project.lexer(flex: String, pack: String) = tasks.registering(JavaExec::class) {
     val src = "src/main/grammars/$flex.flex"
