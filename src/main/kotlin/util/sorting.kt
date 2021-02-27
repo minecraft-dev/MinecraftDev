@@ -10,8 +10,6 @@
 
 package com.demonwav.mcdev.util
 
-import java.util.Comparator
-
 fun <T> Comparator<in T>.lexicographical(): Comparator<in Iterable<T>> =
     Comparator { left, right ->
         // Zipping limits the compared parts to the shorter list, then we perform a component-wise comparison
