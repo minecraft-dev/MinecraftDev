@@ -38,7 +38,13 @@ class ForgeVersion private constructor(val versions: List<String>) {
         val versionText = mcVersion.toString()
         return versions.asSequence()
             .filter { it.startsWith(versionText) }
-            .map { SemanticVersion.parse(it.substringAfter('-')) }
+            .mapNotNull {
+                try {
+                    SemanticVersion.parse(it.substringAfter('-'))
+                } catch (ignore: Exception) {
+                    null
+                }
+            }
             .sortedDescending()
             .take(50)
             .toList()

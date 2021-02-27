@@ -21,7 +21,6 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import java.awt.Color
-import java.util.LinkedHashMap
 import javax.swing.Icon
 import org.apache.commons.lang.builder.ToStringBuilder
 
