@@ -10,6 +10,8 @@
 
 package com.demonwav.mcdev.platform
 
+import com.demonwav.mcdev.platform.adventure.AdventureModuleType
+import com.demonwav.mcdev.platform.adventure.framework.ADVENTURE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType
@@ -54,7 +56,8 @@ enum class PlatformType(
     VELOCITY(VelocityModuleType, "Velocity", "velocity.json"),
     LITELOADER(LiteLoaderModuleType, "LiteLoader"),
     MIXIN(MixinModuleType, "Mixin"),
-    MCP(McpModuleType, "MCP");
+    MCP(McpModuleType, "MCP"),
+    ADVENTURE(AdventureModuleType, "Adventure");
 
     private val children = mutableListOf<PlatformType>()
 
@@ -84,6 +87,7 @@ enum class PlatformType(
             BUNGEECORD_LIBRARY_KIND -> BUNGEECORD
             WATERFALL_LIBRARY_KIND -> WATERFALL
             VELOCITY_LIBRARY_KIND -> VELOCITY
+            ADVENTURE_LIBRARY_KIND -> ADVENTURE
             else -> null
         }
     }

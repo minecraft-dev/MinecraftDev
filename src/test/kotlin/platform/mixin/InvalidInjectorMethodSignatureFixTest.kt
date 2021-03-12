@@ -33,6 +33,7 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
 
                     class MixedInSimple {
                         public void simpleMethod(String string, int i) {
+                            int testInt = Integer.parseInt("FF", 16);
                         }
                     }
                     """,
@@ -83,4 +84,8 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
     @Test
     @DisplayName("Inject without CallbackInfo")
     fun injectWithoutCI() = doTest("injectWithoutCI")
+
+    @Test
+    @DisplayName("ModifyArgs")
+    fun modifyArgs() = doTest("modifyArgs")
 }

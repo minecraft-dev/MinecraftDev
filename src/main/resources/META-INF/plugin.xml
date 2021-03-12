@@ -39,6 +39,7 @@
         <!-- This is grouped in the following order EXCEPT for localInspections and moduleTypes. All localInspections are grouped at the
              end, but the individual local inspections themselves should also be ordered in this way.
                * No platform
+               * Adventure
                * Bukkit
                * Sponge
                * Forge
@@ -148,6 +149,13 @@
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
         <errorHandler implementation="com.demonwav.mcdev.errorreporter.ErrorReporter"/>
+        <!--endregion-->
+
+        <!--region ADVENTURE-->
+        <!---->
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.adventure.framework.AdventurePresentationProvider" />
+
+        <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.platform.adventure.color.AdventureColorLineMarkerProvider"/>
         <!--endregion-->
 
         <!--region BUKKIT-->
