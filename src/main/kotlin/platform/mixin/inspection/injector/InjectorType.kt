@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.injector
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.platform.mixin.util.argsType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoReturnableType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoType
 import com.demonwav.mcdev.util.Parameter
@@ -41,18 +42,21 @@ enum class InjectorType(private val annotation: String) {
 
             val result = ArrayList<ParameterGroup>()
 
+            val targetMethodParameters = mutableListOf<Parameter>()
+
             if (targetMethod.isConstructor) {
                 val containingClass = targetMethod.containingClass
                 val outerClass = containingClass?.containingClass
                 if (outerClass != null && !containingClass.hasModifier(JvmModifier.STATIC)) {
                     val outerClassType = JavaPsiFacade.getElementFactory(outerClass.project).createType(outerClass)
-                    // Inner classes ctors take their outer class as first parameter (required)
-                    result.add(ParameterGroup(listOf(Parameter("outer", outerClassType))))
+                    // Inner classes ctors take their outer class as first parameter
+                    targetMethodParameters.add(Parameter("outer", outerClassType))
                 }
             }
 
             // Parameters from injected method (optional)
-            result.add(ParameterGroup(collectTargetMethodParameters(targetMethod), required = false, default = true))
+            targetMethodParameters.addAll(collectTargetMethodParameters(targetMethod))
+            result.add(ParameterGroup(targetMethodParameters, required = false, default = true))
 
             // Callback info (required)
             result.add(
@@ -173,6 +177,19 @@ enum class InjectorType(private val annotation: String) {
         }
     },
     MODIFY_ARG(MixinConstants.Annotations.MODIFY_ARG),
+    MODIFY_ARGS(MixinConstants.Annotations.MODIFY_ARGS) {
+        override fun expectedMethodSignature(annotation: PsiAnnotation, targetMethod: PsiMethod): MethodSignature? {
+            val result = ArrayList<ParameterGroup>()
+
+            // Args object (required)
+            result.add(ParameterGroup(listOf(Parameter("args", argsType(annotation.project)))))
+
+            // Parameters from injected method (optional)
+            result.add(ParameterGroup(collectTargetMethodParameters(targetMethod), required = false))
+
+            return MethodSignature(result, PsiType.VOID)
+        }
+    },
     MODIFY_CONSTANT(MixinConstants.Annotations.MODIFY_CONSTANT),
     MODIFY_VARIABLE(MixinConstants.Annotations.MODIFY_VARIABLE);
 

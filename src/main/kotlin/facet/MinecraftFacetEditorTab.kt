@@ -47,6 +47,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     private lateinit var waterfallAutoCheckBox: JCheckBox
     private lateinit var velocityEnabledCheckBox: JCheckBox
     private lateinit var velocityAutoCheckBox: JCheckBox
+    private lateinit var adventureEnabledCheckBox: JCheckBox
+    private lateinit var adventureAutoCheckBox: JCheckBox
 
     private lateinit var spongeIcon: JLabel
     private lateinit var mcpIcon: JLabel
@@ -65,7 +67,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             mixinEnabledCheckBox,
             bungeecordEnabledCheckBox,
             waterfallEnabledCheckBox,
-            velocityEnabledCheckBox
+            velocityEnabledCheckBox,
+            adventureEnabledCheckBox
         )
     }
 
@@ -82,7 +85,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             mixinAutoCheckBox,
             bungeecordAutoCheckBox,
             waterfallAutoCheckBox,
-            velocityAutoCheckBox
+            velocityAutoCheckBox,
+            adventureAutoCheckBox
         )
     }
 
@@ -269,6 +273,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         private const val BUNGEECORD = MIXIN + 1
         private const val WATERFALL = BUNGEECORD + 1
         private const val VELOCITY = WATERFALL + 1
+        private const val ADVENTURE = VELOCITY + 1
 
         private val platformTypes = arrayOf(
             PlatformType.BUKKIT,
@@ -282,7 +287,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             PlatformType.MIXIN,
             PlatformType.BUNGEECORD,
             PlatformType.WATERFALL,
-            PlatformType.VELOCITY
+            PlatformType.VELOCITY,
+            PlatformType.ADVENTURE
         )
 
         private val indexes = intArrayOf(
@@ -297,7 +303,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             MIXIN,
             BUNGEECORD,
             WATERFALL,
-            VELOCITY
+            VELOCITY,
+            ADVENTURE
         )
     }
 }
