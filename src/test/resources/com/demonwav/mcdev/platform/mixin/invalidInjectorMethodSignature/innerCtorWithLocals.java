@@ -9,6 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class TestMixin {
 
     @Inject(method = "<init>(Ljava/lang/String;)V", at = @At("RETURN"))
-    private void injectCtor(CallbackInfo ci<caret>, String local1, float local2, int local3) {
+    private void injectCtor(String string, CallbackInfo ci<caret>, String local1, float local2, int local3) {
     }
 }
