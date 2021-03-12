@@ -23,7 +23,7 @@ class SpongeColorAnnotator : Annotator {
             return
         }
 
-        val pair = element.findColor() ?: return
+        val pair = element.findSpongeColor() ?: return
 
         ColorAnnotator.setColorAnnotator(pair.first, element, holder)
     }

@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.facet
 
+import com.demonwav.mcdev.platform.adventure.framework.ADVENTURE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bukkit.framework.BUKKIT_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bukkit.framework.PAPER_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bukkit.framework.SPIGOT_LIBRARY_KIND
@@ -35,5 +36,6 @@ val MINECRAFT_LIBRARY_KINDS = setOf(
     MIXIN_LIBRARY_KIND,
     BUNGEECORD_LIBRARY_KIND,
     WATERFALL_LIBRARY_KIND,
-    VELOCITY_LIBRARY_KIND
+    VELOCITY_LIBRARY_KIND,
+    ADVENTURE_LIBRARY_KIND
 )
