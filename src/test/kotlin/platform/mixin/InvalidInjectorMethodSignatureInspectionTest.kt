@@ -74,12 +74,12 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             @Mixin(MixedInOuter.MixedInInner.class)
             public class TestMixin {
 
-                @Inject(method = "<init>", at = @At("RETURN"))
+                @Inject(method = "<init>()V", at = @At("RETURN"))
                 private void injectCtor(MixedInOuter outer, CallbackInfo ci) {
                 }
 
                 @Inject(method = "<init>", at = @At("RETURN"))
-                private void injectCtor<error descr="Method parameters do not match expected parameters for @Inject">(CallbackInfo ci)</error> {
+                private void injectCtor(CallbackInfo ci) {
                 }
 
                 @Inject(method = "<init>(Ljava/lang/String;)V", at = @At("RETURN"))

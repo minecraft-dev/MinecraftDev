@@ -19,7 +19,12 @@ import com.intellij.codeInsight.daemon.NavigateAction
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiExpressionList
+import com.intellij.psi.PsiLiteralExpression
+import com.intellij.psi.PsiNewExpression
+import com.intellij.psi.impl.source.tree.JavaElementType
 import com.intellij.psi.util.PsiEditorUtil
+import com.intellij.ui.ColorChooser
 import com.intellij.util.FunctionUtil
 import com.intellij.util.ui.ColorIcon
 import com.intellij.util.ui.ColorsIcon
@@ -93,5 +98,47 @@ class ColorLineMarkerProvider : LineMarkerProvider {
 
         override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<*>>) =
             FunctionUtil.nullConstant<PsiElement, String>()
+    }
+
+    class CommonColorInfo(
+        element: PsiElement,
+        color: Color,
+        workElement: PsiElement
+    ) : ColorLineMarkerProvider.ColorInfo(
+        element,
+        color,
+        GutterIconNavigationHandler handler@{ _, _ ->
+            if (!element.isWritable) {
+                return@handler
+            }
+
+            val editor = PsiEditorUtil.findEditor(element) ?: return@handler
+
+            val c = ColorChooser.chooseColor(editor.component, "Choose Color", color, false)
+            if (c != null) {
+                when (workElement) {
+                    is PsiLiteralExpression -> workElement.setColor(c.rgb and 0xFFFFFF)
+                    is PsiExpressionList -> workElement.setColor(c.red, c.green, c.blue)
+                    is PsiNewExpression -> {
+                        val list = workElement.getNode().findChildByType(JavaElementType.EXPRESSION_LIST)
+                            as PsiExpressionList?
+                        list?.setColor(c.red, c.green, c.blue)
+                    }
+                }
+            }
+        }
+    )
+
+    abstract class CommonLineMarkerProvider : LineMarkerProvider {
+        override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
+            val pair = findColor(element) ?: return null
+
+            val info = CommonColorInfo(element, pair.first, pair.second)
+            NavigateAction.setNavigateAction(info, "Change color", null)
+
+            return info
+        }
+
+        abstract fun findColor(element: PsiElement): Pair<Color, PsiElement>?
     }
 }
