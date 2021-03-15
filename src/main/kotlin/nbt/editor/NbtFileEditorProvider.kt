@@ -58,7 +58,10 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
     }
 }
 
-private class NbtFileEditor(private val file: VirtualFile, private val editorProvider: (NbtVirtualFile) -> FileEditor) : FileEditor {
+private class NbtFileEditor(
+    private val file: VirtualFile,
+    private val editorProvider: (NbtVirtualFile) -> FileEditor
+) : FileEditor {
 
     private var editor: FileEditor? = null
     private val component = JPanel(BorderLayout())
