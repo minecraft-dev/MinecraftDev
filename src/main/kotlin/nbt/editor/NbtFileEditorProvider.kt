@@ -36,7 +36,7 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
     override fun accept(project: Project, file: VirtualFile) = file.fileType == NbtFileType
     override fun getPolicy() = FileEditorPolicy.NONE
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {
-        val fileEditor = NbtFileEditor { nbtFile -> super.createEditor(project, nbtFile) }
+        val fileEditor = NbtFileEditor(file) { nbtFile -> super.createEditor(project, nbtFile) }
 
         ApplicationManager.getApplication().executeOnPooledThread {
             val nbtFile = NbtVirtualFile(file, project)
@@ -58,7 +58,7 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
     }
 }
 
-private class NbtFileEditor(private val editorProvider: (NbtVirtualFile) -> FileEditor) : FileEditor {
+private class NbtFileEditor(private val file: VirtualFile, private val editorProvider: (NbtVirtualFile) -> FileEditor) : FileEditor {
 
     private var editor: FileEditor? = null
     private val component = JPanel(BorderLayout())
@@ -95,6 +95,8 @@ private class NbtFileEditor(private val editorProvider: (NbtVirtualFile) -> File
 
     override fun getState(level: FileEditorStateLevel): FileEditorState = editor.exec { getState(level) }
         ?: TextEditorState()
+
+    override fun getFile(): VirtualFile = editor.exec { file } ?: file
 
     override fun getComponent() = component
     override fun getPreferredFocusedComponent() = editor.exec { preferredFocusedComponent }
