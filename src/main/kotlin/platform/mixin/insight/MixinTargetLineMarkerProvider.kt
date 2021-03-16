@@ -58,7 +58,7 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
             identifier,
             identifier.textRange,
             icon,
-            Function { "Go to ${targetInfo.target} element" },
+            Function { "Go to the ${targetInfo.text} target" },
             AccessorGutterIconNavigationHandler(identifier.createSmartPointer(), targetInfo.target),
             GutterIconRenderer.Alignment.LEFT
         )
