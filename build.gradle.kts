@@ -65,7 +65,7 @@ val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSource
 
 repositories {
     mavenCentral()
-    maven("https://dl.bintray.com/minecraft-dev/maven")
+    maven("https://wav.jfrog.io/artifactory/mcdev/")
     maven("https://repo.spongepowered.org/maven")
     maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
     maven("https://repo.gradle.org/gradle/libs-releases-local/")
@@ -93,8 +93,8 @@ dependencies {
 
     testLibs("org.jetbrains.idea:mockJDK:1.7-4d76c50")
     testLibs("org.spongepowered:mixin:0.7-SNAPSHOT")
-    testLibs("com.demonwav.mcdev:all-types-nbt:1.0@nbt")
     testLibs("org.spongepowered:spongeapi:7.0.0:shaded")
+    testLibs("com.demonwav.mcdev:all-types-nbt:1.0@nbt")
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
@@ -154,7 +154,6 @@ tasks.withType<KotlinCompile>().configureEach {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
         freeCompilerArgs = listOf("-Xjvm-default=enable")
     }
-    this.javaPackagePrefix
 }
 
 tasks.withType<GroovyCompile>().configureEach {
