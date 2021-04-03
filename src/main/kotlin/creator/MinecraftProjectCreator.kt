@@ -39,7 +39,7 @@ class MinecraftProjectCreator {
         private var currentStep: Pair<Any, Int>? = null
 
         fun printState(sb: StringBuilder) {
-            sb.append("    ").appendln(if (config is String) config else config.javaClass.name)
+            sb.append("    ").appendLine(if (config is String) config else config.javaClass.name)
             for ((step, indent) in steps) {
                 printStep(sb, step, "        ", indent)
             }
@@ -52,7 +52,7 @@ class MinecraftProjectCreator {
             repeat(indent) {
                 sb.append("    ")
             }
-            sb.append(baseIndent).appendln(if (step is String) step else step.javaClass.name)
+            sb.append(baseIndent).appendLine(if (step is String) step else step.javaClass.name)
         }
 
         fun newCurrentStep(newStep: Any, indent: Int = 0) {
@@ -160,7 +160,7 @@ class MinecraftProjectCreator {
                 }
             } catch (e: Exception) {
                 val workLogText = buildString {
-                    appendln("Build steps completed:")
+                    appendLine("Build steps completed:")
                     for (workLogStep in workLog) {
                         workLogStep.printState(this)
                     }

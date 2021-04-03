@@ -86,6 +86,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
     override fun isDirectory() = false
     override fun getTimeStamp() = backingFile.timeStamp
     override fun getModificationStamp() = 0L
+
     override fun getName() =
         backingFile.name + (if (parseSuccessful) ".nbtt" else ".txt") // don't highlight syntax on bad files
 

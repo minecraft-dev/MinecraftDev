@@ -12,24 +12,16 @@ import org.cadixdev.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-    repositories {
-        maven("https://dl.bintray.com/jetbrains/intellij-plugin-service")
-    }
-}
-
 plugins {
-    kotlin("jvm") version "1.3.31" // kept in sync with IntelliJ's bundled dep
+    kotlin("jvm") version "1.4.32"
     java
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.6.5"
-    id("org.cadixdev.licenser") version "0.5.0"
-    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
+    id("org.jetbrains.intellij") version "0.7.2"
+    id("org.cadixdev.licenser") version "0.5.1"
+    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
-
-val coroutineVersion = "1.2.1" // Coroutine version also kept in sync with IntelliJ's bundled dep
 
 val ideaVersion: String by project
 val ideaVersionName: String by project
@@ -77,11 +69,11 @@ dependencies {
     implementation(files(Jvm.current().toolsJar))
 
     // Kotlin
-    compileOnly(kotlin("stdlib-jdk8"))
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutineVersion") {
-        isTransitive = false
-    }
+    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("reflect"))
+    val coroutineVersion = "1.4.3"
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutineVersion")
 
     implementation(files(gradleToolingExtensionJar))
 
@@ -101,8 +93,9 @@ dependencies {
     gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:193.5233.102")
     gradleToolingExtension("org.jetbrains:annotations:19.0.0")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.1")
+    val junitVersion = "5.7.1"
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
 }
 
 intellij {

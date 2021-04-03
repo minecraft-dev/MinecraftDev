@@ -31,6 +31,7 @@ object ForgeConstants {
     const val PACK_MCMETA = "pack.mcmeta"
 
     const val JAR_VERSION_VAR = "\${file.jarVersion}"
+
     // From https://github.com/MinecraftForge/MinecraftForge/blob/0ff8a596fc1ef33d4070be89dd5cb4851f93f731/src/fmllauncher/java/net/minecraftforge/fml/loading/StringSubstitutor.java
     val KNOWN_SUBSTITUTIONS = setOf(JAR_VERSION_VAR, "\${global.mcVersion}", "\${global.forgeVersion}")
 

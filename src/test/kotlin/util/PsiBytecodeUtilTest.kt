@@ -23,6 +23,7 @@ class PsiBytecodeUtilTest : OuterClassTest() {
     @Test
     @DisplayName("internalName Of Outer Class Test")
     fun outerInternalNameTest() = Assertions.assertEquals("com/example/test/OuterClass", outerClass.internalName)
+
     @Test
     @DisplayName("internalName Of Outer Anonymous Class Test")
     fun outerAnonymousInternalNameTest() =

@@ -27,6 +27,7 @@ class FabricProjectConfig : ProjectConfig(), GradleCreator {
 
     var yarnVersion = ""
     var yarnClassifier: String? = "v2"
+
     // Minecraft does not follow semver in the snapshots
     var mcVersion = ""
     var semanticMcVersion = SemanticVersion.release()
