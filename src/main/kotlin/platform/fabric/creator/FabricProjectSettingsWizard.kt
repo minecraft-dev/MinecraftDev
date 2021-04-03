@@ -61,6 +61,7 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     private lateinit var panel: JPanel
     private lateinit var title: JLabel
     private lateinit var descriptionField: JTextField
+
     @ValidatedField(LIST)
     private lateinit var authorsField: JTextField
     private lateinit var websiteField: JTextField

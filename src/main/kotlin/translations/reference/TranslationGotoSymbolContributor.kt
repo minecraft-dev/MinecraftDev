@@ -23,9 +23,11 @@ import com.intellij.util.indexing.FileBasedIndex
 
 class TranslationGotoSymbolContributor : ChooseByNameContributor {
     override fun getNames(project: Project, includeNonProjectItems: Boolean): Array<String> {
-        val scope = if (includeNonProjectItems) GlobalSearchScope.allScope(project) else GlobalSearchScope.projectScope(
-            project
-        )
+        val scope = if (includeNonProjectItems) {
+            GlobalSearchScope.allScope(project)
+        } else {
+            GlobalSearchScope.projectScope(project)
+        }
         val keys = FileBasedIndex.getInstance().getAllKeys(TranslationIndex.NAME, project)
         val translations = keys
             .asSequence()

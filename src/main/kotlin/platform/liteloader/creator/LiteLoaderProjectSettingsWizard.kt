@@ -51,8 +51,10 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
 
     private lateinit var panel: JPanel
     private lateinit var mcpWarning: JLabel
+
     @ValidatedField(NON_BLANK)
     private lateinit var modNameField: JTextField
+
     @ValidatedField(NON_BLANK, CLASS_NAME)
     private lateinit var mainClassField: JTextField
     private lateinit var minecraftVersionBox: JComboBox<SemanticVersion>

@@ -35,14 +35,17 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
 
     @ValidatedField(NON_BLANK)
     private lateinit var pluginNameField: JTextField
+
     @ValidatedField(NON_BLANK, CLASS_NAME)
     private lateinit var mainClassField: JTextField
     private lateinit var panel: JPanel
     private lateinit var title: JLabel
     private lateinit var descriptionField: JTextField
+
     @ValidatedField(LIST)
     private lateinit var authorsField: JTextField
     private lateinit var websiteField: JTextField
+
     @ValidatedField(LIST)
     private lateinit var dependField: JTextField
     private lateinit var spongeApiVersionBox: JComboBox<String>

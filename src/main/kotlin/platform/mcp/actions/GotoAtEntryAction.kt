@@ -67,8 +67,7 @@ class GotoAtEntryAction : AnAction() {
                     searchForText(e, data, reference.name)
                 }
                 is PsiMethod -> {
-                    val reference =
-                        srgMap.getSrgMethod(parent) ?: parent.qualifiedMemberReference
+                    val reference = srgMap.getSrgMethod(parent) ?: parent.qualifiedMemberReference
                     searchForText(e, data, reference.name + reference.descriptor)
                 }
                 else ->

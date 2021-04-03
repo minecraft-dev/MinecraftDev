@@ -36,13 +36,17 @@ class BungeeCordProjectSettingsWizard(
 ) : MinecraftModuleWizardStep() {
 
     private lateinit var panel: JPanel
+
     @ValidatedField(NON_BLANK)
     private lateinit var pluginNameField: JTextField
+
     @ValidatedField(NON_BLANK, CLASS_NAME)
     private lateinit var mainClassField: JTextField
     private lateinit var descriptionField: JTextField
+
     @ValidatedField(LIST)
     private lateinit var authorField: JTextField
+
     @ValidatedField(LIST)
     private lateinit var dependField: JTextField
     private lateinit var softDependField: JTextField
