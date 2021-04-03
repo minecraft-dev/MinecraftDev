@@ -21,6 +21,7 @@ class LiteLoaderVersion private constructor(private var map: Map<*, *>) {
 
     val sortedMcVersions: List<SemanticVersion> by lazy {
         val mcVersion = map["versions"] as Map<*, *>
+
         @Suppress("UNCHECKED_CAST")
         val keys = mcVersion.keys as Collection<String>
         return@lazy sortVersions(keys)
