@@ -255,6 +255,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     }
 
     private operator fun Boolean.plus(n: Boolean) = this || n
+
     // This is here so we can use vararg. Can't use parameter modifiers in function type definitions for some reason
     open class Invoker {
         open operator fun invoke(vararg indexes: Int) {}

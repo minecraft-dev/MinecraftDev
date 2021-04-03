@@ -36,16 +36,19 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
 
     @ValidatedField(NON_BLANK)
     private lateinit var pluginNameField: JTextField
+
     @ValidatedField(NON_BLANK, CLASS_NAME)
     private lateinit var mainClassField: JTextField
     private lateinit var panel: JPanel
     private lateinit var descriptionField: JTextField
+
     @ValidatedField(LIST)
     private lateinit var authorsField: JTextField
     private lateinit var websiteField: JTextField
     private lateinit var prefixField: JTextField
     private lateinit var loadOrderBox: JComboBox<*>
     private lateinit var loadBeforeField: JTextField
+
     @ValidatedField(LIST)
     private lateinit var dependField: JTextField
     private lateinit var softDependField: JTextField

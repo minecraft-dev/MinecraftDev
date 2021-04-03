@@ -44,11 +44,13 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
 
     @ValidatedField(NON_BLANK)
     private lateinit var modNameField: JTextField
+
     @ValidatedField(NON_BLANK, CLASS_NAME)
     private lateinit var mainClassField: JTextField
     private lateinit var panel: JPanel
     private lateinit var title: JLabel
     private lateinit var descriptionField: JTextField
+
     @ValidatedField(LIST)
     private lateinit var authorsField: JTextField
     private lateinit var websiteField: JTextField

@@ -57,6 +57,7 @@ class ForgeVersion private constructor(val versions: List<String>) {
                 val result = mutableListOf<String>()
                 url.openStream().use { stream ->
                     val inputFactory = XMLInputFactory.newInstance()
+
                     @Suppress("UNCHECKED_CAST")
                     val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
                     for (event in reader) {
