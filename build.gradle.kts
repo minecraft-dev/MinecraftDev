@@ -133,13 +133,15 @@ tasks.publishPlugin {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
 }
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.compilerArgs = listOf("-proc:none")
+    options.release.set(8)
 }
 
 tasks.withType<KotlinCompile>().configureEach {
