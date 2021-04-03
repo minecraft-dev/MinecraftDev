@@ -122,7 +122,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                     } catch (e: GenerateCodeException) {
                         val message = e.message ?: "Unknown error"
                         ApplicationManager.getApplication().invokeLater(
-                            Runnable {
+                            {
                                 if (!mixinEditor.isDisposed) {
                                     mixinEditor.caretModel.moveToOffset(offset)
                                     HintManager.getInstance().showErrorHint(editor, message)
@@ -235,11 +235,13 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
     }
 
     private fun createAccessorMixin(project: Project, targetClass: PsiClass): PsiClass? {
-        val config = MixinModule.getMixinConfigs(project, GlobalSearchScope.projectScope(project)).maxBy {
-            return@maxBy countAccessorMixins(project, it.qualifiedMixins) +
-                countAccessorMixins(project, it.qualifiedClient) +
-                countAccessorMixins(project, it.qualifiedServer)
-        }
+        val config = MixinModule
+            .getMixinConfigs(project, GlobalSearchScope.projectScope(project))
+            .maxByOrNull {
+                countAccessorMixins(project, it.qualifiedMixins) +
+                    countAccessorMixins(project, it.qualifiedClient) +
+                    countAccessorMixins(project, it.qualifiedServer)
+            }
 
         if (config == null) {
             // TODO: generate the mixin configuration file (modding platform dependent)
@@ -277,10 +279,10 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                     JavaDirectoryService.getInstance().createInterface(pkg, name)
                 } catch (e: IncorrectOperationException) {
                     invokeLater {
-                        val message = "${CodeInsightBundle.message(
+                        val message = CodeInsightBundle.message(
                             "intention.error.cannot.create.class.message",
                             name
-                        )}\n${e.localizedMessage}"
+                        ) + "\n" + e.localizedMessage
                         Messages.showErrorDialog(
                             project,
                             message,
@@ -398,9 +400,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
             val method = factory.createMethodFromText(
                 """
                 @${MixinConstants.Annotations.ACCESSOR}
-                ${staticPrefix(isStatic)}ReturnType $prefix${target.name.capitalize()}()${methodBody(
-                    isStatic
-                )}
+                ${staticPrefix(isStatic)}ReturnType $prefix${target.name.capitalize()}()${methodBody(isStatic)}
                 """.trimIndent(),
                 mixin
             )
@@ -409,12 +409,9 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
         }
         if (generateSetter) {
             val method = factory.createMethodFromText(
-                """
-                @${MixinConstants.Annotations.ACCESSOR}
-                ${staticPrefix(isStatic)}void set${target.name.capitalize()}(ParamType ${target.name})${methodBody(
-                    isStatic
-                )}
-                """.trimIndent(),
+                "@${MixinConstants.Annotations.ACCESSOR}\n" +
+                    staticPrefix(isStatic) + "void set${target.name.capitalize()}" +
+                    "(ParamType ${target.name})" + methodBody(isStatic),
                 mixin
             )
             target.typeElement?.let { method.parameterList.parameters[0].typeElement?.replace(it) }
@@ -440,9 +437,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
         val method = factory.createMethodFromText(
             """
             @${MixinConstants.Annotations.INVOKER}
-            ${staticPrefix(isStatic)}ReturnType $name()${methodBody(
-                isStatic
-            )}
+            ${staticPrefix(isStatic)}ReturnType $name()${methodBody(isStatic)}
             """.trimIndent(),
             mixin
         )
@@ -468,7 +463,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
 
     private fun methodBody(isStatic: Boolean): String {
         return if (isStatic) {
-            "{ throw new java.lang.UnsupportedOperationException(); }"
+            " { throw new java.lang.UnsupportedOperationException(); }"
         } else {
             ";"
         }
@@ -477,6 +472,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
     private class HeaderPanel : JComponent() {
         val gettersCheckbox = JBCheckBox("Generate Getter Accessors")
         val settersCheckbox = JBCheckBox("Generate Setter Accessors")
+
         init {
             gettersCheckbox.isSelected = true
             gettersCheckbox.addItemListener {
@@ -493,6 +489,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
             add(gettersCheckbox, createConstraints(0))
             add(settersCheckbox, createConstraints(1))
         }
+
         private fun createConstraints(row: Int): GridConstraints {
             val constraints = GridConstraints()
             constraints.anchor = GridConstraints.ANCHOR_WEST
