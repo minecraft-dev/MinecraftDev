@@ -90,7 +90,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:211-EAP-SNAPSHOT")
+    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:211.6693.111")
     gradleToolingExtension("org.jetbrains:annotations:20.1.0")
 
     val junitVersion = "5.7.1"
