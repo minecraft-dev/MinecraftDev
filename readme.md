@@ -12,11 +12,7 @@ Minecraft Development for IntelliJ
         <td colspan="2"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
     </tr>
     <tr>
-        <td align="right" rowspan="5" ><b>Nightly Builds</b></td>
-        <td align="left">2019.3</td>
-        <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20193"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20193)/statusIcon.svg" alt="2019.3 Nightly Status" /></a></td>
-    </tr>
-    <tr>
+        <td align="right" rowspan="4" ><b>Nightly Builds</b></td>
         <td align="left">2020.1</td>
         <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20201"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20201)/statusIcon.svg" alt="2020.1 Nightly Status" /></a></td>
     </tr>
@@ -29,7 +25,7 @@ Minecraft Development for IntelliJ
         <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20203"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20203)/statusIcon.svg" alt="2020.3 Nightly Status" /></a></td>
     </tr>
     <tr>
-        <td align="left">2021.1 EAP</td>
+        <td align="left">2021.1</td>
         <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20211"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20211)/statusIcon.svg" alt="2021.1 EAP Nightly Status" /></a></td>
     </tr>
     <tr>
