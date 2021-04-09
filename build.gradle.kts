@@ -132,6 +132,10 @@ tasks.publishPlugin {
     channels(properties["mcdev.deploy.channel"] ?: "Stable")
 }
 
+tasks.runPluginVerifier {
+    ideVersions(listOf("IC-2020.1.3", "IC-2020.1.4"))
+}
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(11))
