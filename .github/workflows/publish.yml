@@ -37,11 +37,12 @@ jobs:
         run: ./gradlew clean publishPlugin --no-daemon --stacktrace
       - name: Get tag name
         id: get_tag
+        shell: bash
         # Tag name is reversed from release name due to how IntelilJ parses plugin version numbers
         run: |
           tag_name="$(echo $GITHUB_REF | cut -d / -f 3)"
           echo ::set-output name=tag::$tag_name
-          version_array=(${tag_name//-/})
+          version_array=(${tag_name//-/ })
           echo ::set-output name=release::${version_array[1]}-${version_array[0]}
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
