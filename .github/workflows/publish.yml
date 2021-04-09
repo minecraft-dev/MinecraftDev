@@ -44,7 +44,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.get_tag.outputs.tag }}
-          release_name: 'Release ${{ steps.get_tag.outputs.tag }}'
+          name: 'Release ${{ steps.get_tag.outputs.tag }}'
           body: '[View all plugin releases here.](https://plugins.jetbrains.com/plugin/8327-minecraft-development/versions/stable/)'
           prerelease: false
           draft: false
