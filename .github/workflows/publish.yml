@@ -37,15 +37,20 @@ jobs:
         run: ./gradlew clean publishPlugin --no-daemon --stacktrace
       - name: Get tag name
         id: get_tag
-        run: echo ::set-output name=tag::$(echo $GITHUB_REF | cut -d / -f 3)
+        # Tag name is reversed from release name due to how IntelilJ parses plugin version numbers
+        run: |
+          tag_name="$(echo $GITHUB_REF | cut -d / -f 3)"
+          echo ::set-output name=tag::$tag_name
+          version_array=(${tag_name//-/})
+          echo ::set-output name=release::${version_array[1]}-${version_array[0]}
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.get_tag.outputs.tag }}
-          name: 'Release ${{ steps.get_tag.outputs.tag }}'
-          body: '[View all plugin releases here.](https://plugins.jetbrains.com/plugin/8327-minecraft-development/versions/stable/)'
+          name: 'Release ${{ steps.get_tag.outputs.release }}'
+          body: '## [View all plugin releases here.](https://plugins.jetbrains.com/plugin/8327-minecraft-development/versions/stable/)'
           prerelease: false
           draft: false
           files: build/distributions/*.zip
