@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p ~/.gradle/
-          echo "::set-env name=GRADLE_USER_HOME::$HOME/.gradle"
+          echo "GRADLE_USER_HOME=$HOME/.gradle" >> "$GITHUB_ENV"
           echo "mcdev.deploy.token=${JETBRAINS_TOKEN}" > ~/.gradle/gradle.properties
           echo "mcdev.deploy.channel=testing" >> ~/.gradle/gradle.properties
       - name: Publish plugin
