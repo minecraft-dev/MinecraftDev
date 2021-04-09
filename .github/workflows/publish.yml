@@ -38,7 +38,7 @@ jobs:
       - name: Get tag name
         id: get_tag
         shell: bash
-        # Tag name is reversed from release name due to how IntelilJ parses plugin version numbers
+        # Tag name is reversed from release name due to how IntelliJ parses plugin version numbers
         run: |
           tag_name="$(echo $GITHUB_REF | cut -d / -f 3)"
           echo ::set-output name=tag::$tag_name
