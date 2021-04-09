@@ -32,7 +32,6 @@ jobs:
           mkdir -p ~/.gradle/
           echo "GRADLE_USER_HOME=$HOME/.gradle" >> "$GITHUB_ENV"
           echo "mcdev.deploy.token=${JETBRAINS_TOKEN}" > ~/.gradle/gradle.properties
-          echo "mcdev.deploy.channel=testing" >> ~/.gradle/gradle.properties
       - name: Publish plugin
         run: ./gradlew clean publishPlugin --no-daemon --stacktrace
       - name: Get tag name
