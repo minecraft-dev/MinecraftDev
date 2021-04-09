@@ -18,7 +18,7 @@
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
-    <vendor email="demonwav@gmail.com" url="https://minecraftdev.org/">DemonWav</vendor>
+    <vendor email="demonwav@gmail.com" url="https://minecraftdev.org/">minecraft-dev</vendor>
 
     <description><![CDATA[
       Brings support for Bukkit, Spigot, Paper, Sponge, Forge, Fabric, MCP, Mixin, Velocity, BungeeCord, Waterfall, and
