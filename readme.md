@@ -29,14 +29,10 @@ Minecraft Development for IntelliJ
         <td align="left"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Nightly_20211"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20211)/statusIcon.svg" alt="2021.1 EAP Nightly Status" /></a></td>
     </tr>
     <tr>
-        <td align="right" rowspan="3"><b>OS Tests</b></td>
+        <td align="right"><b>OS Tests</b></td>
         <td align="left" colspan="2">
-            <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Linux+Build%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/Linux%20Build/badge.svg?branch=dev&event=push" alt="Linux GitHub Action Status" /></a>
-            <br/>
-            <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22macOS+Build%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/macOS%20Build/badge.svg?branch=dev&event=push" alt="macOS GitHub Action Status" /></a>
-            <br/>
-            <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Windows+Build%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/Windows%20Build/badge.svg?branch=dev&event=push" alt="Windows GitHub Action Status" /></a>        
-        </td>
+            <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Test%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/Test/badge.svg?branch=dev&event=push" alt="GitHub Action Status" /></a>
+         </td>
     </tr>
 </table>
 
