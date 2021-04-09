@@ -17,6 +17,9 @@ jobs:
         with:
           path: |
             ~/.gradle/caches
+            ~/.gradle/jdks
+            ~/.gradle/native
+            ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('gradle.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
@@ -34,7 +37,7 @@ jobs:
         run: ./gradlew clean publishPlugin --no-daemon --stacktrace
       - name: Get tag name
         id: get_tag
-        run: echo ::set-output tag=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+        run: echo ::set-output name=tag::$(echo $GITHUB_REF | cut -d / -f 3)
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         env:
