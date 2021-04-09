@@ -153,6 +153,8 @@ tasks.withType<KotlinCompile>().configureEach {
 
 tasks.withType<GroovyCompile>().configureEach {
     options.compilerArgs = listOf("-proc:none")
+    sourceCompatibility = "1.5"
+    targetCompatibility = "1.5"
 }
 
 tasks.processResources {
