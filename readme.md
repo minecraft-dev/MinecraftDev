@@ -36,12 +36,12 @@ Minecraft Development for IntelliJ
     </tr>
 </table>
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.5.6-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.5.7-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 <a href="https://discord.gg/j6UNcfr"><img src="https://i.imgur.com/JXu9C1G.png" height="48px"></img></a>
 
-Visit [https://minecraftdev.org](https://minecraftdev.org) for a little information about the project.
+Visit [https://minecraftdev.org](https://minecraftdev.org) for some information about the project.
 
 
 Installation
@@ -55,8 +55,6 @@ box, simply search for `Minecraft`. You can install it from there and restart In
 
 Building
 --------
-
-JDK 8 is required.
 
 Build the plugin with:
 
