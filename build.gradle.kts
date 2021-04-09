@@ -153,6 +153,8 @@ tasks.withType<KotlinCompile>().configureEach {
 
 tasks.withType<GroovyCompile>().configureEach {
     options.compilerArgs = listOf("-proc:none")
+    sourceCompatibility = "1.5"
+    targetCompatibility = "1.5"
 }
 
 tasks.processResources {
@@ -167,7 +169,7 @@ tasks.processResources {
     exclude("fileTemplates/j2ee/**")
     from(fileTree("src/main/resources/fileTemplates/j2ee").files) {
         eachFile {
-            this.relativePath = RelativePath(true, "fileTemplates", "j2ee", this.name)
+            relativePath = RelativePath(true, "fileTemplates", "j2ee", this.name)
         }
     }
 }
