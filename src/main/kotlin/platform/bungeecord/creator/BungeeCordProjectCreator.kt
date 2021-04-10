@@ -171,7 +171,7 @@ class BungeeCordDependenciesStep(
                     BuildDependency(
                         "net.md-5",
                         "bungeecord-api",
-                        "$mcVersion-SNAPSHOT",
+                        mcVersion,
                         mavenScope = "provided",
                         gradleConfiguration = "compileOnly"
                     )
