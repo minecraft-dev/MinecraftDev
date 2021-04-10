@@ -20,9 +20,12 @@ import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.searches.ReferencesSearch
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UIdentifier
+import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.toUElementOfType
 
 class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
@@ -38,15 +41,17 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) = ""
 
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
-        if (element !is PsiIdentifier) {
-            return false
-        }
-        val parent = element.parent
-        if (parent !is PsiClass && parent !is PsiMethod) {
+        val identifier = element?.toUElementOfType<UIdentifier>()
+            ?: return false
+
+        val parent = identifier.uastParent
+        if (parent !is UClass && parent !is UMethod) {
             return false
         }
 
-        return ReferencesSearch.search(parent).anyMatch { EntryPointReference.isEntryPointReference(it) }
+        val psiParent = parent.sourcePsi
+            ?: return false
+        return ReferencesSearch.search(psiParent).anyMatch { EntryPointReference.isEntryPointReference(it) }
     }
 
     override fun dispose() {

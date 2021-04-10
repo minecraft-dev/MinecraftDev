@@ -26,6 +26,7 @@ import com.demonwav.mcdev.util.nullable
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.demonwav.mcdev.util.waitForAllSmart
 import com.intellij.json.JsonFileType
+import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.DumbService
@@ -33,12 +34,14 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedElementsSearch
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UIdentifier
+import org.jetbrains.uast.toUElementOfType
 
 class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
@@ -178,18 +181,14 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
     }
 
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
-        if (element !is PsiIdentifier) {
-            return false
-        }
+        val identifier = element?.toUElementOfType<UIdentifier>()
+            ?: return false
 
-        if (element.parent !is PsiClass) {
-            return false
-        }
+        val psiClass = identifier.uastParent as? UClass
+            ?: return false
 
-        val psiClass = element.parent as PsiClass
-
-        val modifierList = psiClass.modifierList
-        return modifierList?.findAnnotation(ForgeConstants.MOD_ANNOTATION) != null
+        return !psiClass.hasModifier(JvmModifier.ABSTRACT) &&
+            psiClass.findAnnotation(ForgeConstants.MOD_ANNOTATION) != null
     }
 
     override fun checkUselessCancelCheck(expression: PsiMethodCallExpression): IsCancelled? = null

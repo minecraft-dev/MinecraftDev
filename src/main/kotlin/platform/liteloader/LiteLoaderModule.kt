@@ -19,8 +19,10 @@ import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMethod
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UIdentifier
+import org.jetbrains.uast.toUElementOfType
 
 class LiteLoaderModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
@@ -35,10 +37,11 @@ class LiteLoaderModule internal constructor(facet: MinecraftFacet) : AbstractMod
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) = ""
 
-    override fun shouldShowPluginIcon(element: PsiElement?) =
-        element is PsiIdentifier &&
-            element.parent is PsiClass &&
-            element.text.startsWith("LiteMod")
+    override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
+        val identifier = element?.toUElementOfType<UIdentifier>()
+            ?: return false
+        return identifier.uastParent is UClass && identifier.name.startsWith("LiteMod")
+    }
 
     override fun dispose() {
         super.dispose()
