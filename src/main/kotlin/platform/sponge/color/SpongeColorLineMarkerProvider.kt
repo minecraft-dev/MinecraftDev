@@ -13,7 +13,8 @@ package com.demonwav.mcdev.platform.sponge.color
 import com.demonwav.mcdev.insight.ColorLineMarkerProvider
 import com.intellij.psi.PsiElement
 import java.awt.Color
+import org.jetbrains.uast.UElement
 
 class SpongeColorLineMarkerProvider : ColorLineMarkerProvider.CommonLineMarkerProvider() {
-    override fun findColor(element: PsiElement): Pair<Color, PsiElement>? = element.findSpongeColor()
+    override fun findColor(element: PsiElement): Pair<Color, UElement>? = element.findSpongeColor()
 }

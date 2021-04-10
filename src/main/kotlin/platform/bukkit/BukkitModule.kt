@@ -23,18 +23,20 @@ import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.nullable
+import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.util.PsiTypesUtil
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UIdentifier
+import org.jetbrains.uast.toUElementOfType
 
 class BukkitModule<out T : AbstractModuleType<*>> constructor(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
@@ -153,24 +155,17 @@ class BukkitModule<out T : AbstractModuleType<*>> constructor(facet: MinecraftFa
     }
 
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
-        if (element !is PsiIdentifier) {
-            return false
-        }
+        val identifier = element?.toUElementOfType<UIdentifier>()
+            ?: return false
 
-        if (element.parent !is PsiClass) {
-            return false
-        }
+        val psiClass = (identifier.uastParent as? UClass)?.javaPsi
+            ?: return false
 
-        val project = element.project
-        val psiClass = element.parent as PsiClass
-        val javaPluginClass = JavaPsiFacade.getInstance(project)
-            .findClass(BukkitConstants.JAVA_PLUGIN, GlobalSearchScope.allScope(project))
+        val pluginInterface = JavaPsiFacade.getInstance(element.project)
+            .findClass(BukkitConstants.PLUGIN, module.getModuleWithDependenciesAndLibrariesScope(false))
+            ?: return false
 
-        return javaPluginClass != null && psiClass.extendsListTypes.any { c ->
-            c == PsiTypesUtil.getClassType(
-                javaPluginClass
-            )
-        }
+        return !psiClass.hasModifier(JvmModifier.ABSTRACT) && psiClass.isInheritor(pluginInterface, true)
     }
 
     override fun dispose() {

@@ -16,13 +16,11 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo
 import com.intellij.codeInsight.daemon.NavigateAction
+import com.intellij.codeInsight.hint.HintManager
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.editor.markup.GutterIconRenderer
+import com.intellij.psi.JVMElementFactories
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiExpressionList
-import com.intellij.psi.PsiLiteralExpression
-import com.intellij.psi.PsiNewExpression
-import com.intellij.psi.impl.source.tree.JavaElementType
 import com.intellij.psi.util.PsiEditorUtil
 import com.intellij.ui.ColorChooser
 import com.intellij.util.FunctionUtil
@@ -30,6 +28,11 @@ import com.intellij.util.ui.ColorIcon
 import com.intellij.util.ui.ColorsIcon
 import java.awt.Color
 import javax.swing.Icon
+import org.jetbrains.uast.UCallExpression
+import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UIdentifier
+import org.jetbrains.uast.ULiteralExpression
+import org.jetbrains.uast.toUElementOfType
 
 class ColorLineMarkerProvider : LineMarkerProvider {
 
@@ -38,7 +41,8 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             return null
         }
 
-        val info = element.findColor { map, chosen -> ColorInfo(element, chosen.value, map, chosen.key) }
+        val identifier = element.toUElementOfType<UIdentifier>() ?: return null
+        val info = identifier.findColor { map, chosen -> ColorInfo(element, chosen.value, map, chosen.key, identifier) }
         if (info != null) {
             NavigateAction.setNavigateAction(info, "Change Color", null)
         }
@@ -49,7 +53,13 @@ class ColorLineMarkerProvider : LineMarkerProvider {
     open class ColorInfo : MergeableLineMarkerInfo<PsiElement> {
         protected val color: Color
 
-        constructor(element: PsiElement, color: Color, map: Map<String, Color>, colorName: String) : super(
+        constructor(
+            element: PsiElement,
+            color: Color,
+            map: Map<String, Color>,
+            colorName: String,
+            workElement: UElement
+        ) : super(
             element,
             element.textRange,
             ColorIcon(12, color),
@@ -63,8 +73,8 @@ class ColorLineMarkerProvider : LineMarkerProvider {
 
                 val picker = ColorPicker(map, editor.component)
                 val newColor = picker.showDialog()
-                if (newColor != null) {
-                    element.setColor(newColor)
+                if (newColor != null && map[newColor] != color) {
+                    workElement.setColor(newColor)
                 }
             },
             GutterIconRenderer.Alignment.RIGHT,
@@ -103,7 +113,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
     class CommonColorInfo(
         element: PsiElement,
         color: Color,
-        workElement: PsiElement
+        workElement: UElement
     ) : ColorLineMarkerProvider.ColorInfo(
         element,
         color,
@@ -113,18 +123,20 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             }
 
             val editor = PsiEditorUtil.findEditor(element) ?: return@handler
+            if (JVMElementFactories.getFactory(element.language, element.project) == null) {
+                // The setColor methods used here require a JVMElementFactory. Unfortunately the Kotlin plugin does not
+                // implement it yet. It is better to not display the color chooser at all than deceiving users after
+                // after they chose a color
+                HintManager.getInstance()
+                    .showErrorHint(editor, "Can't change colors in " + element.language.displayName)
+                return@handler
+            }
 
             val c = ColorChooser.chooseColor(editor.component, "Choose Color", color, false)
-            if (c != null) {
-                when (workElement) {
-                    is PsiLiteralExpression -> workElement.setColor(c.rgb and 0xFFFFFF)
-                    is PsiExpressionList -> workElement.setColor(c.red, c.green, c.blue)
-                    is PsiNewExpression -> {
-                        val list = workElement.getNode().findChildByType(JavaElementType.EXPRESSION_LIST)
-                            as PsiExpressionList?
-                        list?.setColor(c.red, c.green, c.blue)
-                    }
-                }
+                ?: return@handler
+            when (workElement) {
+                is ULiteralExpression -> workElement.setColor(c.rgb and 0xFFFFFF)
+                is UCallExpression -> workElement.setColor(c.red, c.green, c.blue)
             }
         }
     )
@@ -139,6 +151,6 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             return info
         }
 
-        abstract fun findColor(element: PsiElement): Pair<Color, PsiElement>?
+        abstract fun findColor(element: PsiElement): Pair<Color, UElement>?
     }
 }

@@ -18,6 +18,8 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.psi.PsiElement
 import java.awt.Color
 import java.awt.Font
+import org.jetbrains.uast.UIdentifier
+import org.jetbrains.uast.toUElementOfType
 
 class ColorAnnotator : Annotator {
 
@@ -26,7 +28,7 @@ class ColorAnnotator : Annotator {
             return
         }
 
-        val color = element.findColor { _, chosenEntry -> chosenEntry.value } ?: return
+        val color = element.toUElementOfType<UIdentifier>()?.findColor { _, chosenEntry -> chosenEntry.value } ?: return
 
         setColorAnnotator(color, element, holder)
     }

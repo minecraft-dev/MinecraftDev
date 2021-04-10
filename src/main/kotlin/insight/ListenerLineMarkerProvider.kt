@@ -25,11 +25,13 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiFunctionalExpression
-import com.intellij.psi.PsiMethod
 import com.intellij.psi.util.PsiExpressionTrimRenderer
 import com.intellij.psi.util.PsiUtilCore
 import com.intellij.util.Function
 import javax.swing.Icon
+import org.jetbrains.uast.UIdentifier
+import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.toUElementOfType
 
 /**
  * A [LineMarkerProviderDescriptor] that will provide a line marker info icon
@@ -43,7 +45,7 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
             return null
         }
 
-        val listener = element.eventListener ?: return null
+        val listener = element.toUElementOfType<UIdentifier>()?.uastEventListener ?: return null
         // By this point, we can guarantee that the action of "go to declaration" will work
         // since the PsiClass can be resolved, meaning the event listener is listening to
         // a valid event.
@@ -57,19 +59,19 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
 
     // This is a navigation handler that just simply goes and opens up the event's declaration,
     // even if the event target is a nested class.
-    private fun createHandler(method: PsiMethod): GutterIconNavigationHandler<PsiElement> {
-        return GutterIconNavigationHandler handler@{ _, element1 ->
+    private fun createHandler(method: UMethod): GutterIconNavigationHandler<PsiElement> {
+        return GutterIconNavigationHandler handler@{ _, element ->
             // We need to re-evaluate the targeted method, because if the method signature slightly changes before
             // IntelliJ decides to re-evaluate the method, but the class is no longer valid.
             // In this circumstance, we can find the class anyways because it's still a valid listener.
-            val containingFile = element1.containingFile
-            val parameter = method.eventParameterPair ?: return@handler
+            val containingFile = element.containingFile ?: return@handler
+            val parameter = method.uastEventParameterPair ?: return@handler
 
-            val resolve = parameter.second
+            val resolve = parameter.second.sourcePsi ?: return@handler
             val virtualFile = PsiUtilCore.getVirtualFile(resolve)
 
-            if (virtualFile != null && containingFile != null) {
-                val project = method.project
+            if (virtualFile != null) {
+                val project = element.project
                 val editor = FileEditorManager.getInstance(project).selectedTextEditor
 
                 if (editor != null) {
