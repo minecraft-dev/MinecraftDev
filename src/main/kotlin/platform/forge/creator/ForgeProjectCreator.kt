@@ -23,7 +23,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.SemanticVersion
-import com.demonwav.mcdev.util.runGradleTask
+import com.demonwav.mcdev.util.runGradleTaskAndWait
 import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
@@ -222,7 +222,7 @@ class SetupDecompWorkspaceStep(
     override fun runStep(indicator: ProgressIndicator) {
         indicator.text = "Setting up project"
         indicator.text2 = "Running Gradle task: 'setupDecompWorkspace'"
-        runGradleTask(project, rootDirectory) { settings ->
+        runGradleTaskAndWait(project, rootDirectory) { settings ->
             settings.taskNames = listOf("setupDecompWorkspace")
             settings.vmOptions = "-Xmx2G"
         }
@@ -273,7 +273,7 @@ class Fg3CompileJavaStep(
     override fun runStep(indicator: ProgressIndicator) {
         indicator.text = "Setting up classpath"
         indicator.text2 = "Running Gradle task: 'compileJava'"
-        runGradleTask(project, rootDirectory) { settings ->
+        runGradleTaskAndWait(project, rootDirectory) { settings ->
             settings.taskNames = listOf("compileJava")
         }
         indicator.text2 = null
