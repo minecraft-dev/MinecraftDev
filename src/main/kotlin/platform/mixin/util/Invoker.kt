@@ -24,8 +24,12 @@ import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.createSmartPointer
 import java.util.Locale
 
+fun PsiMember.findInvokerAnnotation(): PsiAnnotation? {
+    return findAnnotation(MixinConstants.Annotations.INVOKER)
+}
+
 fun PsiMember.findInvokerTarget(): SmartPsiElementPointer<PsiMember>? {
-    val accessor = findAnnotation(MixinConstants.Annotations.INVOKER) ?: return null
+    val accessor = findInvokerAnnotation() ?: return null
     val containingClass = containingClass ?: return null
     val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
     return resolveInvokerTarget(accessor, targetClasses, this)?.createSmartPointer()
