@@ -29,7 +29,7 @@ class CopyAtAction : SrgActionBase() {
                 copyToClipboard(
                     data.editor,
                     data.element,
-                    parent.containingClass?.qualifiedName + " " + srg.name + " #" + parent.name
+                    parent.containingClass?.qualifiedName + " " + srg.name + " # " + parent.name
                 )
             }
             is PsiMethod -> {
@@ -37,7 +37,7 @@ class CopyAtAction : SrgActionBase() {
                 copyToClipboard(
                     data.editor,
                     data.element,
-                    parent.containingClass?.qualifiedName + " " + srg.name + srg.descriptor + " #" + parent.name
+                    parent.containingClass?.qualifiedName + " " + srg.name + srg.descriptor + " # " + parent.name
                 )
             }
             is PsiClass -> {
@@ -52,6 +52,6 @@ class CopyAtAction : SrgActionBase() {
         val stringSelection = StringSelection(text)
         val clpbrd = Toolkit.getDefaultToolkit().systemClipboard
         clpbrd.setContents(stringSelection, null)
-        showSuccessBalloon(editor, element, "Copied " + text)
+        showSuccessBalloon(editor, element, "Copied $text")
     }
 }
