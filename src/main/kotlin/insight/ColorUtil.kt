@@ -24,20 +24,38 @@ import kotlin.math.round
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.UField
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.ULiteralExpression
 import org.jetbrains.uast.UQualifiedReferenceExpression
 import org.jetbrains.uast.UReferenceExpression
+import org.jetbrains.uast.UResolvable
 import org.jetbrains.uast.generate.generationPlugin
 import org.jetbrains.uast.generate.replace
+import org.jetbrains.uast.resolveToUElement
 
 fun <T> UIdentifier.findColor(function: (Map<String, Color>, Map.Entry<String, Color>) -> T): T? {
     val parent = this.uastParent
     val expression = parent as? UReferenceExpression ?: return null
-    val type = expression.getExpressionType() ?: return null
+    return findColorFromExpression(expression, function)
+}
 
-    val module = this.sourcePsi?.findModule() ?: return null
+private fun <T> findColorFromExpression(
+    expression: UReferenceExpression,
+    function: (Map<String, Color>, Map.Entry<String, Color>) -> T
+): T? {
+    val referencedElement = expression.resolveToUElement()
+    if (referencedElement is UField) {
+        val referencedFieldInitializer = referencedElement.uastInitializer
+        if (referencedFieldInitializer is UReferenceExpression) {
+            return findColorFromExpression(referencedFieldInitializer, function)
+        }
+    }
+
+    val type = expression.getExpressionType() ?: return null
+    val module = expression.sourcePsi?.findModule() ?: return null
     val facet = MinecraftFacet.getInstance(module) ?: return null
+    val resolvedName = expression.resolvedName ?: return null
     for (abstractModuleType in facet.types) {
         val map = abstractModuleType.classToColorMappings
         for (entry in map.entries) {
@@ -47,7 +65,7 @@ fun <T> UIdentifier.findColor(function: (Map<String, Color>, Map.Entry<String, C
             // So we combine those checks and get this
             val colorClass = entry.key.substringBeforeLast('.')
             val colorName = entry.key.substringAfterLast('.')
-            if (colorClass.startsWith(type.canonicalText) && colorName == expression.resolvedName ?: continue) {
+            if (colorClass.startsWith(type.canonicalText) && colorName == resolvedName) {
                 return function(map.filterKeys { key -> key.startsWith(colorClass) }, entry)
             }
         }
@@ -61,20 +79,51 @@ fun UIdentifier.findColor(
     vectorClasses: Array<String>?
 ): Pair<Color, UElement>? {
     val sourcePsi = this.sourcePsi ?: return null
-    val project = sourcePsi.project
-
     val module = ModuleUtilCore.findModuleForPsiElement(sourcePsi) ?: return null
-
     val facet = MinecraftFacet.getInstance(module) ?: return null
-
     if (!facet.isOfType(moduleType)) {
         return null
     }
 
-    val methodExpression = uastParent as? UCallExpression ?: return null
-    if (methodExpression.resolve()?.containingClass?.qualifiedName != className) {
-        return null
+    val methodExpression = (uastParent as? UCallExpression)
+    if (methodExpression?.resolve()?.containingClass?.qualifiedName == className) {
+        return findColorFromCallExpression(methodExpression, vectorClasses)
     }
+
+    var referencedElement = (uastParent as? UResolvable)?.resolveToUElement()
+    while (referencedElement is UField) {
+        val referencedFieldInitializer: UExpression? = referencedElement.uastInitializer
+        if (referencedFieldInitializer is UCallExpression) {
+            // The field is initialized with a method call
+            return referencedFieldInitializer.methodIdentifier?.findColor(moduleType, className, vectorClasses)
+        }
+
+        if (referencedFieldInitializer is UReferenceExpression) {
+            // referencedElement = referencedFieldInitializer.resolveToUElement()
+            // continue
+            // The field is probably initialized with a reference to another field
+            val referenceNameElement = referencedFieldInitializer.referenceNameElement
+            if (referenceNameElement is UIdentifier) {
+                // The expression was simple enough
+                return referenceNameElement.findColor(moduleType, className, vectorClasses)
+            } else if (referenceNameElement is UResolvable) {
+                // The expression is complex, so we resolve it. If it is a field we're on for another round
+                referencedElement = referenceNameElement.resolveToUElement()
+                continue
+            }
+        }
+
+        break
+    }
+
+    return null
+}
+
+private fun findColorFromCallExpression(
+    methodExpression: UCallExpression,
+    vectorClasses: Array<String>?
+): Pair<Color, UElement>? {
+    val project = methodExpression.sourcePsi?.project ?: return null
 
     val arguments = methodExpression.valueArguments
     val types = arguments.map(UExpression::getExpressionType)
