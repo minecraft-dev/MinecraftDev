@@ -40,27 +40,48 @@ object EntryPointReference : PsiReferenceProvider() {
         val clazzParts = methodParts[0].split("$", limit = 0)
         val references = mutableListOf<Reference>()
         var cursor = -1
-        var innerClassDepth = -1;
+        var innerClassDepth = -1
         for (clazzPart in clazzParts) {
             cursor++
             innerClassDepth++
-            references.add(Reference(element, range.cutOut(TextRange.from(cursor, clazzPart.length)), innerClassDepth, false))
+            references.add(
+                Reference(
+                    element,
+                    range.cutOut(TextRange.from(cursor, clazzPart.length)),
+                    innerClassDepth,
+                    false
+                )
+            )
             cursor += clazzPart.length
         }
         if (methodParts.size == 2) {
-            cursor += 2;
-            references.add(Reference(element, range.cutOut(TextRange.from(cursor, methodParts[1].length)), innerClassDepth, true))
+            cursor += 2
+            references.add(
+                Reference(
+                    element,
+                    range.cutOut(TextRange.from(cursor, methodParts[1].length)),
+                    innerClassDepth,
+                    true
+                )
+            )
         }
         return references.toTypedArray()
     }
 
-    private fun resolveReference(element: JsonStringLiteral, innerClassDepth: Int, isMethodReference: Boolean): Array<PsiElement> {
+    private fun resolveReference(
+        element: JsonStringLiteral,
+        innerClassDepth: Int,
+        isMethodReference: Boolean
+    ): Array<PsiElement> {
         val strReference = element.value
         val methodParts = strReference.split("::", limit = 2)
         // split at dollar sign for inner class evaluation
         val clazzParts = methodParts[0].split("$", limit = 0)
         // this case should only happen if someone misuses the method, better protect against it anyways
-        if (innerClassDepth >= clazzParts.size || innerClassDepth + 1 < clazzParts.size && isMethodReference) throw IncorrectOperationException("Invalid reference")
+        if (innerClassDepth >= clazzParts.size ||
+            innerClassDepth + 1 < clazzParts.size &&
+            isMethodReference
+        ) throw IncorrectOperationException("Invalid reference")
         var clazz = JavaPsiFacade.getInstance(element.project).findClass(clazzParts[0], element.resolveScope)
             ?: return PsiElement.EMPTY_ARRAY
         // if class is inner class, then a dot "." was used as separator instead of a dollar sign "$", this does not work to reference an inner class
@@ -87,7 +108,12 @@ object EntryPointReference : PsiReferenceProvider() {
 
     fun isEntryPointReference(reference: PsiReference) = reference is Reference
 
-    private class Reference(element: JsonStringLiteral, range: TextRange, private val innerClassDepth: Int, private val isMethodReference: Boolean) :
+    private class Reference(
+        element: JsonStringLiteral,
+        range: TextRange,
+        private val innerClassDepth: Int,
+        private val isMethodReference: Boolean
+    ) :
         PsiReferenceBase<JsonStringLiteral>(element, range),
         PsiPolyVariantReference,
         InspectionReference {
@@ -96,7 +122,8 @@ object EntryPointReference : PsiReferenceProvider() {
         override val unresolved = resolve() == null
 
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-            return resolveReference(element, innerClassDepth, isMethodReference).map { PsiElementResolveResult(it) }.toTypedArray()
+            return resolveReference(element, innerClassDepth, isMethodReference)
+                .map { PsiElementResolveResult(it) }.toTypedArray()
         }
 
         override fun resolve(): PsiElement? {
