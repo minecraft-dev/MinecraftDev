@@ -85,7 +85,7 @@ fun UIdentifier.findColor(
         return null
     }
 
-    val methodExpression = (uastParent as? UCallExpression)
+    val methodExpression = uastParent as? UCallExpression
     if (methodExpression?.resolve()?.containingClass?.qualifiedName == className) {
         return findColorFromCallExpression(methodExpression, vectorClasses)
     }
@@ -99,8 +99,6 @@ fun UIdentifier.findColor(
         }
 
         if (referencedFieldInitializer is UReferenceExpression) {
-            // referencedElement = referencedFieldInitializer.resolveToUElement()
-            // continue
             // The field is probably initialized with a reference to another field
             val referenceNameElement = referencedFieldInitializer.referenceNameElement
             if (referenceNameElement is UIdentifier) {
