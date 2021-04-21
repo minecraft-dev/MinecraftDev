@@ -10,6 +10,7 @@ dependencies {
 }
 
 processResources {
+    filteringCharset = 'UTF-8'
     from(sourceSets.main.resources.srcDirs) {
         expand 'version': project.version
     }

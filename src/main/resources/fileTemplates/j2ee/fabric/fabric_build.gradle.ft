@@ -26,6 +26,7 @@ dependencies {
 }
 
 processResources {
+    filteringCharset = 'UTF-8'
     inputs.property "version", project.version
 
     from(sourceSets.main.resources.srcDirs) {
