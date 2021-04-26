@@ -16,11 +16,13 @@ import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_GRADLE_PROPERTIES_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_MAIN_CLASS_TEMPLATE
+import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_MIXINS_JSON_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_SETTINGS_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.MODS_TOML_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.PACK_MCMETA_TEMPLATE
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.toPackageName
 import com.intellij.openapi.project.Project
 
 object Fg3Template : BaseTemplate() {
@@ -146,5 +148,17 @@ object Fg3Template : BaseTemplate() {
         )
 
         return project.applyTemplate(PACK_MCMETA_TEMPLATE, props)
+    }
+    fun applyMixinConfigTemplate(
+        project: Project,
+        buildSystem: BuildSystem
+    ): String {
+        val packageName = "${buildSystem.groupId.toPackageName()}.${buildSystem.artifactId.toPackageName()}.mixin"
+        val artifactId = "${buildSystem.artifactId.toPackageName()}"
+        val props = mapOf(
+            "PACKAGE_NAME" to packageName,
+            "ARTIFACT_ID" to artifactId
+        )
+        return project.applyTemplate(FG3_MIXINS_JSON_TEMPLATE, props)
     }
 }

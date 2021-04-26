@@ -34,6 +34,7 @@ class ForgeProjectConfig : ProjectConfig(), GradleCreator {
     var forgeVersionText: String = ""
     var forgeVersion: SemanticVersion = SemanticVersion.release()
     var mcVersion: SemanticVersion = SemanticVersion.release()
+    var mixins = false
 
     override val preferredBuildSystem = BuildSystemType.GRADLE
 

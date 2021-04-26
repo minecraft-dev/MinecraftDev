@@ -25,6 +25,7 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.modUpdateStep
 import com.intellij.ui.CollectionComboBoxModel
 import java.awt.event.ActionListener
+import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -55,6 +56,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     private lateinit var authorsField: JTextField
     private lateinit var websiteField: JTextField
     private lateinit var updateUrlField: JTextField
+    private lateinit var mixinsCheckbox: JCheckBox
     private lateinit var minecraftVersionBox: JComboBox<SemanticVersion>
     private lateinit var forgeVersionBox: JComboBox<SemanticVersion>
     private lateinit var mcpVersionBox: JComboBox<McpVersionEntry>
@@ -163,6 +165,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
             conf.forgeVersion = version
         }
 
+        conf.mixins = mixinsCheckbox.isSelected
         conf.mcVersion = this.version ?: SemanticVersion.release()
     }
 
