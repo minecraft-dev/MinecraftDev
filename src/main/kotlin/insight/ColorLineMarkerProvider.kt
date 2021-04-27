@@ -118,7 +118,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
         element,
         color,
         GutterIconNavigationHandler handler@{ _, _ ->
-            if (!element.isWritable) {
+            if (!element.isWritable || !element.isValid) {
                 return@handler
             }
 
