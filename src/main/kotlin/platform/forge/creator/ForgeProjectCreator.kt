@@ -170,6 +170,10 @@ open class Fg3ProjectCreator(
 
         return steps
     }
+
+    companion object {
+        val FG4_WRAPPER_VERSION = SemanticVersion.release(6, 8, 1)
+    }
 }
 
 class Fg3Mc112ProjectCreator(
