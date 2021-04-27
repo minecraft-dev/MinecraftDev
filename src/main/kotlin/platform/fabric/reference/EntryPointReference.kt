@@ -36,28 +36,68 @@ object EntryPointReference : PsiReferenceProvider() {
         val manipulator = element.manipulator ?: return PsiReference.EMPTY_ARRAY
         val range = manipulator.getRangeInElement(element)
         val text = element.text.substring(range.startOffset, range.endOffset)
-        val parts = text.split("::", limit = 2)
-        return if (parts.size == 1) {
-            arrayOf(Reference(element, range, false))
-        } else {
-            arrayOf(
-                Reference(element, range.cutOut(TextRange.from(0, parts[0].length)), false),
-                Reference(element, range.cutOut(TextRange.from(parts[0].length + 2, parts[1].length)), true)
+        val methodParts = text.split("::", limit = 2)
+        val clazzParts = methodParts[0].split("$", limit = 0)
+        val references = mutableListOf<Reference>()
+        var cursor = -1
+        var innerClassDepth = -1
+        for (clazzPart in clazzParts) {
+            cursor++
+            innerClassDepth++
+            references.add(
+                Reference(
+                    element,
+                    range.cutOut(TextRange.from(cursor, clazzPart.length)),
+                    innerClassDepth,
+                    false
+                )
+            )
+            cursor += clazzPart.length
+        }
+        if (methodParts.size == 2) {
+            cursor += 2
+            references.add(
+                Reference(
+                    element,
+                    range.cutOut(TextRange.from(cursor, methodParts[1].length)),
+                    innerClassDepth,
+                    true
+                )
             )
         }
+        return references.toTypedArray()
     }
 
-    private fun resolveReference(element: JsonStringLiteral, isMethodReference: Boolean): Array<PsiElement> {
+    private fun resolveReference(
+        element: JsonStringLiteral,
+        innerClassDepth: Int,
+        isMethodReference: Boolean
+    ): Array<PsiElement> {
         val strReference = element.value
-        val parts = strReference.split("::", limit = 2)
-        val clazz = JavaPsiFacade.getInstance(element.project).findClass(parts[0], element.resolveScope)
+        val methodParts = strReference.split("::", limit = 2)
+        // split at dollar sign for inner class evaluation
+        val clazzParts = methodParts[0].split("$", limit = 0)
+        // this case should only happen if someone misuses the method, better protect against it anyways
+        if (innerClassDepth >= clazzParts.size ||
+            innerClassDepth + 1 < clazzParts.size &&
+            isMethodReference
+        ) throw IncorrectOperationException("Invalid reference")
+        var clazz = JavaPsiFacade.getInstance(element.project).findClass(clazzParts[0], element.resolveScope)
             ?: return PsiElement.EMPTY_ARRAY
+        // if class is inner class, then a dot "." was used as separator instead of a dollar sign "$", this does not work to reference an inner class
+        if (clazz.parent is PsiClass) return PsiElement.EMPTY_ARRAY
+        // walk inner classes
+        for (inner in clazzParts.drop(1).take(innerClassDepth)) {
+            // we don't want any dots "." in the names of the inner classes
+            if (inner.contains('.')) return PsiElement.EMPTY_ARRAY
+            clazz = clazz.findInnerClassByName(inner, false) ?: return PsiElement.EMPTY_ARRAY
+        }
         return if (isMethodReference) {
-            if (parts.size == 1) {
+            if (methodParts.size == 1) {
                 throw IncorrectOperationException("Invalid reference")
             }
             clazz.methods.filter { method ->
-                method.name == parts[1] &&
+                method.name == methodParts[1] &&
                     method.hasModifierProperty(PsiModifier.PUBLIC) &&
                     method.hasModifierProperty(PsiModifier.STATIC)
             }.toTypedArray()
@@ -68,7 +108,12 @@ object EntryPointReference : PsiReferenceProvider() {
 
     fun isEntryPointReference(reference: PsiReference) = reference is Reference
 
-    private class Reference(element: JsonStringLiteral, range: TextRange, private val isMethodReference: Boolean) :
+    private class Reference(
+        element: JsonStringLiteral,
+        range: TextRange,
+        private val innerClassDepth: Int,
+        private val isMethodReference: Boolean
+    ) :
         PsiReferenceBase<JsonStringLiteral>(element, range),
         PsiPolyVariantReference,
         InspectionReference {
@@ -77,7 +122,8 @@ object EntryPointReference : PsiReferenceProvider() {
         override val unresolved = resolve() == null
 
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-            return resolveReference(element, isMethodReference).map { PsiElementResolveResult(it) }.toTypedArray()
+            return resolveReference(element, innerClassDepth, isMethodReference)
+                .map { PsiElementResolveResult(it) }.toTypedArray()
         }
 
         override fun resolve(): PsiElement? {
