@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "${PACKAGE_NAME}",
   "compatibilityLevel": "JAVA_8",
+  "refmap": "${ARTIFACT_ID}.refmap.json",
   "mixins": [
   ],
   "client": [

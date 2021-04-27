@@ -69,6 +69,9 @@ object Fg3Template : BaseTemplate() {
         if (config.hasAuthors()) {
             props["AUTHOR_LIST"] = config.authors.joinToString(", ")
         }
+        if (config.mixins) {
+            props["MIXINS"] = "true"
+        }
 
         return project.applyTemplate(FG3_BUILD_GRADLE_TEMPLATE, props)
     }
@@ -107,6 +110,9 @@ object Fg3Template : BaseTemplate() {
         }
         if (config.hasAuthors()) {
             props["AUTHOR_LIST"] = config.authors.joinToString(", ")
+        }
+        if (config.mixins) {
+            props["MIXINS"] = "true"
         }
 
         return project.applyTemplate(FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE, props)
@@ -149,12 +155,14 @@ object Fg3Template : BaseTemplate() {
 
         return project.applyTemplate(PACK_MCMETA_TEMPLATE, props)
     }
+
     fun applyMixinConfigTemplate(
         project: Project,
         buildSystem: BuildSystem
     ): String {
-        val packageName = "${buildSystem.groupId.toPackageName()}.${buildSystem.artifactId.toPackageName()}.mixin"
-        val artifactId = "${buildSystem.artifactId.toPackageName()}"
+        val groupId = buildSystem.groupId.toPackageName()
+        val artifactId = buildSystem.artifactId.toPackageName()
+        val packageName = "$groupId.$artifactId.mixin"
         val props = mapOf(
             "PACKAGE_NAME" to packageName,
             "ARTIFACT_ID" to artifactId

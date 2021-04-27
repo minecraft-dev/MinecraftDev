@@ -54,7 +54,7 @@ class Fg2ProjectCreator(
         val settingsText = Fg2Template.applySettingsGradle(project, buildSystem.artifactId)
         val files = GradleFiles(buildText, propText, settingsText)
 
-        val steps = mutableListOf(
+        return listOf(
             SimpleGradleSetupStep(
                 project,
                 rootDirectory,
@@ -69,8 +69,6 @@ class Fg2ProjectCreator(
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem),
             ForgeRunConfigsStep(buildSystem, rootDirectory, config, CreatedModuleType.SINGLE)
         )
-
-        return steps
     }
 
     override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
@@ -78,7 +76,7 @@ class Fg2ProjectCreator(
         val propText = Fg2Template.applyGradleProp(project, config)
         val files = GradleFiles(buildText, propText, null)
 
-        val steps = mutableListOf(
+        return listOf(
             SimpleGradleSetupStep(
                 project,
                 rootDirectory,
@@ -90,8 +88,6 @@ class Fg2ProjectCreator(
             SetupDecompWorkspaceStep(project, rootDirectory),
             ForgeRunConfigsStep(buildSystem, projectBaseDir, config, CreatedModuleType.MULTI)
         )
-
-        return steps
     }
 
     companion object {
