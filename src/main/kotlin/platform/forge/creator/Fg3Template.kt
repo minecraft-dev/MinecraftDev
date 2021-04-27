@@ -16,9 +16,9 @@ import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_GRADLE_PROPERTIES_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_MAIN_CLASS_TEMPLATE
-import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_MIXINS_JSON_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_SETTINGS_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE
+import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FORGE_MIXINS_JSON_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.MODS_TOML_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.PACK_MCMETA_TEMPLATE
 import com.demonwav.mcdev.util.SemanticVersion
@@ -159,6 +159,6 @@ object Fg3Template : BaseTemplate() {
             "PACKAGE_NAME" to packageName,
             "ARTIFACT_ID" to artifactId
         )
-        return project.applyTemplate(FG3_MIXINS_JSON_TEMPLATE, props)
+        return project.applyTemplate(FORGE_MIXINS_JSON_TEMPLATE, props)
     }
 }
