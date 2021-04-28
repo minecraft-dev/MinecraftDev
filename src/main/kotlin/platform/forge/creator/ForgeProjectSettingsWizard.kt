@@ -80,6 +80,13 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         mcpWarning.isVisible = (mcpVersionBox.selectedItem as? McpVersionEntry)?.isRed == true
     }
 
+    private val forgeVersionBoxListener = ActionListener {
+        val supportedMixinVersion = forgeVersionBox.selectedItem as SemanticVersion >= SemanticVersion.parse("31.2.45")
+        mixinsCheckbox.isEnabled = supportedMixinVersion
+        mixinsCheckbox.isSelected = supportedMixinVersion
+
+    }
+
     private val minecraftBoxActionListener: ActionListener = ActionListener {
         CoroutineScope(Dispatchers.Swing).launch {
             loadingBar.isIndeterminate = true
@@ -176,7 +183,10 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         mcpVersionBox.addActionListener(mcpBoxActionListener)
         mcpBoxActionListener.actionPerformed(null)
 
+        forgeVersionBox.removeActionListener(forgeVersionBoxListener)
         setForgeVersion(data)
+        forgeVersionBox.addActionListener(forgeVersionBoxListener)
+        forgeVersionBoxListener.actionPerformed(null)
     }
 
     private fun updateVersions() = CoroutineScope(Dispatchers.Swing).launch {
