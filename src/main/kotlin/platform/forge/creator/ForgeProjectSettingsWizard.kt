@@ -81,10 +81,10 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     }
 
     private val forgeVersionBoxListener = ActionListener {
-        val supportedMixinVersion = forgeVersionBox.selectedItem as SemanticVersion >= SemanticVersion.parse("31.2.45")
+        val selectedVersion = forgeVersionBox.selectedItem as? SemanticVersion ?: return@ActionListener
+        val supportedMixinVersion = selectedVersion >= SemanticVersion.release(31, 2, 45)
         mixinsCheckbox.isEnabled = supportedMixinVersion
         mixinsCheckbox.isSelected = supportedMixinVersion
-
     }
 
     private val minecraftBoxActionListener: ActionListener = ActionListener {
