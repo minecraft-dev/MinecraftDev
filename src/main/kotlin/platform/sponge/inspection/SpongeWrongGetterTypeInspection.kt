@@ -128,10 +128,6 @@ class SpongeWrongGetterTypeInspection : AbstractBaseUastLocalInspectionTool() {
         paramIndex: Int,
         project: Project
     ): Array<out LocalQuickFix> {
-        // if (method.isWritable != true) {
-        //     return InspectionGadgetsFix.EMPTY_ARRAY
-        // }
-
         if (expectedType is PsiPrimitiveType ||
             expectedType is PsiClassType && !isOptional(expectedType)
         ) {
