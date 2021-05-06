@@ -25,6 +25,7 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.modUpdateStep
 import com.intellij.ui.CollectionComboBoxModel
 import java.awt.event.ActionListener
+import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -55,6 +56,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     private lateinit var authorsField: JTextField
     private lateinit var websiteField: JTextField
     private lateinit var updateUrlField: JTextField
+    private lateinit var mixinsCheckbox: JCheckBox
     private lateinit var minecraftVersionBox: JComboBox<SemanticVersion>
     private lateinit var forgeVersionBox: JComboBox<SemanticVersion>
     private lateinit var mcpVersionBox: JComboBox<McpVersionEntry>
@@ -76,6 +78,15 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
 
     private val mcpBoxActionListener = ActionListener {
         mcpWarning.isVisible = (mcpVersionBox.selectedItem as? McpVersionEntry)?.isRed == true
+    }
+
+    private val forgeVersionBoxListener = ActionListener {
+        val selectedVersion = forgeVersionBox.selectedItem as? SemanticVersion ?: return@ActionListener
+        val supportedMixinVersion = selectedVersion >= SemanticVersion.release(31, 2, 45)
+        mixinsCheckbox.isEnabled = supportedMixinVersion
+        if (!supportedMixinVersion) {
+            mixinsCheckbox.isSelected = false
+        }
     }
 
     private val minecraftBoxActionListener: ActionListener = ActionListener {
@@ -163,6 +174,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
             conf.forgeVersion = version
         }
 
+        conf.mixins = mixinsCheckbox.isSelected
         conf.mcVersion = this.version ?: SemanticVersion.release()
     }
 
@@ -173,7 +185,10 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         mcpVersionBox.addActionListener(mcpBoxActionListener)
         mcpBoxActionListener.actionPerformed(null)
 
+        forgeVersionBox.removeActionListener(forgeVersionBoxListener)
         setForgeVersion(data)
+        forgeVersionBox.addActionListener(forgeVersionBoxListener)
+        forgeVersionBoxListener.actionPerformed(null)
     }
 
     private fun updateVersions() = CoroutineScope(Dispatchers.Swing).launch {
