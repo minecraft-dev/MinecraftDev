@@ -18,8 +18,8 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.7.2"
-    id("org.cadixdev.licenser") version "0.5.1"
+    id("org.jetbrains.intellij") version "0.7.3"
+    id("org.cadixdev.licenser") version "0.6.0"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
 
@@ -71,31 +71,28 @@ dependencies {
     // Kotlin
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    val coroutineVersion = "1.4.3"
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutineVersion")
+    implementation(libs.bundles.coroutines)
 
     implementation(files(gradleToolingExtensionJar))
 
-    implementation("com.extracraftx.minecraft:TemplateMakerFabric:0.3.0")
+    implementation(libs.templateMakerFabric)
 
-    jflex("org.jetbrains.idea:jflex:1.7.0-b7f882a")
-    jflexSkeleton("org.jetbrains.idea:jflex:1.7.0-c1fdf11:idea@skeleton")
-    grammarKit("org.jetbrains.idea:grammar-kit:1.5.1")
+    jflex(libs.jflex.lib)
+    jflexSkeleton("${libs.jflex.skeleton.text()}:idea@skeleton")
+    grammarKit(libs.grammarKit)
 
-    testLibs("org.jetbrains.idea:mockJDK:1.7-4d76c50")
-    testLibs("org.spongepowered:mixin:0.7-SNAPSHOT")
-    testLibs("org.spongepowered:spongeapi:7.0.0:shaded")
-    testLibs("com.demonwav.mcdev:all-types-nbt:1.0@nbt")
+    testLibs(libs.test.mockJdk)
+    testLibs(libs.test.mixin)
+    testLibs("${libs.test.spongeapi.text()}:shaded")
+    testLibs("${libs.test.nbt.text()}@nbt")
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
-    gradleToolingExtension("com.jetbrains.intellij.gradle:gradle-tooling-extension:201.6668.121")
-    gradleToolingExtension("org.jetbrains:annotations:19.0.0")
+    gradleToolingExtension(libs.gradleToolingExtension)
+    gradleToolingExtension(libs.annotations)
 
-    val junitVersion = "5.7.1"
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testImplementation(libs.junit.api)
+    testRuntimeOnly(libs.junit.entine)
 }
 
 intellij {
@@ -208,7 +205,7 @@ idea {
 }
 
 license {
-    header = file("copyright.txt")
+    header.set(resources.text.fromFile(file("copyright.txt")))
     style["flex"] = HeaderStyle.BLOCK_COMMENT.format
     style["bnf"] = HeaderStyle.BLOCK_COMMENT.format
 
@@ -233,20 +230,23 @@ license {
 
     tasks {
         register("gradle") {
-            files = project.fileTree(project.projectDir) {
-                include("**/*.gradle.kts", "gradle.properties")
-                exclude("**/buildSrc/**", "**/build/**")
-            }
+            files.from(
+                fileTree(project.projectDir) {
+                    include("**/*.gradle.kts", "gradle.properties")
+                    exclude("**/buildSrc/**", "**/build/**")
+                }
+            )
         }
         register("buildSrc") {
-            val buildSrc = project.projectDir.resolve("buildSrc")
-            files = project.fileTree(buildSrc) {
-                include("**/*.kt", "**/*.kts")
-                exclude("**/build/**")
-            }
+            files.from(
+                project.fileTree(project.projectDir.resolve("buildSrc")) {
+                    include("**/*.kt", "**/*.kts")
+                    exclude("**/build/**")
+                }
+            )
         }
         register("grammars") {
-            files = project.fileTree("src/main/grammars")
+            files.from(project.fileTree("src/main/grammars"))
         }
     }
 }
@@ -305,4 +305,11 @@ tasks.runIde {
     // Set these properties to test different languages
     // systemProperty("user.language", "en")
     // systemProperty("user.country", "US")
+}
+
+// version catalogs still have rough edges as it's still experimental
+// this lets us get around some of that while still getting the benefits of using catalogs
+fun Provider<MinimalExternalModuleDependency>.text(): String {
+    val dep = get()
+    return "${dep.module.group}:${dep.module.name}:${dep.versionConstraint}"
 }
