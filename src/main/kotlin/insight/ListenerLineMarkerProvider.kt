@@ -45,7 +45,13 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
             return null
         }
 
-        val listener = element.toUElementOfType<UIdentifier>()?.uastEventListener ?: return null
+        val identifier = element.toUElementOfType<UIdentifier>()
+        if (identifier?.uastParent !is UMethod) {
+            // We only target the method name
+            return null
+        }
+
+        val listener = identifier.uastEventListener ?: return null
         // By this point, we can guarantee that the action of "go to declaration" will work
         // since the PsiClass can be resolved, meaning the event listener is listening to
         // a valid event.

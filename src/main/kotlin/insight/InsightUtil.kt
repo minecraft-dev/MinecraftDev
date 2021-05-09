@@ -18,12 +18,13 @@ import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UParameter
+import org.jetbrains.uast.getParentOfType
 import org.jetbrains.uast.toUElementOfType
 
 val UElement.uastEventListener: Pair<UClass, UMethod>?
     get() {
         // The PsiIdentifier is going to be a method of course!
-        val method = this.uastParent as? UMethod ?: return null
+        val method = this.getParentOfType<UMethod>() ?: return null
         if (method.javaPsi.hasModifierProperty(PsiModifier.ABSTRACT)) {
             // I don't think any implementation allows for abstract method listeners.
             return null
