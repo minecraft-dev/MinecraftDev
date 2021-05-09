@@ -114,7 +114,7 @@ If you're curious about that task, it is implemented in `buildSrc`.
 Developers
 ----------
 
-- Project Owner - [**@DemonWav** - Kyle Wood](https://github.com/DemonWav)
+- Project Owner - [**@DenWav** - Kyle Wood](https://github.com/DenWav)
 - [**@Minecrell**](https://github.com/Minecrell)
 - [**@PaleoCrafter** - Marvin Rösch](https://github.com/PaleoCrafter)
 - [**@RedNesto**](https://github.com/RedNesto)

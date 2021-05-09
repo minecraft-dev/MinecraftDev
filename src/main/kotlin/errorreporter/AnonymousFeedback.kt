@@ -29,7 +29,7 @@ object AnonymousFeedback {
 
     data class FeedbackData(val url: String, val token: Int, val isDuplicate: Boolean)
 
-    const val url = "https://www.demonwav.com/errorReport"
+    const val url = "https://www.denwav.dev/errorReport"
 
     fun sendFeedback(
         factory: HttpConnectionFactory,
