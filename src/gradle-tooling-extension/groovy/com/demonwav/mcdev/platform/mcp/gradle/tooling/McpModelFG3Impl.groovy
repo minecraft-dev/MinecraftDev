@@ -19,11 +19,19 @@ final class McpModelFG3Impl implements McpModelFG3, Serializable {
     final String mcpVersion
     final File taskOutputLocation
     final String taskName
+    final List<File> accessTransformers
 
-    McpModelFG3Impl(List<String> minecraftDepVersions, String mcpVersion, File taskOutputLocation, String taskName) {
+    McpModelFG3Impl(
+            final List<String> minecraftDepVersions,
+            final String mcpVersion,
+            final File taskOutputLocation,
+            final String taskName,
+            final List<File> accessTransformers
+    ) {
         this.minecraftDepVersions = minecraftDepVersions
         this.mcpVersion = mcpVersion
         this.taskOutputLocation = taskOutputLocation
         this.taskName = taskName
+        this.accessTransformers = accessTransformers
     }
 }

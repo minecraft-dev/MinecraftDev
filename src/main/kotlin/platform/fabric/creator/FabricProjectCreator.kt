@@ -28,7 +28,7 @@ import com.demonwav.mcdev.util.addAnnotation
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.addMethod
 import com.demonwav.mcdev.util.invokeLater
-import com.demonwav.mcdev.util.runGradleTask
+import com.demonwav.mcdev.util.runGradleTaskAndWait
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.runWriteTaskInSmartMode
@@ -137,7 +137,7 @@ class GenSourcesStep(
     override fun runStep(indicator: ProgressIndicator) {
         indicator.text = "Setting up project"
         indicator.text2 = "Running Gradle task: 'genSources'"
-        runGradleTask(project, rootDirectory) { settings ->
+        runGradleTaskAndWait(project, rootDirectory) { settings ->
             settings.taskNames = listOf("genSources")
             settings.vmOptions = "-Xmx1G"
         }

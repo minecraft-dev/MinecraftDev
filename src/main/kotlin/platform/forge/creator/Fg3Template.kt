@@ -18,9 +18,11 @@ import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_GRADLE_PROPERTIE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_MAIN_CLASS_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_SETTINGS_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE
+import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FORGE_MIXINS_JSON_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.MODS_TOML_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.PACK_MCMETA_TEMPLATE
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.toPackageName
 import com.intellij.openapi.project.Project
 
 object Fg3Template : BaseTemplate() {
@@ -67,6 +69,9 @@ object Fg3Template : BaseTemplate() {
         if (config.hasAuthors()) {
             props["AUTHOR_LIST"] = config.authors.joinToString(", ")
         }
+        if (config.mixins) {
+            props["MIXINS"] = "true"
+        }
 
         return project.applyTemplate(FG3_BUILD_GRADLE_TEMPLATE, props)
     }
@@ -105,6 +110,9 @@ object Fg3Template : BaseTemplate() {
         }
         if (config.hasAuthors()) {
             props["AUTHOR_LIST"] = config.authors.joinToString(", ")
+        }
+        if (config.mixins) {
+            props["MIXINS"] = "true"
         }
 
         return project.applyTemplate(FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE, props)
@@ -146,5 +154,19 @@ object Fg3Template : BaseTemplate() {
         )
 
         return project.applyTemplate(PACK_MCMETA_TEMPLATE, props)
+    }
+
+    fun applyMixinConfigTemplate(
+        project: Project,
+        buildSystem: BuildSystem
+    ): String {
+        val groupId = buildSystem.groupId.toPackageName()
+        val artifactId = buildSystem.artifactId.toPackageName()
+        val packageName = "$groupId.$artifactId.mixin"
+        val props = mapOf(
+            "PACKAGE_NAME" to packageName,
+            "ARTIFACT_ID" to artifactId
+        )
+        return project.applyTemplate(FORGE_MIXINS_JSON_TEMPLATE, props)
     }
 }

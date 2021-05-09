@@ -253,7 +253,9 @@
         <!-- Folding -->
         <applicationService serviceImplementation="com.demonwav.mcdev.platform.mixin.folding.MixinFoldingSettings" />
         <codeFoldingOptionsProvider instance="com.demonwav.mcdev.platform.mixin.folding.MixinFoldingOptionsProvider" />
-        <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.folding.MixinFoldingBuilder"/>
+        <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.folding.MixinObjectCastFoldingBuilder"/>
+        <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.folding.MixinTargetDescriptorFoldingBuilder"/>
+        <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.folding.AccessorMixinFoldingBuilder"/>
 
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.mixin.insight.MixinImplicitUsageProvider"/>
         <deadCode implementation="com.demonwav.mcdev.platform.mixin.insight.MixinEntryPoint"/>
