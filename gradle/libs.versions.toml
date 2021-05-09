@@ -1,0 +1,30 @@
+[versions]
+coroutines = "1.4.3"
+junit = "5.7.1"
+
+[libraries]
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
+
+templateMakerFabric = "com.extracraftx.minecraft:TemplateMakerFabric:0.3.0"
+
+# GrammarKit
+jflex-lib = "org.jetbrains.idea:jflex:1.7.0-b7f882a"
+jflex-skeleton = "org.jetbrains.idea:jflex:1.7.0-c1fdf11"
+grammarKit = "org.jetbrains.idea:grammar-kit:1.5.1"
+
+# Gradle Tooling
+gradleToolingExtension = "com.jetbrains.intellij.gradle:gradle-tooling-extension:202.6397.94"
+annotations = "org.jetbrains:annotations:19.0.0"
+
+# Testing
+test-mockJdk = "org.jetbrains.idea:mockJDK:1.7-4d76c50"
+test-mixin = "org.spongepowered:mixin:0.7-SNAPSHOT"
+test-spongeapi = "org.spongepowered:spongeapi:7.0.0"
+test-nbt = "com.demonwav.mcdev:all-types-nbt:1.0"
+
+junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-entine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+
+[bundles]
+coroutines = ["coroutines-core", "coroutines-swing"]

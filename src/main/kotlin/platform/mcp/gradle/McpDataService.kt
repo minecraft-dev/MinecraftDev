@@ -44,11 +44,6 @@ class McpDataService : AbstractProjectDataService<McpModelData, Module>() {
                 mcpModule.updateSettings(data.settings)
                 continue
             }
-
-            val children = MinecraftFacet.getChildInstances(module)
-            for (child in children) {
-                child.getModuleOfType(McpModuleType)?.updateSettings(data.settings)
-            }
         }
     }
 }

@@ -46,7 +46,8 @@ final class McpModelFG3BuilderImpl implements ModelBuilderService {
         }
 
         def taskOutput = task.outputs.files.singleFile
-        return new McpModelFG3Impl(minecraftDepVersions, extension.mappings, taskOutput, task.name)
+        //noinspection GroovyAssignabilityCheck
+        return new McpModelFG3Impl(minecraftDepVersions, extension.mappings, taskOutput, task.name, extension.accessTransformers)
     }
 
     @Override

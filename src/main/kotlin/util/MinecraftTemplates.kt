@@ -75,6 +75,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             forgeGroup.addTemplate(FileTemplateDescriptor(FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FORGE_GRADLE_PROPERTIES_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FORGE_SETTINGS_GRADLE_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(FORGE_MIXINS_JSON_TEMPLATE, PlatformAssets.FORGE_ICON))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_BUILD_GRADLE_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE))
@@ -197,6 +198,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FORGE_BUILD_GRADLE_TEMPLATE = "Forge build.gradle"
         const val FORGE_SUBMODULE_BUILD_GRADLE_TEMPLATE = "Forge Submodule build.gradle"
         const val FORGE_GRADLE_PROPERTIES_TEMPLATE = "Forge gradle.properties"
+        const val FORGE_MIXINS_JSON_TEMPLATE = "Forge Mixins Config.json"
         const val FORGE_SETTINGS_GRADLE_TEMPLATE = "Forge settings.gradle"
         const val FG3_MAIN_CLASS_TEMPLATE = "Forge (1.13+) Main Class.java"
         const val FG3_BUILD_GRADLE_TEMPLATE = "Forge (1.13+) build.gradle"

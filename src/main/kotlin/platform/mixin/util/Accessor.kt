@@ -24,8 +24,12 @@ import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.util.createSmartPointer
 import java.util.Locale
 
+fun PsiMember.findAccessorAnnotation(): PsiAnnotation? {
+    return findAnnotation(MixinConstants.Annotations.ACCESSOR)
+}
+
 fun PsiMember.findAccessorTarget(): SmartPsiElementPointer<PsiMember>? {
-    val accessor = findAnnotation(MixinConstants.Annotations.ACCESSOR) ?: return null
+    val accessor = findAccessorAnnotation() ?: return null
     val containingClass = containingClass ?: return null
     val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
     return resolveAccessorTarget(accessor, targetClasses, this)?.createSmartPointer()
@@ -43,7 +47,10 @@ fun resolveAccessorTarget(
                 // Accessors either have a return value (field getter) or a parameter (field setter)
                 if (!member.hasParameters() && accessorInfo.type.allowGetters) {
                     it.type.isErasureEquivalentTo(member.returnType)
-                } else if (PsiType.VOID == member.returnType && accessorInfo.type.allowSetters) {
+                } else if (
+                    PsiType.VOID == member.returnType && member.parameterList.parametersCount == 1 &&
+                    accessorInfo.type.allowSetters
+                ) {
                     it.type.isErasureEquivalentTo(member.parameterList.parameters[0].type)
                 } else {
                     false

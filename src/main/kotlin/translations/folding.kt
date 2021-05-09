@@ -30,8 +30,9 @@ import com.intellij.psi.util.PsiTreeUtil
 class TranslationCodeFoldingOptionsProvider :
     BeanConfigurable<TranslationFoldingSettings>(TranslationFoldingSettings.instance), CodeFoldingOptionsProvider {
     init {
+        title = "Minecraft"
         checkBox(
-            "Minecraft Translations",
+            "Translation Strings",
             TranslationFoldingSettings.instance::shouldFoldTranslations
         ) {
             TranslationFoldingSettings.instance.shouldFoldTranslations = it

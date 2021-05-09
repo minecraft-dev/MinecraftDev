@@ -17,15 +17,26 @@ import com.intellij.openapi.externalSystem.task.TaskCallback
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.project.Project
 import java.nio.file.Path
-import java.util.concurrent.locks.Condition
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
+import java.util.concurrent.CountDownLatch
 import org.jetbrains.plugins.gradle.util.GradleConstants
 
-inline fun runGradleTask(
+fun runGradleTask(project: Project, dir: Path, func: (ExternalSystemTaskExecutionSettings) -> Unit) {
+    runGradleTaskWithCallback(project, dir, func, GradleCallback(null))
+}
+
+fun runGradleTaskAndWait(project: Project, dir: Path, func: (ExternalSystemTaskExecutionSettings) -> Unit) {
+    val latch = CountDownLatch(1)
+
+    runGradleTaskWithCallback(project, dir, func, GradleCallback(latch))
+
+    latch.await()
+}
+
+private fun runGradleTaskWithCallback(
     project: Project,
     dir: Path,
-    func: (ExternalSystemTaskExecutionSettings) -> Unit
+    func: (ExternalSystemTaskExecutionSettings) -> Unit,
+    callback: TaskCallback
 ) {
     val settings = ExternalSystemTaskExecutionSettings().apply {
         externalSystemIdString = GradleConstants.SYSTEM_ID.id
@@ -33,32 +44,23 @@ inline fun runGradleTask(
         func(this)
     }
 
-    val lock = ReentrantLock()
-    val condition = lock.newCondition()
-
-    lock.withLock {
-        ExternalSystemUtil.runTask(
-            settings,
-            DefaultRunExecutor.EXECUTOR_ID,
-            project,
-            GradleConstants.SYSTEM_ID,
-            GradleCallback(lock, condition),
-            ProgressExecutionMode.IN_BACKGROUND_ASYNC,
-            false
-        )
-
-        condition.await()
-    }
+    ExternalSystemUtil.runTask(
+        settings,
+        DefaultRunExecutor.EXECUTOR_ID,
+        project,
+        GradleConstants.SYSTEM_ID,
+        callback,
+        ProgressExecutionMode.IN_BACKGROUND_ASYNC,
+        false
+    )
 }
 
-class GradleCallback(private val lock: ReentrantLock, private val condition: Condition) : TaskCallback {
+class GradleCallback(private val latch: CountDownLatch?) : TaskCallback {
 
     override fun onSuccess() = resume()
     override fun onFailure() = resume()
 
     private fun resume() {
-        lock.withLock {
-            condition.signalAll()
-        }
+        latch?.countDown()
     }
 }
