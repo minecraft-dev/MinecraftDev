@@ -11,27 +11,28 @@
 package com.demonwav.mcdev.platform.mcp.gradle.datahandler
 
 import com.demonwav.mcdev.platform.mcp.McpModuleSettings
+import com.demonwav.mcdev.platform.mcp.at.AtFileType
 import com.demonwav.mcdev.platform.mcp.gradle.McpModelData
 import com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModelFG3
 import com.demonwav.mcdev.platform.mcp.srg.SrgType
-import com.demonwav.mcdev.util.runGradleTask
-import com.intellij.openapi.application.ApplicationManager
+import com.demonwav.mcdev.util.runWriteTaskLater
+import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ModuleData
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
-import com.intellij.openapi.project.DumbService
-import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.fileTypes.ExactFileNameMatcher
+import com.intellij.openapi.fileTypes.FileTypeManager
+import com.intellij.openapi.vfs.LocalFileSystem
 import org.gradle.tooling.model.idea.IdeaModule
+import org.jetbrains.plugins.gradle.model.data.GradleSourceSetData
 import org.jetbrains.plugins.gradle.service.project.ProjectResolverContext
 
 object McpModelFG3Handler : McpModelDataHandler {
+
     override fun build(
         gradleModule: IdeaModule,
-        module: ModuleData,
+        node: DataNode<ModuleData>,
         resolverCtx: ProjectResolverContext
-    ): McpModelData? {
-        val data = resolverCtx.getExtraProject(gradleModule, McpModelFG3::class.java) ?: return null
+    ) {
+        val data = resolverCtx.getExtraProject(gradleModule, McpModelFG3::class.java) ?: return
 
         var version: String? = null
         for (minecraftDepVersion in data.minecraftDepVersions) {
@@ -50,43 +51,29 @@ object McpModelFG3Handler : McpModelDataHandler {
             SrgType.TSRG
         )
 
-        ApplicationManager.getApplication().executeOnPooledThread {
-            // Wait until indexing is done, to try and not interfere with current gradle process
-            for (openProject in ProjectManager.getInstance().openProjects) {
-                DumbService.getInstance(openProject).waitForSmartMode()
-            }
-            val project = ProjectManager.getInstance().openProjects.firstOrNull { it.name == gradleModule.project.name }
-                ?: return@executeOnPooledThread
-            if (project.isDisposed) {
-                return@executeOnPooledThread
-            }
+        val gradleProjectPath = gradleModule.gradleProject.projectIdentifier.projectPath
+        val suffix = if (gradleProjectPath.endsWith(':')) "" else ":"
+        val taskName = gradleProjectPath + suffix + data.taskName
 
-            var gradleProject = gradleModule.gradleProject
-            val task = StringBuilder(data.taskName)
-            if (gradleProject.parent != null) {
-                task.insert(0, ':')
-            }
-            while (gradleProject.parent != null) {
-                gradleProject = gradleProject.parent
-                task.insert(0, gradleProject.name)
-                task.insert(0, ':')
-            }
-
-            ProgressManager.getInstance().run(
-                object : Task.Backgroundable(project, "Generating SRG map", false) {
-                    override fun run(indicator: ProgressIndicator) {
-                        indicator.isIndeterminate = true
-
-                        indicator.text = "Creating SRG map"
-                        indicator.text2 = "Running Gradle task: '${data.taskName}'"
-                        runGradleTask(project, gradleProject.projectDirectory.toPath()) { settings ->
-                            settings.taskNames = listOf(data.taskName)
-                        }
-                    }
+        val ats = data.accessTransformers
+        if (ats != null && ats.isNotEmpty()) {
+            runWriteTaskLater {
+                for (at in ats) {
+                    val fileTypeManager = FileTypeManager.getInstance()
+                    val atFile = LocalFileSystem.getInstance().findFileByIoFile(at) ?: continue
+                    fileTypeManager.associate(AtFileType, ExactFileNameMatcher(atFile.name))
                 }
-            )
+            }
         }
 
-        return McpModelData(module, state)
+        val modelData = McpModelData(node.data, state, taskName, data.accessTransformers)
+        node.createChild(McpModelData.KEY, modelData)
+
+        for (child in node.children) {
+            val childData = child.data
+            if (childData is GradleSourceSetData) {
+                child.createChild(McpModelData.KEY, modelData.copy(module = childData))
+            }
+        }
     }
 }

@@ -23,7 +23,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('gradle.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - uses: gradle/wrapper-validation-action@v1
       - name: Setup publish token
         env:
           JETBRAINS_TOKEN: ${{ secrets.JETBRAINS_TOKEN }}

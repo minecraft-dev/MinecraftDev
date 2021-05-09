@@ -23,7 +23,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.SemanticVersion
-import com.demonwav.mcdev.util.runGradleTask
+import com.demonwav.mcdev.util.runGradleTaskAndWait
 import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
@@ -123,8 +123,7 @@ open class Fg3ProjectCreator(
 
     override fun getSingleModuleSteps(): Iterable<CreatorStep> {
         val files = createGradleFiles(hasData = true)
-
-        return listOf(
+        val steps = mutableListOf(
             SimpleGradleSetupStep(
                 project,
                 rootDirectory,
@@ -139,6 +138,12 @@ open class Fg3ProjectCreator(
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem),
             ForgeRunConfigsStep(buildSystem, rootDirectory, config, CreatedModuleType.SINGLE)
         )
+
+        if (config.mixins) {
+            steps += MixinConfigStep(project, buildSystem)
+        }
+
+        return steps
     }
 
     override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
@@ -146,7 +151,7 @@ open class Fg3ProjectCreator(
         val buildText = Fg3Template.applySubBuildGradle(project, buildSystem, config, modName, hasData = true)
         val files = GradleFiles(buildText, null, null)
 
-        return listOf(
+        val steps = mutableListOf(
             SimpleGradleSetupStep(
                 project,
                 rootDirectory,
@@ -158,6 +163,12 @@ open class Fg3ProjectCreator(
             Fg3CompileJavaStep(project, rootDirectory),
             ForgeRunConfigsStep(buildSystem, projectBaseDir, config, CreatedModuleType.MULTI)
         )
+
+        if (config.mixins) {
+            steps += MixinConfigStep(project, buildSystem)
+        }
+
+        return steps
     }
 }
 
@@ -222,7 +233,7 @@ class SetupDecompWorkspaceStep(
     override fun runStep(indicator: ProgressIndicator) {
         indicator.text = "Setting up project"
         indicator.text2 = "Running Gradle task: 'setupDecompWorkspace'"
-        runGradleTask(project, rootDirectory) { settings ->
+        runGradleTaskAndWait(project, rootDirectory) { settings ->
             settings.taskNames = listOf("setupDecompWorkspace")
             settings.vmOptions = "-Xmx2G"
         }
@@ -273,10 +284,23 @@ class Fg3CompileJavaStep(
     override fun runStep(indicator: ProgressIndicator) {
         indicator.text = "Setting up classpath"
         indicator.text2 = "Running Gradle task: 'compileJava'"
-        runGradleTask(project, rootDirectory) { settings ->
+        runGradleTaskAndWait(project, rootDirectory) { settings ->
             settings.taskNames = listOf("compileJava")
         }
         indicator.text2 = null
+    }
+}
+
+class MixinConfigStep(
+    private val project: Project,
+    private val buildSystem: BuildSystem
+) : CreatorStep {
+    override fun runStep(indicator: ProgressIndicator) {
+        val text = Fg3Template.applyMixinConfigTemplate(project, buildSystem)
+        val dir = buildSystem.dirsOrError.resourceDirectory
+        runWriteTask {
+            CreatorStep.writeTextToFile(project, dir, "${buildSystem.artifactId}.mixins.json", text)
+        }
     }
 }
 

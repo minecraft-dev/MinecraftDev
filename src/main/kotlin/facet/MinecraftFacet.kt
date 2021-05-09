@@ -35,6 +35,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import java.util.concurrent.ConcurrentHashMap
 import javax.swing.Icon
+import kotlin.jvm.Throws
 import org.jetbrains.jps.model.java.JavaResourceRootType
 import org.jetbrains.jps.model.java.JavaSourceRootType
 
@@ -195,10 +196,34 @@ class MinecraftFacet(
         }
 
     fun findFile(path: String, type: SourceType): VirtualFile? {
-        val roots = roots[type]
-        for (root in roots) {
-            return root?.findFileByRelativePath(path) ?: continue
+        try {
+            return findFile0(path, type)
+        } catch (ignored: RefreshRootsException) {}
+
+        updateRoots()
+
+        return try {
+            findFile0(path, type)
+        } catch (ignored: RefreshRootsException) {
+            // Well we tried our best
+            null
         }
+    }
+
+    private class RefreshRootsException : Exception()
+
+    @Throws(RefreshRootsException::class)
+    private fun findFile0(path: String, type: SourceType): VirtualFile? {
+        val roots = roots[type]
+
+        for (root in roots) {
+            val r = root ?: continue
+            if (!r.isValid) {
+                throw RefreshRootsException()
+            }
+            return r.findFileByRelativePath(path) ?: continue
+        }
+
         return null
     }
 

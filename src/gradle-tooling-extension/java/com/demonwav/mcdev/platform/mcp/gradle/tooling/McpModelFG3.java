@@ -17,4 +17,5 @@ public interface McpModelFG3 extends McpModel {
     List<String> getMinecraftDepVersions();
     File getTaskOutputLocation();
     String getTaskName();
+    List<File> getAccessTransformers();
 }

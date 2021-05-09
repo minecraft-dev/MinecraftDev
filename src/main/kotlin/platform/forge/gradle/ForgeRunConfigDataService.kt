@@ -16,7 +16,7 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.invokeAndWait
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.localFile
-import com.demonwav.mcdev.util.runGradleTask
+import com.demonwav.mcdev.util.runGradleTaskAndWait
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunManagerListener
 import com.intellij.execution.RunnerAndConfigurationSettings
@@ -144,7 +144,7 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
                     val projectDir = project.guessProjectDir() ?: return
                     indicator.text = "Creating run configurations"
                     indicator.text2 = "Running Gradle task: '$task'"
-                    runGradleTask(project, projectDir.localFile.toPath()) { settings ->
+                    runGradleTaskAndWait(project, projectDir.localFile.toPath()) { settings ->
                         settings.taskNames = listOf(task)
                     }
 

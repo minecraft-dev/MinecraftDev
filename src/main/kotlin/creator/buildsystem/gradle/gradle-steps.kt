@@ -17,7 +17,7 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystemTemplate
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.creator.buildsystem.DirectorySet
 import com.demonwav.mcdev.util.invokeLater
-import com.demonwav.mcdev.util.runGradleTask
+import com.demonwav.mcdev.util.runGradleTaskAndWait
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.virtualFileOrError
@@ -272,7 +272,7 @@ class GradleWrapperStep(
 
         indicator.text = "Setting up Gradle Wrapper"
         indicator.text2 = "Running Gradle task: 'wrapper'"
-        runGradleTask(project, rootDirectory) { settings ->
+        runGradleTaskAndWait(project, rootDirectory) { settings ->
             settings.taskNames = listOf("wrapper")
         }
         indicator.text2 = null

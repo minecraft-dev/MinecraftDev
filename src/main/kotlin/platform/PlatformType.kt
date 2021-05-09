@@ -51,7 +51,7 @@ enum class PlatformType(
     FORGE(ForgeModuleType, "Forge"),
     FABRIC(FabricModuleType, "Fabric"),
     SPONGE(SpongeModuleType, "Sponge"),
-    BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord.json"),
+    BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord_v2.json"),
     WATERFALL(WaterfallModuleType, "Waterfall", "waterfall.json", BUNGEECORD),
     VELOCITY(VelocityModuleType, "Velocity", "velocity.json"),
     LITELOADER(LiteLoaderModuleType, "LiteLoader"),
