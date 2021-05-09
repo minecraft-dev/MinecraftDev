@@ -22,6 +22,8 @@ import java.net.HttpURLConnection
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
 import org.apache.commons.io.IOUtils
+import org.apache.http.HttpHeaders
+import org.apache.http.entity.ContentType
 
 object AnonymousFeedback {
 
@@ -206,7 +208,11 @@ object AnonymousFeedback {
                 continue
             }
 
-            data = connection.inputStream.reader().use(InputStreamReader::readCharSequence).toString()
+            val charset = connection.getHeaderField(HttpHeaders.CONTENT_TYPE)?.let {
+                ContentType.parse(it).charset
+            } ?: Charsets.UTF_8
+
+            data = connection.inputStream.reader(charset).readText()
 
             response = Gson().fromJson(data)
             list.addAll(response)
@@ -219,18 +225,21 @@ object AnonymousFeedback {
         return list
     }
 
-    private fun getNextLink(link: String?): String? {
-        if (link == null) {
+    private fun getNextLink(linkHeader: String?): String? {
+        if (linkHeader == null) {
             return null
         }
-        val lines = link.split(",")
-        for (line in lines) {
-            if (!line.contains("rel=\"next\"")) {
+        val links = linkHeader.split(",")
+        for (link in links) {
+            if (!link.contains("rel=\"next\"")) {
                 continue
             }
 
-            val parts = line.split(";")
-            return parts[0].substring(1, parts[0].length - 1)
+            val parts = link.split(";")
+            if (parts.isEmpty()) {
+                continue
+            }
+            return parts[0].trim().removePrefix("<").removeSuffix(">")
         }
 
         return null
