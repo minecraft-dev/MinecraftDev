@@ -20,7 +20,11 @@ class MixinFoldingSettings : PersistentStateComponent<MixinFoldingSettings.State
 
     data class State(
         var foldTargetDescriptors: Boolean = true,
-        var foldObjectCasts: Boolean = false
+        var foldObjectCasts: Boolean = false,
+        var foldInvokerCasts: Boolean = true,
+        var foldInvokerMethodCalls: Boolean = true,
+        var foldAccessorCasts: Boolean = true,
+        var foldAccessorMethodCalls: Boolean = false,
     )
 
     private var state = State()
