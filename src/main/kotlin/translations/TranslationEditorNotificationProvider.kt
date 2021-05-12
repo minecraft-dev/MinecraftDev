@@ -14,6 +14,7 @@ import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.sorting.Ordering
 import com.demonwav.mcdev.translations.sorting.TranslationSorter
 import com.demonwav.mcdev.util.applyWriteAction
+import com.demonwav.mcdev.util.findMcpModule
 import com.demonwav.mcdev.util.mcDomain
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
@@ -55,6 +56,12 @@ class TranslationEditorNotificationProvider :
                     TranslationFiles.addAll(psi, fileEntries.asIterable())
                     EditorNotifications.updateAll()
                 }
+
+                if (psi.findMcpModule() == null) {
+                    // TranslationSorter.query requires an MCP module to work
+                    return@createActionLabel
+                }
+
                 val sort = Messages.showYesNoDialog(
                     project,
                     "Would you like to sort all translations now?",
