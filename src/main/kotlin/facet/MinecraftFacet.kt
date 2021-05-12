@@ -44,8 +44,7 @@ class MinecraftFacet(
     name: String,
     configuration: MinecraftFacetConfiguration,
     underlyingFacet: Facet<*>?
-) :
-    Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, underlyingFacet) {
+) : Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, underlyingFacet) {
 
     private val moduleMap = ConcurrentHashMap<AbstractModuleType<*>, AbstractModule>()
     private val roots: HashMultimap<SourceType, VirtualFile?> = HashMultimap.create()
