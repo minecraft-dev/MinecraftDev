@@ -38,8 +38,8 @@ object AnonymousFeedback {
         val duplicateId = findDuplicateIssue(envDetails, factory)
         if (duplicateId != null) {
             // This is a duplicate
-            val commentUrl =
-                sendCommentOnDuplicateIssue(duplicateId, factory, convertToGitHubIssueFormat(envDetails, attachments))
+            val issueContent = convertToGitHubIssueFormat(envDetails, attachments)
+            val commentUrl = sendCommentOnDuplicateIssue(duplicateId, factory, issueContent)
             return FeedbackData(commentUrl, duplicateId, true)
         }
 
@@ -66,8 +66,10 @@ object AnonymousFeedback {
         }
 
         var stackTrace = body.remove("error.stacktrace")
-        if (stackTrace.isNullOrEmpty()) {
-            stackTrace = "no stacktrace"
+        stackTrace = if (stackTrace.isNullOrEmpty()) {
+            "no stacktrace"
+        } else {
+            linkStacktrace(stackTrace)
         }
 
         val sb = StringBuilder()
@@ -88,7 +90,7 @@ object AnonymousFeedback {
         }
         sb.append("</table></td></tr></table>\n")
 
-        sb.append("\n```\n").append(stackTrace).append("\n```\n")
+        sb.append("\n<pre>\n").append(stackTrace).append("\n</pre>\n")
         sb.append("\n```\n").append(errorMessage).append("\n```\n")
 
         if (attachments.isNotEmpty()) {
@@ -138,15 +140,15 @@ object AnonymousFeedback {
         return connection
     }
 
-    private val numberRegex = Regex("\\d+")
-    private val newLineRegex = Regex("[\r\n]+")
-
     private const val openIssueUrl = "$baseUrl?state=open&creator=minecraft-dev-autoreporter&per_page=100"
     private const val closedIssueUrl = "$baseUrl?state=closed&creator=minecraft-dev-autoreporter&per_page=100"
 
     private const val packagePrefix = "\tat com.demonwav.mcdev"
 
     private fun findDuplicateIssue(envDetails: LinkedHashMap<String, String?>, factory: HttpConnectionFactory): Int? {
+        val numberRegex = Regex("\\d+")
+        val newLineRegex = Regex("[\r\n]+")
+
         val stack = envDetails["error.stacktrace"]?.replace(numberRegex, "") ?: return null
 
         val stackMcdevParts = stack.lineSequence()
@@ -296,6 +298,72 @@ object AnonymousFeedback {
         connection.setRequestProperty("Content-Type", "application/json")
 
         return connection
+    }
+
+    private fun linkStacktrace(stacktrace: String): String {
+        val versionRegex = Regex("""(?<intellijVersion>\d{4}\.\d)-(?<pluginVersion>\d+\.\d+\.\d+)""")
+
+        val version = PluginUtil.pluginVersion
+        val match = versionRegex.matchEntire(version) ?: return stacktrace
+
+        val intellijVersion = match.groups["intellijVersion"]?.value ?: return stacktrace
+        val pluginVersion = match.groups["pluginVersion"]?.value ?: return stacktrace
+
+        val tag = "$pluginVersion-$intellijVersion"
+
+        //         v                             stack element text                                  v
+        //      at com.demonwav.mcdev.facet.MinecraftFacet.shouldShowPluginIcon(MinecraftFacet.kt:185)
+        // prefix ^        class path ^   ^                           file name ^               ^  ^ line number
+        val stackElementRegex = Regex(
+            """(?<prefix>\s+at\s+)""" +
+                """(?<stackElementText>""" +
+                """(?<className>com\.demonwav\.mcdev(?:\.\p{javaJavaIdentifierStart}\p{javaJavaIdentifierPart}*)+)""" +
+                """(?:\.\p{javaJavaIdentifierStart}\p{javaJavaIdentifierPart}*|<(?:cl)?init>)""" +
+                """\((?<fileName>.*\.\w+):(?<lineNumber>\d+)\)""" +
+                """)\s*"""
+        )
+
+        val baseTagUrl = "https://github.com/minecraft-dev/MinecraftDev/blob/$tag/src/main/kotlin/"
+
+        val sb = StringBuilder(stacktrace.length * 2)
+
+        for (line in stacktrace.lineSequence()) {
+            val lineMatch = stackElementRegex.matchEntire(line)
+            if (lineMatch == null) {
+                sb.append(line).append('\n')
+                continue
+            }
+
+            val prefix = lineMatch.groups["prefix"]?.value
+            val className = lineMatch.groups["className"]?.value
+            val fileName = lineMatch.groups["fileName"]?.value
+            val lineNumber = lineMatch.groups["lineNumber"]?.value
+            val stackElementText = lineMatch.groups["stackElementText"]?.value
+
+            if (prefix == null || className == null || fileName == null || lineNumber == null || stackElementText == null) {
+                sb.append(line).append('\n')
+                continue
+            }
+
+            val path = className.substringAfter("com.demonwav.mcdev.")
+                .substringBeforeLast('.')
+                .replace('.', '/')
+            sb.apply {
+                append(prefix)
+                append("<a href=\"")
+                append(baseTagUrl)
+                append(path)
+                append('/')
+                append(fileName)
+                append("#L")
+                append(lineNumber)
+                append("\">")
+                append(stackElementText)
+                append("</a>\n")
+            }
+        }
+
+        return sb.toString()
     }
 
     private val userAgent by lazy {
