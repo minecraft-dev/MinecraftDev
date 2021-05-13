@@ -1,0 +1,13 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+#parse("File Header.java")
+
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentType;
+import net.minecraft.inventory.EquipmentSlotType;
+
+public class ${NAME} extends Enchantment {
+    public ${NAME}(Rarity rarityIn, EnchantmentType typeIn, EquipmentSlotType[] slots) {
+		super(rarityIn, typeIn, slots);
+    }
+}
+
