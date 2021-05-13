@@ -340,7 +340,9 @@ object AnonymousFeedback {
             val lineNumber = lineMatch.groups["lineNumber"]?.value
             val stackElementText = lineMatch.groups["stackElementText"]?.value
 
-            if (prefix == null || className == null || fileName == null || lineNumber == null || stackElementText == null) {
+            if (prefix == null || className == null || fileName == null ||
+                lineNumber == null || stackElementText == null
+            ) {
                 sb.append(line).append('\n')
                 continue
             }

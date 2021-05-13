@@ -13,7 +13,6 @@ package com.demonwav.mcdev.update
 import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.extensions.PluginId
-import org.jetbrains.annotations.NotNull
 
 object PluginUtil {
     val PLUGIN_ID = PluginId.getId("com.demonwav.minecraft-dev")
