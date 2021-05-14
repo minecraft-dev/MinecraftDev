@@ -97,7 +97,7 @@ object PluginUpdater {
 
     private fun checkUpdatesInCustomRepo(host: String): PluginUpdateStatus {
         val plugins = try {
-            RepositoryHelper.loadPlugins(host, null)
+            RepositoryHelper.loadPlugins(host, null, null)
         } catch (e: IOException) {
             return PluginUpdateStatus.CheckFailed("Checking custom plugin repository $host  failed")
         }

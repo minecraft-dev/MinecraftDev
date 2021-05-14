@@ -84,9 +84,8 @@ class ErrorReporter : ErrorReportSubmitter() {
                 NotificationGroupManager.getInstance().getNotificationGroup("Error Report").createNotification(
                     DiagnosticBundle.message("error.report.title"),
                     message,
-                    NotificationType.INFORMATION,
-                    NotificationListener.URL_OPENING_LISTENER
-                ).setImportant(false).notify(project)
+                    NotificationType.INFORMATION
+                ).setListener(NotificationListener.URL_OPENING_LISTENER).setImportant(false).notify(project)
 
                 val reportInfo = SubmittedReportInfo(htmlUrl, "Issue #$token", type)
                 consumer.consume(reportInfo)
@@ -98,8 +97,7 @@ class ErrorReporter : ErrorReportSubmitter() {
                     DiagnosticBundle.message("error.report.title"),
                     message,
                     NotificationType.ERROR,
-                    NotificationListener.URL_OPENING_LISTENER
-                ).setImportant(false).notify(project)
+                ).setListener(NotificationListener.URL_OPENING_LISTENER).setImportant(false).notify(project)
 
                 consumer.consume(SubmittedReportInfo(null, null, SubmittedReportInfo.SubmissionStatus.FAILED))
             }

@@ -28,7 +28,7 @@ class NbttParserDefinition : ParserDefinition {
     override fun createFile(viewProvider: FileViewProvider) = NbttFile(viewProvider)
 
     override fun spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) =
-        LanguageUtil.canStickTokensTogetherByLexer(left, right, NbttLexerAdapter())!!
+        LanguageUtil.canStickTokensTogetherByLexer(left, right, NbttLexerAdapter())
 
     override fun getStringLiteralElements() = STRING_LITERALS
     override fun getWhitespaceTokens() = WHITE_SPACES

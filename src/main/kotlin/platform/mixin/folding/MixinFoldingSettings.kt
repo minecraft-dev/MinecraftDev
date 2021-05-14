@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.platform.mixin.folding
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 
@@ -37,6 +37,6 @@ class MixinFoldingSettings : PersistentStateComponent<MixinFoldingSettings.State
 
     companion object {
         val instance: MixinFoldingSettings
-            get() = ServiceManager.getService(MixinFoldingSettings::class.java)
+            get() = ApplicationManager.getApplication().getService(MixinFoldingSettings::class.java)
     }
 }

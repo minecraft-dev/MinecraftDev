@@ -16,8 +16,8 @@ import com.intellij.application.options.editor.CodeFoldingOptionsProvider
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.FoldingBuilderEx
 import com.intellij.lang.folding.FoldingDescriptor
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.editor.Document
@@ -66,7 +66,7 @@ class TranslationFoldingSettings : PersistentStateComponent<TranslationFoldingSe
 
     companion object {
         val instance: TranslationFoldingSettings
-            get() = ServiceManager.getService(TranslationFoldingSettings::class.java)
+            get() = ApplicationManager.getApplication().getService(TranslationFoldingSettings::class.java)
     }
 }
 

@@ -27,7 +27,7 @@ class LangParserDefinition : ParserDefinition {
     override fun createFile(viewProvider: FileViewProvider) = LangFile(viewProvider)
 
     override fun spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) =
-        LanguageUtil.canStickTokensTogetherByLexer(left, right, LangLexerAdapter())!!
+        LanguageUtil.canStickTokensTogetherByLexer(left, right, LangLexerAdapter())
 
     override fun getStringLiteralElements() = STRING_LITERALS
     override fun getWhitespaceTokens() = WHITE_SPACES

@@ -130,7 +130,7 @@ tasks.publishPlugin {
 }
 
 tasks.runPluginVerifier {
-    ideVersions.addAll("IC-2020.1.3", "IC-2020.1.4")
+    ideVersions.addAll("IC-2021.2")
 }
 
 java {

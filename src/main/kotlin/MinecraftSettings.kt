@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.editor.markup.EffectType
@@ -90,6 +90,6 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
 
     companion object {
         val instance: MinecraftSettings
-            get() = ServiceManager.getService(MinecraftSettings::class.java)
+            get() = ApplicationManager.getApplication().getService(MinecraftSettings::class.java)
     }
 }
