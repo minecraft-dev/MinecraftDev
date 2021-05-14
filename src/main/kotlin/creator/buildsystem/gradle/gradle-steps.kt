@@ -40,6 +40,7 @@ import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import java.nio.file.StandardOpenOption.WRITE
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
+import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
 import org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import org.jetbrains.plugins.groovy.GroovyLanguage
@@ -211,9 +212,11 @@ class BasicGradleFinalizerStep(
         rootDirectory.virtualFileOrError.refresh(false, true)
 
         invokeLater {
-            @Suppress("UnstableApiUsage")
-            linkAndRefreshGradleProject(rootDirectory.toAbsolutePath().toString(), project)
-            showProgress(project)
+            val path = rootDirectory.toAbsolutePath().toString()
+            if (canLinkAndRefreshGradleProject(path, project, false)) {
+                linkAndRefreshGradleProject(path, project)
+                showProgress(project)
+            }
         }
 
         // Set up the run config

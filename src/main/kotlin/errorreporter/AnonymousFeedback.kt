@@ -16,8 +16,6 @@ import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.diagnostic.Attachment
-import com.intellij.util.io.readCharSequence
-import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
@@ -29,7 +27,8 @@ object AnonymousFeedback {
 
     data class FeedbackData(val url: String, val token: Int, val isDuplicate: Boolean)
 
-    const val url = "https://www.denwav.dev/errorReport"
+    private const val authedUrl = "https://www.denwav.dev/errorReport"
+    private const val baseUrl = "https://api.github.com/repos/minecraft-dev/MinecraftDev/issues"
 
     fun sendFeedback(
         factory: HttpConnectionFactory,
@@ -39,8 +38,8 @@ object AnonymousFeedback {
         val duplicateId = findDuplicateIssue(envDetails, factory)
         if (duplicateId != null) {
             // This is a duplicate
-            val commentUrl =
-                sendCommentOnDuplicateIssue(duplicateId, factory, convertToGitHubIssueFormat(envDetails, attachments))
+            val issueContent = convertToGitHubIssueFormat(envDetails, attachments)
+            val commentUrl = sendCommentOnDuplicateIssue(duplicateId, factory, issueContent)
             return FeedbackData(commentUrl, duplicateId, true)
         }
 
@@ -67,21 +66,31 @@ object AnonymousFeedback {
         }
 
         var stackTrace = body.remove("error.stacktrace")
-        if (stackTrace.isNullOrEmpty()) {
-            stackTrace = "no stacktrace"
+        stackTrace = if (stackTrace.isNullOrEmpty()) {
+            "no stacktrace"
+        } else {
+            linkStacktrace(stackTrace)
         }
 
         val sb = StringBuilder()
 
-        if (!errorDescription.isEmpty()) {
+        if (errorDescription.isNotEmpty()) {
             sb.append(errorDescription).append("\n\n")
         }
 
-        for ((key, value) in body) {
-            sb.append(key).append(": ").append(value).append("\n")
+        sb.append("<table><tr><td><table>\n")
+        for ((i, entry) in body.entries.withIndex()) {
+            if (i == 6) {
+                sb.append("</table></td><td><table>\n")
+            }
+            val (key, value) = entry
+            sb.append("<tr><td><b>").append(key).append("</b></td><td><code>").append(value).append(
+                "</code></td></tr>\n"
+            )
         }
+        sb.append("</table></td></tr></table>\n")
 
-        sb.append("\n```\n").append(stackTrace).append("\n```\n")
+        sb.append("\n<pre>\n").append(stackTrace).append("\n</pre>\n")
         sb.append("\n```\n").append(errorMessage).append("\n```\n")
 
         if (attachments.isNotEmpty()) {
@@ -118,7 +127,7 @@ object AnonymousFeedback {
     }
 
     private fun sendFeedback(factory: HttpConnectionFactory, payload: ByteArray): Pair<String, Int> {
-        val connection = getConnection(factory, url)
+        val connection = getConnection(factory, authedUrl)
         connection.connect()
         val json = executeCall(connection, payload)
         return json["html_url"] as String to (json["number"] as Double).toInt()
@@ -131,17 +140,15 @@ object AnonymousFeedback {
         return connection
     }
 
-    private val numberRegex = Regex("\\d+")
-    private val newLineRegex = Regex("[\r\n]+")
-
-    private const val openIssueUrl = "https://api.github.com/repos/minecraft-dev/MinecraftDev/issues" +
-        "?state=open&creator=minecraft-dev-autoreporter&per_page=100"
-    private const val closedIssueUrl = "https://api.github.com/repos/minecraft-dev/MinecraftDev/issues" +
-        "?state=closed&creator=minecraft-dev-autoreporter&per_page=100"
+    private const val openIssueUrl = "$baseUrl?state=open&creator=minecraft-dev-autoreporter&per_page=100"
+    private const val closedIssueUrl = "$baseUrl?state=closed&creator=minecraft-dev-autoreporter&per_page=100"
 
     private const val packagePrefix = "\tat com.demonwav.mcdev"
 
     private fun findDuplicateIssue(envDetails: LinkedHashMap<String, String?>, factory: HttpConnectionFactory): Int? {
+        val numberRegex = Regex("\\d+")
+        val newLineRegex = Regex("[\r\n]+")
+
         val stack = envDetails["error.stacktrace"]?.replace(numberRegex, "") ?: return null
 
         val stackMcdevParts = stack.lineSequence()
@@ -177,55 +184,50 @@ object AnonymousFeedback {
     }
 
     private fun getAllIssues(url: String, factory: HttpConnectionFactory): List<Map<*, *>>? {
-        var connection = connect(factory, url)
-        connection.requestMethod = "GET"
-        connection.setRequestProperty("User-Agent", userAgent)
+        var useAuthed = false
 
-        connection.connect()
-        if (connection.responseCode != 200) {
-            connection.disconnect()
-            return null
-        }
-
+        var next: String? = url
         val list = mutableListOf<Map<*, *>>()
-        var data = connection.inputStream.reader().use(InputStreamReader::readCharSequence).toString()
 
-        var response = Gson().fromJson<List<Map<*, *>>>(data)
-        list.addAll(response)
-
-        var link = connection.getHeaderField("Link")
-        connection.disconnect()
-
-        var next = getNextLink(link)
         while (next != null) {
-            connection = connect(factory, next)
-            connection.requestMethod = "GET"
-            connection.setRequestProperty("User-Agent", userAgent)
+            val connection: HttpURLConnection = connect(factory, next)
+            try {
+                connection.requestMethod = "GET"
+                connection.setRequestProperty("User-Agent", userAgent)
 
-            connection.connect()
-            if (connection.responseCode != 200) {
+                connection.connect()
+
+                if (connection.responseCode == 403 && !useAuthed) {
+                    useAuthed = true
+                    next = replaceWithAuth(next)
+                    continue
+                }
+
+                if (connection.responseCode != 200) {
+                    return null
+                }
+
+                val charset = connection.getHeaderField(HttpHeaders.CONTENT_TYPE)?.let {
+                    ContentType.parse(it).charset
+                } ?: Charsets.UTF_8
+
+                val data = connection.inputStream.reader(charset).readText()
+
+                val response = Gson().fromJson<List<Map<*, *>>>(data)
+                list.addAll(response)
+
+                val link = connection.getHeaderField("Link")
+
+                next = getNextLink(link, useAuthed)
+            } finally {
                 connection.disconnect()
-                continue
             }
-
-            val charset = connection.getHeaderField(HttpHeaders.CONTENT_TYPE)?.let {
-                ContentType.parse(it).charset
-            } ?: Charsets.UTF_8
-
-            data = connection.inputStream.reader(charset).readText()
-
-            response = Gson().fromJson(data)
-            list.addAll(response)
-
-            link = connection.getHeaderField("Link")
-            connection.disconnect()
-            next = getNextLink(link)
         }
 
         return list
     }
 
-    private fun getNextLink(linkHeader: String?): String? {
+    private fun getNextLink(linkHeader: String?, useAuthed: Boolean): String? {
         if (linkHeader == null) {
             return null
         }
@@ -239,14 +241,31 @@ object AnonymousFeedback {
             if (parts.isEmpty()) {
                 continue
             }
-            return parts[0].trim().removePrefix("<").removeSuffix(">")
+            val nextUrl = parts[0].trim().removePrefix("<").removeSuffix(">")
+            if (!useAuthed) {
+                return nextUrl
+            }
+
+            return replaceWithAuth(nextUrl)
         }
 
         return null
     }
 
+    private fun replaceWithAuth(url: String): String? {
+        // non-authed-API requests are rate limited at 60 / hour / IP
+        // authed requests have a rate limit of 5000 / hour / account
+        // We don't want to use the authed URL by default since all users would use the same rate limit
+        // but it's a good fallback when the non-authed API stops working.
+        val index = url.indexOf('?')
+        if (index == -1) {
+            return null
+        }
+        return authedUrl + url.substring(index)
+    }
+
     private fun sendCommentOnDuplicateIssue(id: Int, factory: HttpConnectionFactory, payload: ByteArray): String {
-        val commentUrl = "$url/$id/comments"
+        val commentUrl = "$authedUrl/$id/comments"
         val connection = getConnection(factory, commentUrl)
         val json = executeCall(connection, payload)
         return json["html_url"] as String
@@ -279,6 +298,74 @@ object AnonymousFeedback {
         connection.setRequestProperty("Content-Type", "application/json")
 
         return connection
+    }
+
+    private fun linkStacktrace(stacktrace: String): String {
+        val versionRegex = Regex("""(?<intellijVersion>\d{4}\.\d)-(?<pluginVersion>\d+\.\d+\.\d+)""")
+
+        val version = PluginUtil.pluginVersion
+        val match = versionRegex.matchEntire(version) ?: return stacktrace
+
+        val intellijVersion = match.groups["intellijVersion"]?.value ?: return stacktrace
+        val pluginVersion = match.groups["pluginVersion"]?.value ?: return stacktrace
+
+        val tag = "$pluginVersion-$intellijVersion"
+
+        //         v                             stack element text                                  v
+        //      at com.demonwav.mcdev.facet.MinecraftFacet.shouldShowPluginIcon(MinecraftFacet.kt:185)
+        // prefix ^        class path ^   ^                           file name ^               ^  ^ line number
+        val stackElementRegex = Regex(
+            """(?<prefix>\s+at\s+)""" +
+                """(?<stackElementText>""" +
+                """(?<className>com\.demonwav\.mcdev(?:\.\p{javaJavaIdentifierStart}\p{javaJavaIdentifierPart}*)+)""" +
+                """(?:\.\p{javaJavaIdentifierStart}\p{javaJavaIdentifierPart}*|<(?:cl)?init>)""" +
+                """\((?<fileName>.*\.\w+):(?<lineNumber>\d+)\)""" +
+                """)\s*"""
+        )
+
+        val baseTagUrl = "https://github.com/minecraft-dev/MinecraftDev/blob/$tag/src/main/kotlin/"
+
+        val sb = StringBuilder(stacktrace.length * 2)
+
+        for (line in stacktrace.lineSequence()) {
+            val lineMatch = stackElementRegex.matchEntire(line)
+            if (lineMatch == null) {
+                sb.append(line).append('\n')
+                continue
+            }
+
+            val prefix = lineMatch.groups["prefix"]?.value
+            val className = lineMatch.groups["className"]?.value
+            val fileName = lineMatch.groups["fileName"]?.value
+            val lineNumber = lineMatch.groups["lineNumber"]?.value
+            val stackElementText = lineMatch.groups["stackElementText"]?.value
+
+            if (prefix == null || className == null || fileName == null ||
+                lineNumber == null || stackElementText == null
+            ) {
+                sb.append(line).append('\n')
+                continue
+            }
+
+            val path = className.substringAfter("com.demonwav.mcdev.")
+                .substringBeforeLast('.')
+                .replace('.', '/')
+            sb.apply {
+                append(prefix)
+                append("<a href=\"")
+                append(baseTagUrl)
+                append(path)
+                append('/')
+                append(fileName)
+                append("#L")
+                append(lineNumber)
+                append("\">")
+                append(stackElementText)
+                append("</a>\n")
+            }
+        }
+
+        return sb.toString()
     }
 
     private val userAgent by lazy {
