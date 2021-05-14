@@ -115,7 +115,7 @@ intellij {
 
     downloadSources = downloadIdeaSources.toBoolean()
 
-    sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
+    sandboxDirectory = layout.projectDirectory.dir(".sandbox")
 }
 
 tasks.publishPlugin {
@@ -293,6 +293,12 @@ sourceSets.main { java.srcDir(generate) }
 
 // Remove gen directory on clean
 tasks.clean { delete(generate) }
+
+tasks.register("cleanSandbox", Delete::class) {
+    group = "intellij"
+    description = "Deletes the sandbox directory."
+    delete(layout.projectDirectory.dir(".sandbox"))
+}
 
 tasks.runIde {
     maxHeapSize = "2G"
