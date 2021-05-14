@@ -58,7 +58,11 @@ class ForgeProjectConfig : ProjectConfig(), GradleCreator {
         rootDirectory: Path,
         buildSystem: GradleBuildSystem
     ) {
-        buildSystem.gradleVersion = Fg2ProjectCreator.FG_WRAPPER_VERSION
+        buildSystem.gradleVersion = if (isFg3(mcVersion, forgeVersion)) {
+            Fg3ProjectCreator.FG4_WRAPPER_VERSION
+        } else {
+            Fg2ProjectCreator.FG_WRAPPER_VERSION
+        }
     }
 
     private fun isFg3(mcVersion: SemanticVersion, forgeVersion: SemanticVersion): Boolean {

@@ -56,7 +56,11 @@ object JsonTranslationProvider : TranslationProvider {
             return null
         }
         val obj = json.asJsonObject
-        return TranslationIndexEntry(domain, obj.entrySet().map { Translation(it.key, it.value.asString) })
+        val translations = obj.entrySet().asSequence()
+            .filter { it.value.isJsonPrimitive }
+            .map { Translation(it.key, it.value.asString) }
+            .toList()
+        return TranslationIndexEntry(domain, translations)
     }
 
     override fun findElements(project: Project, file: VirtualFile, key: String): List<JsonProperty> {

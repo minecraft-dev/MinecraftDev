@@ -68,10 +68,14 @@ class JsonReferenceContributor : PsiReferenceContributor() {
                         return arrayOf()
                     }
                     val entry = element as? JsonProperty ?: return arrayOf()
+                    val nameTextRange = element.nameElement.textRangeInParent
+                    if (nameTextRange.length < 2) {
+                        return arrayOf()
+                    }
                     return arrayOf(
                         TranslationReference(
                             element,
-                            element.nameElement.textRangeInParent.shiftRight(1).grown(-2),
+                            nameTextRange.shiftRight(1).grown(-2),
                             TranslationInstance.Key("", entry.name, "")
                         ) { elem, _, newName ->
                             (elem as JsonProperty).setName(newName)
