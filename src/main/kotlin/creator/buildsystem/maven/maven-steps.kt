@@ -190,7 +190,7 @@ class BasicMavenFinalizerStep(
         val vPomFile = pomFile.virtualFile ?: throw IllegalStateException("Could not find file: $pomFile")
 
         // Force Maven to setup the project
-        invokeLater {
+        invokeLater(project.disposed) {
             val manager = MavenProjectsManager.getInstance(project)
             manager.addManagedFilesOrUnignore(listOf(vPomFile))
             manager.importingSettings.isDownloadDocsAutomatically = true

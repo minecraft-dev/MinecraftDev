@@ -58,6 +58,10 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
                 FileTypeManager.getInstance().associatePattern(JsonFileType.INSTANCE, ForgeConstants.PACK_MCMETA)
             }
 
+            if (project.isDisposed) {
+                return@executeOnPooledThread
+            }
+
             // Index @SideOnly
             val service = DumbService.getInstance(project)
             service.runReadActionInSmartMode runSmart@{
