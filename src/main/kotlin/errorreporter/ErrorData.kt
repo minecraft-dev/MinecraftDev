@@ -64,6 +64,7 @@ class ErrorData(var throwable: Throwable?, val lastAction: String?) {
         }
 
         params["error.message"] = message
+        params["error.raw_stacktrace"] = throwable?.stackTraceToString()
         params["error.stacktrace"] = formatStackTrace()
 
         return params to attachments
