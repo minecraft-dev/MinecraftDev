@@ -30,8 +30,8 @@ class AnonymousFeedbackTask(
         indicator.isIndeterminate = true
 
         try {
-            val (url, token, isDuplicate) =
-                AnonymousFeedback.sendFeedback(ProxyHttpConnectionFactory, params, attachments)
+            val factory = ProxyHttpConnectionFactory
+            val (url, token, isDuplicate) = AnonymousFeedback.sendFeedback(factory, params, attachments)
 
             callback(url, token, isDuplicate)
         } catch (e: Exception) {
