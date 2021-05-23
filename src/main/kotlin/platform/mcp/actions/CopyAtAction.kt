@@ -29,7 +29,9 @@ class CopyAtAction : SrgActionBase() {
                     return showBalloon("No SRG name found", e)
                 }
                 val classSrg = srgMap.getSrgClass(parent.containingClass!!) ?: return showBalloon(
-                    "No SRG name found", e)
+                    "No SRG name found",
+                    e
+                )
                 val srg = srgMap.getSrgField(parent) ?: return showBalloon("No SRG name found", e)
                 copyToClipboard(
                     data.editor,
@@ -42,7 +44,9 @@ class CopyAtAction : SrgActionBase() {
                     return showBalloon("No SRG name found", e)
                 }
                 val classSrg = srgMap.getSrgClass(parent.containingClass!!) ?: return showBalloon(
-                    "No SRG name found", e)
+                    "No SRG name found",
+                    e
+                )
                 val srg = srgMap.getSrgMethod(parent) ?: return showBalloon("No SRG name found", e)
                 copyToClipboard(
                     data.editor,
