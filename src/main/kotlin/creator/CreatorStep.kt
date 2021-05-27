@@ -67,6 +67,9 @@ interface CreatorStep {
 
             // Reformat the code to match their code style
             runReadAction {
+                if (project.isDisposed) {
+                    return@runReadAction
+                }
                 PsiManager.getInstance(project).findFile(vFile)?.let {
                     scheduledReformats += it.createSmartPointer()
                 }
