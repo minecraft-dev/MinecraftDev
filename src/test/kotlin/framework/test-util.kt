@@ -77,7 +77,7 @@ fun ProjectBuilderTest.testParser(basePath: String, func: ProjectBuilderFunc) {
         file = func(basePath.substringAfterLast('/'), text, true, false).toPsiFile()
     }
 
-    val actual = DebugUtil.psiToString(file!!, false, true)
+    val actual = DebugUtil.psiToString(file!!, true, true)
 
     val expectedLines = expected.lineSequence().filter { it.isNotBlank() }.toList()
     val actualLines = actual.lineSequence().filter { it.isNotBlank() }.toList()
