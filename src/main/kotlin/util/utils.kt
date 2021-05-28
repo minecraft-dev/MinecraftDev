@@ -25,6 +25,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.roots.libraries.LibraryKind
 import com.intellij.openapi.util.Computable
+import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
@@ -78,6 +79,10 @@ fun invokeLater(func: () -> Unit) {
     ApplicationManager.getApplication().invokeLater(func, ModalityState.defaultModalityState())
 }
 
+fun invokeLater(expired: Condition<*>, func: () -> Unit) {
+    ApplicationManager.getApplication().invokeLater(func, ModalityState.defaultModalityState(), expired)
+}
+
 fun invokeLaterAny(func: () -> Unit) {
     ApplicationManager.getApplication().invokeLater(func, ModalityState.any())
 }
@@ -96,7 +101,9 @@ inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T
 
 fun waitForAllSmart() {
     for (project in ProjectManager.getInstance().openProjects) {
-        DumbService.getInstance(project).waitForSmartMode()
+        if (!project.isDisposed) {
+            DumbService.getInstance(project).waitForSmartMode()
+        }
     }
 }
 

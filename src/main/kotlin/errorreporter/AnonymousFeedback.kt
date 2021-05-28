@@ -16,9 +16,11 @@ import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.diagnostic.Attachment
+import com.intellij.openapi.util.text.StringUtil
 import java.net.HttpURLConnection
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
+import org.apache.commons.httpclient.HttpStatus
 import org.apache.commons.io.IOUtils
 import org.apache.http.HttpHeaders
 import org.apache.http.entity.ContentType
@@ -65,12 +67,8 @@ object AnonymousFeedback {
             errorMessage = "no error"
         }
 
-        var stackTrace = body.remove("error.stacktrace")
-        stackTrace = if (stackTrace.isNullOrEmpty()) {
-            "no stacktrace"
-        } else {
-            linkStacktrace(stackTrace)
-        }
+        val rawStackTrace = body.remove("error.raw_stacktrace")?.takeIf { it.isNotBlank() } ?: "no stacktrace"
+        val stackTrace = body.remove("error.stacktrace")?.takeIf { it.isNotBlank() } ?: "no stacktrace"
 
         val sb = StringBuilder()
 
@@ -84,13 +82,20 @@ object AnonymousFeedback {
                 sb.append("</table></td><td><table>\n")
             }
             val (key, value) = entry
-            sb.append("<tr><td><b>").append(key).append("</b></td><td><code>").append(value).append(
-                "</code></td></tr>\n"
-            )
+            sb.append("<tr><td><b>")
+                .append(key)
+                .append("</b></td><td><code>")
+                .append(value)
+                .append("</code></td></tr>\n")
         }
         sb.append("</table></td></tr></table>\n")
 
-        sb.append("\n<pre>\n").append(stackTrace).append("\n</pre>\n")
+        sb.append("\n<pre><code>").append(stackTrace).append("</code></pre>\n")
+
+        sb.append("\n<details><summary>Original stack trace</summary>\n\n```\n")
+            .append(rawStackTrace)
+            .append("\n```\n</details>\n")
+
         sb.append("\n```\n").append(errorMessage).append("\n```\n")
 
         if (attachments.isNotEmpty()) {
@@ -149,11 +154,16 @@ object AnonymousFeedback {
         val numberRegex = Regex("\\d+")
         val newLineRegex = Regex("[\r\n]+")
 
-        val stack = envDetails["error.stacktrace"]?.replace(numberRegex, "") ?: return null
+        val stack = envDetails["error.raw_stacktrace"]?.replace(numberRegex, "") ?: return null
 
-        val stackMcdevParts = stack.lineSequence()
+        val ourMcdevParts = stack.lineSequence()
             .filter { line -> line.startsWith(packagePrefix) }
-            .joinToString("\n")
+            .map { it.trim() }
+            .toList()
+
+        if (ourMcdevParts.isEmpty()) {
+            return null
+        }
 
         val predicate = fun(map: Map<*, *>): Boolean {
             val body = (map["body"] as? String ?: return false)
@@ -167,23 +177,36 @@ object AnonymousFeedback {
 
             val first = body.indexOf("\n```\n", startIndex = 0) + 5
             val second = body.indexOf("\n```\n", startIndex = first)
+            if (first == 4 || second == -1) {
+                return false
+            }
+
             val stackText = body.substring(first, second)
 
-            val mcdevParts = stackText.lineSequence()
+            val theirMcdevParts = stackText.lineSequence()
                 .filter { line -> line.startsWith(packagePrefix) }
-                .joinToString("\n")
+                .map { it.trim() }
+                .toList()
 
-            return stackMcdevParts == mcdevParts
+            return ourMcdevParts == theirMcdevParts
         }
 
         // Look first for an open issue, then for a closed issue if one isn't found
         val block = getAllIssues(openIssueUrl, factory)?.firstOrNull(predicate)
-            ?: getAllIssues(closedIssueUrl, factory)?.firstOrNull(predicate)
+            ?: getAllIssues(closedIssueUrl, factory, limit = 300)?.firstOrNull(predicate)
             ?: return null
         return (block["number"] as Double).toInt()
     }
 
-    private fun getAllIssues(url: String, factory: HttpConnectionFactory): List<Map<*, *>>? {
+    private fun getMcdevStackElementLines(stack: String, numberRegex: Regex, linkRegex: Regex): List<String> {
+        return stack.lineSequence()
+            .mapNotNull { line -> linkRegex.matchEntire(line)?.groups?.get("content")?.value }
+            .map { line -> StringUtil.unescapeXmlEntities(line) }
+            .map { line -> line.replace(numberRegex, "") }
+            .toList()
+    }
+
+    private fun getAllIssues(url: String, factory: HttpConnectionFactory, limit: Int = -1): List<Map<*, *>>? {
         var useAuthed = false
 
         var next: String? = url
@@ -197,13 +220,13 @@ object AnonymousFeedback {
 
                 connection.connect()
 
-                if (connection.responseCode == 403 && !useAuthed) {
+                if (connection.responseCode == HttpStatus.SC_FORBIDDEN && !useAuthed) {
                     useAuthed = true
                     next = replaceWithAuth(next)
                     continue
                 }
 
-                if (connection.responseCode != 200) {
+                if (connection.responseCode != HttpStatus.SC_OK) {
                     return null
                 }
 
@@ -215,6 +238,10 @@ object AnonymousFeedback {
 
                 val response = Gson().fromJson<List<Map<*, *>>>(data)
                 list.addAll(response)
+
+                if (limit > 0 && list.size >= limit) {
+                    return list
+                }
 
                 val link = connection.getHeaderField("Link")
 
@@ -277,7 +304,7 @@ object AnonymousFeedback {
         }
 
         val responseCode = connection.responseCode
-        if (responseCode != 201) {
+        if (responseCode != HttpStatus.SC_CREATED) {
             throw RuntimeException("Expected HTTP_CREATED (201), obtained $responseCode instead.")
         }
 
@@ -287,7 +314,7 @@ object AnonymousFeedback {
         }
         connection.disconnect()
 
-        return Gson().fromJson<Map<*, *>>(body)
+        return Gson().fromJson(body)
     }
 
     private fun getConnection(factory: HttpConnectionFactory, url: String): HttpURLConnection {
@@ -298,74 +325,6 @@ object AnonymousFeedback {
         connection.setRequestProperty("Content-Type", "application/json")
 
         return connection
-    }
-
-    private fun linkStacktrace(stacktrace: String): String {
-        val versionRegex = Regex("""(?<intellijVersion>\d{4}\.\d)-(?<pluginVersion>\d+\.\d+\.\d+)""")
-
-        val version = PluginUtil.pluginVersion
-        val match = versionRegex.matchEntire(version) ?: return stacktrace
-
-        val intellijVersion = match.groups["intellijVersion"]?.value ?: return stacktrace
-        val pluginVersion = match.groups["pluginVersion"]?.value ?: return stacktrace
-
-        val tag = "$pluginVersion-$intellijVersion"
-
-        //         v                             stack element text                                  v
-        //      at com.demonwav.mcdev.facet.MinecraftFacet.shouldShowPluginIcon(MinecraftFacet.kt:185)
-        // prefix ^        class path ^   ^                           file name ^               ^  ^ line number
-        val stackElementRegex = Regex(
-            """(?<prefix>\s+at\s+)""" +
-                """(?<stackElementText>""" +
-                """(?<className>com\.demonwav\.mcdev(?:\.\p{javaJavaIdentifierStart}\p{javaJavaIdentifierPart}*)+)""" +
-                """(?:\.\p{javaJavaIdentifierStart}\p{javaJavaIdentifierPart}*|<(?:cl)?init>)""" +
-                """\((?<fileName>.*\.\w+):(?<lineNumber>\d+)\)""" +
-                """)\s*"""
-        )
-
-        val baseTagUrl = "https://github.com/minecraft-dev/MinecraftDev/blob/$tag/src/main/kotlin/"
-
-        val sb = StringBuilder(stacktrace.length * 2)
-
-        for (line in stacktrace.lineSequence()) {
-            val lineMatch = stackElementRegex.matchEntire(line)
-            if (lineMatch == null) {
-                sb.append(line).append('\n')
-                continue
-            }
-
-            val prefix = lineMatch.groups["prefix"]?.value
-            val className = lineMatch.groups["className"]?.value
-            val fileName = lineMatch.groups["fileName"]?.value
-            val lineNumber = lineMatch.groups["lineNumber"]?.value
-            val stackElementText = lineMatch.groups["stackElementText"]?.value
-
-            if (prefix == null || className == null || fileName == null ||
-                lineNumber == null || stackElementText == null
-            ) {
-                sb.append(line).append('\n')
-                continue
-            }
-
-            val path = className.substringAfter("com.demonwav.mcdev.")
-                .substringBeforeLast('.')
-                .replace('.', '/')
-            sb.apply {
-                append(prefix)
-                append("<a href=\"")
-                append(baseTagUrl)
-                append(path)
-                append('/')
-                append(fileName)
-                append("#L")
-                append(lineNumber)
-                append("\">")
-                append(stackElementText)
-                append("</a>\n")
-            }
-        }
-
-        return sb.toString()
     }
 
     private val userAgent by lazy {
