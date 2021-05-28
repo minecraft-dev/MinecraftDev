@@ -232,7 +232,7 @@ license {
         register("gradle") {
             files.from(
                 fileTree(project.projectDir) {
-                    include("**/*.gradle.kts", "gradle.properties")
+                    include("*.gradle.kts", "gradle.properties")
                     exclude("**/buildSrc/**", "**/build/**")
                 }
             )
