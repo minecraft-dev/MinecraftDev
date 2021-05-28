@@ -51,7 +51,8 @@ object Sponge8Template : BaseTemplate() {
             "GROUP_ID" to buildSystem.groupId,
             "PLUGIN_ID" to buildSystem.artifactId,
             "PLUGIN_VERSION" to buildSystem.version,
-            "SPONGEAPI_VERSION" to spongeApiVersion.removeSuffix("-SNAPSHOT"), // SpongeGradle 1.1.0 adds the -SNAPSHOT suffix itself
+            // SpongeGradle 1.1.0 adds the -SNAPSHOT suffix itself
+            "SPONGEAPI_VERSION" to spongeApiVersion.removeSuffix("-SNAPSHOT"),
             "PLUGIN_NAME" to pluginName,
             "MAIN_CLASS" to mainClass,
             "DESCRIPTION" to description,
@@ -88,7 +89,8 @@ object Sponge8Template : BaseTemplate() {
     ): String {
         val props = mutableMapOf(
             "PLUGIN_ID" to buildSystem.parentOrError.artifactId,
-            "SPONGEAPI_VERSION" to spongeApiVersion.removeSuffix("-SNAPSHOT"), // SpongeGradle 1.1.0 adds the -SNAPSHOT suffix itself
+            // SpongeGradle 1.1.0 adds the -SNAPSHOT suffix itself
+            "SPONGEAPI_VERSION" to spongeApiVersion.removeSuffix("-SNAPSHOT"),
             "PLUGIN_NAME" to pluginName,
             "MAIN_CLASS" to mainClass,
             "DESCRIPTION" to description,

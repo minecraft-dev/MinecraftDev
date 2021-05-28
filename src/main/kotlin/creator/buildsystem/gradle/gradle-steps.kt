@@ -147,7 +147,12 @@ fun setupGradleFiles(dir: Path, givenFiles: GradleFiles<String>, kotlinScript: B
     }
 }
 
-fun addBuildGradleDependencies(project: Project, buildSystem: BuildSystem, text: String, kotlinScript: Boolean = false): PsiFile {
+fun addBuildGradleDependencies(
+    project: Project,
+    buildSystem: BuildSystem,
+    text: String,
+    kotlinScript: Boolean = false
+): PsiFile {
     val file = PsiFileFactory.getInstance(project).createFileFromText(GroovyLanguage, text)
     return file.runWriteAction {
         val fileName = if (kotlinScript) "build.gradle.kts" else "build.gradle"
