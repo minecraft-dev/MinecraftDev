@@ -11,6 +11,11 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleSetupStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenFinalizerStep
+import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
+import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
+import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
+import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
 import com.intellij.openapi.module.Module
 import java.nio.file.Path
 
@@ -28,8 +33,54 @@ sealed class Sponge8ProjectCreator<T : BuildSystem>(
 
     protected fun setupMainClassStep(): BasicJavaClassStep {
         return createJavaClassStep(config.mainClass) { packageName, className ->
-            Sponge8Template.applyMainClass(project, buildSystem.artifactId, packageName, className)
+            val pluginId = (buildSystem.parent ?: buildSystem).artifactId
+            Sponge8Template.applyMainClass(project, pluginId, packageName, className)
         }
+    }
+}
+
+class Sponge8MavenCreator(
+    rootDirectory: Path,
+    rootModule: Module,
+    buildSystem: MavenBuildSystem,
+    config: SpongeProjectConfig
+) : Sponge8ProjectCreator<MavenBuildSystem>(rootDirectory, rootModule, buildSystem, config) {
+
+    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+        val mainClassStep = setupMainClassStep()
+
+        val pomText = SpongeTemplate.applyPom(project)
+
+        return listOf(
+            setupDependencyStep(),
+            BasicMavenStep(project, rootDirectory, buildSystem, config, pomText),
+            mainClassStep,
+            MavenGitignoreStep(project, rootDirectory),
+            BasicMavenFinalizerStep(rootModule, rootDirectory)
+        )
+    }
+
+    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
+        val depStep = setupDependencyStep()
+        val commonDepStep = CommonModuleDependencyStep(buildSystem)
+        val mainClassStep = setupMainClassStep()
+
+        val pomText = SpongeTemplate.applySubPom(project)
+        val mavenStep = BasicMavenStep(
+            project = project,
+            rootDirectory = rootDirectory,
+            buildSystem = buildSystem,
+            config = config,
+            pomText = pomText,
+            parts = listOf(
+                BasicMavenStep.setupDirs(),
+                BasicMavenStep.setupSubCore(buildSystem.parentOrError.artifactId),
+                BasicMavenStep.setupSubName(config.type),
+                BasicMavenStep.setupInfo(),
+                BasicMavenStep.setupDependencies()
+            )
+        )
+        return listOf(depStep, commonDepStep, mavenStep, mainClassStep)
     }
 }
 

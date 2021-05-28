@@ -21,14 +21,6 @@ import com.intellij.openapi.project.Project
 
 object Sponge8Template : BaseTemplate() {
 
-    // fun applyPom(project: Project): String {
-    //     return project.applyTemplate(SPONGE8_POM_TEMPLATE, BasicMavenStep.pluginVersions)
-    // }
-    //
-    // fun applySubPom(project: Project): String {
-    //     return project.applyTemplate(SPONGE8_SUBMODULE_POM_TEMPLATE, BasicMavenStep.pluginVersions)
-    // }
-
     fun applyMainClass(
         project: Project,
         pluginId: String,
@@ -95,9 +87,7 @@ object Sponge8Template : BaseTemplate() {
         dependencies: List<String>
     ): String {
         val props = mutableMapOf(
-            "GROUP_ID" to buildSystem.groupId,
-            "PLUGIN_ID" to buildSystem.artifactId,
-            "PLUGIN_VERSION" to buildSystem.version,
+            "PLUGIN_ID" to buildSystem.parentOrError.artifactId,
             "SPONGEAPI_VERSION" to spongeApiVersion.removeSuffix("-SNAPSHOT"), // SpongeGradle 1.1.0 adds the -SNAPSHOT suffix itself
             "PLUGIN_NAME" to pluginName,
             "MAIN_CLASS" to mainClass,

@@ -53,7 +53,7 @@ class SpongeProjectConfig : ProjectConfig(), MavenCreator, GradleCreator {
         return if (apiVersion < SpongeConstants.API8) {
             SpongeMavenCreator(rootDirectory, module, buildSystem, this)
         } else {
-            TODO()
+            Sponge8MavenCreator(rootDirectory, module, buildSystem, this)
         }
     }
 
