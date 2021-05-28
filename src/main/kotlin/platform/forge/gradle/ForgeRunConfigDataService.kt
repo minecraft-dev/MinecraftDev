@@ -62,7 +62,12 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             return
         }
 
-        val (moduleName, mcVersion, forgeVersion, task) = Files.readAllLines(hello, Charsets.UTF_8)
+        val lines = Files.readAllLines(hello, Charsets.UTF_8)
+        if (lines.size < 4) {
+            return
+        }
+
+        val (moduleName, mcVersion, forgeVersion, task) = lines
         val mcVersionParsed = SemanticVersion.parse(mcVersion)
         val forgeVersionParsed = SemanticVersion.parse(forgeVersion)
 

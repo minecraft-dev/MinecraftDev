@@ -20,8 +20,6 @@ import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.application.ApplicationNamesInfo
-import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent
 import com.intellij.openapi.diagnostic.SubmittedReportInfo
@@ -41,25 +39,25 @@ class ErrorReporter : ErrorReportSubmitter() {
         consumer: Consumer<in SubmittedReportInfo>
     ): Boolean {
         val event = events[0]
-        val bean = ErrorBean(event.throwable, IdeaLogger.ourLastActionId)
+        val errorData = ErrorData(event.throwable, IdeaLogger.ourLastActionId)
         val dataContext = DataManager.getInstance().getDataContext(parentComponent)
 
-        bean.description = additionalInfo
-        bean.message = event.message
+        errorData.description = additionalInfo
+        errorData.message = event.message
 
         PluginManagerCore.getPlugin(PluginUtil.PLUGIN_ID)?.let { plugin ->
-            bean.pluginName = plugin.name
-            bean.pluginVersion = plugin.version
+            errorData.pluginName = plugin.name
+            errorData.pluginVersion = plugin.version
         }
 
         val data = event.data
 
         if (data is LogMessage) {
-            bean.attachments = data.includedAttachments
+            errorData.throwable = data.throwable
+            errorData.attachments = data.includedAttachments
         }
 
-        val (reportValues, attachments) =
-            IdeaITNProxy.getKeyValuePairs(bean, ApplicationInfoEx.getInstanceEx(), ApplicationNamesInfo.getInstance())
+        val (reportValues, attachments) = errorData.formatErrorData()
 
         val project = CommonDataKeys.PROJECT.getData(dataContext)
 
@@ -70,13 +68,14 @@ class ErrorReporter : ErrorReportSubmitter() {
             reportValues,
             attachments,
             { htmlUrl, token, isDuplicate ->
-                val reportInfo =
-                    SubmittedReportInfo(htmlUrl, "Issue #$token", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE)
-                consumer.consume(reportInfo)
+                val type = if (isDuplicate) {
+                    SubmittedReportInfo.SubmissionStatus.DUPLICATE
+                } else {
+                    SubmittedReportInfo.SubmissionStatus.NEW_ISSUE
+                }
 
                 val message = if (!isDuplicate) {
-                    "<html>Created Issue #$token successfully. " +
-                        "<a href=\"$htmlUrl\">View issue.</a></html>"
+                    "<html>Created Issue #$token successfully. <a href=\"$htmlUrl\">View issue.</a></html>"
                 } else {
                     "<html>Commented on existing Issue #$token successfully. " +
                         "<a href=\"$htmlUrl\">View comment.</a></html>"
@@ -88,6 +87,9 @@ class ErrorReporter : ErrorReportSubmitter() {
                     NotificationType.INFORMATION,
                     NotificationListener.URL_OPENING_LISTENER
                 ).setImportant(false).notify(project)
+
+                val reportInfo = SubmittedReportInfo(htmlUrl, "Issue #$token", type)
+                consumer.consume(reportInfo)
             },
             { e ->
                 val message = "<html>Error Submitting Issue: ${e.message}<br>Consider opening an issue on " +
@@ -98,6 +100,8 @@ class ErrorReporter : ErrorReportSubmitter() {
                     NotificationType.ERROR,
                     NotificationListener.URL_OPENING_LISTENER
                 ).setImportant(false).notify(project)
+
+                consumer.consume(SubmittedReportInfo(null, null, SubmittedReportInfo.SubmissionStatus.FAILED))
             }
         )
 
@@ -106,6 +110,7 @@ class ErrorReporter : ErrorReportSubmitter() {
         } else {
             ProgressManager.getInstance().run(task)
         }
+
         return true
     }
 }

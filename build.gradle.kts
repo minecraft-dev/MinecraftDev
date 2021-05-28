@@ -18,7 +18,7 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "0.7.3"
+    id("org.jetbrains.intellij") version "1.0"
     id("org.cadixdev.licenser") version "0.6.0"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
@@ -97,25 +97,25 @@ dependencies {
 
 intellij {
     // IntelliJ IDEA dependency
-    version = ideaVersion
+    version.set(ideaVersion)
     // Bundled plugin dependencies
-    setPlugins(
+    plugins.addAll(
         "java",
         "maven",
         "gradle",
         "Groovy",
+        "org.toml.lang:$pluginTomlVersion",
         // needed dependencies for unit tests
         "properties",
-        "junit",
-        "org.toml.lang:$pluginTomlVersion"
+        "junit"
     )
 
-    pluginName = "Minecraft Development"
-    updateSinceUntilBuild = true
+    pluginName.set("Minecraft Development")
+    updateSinceUntilBuild.set(true)
 
-    downloadSources = downloadIdeaSources.toBoolean()
+    downloadSources.set(downloadIdeaSources.toBoolean())
 
-    sandboxDirectory = layout.projectDirectory.dir(".sandbox")
+    sandboxDir.set(layout.projectDirectory.dir(".sandbox").toString())
 }
 
 tasks.publishPlugin {
@@ -124,13 +124,13 @@ tasks.publishPlugin {
         project.version = "${project.version}-$buildNumber"
     }
     properties["mcdev.deploy.token"]?.let { deployToken ->
-        token(deployToken)
+        token.set(deployToken.toString())
     }
-    channels(properties["mcdev.deploy.channel"] ?: "Stable")
+    channels.add(properties["mcdev.deploy.channel"]?.toString() ?: "Stable")
 }
 
 tasks.runPluginVerifier {
-    ideVersions(listOf("IC-2020.1.3", "IC-2020.1.4"))
+    ideVersions.addAll("IC-2020.1.3", "IC-2020.1.4")
 }
 
 java {
@@ -200,7 +200,7 @@ tasks.test {
 idea {
     module {
         generatedSourceDirs.add(file("gen"))
-        excludeDirs.add(file(intellij.sandboxDirectory))
+        excludeDirs.add(file(intellij.sandboxDir.get()))
     }
 }
 

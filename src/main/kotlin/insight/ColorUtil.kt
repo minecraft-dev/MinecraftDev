@@ -42,13 +42,19 @@ fun <T> UIdentifier.findColor(function: (Map<String, Color>, Map.Entry<String, C
 
 private fun <T> findColorFromExpression(
     expression: UReferenceExpression,
-    function: (Map<String, Color>, Map.Entry<String, Color>) -> T
+    function: (Map<String, Color>, Map.Entry<String, Color>) -> T,
+    maxDepth: Int = 10,
+    depth: Int = 0,
 ): T? {
+    if (depth >= maxDepth) {
+        return null
+    }
+
     val referencedElement = expression.resolveToUElement()
     if (referencedElement is UField) {
         val referencedFieldInitializer = referencedElement.uastInitializer
         if (referencedFieldInitializer is UReferenceExpression) {
-            return findColorFromExpression(referencedFieldInitializer, function)
+            return findColorFromExpression(referencedFieldInitializer, function, maxDepth, depth + 1)
         }
     }
 
@@ -76,8 +82,14 @@ private fun <T> findColorFromExpression(
 fun UIdentifier.findColor(
     moduleType: AbstractModuleType<AbstractModule>,
     className: String,
-    vectorClasses: Array<String>?
+    vectorClasses: Array<String>?,
+    maxDepth: Int = 10,
+    depth: Int = 0
 ): Pair<Color, UElement>? {
+    if (depth >= maxDepth) {
+        return null
+    }
+
     val sourcePsi = this.sourcePsi ?: return null
     val module = ModuleUtilCore.findModuleForPsiElement(sourcePsi) ?: return null
     val facet = MinecraftFacet.getInstance(module) ?: return null
@@ -95,7 +107,8 @@ fun UIdentifier.findColor(
         val referencedFieldInitializer: UExpression? = referencedElement.uastInitializer
         if (referencedFieldInitializer is UCallExpression) {
             // The field is initialized with a method call
-            return referencedFieldInitializer.methodIdentifier?.findColor(moduleType, className, vectorClasses)
+            val calledMethodIdentifier = referencedFieldInitializer.methodIdentifier ?: return null
+            return calledMethodIdentifier.findColor(moduleType, className, vectorClasses, maxDepth, depth + 1)
         }
 
         if (referencedFieldInitializer is UReferenceExpression) {
@@ -103,7 +116,7 @@ fun UIdentifier.findColor(
             val referenceNameElement = referencedFieldInitializer.referenceNameElement
             if (referenceNameElement is UIdentifier) {
                 // The expression was simple enough
-                return referenceNameElement.findColor(moduleType, className, vectorClasses)
+                return referenceNameElement.findColor(moduleType, className, vectorClasses, maxDepth, depth + 1)
             } else if (referenceNameElement is UResolvable) {
                 // The expression is complex, so we resolve it. If it is a field we're on for another round
                 referencedElement = referenceNameElement.resolveToUElement()

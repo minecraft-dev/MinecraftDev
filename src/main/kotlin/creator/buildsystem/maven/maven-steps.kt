@@ -59,6 +59,9 @@ class BasicMavenStep(
         Files.createDirectories(rootDirectory)
 
         runWriteTask {
+            if (project.isDisposed) {
+                return@runWriteTask
+            }
             val pomPsi = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, pomText)
                 ?: return@runWriteTask
 
@@ -66,6 +69,9 @@ class BasicMavenStep(
 
             val pomXmlPsi = pomPsi as XmlFile
             pomPsi.runWriteAction {
+                if (project.isDisposed) {
+                    return@runWriteAction
+                }
                 val manager = DomManager.getDomManager(project)
                 val mavenProjectXml = manager.getFileElement(pomXmlPsi, MavenDomProjectModel::class.java)?.rootElement
                     ?: return@runWriteAction
@@ -190,7 +196,7 @@ class BasicMavenFinalizerStep(
         val vPomFile = pomFile.virtualFile ?: throw IllegalStateException("Could not find file: $pomFile")
 
         // Force Maven to setup the project
-        invokeLater {
+        invokeLater(project.disposed) {
             val manager = MavenProjectsManager.getInstance(project)
             manager.addManagedFilesOrUnignore(listOf(vPomFile))
             manager.importingSettings.isDownloadDocsAutomatically = true
