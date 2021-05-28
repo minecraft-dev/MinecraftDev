@@ -129,9 +129,10 @@ fun setupGradleFiles(dir: Path, givenFiles: GradleFiles<String>): GradleFiles<Pa
         givenFiles.gradleProperties?.let { dir.resolve("gradle.properties") },
         givenFiles.settingsGradle?.let { dir.resolve("settings.gradle") }
     ).apply {
+        Files.deleteIfExists(buildGradle)
         Files.createFile(buildGradle)
-        gradleProperties?.let { Files.createFile(it) }
-        settingsGradle?.let { Files.createFile(it) }
+        gradleProperties?.let { Files.deleteIfExists(it); Files.createFile(it) }
+        settingsGradle?.let { Files.deleteIfExists(it); Files.createFile(it) }
     }
 }
 

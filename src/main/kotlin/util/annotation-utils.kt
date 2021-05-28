@@ -42,7 +42,7 @@ fun PsiAnnotationMemberValue.resolveClass(): PsiClass? {
         return null
     }
 
-    return (operand.type as PsiClassType).resolve()
+    return (operand.type as? PsiClassType)?.resolve()
 }
 
 /**

@@ -76,7 +76,7 @@ class MinecraftProjectCreator {
         private val root: Path,
         private val module: Module,
         private val build: BuildSystem
-    ) : Task.Backgroundable(module.project, "Setting Up Project", false) {
+    ) : Task.Backgroundable(module.project, "Setting up project", false) {
         override fun shouldStartInBackground() = false
 
         override fun run(indicator: ProgressIndicator) {
