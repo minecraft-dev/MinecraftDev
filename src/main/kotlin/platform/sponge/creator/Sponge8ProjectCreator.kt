@@ -69,17 +69,25 @@ class Sponge8GradleCreator(
     }
 
     override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        TODO()
-        // val mainClassStep = setupMainClassStep()
-        //
-        // val buildText = SpongeTemplate.applySubBuildGradle(project, buildSystem)
-        // val files = GradleFiles(buildText, null, null)
-        //
-        // return listOf(
-        //     setupDependencyStep(),
-        //     CreateDirectoriesStep(buildSystem, rootDirectory),
-        //     GradleSetupStep(project, rootDirectory, buildSystem, files),
-        //     mainClassStep
-        // )
+        val mainClassStep = setupMainClassStep()
+
+        val buildText = Sponge8Template.applySubBuildGradle(
+            project,
+            buildSystem,
+            config.spongeApiVersion,
+            config.pluginName,
+            config.mainClass,
+            config.description,
+            config.website,
+            config.authors,
+            config.dependencies
+        )
+        val files = GradleFiles(buildText, null, null)
+
+        return listOf(
+            CreateDirectoriesStep(buildSystem, rootDirectory),
+            GradleSetupStep(project, rootDirectory, buildSystem, files, true),
+            mainClassStep
+        )
     }
 }
