@@ -53,7 +53,8 @@ class SimpleGradleSetupStep(
     private val project: Project,
     private val rootDirectory: Path,
     private val buildSystem: BuildSystem,
-    private val gradleFiles: GradleFiles<String>
+    private val gradleFiles: GradleFiles<String>,
+    private val kotlinScript: Boolean = false
 ) : CreatorStep {
 
     override fun runStep(indicator: ProgressIndicator) {
@@ -66,7 +67,8 @@ class SimpleGradleSetupStep(
                 DirectorySet.create(rootDirectory)
             val (buildGradle, gradleProp, settingsGradle) = setupGradleFiles(
                 rootDirectory,
-                gradleFiles
+                gradleFiles,
+                kotlinScript
             )
 
             val psiManager = PsiManager.getInstance(project)
@@ -97,17 +99,18 @@ class GradleSetupStep(
     private val project: Project,
     private val rootDirectory: Path,
     private val buildSystem: BuildSystem,
-    private val gradleFiles: GradleFiles<String>
+    private val gradleFiles: GradleFiles<String>,
+    private val kotlinScript: Boolean = false
 ) : CreatorStep {
     override fun runStep(indicator: ProgressIndicator) {
-        val (_, gradleProp, settingsGradle) = setupGradleFiles(rootDirectory, gradleFiles)
+        val (_, gradleProp, settingsGradle) = setupGradleFiles(rootDirectory, gradleFiles, kotlinScript)
 
         runWriteTask {
             if (project.isDisposed) {
                 return@runWriteTask
             }
 
-            val buildGradlePsi = addBuildGradleDependencies(project, buildSystem, gradleFiles.buildGradle)
+            val buildGradlePsi = addBuildGradleDependencies(project, buildSystem, gradleFiles.buildGradle, kotlinScript)
             val psiManager = PsiManager.getInstance(project)
             psiManager.findDirectory(rootDirectory.virtualFileOrError)?.let { dir ->
                 dir.findFile(buildGradlePsi.name)?.delete()
@@ -131,11 +134,11 @@ data class GradleFiles<out T>(
     val settingsGradle: T?
 )
 
-fun setupGradleFiles(dir: Path, givenFiles: GradleFiles<String>): GradleFiles<Path> {
+fun setupGradleFiles(dir: Path, givenFiles: GradleFiles<String>, kotlinScript: Boolean = false): GradleFiles<Path> {
     return GradleFiles(
-        dir.resolve("build.gradle"),
+        dir.resolve(if (kotlinScript) "build.gradle.kts" else "build.gradle"),
         givenFiles.gradleProperties?.let { dir.resolve("gradle.properties") },
-        givenFiles.settingsGradle?.let { dir.resolve("settings.gradle") }
+        givenFiles.settingsGradle?.let { dir.resolve(if (kotlinScript) "settings.gradle.kts" else "settings.gradle") },
     ).apply {
         Files.deleteIfExists(buildGradle)
         Files.createFile(buildGradle)
@@ -144,10 +147,10 @@ fun setupGradleFiles(dir: Path, givenFiles: GradleFiles<String>): GradleFiles<Pa
     }
 }
 
-fun addBuildGradleDependencies(project: Project, buildSystem: BuildSystem, text: String): PsiFile {
+fun addBuildGradleDependencies(project: Project, buildSystem: BuildSystem, text: String, kotlinScript: Boolean = false): PsiFile {
     val file = PsiFileFactory.getInstance(project).createFileFromText(GroovyLanguage, text)
     return file.runWriteAction {
-        val fileName = "build.gradle"
+        val fileName = if (kotlinScript) "build.gradle.kts" else "build.gradle"
         file.name = fileName
 
         val groovyFile = file as GroovyFile

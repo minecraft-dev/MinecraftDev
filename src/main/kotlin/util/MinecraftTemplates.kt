@@ -66,6 +66,13 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_SETTINGS_GRADLE_TEMPLATE))
             spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_POM_TEMPLATE))
             spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_SUBMODULE_POM_TEMPLATE))
+            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_MAIN_CLASS_TEMPLATE))
+            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_BUILD_GRADLE_TEMPLATE))
+            // spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_SUBMODULE_BUILD_GRADLE_TEMPLATE))
+            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_GRADLE_PROPERTIES_TEMPLATE))
+            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_SETTINGS_GRADLE_TEMPLATE))
+            // spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_POM_TEMPLATE))
+            // spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_SUBMODULE_POM_TEMPLATE))
         }
 
         FileTemplateGroupDescriptor("Forge", PlatformAssets.FORGE_ICON).let { forgeGroup ->
@@ -194,6 +201,14 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val SPONGE_SETTINGS_GRADLE_TEMPLATE = "Sponge settings.gradle"
         const val SPONGE_POM_TEMPLATE = "Sponge pom.xml"
         const val SPONGE_SUBMODULE_POM_TEMPLATE = "Sponge Submodule pom.xml"
+
+        const val SPONGE8_MAIN_CLASS_TEMPLATE = "Sponge 8+ Main Class.java"
+        const val SPONGE8_BUILD_GRADLE_TEMPLATE = "Sponge 8+ build.gradle.kts"
+        // const val SPONGE8_SUBMODULE_BUILD_GRADLE_TEMPLATE = "Sponge 8+ Submodule build.gradle.kts"
+        const val SPONGE8_GRADLE_PROPERTIES_TEMPLATE = "Sponge 8+ gradle.properties"
+        const val SPONGE8_SETTINGS_GRADLE_TEMPLATE = "Sponge 8+ settings.gradle.kts"
+        // const val SPONGE8_POM_TEMPLATE = "Sponge 8+ pom.xml"
+        // const val SPONGE8_SUBMODULE_POM_TEMPLATE = "Sponge 8+ Submodule pom.xml"
 
         const val FORGE_MAIN_CLASS_TEMPLATE = "Forge Main Class.java"
         const val FORGE_BUILD_GRADLE_TEMPLATE = "Forge build.gradle"

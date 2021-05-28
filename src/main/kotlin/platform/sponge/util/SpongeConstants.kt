@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.sponge.util
 
+import com.demonwav.mcdev.util.SemanticVersion
 import java.util.regex.Pattern
 
 object SpongeConstants {
@@ -31,4 +32,6 @@ object SpongeConstants {
     // Taken from https://github.com/SpongePowered/plugin-meta/blob/185f5c2/src/main/java/org/spongepowered/plugin/meta/PluginMetadata.java#L60
     val ID_PATTERN_STRING = "^[a-z][a-z0-9-_]{1,63}$"
     val ID_PATTERN = Pattern.compile(ID_PATTERN_STRING)
+    
+    val API8 = SemanticVersion.release(8)
 }

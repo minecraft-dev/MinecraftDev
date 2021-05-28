@@ -1,0 +1,73 @@
+import org.spongepowered.gradle.plugin.config.PluginLoaders
+import org.spongepowered.plugin.metadata.PluginDependency
+
+plugins {
+    `java-library`
+    id("org.spongepowered.gradle.plugin") version "1.1.0"
+}
+
+group = "${GROUP_ID}"
+version = "${PLUGIN_VERSION}"
+
+repositories {
+    mavenCentral()
+}
+
+sponge {
+    apiVersion("${SPONGEAPI_VERSION}")
+    plugin("${PLUGIN_ID}") {
+        loader(PluginLoaders.JAVA_PLAIN)
+        displayName("${PLUGIN_NAME}")
+        mainClass("${MAIN_CLASS}")
+        #if (${DESCRIPTION})
+        description("${DESCRIPTION}")
+        #else
+        // description("My plugin description")
+        #end
+        links {
+            #if (${WEBSITE})
+            homepage("${WEBSITE}")
+            #else
+            // homepage("https://spongepowered.org")
+            #end
+            // source("https://spongepowered.org/source")
+            // issues("https://spongepowered.org/issues")
+        }
+        #foreach (${AUTHOR} in ${AUTHORS})
+        contributor("${AUTHOR}") {
+            description("Author")
+        }
+        #end
+        dependency("spongeapi") {
+            loadOrder(PluginDependency.LoadOrder.AFTER)
+            optional(false)
+        }
+        #foreach (${DEPENDENCY} in ${DEPENDENCIES})
+        dependency("${DEPEDENCY}") {
+            loadOrder(PluginDependency.LoadOrder.AFTER)
+            optional(false)
+        }
+        #end
+    }
+}
+
+val javaTarget = 8 // Sponge targets a minimum of Java 8
+java {
+    sourceCompatibility = JavaVersion.toVersion(javaTarget)
+    targetCompatibility = JavaVersion.toVersion(javaTarget)
+}
+
+tasks.withType(JavaCompile::class).configureEach {
+    options.apply {
+        encoding = "utf-8" // Consistent source file encoding
+        if (JavaVersion.current().isJava10Compatible) {
+            release.set(javaTarget)
+        }
+    }
+}
+
+// Make sure all tasks which produce archives (jar, sources jar, javadoc jar, etc) produce more consistent output
+tasks.withType(AbstractArchiveTask::class).configureEach {
+    isReproducibleFileOrder = true
+    isPreserveFileTimestamps = false
+}
