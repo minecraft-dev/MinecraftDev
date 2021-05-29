@@ -4,7 +4,7 @@ import org.spongepowered.plugin.metadata.PluginDependency
 plugins {
     `java-library`
     id("com.github.johnrengelman.shadow")
-    id("org.spongepowered.gradle.plugin") version "1.1.0"
+    id("org.spongepowered.gradle.plugin") version "1.1.1"
 }
 
 repositories {
