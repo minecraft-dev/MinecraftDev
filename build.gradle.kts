@@ -10,6 +10,7 @@
 
 import org.cadixdev.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
+import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -311,6 +312,29 @@ tasks.runIde {
     // Set these properties to test different languages
     // systemProperty("user.language", "en")
     // systemProperty("user.country", "US")
+}
+
+tasks.buildSearchableOptions {
+    // not working atm
+    enabled = false
+    // https://youtrack.jetbrains.com/issue/IDEA-210683
+    jvmArgs(
+        "--illegal-access=deny",
+        "--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED",
+        "--add-opens=java.base/java.lang=ALL-UNNAMED",
+        "--add-opens=java.base/java.util=ALL-UNNAMED",
+        "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
+        "--add-opens=java.desktop/java.awt.event=ALL-UNNAMED",
+        "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
+        "--add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
+        "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
+        "--add-opens=java.desktop/sun.font=ALL-UNNAMED",
+        "--add-opens=java.desktop/sun.swing=ALL-UNNAMED"
+    )
+
+    if (OperatingSystem.current().isMacOsX) {
+        jvmArgs("--add-opens=java.desktop/com.apple.eawt.event=ALL-UNNAMED")
+    }
 }
 
 // version catalogs still have rough edges as it's still experimental
