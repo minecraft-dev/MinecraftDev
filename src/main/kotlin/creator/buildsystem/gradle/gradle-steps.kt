@@ -219,7 +219,8 @@ private fun getClosableBlockByName(element: PsiElement, name: String) =
 class BasicGradleFinalizerStep(
     private val module: Module,
     private val rootDirectory: Path,
-    private val buildSystem: BuildSystem
+    private val buildSystem: BuildSystem,
+    private vararg val additionalRunTasks: String
 ) : CreatorStep {
     private val project
         get() = module.project
@@ -238,10 +239,17 @@ class BasicGradleFinalizerStep(
 
         // Set up the run config
         // Get the gradle external task type, this is what sets it as a gradle task
+        addRunTaskConfiguration("build")
+        for (tasks in additionalRunTasks) {
+            addRunTaskConfiguration(tasks)
+        }
+    }
+
+    private fun addRunTaskConfiguration(task: String) {
         val gradleType = GradleExternalTaskConfigurationType.getInstance()
 
         val runManager = RunManager.getInstance(project)
-        val runConfigName = buildSystem.artifactId + " build"
+        val runConfigName = buildSystem.artifactId + ' ' + task
 
         val runConfiguration = ExternalSystemRunConfiguration(
             GradleConstants.SYSTEM_ID,
@@ -253,7 +261,7 @@ class BasicGradleFinalizerStep(
         // Set relevant gradle values
         runConfiguration.settings.externalProjectPath = rootDirectory.toAbsolutePath().toString()
         runConfiguration.settings.executionName = runConfigName
-        runConfiguration.settings.taskNames = listOf("build")
+        runConfiguration.settings.taskNames = listOf(task)
 
         runConfiguration.isAllowRunningInParallel = false
 

@@ -125,7 +125,7 @@ class Sponge8GradleCreator(
             mainClassStep,
             GradleWrapperStep(project, rootDirectory, buildSystem),
             GradleGitignoreStep(project, rootDirectory),
-            BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
+            BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem, "runServer")
         )
     }
 
