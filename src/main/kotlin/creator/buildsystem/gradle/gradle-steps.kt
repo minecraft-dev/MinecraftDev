@@ -58,6 +58,10 @@ class SimpleGradleSetupStep(
 
     override fun runStep(indicator: ProgressIndicator) {
         runWriteTask {
+            if (project.isDisposed) {
+                return@runWriteTask
+            }
+
             buildSystem.directories =
                 DirectorySet.create(rootDirectory)
             val (buildGradle, gradleProp, settingsGradle) = setupGradleFiles(
@@ -99,6 +103,10 @@ class GradleSetupStep(
         val (_, gradleProp, settingsGradle) = setupGradleFiles(rootDirectory, gradleFiles)
 
         runWriteTask {
+            if (project.isDisposed) {
+                return@runWriteTask
+            }
+
             val buildGradlePsi = addBuildGradleDependencies(project, buildSystem, gradleFiles.buildGradle)
             val psiManager = PsiManager.getInstance(project)
             psiManager.findDirectory(rootDirectory.virtualFileOrError)?.let { dir ->
@@ -212,7 +220,7 @@ class BasicGradleFinalizerStep(
         // Tell IntelliJ to import this project
         rootDirectory.virtualFileOrError.refresh(false, true)
 
-        invokeLater {
+        invokeLater(module.disposed) {
             val path = rootDirectory.toAbsolutePath().toString()
             if (canLinkAndRefreshGradleProject(path, project, false)) {
                 linkAndRefreshGradleProject(path, project)
