@@ -26,6 +26,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.ResolveResult
+import com.intellij.util.ArrayUtil
 import com.intellij.util.ProcessingContext
 
 /**
@@ -43,8 +44,21 @@ abstract class ReferenceResolver : PsiReferenceProvider() {
     private class Reference(element: PsiLiteral, private val resolver: ReferenceResolver) :
         PsiReferenceBase<PsiLiteral>(element) {
 
-        override fun resolve() = resolver.resolveReference(element.findContextElement())
-        override fun getVariants() = resolver.collectVariants(element.findContextElement())
+        override fun resolve(): PsiElement? {
+            val context = element.findContextElement()
+            if (context.isValid) {
+                return resolver.resolveReference(context)
+            }
+            return null
+        }
+
+        override fun getVariants(): Array<Any> {
+            val context = element.findContextElement()
+            if (context.isValid) {
+                return resolver.collectVariants(element.findContextElement())
+            }
+            return ArrayUtil.EMPTY_OBJECT_ARRAY
+        }
     }
 }
 
@@ -63,8 +77,21 @@ abstract class PolyReferenceResolver : PsiReferenceProvider() {
     private class Reference(element: PsiLiteral, private val resolver: PolyReferenceResolver) :
         PsiReferenceBase.Poly<PsiLiteral>(element) {
 
-        override fun multiResolve(incompleteCode: Boolean) = resolver.resolveReference(element.findContextElement())
-        override fun getVariants() = resolver.collectVariants(element.findContextElement())
+        override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
+            val context = element.findContextElement()
+            if (context.isValid) {
+                return resolver.resolveReference(context)
+            }
+            return ResolveResult.EMPTY_ARRAY
+        }
+
+        override fun getVariants(): Array<Any> {
+            val context = element.findContextElement()
+            if (context.isValid) {
+                return resolver.collectVariants(element.findContextElement())
+            }
+            return ArrayUtil.EMPTY_OBJECT_ARRAY
+        }
     }
 }
 

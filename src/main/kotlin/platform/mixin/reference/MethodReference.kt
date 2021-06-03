@@ -53,7 +53,7 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
             targets.isEmpty() -> listOfNotNull(upstreamMixin)
             upstreamMixin != null -> targets + upstreamMixin
             else -> targets
-        }
+        }.filter(PsiClass::isValid)
     }
 
     override fun isUnresolved(context: PsiElement): Boolean {
