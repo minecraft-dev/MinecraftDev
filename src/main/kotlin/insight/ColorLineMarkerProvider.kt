@@ -65,11 +65,11 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             ColorIcon(12, color),
             FunctionUtil.nullConstant<Any, String>(),
             GutterIconNavigationHandler handler@{ _, psiElement ->
-                if (!psiElement.isWritable || !element.isValid) {
+                if (psiElement == null || !psiElement.isWritable || !psiElement.isValid || !workElement.isPsiValid) {
                     return@handler
                 }
 
-                val editor = PsiEditorUtil.findEditor(element) ?: return@handler
+                val editor = PsiEditorUtil.findEditor(psiElement) ?: return@handler
 
                 val picker = ColorPicker(map, editor.component)
                 val newColor = picker.showDialog()
@@ -117,18 +117,20 @@ class ColorLineMarkerProvider : LineMarkerProvider {
     ) : ColorLineMarkerProvider.ColorInfo(
         element,
         color,
-        GutterIconNavigationHandler handler@{ _, _ ->
-            if (!element.isWritable || !element.isValid) {
+        GutterIconNavigationHandler handler@{ _, psiElement ->
+            if (psiElement == null || !psiElement.isValid ||
+                !workElement.isPsiValid || workElement.sourcePsi?.isWritable != true
+            ) {
                 return@handler
             }
 
-            val editor = PsiEditorUtil.findEditor(element) ?: return@handler
-            if (JVMElementFactories.getFactory(element.language, element.project) == null) {
+            val editor = PsiEditorUtil.findEditor(psiElement) ?: return@handler
+            if (JVMElementFactories.getFactory(psiElement.language, psiElement.project) == null) {
                 // The setColor methods used here require a JVMElementFactory. Unfortunately the Kotlin plugin does not
                 // implement it yet. It is better to not display the color chooser at all than deceiving users after
                 // after they chose a color
                 HintManager.getInstance()
-                    .showErrorHint(editor, "Can't change colors in " + element.language.displayName)
+                    .showErrorHint(editor, "Can't change colors in " + psiElement.language.displayName)
                 return@handler
             }
 
