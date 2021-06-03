@@ -55,16 +55,16 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             ColorIcon(12, color),
             FunctionUtil.nullConstant<Any, String>(),
             GutterIconNavigationHandler handler@{ _, psiElement ->
-                if (!psiElement.isWritable || !element.isValid) {
+                if (psiElement == null || !psiElement.isWritable || !psiElement.isValid) {
                     return@handler
                 }
 
-                val editor = PsiEditorUtil.findEditor(element) ?: return@handler
+                val editor = PsiEditorUtil.findEditor(psiElement) ?: return@handler
 
                 val picker = ColorPicker(map, editor.component)
                 val newColor = picker.showDialog()
                 if (newColor != null) {
-                    element.setColor(newColor)
+                    psiElement.setColor(newColor)
                 }
             },
             GutterIconRenderer.Alignment.RIGHT
@@ -105,12 +105,12 @@ class ColorLineMarkerProvider : LineMarkerProvider {
     ) : ColorLineMarkerProvider.ColorInfo(
         element,
         color,
-        GutterIconNavigationHandler handler@{ _, _ ->
-            if (!element.isWritable) {
+        GutterIconNavigationHandler handler@{ _, psiElement ->
+            if (psiElement == null || !psiElement.isValid || !workElement.isValid || !workElement.isWritable) {
                 return@handler
             }
 
-            val editor = PsiEditorUtil.findEditor(element) ?: return@handler
+            val editor = PsiEditorUtil.findEditor(psiElement) ?: return@handler
 
             val c = ColorChooser.chooseColor(editor.component, "Choose Color", color, false)
             if (c != null) {
