@@ -17,9 +17,9 @@ import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 
 fun Project.lexer(flex: String, pack: String) = tasks.registering(JavaExec::class) {
-    val src = "src/main/grammars/$flex.flex"
-    val dst = "gen/$pack"
-    val output = "$dst/$flex.java"
+    val src = layout.projectDirectory.file("src/main/grammars/$flex.flex")
+    val dst = layout.buildDirectory.dir("gen/$pack")
+    val output = layout.buildDirectory.file("gen/$pack/$flex.java")
 
     val jflex by project.configurations
     val jflexSkeleton by project.configurations
@@ -30,8 +30,8 @@ fun Project.lexer(flex: String, pack: String) = tasks.registering(JavaExec::clas
     doFirst {
         args(
             "--skel", jflexSkeleton.singleFile.absolutePath,
-            "-d", dst,
-            src
+            "-d", dst.get().asFile.absolutePath,
+            src.asFile.absolutePath
         )
 
         // Delete current lexer
