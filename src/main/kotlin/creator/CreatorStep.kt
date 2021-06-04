@@ -83,6 +83,7 @@ interface CreatorStep {
         fun writeText(file: Path, text: String, psiManager: PsiManager? = null) {
             Files.write(file, text.toByteArray(Charsets.UTF_8), CREATE, TRUNCATE_EXISTING, WRITE)
             psiManager?.findFile(file.virtualFileOrError)?.let {
+                PsiDocumentManager.getInstance(psiManager.project).getDocument(it)?.setReadOnly(false)
                 ReformatCodeProcessor(it, false).run()
             }
         }
