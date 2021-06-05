@@ -68,11 +68,9 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_SUBMODULE_POM_TEMPLATE))
             spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_MAIN_CLASS_TEMPLATE))
             spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_BUILD_GRADLE_TEMPLATE))
-            // spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_SUBMODULE_BUILD_GRADLE_TEMPLATE))
+            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_SUBMODULE_BUILD_GRADLE_TEMPLATE))
             spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_GRADLE_PROPERTIES_TEMPLATE))
             spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_SETTINGS_GRADLE_TEMPLATE))
-            // spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_POM_TEMPLATE))
-            // spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_SUBMODULE_POM_TEMPLATE))
         }
 
         FileTemplateGroupDescriptor("Forge", PlatformAssets.FORGE_ICON).let { forgeGroup ->

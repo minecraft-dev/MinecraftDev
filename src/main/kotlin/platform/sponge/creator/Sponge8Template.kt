@@ -39,26 +39,20 @@ object Sponge8Template : BaseTemplate() {
     fun applyBuildGradle(
         project: Project,
         buildSystem: BuildSystem,
-        spongeApiVersion: String,
-        pluginName: String,
-        mainClass: String,
-        description: String?,
-        website: String?,
-        authors: List<String>,
-        dependencies: List<String>
+        config: SpongeProjectConfig
     ): String {
         val props = mutableMapOf(
             "GROUP_ID" to buildSystem.groupId,
             "PLUGIN_ID" to buildSystem.artifactId,
             "PLUGIN_VERSION" to buildSystem.version,
             // SpongeGradle 1.1.0 adds the -SNAPSHOT suffix itself
-            "SPONGEAPI_VERSION" to spongeApiVersion.removeSuffix("-SNAPSHOT"),
-            "PLUGIN_NAME" to pluginName,
-            "MAIN_CLASS" to mainClass,
-            "DESCRIPTION" to description,
-            "WEBSITE" to website,
-            "AUTHORS" to authors,
-            "DEPENDENCIES" to dependencies
+            "SPONGEAPI_VERSION" to config.spongeApiVersion.removeSuffix("-SNAPSHOT"),
+            "PLUGIN_NAME" to config.pluginName,
+            "MAIN_CLASS" to config.mainClass,
+            "DESCRIPTION" to config.description,
+            "WEBSITE" to config.website,
+            "AUTHORS" to config.authors,
+            "DEPENDENCIES" to config.dependencies
         )
 
         return project.applyTemplate(SPONGE8_BUILD_GRADLE_TEMPLATE, props)
@@ -79,24 +73,18 @@ object Sponge8Template : BaseTemplate() {
     fun applySubBuildGradle(
         project: Project,
         buildSystem: BuildSystem,
-        spongeApiVersion: String,
-        pluginName: String,
-        mainClass: String,
-        description: String?,
-        website: String?,
-        authors: List<String>,
-        dependencies: List<String>
+        config: SpongeProjectConfig
     ): String {
         val props = mutableMapOf(
             "PLUGIN_ID" to buildSystem.parentOrError.artifactId,
             // SpongeGradle 1.1.0 adds the -SNAPSHOT suffix itself
-            "SPONGEAPI_VERSION" to spongeApiVersion.removeSuffix("-SNAPSHOT"),
-            "PLUGIN_NAME" to pluginName,
-            "MAIN_CLASS" to mainClass,
-            "DESCRIPTION" to description,
-            "WEBSITE" to website,
-            "AUTHORS" to authors,
-            "DEPENDENCIES" to dependencies,
+            "SPONGEAPI_VERSION" to config.spongeApiVersion.removeSuffix("-SNAPSHOT"),
+            "PLUGIN_NAME" to config.pluginName,
+            "MAIN_CLASS" to config.mainClass,
+            "DESCRIPTION" to config.description,
+            "WEBSITE" to config.website,
+            "AUTHORS" to config.authors,
+            "DEPENDENCIES" to config.dependencies,
             "COMMON_PROJECT_NAME" to buildSystem.commonModuleName
         )
 

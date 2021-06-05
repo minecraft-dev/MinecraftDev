@@ -107,13 +107,7 @@ class Sponge8GradleCreator(
         val buildText = Sponge8Template.applyBuildGradle(
             project,
             buildSystem,
-            config.spongeApiVersion,
-            config.pluginName,
-            config.mainClass,
-            config.description,
-            config.website,
-            config.authors,
-            config.dependencies
+            config
         )
         val propText = Sponge8Template.applyGradleProp(project)
         val settingsText = Sponge8Template.applySettingsGradle(project, buildSystem.artifactId)
@@ -135,13 +129,7 @@ class Sponge8GradleCreator(
         val buildText = Sponge8Template.applySubBuildGradle(
             project,
             buildSystem,
-            config.spongeApiVersion,
-            config.pluginName,
-            config.mainClass,
-            config.description,
-            config.website,
-            config.authors,
-            config.dependencies
+            config
         )
         val files = GradleFiles(buildText, null, null)
 
