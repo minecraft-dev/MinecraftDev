@@ -59,21 +59,24 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                     val value = keyValue.value ?: return
                     val modId = value.stringValue() ?: return
                     if (!ForgeConstants.MOD_ID_REGEX.matches(modId)) {
-                        holder.registerProblem(value, TextRange(1, modId.length + 1), "Mod ID is invalid")
+                        val endOffset = if (value.text.endsWith('"')) modId.length + 1 else modId.length
+                        holder.registerProblem(value, TextRange(1, endOffset), "Mod ID is invalid")
                     }
                 }
                 "side" -> {
                     val value = keyValue.value ?: return
                     val side = value.stringValue() ?: return
                     if (side !in ForgeConstants.DEPENDENCY_SIDES) {
-                        holder.registerProblem(value, TextRange(1, side.length + 1), "Side $side does not exist")
+                        val endOffset = if (value.text.endsWith('"')) side.length + 1 else side.length
+                        holder.registerProblem(value, TextRange(1, endOffset), "Side $side does not exist")
                     }
                 }
                 "ordering" -> {
                     val value = keyValue.value ?: return
                     val order = value.stringValue() ?: return
                     if (order !in ForgeConstants.DEPENDENCY_ORDER) {
-                        holder.registerProblem(value, TextRange(1, order.length + 1), "Order $order does not exist")
+                        val endOffset = if (value.text.endsWith('"')) order.length + 1 else order.length
+                        holder.registerProblem(value, TextRange(1, endOffset), "Order $order does not exist")
                     }
                 }
             }
