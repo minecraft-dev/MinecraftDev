@@ -92,30 +92,30 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
 
     companion object {
         fun downloadData(): McpVersion? {
-            try {
+            val bspkrsMappings = try {
                 val text = URL("http://export.mcpbot.bspk.rs/versions.json").readText()
-                val map = Gson().fromJson<MutableMap<String, MutableMap<String, MutableList<Int>>>>(text)
-
-                val tempMappings = URL("https://assets.tterrag.com/temp_mappings.json").readText()
-                val tempMappingsMap = Gson()
-                    .fromJson<MutableMap<String, MutableMap<String, MutableList<Int>>>>(tempMappings)
-
-                // Merge the temporary mappings list into the main one, temporary solution for 1.16
-                tempMappingsMap.forEach { (mcVersion, channels) ->
-                    val existingChannels = map.getOrPut(mcVersion, ::mutableMapOf)
-                    channels.forEach { (channelName, newVersions) ->
-                        val existingVersions = existingChannels.getOrPut(channelName, ::mutableListOf)
-                        existingVersions.addAll(newVersions)
-                    }
-                }
-
-                val mcpVersion = McpVersion(map)
-                mcpVersion.versions
-                return mcpVersion
+                Gson().fromJson<MutableMap<String, MutableMap<String, MutableList<Int>>>>(text)
             } catch (ignored: IOException) {
+                mutableMapOf()
             }
 
-            return null
+            val tteragMappings = try {
+                val tempMappings = URL("https://assets.tterrag.com/temp_mappings.json").readText()
+                Gson().fromJson<MutableMap<String, MutableMap<String, MutableList<Int>>>>(tempMappings)
+            } catch (ignored: IOException) {
+                emptyMap()
+            }
+
+            // Merge the temporary mappings list into the main one, temporary solution for 1.16
+            tteragMappings.forEach { (mcVersion, channels) ->
+                val existingChannels = bspkrsMappings.getOrPut(mcVersion, ::mutableMapOf)
+                channels.forEach { (channelName, newVersions) ->
+                    val existingVersions = existingChannels.getOrPut(channelName, ::mutableListOf)
+                    existingVersions.addAll(newVersions)
+                }
+            }
+
+            return if (bspkrsMappings.isEmpty()) null else McpVersion(bspkrsMappings)
         }
     }
 }
