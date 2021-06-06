@@ -93,21 +93,21 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
     companion object {
         fun downloadData(): McpVersion? {
             val bspkrsMappings = try {
-                val text = URL("http://export.mcpbot.bspk.rs/versions.json").readText()
-                Gson().fromJson<MutableMap<String, MutableMap<String, MutableList<Int>>>>(text)
+                val bspkrsText = URL("http://export.mcpbot.bspk.rs/versions.json").readText()
+                Gson().fromJson<MutableMap<String, MutableMap<String, MutableList<Int>>>>(bspkrsText)
             } catch (ignored: IOException) {
                 mutableMapOf()
             }
 
-            val tteragMappings = try {
-                val tempMappings = URL("https://assets.tterrag.com/temp_mappings.json").readText()
-                Gson().fromJson<MutableMap<String, MutableMap<String, MutableList<Int>>>>(tempMappings)
+            val tterragMappings = try {
+                val tterragText = URL("https://assets.tterrag.com/temp_mappings.json").readText()
+                Gson().fromJson<MutableMap<String, MutableMap<String, MutableList<Int>>>>(tterragText)
             } catch (ignored: IOException) {
                 emptyMap()
             }
 
             // Merge the temporary mappings list into the main one, temporary solution for 1.16
-            tteragMappings.forEach { (mcVersion, channels) ->
+            tterragMappings.forEach { (mcVersion, channels) ->
                 val existingChannels = bspkrsMappings.getOrPut(mcVersion, ::mutableMapOf)
                 channels.forEach { (channelName, newVersions) ->
                     val existingVersions = existingChannels.getOrPut(channelName, ::mutableListOf)
