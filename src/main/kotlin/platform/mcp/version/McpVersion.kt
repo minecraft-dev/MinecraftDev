@@ -93,7 +93,7 @@ class McpVersion private constructor(private val map: Map<String, Map<String, Li
     companion object {
         fun downloadData(): McpVersion? {
             val bspkrsMappings = try {
-                val bspkrsText = URL("http://export.mcpbot.bspk.rs/versions.json").readText()
+                val bspkrsText = URL("https://maven.minecraftforge.net/de/oceanlabs/mcp/versions.json").readText()
                 Gson().fromJson<MutableMap<String, MutableMap<String, MutableList<Int>>>>(bspkrsText)
             } catch (ignored: IOException) {
                 mutableMapOf()
