@@ -27,6 +27,8 @@ import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.project.Project
 import java.nio.file.Path
 
 sealed class Sponge8ProjectCreator<T : BuildSystem>(
@@ -38,7 +40,7 @@ sealed class Sponge8ProjectCreator<T : BuildSystem>(
 
     protected fun setupDependencyStep(): SpongeDependenciesSetup {
         val spongeApiVersion = config.spongeApiVersion
-        return SpongeDependenciesSetup(buildSystem, spongeApiVersion)
+        return SpongeDependenciesSetup(buildSystem, spongeApiVersion, false)
     }
 
     protected fun setupMainClassStep(): BasicJavaClassStep {
@@ -58,6 +60,7 @@ class Sponge8MavenCreator(
 
     override fun getSingleModuleSteps(): Iterable<CreatorStep> {
         val mainClassStep = setupMainClassStep()
+        val pluginsJsonStep = CreatePluginsJsonStep(project, buildSystem, config)
 
         val pomText = SpongeTemplate.applyPom(project)
 
@@ -65,8 +68,9 @@ class Sponge8MavenCreator(
             setupDependencyStep(),
             BasicMavenStep(project, rootDirectory, buildSystem, config, pomText),
             mainClassStep,
+            pluginsJsonStep,
             MavenGitignoreStep(project, rootDirectory),
-            BasicMavenFinalizerStep(rootModule, rootDirectory)
+            BasicMavenFinalizerStep(rootModule, rootDirectory),
         )
     }
 
@@ -74,6 +78,7 @@ class Sponge8MavenCreator(
         val depStep = setupDependencyStep()
         val commonDepStep = CommonModuleDependencyStep(buildSystem)
         val mainClassStep = setupMainClassStep()
+        val pluginsJsonStep = CreatePluginsJsonStep(project, buildSystem, config)
 
         val pomText = SpongeTemplate.applySubPom(project)
         val mavenStep = BasicMavenStep(
@@ -90,7 +95,19 @@ class Sponge8MavenCreator(
                 BasicMavenStep.setupDependencies()
             )
         )
-        return listOf(depStep, commonDepStep, mavenStep, mainClassStep)
+        return listOf(depStep, commonDepStep, mavenStep, mainClassStep, pluginsJsonStep)
+    }
+}
+
+class CreatePluginsJsonStep(
+    private val project: Project,
+    private val buildSystem: BuildSystem,
+    private val config: SpongeProjectConfig
+) : CreatorStep {
+    override fun runStep(indicator: ProgressIndicator) {
+        val pluginsJsonPath = buildSystem.dirsOrError.resourceDirectory.resolve("META-INF")
+        val pluginsJsonText = Sponge8Template.applyPluginsJson(project, buildSystem, config)
+        CreatorStep.writeTextToFile(project, pluginsJsonPath, "plugins.json", pluginsJsonText)
     }
 }
 

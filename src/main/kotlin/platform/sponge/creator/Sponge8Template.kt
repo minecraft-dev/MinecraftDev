@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.BaseTemplate
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.SPONGE8_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.SPONGE8_GRADLE_PROPERTIES_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.SPONGE8_MAIN_CLASS_TEMPLATE
+import com.demonwav.mcdev.util.MinecraftTemplates.Companion.SPONGE8_PLUGINS_JSON_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.SPONGE8_SETTINGS_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.SPONGE8_SUBMODULE_BUILD_GRADLE_TEMPLATE
 import com.intellij.openapi.project.Project
@@ -34,6 +35,26 @@ object Sponge8Template : BaseTemplate() {
         )
 
         return project.applyTemplate(SPONGE8_MAIN_CLASS_TEMPLATE, props)
+    }
+
+    fun applyPluginsJson(
+        project: Project,
+        buildSystem: BuildSystem,
+        config: SpongeProjectConfig
+    ): String {
+        val props = mutableMapOf(
+            "PLUGIN_ID" to buildSystem.artifactId,
+            "VERSION_PLACEHOLDER" to "\${version}",
+            "SPONGEAPI_VERSION" to config.spongeApiVersion,
+            "PLUGIN_NAME" to config.pluginName,
+            "MAIN_CLASS" to config.mainClass,
+            "DESCRIPTION" to config.description,
+            "WEBSITE" to config.website,
+            "AUTHORS" to config.authors,
+            "DEPENDENCIES" to config.dependencies
+        )
+
+        return project.applyTemplate(SPONGE8_PLUGINS_JSON_TEMPLATE, props)
     }
 
     fun applyBuildGradle(
