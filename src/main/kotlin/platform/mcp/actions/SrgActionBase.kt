@@ -12,19 +12,26 @@ package com.demonwav.mcdev.platform.mcp.actions
 
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.srg.McpSrgMap
+import com.demonwav.mcdev.platform.mcp.srg.SrgManager
 import com.demonwav.mcdev.platform.mixin.util.findFirstShadowTarget
 import com.demonwav.mcdev.util.ActionData
+import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.getDataFromActionEvent
 import com.demonwav.mcdev.util.invokeLater
+import com.demonwav.mcdev.util.qualifiedMemberReference
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.wm.WindowManager
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiField
 import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMember
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiReference
 import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
@@ -39,29 +46,59 @@ abstract class SrgActionBase : AnAction() {
             return
         }
 
-        val mcpModule = data.instance.getModuleOfType(McpModuleType) ?: return showBalloon("No mappings found", e)
+        var parent = data.element.parent ?: return showBalloon("Not a valid element", e)
 
-        mcpModule.srgManager?.srgMap?.onSuccess { srgMap ->
-            var parent = data.element.parent
-
-            if (parent is PsiMember) {
-                val shadowTarget = parent.findFirstShadowTarget()?.element
-                if (shadowTarget != null) {
-                    parent = shadowTarget
-                }
+        if (parent is PsiMember) {
+            val shadowTarget = parent.findFirstShadowTarget()?.element
+            if (shadowTarget != null) {
+                parent = shadowTarget
             }
+        }
 
-            if (parent is PsiReference) {
-                parent = parent.resolve()
+        if (parent is PsiReference) {
+            parent = parent.resolve() ?: return showBalloon("Not a valid element", e)
+        }
+
+        val srgManager = data.instance.getModuleOfType(McpModuleType)?.srgManager
+            // Not all ATs are in MCP modules, fallback to this if possible
+            // TODO try to find SRG references for all modules if current module isn't found?
+            ?: SrgManager.findAnyInstance(data.project)
+        if (srgManager == null) {
+            withSrgTarget(parent, null, e, data)
+        } else {
+            srgManager.srgMap.onSuccess { srgMap ->
+                withSrgTarget(parent, srgMap, e, data)
+            }.onError {
+                showBalloon(it.message ?: "No MCP data available", e)
             }
-
-            withSrgTarget(parent, srgMap, e, data)
-        }?.onError {
-            showBalloon(it.message ?: "No MCP data available", e)
-        } ?: showBalloon("No mappings found", e)
+        }
     }
 
-    abstract fun withSrgTarget(parent: PsiElement, srgMap: McpSrgMap, e: AnActionEvent, data: ActionData)
+    abstract fun withSrgTarget(parent: PsiElement, srgMap: McpSrgMap?, e: AnActionEvent, data: ActionData)
+
+    protected fun getSrgClass(srgMap: McpSrgMap?, clazz: PsiClass): String? {
+        return if (srgMap != null) {
+            srgMap.getSrgClass(clazz)
+        } else {
+            clazz.fullQualifiedName
+        }
+    }
+
+    protected fun getSrgMethod(srgMap: McpSrgMap?, element: PsiMethod): MemberReference? {
+        return if (srgMap != null) {
+            srgMap.getSrgMethod(element)
+        } else {
+            element.qualifiedMemberReference
+        }
+    }
+
+    protected fun getSrgField(srgMap: McpSrgMap?, element: PsiField): MemberReference? {
+        return if (srgMap != null) {
+            srgMap.getSrgField(element)
+        } else {
+            element.qualifiedMemberReference
+        }
+    }
 
     protected fun showBalloon(message: String, e: AnActionEvent) {
         val balloon = JBPopupFactory.getInstance()
