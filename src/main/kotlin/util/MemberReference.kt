@@ -130,7 +130,7 @@ val PsiMethod.memberReference
     get() = MemberReference(internalName, descriptor)
 
 val PsiMethod.qualifiedMemberReference
-    get() = MemberReference(internalName, descriptor, containingClass!!.fullQualifiedName)
+    get() = MemberReference(internalName, descriptor, containingClass?.fullQualifiedName)
 
 fun PsiMethod.getQualifiedMemberReference(owner: PsiClass): MemberReference {
     return MemberReference(internalName, descriptor, owner.fullQualifiedName)
