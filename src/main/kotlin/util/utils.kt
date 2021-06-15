@@ -92,10 +92,9 @@ inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
 
 inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T): T {
     val result = WriteCommandAction.writeCommandAction(this).withGlobalUndo().compute<T, Throwable> { func() }
-    PsiDocumentManager.getInstance(project)
-        .doPostponedOperationsAndUnblockDocument(
-            FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return result
-        )
+    val documentManager = PsiDocumentManager.getInstance(project)
+    val document = documentManager.getDocument(this) ?: return result
+    documentManager.doPostponedOperationsAndUnblockDocument(document)
     return result
 }
 
