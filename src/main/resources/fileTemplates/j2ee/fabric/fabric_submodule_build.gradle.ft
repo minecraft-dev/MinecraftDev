@@ -3,15 +3,16 @@ plugins {
     id 'maven-publish'
 }
 
-#if (${JAVA_VERSION} >= 16)
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
-#else
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-#end
-
-archivesBaseName = project.archives_base_name
+java {
+    #if (${JAVA_VERSION} >= 16)
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+    #else
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    #end
+    archivesBaseName = project.archives_base_name
+}
 
 repositories {
     // Add repositories to retrieve artifacts from in here.
