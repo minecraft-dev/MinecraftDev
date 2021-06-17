@@ -10,9 +10,9 @@ dependencies {
 }
 
 processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        expand 'version': project.version
-    }
+    def props = [version: project.version]
+    inputs.properties props
+    expand props
 }
 
 shadowJar {

@@ -15,12 +15,11 @@ repositories {
 dependencies {
 }
 
-import org.apache.tools.ant.filters.ReplaceTokens
-
 task processSources(type: Sync) {
     from sourceSets.main.java.srcDirs
-    inputs.property 'version', version
-    filter ReplaceTokens, tokens: [version: version]
+    def props = [version: version]
+    inputs.properties props
+    expand props
     into "$buildDir/src"
 }
 

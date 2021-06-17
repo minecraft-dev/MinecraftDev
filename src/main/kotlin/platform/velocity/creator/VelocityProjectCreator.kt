@@ -174,7 +174,7 @@ class VelocityMainClassModifyStep(
             annotationBuilder + ",\nname = ${literal(config.pluginName)}"
 
             if (buildSystem is GradleBuildSystem) {
-                annotationBuilder + ",\nversion = \"@version@\""
+                annotationBuilder + ",\nversion = \"\${version}\""
             } else {
                 annotationBuilder + ",\nversion = \"${buildSystem.version}\""
             }
