@@ -1,15 +1,14 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow'
 }
-
-apply plugin: 'com.github.johnrengelman.shadow'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile project(':${COMMON_PROJECT_NAME}')
+    api project(':${COMMON_PROJECT_NAME}')
 }
 
 shadowJar {

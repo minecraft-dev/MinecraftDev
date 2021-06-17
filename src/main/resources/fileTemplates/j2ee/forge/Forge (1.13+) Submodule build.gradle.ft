@@ -139,7 +139,7 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:${FORGE_VERSION}'
 
-    compile project(":${COMMON_PROJECT_NAME}")
+    api project(":${COMMON_PROJECT_NAME}")
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"

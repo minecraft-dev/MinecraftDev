@@ -1,22 +1,16 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
-    }
+plugins {
+    id "com.github.johnrengelman.shadow" version "7.0.0" apply false
 }
 
 group = '${GROUP_ID}'
 version = '${PLUGIN_VERSION}'
 
 subprojects {
-    apply plugin: 'java'
-    apply plugin: 'maven'
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
 
-    group = project.group
-    version = project.version
+    group = parent.group
+    version = parent.version
 
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8
