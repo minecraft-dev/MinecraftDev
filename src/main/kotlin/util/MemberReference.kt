@@ -19,10 +19,8 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.util.containers.stream
 import java.io.Serializable
 import java.lang.reflect.Type
-import java.util.stream.Stream
 
 /**
  * Represents a reference to a class member (a method or a field). It may
@@ -76,7 +74,7 @@ data class MemberReference(
 
         val member: PsiMember? = if (descriptor != null && descriptor.startsWith('(')) {
             // Method, we assume there is only one (since this member descriptor is full qualified)
-            psiClass.findMethods(this, checkBases = true).findAny().orElse(null)
+            psiClass.findMethods(this, checkBases = true).firstOrNull()
         } else {
             // Field
             psiClass.findField(this, checkBases = true)
@@ -98,16 +96,16 @@ data class MemberReference(
 
 // Class
 
-fun PsiClass.findMethods(member: MemberReference, checkBases: Boolean = false): Stream<PsiMethod> {
+fun PsiClass.findMethods(member: MemberReference, checkBases: Boolean = false): Sequence<PsiMethod> {
     if (!member.matchOwner(this)) {
-        return Stream.empty()
+        return emptySequence()
     }
 
     val result = findMethodsByInternalName(member.name, checkBases)
     return if (member.descriptor != null) {
-        result.stream().filter { it.descriptor == member.descriptor }
+        result.asSequence().filter { it.descriptor == member.descriptor }
     } else {
-        result.stream()
+        result.asSequence()
     }
 }
 

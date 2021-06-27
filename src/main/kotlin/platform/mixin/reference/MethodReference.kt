@@ -36,7 +36,6 @@ import com.intellij.util.ArrayUtil
 import com.intellij.util.containers.stream
 import java.util.stream.Collectors
 import java.util.stream.Stream
-import kotlin.streams.toList
 
 object MethodReference : PolyReferenceResolver(), MixinReference {
 
@@ -59,7 +58,7 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
     override fun isUnresolved(context: PsiElement): Boolean {
         val targetMethodInfo = MixinMemberReference.parse(context.constantStringValue) ?: return false
         val targets = getTargets(context) ?: return false
-        return !targets.stream().flatMap { it.findMethods(targetMethodInfo) }.findAny().isPresent
+        return !targets.asSequence().flatMap { it.findMethods(targetMethodInfo) }.any()
     }
 
     fun getReferenceIfAmbiguous(context: PsiElement): MemberReference? {
@@ -76,7 +75,7 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
         return targets.any { it.findMethodsByName(targetReference.name, false).size > 1 }
     }
 
-    private fun resolve(context: PsiElement): Stream<PsiMethod>? {
+    private fun resolve(context: PsiElement): Sequence<PsiMethod>? {
         val targets = getTargets(context) ?: return null
         val targetedMethods = when (context) {
             is PsiLiteral -> context.constantStringValue?.let { listOf(it) } ?: emptyList()
@@ -84,19 +83,19 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
             else -> emptyList()
         }
 
-        return targetedMethods.stream().flatMap { method ->
-            val targetReference = MixinMemberReference.parse(method) ?: return@flatMap null
+        return targetedMethods.asSequence().flatMap { method ->
+            val targetReference = MixinMemberReference.parse(method) ?: return@flatMap emptySequence()
             return@flatMap resolve(targets, targetReference)
         }
     }
 
-    private fun resolve(targets: Collection<PsiClass>, targetReference: MemberReference): Stream<PsiMethod> {
-        return targets.stream()
+    private fun resolve(targets: Collection<PsiClass>, targetReference: MemberReference): Sequence<PsiMethod> {
+        return targets.asSequence()
             .flatMap { it.findMethods(targetReference) }
     }
 
     fun resolveIfUnique(context: PsiElement): PsiMethod? {
-        return resolve(context)?.collect(Collectors.reducing<PsiMethod> { _, _ -> null })?.orElse(null)
+        return resolve(context)?.singleOrNull()
     }
 
     fun resolveAllIfNotAmbiguous(context: PsiElement): List<PsiMethod>? {
@@ -108,10 +107,10 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
             else -> emptyList()
         }
 
-        return targetedMethods.stream().flatMap { method ->
-            val targetReference = MixinMemberReference.parse(method) ?: return@flatMap null
+        return targetedMethods.asSequence().flatMap { method ->
+            val targetReference = MixinMemberReference.parse(method) ?: return@flatMap emptySequence()
             if (targetReference.descriptor == null && isAmbiguous(targets, targetReference)) {
-                return@flatMap null
+                return@flatMap emptySequence()
             }
             return@flatMap resolve(targets, targetReference)
         }.toList()

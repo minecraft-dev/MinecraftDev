@@ -18,7 +18,7 @@ gradleToolingExtension = "com.jetbrains.intellij.gradle:gradle-tooling-extension
 annotations = "org.jetbrains:annotations:19.0.0"
 
 # Testing
-test-mockJdk = "org.jetbrains.idea:mockJDK:1.7-4d76c50"
+test-mockJdk = "org.jetbrains.idea:mock-jdk:1.7-4d76c50"
 test-mixin = "org.spongepowered:mixin:0.7-SNAPSHOT"
 test-spongeapi = "org.spongepowered:spongeapi:7.0.0"
 test-nbt = "com.demonwav.mcdev:all-types-nbt:1.0"

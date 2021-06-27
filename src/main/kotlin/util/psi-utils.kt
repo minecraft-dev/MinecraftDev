@@ -46,7 +46,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import com.siyeh.ig.psiutils.ImportUtils
-import java.util.stream.Stream
 
 // Parent
 fun PsiElement.findModule(): Module? = ModuleUtilCore.findModuleForPsiElement(this)
@@ -155,7 +154,7 @@ fun <T : Any> Sequence<T>.filter(filter: ElementFilter?, context: PsiElement): S
     return filter { filter.isAcceptable(it, context) }
 }
 
-fun Stream<out PsiElement>.toResolveResults(): Array<ResolveResult> = map(::PsiElementResolveResult).toTypedArray()
+fun Sequence<PsiElement>.toResolveResults(): Array<ResolveResult> = map(::PsiElementResolveResult).toTypedArray()
 
 fun PsiParameterList.synchronize(newParams: List<PsiParameter>) {
     ChangeSignatureUtil.synchronizeList(this, newParams, { it.parameters.asList() }, BooleanArray(newParams.size))
