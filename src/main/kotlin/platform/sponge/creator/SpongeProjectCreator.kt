@@ -52,7 +52,7 @@ sealed class SpongeProjectCreator<T : BuildSystem>(
 
     protected fun setupDependencyStep(): SpongeDependenciesSetup {
         val spongeApiVersion = config.spongeApiVersion
-        return SpongeDependenciesSetup(buildSystem, spongeApiVersion)
+        return SpongeDependenciesSetup(buildSystem, spongeApiVersion, true)
     }
 
     protected fun setupMainClassSteps(): Pair<CreatorStep, CreatorStep> {
@@ -228,7 +228,8 @@ class SpongeMainClassModifyStep(
 
 class SpongeDependenciesSetup(
     private val buildSystem: BuildSystem,
-    private val spongeApiVersion: String
+    private val spongeApiVersion: String,
+    private val addAnnotationProcessor: Boolean
 ) : CreatorStep {
     override fun runStep(indicator: ProgressIndicator) {
         buildSystem.repositories.add(
@@ -247,13 +248,15 @@ class SpongeDependenciesSetup(
                 gradleConfiguration = "compileOnly"
             )
         )
-        buildSystem.dependencies.add(
-            BuildDependency(
-                "org.spongepowered",
-                "spongeapi",
-                spongeApiVersion,
-                gradleConfiguration = "annotationProcessor"
+        if (addAnnotationProcessor) {
+            buildSystem.dependencies.add(
+                BuildDependency(
+                    "org.spongepowered",
+                    "spongeapi",
+                    spongeApiVersion,
+                    gradleConfiguration = "annotationProcessor"
+                )
             )
-        )
+        }
     }
 }

@@ -53,7 +53,8 @@ class SimpleGradleSetupStep(
     private val project: Project,
     private val rootDirectory: Path,
     private val buildSystem: BuildSystem,
-    private val gradleFiles: GradleFiles<String>
+    private val gradleFiles: GradleFiles<String>,
+    private val kotlinScript: Boolean = false
 ) : CreatorStep {
 
     override fun runStep(indicator: ProgressIndicator) {
@@ -66,7 +67,8 @@ class SimpleGradleSetupStep(
                 DirectorySet.create(rootDirectory)
             val (buildGradle, gradleProp, settingsGradle) = setupGradleFiles(
                 rootDirectory,
-                gradleFiles
+                gradleFiles,
+                kotlinScript
             )
 
             val psiManager = PsiManager.getInstance(project)
@@ -97,17 +99,18 @@ class GradleSetupStep(
     private val project: Project,
     private val rootDirectory: Path,
     private val buildSystem: BuildSystem,
-    private val gradleFiles: GradleFiles<String>
+    private val gradleFiles: GradleFiles<String>,
+    private val kotlinScript: Boolean = false
 ) : CreatorStep {
     override fun runStep(indicator: ProgressIndicator) {
-        val (_, gradleProp, settingsGradle) = setupGradleFiles(rootDirectory, gradleFiles)
+        val (_, gradleProp, settingsGradle) = setupGradleFiles(rootDirectory, gradleFiles, kotlinScript)
 
         runWriteTask {
             if (project.isDisposed) {
                 return@runWriteTask
             }
 
-            val buildGradlePsi = addBuildGradleDependencies(project, buildSystem, gradleFiles.buildGradle)
+            val buildGradlePsi = addBuildGradleDependencies(project, buildSystem, gradleFiles.buildGradle, kotlinScript)
             val psiManager = PsiManager.getInstance(project)
             psiManager.findDirectory(rootDirectory.virtualFileOrError)?.let { dir ->
                 dir.findFile(buildGradlePsi.name)?.delete()
@@ -131,11 +134,11 @@ data class GradleFiles<out T>(
     val settingsGradle: T?
 )
 
-fun setupGradleFiles(dir: Path, givenFiles: GradleFiles<String>): GradleFiles<Path> {
+fun setupGradleFiles(dir: Path, givenFiles: GradleFiles<String>, kotlinScript: Boolean = false): GradleFiles<Path> {
     return GradleFiles(
-        dir.resolve("build.gradle"),
+        dir.resolve(if (kotlinScript) "build.gradle.kts" else "build.gradle"),
         givenFiles.gradleProperties?.let { dir.resolve("gradle.properties") },
-        givenFiles.settingsGradle?.let { dir.resolve("settings.gradle") }
+        givenFiles.settingsGradle?.let { dir.resolve(if (kotlinScript) "settings.gradle.kts" else "settings.gradle") },
     ).apply {
         Files.deleteIfExists(buildGradle)
         Files.createFile(buildGradle)
@@ -144,10 +147,15 @@ fun setupGradleFiles(dir: Path, givenFiles: GradleFiles<String>): GradleFiles<Pa
     }
 }
 
-fun addBuildGradleDependencies(project: Project, buildSystem: BuildSystem, text: String): PsiFile {
+fun addBuildGradleDependencies(
+    project: Project,
+    buildSystem: BuildSystem,
+    text: String,
+    kotlinScript: Boolean = false
+): PsiFile {
     val file = PsiFileFactory.getInstance(project).createFileFromText(GroovyLanguage, text)
     return file.runWriteAction {
-        val fileName = "build.gradle"
+        val fileName = if (kotlinScript) "build.gradle.kts" else "build.gradle"
         file.name = fileName
 
         val groovyFile = file as GroovyFile
@@ -211,7 +219,8 @@ private fun getClosableBlockByName(element: PsiElement, name: String) =
 class BasicGradleFinalizerStep(
     private val module: Module,
     private val rootDirectory: Path,
-    private val buildSystem: BuildSystem
+    private val buildSystem: BuildSystem,
+    private vararg val additionalRunTasks: String
 ) : CreatorStep {
     private val project
         get() = module.project
@@ -230,10 +239,17 @@ class BasicGradleFinalizerStep(
 
         // Set up the run config
         // Get the gradle external task type, this is what sets it as a gradle task
+        addRunTaskConfiguration("build")
+        for (tasks in additionalRunTasks) {
+            addRunTaskConfiguration(tasks)
+        }
+    }
+
+    private fun addRunTaskConfiguration(task: String) {
         val gradleType = GradleExternalTaskConfigurationType.getInstance()
 
         val runManager = RunManager.getInstance(project)
-        val runConfigName = buildSystem.artifactId + " build"
+        val runConfigName = buildSystem.artifactId + ' ' + task
 
         val runConfiguration = ExternalSystemRunConfiguration(
             GradleConstants.SYSTEM_ID,
@@ -245,7 +261,7 @@ class BasicGradleFinalizerStep(
         // Set relevant gradle values
         runConfiguration.settings.externalProjectPath = rootDirectory.toAbsolutePath().toString()
         runConfiguration.settings.executionName = runConfigName
-        runConfiguration.settings.taskNames = listOf("build")
+        runConfiguration.settings.taskNames = listOf(task)
 
         runConfiguration.isAllowRunningInParallel = false
 
