@@ -39,6 +39,9 @@ root: {
     "double15": NaN
     "double16": NaNd
     "double17": NaND
+    "preciseDouble1": 12188.6999999881
+    "preciseDouble2": 12188.6999999881d
+    "presiceDouble3": 12188.6999999881D
     "string1": "this is a string with quotes"
     "string2": this is a string without quotes
     quoteless key: quoteless value
@@ -51,6 +54,7 @@ root: {
     longList: [ 127l, 127L ]
     floatList: [ 127f, 127F, 127.0f, 127.0F, Infinityf, InfinityF, +InfinityF, +Infinityf, -Infinityf, -InfinityF, NaNf, NaNF ]
     doubleList: [ 127d, 127D, 127.0, 127.0d, 127.0D, Infinity, Infinityd, InfinityD, +Infinity, +Infinityd, +InfinityD, -Infinityd, -InfinityD, NaN, NaNd, NaND ]
+    preciseDoubleList: [ 12188.6999999881d, 12188.6999999881D, 12188.6999999881, Infinity, Infinityd, InfinityD, +Infinity, +Infinityd, +InfinityD, -Infinityd, -InfinityD, NaN, NaNd, NaND ]
     "compound1": {
         "compound2": {
             "compound3": {

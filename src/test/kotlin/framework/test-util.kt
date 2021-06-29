@@ -33,7 +33,7 @@ typealias ProjectBuilderFunc =
     ProjectBuilder.(path: String, code: String, configure: Boolean, allowAst: Boolean) -> VirtualFile
 
 val mockJdk by lazy {
-    val path = findLibraryPath("mockJDK")
+    val path = findLibraryPath("mock-jdk")
     val rtFile = StandardFileSystems.local().findFileByPath(path)!!
     val rt = JarFileSystem.getInstance().getRootByLocal(rtFile)!!
     val home = rtFile.parent!!
@@ -57,9 +57,9 @@ fun createLibrary(project: Project, name: String): Library {
 
 fun testLexer(basePath: String, lexer: Lexer) {
     val caller = ReflectionUtil.getCallerClass(3)!!
-    val text = caller.getResource(basePath).readText().trim()
+    val text = caller.getResource(basePath)!!.readText().trim()
 
-    val expected = caller.getResource("${basePath.substringBeforeLast('.')}.txt").readText().trim()
+    val expected = caller.getResource("${basePath.substringBeforeLast('.')}.txt")!!.readText().trim()
     val actual = LexerTestCase.printTokens(text.filter { it != '\r' }, 0, lexer)
 
     val expectedLines = expected.lineSequence().filter { it.isNotBlank() }.toList()

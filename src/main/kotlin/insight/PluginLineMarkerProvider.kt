@@ -24,6 +24,10 @@ class PluginLineMarkerProvider : LineMarkerProviderDescriptor() {
     override fun getName() = "Minecraft Plugin line marker"
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
+        if (!element.isValid) {
+            return null
+        }
+
         val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return null
 
         val instance = MinecraftFacet.getInstance(module) ?: return null

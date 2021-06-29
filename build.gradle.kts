@@ -20,7 +20,7 @@ plugins {
     groovy
     idea
     id("org.jetbrains.intellij") version "1.0"
-    id("org.cadixdev.licenser") version "0.6.0"
+    id("org.cadixdev.licenser") version "0.6.1"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
 
@@ -58,7 +58,7 @@ val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSource
 
 repositories {
     mavenCentral()
-    maven("https://wav.jfrog.io/artifactory/mcdev/")
+    maven("https://repo.denwav.dev/repository/maven-public/")
     maven("https://repo.spongepowered.org/maven")
     maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
     maven("https://repo.gradle.org/gradle/libs-releases-local/")
@@ -79,7 +79,7 @@ dependencies {
     implementation(libs.templateMakerFabric)
 
     jflex(libs.jflex.lib)
-    jflexSkeleton("${libs.jflex.skeleton.text()}:idea@skeleton")
+    jflexSkeleton("${libs.jflex.skeleton.text()}@skeleton")
     grammarKit(libs.grammarKit)
 
     testLibs(libs.test.mockJdk)

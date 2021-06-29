@@ -105,6 +105,10 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
                 .first().positionCaret(editor, true)
         }
 
+        if (!psiClass.isValid) {
+            return
+        }
+
         // Generate needed shadows
         val newShadows = createShadowMembers(project, psiClass, filterNewShadows(requiredMembers, psiClass))
 

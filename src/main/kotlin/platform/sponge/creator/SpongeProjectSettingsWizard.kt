@@ -19,6 +19,7 @@ import com.demonwav.mcdev.creator.ValidatedFieldType.LIST
 import com.demonwav.mcdev.creator.ValidatedFieldType.NON_BLANK
 import com.demonwav.mcdev.platform.sponge.SpongeVersion
 import com.demonwav.mcdev.util.firstOfType
+import com.intellij.util.text.nullize
 import com.intellij.util.ui.UIUtil
 import javax.swing.JComboBox
 import javax.swing.JComponent
@@ -94,8 +95,8 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
 
         conf.pluginName = this.pluginNameField.text
         conf.mainClass = this.mainClassField.text
-        conf.description = this.descriptionField.text
-        conf.website = this.websiteField.text
+        conf.description = this.descriptionField.text?.nullize(true)
+        conf.website = this.websiteField.text?.nullize(true)
         conf.spongeApiVersion = this.spongeApiVersionBox.selectedItem as String
 
         conf.setAuthors(this.authorsField.text)

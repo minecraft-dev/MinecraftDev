@@ -66,6 +66,10 @@ class MinecraftFacet(
     }
 
     fun refresh() {
+        if (module.isDisposed) {
+            return
+        }
+
         // Don't allow parent types with child types in auto detected set
         val allEnabled = configuration.state.run {
             autoDetectTypes = PlatformType.removeParents(autoDetectTypes)
