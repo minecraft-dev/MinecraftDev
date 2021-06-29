@@ -20,6 +20,7 @@ import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.SmartPsiElementPointer
@@ -46,6 +47,7 @@ interface CreatorStep {
             runWriteTask {
                 for (scheduledReformat in scheduledReformats) {
                     val file = scheduledReformat.element ?: continue
+                    PsiDocumentManager.getInstance(file.project).getDocument(file)?.setReadOnly(false)
                     ReformatCodeProcessor(file, false).run()
                 }
             }
@@ -81,6 +83,7 @@ interface CreatorStep {
         fun writeText(file: Path, text: String, psiManager: PsiManager? = null) {
             Files.write(file, text.toByteArray(Charsets.UTF_8), CREATE, TRUNCATE_EXISTING, WRITE)
             psiManager?.findFile(file.virtualFileOrError)?.let {
+                PsiDocumentManager.getInstance(psiManager.project).getDocument(it)?.setReadOnly(false)
                 ReformatCodeProcessor(it, false).run()
             }
         }

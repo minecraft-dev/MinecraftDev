@@ -46,8 +46,6 @@ import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings
-import java.util.stream.Stream
-import kotlin.streams.toList
 
 class GenerateShadowAction : MixinCodeInsightAction() {
 
@@ -65,7 +63,7 @@ class GenerateShadowAction : MixinCodeInsightAction() {
         }
 
         val chooser = MemberChooser<PsiElementClassMember<*>>(members, false, true, project)
-        chooser.title = "Select members to Shadow"
+        chooser.title = "Select Members to Shadow"
         chooser.setCopyJavadocVisible(false)
         chooser.show()
 
@@ -78,7 +76,7 @@ class GenerateShadowAction : MixinCodeInsightAction() {
                     createShadowMembers(
                         project,
                         psiClass,
-                        elements.stream().map(PsiElementClassMember<*>::getElement)
+                        elements.asSequence().map(PsiElementClassMember<*>::getElement)
                     )
                     // Select first element in editor
                 ).firstOrNull()?.positionCaret(editor, false)
@@ -87,7 +85,7 @@ class GenerateShadowAction : MixinCodeInsightAction() {
     }
 }
 
-fun insertShadows(project: Project, psiClass: PsiClass, members: Stream<PsiMember>) {
+fun insertShadows(project: Project, psiClass: PsiClass, members: Sequence<PsiMember>) {
     insertShadows(psiClass, createShadowMembers(project, psiClass, members))
 }
 
@@ -106,7 +104,7 @@ fun insertShadows(psiClass: PsiClass, shadows: List<GenerationInfo>) {
 fun createShadowMembers(
     project: Project,
     psiClass: PsiClass,
-    members: Stream<PsiMember>
+    members: Sequence<PsiMember>
 ): List<PsiGenerationInfo<PsiMember>> {
     var methodAdded = false
 

@@ -20,8 +20,6 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiJavaCodeReferenceElement
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
-import com.intellij.util.containers.isEmpty
-import java.util.stream.Stream
 
 fun collectRequiredMembers(element: PsiElement, psiClass: PsiClass): List<PsiMember> {
     val visitor = CollectRequiredClassMembersVisitor(psiClass)
@@ -51,10 +49,10 @@ private class CollectRequiredClassMembersVisitor(private val psiClass: PsiClass)
     }
 }
 
-fun filterNewShadows(requiredMembers: Collection<PsiMember>, psiClass: PsiClass): Stream<PsiMember> {
-    return requiredMembers.stream().filter { m ->
+fun filterNewShadows(requiredMembers: Collection<PsiMember>, psiClass: PsiClass): Sequence<PsiMember> {
+    return requiredMembers.asSequence().filter { m ->
         when (m) {
-            is PsiMethod -> psiClass.findMethods(m.memberReference).isEmpty()
+            is PsiMethod -> psiClass.findMethods(m.memberReference).none()
             is PsiField -> psiClass.findField(m.memberReference) == null
             else -> throw UnsupportedOperationException("Unsupported member type: ${m::class.java.name}")
         }

@@ -24,7 +24,6 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiVariable
 import com.intellij.psi.impl.source.PostprocessReformattingAspect
-import java.util.stream.Stream
 
 fun ShadowTarget.createLookupElement(): LookupElement {
     return when (member) {
@@ -60,7 +59,7 @@ private fun insertShadow(context: InsertionContext, shadow: ShadowTarget) {
     val mixinClass = shadow.mixin ?: context.file.findElementAt(context.startOffset)?.findContainingClass() ?: return
 
     // Insert @Shadow element
-    insertShadows(context.project, mixinClass, Stream.of(shadow.member))
+    insertShadows(context.project, mixinClass, sequenceOf(shadow.member))
     disableAnnotationWrapping(context.project) {
         PostprocessReformattingAspect.getInstance(context.project).doPostponedFormatting()
     }
