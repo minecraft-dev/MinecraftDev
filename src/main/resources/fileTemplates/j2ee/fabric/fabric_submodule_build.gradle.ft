@@ -3,11 +3,6 @@ plugins {
     id 'maven-publish'
 }
 
-java {
-    toolchain.languageVersion = JavaLanguageVersion.of(${JAVA_VERSION})
-    archivesBaseName = project.archives_base_name
-}
-
 repositories {
     // Add repositories to retrieve artifacts from in here.
     // You should only use this when depending on other mods because
@@ -53,6 +48,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
+    toolchain.languageVersion = JavaLanguageVersion.of(${JAVA_VERSION})
+    archivesBaseName = project.archives_base_name
     // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
     // if it is present.
     // If you remove this line, sources will not be generated.
