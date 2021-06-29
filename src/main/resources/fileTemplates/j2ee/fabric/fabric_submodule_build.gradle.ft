@@ -4,13 +4,7 @@ plugins {
 }
 
 java {
-    #if (${JAVA_VERSION} >= 16)
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
-    #else
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    #end
+    toolchain.languageVersion = JavaLanguageVersion.of(${JAVA_VERSION})
     archivesBaseName = project.archives_base_name
 }
 

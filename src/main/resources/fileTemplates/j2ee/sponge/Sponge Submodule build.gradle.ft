@@ -3,6 +3,11 @@ plugins {
     id 'com.github.johnrengelman.shadow'
 }
 
+java {
+    targetCompatibility = null
+    sourceCompatibility = null
+}
+
 dependencies {
     compile project(':${COMMON_PROJECT_NAME}')
 }
