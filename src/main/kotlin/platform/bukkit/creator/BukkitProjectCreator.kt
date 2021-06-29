@@ -29,6 +29,8 @@ import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.util.MinecraftVersions
+import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
@@ -154,9 +156,13 @@ open class BukkitDependenciesStep(
                         "https://papermc.io/repo/repository/maven-public/"
                     )
                 )
+                val paperGroupId = when {
+                    SemanticVersion.parse(mcVersion) >= MinecraftVersions.MC1_17 -> "io.papermc.paper"
+                    else -> "com.destroystokyo.paper"
+                }
                 buildSystem.dependencies.add(
                     BuildDependency(
-                        "com.destroystokyo.paper",
+                        paperGroupId,
                         "paper-api",
                         "$mcVersion-R0.1-SNAPSHOT",
                         mavenScope = "provided",

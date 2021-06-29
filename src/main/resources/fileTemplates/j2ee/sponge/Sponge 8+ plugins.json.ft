@@ -1,0 +1,44 @@
+{
+  "plugins": [
+    {
+      "loader": "java_plain",
+      "id": "${PLUGIN_ID}",
+      "name": "${PLUGIN_NAME}",
+      "version": "${VERSION_PLACEHOLDER}",
+      "main-class": "${MAIN_CLASS}",
+      #if (${DESCRIPTION})
+      "description": "${DESCRIPTION}",
+      #else
+      "description": "My plugin description",
+      #end
+      "links": {
+        #if (${WEBSITE})
+        "homepage": "https://spongepowered.org"
+        #end
+      },
+      "contributors": [
+        #foreach (${AUTHOR} in ${AUTHORS})
+        {
+          "name": "${AUTHOR}",
+          "description": "Author"
+        }
+        #end
+      ],
+      "dependencies": [
+        {
+          "id": "spongeapi",
+          "version": "${SPONGEAPI_VERSION}",
+          "load-order": "AFTER",
+          "optional": false
+        #foreach (${DEPENDENCY} in ${DEPENDENCIES})
+        },
+        {
+          "id": "${DEPENDENCY}",
+          "load-order": "AFTER",
+          "optional": false
+        #end
+        }
+      ]
+    }
+  ]
+}

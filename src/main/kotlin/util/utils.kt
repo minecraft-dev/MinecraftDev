@@ -16,7 +16,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -92,10 +91,9 @@ inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
 
 inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T): T {
     val result = WriteCommandAction.writeCommandAction(this).withGlobalUndo().compute<T, Throwable> { func() }
-    PsiDocumentManager.getInstance(project)
-        .doPostponedOperationsAndUnblockDocument(
-            FileDocumentManager.getInstance().getDocument(this.virtualFile) ?: return result
-        )
+    val documentManager = PsiDocumentManager.getInstance(project)
+    val document = documentManager.getDocument(this) ?: return result
+    documentManager.doPostponedOperationsAndUnblockDocument(document)
     return result
 }
 

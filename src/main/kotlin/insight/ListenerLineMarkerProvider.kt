@@ -67,6 +67,10 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
     // even if the event target is a nested class.
     private fun createHandler(method: UMethod): GutterIconNavigationHandler<PsiElement> {
         return GutterIconNavigationHandler handler@{ _, element ->
+            if (!method.isPsiValid) {
+                return@handler
+            }
+
             // We need to re-evaluate the targeted method, because if the method signature slightly changes before
             // IntelliJ decides to re-evaluate the method, but the class is no longer valid.
             // In this circumstance, we can find the class anyways because it's still a valid listener.

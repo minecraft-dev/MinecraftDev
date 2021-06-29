@@ -42,7 +42,7 @@ abstract class SrgActionBase : AnAction() {
         val mcpModule = data.instance.getModuleOfType(McpModuleType) ?: return showBalloon("No mappings found", e)
 
         mcpModule.srgManager?.srgMap?.onSuccess { srgMap ->
-            var parent = data.element.parent
+            var parent = data.element.parent ?: return@onSuccess showBalloon("Not a valid element", e)
 
             if (parent is PsiMember) {
                 val shadowTarget = parent.findFirstShadowTarget()?.element
@@ -52,7 +52,7 @@ abstract class SrgActionBase : AnAction() {
             }
 
             if (parent is PsiReference) {
-                parent = parent.resolve()
+                parent = parent.resolve() ?: return@onSuccess showBalloon("Not a valid element", e)
             }
 
             withSrgTarget(parent, srgMap, e, data)
