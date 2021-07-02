@@ -153,6 +153,9 @@
 
         <!--region ADVENTURE-->
         <!---->
+
+        <dependencySupport coordinate="net.kyori:adventure-api" kind="java"/>
+
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.adventure.framework.AdventurePresentationProvider" />
 
         <codeInsight.lineMarkerProvider language="" implementationClass="com.demonwav.mcdev.platform.adventure.color.AdventureColorLineMarkerProvider"/>
@@ -160,6 +163,11 @@
 
         <!--region BUKKIT-->
         <!---->
+
+        <dependencySupport coordinate="org.bukkit:bukkit" kind="java"/>
+        <dependencySupport coordinate="org.spigotmc:spigot-api" kind="java"/>
+        <dependencySupport coordinate="com.destroystokyo.paper:paper-api" kind="java"/>
+        <dependencySupport coordinate="io.papermc.paper:paper-api" kind="java"/>
 
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.BukkitPresentationProvider" />
@@ -169,6 +177,8 @@
 
         <!--region SPONGE-->
         <!---->
+
+        <dependencySupport coordinate="org.spongepowered:spongeapi" kind="java"/>
 
         <!-- Sponge Line Marker Provider -->
         <codeInsight.lineMarkerProvider language=""
@@ -193,6 +203,7 @@
         <!--endregion-->
 
         <!--region FORGE-->
+        <dependencySupport coordinate="net.minecraftforge:forge" kind="java"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.forge.reflection.reference.ReflectionReferenceContributor"/>
         <!--endregion-->
 
@@ -208,6 +219,7 @@
         <!--endregion-->
 
         <!--region FABRIC-->
+        <dependencySupport coordinate="net.fabricmc:fabric-loader" kind="java"/>
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.fabric.framework.FabricPresentationProvider" />
         <fileIconProvider implementation="com.demonwav.mcdev.platform.fabric.FabricFileIconProvider"/>
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.fabric.reference.FabricReferenceContributor" />
@@ -249,6 +261,8 @@
 
         <!--region MIXIN-->
         <!---->
+
+        <dependencySupport coordinate="org.spongepowered:mixin" kind="java"/>
 
         <!-- Folding -->
         <applicationService serviceImplementation="com.demonwav.mcdev.platform.mixin.folding.MixinFoldingSettings" />
@@ -294,12 +308,17 @@
         <!--region VELOCITY-->
         <!---->
 
+        <dependencySupport coordinate="com.velocitypowered:velocity-api" kind="java"/>
+
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.velocity.framework.VelocityPresentationProvider"/>
 
         <!--endregion-->
 
         <!--region BUNGEECORD-->
         <!---->
+
+        <dependencySupport coordinate="net.md-5:bungeecord-api" kind="java"/>
+        <dependencySupport coordinate="io.github.waterfallmc:waterfall-api" kind="java"/>
 
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
 
