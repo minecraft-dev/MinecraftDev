@@ -228,6 +228,8 @@
 
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mcp.debug.McpRunConfigurationExtension"/>
 
+        <attachSourcesProvider implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleDecompileSourceProvider" />
+
         <!-- access transformer file type -->
         <fileType name="Access Transformers" language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtFileType" fieldName="INSTANCE" patterns="*_at.cfg" />
         <lang.parserDefinition language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtParserDefinition"/>
@@ -789,6 +791,7 @@
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
+        <projectResolve implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleProjectResolverExtension"/>
     </extensions>
 
     <applicationListeners>
