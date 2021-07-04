@@ -285,6 +285,16 @@
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.at.AtGotoDeclarationHandler" />
         <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
 
+        <!-- access widener file type -->
+        <fileType name="Access Widener" language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwFileType" fieldName="INSTANCE" patterns="*.accesswidener" />
+        <lang.parserDefinition language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.aw.AwColorSettingsPage" />
+        <lang.commenter language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwCommenter" />
+        <typedHandler implementation="com.demonwav.mcdev.platform.mcp.aw.AwTypedHandlerDelegate" />
+        <annotator language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwAnnotator"/>
+        <completion.contributor language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwCompletionContributor"/>
+
         <moduleService serviceImplementation="com.demonwav.mcdev.platform.mcp.McpModuleSettings"/>
 
         <gotoSymbolContributor implementation="com.demonwav.mcdev.platform.mcp.navigation.SrgMemberChooseByNameContributor" />

@@ -1,0 +1,107 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2021 minecraft-dev
+ *
+ * MIT License
+ */
+
+{
+    parserClass="com.demonwav.mcdev.platform.mcp.aw.gen.parser.AwParser"
+
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="Aw"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.demonwav.mcdev.platform.mcp.aw.gen.psi"
+    psiImplPackage="com.demonwav.mcdev.platform.mcp.aw.gen.psi.impl"
+
+    elementTypeHolderClass="com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwTypes"
+    elementTypeClass="com.demonwav.mcdev.platform.mcp.aw.psi.AwElementType"
+    tokenTypeClass="com.demonwav.mcdev.platform.mcp.aw.psi.AwTokenType"
+
+    consumeTokenMethod="consumeTokenFast"
+}
+
+aw_file ::= header_line line*
+
+private header_line ::= !<<eof>> header COMMENT? end_line
+
+private line ::= !<<eof>> entry? COMMENT? end_line
+private end_line ::= crlf | <<eof>>
+
+header ::= HEADER_NAME HEADER_VERSION_ELEMENT HEADER_NAMESPACE_ELEMENT {
+    mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwHeaderImplMixin"
+    implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwHeaderMixin"
+}
+
+private entry ::= class_entry | method_entry | field_entry {
+    mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwEntryMixin"
+    recoverWhile = line_recover
+}
+
+class_entry ::= access class_literal class_name {
+    mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwClassEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwClassEntryMixin"
+}
+
+method_entry ::= access method_literal class_name member_name method_desc{
+    mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwMethodEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwMethodEntryMixin"
+}
+
+field_entry ::= access field_literal class_name member_name field_desc{
+    mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwFieldEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwFieldEntryMixin"
+}
+
+private line_recover ::= !(end_line | COMMENT)
+
+access ::= ACCESS_ELEMENT {
+    methods=[
+        accessElement="ACCESS_ELEMENT"
+    ]
+}
+
+class_literal ::= CLASS_ELEMENT
+
+method_literal ::= METHOD_ELEMENT
+
+field_literal ::= FIELD_ELEMENT
+
+class_name ::= CLASS_NAME_ELEMENT {
+    mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwClassNameImplMixin"
+    implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwClassNameMixin"
+    methods=[
+        classNameElement="CLASS_NAME_ELEMENT"
+    ]
+}
+
+member_name ::= NAME_ELEMENT {
+    mixin= "com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwMemberNameImplMixin"
+    implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwMemberNameMixin"
+    methods=[
+        nameElement="NAME_ELEMENT"
+    ]
+}
+
+method_desc ::= OPEN_PAREN argument* CLOSE_PAREN return_value
+
+field_desc ::= argument
+
+argument ::= PRIMITIVE | CLASS_VALUE {
+    methods=[
+        primitive="PRIMITIVE"
+        classValue="CLASS_VALUE"
+    ]
+}
+
+return_value ::= PRIMITIVE | CLASS_VALUE {
+    methods=[
+        primitive="PRIMITIVE"
+        classValue="CLASS_VALUE"
+    ]
+}
