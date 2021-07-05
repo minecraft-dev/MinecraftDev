@@ -60,7 +60,7 @@ repositories {
     mavenCentral()
     maven("https://repo.denwav.dev/repository/maven-public/")
     maven("https://repo.spongepowered.org/maven")
-    maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
+    maven("https://cache-redirector.jetbrains.com/jetbrains.bintray.com/intellij-third-party-dependencies/")
     maven("https://repo.gradle.org/gradle/libs-releases-local/")
     maven("https://maven.extracraftx.com")
 }
