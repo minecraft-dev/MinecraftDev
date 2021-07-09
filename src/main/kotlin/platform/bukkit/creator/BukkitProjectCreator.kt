@@ -50,7 +50,7 @@ sealed class BukkitProjectCreator<T : BuildSystem>(
     }
 
     protected fun setupDependencyStep(): BukkitDependenciesStep {
-        val mcVersion = config.minecraftVersion ?: throw IllegalStateException("No Minecraft version is set")
+        val mcVersion = config.minecraftVersion
         return BukkitDependenciesStep(buildSystem, config.type, mcVersion)
     }
 

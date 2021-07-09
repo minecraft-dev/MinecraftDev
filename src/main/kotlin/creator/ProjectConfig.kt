@@ -13,6 +13,7 @@ package com.demonwav.mcdev.creator
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.util.containers.isNullOrEmpty
+import com.intellij.util.lang.JavaVersion
 
 private val bracketRegex = Regex("[\\[\\]]")
 private val commaRegex = Regex("\\s*,\\s*")
@@ -36,6 +37,8 @@ abstract class ProjectConfig {
 
     var description: String? = null
     fun hasDescription() = description?.isNotBlank() == true
+
+    abstract val javaVersion: JavaVersion
 
     protected fun commaSplit(string: String): List<String> {
         return if (!string.isBlank()) {

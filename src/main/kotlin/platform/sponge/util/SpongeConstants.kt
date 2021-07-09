@@ -34,4 +34,5 @@ object SpongeConstants {
     val ID_PATTERN = Pattern.compile(ID_PATTERN_STRING)
 
     val API8 = SemanticVersion.release(8)
+    val API9 = SemanticVersion.release(8)
 }

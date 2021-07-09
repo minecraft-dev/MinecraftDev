@@ -60,7 +60,7 @@ sealed class VelocityProjectCreator<T : BuildSystem>(
 
     protected fun setupMainClassSteps(): Pair<CreatorStep, CreatorStep> {
         val mainClassStep = createJavaClassStep(config.mainClass) { packageName, className ->
-            val version = SemanticVersion.parse(config.velocityApiVersion)
+            val version = config.apiVersion
             VelocityTemplate.applyMainClass(project, packageName, className, config.hasDependencies(), version)
         }
 

@@ -111,7 +111,8 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
             FabricProjectSettingsWizard(creator),
             LiteLoaderProjectSettingsWizard(creator),
             VelocityProjectSettingsWizard(creator),
-            BungeeCordProjectSettingsWizard(creator)
+            BungeeCordProjectSettingsWizard(creator),
+            ProjectSetupFinalizerWizardStep(creator, wizardContext)
         )
     }
 

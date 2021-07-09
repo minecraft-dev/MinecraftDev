@@ -81,7 +81,7 @@ class VelocityProjectSettingsWizard(private val creator: MinecraftProjectCreator
         return creator.configs.any { it is VelocityProjectConfig }
     }
 
-    override fun onStepLeaving() {
+    override fun updateDataModel() {
         val conf = this.config ?: return
 
         conf.pluginName = this.pluginNameField.text
@@ -93,6 +93,4 @@ class VelocityProjectSettingsWizard(private val creator: MinecraftProjectCreator
         conf.setAuthors(this.authorsField.text)
         conf.setDependencies(this.dependField.text)
     }
-
-    override fun updateDataModel() {}
 }
