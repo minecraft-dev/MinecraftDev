@@ -72,6 +72,10 @@ class TranslationFoldingSettings : PersistentStateComponent<TranslationFoldingSe
 
 class TranslationFoldingBuilder : FoldingBuilderEx() {
     override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean): Array<FoldingDescriptor> {
+        if (ApplicationManager.getApplication().isDispatchThread) {
+            return emptyArray()
+        }
+
         val descriptors = mutableListOf<FoldingDescriptor>()
         for (identifier in TranslationIdentifier.INSTANCES) {
             val elements = PsiTreeUtil.findChildrenOfType(root, identifier.elementClass())
