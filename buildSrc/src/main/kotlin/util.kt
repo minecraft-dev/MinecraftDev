@@ -25,7 +25,7 @@ fun Project.lexer(flex: String, pack: String) = tasks.registering(JavaExec::clas
     val jflexSkeleton by project.configurations
 
     classpath = jflex
-    main = "jflex.Main"
+    mainClass.set("jflex.Main")
 
     doFirst {
         args(
@@ -56,7 +56,7 @@ fun Project.parser(bnf: String, pack: String) = tasks.registering(JavaExec::clas
     }
 
     classpath = grammarKit
-    main = "org.intellij.grammar.Main"
+    mainClass.set("org.intellij.grammar.Main")
 
     if (JavaVersion.current().isJava9Compatible) {
         jvmArgs(
