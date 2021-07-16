@@ -23,6 +23,8 @@ class IsCancelledInspection : BaseInspection() {
     @Nls
     override fun getDisplayName() = "Useless event is cancelled check"
 
+    override fun getStaticDescription(): String = "Reports useless event cancellation checks"
+
     override fun buildErrorString(vararg infos: Any): String {
         val useless = infos[0] as IsCancelled
         return useless.errorString

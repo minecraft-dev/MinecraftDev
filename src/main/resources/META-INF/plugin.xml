@@ -313,7 +313,7 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="false"
+                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
         <localInspection displayName="Missing translations"
                          groupName="Minecraft"
