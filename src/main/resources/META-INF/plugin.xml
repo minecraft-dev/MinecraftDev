@@ -187,7 +187,6 @@
         <importFilter implementation="com.demonwav.mcdev.platform.sponge.SpongeImportFilter" />
 
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.sponge.inspection.suppress.SpongeGetterParamOptionalInspectionSuppressor" />
-        <daemon.highlightInfoFilter implementation="com.demonwav.mcdev.platform.sponge.codeInsight.highlighting.SpongeGetterFilterInfoFilter" />
         <!--endregion-->
 
         <!--region FORGE-->
