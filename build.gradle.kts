@@ -200,7 +200,7 @@ tasks.test {
 
 idea {
     module {
-        generatedSourceDirs.add(file("gen"))
+        generatedSourceDirs.add(file("build/gen"))
         excludeDirs.add(file(intellij.sandboxDir.get()))
     }
 }
@@ -278,7 +278,7 @@ val generateTranslationTemplateLexer by lexer("TranslationTemplateLexer", "com/d
 val generate by tasks.registering {
     group = "minecraft"
     description = "Generates sources needed to compile the plugin."
-    outputs.dir("gen")
+    outputs.dir(layout.buildDirectory.dir("gen"))
     dependsOn(
         generateAtLexer,
         generateAtParser,

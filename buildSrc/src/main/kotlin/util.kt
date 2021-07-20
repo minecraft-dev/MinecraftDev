@@ -43,11 +43,11 @@ fun Project.lexer(flex: String, pack: String) = tasks.registering(JavaExec::clas
 }
 
 fun Project.parser(bnf: String, pack: String) = tasks.registering(JavaExec::class) {
-    val src = "src/main/grammars/$bnf.bnf".replace('/', File.separatorChar)
-    val dstRoot = "gen"
-    val dst = "$dstRoot/$pack".replace('/', File.separatorChar)
-    val psiDir = "$dst/psi/".replace('/', File.separatorChar)
-    val parserDir = "$dst/parser/".replace('/', File.separatorChar)
+    val src = project.layout.projectDirectory.file("src/main/grammars/$bnf.bnf")
+    val dstRoot = project.layout.buildDirectory.dir("gen")
+    val dst = dstRoot.map { it.dir(pack) }
+    val psiDir = dst.map { it.dir("psi") }
+    val parserDir = dst.map { it.dir("parser") }
 
     val grammarKit by project.configurations
 
@@ -66,7 +66,9 @@ fun Project.parser(bnf: String, pack: String) = tasks.registering(JavaExec::clas
         )
     }
 
-    args(dstRoot, src)
+    doFirst {
+        args(dstRoot.get().asFile, src.asFile)
+    }
 
     inputs.file(src)
     outputs.dirs(
