@@ -18,4 +18,8 @@ processResources {
     def props = [version: version]
     inputs.properties props
     expand props
+    filteringCharset 'UTF-8'
+    filesMatching('bungee.yml') {
+        expand props
+    }
 }

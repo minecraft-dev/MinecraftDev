@@ -20,6 +20,7 @@ task processSources(type: Sync) {
     from sourceSets.main.java.srcDirs
     def props = [version: version]
     inputs.properties props
+    filteringCharset 'UTF-8'
     expand props
     into "$buildDir/src"
 }
