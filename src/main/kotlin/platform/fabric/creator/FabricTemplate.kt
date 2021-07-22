@@ -138,11 +138,13 @@ object FabricTemplate : BaseTemplate() {
 
     fun applyMixinConfigTemplate(
         project: Project,
-        buildSystem: BuildSystem
+        buildSystem: BuildSystem,
+        config: FabricProjectConfig
     ): String {
         val packageName = "${buildSystem.groupId.toPackageName()}.${buildSystem.artifactId.toPackageName()}.mixin"
         val props = mapOf(
-            "PACKAGE_NAME" to packageName
+            "PACKAGE_NAME" to packageName,
+            "JAVA_VERSION" to config.javaVersion
         )
         return project.applyTemplate(FABRIC_MIXINS_JSON_TEMPLATE, props)
     }
