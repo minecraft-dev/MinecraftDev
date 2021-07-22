@@ -103,3 +103,9 @@ interface GradleCreator {
      */
     fun configureRootGradle(rootDirectory: Path, buildSystem: GradleBuildSystem) {}
 }
+
+data class GradlePlugin(
+    val id: String,
+    val version: String? = null,
+    val apply: Boolean = true,
+)

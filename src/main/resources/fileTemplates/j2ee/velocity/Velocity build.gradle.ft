@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'eclipse'
 }
 
 group = '${GROUP_ID}'
@@ -28,13 +29,20 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
-task processSources(type: Sync) {
-    from sourceSets.main.java.srcDirs
-    def props = [version: version]
-    inputs.properties props
-    filteringCharset 'UTF-8'
-    expand props
-    into "$buildDir/src"
+def templateSource = file('src/main/templates')
+def templateDest = layout.buildDirectory.dir('generated/sources/templates')
+def generateTemplates = tasks.register('generateTemplates', Copy) { task ->
+    def props = [
+            'version': project.version
+    ]
+    task.inputs.properties props
+
+    task.from templateSource
+    task.into templateDest
+    task.expand props
 }
 
-compileJava.source = processSources.outputs
+sourceSets.main.java.srcDir(generateTemplates.map { it.outputs })
+
+rootProject.idea.project.settings.taskTriggers.afterSync generateTemplates
+project.eclipse.synchronizationTasks(generateTemplates)
