@@ -17,21 +17,21 @@ import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 
 fun Project.lexer(flex: String, pack: String) = tasks.registering(JavaExec::class) {
-    val src = "src/main/grammars/$flex.flex"
-    val dst = "gen/$pack"
-    val output = "$dst/$flex.java"
+    val src = layout.projectDirectory.file("src/main/grammars/$flex.flex")
+    val dst = layout.buildDirectory.dir("gen/$pack")
+    val output = layout.buildDirectory.file("gen/$pack/$flex.java")
 
     val jflex by project.configurations
     val jflexSkeleton by project.configurations
 
     classpath = jflex
-    main = "jflex.Main"
+    mainClass.set("jflex.Main")
 
     doFirst {
         args(
             "--skel", jflexSkeleton.singleFile.absolutePath,
-            "-d", dst,
-            src
+            "-d", dst.get().asFile.absolutePath,
+            src.asFile.absolutePath
         )
 
         // Delete current lexer
@@ -43,11 +43,11 @@ fun Project.lexer(flex: String, pack: String) = tasks.registering(JavaExec::clas
 }
 
 fun Project.parser(bnf: String, pack: String) = tasks.registering(JavaExec::class) {
-    val src = "src/main/grammars/$bnf.bnf".replace('/', File.separatorChar)
-    val dstRoot = "gen"
-    val dst = "$dstRoot/$pack".replace('/', File.separatorChar)
-    val psiDir = "$dst/psi/".replace('/', File.separatorChar)
-    val parserDir = "$dst/parser/".replace('/', File.separatorChar)
+    val src = project.layout.projectDirectory.file("src/main/grammars/$bnf.bnf")
+    val dstRoot = project.layout.buildDirectory.dir("gen")
+    val dst = dstRoot.map { it.dir(pack) }
+    val psiDir = dst.map { it.dir("psi") }
+    val parserDir = dst.map { it.dir("parser") }
 
     val grammarKit by project.configurations
 
@@ -56,7 +56,7 @@ fun Project.parser(bnf: String, pack: String) = tasks.registering(JavaExec::clas
     }
 
     classpath = grammarKit
-    main = "org.intellij.grammar.Main"
+    mainClass.set("org.intellij.grammar.Main")
 
     if (JavaVersion.current().isJava9Compatible) {
         jvmArgs(
@@ -66,7 +66,9 @@ fun Project.parser(bnf: String, pack: String) = tasks.registering(JavaExec::clas
         )
     }
 
-    args(dstRoot, src)
+    doFirst {
+        args(dstRoot.get().asFile, src.asFile)
+    }
 
     inputs.file(src)
     outputs.dirs(

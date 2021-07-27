@@ -198,8 +198,7 @@
 
         <lang.inspectionSuppressor language="JAVA"
                                    implementationClass="com.demonwav.mcdev.platform.sponge.inspection.suppress.SpongeGetterParamOptionalInspectionSuppressor"/>
-        <daemon.highlightInfoFilter
-            implementation="com.demonwav.mcdev.platform.sponge.codeInsight.highlighting.SpongeGetterFilterInfoFilter"/>
+
         <!--endregion-->
 
         <!--region FORGE-->
@@ -241,6 +240,8 @@
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.mcp.framework.McpPresentationProvider" />
 
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mcp.debug.McpRunConfigurationExtension"/>
+
+        <attachSourcesProvider implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleDecompileSourceProvider" />
 
         <!-- access transformer file type -->
         <fileType name="Access Transformers" language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtFileType" fieldName="INSTANCE" patterns="*_at.cfg" />
@@ -335,7 +336,7 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="false"
+                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
         <localInspection displayName="Missing translations"
                          groupName="Minecraft"
@@ -810,6 +811,7 @@
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
+        <projectResolve implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleProjectResolverExtension"/>
     </extensions>
 
     <applicationListeners>

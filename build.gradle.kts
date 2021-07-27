@@ -19,7 +19,7 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.0"
+    id("org.jetbrains.intellij") version "1.1.3"
     id("org.cadixdev.licenser") version "0.6.1"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
@@ -60,7 +60,7 @@ repositories {
     mavenCentral()
     maven("https://repo.denwav.dev/repository/maven-public/")
     maven("https://repo.spongepowered.org/maven")
-    maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
+    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
     maven("https://repo.gradle.org/gradle/libs-releases-local/")
     maven("https://maven.extracraftx.com")
 }
@@ -200,7 +200,7 @@ tasks.test {
 
 idea {
     module {
-        generatedSourceDirs.add(file("gen"))
+        generatedSourceDirs.add(file("build/gen"))
         excludeDirs.add(file(intellij.sandboxDir.get()))
     }
 }
@@ -278,7 +278,7 @@ val generateTranslationTemplateLexer by lexer("TranslationTemplateLexer", "com/d
 val generate by tasks.registering {
     group = "minecraft"
     description = "Generates sources needed to compile the plugin."
-    outputs.dir("gen")
+    outputs.dir(layout.buildDirectory.dir("gen"))
     dependsOn(
         generateAtLexer,
         generateAtParser,

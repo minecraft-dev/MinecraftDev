@@ -175,7 +175,12 @@ private fun colorFromThreeArguments(expressions: List<UExpression>): Color? {
     val r = normalize(expressions[0].evaluate()) ?: return null
     val g = normalize(expressions[1].evaluate()) ?: return null
     val b = normalize(expressions[2].evaluate()) ?: return null
-    return Color(r, g, b)
+    return try {
+        Color(r, g, b)
+    } catch (e: IllegalArgumentException) {
+        // Invalid color component
+        null
+    }
 }
 
 private fun colorFromVectorArgument(newExpression: UCallExpression): Color? {

@@ -12,21 +12,17 @@ package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.GeneralAssets
-import com.demonwav.mcdev.util.gotoTargetElement
-import com.intellij.codeInsight.TargetElementUtil
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
 import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo
 import com.intellij.featureStatistics.FeatureUsageTracker
 import com.intellij.openapi.editor.markup.GutterIconRenderer
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiFunctionalExpression
 import com.intellij.psi.util.PsiExpressionTrimRenderer
-import com.intellij.psi.util.PsiUtilCore
 import com.intellij.util.Function
 import javax.swing.Icon
 import org.jetbrains.uast.UIdentifier
@@ -45,13 +41,11 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
             return null
         }
 
-        val identifier = element.toUElementOfType<UIdentifier>()
-        if (identifier?.uastParent !is UMethod) {
-            // We only target the method name
+        val identifier = element.toUElementOfType<UIdentifier>() ?: return null
+        if (identifier.uastParent !is UMethod || identifier.uastEventListener == null) {
             return null
         }
 
-        val listener = identifier.uastEventListener ?: return null
         // By this point, we can guarantee that the action of "go to declaration" will work
         // since the PsiClass can be resolved, meaning the event listener is listening to
         // a valid event.
@@ -59,40 +53,17 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
             element,
             element.textRange,
             icon,
-            createHandler(listener.second)
+            createHandler()
         )
     }
 
     // This is a navigation handler that just simply goes and opens up the event's declaration,
     // even if the event target is a nested class.
-    private fun createHandler(method: UMethod): GutterIconNavigationHandler<PsiElement> {
+    private fun createHandler(): GutterIconNavigationHandler<PsiElement> {
         return GutterIconNavigationHandler handler@{ _, element ->
-            if (!method.isPsiValid) {
-                return@handler
-            }
-
-            // We need to re-evaluate the targeted method, because if the method signature slightly changes before
-            // IntelliJ decides to re-evaluate the method, but the class is no longer valid.
-            // In this circumstance, we can find the class anyways because it's still a valid listener.
-            val containingFile = element.containingFile ?: return@handler
-            val parameter = method.uastEventParameterPair ?: return@handler
-
-            val resolve = parameter.second.sourcePsi ?: return@handler
-            val virtualFile = PsiUtilCore.getVirtualFile(resolve)
-
-            if (virtualFile != null) {
-                val project = element.project
-                val editor = FileEditorManager.getInstance(project).selectedTextEditor
-
-                if (editor != null) {
-                    FeatureUsageTracker.getInstance().triggerFeatureUsed("navigation.goto.declaration")
-                    var navElement: PsiElement? = resolve.navigationElement
-                    navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(resolve, navElement)
-                    if (navElement != null) {
-                        gotoTargetElement(navElement, editor, containingFile)
-                    }
-                }
-            }
+            val (eventClass, _) = element.toUElementOfType<UIdentifier>()?.uastEventListener ?: return@handler
+            FeatureUsageTracker.getInstance().triggerFeatureUsed("navigation.goto.declaration")
+            eventClass.navigate(true)
         }
     }
 
