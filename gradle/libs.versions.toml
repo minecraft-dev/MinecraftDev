@@ -6,7 +6,7 @@ junit = "5.7.1"
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
-templateMakerFabric = "com.extracraftx.minecraft:TemplateMakerFabric:0.3.0"
+templateMakerFabric = "com.extracraftx.minecraft:TemplateMakerFabric:0.4.0"
 
 # GrammarKit
 jflex-lib = "org.jetbrains.idea:jflex:1.7.0-b7f882a"

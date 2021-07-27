@@ -44,7 +44,7 @@ object ConstructorTargetReference : TargetReference.Handler<PsiClass>() {
     }
 
     private fun resolveConstructedClass(expression: PsiNewExpression): PsiClass? {
-        return expression.anonymousClass ?: expression.classReference?.resolve() as PsiClass
+        return expression.anonymousClass ?: expression.classReference?.resolve() as? PsiClass
     }
 
     private class FindUsagesVisitor(private val qualifiedName: String, checkOnly: Boolean) :

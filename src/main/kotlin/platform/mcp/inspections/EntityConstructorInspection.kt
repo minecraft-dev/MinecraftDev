@@ -52,7 +52,7 @@ class EntityConstructorInspection : BaseInspection() {
                 val module = ModuleUtilCore.findModuleForPsiElement(aClass) ?: return
                 val mcpModule = MinecraftFacet.getInstance(module, McpModuleType) ?: return
                 val mcVersion = mcpModule.getSettings().minecraftVersion
-                if (mcVersion != null && SemanticVersion.parse(mcVersion) > McpModuleType.MC_1_12_2) {
+                if (mcVersion == null || SemanticVersion.parse(mcVersion) > McpModuleType.MC_1_12_2) {
                     return
                 }
 
