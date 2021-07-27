@@ -14,7 +14,7 @@ jflex-skeleton = "org.jetbrains.idea:jflex:1.7.0-c1fdf11"
 grammarKit = "org.jetbrains.idea:grammar-kit:1.5.1"
 
 # Gradle Tooling
-gradleToolingExtension = "com.jetbrains.intellij.gradle:gradle-tooling-extension:212-EAP-SNAPSHOT"
+gradleToolingExtension = "com.jetbrains.intellij.gradle:gradle-tooling-extension:212.4746.92"
 annotations = "org.jetbrains:annotations:20.1.0"
 
 # Testing
