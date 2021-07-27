@@ -48,6 +48,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         FileTemplateGroupDescriptor("Velocity", PlatformAssets.VELOCITY_ICON).let { velocityGroup ->
             group.addTemplate(velocityGroup)
             velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_MAIN_CLASS_TEMPLATE))
+            velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_BUILD_CONSTANTS_TEMPLATE))
             velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_MAIN_CLASS_V2_TEMPLATE))
             velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_BUILD_GRADLE_TEMPLATE))
             velocityGroup.addTemplate(FileTemplateDescriptor(VELOCITY_SUBMODULE_BUILD_GRADLE_TEMPLATE))
@@ -59,19 +60,23 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
 
         FileTemplateGroupDescriptor("Sponge", PlatformAssets.SPONGE_ICON).let { spongeGroup ->
             group.addTemplate(spongeGroup)
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_MAIN_CLASS_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_BUILD_GRADLE_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_SUBMODULE_BUILD_GRADLE_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_GRADLE_PROPERTIES_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_SETTINGS_GRADLE_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_POM_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE_SUBMODULE_POM_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_MAIN_CLASS_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_PLUGINS_JSON_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_BUILD_GRADLE_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_SUBMODULE_BUILD_GRADLE_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_GRADLE_PROPERTIES_TEMPLATE))
-            spongeGroup.addTemplate(FileTemplateDescriptor(SPONGE8_SETTINGS_GRADLE_TEMPLATE))
+            FileTemplateGroupDescriptor("Legacy", null).let { legacyGroup ->
+                spongeGroup.addTemplate(legacyGroup)
+                legacyGroup.addTemplate(template(SPONGE_MAIN_CLASS_TEMPLATE))
+                legacyGroup.addTemplate(template(SPONGE_BUILD_GRADLE_TEMPLATE))
+                legacyGroup.addTemplate(template(SPONGE_SUBMODULE_BUILD_GRADLE_TEMPLATE))
+                legacyGroup.addTemplate(template(SPONGE_GRADLE_PROPERTIES_TEMPLATE))
+                legacyGroup.addTemplate(template(SPONGE_SETTINGS_GRADLE_TEMPLATE))
+            }
+            fun sponge8Template(fileName: String) = template(fileName, fileName.replace("8+ ", ""))
+            spongeGroup.addTemplate(sponge8Template(SPONGE8_MAIN_CLASS_TEMPLATE))
+            spongeGroup.addTemplate(sponge8Template(SPONGE8_PLUGINS_JSON_TEMPLATE))
+            spongeGroup.addTemplate(sponge8Template(SPONGE8_BUILD_GRADLE_TEMPLATE))
+            spongeGroup.addTemplate(sponge8Template(SPONGE8_SUBMODULE_BUILD_GRADLE_TEMPLATE))
+            spongeGroup.addTemplate(sponge8Template(SPONGE8_GRADLE_PROPERTIES_TEMPLATE))
+            spongeGroup.addTemplate(sponge8Template(SPONGE8_SETTINGS_GRADLE_TEMPLATE))
+            spongeGroup.addTemplate(template(SPONGE_POM_TEMPLATE))
+            spongeGroup.addTemplate(template(SPONGE_SUBMODULE_POM_TEMPLATE))
         }
 
         FileTemplateGroupDescriptor("Forge", PlatformAssets.FORGE_ICON).let { forgeGroup ->
@@ -186,6 +191,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
 
         const val VELOCITY_MAIN_CLASS_TEMPLATE = "Velocity Main Class.java"
         const val VELOCITY_MAIN_CLASS_V2_TEMPLATE = "Velocity Main Class V2.java"
+        const val VELOCITY_BUILD_CONSTANTS_TEMPLATE = "Velocity Build Constants.java"
         const val VELOCITY_BUILD_GRADLE_TEMPLATE = "Velocity build.gradle"
         const val VELOCITY_SUBMODULE_BUILD_GRADLE_TEMPLATE = "Velocity Submodule build.gradle"
         const val VELOCITY_GRADLE_PROPERTIES_TEMPLATE = "Velocity gradle.properties"
@@ -256,5 +262,11 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FABRIC_BLOCK_TEMPLATE = "FabricBlock.java"
         const val FABRIC_ITEM_TEMPLATE = "FabricItem.java"
         const val FABRIC_ENCHANTMENT_TEMPLATE = "FabricEnchantment.java"
+    }
+
+    private fun template(fileName: String, displayName: String? = null) = CustomDescriptor(fileName, displayName)
+
+    private class CustomDescriptor(fileName: String, val visibleName: String?) : FileTemplateDescriptor(fileName) {
+        override fun getDisplayName(): String = visibleName ?: fileName
     }
 }
