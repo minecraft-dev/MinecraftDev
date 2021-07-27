@@ -12,21 +12,17 @@ package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.GeneralAssets
-import com.demonwav.mcdev.util.gotoTargetElement
-import com.intellij.codeInsight.TargetElementUtil
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
 import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo
 import com.intellij.featureStatistics.FeatureUsageTracker
 import com.intellij.openapi.editor.markup.GutterIconRenderer
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiFunctionalExpression
 import com.intellij.psi.util.PsiExpressionTrimRenderer
-import com.intellij.psi.util.PsiUtilCore
 import com.intellij.util.Function
 import javax.swing.Icon
 import org.jetbrains.uast.UIdentifier
