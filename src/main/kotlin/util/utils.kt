@@ -120,6 +120,13 @@ inline fun <T : Collection<*>> T.ifEmpty(func: () -> Unit): T {
     return this
 }
 
+inline fun <T : Collection<*>> T.ifNotEmpty(func: (T) -> Unit): T {
+    if (isNotEmpty()) {
+        func(this)
+    }
+    return this
+}
+
 inline fun <T, R> Iterable<T>.mapFirstNotNull(transform: (T) -> R?): R? {
     forEach { element -> transform(element)?.let { return it } }
     return null

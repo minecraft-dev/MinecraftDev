@@ -20,6 +20,7 @@ import com.intellij.psi.PsiCall
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
+import java.util.IllegalFormatException
 
 class TranslationFunction(
     private val memberReference: MemberReference,
@@ -71,7 +72,11 @@ class TranslationFunction(
         val method = call.referencedMethod ?: return translation to -1
         val varargs = call.extractVarArgs(method.parameterList.parametersCount - 1, true, true)
         val varargStart = if (varargs.size > paramCount) method.parameterList.parametersCount - 1 + paramCount else -1
-        return String.format(format, *varargs) to varargStart
+        return try {
+            String.format(format, *varargs) to varargStart
+        } catch (e: IllegalFormatException) {
+            null
+        }
     }
 
     override fun toString(): String {
