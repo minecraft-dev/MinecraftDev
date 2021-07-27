@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
-import com.demonwav.mcdev.platform.fabric.creator.FabricTemplate
+import com.demonwav.mcdev.platform.CommonTemplate
 import com.demonwav.mcdev.util.License
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
@@ -28,7 +28,7 @@ class LicenseStep(
     override fun runStep(indicator: ProgressIndicator) {
         val licenseFile = rootDirectory.resolve("LICENSE")
 
-        val fileText = FabricTemplate.applyLicenseTemplate(project, license, author)
+        val fileText = CommonTemplate.applyLicenseTemplate(project, license, author)
 
         Files.write(
             licenseFile,
