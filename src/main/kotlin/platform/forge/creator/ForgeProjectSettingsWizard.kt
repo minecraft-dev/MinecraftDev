@@ -19,9 +19,11 @@ import com.demonwav.mcdev.creator.ValidatedFieldType.LIST
 import com.demonwav.mcdev.creator.ValidatedFieldType.NON_BLANK
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.version.ForgeVersion
+import com.demonwav.mcdev.platform.mcp.McpVersionPair
 import com.demonwav.mcdev.platform.mcp.version.McpVersion
 import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry
 import com.demonwav.mcdev.util.License
+import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.modUpdateStep
 import com.intellij.ui.CollectionComboBoxModel
@@ -171,7 +173,12 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         conf.setAuthors(this.authorsField.text)
         conf.updateUrl = this.updateUrlField.text
 
-        conf.mcpVersion = (this.mcpVersionBox.selectedItem as McpVersionEntry).versionPair
+        conf.mcVersion = this.version ?: SemanticVersion.release()
+        conf.mcpVersion = if (conf.mcVersion >= MinecraftVersions.MC1_17) {
+            McpVersionPair("official_" + conf.mcVersion, conf.mcVersion)
+        } else {
+            (this.mcpVersionBox.selectedItem as McpVersionEntry).versionPair
+        }
 
         (this.forgeVersionBox.selectedItem as SemanticVersion).let { version ->
             val versionString = version.toString()
@@ -182,7 +189,6 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
 
         conf.mixins = mixinsCheckbox.isSelected
         conf.license = licenseBox.selectedItem as? License ?: License.ALL_RIGHTS_RESERVED
-        conf.mcVersion = this.version ?: SemanticVersion.release()
     }
 
     private fun mcVersionUpdate(data: Data) {
