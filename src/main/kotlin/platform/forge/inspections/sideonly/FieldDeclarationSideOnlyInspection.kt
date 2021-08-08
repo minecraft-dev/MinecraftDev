@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiField
 import com.siyeh.ig.BaseInspection
@@ -35,10 +36,10 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
     }
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
-        val field = infos[3] as PsiField
+        val annotation = infos[3] as PsiAnnotation
 
-        return if (field.isWritable) {
-            RemoveAnnotationInspectionGadgetsFix(field, "Remove @SideOnly annotation from field")
+        return if (annotation.isWritable) {
+            RemoveAnnotationInspectionGadgetsFix(annotation, "Remove @SideOnly annotation from field")
         } else {
             null
         }
@@ -53,24 +54,24 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
                     return
                 }
 
-                val fieldSide = SideOnlyUtil.checkField(field)
-                if (fieldSide === Side.INVALID) {
+                val (fieldAnnotation, fieldSide) = SideOnlyUtil.checkField(field)
+                if (fieldAnnotation == null || fieldSide === Side.INVALID) {
                     return
                 }
 
-                val classSide = SideOnlyUtil.getSideForClass(psiClass)
+                val (classAnnotation, classSide) = SideOnlyUtil.getSideForClass(psiClass)
 
                 if (fieldSide !== Side.NONE && fieldSide !== classSide) {
-                    if (classSide !== Side.NONE && classSide !== Side.INVALID) {
+                    if (classAnnotation != null && classSide !== Side.NONE && classSide !== Side.INVALID) {
                         registerFieldError(
                             field,
                             Error.CLASS_CROSS_ANNOTATED,
-                            fieldSide.annotation,
-                            classSide.annotation,
-                            field
+                            fieldAnnotation.renderSide(fieldSide),
+                            classAnnotation.renderSide(classSide),
+                            field.getAnnotation(fieldAnnotation.annotationName)
                         )
                     } else if (classSide !== Side.NONE) {
-                        registerFieldError(field, Error.CLASS_UNANNOTATED, fieldSide.annotation, null, field)
+                        registerFieldError(field, Error.CLASS_UNANNOTATED, fieldAnnotation, null, field)
                     }
                 }
 
@@ -85,9 +86,9 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
                 val type = field.type as PsiClassType
                 val fieldClass = type.resolve() ?: return
 
-                val fieldClassSide = SideOnlyUtil.getSideForClass(fieldClass)
+                val (fieldClassAnnotation, fieldClassSide) = SideOnlyUtil.getSideForClass(fieldClass)
 
-                if (fieldClassSide === Side.NONE || fieldClassSide === Side.INVALID) {
+                if (fieldClassAnnotation == null || fieldClassSide === Side.NONE || fieldClassSide === Side.INVALID) {
                     return
                 }
 
@@ -95,9 +96,9 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
                     registerFieldError(
                         field,
                         Error.FIELD_CROSS_ANNOTATED,
-                        fieldClassSide.annotation,
-                        fieldSide.annotation,
-                        field
+                        fieldClassAnnotation.renderSide(fieldClassSide),
+                        fieldAnnotation.renderSide(fieldSide),
+                        field.getAnnotation(fieldAnnotation.annotationName)
                     )
                 }
             }

@@ -15,8 +15,10 @@ import com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyUtil
 import com.demonwav.mcdev.platform.mixin.MixinModule
 import com.demonwav.mcdev.platform.mixin.config.MixinConfig
 import com.demonwav.mcdev.platform.mixin.util.isMixin
+import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.fullQualifiedName
+import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
@@ -61,7 +63,12 @@ class UnusedMixinInspection : MixinInspection() {
                     val bestQuickFixFile = bestQuickFixConfig?.file
                     val qualifiedName = clazz.fullQualifiedName
                     if (bestQuickFixFile != null && qualifiedName != null) {
-                        val quickFix = QuickFix(bestQuickFixFile, qualifiedName, SideOnlyUtil.getSideForClass(clazz))
+                        var side = SideOnlyUtil.getSideForClass(clazz).second
+                        if (side == Side.NONE || side == Side.INVALID) {
+                            side = clazz.mixinTargets.mapFirstNotNull(SideOnlyUtil::getSideForClass)?.second
+                                ?: Side.NONE
+                        }
+                        val quickFix = QuickFix(bestQuickFixFile, qualifiedName, side)
                         holder.registerProblem(problematicElement, "Mixin not found in any mixin config", quickFix)
                     } else {
                         holder.registerProblem(problematicElement, "Mixin not found in any mixin config")
@@ -76,7 +83,14 @@ class UnusedMixinInspection : MixinInspection() {
         private val qualifiedName: String,
         private val side: Side
     ) : LocalQuickFix {
-        override fun getName() = "Add to Mixin config"
+
+        private val sideDisplayName = when (side) {
+            Side.CLIENT -> "client"
+            Side.SERVER -> "server"
+            else -> "common"
+        }
+
+        override fun getName() = "Add to Mixin config ($sideDisplayName side)"
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val psiFile = PsiManager.getInstance(project).findFile(quickFixFile) as? JsonFile ?: return

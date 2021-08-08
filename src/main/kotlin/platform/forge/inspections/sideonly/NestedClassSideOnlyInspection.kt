@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
@@ -32,10 +33,10 @@ class NestedClassSideOnlyInspection : BaseInspection() {
     }
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
-        val psiClass = infos[0] as PsiClass
+        val annotation = infos[0] as PsiAnnotation
 
-        return if (psiClass.isWritable) {
-            RemoveAnnotationInspectionGadgetsFix(psiClass, "Remove @SideOnly annotation from nested class")
+        return if (annotation.isWritable) {
+            RemoveAnnotationInspectionGadgetsFix(annotation, "Remove @SideOnly annotation from nested class")
         } else {
             null
         }
@@ -54,26 +55,24 @@ class NestedClassSideOnlyInspection : BaseInspection() {
                     return
                 }
 
-                val classHierarchyList = SideOnlyUtil.checkClassHierarchy(aClass)
-
                 // The class lists are ordered from lowest to highest in the hierarchy - that is the first element in the list
                 // is the most nested class, and the last element in the list is the top level class
                 //
                 // In this case, the higher-level classes take precedence, so if a class is annotated as @SideOnly.CLIENT and a nested class is
                 // annotated as @SideOnly.SERVER, the nested class is the class that is in error, not the top level class
                 var currentSide = Side.NONE
-                for (pair in classHierarchyList) {
+                for ((classAnnotation, classSide) in SideOnlyUtil.checkClassHierarchy(aClass)) {
                     if (currentSide === Side.NONE) {
                         // If currentSide is NONE, then a class hasn't declared yet what it is
-                        if (pair.first !== Side.NONE && pair.first !== Side.INVALID) {
-                            currentSide = pair.first
+                        if (classSide !== Side.NONE && classSide !== Side.INVALID) {
+                            currentSide = classSide
                         } else {
                             // We are only worried about this class
                             return
                         }
-                    } else if (pair.first !== Side.NONE && pair.first !== Side.INVALID) {
-                        if (pair.first !== currentSide) {
-                            registerClassError(aClass, aClass)
+                    } else if (classAnnotation != null && classSide !== Side.NONE && classSide !== Side.INVALID) {
+                        if (classSide !== currentSide) {
+                            registerClassError(aClass, aClass.getAnnotation(classAnnotation.annotationName))
                         } else {
                             return
                         }

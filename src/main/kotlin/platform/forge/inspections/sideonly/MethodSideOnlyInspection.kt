@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiMethod
 import com.siyeh.ig.BaseInspection
@@ -36,10 +37,10 @@ class MethodSideOnlyInspection : BaseInspection() {
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         val error = infos[0] as Error
-        val method = infos[3] as PsiMethod
+        val annotation = infos[3] as PsiAnnotation
 
-        return if (method.isWritable && error === Error.METHOD_IN_WRONG_CLASS) {
-            RemoveAnnotationInspectionGadgetsFix(method, "Remove @SideOnly annotation from method")
+        return if (annotation.isWritable && error === Error.METHOD_IN_WRONG_CLASS) {
+            RemoveAnnotationInspectionGadgetsFix(annotation, "Remove @SideOnly annotation from method")
         } else {
             null
         }
@@ -54,54 +55,54 @@ class MethodSideOnlyInspection : BaseInspection() {
                     return
                 }
 
-                val methodSide = SideOnlyUtil.checkMethod(method)
+                val (methodAnnotation, methodSide) = SideOnlyUtil.checkMethod(method)
+                if (methodAnnotation == null) {
+                    return
+                }
 
-                val returnType = method.returnType as? PsiClassType ?: return
+                val resolve = (method.returnType as? PsiClassType)?.resolve()
 
-                val resolve = returnType.resolve() ?: return
-
-                val returnSide = SideOnlyUtil.getSideForClass(resolve)
-                if (returnSide !== Side.NONE && returnSide !== Side.INVALID && returnSide !== methodSide &&
-                    methodSide !== Side.NONE && methodSide !== Side.INVALID
+                val (returnAnnotation, returnSide) =
+                    if (resolve == null) null to Side.NONE else SideOnlyUtil.getSideForClass(resolve)
+                if (returnAnnotation != null && returnSide !== Side.NONE && returnSide !== Side.INVALID &&
+                    returnSide !== methodSide && methodSide !== Side.NONE && methodSide !== Side.INVALID
                 ) {
                     registerMethodError(
                         method,
                         Error.RETURN_TYPE_ON_WRONG_METHOD,
-                        methodSide.annotation,
-                        returnSide.annotation,
-                        method
+                        methodAnnotation.renderSide(methodSide),
+                        returnAnnotation.renderSide(returnSide),
+                        method.getAnnotation(methodAnnotation.annotationName)
                     )
                 }
 
-                val classHierarchySides = SideOnlyUtil.checkClassHierarchy(psiClass)
-
-                for (classHierarchySide in classHierarchySides) {
-                    if (classHierarchySide.first !== Side.NONE && classHierarchySide.first !== Side.INVALID) {
+                for ((classAnnotation, classSide) in SideOnlyUtil.checkClassHierarchy(psiClass)) {
+                    if (classAnnotation != null && classSide !== Side.NONE && classSide !== Side.INVALID) {
                         if (
-                            methodSide !== classHierarchySide.first &&
+                            methodSide !== classSide &&
                             methodSide !== Side.NONE &&
                             methodSide !== Side.INVALID
                         ) {
                             registerMethodError(
                                 method,
                                 Error.METHOD_IN_WRONG_CLASS,
-                                methodSide.annotation,
-                                classHierarchySide.first.annotation,
-                                method
+                                methodAnnotation.renderSide(methodSide),
+                                classAnnotation.renderSide(classSide),
+                                method.getAnnotation(methodAnnotation.annotationName)
                             )
                         }
-                        if (returnSide !== Side.NONE && returnSide !== Side.INVALID) {
-                            if (returnSide !== classHierarchySide.first) {
+                        if (returnAnnotation != null && returnSide !== Side.NONE && returnSide !== Side.INVALID) {
+                            if (returnSide !== classSide) {
                                 registerMethodError(
                                     method,
                                     Error.RETURN_TYPE_IN_WRONG_CLASS,
-                                    classHierarchySide.first.annotation,
-                                    returnSide.annotation,
-                                    method
+                                    classAnnotation.renderSide(classSide),
+                                    returnAnnotation.renderSide(returnSide),
+                                    method.getAnnotation(methodAnnotation.annotationName)
                                 )
                             }
                         }
-                        return
+                        break
                     }
                 }
             }
