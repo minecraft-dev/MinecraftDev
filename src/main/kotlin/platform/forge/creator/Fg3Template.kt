@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.forge.creator
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.BaseTemplate
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
+import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_1_17_MAIN_CLASS_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_GRADLE_PROPERTIES_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_MAIN_CLASS_TEMPLATE
@@ -21,6 +22,7 @@ import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_SUBMODULE_BUILD_
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FORGE_MIXINS_JSON_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.MODS_TOML_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.PACK_MCMETA_TEMPLATE
+import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.toPackageName
 import com.intellij.openapi.project.Project
@@ -45,6 +47,24 @@ object Fg3Template : BaseTemplate() {
         return project.applyTemplate(FG3_MAIN_CLASS_TEMPLATE, props)
     }
 
+    fun apply1_17MainClass(
+        project: Project,
+        buildSystem: BuildSystem,
+        config: ForgeProjectConfig,
+        packageName: String,
+        className: String
+    ): String {
+        val props = mapOf(
+            "PACKAGE_NAME" to packageName,
+            "CLASS_NAME" to className,
+            "ARTIFACT_ID" to buildSystem.artifactId,
+            "MOD_NAME" to config.pluginName,
+            "MOD_VERSION" to buildSystem.version
+        )
+
+        return project.applyTemplate(FG3_1_17_MAIN_CLASS_TEMPLATE, props)
+    }
+
     fun applyBuildGradle(
         project: Project,
         buildSystem: BuildSystem,
@@ -53,7 +73,7 @@ object Fg3Template : BaseTemplate() {
         hasData: Boolean
     ): String {
         val (channel, version) = config.mcpVersion.mcpVersion.split('_', limit = 2)
-        val props = mutableMapOf(
+        val props = mutableMapOf<String, Any>(
             "MOD_NAME" to modName,
             "MCP_CHANNEL" to channel,
             "MCP_VERSION" to version,
@@ -61,7 +81,8 @@ object Fg3Template : BaseTemplate() {
             "FORGE_VERSION" to config.forgeVersionText,
             "GROUP_ID" to buildSystem.groupId,
             "ARTIFACT_ID" to buildSystem.artifactId,
-            "MOD_VERSION" to buildSystem.version
+            "MOD_VERSION" to buildSystem.version,
+            "JAVA_VERSION" to if (config.mcVersion < MinecraftVersions.MC1_17) 8 else 16
         )
         if (hasData) {
             props["HAS_DATA"] = "true"
@@ -96,13 +117,14 @@ object Fg3Template : BaseTemplate() {
         hasData: Boolean
     ): String {
         val (channel, version) = config.mcpVersion.mcpVersion.split('_', limit = 2)
-        val props = mutableMapOf(
+        val props = mutableMapOf<String, Any>(
             "MOD_NAME" to modName,
             "MCP_CHANNEL" to channel,
             "MCP_VERSION" to version,
             "MCP_MC_VERSION" to config.mcpVersion.mcVersion.toString(),
             "FORGE_VERSION" to config.forgeVersionText,
             "ARTIFACT_ID" to buildSystem.artifactId,
+            "JAVA_VERSION" to if (config.mcVersion < MinecraftVersions.MC1_17) 8 else 16,
             "COMMON_PROJECT_NAME" to buildSystem.commonModuleName
         )
         if (hasData) {

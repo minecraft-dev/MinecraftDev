@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
 import com.demonwav.mcdev.util.findContainingClass
-import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiLocalVariable
 import com.siyeh.ig.BaseInspection
@@ -34,11 +34,11 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
             " or method that does not match the same side."
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
-        val variableClass = infos[3] as PsiClass
+        val annotation = infos[3] as PsiAnnotation
 
-        return if (variableClass.isWritable) {
+        return if (annotation.isWritable) {
             RemoveAnnotationInspectionGadgetsFix(
-                variableClass,
+                annotation,
                 "Remove @SideOnly annotation from variable class declaration"
             )
         } else {
@@ -59,30 +59,32 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
 
                 val variableClass = type.resolve() ?: return
 
-                val variableSide = SideOnlyUtil.getSideForClass(variableClass)
-                if (variableSide === Side.NONE || variableSide === Side.INVALID) {
+                val (variableAnnotation, variableSide) = SideOnlyUtil.getSideForClass(variableClass)
+                if (variableAnnotation == null || variableSide === Side.NONE || variableSide === Side.INVALID) {
                     return
                 }
 
-                val containingClassSide = SideOnlyUtil.getSideForClass(psiClass)
-                val methodSide = SideOnlyUtil.checkElementInMethod(variable)
+                val (containingClassAnnotation, containingClassSide) = SideOnlyUtil.getSideForClass(psiClass)
+                val (methodAnnotation, methodSide) = SideOnlyUtil.checkElementInMethod(variable)
 
                 var classAnnotated = false
 
-                if (containingClassSide !== Side.NONE && containingClassSide !== Side.INVALID) {
+                if (containingClassAnnotation != null &&
+                    containingClassSide !== Side.NONE && containingClassSide !== Side.INVALID
+                ) {
                     if (variableSide !== containingClassSide) {
                         registerVariableError(
                             variable,
                             Error.VAR_CROSS_ANNOTATED_CLASS,
-                            variableSide.annotation,
-                            containingClassSide.annotation,
-                            variableClass
+                            variableAnnotation.renderSide(variableSide),
+                            containingClassAnnotation.renderSide(containingClassSide),
+                            variableClass.getAnnotation(variableAnnotation.annotationName)
                         )
                     }
                     classAnnotated = true
                 }
 
-                if (methodSide === Side.INVALID) {
+                if (methodAnnotation == null || methodSide === Side.INVALID) {
                     return
                 }
 
@@ -92,18 +94,18 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
                             registerVariableError(
                                 variable,
                                 Error.VAR_UNANNOTATED_METHOD,
-                                variableSide.annotation,
-                                methodSide.annotation,
-                                variableClass
+                                variableAnnotation.renderSide(variableSide),
+                                methodAnnotation.renderSide(methodSide),
+                                variableClass.getAnnotation(variableAnnotation.annotationName)
                             )
                         }
                     } else {
                         registerVariableError(
                             variable,
                             Error.VAR_CROSS_ANNOTATED_METHOD,
-                            variableSide.annotation,
-                            methodSide.annotation,
-                            variableClass
+                            variableAnnotation.renderSide(variableSide),
+                            methodAnnotation.renderSide(methodSide),
+                            variableClass.getAnnotation(variableAnnotation.annotationName)
                         )
                     }
                 }
