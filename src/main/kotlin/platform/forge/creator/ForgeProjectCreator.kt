@@ -23,6 +23,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
+import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.runGradleTaskAndWait
 import com.demonwav.mcdev.util.runWriteTask
@@ -105,7 +106,11 @@ open class Fg3ProjectCreator(
 
     private fun setupMainClassStep(): BasicJavaClassStep {
         return createJavaClassStep(config.mainClass) { packageName, className ->
-            Fg3Template.applyMainClass(project, buildSystem, config, packageName, className)
+            if (config.mcVersion >= MinecraftVersions.MC1_17) {
+                Fg3Template.apply1_17MainClass(project, buildSystem, config, packageName, className)
+            } else {
+                Fg3Template.applyMainClass(project, buildSystem, config, packageName, className)
+            }
         }
     }
 
@@ -175,7 +180,7 @@ open class Fg3ProjectCreator(
     }
 
     companion object {
-        val FG4_WRAPPER_VERSION = SemanticVersion.release(6, 8, 1)
+        val FG5_WRAPPER_VERSION = SemanticVersion.release(7, 1, 1)
     }
 }
 

@@ -61,7 +61,7 @@ class ForgeProjectConfig : ProjectConfig(), GradleCreator {
         buildSystem: GradleBuildSystem
     ) {
         buildSystem.gradleVersion = if (isFg3(mcVersion, forgeVersion)) {
-            Fg3ProjectCreator.FG4_WRAPPER_VERSION
+            Fg3ProjectCreator.FG5_WRAPPER_VERSION
         } else {
             Fg2ProjectCreator.FG_WRAPPER_VERSION
         }
