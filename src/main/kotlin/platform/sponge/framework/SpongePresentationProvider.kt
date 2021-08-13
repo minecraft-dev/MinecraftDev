@@ -26,17 +26,19 @@ class SpongePresentationProvider : LibraryPresentationProvider<LibraryVersionPro
     override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.SPONGE_ICON
 
     override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        loop@ for (classesRoot in classesRoots) {
+        for (classesRoot in classesRoots) {
             val manifest = classesRoot.manifest ?: continue
 
-            val versionAttribute = when ("SpongeAPI") {
-                manifest[IMPLEMENTATION_TITLE] -> IMPLEMENTATION_VERSION
-                manifest[SPECIFICATION_TITLE] -> SPECIFICATION_VERSION
-                else -> continue@loop
-            }
+            loop@ for (title in setOf("SpongeAPI", "spongeapi")) {
+                val versionAttribute = when (title) {
+                    manifest[IMPLEMENTATION_TITLE] -> IMPLEMENTATION_VERSION
+                    manifest[SPECIFICATION_TITLE] -> SPECIFICATION_VERSION
+                    else -> continue@loop
+                }
 
-            val version = manifest[versionAttribute] ?: continue
-            return LibraryVersionProperties(version)
+                val version = manifest[versionAttribute] ?: continue
+                return LibraryVersionProperties(version)
+            }
         }
         return null
     }

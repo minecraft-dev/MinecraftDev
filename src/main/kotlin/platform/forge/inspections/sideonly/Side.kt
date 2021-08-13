@@ -12,12 +12,12 @@ package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
 import com.intellij.openapi.util.Key
 
-enum class Side(val annotation: String) {
+enum class Side {
 
-    CLIENT("SideOnly.CLIENT"),
-    SERVER("SideOnly.SERVER"),
-    NONE("NONE"),
-    INVALID("INVALID");
+    CLIENT,
+    SERVER,
+    NONE,
+    INVALID;
 
     companion object {
         val KEY = Key<Side>("MC_DEV_SIDE")

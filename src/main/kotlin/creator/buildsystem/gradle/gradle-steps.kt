@@ -25,7 +25,6 @@ import com.demonwav.mcdev.util.virtualFileOrError
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.execution.RunManager
 import com.intellij.ide.ui.UISettings
-import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
@@ -41,9 +40,9 @@ import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import java.nio.file.StandardOpenOption.WRITE
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
+import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
 import org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject
-import org.jetbrains.plugins.gradle.util.GradleConstants
 import org.jetbrains.plugins.groovy.GroovyLanguage
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.GroovyPsiElementFactory
@@ -286,12 +285,7 @@ class BasicGradleFinalizerStep(
         val runManager = RunManager.getInstance(project)
         val runConfigName = buildSystem.artifactId + ' ' + task
 
-        val runConfiguration = ExternalSystemRunConfiguration(
-            GradleConstants.SYSTEM_ID,
-            project,
-            gradleType.configurationFactories[0],
-            runConfigName
-        )
+        val runConfiguration = GradleRunConfiguration(project, gradleType.factory, runConfigName)
 
         // Set relevant gradle values
         runConfiguration.settings.externalProjectPath = rootDirectory.toAbsolutePath().toString()
@@ -302,7 +296,7 @@ class BasicGradleFinalizerStep(
 
         val settings = runManager.createConfiguration(
             runConfiguration,
-            GradleExternalTaskConfigurationType.getInstance().configurationFactories.first()
+            gradleType.factory
         )
 
         settings.isActivateToolWindowBeforeRun = true

@@ -12,14 +12,15 @@ package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
-import com.demonwav.mcdev.platform.forge.util.ForgeConstants
+import com.demonwav.mcdev.util.findAnnotation
 import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.openapi.util.Pair
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
-import java.util.Arrays
+import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.PsiReferenceExpression
 import java.util.LinkedList
 
 object SideOnlyUtil {
@@ -35,32 +36,11 @@ object SideOnlyUtil {
         return facet != null && facet.isOfType(ForgeModuleType)
     }
 
-    private fun normalize(text: String): String {
-        if (text.startsWith(ForgeConstants.SIDE_ANNOTATION)) {
-            // We chop off the "net.minecraftforge.fml.relauncher." part here
-            return text.substring(text.lastIndexOf(".") - 4)
-        }
-        return text
+    fun checkMethod(method: PsiMethod): Pair<SideAnnotation?, Side> {
+        return findSide(method) ?: (null to Side.NONE)
     }
 
-    fun checkMethod(method: PsiMethod): Side {
-        val methodAnnotation =
-            // It's not annotated, which would be invalid if the element was annotated
-            method.modifierList.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION)
-                // (which, if we've gotten this far, is true)
-                ?: return Side.NONE
-
-        // Check the value of the annotation
-        val methodValue =
-            // The annotation has no value yet, IntelliJ will give it's own error because a value is required
-            methodAnnotation.findAttributeValue("value")
-                ?: return Side.INVALID
-
-        // Return the value of the annotation
-        return getFromName(methodValue.text)
-    }
-
-    fun checkElementInMethod(element: PsiElement): Side {
+    fun checkElementInMethod(element: PsiElement): Pair<SideAnnotation?, Side> {
         var changingElement = element
         // Maybe there is a better way of doing this, I don't know, but crawl up the PsiElement stack in search of the
         // method this element is in. If it's not in a method it won't find one and the PsiMethod will be null
@@ -81,13 +61,13 @@ object SideOnlyUtil {
 
         // No method was found
         if (method == null) {
-            return Side.INVALID
+            return (null to Side.INVALID)
         }
 
         return checkMethod(method)
     }
 
-    fun checkClassHierarchy(psiClass: PsiClass): List<Pair<Side, PsiClass>> {
+    fun checkClassHierarchy(psiClass: PsiClass): List<Triple<SideAnnotation?, Side, PsiClass>> {
         val classList = LinkedList<PsiClass>()
         classList.add(psiClass)
 
@@ -104,70 +84,83 @@ object SideOnlyUtil {
         return classList.map { checkClass(it) }
     }
 
-    fun getSideForClass(psiClass: PsiClass): Side {
+    fun getSideForClass(psiClass: PsiClass): Pair<SideAnnotation?, Side> {
         return getFirstSide(checkClassHierarchy(psiClass))
     }
 
-    private fun checkClass(psiClass: PsiClass): Pair<Side, PsiClass> {
-        val side = psiClass.getUserData(Side.KEY)
-        if (side != null) {
-            return Pair(side, psiClass)
+    private fun checkClass(psiClass: PsiClass): Triple<SideAnnotation?, Side, PsiClass> {
+        val knownSide = psiClass.getUserData(Side.KEY)
+        if (knownSide != null) {
+            return Triple(null, knownSide, psiClass)
         }
 
-        val modifierList = psiClass.modifierList ?: return Pair(Side.NONE, psiClass)
-
-        // Check for the annotation, if it's not there then we return none, but this is
-        // usually irrelevant for classes
-        val annotation = modifierList.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION)
-        if (annotation == null) {
-            if (psiClass.supers.isEmpty()) {
-                return Pair(Side.NONE, psiClass)
+        // Check for a sided annotation, if it's not there then we search super classes
+        findSide(psiClass)?.let { (annotation, side) ->
+            if (side != Side.INVALID && side != Side.NONE) {
+                return Triple(annotation, side, psiClass)
             }
-
-            // check the classes this class extends
-            return psiClass.supers.asSequence()
-                .filter {
-                    // Prevent stack-overflow on cyclic dependencies
-                    psiClass != it
-                }
-                .map { checkClassHierarchy(it) }
-                .firstOrNull { it.isNotEmpty() }?.let { Pair(it[0].getFirst(), psiClass) } ?: Pair(Side.NONE, psiClass)
         }
 
-        // Check the value on the annotation. If it's not there, IntelliJ will throw
-        // it's own error
-        val value = annotation.findAttributeValue("value") ?: return Pair(Side.INVALID, psiClass)
+        if (psiClass.supers.isEmpty()) {
+            return Triple(null, Side.NONE, psiClass)
+        }
 
-        return Pair(getFromName(value.text), psiClass)
+        // check the classes this class extends
+        return psiClass.supers.asSequence()
+            // Prevent stack-overflow on cyclic dependencies
+            .filter { psiClass != it }
+            .map { checkClassHierarchy(it) }
+            .firstOrNull { it.isNotEmpty() }
+            ?.let {
+                val (annotation, side, _) = it[0]
+                Triple(annotation, side, psiClass)
+            } ?: Triple(null, Side.NONE, psiClass)
     }
 
-    fun checkField(field: PsiField): Side {
-        // We check if this field has the @SideOnly annotation we are looking for
+    fun checkField(field: PsiField): Pair<SideAnnotation?, Side> {
+        // We check if this field has a sided annotation we are looking for
         // If it doesn't, we aren't worried about it
-        val modifierList = field.modifierList ?: return Side.NONE
-        val annotation = modifierList.findAnnotation(ForgeConstants.SIDE_ONLY_ANNOTATION) ?: return Side.NONE
-
-        // The value may not necessarily be set, but that will give an error by default as "value" is a
-        // required value for @SideOnly
-        val value = annotation.findAttributeValue("value") ?: return Side.INVALID
-
-        // Finally, get the value of the SideOnly
-        return SideOnlyUtil.getFromName(value.text)
+        return findSide(field) ?: (null to Side.NONE)
     }
 
-    private fun getFromName(name: String): Side {
-        return when (normalize(name)) {
-            "Side.SERVER" -> Side.SERVER
-            "Side.CLIENT" -> Side.CLIENT
-            else -> Side.INVALID
+    /**
+     * @return a pair of the first sided annotation found on the given element with its side value.
+     * `null` is returned if no known side annotation was found. Side might be [Side.INVALID] but never [Side.NONE].
+     */
+    fun findSide(element: PsiModifierListOwner): Pair<SideAnnotation, Side>? {
+        for (sideAnnotation in SideAnnotation.KNOWN_ANNOTATIONS) {
+            val annotation = element.findAnnotation(sideAnnotation.annotationName)
+                ?: continue
+
+            val sideValue = annotation.findAttributeValue("value")
+                ?: return sideAnnotation to Side.INVALID
+
+            if (sideValue is PsiReferenceExpression) {
+                val referenced = sideValue.resolve()
+                if (referenced is PsiEnumConstant) {
+                    val enumClass = referenced.containingClass
+                    if (enumClass?.qualifiedName != sideAnnotation.enumName) {
+                        continue
+                    }
+                    val side = when (referenced.name) {
+                        sideAnnotation.clientValue -> Side.CLIENT
+                        sideAnnotation.serverValue -> Side.SERVER
+                        else -> continue
+                    }
+                    return sideAnnotation to side
+                }
+            }
         }
+        return null
     }
 
-    fun getFirstSide(list: List<Pair<Side, PsiClass>>): Side {
-        return list.firstOrNull { it.first !== Side.NONE }?.first ?: Side.NONE
+    fun getFirstSide(list: List<Triple<SideAnnotation?, Side, PsiClass>>): Pair<SideAnnotation?, Side> {
+        return list.firstOrNull { it.first != null && it.second != Side.NONE }
+            ?.let { it.first to it.second }
+            ?: (null to Side.NONE)
     }
 
     fun <T : Any?> getSubArray(infos: Array<T>): Array<T> {
-        return Arrays.copyOfRange(infos, 1, infos.size - 1)
+        return infos.copyOfRange(1, infos.size - 1)
     }
 }

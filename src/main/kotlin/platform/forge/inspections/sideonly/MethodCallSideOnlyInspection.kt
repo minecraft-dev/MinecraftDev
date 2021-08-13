@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.util.findContainingClass
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
@@ -37,10 +38,10 @@ class MethodCallSideOnlyInspection : BaseInspection() {
             "used in matching @SideOnly classes and methods."
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
-        val method = infos[3] as PsiMethod
+        val annotation = infos[3] as PsiAnnotation
 
-        return if (method.isWritable) {
-            RemoveAnnotationInspectionGadgetsFix(method, "Remove @SideOnly annotation from method declaration")
+        return if (annotation.isWritable) {
+            RemoveAnnotationInspectionGadgetsFix(annotation, "Remove @SideOnly annotation from method declaration")
         } else {
             null
         }
@@ -75,50 +76,53 @@ class MethodCallSideOnlyInspection : BaseInspection() {
 
                 val declaration = referenceExpression.resolve() as? PsiMethod ?: return
 
-                var elementSide = SideOnlyUtil.checkMethod(declaration)
+                var (elementAnnotation, elementSide) = SideOnlyUtil.checkMethod(declaration)
 
                 // Check the class(es) the element is declared in
                 val declarationContainingClass = declaration.containingClass ?: return
 
                 val declarationClassHierarchySides = SideOnlyUtil.checkClassHierarchy(declarationContainingClass)
 
-                val declarationClassSide = SideOnlyUtil.getFirstSide(declarationClassHierarchySides)
+                val (declarationClassAnnotation, declarationClassSide) =
+                    SideOnlyUtil.getFirstSide(declarationClassHierarchySides)
 
                 // The element inherits the @SideOnly from it's parent class if it doesn't explicitly set it itself
                 var inherited = false
-                if (declarationClassSide !== Side.NONE && (elementSide === Side.INVALID || elementSide === Side.NONE)) {
+                if (declarationClassAnnotation != null &&
+                    declarationClassSide !== Side.NONE && (elementSide === Side.INVALID || elementSide === Side.NONE)
+                ) {
                     inherited = true
                     elementSide = declarationClassSide
                 }
 
-                if (elementSide === Side.INVALID || elementSide === Side.NONE) {
+                if (elementAnnotation == null || elementSide === Side.INVALID || elementSide === Side.NONE) {
                     return
                 }
 
                 // Check the class(es) the element is in
                 val containingClass = expression.findContainingClass() ?: return
 
-                val classSide = SideOnlyUtil.getSideForClass(containingClass)
+                val (classAnnotation, classSide) = SideOnlyUtil.getSideForClass(containingClass)
 
                 var classAnnotated = false
 
-                if (classSide !== Side.NONE && classSide !== Side.INVALID) {
+                if (classAnnotation != null && classSide !== Side.NONE && classSide !== Side.INVALID) {
                     if (classSide !== elementSide) {
                         if (inherited) {
                             registerError(
                                 referenceExpression.element,
                                 Error.ANNOTATED_CLASS_METHOD_IN_CROSS_ANNOTATED_CLASS_METHOD,
-                                elementSide.annotation,
-                                classSide.annotation,
-                                declaration
+                                elementAnnotation.renderSide(elementSide),
+                                classAnnotation.renderSide(classSide),
+                                declaration.getAnnotation(elementAnnotation.annotationName)
                             )
                         } else {
                             registerError(
                                 referenceExpression.element,
                                 Error.ANNOTATED_METHOD_IN_CROSS_ANNOTATED_CLASS_METHOD,
-                                elementSide.annotation,
-                                classSide.annotation,
-                                declaration
+                                elementAnnotation.renderSide(elementSide),
+                                classAnnotation.renderSide(classSide),
+                                declaration.getAnnotation(elementAnnotation.annotationName)
                             )
                         }
                     }
@@ -126,10 +130,10 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                 }
 
                 // Check the method the element is in
-                val methodSide = SideOnlyUtil.checkElementInMethod(expression)
+                val (methodAnnotation, methodSide) = SideOnlyUtil.checkElementInMethod(expression)
 
                 // Put error on for method
-                if (elementSide !== methodSide && methodSide !== Side.INVALID) {
+                if (methodAnnotation != null && elementSide !== methodSide && methodSide !== Side.INVALID) {
                     if (methodSide === Side.NONE) {
                         // If the class is properly annotated the method doesn't need to also be annotated
                         if (!classAnnotated) {
@@ -137,17 +141,17 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                 registerError(
                                     referenceExpression.element,
                                     Error.ANNOTATED_CLASS_METHOD_IN_UNANNOTATED_METHOD,
-                                    elementSide.annotation,
+                                    elementAnnotation.renderSide(elementSide),
                                     null,
-                                    declaration
+                                    declaration.getAnnotation(elementAnnotation.annotationName)
                                 )
                             } else {
                                 registerError(
                                     referenceExpression.element,
                                     Error.ANNOTATED_METHOD_IN_UNANNOTATED_METHOD,
-                                    elementSide.annotation,
+                                    elementAnnotation.renderSide(elementSide),
                                     null,
-                                    declaration
+                                    declaration.getAnnotation(elementAnnotation.annotationName)
                                 )
                             }
                         }
@@ -156,17 +160,17 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                             registerError(
                                 referenceExpression.element,
                                 Error.ANNOTATED_CLASS_METHOD_IN_CROSS_ANNOTATED_METHOD,
-                                elementSide.annotation,
-                                methodSide.annotation,
-                                declaration
+                                elementAnnotation.renderSide(elementSide),
+                                methodAnnotation.renderSide(methodSide),
+                                declaration.getAnnotation(elementAnnotation.annotationName)
                             )
                         } else {
                             registerError(
                                 referenceExpression.element,
                                 Error.ANNOTATED_METHOD_IN_CROSS_ANNOTATED_METHOD,
-                                elementSide.annotation,
-                                methodSide.annotation,
-                                declaration
+                                elementAnnotation.renderSide(elementSide),
+                                methodAnnotation.renderSide(methodSide),
+                                declaration.getAnnotation(elementAnnotation.annotationName)
                             )
                         }
                     }

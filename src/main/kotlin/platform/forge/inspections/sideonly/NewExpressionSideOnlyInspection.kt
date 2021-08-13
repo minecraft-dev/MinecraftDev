@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
 import com.demonwav.mcdev.util.findContainingClass
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiNewExpression
 import com.siyeh.ig.BaseInspection
@@ -34,10 +35,10 @@ class NewExpressionSideOnlyInspection : BaseInspection() {
     }
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
-        val psiClass = infos[0] as PsiClass
+        val annotation = infos[0] as PsiAnnotation
 
-        return if (psiClass.isWritable) {
-            RemoveAnnotationInspectionGadgetsFix(psiClass, "Remove @SideOnly annotation from class declaration")
+        return if (annotation.isWritable) {
+            RemoveAnnotationInspectionGadgetsFix(annotation, "Remove @SideOnly annotation from class declaration")
         } else {
             null
         }
@@ -54,41 +55,41 @@ class NewExpressionSideOnlyInspection : BaseInspection() {
 
                 val psiElement = (element.resolve() ?: return) as? PsiClass ?: return
 
-                val list = SideOnlyUtil.checkClassHierarchy(psiElement)
-
+                var classAnnotation: SideAnnotation? = null
                 var classSide = Side.NONE
-
                 var offender: PsiClass? = null
-                for (pair in list) {
-                    if (pair.first !== Side.NONE && pair.first !== Side.INVALID) {
-                        classSide = pair.first
-                        offender = pair.second
+                for ((hierarchyAnnotation, hierarchySide, clazz) in SideOnlyUtil.checkClassHierarchy(psiElement)) {
+                    if (hierarchySide !== Side.NONE && hierarchySide !== Side.INVALID) {
+                        classAnnotation = hierarchyAnnotation
+                        classSide = hierarchySide
+                        offender = clazz
                         break
                     }
                 }
 
-                if (classSide === Side.NONE) {
+                if (classAnnotation == null || classSide == Side.NONE || offender == null) {
                     return
                 }
 
                 // Check the class(es) the element is in
                 val containingClass = expression.findContainingClass() ?: return
 
-                val containingClassSide = SideOnlyUtil.getSideForClass(containingClass)
+                val (_, containingClassSide) = SideOnlyUtil.getSideForClass(containingClass)
                 // Check the method the element is in
-                val methodSide = SideOnlyUtil.checkElementInMethod(expression)
+                val (_, methodSide) = SideOnlyUtil.checkElementInMethod(expression)
 
                 var classAnnotated = false
 
-                if (containingClassSide !== Side.NONE && containingClassSide !== Side.INVALID) {
+                if (containingClassSide !== Side.NONE && containingClassSide !== Side.INVALID
+                ) {
                     if (containingClassSide !== classSide) {
-                        registerError(expression, offender)
+                        registerError(expression, offender.getAnnotation(classAnnotation.annotationName))
                     }
                     classAnnotated = true
                 } else {
                     if (methodSide === Side.INVALID) {
                         // It's not in a method
-                        registerError(expression, offender)
+                        registerError(expression, offender.getAnnotation(classAnnotation.annotationName))
                         return
                     }
                 }
@@ -98,10 +99,10 @@ class NewExpressionSideOnlyInspection : BaseInspection() {
                     if (methodSide === Side.NONE) {
                         // If the class is properly annotated the method doesn't need to also be annotated
                         if (!classAnnotated) {
-                            registerError(expression, offender)
+                            registerError(expression, offender.getAnnotation(classAnnotation.annotationName))
                         }
                     } else {
-                        registerError(expression, offender)
+                        registerError(expression, offender.getAnnotation(classAnnotation.annotationName))
                     }
                 }
             }
