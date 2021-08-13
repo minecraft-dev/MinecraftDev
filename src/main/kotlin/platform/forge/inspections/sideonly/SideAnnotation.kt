@@ -10,8 +10,6 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
-import com.demonwav.mcdev.platform.forge.util.ForgeConstants
-
 data class SideAnnotation(
     val annotationName: String,
     val enumName: String,
@@ -35,8 +33,8 @@ data class SideAnnotation(
     companion object {
         val KNOWN_ANNOTATIONS = listOf(
             SideAnnotation(
-                ForgeConstants.SIDE_ONLY_ANNOTATION,
-                ForgeConstants.SIDE_ANNOTATION,
+                "net.minecraftforge.fml.relauncher.SideOnly",
+                "net.minecraftforge.fml.relauncher.Side",
                 "CLIENT",
                 "SERVER"
             ),
