@@ -189,12 +189,13 @@ class MinecraftFacet(
 
     val icon: Icon?
         get() {
-            val iconCount = moduleMap.keys.count { it.hasIcon }
-            return when {
-                iconCount == 0 -> null
-                iconCount == 1 -> moduleMap.keys.firstOrNull { it.hasIcon }?.icon
-                moduleMap.size > 0 -> PlatformAssets.MINECRAFT_ICON
-                else -> null
+            val modulesWithIcon = moduleMap.keys.filter { it.hasIcon }
+            val candidateModules = modulesWithIcon.filter { !it.isIconSecondary }
+                .ifEmpty { modulesWithIcon }
+            return when (candidateModules.size) {
+                0 -> null
+                1 -> candidateModules.single().icon
+                else -> PlatformAssets.MINECRAFT_ICON
             }
         }
 

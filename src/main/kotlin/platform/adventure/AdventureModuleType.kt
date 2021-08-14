@@ -28,6 +28,7 @@ object AdventureModuleType : AbstractModuleType<AdventureModule>(
     override val platformType = PlatformType.ADVENTURE
 
     override val icon: Icon = PlatformAssets.ADVENTURE_ICON
+    override val isIconSecondary = true
 
     override val ignoredAnnotations = emptyList<String>()
     override val listenerAnnotations = emptyList<String>()
