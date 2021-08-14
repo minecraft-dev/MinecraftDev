@@ -30,6 +30,7 @@ import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
+import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTaskInSmartMode
@@ -259,11 +260,13 @@ class VelocityDependenciesSetup(
                 gradleConfiguration = "compileOnly"
             )
         )
+        val semanticApiVersion = SemanticVersion.parse(velocityApiVersion)
         buildSystem.dependencies.add(
             BuildDependency(
                 "com.velocitypowered",
-                "velocity-api",
+                if (semanticApiVersion >= VelocityConstants.API_4) "velocity-annotation-processor" else "velocity-api",
                 velocityApiVersion,
+                mavenScope = if (semanticApiVersion >= VelocityConstants.API_4) "provided" else null,
                 gradleConfiguration = "annotationProcessor"
             )
         )

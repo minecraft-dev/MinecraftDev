@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.velocity.creator
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.platform.BaseTemplate
+import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_BUILD_CONSTANTS_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_GRADLE_PROPERTIES_TEMPLATE
@@ -26,10 +27,6 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.openapi.project.Project
 
 object VelocityTemplate : BaseTemplate() {
-
-    private val VELOCITY_2 = SemanticVersion.release(2)
-    private val VELOCITY_3 = SemanticVersion.release(3)
-    private val VELOCITY_4 = SemanticVersion.release(4)
 
     fun applyPom(project: Project, config: VelocityProjectConfig): String {
         val props = BasicMavenStep.pluginVersions + ("JAVA_VERSION" to config.javaVersion.toFeatureString())
@@ -57,7 +54,9 @@ object VelocityTemplate : BaseTemplate() {
             props["HAS_DEPENDENCIES"] = "true"
         }
 
-        val template = if (version < VELOCITY_2 || (version >= VELOCITY_3 && version < VELOCITY_4)) {
+        val template = if (version < VelocityConstants.API_2 ||
+            (version >= VelocityConstants.API_3 && version < VelocityConstants.API_4)
+        ) {
             VELOCITY_MAIN_CLASS_TEMPLATE // API 1 and 3
         } else {
             VELOCITY_MAIN_CLASS_V2_TEMPLATE // API 2 and 4 (4+ maybe ?)
