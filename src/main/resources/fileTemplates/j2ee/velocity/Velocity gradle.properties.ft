@@ -1,0 +1,3 @@
+#if (${JAVA_VERSION})
+javaVersion=${JAVA_VERSION}
+#end

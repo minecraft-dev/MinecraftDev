@@ -76,7 +76,7 @@ class VelocityMavenCreator(
     override fun getSingleModuleSteps(): Iterable<CreatorStep> {
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
-        val pomText = VelocityTemplate.applyPom(project)
+        val pomText = VelocityTemplate.applyPom(project, config)
 
         return listOf(
             setupDependencyStep(),
@@ -93,7 +93,7 @@ class VelocityMavenCreator(
         val commonDepStep = CommonModuleDependencyStep(buildSystem)
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
-        val pomText = VelocityTemplate.applySubPom(project)
+        val pomText = VelocityTemplate.applySubPom(project, config)
         val mavenStep = BasicMavenStep(
             project,
             rootDirectory,
@@ -124,8 +124,8 @@ class VelocityGradleCreator(
     override fun getSingleModuleSteps(): Iterable<CreatorStep> {
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
-        val buildText = VelocityTemplate.applyBuildGradle(project, buildSystem)
-        val propText = VelocityTemplate.applyGradleProp(project)
+        val buildText = VelocityTemplate.applyBuildGradle(project, buildSystem, config)
+        val propText = VelocityTemplate.applyGradleProp(project, null)
         val settingsText = VelocityTemplate.applySettingsGradle(project, buildSystem.artifactId)
         val files = GradleFiles(buildText, propText, settingsText)
 
@@ -147,7 +147,8 @@ class VelocityGradleCreator(
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
         val buildText = VelocityTemplate.applySubBuildGradle(project, buildSystem)
-        val files = GradleFiles(buildText, null, null)
+        val propText = VelocityTemplate.applyGradleProp(project, config.javaVersion.feature)
+        val files = GradleFiles(buildText, propText, null)
 
         return listOf(
             setupDependencyStep(),
