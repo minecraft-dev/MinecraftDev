@@ -62,7 +62,8 @@ class MinecraftFacetDetector : StartupActivity {
             val configuration = MinecraftFacetConfiguration()
             configuration.state.autoDetectTypes.addAll(platforms)
 
-            val facet = facetManager.createFacet(MinecraftFacet.facetType, "Minecraft", configuration, null)
+            val facetType = MinecraftFacet.facetTypeOrNull ?: return
+            val facet = facetManager.createFacet(facetType, "Minecraft", configuration, null)
             runWriteTaskLater {
                 // Only add the new facet if there isn't a Minecraft facet already - double check here since this
                 // task may run much later

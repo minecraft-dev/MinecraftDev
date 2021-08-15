@@ -234,8 +234,11 @@ class MinecraftFacet(
     companion object {
         val ID = FacetTypeId<MinecraftFacet>(TYPE_ID)
 
-        val facetType
+        val facetType: MinecraftFacetType
             get() = FacetTypeRegistry.getInstance().findFacetType(ID) as MinecraftFacetType
+
+        val facetTypeOrNull: MinecraftFacetType?
+            get() = FacetTypeRegistry.getInstance().findFacetType(TYPE_ID) as? MinecraftFacetType
 
         fun getInstance(module: Module) = FacetManager.getInstance(module).getFacetByType(ID)
 
