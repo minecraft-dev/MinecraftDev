@@ -11,63 +11,64 @@
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
+import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.platform.mixin.util.argsType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoReturnableType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoType
+import com.demonwav.mcdev.platform.mixin.util.hasAccess
+import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
-import com.intellij.lang.jvm.JvmModifier
+import com.demonwav.mcdev.util.toJavaIdentifier
+import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationOwner
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiEllipsisType
-import com.intellij.psi.PsiField
-import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiModifier.STATIC
 import com.intellij.psi.PsiNameHelper
-import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiType
 import org.jetbrains.org.objectweb.asm.Opcodes
+import org.objectweb.asm.Type
+import org.objectweb.asm.tree.FieldNode
+import org.objectweb.asm.tree.MethodNode
 
 enum class InjectorType(private val annotation: String) {
     INJECT(MixinConstants.Annotations.INJECT) {
 
-        override fun expectedMethodSignature(annotation: PsiAnnotation, targetMethod: PsiMethod): MethodSignature? {
-            val returnType = targetMethod.returnType
+        override fun expectedMethodSignature(
+            annotation: PsiAnnotation,
+            targetMethod: MethodNode
+        ): MethodSignature {
+            val elementFactory = JavaPsiFacade.getElementFactory(annotation.project)
+
+            val returnType = elementFactory.createTypeFromText(Type.getReturnType(targetMethod.desc).className, null)
 
             val result = ArrayList<ParameterGroup>()
 
-            val targetMethodParameters = mutableListOf<Parameter>()
-
-            if (targetMethod.isConstructor) {
-                val containingClass = targetMethod.containingClass
-                val outerClass = containingClass?.containingClass
-                if (outerClass != null && !containingClass.hasModifier(JvmModifier.STATIC)) {
-                    val outerClassType = JavaPsiFacade.getElementFactory(outerClass.project).createType(outerClass)
-                    // Inner classes ctors take their outer class as first parameter
-                    targetMethodParameters.add(Parameter("outer", outerClassType))
-                }
-            }
-
             // Parameters from injected method (optional)
-            targetMethodParameters.addAll(collectTargetMethodParameters(targetMethod))
-            result.add(ParameterGroup(targetMethodParameters, required = false, default = true))
+            result.add(
+                ParameterGroup(
+                    collectTargetMethodParameters(annotation.project, targetMethod),
+                    required = false,
+                    default = true
+                )
+            )
 
             // Callback info (required)
             result.add(
                 ParameterGroup(
                     listOf(
-                        if (returnType == null || returnType == PsiType.VOID) {
-                            Parameter("ci", callbackInfoType(targetMethod.project)!!)
+                        if (returnType == PsiType.VOID) {
+                            Parameter("ci", callbackInfoType(annotation.project))
                         } else {
                             Parameter(
                                 "cir",
-                                callbackInfoReturnableType(targetMethod.project, targetMethod, returnType)!!
+                                callbackInfoReturnableType(annotation.project, annotation, returnType)!!
                             )
                         }
                     )
@@ -77,6 +78,7 @@ enum class InjectorType(private val annotation: String) {
             // Captured locals (only if local capture is enabled)
             // Right now we allow any parameters here since we can't easily
             // detect the local variables that can be captured
+            // TODO: now we can work with the bytecode, revisit this?
             if ((
                 (annotation.findDeclaredAttributeValue("locals") as? PsiQualifiedReference)
                     ?.referenceName ?: "NO_CAPTURE"
@@ -90,7 +92,10 @@ enum class InjectorType(private val annotation: String) {
     },
     REDIRECT(MixinConstants.Annotations.REDIRECT) {
 
-        override fun expectedMethodSignature(annotation: PsiAnnotation, targetMethod: PsiMethod): MethodSignature? {
+        override fun expectedMethodSignature(
+            annotation: PsiAnnotation,
+            targetMethod: MethodNode
+        ): MethodSignature? {
             val at = annotation.findDeclaredAttributeValue("at") as? PsiAnnotation ?: return null
             val target = at.findDeclaredAttributeValue("target") ?: return null
 
@@ -109,48 +114,72 @@ enum class InjectorType(private val annotation: String) {
                 return null
             }
 
-            val (owner, member) = reference.resolve(annotation.project, annotation.resolveScope) ?: return null
+            val member = reference.resolveAsm(annotation.project, annotation.resolveScope) ?: return null
             val (parameters, returnType) = when (member) {
-                is PsiMethod -> collectMethodParameters(owner, member)
-                is PsiField -> collectFieldParameters(at, owner, member)
-                else -> throw AssertionError("Cannot resolve member reference to: $member")
+                is MethodTargetMember -> collectMethodParameters(
+                    annotation.project,
+                    reference,
+                    member.classAndMethod.method
+                )
+                is FieldTargetMember -> collectFieldParameters(
+                    annotation.project,
+                    at,
+                    reference,
+                    member.classAndField.field
+                )
             } ?: return null
 
             val primaryGroup = ParameterGroup(parameters, required = true)
 
             // Optionally the target method parameters can be used
-            val targetMethodGroup = ParameterGroup(collectTargetMethodParameters(targetMethod), required = false)
+            val targetMethodGroup = ParameterGroup(
+                collectTargetMethodParameters(annotation.project, targetMethod),
+                required = false
+            )
 
             return MethodSignature(listOf(primaryGroup, targetMethodGroup), returnType)
         }
 
-        private fun getInstanceParameter(owner: PsiClass): Parameter {
-            return Parameter(null, JavaPsiFacade.getElementFactory(owner.project).createType(owner))
-        }
+        private fun collectMethodParameters(
+            project: Project,
+            reference: MemberReference,
+            method: MethodNode
+        ): Pair<List<Parameter>, PsiType>? {
+            val elementFactory = JavaPsiFacade.getElementFactory(project)
+            val ownerName = reference.owner ?: return null
 
-        private fun collectMethodParameters(owner: PsiClass, method: PsiMethod): Pair<List<Parameter>, PsiType>? {
-            val parameterList = method.parameterList
-            val parameters = ArrayList<Parameter>(parameterList.parametersCount + 1)
-
-            val returnType = if (method.isConstructor) {
-                PsiType.VOID
-            } else {
-                if (!method.hasModifierProperty(STATIC)) {
-                    parameters.add(getInstanceParameter(owner))
-                }
-
-                method.returnType!!
+            val hasThis = !method.hasAccess(Opcodes.ACC_STATIC)
+            val parameters = mutableListOf<Parameter>()
+            if (hasThis) {
+                parameters += Parameter(
+                    "self",
+                    elementFactory.createTypeFromText(Type.getType(ownerName.replace('.', '/')).className, null)
+                )
             }
 
-            parameterList.parameters.mapTo(parameters, ::sanitizedParameter)
-            return Pair(parameters, returnType)
+            Type.getArgumentTypes(method.desc).asSequence().withIndex().mapTo(parameters) { (index, arg) ->
+                val i = if (hasThis) index + 1 else index
+                val name = method.localVariables?.getOrNull(i)?.name?.toJavaIdentifier() ?: "par${index + 1}"
+                val type = elementFactory.createTypeFromText(arg.className, null)
+                sanitizedParameter(type, name)
+            }
+
+            val returnType = elementFactory.createTypeFromText(
+                Type.getReturnType(method.desc).className,
+                null
+            )
+            return parameters to returnType
         }
 
         private fun collectFieldParameters(
+            project: Project,
             at: PsiAnnotation,
-            owner: PsiClass,
-            field: PsiField
+            reference: MemberReference,
+            field: FieldNode
         ): Pair<List<Parameter>, PsiType>? {
+            val elementFactory = JavaPsiFacade.getElementFactory(project)
+            val ownerName = reference.owner ?: return null
+
             // TODO: Report if opcode isn't set
             val opcode = at.findDeclaredAttributeValue("opcode")?.constantValue as? Int ?: return null
 
@@ -160,17 +189,23 @@ enum class InjectorType(private val annotation: String) {
             val parameters = ArrayList<Parameter>(2)
 
             // TODO: Report if GETSTATIC/PUTSTATIC is used for an instance field
-            if (opcode == Opcodes.GETFIELD || opcode == Opcodes.PUTFIELD) {
-                parameters.add(getInstanceParameter(owner))
+            if (!field.hasAccess(Opcodes.ACC_STATIC)) {
+                parameters += Parameter(
+                    "self",
+                    elementFactory.createTypeFromText(Type.getType(ownerName.replace('.', '/')).className, null)
+                )
             }
 
+            val fieldType = elementFactory.createTypeFromText(Type.getType(field.desc).className, null)
+
             val returnType = when (opcode) {
-                Opcodes.GETFIELD, Opcodes.GETSTATIC -> field.type
                 Opcodes.PUTFIELD, Opcodes.PUTSTATIC -> {
-                    parameters.add(Parameter("value", field.type))
+                    parameters.add(Parameter("value", fieldType))
                     PsiType.VOID
                 }
-                else -> return null // Invalid opcode
+                else -> { // assume getfield redirect
+                    fieldType
+                }
             }
 
             return Pair(parameters, returnType)
@@ -178,14 +213,22 @@ enum class InjectorType(private val annotation: String) {
     },
     MODIFY_ARG(MixinConstants.Annotations.MODIFY_ARG),
     MODIFY_ARGS(MixinConstants.Annotations.MODIFY_ARGS) {
-        override fun expectedMethodSignature(annotation: PsiAnnotation, targetMethod: PsiMethod): MethodSignature? {
+        override fun expectedMethodSignature(
+            annotation: PsiAnnotation,
+            targetMethod: MethodNode
+        ): MethodSignature {
             val result = ArrayList<ParameterGroup>()
 
             // Args object (required)
             result.add(ParameterGroup(listOf(Parameter("args", argsType(annotation.project)))))
 
             // Parameters from injected method (optional)
-            result.add(ParameterGroup(collectTargetMethodParameters(targetMethod), required = false))
+            result.add(
+                ParameterGroup(
+                    collectTargetMethodParameters(annotation.project, targetMethod),
+                    required = false
+                )
+            )
 
             return MethodSignature(result, PsiType.VOID)
         }
@@ -195,43 +238,41 @@ enum class InjectorType(private val annotation: String) {
 
     val annotationName = "@${PsiNameHelper.getShortClassName(annotation)}"
 
-    open fun expectedMethodSignature(annotation: PsiAnnotation, targetMethod: PsiMethod): MethodSignature? = null
+    open fun expectedMethodSignature(
+        annotation: PsiAnnotation,
+        targetMethod: MethodNode
+    ): MethodSignature? = null
 
     companion object {
 
         private val injectionPointAnnotations = InjectorType.values().associateBy { it.annotation }
 
-        private fun collectTargetMethodParameters(targetMethod: PsiMethod): List<Parameter> {
-            val parameters = targetMethod.parameterList.parameters
-            val list = ArrayList<Parameter>(parameters.size)
-
-            // Special handling for enums: When compiled, the Java compiler
-            // prepends the name and the ordinal to the constructor
-            if (targetMethod.isConstructor) {
-                val containingClass = targetMethod.containingClass
-                if (containingClass != null && containingClass.isEnum) {
-                    list.add(
-                        Parameter(
-                            "enumName",
-                            PsiType.getJavaLangString(targetMethod.manager, targetMethod.resolveScope)
-                        )
-                    )
-                    list.add(Parameter("ordinal", PsiType.INT))
+        private fun collectTargetMethodParameters(
+            project: Project,
+            targetMethod: MethodNode
+        ): List<Parameter> {
+            val numLocalsToDrop = if (targetMethod.hasAccess(Opcodes.ACC_STATIC)) 0 else 1
+            val elementFactory = JavaPsiFacade.getElementFactory(project)
+            return Type.getArgumentTypes(targetMethod.desc).asSequence().withIndex()
+                .map { (index, it) ->
+                    val type = elementFactory.createTypeFromText(it.className, null)
+                    val name = targetMethod.localVariables
+                        ?.getOrNull(index + numLocalsToDrop)
+                        ?.name
+                        ?.toJavaIdentifier()
+                        ?: "par${index + 1}"
+                    type to name
                 }
-            }
-
-            // Add method parameters to list
-            parameters.mapTo(list, ::sanitizedParameter)
-            return list
+                .map { (type, name) -> sanitizedParameter(type, name) }
+                .toList()
         }
 
-        private fun sanitizedParameter(parameter: PsiParameter): Parameter {
+        private fun sanitizedParameter(type: PsiType, name: String): Parameter {
             // Parameters should not use ellipsis because others like CallbackInfo may follow
-            val type = parameter.type
             return if (type is PsiEllipsisType) {
-                Parameter(parameter.name, type.toArrayType())
+                Parameter(name, type.toArrayType())
             } else {
-                Parameter(parameter)
+                Parameter(name, type)
             }
         }
 

@@ -11,51 +11,59 @@
 package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.ifEmpty
-import com.demonwav.mcdev.util.isErasureEquivalentTo
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
 import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.util.createSmartPointer
 import java.util.Locale
+import org.objectweb.asm.tree.ClassNode
 
 fun PsiMember.findAccessorAnnotation(): PsiAnnotation? {
     return findAnnotation(MixinConstants.Annotations.ACCESSOR)
 }
 
-fun PsiMember.findAccessorTarget(): SmartPsiElementPointer<PsiMember>? {
+fun PsiMember.findAccessorTargetForReference(): SmartPsiElementPointer<PsiField>? {
     val accessor = findAccessorAnnotation() ?: return null
     val containingClass = containingClass ?: return null
     val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
-    return resolveAccessorTarget(accessor, targetClasses, this)?.createSmartPointer()
+    val targetMember = resolveAccessorTarget(accessor, targetClasses, this) ?: return null
+    return targetMember.classAndField.field.findOrConstructSourceField(
+        targetMember.classAndField.clazz,
+        project,
+        resolveScope,
+        canDecompile = false
+    ).createSmartPointer()
 }
 
 fun resolveAccessorTarget(
     accessor: PsiAnnotation,
-    targetClasses: Collection<PsiClass>,
+    targetClasses: Collection<ClassNode>,
     member: PsiMember
-): PsiMember? {
+): FieldTargetMember? {
     val accessorInfo = getAccessorInfo(accessor, member) ?: return null
     return when (member) {
-        is PsiMethod -> targetClasses.mapFirstNotNull { psiClass ->
-            psiClass.findFieldByName(accessorInfo.name, false)?.takeIf {
+        is PsiMethod -> targetClasses.mapFirstNotNull { targetClass ->
+            val field = targetClass.findFieldByName(accessorInfo.name)?.takeIf {
                 // Accessors either have a return value (field getter) or a parameter (field setter)
                 if (!member.hasParameters() && accessorInfo.type.allowGetters) {
-                    it.type.isErasureEquivalentTo(member.returnType)
+                    it.desc == member.returnType?.descriptor
                 } else if (
                     PsiType.VOID == member.returnType && member.parameterList.parametersCount == 1 &&
                     accessorInfo.type.allowSetters
                 ) {
-                    it.type.isErasureEquivalentTo(member.parameterList.parameters[0].type)
+                    it.desc == member.parameterList.parameters[0].type.descriptor
                 } else {
                     false
                 }
-            }
+            } ?: return null
+            FieldTargetMember(null, ClassAndFieldNode(targetClass, field))
         }
         else -> null
     }

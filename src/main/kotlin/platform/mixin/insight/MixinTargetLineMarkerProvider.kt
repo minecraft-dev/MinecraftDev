@@ -11,9 +11,9 @@
 package com.demonwav.mcdev.platform.mixin.insight
 
 import com.demonwav.mcdev.asset.MixinAssets
-import com.demonwav.mcdev.platform.mixin.util.findAccessorTarget
+import com.demonwav.mcdev.platform.mixin.util.findAccessorTargetForReference
 import com.demonwav.mcdev.platform.mixin.util.findFirstOverwriteTarget
-import com.demonwav.mcdev.platform.mixin.util.findFirstShadowTarget
+import com.demonwav.mcdev.platform.mixin.util.findFirstShadowTargetForReference
 import com.demonwav.mcdev.platform.mixin.util.findInvokerTarget
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -66,8 +66,18 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
 
     private class TargetInfo(val target: SmartPsiElementPointer<out PsiMember>, val text: String)
 
-    private fun PsiMember.findShadow(): TargetInfo? = this.findFirstShadowTarget()?.let { TargetInfo(it, "shadow") }
-    private fun PsiMember.findAccessor(): TargetInfo? = this.findAccessorTarget()?.let { TargetInfo(it, "accessor") }
+    private fun PsiMember.findShadow(): TargetInfo? = this.findFirstShadowTargetForReference()?.let {
+        TargetInfo(
+            it,
+            "shadow"
+        )
+    }
+    private fun PsiMember.findAccessor(): TargetInfo? = this.findAccessorTargetForReference()?.let {
+        TargetInfo(
+            it,
+            "accessor"
+        )
+    }
     private fun PsiMember.findInvoker(): TargetInfo? = this.findInvokerTarget()?.let { TargetInfo(it, "invoker") }
     private fun PsiMethod.findOverwrite(): TargetInfo? =
         this.findFirstOverwriteTarget()?.let { TargetInfo(it, "@Overwrite") }

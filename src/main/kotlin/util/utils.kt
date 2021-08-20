@@ -143,8 +143,16 @@ inline fun <T : Any> Iterable<T?>.forEachNotNull(func: (T) -> Unit) {
 
 inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R) = Array(size) { i -> transform(this[i]) }
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R) = Array(size) { i -> transform(this[i]) }
+inline fun <T, reified R> Collection<T>.mapToArray(transform: (T) -> R): Array<R> {
+    val result = arrayOfNulls<R>(size)
+    var i = 0
+    for (element in this) {
+        result[i++] = transform(element)
+    }
+    return result.castNotNull()
+}
 
-fun <T : Any> Array<T?>.castNotNull(): Array<T> {
+fun <T> Array<T?>.castNotNull(): Array<T> {
     @Suppress("UNCHECKED_CAST")
     return this as Array<T>
 }
@@ -210,6 +218,30 @@ fun String.getSimilarity(text: String, bonus: Int = 0): Int {
     return distance + bonus
 }
 
+fun String.toJavaIdentifier(allowDollars: Boolean = true): String {
+    if (this.isEmpty()) {
+        return "_"
+    }
+
+    if (this.isJavaKeyword()) {
+        return "_$this"
+    }
+
+    if (!this[0].isJavaIdentifierStart() && this[0].isJavaIdentifierPart()) {
+        return "_$this".toJavaIdentifier(allowDollars)
+    }
+
+    return this.asSequence()
+        .map {
+            if (it.isJavaIdentifierPart() && (allowDollars || it != '$')) {
+                it
+            } else {
+                "_"
+            }
+        }
+        .joinToString("")
+}
+
 fun String.toPackageName(): String {
     if (this.isEmpty()) {
         return "_"
@@ -239,3 +271,58 @@ inline fun <reified T> Iterable<*>.firstOfType(): T? {
 }
 
 fun libraryKind(id: String): LibraryKind = LibraryKind.findById(id) ?: LibraryKind.create(id)
+
+fun String.isJavaKeyword() = javaKeywords.contains(this)
+
+private val javaKeywords = setOf(
+    "abstract",
+    "continue",
+    "for",
+    "new",
+    "switch",
+    "assert",
+    "default",
+    "goto",
+    "package",
+    "synchronized",
+    "boolean",
+    "do",
+    "if",
+    "private",
+    "this",
+    "break",
+    "double",
+    "implements",
+    "protected",
+    "throw",
+    "byte",
+    "else",
+    "import",
+    "public",
+    "throws",
+    "case",
+    "enum",
+    "instanceof",
+    "return",
+    "transient",
+    "catch",
+    "extends",
+    "int",
+    "short",
+    "try",
+    "char",
+    "final",
+    "interface",
+    "static",
+    "void",
+    "class",
+    "finally",
+    "long",
+    "strictfp",
+    "volatile",
+    "const",
+    "float",
+    "native",
+    "super",
+    "while"
+)

@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.mixin.reference
 
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
 import com.demonwav.mcdev.util.insideAnnotationAttribute
 import com.intellij.patterns.PsiJavaPatterns
 import com.intellij.patterns.StandardPatterns
@@ -24,10 +23,7 @@ class MixinReferenceContributor : PsiReferenceContributor() {
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         // Method references
         registrar.registerReferenceProvider(
-            PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationParam(
-                StandardPatterns.string().oneOf(METHOD_INJECTORS),
-                "method"
-            ),
+            MethodReference.ELEMENT_PATTERN,
             MethodReference
         )
 
@@ -40,8 +36,7 @@ class MixinReferenceContributor : PsiReferenceContributor() {
 
         // Target references
         registrar.registerReferenceProvider(
-            PsiJavaPatterns.psiLiteral(StandardPatterns.string())
-                .insideAnnotationAttribute(AT, "target"),
+            TargetReference.ELEMENT_PATTERN,
             TargetReference
         )
     }

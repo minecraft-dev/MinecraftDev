@@ -12,50 +12,54 @@ package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findAnnotation
-import com.demonwav.mcdev.util.findMatchingMethod
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.mapFirstNotNull
+import com.demonwav.mcdev.util.memberReference
 import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.SmartPsiElementPointer
-import com.intellij.psi.util.PsiUtil
-import com.intellij.psi.util.createSmartPointer
+import com.intellij.refactoring.suggested.createSmartPointer
 import java.util.Locale
+import org.jetbrains.plugins.groovy.intentions.style.inference.resolve
+import org.objectweb.asm.tree.ClassNode
 
 fun PsiMember.findInvokerAnnotation(): PsiAnnotation? {
     return findAnnotation(MixinConstants.Annotations.INVOKER)
 }
 
-fun PsiMember.findInvokerTarget(): SmartPsiElementPointer<PsiMember>? {
+fun PsiMember.findInvokerTarget(): SmartPsiElementPointer<PsiMethod>? {
     val accessor = findInvokerAnnotation() ?: return null
     val containingClass = containingClass ?: return null
     val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
-    return resolveInvokerTarget(accessor, targetClasses, this)?.createSmartPointer()
+    val invokerTarget = resolveInvokerTarget(accessor, targetClasses, this) ?: return null
+    return invokerTarget.classAndMethod.method.findOrConstructSourceMethod(
+        invokerTarget.classAndMethod.clazz,
+        containingClass.project,
+        containingClass.resolveScope,
+        canDecompile = false
+    ).createSmartPointer()
 }
 
 fun resolveInvokerTarget(
     invoker: PsiAnnotation,
-    targetClasses: Collection<PsiClass>,
+    targetClasses: Collection<ClassNode>,
     member: PsiMember
-): PsiMember? {
+): MethodTargetMember? {
     val name = getInvokerTargetName(invoker, member) ?: return null
     val constructor = name == "<init>"
-    return when (member) {
+    val targetMethod = when (member) {
         is PsiMethod -> targetClasses.mapFirstNotNull {
-            if (constructor && PsiUtil.resolveClassInType(member.returnType)?.qualifiedName != it.qualifiedName) {
+            if (constructor && member.returnType?.resolve()?.fullQualifiedName?.replace('.', '/') != it.name) {
                 return null
             }
-            it.findMatchingMethod(
-                member,
-                false,
-                if (constructor) it.name ?: name else name,
-                constructor
-            )
+            val method = it.findMethod(member.memberReference) ?: return null
+            ClassAndMethodNode(it, method)
         }
         else -> null
-    }
+    } ?: return null
+    return MethodTargetMember(null, targetMethod)
 }
 
 fun getInvokerTargetName(invoker: PsiAnnotation, member: PsiMember): String? {

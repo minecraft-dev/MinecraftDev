@@ -220,11 +220,12 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
     }
 
     private fun getOrCreateAccessorMixin(project: Project, targetClass: PsiClass): PsiClass? {
+        val targetInternalName = targetClass.fullQualifiedName?.replace('.', '/') ?: return null
         val mixins = MixinModule.getAllMixinClasses(project, GlobalSearchScope.projectScope(project))
             .asSequence()
             .filter { it.isWritable }
             .filter { it.isAccessorMixin }
-            .filter { it.mixinTargets.any { target -> target.qualifiedName == targetClass.qualifiedName } }
+            .filter { it.mixinTargets.any { target -> target.name == targetInternalName } }
             .toList()
 
         return when (mixins.size) {
