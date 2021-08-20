@@ -35,6 +35,7 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
     override fun getComponent() = panel
 
     override fun updateStep() {
+        val previousBuildSystem = buildSystemBox.selectedItem
         buildSystemBox.removeAllItems()
         buildSystemBox.isEnabled = true
 
@@ -46,11 +47,17 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
             buildSystemBox.addItem(type)
         }
 
-        buildSystemBox.selectedIndex = 0
         if (buildSystemBox.itemCount == 1) {
             buildSystemBox.isEnabled = false
             return
         }
+
+        if (previousBuildSystem != null) {
+            buildSystemBox.selectedItem = previousBuildSystem
+            return
+        }
+
+        buildSystemBox.selectedIndex = 0
 
         // We prefer Gradle, so if it's included, choose it
         // If Gradle is not included, luck of the draw
