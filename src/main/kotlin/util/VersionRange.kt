@@ -52,9 +52,6 @@ data class VersionRange(val lower: SemanticVersion, val upper: SemanticVersion? 
         return VersionRange(highestLowerBound, lowestUpperBound)
     }
 
-    fun intersect(vararg others: VersionRange): VersionRange? =
-        others.fold(this) { left, right -> left.intersect(right) ?: return null }
-
     override fun toString(): String = displayString
 
     companion object {
@@ -64,17 +61,6 @@ data class VersionRange(val lower: SemanticVersion, val upper: SemanticVersion? 
          * @see [isFixed]
          */
         fun fixed(version: SemanticVersion): VersionRange = VersionRange(version, version)
-
-        fun intersect(ranges: Iterable<VersionRange>): VersionRange? =
-            ranges.reduce { acc, range -> acc.intersect(range) ?: return null }
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val range1 = SemanticVersion.release(1, 6) until SemanticVersion.release(2)
-            val range2 = SemanticVersion.release(1, 5) until SemanticVersion.release(2, 5)
-            val range3 = SemanticVersion.release(1, 6, 5) until SemanticVersion.release(2, 4)
-            println(range1.intersect(range2, range3)) // Prints [1.6.5,2)
-        }
     }
 }
 
