@@ -29,6 +29,10 @@ import com.intellij.util.Consumer
 import java.awt.Component
 
 class ErrorReporter : ErrorReportSubmitter() {
+    private val ignoredErrorMessages = listOf(
+        "Key com.demonwav.mcdev.translations.TranslationFoldingSettings duplicated",
+        "Inspection #EntityConstructor has no description"
+    )
     private val baseUrl = "https://github.com/minecraft-dev/MinecraftDev/issues"
     override fun getReportActionText() = "Report to Minecraft Dev GitHub Issue Tracker"
 
@@ -39,6 +43,11 @@ class ErrorReporter : ErrorReportSubmitter() {
         consumer: Consumer<in SubmittedReportInfo>
     ): Boolean {
         val event = events[0]
+        val errorMessage = event.throwable.message
+        if (errorMessage != null && ignoredErrorMessages.any(errorMessage::contains)) {
+            return true
+        }
+
         val errorData = ErrorData(event.throwable, IdeaLogger.ourLastActionId)
         val dataContext = DataManager.getInstance().getDataContext(parentComponent)
 
