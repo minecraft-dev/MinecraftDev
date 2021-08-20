@@ -86,6 +86,7 @@ dependencies {
     testLibs(libs.test.mixin)
     testLibs("${libs.test.spongeapi.text()}:shaded")
     testLibs("${libs.test.nbt.text()}@nbt")
+    testLibs(project(":mixin-test-data"))
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
@@ -184,6 +185,9 @@ tasks.test {
         testLibs.resolvedConfiguration.resolvedArtifacts.forEach {
             systemProperty("testLibs.${it.name}", it.file.absolutePath)
         }
+    }
+    if (System.getProperty("os.name").toLowerCase().contains("win")) {
+        systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
     }
     if (JavaVersion.current().isJava9Compatible) {
         jvmArgs(

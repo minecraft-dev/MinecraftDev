@@ -24,22 +24,6 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
     private fun doTest(@Language("JAVA") code: String) {
         buildProject {
             dir("test") {
-                java(
-                    "MixedIn.java",
-                    """
-                    package test;
-
-                    class MixedIn {
-                    
-                        public void method() {
-                        }
-                    
-                        public void otherMethod() {
-                        }
-                    }
-                    """,
-                    configure = false
-                )
                 java("UnnecessaryQualifiedMemberReferenceMixin.java", code)
             }
         }
@@ -55,6 +39,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.unnecessaryQualifiedMemberReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -77,6 +62,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.unnecessaryQualifiedMemberReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -99,6 +85,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.unnecessaryQualifiedMemberReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -121,6 +108,7 @@ class UnnecessaryQualifiedMemberReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.unnecessaryQualifiedMemberReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;

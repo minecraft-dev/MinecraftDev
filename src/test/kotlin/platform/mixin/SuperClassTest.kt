@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.mixin
 import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.platform.mixin.inspection.MixinSuperClassInspection
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -21,49 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(EdtInterceptor::class)
 @DisplayName("Mixin Super Class Inspection Tests")
 class SuperClassTest : BaseMixinTest() {
-
-    @BeforeEach
-    fun setupProject() {
-        buildProject {
-            dir("test") {
-                java(
-                    "Entity.java",
-                    """
-                    package test;
-
-                    public class Entity {
-
-                    }
-                    """,
-                    configure = false
-                )
-
-                java(
-                    "DemonWav.java",
-                    """
-                    package test;
-
-                    public class DemonWav extends Entity {
-
-                    }
-                    """,
-                    configure = false
-                )
-
-                java(
-                    "Minecrell.java",
-                    """
-                    package test;
-
-                    public class Minecrell extends Entity {
-
-                    }
-                    """,
-                    configure = false
-                )
-            }
-        }
-    }
 
     private fun doTest(
         @Language("JAVA")
@@ -86,6 +42,7 @@ class SuperClassTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.superClass.Minecrell;
             import org.spongepowered.asm.mixin.Mixin;
 
             @Mixin(Minecrell.class)
@@ -103,6 +60,8 @@ class SuperClassTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.superClass.Entity;
+            import com.demonwav.mcdev.mixintestdata.superClass.Minecrell;
             import org.spongepowered.asm.mixin.Mixin;
 
             @Mixin(Minecrell.class)
@@ -120,6 +79,7 @@ class SuperClassTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.superClass.DemonWav;
             import org.spongepowered.asm.mixin.Mixin;
 
             @Mixin(DemonWav.class)
@@ -137,6 +97,8 @@ class SuperClassTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.superClass.DemonWav;
+            import com.demonwav.mcdev.mixintestdata.superClass.Minecrell;
             import org.spongepowered.asm.mixin.Mixin;
 
             @Mixin(DemonWav.class)

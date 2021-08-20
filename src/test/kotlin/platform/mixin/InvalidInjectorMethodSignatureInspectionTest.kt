@@ -24,33 +24,6 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
     private fun doTest(@Language("JAVA") code: String) {
         buildProject {
             dir("test") {
-                java(
-                    "MixedInOuter.java",
-                    """
-                    package test;
-                    
-                    import java.lang.String;
-
-                    class MixedInOuter {
-                        public class MixedInInner {
-                            public MixedInInner() {
-                            }
-                            
-                            public MixedInInner(String string) {
-                            }
-                        }
-                        
-                        public static class MixedInStaticInner {
-                            public MixedInStaticInner() {
-                            }
-                            
-                            public MixedInStaticInner(String string) {
-                            }
-                        }
-                    }
-                    """,
-                    configure = false
-                )
                 java("TestMixin.java", code)
             }
         }
@@ -66,6 +39,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureInspection.MixedInOuter;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -74,7 +48,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             @Mixin(MixedInOuter.MixedInInner.class)
             public class TestMixin {
 
-                @Inject(method = "<init>()V", at = @At("RETURN"))
+                @Inject(method = "<init>(Lcom/demonwav/mcdev/mixintestdata/invalidInjectorMethodSignatureInspection/MixedInOuter;)V", at = @At("RETURN"))
                 private void injectCtor(MixedInOuter outer, CallbackInfo ci) {
                 }
 
@@ -82,11 +56,11 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
                 private void injectCtor(CallbackInfo ci) {
                 }
 
-                @Inject(method = "<init>(Ljava/lang/String;)V", at = @At("RETURN"))
+                @Inject(method = "<init>(Lcom/demonwav/mcdev/mixintestdata/invalidInjectorMethodSignatureInspection/MixedInOuter;Ljava/lang/String;)V", at = @At("RETURN"))
                 private void injectCtor(MixedInOuter outer, String string, CallbackInfo ci) {
                 }
 
-                @Inject(method = "<init>(Ljava/lang/String;)V", at = @At("RETURN"))
+                @Inject(method = "<init>(Lcom/demonwav/mcdev/mixintestdata/invalidInjectorMethodSignatureInspection/MixedInOuter;Ljava/lang/String;)V", at = @At("RETURN"))
                 private void injectCtor<error descr="Method parameters do not match expected parameters for @Inject">(String string, CallbackInfo ci)</error> {
                 }
             }
@@ -101,6 +75,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureInspection.MixedInOuter;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -109,8 +84,8 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             @Mixin(MixedInOuter.MixedInStaticInner.class)
             public class TestMixin {
 
-                @Inject(method = "<init>", at = @At("RETURN"))
-                private void injectCtor<error descr="Method parameters do not match expected parameters for @Inject">(MixedInOuter outer, CallbackInfo ci)</error> {
+                @Inject(method = "<init>()V", at = @At("RETURN"))
+                private void injectCtorWrong<error descr="Method parameters do not match expected parameters for @Inject">(MixedInOuter outer, CallbackInfo ci)</error> {
                 }
 
                 @Inject(method = "<init>", at = @At("RETURN"))
