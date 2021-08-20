@@ -14,6 +14,7 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.ProxyHttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
+import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.openapi.diagnostic.Logger
 import java.io.IOException
 import javax.swing.JComboBox
@@ -30,7 +31,14 @@ fun getVersionSelector(type: PlatformType): PlatformVersion {
 
 inline fun <reified T : Any> getVersionJson(path: String): T {
     val text = getText(path)
-    return Gson().fromJson(text)
+    try {
+        return Gson().fromJson(text)
+    } catch (e: Exception) {
+        val attachment = Attachment("JSON Document", text)
+        attachment.isIncluded = true
+        PLATFORM_VERSION_LOGGER.error("Failed to parse JSON document from '$path'", e, attachment)
+        throw e
+    }
 }
 
 fun getText(path: String): String {
