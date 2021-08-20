@@ -11,57 +11,68 @@
 package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.platform.mixin.util.fakeResolve
+import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceField
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReferenceExpression
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.FieldInsnNode
+import org.objectweb.asm.tree.MethodNode
 
 object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
-
-    override fun createFindUsagesVisitor(
-        context: PsiElement,
-        targetClass: PsiClass,
-        checkOnly: Boolean
-    ): CollectVisitor<PsiReferenceExpression>? {
+    override fun createNavigationVisitor(context: PsiElement, targetClass: PsiClass): NavigationVisitor? {
         return MixinMemberReference.parse(context.constantStringValue)
-            ?.let { FindUsagesVisitor(targetClass, it, checkOnly) }
+            ?.let { MyNavigationVisitor(targetClass, it) }
     }
 
-    override fun createCollectUsagesVisitor(): CollectVisitor<QualifiedMember<PsiField>> = CollectUsagesVisitor()
+    override fun createCollectVisitor(
+        context: PsiElement,
+        targetClass: ClassNode,
+        mode: CollectVisitor.Mode
+    ): CollectVisitor<PsiField>? {
+        if (mode == CollectVisitor.Mode.COMPLETION) {
+            return MyCollectVisitor(mode, context.project, MemberReference(""))
+        }
+        return MixinMemberReference.parse(context.constantStringValue)
+            ?.let { MyCollectVisitor(mode, context.project, it) }
+    }
 
-    override fun createLookup(targetClass: PsiClass, m: PsiField, owner: PsiClass): LookupElementBuilder {
+    override fun createLookup(targetClass: ClassNode, m: PsiField, owner: String): LookupElementBuilder {
         return JavaLookupElementBuilder.forField(
             m,
             MixinMemberReference.toString(m.getQualifiedMemberReference(owner)),
-            targetClass
+            null
         )
+            .setBoldIfInClass(m, targetClass)
             .withPresentableText(m.name)
             .withLookupString(m.name)
     }
 
-    private class FindUsagesVisitor(
+    private class MyNavigationVisitor(
         private val targetClass: PsiClass,
-        private val target: MemberReference,
-        checkOnly: Boolean
-    ) :
-        CollectVisitor<PsiReferenceExpression>(checkOnly) {
-
+        private val reference: MemberReference
+    ) : NavigationVisitor() {
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
             if (expression !is PsiMethodReferenceExpression) {
-                // TODO: Optimize this so we don't need to resolve all fields to find a reference
-                (expression.resolve() as? PsiField)?.let { resolved ->
-                    val matches = target.match(
-                        resolved,
-                        QualifiedMember.resolveQualifier(expression) ?: targetClass
-                    )
-                    if (matches) {
-                        addResult(expression)
+                // early out for if the name does not match
+                if (expression.referenceName == reference.name) {
+                    (expression.resolve() as? PsiField)?.let { resolved ->
+                        val matches = reference.match(
+                            resolved,
+                            QualifiedMember.resolveQualifier(expression) ?: targetClass
+                        )
+                        if (matches) {
+                            addResult(expression)
+                        }
                     }
                 }
             }
@@ -70,17 +81,30 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
         }
     }
 
-    private class CollectUsagesVisitor : CollectVisitor<QualifiedMember<PsiField>>(false) {
+    private class MyCollectVisitor(
+        mode: Mode,
+        private val project: Project,
+        private val reference: MemberReference
+    ) : CollectVisitor<PsiField>(mode) {
+        override fun accept(methodNode: MethodNode) {
+            val insns = methodNode.instructions ?: return
+            insns.iterator().forEachRemaining { insn ->
+                if (insn !is FieldInsnNode) return@forEachRemaining
+                if (mode != Mode.COMPLETION) {
+                    if (insn.name != reference.name) return@forEachRemaining
+                    if (reference.descriptor != null && insn.desc != reference.descriptor) return@forEachRemaining
 
-        override fun visitReferenceExpression(expression: PsiReferenceExpression) {
-            if (expression !is PsiMethodReferenceExpression) {
-                val resolved = expression.resolve()
-                if (resolved is PsiField) {
-                    addResult(QualifiedMember(resolved, expression))
+                    val owner = reference.owner
+                    if (owner != null && owner.replace('.', '/') != insn.owner) return@forEachRemaining
                 }
+                val fieldNode = insn.fakeResolve()
+                val psiField = fieldNode.field.findOrConstructSourceField(
+                    fieldNode.clazz,
+                    project,
+                    canDecompile = false
+                )
+                addResult(psiField, qualifier = insn.owner.replace('/', '.'))
             }
-
-            super.visitReferenceExpression(expression)
         }
     }
 }

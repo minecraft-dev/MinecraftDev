@@ -10,9 +10,11 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.platform.mixin.util.findStubClass
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
-import com.demonwav.mcdev.util.equivalentTo
+import com.demonwav.mcdev.platform.mixin.util.shortName
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.shortName
 import com.intellij.codeInspection.ProblemsHolder
@@ -39,15 +41,17 @@ class MixinSuperClassInspection : MixinInspection() {
                 return
             }
 
+            val superInternalName = superClass.fullQualifiedName?.replace('.', '/') ?: return
+
             val targetClasses = psiClass.mixinTargets.ifEmpty { return }
 
             val superTargets = superClass.mixinTargets
             if (superTargets.isEmpty()) {
                 // Super class must be a regular class in the hierarchy of the target class(es)
                 for (targetClass in targetClasses) {
-                    if (targetClass equivalentTo superClass) {
+                    if (targetClass.name == superInternalName) {
                         reportSuperClass(psiClass, "Cannot extend target class")
-                    } else if (!targetClass.isInheritor(superClass, true)) {
+                    } else if (targetClass.findStubClass(psiClass.project)?.isInheritor(superClass, true) == false) {
                         reportSuperClass(
                             psiClass,
                             "Cannot find '${superClass.shortName}' " +
@@ -58,7 +62,11 @@ class MixinSuperClassInspection : MixinInspection() {
             } else {
                 // At least one of the target classes of the super mixin must be in the hierarchy of the target class(es)
                 for (targetClass in targetClasses) {
-                    if (!superTargets.any { superTarget -> targetClass.isInheritor(superTarget, true) }) {
+                    val targetStub = targetClass.findStubClass(psiClass.project) ?: continue
+                    if (!superTargets.asSequence()
+                        .map { it.findStubClass(psiClass.project) }
+                        .any { superTarget -> superTarget == null || targetStub.isInheritor(superTarget, true) }
+                    ) {
                         reportSuperClass(
                             psiClass,
                             "Cannot find '${targetClass.shortName}' in the hierarchy of the super mixin"

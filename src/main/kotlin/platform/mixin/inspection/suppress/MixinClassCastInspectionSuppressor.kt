@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.suppress
 
+import com.demonwav.mcdev.platform.mixin.util.findStubClass
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInspection.InspectionSuppressor
@@ -49,11 +50,12 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
         val toType = castType.type
         if (
             targets.none { t ->
-                val type = factory.createType(t)
+                val targetClass = t.findStubClass(project) ?: return@none false
+                val type = factory.createType(targetClass)
                 // type == toType                   --> direct cast
                 // toType.superTypes.contains(type) --> cast to a subclass of the current mixin
                 // t.superTypes.contains(toType)    --> cast to a superclass of the current mixin
-                type == toType || toType.superTypes.contains(type) || t.superTypes.contains(toType)
+                type == toType || toType.superTypes.contains(type) || targetClass.superTypes.contains(toType)
             }
         ) {
             return false

@@ -46,13 +46,19 @@ class FindMixinsAction : AnAction() {
         val editor = e.getData(EDITOR) ?: return
 
         val element = file.findElementAt(caret.offset) ?: return
-        val classOfElement = element.findReferencedClass()?.qualifiedName ?: return
+        val classOfElement = element.findReferencedClass() ?: return
 
         invokeLater {
             runBackgroundableTask("Searching for Mixins", project, true) run@{ indicator ->
                 indicator.isIndeterminate = true
 
                 val classes = runReadAction {
+                    if (!classOfElement.isValid) {
+                        return@runReadAction null
+                    }
+                    val targetInternalName = classOfElement.fullQualifiedName?.replace('.', '/')
+                        ?: return@runReadAction null
+
                     val mixinAnnotation = JavaPsiFacade.getInstance(project).findClass(
                         MixinConstants.Annotations.MIXIN,
                         GlobalSearchScope.allScope(project)
@@ -67,7 +73,7 @@ class FindMixinsAction : AnAction() {
                             indicator.text = "Checking ${it.name}..."
 
                             it.mixinTargets.any { c ->
-                                c.qualifiedName == classOfElement
+                                c.name == targetInternalName
                             }
                         }
 

@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.injector
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.isErasureEquivalentTo
@@ -32,6 +33,7 @@ import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.codeStyle.VariableKind
+import org.objectweb.asm.Opcodes
 
 class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
@@ -54,7 +56,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
                 for (targetMethod in targetMethods) {
                     if (!reportedStatic) {
-                        val static = targetMethod.hasModifierProperty(PsiModifier.STATIC)
+                        val static = targetMethod.method.hasAccess(Opcodes.ACC_STATIC)
                         if (static && !modifiers.hasModifierProperty(PsiModifier.STATIC)) {
                             reportedStatic = true
                             holder.registerProblem(
@@ -75,7 +77,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                         val parameters = method.parameterList
                         val (expectedParameters, expectedReturnType) = type.expectedMethodSignature(
                             annotation,
-                            targetMethod
+                            targetMethod.method
                         ) ?: continue
 
                         if (!checkParameters(parameters, expectedParameters)) {

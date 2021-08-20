@@ -12,7 +12,7 @@ package com.demonwav.mcdev.platform.mixin.folding
 
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.demonwav.mcdev.platform.mixin.util.findAccessorAnnotation
-import com.demonwav.mcdev.platform.mixin.util.findAccessorTarget
+import com.demonwav.mcdev.platform.mixin.util.findAccessorTargetForReference
 import com.demonwav.mcdev.platform.mixin.util.findInvokerAnnotation
 import com.demonwav.mcdev.platform.mixin.util.findInvokerTarget
 import com.demonwav.mcdev.util.referencedMethod
@@ -81,7 +81,7 @@ class AccessorMixinFoldingBuilder : CustomFoldingBuilder() {
             return method.findInvokerTarget()?.element?.name
         }
         if (method.findAccessorAnnotation() != null) {
-            val name = method.findAccessorTarget()?.element?.name ?: return null
+            val name = method.findAccessorTargetForReference()?.element?.name ?: return null
             return if (method.returnType == PsiType.VOID) {
                 "$name = "
             } else {

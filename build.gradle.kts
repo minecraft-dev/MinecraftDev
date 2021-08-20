@@ -108,7 +108,8 @@ intellij {
         "org.toml.lang:$pluginTomlVersion",
         // needed dependencies for unit tests
         "properties",
-        "junit"
+        "junit",
+        "ByteCodeViewer"
     )
 
     pluginName.set("Minecraft Development")

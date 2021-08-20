@@ -12,14 +12,13 @@ package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
 import com.demonwav.mcdev.util.findAnnotation
-import com.demonwav.mcdev.util.findMatchingMethod
-import com.demonwav.mcdev.util.findMatchingMethods
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.mapFirstNotNull
-import com.intellij.psi.PsiClass
+import com.demonwav.mcdev.util.memberReference
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.util.createSmartPointer
+import org.objectweb.asm.tree.ClassNode
 
 val PsiMethod.isOverwrite
     get() = findAnnotation(OVERWRITE) != null
@@ -28,13 +27,23 @@ fun PsiMethod.findFirstOverwriteTarget(): SmartPsiElementPointer<PsiMethod>? {
     findAnnotation(OVERWRITE) ?: return null
     val containingClass = containingClass ?: return null
     val targetClasses = containingClass.mixinTargets.ifEmpty { return null }
-    return resolveFirstOverwriteTarget(targetClasses, this)?.createSmartPointer()
+    val overwriteTarget = resolveFirstOverwriteTarget(targetClasses, this) ?: return null
+    return overwriteTarget.method.findOrConstructSourceMethod(
+        overwriteTarget.clazz,
+        containingClass.project,
+        containingClass.resolveScope,
+        canDecompile = false
+    ).createSmartPointer()
 }
 
-fun resolveFirstOverwriteTarget(targetClasses: Collection<PsiClass>, method: PsiMethod): PsiMethod? {
-    return targetClasses.mapFirstNotNull { it.findMatchingMethod(method, false) }
+fun resolveFirstOverwriteTarget(targetClasses: Collection<ClassNode>, method: PsiMethod): ClassAndMethodNode? {
+    return targetClasses.mapFirstNotNull { targetClass ->
+        targetClass.findMethod(method.memberReference)?.let { ClassAndMethodNode(targetClass, it) }
+    }
 }
 
-fun resolveOverwriteTargets(targetClasses: Collection<PsiClass>, method: PsiMethod): List<PsiMethod> {
-    return targetClasses.flatMap { it.findMatchingMethods(method, false) }
+fun resolveOverwriteTargets(targetClasses: Collection<ClassNode>, method: PsiMethod): List<ClassAndMethodNode> {
+    return targetClasses.mapNotNull { targetClass ->
+        targetClass.findMethod(method.memberReference)?.let { ClassAndMethodNode(targetClass, it) }
+    }
 }

@@ -20,7 +20,6 @@ import com.intellij.debugger.NoDataException
 import com.intellij.debugger.SourcePosition
 import com.intellij.debugger.engine.DebugProcess
 import com.intellij.debugger.engine.DebuggerUtils
-import com.intellij.debugger.engine.JVMNameUtil
 import com.intellij.debugger.impl.DebuggerUtilsEx
 import com.intellij.debugger.requests.ClassPrepareRequestor
 import com.intellij.ide.highlighter.JavaFileType
@@ -128,7 +127,6 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
         return classElement.mixinTargets
             .ifEmpty { throw NoDataException.INSTANCE }
             .stream()
-            // TODO: Support for anonymous classes
-            .mapNotNull(JVMNameUtil::getNonAnonymousClassName)
+            .map { it.name }
     }
 }

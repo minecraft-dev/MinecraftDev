@@ -10,8 +10,13 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.overwrite
 
+import com.demonwav.mcdev.platform.mixin.util.accessLevel
+import com.demonwav.mcdev.platform.mixin.util.findStubMethod
+import com.demonwav.mcdev.platform.mixin.util.hasModifier
+import com.demonwav.mcdev.platform.mixin.util.internalNameToShortName
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.platform.mixin.util.resolveFirstOverwriteTarget
+import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findKeyword
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.isAccessModifier
@@ -23,6 +28,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.util.PsiUtil
+import org.objectweb.asm.Type
 
 class OverwriteModifiersInspection : OverwriteInspection() {
 
@@ -32,12 +38,12 @@ class OverwriteModifiersInspection : OverwriteInspection() {
         val psiClass = method.containingClass ?: return
         val targetClasses = psiClass.mixinTargets.ifEmpty { return }
 
-        val target = resolveFirstOverwriteTarget(targetClasses, method)?.modifierList ?: return
+        val target = resolveFirstOverwriteTarget(targetClasses, method) ?: return
         val nameIdentifier = method.nameIdentifier ?: return
         val modifierList = method.modifierList
 
         // Check access modifiers
-        val targetAccessLevel = PsiUtil.getAccessLevel(target)
+        val targetAccessLevel = target.method.accessLevel
         val currentAccessLevel = PsiUtil.getAccessLevel(modifierList)
         if (currentAccessLevel < targetAccessLevel) {
             val targetModifier = PsiUtil.getAccessModifier(targetAccessLevel)
@@ -56,7 +62,7 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                 continue
             }
 
-            val targetModifier = target.hasModifierProperty(modifier)
+            val targetModifier = target.method.hasModifier(modifier)
             val overwriteModifier = modifierList.hasModifierProperty(modifier)
             if (targetModifier != overwriteModifier) {
                 val marker: PsiElement
@@ -76,15 +82,27 @@ class OverwriteModifiersInspection : OverwriteInspection() {
             }
         }
 
-        for (annotation in target.annotations) {
-            val qualifiedName = annotation.qualifiedName ?: continue
+        val targetAnnotations = target.method.visibleAnnotations ?: mutableListOf()
+        target.method.invisibleAnnotations?.let { targetAnnotations += it }
+        for (annotation in targetAnnotations) {
+            val internalName = Type.getType(annotation.desc).takeIf { it.sort == Type.OBJECT }?.internalName ?: continue
+            val qualifiedName = internalName.replace('/', '.').replace('$', '.')
             val overwriteAnnotation = modifierList.findAnnotation(qualifiedName)
             if (overwriteAnnotation == null) {
-                holder.registerProblem(
-                    nameIdentifier,
-                    "Missing @${annotation.nameReferenceElement?.text} annotation",
-                    AddAnnotationFix(qualifiedName, method, annotation.parameterList.attributes)
-                )
+                val targetAnnPsi = target.method.findStubMethod(target.clazz, method.project)
+                    ?.findAnnotation(qualifiedName)
+                if (targetAnnPsi != null) {
+                    holder.registerProblem(
+                        nameIdentifier,
+                        "Missing @${internalNameToShortName(internalName)} annotation",
+                        AddAnnotationFix(qualifiedName, method, targetAnnPsi.parameterList.attributes)
+                    )
+                } else {
+                    holder.registerProblem(
+                        nameIdentifier,
+                        "Missing @${internalNameToShortName(internalName)} annotation"
+                    )
+                }
             }
 
             // TODO: Check if attributes are specified correctly?

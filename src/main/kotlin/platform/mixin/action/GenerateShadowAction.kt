@@ -13,11 +13,14 @@ package com.demonwav.mcdev.platform.mixin.action
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findFields
 import com.demonwav.mcdev.platform.mixin.util.findMethods
+import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceField
+import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findFirstMember
 import com.demonwav.mcdev.util.findLastChild
 import com.demonwav.mcdev.util.findNextMember
 import com.demonwav.mcdev.util.ifEmpty
+import com.demonwav.mcdev.util.realName
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.application.options.CodeStyle
 import com.intellij.codeInsight.generation.GenerateMembersUtil
@@ -34,6 +37,7 @@ import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -53,8 +57,20 @@ class GenerateShadowAction : MixinCodeInsightAction() {
         val offset = editor.caretModel.offset
         val psiClass = file.findElementAt(offset)?.findContainingClass() ?: return
 
-        val fields = findFields(psiClass)?.map(::PsiFieldMember) ?: emptySequence()
-        val methods = findMethods(psiClass)?.map(::PsiMethodMember) ?: emptySequence()
+        val fields = findFields(psiClass)?.map { (classNode, fieldNode) ->
+            fieldNode.findOrConstructSourceField(
+                classNode,
+                project,
+                canDecompile = false
+            ).let(::PsiFieldMember)
+        } ?: emptySequence()
+        val methods = findMethods(psiClass)?.map { (classNode, fieldNode) ->
+            fieldNode.findOrConstructSourceMethod(
+                classNode,
+                project,
+                canDecompile = false
+            ).let(::PsiMethodMember)
+        } ?: emptySequence()
 
         val members = (fields + methods).toTypedArray()
         if (members.isEmpty()) {
@@ -119,7 +135,16 @@ fun createShadowMembers(
         }
 
         // Add @Shadow annotation
-        shadowMember.modifierList!!.addAnnotation(MixinConstants.Annotations.SHADOW)
+        val annotation = shadowMember.modifierList!!.addAnnotation(MixinConstants.Annotations.SHADOW)
+        val realName = m.realName
+        if (realName != null && realName != m.name) {
+            val elementFactory = JavaPsiFacade.getElementFactory(project)
+            val value = elementFactory.createExpressionFromText(
+                "\"${StringUtil.escapeStringCharacters(realName)}\"",
+                annotation
+            )
+            annotation.setDeclaredAttributeValue("aliases", value)
+        }
 
         PsiGenerationInfo(shadowMember)
     }.toList()

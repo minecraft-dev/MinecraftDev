@@ -21,6 +21,7 @@ import com.intellij.openapi.roots.LibraryOrderEntry
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.impl.OrderEntryUtil
+import com.intellij.openapi.util.Key
 import com.intellij.psi.ElementManipulator
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.JavaPsiFacade
@@ -32,11 +33,13 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiKeyword
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifier.ModifierConstant
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiReference
+import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.filters.ElementFilter
@@ -228,4 +231,19 @@ val PsiElement.mcVersion: SemanticVersion?
         findMcpModule()?.let {
             SemanticVersion.parse(it.getSettings().minecraftVersion ?: return@let null)
         }
+    }
+
+private val REAL_NAME_KEY = Key<String>("mcdev.real_name")
+
+var PsiMember.realName: String?
+    get() = getUserData(REAL_NAME_KEY)
+    set(value) = putUserData(REAL_NAME_KEY, value)
+
+val PsiMethodReferenceExpression.hasSyntheticMethod: Boolean
+    get() {
+        // the only method reference that doesn't have a synthetic method is a direct reference to a method
+        if (referenceName == "new") return true
+        val qualifier = this.qualifier
+        if (qualifier !is PsiReferenceExpression) return true
+        return qualifier.resolve() !is PsiClass
     }

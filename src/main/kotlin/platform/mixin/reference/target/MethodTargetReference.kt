@@ -11,8 +11,11 @@
 package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.platform.mixin.util.fakeResolve
+import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
+import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -22,44 +25,41 @@ import com.intellij.psi.PsiForeachStatement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiNewExpression
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.MethodInsnNode
+import org.objectweb.asm.tree.MethodNode
 
 object MethodTargetReference : TargetReference.MethodHandler() {
-
-    override fun createFindUsagesVisitor(
+    override fun createNavigationVisitor(
         context: PsiElement,
-        targetClass: PsiClass,
-        checkOnly: Boolean
-    ): CollectVisitor<out PsiElement>? {
+        targetClass: PsiClass
+    ): NavigationVisitor? {
         return MixinMemberReference.parse(context.constantStringValue)
-            ?.let { FindUsagesVisitor(targetClass, it, checkOnly) }
+            ?.let { MyNavigationVisitor(targetClass, it) }
     }
 
-    override fun createCollectUsagesVisitor(): CollectVisitor<QualifiedMember<PsiMethod>> = CollectUsagesVisitor()
+    override fun createCollectVisitor(
+        context: PsiElement,
+        targetClass: ClassNode,
+        mode: CollectVisitor.Mode
+    ): CollectVisitor<PsiMethod>? {
+        if (mode == CollectVisitor.Mode.COMPLETION) {
+            return MyCollectVisitor(mode, context.project, MemberReference(""))
+        }
+        return MixinMemberReference.parse(context.constantStringValue)
+            ?.let { MyCollectVisitor(mode, context.project, it) }
+    }
 
-    private class FindUsagesVisitor(
+    private class MyNavigationVisitor(
         private val targetClass: PsiClass,
-        private val target: MemberReference,
-        checkOnly: Boolean
-    ) :
-        CompiledMethodsVisitor<PsiElement>(checkOnly) {
+        private val reference: MemberReference
+    ) : NavigationVisitor() {
 
-        override fun visitMethodUsage(method: PsiMethod, qualifier: PsiClass?, source: PsiElement) {
-            if (target.match(method, qualifier ?: targetClass)) {
-                addResult(source)
+        private fun visitMethodUsage(method: PsiMethod, qualifier: PsiClass?, expression: PsiElement) {
+            if (reference.match(method, qualifier ?: targetClass)) {
+                addResult(expression)
             }
         }
-    }
-
-    private class CollectUsagesVisitor : CompiledMethodsVisitor<QualifiedMember<PsiMethod>>(false) {
-
-        override fun visitMethodUsage(method: PsiMethod, qualifier: PsiClass?, source: PsiElement) {
-            addResult(QualifiedMember(method, qualifier))
-        }
-    }
-
-    private abstract class CompiledMethodsVisitor<T>(checkOnly: Boolean) : CollectVisitor<T>(checkOnly) {
-
-        protected abstract fun visitMethodUsage(method: PsiMethod, qualifier: PsiClass?, source: PsiElement)
 
         override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
             val method = expression.resolveMethod()
@@ -126,6 +126,36 @@ object MethodTargetReference : TargetReference.MethodHandler() {
             }
 
             super.visitForeachStatement(statement)
+        }
+    }
+
+    private class MyCollectVisitor(
+        mode: Mode,
+        private val project: Project,
+        private val reference: MemberReference
+    ) : CollectVisitor<PsiMethod>(mode) {
+        override fun accept(methodNode: MethodNode) {
+            val insns = methodNode.instructions ?: return
+            insns.iterator().forEachRemaining { insn ->
+                if (insn !is MethodInsnNode) return@forEachRemaining
+
+                if (mode != Mode.COMPLETION) {
+                    if (reference.name != insn.name) return@forEachRemaining
+                    if (reference.descriptor != null && reference.descriptor != insn.desc) return@forEachRemaining
+                    val owner = reference.owner
+                    if (owner != null && owner.replace('.', '/') != insn.owner) return@forEachRemaining
+                }
+
+                val fakeMethod = insn.fakeResolve()
+                addResult(
+                    fakeMethod.method.findOrConstructSourceMethod(
+                        fakeMethod.clazz,
+                        project,
+                        canDecompile = false
+                    ),
+                    qualifier = insn.owner.replace('/', '.')
+                )
+            }
         }
     }
 }

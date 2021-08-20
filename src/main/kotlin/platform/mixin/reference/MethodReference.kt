@@ -10,49 +10,57 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.platform.mixin.util.bytecode
+import com.demonwav.mcdev.platform.mixin.util.findMethods
+import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
+import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.platform.mixin.util.findUpstreamMixin
+import com.demonwav.mcdev.platform.mixin.util.memberReference
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findContainingMethod
-import com.demonwav.mcdev.util.findMethods
-import com.demonwav.mcdev.util.internalName
-import com.demonwav.mcdev.util.memberReference
 import com.demonwav.mcdev.util.reference.PolyReferenceResolver
 import com.demonwav.mcdev.util.reference.completeToLiteral
 import com.demonwav.mcdev.util.toResolveResults
+import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
+import com.intellij.patterns.ElementPattern
+import com.intellij.patterns.PsiJavaPatterns
+import com.intellij.patterns.StandardPatterns
 import com.intellij.psi.PsiArrayInitializerMemberValue
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteral
-import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.ResolveResult
 import com.intellij.util.ArrayUtil
-import com.intellij.util.containers.stream
-import java.util.stream.Collectors
-import java.util.stream.Stream
+import org.objectweb.asm.tree.ClassNode
 
 object MethodReference : PolyReferenceResolver(), MixinReference {
+
+    val ELEMENT_PATTERN: ElementPattern<PsiLiteral> =
+        PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationParam(
+            StandardPatterns.string().oneOf(METHOD_INJECTORS),
+            "method"
+        )
 
     override val description: String
         get() = "method '%s' in target class"
 
     override fun isValidAnnotation(name: String) = name in METHOD_INJECTORS
 
-    private fun getTargets(context: PsiElement): Collection<PsiClass>? {
+    private fun getTargets(context: PsiElement): Collection<ClassNode>? {
         val psiClass = context.findContainingClass() ?: return null
         val targets = psiClass.mixinTargets
-        val upstreamMixin = context.findContainingMethod()?.findUpstreamMixin()
+        val upstreamMixin = context.findContainingMethod()?.findUpstreamMixin()?.bytecode
         return when {
-            targets.isEmpty() -> listOfNotNull(upstreamMixin)
             upstreamMixin != null -> targets + upstreamMixin
             else -> targets
-        }.filter(PsiClass::isValid)
+        }
     }
 
     override fun isUnresolved(context: PsiElement): Boolean {
@@ -71,11 +79,11 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
         return if (isAmbiguous(targets, targetReference)) targetReference else null
     }
 
-    private fun isAmbiguous(targets: Collection<PsiClass>, targetReference: MemberReference): Boolean {
-        return targets.any { it.findMethodsByName(targetReference.name, false).size > 1 }
+    private fun isAmbiguous(targets: Collection<ClassNode>, targetReference: MemberReference): Boolean {
+        return targets.any { it.findMethods(MemberReference(targetReference.name)).count() > 1 }
     }
 
-    private fun resolve(context: PsiElement): Sequence<PsiMethod>? {
+    private fun resolve(context: PsiElement): Sequence<ClassAndMethodNode>? {
         val targets = getTargets(context) ?: return null
         val targetedMethods = when (context) {
             is PsiLiteral -> context.constantStringValue?.let { listOf(it) } ?: emptyList()
@@ -89,16 +97,19 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
         }
     }
 
-    private fun resolve(targets: Collection<PsiClass>, targetReference: MemberReference): Sequence<PsiMethod> {
+    private fun resolve(
+        targets: Collection<ClassNode>,
+        targetReference: MemberReference
+    ): Sequence<ClassAndMethodNode> {
         return targets.asSequence()
-            .flatMap { it.findMethods(targetReference) }
+            .flatMap { target -> target.findMethods(targetReference).map { ClassAndMethodNode(target, it) } }
     }
 
-    fun resolveIfUnique(context: PsiElement): PsiMethod? {
+    fun resolveIfUnique(context: PsiElement): ClassAndMethodNode? {
         return resolve(context)?.singleOrNull()
     }
 
-    fun resolveAllIfNotAmbiguous(context: PsiElement): List<PsiMethod>? {
+    fun resolveAllIfNotAmbiguous(context: PsiElement): List<ClassAndMethodNode>? {
         val targets = getTargets(context) ?: return null
 
         val targetedMethods = when (context) {
@@ -116,8 +127,26 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
         }.toList()
     }
 
+    fun resolveForNavigation(context: PsiElement): Array<PsiElement>? {
+        return resolve(context)?.mapNotNull {
+            it.method.findSourceElement(
+                it.clazz,
+                context.project,
+                scope = context.resolveScope,
+                canDecompile = true
+            )
+        }?.toTypedArray()
+    }
+
     override fun resolveReference(context: PsiElement): Array<ResolveResult> {
-        return resolve(context)?.toResolveResults() ?: ResolveResult.EMPTY_ARRAY
+        return resolve(context)?.mapNotNull {
+            it.method.findSourceElement(
+                it.clazz,
+                context.project,
+                scope = context.resolveScope,
+                canDecompile = false
+            )
+        }?.toResolveResults() ?: ResolveResult.EMPTY_ARRAY
     }
 
     override fun collectVariants(context: PsiElement): Array<Any> {
@@ -125,15 +154,15 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
         return targets.singleOrNull()?.let { collectVariants(context, it) } ?: collectVariants(context, targets)
     }
 
-    private fun collectVariants(context: PsiElement, target: PsiClass): Array<Any> {
-        val methods = target.methods
+    private fun collectVariants(context: PsiElement, target: ClassNode): Array<Any> {
+        val methods = target.methods ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
 
         // All methods which are not unique by their name need to be qualified with the descriptor
         val visitedMethods = HashSet<String>()
         val uniqueMethods = HashSet<String>()
 
         for (method in methods) {
-            val name = method.internalName
+            val name = method.name
             if (visitedMethods.add(name)) {
                 uniqueMethods.add(name)
             } else {
@@ -141,24 +170,26 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
             }
         }
 
-        return createLookup(context, methods.stream(), uniqueMethods)
+        return createLookup(context, methods.asSequence().map { ClassAndMethodNode(target, it) }, uniqueMethods)
     }
 
-    private fun collectVariants(context: PsiElement, targets: Collection<PsiClass>): Array<Any> {
-        val groupedMethods = targets.stream()
-            .flatMap { target -> target.methods.stream() }
-            .collect(Collectors.groupingBy(PsiMethod::memberReference))
+    private fun collectVariants(context: PsiElement, targets: Collection<ClassNode>): Array<Any> {
+        val groupedMethods = targets.asSequence()
+            .flatMap { target ->
+                target.methods?.asSequence()?.map { ClassAndMethodNode(target, it) } ?: emptySequence()
+            }
+            .groupBy { it.method.memberReference }
             .values
 
         // All methods which are not unique by their name need to be qualified with the descriptor
         val visitedMethods = HashSet<String>()
         val uniqueMethods = HashSet<String>()
 
-        val allMethods = ArrayList<PsiMethod>(groupedMethods.size)
+        val allMethods = ArrayList<ClassAndMethodNode>(groupedMethods.size)
 
         for (methods in groupedMethods) {
             val firstMethod = methods.first()
-            val name = firstMethod.internalName
+            val name = firstMethod.method.name
             if (visitedMethods.add(name)) {
                 uniqueMethods.add(name)
             } else {
@@ -173,26 +204,36 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
             }
         }
 
-        return createLookup(context, allMethods.stream(), uniqueMethods)
+        return createLookup(context, allMethods.asSequence(), uniqueMethods)
     }
 
-    private fun createLookup(context: PsiElement, methods: Stream<PsiMethod>, uniqueMethods: Set<String>): Array<Any> {
+    private fun createLookup(
+        context: PsiElement,
+        methods: Sequence<ClassAndMethodNode>,
+        uniqueMethods: Set<String>
+    ): Array<Any> {
         return methods
             .map { m ->
-                val targetMethodInfo = if (m.internalName in uniqueMethods) {
-                    MemberReference(m.internalName)
+                val targetMethodInfo = if (m.method.name in uniqueMethods) {
+                    MemberReference(m.method.name)
                 } else {
-                    m.memberReference
+                    m.method.memberReference
                 }
 
+                val sourceMethod = m.method.findOrConstructSourceMethod(
+                    m.clazz,
+                    context.project,
+                    scope = context.resolveScope,
+                    canDecompile = false
+                )
                 JavaLookupElementBuilder.forMethod(
-                    m,
+                    sourceMethod,
                     MixinMemberReference.toString(targetMethodInfo),
                     PsiSubstitutor.EMPTY,
                     null
                 )
-                    .withPresentableText(m.internalName)
+                    .withPresentableText(m.method.name)
                     .completeToLiteral(context)
-            }.toArray()
+            }.toTypedArray()
     }
 }
