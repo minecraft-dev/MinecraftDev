@@ -51,6 +51,8 @@ class VelocityProjectSettingsWizard(private val creator: MinecraftProjectCreator
 
     private var config: VelocityProjectConfig? = null
 
+    private var versionsLoaded: Boolean = false
+
     override fun getComponent(): JComponent {
         return panel
     }
@@ -68,6 +70,11 @@ class VelocityProjectSettingsWizard(private val creator: MinecraftProjectCreator
 
         basicUpdateStep(creator, conf, pluginNameField, mainClassField)
 
+        if (versionsLoaded) {
+            return
+        }
+
+        versionsLoaded = true
         CoroutineScope(Dispatchers.Swing).launch {
             try {
                 withContext(Dispatchers.IO) { getVersionSelector(conf.type) }.set(velocityApiVersionBox)

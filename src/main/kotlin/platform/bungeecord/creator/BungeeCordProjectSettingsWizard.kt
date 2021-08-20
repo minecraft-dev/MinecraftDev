@@ -56,6 +56,8 @@ class BungeeCordProjectSettingsWizard(
 
     private var config: BungeeCordProjectConfig? = null
 
+    private var versionsLoaded: Boolean = false
+
     override fun getComponent(): JComponent {
         return panel
     }
@@ -85,6 +87,11 @@ class BungeeCordProjectSettingsWizard(
             else -> {}
         }
 
+        if (versionsLoaded) {
+            return
+        }
+
+        versionsLoaded = true
         CoroutineScope(Dispatchers.Swing).launch {
             try {
                 withContext(Dispatchers.IO) { getVersionSelector(conf.type) }.set(minecraftVersionBox)

@@ -54,6 +54,8 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
 
     private var config: SpongeProjectConfig? = null
 
+    private var versionsLoaded: Boolean = false
+
     override fun getComponent(): JComponent {
         return panel
     }
@@ -77,6 +79,11 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             title.icon = PlatformAssets.SPONGE_ICON_2X
         }
 
+        if (versionsLoaded) {
+            return
+        }
+
+        versionsLoaded = true
         CoroutineScope(Dispatchers.Swing).launch {
             try {
                 withContext(Dispatchers.IO) { SpongeVersion.downloadData() }?.set(spongeApiVersionBox)
