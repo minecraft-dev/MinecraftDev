@@ -788,6 +788,8 @@
                          implementationClass="com.demonwav.mcdev.platform.bungeecord.inspection.BungeeCordListenerImplementedInspection"/>
         <!--endregion-->
         <!--endregion-->
+
+        <registryKey defaultValue="true" description="Enable the Minecraft Wizard finalizer step." key="mcdev.wizard.finalizer"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
