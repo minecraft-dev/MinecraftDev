@@ -22,45 +22,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
 
     private fun doTest(testName: String) {
-        buildProject {
-            dir("test") {
-                java(
-                    "MixedInSimple.java",
-                    """
-                    package test;
-                    
-                    import java.lang.String;
-
-                    class MixedInSimple {
-                        public void simpleMethod(String string, int i) {
-                            int testInt = Integer.parseInt("FF", 16);
-                        }
-                    }
-                    """,
-                    configure = false
-                )
-                java(
-                    "MixedInOuter.java",
-                    """
-                    package test;
-                    
-                    import java.lang.String;
-
-                    class MixedInOuter {
-                        public class MixedInInner {
-                            public MixedInInner() {
-                            }
-                            
-                            public MixedInInner(String string) {
-                            }
-                        }
-                    }
-                    """,
-                    configure = false
-                )
-            }
-        }
-
         fixture.enableInspections(InvalidInjectorMethodSignatureInspection::class)
         testInspectionFix(fixture, "invalidInjectorMethodSignature/$testName", "Fix method parameters")
     }

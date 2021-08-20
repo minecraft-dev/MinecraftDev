@@ -24,26 +24,6 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
     private fun doTest(@Language("JAVA") code: String) {
         buildProject {
             dir("test") {
-                java(
-                    "MixedIn.java",
-                    """
-                    package test;
-
-                    class MixedIn {
-
-                        public void method() {
-                        }
-
-                        public void method(String string) {
-                        }
-
-                        public void uniqueMethod(String string) {
-                        }
-                    }
-                    """,
-                    configure = false,
-                    allowAst = true
-                )
                 java("AmbiguousReferenceMixin.java", code)
             }
         }
@@ -59,6 +39,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -81,6 +62,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -103,6 +85,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -125,6 +108,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -147,6 +131,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;

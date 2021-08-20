@@ -157,6 +157,31 @@ fun <T> Array<T?>.castNotNull(): Array<T> {
     return this as Array<T>
 }
 
+// Same as Collections.rotate but for arrays
+fun <T> Array<T>.rotate(amount: Int) {
+    val size = size
+    if (size == 0) return
+    var distance = amount % size
+    if (distance < 0) distance += size
+    if (distance == 0) return
+
+    var cycleStart = 0
+    var nMoved = 0
+    while (nMoved != size) {
+        var displaced = this[cycleStart]
+        var i = cycleStart
+        do {
+            i += distance
+            if (i >= size) i -= size
+            val newDisplaced = this[i]
+            this[i] = displaced
+            displaced = newDisplaced
+            nMoved++
+        } while (i != cycleStart)
+        cycleStart++
+    }
+}
+
 fun Module.findChildren(): Set<Module> {
     return runReadAction {
         val manager = ModuleManager.getInstance(project)

@@ -16,7 +16,6 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -24,31 +23,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(EdtInterceptor::class)
 @DisplayName("Accessor Mixin Extension Property Tests")
 class AccessorMixinTest : BaseMixinTest() {
-
-    @BeforeEach
-    fun setupProject() {
-        buildProject {
-            dir("test") {
-                java(
-                    "BaseMixin.java",
-                    """
-                    package test;
-                    public class BaseMixin {}
-                    """,
-                    configure = false
-                )
-
-                java(
-                    "BaseMixinInterface.java",
-                    """
-                    package test;
-                    public interface BaseMixinInterface {}
-                    """,
-                    configure = false
-                )
-            }
-        }
-    }
 
     private fun doTest(className: String, @Language("JAVA") code: String, test: (psiClass: PsiClass) -> Unit) {
         var psiClass: PsiClass? = null
@@ -68,6 +42,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixin;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
@@ -91,6 +66,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixin;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
@@ -114,6 +90,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixinInterface;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
@@ -137,6 +114,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixin;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.Mixin;
 
@@ -157,6 +135,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixin;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
 
@@ -177,6 +156,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixin;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
@@ -198,6 +178,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixinInterface;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
