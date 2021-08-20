@@ -27,6 +27,7 @@ import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.ui.MultiLineLabelUI
 import com.intellij.ui.SortedComboBoxModel
 import com.intellij.ui.components.Label
+import com.intellij.ui.layout.Row
 import com.intellij.ui.layout.RowBuilder
 import com.intellij.ui.layout.panel
 import com.intellij.util.ui.UIUtil
@@ -37,31 +38,45 @@ class ProjectSetupFinalizerWizardStep(
     val context: WizardContext
 ) : ModuleWizardStep() {
 
-    private val validators: List<ProjectSetupFinalizer> =
+    private val finalizers: List<ProjectSetupFinalizer> =
         listOf(JdkProjectSetupFinalizer(), GradleProjectSetupFinalizer())
+    private val finalizersWithRow: MutableMap<ProjectSetupFinalizer, Row> = linkedMapOf()
+    private val applicableFinalizers: MutableSet<ProjectSetupFinalizer> = linkedSetOf()
 
-    override fun isStepVisible(): Boolean = validators.any { !it.validateConfigs(creator, context) }
-
-    override fun getComponent(): JComponent = panel {
-        row(Label("<html><font size=\"6\">Project finalization</size></html>")) {}
-        validators.forEach { validator ->
-            titledRow("<html><font size=\"5\">${validator.title}</size></html>") {
-                with(validator) {
-                    buildComponent(creator, context)
+    private val panel by lazy {
+        panel {
+            row(Label("<html><font size=\"6\">Project finalization</size></html>")) {}
+            finalizers.forEach { finalizer ->
+                val row = titledRow("<html><font size=\"5\">${finalizer.title}</size></html>") {
+                    with(finalizer) {
+                        buildComponent(creator, context)
+                    }
                 }
+                finalizersWithRow[finalizer] = row
             }
         }
     }
 
+    override fun isStepVisible(): Boolean = true
+
+    override fun getComponent(): JComponent = panel
+
     override fun updateStep() {
-        for (validator in validators) {
-            validator.validateConfigs(creator, context)
+        applicableFinalizers.clear()
+        for ((finalizer, row) in finalizersWithRow) {
+            if (finalizer.isApplicable(creator, context)) {
+                applicableFinalizers.add(finalizer)
+                finalizer.validateConfigs(creator, context)
+                row.visible = true
+            } else {
+                row.visible = false
+            }
         }
     }
 
-    override fun updateDataModel(): Unit = validators.forEach { it.apply(creator, context) }
+    override fun updateDataModel(): Unit = applicableFinalizers.forEach { it.apply(creator, context) }
 
-    override fun validate(): Boolean = validators.all { it.validateChanges(creator, context) }
+    override fun validate(): Boolean = applicableFinalizers.all { it.validateChanges(creator, context) }
 }
 
 /**
@@ -76,6 +91,16 @@ interface ProjectSetupFinalizer {
      * Builds the component to display in a titled row ([title])
      */
     fun RowBuilder.buildComponent(creator: MinecraftProjectCreator, context: WizardContext)
+
+    /**
+     * Whether this finalizer makes sense to appear in the given context.
+     *
+     * If `false` is returned the component of this finalizer will not be shown, and [validateConfigs],
+     * [validateChanges] and [apply] won't be called until it returns `true`.
+     *
+     * @return `true` if this finalizer applies to the given context, `false` otherwise
+     */
+    fun isApplicable(creator: MinecraftProjectCreator, context: WizardContext): Boolean
 
     /**
      * Validates the existing [ProjectConfig]s of this wizard. You can also initialize
@@ -102,7 +127,10 @@ interface ProjectSetupFinalizer {
 class JdkProjectSetupFinalizer : ProjectSetupFinalizer {
 
     private val errorLabel = Label("", fontColor = UIUtil.FontColor.BRIGHTER)
-        .apply { icon = UIUtil.getErrorIcon() }
+        .apply {
+            icon = UIUtil.getErrorIcon()
+            isVisible = false
+        }
     private val sdksModel = ProjectSdksModel()
     private lateinit var jdkBox: JdkComboBox
     private var minimumVersion: JavaSdkVersion = JavaSdkVersion.JDK_1_8
@@ -139,6 +167,8 @@ class JdkProjectSetupFinalizer : ProjectSetupFinalizer {
             component(jdkBox).constraints(grow)
         }
     }
+
+    override fun isApplicable(creator: MinecraftProjectCreator, context: WizardContext) = true
 
     private fun reloadJdkBox(context: WizardContext) {
         sdksModel.syncSdks()
@@ -182,10 +212,11 @@ class GradleProjectSetupFinalizer : ProjectSetupFinalizer {
         .apply {
             icon = UIUtil.getErrorIcon()
             setUI(MultiLineLabelUI())
+            isVisible = false
         }
     private val model = SortedComboBoxModel<SemanticVersion>(Comparator.naturalOrder())
 
-    private val propertyGraph = PropertyGraph("GradleProjectSetupValidator graph")
+    private val propertyGraph = PropertyGraph("GradleProjectSetupFinalizer graph")
     var gradleVersion: SemanticVersion by propertyGraph.graphProperty { SemanticVersion.release() }
     private var configs: Collection<ProjectConfig> = emptyList()
     private var incompatibleConfigs: List<ProjectConfig> = emptyList()
@@ -200,6 +231,11 @@ class GradleProjectSetupFinalizer : ProjectSetupFinalizer {
             comboBox(model, ::gradleVersion)
                 .enabled(false) // TODO load compatible Gradle versions list
         }
+    }
+
+    override fun isApplicable(creator: MinecraftProjectCreator, context: WizardContext): Boolean {
+        val buildSystem = creator.buildSystem
+        return buildSystem is GradleBuildSystem
     }
 
     override fun validateConfigs(creator: MinecraftProjectCreator, context: WizardContext): Boolean {
