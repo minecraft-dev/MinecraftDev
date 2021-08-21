@@ -57,6 +57,28 @@ import com.intellij.util.ArrayUtil
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
+/**
+ * The reference inside @At.target().
+ *
+ * Resolution of this reference depends on @At.value(), each of which have their own [Handler]. This handler is in
+ * charge of parsing, validating and resolving this reference.
+ *
+ * This reference can be resolved in four different ways.
+ * - [isUnresolved] only checks the bytecode of the target class, to check whether this reference is valid.
+ * - [resolveReference] resolves to the actual member being targeted, rather than the location it's referenced in the
+ *   target method. This serves as a backup in case nothing else is found to navigate to, and so that find usages can
+ *   take you back to this reference.
+ * - [collectVariants] is used for auto-completion. It does not take into account what is actually in the target string,
+ *   and instead matches everything the handler *could* match. The references resolve similarly to `resolveReference`,
+ *   although new elements may be created if not found.
+ * - [resolveNavigationTargets] is used when the user attempts to navigate on this reference. This attempts to take you
+ *   to the actual location in the source code of the target class which is being targeted. Potentially slow as it may
+ *   decompile the target class.
+ *
+ * To support the above, handlers must be able to resolve the target element, and support a collect visitor and a
+ * navigation visitor. The collect visitor finds target instructions in the bytecode of the target method, and the
+ * navigation visitor makes a best-effort attempt at matching source code elements.
+ */
 object TargetReference : PolyReferenceResolver(), MixinReference {
 
     val ELEMENT_PATTERN: ElementPattern<PsiLiteral> = PsiJavaPatterns.psiLiteral(StandardPatterns.string())
@@ -116,6 +138,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
     }
 
     fun resolveNavigationTargets(context: PsiElement): Array<PsiElement>? {
+        // First resolve the actual target in the bytecode using the collect visitor
         val at = context.parentOfType<PsiAnnotation>() ?: return null // @At
         val handler = getHandler(at) ?: return null
 
@@ -126,6 +149,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
         collectVisitor.visit(targetMethod.method)
         val bytecodeResults = collectVisitor.result
 
+        // Then attempt to find the corresponding source elements using the navigation visitor
         val targetElement = targetMethod.method.findSourceElement(
             targetMethod.clazz,
             context.project,

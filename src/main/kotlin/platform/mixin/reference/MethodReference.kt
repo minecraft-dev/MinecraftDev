@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
@@ -40,6 +41,10 @@ import com.intellij.psi.ResolveResult
 import com.intellij.util.ArrayUtil
 import org.objectweb.asm.tree.ClassNode
 
+/**
+ * The reference inside e.g. @Inject.method(). Similar to [TargetReference], this reference has different ways of being
+ * resolved. See the docs for that class for details.
+ */
 object MethodReference : PolyReferenceResolver(), MixinReference {
 
     val ELEMENT_PATTERN: ElementPattern<PsiLiteral> =
