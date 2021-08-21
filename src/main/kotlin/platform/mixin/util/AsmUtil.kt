@@ -116,6 +116,14 @@ private val LOAD_CLASS_FILE_BYTES: Method? = runCatching {
         .let { it.isAccessible = true; it }
 }.getOrNull()
 
+/**
+ * Tries to find the bytecode for the class for the given qualified name.
+ *
+ * ### Implementation note:
+ * First attempts to resolve the class using [findQualifiedClass]. This may fail in the case of anonymous classes, which
+ * don't exist inside `PsiCompiledElement`s, so it then creates a fake `PsiClass` based on the qualified name and
+ * attempts to resolve it from that.
+ */
 fun findClassNodeByQualifiedName(project: Project, module: Module?, fqn: String): ClassNode? {
     val psiClass = findQualifiedClass(project, fqn)
     if (psiClass != null) {
@@ -178,6 +186,7 @@ private fun ClassNode.constructClass(project: Project, body: String): PsiClass? 
         for ((index, innerClass) in innerClasses.withIndex()) {
             val anonymousIndex = innerClass.toIntOrNull()
             if (anonymousIndex != null) {
+                // add anonymous classes make the anonymous class index correct
                 if (anonymousIndex in 1..999) {
                     repeat(anonymousIndex - 1) { i ->
                         append(indent)
@@ -245,10 +254,23 @@ private fun ClassNode.constructClass(project: Project, body: String): PsiClass? 
     }
 }
 
+/**
+ * Finds the stub `PsiClass` for this class node (or the source code element if this is from a source file in the
+ * module)
+ */
 fun ClassNode.findStubClass(project: Project): PsiClass? {
     return findQualifiedClass(project, name.replace('/', '.'))
 }
 
+/**
+ * Attempts to find the most readable source code for this class. Checks the following locations in this order:
+ * - Library sources
+ * - Decompiled sources (if `canDecompile` is set to true)
+ * - Stub file (which may be the source file if the source file is part of the module)
+ *
+ * The `canDecompile` parameter should only be set to true if this was triggered by a user action, as decompilation can
+ * be slow.
+ */
 fun ClassNode.findSourceClass(project: Project, scope: GlobalSearchScope, canDecompile: Boolean = false): PsiClass? {
     return findQualifiedClass(name.replace('/', '.')) { name ->
         val stubClass = JavaPsiFacade.getInstance(project).findClass(name, scope) ?: return@findQualifiedClass null
@@ -341,6 +363,11 @@ fun FieldNode.findStubField(clazz: ClassNode, project: Project): PsiField? {
     return clazz.findStubClass(project)?.findField(memberReference)
 }
 
+/**
+ * Attempts to find the source field using [findSourceField], and constructs one if it couldn't be found.
+ *
+ * The returned field will be inside a valid `PsiClass` inside a valid `PsiJavaFile`, if the `clazz` parameter is given.
+ */
 fun FieldNode.findOrConstructSourceField(
     clazz: ClassNode?,
     project: Project,
@@ -370,6 +397,10 @@ fun FieldNode.findOrConstructSourceField(
         ?: psiField
 }
 
+/**
+ * Attempts to find the most readable source field for this field, using the same technique as described in
+ * [findSourceClass]
+ */
 fun FieldNode.findSourceField(
     clazz: ClassNode,
     project: Project,
@@ -379,6 +410,9 @@ fun FieldNode.findSourceField(
     return clazz.findSourceClass(project, scope, canDecompile)?.findField(memberReference)
 }
 
+/**
+ * Constructs a fake field node which could have been reached via this field instruction
+ */
 fun FieldInsnNode.fakeResolve(): ClassAndFieldNode {
     val clazz = makeFakeClass(owner)
     val field = FieldNode(Opcodes.ACC_PUBLIC, name, desc, null, null)
@@ -498,6 +532,13 @@ fun MethodNode.findStubMethod(clazz: ClassNode, project: Project): PsiMethod? {
     return clazz.findStubClass(project)?.findMethods(memberReference)?.firstOrNull()
 }
 
+/**
+ * Attempts to find the source method using [findSourceElement]. If this fails, or if the result is not a `PsiMethod`,
+ * then a new source method is constructed, possibly copying the body of the found source element.
+ *
+ * The returned method will be inside a valid `PsiClass` inside a valid `PsiJavaFile`, if the `clazz` parameter is
+ * given.
+ */
 fun MethodNode.findOrConstructSourceMethod(
     clazz: ClassNode?,
     project: Project,
@@ -607,6 +648,12 @@ fun MethodNode.findOrConstructSourceMethod(
         ?: psiMethod
 }
 
+/**
+ * Attempts to find the most readable source element corresponding to this method, using the same priorities as
+ * [findSourceClass]. If this method is synthetic and corresponds to a lambda expression or method reference, attempts
+ * to find the associated lambda expression or method reference. If the class source couldn't be found and only a stub
+ * tree is located, then lambdas cannot be searched for as that requires looking inside method bodies.
+ */
 fun MethodNode.findSourceElement(
     clazz: ClassNode,
     project: Project,
@@ -626,6 +673,9 @@ fun MethodNode.findSourceElement(
     return findAssociatedLambda(psiClass, clazz, this)
 }
 
+/**
+ * Constructs a fake method node which could have been reached via this method instruction
+ */
 fun MethodInsnNode.fakeResolve(): ClassAndMethodNode {
     val clazz = makeFakeClass(owner)
     if (itf) {
