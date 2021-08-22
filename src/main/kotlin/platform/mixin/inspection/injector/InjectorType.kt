@@ -18,6 +18,9 @@ import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.platform.mixin.util.argsType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoReturnableType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoType
+import com.demonwav.mcdev.platform.mixin.util.getGenericParameterTypes
+import com.demonwav.mcdev.platform.mixin.util.getGenericReturnType
+import com.demonwav.mcdev.platform.mixin.util.getGenericType
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.Parameter
@@ -44,9 +47,7 @@ enum class InjectorType(private val annotation: String) {
             annotation: PsiAnnotation,
             targetMethod: MethodNode
         ): MethodSignature {
-            val elementFactory = JavaPsiFacade.getElementFactory(annotation.project)
-
-            val returnType = elementFactory.createTypeFromText(Type.getReturnType(targetMethod.desc).className, null)
+            val returnType = targetMethod.getGenericReturnType(annotation.project)
 
             val result = ArrayList<ParameterGroup>()
 
@@ -157,17 +158,13 @@ enum class InjectorType(private val annotation: String) {
                 )
             }
 
-            Type.getArgumentTypes(method.desc).asSequence().withIndex().mapTo(parameters) { (index, arg) ->
+            method.getGenericParameterTypes(project).asSequence().withIndex().mapTo(parameters) { (index, type) ->
                 val i = if (hasThis) index + 1 else index
                 val name = method.localVariables?.getOrNull(i)?.name?.toJavaIdentifier() ?: "par${index + 1}"
-                val type = elementFactory.createTypeFromText(arg.className, null)
                 sanitizedParameter(type, name)
             }
 
-            val returnType = elementFactory.createTypeFromText(
-                Type.getReturnType(method.desc).className,
-                null
-            )
+            val returnType = method.getGenericReturnType(project)
             return parameters to returnType
         }
 
@@ -196,15 +193,13 @@ enum class InjectorType(private val annotation: String) {
                 )
             }
 
-            val fieldType = elementFactory.createTypeFromText(Type.getType(field.desc).className, null)
-
             val returnType = when (opcode) {
                 Opcodes.PUTFIELD, Opcodes.PUTSTATIC -> {
-                    parameters.add(Parameter("value", fieldType))
+                    parameters.add(Parameter("value", field.getGenericType(project)))
                     PsiType.VOID
                 }
                 else -> { // assume getfield redirect
-                    fieldType
+                    field.getGenericType(project)
                 }
             }
 
@@ -252,10 +247,8 @@ enum class InjectorType(private val annotation: String) {
             targetMethod: MethodNode
         ): List<Parameter> {
             val numLocalsToDrop = if (targetMethod.hasAccess(Opcodes.ACC_STATIC)) 0 else 1
-            val elementFactory = JavaPsiFacade.getElementFactory(project)
-            return Type.getArgumentTypes(targetMethod.desc).asSequence().withIndex()
-                .map { (index, it) ->
-                    val type = elementFactory.createTypeFromText(it.className, null)
+            return targetMethod.getGenericParameterTypes(project).asSequence().withIndex()
+                .map { (index, type) ->
                     val name = targetMethod.localVariables
                         ?.getOrNull(index + numLocalsToDrop)
                         ?.name

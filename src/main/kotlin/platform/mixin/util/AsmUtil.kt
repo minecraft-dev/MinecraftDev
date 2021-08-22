@@ -33,11 +33,14 @@ import com.intellij.openapi.util.RecursionManager
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor
 import com.intellij.psi.PsiAnonymousClass
+import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassInitializer
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiCompiledElement
 import com.intellij.psi.PsiCompiledFile
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiJavaFile
@@ -46,6 +49,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiModifier
+import com.intellij.psi.PsiType
 import com.intellij.psi.impl.compiled.ClsElementImpl
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiUtil
@@ -56,6 +60,7 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Handle
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
+import org.objectweb.asm.signature.SignatureReader
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.FieldNode
@@ -359,6 +364,14 @@ fun FieldNode.hasModifier(@PsiModifier.ModifierConstant modifier: String) = hasM
 val FieldNode.memberReference
     get() = MemberReference(this.name, this.desc)
 
+fun FieldNode.getGenericType(project: Project): PsiType {
+    val elementFactory = JavaPsiFacade.getElementFactory(project)
+    val signature = this.signature ?: return elementFactory.createTypeFromText(Type.getType(this.desc).className, null)
+    val sigToPsi = SignatureToPsi(elementFactory, null)
+    SignatureReader(signature).acceptType(sigToPsi)
+    return sigToPsi.type
+}
+
 fun FieldNode.findStubField(clazz: ClassNode, project: Project): PsiField? {
     return clazz.findStubClass(project)?.findField(memberReference)
 }
@@ -377,9 +390,19 @@ fun FieldNode.findOrConstructSourceField(
     clazz?.let { findSourceField(it, project, scope, canDecompile = canDecompile) }?.let { return it }
 
     val elementFactory = JavaPsiFacade.getInstance(project).elementFactory
+
+    val signature = this.signature
+    val fieldType = if (signature == null) {
+        elementFactory.createTypeFromText(Type.getType(this.desc).className, null)
+    } else {
+        val sigToPsi = SignatureToPsi(elementFactory, null)
+        SignatureReader(signature).acceptType(sigToPsi)
+        sigToPsi.type
+    }
+
     val psiField = elementFactory.createField(
         this.name.toJavaIdentifier(),
-        elementFactory.createTypeFromText(Type.getType(this.desc).className, null)
+        fieldType
     )
     psiField.realName = this.name
     val modifierList = psiField.modifierList!!
@@ -436,6 +459,28 @@ fun MethodNode.hasModifier(@PsiModifier.ModifierConstant modifier: String) = has
 
 val MethodNode.memberReference
     get() = MemberReference(this.name, this.desc)
+
+fun MethodNode.getGenericReturnType(project: Project): PsiType {
+    val elementFactory = JavaPsiFacade.getElementFactory(project)
+    this.signature?.let { signature ->
+        val sigToPsi = SignatureToPsi(elementFactory, null)
+        SignatureReader(signature).accept(sigToPsi)
+        sigToPsi.returnType?.let { return it }
+    }
+    return elementFactory.createTypeFromText(Type.getReturnType(this.desc).className, null)
+}
+
+fun MethodNode.getGenericParameterTypes(project: Project): List<PsiType> {
+    val elementFactory = JavaPsiFacade.getElementFactory(project)
+    val sigParamTypes = this.signature?.let { signature ->
+        val sigToPsi = SignatureToPsi(elementFactory, null)
+        SignatureReader(signature).accept(sigToPsi)
+        sigToPsi.parameterTypes
+    } ?: emptyList()
+    return Type.getArgumentTypes(this.desc).withIndex().map { (index, argType) ->
+        sigParamTypes.getOrNull(index) ?: elementFactory.createTypeFromText(argType.className, null)
+    }
+}
 
 val MethodNode.isConstructor
     get() = this.name == "<init>"
@@ -553,6 +598,9 @@ fun MethodNode.findOrConstructSourceMethod(
     val elementFactory = JavaPsiFacade.getInstance(project).elementFactory
     val methodText = buildString {
         append("public ")
+        if (this@findOrConstructSourceMethod.signature != null) {
+            append("<T> ")
+        }
         val returnType = Type.getReturnType(this@findOrConstructSourceMethod.desc)
         if (isConstructor) {
             var name = "_init_"
@@ -607,6 +655,42 @@ fun MethodNode.findOrConstructSourceMethod(
     }
     val psiMethod = elementFactory.createMethodFromText(methodText, null)
     psiMethod.realName = name
+
+    // replace generics
+    this.signature?.let { signature ->
+        val sigToPsi = SignatureToPsi(elementFactory, null)
+        SignatureReader(signature).accept(sigToPsi)
+
+        val ftp = sigToPsi.formalTypeParameters
+        if (ftp == null) {
+            psiMethod.typeParameterList?.delete()
+        } else {
+            psiMethod.typeParameterList?.replace(ftp)
+        }
+
+        for ((index, parameterType) in sigToPsi.parameterTypes.withIndex()) {
+            val parameter = psiMethod.parameterList.getParameter(index) ?: continue
+            // make sure to respect varargs
+            val actualType = if (parameter.type is PsiEllipsisType && parameterType is PsiArrayType) {
+                PsiEllipsisType(parameterType.componentType, parameterType.annotations)
+            } else {
+                parameterType
+            }
+
+            val typeElement = elementFactory.createTypeElement(actualType)
+            parameter.typeElement?.replace(typeElement)
+        }
+
+        sigToPsi.returnType?.let { returnType ->
+            psiMethod.returnTypeElement?.replace(elementFactory.createTypeElement(returnType))
+        }
+
+        for ((index, exceptionType) in sigToPsi.exceptionTypes.withIndex()) {
+            val throwsType = psiMethod.throwsList.referenceElements.getOrNull(index) ?: continue
+            if (exceptionType !is PsiClassType) continue
+            throwsType.replace(elementFactory.createReferenceElementByType(exceptionType))
+        }
+    }
 
     // the body of the method may have still been in the source method if it wasn't actually a method
     when (sourceElement) {
