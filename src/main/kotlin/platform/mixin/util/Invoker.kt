@@ -10,12 +10,13 @@
 
 package com.demonwav.mcdev.platform.mixin.util
 
+import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.mapFirstNotNull
-import com.demonwav.mcdev.util.memberReference
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
@@ -54,7 +55,11 @@ fun resolveInvokerTarget(
             if (constructor && member.returnType?.resolve()?.fullQualifiedName?.replace('.', '/') != it.name) {
                 return null
             }
-            val method = it.findMethod(member.memberReference) ?: return null
+            var wantedDesc = member.descriptor ?: return null
+            if (constructor) {
+                wantedDesc = wantedDesc.replaceAfterLast(')', "V")
+            }
+            val method = it.findMethod(MemberReference(name, wantedDesc)) ?: return null
             ClassAndMethodNode(it, method)
         }
         else -> null

@@ -107,10 +107,10 @@ intellij {
         "gradle",
         "Groovy",
         "org.toml.lang:$pluginTomlVersion",
+        "ByteCodeViewer",
         // needed dependencies for unit tests
         "properties",
-        "junit",
-        "ByteCodeViewer"
+        "junit"
     )
 
     pluginName.set("Minecraft Development")

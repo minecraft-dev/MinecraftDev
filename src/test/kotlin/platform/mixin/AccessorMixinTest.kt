@@ -11,6 +11,8 @@
 package com.demonwav.mcdev.platform.mixin
 
 import com.demonwav.mcdev.framework.EdtInterceptor
+import com.demonwav.mcdev.platform.mixin.inspection.accessor.AccessorTargetInspection
+import com.demonwav.mcdev.platform.mixin.inspection.invoker.InvokerTargetInspection
 import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
@@ -191,5 +193,165 @@ class AccessorMixinTest : BaseMixinTest() {
         """
     ) { psiClass ->
         Assertions.assertFalse(psiClass.isAccessorMixin)
+    }
+
+    @Test
+    @DisplayName("Accessor Mixin Target Test")
+    fun accessorMixinTargetTest() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Accessor;
+        import org.spongepowered.asm.mixin.gen.Invoker;
+        import org.spongepowered.asm.mixin.Mixin;
+        import org.spongepowered.asm.mixin.Mutable;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            @Accessor static String getPrivateStaticString() { return null; }
+            @Accessor static void setPrivateStaticString(String value) {}
+            @Accessor String getPrivateString();
+            @Accessor void setPrivateString(String value);
+            @Accessor @Mutable void setPrivateFinalString(String value);
+            @Invoker static String callPrivateStaticMethod() { return null; }
+            @Invoker String callPrivateMethod();
+            @Invoker static MixinBase createMixinBase() { return null; }
+        }
+        """
+    ) {
+        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Accessor Mixin Renamed Target Test")
+    fun accessorMixinRenamedTargetTest() = doTest(
+        "AccessorMixinRenamedTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Accessor;
+        import org.spongepowered.asm.mixin.gen.Invoker;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinRenamedTargetMixin {
+            @Accessor("privateString") String foo1();
+            @Accessor("privateString") void foo2(String value);
+            @Invoker("privateMethod") String foo3();
+            @Invoker("<init>") MixinBase foo4();
+        }
+        """
+    ) {
+        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Invalid Accessor Target")
+    fun invalidAccessorTarget() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Accessor;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            <error descr="Cannot resolve member 'foo' in target class">@Accessor</error> String getFoo();
+        }
+        """
+    ) {
+        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Invalid Named Accessor Target")
+    fun invalidNamedAccessorTarget() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Accessor;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            <error descr="Cannot resolve member 'foo' in target class">@Accessor("foo")</error> String bar();
+        }
+        """
+    ) {
+        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Invalid Invoker Target")
+    fun invalidInvokerTarget() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Invoker;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            <error descr="Cannot resolve member 'foo' in target class">@Invoker</error> String callFoo();
+        }
+        """
+    ) {
+        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Invalid Named Invoker Target")
+    fun invalidNamedInvokerTarget() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Invoker;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            <error descr="Cannot resolve member 'foo' in target class">@Invoker("foo")</error> String bar();
+        }
+        """
+    ) {
+        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Invalid Constructor Invoker Target")
+    fun invalidConstructorInvokerTarget() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Invoker;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            <error descr="Cannot resolve member '<init>' in target class">@Invoker("<init>")</error> String construct(String invalidArg);
+        }
+        """
+    ) {
+        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
     }
 }

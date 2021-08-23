@@ -18,4 +18,8 @@ public class MixedInOuter {
         public MixedInInner(String string) {
         }
     }
+
+    public MixedInInner methodWithInnerType(MixedInInner param) {
+        return null;
+    }
 }

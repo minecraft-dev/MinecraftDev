@@ -61,6 +61,10 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                 // Access modifiers are already checked above
                 continue
             }
+            if (modifier == PsiModifier.DEFAULT) {
+                // default modifier is not present in bytecode
+                continue
+            }
 
             val targetModifier = target.method.hasModifier(modifier)
             val overwriteModifier = modifierList.hasModifierProperty(modifier)
