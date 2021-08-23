@@ -19,13 +19,13 @@ import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.findQualifiedClass
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.hasSyntheticMethod
+import com.demonwav.mcdev.util.isErasureEquivalentTo
 import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.realName
 import com.demonwav.mcdev.util.toJavaIdentifier
 import com.intellij.codeEditor.JavaEditorFileSwapper
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.CompilerModuleExtension
@@ -40,6 +40,7 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiCompiledElement
 import com.intellij.psi.PsiCompiledFile
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiFileFactory
@@ -104,6 +105,10 @@ private fun hasModifier(access: Int, @PsiModifier.ModifierConstant modifier: Str
     return (access and flag) != 0
 }
 
+fun Type.toPsiType(elementFactory: PsiElementFactory, context: PsiElement? = null): PsiType {
+    return elementFactory.createTypeFromText(className.replace('$', '.'), context)
+}
+
 // ClassNode
 
 fun ClassNode.hasAccess(flag: Int) = (this.access and flag) != 0
@@ -143,29 +148,36 @@ fun findClassNodeByQualifiedName(project: Project, module: Module?, fqn: String)
 }
 
 fun findClassNodeByPsiClass(psiClass: PsiClass, module: Module? = psiClass.findModule()): ClassNode? {
-    return runCatching {
+    return try {
         val bytes = LOAD_CLASS_FILE_BYTES?.invoke(null, psiClass) as? ByteArray
         if (bytes == null) {
             // find compiler output
-            if (module == null) return@runCatching null
-            val fqn = psiClass.fullQualifiedName ?: return@runCatching null
-            var parentDir = CompilerModuleExtension.getInstance(module)?.compilerOutputPath ?: return@runCatching null
+            if (module == null) return null
+            val fqn = psiClass.fullQualifiedName ?: return null
+            var parentDir = CompilerModuleExtension.getInstance(module)?.compilerOutputPath ?: return null
             val packageName = fqn.substringBeforeLast('.', "")
             if (packageName.isNotEmpty()) {
                 for (dir in packageName.split('.')) {
-                    parentDir = parentDir.findChild(dir) ?: return@runCatching null
+                    parentDir = parentDir.findChild(dir) ?: return null
                 }
             }
-            val classFile = parentDir.findChild("${fqn.substringAfterLast('.')}.class") ?: return@runCatching null
+            val classFile = parentDir.findChild("${fqn.substringAfterLast('.')}.class") ?: return null
             val node = ClassNode()
             ClassReader(classFile.inputStream).accept(node, 0)
-            return@runCatching node
+            node
         } else {
             val node = ClassNode()
             ClassReader(bytes).accept(node, 0)
-            return@runCatching node
+            node
         }
-    }.getOrLogException(LOGGER)
+    } catch (e: Throwable) {
+        val message = e.message
+        // TODO: display an error to the user?
+        if (message == null || !message.contains("Unsupported class file major version")) {
+            LOGGER.error(e)
+        }
+        null
+    }
 }
 
 private fun ClassNode.constructClass(project: Project, body: String): PsiClass? {
@@ -366,7 +378,7 @@ val FieldNode.memberReference
 
 fun FieldNode.getGenericType(project: Project): PsiType {
     val elementFactory = JavaPsiFacade.getElementFactory(project)
-    val signature = this.signature ?: return elementFactory.createTypeFromText(Type.getType(this.desc).className, null)
+    val signature = this.signature ?: return Type.getType(this.desc).toPsiType(elementFactory)
     val sigToPsi = SignatureToPsi(elementFactory, null)
     SignatureReader(signature).acceptType(sigToPsi)
     return sigToPsi.type
@@ -391,18 +403,9 @@ fun FieldNode.findOrConstructSourceField(
 
     val elementFactory = JavaPsiFacade.getInstance(project).elementFactory
 
-    val signature = this.signature
-    val fieldType = if (signature == null) {
-        elementFactory.createTypeFromText(Type.getType(this.desc).className, null)
-    } else {
-        val sigToPsi = SignatureToPsi(elementFactory, null)
-        SignatureReader(signature).acceptType(sigToPsi)
-        sigToPsi.type
-    }
-
     val psiField = elementFactory.createField(
         this.name.toJavaIdentifier(),
-        fieldType
+        this.getGenericType(project)
     )
     psiField.realName = this.name
     val modifierList = psiField.modifierList!!
@@ -467,18 +470,29 @@ fun MethodNode.getGenericReturnType(project: Project): PsiType {
         SignatureReader(signature).accept(sigToPsi)
         sigToPsi.returnType?.let { return it }
     }
-    return elementFactory.createTypeFromText(Type.getReturnType(this.desc).className, null)
+    return Type.getReturnType(this.desc).toPsiType(elementFactory)
 }
 
-fun MethodNode.getGenericParameterTypes(project: Project): List<PsiType> {
+fun MethodNode.getGenericParameterTypes(clazz: ClassNode, project: Project): List<PsiType> {
     val elementFactory = JavaPsiFacade.getElementFactory(project)
     val sigParamTypes = this.signature?.let { signature ->
         val sigToPsi = SignatureToPsi(elementFactory, null)
         SignatureReader(signature).accept(sigToPsi)
         sigToPsi.parameterTypes
     } ?: emptyList()
+    val offset = if (this.isConstructor) {
+        when {
+            clazz.hasAccess(Opcodes.ACC_ENUM) -> 2
+            clazz.outerClass != null && !clazz.hasAccess(Opcodes.ACC_STATIC) -> 1
+            else -> 0
+        }
+    } else {
+        0
+    }
     return Type.getArgumentTypes(this.desc).withIndex().map { (index, argType) ->
-        sigParamTypes.getOrNull(index) ?: elementFactory.createTypeFromText(argType.className, null)
+        val argParam = argType.toPsiType(elementFactory)
+        val sigParam = sigParamTypes.getOrNull(index + offset) ?: return@map argParam
+        if (sigParam.isErasureEquivalentTo(argParam)) sigParam else argParam
     }
 }
 
@@ -618,7 +632,7 @@ fun MethodNode.findOrConstructSourceMethod(
             }
             append(name)
         } else {
-            append(returnType.className)
+            append(returnType.className.replace('$', '.'))
             append(' ')
             append(this@findOrConstructSourceMethod.name.toJavaIdentifier())
         }
@@ -628,7 +642,7 @@ fun MethodNode.findOrConstructSourceMethod(
             if (index != 0) {
                 append(", ")
             }
-            var typeName = param.className
+            var typeName = param.className.replace('$', '.')
             if (index == params.size - 1 && hasAccess(Opcodes.ACC_VARARGS) && typeName.endsWith("[]")) {
                 typeName = typeName.replaceRange(typeName.length - 2, typeName.length, "...")
             }

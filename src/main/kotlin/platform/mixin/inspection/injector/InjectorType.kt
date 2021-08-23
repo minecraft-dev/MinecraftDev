@@ -22,6 +22,7 @@ import com.demonwav.mcdev.platform.mixin.util.getGenericParameterTypes
 import com.demonwav.mcdev.platform.mixin.util.getGenericReturnType
 import com.demonwav.mcdev.platform.mixin.util.getGenericType
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
+import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.constantStringValue
@@ -37,6 +38,7 @@ import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiType
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
+import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
 
@@ -45,6 +47,7 @@ enum class InjectorType(private val annotation: String) {
 
         override fun expectedMethodSignature(
             annotation: PsiAnnotation,
+            targetClass: ClassNode,
             targetMethod: MethodNode
         ): MethodSignature {
             val returnType = targetMethod.getGenericReturnType(annotation.project)
@@ -54,7 +57,7 @@ enum class InjectorType(private val annotation: String) {
             // Parameters from injected method (optional)
             result.add(
                 ParameterGroup(
-                    collectTargetMethodParameters(annotation.project, targetMethod),
+                    collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
                     required = false,
                     default = true
                 )
@@ -95,6 +98,7 @@ enum class InjectorType(private val annotation: String) {
 
         override fun expectedMethodSignature(
             annotation: PsiAnnotation,
+            targetClass: ClassNode,
             targetMethod: MethodNode
         ): MethodSignature? {
             val at = annotation.findDeclaredAttributeValue("at") as? PsiAnnotation ?: return null
@@ -120,6 +124,7 @@ enum class InjectorType(private val annotation: String) {
                 is MethodTargetMember -> collectMethodParameters(
                     annotation.project,
                     reference,
+                    member.classAndMethod.clazz,
                     member.classAndMethod.method
                 )
                 is FieldTargetMember -> collectFieldParameters(
@@ -134,7 +139,7 @@ enum class InjectorType(private val annotation: String) {
 
             // Optionally the target method parameters can be used
             val targetMethodGroup = ParameterGroup(
-                collectTargetMethodParameters(annotation.project, targetMethod),
+                collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
                 required = false
             )
 
@@ -144,6 +149,7 @@ enum class InjectorType(private val annotation: String) {
         private fun collectMethodParameters(
             project: Project,
             reference: MemberReference,
+            clazz: ClassNode,
             method: MethodNode
         ): Pair<List<Parameter>, PsiType>? {
             val elementFactory = JavaPsiFacade.getElementFactory(project)
@@ -154,15 +160,18 @@ enum class InjectorType(private val annotation: String) {
             if (hasThis) {
                 parameters += Parameter(
                     "self",
-                    elementFactory.createTypeFromText(Type.getType(ownerName.replace('.', '/')).className, null)
+                    Type.getObjectType(ownerName.replace('.', '/')).toPsiType(elementFactory)
                 )
             }
 
-            method.getGenericParameterTypes(project).asSequence().withIndex().mapTo(parameters) { (index, type) ->
-                val i = if (hasThis) index + 1 else index
-                val name = method.localVariables?.getOrNull(i)?.name?.toJavaIdentifier() ?: "par${index + 1}"
-                sanitizedParameter(type, name)
-            }
+            method.getGenericParameterTypes(clazz, project)
+                .asSequence()
+                .withIndex()
+                .mapTo(parameters) { (index, type) ->
+                    val i = if (hasThis) index + 1 else index
+                    val name = method.localVariables?.getOrNull(i)?.name?.toJavaIdentifier() ?: "par${index + 1}"
+                    sanitizedParameter(type, name)
+                }
 
             val returnType = method.getGenericReturnType(project)
             return parameters to returnType
@@ -189,7 +198,7 @@ enum class InjectorType(private val annotation: String) {
             if (!field.hasAccess(Opcodes.ACC_STATIC)) {
                 parameters += Parameter(
                     "self",
-                    elementFactory.createTypeFromText(Type.getType(ownerName.replace('.', '/')).className, null)
+                    Type.getObjectType(ownerName.replace('.', '/')).toPsiType(elementFactory)
                 )
             }
 
@@ -210,6 +219,7 @@ enum class InjectorType(private val annotation: String) {
     MODIFY_ARGS(MixinConstants.Annotations.MODIFY_ARGS) {
         override fun expectedMethodSignature(
             annotation: PsiAnnotation,
+            targetClass: ClassNode,
             targetMethod: MethodNode
         ): MethodSignature {
             val result = ArrayList<ParameterGroup>()
@@ -220,7 +230,7 @@ enum class InjectorType(private val annotation: String) {
             // Parameters from injected method (optional)
             result.add(
                 ParameterGroup(
-                    collectTargetMethodParameters(annotation.project, targetMethod),
+                    collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
                     required = false
                 )
             )
@@ -235,6 +245,7 @@ enum class InjectorType(private val annotation: String) {
 
     open fun expectedMethodSignature(
         annotation: PsiAnnotation,
+        targetClass: ClassNode,
         targetMethod: MethodNode
     ): MethodSignature? = null
 
@@ -244,10 +255,11 @@ enum class InjectorType(private val annotation: String) {
 
         private fun collectTargetMethodParameters(
             project: Project,
+            clazz: ClassNode,
             targetMethod: MethodNode
         ): List<Parameter> {
             val numLocalsToDrop = if (targetMethod.hasAccess(Opcodes.ACC_STATIC)) 0 else 1
-            return targetMethod.getGenericParameterTypes(project).asSequence().withIndex()
+            return targetMethod.getGenericParameterTypes(clazz, project).asSequence().withIndex()
                 .map { (index, type) ->
                     val name = targetMethod.localVariables
                         ?.getOrNull(index + numLocalsToDrop)

@@ -77,6 +77,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                         val parameters = method.parameterList
                         val (expectedParameters, expectedReturnType) = type.expectedMethodSignature(
                             annotation,
+                            targetMethod.clazz,
                             targetMethod.method
                         ) ?: continue
 

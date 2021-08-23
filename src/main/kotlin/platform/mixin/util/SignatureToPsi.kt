@@ -42,13 +42,7 @@ class SignatureToPsi(
         }
 
     val type: PsiType
-        get() {
-            if (arrayDimensions > 0) {
-                text.append("[]".repeat(arrayDimensions))
-                arrayDimensions = 0
-            }
-            return elementFactory.createTypeFromText(text.toString(), context)
-        }
+        get() = elementFactory.createTypeFromText(text.toString(), context)
 
     var superclassType: PsiType? = null
     val interfaceTypes = mutableListOf<PsiType>()
@@ -113,14 +107,22 @@ class SignatureToPsi(
         }
     }
 
+    private fun onTypeCompleted() {
+        if (arrayDimensions > 0) {
+            text.append("[]".repeat(arrayDimensions))
+            arrayDimensions = 0
+        }
+        typeCompletedCallback?.let { it(this.type) }
+    }
+
     override fun visitBaseType(descriptor: Char) {
         text.append(Type.getType(descriptor.toString()).className)
-        typeCompletedCallback?.let { it(this.type) }
+        onTypeCompleted()
     }
 
     override fun visitTypeVariable(name: String) {
         text.append(name)
-        typeCompletedCallback?.let { it(this.type) }
+        onTypeCompleted()
     }
 
     override fun visitArrayType(): SignatureVisitor {
@@ -157,6 +159,7 @@ class SignatureToPsi(
             text.append(", ")
         } else {
             text.append('<')
+            hadTypeArgument = true
         }
         if (wildcard == EXTENDS) {
             text.append("? extends ")
@@ -183,6 +186,6 @@ class SignatureToPsi(
         if (hadTypeArgument) {
             text.append('>')
         }
-        typeCompletedCallback?.let { it(this.type) }
+        onTypeCompleted()
     }
 }

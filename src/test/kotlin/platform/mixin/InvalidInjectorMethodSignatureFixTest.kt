@@ -49,4 +49,16 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
     @Test
     @DisplayName("ModifyArgs")
     fun modifyArgs() = doTest("modifyArgs")
+
+    @Test
+    @DisplayName("Generic method")
+    fun genericCase() = doTest("genericCase")
+
+    @Test
+    @DisplayName("Generic method complex return type")
+    fun genericCaseComplexReturnType() = doTest("genericCaseComplexReturnType")
+
+    @Test
+    @DisplayName("Simple method with inner type")
+    fun simpleMethodWithInnerType() = doTest("simpleMethodWithInnerType")
 }

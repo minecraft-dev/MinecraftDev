@@ -11,6 +11,8 @@
 package com.demonwav.mcdev.mixintestdata.shadow;
 
 public class MixinBase {
+    private MixinBase() {}
+
     // Static
     private static final String privateStaticFinalString = "";
     private static String privateStaticString = "";
@@ -42,4 +44,12 @@ public class MixinBase {
     protected final String noFinal = "";
 
     public final String twoIssues = "";
+
+    private static String privateStaticMethod() {
+        return null;
+    }
+
+    private String privateMethod() {
+        return null;
+    }
 }

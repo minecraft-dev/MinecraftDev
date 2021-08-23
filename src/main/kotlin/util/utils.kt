@@ -12,6 +12,7 @@ package com.demonwav.mcdev.util
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.intellij.lang.java.lexer.JavaLexer
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.runReadAction
@@ -26,6 +27,7 @@ import com.intellij.openapi.roots.libraries.LibraryKind
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Ref
+import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import java.util.Locale
@@ -243,6 +245,8 @@ fun String.getSimilarity(text: String, bonus: Int = 0): Int {
     return distance + bonus
 }
 
+fun String.isJavaKeyword() = JavaLexer.isSoftKeyword(this, LanguageLevel.HIGHEST)
+
 fun String.toJavaIdentifier(allowDollars: Boolean = true): String {
     if (this.isEmpty()) {
         return "_"
@@ -296,58 +300,3 @@ inline fun <reified T> Iterable<*>.firstOfType(): T? {
 }
 
 fun libraryKind(id: String): LibraryKind = LibraryKind.findById(id) ?: LibraryKind.create(id)
-
-fun String.isJavaKeyword() = javaKeywords.contains(this)
-
-private val javaKeywords = setOf(
-    "abstract",
-    "continue",
-    "for",
-    "new",
-    "switch",
-    "assert",
-    "default",
-    "goto",
-    "package",
-    "synchronized",
-    "boolean",
-    "do",
-    "if",
-    "private",
-    "this",
-    "break",
-    "double",
-    "implements",
-    "protected",
-    "throw",
-    "byte",
-    "else",
-    "import",
-    "public",
-    "throws",
-    "case",
-    "enum",
-    "instanceof",
-    "return",
-    "transient",
-    "catch",
-    "extends",
-    "int",
-    "short",
-    "try",
-    "char",
-    "final",
-    "interface",
-    "static",
-    "void",
-    "class",
-    "finally",
-    "long",
-    "strictfp",
-    "volatile",
-    "const",
-    "float",
-    "native",
-    "super",
-    "while"
-)
