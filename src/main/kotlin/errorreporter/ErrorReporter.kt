@@ -24,7 +24,9 @@ import com.intellij.openapi.diagnostic.ErrorReportSubmitter
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent
 import com.intellij.openapi.diagnostic.SubmittedReportInfo
 import com.intellij.openapi.progress.EmptyProgressIndicator
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.util.Consumer
 import java.awt.Component
 
@@ -42,14 +44,26 @@ class ErrorReporter : ErrorReportSubmitter() {
         parentComponent: Component,
         consumer: Consumer<in SubmittedReportInfo>
     ): Boolean {
+        val dataContext = DataManager.getInstance().getDataContext(parentComponent)
+        val project = CommonDataKeys.PROJECT.getData(dataContext)
+
         val event = events[0]
-        val errorMessage = event.throwable.message
-        if (errorMessage != null && ignoredErrorMessages.any(errorMessage::contains)) {
+        val errorMessage = event.throwableText
+        if (errorMessage.isNotBlank() && ignoredErrorMessages.any(errorMessage::contains)) {
+            val task = object : Task.Backgroundable(project, "Ignored error") {
+                override fun run(indicator: ProgressIndicator) {
+                    consumer.consume(SubmittedReportInfo(null, null, SubmittedReportInfo.SubmissionStatus.DUPLICATE))
+                }
+            }
+            if (project == null) {
+                task.run(EmptyProgressIndicator())
+            } else {
+                ProgressManager.getInstance().run(task)
+            }
             return true
         }
 
         val errorData = ErrorData(event.throwable, IdeaLogger.ourLastActionId)
-        val dataContext = DataManager.getInstance().getDataContext(parentComponent)
 
         errorData.description = additionalInfo
         errorData.message = event.message
@@ -67,8 +81,6 @@ class ErrorReporter : ErrorReportSubmitter() {
         }
 
         val (reportValues, attachments) = errorData.formatErrorData()
-
-        val project = CommonDataKeys.PROJECT.getData(dataContext)
 
         val task = AnonymousFeedbackTask(
             project,
