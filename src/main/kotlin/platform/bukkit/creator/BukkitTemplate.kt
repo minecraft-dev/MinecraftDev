@@ -26,7 +26,6 @@ import com.demonwav.mcdev.util.MinecraftTemplates.Companion.BUKKIT_POM_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.BUKKIT_SETTINGS_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.BUKKIT_SUBMODULE_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.BUKKIT_SUBMODULE_POM_TEMPLATE
-import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.openapi.project.Project
 
 object BukkitTemplate : BaseTemplate() {
@@ -126,11 +125,9 @@ object BukkitTemplate : BaseTemplate() {
 
         // Plugins targeting 1.13 or newer need an explicit api declaration flag
         // This is the major and minor version separated by a dot without the patch version. ex: 1.15 even for 1.15.2
-        config.minecraftVersion?.let { mcVersion ->
-            val semVer = SemanticVersion.parse(mcVersion)
-            if (semVer >= BukkitModuleType.API_TAG_VERSION) {
-                props["API_VERSION"] = semVer.take(2).toString()
-            }
+        val mcVersion = config.semanticMinecraftVersion
+        if (mcVersion >= BukkitModuleType.API_TAG_VERSION) {
+            props["API_VERSION"] = mcVersion.take(2).toString()
         }
 
         return project.applyTemplate(BUKKIT_PLUGIN_YML_TEMPLATE, props)

@@ -19,8 +19,12 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.mcp.McpVersionPair
 import com.demonwav.mcdev.util.License
+import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.VersionRange
+import com.demonwav.mcdev.util.until
 import com.intellij.openapi.module.Module
+import com.intellij.util.lang.JavaVersion
 import java.nio.file.Path
 
 class ForgeProjectConfig : ProjectConfig(), GradleCreator {
@@ -39,6 +43,15 @@ class ForgeProjectConfig : ProjectConfig(), GradleCreator {
     var license = License.ALL_RIGHTS_RESERVED
 
     override val preferredBuildSystem = BuildSystemType.GRADLE
+
+    override val javaVersion: JavaVersion
+        get() = MinecraftVersions.requiredJavaVersion(mcVersion)
+
+    override val compatibleGradleVersions: VersionRange
+        get() = when {
+            isFg3(mcVersion, forgeVersion) -> Fg3ProjectCreator.FG5_WRAPPER_VERSION until null
+            else -> VersionRange.fixed(Fg2ProjectCreator.FG_WRAPPER_VERSION)
+        }
 
     override fun buildGradleCreator(
         rootDirectory: Path,

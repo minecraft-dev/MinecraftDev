@@ -19,7 +19,11 @@ import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenCreator
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.BukkitLikeConfiguration
+import com.demonwav.mcdev.util.MinecraftVersions
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.VersionRange
 import com.intellij.openapi.module.Module
+import com.intellij.util.lang.JavaVersion
 import java.nio.file.Path
 
 class BungeeCordProjectConfig(override var type: PlatformType) :
@@ -28,6 +32,8 @@ class BungeeCordProjectConfig(override var type: PlatformType) :
     override lateinit var mainClass: String
 
     var minecraftVersion = ""
+    val semanticMinecraftVersion: SemanticVersion
+        get() = if (minecraftVersion.isBlank()) SemanticVersion.release() else SemanticVersion.parse(minecraftVersion)
 
     override val dependencies = mutableListOf<String>()
     override fun hasDependencies() = listContainsAtLeastOne(dependencies)
@@ -44,6 +50,11 @@ class BungeeCordProjectConfig(override var type: PlatformType) :
     }
 
     override val preferredBuildSystem = BuildSystemType.MAVEN
+
+    override val javaVersion: JavaVersion
+        get() = MinecraftVersions.requiredJavaVersion(semanticMinecraftVersion)
+
+    override val compatibleGradleVersions: VersionRange? = null
 
     override fun buildMavenCreator(
         rootDirectory: Path,

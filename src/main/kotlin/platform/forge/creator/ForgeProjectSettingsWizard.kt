@@ -133,13 +133,13 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
 
         minecraftVersionLabel.text = "Minecraft Version"
 
+        licenseBox.model = EnumComboBoxModel(License::class.java)
+        licenseBox.selectedItem = License.ALL_RIGHTS_RESERVED
+
         if (versions != null || currentJob?.isActive == true) {
             return
         }
         currentJob = updateVersions()
-
-        licenseBox.model = EnumComboBoxModel(License::class.java)
-        licenseBox.selectedItem = License.ALL_RIGHTS_RESERVED
     }
 
     private fun setForgeVersion(data: Data) {

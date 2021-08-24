@@ -19,8 +19,11 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
 import com.demonwav.mcdev.util.License
+import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.VersionRange
 import com.intellij.openapi.module.Module
+import com.intellij.util.lang.JavaVersion
 import java.nio.file.Path
 
 class FabricProjectConfig : ProjectConfig(), GradleCreator {
@@ -31,7 +34,6 @@ class FabricProjectConfig : ProjectConfig(), GradleCreator {
     // Minecraft does not follow semver in the snapshots
     var mcVersion = ""
     var semanticMcVersion = SemanticVersion.release()
-    var javaVersion = 8
     var loaderVersion = SemanticVersion.release()
     var apiVersion: SemanticVersion? = null
     var apiMavenLocation: String? = null
@@ -48,6 +50,12 @@ class FabricProjectConfig : ProjectConfig(), GradleCreator {
 
     override val preferredBuildSystem = BuildSystemType.GRADLE
 
+    override val javaVersion: JavaVersion
+        get() = MinecraftVersions.requiredJavaVersion(semanticMcVersion)
+
+    override val compatibleGradleVersions: VersionRange
+        get() = VersionRange.fixed(gradleVersion)
+
     override fun buildGradleCreator(
         rootDirectory: Path,
         module: Module,
@@ -62,6 +70,7 @@ class FabricProjectConfig : ProjectConfig(), GradleCreator {
     }
 
     override fun configureRootGradle(rootDirectory: Path, buildSystem: GradleBuildSystem) {
-        buildSystem.gradleVersion = gradleVersion
+        buildSystem.gradleVersion =
+            if (semanticMcVersion >= MinecraftVersions.MC1_17) SemanticVersion.release(7, 1, 1) else gradleVersion
     }
 }

@@ -17,18 +17,22 @@ import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.findModule
+import com.intellij.codeInsight.daemon.JavaErrorBundle
+import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil
 import com.intellij.ide.actions.CreateFileFromTemplateDialog
 import com.intellij.ide.actions.CreateTemplateInPackageAction
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.InputValidatorEx
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.JavaDirectoryService
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameHelper
+import com.intellij.psi.util.PsiUtil
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes
 
 class MinecraftClassCreateAction :
@@ -44,6 +48,7 @@ class MinecraftClassCreateAction :
 
     override fun buildDialog(project: Project, directory: PsiDirectory, builder: CreateFileFromTemplateDialog.Builder) {
         builder.setTitle(CAPTION)
+        builder.setValidator(ClassInputValidator(project, directory))
 
         val module = directory.findModule()
         val isForge = module?.let { MinecraftFacet.getInstance(it, ForgeModuleType) } != null
@@ -88,6 +93,31 @@ class MinecraftClassCreateAction :
 
     override fun doCreate(dir: PsiDirectory, className: String, templateName: String): PsiClass? {
         return JavaDirectoryService.getInstance().createClass(dir, className, templateName, false)
+    }
+
+    private class ClassInputValidator(
+        private val project: Project,
+        private val directory: PsiDirectory
+    ) : InputValidatorEx {
+        override fun getErrorText(inputString: String): String? {
+            if (inputString.isNotEmpty() && !PsiNameHelper.getInstance(project).isQualifiedName(inputString)) {
+                return JavaErrorBundle.message("create.class.action.this.not.valid.java.qualified.name")
+            }
+
+            val shortName = StringUtil.getShortName(inputString)
+            val languageLevel = PsiUtil.getLanguageLevel(directory)
+            return if (HighlightClassUtil.isRestrictedIdentifier(shortName, languageLevel)) {
+                JavaErrorBundle.message("restricted.identifier", shortName)
+            } else {
+                null
+            }
+        }
+
+        override fun checkInput(inputString: String): Boolean =
+            inputString.isNotBlank() && getErrorText(inputString) == null
+
+        override fun canClose(inputString: String): Boolean =
+            checkInput(inputString)
     }
 
     private companion object {

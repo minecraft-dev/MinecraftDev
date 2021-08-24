@@ -93,6 +93,8 @@
         <fileTypeDetector implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeDetector"/>
         <fileEditorProvider implementation="com.demonwav.mcdev.nbt.editor.NbtFileEditorProvider" />
 
+        <notificationGroup id="NBT Save Error" displayType="STICKY_BALLOON"/>
+
         <!-- Text representation of NBT -->
         <fileType name="NBTT" language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttFileType" fieldName="INSTANCE" extensions="nbtt" />
         <lang.parserDefinition language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttParserDefinition"/>
@@ -788,6 +790,8 @@
                          implementationClass="com.demonwav.mcdev.platform.bungeecord.inspection.BungeeCordListenerImplementedInspection"/>
         <!--endregion-->
         <!--endregion-->
+
+        <registryKey defaultValue="false" description="Enable the Minecraft Wizard finalizer step." key="mcdev.wizard.finalizer"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">

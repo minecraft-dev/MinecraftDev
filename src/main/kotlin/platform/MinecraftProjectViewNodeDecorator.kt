@@ -44,13 +44,7 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
 
         val rootManager = ModuleRootManager.getInstance(module)
         // Make sure there is at least a root to go off of
-        if (rootManager.contentRoots.isEmpty()) {
-            return
-        }
-
-        // Get the root and compare it to the node
-        val root = rootManager.contentRoots[0]
-        if (root != node.getVirtualFile()) {
+        if (node.virtualFile !in rootManager.contentRoots) {
             return
         }
 

@@ -18,8 +18,11 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleCreator
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.creator.Fg2ProjectCreator
 import com.demonwav.mcdev.platform.mcp.McpVersionPair
+import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.VersionRange
 import com.intellij.openapi.module.Module
+import com.intellij.util.lang.JavaVersion
 import java.nio.file.Path
 
 class LiteLoaderProjectConfig : ProjectConfig(), GradleCreator {
@@ -32,6 +35,11 @@ class LiteLoaderProjectConfig : ProjectConfig(), GradleCreator {
     override var type = PlatformType.LITELOADER
 
     override val preferredBuildSystem = BuildSystemType.GRADLE
+
+    override val javaVersion: JavaVersion
+        get() = MinecraftVersions.requiredJavaVersion(mcVersion)
+
+    override val compatibleGradleVersions: VersionRange = VersionRange.fixed(Fg2ProjectCreator.FG_WRAPPER_VERSION)
 
     override fun buildGradleCreator(
         rootDirectory: Path,

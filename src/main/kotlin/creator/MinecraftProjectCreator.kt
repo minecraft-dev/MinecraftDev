@@ -16,6 +16,7 @@ import com.demonwav.mcdev.util.invokeAndWait
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.virtualFileOrError
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -159,6 +160,10 @@ class MinecraftProjectCreator {
                     VfsUtil.markDirtyAndRefresh(false, true, true, root.virtualFileOrError)
                 }
             } catch (e: Exception) {
+                if (e is ProcessCanceledException || e.cause is ProcessCanceledException) {
+                    // Do not log PCE. The second condition is there because LaterInvocator wraps PCEs in RuntimeExceptions
+                    return
+                }
                 val workLogText = buildString {
                     appendLine("Build steps completed:")
                     for (workLogStep in workLog) {

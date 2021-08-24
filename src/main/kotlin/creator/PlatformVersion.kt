@@ -14,11 +14,15 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.ProxyHttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
+import com.intellij.openapi.diagnostic.Attachment
+import com.intellij.openapi.diagnostic.Logger
 import java.io.IOException
 import javax.swing.JComboBox
 
 private const val cloudflareBaseUrl = "https://minecraftdev.org/versions/"
 private const val githubBaseUrl = "https://raw.githubusercontent.com/minecraft-dev/minecraftdev.org/master/versions/"
+
+val PLATFORM_VERSION_LOGGER = Logger.getInstance("MDev.PlatformVersion")
 
 fun getVersionSelector(type: PlatformType): PlatformVersion {
     val versionJson = type.versionJson ?: throw UnsupportedOperationException("Incorrect platform type: $type")
@@ -27,7 +31,14 @@ fun getVersionSelector(type: PlatformType): PlatformVersion {
 
 inline fun <reified T : Any> getVersionJson(path: String): T {
     val text = getText(path)
-    return Gson().fromJson(text)
+    try {
+        return Gson().fromJson(text)
+    } catch (e: Exception) {
+        val attachment = Attachment("JSON Document", text)
+        attachment.isIncluded = true
+        PLATFORM_VERSION_LOGGER.error("Failed to parse JSON document from '$path'", e, attachment)
+        throw e
+    }
 }
 
 fun getText(path: String): String {
@@ -35,8 +46,14 @@ fun getText(path: String): String {
         // attempt cloudflare
         doCall(cloudflareBaseUrl + path)
     } catch (e: IOException) {
+        PLATFORM_VERSION_LOGGER.warn("Failed to reach cloudflare URL ${cloudflareBaseUrl + path}", e)
         // if that fails, attempt github
-        doCall(githubBaseUrl + path)
+        try {
+            doCall(githubBaseUrl + path)
+        } catch (e: IOException) {
+            PLATFORM_VERSION_LOGGER.warn("Failed to reach fallback GitHub URL ${githubBaseUrl + path}", e)
+            throw e
+        }
     }
 }
 

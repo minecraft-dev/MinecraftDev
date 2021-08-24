@@ -33,6 +33,7 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
     abstract val icon: Icon?
 
     open val hasIcon = true
+    open val isIconSecondary = false
 
     abstract val id: String
 

@@ -39,7 +39,7 @@ object FabricTemplate : BaseTemplate() {
             "YARN_MAPPINGS" to config.yarnVersion,
             "LOADER_VERSION" to config.loaderVersion.toString(),
             "LOOM_VERSION" to config.loomVersion.toString(),
-            "JAVA_VERSION" to config.javaVersion
+            "JAVA_VERSION" to config.javaVersion.feature
         )
         config.yarnClassifier?.let {
             props["YARN_CLASSIFIER"] = it
@@ -110,7 +110,7 @@ object FabricTemplate : BaseTemplate() {
             },
             "LOADER_VERSION" to config.loaderVersion.toString(),
             "MC_VERSION" to config.semanticMcVersion.toString(),
-            "JAVA_VERSION" to config.javaVersion,
+            "JAVA_VERSION" to config.javaVersion.feature,
             "LICENSE" to ((config.license ?: License.ALL_RIGHTS_RESERVED).id)
         )
         config.apiVersion?.let {
@@ -131,7 +131,7 @@ object FabricTemplate : BaseTemplate() {
         val packageName = "${buildSystem.groupId.toPackageName()}.${buildSystem.artifactId.toPackageName()}.mixin"
         val props = mapOf(
             "PACKAGE_NAME" to packageName,
-            "JAVA_VERSION" to config.javaVersion
+            "JAVA_VERSION" to config.javaVersion.feature
         )
         return project.applyTemplate(FABRIC_MIXINS_JSON_TEMPLATE, props)
     }

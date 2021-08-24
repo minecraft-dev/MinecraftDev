@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.velocity.creator
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.platform.BaseTemplate
+import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_BUILD_CONSTANTS_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.VELOCITY_GRADLE_PROPERTIES_TEMPLATE
@@ -27,13 +28,15 @@ import com.intellij.openapi.project.Project
 
 object VelocityTemplate : BaseTemplate() {
 
-    private val VELOCITY_2_SNAPSHOT = SemanticVersion.parse("2.0.0-SNAPSHOT")
+    fun applyPom(project: Project, config: VelocityProjectConfig): String {
+        val props = BasicMavenStep.pluginVersions + ("JAVA_VERSION" to config.javaVersion.toFeatureString())
+        return project.applyTemplate(VELOCITY_POM_TEMPLATE, props)
+    }
 
-    fun applyPom(project: Project): String =
-        project.applyTemplate(VELOCITY_POM_TEMPLATE, BasicMavenStep.pluginVersions)
-
-    fun applySubPom(project: Project): String =
-        project.applyTemplate(VELOCITY_SUBMODULE_POM_TEMPLATE, BasicMavenStep.pluginVersions)
+    fun applySubPom(project: Project, config: VelocityProjectConfig): String {
+        val props = BasicMavenStep.pluginVersions + ("JAVA_VERSION" to config.javaVersion.toFeatureString())
+        return project.applyTemplate(VELOCITY_SUBMODULE_POM_TEMPLATE, props)
+    }
 
     fun applyMainClass(
         project: Project,
@@ -51,10 +54,12 @@ object VelocityTemplate : BaseTemplate() {
             props["HAS_DEPENDENCIES"] = "true"
         }
 
-        val template = if (version < VELOCITY_2_SNAPSHOT) {
-            VELOCITY_MAIN_CLASS_TEMPLATE
+        val template = if (version < VelocityConstants.API_2 ||
+            (version >= VelocityConstants.API_3 && version < VelocityConstants.API_4)
+        ) {
+            VELOCITY_MAIN_CLASS_TEMPLATE // API 1 and 3
         } else {
-            VELOCITY_MAIN_CLASS_V2_TEMPLATE
+            VELOCITY_MAIN_CLASS_V2_TEMPLATE // API 2 and 4 (4+ maybe ?)
         }
 
         return project.applyTemplate(template, props)
@@ -68,17 +73,20 @@ object VelocityTemplate : BaseTemplate() {
         return project.applyTemplate(VELOCITY_BUILD_CONSTANTS_TEMPLATE, props)
     }
 
-    fun applyBuildGradle(project: Project, buildSystem: BuildSystem): String {
+    fun applyBuildGradle(project: Project, buildSystem: BuildSystem, config: VelocityProjectConfig): String {
+        val javaVersion = config.javaVersion.feature
         val props = mapOf(
             "GROUP_ID" to buildSystem.groupId,
             "PLUGIN_ID" to buildSystem.artifactId,
-            "PLUGIN_VERSION" to buildSystem.version
+            "PLUGIN_VERSION" to buildSystem.version,
+            "JAVA_VERSION" to javaVersion
         )
 
         return project.applyTemplate(VELOCITY_BUILD_GRADLE_TEMPLATE, props)
     }
 
-    fun applyGradleProp(project: Project): String = project.applyTemplate(VELOCITY_GRADLE_PROPERTIES_TEMPLATE)
+    fun applyGradleProp(project: Project, javaVersion: Int?): String =
+        project.applyTemplate(VELOCITY_GRADLE_PROPERTIES_TEMPLATE, mapOf("JAVA_VERSION" to javaVersion))
 
     fun applySettingsGradle(project: Project, artifactId: String): String {
         val props = mapOf("ARTIFACT_ID" to artifactId)
