@@ -10,8 +10,10 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
+import com.demonwav.mcdev.platform.mixin.reference.target.QualifiedMember
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.util.findReferencedMember
+import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.demonwav.mcdev.util.qualifiedMemberReference
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -21,6 +23,7 @@ import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiQualifiedReference
 import java.awt.datatransfer.StringSelection
 
 class CopyMixinTargetReferenceAction : AnAction() {
@@ -32,10 +35,19 @@ class CopyMixinTargetReferenceAction : AnAction() {
 
         val element = file.findElementAt(caret.offset) ?: return
         val member = element.findReferencedMember() ?: return
+        val targetClass = (element.parent as? PsiQualifiedReference)?.let { QualifiedMember.resolveQualifier(it) }
 
         val targetReference = when (member) {
-            is PsiMethod -> member.qualifiedMemberReference
-            is PsiField -> member.qualifiedMemberReference
+            is PsiMethod -> if (targetClass != null) {
+                member.getQualifiedMemberReference(targetClass)
+            } else {
+                member.qualifiedMemberReference
+            }
+            is PsiField -> if (targetClass != null) {
+                member.getQualifiedMemberReference(targetClass)
+            } else {
+                member.qualifiedMemberReference
+            }
             else -> return
         }
 

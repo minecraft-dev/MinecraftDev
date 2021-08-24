@@ -20,7 +20,10 @@ import com.demonwav.mcdev.creator.buildsystem.maven.MavenCreator
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.VersionRange
+import com.demonwav.mcdev.util.until
 import com.intellij.openapi.module.Module
+import com.intellij.util.lang.JavaVersion
 import java.nio.file.Path
 
 class SpongeProjectConfig : ProjectConfig(), MavenCreator, GradleCreator {
@@ -28,6 +31,8 @@ class SpongeProjectConfig : ProjectConfig(), MavenCreator, GradleCreator {
     lateinit var mainClass: String
 
     var spongeApiVersion = ""
+    val apiVersion: SemanticVersion
+        get() = if (spongeApiVersion.isBlank()) SemanticVersion.release() else SemanticVersion.parse(spongeApiVersion)
 
     override var type = PlatformType.SPONGE
 
@@ -44,6 +49,12 @@ class SpongeProjectConfig : ProjectConfig(), MavenCreator, GradleCreator {
 
     override val preferredBuildSystem = BuildSystemType.GRADLE
 
+    override val javaVersion: JavaVersion
+        get() = when {
+            apiVersion >= SpongeConstants.API9 -> JavaVersion.compose(16)
+            else -> JavaVersion.compose(8)
+        }
+
     override fun buildMavenCreator(
         rootDirectory: Path,
         module: Module,
@@ -56,6 +67,12 @@ class SpongeProjectConfig : ProjectConfig(), MavenCreator, GradleCreator {
             Sponge8MavenCreator(rootDirectory, module, buildSystem, this)
         }
     }
+
+    override val compatibleGradleVersions: VersionRange
+        get() = when {
+            apiVersion >= SpongeConstants.API9 -> SemanticVersion.release(7) until null
+            else -> SemanticVersion.release(6) until SemanticVersion.release(7)
+        }
 
     override fun buildGradleCreator(
         rootDirectory: Path,

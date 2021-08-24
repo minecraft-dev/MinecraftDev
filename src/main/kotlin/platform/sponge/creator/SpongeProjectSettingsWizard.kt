@@ -54,6 +54,8 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
 
     private var config: SpongeProjectConfig? = null
 
+    private var versionsLoaded: Boolean = false
+
     override fun getComponent(): JComponent {
         return panel
     }
@@ -77,6 +79,11 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             title.icon = PlatformAssets.SPONGE_ICON_2X
         }
 
+        if (versionsLoaded) {
+            return
+        }
+
+        versionsLoaded = true
         CoroutineScope(Dispatchers.Swing).launch {
             try {
                 withContext(Dispatchers.IO) { SpongeVersion.downloadData() }?.set(spongeApiVersionBox)
@@ -90,7 +97,7 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         return creator.configs.any { it is SpongeProjectConfig }
     }
 
-    override fun onStepLeaving() {
+    override fun updateDataModel() {
         val conf = this.config ?: return
 
         conf.pluginName = this.pluginNameField.text
@@ -102,6 +109,4 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         conf.setAuthors(this.authorsField.text)
         conf.setDependencies(this.dependField.text)
     }
-
-    override fun updateDataModel() {}
 }

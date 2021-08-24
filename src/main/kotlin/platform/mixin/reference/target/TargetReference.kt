@@ -41,7 +41,6 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiSubstitutor
-import com.intellij.psi.PsiThisExpression
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.ArrayUtil
@@ -218,10 +217,6 @@ data class QualifiedMember<T : PsiMember>(val member: T, val qualifier: PsiClass
 
         fun resolveQualifier(reference: PsiQualifiedReference): PsiClass? {
             val qualifier = reference.qualifier ?: return null
-            if (qualifier is PsiThisExpression) {
-                return null
-            }
-
             ((qualifier as? PsiReference)?.resolve() as? PsiClass)?.let { return it }
             ((qualifier as? PsiExpression)?.type as? PsiClassType)?.resolve()?.let { return it }
             return null

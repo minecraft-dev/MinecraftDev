@@ -100,7 +100,17 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
         VfsUtilCore.outputStreamAddingBOM(NbtOutputStream(this, requestor), this)
 
     fun writeFile(requester: Any) {
-        val nbttFile = PsiManager.getInstance(project).findFile(this) as NbttFile
+        val nbttFile = PsiManager.getInstance(project).findFile(this) as? NbttFile
+        if (nbttFile == null) {
+            Notification(
+                "NBT Save Error",
+                "Error Saving NBT File",
+                "The file is not recognised as a NBTT file. This might be caused by wrong file type associations.",
+                NotificationType.WARNING
+            ).notify(project)
+            return
+        }
+
         val rootTag = nbttFile.getRootCompound()?.getRootCompoundTag()
 
         if (rootTag == null) {

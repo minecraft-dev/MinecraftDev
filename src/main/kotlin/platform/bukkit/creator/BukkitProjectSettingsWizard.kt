@@ -58,6 +58,8 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
 
     private var config: BukkitProjectConfig? = null
 
+    private var versionsLoaded: Boolean = false
+
     override fun getComponent(): JComponent {
         return panel
     }
@@ -92,6 +94,11 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
             }
         }
 
+        if (versionsLoaded) {
+            return
+        }
+
+        versionsLoaded = true
         CoroutineScope(Dispatchers.Swing).launch {
             try {
                 withContext(Dispatchers.IO) { getVersionSelector(conf.type) }.set(minecraftVersionBox)

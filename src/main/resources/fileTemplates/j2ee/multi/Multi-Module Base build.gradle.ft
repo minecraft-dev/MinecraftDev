@@ -12,7 +12,7 @@ subprojects {
     group = parent.group
     version = parent.version
 
-    def targetJavaVersion = 8
+    def targetJavaVersion = property('javaVersion') as int
     java {
         def javaVersion = JavaVersion.toVersion(targetJavaVersion)
         sourceCompatibility = javaVersion

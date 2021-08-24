@@ -27,6 +27,7 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBLoadingPanel
+import com.intellij.util.IncorrectOperationException
 import java.awt.BorderLayout
 import java.beans.PropertyChangeListener
 import javax.swing.JPanel
@@ -80,7 +81,15 @@ private class NbtFileEditor(
         nbtFile.toolbar = toolbar
         editor = editorProvider(nbtFile)
         editor?.let { editor ->
-            Disposer.register(this, editor)
+            try {
+                Disposer.register(this, editor)
+            } catch (e: IncorrectOperationException) {
+                // The editor can be disposed really quickly when opening a large number of NBT files
+                // Since everything happens basically at the same time, calling Disposer.isDisposed right before
+                // returns false but #dispose throws this IOE...
+                Disposer.dispose(this)
+                return@let
+            }
             component.add(toolbar.panel, BorderLayout.NORTH)
             component.add(editor.component, BorderLayout.CENTER)
         }

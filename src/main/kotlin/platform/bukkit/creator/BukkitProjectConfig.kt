@@ -20,7 +20,11 @@ import com.demonwav.mcdev.creator.buildsystem.maven.MavenCreator
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.BukkitLikeConfiguration
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder
+import com.demonwav.mcdev.util.MinecraftVersions
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.VersionRange
 import com.intellij.openapi.module.Module
+import com.intellij.util.lang.JavaVersion
 import java.nio.file.Path
 
 class BukkitProjectConfig(override var type: PlatformType) :
@@ -29,7 +33,9 @@ class BukkitProjectConfig(override var type: PlatformType) :
     override lateinit var mainClass: String
 
     var loadOrder: LoadOrder = LoadOrder.POSTWORLD
-    var minecraftVersion: String? = null
+    var minecraftVersion: String = ""
+    val semanticMinecraftVersion: SemanticVersion
+        get() = if (minecraftVersion.isBlank()) SemanticVersion.release() else SemanticVersion.parse(minecraftVersion)
 
     var prefix: String? = null
     fun hasPrefix() = prefix?.isNotBlank() == true
@@ -56,6 +62,11 @@ class BukkitProjectConfig(override var type: PlatformType) :
     }
 
     override val preferredBuildSystem = BuildSystemType.MAVEN
+
+    override val javaVersion: JavaVersion
+        get() = MinecraftVersions.requiredJavaVersion(semanticMinecraftVersion)
+
+    override val compatibleGradleVersions: VersionRange? = null
 
     override fun buildMavenCreator(
         rootDirectory: Path,

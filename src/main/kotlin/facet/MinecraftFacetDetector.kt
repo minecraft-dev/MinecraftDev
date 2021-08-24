@@ -62,7 +62,8 @@ class MinecraftFacetDetector : StartupActivity {
             val configuration = MinecraftFacetConfiguration()
             configuration.state.autoDetectTypes.addAll(platforms)
 
-            val facet = facetManager.createFacet(MinecraftFacet.facetType, "Minecraft", configuration, null)
+            val facetType = MinecraftFacet.facetTypeOrNull ?: return
+            val facet = facetManager.createFacet(facetType, "Minecraft", configuration, null)
             runWriteTaskLater {
                 // Only add the new facet if there isn't a Minecraft facet already - double check here since this
                 // task may run much later
@@ -120,7 +121,7 @@ class MinecraftFacetDetector : StartupActivity {
                 .withoutLibraries()
                 .withoutSdk()
                 .forEachModule forEach@{ m ->
-                    if (m.name.startsWith("SpongeAPI")) {
+                    if (m.name.startsWith("SpongeAPI", ignoreCase = true)) {
                         // We don't want want to add parent modules in module groups
                         val moduleManager = ModuleManager.getInstance(m.project)
                         val groupPath = moduleManager.getModuleGroupPath(m)

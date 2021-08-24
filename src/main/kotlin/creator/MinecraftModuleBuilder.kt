@@ -32,6 +32,7 @@ import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
 import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import java.nio.file.Files
@@ -103,7 +104,7 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
         wizardContext: WizardContext,
         modulesProvider: ModulesProvider
     ): Array<ModuleWizardStep> {
-        return arrayOf(
+        val baseSteps = arrayOf(
             BuildSystemWizardStep(creator),
             BukkitProjectSettingsWizard(creator),
             SpongeProjectSettingsWizard(creator),
@@ -113,6 +114,10 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
             VelocityProjectSettingsWizard(creator),
             BungeeCordProjectSettingsWizard(creator)
         )
+        if (Registry.`is`("mcdev.wizard.finalizer")) {
+            return baseSteps + ProjectSetupFinalizerWizardStep(creator, wizardContext)
+        }
+        return baseSteps
     }
 
     override fun getCustomOptionsStep(context: WizardContext?, parentDisposable: Disposable?) =

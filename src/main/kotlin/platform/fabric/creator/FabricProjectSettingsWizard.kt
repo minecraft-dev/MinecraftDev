@@ -21,7 +21,6 @@ import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
 import com.demonwav.mcdev.util.License
-import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.modUpdateStep
 import com.demonwav.mcdev.util.toPackageName
@@ -237,7 +236,6 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         conf.mcVersion = mcVersion ?: ""
         val normalizedMcVersion = dataProvider?.getNormalizedMinecraftVersion(mcVersion)?.normalized
         conf.semanticMcVersion = normalizedMcVersion?.let { SemanticVersion.parse(it) } ?: SemanticVersion.release()
-        conf.javaVersion = if (conf.semanticMcVersion >= MinecraftVersions.MC1_17) 16 else 8
         val loaderVer = loaderVersion
         if (loaderVer != null) {
             conf.loaderVersion = SemanticVersion.parse(loaderVer)

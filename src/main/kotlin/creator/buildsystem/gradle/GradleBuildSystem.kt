@@ -18,6 +18,7 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystemTemplate
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.VersionRange
 import com.intellij.openapi.module.Module
 import java.nio.file.Path
 import java.util.Locale
@@ -95,6 +96,9 @@ class GradleBuildSystem(
  * creating `Gradle` projects.
  */
 interface GradleCreator {
+
+    val compatibleGradleVersions: VersionRange?
+
     fun buildGradleCreator(rootDirectory: Path, module: Module, buildSystem: GradleBuildSystem): ProjectCreator
 
     /**

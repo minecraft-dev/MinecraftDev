@@ -30,6 +30,7 @@ import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
+import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTaskInSmartMode
@@ -59,7 +60,7 @@ sealed class VelocityProjectCreator<T : BuildSystem>(
 
     protected fun setupMainClassSteps(): Pair<CreatorStep, CreatorStep> {
         val mainClassStep = createJavaClassStep(config.mainClass) { packageName, className ->
-            val version = SemanticVersion.parse(config.velocityApiVersion)
+            val version = config.apiVersion
             VelocityTemplate.applyMainClass(project, packageName, className, config.hasDependencies(), version)
         }
 
@@ -76,7 +77,7 @@ class VelocityMavenCreator(
     override fun getSingleModuleSteps(): Iterable<CreatorStep> {
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
-        val pomText = VelocityTemplate.applyPom(project)
+        val pomText = VelocityTemplate.applyPom(project, config)
 
         return listOf(
             setupDependencyStep(),
@@ -93,7 +94,7 @@ class VelocityMavenCreator(
         val commonDepStep = CommonModuleDependencyStep(buildSystem)
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
-        val pomText = VelocityTemplate.applySubPom(project)
+        val pomText = VelocityTemplate.applySubPom(project, config)
         val mavenStep = BasicMavenStep(
             project,
             rootDirectory,
@@ -124,8 +125,8 @@ class VelocityGradleCreator(
     override fun getSingleModuleSteps(): Iterable<CreatorStep> {
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
-        val buildText = VelocityTemplate.applyBuildGradle(project, buildSystem)
-        val propText = VelocityTemplate.applyGradleProp(project)
+        val buildText = VelocityTemplate.applyBuildGradle(project, buildSystem, config)
+        val propText = VelocityTemplate.applyGradleProp(project, null)
         val settingsText = VelocityTemplate.applySettingsGradle(project, buildSystem.artifactId)
         val files = GradleFiles(buildText, propText, settingsText)
 
@@ -147,7 +148,8 @@ class VelocityGradleCreator(
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
         val buildText = VelocityTemplate.applySubBuildGradle(project, buildSystem)
-        val files = GradleFiles(buildText, null, null)
+        val propText = VelocityTemplate.applyGradleProp(project, config.javaVersion.feature)
+        val files = GradleFiles(buildText, propText, null)
 
         return listOf(
             setupDependencyStep(),
@@ -258,11 +260,13 @@ class VelocityDependenciesSetup(
                 gradleConfiguration = "compileOnly"
             )
         )
+        val semanticApiVersion = SemanticVersion.parse(velocityApiVersion)
         buildSystem.dependencies.add(
             BuildDependency(
                 "com.velocitypowered",
-                "velocity-api",
+                if (semanticApiVersion >= VelocityConstants.API_4) "velocity-annotation-processor" else "velocity-api",
                 velocityApiVersion,
+                mavenScope = if (semanticApiVersion >= VelocityConstants.API_4) "provided" else null,
                 gradleConfiguration = "annotationProcessor"
             )
         )
