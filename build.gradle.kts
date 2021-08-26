@@ -186,9 +186,7 @@ tasks.test {
             systemProperty("testLibs.${it.name}", it.file.absolutePath)
         }
     }
-    if (System.getProperty("os.name").toLowerCase().contains("win")) {
-        systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
-    }
+    systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
     if (JavaVersion.current().isJava9Compatible) {
         jvmArgs(
             "--add-opens", "java.base/java.io=ALL-UNNAMED",
