@@ -13,10 +13,6 @@ package com.demonwav.mcdev.platform.mixin.inspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INJECT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
-import com.demonwav.mcdev.platform.mixin.util.isMixin
-import com.demonwav.mcdev.util.findContainingClass
-import com.demonwav.mcdev.util.findContainingMethod
-import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
@@ -29,45 +25,47 @@ import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiLiteral
-import com.intellij.psi.PsiMethodCallExpression
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiType
+import com.siyeh.ig.psiutils.ControlFlowUtils.elementContainsCallToMethod
 
 class MixinCancellableInspection : MixinInspection() {
 
     override fun getStaticDescription(): String =
-        "@Inject must be cancellable in order to be cancelled"
+        "Reports missing or unused cancellable @Inject usages"
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
     private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
-        override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
-            if (expression.findContainingClass()?.isMixin == false) {
-                return
-            }
+        override fun visitMethod(method: PsiMethod) {
+            val injectAnnotation = method.getAnnotation(INJECT) ?: return
 
-            val calledMethod = expression.resolveMethod() ?: return
-            if (calledMethod.name != "cancel" && calledMethod.name != "setReturnValue") {
-                return
-            }
+            val cancellableAttribute = injectAnnotation.findAttributeValue("cancellable") as? PsiLiteral ?: return
+            val isCancellable = cancellableAttribute.value == true
 
-            val classFqn = calledMethod.containingClass?.fullQualifiedName ?: return
-            if (classFqn != CALLBACK_INFO && classFqn != CALLBACK_INFO_RETURNABLE) {
-                return
-            }
+            val usesCancel = elementContainsCallToMethod(method, CALLBACK_INFO, PsiType.VOID, "cancel") ||
+                elementContainsCallToMethod(method, CALLBACK_INFO_RETURNABLE, PsiType.VOID, "setReturnValue", null)
 
-            val injectAnnotation = expression.findContainingMethod()?.getAnnotation(INJECT) ?: return
-            val cancellableValue = injectAnnotation.findAttributeValue("cancellable")
-            if ((cancellableValue as? PsiLiteral)?.value != true) {
+            if (usesCancel && !isCancellable) {
                 holder.registerProblem(
-                    expression,
+                    method.nameIdentifier ?: method,
                     "@Inject must be marked as cancellable in order to be cancelled",
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                     MakeInjectCancellableFix(injectAnnotation)
+                )
+            } else if (!usesCancel && isCancellable) {
+                holder.registerProblem(
+                    cancellableAttribute.parent,
+                    "@Inject is cancellable but is never cancelled",
+                    ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+                    RemoveInjectCancellableFix(injectAnnotation)
                 )
             }
         }
     }
 
-    private class MakeInjectCancellableFix(element: PsiElement) : LocalQuickFixAndIntentionActionOnPsiElement(element) {
+    private class MakeInjectCancellableFix(element: PsiAnnotation) :
+        LocalQuickFixAndIntentionActionOnPsiElement(element) {
 
         override fun getFamilyName(): String = "Mark as cancellable"
 
@@ -83,6 +81,25 @@ class MixinCancellableInspection : MixinInspection() {
             val annotation = startElement as PsiAnnotation
             val value = PsiElementFactory.getInstance(project).createExpressionFromText("true", annotation)
             annotation.setDeclaredAttributeValue("cancellable", value)
+        }
+    }
+
+    private class RemoveInjectCancellableFix(element: PsiAnnotation) :
+        LocalQuickFixAndIntentionActionOnPsiElement(element) {
+
+        override fun getFamilyName(): String = "Remove unused cancellable attribute"
+
+        override fun getText(): String = familyName
+
+        override fun invoke(
+            project: Project,
+            file: PsiFile,
+            editor: Editor?,
+            startElement: PsiElement,
+            endElement: PsiElement
+        ) {
+            val annotation = startElement as PsiAnnotation
+            annotation.setDeclaredAttributeValue("cancellable", null)
         }
     }
 }

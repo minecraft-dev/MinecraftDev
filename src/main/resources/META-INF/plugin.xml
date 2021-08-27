@@ -507,8 +507,8 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationsInspection"/>
-        <localInspection displayName="Callback cancellation in non-cancellable @Inject"
-                         shortName="CancelInNotCancellableInjection"
+        <localInspection displayName="Missing or unused cancellable @Inject"
+                         shortName="CancellableInjectionUsage"
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
