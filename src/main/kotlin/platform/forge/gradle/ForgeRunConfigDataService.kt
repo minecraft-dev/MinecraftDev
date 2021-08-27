@@ -161,7 +161,9 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
 
     private fun cleanupGeneratedRuns(project: Project, module: Module, hasData: Boolean) {
         invokeAndWait {
-            ForgeRunManagerListener(module, hasData)
+            if (!module.isDisposed) {
+                ForgeRunManagerListener(module, hasData)
+            }
         }
 
         project.guessProjectDir()?.let { dir ->
