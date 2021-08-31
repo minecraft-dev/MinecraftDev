@@ -78,6 +78,9 @@ dependencies {
 
     implementation(libs.templateMakerFabric)
 
+    implementation("org.ow2.asm:asm:9.2")
+    implementation("org.ow2.asm:asm-tree:9.2")
+
     jflex(libs.jflex.lib)
     jflexSkeleton("${libs.jflex.skeleton.text()}@skeleton")
     grammarKit(libs.grammarKit)
