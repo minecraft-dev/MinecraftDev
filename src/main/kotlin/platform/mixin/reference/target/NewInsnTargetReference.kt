@@ -60,7 +60,7 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
             if (ref.name != "<init>") return null
             return ref
         }
-        if (!StringUtil.isJavaIdentifier(value.replace('.', '_').replace('$', '_'))) {
+        if (!StringUtil.isJavaIdentifier(value.replace('/', '_').replace('$', '_'))) {
             return null
         }
         val name = value.replace('/', '.')
