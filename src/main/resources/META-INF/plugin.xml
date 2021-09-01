@@ -512,7 +512,7 @@
                          groupName="Mixin"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="ERROR"
+                         level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinCancellableInspection"/>
         <localInspection displayName="Invalid @Mixin Target"

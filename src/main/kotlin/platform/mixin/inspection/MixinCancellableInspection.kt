@@ -20,14 +20,17 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiAnnotation
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiExpressionList
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiType
-import com.siyeh.ig.psiutils.ControlFlowUtils.elementContainsCallToMethod
+import com.intellij.psi.PsiReferenceExpression
+import com.intellij.psi.search.searches.ReferencesSearch
+import com.intellij.psi.util.PsiUtil
 
 class MixinCancellableInspection : MixinInspection() {
 
@@ -43,17 +46,38 @@ class MixinCancellableInspection : MixinInspection() {
             val cancellableAttribute = injectAnnotation.findAttributeValue("cancellable") as? PsiLiteral ?: return
             val isCancellable = cancellableAttribute.value == true
 
-            val usesCancel = elementContainsCallToMethod(method, CALLBACK_INFO, PsiType.VOID, "cancel") ||
-                elementContainsCallToMethod(method, CALLBACK_INFO_RETURNABLE, PsiType.VOID, "setReturnValue", null)
+            val ciParam = method.parameterList.parameters.firstOrNull {
+                it.type.equalsToText(CALLBACK_INFO) || it.type.equalsToText(CALLBACK_INFO_RETURNABLE)
+            } ?: return
 
-            if (usesCancel && !isCancellable) {
+            val ciType = (ciParam.type as? PsiClassType)?.resolve() ?: return
+            val searchingFor = ciType.findMethodsByName("setReturnValue", false).firstOrNull()
+                ?: ciType.findMethodsByName("cancel", false).firstOrNull()
+                ?: return
+
+            var mayUseCancel = false
+            var definitelyUsesCancel = false
+            for (ref in ReferencesSearch.search(ciParam)) {
+                val parent = PsiUtil.skipParenthesizedExprUp(ref.element.parent)
+                if (parent is PsiExpressionList) {
+                    // method argument, we can't tell whether it uses cancel
+                    mayUseCancel = true
+                }
+                val methodCall = parent as? PsiReferenceExpression ?: continue
+                if (methodCall.references.any { it.isReferenceTo(searchingFor) }) {
+                    definitelyUsesCancel = true
+                    break
+                }
+            }
+
+            if (definitelyUsesCancel && !isCancellable) {
                 holder.registerProblem(
                     method.nameIdentifier ?: method,
                     "@Inject must be marked as cancellable in order to be cancelled",
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                     MakeInjectCancellableFix(injectAnnotation)
                 )
-            } else if (!usesCancel && isCancellable) {
+            } else if (!definitelyUsesCancel && !mayUseCancel && isCancellable) {
                 holder.registerProblem(
                     cancellableAttribute.parent,
                     "@Inject is cancellable but is never cancelled",
