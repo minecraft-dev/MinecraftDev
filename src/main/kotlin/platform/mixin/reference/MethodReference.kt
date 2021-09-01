@@ -85,6 +85,12 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
     }
 
     private fun isAmbiguous(targets: Collection<ClassNode>, targetReference: MemberReference): Boolean {
+        if (targetReference.matchAllNames) {
+            return targets.any {
+                val methods = it.methods
+                methods != null && methods.size > 1
+            }
+        }
         return targets.any { it.findMethods(MemberReference(targetReference.name)).count() > 1 }
     }
 

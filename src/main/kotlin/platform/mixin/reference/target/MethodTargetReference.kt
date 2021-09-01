@@ -140,7 +140,7 @@ object MethodTargetReference : TargetReference.MethodHandler() {
                 if (insn !is MethodInsnNode) return@forEachRemaining
 
                 if (mode != Mode.COMPLETION) {
-                    if (reference.name != insn.name) return@forEachRemaining
+                    if (!reference.matchAllNames && reference.name != insn.name) return@forEachRemaining
                     if (reference.descriptor != null && reference.descriptor != insn.desc) return@forEachRemaining
                     val owner = reference.owner
                     if (owner != null && owner.replace('.', '/') != insn.owner) return@forEachRemaining

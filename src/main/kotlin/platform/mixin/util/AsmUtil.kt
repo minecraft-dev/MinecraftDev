@@ -335,8 +335,9 @@ fun ClassNode.findFieldByName(name: String): FieldNode? {
 }
 
 fun ClassNode.findMethods(ref: MemberReference): Sequence<MethodNode> {
-    return methods?.asSequence()
-        ?.filter { it.name == ref.name && (ref.descriptor == null || it.desc == ref.descriptor) } ?: emptySequence()
+    return methods?.asSequence()?.filter {
+        (ref.matchAllNames || it.name == ref.name) && (ref.descriptor == null || it.desc == ref.descriptor)
+    } ?: emptySequence()
 }
 
 fun ClassNode.findMethod(ref: MemberReference): MethodNode? {

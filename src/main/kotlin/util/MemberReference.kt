@@ -16,7 +16,6 @@ import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.bytecode
-import com.demonwav.mcdev.platform.mixin.util.findFieldByName
 import com.demonwav.mcdev.platform.mixin.util.findMethod
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -37,21 +36,26 @@ import org.objectweb.asm.tree.MethodNode
 
 /**
  * Represents a reference to a class member (a method or a field). It may
- * resolve to multiple members if [matchAll] is set or if the member is
+ * resolve to multiple members if [matchAllNames] or [matchAllDescs] is set or if the member is
  * not full qualified.
  */
 data class MemberReference(
     val name: String,
     val descriptor: String? = null,
     val owner: String? = null,
-    val matchAll: Boolean = false
+    val matchAllNames: Boolean = false,
+    val matchAllDescs: Boolean = false
 ) : Serializable {
 
     val qualified
         get() = this.owner != null
 
     val withoutOwner
-        get() = if (this.owner == null) this else MemberReference(this.name, this.descriptor, null, this.matchAll)
+        get() = if (this.owner == null) {
+            this
+        } else {
+            MemberReference(this.name, this.descriptor, null, this.matchAllNames, this.matchAllDescs)
+        }
 
     fun matchOwner(psiClass: PsiClass): Boolean {
         return this.owner == null || this.owner == psiClass.fullQualifiedName
@@ -62,22 +66,22 @@ data class MemberReference(
     }
 
     fun match(method: PsiMethod, qualifier: PsiClass): Boolean {
-        return this.name == method.internalName && matchOwner(qualifier) &&
+        return (this.matchAllNames || this.name == method.internalName) && matchOwner(qualifier) &&
             (this.descriptor == null || this.descriptor == method.descriptor)
     }
 
     fun match(method: MethodNode, qualifier: ClassNode): Boolean {
-        return this.name == method.name && matchOwner(qualifier) &&
+        return (this.matchAllNames || this.name == method.name) && matchOwner(qualifier) &&
             (this.descriptor == null || this.descriptor == method.desc)
     }
 
     fun match(field: PsiField, qualifier: PsiClass): Boolean {
-        return this.name == field.name && matchOwner(qualifier) &&
+        return (this.matchAllNames || this.name == field.name) && matchOwner(qualifier) &&
             (this.descriptor == null || this.descriptor == field.descriptor)
     }
 
     fun match(field: FieldNode, qualifier: ClassNode): Boolean {
-        return this.name == field.name && matchOwner(qualifier) &&
+        return (this.matchAllNames || this.name == field.name) && matchOwner(qualifier) &&
             (this.descriptor == null || this.descriptor == field.desc)
     }
 
@@ -114,7 +118,9 @@ data class MemberReference(
                 }
 
                 if (descriptor == null || !descriptor.startsWith("(")) {
-                    classNode.findFieldByName(name)?.takeIf { descriptor == null || it.desc == descriptor }?.let {
+                    classNode.fields?.firstOrNull {
+                        (matchAllNames || name == it.name) && (descriptor == null || it.desc == descriptor)
+                    }?.let {
                         return@doPreventingRecursion FieldTargetMember(null, ClassAndFieldNode(classNode, it))
                     }
                 }
@@ -170,7 +176,15 @@ fun PsiClass.findMethods(member: MemberReference, checkBases: Boolean = false): 
         return emptySequence()
     }
 
-    val result = findMethodsByInternalName(member.name, checkBases)
+    val result = if (member.matchAllNames) {
+        if (checkBases) {
+            allMethods + constructors
+        } else {
+            methods + constructors
+        }
+    } else {
+        findMethodsByInternalName(member.name, checkBases)
+    }
     return if (member.descriptor != null) {
         result.asSequence().filter { it.descriptor == member.descriptor }
     } else {
@@ -183,12 +197,19 @@ fun PsiClass.findField(member: MemberReference, checkBases: Boolean = false): Ps
         return null
     }
 
-    val field = findFieldByName(member.name, checkBases) ?: return null
-    if (member.descriptor != null && member.descriptor != field.descriptor) {
-        return null
+    val fields = if (member.matchAllNames) {
+        if (checkBases) {
+            allFields.toList()
+        } else {
+            fields.toList()
+        }
+    } else {
+        listOfNotNull(findFieldByName(member.name, checkBases))
     }
-
-    return field
+    if (member.descriptor == null) {
+        return fields.firstOrNull()
+    }
+    return fields.firstOrNull { it.descriptor == member.descriptor }
 }
 
 // Method

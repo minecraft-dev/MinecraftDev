@@ -127,7 +127,7 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
 
             if (mode != Mode.COMPLETION) {
                 // ensure we match the target
-                if (target.name != insn.name) return
+                if (!target.matchAllNames && target.name != insn.name) return
                 if (target.descriptor != null && target.descriptor != insn.desc) return
 
                 val owner = target.owner

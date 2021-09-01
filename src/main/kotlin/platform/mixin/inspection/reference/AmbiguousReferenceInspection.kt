@@ -43,7 +43,7 @@ class AmbiguousReferenceInspection : MixinAnnotationAttributeInspection(METHOD_I
 
     private fun checkMember(value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
         val ambiguousReference = MethodReference.getReferenceIfAmbiguous(value) ?: return
-        if (ambiguousReference.matchAll) {
+        if (ambiguousReference.matchAllNames || ambiguousReference.matchAllDescs) {
             // the intent of ambiguity is clear
             return
         }

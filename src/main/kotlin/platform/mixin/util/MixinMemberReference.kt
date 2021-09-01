@@ -20,7 +20,7 @@ object MixinMemberReference {
             builder.append('L').append(reference.owner.replace('.', '/')).append(';')
         }
 
-        builder.append(reference.name)
+        builder.append(if (reference.matchAllNames) "*" else reference.name)
 
         reference.descriptor?.let { descriptor ->
             if (!descriptor.startsWith('(')) {
@@ -38,8 +38,9 @@ object MixinMemberReference {
      * Parses a [MemberReference] based on the specifications of Mixin's
      * MemberInfo.
      */
-    fun parse(reference: String?): MemberReference? {
-        reference ?: return null
+    fun parse(ref: String?): MemberReference? {
+        ref ?: return null
+        val reference = ref.replace(" ", "")
         val owner: String?
 
         var pos = reference.lastIndexOf('.')
@@ -65,7 +66,8 @@ object MixinMemberReference {
 
         val descriptor: String?
         val name: String
-        val matchAll: Boolean
+        val matchAllNames = reference.getOrNull(pos + 1) == '*'
+        val matchAllDescs: Boolean
 
         // Find descriptor separator
         val methodDescPos = reference.indexOf('(', pos + 1)
@@ -73,17 +75,17 @@ object MixinMemberReference {
             // Method descriptor
             descriptor = reference.substring(methodDescPos)
             name = reference.substring(pos + 1, methodDescPos)
-            matchAll = false
+            matchAllDescs = false
         } else {
             val fieldDescPos = reference.indexOf(':', pos + 1)
             if (fieldDescPos != -1) {
                 descriptor = reference.substring(fieldDescPos + 1)
                 name = reference.substring(pos + 1, fieldDescPos)
-                matchAll = false
+                matchAllDescs = false
             } else {
                 descriptor = null
-                matchAll = reference.endsWith('*')
-                name = if (matchAll) {
+                matchAllDescs = reference.endsWith('*')
+                name = if (matchAllDescs) {
                     reference.substring(pos + 1, reference.lastIndex)
                 } else {
                     reference.substring(pos + 1)
@@ -91,6 +93,6 @@ object MixinMemberReference {
             }
         }
 
-        return MemberReference(name, descriptor, owner, matchAll)
+        return MemberReference(if (matchAllNames) "*" else name, descriptor, owner, matchAllNames, matchAllDescs)
     }
 }

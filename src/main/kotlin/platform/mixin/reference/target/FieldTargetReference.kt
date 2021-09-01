@@ -64,7 +64,7 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
             if (expression !is PsiMethodReferenceExpression) {
                 // early out for if the name does not match
-                if (expression.referenceName == reference.name) {
+                if (reference.matchAllNames || expression.referenceName == reference.name) {
                     (expression.resolve() as? PsiField)?.let { resolved ->
                         val matches = reference.match(
                             resolved,
@@ -91,7 +91,7 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
             insns.iterator().forEachRemaining { insn ->
                 if (insn !is FieldInsnNode) return@forEachRemaining
                 if (mode != Mode.COMPLETION) {
-                    if (insn.name != reference.name) return@forEachRemaining
+                    if (!reference.matchAllNames && insn.name != reference.name) return@forEachRemaining
                     if (reference.descriptor != null && insn.desc != reference.descriptor) return@forEachRemaining
 
                     val owner = reference.owner
