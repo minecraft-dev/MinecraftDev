@@ -22,6 +22,7 @@ import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.isAccessModifier
 import com.intellij.codeInsight.intention.AddAnnotationFix
 import com.intellij.codeInsight.intention.QuickFixFactory
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
@@ -99,12 +100,14 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                     holder.registerProblem(
                         nameIdentifier,
                         "Missing @${internalNameToShortName(internalName)} annotation",
+                        ProblemHighlightType.WARNING,
                         AddAnnotationFix(qualifiedName, method, targetAnnPsi.parameterList.attributes)
                     )
                 } else {
                     holder.registerProblem(
                         nameIdentifier,
-                        "Missing @${internalNameToShortName(internalName)} annotation"
+                        "Missing @${internalNameToShortName(internalName)} annotation",
+                        ProblemHighlightType.WARNING
                     )
                 }
             }
