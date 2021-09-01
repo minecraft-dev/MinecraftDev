@@ -230,6 +230,9 @@ private fun ClassNode.constructClass(project: Project, body: String): PsiClass? 
                 }
                 append("public class ")
                 append(innerClass)
+                if (index == innerClasses.lastIndex) {
+                    append("<T>")
+                }
                 append(" {\n")
             }
             indent += "   "
@@ -267,8 +270,24 @@ private fun ClassNode.constructClass(project: Project, body: String): PsiClass? 
     while (true) {
         clazz = clazz.innerClasses.firstOrNull()
             ?: clazz.anonymousElements.lastOrNull { it !== clazz && it is PsiClass } as? PsiClass
-            ?: return clazz
+            ?: break
     }
+
+    // add type parameters from class signature
+    val elementFactory = JavaPsiFacade.getInstance(project).elementFactory
+    val typeParams = this.signature?.let { signature ->
+        val sigToPsi = SignatureToPsi(elementFactory, null)
+        SignatureReader(signature).accept(sigToPsi)
+        sigToPsi.formalTypeParameters
+    }
+
+    if (typeParams == null || typeParams.typeParameters.isEmpty()) {
+        clazz.typeParameterList?.replace(elementFactory.createTypeParameterList())
+    } else {
+        clazz.typeParameterList?.replace(typeParams)
+    }
+
+    return clazz
 }
 
 /**
@@ -376,12 +395,15 @@ fun FieldNode.hasModifier(@PsiModifier.ModifierConstant modifier: String) = hasM
 val FieldNode.memberReference
     get() = MemberReference(this.name, this.desc)
 
-fun FieldNode.getGenericType(project: Project): PsiType {
+fun FieldNode.getGenericType(
+    clazz: ClassNode,
+    project: Project
+): PsiType {
+    if (this.signature != null) {
+        return findOrConstructSourceField(clazz, project, canDecompile = false).type
+    }
     val elementFactory = JavaPsiFacade.getElementFactory(project)
-    val signature = this.signature ?: return Type.getType(this.desc).toPsiType(elementFactory)
-    val sigToPsi = SignatureToPsi(elementFactory, null)
-    SignatureReader(signature).acceptType(sigToPsi)
-    return sigToPsi.type
+    return Type.getType(this.desc).toPsiType(elementFactory)
 }
 
 fun FieldNode.findStubField(clazz: ClassNode, project: Project): PsiField? {
@@ -403,9 +425,19 @@ fun FieldNode.findOrConstructSourceField(
 
     val elementFactory = JavaPsiFacade.getInstance(project).elementFactory
 
+    val containingClass = clazz?.constructClass(project, "int foo;")
+
+    val signature = this.signature
+    val type = if (signature != null) {
+        val sigToPsi = SignatureToPsi(elementFactory, containingClass)
+        SignatureReader(signature).acceptType(sigToPsi)
+        sigToPsi.type
+    } else {
+        Type.getType(this.desc).toPsiType(elementFactory)
+    }
     val psiField = elementFactory.createField(
         this.name.toJavaIdentifier(),
-        this.getGenericType(project)
+        type
     )
     psiField.realName = this.name
     val modifierList = psiField.modifierList!!
@@ -416,8 +448,7 @@ fun FieldNode.findOrConstructSourceField(
     modifierList.setModifierProperty(PsiModifier.FINAL, hasAccess(Opcodes.ACC_FINAL))
     modifierList.setModifierProperty(PsiModifier.VOLATILE, hasAccess(Opcodes.ACC_VOLATILE))
     modifierList.setModifierProperty(PsiModifier.TRANSIENT, hasAccess(Opcodes.ACC_TRANSIENT))
-    return clazz
-        ?.constructClass(project, "int foo;")
+    return containingClass
         ?.findFieldByName("foo", false)
         ?.replace(psiField) as? PsiField
         ?: psiField
@@ -463,37 +494,36 @@ fun MethodNode.hasModifier(@PsiModifier.ModifierConstant modifier: String) = has
 val MethodNode.memberReference
     get() = MemberReference(this.name, this.desc)
 
-fun MethodNode.getGenericReturnType(project: Project): PsiType {
-    val elementFactory = JavaPsiFacade.getElementFactory(project)
-    this.signature?.let { signature ->
-        val sigToPsi = SignatureToPsi(elementFactory, null)
-        SignatureReader(signature).accept(sigToPsi)
-        sigToPsi.returnType?.let { return it }
+fun MethodNode.getGenericSignature(clazz: ClassNode, project: Project): Pair<PsiType, List<PsiType>> {
+    var pair: Pair<PsiType, List<PsiType>>? = null
+    if (this.signature != null) {
+        val sourceMethod = findOrConstructSourceMethod(clazz, project, canDecompile = false)
+        sourceMethod.returnType?.let { returnType ->
+            pair = returnType to sourceMethod.parameterList.parameters.map { it.type }
+        }
     }
-    return Type.getReturnType(this.desc).toPsiType(elementFactory)
+
+    if (pair == null) {
+        val elementFactory = JavaPsiFacade.getElementFactory(project)
+        pair = Type.getReturnType(this.desc).toPsiType(elementFactory) to
+            Type.getArgumentTypes(this.desc).map { it.toPsiType(elementFactory) }
+    }
+    var ret = pair!!
+
+    val lastType = ret.second.lastOrNull()
+    if (hasAccess(Opcodes.ACC_VARARGS) && lastType is PsiArrayType) {
+        ret = ret.first to (ret.second.dropLast(1) + PsiEllipsisType(lastType.componentType))
+    }
+
+    return ret
+}
+
+fun MethodNode.getGenericReturnType(clazz: ClassNode, project: Project): PsiType {
+    return getGenericSignature(clazz, project).first
 }
 
 fun MethodNode.getGenericParameterTypes(clazz: ClassNode, project: Project): List<PsiType> {
-    val elementFactory = JavaPsiFacade.getElementFactory(project)
-    val sigParamTypes = this.signature?.let { signature ->
-        val sigToPsi = SignatureToPsi(elementFactory, null)
-        SignatureReader(signature).accept(sigToPsi)
-        sigToPsi.parameterTypes
-    } ?: emptyList()
-    val offset = if (this.isConstructor) {
-        when {
-            clazz.hasAccess(Opcodes.ACC_ENUM) -> 2
-            clazz.outerClass != null && !clazz.hasAccess(Opcodes.ACC_STATIC) -> 1
-            else -> 0
-        }
-    } else {
-        0
-    }
-    return Type.getArgumentTypes(this.desc).withIndex().map { (index, argType) ->
-        val argParam = argType.toPsiType(elementFactory)
-        val sigParam = sigParamTypes.getOrNull(index + offset) ?: return@map argParam
-        if (sigParam.isErasureEquivalentTo(argParam)) sigParam else argParam
-    }
+    return getGenericSignature(clazz, project).second
 }
 
 val MethodNode.isConstructor
@@ -609,12 +639,11 @@ fun MethodNode.findOrConstructSourceMethod(
         return sourceElement
     }
 
+    val psiClass = clazz?.constructClass(project, "void foo(){}")
+
     val elementFactory = JavaPsiFacade.getInstance(project).elementFactory
     val methodText = buildString {
-        append("public ")
-        if (this@findOrConstructSourceMethod.signature != null) {
-            append("<T> ")
-        }
+        append("public <T> ")
         val returnType = Type.getReturnType(this@findOrConstructSourceMethod.desc)
         if (isConstructor) {
             var name = "_init_"
@@ -667,23 +696,45 @@ fun MethodNode.findOrConstructSourceMethod(
             append('}')
         }
     }
-    val psiMethod = elementFactory.createMethodFromText(methodText, null)
+    val tempMethod = elementFactory.createMethodFromText(methodText, psiClass)
+    // put the method inside the class, if given
+    val psiMethod = psiClass
+        ?.findMethodsByName("foo", false)
+        ?.firstOrNull()
+        ?.replace(tempMethod) as? PsiMethod
+        ?: tempMethod
     psiMethod.realName = name
 
-    // replace generics
+    // replace signature first so that subsequent generics resolution can work
+    val typeParams = this.signature?.let { signature ->
+        val sigToPsi = SignatureToPsi(elementFactory, psiClass)
+        SignatureReader(signature).accept(sigToPsi)
+        sigToPsi.formalTypeParameters
+    }
+    if (typeParams == null || typeParams.typeParameters.isEmpty()) {
+        psiMethod.typeParameterList?.replace(elementFactory.createTypeParameterList())
+    } else {
+        psiMethod.typeParameterList?.replace(typeParams)
+    }
+
+    // replace other generics
     this.signature?.let { signature ->
-        val sigToPsi = SignatureToPsi(elementFactory, null)
+        val sigToPsi = SignatureToPsi(elementFactory, psiMethod)
         SignatureReader(signature).accept(sigToPsi)
 
-        val ftp = sigToPsi.formalTypeParameters
-        if (ftp == null) {
-            psiMethod.typeParameterList?.delete()
+        val offset = if (this.isConstructor) {
+            when {
+                clazz?.hasAccess(Opcodes.ACC_ENUM) == true -> 2
+                clazz?.outerClass != null && !clazz.hasAccess(Opcodes.ACC_STATIC) -> 1
+                else -> 0
+            }
         } else {
-            psiMethod.typeParameterList?.replace(ftp)
+            0
         }
 
         for ((index, parameterType) in sigToPsi.parameterTypes.withIndex()) {
-            val parameter = psiMethod.parameterList.getParameter(index) ?: continue
+            val parameter = psiMethod.parameterList.getParameter(index + offset) ?: continue
+            if (!parameter.type.isErasureEquivalentTo(parameterType)) continue
             // make sure to respect varargs
             val actualType = if (parameter.type is PsiEllipsisType && parameterType is PsiArrayType) {
                 PsiEllipsisType(parameterType.componentType, parameterType.annotations)
@@ -737,13 +788,7 @@ fun MethodNode.findOrConstructSourceMethod(
     modifierList.setModifierProperty(PsiModifier.SYNCHRONIZED, hasAccess(Opcodes.ACC_SYNCHRONIZED))
     modifierList.setModifierProperty(PsiModifier.NATIVE, hasAccess(Opcodes.ACC_NATIVE))
 
-    // put the method inside the class, if given
-    return clazz
-        ?.constructClass(project, "void foo(){}")
-        ?.findMethodsByName("foo", false)
-        ?.firstOrNull()
-        ?.replace(psiMethod) as? PsiMethod
-        ?: psiMethod
+    return psiMethod
 }
 
 /**
