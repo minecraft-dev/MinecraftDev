@@ -50,7 +50,7 @@ enum class InjectorType(private val annotation: String) {
             targetClass: ClassNode,
             targetMethod: MethodNode
         ): MethodSignature {
-            val returnType = targetMethod.getGenericReturnType(annotation.project)
+            val returnType = targetMethod.getGenericReturnType(targetClass, annotation.project)
 
             val result = ArrayList<ParameterGroup>()
 
@@ -131,6 +131,7 @@ enum class InjectorType(private val annotation: String) {
                     annotation.project,
                     at,
                     reference,
+                    member.classAndField.clazz,
                     member.classAndField.field
                 )
             } ?: return null
@@ -173,7 +174,7 @@ enum class InjectorType(private val annotation: String) {
                     sanitizedParameter(type, name)
                 }
 
-            val returnType = method.getGenericReturnType(project)
+            val returnType = method.getGenericReturnType(clazz, project)
             return parameters to returnType
         }
 
@@ -181,6 +182,7 @@ enum class InjectorType(private val annotation: String) {
             project: Project,
             at: PsiAnnotation,
             reference: MemberReference,
+            clazz: ClassNode,
             field: FieldNode
         ): Pair<List<Parameter>, PsiType>? {
             val elementFactory = JavaPsiFacade.getElementFactory(project)
@@ -204,11 +206,11 @@ enum class InjectorType(private val annotation: String) {
 
             val returnType = when (opcode) {
                 Opcodes.PUTFIELD, Opcodes.PUTSTATIC -> {
-                    parameters.add(Parameter("value", field.getGenericType(project)))
+                    parameters.add(Parameter("value", field.getGenericType(clazz, project)))
                     PsiType.VOID
                 }
                 else -> { // assume getfield redirect
-                    field.getGenericType(project)
+                    field.getGenericType(clazz, project)
                 }
             }
 
