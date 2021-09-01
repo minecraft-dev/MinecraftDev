@@ -29,7 +29,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
         }
 
         fixture.enableInspections(AmbiguousReferenceInspection::class)
-        fixture.checkHighlighting(false, false, false)
+        fixture.checkHighlighting(true, false, false)
     }
 
     @Test
@@ -47,7 +47,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             @Mixin(MixedIn.class)
             class AmbiguousReferenceMixin {
             
-                @Inject(method = <error descr="Ambiguous reference to method 'method' in target class">"method"</error>, at = @At("HEAD"))
+                @Inject(method = <warning descr="Ambiguous reference to method 'method' in target class">"method"</warning>, at = @At("HEAD"))
                 public void onMethod() {
                 }
             }
@@ -93,7 +93,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             @Mixin(MixedIn.class)
             class AmbiguousReferenceMixin {
             
-                @Inject(method = {<error descr="Ambiguous reference to method 'method' in target class">"method"</error>, "uniqueMethod"}, at = @At("HEAD"))
+                @Inject(method = {<warning descr="Ambiguous reference to method 'method' in target class">"method"</warning>, "uniqueMethod"}, at = @At("HEAD"))
                 public void onMethod() {
                 }
             }
