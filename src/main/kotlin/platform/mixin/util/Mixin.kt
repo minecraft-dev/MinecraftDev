@@ -28,6 +28,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.util.PsiModificationTracker
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 
@@ -81,7 +82,7 @@ val PsiClass.mixinTargets: List<ClassNode>
     }
 
 val PsiClass.bytecode: ClassNode?
-    get() = cached {
+    get() = cached(PsiModificationTracker.MODIFICATION_COUNT) {
         findClassNodeByPsiClass(this)
     }
 
