@@ -191,8 +191,10 @@ val PsiMethod.nameAndParameterTypes: String
 val <T : PsiElement> T.manipulator: ElementManipulator<T>?
     get() = ElementManipulators.getManipulator(this)
 
-inline fun <T> PsiElement.cached(crossinline compute: () -> T): T {
-    return CachedValuesManager.getCachedValue(this) { CachedValueProvider.Result.create(compute(), this) }
+inline fun <T> PsiElement.cached(vararg dependencies: Any, crossinline compute: () -> T): T {
+    return CachedValuesManager.getCachedValue(this) {
+        CachedValueProvider.Result.create(compute(), *(dependencies.toList() + this).toTypedArray())
+    }
 }
 
 fun LookupElementBuilder.withImportInsertion(toImport: List<PsiClass>): LookupElementBuilder =
