@@ -31,7 +31,7 @@ class MixinReferenceContributor : PsiReferenceContributor() {
         registrar.registerReferenceProvider(
             PsiJavaPatterns.psiLiteral(StandardPatterns.string())
                 .insideAnnotationAttribute(AT),
-            InjectionPointType
+            InjectionPointReference
         )
 
         // Target references

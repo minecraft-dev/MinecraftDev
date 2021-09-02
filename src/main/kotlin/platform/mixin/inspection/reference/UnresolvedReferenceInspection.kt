@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
-import com.demonwav.mcdev.platform.mixin.reference.InjectionPointType
+import com.demonwav.mcdev.platform.mixin.reference.InjectionPointReference
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
@@ -40,7 +40,7 @@ class UnresolvedReferenceInspection : MixinInspection() {
             val resolver: MixinReference = when (name) {
                 "method" -> MethodReference
                 "target" -> TargetReference
-                "value" -> InjectionPointType
+                "value" -> InjectionPointReference
                 else -> return
             }
 
