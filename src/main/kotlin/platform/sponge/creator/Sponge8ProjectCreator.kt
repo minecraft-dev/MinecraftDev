@@ -107,7 +107,7 @@ class CreatePluginsJsonStep(
     override fun runStep(indicator: ProgressIndicator) {
         val pluginsJsonPath = buildSystem.dirsOrError.resourceDirectory.resolve("META-INF")
         val pluginsJsonText = Sponge8Template.applyPluginsJson(project, buildSystem, config)
-        CreatorStep.writeTextToFile(project, pluginsJsonPath, "plugins.json", pluginsJsonText)
+        CreatorStep.writeTextToFile(project, pluginsJsonPath, "sponge_plugins.json", pluginsJsonText)
     }
 }
 

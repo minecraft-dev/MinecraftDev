@@ -1,16 +1,21 @@
 {
+  "loader": {
+    "name": "java_plain",
+    "version": "1.0"
+  },
+  "license": "${LICENSE}",
   "plugins": [
     {
-      "loader": "java_plain",
       "id": "${PLUGIN_ID}",
       "name": "${PLUGIN_NAME}",
       "version": "${VERSION_PLACEHOLDER}",
-      "main-class": "${MAIN_CLASS}",
+      "entrypoint": "${MAIN_CLASS}",
       #if (${DESCRIPTION})
       "description": "${DESCRIPTION}",
       #else
       "description": "My plugin description",
       #end
+      "branding": {},
       "links": {
         #if (${WEBSITE})
         "homepage": "https://spongepowered.org"
@@ -28,13 +33,13 @@
         {
           "id": "spongeapi",
           "version": "${SPONGEAPI_VERSION}",
-          "load-order": "AFTER",
+          "load-order": "after",
           "optional": false
         #foreach (${DEPENDENCY} in ${DEPENDENCIES})
         },
         {
           "id": "${DEPENDENCY}",
-          "load-order": "AFTER",
+          "load-order": "after",
           "optional": false
         #end
         }

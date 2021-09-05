@@ -1,10 +1,10 @@
 import org.spongepowered.gradle.plugin.config.PluginLoaders
-import org.spongepowered.plugin.metadata.PluginDependency
+import org.spongepowered.plugin.metadata.model.PluginDependency
 
 plugins {
     `java-library`
     id("com.github.johnrengelman.shadow")
-    id("org.spongepowered.gradle.plugin") version "1.1.1"
+    id("org.spongepowered.gradle.plugin") version "2.0.0"
 }
 
 repositories {
@@ -17,10 +17,14 @@ dependencies {
 
 sponge {
     apiVersion("${SPONGEAPI_VERSION}")
+    license("${LICENSE}")
+    loader {
+        name(PluginLoaders.JAVA_PLAIN)
+        version("1.0")
+    }
     plugin("${PLUGIN_ID}") {
-        loader(PluginLoaders.JAVA_PLAIN)
         displayName("${PLUGIN_NAME}")
-        mainClass("${MAIN_CLASS}")
+        entrypoint("${MAIN_CLASS}")
         #if (${DESCRIPTION})
         description("${DESCRIPTION}")
         #else
@@ -65,7 +69,9 @@ java {
 tasks.withType(JavaCompile::class).configureEach {
     options.apply {
         encoding = "utf-8" // Consistent source file encoding
-        release.set(javaTarget)
+        if (JavaVersion.current().isJava10Compatible) {
+            release.set(javaTarget)
+        }
     }
 }
 
