@@ -845,9 +845,9 @@
             <add-to-group group-id="GenerateGroup" anchor="last" />
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.action.CopyMixinTargetReferenceAction" id="CopyMixinTargetReferenceAction"
-                text="Copy Mixin Target Reference"
+                text="Mixin Target Reference"
                 description="Copy the reference to the element for use in an injector">
-            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+            <add-to-group relative-to-action="CopyReference" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.action.GenerateAccessorAction" id="GenerateAccessorAction"
                 text="Generate Accessor/Invoker"
@@ -860,14 +860,14 @@
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu2"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.CopyAtAction" id="CopyATAction"
-                text="Copy AT Entry to Clipboard"
+                text="AT Entry"
                 description="Copy the reference to clipboard in Access Transformer format">
-            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu2"/>
+            <add-to-group relative-to-action="CopyReference" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.GotoAtEntryAction" id="GotoAtEntry"
-                text="Go To AT Entry"
+                text="AT Entry"
                 description="Go to the relevant Access Transformer entry, if it exists">
-            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
+            <add-to-group group-id="EditorPopupMenu.GoTo"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.LookupMemberAction" id="LookupMcpMember"
                 text="Lookup MCP Member"
