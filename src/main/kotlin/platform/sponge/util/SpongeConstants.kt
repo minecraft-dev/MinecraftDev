@@ -16,6 +16,7 @@ import java.util.regex.Pattern
 object SpongeConstants {
 
     const val PLUGIN_ANNOTATION = "org.spongepowered.api.plugin.Plugin"
+    const val JVM_PLUGIN_ANNOTATION = "org.spongepowered.plugin.builtin.jvm.Plugin"
     const val DEPENDENCY_ANNOTATION = "org.spongepowered.api.plugin.Dependency"
     const val TEXT_COLORS = "org.spongepowered.api.text.format.TextColors"
     const val EVENT = "org.spongepowered.api.event.Event"
