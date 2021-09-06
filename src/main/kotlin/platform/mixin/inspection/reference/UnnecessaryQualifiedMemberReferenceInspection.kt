@@ -15,7 +15,6 @@ import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
 import com.demonwav.mcdev.util.MemberReference
-import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
@@ -42,19 +41,18 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
     }
 
     private fun checkMemberReference(value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
-        val stringValue = value.constantStringValue ?: return
-        val reference = parseMixinSelector(stringValue) ?: return
-        if (reference.qualified) {
-            if (reference is MemberReference) {
+        val selector = parseMixinSelector(value) ?: return
+        if (selector.qualified) {
+            if (selector is MemberReference) {
                 holder.registerProblem(
                     value,
-                    "Unnecessary qualified reference to '${reference.displayName}' in target class",
-                    QuickFix(reference)
+                    "Unnecessary qualified reference to '${selector.displayName}' in target class",
+                    QuickFix(selector)
                 )
             } else {
                 holder.registerProblem(
                     value,
-                    "Unnecessary qualified reference to '${reference.displayName}' in target class"
+                    "Unnecessary qualified reference to '${selector.displayName}' in target class"
                 )
             }
         }

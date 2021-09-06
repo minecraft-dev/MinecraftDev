@@ -46,24 +46,23 @@ import org.objectweb.asm.tree.TypeInsnNode
 
 object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
 
-    private fun parseSelector(value: String): MixinSelector? {
+    private fun parseSelector(context: PsiElement): MixinSelector? {
+        val value = context.constantStringValue ?: return null
         val fqn = value.replace('/', '.').replace('$', '.')
         if (fqn.isNotEmpty() && !fqn.startsWith('.') && !fqn.endsWith('.') && !fqn.contains("..")) {
             if (StringUtil.isJavaIdentifier(fqn.replace('.', '_'))) {
                 return MemberReference("<init>", owner = fqn)
             }
         }
-        return parseMixinSelector(value)
+        return parseMixinSelector(value, context)
     }
 
     override fun resolveTarget(context: PsiElement): PsiElement? {
-        val value = context.constantStringValue ?: return null
-        return parseSelector(value)?.resolveMember(context.project, context.resolveScope)
+        return parseSelector(context)?.resolveMember(context.project, context.resolveScope)
     }
 
     override fun createNavigationVisitor(context: PsiElement, targetClass: PsiClass): NavigationVisitor? {
-        val value = context.constantStringValue ?: return null
-        val selector = parseSelector(value) ?: return null
+        val selector = parseSelector(context) ?: return null
         return MyNavigationVisitor(selector)
     }
 
@@ -75,8 +74,7 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, context.project, MemberReference(""))
         }
-        val value = context.constantStringValue ?: return null
-        val ref = parseSelector(value) ?: return null
+        val ref = parseSelector(context) ?: return null
         return MyCollectVisitor(mode, context.project, ref)
     }
 

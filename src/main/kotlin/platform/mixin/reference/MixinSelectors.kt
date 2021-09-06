@@ -14,12 +14,16 @@ import com.demonwav.mcdev.platform.mixin.util.ClassAndFieldNode
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.bytecode
 import com.demonwav.mcdev.platform.mixin.util.findField
 import com.demonwav.mcdev.platform.mixin.util.findMethod
 import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.cached
+import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.descriptor
+import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findField
 import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.findQualifiedClass
@@ -28,26 +32,37 @@ import com.demonwav.mcdev.util.internalName
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.RecursionManager
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.CommonClassNames
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.searches.AnnotatedMembersSearch
+import com.intellij.psi.util.InheritanceUtil
+import com.intellij.psi.util.PsiModificationTracker
 import java.util.regex.PatternSyntaxException
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
 
-fun parseMixinSelector(value: String): MixinSelector? {
+fun parseMixinSelector(element: PsiElement): MixinSelector? {
+    val stringValue = element.constantStringValue ?: return null
+    return parseMixinSelector(stringValue, element)
+}
+
+fun parseMixinSelector(value: String, context: PsiElement): MixinSelector? {
     for (parser in MixinSelectorParser.EP_NAME.extensionList) {
-        parser.parse(value)?.let { return it }
+        parser.parse(value, context)?.let { return it }
     }
     return null
 }
 
 interface MixinSelectorParser {
-    fun parse(value: String): MixinSelector?
+    fun parse(value: String, context: PsiElement): MixinSelector?
 
     companion object {
         val EP_NAME = ExtensionPointName.create<MixinSelectorParser>("com.demonwav.minecraft-dev.mixinSelectorParser")
@@ -176,7 +191,7 @@ fun MemberReference.toMixinString(): String {
 }
 
 class MixinMemberParser : MixinSelectorParser {
-    override fun parse(value: String): MixinSelector? {
+    override fun parse(value: String, context: PsiElement): MixinSelector? {
         val reference = value.replace(" ", "")
         val owner: String?
 
@@ -188,7 +203,7 @@ class MixinMemberParser : MixinSelectorParser {
             pos = reference.indexOf(';')
             if (pos != -1 && reference.startsWith('L')) {
                 val internalOwner = reference.substring(1, pos)
-                if (internalOwner.contains('.')) {
+                if (!StringUtil.isJavaIdentifier(internalOwner.replace('/', '_'))) {
                     // Invalid: Qualifier should only contain slashes
                     return null
                 }
@@ -230,6 +245,10 @@ class MixinMemberParser : MixinSelectorParser {
             }
         }
 
+        if (!matchAllNames && !StringUtil.isJavaIdentifier(name) && name != "<init>" && name != "<clinit>") {
+            return null
+        }
+
         return MemberReference(if (matchAllNames) "*" else name, descriptor, owner, matchAllNames, matchAllDescs)
     }
 }
@@ -237,7 +256,7 @@ class MixinMemberParser : MixinSelectorParser {
 // Regex reference
 
 class MixinRegexParser : MixinSelectorParser {
-    override fun parse(value: String): MixinSelector? {
+    override fun parse(value: String, context: PsiElement): MixinSelector? {
         if (!value.endsWith("/")) {
             return null
         }
@@ -325,4 +344,59 @@ data class MixinRegexSelector(
 
     override val displayName: String
         get() = namePattern.pattern
+}
+
+// Dynamic selectors
+
+fun isDynamicSelector(project: Project, value: String): Boolean {
+    // check for dynamic selectors that maybe aren't registered in extension points
+    val matchResult = DYNAMIC_SELECTOR_PATTERN.find(value) ?: return false
+    val id = matchResult.groups[1]!!.value
+    return getAllDynamicSelectors(project).contains(id)
+}
+
+private fun getAllDynamicSelectors(project: Project): Set<String> {
+    val selectorId = JavaPsiFacade.getInstance(project)
+        .findClass(MixinConstants.Classes.SELECTOR_ID, GlobalSearchScope.allScope(project)) ?: return emptySet()
+    return selectorId.cached(PsiModificationTracker.MODIFICATION_COUNT) {
+        AnnotatedMembersSearch.search(selectorId).asSequence().flatMap { member ->
+            if (member !is PsiClass) {
+                return@flatMap emptySequence()
+            }
+            if (!InheritanceUtil.isInheritor(member, MixinConstants.Classes.TARGET_SELECTOR_DYNAMIC)) {
+                return@flatMap emptySequence()
+            }
+            val annotation = member.findAnnotation(MixinConstants.Classes.SELECTOR_ID) ?: return@flatMap emptySequence()
+            val value = annotation.findAttributeValue("value")?.constantStringValue
+                ?: return@flatMap emptySequence()
+            val namespace = annotation.findAttributeValue("namespace")?.constantStringValue
+            if (namespace.isNullOrEmpty()) {
+                val builtinPrefix = "org.spongepowered.asm.mixin.injection.selectors."
+                if (member.qualifiedName?.startsWith(builtinPrefix) == true) {
+                    sequenceOf(value, "mixin:$value")
+                } else {
+                    sequenceOf(value)
+                }
+            } else {
+                sequenceOf("$namespace:$value")
+            }
+        }.toSet()
+    }
+}
+
+private val DYNAMIC_SELECTOR_PATTERN = "(?i)^@([a-z]+(:[a-z]+)?)(\\((.*)\\))?$".toRegex()
+
+abstract class DynamicSelectorParser(id: String, vararg aliases: String) : MixinSelectorParser {
+    private val validIds = aliases.toSet() + id
+
+    final override fun parse(value: String, context: PsiElement): MixinSelector? {
+        val matchResult = DYNAMIC_SELECTOR_PATTERN.find(value) ?: return null
+        val id = matchResult.groups[1]!!.value
+        if (!validIds.contains(id)) {
+            return null
+        }
+        return parseDynamic(matchResult.groups[4]?.value ?: "", context)
+    }
+
+    abstract fun parseDynamic(args: String, context: PsiElement): MixinSelector?
 }

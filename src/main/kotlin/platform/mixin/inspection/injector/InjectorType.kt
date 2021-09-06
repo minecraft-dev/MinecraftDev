@@ -25,7 +25,6 @@ import com.demonwav.mcdev.platform.mixin.util.getGenericType
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.Parameter
-import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.toJavaIdentifier
 import com.intellij.openapi.project.Project
@@ -112,25 +111,25 @@ enum class InjectorType(private val annotation: String) {
             // we don't actually have to resolve the target reference in the
             // target method. Everything needed to get the method parameters
             // is included in the reference.
-            val reference = target.constantStringValue?.let { parseMixinSelector(it) } ?: return null
+            val selector = parseMixinSelector(target) ?: return null
 
-            if (!reference.qualified || reference.descriptor == null) {
+            if (!selector.qualified || selector.descriptor == null) {
                 // Invalid anyway and we need the qualified reference
                 return null
             }
 
-            val member = reference.resolveAsm(annotation.project, annotation.resolveScope) ?: return null
+            val member = selector.resolveAsm(annotation.project, annotation.resolveScope) ?: return null
             val (parameters, returnType) = when (member) {
                 is MethodTargetMember -> collectMethodParameters(
                     annotation.project,
-                    reference,
+                    selector,
                     member.classAndMethod.clazz,
                     member.classAndMethod.method
                 )
                 is FieldTargetMember -> collectFieldParameters(
                     annotation.project,
                     at,
-                    reference,
+                    selector,
                     member.classAndField.clazz,
                     member.classAndField.field
                 )

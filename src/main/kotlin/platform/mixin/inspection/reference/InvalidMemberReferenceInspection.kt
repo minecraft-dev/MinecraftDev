@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.reference
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
+import com.demonwav.mcdev.platform.mixin.reference.isDynamicSelector
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.util.annotationFromNameValuePair
@@ -65,7 +66,9 @@ class InvalidMemberReferenceInspection : MixinInspection() {
         }
 
         private fun checkMemberReference(element: PsiElement, value: String?) {
-            if (value == null || parseMixinSelector(value) == null) {
+            val validSelector = value != null &&
+                (parseMixinSelector(value, element) != null || isDynamicSelector(element.project, value))
+            if (!validSelector) {
                 holder.registerProblem(element, "Invalid member reference")
             }
         }

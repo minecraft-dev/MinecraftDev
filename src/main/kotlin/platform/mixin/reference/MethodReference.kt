@@ -69,14 +69,16 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
 
     override fun isUnresolved(context: PsiElement): Boolean {
         val stringValue = context.constantStringValue ?: return false
-        val targetMethodInfo = parseMixinSelector(stringValue) ?: return false
+        val targetMethodInfo = parseMixinSelector(stringValue, context) ?: return false
         val targets = getTargets(context) ?: return false
-        return !targets.asSequence().flatMap { it.findMethods(targetMethodInfo) }.any()
+        if (targets.asSequence().flatMap { it.findMethods(targetMethodInfo) }.any()) {
+            return false
+        }
+        return !isDynamicSelector(context.project, stringValue)
     }
 
     fun getReferenceIfAmbiguous(context: PsiElement): MemberReference? {
-        val stringValue = context.constantStringValue ?: return null
-        val targetReference = parseMixinSelector(stringValue) as? MemberReference ?: return null
+        val targetReference = parseMixinSelector(context) as? MemberReference ?: return null
         if (targetReference.descriptor != null) {
             return null
         }
@@ -104,7 +106,7 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
         }
 
         return targetedMethods.asSequence().flatMap { method ->
-            val targetReference = parseMixinSelector(method) ?: return@flatMap emptySequence()
+            val targetReference = parseMixinSelector(method, context) ?: return@flatMap emptySequence()
             return@flatMap resolve(targets, targetReference)
         }
     }
@@ -131,7 +133,7 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
         }
 
         return targetedMethods.asSequence().flatMap { method ->
-            val targetReference = parseMixinSelector(method) ?: return@flatMap emptySequence()
+            val targetReference = parseMixinSelector(method, context) ?: return@flatMap emptySequence()
             if (targetReference is MemberReference && targetReference.descriptor == null && isAmbiguous(
                     targets,
                     targetReference

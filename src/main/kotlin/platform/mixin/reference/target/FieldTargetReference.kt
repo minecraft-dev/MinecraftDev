@@ -16,7 +16,6 @@ import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceField
 import com.demonwav.mcdev.util.MemberReference
-import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -32,8 +31,7 @@ import org.objectweb.asm.tree.MethodNode
 
 object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
     override fun createNavigationVisitor(context: PsiElement, targetClass: PsiClass): NavigationVisitor? {
-        val stringValue = context.constantStringValue ?: return null
-        return parseMixinSelector(stringValue)
+        return parseMixinSelector(context)
             ?.let { MyNavigationVisitor(targetClass, it) }
     }
 
@@ -45,8 +43,7 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, context.project, MemberReference(""))
         }
-        val stringValue = context.constantStringValue ?: return null
-        return parseMixinSelector(stringValue)
+        return parseMixinSelector(context)
             ?.let { MyCollectVisitor(mode, context.project, it) }
     }
 

@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
+import com.demonwav.mcdev.platform.mixin.reference.isDynamicSelector
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
@@ -133,7 +134,11 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
         val targetMethod = getTargetMethod(at) ?: return false // the target method inspection will catch this
 
         val collectVisitor = handler.createCollectVisitor(context, targetMethod.clazz, CollectVisitor.Mode.MATCH_FIRST)
-            ?: return true // syntax error in target
+        if (collectVisitor == null) {
+            // syntax error in target
+            val target = at.findAttributeValue("target")?.constantStringValue ?: return true
+            return !isDynamicSelector(context.project, target)
+        }
         collectVisitor.visit(targetMethod.method)
         return collectVisitor.result.isEmpty()
     }
@@ -224,8 +229,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
         protected abstract fun createLookup(targetClass: ClassNode, m: T, owner: String): LookupElementBuilder
 
         override fun resolveTarget(context: PsiElement): PsiElement? {
-            val value = context.constantStringValue ?: return null
-            val selector = parseMixinSelector(value)
+            val selector = parseMixinSelector(context)
             selector?.owner ?: return null
             return selector.resolveMember(context.project, context.resolveScope)
         }

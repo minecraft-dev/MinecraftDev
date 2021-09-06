@@ -15,7 +15,6 @@ import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.MemberReference
-import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
@@ -35,8 +34,7 @@ object MethodTargetReference : TargetReference.MethodHandler() {
         context: PsiElement,
         targetClass: PsiClass
     ): NavigationVisitor? {
-        val stringValue = context.constantStringValue ?: return null
-        return parseMixinSelector(stringValue)
+        return parseMixinSelector(context)
             ?.let { MyNavigationVisitor(targetClass, it) }
     }
 
@@ -48,8 +46,7 @@ object MethodTargetReference : TargetReference.MethodHandler() {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, context.project, MemberReference(""))
         }
-        val stringValue = context.constantStringValue ?: return null
-        return parseMixinSelector(stringValue)
+        return parseMixinSelector(context)
             ?.let { MyCollectVisitor(mode, context.project, it) }
     }
 
