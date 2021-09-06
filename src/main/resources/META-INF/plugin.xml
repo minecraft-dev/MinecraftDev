@@ -41,6 +41,7 @@
     </extensionPoints>
     
     <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
+        <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />
     </extensions>
 

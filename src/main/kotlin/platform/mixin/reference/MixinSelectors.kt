@@ -34,6 +34,7 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.GlobalSearchScope
+import java.util.regex.PatternSyntaxException
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
@@ -231,4 +232,97 @@ class MixinMemberParser : MixinSelectorParser {
 
         return MemberReference(if (matchAllNames) "*" else name, descriptor, owner, matchAllNames, matchAllDescs)
     }
+}
+
+// Regex reference
+
+class MixinRegexParser : MixinSelectorParser {
+    override fun parse(value: String): MixinSelector? {
+        if (!value.endsWith("/")) {
+            return null
+        }
+        var foundAny = false
+        var ownerPattern = MATCH_EVERYTHING
+        var namePattern = MATCH_EVERYTHING
+        var descPattern = MATCH_EVERYTHING
+        for (match in PATTERN.findAll(value)) {
+            foundAny = true
+            val pattern = match.groups[3]!!.value
+            when (match.groups[2]?.value) {
+                "owner" -> ownerPattern = pattern.safeToRegex()
+                "name" -> namePattern = pattern.safeToRegex()
+                "desc" -> descPattern = pattern.safeToRegex()
+                null -> namePattern = pattern.safeToRegex()
+                else -> throw AssertionError() // should be covered by the pattern
+            }
+        }
+
+        if (!foundAny) {
+            return null
+        }
+
+        return MixinRegexSelector(
+            ownerPattern,
+            namePattern,
+            descPattern,
+            ownerPattern.getConstantString(),
+            descPattern.getConstantString()
+        )
+    }
+
+    private fun String.safeToRegex(): Regex {
+        return try {
+            toRegex()
+        } catch (e: PatternSyntaxException) {
+            MATCH_EVERYTHING
+        }
+    }
+
+    private fun Regex.getConstantString(): String? {
+        val pattern = this.pattern
+        if (!pattern.startsWith("^") || !pattern.endsWith("$")) {
+            return null
+        }
+        var entirePattern = pattern.substring(1, pattern.length - 1)
+        if (SPECIAL_CHARS.containsMatchIn(entirePattern)) {
+            return null
+        }
+        entirePattern = entirePattern.replace(UNESCAPED_BACKSLASH, "")
+        entirePattern = entirePattern.replace("\\\\", "\\")
+        return entirePattern
+    }
+
+    companion object {
+        private val MATCH_EVERYTHING = ".*".toRegex()
+        private val PATTERN = "((owner|name|desc)\\s*=\\s*)?/(.*?)(?<!\\\\)/".toRegex()
+        private val SPECIAL_CHARS = "(?<!\\\\)(?:\\\\\\\\)*[\\^\$.|?*+()\\[\\]{}]".toRegex()
+        private val UNESCAPED_BACKSLASH = "(?<!\\\\)\\\\(?!(\\\\\\\\)*\\\\)".toRegex()
+    }
+}
+
+data class MixinRegexSelector(
+    val ownerPattern: Regex,
+    val namePattern: Regex,
+    val descPattern: Regex,
+    override val owner: String?,
+    override val descriptor: String?
+) : MixinSelector {
+    override fun matchField(owner: String, name: String, desc: String): Boolean {
+        return ownerPattern.containsMatchIn(owner) &&
+            namePattern.containsMatchIn(name) &&
+            descPattern.containsMatchIn(desc)
+    }
+
+    override fun matchMethod(owner: String, name: String, desc: String): Boolean {
+        return ownerPattern.containsMatchIn(owner) &&
+            namePattern.containsMatchIn(name) &&
+            descPattern.containsMatchIn(desc)
+    }
+
+    override fun canEverMatch(name: String): Boolean {
+        return namePattern.containsMatchIn(name)
+    }
+
+    override val displayName: String
+        get() = namePattern.pattern
 }
