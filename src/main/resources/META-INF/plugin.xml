@@ -43,6 +43,7 @@
     <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />
+        <mixinSelectorParser implementation="com.demonwav.mcdev.platform.mixin.reference.target.NewInsnTargetSelectorParser" order="before memberReference" />
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">

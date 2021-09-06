@@ -11,8 +11,10 @@
 package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.platform.mixin.util.shortName
@@ -28,6 +30,7 @@ import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMember
@@ -46,23 +49,12 @@ import org.objectweb.asm.tree.TypeInsnNode
 
 object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
 
-    private fun parseSelector(context: PsiElement): MixinSelector? {
-        val value = context.constantStringValue ?: return null
-        val fqn = value.replace('/', '.').replace('$', '.')
-        if (fqn.isNotEmpty() && !fqn.startsWith('.') && !fqn.endsWith('.') && !fqn.contains("..")) {
-            if (StringUtil.isJavaIdentifier(fqn.replace('.', '_'))) {
-                return MemberReference("<init>", owner = fqn)
-            }
-        }
-        return parseMixinSelector(value, context)
-    }
-
     override fun resolveTarget(context: PsiElement): PsiElement? {
-        return parseSelector(context)?.resolveMember(context.project, context.resolveScope)
+        return parseMixinSelector(context)?.resolveMember(context.project, context.resolveScope)
     }
 
     override fun createNavigationVisitor(context: PsiElement, targetClass: PsiClass): NavigationVisitor? {
-        val selector = parseSelector(context) ?: return null
+        val selector = parseMixinSelector(context) ?: return null
         return MyNavigationVisitor(selector)
     }
 
@@ -74,7 +66,7 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, context.project, MemberReference(""))
         }
-        val ref = parseSelector(context) ?: return null
+        val ref = parseMixinSelector(context) ?: return null
         return MyCollectVisitor(mode, context.project, ref)
     }
 
@@ -184,5 +176,23 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
 
             return null
         }
+    }
+}
+
+class NewInsnTargetSelectorParser : MixinSelectorParser {
+    override fun parse(value: String, context: PsiElement): MixinSelector? {
+        // check we're inside NEW
+        val at = context.parentOfType<PsiAnnotation>() ?: return null
+        if (!at.hasQualifiedName(AT)) return null
+        if (at.findAttributeValue("value")?.constantStringValue != "NEW") return null
+
+        val fqn = value.replace('/', '.').replace('$', '.')
+        if (fqn.isNotEmpty() && !fqn.startsWith('.') && !fqn.endsWith('.') && !fqn.contains("..")) {
+            if (StringUtil.isJavaIdentifier(fqn.replace('.', '_'))) {
+                return MemberReference("<init>", owner = fqn)
+            }
+        }
+
+        return null
     }
 }
