@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.mixin.reference
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
-import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.platform.mixin.util.bytecode
 import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
@@ -69,13 +68,15 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
     }
 
     override fun isUnresolved(context: PsiElement): Boolean {
-        val targetMethodInfo = MixinMemberReference.parse(context.constantStringValue) ?: return false
+        val stringValue = context.constantStringValue ?: return false
+        val targetMethodInfo = parseMixinSelector(stringValue) ?: return false
         val targets = getTargets(context) ?: return false
         return !targets.asSequence().flatMap { it.findMethods(targetMethodInfo) }.any()
     }
 
     fun getReferenceIfAmbiguous(context: PsiElement): MemberReference? {
-        val targetReference = MixinMemberReference.parse(context.constantStringValue) ?: return null
+        val stringValue = context.constantStringValue ?: return null
+        val targetReference = parseMixinSelector(stringValue) as? MemberReference ?: return null
         if (targetReference.descriptor != null) {
             return null
         }
@@ -103,17 +104,17 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
         }
 
         return targetedMethods.asSequence().flatMap { method ->
-            val targetReference = MixinMemberReference.parse(method) ?: return@flatMap emptySequence()
+            val targetReference = parseMixinSelector(method) ?: return@flatMap emptySequence()
             return@flatMap resolve(targets, targetReference)
         }
     }
 
     private fun resolve(
         targets: Collection<ClassNode>,
-        targetReference: MemberReference
+        selector: MixinSelector
     ): Sequence<ClassAndMethodNode> {
         return targets.asSequence()
-            .flatMap { target -> target.findMethods(targetReference).map { ClassAndMethodNode(target, it) } }
+            .flatMap { target -> target.findMethods(selector).map { ClassAndMethodNode(target, it) } }
     }
 
     fun resolveIfUnique(context: PsiElement): ClassAndMethodNode? {
@@ -130,8 +131,12 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
         }
 
         return targetedMethods.asSequence().flatMap { method ->
-            val targetReference = MixinMemberReference.parse(method) ?: return@flatMap emptySequence()
-            if (targetReference.descriptor == null && isAmbiguous(targets, targetReference)) {
+            val targetReference = parseMixinSelector(method) ?: return@flatMap emptySequence()
+            if (targetReference is MemberReference && targetReference.descriptor == null && isAmbiguous(
+                    targets,
+                    targetReference
+                )
+            ) {
                 return@flatMap emptySequence()
             }
             return@flatMap resolve(targets, targetReference)
@@ -239,7 +244,7 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
                 )
                 JavaLookupElementBuilder.forMethod(
                     sourceMethod,
-                    MixinMemberReference.toString(targetMethodInfo),
+                    targetMethodInfo.toMixinString(),
                     PsiSubstitutor.EMPTY,
                     null
                 )

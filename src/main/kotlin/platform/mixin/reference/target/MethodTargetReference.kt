@@ -10,7 +10,8 @@
 
 package com.demonwav.mcdev.platform.mixin.reference.target
 
-import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
+import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.MemberReference
@@ -34,7 +35,8 @@ object MethodTargetReference : TargetReference.MethodHandler() {
         context: PsiElement,
         targetClass: PsiClass
     ): NavigationVisitor? {
-        return MixinMemberReference.parse(context.constantStringValue)
+        val stringValue = context.constantStringValue ?: return null
+        return parseMixinSelector(stringValue)
             ?.let { MyNavigationVisitor(targetClass, it) }
     }
 
@@ -46,17 +48,18 @@ object MethodTargetReference : TargetReference.MethodHandler() {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, context.project, MemberReference(""))
         }
-        return MixinMemberReference.parse(context.constantStringValue)
+        val stringValue = context.constantStringValue ?: return null
+        return parseMixinSelector(stringValue)
             ?.let { MyCollectVisitor(mode, context.project, it) }
     }
 
     private class MyNavigationVisitor(
         private val targetClass: PsiClass,
-        private val reference: MemberReference
+        private val selector: MixinSelector
     ) : NavigationVisitor() {
 
         private fun visitMethodUsage(method: PsiMethod, qualifier: PsiClass?, expression: PsiElement) {
-            if (reference.match(method, qualifier ?: targetClass)) {
+            if (selector.matchMethod(method, qualifier ?: targetClass)) {
                 addResult(expression)
             }
         }
@@ -132,7 +135,7 @@ object MethodTargetReference : TargetReference.MethodHandler() {
     private class MyCollectVisitor(
         mode: Mode,
         private val project: Project,
-        private val reference: MemberReference
+        private val selector: MixinSelector
     ) : CollectVisitor<PsiMethod>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return
@@ -140,10 +143,9 @@ object MethodTargetReference : TargetReference.MethodHandler() {
                 if (insn !is MethodInsnNode) return@forEachRemaining
 
                 if (mode != Mode.COMPLETION) {
-                    if (!reference.matchAllNames && reference.name != insn.name) return@forEachRemaining
-                    if (reference.descriptor != null && reference.descriptor != insn.desc) return@forEachRemaining
-                    val owner = reference.owner
-                    if (owner != null && owner.replace('.', '/') != insn.owner) return@forEachRemaining
+                    if (!selector.matchMethod(insn.owner, insn.name, insn.desc)) {
+                        return@forEachRemaining
+                    }
                 }
 
                 val fakeMethod = insn.fakeResolve()

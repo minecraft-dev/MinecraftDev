@@ -36,6 +36,14 @@
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <idea-version since-build="203.7148.57" until-build="203.*"/>
 
+    <extensionPoints>
+        <extensionPoint name="mixinSelectorParser" interface="com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser" />
+    </extensionPoints>
+    
+    <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
+        <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />
+    </extensions>
+
     <extensions defaultExtensionNs="com.intellij">
         <!-- This is grouped in the following order EXCEPT for localInspections and moduleTypes. All localInspections are grouped at the
              end, but the individual local inspections themselves should also be ordered in this way.

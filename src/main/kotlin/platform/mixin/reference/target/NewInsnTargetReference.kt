@@ -10,15 +10,19 @@
 
 package com.demonwav.mcdev.platform.mixin.reference.target
 
-import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
+import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
+import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.platform.mixin.util.shortName
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
-import com.demonwav.mcdev.util.findQualifiedClass
+import com.demonwav.mcdev.util.descriptor
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.demonwav.mcdev.util.internalName
+import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.shortName
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -28,9 +32,12 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiNewExpression
 import com.intellij.psi.PsiSubstitutor
+import com.intellij.psi.util.parentOfType
 import org.objectweb.asm.Opcodes
+import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodInsnNode
@@ -39,38 +46,25 @@ import org.objectweb.asm.tree.TypeInsnNode
 
 object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
 
-    override fun resolveTarget(context: PsiElement): PsiElement? {
-        val value = context.constantStringValue ?: return null
-        if (value.contains("(")) {
-            val ref = MixinMemberReference.parse(value)
-            ref?.owner ?: return null
-            return ref.resolveMember(context.project, context.resolveScope)
+    private fun parseSelector(value: String): MixinSelector? {
+        val fqn = value.replace('/', '.').replace('$', '.')
+        if (fqn.isNotEmpty() && !fqn.startsWith('.') && !fqn.endsWith('.') && !fqn.contains("..")) {
+            if (StringUtil.isJavaIdentifier(fqn.replace('.', '_'))) {
+                return MemberReference("<init>", owner = fqn)
+            }
         }
-        if (!StringUtil.isJavaIdentifier(value.replace('.', '_').replace('$', '_'))) {
-            return null
-        }
-        val name = value.replace('/', '.')
-        return findQualifiedClass(name, context)
+        return parseMixinSelector(value)
     }
 
-    private fun parseReference(value: String): MemberReference? {
-        if (value.contains("(")) {
-            val ref = MixinMemberReference.parse(value)
-            ref?.owner ?: return null
-            if (ref.name != "<init>") return null
-            return ref
-        }
-        if (!StringUtil.isJavaIdentifier(value.replace('/', '_').replace('$', '_'))) {
-            return null
-        }
-        val name = value.replace('/', '.')
-        return MemberReference("<init>", owner = name)
+    override fun resolveTarget(context: PsiElement): PsiElement? {
+        val value = context.constantStringValue ?: return null
+        return parseSelector(value)?.resolveMember(context.project, context.resolveScope)
     }
 
     override fun createNavigationVisitor(context: PsiElement, targetClass: PsiClass): NavigationVisitor? {
         val value = context.constantStringValue ?: return null
-        val ref = parseReference(value) ?: return null
-        return MyNavigationVisitor(ref)
+        val selector = parseSelector(value) ?: return null
+        return MyNavigationVisitor(selector)
     }
 
     override fun createCollectVisitor(
@@ -82,7 +76,7 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
             return MyCollectVisitor(mode, context.project, MemberReference(""))
         }
         val value = context.constantStringValue ?: return null
-        val ref = parseReference(value) ?: return null
+        val ref = parseSelector(value) ?: return null
         return MyCollectVisitor(mode, context.project, ref)
     }
 
@@ -96,7 +90,7 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
                 val ownerName = result.qualifier?.substringAfterLast('.')?.replace('$', '.') ?: targetClass.shortName
                 return JavaLookupElementBuilder.forMethod(
                     target,
-                    MixinMemberReference.toString(target.getQualifiedMemberReference(result.qualifier)),
+                    target.getQualifiedMemberReference(result.qualifier).toMixinString(),
                     PsiSubstitutor.EMPTY,
                     null
                 )
@@ -109,19 +103,28 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
     }
 
     private class MyNavigationVisitor(
-        private val reference: MemberReference
+        private val selector: MixinSelector
     ) : NavigationVisitor() {
         override fun visitNewExpression(expression: PsiNewExpression) {
-            val anonymousClass = expression.anonymousClass
-            if (anonymousClass != null) {
-                if (reference.matchOwner(anonymousClass)) {
+            val anonymousName = expression.anonymousClass?.fullQualifiedName?.replace('.', '/')
+            if (anonymousName != null) {
+                // guess descriptor
+                val hasThis = expression.parentOfType<PsiMethod>()?.hasModifierProperty(PsiModifier.STATIC) == false
+                val thisType = if (hasThis) expression.parentOfType<PsiClass>()?.internalName else null
+                val argTypes = expression.argumentList?.expressionTypes?.map { it.descriptor } ?: emptyList()
+                val bytecodeArgTypes = if (thisType != null) listOf(thisType) + argTypes else argTypes
+                val methodDesc = Type.getMethodDescriptor(
+                    Type.VOID_TYPE,
+                    *bytecodeArgTypes.mapToArray { Type.getType(it) }
+                )
+                if (selector.matchMethod(anonymousName, "<init>", methodDesc)) {
                     addResult(expression)
                 }
             } else {
                 val ctor = expression.resolveConstructor()
                 val containingClass = ctor?.containingClass
                 if (ctor != null && containingClass != null) {
-                    if (reference.match(ctor, containingClass)) {
+                    if (selector.matchMethod(ctor, containingClass)) {
                         addResult(expression)
                     }
                 }
@@ -133,20 +136,18 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
     private class MyCollectVisitor(
         mode: Mode,
         private val project: Project,
-        private val reference: MemberReference
+        private val selector: MixinSelector
     ) : CollectVisitor<PsiMember>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return
             insns.iterator().forEachRemaining { insn ->
                 if (insn !is TypeInsnNode) return@forEachRemaining
                 if (insn.opcode != Opcodes.NEW) return@forEachRemaining
-                if (mode != Mode.COMPLETION) {
-                    val owner = reference.owner
-                    if (owner != null && owner.replace('.', '/') != insn.desc) return@forEachRemaining
-                }
                 val initCall = findInitCall(insn) ?: return@forEachRemaining
                 if (mode != Mode.COMPLETION) {
-                    if (reference.descriptor != null && reference.descriptor != initCall.desc) return@forEachRemaining
+                    if (!selector.matchMethod(initCall.owner, initCall.name, initCall.desc)) {
+                        return@forEachRemaining
+                    }
                 }
 
                 val targetMethod = initCall.fakeResolve()
@@ -162,22 +163,19 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
         }
 
         private fun findInitCall(newInsn: TypeInsnNode): MethodInsnNode? {
-            var matchingNewInsns = 0
+            var newInsns = 0
             var insn: AbstractInsnNode? = newInsn
             while (insn != null) {
                 when (insn) {
                     is TypeInsnNode -> {
-                        if (insn.opcode == Opcodes.NEW && insn.desc == newInsn.desc) {
-                            matchingNewInsns++
+                        if (insn.opcode == Opcodes.NEW) {
+                            newInsns++
                         }
                     }
                     is MethodInsnNode -> {
-                        if (insn.opcode == Opcodes.INVOKESPECIAL &&
-                            insn.name == "<init>" &&
-                            insn.owner == newInsn.desc
-                        ) {
-                            matchingNewInsns--
-                            if (matchingNewInsns == 0) {
+                        if (insn.opcode == Opcodes.INVOKESPECIAL && insn.name == "<init>") {
+                            newInsns--
+                            if (newInsns == 0) {
                                 return insn
                             }
                         }
