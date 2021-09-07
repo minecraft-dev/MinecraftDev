@@ -75,6 +75,10 @@ fun parseMixinSelector(value: String, context: PsiElement): MixinSelector? {
     return null
 }
 
+/**
+ * A parser which creates a selector from a string literal. Can be added via an extension point.
+ * For custom dynamic selectors, you likely want to extend [DynamicSelectorParser].
+ */
 interface MixinSelectorParser {
     fun parse(value: String, context: PsiElement): MixinSelector?
 
@@ -83,6 +87,9 @@ interface MixinSelectorParser {
     }
 }
 
+/**
+ * An interface which matches members, that's it really.
+ */
 interface MixinSelector {
     fun matchField(owner: String, name: String, desc: String): Boolean
     fun matchMethod(owner: String, name: String, desc: String): Boolean
@@ -366,8 +373,12 @@ private class MixinRegexSelector(
 
 // Dynamic selectors
 
+/**
+ * Checks if the string uses a dynamic selector that exists in the project but has no special handling
+ * in mcdev, used to suppress invalid selector errors.
+ */
 fun isMiscDynamicSelector(project: Project, value: String): Boolean {
-    // check for dynamic selectors that maybe aren't registered in extension points
+    // check for dynamic selectors that aren't registered in extension points
     val matchResult = DYNAMIC_SELECTOR_PATTERN.find(value) ?: return false
     val id = matchResult.groups[1]!!.value
     for (parser in MixinSelectorParser.EP_NAME.extensionList) {
