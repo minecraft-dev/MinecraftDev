@@ -44,6 +44,7 @@
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />
         <mixinSelectorParser implementation="com.demonwav.mcdev.platform.mixin.reference.target.NewInsnTargetSelectorParser" order="before memberReference" />
+        <mixinSelectorParser implementation="com.demonwav.mcdev.platform.mixin.reference.DescSelectorParser" />
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">

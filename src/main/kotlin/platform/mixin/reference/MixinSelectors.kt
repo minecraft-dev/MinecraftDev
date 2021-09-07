@@ -15,36 +15,50 @@ import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DESC
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.bytecode
 import com.demonwav.mcdev.platform.mixin.util.findField
 import com.demonwav.mcdev.platform.mixin.util.findMethod
+import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotation
+import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findField
 import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.findQualifiedClass
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.internalName
+import com.demonwav.mcdev.util.mapToArray
+import com.demonwav.mcdev.util.resolveClass
+import com.demonwav.mcdev.util.resolveType
+import com.demonwav.mcdev.util.resolveTypeArray
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.RecursionManager
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiNameValuePair
+import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedMembersSearch
 import com.intellij.psi.util.InheritanceUtil
 import com.intellij.psi.util.PsiModificationTracker
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.parentOfType
+import java.util.Locale
 import java.util.regex.PatternSyntaxException
+import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
@@ -100,7 +114,8 @@ interface MixinSelector {
     }
 
     val owner: String?
-    val descriptor: String?
+    val methodDescriptor: String?
+    val fieldDescriptor: String?
     val qualified
         get() = owner != null
 
@@ -319,12 +334,12 @@ class MixinRegexParser : MixinSelectorParser {
     }
 }
 
-data class MixinRegexSelector(
+private class MixinRegexSelector(
     val ownerPattern: Regex,
     val namePattern: Regex,
     val descPattern: Regex,
     override val owner: String?,
-    override val descriptor: String?
+    descriptor: String?
 ) : MixinSelector {
     override fun matchField(owner: String, name: String, desc: String): Boolean {
         return ownerPattern.containsMatchIn(owner) &&
@@ -342,16 +357,24 @@ data class MixinRegexSelector(
         return namePattern.containsMatchIn(name)
     }
 
+    override val methodDescriptor = descriptor?.takeIf { it.contains("(") }
+    override val fieldDescriptor = descriptor?.takeUnless { it.contains("(") }
+
     override val displayName: String
         get() = namePattern.pattern
 }
 
 // Dynamic selectors
 
-fun isDynamicSelector(project: Project, value: String): Boolean {
+fun isMiscDynamicSelector(project: Project, value: String): Boolean {
     // check for dynamic selectors that maybe aren't registered in extension points
     val matchResult = DYNAMIC_SELECTOR_PATTERN.find(value) ?: return false
     val id = matchResult.groups[1]!!.value
+    for (parser in MixinSelectorParser.EP_NAME.extensionList) {
+        if (parser is DynamicSelectorParser && parser.validIds.contains(id)) {
+            return false
+        }
+    }
     return getAllDynamicSelectors(project).contains(id)
 }
 
@@ -387,7 +410,7 @@ private fun getAllDynamicSelectors(project: Project): Set<String> {
 private val DYNAMIC_SELECTOR_PATTERN = "(?i)^@([a-z]+(:[a-z]+)?)(\\((.*)\\))?$".toRegex()
 
 abstract class DynamicSelectorParser(id: String, vararg aliases: String) : MixinSelectorParser {
-    private val validIds = aliases.toSet() + id
+    val validIds = aliases.toSet() + id
 
     final override fun parse(value: String, context: PsiElement): MixinSelector? {
         val matchResult = DYNAMIC_SELECTOR_PATTERN.find(value) ?: return null
@@ -399,4 +422,149 @@ abstract class DynamicSelectorParser(id: String, vararg aliases: String) : Mixin
     }
 
     abstract fun parseDynamic(args: String, context: PsiElement): MixinSelector?
+}
+
+// @Desc
+
+class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
+    override fun parseDynamic(args: String, context: PsiElement): MixinSelector? {
+        val descAnnotation = findDescAnnotation(args.toLowerCase(Locale.ROOT), context) ?: return null
+
+        val explicitOwner = descAnnotation.findAttributeValue("owner")
+            ?.resolveClass()?.fullQualifiedName?.replace('.', '/')
+        val owners = if (explicitOwner != null) {
+            setOf(explicitOwner)
+        } else {
+            context.findContainingClass()?.mixinTargets?.mapTo(mutableSetOf()) { it.name } ?: return null
+        }
+        if (owners.isEmpty()) {
+            return null
+        }
+
+        val name = descAnnotation.findAttributeValue("value")?.constantStringValue ?: return null
+
+        val argTypes = descAnnotation.findAttributeValue("args")?.resolveTypeArray() ?: emptyList()
+        val ret = descAnnotation.findAttributeValue("ret")?.resolveType() ?: PsiType.VOID
+        val desc = Type.getMethodDescriptor(
+            Type.getType(ret.descriptor),
+            *argTypes.mapToArray { Type.getType(it.descriptor) }
+        )
+
+        return DescSelector(owners, name, desc)
+    }
+
+    private fun findDescAnnotation(id: String, context: PsiElement): PsiAnnotation? {
+        if (id.isNotEmpty() && id != "?") {
+            // explicit id
+            forEachDescAnnotationOwner(context) { annotationOwner ->
+                findDescAnnotations(annotationOwner) { desc ->
+                    val descId = desc.findAttributeValue("id")?.constantStringValue?.toLowerCase(Locale.ROOT)
+                    if (descId == id) {
+                        return desc
+                    }
+                }
+            }
+            return null
+        } else {
+            // implicit coordinates
+            val childOwners = mutableListOf<PsiElement>()
+            var coordinate = ""
+            forEachDescAnnotationOwner(context) { annotationOwner ->
+                childOwners.add(annotationOwner)
+                if (coordinate.isNotEmpty()) {
+                    for (owner in childOwners) {
+                        findDescAnnotations(owner) { desc ->
+                            val descId = desc.findAttributeValue("id")?.constantStringValue?.toLowerCase(Locale.ROOT)
+                            if (descId == coordinate) {
+                                return desc
+                            }
+                        }
+                    }
+                }
+                fun appendToCoordinate(nextCoordinate: String) {
+                    coordinate = if (coordinate.isEmpty()) {
+                        nextCoordinate.toLowerCase(Locale.ROOT)
+                    } else {
+                        "${nextCoordinate.toLowerCase(Locale.ROOT)}.$coordinate"
+                    }
+                }
+                when (annotationOwner) {
+                    is PsiAnnotation -> {
+                        val name = annotationOwner.parentOfType<PsiNameValuePair>()?.name
+                        if (name != null) {
+                            appendToCoordinate(name)
+                        }
+                    }
+                    is PsiMethod -> {
+                        appendToCoordinate(annotationOwner.name)
+                    }
+                }
+            }
+
+            return null
+        }
+    }
+
+    private inline fun forEachDescAnnotationOwner(context: PsiElement, handler: (PsiElement) -> Unit) {
+        var element: PsiElement? = context.parentOfType<PsiAnnotation>()
+        while (element != null) {
+            handler(element)
+            if (element is PsiClass) {
+                break
+            }
+            element = PsiTreeUtil.getParentOfType(
+                element,
+                PsiAnnotation::class.java,
+                PsiMethod::class.java,
+                PsiClass::class.java
+            )
+        }
+    }
+
+    private inline fun findDescAnnotations(element: PsiElement, handler: (PsiAnnotation) -> Unit) {
+        when (element) {
+            is PsiAnnotation -> {
+                val desc = element.findAttributeValue("desc") as? PsiAnnotation ?: return
+                if (!desc.hasQualifiedName(DESC)) return
+                handler(desc)
+            }
+            is PsiMethod -> {
+                for (annotation in element.modifierList.applicableAnnotations) {
+                    if (annotation.hasQualifiedName(DESC)) {
+                        handler(annotation)
+                    }
+                }
+            }
+            is PsiClass -> {
+                val modifierList = element.modifierList ?: return
+                for (annotation in modifierList.applicableAnnotations) {
+                    if (annotation.hasQualifiedName(DESC)) {
+                        handler(annotation)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private data class DescSelector(
+    val owners: Set<String>,
+    val name: String,
+    override val methodDescriptor: String
+) : MixinSelector {
+    override fun matchField(owner: String, name: String, desc: String): Boolean {
+        return this.owners.contains(owner) && this.name == name && this.fieldDescriptor.substringBefore("(") == desc
+    }
+
+    override fun matchMethod(owner: String, name: String, desc: String): Boolean {
+        return this.owners.contains(owner) && this.name == name && this.methodDescriptor == desc
+    }
+
+    override fun canEverMatch(name: String): Boolean {
+        return this.name == name
+    }
+
+    override val owner = owners.singleOrNull()
+    override val fieldDescriptor = methodDescriptor.substringBefore('(')
+    override val displayName = name
 }

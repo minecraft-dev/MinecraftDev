@@ -74,7 +74,7 @@ object MethodReference : PolyReferenceResolver(), MixinReference {
         if (targets.asSequence().flatMap { it.findMethods(targetMethodInfo) }.any()) {
             return false
         }
-        return !isDynamicSelector(context.project, stringValue)
+        return !isMiscDynamicSelector(context.project, stringValue)
     }
 
     fun getReferenceIfAmbiguous(context: PsiElement): MemberReference? {

@@ -28,6 +28,7 @@ import com.intellij.codeEditor.JavaEditorFileSwapper
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.CompilerModuleExtension
 import com.intellij.openapi.util.RecursionManager
@@ -57,6 +58,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiUtil
 import com.intellij.refactoring.util.LambdaRefactoringUtil
 import com.intellij.refactoring.util.RefactoringUtil
+import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Handle
@@ -172,10 +174,13 @@ fun findClassNodeByPsiClass(psiClass: PsiClass, module: Module? = psiClass.findM
             node
         }
     } catch (e: Throwable) {
-        val message = e.message
+        val actualThrowable = if (e is InvocationTargetException) e.cause ?: e else e
+        val message = actualThrowable.message
         // TODO: display an error to the user?
-        if (message == null || !message.contains("Unsupported class file major version")) {
-            LOGGER.error(e)
+        if (actualThrowable !is ProcessCanceledException &&
+            (message == null || !message.contains("Unsupported class file major version"))
+        ) {
+            LOGGER.error(actualThrowable)
         }
         null
     }

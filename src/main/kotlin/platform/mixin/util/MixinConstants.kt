@@ -37,6 +37,7 @@ object MixinConstants {
         const val AT = "org.spongepowered.asm.mixin.injection.At"
         const val AT_CODE = "org.spongepowered.asm.mixin.injection.InjectionPoint.AtCode"
         const val DEBUG = "org.spongepowered.asm.mixin.Debug"
+        const val DESC = "org.spongepowered.asm.mixin.injection.Desc"
         const val DYNAMIC = "org.spongepowered.asm.mixin.Dynamic"
         const val FINAL = "org.spongepowered.asm.mixin.Final"
         const val IMPLEMENTS = "org.spongepowered.asm.mixin.Implements"

@@ -113,7 +113,7 @@ enum class InjectorType(private val annotation: String) {
             // is included in the reference.
             val selector = parseMixinSelector(target) ?: return null
 
-            if (!selector.qualified || selector.descriptor == null) {
+            if (!selector.qualified || (selector.methodDescriptor == null && selector.fieldDescriptor == null)) {
                 // Invalid anyway and we need the qualified reference
                 return null
             }

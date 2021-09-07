@@ -27,7 +27,7 @@ import java.lang.reflect.Type
  */
 data class MemberReference(
     val name: String,
-    override val descriptor: String? = null,
+    val descriptor: String? = null,
     override val owner: String? = null,
     val matchAllNames: Boolean = false,
     val matchAllDescs: Boolean = false
@@ -44,6 +44,8 @@ data class MemberReference(
             MemberReference(this.name, this.descriptor, null, this.matchAllNames, this.matchAllDescs)
         }
 
+    override val methodDescriptor = descriptor?.takeIf { it.contains("(") }
+    override val fieldDescriptor = descriptor?.takeUnless { it.contains("(") }
     override val displayName = name
 
     override fun canEverMatch(name: String): Boolean {

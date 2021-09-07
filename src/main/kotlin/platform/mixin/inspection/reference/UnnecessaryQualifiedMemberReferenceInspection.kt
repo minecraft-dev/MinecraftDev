@@ -42,19 +42,12 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
 
     private fun checkMemberReference(value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
         val selector = parseMixinSelector(value) ?: return
-        if (selector.qualified) {
-            if (selector is MemberReference) {
-                holder.registerProblem(
-                    value,
-                    "Unnecessary qualified reference to '${selector.displayName}' in target class",
-                    QuickFix(selector)
-                )
-            } else {
-                holder.registerProblem(
-                    value,
-                    "Unnecessary qualified reference to '${selector.displayName}' in target class"
-                )
-            }
+        if (selector is MemberReference && selector.qualified) {
+            holder.registerProblem(
+                value,
+                "Unnecessary qualified reference to '${selector.displayName}' in target class",
+                QuickFix(selector)
+            )
         }
     }
 

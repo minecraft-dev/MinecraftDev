@@ -40,7 +40,7 @@ class UnqualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection(
             return
         }
 
-        if (selector.descriptor == null) {
+        if (selector.methodDescriptor == null && selector.fieldDescriptor == null) {
             holder.registerProblem(value, "Method/field descriptor is required for member reference in @At target")
         }
     }

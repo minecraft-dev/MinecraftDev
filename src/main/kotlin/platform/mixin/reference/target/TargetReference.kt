@@ -12,7 +12,7 @@ package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
-import com.demonwav.mcdev.platform.mixin.reference.isDynamicSelector
+import com.demonwav.mcdev.platform.mixin.reference.isMiscDynamicSelector
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
@@ -137,7 +137,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
         if (collectVisitor == null) {
             // syntax error in target
             val target = at.findAttributeValue("target")?.constantStringValue ?: return true
-            return !isDynamicSelector(context.project, target)
+            return !isMiscDynamicSelector(context.project, target)
         }
         collectVisitor.visit(targetMethod.method)
         return collectVisitor.result.isEmpty()
