@@ -16,6 +16,7 @@ import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DESC
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SLICE
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.bytecode
 import com.demonwav.mcdev.platform.mixin.util.findField
@@ -492,27 +493,39 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
                         }
                     }
                 }
-                fun appendToCoordinate(nextCoordinate: String) {
+                val nextCoordinate = getCoordinate(annotationOwner)?.toLowerCase(Locale.ROOT)
+                if (nextCoordinate != null) {
                     coordinate = if (coordinate.isEmpty()) {
-                        nextCoordinate.toLowerCase(Locale.ROOT)
+                        nextCoordinate
                     } else {
-                        "${nextCoordinate.toLowerCase(Locale.ROOT)}.$coordinate"
-                    }
-                }
-                when (annotationOwner) {
-                    is PsiAnnotation -> {
-                        val name = annotationOwner.parentOfType<PsiNameValuePair>()?.name
-                        if (name != null) {
-                            appendToCoordinate(name)
-                        }
-                    }
-                    is PsiMethod -> {
-                        appendToCoordinate(annotationOwner.name)
+                        "$nextCoordinate.$coordinate"
                     }
                 }
             }
 
             return null
+        }
+    }
+
+    private fun getCoordinate(element: PsiElement): String? {
+        return when (element) {
+            is PsiAnnotation -> {
+                val name = element.parentOfType<PsiNameValuePair>()?.name ?: return null
+                if (element.hasQualifiedName(SLICE)) {
+                    val sliceId = element.findAttributeValue("id")?.constantStringValue
+                    if (!sliceId.isNullOrEmpty()) {
+                        "$name.$sliceId"
+                    } else {
+                        name
+                    }
+                } else {
+                    name
+                }
+            }
+            is PsiMethod -> {
+                element.name
+            }
+            else -> null
         }
     }
 
