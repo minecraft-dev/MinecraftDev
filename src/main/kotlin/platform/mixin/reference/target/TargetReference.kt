@@ -12,10 +12,12 @@ package com.demonwav.mcdev.platform.mixin.reference.target
 
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
+import com.demonwav.mcdev.platform.mixin.reference.isMiscDynamicSelector
+import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
+import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SLICE
-import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.util.annotationFromArrayValue
 import com.demonwav.mcdev.util.annotationFromValue
@@ -132,7 +134,11 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
         val targetMethod = getTargetMethod(at) ?: return false // the target method inspection will catch this
 
         val collectVisitor = handler.createCollectVisitor(context, targetMethod.clazz, CollectVisitor.Mode.MATCH_FIRST)
-            ?: return true // syntax error in target
+        if (collectVisitor == null) {
+            // syntax error in target
+            val target = at.findAttributeValue("target")?.constantStringValue ?: return true
+            return !isMiscDynamicSelector(context.project, target)
+        }
         collectVisitor.visit(targetMethod.method)
         return collectVisitor.result.isEmpty()
     }
@@ -223,10 +229,9 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
         protected abstract fun createLookup(targetClass: ClassNode, m: T, owner: String): LookupElementBuilder
 
         override fun resolveTarget(context: PsiElement): PsiElement? {
-            val value = context.constantStringValue ?: return null
-            val ref = MixinMemberReference.parse(value)
-            ref?.owner ?: return null
-            return ref.resolveMember(context.project, context.resolveScope)
+            val selector = parseMixinSelector(context)
+            selector?.owner ?: return null
+            return selector.resolveMember(context.project, context.resolveScope)
         }
 
         protected open fun getInternalName(m: T): String {
@@ -264,7 +269,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
         override fun createLookup(targetClass: ClassNode, m: PsiMethod, owner: String): LookupElementBuilder {
             return JavaLookupElementBuilder.forMethod(
                 m,
-                MixinMemberReference.toString(m.getQualifiedMemberReference(owner)),
+                m.getQualifiedMemberReference(owner).toMixinString(),
                 PsiSubstitutor.EMPTY,
                 null
             )

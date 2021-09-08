@@ -10,11 +10,11 @@
 
 package com.demonwav.mcdev.platform.mixin.reference.target
 
-import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
+import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.MemberReference
-import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -34,7 +34,7 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
         context: PsiElement,
         targetClass: PsiClass
     ): NavigationVisitor? {
-        return MixinMemberReference.parse(context.constantStringValue)
+        return parseMixinSelector(context)
             ?.let { MyNavigationVisitor(targetClass, it) }
     }
 
@@ -46,7 +46,7 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, context.project, MemberReference(""))
         }
-        return MixinMemberReference.parse(context.constantStringValue)
+        return parseMixinSelector(context)
             ?.let { MyCollectVisitor(mode, context.project, it) }
     }
 
@@ -78,13 +78,13 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
 
     private class MyNavigationVisitor(
         private val targetClass: PsiClass,
-        private val target: MemberReference
+        private val selector: MixinSelector
     ) : NavigationVisitor() {
 
         override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
             if (isConstantStringMethodCall(expression)) {
                 expression.resolveMethod()?.let { method ->
-                    val matches = target.match(
+                    val matches = selector.matchMethod(
                         method,
                         QualifiedMember.resolveQualifier(expression.methodExpression) ?: targetClass
                     )
@@ -101,7 +101,7 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
     private class MyCollectVisitor(
         mode: Mode,
         private val project: Project,
-        private val target: MemberReference
+        private val selector: MixinSelector
     ) : CollectVisitor<PsiMethod>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return
@@ -127,11 +127,9 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
 
             if (mode != Mode.COMPLETION) {
                 // ensure we match the target
-                if (!target.matchAllNames && target.name != insn.name) return
-                if (target.descriptor != null && target.descriptor != insn.desc) return
-
-                val owner = target.owner
-                if (owner != null && owner.replace('.', '/') != insn.owner) return
+                if (!selector.matchMethod(insn.owner, insn.name, insn.desc)) {
+                    return
+                }
             }
 
             val fakeMethod = insn.fakeResolve()

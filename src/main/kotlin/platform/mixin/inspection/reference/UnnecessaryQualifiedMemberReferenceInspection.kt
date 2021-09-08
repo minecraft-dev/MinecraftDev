@@ -11,10 +11,10 @@
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
+import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
+import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
-import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.util.MemberReference
-import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
@@ -41,12 +41,12 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
     }
 
     private fun checkMemberReference(value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
-        val reference = MixinMemberReference.parse(value.constantStringValue) ?: return
-        if (reference.qualified) {
+        val selector = parseMixinSelector(value) ?: return
+        if (selector is MemberReference && selector.qualified) {
             holder.registerProblem(
                 value,
-                "Unnecessary qualified reference to '${reference.name}' in target class",
-                QuickFix(reference)
+                "Unnecessary qualified reference to '${selector.displayName}' in target class",
+                QuickFix(selector)
             )
         }
     }
@@ -59,7 +59,7 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
             val element = descriptor.psiElement
             element.replace(
                 JavaPsiFacade.getElementFactory(project)
-                    .createExpressionFromText("\"${MixinMemberReference.toString(reference.withoutOwner)}\"", element)
+                    .createExpressionFromText("\"${reference.withoutOwner.toMixinString()}\"", element)
             )
         }
     }

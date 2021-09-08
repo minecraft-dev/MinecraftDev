@@ -10,11 +10,12 @@
 
 package com.demonwav.mcdev.platform.mixin.reference.target
 
-import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
+import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
+import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceField
 import com.demonwav.mcdev.util.MemberReference
-import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -30,7 +31,7 @@ import org.objectweb.asm.tree.MethodNode
 
 object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
     override fun createNavigationVisitor(context: PsiElement, targetClass: PsiClass): NavigationVisitor? {
-        return MixinMemberReference.parse(context.constantStringValue)
+        return parseMixinSelector(context)
             ?.let { MyNavigationVisitor(targetClass, it) }
     }
 
@@ -42,14 +43,14 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, context.project, MemberReference(""))
         }
-        return MixinMemberReference.parse(context.constantStringValue)
+        return parseMixinSelector(context)
             ?.let { MyCollectVisitor(mode, context.project, it) }
     }
 
     override fun createLookup(targetClass: ClassNode, m: PsiField, owner: String): LookupElementBuilder {
         return JavaLookupElementBuilder.forField(
             m,
-            MixinMemberReference.toString(m.getQualifiedMemberReference(owner)),
+            m.getQualifiedMemberReference(owner).toMixinString(),
             null
         )
             .setBoldIfInClass(m, targetClass)
@@ -59,14 +60,15 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
 
     private class MyNavigationVisitor(
         private val targetClass: PsiClass,
-        private val reference: MemberReference
+        private val selector: MixinSelector
     ) : NavigationVisitor() {
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
             if (expression !is PsiMethodReferenceExpression) {
                 // early out for if the name does not match
-                if (reference.matchAllNames || expression.referenceName == reference.name) {
+                val name = expression.referenceName
+                if (name == null || selector.canEverMatch(name)) {
                     (expression.resolve() as? PsiField)?.let { resolved ->
-                        val matches = reference.match(
+                        val matches = selector.matchField(
                             resolved,
                             QualifiedMember.resolveQualifier(expression) ?: targetClass
                         )
@@ -84,18 +86,16 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
     private class MyCollectVisitor(
         mode: Mode,
         private val project: Project,
-        private val reference: MemberReference
+        private val selector: MixinSelector
     ) : CollectVisitor<PsiField>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return
             insns.iterator().forEachRemaining { insn ->
                 if (insn !is FieldInsnNode) return@forEachRemaining
                 if (mode != Mode.COMPLETION) {
-                    if (!reference.matchAllNames && insn.name != reference.name) return@forEachRemaining
-                    if (reference.descriptor != null && insn.desc != reference.descriptor) return@forEachRemaining
-
-                    val owner = reference.owner
-                    if (owner != null && owner.replace('.', '/') != insn.owner) return@forEachRemaining
+                    if (!selector.matchField(insn.owner, insn.name, insn.desc)) {
+                        return@forEachRemaining
+                    }
                 }
                 val fieldNode = insn.fakeResolve()
                 val psiField = fieldNode.field.findOrConstructSourceField(

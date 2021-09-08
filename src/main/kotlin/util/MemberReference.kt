@@ -10,29 +10,15 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.platform.mixin.util.ClassAndFieldNode
-import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
-import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
-import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
-import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
-import com.demonwav.mcdev.platform.mixin.util.bytecode
-import com.demonwav.mcdev.platform.mixin.util.findMethod
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.RecursionManager
-import com.intellij.psi.CommonClassNames
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
-import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.search.GlobalSearchScope
 import java.io.Serializable
 import java.lang.reflect.Type
-import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.FieldNode
-import org.objectweb.asm.tree.MethodNode
 
 /**
  * Represents a reference to a class member (a method or a field). It may
@@ -42,13 +28,14 @@ import org.objectweb.asm.tree.MethodNode
 data class MemberReference(
     val name: String,
     val descriptor: String? = null,
-    val owner: String? = null,
+    override val owner: String? = null,
     val matchAllNames: Boolean = false,
     val matchAllDescs: Boolean = false
-) : Serializable {
+) : Serializable, MixinSelector {
 
-    val qualified
-        get() = this.owner != null
+    init {
+        assert(owner?.contains('/') != true)
+    }
 
     val withoutOwner
         get() = if (this.owner == null) {
@@ -57,105 +44,31 @@ data class MemberReference(
             MemberReference(this.name, this.descriptor, null, this.matchAllNames, this.matchAllDescs)
         }
 
-    fun matchOwner(psiClass: PsiClass): Boolean {
-        return this.owner == null || this.owner == psiClass.fullQualifiedName
+    override val methodDescriptor = descriptor?.takeIf { it.contains("(") }
+    override val fieldDescriptor = descriptor?.takeUnless { it.contains("(") }
+    override val displayName = name
+
+    override fun canEverMatch(name: String): Boolean {
+        return matchAllNames || this.name == name
     }
 
-    fun matchOwner(clazz: ClassNode): Boolean {
-        return this.owner == null || this.owner == clazz.name.replace('/', '.')
+    private fun matchOwner(clazz: String): Boolean {
+        assert(!clazz.contains('.'))
+        return this.owner == null || this.owner == clazz.replace('/', '.')
     }
 
-    fun match(method: PsiMethod, qualifier: PsiClass): Boolean {
-        return (this.matchAllNames || this.name == method.internalName) && matchOwner(qualifier) &&
-            (this.descriptor == null || this.descriptor == method.descriptor)
+    override fun matchField(owner: String, name: String, desc: String): Boolean {
+        assert(!owner.contains('.'))
+        return (this.matchAllNames || this.name == name) &&
+            matchOwner(owner) &&
+            (this.descriptor == null || this.descriptor == desc)
     }
 
-    fun match(method: MethodNode, qualifier: ClassNode): Boolean {
-        return (this.matchAllNames || this.name == method.name) && matchOwner(qualifier) &&
-            (this.descriptor == null || this.descriptor == method.desc)
-    }
-
-    fun match(field: PsiField, qualifier: PsiClass): Boolean {
-        return (this.matchAllNames || this.name == field.name) && matchOwner(qualifier) &&
-            (this.descriptor == null || this.descriptor == field.descriptor)
-    }
-
-    fun match(field: FieldNode, qualifier: ClassNode): Boolean {
-        return (this.matchAllNames || this.name == field.name) && matchOwner(qualifier) &&
-            (this.descriptor == null || this.descriptor == field.desc)
-    }
-
-    fun resolve(
-        project: Project,
-        scope: GlobalSearchScope = GlobalSearchScope.allScope(project)
-    ): Pair<PsiClass, PsiMember>? {
-        return resolve(project, scope, ::Pair)
-    }
-
-    fun resolveMember(project: Project, scope: GlobalSearchScope = GlobalSearchScope.allScope(project)): PsiMember? {
-        return resolve(project, scope) { _, member -> member }
-    }
-
-    fun resolveAsm(
-        project: Project,
-        scope: GlobalSearchScope = GlobalSearchScope.allScope(project)
-    ): MixinTargetMember? {
-        if (this.owner == null) {
-            throw IllegalStateException("Cannot resolve unqualified member reference (owner == null)")
-        }
-
-        fun doFind(owner: String): MixinTargetMember? {
-            if (owner == CommonClassNames.JAVA_LANG_OBJECT) {
-                return null
-            }
-            return RecursionManager.doPreventingRecursion(owner, false) {
-                val classNode = findQualifiedClass(project, owner, scope)?.bytecode ?: return@doPreventingRecursion null
-
-                if (descriptor == null || descriptor.startsWith("(")) {
-                    classNode.findMethod(this)?.let {
-                        return@doPreventingRecursion MethodTargetMember(null, ClassAndMethodNode(classNode, it))
-                    }
-                }
-
-                if (descriptor == null || !descriptor.startsWith("(")) {
-                    classNode.fields?.firstOrNull {
-                        (matchAllNames || name == it.name) && (descriptor == null || it.desc == descriptor)
-                    }?.let {
-                        return@doPreventingRecursion FieldTargetMember(null, ClassAndFieldNode(classNode, it))
-                    }
-                }
-
-                classNode.superName?.let { doFind(it.replace('/', '.')) }?.let { return@doPreventingRecursion it }
-
-                classNode.interfaces?.let { interfaces ->
-                    for (itf in interfaces) {
-                        doFind(itf.replace('/', '.'))?.let { return@doPreventingRecursion it }
-                    }
-                }
-
-                null
-            }
-        }
-
-        return doFind(this.owner)
-    }
-
-    private inline fun <R> resolve(project: Project, scope: GlobalSearchScope, ret: (PsiClass, PsiMember) -> R): R? {
-        if (this.owner == null) {
-            throw IllegalStateException("Cannot resolve unqualified member reference (owner == null)")
-        }
-
-        val psiClass = findQualifiedClass(project, this.owner, scope) ?: return null
-
-        val member: PsiMember? = if (descriptor != null && descriptor.startsWith('(')) {
-            // Method, we assume there is only one (since this member descriptor is full qualified)
-            psiClass.findMethods(this, checkBases = true).firstOrNull()
-        } else {
-            // Field
-            psiClass.findField(this, checkBases = true)
-        }
-
-        return member?.let { ret(psiClass, member) }
+    override fun matchMethod(owner: String, name: String, desc: String): Boolean {
+        assert(!owner.contains('.'))
+        return (this.matchAllNames || this.name == name) &&
+            matchOwner(owner) &&
+            (this.descriptor == null || this.descriptor == desc)
     }
 
     object Deserializer : JsonDeserializer<MemberReference> {
@@ -171,45 +84,22 @@ data class MemberReference(
 
 // Class
 
-fun PsiClass.findMethods(member: MemberReference, checkBases: Boolean = false): Sequence<PsiMethod> {
-    if (!member.matchOwner(this)) {
-        return emptySequence()
-    }
-
-    val result = if (member.matchAllNames) {
-        if (checkBases) {
-            allMethods + constructors
-        } else {
-            methods + constructors
-        }
+fun PsiClass.findMethods(member: MixinSelector, checkBases: Boolean = false): Sequence<PsiMethod> {
+    val methods = if (checkBases) {
+        allMethods.asSequence()
     } else {
-        findMethodsByInternalName(member.name, checkBases)
-    }
-    return if (member.descriptor != null) {
-        result.asSequence().filter { it.descriptor == member.descriptor }
-    } else {
-        result.asSequence()
-    }
+        methods.asSequence()
+    } + constructors
+    return methods.filter { member.matchMethod(it, this) }
 }
 
-fun PsiClass.findField(member: MemberReference, checkBases: Boolean = false): PsiField? {
-    if (!member.matchOwner(this)) {
-        return null
-    }
-
-    val fields = if (member.matchAllNames) {
-        if (checkBases) {
-            allFields.toList()
-        } else {
-            fields.toList()
-        }
+fun PsiClass.findField(selector: MixinSelector, checkBases: Boolean = false): PsiField? {
+    val fields = if (checkBases) {
+        allFields.toList()
     } else {
-        listOfNotNull(findFieldByName(member.name, checkBases))
+        fields.toList()
     }
-    if (member.descriptor == null) {
-        return fields.firstOrNull()
-    }
-    return fields.firstOrNull { it.descriptor == member.descriptor }
+    return fields.firstOrNull { selector.matchField(it, this) }
 }
 
 // Method

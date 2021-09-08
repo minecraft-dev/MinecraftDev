@@ -10,11 +10,12 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
+import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.platform.mixin.util.argsType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoReturnableType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoType
@@ -23,9 +24,7 @@ import com.demonwav.mcdev.platform.mixin.util.getGenericReturnType
 import com.demonwav.mcdev.platform.mixin.util.getGenericType
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
-import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.Parameter
-import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.toJavaIdentifier
 import com.intellij.openapi.project.Project
@@ -112,25 +111,25 @@ enum class InjectorType(private val annotation: String) {
             // we don't actually have to resolve the target reference in the
             // target method. Everything needed to get the method parameters
             // is included in the reference.
-            val reference = MixinMemberReference.parse(target.constantStringValue) ?: return null
+            val selector = parseMixinSelector(target) ?: return null
 
-            if (!reference.qualified || reference.descriptor == null) {
+            if (!selector.qualified || (selector.methodDescriptor == null && selector.fieldDescriptor == null)) {
                 // Invalid anyway and we need the qualified reference
                 return null
             }
 
-            val member = reference.resolveAsm(annotation.project, annotation.resolveScope) ?: return null
+            val member = selector.resolveAsm(annotation.project, annotation.resolveScope) ?: return null
             val (parameters, returnType) = when (member) {
                 is MethodTargetMember -> collectMethodParameters(
                     annotation.project,
-                    reference,
+                    selector,
                     member.classAndMethod.clazz,
                     member.classAndMethod.method
                 )
                 is FieldTargetMember -> collectFieldParameters(
                     annotation.project,
                     at,
-                    reference,
+                    selector,
                     member.classAndField.clazz,
                     member.classAndField.field
                 )
@@ -149,12 +148,12 @@ enum class InjectorType(private val annotation: String) {
 
         private fun collectMethodParameters(
             project: Project,
-            reference: MemberReference,
+            selector: MixinSelector,
             clazz: ClassNode,
             method: MethodNode
         ): Pair<List<Parameter>, PsiType>? {
             val elementFactory = JavaPsiFacade.getElementFactory(project)
-            val ownerName = reference.owner ?: return null
+            val ownerName = selector.owner ?: return null
 
             val hasThis = !method.hasAccess(Opcodes.ACC_STATIC)
             val parameters = mutableListOf<Parameter>()
@@ -181,12 +180,12 @@ enum class InjectorType(private val annotation: String) {
         private fun collectFieldParameters(
             project: Project,
             at: PsiAnnotation,
-            reference: MemberReference,
+            selector: MixinSelector,
             clazz: ClassNode,
             field: FieldNode
         ): Pair<List<Parameter>, PsiType>? {
             val elementFactory = JavaPsiFacade.getElementFactory(project)
-            val ownerName = reference.owner ?: return null
+            val ownerName = selector.owner ?: return null
 
             // TODO: Report if opcode isn't set
             val opcode = at.findDeclaredAttributeValue("opcode")?.constantValue as? Int ?: return null

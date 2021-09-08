@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.util
 
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.anonymousElements
 import com.demonwav.mcdev.util.childrenOfType
@@ -339,13 +340,19 @@ fun ClassNode.findFieldByName(name: String): FieldNode? {
     return fields?.firstOrNull { it.name == name }
 }
 
-fun ClassNode.findMethods(ref: MemberReference): Sequence<MethodNode> {
-    return methods?.asSequence()?.filter {
-        (ref.matchAllNames || it.name == ref.name) && (ref.descriptor == null || it.desc == ref.descriptor)
-    } ?: emptySequence()
+fun ClassNode.findFields(ref: MixinSelector): Sequence<FieldNode> {
+    return fields?.asSequence()?.filter { ref.matchField(it, this) } ?: emptySequence()
 }
 
-fun ClassNode.findMethod(ref: MemberReference): MethodNode? {
+fun ClassNode.findField(ref: MixinSelector): FieldNode? {
+    return findFields(ref).firstOrNull()
+}
+
+fun ClassNode.findMethods(ref: MixinSelector): Sequence<MethodNode> {
+    return methods?.asSequence()?.filter { ref.matchMethod(it, this) } ?: emptySequence()
+}
+
+fun ClassNode.findMethod(ref: MixinSelector): MethodNode? {
     return findMethods(ref).firstOrNull()
 }
 

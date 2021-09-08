@@ -19,6 +19,7 @@ import com.intellij.psi.PsiClassObjectAccessExpression
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.PsiType
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 
 fun PsiModifierListOwner.findAnnotation(qualifiedName: String): PsiAnnotation? {
@@ -43,6 +44,14 @@ fun PsiAnnotationMemberValue.resolveClass(): PsiClass? {
     }
 
     return (operand.type as? PsiClassType)?.resolve()
+}
+
+fun PsiAnnotationMemberValue.resolveTypeArray(): List<PsiType> {
+    return parseArray { it.resolveType() }
+}
+
+fun PsiAnnotationMemberValue.resolveType(): PsiType? {
+    return (this as? PsiClassObjectAccessExpression)?.operand?.type
 }
 
 /**
