@@ -28,6 +28,7 @@ import com.demonwav.mcdev.util.reference.completeToLiteral
 import com.demonwav.mcdev.util.toResolveResults
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiArrayInitializerMemberValue
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteral
@@ -219,7 +220,7 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
     ): Array<Any> {
         return methods
             .map { m ->
-                val targetMethodInfo = if (m.method.name in uniqueMethods) {
+                val targetMethodInfo = if (!requireDescriptor && m.method.name in uniqueMethods) {
                     MemberReference(m.method.name)
                 } else {
                     m.method.memberReference
@@ -231,14 +232,24 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
                     scope = context.resolveScope,
                     canDecompile = false
                 )
-                JavaLookupElementBuilder.forMethod(
+                val builder = JavaLookupElementBuilder.forMethod(
                     sourceMethod,
                     targetMethodInfo.toMixinString(),
                     PsiSubstitutor.EMPTY,
                     null
                 )
                     .withPresentableText(m.method.name)
-                    .completeToLiteral(context)
+                addCompletionInfo(builder, context, targetMethodInfo)
             }.toTypedArray()
+    }
+
+    open val requireDescriptor = false
+
+    open fun addCompletionInfo(
+        builder: LookupElementBuilder,
+        context: PsiElement,
+        targetMethodInfo: MemberReference
+    ): LookupElementBuilder {
+        return builder.completeToLiteral(context)
     }
 }
