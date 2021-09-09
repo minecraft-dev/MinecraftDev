@@ -441,28 +441,7 @@ abstract class DynamicSelectorParser(id: String, vararg aliases: String) : Mixin
 class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
     override fun parseDynamic(args: String, context: PsiElement): MixinSelector? {
         val descAnnotation = findDescAnnotation(args.toLowerCase(Locale.ROOT), context) ?: return null
-
-        val explicitOwner = descAnnotation.findAttributeValue("owner")
-            ?.resolveClass()?.fullQualifiedName?.replace('.', '/')
-        val owners = if (explicitOwner != null) {
-            setOf(explicitOwner)
-        } else {
-            context.findContainingClass()?.mixinTargets?.mapTo(mutableSetOf()) { it.name } ?: return null
-        }
-        if (owners.isEmpty()) {
-            return null
-        }
-
-        val name = descAnnotation.findAttributeValue("value")?.constantStringValue ?: return null
-
-        val argTypes = descAnnotation.findAttributeValue("args")?.resolveTypeArray() ?: emptyList()
-        val ret = descAnnotation.findAttributeValue("ret")?.resolveType() ?: PsiType.VOID
-        val desc = Type.getMethodDescriptor(
-            Type.getType(ret.descriptor),
-            *argTypes.mapToArray { Type.getType(it.descriptor) }
-        )
-
-        return DescSelector(owners, name, desc)
+        return descSelectorFromAnnotation(descAnnotation)
     }
 
     private fun findDescAnnotation(id: String, context: PsiElement): PsiAnnotation? {
@@ -567,6 +546,32 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
                     }
                 }
             }
+        }
+    }
+
+    companion object {
+        fun descSelectorFromAnnotation(descAnnotation: PsiAnnotation): MixinSelector? {
+            val explicitOwner = descAnnotation.findAttributeValue("owner")
+                ?.resolveClass()?.fullQualifiedName?.replace('.', '/')
+            val owners = if (explicitOwner != null) {
+                setOf(explicitOwner)
+            } else {
+                descAnnotation.findContainingClass()?.mixinTargets?.mapTo(mutableSetOf()) { it.name } ?: return null
+            }
+            if (owners.isEmpty()) {
+                return null
+            }
+
+            val name = descAnnotation.findAttributeValue("value")?.constantStringValue ?: return null
+
+            val argTypes = descAnnotation.findAttributeValue("args")?.resolveTypeArray() ?: emptyList()
+            val ret = descAnnotation.findAttributeValue("ret")?.resolveType() ?: PsiType.VOID
+            val desc = Type.getMethodDescriptor(
+                Type.getType(ret.descriptor),
+                *argTypes.mapToArray { Type.getType(it.descriptor) }
+            )
+
+            return DescSelector(owners, name, desc)
         }
     }
 }

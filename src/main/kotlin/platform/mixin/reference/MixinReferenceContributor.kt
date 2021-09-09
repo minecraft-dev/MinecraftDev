@@ -27,6 +27,12 @@ class MixinReferenceContributor : PsiReferenceContributor() {
             MethodReference
         )
 
+        // Desc references
+        registrar.registerReferenceProvider(
+            DescReference.ELEMENT_PATTERN,
+            DescReference
+        )
+
         // Injection point types
         registrar.registerReferenceProvider(
             PsiJavaPatterns.psiLiteral(StandardPatterns.string())
