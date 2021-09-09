@@ -550,7 +550,7 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
     }
 
     companion object {
-        fun descSelectorFromAnnotation(descAnnotation: PsiAnnotation): MixinSelector? {
+        fun descSelectorFromAnnotation(descAnnotation: PsiAnnotation): DescSelector? {
             val explicitOwner = descAnnotation.findAttributeValue("owner")
                 ?.resolveClass()?.fullQualifiedName?.replace('.', '/')
             val owners = if (explicitOwner != null) {
@@ -576,7 +576,7 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
     }
 }
 
-private data class DescSelector(
+data class DescSelector(
     val owners: Set<String>,
     val name: String,
     override val methodDescriptor: String

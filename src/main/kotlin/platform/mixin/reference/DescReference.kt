@@ -11,7 +11,9 @@
 package com.demonwav.mcdev.platform.mixin.reference
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DESC
+import com.demonwav.mcdev.platform.mixin.util.findClassNodeByQualifiedName
 import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.findModule
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.CommandProcessor
@@ -30,6 +32,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.util.parentOfType
 import org.objectweb.asm.Type
+import org.objectweb.asm.tree.ClassNode
 
 object DescReference : AbstractMethodReference() {
     val ELEMENT_PATTERN: ElementPattern<PsiLiteral> =
@@ -41,9 +44,15 @@ object DescReference : AbstractMethodReference() {
 
     override fun isValidAnnotation(name: String) = name == DESC
 
-    override fun parseSelector(context: PsiElement): MixinSelector? {
+    override fun parseSelector(context: PsiElement): DescSelector? {
         val annotation = context.parentOfType<PsiAnnotation>() ?: return null // @Desc
         return DescSelectorParser.descSelectorFromAnnotation(annotation)
+    }
+
+    override fun getTargets(context: PsiElement): Collection<ClassNode>? {
+        return parseSelector(context)?.owners?.mapNotNull { internalName ->
+            findClassNodeByQualifiedName(context.project, context.findModule(), internalName.replace('/', '.'))
+        }
     }
 
     override fun addCompletionInfo(

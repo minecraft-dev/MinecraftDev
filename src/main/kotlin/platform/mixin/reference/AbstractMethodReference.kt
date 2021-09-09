@@ -48,7 +48,7 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
         return parseSelector(context)
     }
 
-    private fun getTargets(context: PsiElement): Collection<ClassNode>? {
+    protected open fun getTargets(context: PsiElement): Collection<ClassNode>? {
         val psiClass = context.findContainingClass() ?: return null
         val targets = psiClass.mixinTargets
         val upstreamMixin = context.findContainingMethod()?.findUpstreamMixin()?.bytecode
