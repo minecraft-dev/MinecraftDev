@@ -47,13 +47,20 @@ import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
 
 class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
+    private fun getTarget(at: PsiAnnotation, target: MixinSelector?): MixinSelector? {
+        if (target != null) {
+            return target
+        }
+        val clazz = AtResolver.getArgs(at)["class"] ?: return null
+        return classToMemberReference(clazz)
+    }
 
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: PsiClass
     ): NavigationVisitor? {
-        return target?.let { MyNavigationVisitor(it) }
+        return getTarget(at, target)?.let { MyNavigationVisitor(it) }
     }
 
     override fun createCollectVisitor(
@@ -65,7 +72,7 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, at.project, MemberReference(""))
         }
-        return target?.let { MyCollectVisitor(mode, at.project, it) }
+        return getTarget(at, target)?.let { MyCollectVisitor(mode, at.project, it) }
     }
 
     override fun createLookup(targetClass: ClassNode, result: CollectVisitor.Result<PsiMember>): LookupElementBuilder? {
@@ -185,13 +192,17 @@ class NewInsnSelectorParser : MixinSelectorParser {
         if (!at.hasQualifiedName(AT)) return null
         if (at.findAttributeValue("value")?.constantStringValue != "NEW") return null
 
-        val fqn = value.replace('/', '.').replace('$', '.')
-        if (fqn.isNotEmpty() && !fqn.startsWith('.') && !fqn.endsWith('.') && !fqn.contains("..")) {
-            if (StringUtil.isJavaIdentifier(fqn.replace('.', '_'))) {
-                return MemberReference("<init>", owner = fqn)
-            }
-        }
-
-        return null
+        return classToMemberReference(value)
     }
+}
+
+private fun classToMemberReference(value: String): MemberReference? {
+    val fqn = value.replace('/', '.').replace('$', '.')
+    if (fqn.isNotEmpty() && !fqn.startsWith('.') && !fqn.endsWith('.') && !fqn.contains("..")) {
+        if (StringUtil.isJavaIdentifier(fqn.replace('.', '_'))) {
+            return MemberReference("<init>", owner = fqn)
+        }
+    }
+
+    return null
 }

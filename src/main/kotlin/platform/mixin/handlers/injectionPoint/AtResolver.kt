@@ -14,6 +14,7 @@ import com.demonwav.mcdev.platform.mixin.reference.isMiscDynamicSelector
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.findSourceElement
+import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiAnnotation
@@ -64,6 +65,20 @@ class AtResolver(
         fun usesMemberReference(at: PsiAnnotation): Boolean {
             val handler = getInjectionPoint(at) ?: return false
             return handler.usesMemberReference()
+        }
+
+        fun getArgs(at: PsiAnnotation): Map<String, String> {
+            val args = at.findAttributeValue("args")?.computeStringArray() ?: return emptyMap()
+            return args.asSequence()
+                .map {
+                    val parts = it.split('=', limit = 2)
+                    if (parts.size == 1) {
+                        parts[0] to ""
+                    } else {
+                        parts[0] to parts[1]
+                    }
+                }
+                .toMap()
         }
     }
 
