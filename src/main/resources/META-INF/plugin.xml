@@ -41,12 +41,15 @@
         <extensionPoint name="mixinAnnotationHandler" beanClass="com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandlerInfo" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler"/>
         </extensionPoint>
+        <extensionPoint name="injectionPoint" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointInfo" dynamic="true">
+            <with attribute="implementation" implements="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint"/>
+        </extensionPoint>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />
-        <mixinSelectorParser implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.NewInsnTargetSelectorParser" order="before memberReference" />
+        <mixinSelectorParser implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.NewInsnSelectorParser" order="before memberReference" />
         <mixinSelectorParser implementation="com.demonwav.mcdev.platform.mixin.reference.DescSelectorParser" />
 
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.Overwrite" implementation="com.demonwav.mcdev.platform.mixin.handlers.OverwriteHandler" />
@@ -59,6 +62,12 @@
         <!-- TODO: ModifyConstant -->
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyVariable" implementation="com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.Redirect" implementation="com.demonwav.mcdev.platform.mixin.handlers.RedirectInjectorHandler" />
+
+        <injectionPoint atCode="INVOKE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.MethodInjectionPoint" />
+        <injectionPoint atCode="INVOKE_ASSIGN" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.MethodInjectionPoint" />
+        <injectionPoint atCode="INVOKE_STRING" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantStringMethodInjectionPoint" />
+        <injectionPoint atCode="FIELD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.FieldInjectionPoint" />
+        <injectionPoint atCode="NEW" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.NewInsnInjectionPoint" />
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">

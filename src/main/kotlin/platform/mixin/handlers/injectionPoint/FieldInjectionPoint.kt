@@ -28,7 +28,7 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.MethodNode
 
-object FieldTargetReference : AtResolver.QualifiedHandler<PsiField>() {
+class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,

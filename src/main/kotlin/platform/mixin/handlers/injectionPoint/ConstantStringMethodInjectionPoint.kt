@@ -28,7 +28,7 @@ import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 
-object ConstantStringMethodTargetReference : AtResolver.MethodHandler() {
+class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
@@ -49,36 +49,35 @@ object ConstantStringMethodTargetReference : AtResolver.MethodHandler() {
         return target?.let { MyCollectVisitor(mode, at.project, it) }
     }
 
-    private fun isConstantStringMethodCall(expression: PsiMethodCallExpression): Boolean {
-        // Must return void
-        if (expression.type != PsiType.VOID) {
-            return false
-        }
-
-        val arguments = expression.argumentList
-        val argumentTypes = arguments.expressionTypes
-        val javaStringType = PsiType.getJavaLangString(
-            expression.manager,
-            expression.resolveScope
-        )
-
-        if (argumentTypes.size != 1 || argumentTypes[0] != javaStringType) {
-            // Must have one String parameter
-            return false
-        }
-
-        // Expression must be constant, so either a literal or a constant field reference
-        return when (val expr = arguments.expressions[0]) {
-            is PsiLiteral -> true
-            is PsiReference -> (expr.resolve() as? PsiVariable)?.computeConstantValue() != null
-            else -> false
-        }
-    }
-
     private class MyNavigationVisitor(
         private val targetClass: PsiClass,
         private val selector: MixinSelector
     ) : NavigationVisitor() {
+        private fun isConstantStringMethodCall(expression: PsiMethodCallExpression): Boolean {
+            // Must return void
+            if (expression.type != PsiType.VOID) {
+                return false
+            }
+
+            val arguments = expression.argumentList
+            val argumentTypes = arguments.expressionTypes
+            val javaStringType = PsiType.getJavaLangString(
+                expression.manager,
+                expression.resolveScope
+            )
+
+            if (argumentTypes.size != 1 || argumentTypes[0] != javaStringType) {
+                // Must have one String parameter
+                return false
+            }
+
+            // Expression must be constant, so either a literal or a constant field reference
+            return when (val expr = arguments.expressions[0]) {
+                is PsiLiteral -> true
+                is PsiReference -> (expr.resolve() as? PsiVariable)?.computeConstantValue() != null
+                else -> false
+            }
+        }
 
         override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
             if (isConstantStringMethodCall(expression)) {

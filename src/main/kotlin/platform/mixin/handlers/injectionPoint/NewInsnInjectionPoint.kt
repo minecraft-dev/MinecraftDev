@@ -47,7 +47,7 @@ import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
 
-object NewInsnTargetReference : AtResolver.Handler<PsiMember>() {
+class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
 
     override fun resolveTarget(context: PsiElement): PsiElement? {
         return parseMixinSelector(context)?.resolveMember(context.project, context.resolveScope)
@@ -183,7 +183,7 @@ object NewInsnTargetReference : AtResolver.Handler<PsiMember>() {
     }
 }
 
-class NewInsnTargetSelectorParser : MixinSelectorParser {
+class NewInsnSelectorParser : MixinSelectorParser {
     override fun parse(value: String, context: PsiElement): MixinSelector? {
         // check we're inside NEW
         val at = context.parentOfType<PsiAnnotation>() ?: return null

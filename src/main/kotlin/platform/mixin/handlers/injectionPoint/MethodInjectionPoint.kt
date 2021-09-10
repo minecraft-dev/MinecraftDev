@@ -29,7 +29,7 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 
-object MethodTargetReference : AtResolver.MethodHandler() {
+class MethodInjectionPoint : AbstractMethodInjectionPoint() {
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
