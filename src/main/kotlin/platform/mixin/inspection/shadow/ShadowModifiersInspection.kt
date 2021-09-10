@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.shadow
 
+import com.demonwav.mcdev.platform.mixin.handlers.ShadowHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
@@ -17,10 +18,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.FINAL
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.accessLevel
-import com.demonwav.mcdev.platform.mixin.util.mixinTargets
-import com.demonwav.mcdev.platform.mixin.util.resolveFirstShadowTarget
 import com.demonwav.mcdev.util.findKeyword
-import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInsight.intention.AddAnnotationFix
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.ProblemHighlightType
@@ -53,9 +51,7 @@ class ShadowModifiersInspection : MixinInspection() {
 
             val shadowModifierList = annotation.owner as? PsiModifierList ?: return
             val member = shadowModifierList.parent as? PsiMember ?: return
-            val psiClass = member.containingClass ?: return
-            val targetClasses = psiClass.mixinTargets.ifEmpty { return }
-            val target = resolveFirstShadowTarget(annotation, targetClasses, member) ?: return
+            val target = ShadowHandler.getInstance()?.resolveTarget(annotation)?.firstOrNull() ?: return
 
             // Check static modifier
             val targetStatic = (target.access and Opcodes.ACC_STATIC) != 0

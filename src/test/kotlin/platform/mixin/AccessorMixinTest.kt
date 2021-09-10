@@ -11,8 +11,7 @@
 package com.demonwav.mcdev.platform.mixin
 
 import com.demonwav.mcdev.framework.EdtInterceptor
-import com.demonwav.mcdev.platform.mixin.inspection.accessor.AccessorTargetInspection
-import com.demonwav.mcdev.platform.mixin.inspection.invoker.InvokerTargetInspection
+import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationTargetInspection
 import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
@@ -221,7 +220,7 @@ class AccessorMixinTest : BaseMixinTest() {
         }
         """
     ) {
-        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
         fixture.checkHighlighting(false, false, false)
     }
 
@@ -246,7 +245,7 @@ class AccessorMixinTest : BaseMixinTest() {
         }
         """
     ) {
-        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
         fixture.checkHighlighting(false, false, false)
     }
 
@@ -263,11 +262,11 @@ class AccessorMixinTest : BaseMixinTest() {
         
         @Mixin(MixinBase.class)
         public interface AccessorMixinTargetMixin {
-            <error descr="Cannot resolve member 'foo' in target class">@Accessor</error> String getFoo();
+            <error descr="Cannot find field foo in target class MixinBase">@Accessor</error> String getFoo();
         }
         """
     ) {
-        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
         fixture.checkHighlighting(false, false, false)
     }
 
@@ -284,11 +283,11 @@ class AccessorMixinTest : BaseMixinTest() {
         
         @Mixin(MixinBase.class)
         public interface AccessorMixinTargetMixin {
-            <error descr="Cannot resolve member 'foo' in target class">@Accessor("foo")</error> String bar();
+            <error descr="Cannot find field foo in target class MixinBase">@Accessor("foo")</error> String bar();
         }
         """
     ) {
-        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
         fixture.checkHighlighting(false, false, false)
     }
 
@@ -305,11 +304,11 @@ class AccessorMixinTest : BaseMixinTest() {
         
         @Mixin(MixinBase.class)
         public interface AccessorMixinTargetMixin {
-            <error descr="Cannot resolve member 'foo' in target class">@Invoker</error> String callFoo();
+            <error descr="Cannot find method foo in target class MixinBase">@Invoker</error> String callFoo();
         }
         """
     ) {
-        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
         fixture.checkHighlighting(false, false, false)
     }
 
@@ -326,11 +325,11 @@ class AccessorMixinTest : BaseMixinTest() {
         
         @Mixin(MixinBase.class)
         public interface AccessorMixinTargetMixin {
-            <error descr="Cannot resolve member 'foo' in target class">@Invoker("foo")</error> String bar();
+            <error descr="Cannot find method foo in target class MixinBase">@Invoker("foo")</error> String bar();
         }
         """
     ) {
-        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
         fixture.checkHighlighting(false, false, false)
     }
 
@@ -347,11 +346,11 @@ class AccessorMixinTest : BaseMixinTest() {
         
         @Mixin(MixinBase.class)
         public interface AccessorMixinTargetMixin {
-            <error descr="Cannot resolve member '<init>' in target class">@Invoker("<init>")</error> String construct(String invalidArg);
+            <error descr="Cannot find method <init> in target class MixinBase">@Invoker("<init>")</error> String construct(String invalidArg);
         }
         """
     ) {
-        fixture.enableInspections(AccessorTargetInspection::class.java, InvokerTargetInspection::class.java)
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
         fixture.checkHighlighting(false, false, false)
     }
 }

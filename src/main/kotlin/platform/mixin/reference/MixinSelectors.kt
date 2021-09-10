@@ -10,8 +10,6 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
-import com.demonwav.mcdev.platform.mixin.util.ClassAndFieldNode
-import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
@@ -155,11 +153,11 @@ interface MixinSelector {
                 val classNode = findQualifiedClass(project, owner, scope)?.bytecode ?: return@doPreventingRecursion null
 
                 classNode.findMethod(this)?.let {
-                    return@doPreventingRecursion MethodTargetMember(null, ClassAndMethodNode(classNode, it))
+                    return@doPreventingRecursion MethodTargetMember(classNode, it)
                 }
 
                 classNode.findField(this)?.let {
-                    return@doPreventingRecursion FieldTargetMember(null, ClassAndFieldNode(classNode, it))
+                    return@doPreventingRecursion FieldTargetMember(classNode, it)
                 }
 
                 classNode.superName?.let { doFind(it.replace('/', '.')) }?.let { return@doPreventingRecursion it }

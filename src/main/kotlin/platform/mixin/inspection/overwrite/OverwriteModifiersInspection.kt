@@ -10,15 +10,15 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.overwrite
 
+import com.demonwav.mcdev.platform.mixin.handlers.OverwriteHandler
+import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
 import com.demonwav.mcdev.platform.mixin.util.accessLevel
 import com.demonwav.mcdev.platform.mixin.util.findStubMethod
 import com.demonwav.mcdev.platform.mixin.util.hasModifier
 import com.demonwav.mcdev.platform.mixin.util.internalNameToShortName
-import com.demonwav.mcdev.platform.mixin.util.mixinTargets
-import com.demonwav.mcdev.platform.mixin.util.resolveFirstOverwriteTarget
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findKeyword
-import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.isAccessModifier
 import com.intellij.codeInsight.intention.AddAnnotationFix
 import com.intellij.codeInsight.intention.QuickFixFactory
@@ -36,10 +36,10 @@ class OverwriteModifiersInspection : OverwriteInspection() {
     override fun getStaticDescription() = "Validates the modifiers of @Overwrite methods"
 
     override fun visitOverwrite(holder: ProblemsHolder, method: PsiMethod, overwrite: PsiAnnotation) {
-        val psiClass = method.containingClass ?: return
-        val targetClasses = psiClass.mixinTargets.ifEmpty { return }
-
-        val target = resolveFirstOverwriteTarget(targetClasses, method) ?: return
+        val overwriteAnnotation = method.getAnnotation(OVERWRITE) ?: return
+        val overwriteHandler = OverwriteHandler.getInstance() ?: return
+        val target = (overwriteHandler.resolveTarget(overwriteAnnotation).firstOrNull() as? MethodTargetMember)
+            ?.classAndMethod ?: return
         val nameIdentifier = method.nameIdentifier ?: return
         val modifierList = method.modifierList
 
@@ -92,8 +92,8 @@ class OverwriteModifiersInspection : OverwriteInspection() {
         for (annotation in targetAnnotations) {
             val internalName = Type.getType(annotation.desc).takeIf { it.sort == Type.OBJECT }?.internalName ?: continue
             val qualifiedName = internalName.replace('/', '.').replace('$', '.')
-            val overwriteAnnotation = modifierList.findAnnotation(qualifiedName)
-            if (overwriteAnnotation == null) {
+            val annotationOnOverwrite = modifierList.findAnnotation(qualifiedName)
+            if (annotationOnOverwrite == null) {
                 val targetAnnPsi = target.method.findStubMethod(target.clazz, method.project)
                     ?.findAnnotation(qualifiedName)
                 if (targetAnnPsi != null) {

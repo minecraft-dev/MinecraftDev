@@ -13,7 +13,7 @@ package com.demonwav.mcdev.platform.mcp.actions
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.srg.SrgManager
-import com.demonwav.mcdev.platform.mixin.util.findFirstShadowTargetForNavigation
+import com.demonwav.mcdev.platform.mixin.handlers.ShadowHandler
 import com.demonwav.mcdev.util.ActionData
 import com.demonwav.mcdev.util.getDataFromActionEvent
 import com.demonwav.mcdev.util.gotoTargetElement
@@ -55,7 +55,7 @@ class GotoAtEntryAction : AnAction() {
             var parent = data.element.parent
 
             if (parent is PsiMember) {
-                val shadowTarget = parent.findFirstShadowTargetForNavigation()?.element
+                val shadowTarget = ShadowHandler.getInstance()?.findFirstShadowTargetForNavigation(parent)?.element
                 if (shadowTarget != null) {
                     parent = shadowTarget
                 }
