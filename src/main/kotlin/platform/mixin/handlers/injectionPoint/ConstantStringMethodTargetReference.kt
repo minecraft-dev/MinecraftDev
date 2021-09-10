@@ -8,16 +8,15 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.reference.target
+package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
-import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.MemberReference
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
@@ -29,25 +28,25 @@ import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 
-object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
+object ConstantStringMethodTargetReference : AtResolver.MethodHandler() {
     override fun createNavigationVisitor(
-        context: PsiElement,
+        at: PsiAnnotation,
+        target: MixinSelector?,
         targetClass: PsiClass
     ): NavigationVisitor? {
-        return parseMixinSelector(context)
-            ?.let { MyNavigationVisitor(targetClass, it) }
+        return target?.let { MyNavigationVisitor(targetClass, it) }
     }
 
     override fun createCollectVisitor(
-        context: PsiElement,
+        at: PsiAnnotation,
+        target: MixinSelector?,
         targetClass: ClassNode,
         mode: CollectVisitor.Mode
     ): CollectVisitor<PsiMethod>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
-            return MyCollectVisitor(mode, context.project, MemberReference(""))
+            return MyCollectVisitor(mode, at.project, MemberReference(""))
         }
-        return parseMixinSelector(context)
-            ?.let { MyCollectVisitor(mode, context.project, it) }
+        return target?.let { MyCollectVisitor(mode, at.project, it) }
     }
 
     private fun isConstantStringMethodCall(expression: PsiMethodCallExpression): Boolean {
@@ -134,6 +133,7 @@ object ConstantStringMethodTargetReference : TargetReference.MethodHandler() {
 
             val fakeMethod = insn.fakeResolve()
             addResult(
+                insn,
                 fakeMethod.method.findOrConstructSourceMethod(
                     fakeMethod.clazz,
                     project,

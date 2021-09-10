@@ -8,7 +8,7 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.reference.target
+package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser
@@ -47,27 +47,30 @@ import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
 
-object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
+object NewInsnTargetReference : AtResolver.Handler<PsiMember>() {
 
     override fun resolveTarget(context: PsiElement): PsiElement? {
         return parseMixinSelector(context)?.resolveMember(context.project, context.resolveScope)
     }
 
-    override fun createNavigationVisitor(context: PsiElement, targetClass: PsiClass): NavigationVisitor? {
-        val selector = parseMixinSelector(context) ?: return null
-        return MyNavigationVisitor(selector)
+    override fun createNavigationVisitor(
+        at: PsiAnnotation,
+        target: MixinSelector?,
+        targetClass: PsiClass
+    ): NavigationVisitor? {
+        return target?.let { MyNavigationVisitor(it) }
     }
 
     override fun createCollectVisitor(
-        context: PsiElement,
+        at: PsiAnnotation,
+        target: MixinSelector?,
         targetClass: ClassNode,
         mode: CollectVisitor.Mode
     ): CollectVisitor<PsiMember>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
-            return MyCollectVisitor(mode, context.project, MemberReference(""))
+            return MyCollectVisitor(mode, at.project, MemberReference(""))
         }
-        val ref = parseMixinSelector(context) ?: return null
-        return MyCollectVisitor(mode, context.project, ref)
+        return target?.let { MyCollectVisitor(mode, at.project, it) }
     }
 
     override fun createLookup(targetClass: ClassNode, result: CollectVisitor.Result<PsiMember>): LookupElementBuilder? {
@@ -142,6 +145,7 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
 
                 val targetMethod = initCall.fakeResolve()
                 addResult(
+                    insn,
                     targetMethod.method.findOrConstructSourceMethod(
                         targetMethod.clazz,
                         project,

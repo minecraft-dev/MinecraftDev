@@ -10,9 +10,9 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
-import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
@@ -103,7 +103,7 @@ enum class InjectorType(private val annotation: String) {
             val at = annotation.findDeclaredAttributeValue("at") as? PsiAnnotation ?: return null
             val target = at.findDeclaredAttributeValue("target") ?: return null
 
-            if (!TargetReference.usesMemberReference(target)) {
+            if (!AtResolver.usesMemberReference(at)) {
                 return null
             }
 

@@ -8,10 +8,9 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.reference.target
+package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
-import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceField
@@ -20,8 +19,8 @@ import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReferenceExpression
@@ -29,22 +28,25 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.MethodNode
 
-object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
-    override fun createNavigationVisitor(context: PsiElement, targetClass: PsiClass): NavigationVisitor? {
-        return parseMixinSelector(context)
-            ?.let { MyNavigationVisitor(targetClass, it) }
+object FieldTargetReference : AtResolver.QualifiedHandler<PsiField>() {
+    override fun createNavigationVisitor(
+        at: PsiAnnotation,
+        target: MixinSelector?,
+        targetClass: PsiClass
+    ): NavigationVisitor? {
+        return target?.let { MyNavigationVisitor(targetClass, it) }
     }
 
     override fun createCollectVisitor(
-        context: PsiElement,
+        at: PsiAnnotation,
+        target: MixinSelector?,
         targetClass: ClassNode,
         mode: CollectVisitor.Mode
     ): CollectVisitor<PsiField>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
-            return MyCollectVisitor(mode, context.project, MemberReference(""))
+            return MyCollectVisitor(mode, at.project, MemberReference(""))
         }
-        return parseMixinSelector(context)
-            ?.let { MyCollectVisitor(mode, context.project, it) }
+        return target?.let { MyCollectVisitor(mode, at.project, it) }
     }
 
     override fun createLookup(targetClass: ClassNode, m: PsiField, owner: String): LookupElementBuilder {
@@ -103,7 +105,7 @@ object FieldTargetReference : TargetReference.QualifiedHandler<PsiField>() {
                     project,
                     canDecompile = false
                 )
-                addResult(psiField, qualifier = insn.owner.replace('/', '.'))
+                addResult(insn, psiField, qualifier = insn.owner.replace('/', '.'))
             }
         }
     }

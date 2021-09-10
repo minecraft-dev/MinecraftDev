@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
-import com.demonwav.mcdev.platform.mixin.reference.target.QualifiedMember
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.QualifiedMember
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.util.findReferencedMember
 import com.demonwav.mcdev.util.getQualifiedMemberReference
