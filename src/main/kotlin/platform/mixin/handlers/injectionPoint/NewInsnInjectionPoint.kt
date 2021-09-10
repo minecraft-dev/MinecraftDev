@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser
-import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
@@ -48,10 +47,6 @@ import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
 
 class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
-
-    override fun resolveTarget(context: PsiElement): PsiElement? {
-        return parseMixinSelector(context)?.resolveMember(context.project, context.resolveScope)
-    }
 
     override fun createNavigationVisitor(
         at: PsiAnnotation,

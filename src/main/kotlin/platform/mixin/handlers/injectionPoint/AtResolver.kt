@@ -21,7 +21,6 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
-import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.GlobalSearchScope
@@ -130,7 +129,7 @@ class AtResolver(
         val target = targetAttr?.let { parseMixinSelector(it) }
 
         // Collect all possible targets
-        fun <T : PsiMember> doCollectVariants(injectionPoint: InjectionPoint<T>): List<Any> {
+        fun <T : PsiElement> doCollectVariants(injectionPoint: InjectionPoint<T>): List<Any> {
             val visitor = injectionPoint.createCollectVisitor(at, target, targetClass, CollectVisitor.Mode.COMPLETION)
                 ?: return emptyList()
             visitor.visit(targetMethod)

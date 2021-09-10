@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
-import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.getQualifiedMemberReference
@@ -38,7 +37,7 @@ import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
-abstract class InjectionPoint<T : PsiMember> {
+abstract class InjectionPoint<T : PsiElement> {
     companion object {
         private val COLLECTOR =
             KeyedExtensionCollector<InjectionPoint<*>, String>("com.demonwav.minecraft-dev.injectionPoint")
@@ -49,8 +48,6 @@ abstract class InjectionPoint<T : PsiMember> {
     }
 
     open fun usesMemberReference() = false
-
-    abstract fun resolveTarget(context: PsiElement): PsiElement?
 
     abstract fun createNavigationVisitor(
         at: PsiAnnotation,
@@ -98,12 +95,6 @@ abstract class QualifiedInjectionPoint<T : PsiMember> : InjectionPoint<T>() {
     final override fun usesMemberReference() = true
 
     protected abstract fun createLookup(targetClass: ClassNode, m: T, owner: String): LookupElementBuilder
-
-    override fun resolveTarget(context: PsiElement): PsiElement? {
-        val selector = parseMixinSelector(context)
-        selector?.owner ?: return null
-        return selector.resolveMember(context.project, context.resolveScope)
-    }
 
     protected open fun getInternalName(m: T): String {
         return m.realName ?: m.name!!
@@ -189,7 +180,7 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
     }
 }
 
-abstract class CollectVisitor<T : PsiMember>(protected val mode: Mode) {
+abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
     fun visit(methodNode: MethodNode) {
         try {
             accept(methodNode)
@@ -220,7 +211,7 @@ abstract class CollectVisitor<T : PsiMember>(protected val mode: Mode) {
         }
     }
 
-    data class Result<T : PsiMember>(
+    data class Result<T : PsiElement>(
         val index: Int,
         val insn: AbstractInsnNode,
         val target: T,

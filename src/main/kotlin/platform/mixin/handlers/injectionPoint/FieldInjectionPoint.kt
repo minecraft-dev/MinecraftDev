@@ -28,6 +28,7 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.MethodNode
 
+// TODO: array accesses
 class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
     override fun createNavigationVisitor(
         at: PsiAnnotation,
