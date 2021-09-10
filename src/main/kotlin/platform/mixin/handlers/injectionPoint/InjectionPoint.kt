@@ -116,7 +116,7 @@ abstract class QualifiedInjectionPoint<T : PsiMember> : InjectionPoint<T>() {
         targetClass: ClassNode,
         m: T
     ): LookupElementBuilder {
-        val owner = m.containingClass!!
+        val owner = m.containingClass ?: return builder
         return if (targetClass.name == owner.fullQualifiedName?.replace('.', '/')) {
             builder
         } else {
