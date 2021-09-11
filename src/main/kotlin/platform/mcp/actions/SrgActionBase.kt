@@ -12,7 +12,7 @@ package com.demonwav.mcdev.platform.mcp.actions
 
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.srg.McpSrgMap
-import com.demonwav.mcdev.platform.mixin.util.findFirstShadowTargetForReference
+import com.demonwav.mcdev.platform.mixin.handlers.ShadowHandler
 import com.demonwav.mcdev.util.ActionData
 import com.demonwav.mcdev.util.getDataFromActionEvent
 import com.demonwav.mcdev.util.invokeLater
@@ -45,7 +45,7 @@ abstract class SrgActionBase : AnAction() {
             var parent = data.element.parent ?: return@onSuccess showBalloon("Not a valid element", e)
 
             if (parent is PsiMember) {
-                val shadowTarget = parent.findFirstShadowTargetForReference()?.element
+                val shadowTarget = ShadowHandler.getInstance()?.findFirstShadowTargetForReference(parent)?.element
                 if (shadowTarget != null) {
                     parent = shadowTarget
                 }

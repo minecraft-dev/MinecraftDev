@@ -10,9 +10,9 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
-import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiAnnotation
@@ -28,7 +28,7 @@ class UnqualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection(
         holder: ProblemsHolder
     ) {
         // Check if the specified target reference uses member descriptors
-        if (!TargetReference.usesMemberReference(value)) {
+        if (!AtResolver.usesMemberReference(annotation)) {
             return
         }
 

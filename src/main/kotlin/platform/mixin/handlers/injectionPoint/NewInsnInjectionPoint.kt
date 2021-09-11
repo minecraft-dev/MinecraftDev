@@ -8,11 +8,10 @@
  * MIT License
  */
 
-package com.demonwav.mcdev.platform.mixin.reference.target
+package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser
-import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
@@ -47,27 +46,33 @@ import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
 
-object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
-
-    override fun resolveTarget(context: PsiElement): PsiElement? {
-        return parseMixinSelector(context)?.resolveMember(context.project, context.resolveScope)
+class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
+    private fun getTarget(at: PsiAnnotation, target: MixinSelector?): MixinSelector? {
+        if (target != null) {
+            return target
+        }
+        val clazz = AtResolver.getArgs(at)["class"] ?: return null
+        return classToMemberReference(clazz)
     }
 
-    override fun createNavigationVisitor(context: PsiElement, targetClass: PsiClass): NavigationVisitor? {
-        val selector = parseMixinSelector(context) ?: return null
-        return MyNavigationVisitor(selector)
+    override fun createNavigationVisitor(
+        at: PsiAnnotation,
+        target: MixinSelector?,
+        targetClass: PsiClass
+    ): NavigationVisitor? {
+        return getTarget(at, target)?.let { MyNavigationVisitor(it) }
     }
 
     override fun createCollectVisitor(
-        context: PsiElement,
+        at: PsiAnnotation,
+        target: MixinSelector?,
         targetClass: ClassNode,
         mode: CollectVisitor.Mode
     ): CollectVisitor<PsiMember>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
-            return MyCollectVisitor(mode, context.project, MemberReference(""))
+            return MyCollectVisitor(mode, at.project, MemberReference(""))
         }
-        val ref = parseMixinSelector(context) ?: return null
-        return MyCollectVisitor(mode, context.project, ref)
+        return getTarget(at, target)?.let { MyCollectVisitor(mode, at.project, it) }
     }
 
     override fun createLookup(targetClass: ClassNode, result: CollectVisitor.Result<PsiMember>): LookupElementBuilder? {
@@ -142,6 +147,7 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
 
                 val targetMethod = initCall.fakeResolve()
                 addResult(
+                    insn,
                     targetMethod.method.findOrConstructSourceMethod(
                         targetMethod.clazz,
                         project,
@@ -179,20 +185,24 @@ object NewInsnTargetReference : TargetReference.Handler<PsiMember>() {
     }
 }
 
-class NewInsnTargetSelectorParser : MixinSelectorParser {
+class NewInsnSelectorParser : MixinSelectorParser {
     override fun parse(value: String, context: PsiElement): MixinSelector? {
         // check we're inside NEW
         val at = context.parentOfType<PsiAnnotation>() ?: return null
         if (!at.hasQualifiedName(AT)) return null
         if (at.findAttributeValue("value")?.constantStringValue != "NEW") return null
 
-        val fqn = value.replace('/', '.').replace('$', '.')
-        if (fqn.isNotEmpty() && !fqn.startsWith('.') && !fqn.endsWith('.') && !fqn.contains("..")) {
-            if (StringUtil.isJavaIdentifier(fqn.replace('.', '_'))) {
-                return MemberReference("<init>", owner = fqn)
-            }
-        }
-
-        return null
+        return classToMemberReference(value)
     }
+}
+
+private fun classToMemberReference(value: String): MemberReference? {
+    val fqn = value.replace('/', '.').replace('$', '.')
+    if (fqn.isNotEmpty() && !fqn.startsWith('.') && !fqn.endsWith('.') && !fqn.contains("..")) {
+        if (StringUtil.isJavaIdentifier(fqn.replace('.', '_'))) {
+            return MemberReference("<init>", owner = fqn)
+        }
+    }
+
+    return null
 }

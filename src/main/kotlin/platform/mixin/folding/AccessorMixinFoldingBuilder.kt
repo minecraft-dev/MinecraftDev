@@ -11,10 +11,10 @@
 package com.demonwav.mcdev.platform.mixin.folding
 
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
-import com.demonwav.mcdev.platform.mixin.util.findAccessorAnnotation
-import com.demonwav.mcdev.platform.mixin.util.findAccessorTargetForReference
-import com.demonwav.mcdev.platform.mixin.util.findInvokerAnnotation
-import com.demonwav.mcdev.platform.mixin.util.findInvokerTarget
+import com.demonwav.mcdev.platform.mixin.handlers.AccessorHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InvokerHandler
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.ACCESSOR
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INVOKER
 import com.demonwav.mcdev.util.referencedMethod
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.CustomFoldingBuilder
@@ -46,12 +46,12 @@ class AccessorMixinFoldingBuilder : CustomFoldingBuilder() {
 
         return when {
             refMethod == null -> false
-            refMethod.findInvokerAnnotation() != null -> when (element) {
+            refMethod.hasAnnotation(INVOKER) -> when (element) {
                 is PsiIdentifier -> settings.foldInvokerMethodCalls
                 is PsiParenthesizedExpression -> settings.foldInvokerCasts
                 else -> false
             }
-            refMethod.findAccessorAnnotation() != null -> when (element) {
+            refMethod.hasAnnotation(ACCESSOR) -> when (element) {
                 is PsiIdentifier -> settings.foldAccessorMethodCalls
                 is PsiParenthesizedExpression -> settings.foldAccessorCasts
                 else -> false
@@ -77,11 +77,12 @@ class AccessorMixinFoldingBuilder : CustomFoldingBuilder() {
         val expr = identifier.parentOfType<PsiMethodCallExpression>() ?: return null
         val method = expr.referencedMethod ?: return null
 
-        if (method.findInvokerAnnotation() != null) {
-            return method.findInvokerTarget()?.element?.name
+        if (method.hasAnnotation(INVOKER)) {
+            return InvokerHandler.getInstance()?.findInvokerTargetForReference(method)?.element?.name
         }
-        if (method.findAccessorAnnotation() != null) {
-            val name = method.findAccessorTargetForReference()?.element?.name ?: return null
+        if (method.hasAnnotation(ACCESSOR)) {
+            val name = AccessorHandler.getInstance()?.findAccessorTargetForReference(method)?.element?.name
+                ?: return null
             return if (method.returnType == PsiType.VOID) {
                 "$name = "
             } else {
@@ -130,11 +131,11 @@ class AccessorMixinFoldingBuilder : CustomFoldingBuilder() {
 
             val refMethod = expression.referencedMethod ?: return
 
-            val invoker = refMethod.findInvokerAnnotation() != null
+            val invoker = refMethod.hasAnnotation(INVOKER)
             if (invoker && !settings.foldInvokerCasts && !settings.foldInvokerMethodCalls) {
                 return
             }
-            val accessor = refMethod.findAccessorAnnotation() != null
+            val accessor = refMethod.hasAnnotation(ACCESSOR)
             if (accessor && !settings.foldAccessorCasts && !settings.foldAccessorMethodCalls) {
                 return
             }

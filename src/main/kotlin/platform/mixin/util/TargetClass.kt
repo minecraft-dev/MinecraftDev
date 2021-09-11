@@ -89,8 +89,8 @@ fun findShadowTargets(psiClass: PsiClass, start: PsiClass, superMixin: Boolean):
         findShadowTargetsDeep(psiClass, start)
     } else {
         // No need to walk the hierarchy if we don't have a super mixin
-        findMethods(start)?.map { MethodTargetMember(null, it) }
-            .plus(findFields(start)?.map { FieldTargetMember(null, it) }) ?: emptySequence()
+        findMethods(start)?.map { MethodTargetMember(it) }
+            .plus(findFields(start)?.map { FieldTargetMember(it) }) ?: emptySequence()
     }
 }
 
@@ -98,8 +98,8 @@ private fun findShadowTargetsDeep(psiClass: PsiClass, start: PsiClass): Sequence
     return start.streamMixinHierarchy()
         .flatMap { mixin ->
             val actualMixin = mixin.takeIf { !(it equivalentTo psiClass) }
-            findMethods(mixin)?.map { MethodTargetMember(actualMixin, it) }
-                .plus(findFields(mixin)?.map { FieldTargetMember(actualMixin, it) })
+            findMethods(mixin)?.map { MethodTargetMember(it, actualMixin) }
+                .plus(findFields(mixin)?.map { FieldTargetMember(it, actualMixin) })
                 ?.filterAccessible(psiClass, mixin) ?: emptySequence()
         }
         .distinctBy {
@@ -113,10 +113,14 @@ private fun findShadowTargetsDeep(psiClass: PsiClass, start: PsiClass): Sequence
 sealed class MixinTargetMember(val mixin: PsiClass?) {
     abstract val access: Int
 }
-class FieldTargetMember(mixin: PsiClass?, val classAndField: ClassAndFieldNode) : MixinTargetMember(mixin) {
+class FieldTargetMember(val classAndField: ClassAndFieldNode, mixin: PsiClass? = null) : MixinTargetMember(mixin) {
+    constructor(clazz: ClassNode, field: FieldNode) : this(ClassAndFieldNode(clazz, field))
+
     override val access = classAndField.field.access
 }
-class MethodTargetMember(mixin: PsiClass?, val classAndMethod: ClassAndMethodNode) : MixinTargetMember(mixin) {
+class MethodTargetMember(val classAndMethod: ClassAndMethodNode, mixin: PsiClass? = null) : MixinTargetMember(mixin) {
+    constructor(clazz: ClassNode, method: MethodNode) : this(ClassAndMethodNode(clazz, method))
+
     override val access = classAndMethod.method.access
 }
 

@@ -12,7 +12,7 @@ package com.demonwav.mcdev.platform.mixin.shadow
 
 import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.platform.mixin.BaseMixinTest
-import com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowTargetInspection
+import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationTargetInspection
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -52,7 +52,7 @@ class ShadowTargetInspectionTest : BaseMixinTest() {
                     @Shadow public String wrongAccessor;
                     @Shadow protected String noFinal;
 
-                    <error descr="Cannot resolve member 'nonExistent' in target class">@Shadow</error> public String nonExistent;
+                    <error descr="Unresolved field nonExistent in target class MixinBase">@Shadow</error> public String nonExistent;
 
                     @Shadow protected String twoIssues;
                 }
@@ -60,7 +60,7 @@ class ShadowTargetInspectionTest : BaseMixinTest() {
             )
         }
 
-        fixture.enableInspections(ShadowTargetInspection::class)
+        fixture.enableInspections(MixinAnnotationTargetInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }
