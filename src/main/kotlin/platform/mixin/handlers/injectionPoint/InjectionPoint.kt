@@ -29,6 +29,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLambdaExpression
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.serviceContainer.BaseKeyedLazyInstance
 import com.intellij.util.KeyedLazyInstance
@@ -153,29 +154,50 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
         result += element
     }
 
+    open fun visitEnd(executableElement: PsiElement) {
+    }
+
     override fun visitElement(element: PsiElement) {
         hasVisitedAnything = true
         super.visitElement(element)
     }
 
-    override fun visitAnonymousClass(aClass: PsiAnonymousClass?) {
+    override fun visitMethod(method: PsiMethod) {
+        if (!hasVisitedAnything) {
+            super.visitMethod(method)
+            visitEnd(method)
+        }
+    }
+
+    override fun visitAnonymousClass(aClass: PsiAnonymousClass) {
         // do not recurse into anonymous classes
         if (!hasVisitedAnything) {
             super.visitAnonymousClass(aClass)
+            visitEnd(aClass)
         }
     }
 
-    override fun visitClass(aClass: PsiClass?) {
+    override fun visitClass(aClass: PsiClass) {
         // do not recurse into inner classes
         if (!hasVisitedAnything) {
             super.visitClass(aClass)
+            visitEnd(aClass)
         }
     }
 
-    override fun visitLambdaExpression(expression: PsiLambdaExpression?) {
+    override fun visitMethodReferenceExpression(expression: PsiMethodReferenceExpression) {
+        val hadVisitedAnything = hasVisitedAnything
+        super.visitMethodReferenceExpression(expression)
+        if (!hadVisitedAnything) {
+            visitEnd(expression)
+        }
+    }
+
+    override fun visitLambdaExpression(expression: PsiLambdaExpression) {
         // do not recurse into lambda expressions
         if (!hasVisitedAnything) {
             super.visitLambdaExpression(expression)
+            visitEnd(expression)
         }
     }
 }
