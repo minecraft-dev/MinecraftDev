@@ -157,8 +157,10 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
                 )
             }
         }
+    }
 
-        private fun findInitCall(newInsn: TypeInsnNode): MethodInsnNode? {
+    companion object {
+        fun findInitCall(newInsn: TypeInsnNode): MethodInsnNode? {
             var newInsns = 0
             var insn: AbstractInsnNode? = newInsn
             while (insn != null) {

@@ -61,7 +61,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
                 }
 
                 @Inject(method = "<init>(Lcom/demonwav/mcdev/mixintestdata/invalidInjectorMethodSignatureInspection/MixedInOuter;Ljava/lang/String;)V", at = @At("RETURN"))
-                private void injectCtor<error descr="Method parameters do not match expected parameters for @Inject">(String string, CallbackInfo ci)</error> {
+                private void injectCtor<error descr="Method parameters do not match expected parameters for Inject">(String string, CallbackInfo ci)</error> {
                 }
             }
             """
@@ -85,7 +85,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             public class TestMixin {
 
                 @Inject(method = "<init>()V", at = @At("RETURN"))
-                private void injectCtorWrong<error descr="Method parameters do not match expected parameters for @Inject">(MixedInOuter outer, CallbackInfo ci)</error> {
+                private void injectCtorWrong<error descr="Method parameters do not match expected parameters for Inject">(MixedInOuter outer, CallbackInfo ci)</error> {
                 }
 
                 @Inject(method = "<init>", at = @At("RETURN"))
@@ -93,7 +93,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
                 }
 
                 @Inject(method = "<init>(Ljava/lang/String;)V", at = @At("RETURN"))
-                private void injectCtor<error descr="Method parameters do not match expected parameters for @Inject">(MixedInOuter outer, String string, CallbackInfo ci)</error> {
+                private void injectCtor<error descr="Method parameters do not match expected parameters for Inject">(MixedInOuter outer, String string, CallbackInfo ci)</error> {
                 }
 
                 @Inject(method = "<init>(Ljava/lang/String;)V", at = @At("RETURN"))

@@ -10,6 +10,9 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.platform.mixin.handlers.InjectAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
@@ -50,7 +53,9 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             var reportedStatic = false
             var reportedSignature = false
 
-            for ((type, annotation) in InjectorType.findAnnotations(modifiers)) {
+            for (annotation in modifiers.annotations) {
+                val qName = annotation.qualifiedName ?: continue
+                val handler = MixinAnnotationHandler.forMixinAnnotation(qName) as? InjectorAnnotationHandler ?: continue
                 val methodAttribute = annotation.findDeclaredAttributeValue("method") ?: continue
                 val targetMethods = MethodReference.resolveAllIfNotAmbiguous(methodAttribute) ?: continue
 
@@ -75,32 +80,66 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                     if (!reportedSignature) {
                         // Check method parameters
                         val parameters = method.parameterList
-                        val (expectedParameters, expectedReturnType) = type.expectedMethodSignature(
+                        val possibleSignatures = handler.expectedMethodSignature(
                             annotation,
                             targetMethod.clazz,
                             targetMethod.method
                         ) ?: continue
 
-                        if (!checkParameters(parameters, expectedParameters)) {
-                            reportedSignature = true
+                        val annotationName = annotation.nameReferenceElement?.referenceName
 
+                        if (possibleSignatures.isEmpty()) {
+                            reportedSignature = true
                             holder.registerProblem(
                                 parameters,
-                                "Method parameters do not match expected parameters for ${type.annotationName}",
-                                ParametersQuickFix(expectedParameters, type)
+                                "There are no possible signatures for this injector"
                             )
+                            continue
                         }
 
-                        val methodReturnType = method.returnType
-                        if (methodReturnType == null || !methodReturnType.isErasureEquivalentTo(expectedReturnType)) {
-                            reportedSignature = true
+                        var isValid = false
+                        for ((expectedParameters, expectedReturnType) in possibleSignatures) {
+                            if (checkParameters(parameters, expectedParameters)) {
+                                val methodReturnType = method.returnType
+                                if (methodReturnType != null &&
+                                    methodReturnType.isErasureEquivalentTo(expectedReturnType)
+                                ) {
+                                    isValid = true
+                                    break
+                                }
+                            }
+                        }
 
-                            holder.registerProblem(
-                                method.returnTypeElement ?: identifier,
-                                "Expected return type '${expectedReturnType.presentableText}' " +
-                                    "for ${type.annotationName} method",
-                                QuickFixFactory.getInstance().createMethodReturnFix(method, expectedReturnType, false)
-                            )
+                        if (!isValid) {
+                            val (expectedParameters, expectedReturnType) = possibleSignatures[0]
+
+                            if (!checkParameters(parameters, expectedParameters)) {
+                                reportedSignature = true
+
+                                holder.registerProblem(
+                                    parameters,
+                                    "Method parameters do not match expected parameters for $annotationName",
+                                    ParametersQuickFix(expectedParameters, handler is InjectAnnotationHandler)
+                                )
+                            }
+
+                            val methodReturnType = method.returnType
+                            if (methodReturnType == null ||
+                                !methodReturnType.isErasureEquivalentTo(expectedReturnType)
+                            ) {
+                                reportedSignature = true
+
+                                holder.registerProblem(
+                                    method.returnTypeElement ?: identifier,
+                                    "Expected return type '${expectedReturnType.presentableText}' " +
+                                        "for $annotationName method",
+                                    QuickFixFactory.getInstance().createMethodReturnFix(
+                                        method,
+                                        expectedReturnType,
+                                        false
+                                    )
+                                )
+                            }
                         }
                     }
                 }
@@ -126,12 +165,13 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
     private class ParametersQuickFix(
         private val expected: List<ParameterGroup>,
-        injectorType: InjectorType
+        isInject: Boolean
     ) : LocalQuickFix {
 
-        private val fixName = when (injectorType) {
-            InjectorType.INJECT -> "Fix method parameters"
-            else -> "Fix method parameters (won't keep captured locals)"
+        private val fixName = if (isInject) {
+            "Fix method parameters"
+        } else {
+            "Fix method parameters (won't keep captured locals)"
         }
 
         override fun getFamilyName() = fixName

@@ -20,22 +20,37 @@ import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotation
+import com.intellij.psi.PsiArrayAccessExpression
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReferenceExpression
+import com.intellij.psi.util.PsiUtil
+import org.objectweb.asm.Opcodes
+import org.objectweb.asm.Type
+import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.MethodNode
 
-// TODO: array accesses
 class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
+    private fun getArrayAccessType(args: Map<String, String>): ArrayAccessType? {
+        return when (args["array"]) {
+            "length" -> ArrayAccessType.LENGTH
+            "get" -> ArrayAccessType.GET
+            "set" -> ArrayAccessType.SET
+            else -> null
+        }
+    }
+
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: PsiClass
     ): NavigationVisitor? {
-        return target?.let { MyNavigationVisitor(targetClass, it) }
+        val args = AtResolver.getArgs(at)
+        val arrayAccess = getArrayAccessType(args)
+        return target?.let { MyNavigationVisitor(targetClass, it, arrayAccess) }
     }
 
     override fun createCollectVisitor(
@@ -45,9 +60,12 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         mode: CollectVisitor.Mode
     ): CollectVisitor<PsiField>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
-            return MyCollectVisitor(mode, at.project, MemberReference(""))
+            return MyCollectVisitor(mode, at.project, MemberReference(""), null, 8)
         }
-        return target?.let { MyCollectVisitor(mode, at.project, it) }
+        val args = AtResolver.getArgs(at)
+        val arrayAccess = getArrayAccessType(args)
+        val fuzz = args["fuzz"]?.toIntOrNull()?.coerceIn(1, 32) ?: 8
+        return target?.let { MyCollectVisitor(mode, at.project, it, arrayAccess, fuzz) }
     }
 
     override fun createLookup(targetClass: ClassNode, m: PsiField, owner: String): LookupElementBuilder {
@@ -63,7 +81,8 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
 
     private class MyNavigationVisitor(
         private val targetClass: PsiClass,
-        private val selector: MixinSelector
+        private val selector: MixinSelector,
+        private val arrayAccess: ArrayAccessType?
     ) : NavigationVisitor() {
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
             if (expression !is PsiMethodReferenceExpression) {
@@ -76,7 +95,28 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
                             QualifiedMember.resolveQualifier(expression) ?: targetClass
                         )
                         if (matches) {
-                            addResult(expression)
+                            // figure out where the array access is.
+                            // ignore fuzz, I don't even want to think about that in source code
+                            val actualResult = when (arrayAccess) {
+                                ArrayAccessType.LENGTH -> {
+                                    val parentRef = PsiUtil.skipParenthesizedExprUp(expression.parent)
+                                        as? PsiReferenceExpression ?: return
+                                    parentRef.takeIf { it.referenceName == "length" }
+                                }
+                                ArrayAccessType.GET -> {
+                                    val parentArrayAccess = PsiUtil.skipParenthesizedExprUp(expression.parent)
+                                        as? PsiArrayAccessExpression ?: return
+                                    parentArrayAccess.takeIf(PsiUtil::isAccessedForReading)
+                                }
+                                ArrayAccessType.SET -> {
+                                    val parentArrayAccess = PsiUtil.skipParenthesizedExprUp(expression.parent)
+                                        as? PsiArrayAccessExpression ?: return
+                                    parentArrayAccess.takeIf(PsiUtil::isAccessedForWriting)
+                                }
+                                null -> expression
+                            } ?: return
+
+                            addResult(actualResult)
                         }
                     }
                 }
@@ -89,7 +129,9 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
     private class MyCollectVisitor(
         mode: Mode,
         private val project: Project,
-        private val selector: MixinSelector
+        private val selector: MixinSelector,
+        private val arrayAccess: ArrayAccessType?,
+        private val fuzz: Int
     ) : CollectVisitor<PsiField>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return
@@ -100,14 +142,60 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
                         return@forEachRemaining
                     }
                 }
+                val actualInsn = if (arrayAccess == null) {
+                    insn
+                } else {
+                    findArrayInsn(insn, arrayAccess)
+                } ?: return@forEachRemaining
                 val fieldNode = insn.fakeResolve()
                 val psiField = fieldNode.field.findOrConstructSourceField(
                     fieldNode.clazz,
                     project,
                     canDecompile = false
                 )
-                addResult(insn, psiField, qualifier = insn.owner.replace('/', '.'))
+                addResult(actualInsn, psiField, qualifier = insn.owner.replace('/', '.'))
             }
         }
+
+        private fun findArrayInsn(fieldInsn: FieldInsnNode, arrayAccess: ArrayAccessType): AbstractInsnNode? {
+            val arrayType = Type.getType(fieldInsn.desc)
+            if (arrayType.sort != Type.ARRAY) {
+                return null
+            }
+            val wantedOpcode = when (arrayAccess) {
+                ArrayAccessType.LENGTH -> Opcodes.ARRAYLENGTH
+                ArrayAccessType.GET -> arrayType.elementType.getOpcode(Opcodes.IALOAD)
+                ArrayAccessType.SET -> arrayType.elementType.getOpcode(Opcodes.IASTORE)
+            }
+
+            var insn = fieldInsn.next
+            var pos = 0
+            while (insn != null) {
+                if (insn.opcode == wantedOpcode) {
+                    return insn
+                }
+                if (insn.opcode == Opcodes.ARRAYLENGTH && pos == 0) {
+                    return null
+                }
+                if (insn is FieldInsnNode &&
+                    insn.owner == fieldInsn.owner &&
+                    insn.name == fieldInsn.name &&
+                    insn.desc == fieldInsn.desc
+                ) {
+                    return null
+                }
+                if (pos > fuzz) {
+                    return null
+                }
+                pos++
+                insn = insn.next
+            }
+
+            return null
+        }
+    }
+
+    private enum class ArrayAccessType {
+        LENGTH, GET, SET
     }
 }
