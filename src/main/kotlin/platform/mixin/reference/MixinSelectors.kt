@@ -142,8 +142,7 @@ interface MixinSelector {
         project: Project,
         scope: GlobalSearchScope = GlobalSearchScope.allScope(project)
     ): MixinTargetMember? {
-        val owner = this.owner
-            ?: throw IllegalStateException("Cannot resolve unqualified member reference (owner == null)")
+        val owner = this.owner ?: return null
 
         fun doFind(owner: String): MixinTargetMember? {
             if (owner == CommonClassNames.JAVA_LANG_OBJECT) {
@@ -176,8 +175,7 @@ interface MixinSelector {
     }
 
     private inline fun <R> resolve(project: Project, scope: GlobalSearchScope, ret: (PsiClass, PsiMember) -> R): R? {
-        val owner = this.owner
-            ?: throw IllegalStateException("Cannot resolve unqualified member reference (owner == null)")
+        val owner = this.owner ?: return null
 
         val psiClass = findQualifiedClass(project, owner, scope) ?: return null
 
