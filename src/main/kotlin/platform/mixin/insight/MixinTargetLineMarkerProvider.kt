@@ -17,6 +17,7 @@ import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
+import com.intellij.codeInsight.hint.HintManager
 import com.intellij.codeInsight.navigation.NavigationUtil
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -85,11 +86,20 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
             }
             val annotation = annotationPointer.element ?: return
             val targets = handler.resolveForNavigation(annotation)
+            val editor = FileEditorManager.getInstance(elt.project).selectedTextEditor
             when (targets.size) {
-                0 -> return
-                1 -> PsiNavigateUtil.navigate(targets[0])
+                0 -> {
+                    if (editor != null) {
+                        HintManager.getInstance().showErrorHint(
+                            editor,
+                            "Cannot find corresponding element in source code"
+                        )
+                    }
+                }
+                1 -> {
+                    PsiNavigateUtil.navigate(targets[0])
+                }
                 else -> {
-                    val editor = FileEditorManager.getInstance(elt.project).selectedTextEditor
                     if (editor != null) {
                         NavigationUtil.getPsiElementPopup(targets.toTypedArray(), "Choose Target")
                             .showInBestPositionFor(editor)
