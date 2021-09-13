@@ -55,7 +55,7 @@ fun findMethods(psiClass: PsiClass, allowClinit: Boolean = true): Sequence<Class
                 .map { it.first() }
     }?.filter { classAndMethod ->
         // Filter methods which are already in the Mixin class
-        psiClass.findMethods(classAndMethod.method.memberReference, false).any()
+        !psiClass.findMethods(classAndMethod.method.memberReference, false).any()
     }
 }
 

@@ -64,7 +64,7 @@ class GenerateShadowAction : MixinCodeInsightAction() {
                 canDecompile = false
             ).let(::PsiFieldMember)
         } ?: emptySequence()
-        val methods = findMethods(psiClass)?.map { (classNode, fieldNode) ->
+        val methods = findMethods(psiClass, allowClinit = false)?.map { (classNode, fieldNode) ->
             fieldNode.findOrConstructSourceMethod(
                 classNode,
                 project,
