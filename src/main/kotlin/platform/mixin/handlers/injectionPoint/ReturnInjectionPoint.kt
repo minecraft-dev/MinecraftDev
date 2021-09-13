@@ -41,7 +41,7 @@ abstract class AbstractReturnInjectionPoint(private val tailOnly: Boolean) : Inj
         return MyNavigationVisitor(tailOnly)
     }
 
-    override fun createCollectVisitor(
+    override fun doCreateCollectVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
@@ -137,7 +137,13 @@ abstract class AbstractReturnInjectionPoint(private val tailOnly: Boolean) : Inj
                 return true
             }
             if (tailOnly) {
-                Iterable { insns.iterator() }.lastOrNull(::insnHandler)
+                var insn = insns.last
+                while (insn != null) {
+                    if (insnHandler(insn)) {
+                        break
+                    }
+                    insn = insn.previous
+                }
             } else {
                 insns.iterator().forEach(::insnHandler)
             }

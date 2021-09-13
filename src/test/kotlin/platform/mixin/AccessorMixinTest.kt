@@ -262,7 +262,7 @@ class AccessorMixinTest : BaseMixinTest() {
         
         @Mixin(MixinBase.class)
         public interface AccessorMixinTargetMixin {
-            <error descr="Cannot find field foo in target class MixinBase">@Accessor</error> String getFoo();
+            @<error descr="Cannot find field foo in target class">Accessor</error> String getFoo();
         }
         """
     ) {
@@ -283,7 +283,7 @@ class AccessorMixinTest : BaseMixinTest() {
         
         @Mixin(MixinBase.class)
         public interface AccessorMixinTargetMixin {
-            <error descr="Cannot find field foo in target class MixinBase">@Accessor("foo")</error> String bar();
+            @<error descr="Cannot find field foo in target class">Accessor</error>("foo") String bar();
         }
         """
     ) {
@@ -304,7 +304,7 @@ class AccessorMixinTest : BaseMixinTest() {
         
         @Mixin(MixinBase.class)
         public interface AccessorMixinTargetMixin {
-            <error descr="Cannot find method foo in target class MixinBase">@Invoker</error> String callFoo();
+            @<error descr="Cannot find method foo in target class">Invoker</error> String callFoo();
         }
         """
     ) {
@@ -325,7 +325,7 @@ class AccessorMixinTest : BaseMixinTest() {
         
         @Mixin(MixinBase.class)
         public interface AccessorMixinTargetMixin {
-            <error descr="Cannot find method foo in target class MixinBase">@Invoker("foo")</error> String bar();
+            @<error descr="Cannot find method foo in target class">Invoker</error>("foo") String bar();
         }
         """
     ) {
@@ -346,7 +346,7 @@ class AccessorMixinTest : BaseMixinTest() {
         
         @Mixin(MixinBase.class)
         public interface AccessorMixinTargetMixin {
-            <error descr="Cannot find method <init> in target class MixinBase">@Invoker("<init>")</error> String construct(String invalidArg);
+            @<error descr="Cannot find method <init> in target class">Invoker</error>("<init>") String construct(String invalidArg);
         }
         """
     ) {

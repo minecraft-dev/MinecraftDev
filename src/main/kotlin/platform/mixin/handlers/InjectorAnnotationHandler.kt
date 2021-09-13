@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.mixin.handlers
 
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.reference.DescSelectorParser
 import com.demonwav.mcdev.platform.mixin.reference.isMiscDynamicSelector
@@ -56,27 +57,26 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         }
     }
 
-    override fun isUnresolved(annotation: PsiAnnotation, targetClass: ClassNode): Boolean {
-        if (resolveTarget(annotation, targetClass).any { targetMember ->
-            val targetMethod = targetMember as? MethodTargetMember ?: return@any false
-            !isUnresolved(annotation, targetClass, targetMethod.classAndMethod.method)
-        }
-        ) {
-            return false
+    override fun isUnresolved(annotation: PsiAnnotation, targetClass: ClassNode): InsnResolutionInfo.Failure? {
+        // check for misc dynamic selectors in method
+        val methodAttr = annotation.findAttributeValue("method")
+        if (methodAttr?.computeStringArray()?.any { isMiscDynamicSelector(annotation.project, it) } == true) {
+            return null
         }
 
-        // check for misc dynamic selectors
-        val methodAttr = annotation.findAttributeValue("method") ?: return true
-        return !methodAttr.computeStringArray().any { isMiscDynamicSelector(annotation.project, it) }
+        return resolveTarget(annotation, targetClass).map { targetMember ->
+            val targetMethod = targetMember as? MethodTargetMember ?: return@map InsnResolutionInfo.Failure()
+            isUnresolved(annotation, targetClass, targetMethod.classAndMethod.method) ?: return@isUnresolved null
+        }.reduceOrNull(InsnResolutionInfo.Failure::combine) ?: InsnResolutionInfo.Failure()
     }
 
     protected open fun isUnresolved(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode
-    ): Boolean {
-        val at = annotation.findAttributeValue("at") as? PsiAnnotation ?: return true
-        return AtResolver(at, targetClass, targetMethod,).isUnresolved()
+    ): InsnResolutionInfo.Failure? {
+        val at = annotation.findAttributeValue("at") as? PsiAnnotation ?: return InsnResolutionInfo.Failure()
+        return AtResolver(at, targetClass, targetMethod).isUnresolved()
     }
 
     override fun resolveForNavigation(annotation: PsiAnnotation, targetClass: ClassNode): List<PsiElement> {
@@ -134,8 +134,8 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         return true
     }
 
-    override fun createUnresolvedMessage(annotation: PsiAnnotation, unresolvedTargetClasses: String): String? {
-        return "Cannot resolve any target instructions in target class $unresolvedTargetClasses"
+    override fun createUnresolvedMessage(annotation: PsiAnnotation): String? {
+        return "Cannot resolve any target instructions in target class"
     }
 
     data class InsnResult(val method: ClassAndMethodNode, val result: CollectVisitor.Result<*>)

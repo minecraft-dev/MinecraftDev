@@ -27,9 +27,9 @@ class OverwriteHandler : MixinMemberAnnotationHandler {
         return listOf(MethodTargetMember(targetClass, targetMethod))
     }
 
-    override fun createUnresolvedMessage(annotation: PsiAnnotation, unresolvedTargetClasses: String): String? {
+    override fun createUnresolvedMessage(annotation: PsiAnnotation): String? {
         val method = annotation.parentOfType<PsiMethod>() ?: return null
-        return "Unresolved method ${method.name} in target class $unresolvedTargetClasses"
+        return "Unresolved method ${method.name} in target class"
     }
 
     companion object {

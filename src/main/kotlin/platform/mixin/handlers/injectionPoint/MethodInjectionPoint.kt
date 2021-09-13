@@ -38,7 +38,7 @@ class MethodInjectionPoint : AbstractMethodInjectionPoint() {
         return target?.let { MyNavigationVisitor(targetClass, it) }
     }
 
-    override fun createCollectVisitor(
+    override fun doCreateCollectVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,

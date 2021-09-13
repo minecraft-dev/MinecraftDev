@@ -63,7 +63,7 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
         return getTarget(at, target)?.let { MyNavigationVisitor(it) }
     }
 
-    override fun createCollectVisitor(
+    override fun doCreateCollectVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,

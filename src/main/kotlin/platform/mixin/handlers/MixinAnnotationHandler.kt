@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers
 
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findContainingClass
@@ -29,14 +30,13 @@ interface MixinAnnotationHandler {
     }
     fun resolveTarget(annotation: PsiAnnotation, targetClass: ClassNode): List<MixinTargetMember>
 
-    fun getUnresolvedClasses(annotation: PsiAnnotation): List<String> {
-        val containingClass = annotation.findContainingClass() ?: return emptyList()
-        return containingClass.mixinTargets.mapNotNull { it.takeIf { isUnresolved(annotation, it) }?.name }
+    fun isUnresolved(annotation: PsiAnnotation): InsnResolutionInfo.Failure? {
+        val containingClass = annotation.findContainingClass() ?: return InsnResolutionInfo.Failure()
+        return containingClass.mixinTargets
+            .mapNotNull { isUnresolved(annotation, it) }
+            .reduceOrNull(InsnResolutionInfo.Failure::combine)
     }
-    fun isUnresolved(annotation: PsiAnnotation): Boolean {
-        return getUnresolvedClasses(annotation).isNotEmpty()
-    }
-    fun isUnresolved(annotation: PsiAnnotation, targetClass: ClassNode): Boolean
+    fun isUnresolved(annotation: PsiAnnotation, targetClass: ClassNode): InsnResolutionInfo.Failure?
 
     fun resolveForNavigation(annotation: PsiAnnotation): List<PsiElement> {
         val containingClass = annotation.findContainingClass() ?: return emptyList()
@@ -44,7 +44,7 @@ interface MixinAnnotationHandler {
     }
     fun resolveForNavigation(annotation: PsiAnnotation, targetClass: ClassNode): List<PsiElement>
 
-    fun createUnresolvedMessage(annotation: PsiAnnotation, unresolvedTargetClasses: String): String?
+    fun createUnresolvedMessage(annotation: PsiAnnotation): String?
 
     companion object {
         private val COLLECTOR =

@@ -53,7 +53,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         return target?.let { MyNavigationVisitor(targetClass, it, arrayAccess) }
     }
 
-    override fun createCollectVisitor(
+    override fun doCreateCollectVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
