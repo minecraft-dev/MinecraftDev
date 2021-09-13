@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.util
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.anonymousElements
+import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.childrenOfType
 import com.demonwav.mcdev.util.findField
 import com.demonwav.mcdev.util.findMethods
@@ -52,6 +53,8 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiModifier
+import com.intellij.psi.PsiParameter
+import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiType
 import com.intellij.psi.impl.compiled.ClsElementImpl
 import com.intellij.psi.search.GlobalSearchScope
@@ -296,6 +299,10 @@ private fun ClassNode.constructClass(project: Project, body: String): PsiClass? 
     return clazz
 }
 
+inline fun <T> ClassNode.cached(project: Project, vararg dependencies: Any, crossinline compute: () -> T): T {
+    return findStubClass(project)?.cached(*dependencies, compute = compute) ?: compute()
+}
+
 /**
  * Finds the stub `PsiClass` for this class node (or the source code element if this is from a source file in the
  * module)
@@ -417,6 +424,15 @@ fun FieldNode.getGenericType(
     }
     val elementFactory = JavaPsiFacade.getElementFactory(project)
     return Type.getType(this.desc).toPsiType(elementFactory)
+}
+
+inline fun <T> FieldNode.cached(
+    clazz: ClassNode,
+    project: Project,
+    vararg dependencies: Any,
+    crossinline compute: () -> T
+): T {
+    return findStubField(clazz, project)?.cached(*dependencies, compute = compute) ?: compute()
 }
 
 fun FieldNode.findStubField(clazz: ClassNode, project: Project): PsiField? {
@@ -630,8 +646,33 @@ private fun findAssociatedLambda(psiClass: PsiClass, clazz: ClassNode, lambdaMet
     }
 }
 
+inline fun <T> MethodNode.cached(
+    clazz: ClassNode,
+    project: Project,
+    vararg dependencies: Array<Any>,
+    crossinline compute: () -> T
+): T {
+    return findStubMethod(clazz, project)?.cached(*dependencies, compute = compute) ?: compute()
+}
+
 fun MethodNode.findStubMethod(clazz: ClassNode, project: Project): PsiMethod? {
     return clazz.findStubClass(project)?.findMethods(memberReference)?.firstOrNull()
+}
+
+private fun MethodNode.getOffset(clazz: ClassNode?): Int {
+    return if (this.isConstructor) {
+        when {
+            clazz?.hasAccess(Opcodes.ACC_ENUM) == true -> 2
+            clazz?.outerClass != null && !clazz.hasAccess(Opcodes.ACC_STATIC) -> 1
+            else -> 0
+        }
+    } else {
+        0
+    }
+}
+
+fun MethodNode.getParameter(clazz: ClassNode, index: Int, parameterList: PsiParameterList): PsiParameter? {
+    return parameterList.parameters.getOrNull(index - getOffset(clazz))
 }
 
 /**
@@ -735,15 +776,7 @@ fun MethodNode.findOrConstructSourceMethod(
         val sigToPsi = SignatureToPsi(elementFactory, psiMethod)
         SignatureReader(signature).accept(sigToPsi)
 
-        val offset = if (this.isConstructor) {
-            when {
-                clazz?.hasAccess(Opcodes.ACC_ENUM) == true -> 2
-                clazz?.outerClass != null && !clazz.hasAccess(Opcodes.ACC_STATIC) -> 1
-                else -> 0
-            }
-        } else {
-            0
-        }
+        val offset = this.getOffset(clazz)
 
         for ((index, parameterType) in sigToPsi.parameterTypes.withIndex()) {
             val parameter = psiMethod.parameterList.getParameter(index + offset) ?: continue

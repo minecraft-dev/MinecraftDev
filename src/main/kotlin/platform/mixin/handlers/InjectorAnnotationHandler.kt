@@ -12,23 +12,32 @@ package com.demonwav.mcdev.platform.mixin.handlers
 
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
+import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.reference.DescSelectorParser
 import com.demonwav.mcdev.platform.mixin.reference.isMiscDynamicSelector
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
+import com.demonwav.mcdev.platform.mixin.util.getGenericParameterTypes
+import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
+import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.toJavaIdentifier
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiEllipsisType
+import com.intellij.psi.PsiType
+import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
-open class InjectorAnnotationHandler : MixinAnnotationHandler {
+abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
     override fun resolveTarget(annotation: PsiAnnotation, targetClass: ClassNode): List<MixinTargetMember> {
         val targetClassMethods = targetClass.methods ?: return emptyList()
 
@@ -110,6 +119,17 @@ open class InjectorAnnotationHandler : MixinAnnotationHandler {
         return AtResolver(at, targetClass, targetMethod).resolveInstructions()
     }
 
+    /**
+     * Returns a list of valid method signatures for the injector.
+     * May return an empty list for no valid signatures, or null for all signatures being valid.
+     * Null is usually returned when an error is detected, which is better handled by another inspection.
+     */
+    abstract fun expectedMethodSignature(
+        annotation: PsiAnnotation,
+        targetClass: ClassNode,
+        targetMethod: MethodNode
+    ): List<MethodSignature>?
+
     open fun isInsnAllowed(insn: AbstractInsnNode): Boolean {
         return true
     }
@@ -119,4 +139,36 @@ open class InjectorAnnotationHandler : MixinAnnotationHandler {
     }
 
     data class InsnResult(val method: ClassAndMethodNode, val result: CollectVisitor.Result<*>)
+
+    companion object {
+        @JvmStatic
+        protected fun collectTargetMethodParameters(
+            project: Project,
+            clazz: ClassNode,
+            targetMethod: MethodNode
+        ): List<Parameter> {
+            val numLocalsToDrop = if (targetMethod.hasAccess(Opcodes.ACC_STATIC)) 0 else 1
+            return targetMethod.getGenericParameterTypes(clazz, project).asSequence().withIndex()
+                .map { (index, type) ->
+                    val name = targetMethod.localVariables
+                        ?.getOrNull(index + numLocalsToDrop)
+                        ?.name
+                        ?.toJavaIdentifier()
+                        ?: "par${index + 1}"
+                    type to name
+                }
+                .map { (type, name) -> sanitizedParameter(type, name) }
+                .toList()
+        }
+
+        @JvmStatic
+        protected fun sanitizedParameter(type: PsiType, name: String?): Parameter {
+            // Parameters should not use ellipsis because others like CallbackInfo may follow
+            return if (type is PsiEllipsisType) {
+                Parameter(name, type.toArrayType())
+            } else {
+                Parameter(name, type)
+            }
+        }
+    }
 }
