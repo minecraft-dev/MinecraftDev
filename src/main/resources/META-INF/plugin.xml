@@ -8,7 +8,7 @@
     MIT License
 -->
 
-<idea-plugin>
+<idea-plugin require-restart="true">
 
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.idea.maven</depends>
