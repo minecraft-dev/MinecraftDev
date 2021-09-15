@@ -23,7 +23,7 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
 class HeadInjectionPoint : InjectionPoint<PsiElement>() {
-    override fun createCollectVisitor(
+    override fun doCreateCollectVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,

@@ -14,15 +14,13 @@ import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
-import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiType
-import com.intellij.psi.PsiVariable
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
@@ -34,24 +32,25 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
         target: MixinSelector?,
         targetClass: PsiClass
     ): NavigationVisitor? {
-        return target?.let { MyNavigationVisitor(targetClass, it) }
+        return target?.let { MyNavigationVisitor(targetClass, it, AtResolver.getArgs(at)["ldc"]) }
     }
 
-    override fun createCollectVisitor(
+    override fun doCreateCollectVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
         mode: CollectVisitor.Mode
     ): CollectVisitor<PsiMethod>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
-            return MyCollectVisitor(mode, at.project, MemberReference(""))
+            return MyCollectVisitor(mode, at.project, MemberReference(""), null)
         }
-        return target?.let { MyCollectVisitor(mode, at.project, it) }
+        return target?.let { MyCollectVisitor(mode, at.project, it, AtResolver.getArgs(at)["ldc"]) }
     }
 
     private class MyNavigationVisitor(
         private val targetClass: PsiClass,
-        private val selector: MixinSelector
+        private val selector: MixinSelector,
+        private val ldc: String?
     ) : NavigationVisitor() {
         private fun isConstantStringMethodCall(expression: PsiMethodCallExpression): Boolean {
             // Must return void
@@ -71,12 +70,9 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
                 return false
             }
 
-            // Expression must be constant, so either a literal or a constant field reference
-            return when (val expr = arguments.expressions[0]) {
-                is PsiLiteral -> true
-                is PsiReference -> (expr.resolve() as? PsiVariable)?.computeConstantValue() != null
-                else -> false
-            }
+            // Expression must be constant
+            val constantValue = arguments.expressions[0].constantStringValue ?: return false
+            return ldc == null || ldc == constantValue
         }
 
         override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
@@ -99,22 +95,26 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
     private class MyCollectVisitor(
         mode: Mode,
         private val project: Project,
-        private val selector: MixinSelector
+        private val selector: MixinSelector,
+        private val ldc: String?
     ) : CollectVisitor<PsiMethod>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return
-            var seenStringConstant = false
+            var seenStringConstant: String? = null
             insns.iterator().forEachRemaining { insn ->
                 if (insn is MethodInsnNode) {
                     // make sure we're coming from a string constant
-                    if (seenStringConstant) {
-                        processMethodInsn(insn)
+                    if (seenStringConstant != null) {
+                        if (ldc == null || ldc == seenStringConstant) {
+                            processMethodInsn(insn)
+                        }
                     }
                 }
-                if ((insn as? LdcInsnNode)?.cst is String) {
-                    seenStringConstant = true
+                val cst = (insn as? LdcInsnNode)?.cst
+                if (cst is String) {
+                    seenStringConstant = cst
                 } else if (insn.opcode != -1) {
-                    seenStringConstant = false
+                    seenStringConstant = null
                 }
             }
         }

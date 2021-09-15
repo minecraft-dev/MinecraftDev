@@ -57,10 +57,10 @@ class AccessorHandler : MixinMemberAnnotationHandler {
         return listOf(FieldTargetMember(targetClass, field))
     }
 
-    override fun createUnresolvedMessage(annotation: PsiAnnotation, unresolvedTargetClasses: String): String? {
+    override fun createUnresolvedMessage(annotation: PsiAnnotation): String? {
         val method = annotation.parentOfType<PsiMethod>() ?: return null
         val accessorInfo = getAccessorInfo(annotation, method) ?: return "Invalid accessor name ${method.name}"
-        return "Cannot find field ${accessorInfo.name} in target class $unresolvedTargetClasses"
+        return "Cannot find field ${accessorInfo.name} in target class"
     }
 
     private fun getAccessorInfo(accessor: PsiAnnotation, member: PsiMember): AccessorInfo? {

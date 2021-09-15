@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers
 
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
@@ -53,18 +54,21 @@ class ShadowHandler : MixinMemberAnnotationHandler {
         }
     }
 
-    override fun isUnresolved(annotation: PsiAnnotation, targetClass: ClassNode): Boolean {
-        return !hasAliases(annotation) && super.isUnresolved(annotation, targetClass)
+    override fun isUnresolved(annotation: PsiAnnotation, targetClass: ClassNode): InsnResolutionInfo.Failure? {
+        if (hasAliases(annotation)) {
+            return null
+        }
+        return super.isUnresolved(annotation, targetClass)
     }
 
-    override fun createUnresolvedMessage(annotation: PsiAnnotation, unresolvedTargetClasses: String): String? {
+    override fun createUnresolvedMessage(annotation: PsiAnnotation): String? {
         val member = annotation.parentOfType<PsiMember>() ?: return null
         val type = when (member) {
             is PsiMethod -> "method"
             is PsiField -> "field"
             else -> return null
         }
-        return "Unresolved $type ${member.name} in target class $unresolvedTargetClasses"
+        return "Unresolved $type ${member.name} in target class"
     }
 
     fun findFirstShadowTargetForNavigation(member: PsiMember): SmartPsiElementPointer<PsiElement>? {

@@ -52,7 +52,7 @@ class ShadowTargetInspectionTest : BaseMixinTest() {
                     @Shadow public String wrongAccessor;
                     @Shadow protected String noFinal;
 
-                    <error descr="Unresolved field nonExistent in target class MixinBase">@Shadow</error> public String nonExistent;
+                    @<error descr="Unresolved field nonExistent in target class">Shadow</error> public String nonExistent;
 
                     @Shadow protected String twoIssues;
                 }

@@ -58,7 +58,7 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
                 MixinAnnotationHandler.forMixinAnnotation(qName)?.let { it to annotation }
             }
         } ?: return null
-        if (handler.isUnresolved(annotation)) {
+        if (handler.isUnresolved(annotation) != null) {
             return null
         }
         val simpleName = annotation.qualifiedName?.substringAfterLast('.') ?: return null

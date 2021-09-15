@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 import com.demonwav.mcdev.platform.mixin.reference.isMiscDynamicSelector
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SLICE
 import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.constantStringValue
@@ -58,7 +59,16 @@ class AtResolver(
 ) {
     companion object {
         private fun getInjectionPoint(at: PsiAnnotation): InjectionPoint<*>? {
-            val atCode = at.findDeclaredAttributeValue("value")?.constantStringValue ?: return null
+            var atCode = at.findDeclaredAttributeValue("value")?.constantStringValue ?: return null
+
+            // remove slice selector
+            val isInSlice = at.parentOfType<PsiAnnotation>()?.hasQualifiedName(SLICE) ?: false
+            if (isInSlice) {
+                if (SliceSelector.values().any { atCode.endsWith(":${it.name}") }) {
+                    atCode = atCode.substringBeforeLast(':')
+                }
+            }
+
             return InjectionPoint.byAtCode(atCode)
         }
 
@@ -82,9 +92,9 @@ class AtResolver(
         }
     }
 
-    fun isUnresolved(): Boolean {
+    fun isUnresolved(): InsnResolutionInfo.Failure? {
         val injectionPoint = getInjectionPoint(at)
-            ?: return false // we don't know what to do with custom handlers, assume ok
+            ?: return null // we don't know what to do with custom handlers, assume ok
 
         val targetAttr = at.findAttributeValue("target")
         val target = targetAttr?.let { parseMixinSelector(it) }
@@ -96,22 +106,39 @@ class AtResolver(
         )
         if (collectVisitor == null) {
             // syntax error in target
-            val stringValue = targetAttr?.constantStringValue ?: return true
-            return !isMiscDynamicSelector(at.project, stringValue)
+            val stringValue = targetAttr?.constantStringValue ?: return InsnResolutionInfo.Failure()
+            return if (isMiscDynamicSelector(at.project, stringValue)) {
+                null
+            } else {
+                InsnResolutionInfo.Failure()
+            }
         }
         collectVisitor.visit(targetMethod)
-        return collectVisitor.result.isEmpty()
+        return if (collectVisitor.result.isEmpty()) {
+            InsnResolutionInfo.Failure(collectVisitor.filterToBlame)
+        } else {
+            null
+        }
     }
 
     fun resolveInstructions(): List<CollectVisitor.Result<*>> {
-        val injectionPoint = getInjectionPoint(at) ?: return emptyList()
+        return (getInstructionResolutionInfo() as? InsnResolutionInfo.Success)?.results ?: emptyList()
+    }
+
+    fun getInstructionResolutionInfo(): InsnResolutionInfo {
+        val injectionPoint = getInjectionPoint(at) ?: return InsnResolutionInfo.Failure()
         val targetAttr = at.findAttributeValue("target")
         val target = targetAttr?.let { parseMixinSelector(it) }
 
         val collectVisitor = injectionPoint.createCollectVisitor(at, target, targetClass, CollectVisitor.Mode.MATCH_ALL)
-            ?: return emptyList()
+            ?: return InsnResolutionInfo.Failure()
         collectVisitor.visit(targetMethod)
-        return collectVisitor.result
+        val result = collectVisitor.result
+        return if (result.isEmpty()) {
+            InsnResolutionInfo.Failure(collectVisitor.filterToBlame)
+        } else {
+            InsnResolutionInfo.Success(result)
+        }
     }
 
     fun resolveNavigationTargets(): List<PsiElement> {
@@ -155,6 +182,23 @@ class AtResolver(
         }
         return doCollectVariants(injectionPoint)
     }
+}
+
+sealed class InsnResolutionInfo {
+    class Success(val results: List<CollectVisitor.Result<*>>) : InsnResolutionInfo()
+    class Failure(val filterToBlame: String? = null) : InsnResolutionInfo() {
+        infix fun combine(other: Failure): Failure {
+            return if (filterToBlame != null) {
+                this
+            } else {
+                other
+            }
+        }
+    }
+}
+
+enum class SliceSelector {
+    FIRST, LAST, ONE
 }
 
 object QualifiedMember {

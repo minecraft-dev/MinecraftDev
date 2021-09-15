@@ -56,10 +56,10 @@ class InvokerHandler : MixinMemberAnnotationHandler {
         return listOf(MethodTargetMember(targetClass, method))
     }
 
-    override fun createUnresolvedMessage(annotation: PsiAnnotation, unresolvedTargetClasses: String): String? {
+    override fun createUnresolvedMessage(annotation: PsiAnnotation): String? {
         val method = annotation.parentOfType<PsiMethod>() ?: return null
         val targetName = getInvokerTargetName(annotation, method) ?: return "Invalid invoker name ${method.name}"
-        return "Cannot find method $targetName in target class $unresolvedTargetClasses"
+        return "Cannot find method $targetName in target class"
     }
 
     private fun getInvokerTargetName(invoker: PsiAnnotation, member: PsiMember): String? {

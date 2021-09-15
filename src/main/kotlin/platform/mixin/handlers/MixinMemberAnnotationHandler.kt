@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers
 
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.findSourceElement
@@ -19,8 +20,12 @@ import com.intellij.psi.PsiElement
 import org.objectweb.asm.tree.ClassNode
 
 interface MixinMemberAnnotationHandler : MixinAnnotationHandler {
-    override fun isUnresolved(annotation: PsiAnnotation, targetClass: ClassNode): Boolean {
-        return resolveTarget(annotation, targetClass).isEmpty()
+    override fun isUnresolved(annotation: PsiAnnotation, targetClass: ClassNode): InsnResolutionInfo.Failure? {
+        return if (resolveTarget(annotation, targetClass).isEmpty()) {
+            InsnResolutionInfo.Failure()
+        } else {
+            null
+        }
     }
 
     override fun resolveForNavigation(annotation: PsiAnnotation, targetClass: ClassNode): List<PsiElement> {
