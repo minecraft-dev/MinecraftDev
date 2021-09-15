@@ -33,6 +33,33 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
     }
 
     @Test
+    @DisplayName("Redirect in constructor before superconstructor call")
+    fun redirectInConstructorBeforeSuperconstructorCall() {
+        doTest(
+            """
+            package test;
+            
+            import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureInspection.MixedInOuter;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Redirect;
+            
+            @Mixin(MixedInOuter.class)
+            public class TestMixin {
+                @Redirect(method = "<init>()V", at = @At(value = "INVOKE", target = "Lcom/demonwav/mcdev/mixintestdata/invalidInjectorMethodSignatureInspection/MixedInOuter;method1()Ljava/lang/String;"))
+                private String <error descr="Method must be static">redirectMethod1</error>() {
+                    return null;
+                }
+                
+                @Redirect(method = "<init>()V", at = @At(value = "INVOKE", target = "Lcom/demonwav/mcdev/mixintestdata/invalidInjectorMethodSignatureInspection/MixedInOuter;method2()V"))
+                private void redirectMethod2() {
+                }
+            }
+            """
+        )
+    }
+
+    @Test
     @DisplayName("Inner Ctor @Inject Parameters")
     fun innerCtorInjectParameters() {
         doTest(

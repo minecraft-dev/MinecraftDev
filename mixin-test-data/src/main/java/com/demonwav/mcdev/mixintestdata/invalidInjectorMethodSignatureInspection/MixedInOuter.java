@@ -13,6 +13,21 @@ package com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureInspectio
 import java.lang.String;
 
 public class MixedInOuter {
+    public MixedInOuter() {
+        this(method1());
+        method2();
+    }
+
+    public MixedInOuter(String arg) {
+    }
+
+    private static String method1() {
+        return null;
+    }
+
+    private static void method2() {
+    }
+
     public class MixedInInner {
         public MixedInInner() {
         }
