@@ -12,8 +12,10 @@ package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.SHIFT
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
+import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.getQualifiedMemberReference
@@ -24,16 +26,21 @@ import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.extensions.RequiredElement
 import com.intellij.openapi.util.KeyedExtensionCollector
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.JavaRecursiveElementVisitor
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiEnumConstant
+import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLambdaExpression
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
+import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiSubstitutor
+import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.parentOfType
 import com.intellij.serviceContainer.BaseKeyedLazyInstance
 import com.intellij.util.KeyedLazyInstance
@@ -84,16 +91,26 @@ abstract class InjectionPoint<T : PsiElement> {
     }
 
     protected fun addStandardFilters(at: PsiAnnotation, targetClass: ClassNode, collectVisitor: CollectVisitor<T>) {
-        addOpcodeFilter(at, collectVisitor)
+        addShiftSupport(at, collectVisitor)
         addSliceFilter(at, targetClass, collectVisitor)
         // make sure the ordinal filter is last, so that the ordinal only increments once the other filters have passed
         addOrdinalFilter(at, collectVisitor)
     }
 
-    private fun addOpcodeFilter(at: PsiAnnotation, collectVisitor: CollectVisitor<T>) {
-        val opcode = at.findDeclaredAttributeValue("opcode")?.constantValue as? Int ?: return
-        collectVisitor.addResultFilter("opcode") { result, _ ->
-            result.insn.opcode == opcode
+    private fun addShiftSupport(at: PsiAnnotation, collectVisitor: CollectVisitor<T>) {
+        val shiftAttr = at.findDeclaredAttributeValue("shift") as? PsiExpression ?: return
+        val shiftReference = PsiUtil.skipParenthesizedExprDown(shiftAttr) as? PsiReferenceExpression ?: return
+        val shift = shiftReference.resolve() as? PsiEnumConstant ?: return
+        val containingClass = shift.containingClass ?: return
+        val shiftClass = JavaPsiFacade.getInstance(at.project).findClass(SHIFT, at.resolveScope) ?: return
+        if (!(containingClass equivalentTo shiftClass)) return
+        when (shift.name) {
+            "BEFORE" -> collectVisitor.shiftBy = -1
+            "AFTER" -> collectVisitor.shiftBy = 1
+            "BY" -> {
+                val by = at.findDeclaredAttributeValue("by")?.constantValue as? Int ?: return
+                collectVisitor.shiftBy = by
+            }
         }
     }
 
@@ -328,9 +345,33 @@ abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
     private val resultFilters = mutableListOf<Pair<String, CollectResultFilter<T>>>()
     var filterToBlame: String? = null
     internal var ordinal = 0
+    internal var shiftBy = 0
 
-    protected fun addResult(insn: AbstractInsnNode, element: T, qualifier: String? = null) {
-        val result = Result(nextIndex++, insn, element, qualifier)
+    protected fun addResult(
+        insn: AbstractInsnNode,
+        element: T,
+        qualifier: String? = null
+    ) {
+        // apply shift.
+        // being able to break out of the shift loops is important to prevent IDE freezes in case of large shift bys.
+        var shiftedInsn: AbstractInsnNode? = insn
+        if (shiftBy < 0) {
+            for (i in shiftBy until 0) {
+                shiftedInsn = shiftedInsn!!.previous
+                if (shiftedInsn == null) {
+                    break
+                }
+            }
+        } else if (shiftBy > 0) {
+            for (i in 0 until shiftBy) {
+                shiftedInsn = shiftedInsn!!.next
+                if (shiftedInsn == null) {
+                    break
+                }
+            }
+        }
+
+        val result = Result(nextIndex++, shiftedInsn ?: return, element, qualifier)
         var isFiltered = false
         for ((name, filter) in resultFilters) {
             if (!filter(result, method)) {

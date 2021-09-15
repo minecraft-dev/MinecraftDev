@@ -15,6 +15,7 @@ import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceField
 import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -24,6 +25,7 @@ import com.intellij.psi.PsiArrayAccessExpression
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethodReferenceExpression
+import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.util.PsiUtil
 import org.objectweb.asm.Opcodes
@@ -34,6 +36,10 @@ import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.MethodNode
 
 class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
+    companion object {
+        private val VALID_OPCODES = setOf(Opcodes.GETFIELD, Opcodes.GETSTATIC, Opcodes.PUTFIELD, Opcodes.PUTSTATIC)
+    }
+
     private fun getArrayAccessType(args: Map<String, String>): ArrayAccessType? {
         return when (args["array"]) {
             "length" -> ArrayAccessType.LENGTH
@@ -48,9 +54,11 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         target: MixinSelector?,
         targetClass: PsiClass
     ): NavigationVisitor? {
+        val opcode = (at.findDeclaredAttributeValue("opcode")?.constantValue as? Int)
+            ?.takeIf { it in VALID_OPCODES } ?: -1
         val args = AtResolver.getArgs(at)
         val arrayAccess = getArrayAccessType(args)
-        return target?.let { MyNavigationVisitor(targetClass, it, arrayAccess) }
+        return target?.let { MyNavigationVisitor(targetClass, it, opcode, arrayAccess) }
     }
 
     override fun doCreateCollectVisitor(
@@ -60,12 +68,14 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         mode: CollectVisitor.Mode
     ): CollectVisitor<PsiField>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
-            return MyCollectVisitor(mode, at.project, MemberReference(""), null, 8)
+            return MyCollectVisitor(mode, at.project, MemberReference(""), -1, null, 8)
         }
+        val opcode = (at.findDeclaredAttributeValue("opcode")?.constantValue as? Int)
+            ?.takeIf { it in VALID_OPCODES } ?: -1
         val args = AtResolver.getArgs(at)
         val arrayAccess = getArrayAccessType(args)
         val fuzz = args["fuzz"]?.toIntOrNull()?.coerceIn(1, 32) ?: 8
-        return target?.let { MyCollectVisitor(mode, at.project, it, arrayAccess, fuzz) }
+        return target?.let { MyCollectVisitor(mode, at.project, it, opcode, arrayAccess, fuzz) }
     }
 
     override fun createLookup(targetClass: ClassNode, m: PsiField, owner: String): LookupElementBuilder {
@@ -82,6 +92,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
     private class MyNavigationVisitor(
         private val targetClass: PsiClass,
         private val selector: MixinSelector,
+        private val opcode: Int,
         private val arrayAccess: ArrayAccessType?
     ) : NavigationVisitor() {
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
@@ -90,10 +101,24 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
                 val name = expression.referenceName
                 if (name == null || selector.canEverMatch(name)) {
                     (expression.resolve() as? PsiField)?.let { resolved ->
-                        val matches = selector.matchField(
+                        var matches = selector.matchField(
                             resolved,
                             QualifiedMember.resolveQualifier(expression) ?: targetClass
                         )
+                        if (matches && opcode != -1) {
+                            // check if we match the opcode
+                            val isStatic = opcode == Opcodes.GETSTATIC || opcode == Opcodes.PUTSTATIC
+                            if (isStatic != resolved.hasModifierProperty(PsiModifier.STATIC)) {
+                                matches = false
+                            } else {
+                                val isWrite = opcode == Opcodes.PUTFIELD || opcode == Opcodes.PUTSTATIC
+                                if (isWrite && !PsiUtil.isAccessedForWriting(expression)) {
+                                    matches = false
+                                } else if (!isWrite && !PsiUtil.isAccessedForReading(expression)) {
+                                    matches = false
+                                }
+                            }
+                        }
                         if (matches) {
                             // figure out where the array access is.
                             // ignore fuzz, I don't even want to think about that in source code
@@ -130,6 +155,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         mode: Mode,
         private val project: Project,
         private val selector: MixinSelector,
+        private val opcode: Int,
         private val arrayAccess: ArrayAccessType?,
         private val fuzz: Int
     ) : CollectVisitor<PsiField>(mode) {
@@ -138,6 +164,9 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
             insns.iterator().forEachRemaining { insn ->
                 if (insn !is FieldInsnNode) return@forEachRemaining
                 if (mode != Mode.COMPLETION) {
+                    if (opcode != -1 && opcode != insn.opcode) {
+                        return@forEachRemaining
+                    }
                     if (!selector.matchField(insn.owner, insn.name, insn.desc)) {
                         return@forEachRemaining
                     }
