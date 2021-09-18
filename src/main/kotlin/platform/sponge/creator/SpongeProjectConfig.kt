@@ -74,7 +74,7 @@ class SpongeProjectConfig : ProjectConfig(), MavenCreator, GradleCreator {
     override val compatibleGradleVersions: VersionRange
         get() = when {
             apiVersion >= SpongeConstants.API8 -> SemanticVersion.release(7, 2) until null
-            else -> SemanticVersion.release(6) until SemanticVersion.release(7)
+            else -> SemanticVersion.release(6, 0) until SemanticVersion.release(7)
         }
 
     override fun buildGradleCreator(
