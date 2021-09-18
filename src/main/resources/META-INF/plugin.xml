@@ -805,7 +805,7 @@
         <!--endregion-->
         <!--endregion-->
 
-        <registryKey defaultValue="true" description="Enable the Minecraft Wizard finalizer step." key="mcdev.wizard.finalizer"/>
+        <registryKey defaultValue="false" description="Enable the Minecraft Wizard finalizer step." key="mcdev.wizard.finalizer"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
