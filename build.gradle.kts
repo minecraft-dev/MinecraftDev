@@ -91,6 +91,7 @@ dependencies {
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
     gradleToolingExtension(libs.gradleToolingExtension)
     gradleToolingExtension(libs.annotations)
+    gradleToolingExtension(libs.groovy)
 
     testImplementation(libs.junit.api)
     testRuntimeOnly(libs.junit.entine)
@@ -131,7 +132,7 @@ tasks.publishPlugin {
 }
 
 tasks.runPluginVerifier {
-    ideVersions.addAll("IC-2021.2")
+    ideVersions.addAll("IC-2021.3")
 }
 
 java {
