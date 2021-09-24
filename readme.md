@@ -22,7 +22,11 @@ Minecraft Development for IntelliJ
     </tr>
     <tr>
         <td align="left">2021.2</td>
-        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20212"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20212)/statusIcon.svg" alt="2021.2 EAP Nightly Status" /></a></td>
+        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20212"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20212)/statusIcon.svg" alt="2021.2 Nightly Status" /></a></td>
+    </tr>
+    <tr>
+        <td align="left">2021.3</td>
+        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20213"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20213)/statusIcon.svg" alt="2021.3 EAP Nightly Status" /></a></td>
     </tr>
     <tr>
         <td align="right"><b>OS Tests</b></td>
