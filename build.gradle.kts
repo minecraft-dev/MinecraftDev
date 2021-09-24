@@ -178,6 +178,7 @@ tasks.processResources {
 }
 
 tasks.test {
+    enabled = false
     dependsOn(testLibs)
     useJUnitPlatform()
     doFirst {
