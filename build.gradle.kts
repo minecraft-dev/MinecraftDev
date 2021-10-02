@@ -60,7 +60,11 @@ repositories {
     mavenCentral()
     maven("https://repo.denwav.dev/repository/maven-public/")
     maven("https://repo.spongepowered.org/maven")
-    maven("https://www.jetbrains.com/intellij-repository/releases")
+    if (!ideaVersion.endsWith("SNAPSHOT")) {
+        maven("https://www.jetbrains.com/intellij-repository/releases")
+    } else {
+        maven("https://www.jetbrains.com/intellij-repository/snapshots")
+    }
     maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
     maven("https://repo.gradle.org/gradle/libs-releases-local/")
     maven("https://maven.extracraftx.com")
