@@ -11,14 +11,17 @@
 package com.demonwav.mcdev.platform.mixin.insight
 
 import com.demonwav.mcdev.asset.MixinAssets
-import com.demonwav.mcdev.platform.mixin.util.findAccessorTarget
-import com.demonwav.mcdev.platform.mixin.util.findFirstOverwriteTarget
-import com.demonwav.mcdev.platform.mixin.util.findFirstShadowTarget
-import com.demonwav.mcdev.platform.mixin.util.findInvokerTarget
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.util.isMixin
+import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
+import com.intellij.codeInsight.hint.HintManager
+import com.intellij.codeInsight.navigation.NavigationUtil
 import com.intellij.openapi.editor.markup.GutterIconRenderer
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiIdentifier
@@ -26,6 +29,7 @@ import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.util.createSmartPointer
+import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.PsiNavigateUtil
 import java.awt.event.MouseEvent
 
@@ -38,6 +42,10 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
         if (element !is PsiMember) {
             return null
         }
+        val containingClass = element.containingClass ?: return null
+        if (!containingClass.isMixin) {
+            return null
+        }
 
         val identifier = when (element) {
             is PsiMethod -> element.nameIdentifier
@@ -45,45 +53,62 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
             else -> null
         } ?: return null
 
-        // Check if this is a Mixin target element
-        // TODO add more target types, @Inject, etc
-        val targetInfo = element.findShadow()
-            ?: (element as? PsiMethod)?.findOverwrite()
-            ?: element.findInvoker()
-            ?: element.findAccessor()
-            ?: return null
+        val (handler, annotation) = element.annotations.mapFirstNotNull { annotation ->
+            annotation.qualifiedName?.let { qName ->
+                MixinAnnotationHandler.forMixinAnnotation(qName)?.let { it to annotation }
+            }
+        } ?: return null
+        if (handler.isUnresolved(annotation) != null) {
+            return null
+        }
+        val simpleName = annotation.qualifiedName?.substringAfterLast('.') ?: return null
 
         return LineMarkerInfo(
             identifier,
             identifier.textRange,
             icon,
-            { "Go to the ${targetInfo.text} target" },
-            AccessorGutterIconNavigationHandler(identifier.createSmartPointer(), targetInfo.target),
+            { "Go to the $simpleName target" },
+            MixinGutterIconNavigationHandler(identifier.createSmartPointer(), annotation.createSmartPointer(), handler),
             GutterIconRenderer.Alignment.LEFT,
-            { "mixin ${targetInfo.text} target indicator" }
+            { "mixin $simpleName target indicator" }
         )
     }
 
-    private class TargetInfo(val target: SmartPsiElementPointer<out PsiMember>, val text: String)
-
-    private fun PsiMember.findShadow(): TargetInfo? = this.findFirstShadowTarget()?.let { TargetInfo(it, "shadow") }
-    private fun PsiMember.findAccessor(): TargetInfo? = this.findAccessorTarget()?.let { TargetInfo(it, "accessor") }
-    private fun PsiMember.findInvoker(): TargetInfo? = this.findInvokerTarget()?.let { TargetInfo(it, "invoker") }
-    private fun PsiMethod.findOverwrite(): TargetInfo? =
-        this.findFirstOverwriteTarget()?.let { TargetInfo(it, "@Overwrite") }
-
-    private class AccessorGutterIconNavigationHandler(
+    private class MixinGutterIconNavigationHandler(
         private val identifierPointer: SmartPsiElementPointer<PsiIdentifier>,
-        private val targetPointer: SmartPsiElementPointer<out PsiMember>
+        private val annotationPointer: SmartPsiElementPointer<PsiAnnotation>,
+        private val handler: MixinAnnotationHandler
     ) : GutterIconNavigationHandler<PsiIdentifier> {
         override fun navigate(e: MouseEvent, elt: PsiIdentifier) {
             val element = identifierPointer.element ?: return
             if (element != elt) {
                 return
             }
-
-            val target = targetPointer.element ?: return
-            PsiNavigateUtil.navigate(target)
+            val annotation = annotationPointer.element ?: return
+            val targets = handler.resolveForNavigation(annotation)
+            val editor = FileEditorManager.getInstance(elt.project).selectedTextEditor
+            when (targets.size) {
+                0 -> {
+                    if (editor != null) {
+                        HintManager.getInstance().showErrorHint(
+                            editor,
+                            "Cannot find corresponding element in source code"
+                        )
+                    }
+                }
+                1 -> {
+                    PsiNavigateUtil.navigate(targets[0])
+                }
+                else -> {
+                    if (editor != null) {
+                        NavigationUtil.getPsiElementPopup(targets.toTypedArray(), "Choose Target")
+                            .showInBestPositionFor(editor)
+                    } else {
+                        NavigationUtil.getPsiElementPopup(targets.toTypedArray(), "Choose Target")
+                            .show(RelativePoint(e))
+                    }
+                }
+            }
         }
     }
 }

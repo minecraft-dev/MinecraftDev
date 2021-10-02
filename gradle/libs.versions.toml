@@ -20,7 +20,7 @@ groovy = "org.codehaus.groovy:groovy-all:2.5.14"
 
 # Testing
 test-mockJdk = "org.jetbrains.idea:mock-jdk:1.7-4d76c50"
-test-mixin = "org.spongepowered:mixin:0.7-SNAPSHOT"
+test-mixin = "org.spongepowered:mixin:0.8-SNAPSHOT"
 test-spongeapi = "org.spongepowered:spongeapi:7.0.0"
 test-nbt = "com.demonwav.mcdev:all-types-nbt:1.0"
 

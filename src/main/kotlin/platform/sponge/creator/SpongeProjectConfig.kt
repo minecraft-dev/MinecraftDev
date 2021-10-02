@@ -19,6 +19,7 @@ import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenCreator
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
+import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.VersionRange
 import com.demonwav.mcdev.util.until
@@ -47,6 +48,8 @@ class SpongeProjectConfig : ProjectConfig(), MavenCreator, GradleCreator {
         dependencies.addAll(commaSplit(string))
     }
 
+    var license = License.ALL_RIGHTS_RESERVED
+
     override val preferredBuildSystem = BuildSystemType.GRADLE
 
     override val javaVersion: JavaVersion
@@ -70,8 +73,8 @@ class SpongeProjectConfig : ProjectConfig(), MavenCreator, GradleCreator {
 
     override val compatibleGradleVersions: VersionRange
         get() = when {
-            apiVersion >= SpongeConstants.API9 -> SemanticVersion.release(7) until null
-            else -> SemanticVersion.release(6) until SemanticVersion.release(7)
+            apiVersion >= SpongeConstants.API8 -> SemanticVersion.release(7, 2) until null
+            else -> SemanticVersion.release(6, 0) until SemanticVersion.release(7)
         }
 
     override fun buildGradleCreator(
@@ -88,9 +91,6 @@ class SpongeProjectConfig : ProjectConfig(), MavenCreator, GradleCreator {
     }
 
     override fun configureRootGradle(rootDirectory: Path, buildSystem: GradleBuildSystem) {
-        val apiVersion = SemanticVersion.parse(spongeApiVersion)
-        if (apiVersion >= SpongeConstants.API8) {
-            buildSystem.gradleVersion = SemanticVersion.release(7, 0, 2)
-        }
+        buildSystem.gradleVersion = compatibleGradleVersions.lower
     }
 }

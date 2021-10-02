@@ -21,10 +21,15 @@ import com.intellij.psi.PsiModifierListOwner
 
 fun PsiMember.isInSpongePluginClass(): Boolean = this.containingClass?.isSpongePluginClass() == true
 
-fun PsiClass.isSpongePluginClass(): Boolean = this.hasAnnotation(SpongeConstants.PLUGIN_ANNOTATION)
+fun PsiClass.isSpongePluginClass(): Boolean = this.hasAnnotation(SpongeConstants.PLUGIN_ANNOTATION) ||
+    this.hasAnnotation(SpongeConstants.JVM_PLUGIN_ANNOTATION)
 
-fun PsiElement.spongePluginClassId(): String? = this.findContainingClass()
-    ?.getAnnotation(SpongeConstants.PLUGIN_ANNOTATION)?.findAttributeValue("id")?.constantStringValue
+fun PsiElement.spongePluginClassId(): String? {
+    val clazz = this.findContainingClass() ?: return null
+    val annotation = clazz.getAnnotation(SpongeConstants.PLUGIN_ANNOTATION)
+        ?: clazz.getAnnotation(SpongeConstants.JVM_PLUGIN_ANNOTATION)
+    return annotation?.findAttributeValue("id")?.constantStringValue
+}
 
 fun isInjected(element: PsiModifierListOwner, optionalSensitive: Boolean): Boolean {
     val annotation = element.getAnnotation(SpongeConstants.INJECT_ANNOTATION) ?: return false

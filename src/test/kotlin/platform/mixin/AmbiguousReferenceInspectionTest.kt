@@ -24,32 +24,12 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
     private fun doTest(@Language("JAVA") code: String) {
         buildProject {
             dir("test") {
-                java(
-                    "MixedIn.java",
-                    """
-                    package test;
-
-                    class MixedIn {
-
-                        public void method() {
-                        }
-
-                        public void method(String string) {
-                        }
-
-                        public void uniqueMethod(String string) {
-                        }
-                    }
-                    """,
-                    configure = false,
-                    allowAst = true
-                )
                 java("AmbiguousReferenceMixin.java", code)
             }
         }
 
         fixture.enableInspections(AmbiguousReferenceInspection::class)
-        fixture.checkHighlighting(false, false, false)
+        fixture.checkHighlighting(true, false, false)
     }
 
     @Test
@@ -59,6 +39,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -66,7 +47,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             @Mixin(MixedIn.class)
             class AmbiguousReferenceMixin {
             
-                @Inject(method = <error descr="Ambiguous reference to method 'method' in target class">"method"</error>, at = @At("HEAD"))
+                @Inject(method = <warning descr="Ambiguous reference to method 'method' in target class">"method"</warning>, at = @At("HEAD"))
                 public void onMethod() {
                 }
             }
@@ -81,6 +62,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -103,6 +85,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -110,7 +93,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             @Mixin(MixedIn.class)
             class AmbiguousReferenceMixin {
             
-                @Inject(method = {<error descr="Ambiguous reference to method 'method' in target class">"method"</error>, "uniqueMethod"}, at = @At("HEAD"))
+                @Inject(method = {<warning descr="Ambiguous reference to method 'method' in target class">"method"</warning>, "uniqueMethod"}, at = @At("HEAD"))
                 public void onMethod() {
                 }
             }
@@ -125,6 +108,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -147,6 +131,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;

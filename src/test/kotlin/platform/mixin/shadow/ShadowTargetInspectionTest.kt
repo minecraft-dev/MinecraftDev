@@ -11,22 +11,26 @@
 package com.demonwav.mcdev.platform.mixin.shadow
 
 import com.demonwav.mcdev.framework.EdtInterceptor
-import com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowTargetInspection
+import com.demonwav.mcdev.platform.mixin.BaseMixinTest
+import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationTargetInspection
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(EdtInterceptor::class)
 @DisplayName("Shadow Target Inspection Tests")
-class ShadowTargetInspectionTest : BaseShadowTest() {
+class ShadowTargetInspectionTest : BaseMixinTest() {
 
-    override fun createMixins() {
-        mixins = {
+    @Test
+    @DisplayName("Shadow Target Inspection Test")
+    fun shadowTargetInspectionTest() {
+        buildProject {
             java(
                 "ShadowData.java",
                 """
                 package test;
 
+                import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
                 import org.spongepowered.asm.mixin.Mixin;
                 import org.spongepowered.asm.mixin.Shadow;
                 import org.spongepowered.asm.mixin.Final;
@@ -48,19 +52,15 @@ class ShadowTargetInspectionTest : BaseShadowTest() {
                     @Shadow public String wrongAccessor;
                     @Shadow protected String noFinal;
 
-                    <error descr="Cannot resolve member 'nonExistent' in target class">@Shadow</error> public String nonExistent;
+                    @<error descr="Unresolved field nonExistent in target class">Shadow</error> public String nonExistent;
 
                     @Shadow protected String twoIssues;
                 }
                 """
             )
         }
-    }
 
-    @Test
-    @DisplayName("Shadow Target Inspection Test")
-    fun shadowTargetInspectionTest() {
-        fixture.enableInspections(ShadowTargetInspection::class)
+        fixture.enableInspections(MixinAnnotationTargetInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
 }

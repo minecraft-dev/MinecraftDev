@@ -18,7 +18,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_IN
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.computeStringArray
-import com.demonwav.mcdev.util.findQualifiedClass
+import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.resolveClassArray
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
@@ -28,6 +28,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.util.PsiModificationTracker
+import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.ClassNode
 
 /**
  * Returns whether the given [PsiClass] is a Mixin class with a `@Mixin` annotation.
@@ -55,20 +58,32 @@ val PsiClass.mixinAnnotation
  * @receiver The [PsiClass] to check.
  * @return A list of resolved classes defined in the Mixin targets.
  */
-val PsiClass.mixinTargets: List<PsiClass>
+val PsiClass.mixinTargets: List<ClassNode>
     get() {
         return cached {
             val mixinAnnotation = mixinAnnotation ?: return@cached emptyList()
 
             // Read class targets (value)
             val classTargets =
-                mixinAnnotation.findDeclaredAttributeValue(null)?.resolveClassArray()?.toMutableList() ?: ArrayList()
+                mixinAnnotation.findDeclaredAttributeValue(null)?.resolveClassArray()
+                    ?.mapNotNullTo(mutableListOf()) { it.bytecode } ?: mutableListOf()
 
             // Read and add string targets (targets)
             mixinAnnotation.findDeclaredAttributeValue("targets")?.computeStringArray()
-                ?.mapNotNullTo(classTargets) { name -> findQualifiedClass(name.replace('/', '.'), mixinAnnotation) }
+                ?.mapNotNullTo(classTargets) { name ->
+                    findClassNodeByQualifiedName(
+                        project,
+                        findModule(),
+                        name.replace('/', '.')
+                    )
+                }
             classTargets
         }
+    }
+
+val PsiClass.bytecode: ClassNode?
+    get() = cached(PsiModificationTracker.MODIFICATION_COUNT) {
+        findClassNodeByPsiClass(this)
     }
 
 /**
@@ -97,10 +112,10 @@ val PsiClass.isAccessorMixin: Boolean
         }
 
         val targets = mixinTargets
-        return targets.isNotEmpty() && !targets.any(PsiClass::isInterface)
+        return targets.isNotEmpty() && !targets.any { it.hasAccess(Opcodes.ACC_INTERFACE) }
     }
 
-fun callbackInfoType(project: Project): PsiType? =
+fun callbackInfoType(project: Project): PsiType =
     PsiType.getTypeByName(CALLBACK_INFO, project, GlobalSearchScope.allScope(project))
 
 fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType: PsiType): PsiType? {
