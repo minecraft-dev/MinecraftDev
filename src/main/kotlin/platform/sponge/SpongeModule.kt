@@ -98,8 +98,12 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         val psiClass = identifier.uastParent as? UClass
             ?: return false
 
-        return !psiClass.hasModifier(JvmModifier.ABSTRACT) &&
-            psiClass.findAnnotation(SpongeConstants.PLUGIN_ANNOTATION) != null
+        if (psiClass.hasModifier(JvmModifier.ABSTRACT)) {
+            return false
+        }
+
+        return psiClass.findAnnotation(SpongeConstants.PLUGIN_ANNOTATION) != null ||
+            psiClass.findAnnotation(SpongeConstants.JVM_PLUGIN_ANNOTATION) != null
     }
 
     override fun checkUselessCancelCheck(expression: PsiMethodCallExpression): IsCancelled? {

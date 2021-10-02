@@ -11,7 +11,8 @@
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
-import com.demonwav.mcdev.platform.mixin.reference.InjectionPointType
+import com.demonwav.mcdev.platform.mixin.reference.DescReference
+import com.demonwav.mcdev.platform.mixin.reference.InjectionPointReference
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
@@ -37,18 +38,16 @@ class UnresolvedReferenceInspection : MixinInspection() {
 
         override fun visitNameValuePair(pair: PsiNameValuePair) {
             val name = pair.name ?: PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME
-            val resolver: MixinReference = when (name) {
-                "method" -> MethodReference
-                "target" -> TargetReference
-                "value" -> InjectionPointType
+            val resolvers: Array<MixinReference> = when (name) {
+                "method" -> arrayOf(MethodReference)
+                "target" -> arrayOf(TargetReference)
+                "value" -> arrayOf(InjectionPointReference, DescReference)
                 else -> return
             }
 
             // Check if valid annotation
             val qualifiedName = pair.annotationFromNameValuePair?.qualifiedName ?: return
-            if (!resolver.isValidAnnotation(qualifiedName)) {
-                return
-            }
+            val resolver = resolvers.firstOrNull { it.isValidAnnotation(qualifiedName) } ?: return
 
             val value = pair.value ?: return
             if (value is PsiArrayInitializerMemberValue) {

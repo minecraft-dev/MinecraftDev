@@ -209,7 +209,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val SPONGE_SUBMODULE_POM_TEMPLATE = "Sponge Submodule pom.xml"
 
         const val SPONGE8_MAIN_CLASS_TEMPLATE = "Sponge 8+ Main Class.java"
-        const val SPONGE8_PLUGINS_JSON_TEMPLATE = "Sponge 8+ plugins.json"
+        const val SPONGE8_PLUGINS_JSON_TEMPLATE = "Sponge 8+ sponge_plugins.json"
         const val SPONGE8_BUILD_GRADLE_TEMPLATE = "Sponge 8+ build.gradle.kts"
         const val SPONGE8_SUBMODULE_BUILD_GRADLE_TEMPLATE = "Sponge 8+ Submodule build.gradle.kts"
         const val SPONGE8_GRADLE_PROPERTIES_TEMPLATE = "Sponge 8+ gradle.properties"

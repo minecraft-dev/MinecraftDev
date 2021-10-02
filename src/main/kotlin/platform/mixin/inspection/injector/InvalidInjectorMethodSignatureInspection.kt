@@ -10,9 +10,14 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.platform.mixin.handlers.InjectAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.hasAccess
+import com.demonwav.mcdev.platform.mixin.util.isConstructor
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.isErasureEquivalentTo
@@ -32,6 +37,10 @@ import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.codeStyle.VariableKind
+import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.AbstractInsnNode
+import org.objectweb.asm.tree.InsnList
+import org.objectweb.asm.tree.MethodInsnNode
 
 class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
@@ -48,14 +57,32 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             var reportedStatic = false
             var reportedSignature = false
 
-            for ((type, annotation) in InjectorType.findAnnotations(modifiers)) {
+            for (annotation in modifiers.annotations) {
+                val qName = annotation.qualifiedName ?: continue
+                val handler = MixinAnnotationHandler.forMixinAnnotation(qName) as? InjectorAnnotationHandler ?: continue
                 val methodAttribute = annotation.findDeclaredAttributeValue("method") ?: continue
                 val targetMethods = MethodReference.resolveAllIfNotAmbiguous(methodAttribute) ?: continue
 
                 for (targetMethod in targetMethods) {
                     if (!reportedStatic) {
-                        val static = targetMethod.hasModifierProperty(PsiModifier.STATIC)
-                        if (static && !modifiers.hasModifierProperty(PsiModifier.STATIC)) {
+                        var shouldBeStatic = targetMethod.method.hasAccess(Opcodes.ACC_STATIC)
+
+                        if (!shouldBeStatic && targetMethod.method.isConstructor) {
+                            // before the superclass constructor call, everything must be static
+                            targetMethod.method.instructions?.let { methodInsns ->
+                                val superCtorCall = findSuperConstructorCall(methodInsns)
+                                val insns = handler.resolveInstructions(
+                                    annotation,
+                                    targetMethod.clazz,
+                                    targetMethod.method
+                                )
+                                shouldBeStatic = insns.any {
+                                    methodInsns.indexOf(it.insn) <= methodInsns.indexOf(superCtorCall)
+                                }
+                            }
+                        }
+
+                        if (shouldBeStatic && !modifiers.hasModifierProperty(PsiModifier.STATIC)) {
                             reportedStatic = true
                             holder.registerProblem(
                                 identifier,
@@ -73,35 +100,91 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                     if (!reportedSignature) {
                         // Check method parameters
                         val parameters = method.parameterList
-                        val (expectedParameters, expectedReturnType) = type.expectedMethodSignature(
+                        val possibleSignatures = handler.expectedMethodSignature(
                             annotation,
-                            targetMethod
+                            targetMethod.clazz,
+                            targetMethod.method
                         ) ?: continue
 
-                        if (!checkParameters(parameters, expectedParameters)) {
-                            reportedSignature = true
+                        val annotationName = annotation.nameReferenceElement?.referenceName
 
+                        if (possibleSignatures.isEmpty()) {
+                            reportedSignature = true
                             holder.registerProblem(
                                 parameters,
-                                "Method parameters do not match expected parameters for ${type.annotationName}",
-                                ParametersQuickFix(expectedParameters, type)
+                                "There are no possible signatures for this injector"
                             )
+                            continue
                         }
 
-                        val methodReturnType = method.returnType
-                        if (methodReturnType == null || !methodReturnType.isErasureEquivalentTo(expectedReturnType)) {
-                            reportedSignature = true
+                        var isValid = false
+                        for ((expectedParameters, expectedReturnType) in possibleSignatures) {
+                            if (checkParameters(parameters, expectedParameters)) {
+                                val methodReturnType = method.returnType
+                                if (methodReturnType != null &&
+                                    methodReturnType.isErasureEquivalentTo(expectedReturnType)
+                                ) {
+                                    isValid = true
+                                    break
+                                }
+                            }
+                        }
 
-                            holder.registerProblem(
-                                method.returnTypeElement ?: identifier,
-                                "Expected return type '${expectedReturnType.presentableText}' " +
-                                    "for ${type.annotationName} method",
-                                QuickFixFactory.getInstance().createMethodReturnFix(method, expectedReturnType, false)
-                            )
+                        if (!isValid) {
+                            val (expectedParameters, expectedReturnType) = possibleSignatures[0]
+
+                            if (!checkParameters(parameters, expectedParameters)) {
+                                reportedSignature = true
+
+                                holder.registerProblem(
+                                    parameters,
+                                    "Method parameters do not match expected parameters for $annotationName",
+                                    ParametersQuickFix(expectedParameters, handler is InjectAnnotationHandler)
+                                )
+                            }
+
+                            val methodReturnType = method.returnType
+                            if (methodReturnType == null ||
+                                !methodReturnType.isErasureEquivalentTo(expectedReturnType)
+                            ) {
+                                reportedSignature = true
+
+                                holder.registerProblem(
+                                    method.returnTypeElement ?: identifier,
+                                    "Expected return type '${expectedReturnType.presentableText}' " +
+                                        "for $annotationName method",
+                                    QuickFixFactory.getInstance().createMethodReturnFix(
+                                        method,
+                                        expectedReturnType,
+                                        false
+                                    )
+                                )
+                            }
                         }
                     }
                 }
             }
+        }
+
+        private fun findSuperConstructorCall(methodInsns: InsnList): AbstractInsnNode? {
+            var superCtorCall = methodInsns.first
+            var newCount = 0
+            while (superCtorCall != null) {
+                if (superCtorCall.opcode == Opcodes.NEW) {
+                    newCount++
+                } else if (superCtorCall.opcode == Opcodes.INVOKESPECIAL) {
+                    val methodCall = superCtorCall as MethodInsnNode
+                    if (methodCall.name == "<init>") {
+                        if (newCount == 0) {
+                            return superCtorCall
+                        } else {
+                            newCount--
+                        }
+                    }
+                }
+                superCtorCall = superCtorCall.next
+            }
+            return null
         }
 
         private fun checkParameters(parameterList: PsiParameterList, expected: List<ParameterGroup>): Boolean {
@@ -123,12 +206,13 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
     private class ParametersQuickFix(
         private val expected: List<ParameterGroup>,
-        injectorType: InjectorType
+        isInject: Boolean
     ) : LocalQuickFix {
 
-        private val fixName = when (injectorType) {
-            InjectorType.INJECT -> "Fix method parameters"
-            else -> "Fix method parameters (won't keep captured locals)"
+        private val fixName = if (isInject) {
+            "Fix method parameters"
+        } else {
+            "Fix method parameters (won't keep captured locals)"
         }
 
         override fun getFamilyName() = fixName

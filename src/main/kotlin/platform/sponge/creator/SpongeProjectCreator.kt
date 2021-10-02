@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.sponge.creator
 import com.demonwav.mcdev.creator.BaseProjectCreator
 import com.demonwav.mcdev.creator.CreateDirectoriesStep
 import com.demonwav.mcdev.creator.CreatorStep
+import com.demonwav.mcdev.creator.LicenseStep
 import com.demonwav.mcdev.creator.buildsystem.BuildDependency
 import com.demonwav.mcdev.creator.buildsystem.BuildRepository
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
@@ -83,6 +84,7 @@ class SpongeMavenCreator(
             mainClassStep,
             modifyStep,
             MavenGitignoreStep(project, rootDirectory),
+            LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", ")),
             BasicMavenFinalizerStep(rootModule, rootDirectory)
         )
     }
@@ -107,7 +109,8 @@ class SpongeMavenCreator(
                 BasicMavenStep.setupDependencies()
             )
         )
-        return listOf(depStep, commonDepStep, mavenStep, mainClassStep, modifyStep)
+        val licenseStep = LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", "))
+        return listOf(depStep, commonDepStep, mavenStep, mainClassStep, modifyStep, licenseStep)
     }
 }
 
@@ -134,6 +137,7 @@ class SpongeGradleCreator(
             modifyStep,
             GradleWrapperStep(project, rootDirectory, buildSystem),
             GradleGitignoreStep(project, rootDirectory),
+            LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", ")),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
         )
     }
@@ -149,7 +153,8 @@ class SpongeGradleCreator(
             CreateDirectoriesStep(buildSystem, rootDirectory),
             GradleSetupStep(project, rootDirectory, buildSystem, files),
             mainClassStep,
-            modifyStep
+            modifyStep,
+            LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", "))
         )
     }
 }

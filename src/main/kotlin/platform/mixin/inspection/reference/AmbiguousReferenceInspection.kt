@@ -13,10 +13,17 @@ package com.demonwav.mcdev.platform.mixin.inspection.reference
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
+import com.demonwav.mcdev.util.constantStringValue
+import com.intellij.codeInspection.LocalQuickFix
+import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.text.StringUtil
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiArrayInitializerMemberValue
+import com.intellij.psi.PsiBinaryExpression
 import com.intellij.psi.PsiLiteral
 
 class AmbiguousReferenceInspection : MixinAnnotationAttributeInspection(METHOD_INJECTORS, "method") {
@@ -36,7 +43,34 @@ class AmbiguousReferenceInspection : MixinAnnotationAttributeInspection(METHOD_I
 
     private fun checkMember(value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
         val ambiguousReference = MethodReference.getReferenceIfAmbiguous(value) ?: return
-        // TODO: Quick fix
-        holder.registerProblem(value, "Ambiguous reference to method '${ambiguousReference.name}' in target class")
+        if (ambiguousReference.matchAllNames || ambiguousReference.matchAllDescs) {
+            // the intent of ambiguity is clear
+            return
+        }
+        holder.registerProblem(
+            value,
+            "Ambiguous reference to method '${ambiguousReference.name}' in target class",
+            QuickFix
+        )
+    }
+
+    private object QuickFix : LocalQuickFix {
+        override fun getFamilyName() = "Add * wildcard"
+
+        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+            val element = descriptor.psiElement ?: return
+            val constantValue = element.constantStringValue
+
+            val elementFactory = JavaPsiFacade.getElementFactory(project)
+
+            if (constantValue != null && element is PsiLiteral) {
+                val newLiteral = "\"${StringUtil.escapeStringCharacters("$constantValue*")}\""
+                element.replace(elementFactory.createExpressionFromText(newLiteral, null))
+            } else {
+                val replacement = elementFactory.createExpressionFromText("str + \"*\"", null) as PsiBinaryExpression
+                replacement.lOperand.replace(element)
+                element.replace(replacement)
+            }
+        }
     }
 }

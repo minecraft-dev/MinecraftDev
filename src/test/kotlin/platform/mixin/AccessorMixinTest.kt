@@ -11,12 +11,12 @@
 package com.demonwav.mcdev.platform.mixin
 
 import com.demonwav.mcdev.framework.EdtInterceptor
+import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationTargetInspection
 import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -24,31 +24,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(EdtInterceptor::class)
 @DisplayName("Accessor Mixin Extension Property Tests")
 class AccessorMixinTest : BaseMixinTest() {
-
-    @BeforeEach
-    fun setupProject() {
-        buildProject {
-            dir("test") {
-                java(
-                    "BaseMixin.java",
-                    """
-                    package test;
-                    public class BaseMixin {}
-                    """,
-                    configure = false
-                )
-
-                java(
-                    "BaseMixinInterface.java",
-                    """
-                    package test;
-                    public interface BaseMixinInterface {}
-                    """,
-                    configure = false
-                )
-            }
-        }
-    }
 
     private fun doTest(className: String, @Language("JAVA") code: String, test: (psiClass: PsiClass) -> Unit) {
         var psiClass: PsiClass? = null
@@ -68,6 +43,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixin;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
@@ -91,6 +67,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixin;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
@@ -114,6 +91,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixinInterface;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
@@ -137,6 +115,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixin;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.Mixin;
 
@@ -157,6 +136,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixin;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
 
@@ -177,6 +157,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixin;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
@@ -198,6 +179,7 @@ class AccessorMixinTest : BaseMixinTest() {
         """
         package test;
 
+        import com.demonwav.mcdev.mixintestdata.accessor.BaseMixinInterface;
         import org.spongepowered.asm.mixin.gen.Accessor;
         import org.spongepowered.asm.mixin.gen.Invoker;
         import org.spongepowered.asm.mixin.Mixin;
@@ -210,5 +192,165 @@ class AccessorMixinTest : BaseMixinTest() {
         """
     ) { psiClass ->
         Assertions.assertFalse(psiClass.isAccessorMixin)
+    }
+
+    @Test
+    @DisplayName("Accessor Mixin Target Test")
+    fun accessorMixinTargetTest() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Accessor;
+        import org.spongepowered.asm.mixin.gen.Invoker;
+        import org.spongepowered.asm.mixin.Mixin;
+        import org.spongepowered.asm.mixin.Mutable;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            @Accessor static String getPrivateStaticString() { return null; }
+            @Accessor static void setPrivateStaticString(String value) {}
+            @Accessor String getPrivateString();
+            @Accessor void setPrivateString(String value);
+            @Accessor @Mutable void setPrivateFinalString(String value);
+            @Invoker static String callPrivateStaticMethod() { return null; }
+            @Invoker String callPrivateMethod();
+            @Invoker static MixinBase createMixinBase() { return null; }
+        }
+        """
+    ) {
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Accessor Mixin Renamed Target Test")
+    fun accessorMixinRenamedTargetTest() = doTest(
+        "AccessorMixinRenamedTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Accessor;
+        import org.spongepowered.asm.mixin.gen.Invoker;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinRenamedTargetMixin {
+            @Accessor("privateString") String foo1();
+            @Accessor("privateString") void foo2(String value);
+            @Invoker("privateMethod") String foo3();
+            @Invoker("<init>") MixinBase foo4();
+        }
+        """
+    ) {
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Invalid Accessor Target")
+    fun invalidAccessorTarget() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Accessor;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            @<error descr="Cannot find field foo in target class">Accessor</error> String getFoo();
+        }
+        """
+    ) {
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Invalid Named Accessor Target")
+    fun invalidNamedAccessorTarget() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Accessor;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            @<error descr="Cannot find field foo in target class">Accessor</error>("foo") String bar();
+        }
+        """
+    ) {
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Invalid Invoker Target")
+    fun invalidInvokerTarget() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Invoker;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            @<error descr="Cannot find method foo in target class">Invoker</error> String callFoo();
+        }
+        """
+    ) {
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Invalid Named Invoker Target")
+    fun invalidNamedInvokerTarget() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Invoker;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            @<error descr="Cannot find method foo in target class">Invoker</error>("foo") String bar();
+        }
+        """
+    ) {
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
+    }
+
+    @Test
+    @DisplayName("Invalid Constructor Invoker Target")
+    fun invalidConstructorInvokerTarget() = doTest(
+        "AccessorMixinTargetMixin",
+        """
+        package test;
+        
+        import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
+        import org.spongepowered.asm.mixin.gen.Invoker;
+        import org.spongepowered.asm.mixin.Mixin;
+        
+        @Mixin(MixinBase.class)
+        public interface AccessorMixinTargetMixin {
+            @<error descr="Cannot find method <init> in target class">Invoker</error>("<init>") String construct(String invalidArg);
+        }
+        """
+    ) {
+        fixture.enableInspections(MixinAnnotationTargetInspection::class.java)
+        fixture.checkHighlighting(false, false, false)
     }
 }

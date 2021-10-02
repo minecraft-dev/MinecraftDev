@@ -12,6 +12,7 @@ package com.demonwav.mcdev.util
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.intellij.lang.java.lexer.JavaLexer
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.runReadAction
@@ -26,6 +27,7 @@ import com.intellij.openapi.roots.libraries.LibraryKind
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Ref
+import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import java.util.Locale
@@ -143,10 +145,43 @@ inline fun <T : Any> Iterable<T?>.forEachNotNull(func: (T) -> Unit) {
 
 inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R) = Array(size) { i -> transform(this[i]) }
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R) = Array(size) { i -> transform(this[i]) }
+inline fun <T, reified R> Collection<T>.mapToArray(transform: (T) -> R): Array<R> {
+    val result = arrayOfNulls<R>(size)
+    var i = 0
+    for (element in this) {
+        result[i++] = transform(element)
+    }
+    return result.castNotNull()
+}
 
-fun <T : Any> Array<T?>.castNotNull(): Array<T> {
+fun <T> Array<T?>.castNotNull(): Array<T> {
     @Suppress("UNCHECKED_CAST")
     return this as Array<T>
+}
+
+// Same as Collections.rotate but for arrays
+fun <T> Array<T>.rotate(amount: Int) {
+    val size = size
+    if (size == 0) return
+    var distance = amount % size
+    if (distance < 0) distance += size
+    if (distance == 0) return
+
+    var cycleStart = 0
+    var nMoved = 0
+    while (nMoved != size) {
+        var displaced = this[cycleStart]
+        var i = cycleStart
+        do {
+            i += distance
+            if (i >= size) i -= size
+            val newDisplaced = this[i]
+            this[i] = displaced
+            displaced = newDisplaced
+            nMoved++
+        } while (i != cycleStart)
+        cycleStart++
+    }
 }
 
 fun Module.findChildren(): Set<Module> {
@@ -208,6 +243,32 @@ fun String.getSimilarity(text: String, bonus: Int = 0): Int {
         }
     }
     return distance + bonus
+}
+
+fun String.isJavaKeyword() = JavaLexer.isSoftKeyword(this, LanguageLevel.HIGHEST)
+
+fun String.toJavaIdentifier(allowDollars: Boolean = true): String {
+    if (this.isEmpty()) {
+        return "_"
+    }
+
+    if (this.isJavaKeyword()) {
+        return "_$this"
+    }
+
+    if (!this[0].isJavaIdentifierStart() && this[0].isJavaIdentifierPart()) {
+        return "_$this".toJavaIdentifier(allowDollars)
+    }
+
+    return this.asSequence()
+        .map {
+            if (it.isJavaIdentifierPart() && (allowDollars || it != '$')) {
+                it
+            } else {
+                "_"
+            }
+        }
+        .joinToString("")
 }
 
 fun String.toPackageName(): String {

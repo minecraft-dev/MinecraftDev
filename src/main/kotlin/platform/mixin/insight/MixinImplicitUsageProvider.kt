@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.platform.mixin.insight
 
-import com.demonwav.mcdev.platform.mixin.util.isShadow
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SHADOW
 import com.intellij.codeInsight.daemon.ImplicitUsageProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
@@ -19,7 +19,7 @@ import com.intellij.psi.PsiParameter
 
 class MixinImplicitUsageProvider : ImplicitUsageProvider {
 
-    private fun isShadowField(element: PsiElement) = element is PsiField && element.isShadow
+    private fun isShadowField(element: PsiElement) = element is PsiField && element.hasAnnotation(SHADOW)
 
     private fun isParameterInShadow(element: PsiElement): Boolean {
         if (element !is PsiParameter) {
@@ -27,7 +27,7 @@ class MixinImplicitUsageProvider : ImplicitUsageProvider {
         }
 
         val method = element.declarationScope as? PsiMethod ?: return false
-        return method.isShadow
+        return method.hasAnnotation(SHADOW)
     }
 
     override fun isImplicitUsage(element: PsiElement) = isParameterInShadow(element)

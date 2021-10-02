@@ -10,8 +10,8 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.suppress
 
-import com.demonwav.mcdev.platform.mixin.util.isOverwrite
-import com.demonwav.mcdev.platform.mixin.util.isShadow
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SHADOW
 import com.demonwav.mcdev.util.findContainingMember
 import com.intellij.codeInspection.InspectionSuppressor
 import com.intellij.codeInspection.SuppressQuickFix
@@ -35,7 +35,7 @@ class ShadowOverwriteInspectionSuppressor : InspectionSuppressor {
         }
 
         val member = element.findContainingMember() ?: return false
-        return member.isShadow || (member is PsiMethod && member.isOverwrite)
+        return member.hasAnnotation(SHADOW) || (member is PsiMethod && member.hasAnnotation(OVERWRITE))
     }
 
     override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> =

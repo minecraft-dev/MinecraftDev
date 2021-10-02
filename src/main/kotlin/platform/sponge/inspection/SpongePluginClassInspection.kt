@@ -99,16 +99,17 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                 }
             }
 
-            aClass.getAnnotation(SpongeConstants.PLUGIN_ANNOTATION)?.let { pluginAnno ->
-                val pluginIdValue = pluginAnno.findAttributeValue("id") ?: return@let
-                val pluginId = pluginIdValue.constantStringValue ?: return@let
-                if (!SpongeConstants.ID_PATTERN.matcher(pluginId).matches()) {
-                    holder.registerProblem(
-                        pluginIdValue,
-                        "Plugin IDs should be lowercase, and only contain characters from a-z, dashes or underscores," +
-                            " start with a lowercase letter, and not exceed 64 characters."
-                    )
-                }
+            val pluginAnnotation = aClass.getAnnotation(SpongeConstants.PLUGIN_ANNOTATION)
+                ?: aClass.getAnnotation(SpongeConstants.JVM_PLUGIN_ANNOTATION)
+                ?: return
+            val pluginIdValue = pluginAnnotation.findAttributeValue("id") ?: return
+            val pluginId = pluginIdValue.constantStringValue ?: return
+            if (!SpongeConstants.ID_PATTERN.matcher(pluginId).matches()) {
+                holder.registerProblem(
+                    pluginIdValue,
+                    "Plugin IDs should be lowercase, and only contain characters from a-z, dashes or underscores," +
+                        " start with a lowercase letter, and not exceed 64 characters."
+                )
             }
         }
     }

@@ -46,6 +46,7 @@ object Sponge8Template : BaseTemplate() {
             "PLUGIN_ID" to buildSystem.artifactId,
             "VERSION_PLACEHOLDER" to "\${version}",
             "SPONGEAPI_VERSION" to config.spongeApiVersion,
+            "LICENSE" to config.license,
             "PLUGIN_NAME" to config.pluginName,
             "MAIN_CLASS" to config.mainClass,
             "DESCRIPTION" to config.description,
@@ -66,8 +67,8 @@ object Sponge8Template : BaseTemplate() {
             "GROUP_ID" to buildSystem.groupId,
             "PLUGIN_ID" to buildSystem.artifactId,
             "PLUGIN_VERSION" to buildSystem.version,
-            // SpongeGradle 1.1.0 adds the -SNAPSHOT suffix itself
-            "SPONGEAPI_VERSION" to config.spongeApiVersion.removeSuffix("-SNAPSHOT"),
+            "SPONGEAPI_VERSION" to config.spongeApiVersion,
+            "LICENSE" to config.license,
             "PLUGIN_NAME" to config.pluginName,
             "MAIN_CLASS" to config.mainClass,
             "DESCRIPTION" to config.description,
@@ -98,8 +99,8 @@ object Sponge8Template : BaseTemplate() {
     ): String {
         val props = mutableMapOf(
             "PLUGIN_ID" to buildSystem.parentOrError.artifactId,
-            // SpongeGradle 1.1.0 adds the -SNAPSHOT suffix itself
-            "SPONGEAPI_VERSION" to config.spongeApiVersion.removeSuffix("-SNAPSHOT"),
+            "SPONGEAPI_VERSION" to config.spongeApiVersion,
+            "LICENSE" to config.license,
             "PLUGIN_NAME" to config.pluginName,
             "MAIN_CLASS" to config.mainClass,
             "DESCRIPTION" to config.description,

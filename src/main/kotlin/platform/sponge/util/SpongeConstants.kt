@@ -16,6 +16,7 @@ import java.util.regex.Pattern
 object SpongeConstants {
 
     const val PLUGIN_ANNOTATION = "org.spongepowered.api.plugin.Plugin"
+    const val JVM_PLUGIN_ANNOTATION = "org.spongepowered.plugin.builtin.jvm.Plugin"
     const val DEPENDENCY_ANNOTATION = "org.spongepowered.api.plugin.Dependency"
     const val TEXT_COLORS = "org.spongepowered.api.text.format.TextColors"
     const val EVENT = "org.spongepowered.api.event.Event"
@@ -34,5 +35,5 @@ object SpongeConstants {
     val ID_PATTERN = Pattern.compile(ID_PATTERN_STRING)
 
     val API8 = SemanticVersion.release(8)
-    val API9 = SemanticVersion.release(8)
+    val API9 = SemanticVersion.release(9)
 }

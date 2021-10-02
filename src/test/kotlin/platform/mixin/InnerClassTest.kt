@@ -35,12 +35,23 @@ class InnerClassTest : BaseMixinTest() {
                     @Mixin
                     class InnerClassMixin {
 
-                        private static void test() {
-                            new <error descr="Anonymous classes are not allowed in a @Mixin class">Object() {
-
-                            }</error>;
+                        private static void anonymousClassOk() {
+                            new Object() {
+                            };
                         }
 
+                        private static void stuffInsideAnonymousClassBad() {
+                            new Object() {
+                                public void foo() {
+                                    new <error descr="Double nested anonymous classes are not allowed in a @Mixin class">Object() {
+                                    }</error>;
+                                }
+
+                                <error descr="Inner class not allowed inside anonymous classes inside mixins">class ClassInsideAnonymousClass {
+                                }</error>
+                            };
+                        }
+                    
                         @Mixin
                         static class GoodInnerMixin {
 

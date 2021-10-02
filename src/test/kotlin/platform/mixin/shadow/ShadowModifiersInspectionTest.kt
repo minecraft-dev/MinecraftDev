@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.shadow
 
 import com.demonwav.mcdev.framework.EdtInterceptor
+import com.demonwav.mcdev.platform.mixin.BaseMixinTest
 import com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowModifiersInspection
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -18,15 +19,18 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(EdtInterceptor::class)
 @DisplayName("Shadow Modifiers Inspection Tests")
-class ShadowModifiersInspectionTest : BaseShadowTest() {
+class ShadowModifiersInspectionTest : BaseMixinTest() {
 
-    override fun createMixins() {
-        mixins = {
+    @Test
+    @DisplayName("Shadow Modifiers Inspection Test")
+    fun shadowModifiersInspectionTest() {
+        buildProject {
             java(
                 "ShadowData.java",
                 """
                 package test;
 
+                import com.demonwav.mcdev.mixintestdata.shadow.MixinBase;
                 import org.spongepowered.asm.mixin.Mixin;
                 import org.spongepowered.asm.mixin.Shadow;
                 import org.spongepowered.asm.mixin.Final;
@@ -55,11 +59,7 @@ class ShadowModifiersInspectionTest : BaseShadowTest() {
                 """
             )
         }
-    }
 
-    @Test
-    @DisplayName("Shadow Modifiers Inspection Test")
-    fun shadowModifiersInspectionTest() {
         fixture.enableInspections(ShadowModifiersInspection::class)
         fixture.checkHighlighting(true, false, false)
     }
