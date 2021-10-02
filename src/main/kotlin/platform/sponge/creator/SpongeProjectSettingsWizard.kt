@@ -18,7 +18,11 @@ import com.demonwav.mcdev.creator.ValidatedFieldType.CLASS_NAME
 import com.demonwav.mcdev.creator.ValidatedFieldType.LIST
 import com.demonwav.mcdev.creator.ValidatedFieldType.NON_BLANK
 import com.demonwav.mcdev.platform.sponge.SpongeVersion
+import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
+import com.demonwav.mcdev.util.License
+import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.firstOfType
+import com.intellij.ui.EnumComboBoxModel
 import com.intellij.util.text.nullize
 import com.intellij.util.ui.UIUtil
 import javax.swing.JComboBox
@@ -49,12 +53,20 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
 
     @ValidatedField(LIST)
     private lateinit var dependField: JTextField
+    private lateinit var licenseBox: JComboBox<License>
     private lateinit var spongeApiVersionBox: JComboBox<String>
     private lateinit var errorLabel: JLabel
 
     private var config: SpongeProjectConfig? = null
 
     private var versionsLoaded: Boolean = false
+
+    init {
+        spongeApiVersionBox.addActionListener {
+            val stringVersion = spongeApiVersionBox.selectedItem as? String
+            licenseBox.isEnabled = stringVersion == null || SemanticVersion.parse(stringVersion) >= SpongeConstants.API8
+        }
+    }
 
     override fun getComponent(): JComponent {
         return panel
@@ -78,6 +90,9 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         } else {
             title.icon = PlatformAssets.SPONGE_ICON_2X
         }
+
+        licenseBox.model = EnumComboBoxModel(License::class.java)
+        licenseBox.selectedItem = License.ALL_RIGHTS_RESERVED
 
         if (versionsLoaded) {
             return
@@ -108,5 +123,6 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
 
         conf.setAuthors(this.authorsField.text)
         conf.setDependencies(this.dependField.text)
+        conf.license = this.licenseBox.selectedItem as License
     }
 }

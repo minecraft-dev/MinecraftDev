@@ -97,7 +97,7 @@ class MixinCompletionContributor : CompletionContributor() {
 
             // Process methods and fields from target class
             findShadowTargets(psiClass, start, superMixin != null)
-                .map { it.createLookupElement() }
+                .map { it.createLookupElement(psiClass.project) }
                 .filter { prefixMatcher.prefixMatches(it) }
                 .filter(filter, position)
                 .map { PrioritizedLookupElement.withExplicitProximity(it, 1) }

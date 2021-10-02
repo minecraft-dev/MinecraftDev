@@ -19,7 +19,7 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.1.3"
+    id("org.jetbrains.intellij") version "1.2.0"
     id("org.cadixdev.licenser") version "0.6.1"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
@@ -60,6 +60,7 @@ repositories {
     mavenCentral()
     maven("https://repo.denwav.dev/repository/maven-public/")
     maven("https://repo.spongepowered.org/maven")
+    maven("https://www.jetbrains.com/intellij-repository/releases")
     maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
     maven("https://repo.gradle.org/gradle/libs-releases-local/")
     maven("https://maven.extracraftx.com")
@@ -78,6 +79,10 @@ dependencies {
 
     implementation(libs.templateMakerFabric)
 
+    implementation("org.ow2.asm:asm:9.2")
+    implementation("org.ow2.asm:asm-tree:9.2")
+    implementation("org.ow2.asm:asm-analysis:9.2")
+
     jflex(libs.jflex.lib)
     jflexSkeleton("${libs.jflex.skeleton.text()}@skeleton")
     grammarKit(libs.grammarKit)
@@ -86,6 +91,7 @@ dependencies {
     testLibs(libs.test.mixin)
     testLibs("${libs.test.spongeapi.text()}:shaded")
     testLibs("${libs.test.nbt.text()}@nbt")
+    testLibs(project(":mixin-test-data"))
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
@@ -106,6 +112,7 @@ intellij {
         "gradle",
         "Groovy",
         "org.toml.lang:$pluginTomlVersion",
+        "ByteCodeViewer",
         // needed dependencies for unit tests
         "properties",
         "junit"
@@ -184,6 +191,7 @@ tasks.test {
             systemProperty("testLibs.${it.name}", it.file.absolutePath)
         }
     }
+    systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
     if (JavaVersion.current().isJava9Compatible) {
         jvmArgs(
             "--add-opens", "java.base/java.io=ALL-UNNAMED",

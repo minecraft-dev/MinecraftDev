@@ -10,13 +10,15 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.shadow
 
+import com.demonwav.mcdev.platform.mixin.handlers.ShadowHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
+import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.FINAL
-import com.demonwav.mcdev.platform.mixin.util.mixinTargets
-import com.demonwav.mcdev.platform.mixin.util.resolveFirstShadowTarget
+import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
+import com.demonwav.mcdev.platform.mixin.util.accessLevel
 import com.demonwav.mcdev.util.findKeyword
-import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInsight.intention.AddAnnotationFix
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.ProblemHighlightType
@@ -32,6 +34,7 @@ import com.intellij.psi.PsiModifierList
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.PsiUtil.ACCESS_LEVEL_PRIVATE
 import com.intellij.psi.util.PsiUtil.ACCESS_LEVEL_PROTECTED
+import org.objectweb.asm.Opcodes
 
 class ShadowModifiersInspection : MixinInspection() {
 
@@ -48,12 +51,10 @@ class ShadowModifiersInspection : MixinInspection() {
 
             val shadowModifierList = annotation.owner as? PsiModifierList ?: return
             val member = shadowModifierList.parent as? PsiMember ?: return
-            val psiClass = member.containingClass ?: return
-            val targetClasses = psiClass.mixinTargets.ifEmpty { return }
-            val target = resolveFirstShadowTarget(annotation, targetClasses, member)?.modifierList ?: return
+            val target = ShadowHandler.getInstance()?.resolveTarget(annotation)?.firstOrNull() ?: return
 
             // Check static modifier
-            val targetStatic = target.hasModifierProperty(PsiModifier.STATIC)
+            val targetStatic = (target.access and Opcodes.ACC_STATIC) != 0
             if (targetStatic != shadowModifierList.hasModifierProperty(PsiModifier.STATIC)) {
                 val message = if (targetStatic) {
                     "@Shadow for static method should be also static"
@@ -83,7 +84,7 @@ class ShadowModifiersInspection : MixinInspection() {
                 holder.registerProblem(
                     shadowModifierList.findKeyword(shadowModifier) ?: annotation,
                     "Invalid access modifiers, has: $shadowModifier, but target member has: " +
-                        PsiUtil.getAccessModifier(PsiUtil.getAccessLevel(target)),
+                        PsiUtil.getAccessModifier(targetAccessLevel),
                     QuickFixFactory.getInstance().createModifierListFix(shadowModifierList, targetModifier, true, false)
                 )
             }
@@ -94,7 +95,7 @@ class ShadowModifiersInspection : MixinInspection() {
             }
 
             // Check @Final
-            val targetFinal = target.hasModifierProperty(PsiModifier.FINAL)
+            val targetFinal = (target.access and Opcodes.ACC_FINAL) != 0
             val shadowFinal = shadowModifierList.findAnnotation(FINAL)
             if (targetFinal != (shadowFinal != null)) {
                 if (targetFinal) {
@@ -113,8 +114,11 @@ class ShadowModifiersInspection : MixinInspection() {
             }
         }
 
-        private fun getTargetAccessLevel(target: PsiModifierList, shadow: PsiModifierList): Int {
-            val targetAccessLevel = PsiUtil.getAccessLevel(target)
+        private fun getTargetAccessLevel(target: MixinTargetMember, shadow: PsiModifierList): Int {
+            val targetAccessLevel = when (target) {
+                is FieldTargetMember -> target.classAndField.field.accessLevel
+                is MethodTargetMember -> target.classAndMethod.method.accessLevel
+            }
 
             // Abstract @Shadow methods for private methods are represented using protected
             return if (targetAccessLevel == ACCESS_LEVEL_PRIVATE && shadow.hasModifierProperty(PsiModifier.ABSTRACT)) {

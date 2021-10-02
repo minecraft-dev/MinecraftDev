@@ -28,21 +28,6 @@ class MultipleTargetTest : BaseMixinTest() {
     private fun doTest(@Language("JAVA") code: String) {
         buildProject {
             dir("test") {
-                java(
-                    "MixedIn.java",
-                    """
-                    package test;
-
-                    class MixedIn {
-                        public void method1() {
-                        }
-                        
-                        public void method2() {
-                        }
-                    }
-                    """,
-                    configure = false
-                )
                 java("AmbiguousReferenceMixin.java", code)
             }
         }
@@ -58,6 +43,7 @@ class MultipleTargetTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.multipleTarget.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;
@@ -80,6 +66,7 @@ class MultipleTargetTest : BaseMixinTest() {
             """
             package test;
 
+            import com.demonwav.mcdev.mixintestdata.multipleTarget.MixedIn;
             import org.spongepowered.asm.mixin.Mixin;
             import org.spongepowered.asm.mixin.injection.At;
             import org.spongepowered.asm.mixin.injection.Inject;

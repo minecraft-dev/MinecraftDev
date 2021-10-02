@@ -14,6 +14,7 @@ import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyUtil
 import com.demonwav.mcdev.platform.mixin.MixinModule
 import com.demonwav.mcdev.platform.mixin.config.MixinConfig
+import com.demonwav.mcdev.platform.mixin.util.findStubClass
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findModule
@@ -65,8 +66,10 @@ class UnusedMixinInspection : MixinInspection() {
                     if (bestQuickFixFile != null && qualifiedName != null) {
                         var side = SideOnlyUtil.getSideForClass(clazz).second
                         if (side == Side.NONE || side == Side.INVALID) {
-                            side = clazz.mixinTargets.mapFirstNotNull(SideOnlyUtil::getSideForClass)?.second
-                                ?: Side.NONE
+                            side = clazz.mixinTargets.mapFirstNotNull {
+                                val stubClass = it.findStubClass(module.project) ?: return@mapFirstNotNull null
+                                SideOnlyUtil.getSideForClass(stubClass)
+                            }?.second ?: Side.NONE
                         }
                         val quickFix = QuickFix(bestQuickFixFile, qualifiedName, side)
                         holder.registerProblem(problematicElement, "Mixin not found in any mixin config", quickFix)

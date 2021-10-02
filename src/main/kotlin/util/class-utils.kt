@@ -119,13 +119,21 @@ fun findQualifiedClass(
     fullQualifiedName: String,
     scope: GlobalSearchScope = GlobalSearchScope.allScope(project)
 ): PsiClass? {
+    return findQualifiedClass(fullQualifiedName) { name ->
+        JavaPsiFacade.getInstance(project).findClass(name, scope)
+    }
+}
+
+fun findQualifiedClass(
+    fullQualifiedName: String,
+    outerResolver: (String) -> PsiClass?
+): PsiClass? {
     var innerPos = fullQualifiedName.indexOf('$')
     if (innerPos == -1) {
-        return JavaPsiFacade.getInstance(project).findClass(fullQualifiedName, scope)
+        return outerResolver(fullQualifiedName)
     }
 
-    var currentClass = JavaPsiFacade.getInstance(project)
-        .findClass(fullQualifiedName.substring(0, innerPos), scope) ?: return null
+    var currentClass = outerResolver(fullQualifiedName.substring(0, innerPos)) ?: return null
     var outerPos: Int
 
     while (true) {

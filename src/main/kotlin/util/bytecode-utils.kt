@@ -55,6 +55,9 @@ fun getPrimitiveType(internalName: Char): PsiPrimitiveType? {
     }
 }
 
+val PsiType.descriptor
+    get() = appendDescriptor(StringBuilder()).toString()
+
 fun getPrimitiveWrapperClass(internalName: Char, project: Project): PsiClass? {
     val type = getPrimitiveType(internalName) ?: return null
     val boxedTypeName = type.boxedTypeName ?: return null
@@ -86,6 +89,7 @@ fun parseClassDescriptor(descriptor: String): String {
 
 val PsiClass.internalName: String?
     get() {
+        realName?.let { return it }
         return try {
             outerQualifiedName?.replace('.', '/') ?: buildInternalName(StringBuilder()).toString()
         } catch (e: ClassNameResolutionFailedException) {
@@ -124,7 +128,14 @@ fun PsiClass.findMethodsByInternalName(internalName: String, checkBases: Boolean
 // Method
 
 val PsiMethod.internalName: String
-    get() = if (isConstructor) INTERNAL_CONSTRUCTOR_NAME else name
+    get() {
+        val realName = realName
+        return when {
+            isConstructor -> INTERNAL_CONSTRUCTOR_NAME
+            realName != null -> realName
+            else -> name
+        }
+    }
 
 val PsiMethod.descriptor: String?
     get() {

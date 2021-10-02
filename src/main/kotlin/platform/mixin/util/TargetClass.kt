@@ -14,19 +14,15 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DYNAMIC
 import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findContainingMethod
-import com.demonwav.mcdev.util.findMatchingMethods
-import com.demonwav.mcdev.util.isMatchingField
-import com.demonwav.mcdev.util.isMatchingMethod
-import com.demonwav.mcdev.util.memberReference
+import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.resolveClass
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
-import com.intellij.psi.PsiMethod
-import com.intellij.psi.impl.compiled.ClsMethodImpl
-import com.intellij.psi.util.PsiUtil
-import com.intellij.psi.util.TypeConversionUtil
+import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.FieldNode
+import org.objectweb.asm.tree.MethodNode
 
 fun PsiMember.findUpstreamMixin(): PsiClass? {
     return findAnnotation(DYNAMIC)?.findDeclaredAttributeValue("mixin")?.resolveClass()
@@ -35,133 +31,111 @@ fun PsiMember.findUpstreamMixin(): PsiClass? {
 val PsiElement.isWithinDynamicMixin: Boolean
     get() = findContainingMethod()?.findAnnotation(DYNAMIC) != null
 
-fun findMethods(psiClass: PsiClass): Sequence<PsiMethod>? {
+data class ClassAndMethodNode(val clazz: ClassNode, val method: MethodNode)
+
+fun findMethods(psiClass: PsiClass, allowClinit: Boolean = true): Sequence<ClassAndMethodNode>? {
     val targets = psiClass.mixinTargets
     return when (targets.size) {
         0 -> null
         1 ->
-            targets.single().methods.asSequence()
-                .filter({ !it.isConstructor })
+            targets.single().let { target ->
+                target.methods?.asSequence()
+                    ?.filter { !it.isConstructor && (allowClinit || !it.isClinit) }
+                    ?.map { ClassAndMethodNode(target, it) }
+            }
         else ->
             targets.asSequence()
-                .flatMap { target -> target.methods.asSequence() }
-                .filter({ !it.isConstructor })
-                .groupBy { it.memberReference }
+                .flatMap { target ->
+                    target.methods?.asSequence()?.map { ClassAndMethodNode(target, it) } ?: emptySequence()
+                }
+                .filter { !it.method.isConstructor && (allowClinit || !it.method.isClinit) }
+                .groupBy { it.method.memberReference }
                 .values.asSequence()
                 .filter { it.size >= targets.size }
                 .map { it.first() }
-    }?.filter { m ->
+    }?.filter { classAndMethod ->
         // Filter methods which are already in the Mixin class
-        psiClass.findMatchingMethods(m, false).isEmpty()
+        !psiClass.findMethods(classAndMethod.method.memberReference, false).any()
     }
 }
 
-fun findFields(psiClass: PsiClass): Sequence<PsiField>? {
+data class ClassAndFieldNode(val clazz: ClassNode, val field: FieldNode)
+
+fun findFields(psiClass: PsiClass): Sequence<ClassAndFieldNode>? {
     val targets = psiClass.mixinTargets
     return when (targets.size) {
         0 -> null
-        1 -> targets.single().fields.asSequence()
+        1 ->
+            targets.single().let { target ->
+                target.fields?.asSequence()?.map { ClassAndFieldNode(target, it) }
+            }
         else ->
             targets.asSequence()
-                .flatMap { target -> target.fields.asSequence() }
-                .groupBy { it.memberReference }
+                .flatMap { target ->
+                    target.fields?.asSequence()?.map { ClassAndFieldNode(target, it) } ?: emptySequence()
+                }
+                .groupBy { it.field.memberReference }
                 .values.asSequence()
                 .filter { it.size >= targets.size }
                 .map { it.first() }
     }?.filter {
         // Filter fields which are already in the Mixin class
-        psiClass.findFieldByName(it.name, false) == null
+        psiClass.findFieldByName(it.field.name, false) == null
     }
 }
 
-fun findShadowTargets(psiClass: PsiClass, start: PsiClass, superMixin: Boolean): Sequence<ShadowTarget> {
+fun findShadowTargets(psiClass: PsiClass, start: PsiClass, superMixin: Boolean): Sequence<MixinTargetMember> {
     return if (superMixin) {
         findShadowTargetsDeep(psiClass, start)
     } else {
         // No need to walk the hierarchy if we don't have a super mixin
-        findMethods(start).plus<PsiMember>(findFields(start))?.map { ShadowTarget(null, it) } ?: emptySequence()
+        findMethods(start)?.map { MethodTargetMember(it) }
+            .plus(findFields(start)?.map { FieldTargetMember(it) }) ?: emptySequence()
     }
 }
 
-private fun findShadowTargetsDeep(psiClass: PsiClass, start: PsiClass): Sequence<ShadowTarget> {
+private fun findShadowTargetsDeep(psiClass: PsiClass, start: PsiClass): Sequence<MixinTargetMember> {
     return start.streamMixinHierarchy()
         .flatMap { mixin ->
-            findMethods(mixin).plus<PsiMember>(findFields(mixin))
-                ?.filterAccessible(psiClass, mixin)
-                ?.map { ShadowTarget(mixin.takeIf { !(it equivalentTo psiClass) }, it) } ?: emptySequence()
+            val actualMixin = mixin.takeIf { !(it equivalentTo psiClass) }
+            findMethods(mixin)?.map { MethodTargetMember(it, actualMixin) }
+                .plus(findFields(mixin)?.map { FieldTargetMember(it, actualMixin) })
+                ?.filterAccessible(psiClass, mixin) ?: emptySequence()
         }
         .distinctBy {
-            @Suppress("IMPLICIT_CAST_TO_ANY")
-            when (it.member) {
-                is PsiMethod -> MethodSignature(it.member)
-                is PsiField -> FieldSignature(it.member)
-                else -> throw AssertionError()
+            when (it) {
+                is MethodTargetMember -> it.classAndMethod.method.memberReference
+                is FieldTargetMember -> it.classAndField.field.memberReference
             }
         }
 }
 
-fun PsiMethod.findSource(): PsiMethod {
-    val body = body
-    if (body != null) {
-        return this
-    }
+sealed class MixinTargetMember(val mixin: PsiClass?) {
+    abstract val access: Int
+}
+class FieldTargetMember(val classAndField: ClassAndFieldNode, mixin: PsiClass? = null) : MixinTargetMember(mixin) {
+    constructor(clazz: ClassNode, field: FieldNode) : this(ClassAndFieldNode(clazz, field))
 
-    // Attempt to find the source if we have a compiled method
-    return (this as? ClsMethodImpl)?.sourceMirrorMethod ?: this
+    override val access = classAndField.field.access
+}
+class MethodTargetMember(val classAndMethod: ClassAndMethodNode, mixin: PsiClass? = null) : MixinTargetMember(mixin) {
+    constructor(clazz: ClassNode, method: MethodNode) : this(ClassAndMethodNode(clazz, method))
+
+    override val access = classAndMethod.method.access
 }
 
-data class ShadowTarget(val mixin: PsiClass?, val member: PsiMember)
-
-private fun <T : PsiMember> Sequence<T>.filterAccessible(psiClass: PsiClass, target: PsiClass): Sequence<T> {
+private fun Sequence<MixinTargetMember>.filterAccessible(
+    psiClass: PsiClass,
+    target: PsiClass
+): Sequence<MixinTargetMember> {
     return if (psiClass equivalentTo target) this else filter {
-        PsiUtil.getAccessLevel(it.modifierList!!) >= PsiUtil.ACCESS_LEVEL_PROTECTED
+        (it.access and (Opcodes.ACC_PUBLIC or Opcodes.ACC_PROTECTED)) != 0
     }
 }
 
 private fun PsiClass.streamMixinHierarchy(): Sequence<PsiClass> {
     return generateSequence(this) {
         it.superClass?.takeIf { it.isMixin }
-    }
-}
-
-private class MethodSignature(private val method: PsiMethod) {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as MethodSignature
-
-        if (method.name != other.method.name) {
-            return false
-        }
-
-        return method.isMatchingMethod(other.method)
-    }
-
-    override fun hashCode(): Int {
-        var result = method.name.hashCode()
-
-        for (parameter in method.parameterList.parameters) {
-            result = 31 * result + TypeConversionUtil.erasure(parameter.type).hashCode()
-        }
-
-        method.returnType?.let { result = 31 * result + TypeConversionUtil.erasure(it).hashCode() }
-        return result
-    }
-}
-
-private class FieldSignature(private val field: PsiField) {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as FieldSignature
-
-        return field.name == other.field.name && field.isMatchingField(other.field)
-    }
-
-    override fun hashCode(): Int {
-        return 31 * field.name.hashCode() + TypeConversionUtil.erasure(field.type).hashCode()
     }
 }
 
