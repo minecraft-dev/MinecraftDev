@@ -300,6 +300,7 @@
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.mixin.insight.MixinImplicitUsageProvider"/>
         <deadCode implementation="com.demonwav.mcdev.platform.mixin.insight.MixinEntryPoint"/>
 
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.DefaultAnnotationParamInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.MixinClassCastInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.ShadowOverwriteInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.suppress.ShadowNullableInspectionSuppressor"/>
