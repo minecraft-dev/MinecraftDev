@@ -138,6 +138,8 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         return "Cannot resolve any target instructions in target class"
     }
 
+    open val allowCoerce = false
+
     data class InsnResult(val method: ClassAndMethodNode, val result: CollectVisitor.Result<*>)
 
     companion object {

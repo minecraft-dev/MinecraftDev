@@ -16,11 +16,12 @@ import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.COERCE
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
+import com.demonwav.mcdev.platform.mixin.util.isAssignable
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.fullQualifiedName
-import com.demonwav.mcdev.util.isErasureEquivalentTo
 import com.demonwav.mcdev.util.synchronize
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.LocalQuickFix
@@ -35,8 +36,11 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
+import com.intellij.psi.PsiPrimitiveType
+import com.intellij.psi.PsiType
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.codeStyle.VariableKind
+import com.intellij.psi.util.TypeConversionUtil
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
@@ -119,10 +123,10 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
                         var isValid = false
                         for ((expectedParameters, expectedReturnType) in possibleSignatures) {
-                            if (checkParameters(parameters, expectedParameters)) {
+                            if (checkParameters(parameters, expectedParameters, handler.allowCoerce)) {
                                 val methodReturnType = method.returnType
                                 if (methodReturnType != null &&
-                                    methodReturnType.isErasureEquivalentTo(expectedReturnType)
+                                    checkReturnType(expectedReturnType, methodReturnType, method, handler.allowCoerce)
                                 ) {
                                     isValid = true
                                     break
@@ -133,7 +137,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                         if (!isValid) {
                             val (expectedParameters, expectedReturnType) = possibleSignatures[0]
 
-                            if (!checkParameters(parameters, expectedParameters)) {
+                            if (!checkParameters(parameters, expectedParameters, handler.allowCoerce)) {
                                 reportedSignature = true
 
                                 holder.registerProblem(
@@ -145,7 +149,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
                             val methodReturnType = method.returnType
                             if (methodReturnType == null ||
-                                !methodReturnType.isErasureEquivalentTo(expectedReturnType)
+                                !checkReturnType(expectedReturnType, methodReturnType, method, handler.allowCoerce)
                             ) {
                                 reportedSignature = true
 
@@ -187,13 +191,37 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             return null
         }
 
-        private fun checkParameters(parameterList: PsiParameterList, expected: List<ParameterGroup>): Boolean {
+        private fun checkReturnType(
+            expectedReturnType: PsiType,
+            methodReturnType: PsiType,
+            method: PsiMethod,
+            allowCoerce: Boolean
+        ): Boolean {
+            val expectedErasure = TypeConversionUtil.erasure(expectedReturnType)
+            val returnErasure = TypeConversionUtil.erasure(methodReturnType)
+            if (expectedErasure == returnErasure) {
+                return true
+            }
+            if (!allowCoerce || !method.hasAnnotation(COERCE)) {
+                return false
+            }
+            if (expectedReturnType is PsiPrimitiveType || methodReturnType is PsiPrimitiveType) {
+                return false
+            }
+            return isAssignable(expectedReturnType, methodReturnType)
+        }
+
+        private fun checkParameters(
+            parameterList: PsiParameterList,
+            expected: List<ParameterGroup>,
+            allowCoerce: Boolean
+        ): Boolean {
             val parameters = parameterList.parameters
             var pos = 0
 
             for (group in expected) {
                 // Check if parameter group matches
-                if (group.match(parameters, pos)) {
+                if (group.match(parameters, pos, allowCoerce)) {
                     pos += group.size
                 } else if (group.required) {
                     return false

@@ -90,6 +90,8 @@ class RedirectInjectorHandler : InjectorAnnotationHandler() {
         }
     }
 
+    override val allowCoerce = true
+
     private interface RedirectType {
         fun isInsnAllowed(node: AbstractInsnNode) = true
 

@@ -71,4 +71,6 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
 
         return listOf(MethodSignature(result, PsiType.VOID))
     }
+
+    override val allowCoerce = true
 }
