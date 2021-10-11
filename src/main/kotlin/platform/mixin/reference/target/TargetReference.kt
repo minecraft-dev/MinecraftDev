@@ -19,7 +19,6 @@ import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.insideAnnotationAttribute
-import com.demonwav.mcdev.util.mapFirstNotNull
 import com.demonwav.mcdev.util.reference.PolyReferenceResolver
 import com.demonwav.mcdev.util.reference.completeToLiteral
 import com.intellij.patterns.ElementPattern
@@ -30,7 +29,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMember
-import com.intellij.psi.PsiMethod
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.ArrayUtilRt
@@ -60,11 +58,12 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
      * reference as unresolved.
      */
     private fun getTargets(at: PsiAnnotation): List<ClassAndMethodNode>? {
-        val method = at.parentOfType<PsiMethod>() ?: return emptyList()
-        val (handler, annotation) = method.annotations.mapFirstNotNull { annotation ->
-            val qName = annotation.qualifiedName ?: return@mapFirstNotNull null
-            MixinAnnotationHandler.forMixinAnnotation(qName)?.let { it to annotation }
-        } ?: return null
+        val (handler, annotation) = generateSequence(at.parent) { it.parent }
+            .filterIsInstance<PsiAnnotation>()
+            .mapNotNull { annotation ->
+                val qName = annotation.qualifiedName ?: return@mapNotNull null
+                MixinAnnotationHandler.forMixinAnnotation(qName)?.let { it to annotation }
+            }.firstOrNull() ?: return null
         return handler.resolveTarget(annotation).mapNotNull { (it as? MethodTargetMember)?.classAndMethod }
     }
 
