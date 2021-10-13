@@ -167,9 +167,9 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         protected fun sanitizedParameter(type: PsiType, name: String?): Parameter {
             // Parameters should not use ellipsis because others like CallbackInfo may follow
             return if (type is PsiEllipsisType) {
-                Parameter(name, type.toArrayType())
+                Parameter(name?.toJavaIdentifier(), type.toArrayType())
             } else {
-                Parameter(name, type)
+                Parameter(name?.toJavaIdentifier(), type)
             }
         }
     }
