@@ -178,11 +178,12 @@ fun findClassNodeByPsiClass(psiClass: PsiClass, module: Module? = psiClass.findM
         }
     } catch (e: Throwable) {
         val actualThrowable = if (e is InvocationTargetException) e.cause ?: e else e
+        if (actualThrowable is ProcessCanceledException) {
+            throw actualThrowable
+        }
         val message = actualThrowable.message
         // TODO: display an error to the user?
-        if (actualThrowable !is ProcessCanceledException &&
-            (message == null || !message.contains("Unsupported class file major version"))
-        ) {
+        if (message == null || !message.contains("Unsupported class file major version")) {
             LOGGER.error(actualThrowable)
         }
         null
