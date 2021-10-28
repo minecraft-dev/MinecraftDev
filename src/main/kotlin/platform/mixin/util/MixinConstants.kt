@@ -31,6 +31,7 @@ object MixinConstants {
         const val SHIFT = "org.spongepowered.asm.mixin.injection.At.Shift"
 
         const val SERIALIZED_NAME = "com.google.gson.annotations.SerializedName"
+        const val MIXIN_SERIALIZED_NAME = "org.spongepowered.include.$SERIALIZED_NAME"
     }
 
     object Annotations {

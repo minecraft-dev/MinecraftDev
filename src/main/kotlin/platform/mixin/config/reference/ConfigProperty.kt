@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.config.reference
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.MIXIN_CONFIG
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.MIXIN_SERIALIZED_NAME
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.SERIALIZED_NAME
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findAnnotation
@@ -62,9 +63,16 @@ object ConfigProperty : PsiReferenceProvider() {
     }
 
     private inline fun forEachProperty(configClass: PsiClass, func: (PsiField, String) -> Unit) {
+        val mixinSerializedNameClass =
+            JavaPsiFacade.getInstance(configClass.project).findClass(MIXIN_SERIALIZED_NAME, configClass.resolveScope)
+        val serializedNameName = if (mixinSerializedNameClass != null) {
+            MIXIN_SERIALIZED_NAME
+        } else {
+            SERIALIZED_NAME
+        }
         for (field in configClass.fields) {
-            val name =
-                field.findAnnotation(SERIALIZED_NAME)?.findDeclaredAttributeValue(null)?.constantStringValue ?: continue
+            val annotation = field.findAnnotation(serializedNameName)
+            val name = annotation?.findDeclaredAttributeValue(null)?.constantStringValue ?: continue
             func(field, name)
         }
     }
