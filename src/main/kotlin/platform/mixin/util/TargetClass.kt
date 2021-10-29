@@ -13,11 +13,9 @@ package com.demonwav.mcdev.platform.mixin.util
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DYNAMIC
 import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.findAnnotation
-import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.resolveClass
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMember
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
@@ -27,9 +25,6 @@ import org.objectweb.asm.tree.MethodNode
 fun PsiMember.findUpstreamMixin(): PsiClass? {
     return findAnnotation(DYNAMIC)?.findDeclaredAttributeValue("mixin")?.resolveClass()
 }
-
-val PsiElement.isWithinDynamicMixin: Boolean
-    get() = findContainingMethod()?.findAnnotation(DYNAMIC) != null
 
 data class ClassAndMethodNode(val clazz: ClassNode, val method: MethodNode)
 
