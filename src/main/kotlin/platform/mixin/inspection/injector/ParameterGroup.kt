@@ -22,7 +22,8 @@ import com.intellij.psi.util.TypeConversionUtil
 data class ParameterGroup(
     val parameters: List<Parameter>?,
     val required: Boolean = parameters != null,
-    val default: Boolean = required
+    val default: Boolean = required,
+    val stopIfNoMatch: Boolean = false
 ) {
 
     val size

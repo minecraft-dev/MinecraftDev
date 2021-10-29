@@ -16,16 +16,28 @@ import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.facet.FacetManager
 import com.intellij.facet.impl.ui.libraries.LibrariesValidatorContextImpl
+import com.intellij.framework.library.LibraryVersionProperties
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootEvent
 import com.intellij.openapi.roots.ModuleRootListener
+import com.intellij.openapi.roots.OrderRootType
+import com.intellij.openapi.roots.libraries.LibraryDetectionManager
 import com.intellij.openapi.roots.libraries.LibraryKind
+import com.intellij.openapi.roots.libraries.LibraryProperties
 import com.intellij.openapi.roots.ui.configuration.libraries.LibraryPresentationManager
 import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.util.Key
 
 class MinecraftFacetDetector : StartupActivity {
+    companion object {
+        private val libraryVersionsKey = Key<MutableMap<LibraryKind, String>>("mcdev.libraryVersions")
+
+        fun getLibraryVersions(module: Module): Map<LibraryKind, String> {
+            return module.getUserData(libraryVersionsKey) ?: emptyMap()
+        }
+    }
 
     override fun runActivity(project: Project) {
         MinecraftModuleRootListener.doCheck(project)
@@ -96,6 +108,10 @@ class MinecraftFacetDetector : StartupActivity {
         }
 
         private fun autoDetectTypes(module: Module): Set<PlatformType> {
+            val libraryVersions = module.getUserData(libraryVersionsKey)
+                ?: mutableMapOf<LibraryKind, String>().also { module.putUserData(libraryVersionsKey, it) }
+            libraryVersions.clear()
+
             val presentationManager = LibraryPresentationManager.getInstance()
             val context = LibrariesValidatorContextImpl(module)
 
@@ -108,6 +124,24 @@ class MinecraftFacetDetector : StartupActivity {
                 .forEachLibrary forEach@{ library ->
                     MINECRAFT_LIBRARY_KINDS.forEach { kind ->
                         if (presentationManager.isLibraryOfKind(library, context.librariesContainer, setOf(kind))) {
+                            val libraryFiles =
+                                context.librariesContainer.getLibraryFiles(library, OrderRootType.CLASSES).toList()
+                            LibraryDetectionManager.getInstance().processProperties(
+                                libraryFiles,
+                                object : LibraryDetectionManager.LibraryPropertiesProcessor {
+                                    override fun <P : LibraryProperties<*>?> processProperties(
+                                        kind: LibraryKind,
+                                        properties: P
+                                    ): Boolean {
+                                        return if (properties is LibraryVersionProperties) {
+                                            libraryVersions[kind] = properties.versionString ?: return true
+                                            false
+                                        } else {
+                                            true
+                                        }
+                                    }
+                                }
+                            )
                             platformKinds.add(kind)
                         }
                     }

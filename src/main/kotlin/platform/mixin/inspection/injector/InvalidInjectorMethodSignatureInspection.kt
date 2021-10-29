@@ -225,7 +225,14 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                     pos += group.size
                 } else if (group.required) {
                     return false
+                } else if (group.stopIfNoMatch) {
+                    break
                 }
+            }
+
+            // check we have consumed all the parameters
+            if (pos < parameters.size) {
+                return false
             }
 
             return true
