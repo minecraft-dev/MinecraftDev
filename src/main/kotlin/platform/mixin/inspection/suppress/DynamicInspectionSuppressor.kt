@@ -12,7 +12,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.suppress
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DYNAMIC
 import com.demonwav.mcdev.util.findAnnotation
-import com.demonwav.mcdev.util.findContainingMethod
+import com.demonwav.mcdev.util.findContainingMember
 import com.intellij.codeInspection.InspectionSuppressor
 import com.intellij.codeInspection.SuppressQuickFix
 import com.intellij.psi.PsiElement
@@ -34,7 +34,7 @@ class DynamicInspectionSuppressor : InspectionSuppressor {
         if (toolId !in suppressedInspections) {
             return false
         }
-        return element.findContainingMethod()?.findAnnotation(DYNAMIC) != null
+        return element.findContainingMember()?.findAnnotation(DYNAMIC) != null
     }
 
     override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> {
