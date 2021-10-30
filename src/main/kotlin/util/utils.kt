@@ -184,6 +184,15 @@ fun <T> Array<T>.rotate(amount: Int) {
     }
 }
 
+inline fun <T> Iterable<T>.firstIndexOrNull(predicate: (T) -> Boolean): Int? {
+    for ((index, element) in this.withIndex()) {
+        if (predicate(element)) {
+            return index
+        }
+    }
+    return null
+}
+
 fun Module.findChildren(): Set<Module> {
     return runReadAction {
         val manager = ModuleManager.getInstance(project)
