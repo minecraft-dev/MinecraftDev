@@ -26,6 +26,7 @@ import com.demonwav.mcdev.util.synchronize
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
@@ -34,7 +35,6 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
-import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
@@ -123,7 +123,9 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
                         var isValid = false
                         for ((expectedParameters, expectedReturnType) in possibleSignatures) {
-                            if (checkParameters(parameters, expectedParameters, handler.allowCoerce)) {
+                            val paramsMatch =
+                                checkParameters(parameters, expectedParameters, handler.allowCoerce) == CheckResult.OK
+                            if (paramsMatch) {
                                 val methodReturnType = method.returnType
                                 if (methodReturnType != null &&
                                     checkReturnType(expectedReturnType, methodReturnType, method, handler.allowCoerce)
@@ -137,14 +139,26 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                         if (!isValid) {
                             val (expectedParameters, expectedReturnType) = possibleSignatures[0]
 
-                            if (!checkParameters(parameters, expectedParameters, handler.allowCoerce)) {
+                            val checkResult = checkParameters(parameters, expectedParameters, handler.allowCoerce)
+                            if (checkResult != CheckResult.OK) {
                                 reportedSignature = true
 
-                                holder.registerProblem(
-                                    parameters,
-                                    "Method parameters do not match expected parameters for $annotationName",
-                                    ParametersQuickFix(expectedParameters, handler is InjectAnnotationHandler)
+                                val description =
+                                    "Method parameters do not match expected parameters for $annotationName"
+                                val quickFix = ParametersQuickFix(
+                                    expectedParameters,
+                                    handler is InjectAnnotationHandler
                                 )
+                                if (checkResult == CheckResult.ERROR) {
+                                    holder.registerProblem(parameters, description, quickFix)
+                                } else {
+                                    holder.registerProblem(
+                                        parameters,
+                                        description,
+                                        ProblemHighlightType.WARNING,
+                                        quickFix
+                                    )
+                                }
                             }
 
                             val methodReturnType = method.returnType
@@ -215,7 +229,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             parameterList: PsiParameterList,
             expected: List<ParameterGroup>,
             allowCoerce: Boolean
-        ): Boolean {
+        ): CheckResult {
             val parameters = parameterList.parameters
             var pos = 0
 
@@ -223,20 +237,33 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                 // Check if parameter group matches
                 if (group.match(parameters, pos, allowCoerce)) {
                     pos += group.size
-                } else if (group.required) {
-                    return false
-                } else if (group.stopIfNoMatch) {
-                    break
+                } else if (group.required != ParameterGroup.RequiredLevel.OPTIONAL) {
+                    return if (group.required == ParameterGroup.RequiredLevel.ERROR_IF_ABSENT) {
+                        CheckResult.ERROR
+                    } else {
+                        CheckResult.WARNING
+                    }
                 }
             }
 
             // check we have consumed all the parameters
             if (pos < parameters.size) {
-                return false
+                return if (
+                    expected.lastOrNull()?.isVarargs == true &&
+                    expected.last().required == ParameterGroup.RequiredLevel.WARN_IF_ABSENT
+                ) {
+                    CheckResult.WARNING
+                } else {
+                    CheckResult.ERROR
+                }
             }
 
-            return true
+            return CheckResult.OK
         }
+    }
+
+    private enum class CheckResult {
+        OK, WARNING, ERROR
     }
 
     private class ParametersQuickFix(
@@ -260,16 +287,16 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                 return@dropWhile fqname != MixinConstants.Classes.CALLBACK_INFO &&
                     fqname != MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
             }.drop(1) // the first element in the list is the CallbackInfo but we don't want it
-            val newParams = expected.flatMapTo(mutableListOf<PsiParameter>()) {
+            val newParams = expected.flatMapTo(mutableListOf()) {
                 if (it.default) {
-                    it.parameters?.mapIndexed { i: Int, p: Parameter ->
+                    it.parameters.mapIndexed { i: Int, p: Parameter ->
                         JavaPsiFacade.getElementFactory(project).createParameter(
                             p.name ?: JavaCodeStyleManager.getInstance(project)
                                 .suggestVariableName(VariableKind.PARAMETER, null, null, p.type).names
                                 .firstOrNull() ?: "var$i",
                             p.type
                         )
-                    } ?: emptyList()
+                    }
                 } else {
                     emptyList()
                 }

@@ -39,8 +39,27 @@ package com.demonwav.mcdev.platform.mixin.util
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.psiType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
+import com.intellij.psi.CommonClassNames
+import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.JavaRecursiveElementWalkingVisitor
+import com.intellij.psi.PsiArrayType
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiForeachStatement
+import com.intellij.psi.PsiLambdaExpression
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiModifier
+import com.intellij.psi.PsiType
+import com.intellij.psi.PsiVariable
+import com.intellij.psi.controlFlow.ControlFlowFactory
+import com.intellij.psi.controlFlow.ControlFlowOptions
+import com.intellij.psi.controlFlow.ControlFlowUtil
+import com.intellij.psi.controlFlow.LocalsControlFlowPolicy
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.parentOfType
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -54,6 +73,141 @@ import org.objectweb.asm.tree.VarInsnNode
 import org.objectweb.asm.tree.analysis.BasicValue
 
 object LocalVariables {
+    fun guessLocalsAt(element: PsiElement, argsOnly: Boolean, start: Boolean): List<SourceLocalVariable> {
+        val method = PsiTreeUtil.getParentOfType(element, PsiMethod::class.java, PsiLambdaExpression::class.java)
+            ?: return emptyList()
+        val actualMethod = method.parentOfType<PsiMethod>(withSelf = true) ?: return emptyList()
+        val locals = mutableListOf<SourceLocalVariable>()
+
+        var localIndex = 0
+        if (!actualMethod.hasModifierProperty(PsiModifier.STATIC)) {
+            locals += SourceLocalVariable("this", actualMethod.containingClass?.psiType ?: return emptyList(), 0)
+            localIndex++
+        }
+
+        for (parameter in method.parameterList.parameters) {
+            val mixinName = if (argsOnly) "var$localIndex" else parameter.name
+            val type = parameter.type
+            locals += SourceLocalVariable(parameter.name, type, localIndex, mixinName = mixinName)
+            localIndex++
+            if (type == PsiType.LONG || type == PsiType.DOUBLE) {
+                localIndex++
+            }
+        }
+
+        if (argsOnly) {
+            return locals
+        }
+
+        val body = method.body ?: return locals
+        val controlFlow = ControlFlowFactory.getControlFlow(
+            body,
+            LocalsControlFlowPolicy(body),
+            ControlFlowOptions.NO_CONST_EVALUATE
+        )
+        var elementLocation: Int
+        var elem = element
+        do {
+            elementLocation = if (start) controlFlow.getStartOffset(elem) else controlFlow.getEndOffset(elem)
+            if (elementLocation >= 0) {
+                break
+            }
+            elem = elem.parent!! // will always be non-null since we stop at the method
+        } while (elem != method)
+        if (elementLocation < 0) {
+            return locals
+        }
+
+        method.body?.accept(
+            object : JavaRecursiveElementWalkingVisitor() {
+                override fun visitVariable(variable: PsiVariable) {
+                    val name = variable.name
+                    if (name != null && ControlFlowUtil.needVariableValueAt(variable, controlFlow, elementLocation)) {
+                        locals += SourceLocalVariable(name, variable.type, localIndex)
+                        localIndex++
+                        if (variable.type == PsiType.LONG || variable.type == PsiType.DOUBLE) {
+                            localIndex++
+                        }
+                    }
+                    super.visitVariable(variable)
+                }
+
+                override fun visitForeachStatement(statement: PsiForeachStatement) {
+                    if (PsiTreeUtil.isAncestor(statement, element, false)) {
+                        val iterable = statement.iteratedValue
+                        if (iterable != null) {
+                            val type = iterable.type
+                            val useCount = if (statement == element) 1 else 0
+                            if (type is PsiArrayType) {
+                                // array
+                                locals += SourceLocalVariable(
+                                    "var$localIndex",
+                                    type,
+                                    localIndex++,
+                                    implicitLoadCountBefore = useCount,
+                                    implicitStoreCountBefore = useCount
+                                )
+                                // length
+                                locals += SourceLocalVariable(
+                                    "var$localIndex",
+                                    PsiType.INT,
+                                    localIndex++,
+                                    implicitStoreCountBefore = useCount,
+                                    implicitLoadCountAfter = useCount
+                                )
+                                // index
+                                locals += SourceLocalVariable(
+                                    "var$localIndex",
+                                    PsiType.INT,
+                                    localIndex++,
+                                    implicitStoreCountBefore = useCount,
+                                    implicitLoadCountBefore = useCount,
+                                    implicitLoadCountAfter = useCount
+                                )
+                            } else {
+                                val iteratorType = JavaPsiFacade.getElementFactory(statement.project)
+                                    .createTypeByFQClassName(
+                                        CommonClassNames.JAVA_UTIL_ITERATOR,
+                                        statement.resolveScope
+                                    )
+                                // iterator
+                                locals += SourceLocalVariable(
+                                    "var$localIndex",
+                                    iteratorType,
+                                    localIndex++,
+                                    implicitStoreCountBefore = useCount,
+                                    implicitLoadCountBefore = useCount
+                                )
+                            }
+                        }
+                    }
+                    super.visitForeachStatement(statement)
+                }
+
+                override fun visitClass(aClass: PsiClass?) {
+// don't go deeper
+                }
+
+                override fun visitLambdaExpression(expression: PsiLambdaExpression?) {
+// don't go deeper
+                }
+
+                override fun visitMethod(method: PsiMethod?) {
+// don't go deeper
+                }
+
+                override fun elementFinished(e: PsiElement) {
+                    super.visitElement(e)
+                    if (e == element) {
+                        stopWalking()
+                    }
+                }
+            }
+        )
+
+        return locals
+    }
+
     fun getLocals(
         module: Module,
         classNode: ClassNode,
@@ -528,6 +682,17 @@ object LocalVariables {
             )
         }
     }
+
+    class SourceLocalVariable(
+        val name: String,
+        val type: PsiType,
+        val index: Int,
+        val mixinName: String = name,
+        val implicitLoadCountBefore: Int = 0,
+        val implicitLoadCountAfter: Int = 0,
+        val implicitStoreCountBefore: Int = 0,
+        val implicitStoreCountAfter: Int = 0
+    )
 
     open class LocalVariable(
         val name: String,
