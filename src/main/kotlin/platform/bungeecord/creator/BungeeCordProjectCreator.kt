@@ -152,8 +152,8 @@ class BungeeCordDependenciesStep(
             PlatformType.WATERFALL -> {
                 buildSystem.repositories.add(
                     BuildRepository(
-                        "destroystokyo-repo",
-                        "https://repo.destroystokyo.com/repository/maven-public/"
+                        "papermc-repo",
+                        "https://papermc.io/repo/repository/maven-public/"
                     )
                 )
                 buildSystem.dependencies.add(
