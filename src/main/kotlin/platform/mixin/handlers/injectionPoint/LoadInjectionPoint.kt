@@ -132,7 +132,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
                             ) &&
                         PsiUtil.isConstantExpression(parentExpr.rExpression) &&
                         (parentExpr.rExpression?.constantValue as? Number)?.toInt()
-                        ?.let { it >= -128 && it <= 127 } == true
+                        ?.let { it >= Short.MIN_VALUE && it <= Short.MAX_VALUE } == true
                     val isIinc = isIincUnary || isIincAssignment
                     if (isIinc) {
                         if (store) {
@@ -161,7 +161,10 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
 
         private fun checkImplicitLocalsPre(location: PsiElement) {
             val localsHere = LocalVariables.guessLocalsAt(location, info.argsOnly, true)
-            for (local in localsHere) {
+            val localIndex = LocalVariables.guessLocalVariableIndex(location) ?: return
+            val localCount = LocalVariables.getLocalVariableSize(location)
+            for (i in localIndex until (localIndex + localCount)) {
+                val local = localsHere.firstOrNull { it.index == i } ?: continue
                 if (store) {
                     repeat(local.implicitStoreCountBefore) {
                         addLocalUsage(location, local.name, localsHere)
@@ -176,7 +179,10 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
 
         private fun checkImplicitLocalsPost(location: PsiElement) {
             val localsHere = LocalVariables.guessLocalsAt(location, info.argsOnly, false)
-            for (local in localsHere) {
+            val localIndex = LocalVariables.guessLocalVariableIndex(location) ?: return
+            val localCount = LocalVariables.getLocalVariableSize(location)
+            for (i in localIndex until (localIndex + localCount)) {
+                val local = localsHere.firstOrNull { it.index == i } ?: continue
                 if (store) {
                     repeat(local.implicitStoreCountAfter) {
                         addLocalUsage(location, local.name, localsHere)
