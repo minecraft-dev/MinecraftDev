@@ -46,7 +46,7 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
         result.add(
             ParameterGroup(
                 collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
-                required = false,
+                required = ParameterGroup.RequiredLevel.OPTIONAL,
                 default = true
             )
         )
@@ -68,11 +68,9 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
         )
 
         // Captured locals (only if local capture is enabled)
-        if ((
-            (annotation.findDeclaredAttributeValue("locals") as? PsiQualifiedReference)
-                ?.referenceName ?: "NO_CAPTURE"
-            ) != "NO_CAPTURE"
-        ) {
+        val localCapture = (annotation.findDeclaredAttributeValue("locals") as? PsiQualifiedReference)
+            ?.referenceName ?: "NO_CAPTURE"
+        if (localCapture != "NO_CAPTURE") {
             annotation.findModule()?.let { module ->
                 var commonLocalsPrefix: MutableList<LocalVariables.LocalVariable>? = null
                 val resolvedInsns = resolveInstructions(annotation, targetClass, targetMethod).ifEmpty { return@let }
@@ -97,18 +95,24 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
 
                 if (commonLocalsPrefix != null) {
                     val elementFactory = JavaPsiFacade.getElementFactory(annotation.project)
-                    for (local in commonLocalsPrefix) {
+                    val localParams = commonLocalsPrefix.map { local ->
                         val type =
                             Type.getType(local.desc).toPsiType(elementFactory, annotation.parentOfType<PsiMethod>())
-                        result.add(
-                            ParameterGroup(
-                                listOf(sanitizedParameter(type, local.name)),
-                                required = false,
-                                default = true,
-                                stopIfNoMatch = true
-                            )
-                        )
+                        sanitizedParameter(type, local.name)
                     }
+                    val requiredLevel = if (localCapture == "CAPTURE_FAILSOFT") {
+                        ParameterGroup.RequiredLevel.WARN_IF_ABSENT
+                    } else {
+                        ParameterGroup.RequiredLevel.ERROR_IF_ABSENT
+                    }
+                    result.add(
+                        ParameterGroup(
+                            localParams,
+                            default = true,
+                            required = requiredLevel,
+                            isVarargs = true
+                        )
+                    )
                 }
             }
         }

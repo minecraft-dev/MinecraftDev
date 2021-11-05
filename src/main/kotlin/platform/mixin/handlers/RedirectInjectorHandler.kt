@@ -84,7 +84,8 @@ class RedirectInjectorHandler : InjectorAnnotationHandler() {
             // add a parameter group for capturing the target method parameters
             val extraGroup = ParameterGroup(
                 collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
-                required = false
+                required = ParameterGroup.RequiredLevel.OPTIONAL,
+                isVarargs = true
             )
             MethodSignature(paramGroups + extraGroup, returnType)
         }
@@ -385,7 +386,7 @@ class RedirectInjectorHandler : InjectorAnnotationHandler() {
                 }
             ).map { (paramGroups, _) ->
                 // drop the instance parameter, return the constructed type
-                MethodSignature(listOf(ParameterGroup(paramGroups[0].parameters?.drop(1))), constructedType)
+                MethodSignature(listOf(ParameterGroup(paramGroups[0].parameters.drop(1))), constructedType)
             }
         }
     }

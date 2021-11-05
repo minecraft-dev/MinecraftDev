@@ -113,10 +113,11 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
     open fun resolveInstructions(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
-        targetMethod: MethodNode
+        targetMethod: MethodNode,
+        mode: CollectVisitor.Mode = CollectVisitor.Mode.MATCH_ALL
     ): List<CollectVisitor.Result<*>> {
         val at = annotation.findAttributeValue("at") as? PsiAnnotation ?: return emptyList()
-        return AtResolver(at, targetClass, targetMethod).resolveInstructions()
+        return AtResolver(at, targetClass, targetMethod).resolveInstructions(mode)
     }
 
     /**

@@ -29,6 +29,7 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
+import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiKeyword
 import com.intellij.psi.PsiMember
@@ -46,6 +47,7 @@ import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.PsiTypesUtil
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import com.siyeh.ig.psiutils.ImportUtils
@@ -181,8 +183,15 @@ infix fun PsiElement.equivalentTo(other: PsiElement): Boolean {
 }
 
 fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
-    // TODO: Do more checks for generics instead
-    return TypeConversionUtil.erasure(this) == TypeConversionUtil.erasure(other)
+    return this?.normalize() == other?.normalize()
+}
+
+fun PsiType.normalize(): PsiType {
+    var normalized = TypeConversionUtil.erasure(this)
+    if (normalized is PsiEllipsisType) {
+        normalized = normalized.toArrayType()
+    }
+    return normalized
 }
 
 val PsiMethod.nameAndParameterTypes: String
@@ -249,3 +258,6 @@ val PsiMethodReferenceExpression.hasSyntheticMethod: Boolean
         if (qualifier !is PsiReferenceExpression) return true
         return qualifier.resolve() !is PsiClass
     }
+
+val PsiClass.psiType: PsiType
+    get() = PsiTypesUtil.getClassType(this)

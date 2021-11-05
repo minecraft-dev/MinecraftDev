@@ -13,30 +13,24 @@ package com.demonwav.mcdev.platform.mixin.inspection.injector
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.COERCE
 import com.demonwav.mcdev.platform.mixin.util.isAssignable
 import com.demonwav.mcdev.util.Parameter
-import com.intellij.psi.PsiEllipsisType
+import com.demonwav.mcdev.util.normalize
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
-import com.intellij.psi.util.TypeConversionUtil
 
 data class ParameterGroup(
-    val parameters: List<Parameter>?,
-    val required: Boolean = parameters != null,
-    val default: Boolean = required,
-    val stopIfNoMatch: Boolean = false
+    val parameters: List<Parameter>,
+    val required: RequiredLevel = RequiredLevel.ERROR_IF_ABSENT,
+    val default: Boolean = required != RequiredLevel.OPTIONAL,
+    val isVarargs: Boolean = false
 ) {
 
     val size
-        get() = this.parameters?.size ?: 0
+        get() = this.parameters.size
 
     fun match(parameters: Array<PsiParameter>, currentPosition: Int, allowCoerce: Boolean): Boolean {
-        if (this.parameters == null) {
-            // Wildcard parameter groups always match
-            return true
-        }
-
         // Check if remaining parameter count is enough
-        if (currentPosition + size > parameters.size) {
+        if (!isVarargs && currentPosition + size > parameters.size) {
             return false
         }
 
@@ -44,21 +38,28 @@ data class ParameterGroup(
 
         // Check parameter types
         for ((_, expectedType) in this.parameters) {
+            if (isVarargs && pos == parameters.size) {
+                break
+            }
             val parameter = parameters[pos++]
             if (!matchParameter(expectedType, parameter, allowCoerce)) {
                 return false
             }
         }
 
-        return true
+        return !isVarargs || pos == parameters.size
+    }
+
+    enum class RequiredLevel {
+        OPTIONAL, WARN_IF_ABSENT, ERROR_IF_ABSENT
     }
 
     companion object {
         private val INT_TYPES = setOf(PsiType.INT, PsiType.SHORT, PsiType.CHAR, PsiType.BYTE, PsiType.BOOLEAN)
 
         private fun matchParameter(expectedType: PsiType, parameter: PsiParameter, allowCoerce: Boolean): Boolean {
-            val normalizedExpected = normalizeType(expectedType)
-            val normalizedParameter = normalizeType(parameter.type)
+            val normalizedExpected = expectedType.normalize()
+            val normalizedParameter = parameter.type.normalize()
             if (normalizedExpected == normalizedParameter) {
                 return true
             }
@@ -73,15 +74,6 @@ data class ParameterGroup(
                 return normalizedExpected in INT_TYPES && normalizedParameter in INT_TYPES
             }
             return isAssignable(normalizedParameter, normalizedExpected)
-        }
-
-        private fun normalizeType(type: PsiType): PsiType {
-            val erasure = TypeConversionUtil.erasure(type)
-            return if (erasure is PsiEllipsisType) {
-                erasure.toArrayType()
-            } else {
-                erasure
-            }
         }
     }
 }
