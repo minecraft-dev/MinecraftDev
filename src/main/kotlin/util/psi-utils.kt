@@ -22,16 +22,19 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.impl.OrderEntryUtil
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.ElementManipulator
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiKeyword
+import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
@@ -50,6 +53,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiTypesUtil
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
+import com.intellij.util.IncorrectOperationException
 import com.siyeh.ig.psiutils.ImportUtils
 
 // Parent
@@ -261,3 +265,16 @@ val PsiMethodReferenceExpression.hasSyntheticMethod: Boolean
 
 val PsiClass.psiType: PsiType
     get() = PsiTypesUtil.getClassType(this)
+
+fun PsiElementFactory.createLiteralExpression(constant: Any?): PsiLiteralExpression {
+    return when (constant) {
+        null -> createExpressionFromText("null", null)
+        is Boolean, is Double, is Int -> createExpressionFromText(constant.toString(), null)
+        is Char -> createExpressionFromText("'${StringUtil.escapeCharCharacters(constant.toString())}'", null)
+        is Float -> createExpressionFromText("${constant}F", null)
+        is Long -> createExpressionFromText("${constant}L", null)
+        is String -> createExpressionFromText("\"${StringUtil.escapeStringCharacters(constant)}\"", null)
+
+        else -> throw IncorrectOperationException("Unsupported literal type: ${constant.javaClass.name}")
+    } as PsiLiteralExpression
+}
