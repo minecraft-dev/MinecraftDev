@@ -59,7 +59,7 @@
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.Inject" implementation="com.demonwav.mcdev.platform.mixin.handlers.InjectAnnotationHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyArg" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyArgHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyArgs" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyArgsHandler" />
-        <!-- TODO: ModifyConstant -->
+        <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyConstant" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyConstantHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyVariable" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyVariableHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.Redirect" implementation="com.demonwav.mcdev.platform.mixin.handlers.RedirectInjectorHandler" />
 

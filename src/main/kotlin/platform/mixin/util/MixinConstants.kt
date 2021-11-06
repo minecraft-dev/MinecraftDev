@@ -21,6 +21,7 @@ object MixinConstants {
         const val CALLBACK_INFO_RETURNABLE = "org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable"
         const val ARGS = "org.spongepowered.asm.mixin.injection.invoke.arg.Args"
         const val COMPATIBILITY_LEVEL = "org.spongepowered.asm.mixin.MixinEnvironment.CompatibilityLevel"
+        const val CONSTANT_CONDITION = "org.spongepowered.asm.mixin.injection.Constant.Condition"
         const val INJECTION_POINT = "org.spongepowered.asm.mixin.injection.InjectionPoint"
         const val SELECTOR = "org.spongepowered.asm.mixin.injection.InjectionPoint.Selector"
         const val MIXIN_AGENT = "org.spongepowered.tools.agent.MixinAgent"

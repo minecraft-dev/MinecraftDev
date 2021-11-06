@@ -124,7 +124,7 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
         GREATER_THAN_OR_EQUAL_TO_ZERO(Opcodes.IFLT, Opcodes.IFGE),
     }
 
-    private class MyNavigationVisitor(
+    class MyNavigationVisitor(
         private val constantInfo: ConstantInfo
     ) : NavigationVisitor() {
         override fun visitForeachStatement(statement: PsiForeachStatement) {
@@ -194,7 +194,7 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
         }
     }
 
-    private class MyCollectVisitor(
+    class MyCollectVisitor(
         private val project: Project,
         mode: Mode,
         private val constantInfo: ConstantInfo

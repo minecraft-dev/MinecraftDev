@@ -65,7 +65,7 @@ fun PsiAnnotationMemberValue?.isNotEmpty(): Boolean {
     return this != null && (this !is PsiArrayInitializerMemberValue || initializers.isNotEmpty())
 }
 
-private inline fun <T : Any> PsiAnnotationMemberValue.parseArray(func: (PsiAnnotationMemberValue) -> T?): List<T> {
+inline fun <T : Any> PsiAnnotationMemberValue.parseArray(func: (PsiAnnotationMemberValue) -> T?): List<T> {
     return if (this is PsiArrayInitializerMemberValue) {
         initializers.mapNotNull(func)
     } else {
