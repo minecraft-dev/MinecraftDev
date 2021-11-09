@@ -660,6 +660,14 @@
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.DuplicateInterfacePrefixInspection"/>
 
         <!-- Injector Inspections -->
+        <localInspection displayName="@Inject into Constructor"
+                         shortName="InjectIntoConstructor"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InjectIntoConstructorInspection"/>
         <localInspection displayName="Invalid injector method signature"
                          shortName="InvalidInjectorMethodSignature"
                          groupName="Mixin"
