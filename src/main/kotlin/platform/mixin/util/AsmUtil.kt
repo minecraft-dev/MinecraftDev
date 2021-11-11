@@ -169,7 +169,7 @@ fun findClassNodeByPsiClass(psiClass: PsiClass, module: Module? = psiClass.findM
             }
             val classFile = parentDir.findChild("${fqn.substringAfterLast('.')}.class") ?: return null
             val node = ClassNode()
-            ClassReader(classFile.inputStream).accept(node, 0)
+            classFile.inputStream.use { ClassReader(it).accept(node, 0) }
             node
         } else {
             val node = ClassNode()
