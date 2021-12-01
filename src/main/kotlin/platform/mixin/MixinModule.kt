@@ -11,9 +11,13 @@
 package com.demonwav.mcdev.platform.mixin
 
 import com.demonwav.mcdev.facet.MinecraftFacet
+import com.demonwav.mcdev.facet.MinecraftFacetDetector
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.mixin.config.MixinConfig
+import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.nullable
 import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonObject
 import com.intellij.openapi.fileTypes.FileTypeManager
@@ -27,6 +31,13 @@ import com.intellij.psi.search.GlobalSearchScope
 import javax.swing.Icon
 
 class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
+    val mixinVersion by nullable {
+        var version = MinecraftFacetDetector.getLibraryVersions(facet.module)[MIXIN_LIBRARY_KIND]
+            ?: return@nullable null
+        // fabric mixin uses the format "0.10.4+mixin.0.8.4", return the original string otherwise.
+        version = version.substringAfter("+mixin.")
+        SemanticVersion.parse(version)
+    }
 
     override val moduleType = MixinModuleType
     override val type = PlatformType.MIXIN

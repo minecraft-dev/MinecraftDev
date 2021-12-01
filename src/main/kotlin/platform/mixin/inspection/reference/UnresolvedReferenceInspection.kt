@@ -16,7 +16,6 @@ import com.demonwav.mcdev.platform.mixin.reference.InjectionPointReference
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
-import com.demonwav.mcdev.platform.mixin.util.isWithinDynamicMixin
 import com.demonwav.mcdev.util.annotationFromNameValuePair
 import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.codeInspection.ProblemHighlightType
@@ -60,7 +59,7 @@ class UnresolvedReferenceInspection : MixinInspection() {
         }
 
         private fun checkResolved(resolver: MixinReference, value: PsiAnnotationMemberValue) {
-            if (resolver.isUnresolved(value) && !value.isWithinDynamicMixin) {
+            if (resolver.isUnresolved(value)) {
                 holder.registerProblem(
                     value,
                     "Cannot resolve ${resolver.description}".format(value.constantStringValue),

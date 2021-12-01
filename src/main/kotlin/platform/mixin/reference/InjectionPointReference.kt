@@ -49,7 +49,8 @@ object InjectionPointReference : ReferenceResolver(), MixinReference {
     override fun resolveReference(context: PsiElement): PsiElement? {
         // Remove slice selectors from the injection point type
         var name = context.constantStringValue ?: return null
-        val isInsideSlice = context.parentOfType<PsiAnnotation>()?.hasQualifiedName(SLICE) == true
+        val at = context.parentOfType<PsiAnnotation>() ?: return null
+        val isInsideSlice = at.parentOfType<PsiAnnotation>()?.hasQualifiedName(SLICE) == true
         if (isInsideSlice) {
             for (sliceSelector in getSliceSelectors(context.project)) {
                 if (name.endsWith(":$sliceSelector")) {

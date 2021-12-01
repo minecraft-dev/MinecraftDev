@@ -21,6 +21,7 @@ object MixinConstants {
         const val CALLBACK_INFO_RETURNABLE = "org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable"
         const val ARGS = "org.spongepowered.asm.mixin.injection.invoke.arg.Args"
         const val COMPATIBILITY_LEVEL = "org.spongepowered.asm.mixin.MixinEnvironment.CompatibilityLevel"
+        const val CONSTANT_CONDITION = "org.spongepowered.asm.mixin.injection.Constant.Condition"
         const val INJECTION_POINT = "org.spongepowered.asm.mixin.injection.InjectionPoint"
         const val SELECTOR = "org.spongepowered.asm.mixin.injection.InjectionPoint.Selector"
         const val MIXIN_AGENT = "org.spongepowered.tools.agent.MixinAgent"
@@ -31,12 +32,15 @@ object MixinConstants {
         const val SHIFT = "org.spongepowered.asm.mixin.injection.At.Shift"
 
         const val SERIALIZED_NAME = "com.google.gson.annotations.SerializedName"
+        const val MIXIN_SERIALIZED_NAME = "org.spongepowered.include.$SERIALIZED_NAME"
     }
 
     object Annotations {
         const val ACCESSOR = "org.spongepowered.asm.mixin.gen.Accessor"
         const val AT = "org.spongepowered.asm.mixin.injection.At"
         const val AT_CODE = "org.spongepowered.asm.mixin.injection.InjectionPoint.AtCode"
+        const val COERCE = "org.spongepowered.asm.mixin.injection.Coerce"
+        const val CONSTANT = "org.spongepowered.asm.mixin.injection.Constant"
         const val DEBUG = "org.spongepowered.asm.mixin.Debug"
         const val DESC = "org.spongepowered.asm.mixin.injection.Desc"
         const val DYNAMIC = "org.spongepowered.asm.mixin.Dynamic"

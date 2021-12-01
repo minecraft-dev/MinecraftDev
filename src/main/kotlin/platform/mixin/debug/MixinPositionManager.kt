@@ -14,7 +14,6 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.ifEmpty
-import com.demonwav.mcdev.util.mapNotNull
 import com.intellij.debugger.MultiRequestPositionManager
 import com.intellij.debugger.NoDataException
 import com.intellij.debugger.SourcePosition
@@ -33,8 +32,6 @@ import com.sun.jdi.AbsentInformationException
 import com.sun.jdi.Location
 import com.sun.jdi.ReferenceType
 import com.sun.jdi.request.ClassPrepareRequest
-import java.util.stream.Stream
-import kotlin.streams.toList
 
 class MixinPositionManager(private val debugProcess: DebugProcess) : MultiRequestPositionManager {
 
@@ -86,7 +83,7 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
     override fun getAllClasses(classPosition: SourcePosition): List<ReferenceType> {
         return runReadAction {
             findMatchingClasses(classPosition)
-                .flatMap { name -> debugProcess.virtualMachineProxy.classesByName(name).stream() }
+                .flatMap { name -> debugProcess.virtualMachineProxy.classesByName(name).asSequence() }
                 .toList()
         }
     }
@@ -122,11 +119,11 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
         }
     }
 
-    private fun findMatchingClasses(position: SourcePosition): Stream<String> {
+    private fun findMatchingClasses(position: SourcePosition): Sequence<String> {
         val classElement = position.elementAt?.findContainingClass() ?: throw NoDataException.INSTANCE
         return classElement.mixinTargets
             .ifEmpty { throw NoDataException.INSTANCE }
-            .stream()
-            .map { it.name }
+            .asSequence()
+            .map { it.name.replace('/', '.') }
     }
 }
