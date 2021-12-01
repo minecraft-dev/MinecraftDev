@@ -98,7 +98,7 @@ dependencies {
     testLibs(project(":mixin-test-data"))
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
-    // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
+    // afterEvaluate { println(intellij.ideaDependency.get().buildNumber.substring(intellij.type.get().length + 1)) }
     gradleToolingExtension(libs.gradleToolingExtension)
     gradleToolingExtension(libs.annotations)
     gradleToolingExtension(libs.groovy)
