@@ -59,7 +59,7 @@
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.Inject" implementation="com.demonwav.mcdev.platform.mixin.handlers.InjectAnnotationHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyArg" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyArgHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyArgs" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyArgsHandler" />
-        <!-- TODO: ModifyConstant -->
+        <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyConstant" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyConstantHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyVariable" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyVariableHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.Redirect" implementation="com.demonwav.mcdev.platform.mixin.handlers.RedirectInjectorHandler" />
 
@@ -71,7 +71,9 @@
         <injectionPoint atCode="HEAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.HeadInjectionPoint" />
         <injectionPoint atCode="RETURN" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ReturnInjectionPoint" />
         <injectionPoint atCode="TAIL" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.TailInjectionPoint" />
-        <!-- TODO: LOAD, STORE, CONSTANT -->
+        <injectionPoint atCode="LOAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.LoadInjectionPoint" />
+        <injectionPoint atCode="STORE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.StoreInjectionPoint" />
+        <injectionPoint atCode="CONSTANT" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantInjectionPoint" />
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -300,6 +302,8 @@
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.mixin.insight.MixinImplicitUsageProvider"/>
         <deadCode implementation="com.demonwav.mcdev.platform.mixin.insight.MixinEntryPoint"/>
 
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.DefaultAnnotationParamInspectionSuppressor"/>
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.DynamicInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.MixinClassCastInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.ShadowOverwriteInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.suppress.ShadowNullableInspectionSuppressor"/>
@@ -656,6 +660,14 @@
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.DuplicateInterfacePrefixInspection"/>
 
         <!-- Injector Inspections -->
+        <localInspection displayName="@Inject into Constructor"
+                         shortName="InjectIntoConstructor"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InjectIntoConstructorInspection"/>
         <localInspection displayName="Invalid injector method signature"
                          shortName="InvalidInjectorMethodSignature"
                          groupName="Mixin"
@@ -664,6 +676,14 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InvalidInjectorMethodSignatureInspection"/>
+        <localInspection displayName="ModifyVariable may be argsOnly = true"
+                         shortName="ModifyVariableMayBeArgsOnly"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableArgsOnlyInspection"/>
 
         <!-- Overwrite Inspections -->
         <localInspection displayName="Invalid @Overwrite method modifiers"

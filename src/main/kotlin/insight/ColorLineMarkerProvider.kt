@@ -134,7 +134,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                 return@handler
             }
 
-            val c = ColorChooser.chooseColor(editor.component, "Choose Color", color, false)
+            val c = ColorChooser.chooseColor(psiElement.project, editor.component, "Choose Color", color, false)
                 ?: return@handler
             when (workElement) {
                 is ULiteralExpression -> workElement.setColor(c.rgb and 0xFFFFFF)

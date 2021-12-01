@@ -16,15 +16,17 @@ import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.COERCE
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
+import com.demonwav.mcdev.platform.mixin.util.isAssignable
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.fullQualifiedName
-import com.demonwav.mcdev.util.isErasureEquivalentTo
 import com.demonwav.mcdev.util.synchronize
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
@@ -33,10 +35,12 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
-import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
+import com.intellij.psi.PsiPrimitiveType
+import com.intellij.psi.PsiType
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.codeStyle.VariableKind
+import com.intellij.psi.util.TypeConversionUtil
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
@@ -119,10 +123,12 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
                         var isValid = false
                         for ((expectedParameters, expectedReturnType) in possibleSignatures) {
-                            if (checkParameters(parameters, expectedParameters)) {
+                            val paramsMatch =
+                                checkParameters(parameters, expectedParameters, handler.allowCoerce) == CheckResult.OK
+                            if (paramsMatch) {
                                 val methodReturnType = method.returnType
                                 if (methodReturnType != null &&
-                                    methodReturnType.isErasureEquivalentTo(expectedReturnType)
+                                    checkReturnType(expectedReturnType, methodReturnType, method, handler.allowCoerce)
                                 ) {
                                     isValid = true
                                     break
@@ -133,19 +139,31 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                         if (!isValid) {
                             val (expectedParameters, expectedReturnType) = possibleSignatures[0]
 
-                            if (!checkParameters(parameters, expectedParameters)) {
+                            val checkResult = checkParameters(parameters, expectedParameters, handler.allowCoerce)
+                            if (checkResult != CheckResult.OK) {
                                 reportedSignature = true
 
-                                holder.registerProblem(
-                                    parameters,
-                                    "Method parameters do not match expected parameters for $annotationName",
-                                    ParametersQuickFix(expectedParameters, handler is InjectAnnotationHandler)
+                                val description =
+                                    "Method parameters do not match expected parameters for $annotationName"
+                                val quickFix = ParametersQuickFix(
+                                    expectedParameters,
+                                    handler is InjectAnnotationHandler
                                 )
+                                if (checkResult == CheckResult.ERROR) {
+                                    holder.registerProblem(parameters, description, quickFix)
+                                } else {
+                                    holder.registerProblem(
+                                        parameters,
+                                        description,
+                                        ProblemHighlightType.WARNING,
+                                        quickFix
+                                    )
+                                }
                             }
 
                             val methodReturnType = method.returnType
                             if (methodReturnType == null ||
-                                !methodReturnType.isErasureEquivalentTo(expectedReturnType)
+                                !checkReturnType(expectedReturnType, methodReturnType, method, handler.allowCoerce)
                             ) {
                                 reportedSignature = true
 
@@ -187,21 +205,65 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             return null
         }
 
-        private fun checkParameters(parameterList: PsiParameterList, expected: List<ParameterGroup>): Boolean {
+        private fun checkReturnType(
+            expectedReturnType: PsiType,
+            methodReturnType: PsiType,
+            method: PsiMethod,
+            allowCoerce: Boolean
+        ): Boolean {
+            val expectedErasure = TypeConversionUtil.erasure(expectedReturnType)
+            val returnErasure = TypeConversionUtil.erasure(methodReturnType)
+            if (expectedErasure == returnErasure) {
+                return true
+            }
+            if (!allowCoerce || !method.hasAnnotation(COERCE)) {
+                return false
+            }
+            if (expectedReturnType is PsiPrimitiveType || methodReturnType is PsiPrimitiveType) {
+                return false
+            }
+            return isAssignable(expectedReturnType, methodReturnType)
+        }
+
+        private fun checkParameters(
+            parameterList: PsiParameterList,
+            expected: List<ParameterGroup>,
+            allowCoerce: Boolean
+        ): CheckResult {
             val parameters = parameterList.parameters
             var pos = 0
 
             for (group in expected) {
                 // Check if parameter group matches
-                if (group.match(parameters, pos)) {
+                if (group.match(parameters, pos, allowCoerce)) {
                     pos += group.size
-                } else if (group.required) {
-                    return false
+                } else if (group.required != ParameterGroup.RequiredLevel.OPTIONAL) {
+                    return if (group.required == ParameterGroup.RequiredLevel.ERROR_IF_ABSENT) {
+                        CheckResult.ERROR
+                    } else {
+                        CheckResult.WARNING
+                    }
                 }
             }
 
-            return true
+            // check we have consumed all the parameters
+            if (pos < parameters.size) {
+                return if (
+                    expected.lastOrNull()?.isVarargs == true &&
+                    expected.last().required == ParameterGroup.RequiredLevel.WARN_IF_ABSENT
+                ) {
+                    CheckResult.WARNING
+                } else {
+                    CheckResult.ERROR
+                }
+            }
+
+            return CheckResult.OK
         }
+    }
+
+    private enum class CheckResult {
+        OK, WARNING, ERROR
     }
 
     private class ParametersQuickFix(
@@ -225,16 +287,16 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                 return@dropWhile fqname != MixinConstants.Classes.CALLBACK_INFO &&
                     fqname != MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
             }.drop(1) // the first element in the list is the CallbackInfo but we don't want it
-            val newParams = expected.flatMapTo(mutableListOf<PsiParameter>()) {
+            val newParams = expected.flatMapTo(mutableListOf()) {
                 if (it.default) {
-                    it.parameters?.mapIndexed { i: Int, p: Parameter ->
+                    it.parameters.mapIndexed { i: Int, p: Parameter ->
                         JavaPsiFacade.getElementFactory(project).createParameter(
                             p.name ?: JavaCodeStyleManager.getInstance(project)
                                 .suggestVariableName(VariableKind.PARAMETER, null, null, p.type).names
                                 .firstOrNull() ?: "var$i",
                             p.type
                         )
-                    } ?: emptyList()
+                    }
                 } else {
                     emptyList()
                 }

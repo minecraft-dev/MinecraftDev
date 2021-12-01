@@ -121,16 +121,16 @@ class AtResolver(
         }
     }
 
-    fun resolveInstructions(): List<CollectVisitor.Result<*>> {
-        return (getInstructionResolutionInfo() as? InsnResolutionInfo.Success)?.results ?: emptyList()
+    fun resolveInstructions(mode: CollectVisitor.Mode = CollectVisitor.Mode.MATCH_ALL): List<CollectVisitor.Result<*>> {
+        return (getInstructionResolutionInfo(mode) as? InsnResolutionInfo.Success)?.results ?: emptyList()
     }
 
-    fun getInstructionResolutionInfo(): InsnResolutionInfo {
+    fun getInstructionResolutionInfo(mode: CollectVisitor.Mode = CollectVisitor.Mode.MATCH_ALL): InsnResolutionInfo {
         val injectionPoint = getInjectionPoint(at) ?: return InsnResolutionInfo.Failure()
         val targetAttr = at.findAttributeValue("target")
         val target = targetAttr?.let { parseMixinSelector(it) }
 
-        val collectVisitor = injectionPoint.createCollectVisitor(at, target, targetClass, CollectVisitor.Mode.MATCH_ALL)
+        val collectVisitor = injectionPoint.createCollectVisitor(at, target, targetClass, mode)
             ?: return InsnResolutionInfo.Failure()
         collectVisitor.visit(targetMethod)
         val result = collectVisitor.result
