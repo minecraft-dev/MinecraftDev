@@ -87,7 +87,7 @@ class GradleBuildSystem(
     }
 
     companion object {
-        val DEFAULT_WRAPPER_VERSION = SemanticVersion.release(7, 1, 1)
+        val DEFAULT_WRAPPER_VERSION = SemanticVersion.release(7, 3)
     }
 }
 

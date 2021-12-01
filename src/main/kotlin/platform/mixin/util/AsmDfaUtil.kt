@@ -30,7 +30,7 @@ import org.objectweb.asm.tree.analysis.SimpleVerifier
 object AsmDfaUtil {
     private val LOGGER = Logger.getInstance(AsmDfaUtil::class.java)
 
-    private fun analyzeMethod(project: Project, clazz: ClassNode, method: MethodNode): Array<Frame<BasicValue>>? {
+    fun analyzeMethod(project: Project, clazz: ClassNode, method: MethodNode): Array<Frame<BasicValue>?>? {
         return method.cached(clazz, project) {
             try {
                 Analyzer(

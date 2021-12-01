@@ -113,10 +113,11 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
     open fun resolveInstructions(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
-        targetMethod: MethodNode
+        targetMethod: MethodNode,
+        mode: CollectVisitor.Mode = CollectVisitor.Mode.MATCH_ALL
     ): List<CollectVisitor.Result<*>> {
         val at = annotation.findAttributeValue("at") as? PsiAnnotation ?: return emptyList()
-        return AtResolver(at, targetClass, targetMethod).resolveInstructions()
+        return AtResolver(at, targetClass, targetMethod).resolveInstructions(mode)
     }
 
     /**
@@ -137,6 +138,8 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
     override fun createUnresolvedMessage(annotation: PsiAnnotation): String? {
         return "Cannot resolve any target instructions in target class"
     }
+
+    open val allowCoerce = false
 
     data class InsnResult(val method: ClassAndMethodNode, val result: CollectVisitor.Result<*>)
 
@@ -165,9 +168,9 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         protected fun sanitizedParameter(type: PsiType, name: String?): Parameter {
             // Parameters should not use ellipsis because others like CallbackInfo may follow
             return if (type is PsiEllipsisType) {
-                Parameter(name, type.toArrayType())
+                Parameter(name?.toJavaIdentifier(), type.toArrayType())
             } else {
-                Parameter(name, type)
+                Parameter(name?.toJavaIdentifier(), type)
             }
         }
     }
