@@ -40,7 +40,8 @@ class ModifyArgsHandler : InjectorAnnotationHandler() {
                     ParameterGroup(listOf(Parameter("args", argsType))),
                     ParameterGroup(
                         collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
-                        required = false
+                        required = ParameterGroup.RequiredLevel.OPTIONAL,
+                        isVarargs = true
                     )
                 ),
                 PsiType.VOID

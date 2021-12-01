@@ -71,6 +71,6 @@ class FabricProjectConfig : ProjectConfig(), GradleCreator {
 
     override fun configureRootGradle(rootDirectory: Path, buildSystem: GradleBuildSystem) {
         buildSystem.gradleVersion =
-            if (semanticMcVersion >= MinecraftVersions.MC1_17) SemanticVersion.release(7, 1, 1) else gradleVersion
+            if (semanticMcVersion >= MinecraftVersions.MC1_17) SemanticVersion.release(7, 3) else gradleVersion
     }
 }
