@@ -24,16 +24,6 @@ import com.intellij.psi.util.PsiTreeUtil
 
 class AwAnnotator : Annotator {
 
-    private val compatibleByAccessMap = HashMultimap.create<String, String>()
-    private val compatibleByTargetMap = HashMultimap.create<String, String>()
-
-    init {
-        compatibleByAccessMap.putAll("accessible", setOf("class", "method", "field"))
-        compatibleByAccessMap.putAll("extendable", setOf("class", "method"))
-        compatibleByAccessMap.putAll("mutable", setOf("field"))
-        Multimaps.invertFrom(compatibleByAccessMap, compatibleByTargetMap)
-    }
-
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         if (element is AwAccess) {
             val access = element.text
@@ -47,6 +37,19 @@ class AwAnnotator : Annotator {
             if (!compatibleByTargetMap.get(target).contains(access)) {
                 holder.newAnnotation(HighlightSeverity.ERROR, "'$target' cannot be used with '$access'").create()
             }
+        }
+    }
+
+    companion object {
+
+        val compatibleByAccessMap = HashMultimap.create<String, String>()!!
+        val compatibleByTargetMap = HashMultimap.create<String, String>()!!
+
+        init {
+            compatibleByAccessMap.putAll("accessible", setOf("class", "method", "field"))
+            compatibleByAccessMap.putAll("extendable", setOf("class", "method"))
+            compatibleByAccessMap.putAll("mutable", setOf("field"))
+            Multimaps.invertFrom(compatibleByAccessMap, compatibleByTargetMap)
         }
     }
 }

@@ -24,6 +24,7 @@ import com.intellij.openapi.application.runReadAction
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.TokenType
+import com.intellij.psi.util.elementType
 import com.intellij.psi.util.prevLeaf
 import com.intellij.util.ProcessingContext
 
@@ -97,7 +98,9 @@ object AwTargetCompletionProvider : CompletionProvider<CompletionParameters>() {
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
-        val elements = listOf("class", "method", "field")
+        val text = parameters.position
+            .prevLeaf { it.elementType == AwTypes.ACCESS_ELEMENT || it.elementType == AwTypes.CRLF }?.text
+        val elements = AwAnnotator.compatibleByAccessMap.get(text)
             .map { LookupElementBuilder.create(it).withInsertHandler(::insertWhitespace) }
         result.addAllElements(elements)
     }
