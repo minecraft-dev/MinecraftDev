@@ -12,7 +12,7 @@ repositories {
 dependencies {
 }
 
-def targetJavaVersion = 8
+def targetJavaVersion = ${JAVA_VERSION}
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion

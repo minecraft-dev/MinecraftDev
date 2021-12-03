@@ -51,10 +51,11 @@ object BukkitTemplate : BaseTemplate() {
         return project.applyTemplate(BUKKIT_SUBMODULE_POM_TEMPLATE, BasicMavenStep.pluginVersions)
     }
 
-    fun applyBuildGradle(project: Project, buildSystem: BuildSystem): String {
+    fun applyBuildGradle(project: Project, buildSystem: BuildSystem, config: BukkitProjectConfig): String {
         val props = mapOf(
             "GROUP_ID" to buildSystem.groupId,
-            "PLUGIN_VERSION" to buildSystem.version
+            "PLUGIN_VERSION" to buildSystem.version,
+            "JAVA_VERSION" to config.javaVersion.feature
         )
 
         return project.applyTemplate(BUKKIT_BUILD_GRADLE_TEMPLATE, props)
