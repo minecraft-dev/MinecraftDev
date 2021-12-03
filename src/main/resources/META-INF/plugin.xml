@@ -207,6 +207,7 @@
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.BukkitPresentationProvider" />
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.SpigotPresentationProvider" />
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.OldPaperPresentationProvider" />
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.PaperPresentationProvider" />
         <!--endregion-->
 
