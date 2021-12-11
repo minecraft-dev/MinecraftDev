@@ -122,6 +122,13 @@ inline fun <T : Collection<*>> T.ifEmpty(func: () -> Unit): T {
     return this
 }
 
+inline fun <T: Collection<*>?> T.ifNullOrEmpty(func: () -> Unit): T {
+    if (this == null || isEmpty()) {
+        func()
+    }
+    return this
+}
+
 inline fun <T : Collection<*>> T.ifNotEmpty(func: (T) -> Unit): T {
     if (isNotEmpty()) {
         func(this)
