@@ -35,7 +35,7 @@ class ErrorReporter : ErrorReportSubmitter() {
         "Key com.demonwav.mcdev.translations.TranslationFoldingSettings duplicated",
         "Inspection #EntityConstructor has no description"
     )
-    private val baseUrl = "https://github.com/minecraft-dev/MinecraftDev/issues"
+    private val baseUrl = "https://github.com/minecraft-dev/mcdev-error-report/issues"
     override fun getReportActionText() = "Report to Minecraft Dev GitHub Issue Tracker"
 
     override fun submit(
