@@ -27,6 +27,7 @@ import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.ifNullOrEmpty
 import com.demonwav.mcdev.util.toJavaIdentifier
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotation
@@ -75,8 +76,10 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         targetClass: ClassNode,
         targetMethod: MethodNode
     ): InsnResolutionInfo.Failure? {
-        val at = annotation.findAttributeValue("at") as? PsiAnnotation ?: return InsnResolutionInfo.Failure()
-        return AtResolver(at, targetClass, targetMethod).isUnresolved()
+        return annotation.findAttributeValue("at")?.findAnnotations()
+            .ifNullOrEmpty { return InsnResolutionInfo.Failure() }!!
+            .mapNotNull { AtResolver(it, targetClass, targetMethod).isUnresolved() }
+            .firstOrNull()
     }
 
     override fun resolveForNavigation(annotation: PsiAnnotation, targetClass: ClassNode): List<PsiElement> {
@@ -91,8 +94,9 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         targetClass: ClassNode,
         targetMethod: MethodNode
     ): List<PsiElement> {
-        val at = annotation.findAttributeValue("at") as? PsiAnnotation ?: return emptyList()
-        return AtResolver(at, targetClass, targetMethod).resolveNavigationTargets()
+        return annotation.findAttributeValue("at")?.findAnnotations()
+            .ifNullOrEmpty { return emptyList() }!!
+            .flatMap { AtResolver(it, targetClass, targetMethod).resolveNavigationTargets() }
     }
 
     fun resolveInstructions(annotation: PsiAnnotation): List<InsnResult> {
@@ -116,8 +120,9 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         targetMethod: MethodNode,
         mode: CollectVisitor.Mode = CollectVisitor.Mode.MATCH_ALL
     ): List<CollectVisitor.Result<*>> {
-        val at = annotation.findAttributeValue("at") as? PsiAnnotation ?: return emptyList()
-        return AtResolver(at, targetClass, targetMethod).resolveInstructions(mode)
+        return annotation.findAttributeValue("at")?.findAnnotations()
+            .ifNullOrEmpty { return emptyList() }!!
+            .flatMap { AtResolver(it, targetClass, targetMethod).resolveInstructions(mode) }
     }
 
     /**

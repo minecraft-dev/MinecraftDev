@@ -62,10 +62,6 @@ minecraft {
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
-        #if (${MIXINS})
-
-            arg "-mixin.config=${ARTIFACT_ID}.mixins.json"
-        #end
 
             mods {
                 ${MOD_NAME} {
@@ -88,10 +84,7 @@ minecraft {
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
-        #if (${MIXINS})
 
-            arg "-mixin.config=${ARTIFACT_ID}.mixins.json"
-        #end
             mods {
                 ${MOD_NAME} {
                     source sourceSets.main
@@ -131,6 +124,8 @@ minecraft {
 
 mixin {
     add sourceSets.main, "${ARTIFACT_ID}.refmap.json"
+
+    config "${ARTIFACT_ID}.mixins.json"
 }
 #end
 
@@ -168,7 +163,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 #if (${MIXINS})
 
-    annotationProcessor 'org.spongepowered:mixin:0.8:processor'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 #end
 }
 
@@ -189,9 +184,6 @@ jar {
                 "Implementation-Vendor": "${AUTHOR_LIST}",
             #else
                 //"Implementation-Vendor": "${MOD_NAME} authors",
-            #end
-            #if (${MIXINS})
-                "MixinConfigs": "${ARTIFACT_ID}.mixins.json",
             #end
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])

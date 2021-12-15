@@ -54,7 +54,8 @@ abstract class ManifestLibraryPresentationProvider(
 abstract class MavenLibraryPresentationProvider(
     kind: LibraryKind,
     private val groupId: String,
-    private val artifactId: String
+    private val artifactId: String,
+    private val strict: Boolean = true
 ) :
     LibraryPresentationProvider<LibraryVersionProperties>(kind) {
 
@@ -65,7 +66,7 @@ abstract class MavenLibraryPresentationProvider(
             val file = classesRoot.localFile
             val properties = JarUtil.loadProperties(file, propertiesPath) ?: continue
 
-            if (properties["groupId"] != groupId || properties["artifactId"] != artifactId) {
+            if (strict && (properties["groupId"] != groupId || properties["artifactId"] != artifactId)) {
                 continue
             }
 
