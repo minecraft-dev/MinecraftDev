@@ -122,7 +122,7 @@ inline fun <T : Collection<*>> T.ifEmpty(func: () -> Unit): T {
     return this
 }
 
-inline fun <T: Collection<*>?> T.ifNullOrEmpty(func: () -> Unit): T {
+inline fun <T : Collection<*>?> T.ifNullOrEmpty(func: () -> Unit): T {
     if (this == null || isEmpty()) {
         func()
     }
