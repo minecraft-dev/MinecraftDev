@@ -435,10 +435,15 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
         } else {
             "call${target.name.capitalize()}"
         }
+        val invokerParams = if (target.isConstructor) {
+            "(\"<init>\")"
+        } else {
+            ""
+        }
 
         val method = factory.createMethodFromText(
             """
-            @${MixinConstants.Annotations.INVOKER}
+            @${MixinConstants.Annotations.INVOKER}$invokerParams
             ${staticPrefix(isStatic)}ReturnType $name()${methodBody(isStatic)}
             """.trimIndent(),
             mixin

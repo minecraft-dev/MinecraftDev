@@ -2,6 +2,8 @@
     "pack": {
         "description": "${ARTIFACT_ID} resources",
         "pack_format": ${PACK_FORMAT},
+        #if (${PACK_COMMENT} != "")
         "_comment": "${PACK_COMMENT}"
+        #end
     }
 }

@@ -111,7 +111,7 @@ class BukkitGradleCreator(
 ) : BukkitProjectCreator<GradleBuildSystem>(rootDirectory, rootModule, buildSystem, config) {
 
     override fun getSingleModuleSteps(): Iterable<CreatorStep> {
-        val buildText = BukkitTemplate.applyBuildGradle(project, buildSystem)
+        val buildText = BukkitTemplate.applyBuildGradle(project, buildSystem, config)
         val propText = BukkitTemplate.applyGradleProp(project)
         val settingsText = BukkitTemplate.applySettingsGradle(project, buildSystem.artifactId)
         val files = GradleFiles(buildText, propText, settingsText)

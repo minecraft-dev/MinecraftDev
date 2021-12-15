@@ -22,7 +22,12 @@ class SpigotPresentationProvider : MavenLibraryPresentationProvider(SPIGOT_LIBRA
     override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.SPIGOT_ICON
 }
 
-class PaperPresentationProvider :
+class OldPaperPresentationProvider :
     MavenLibraryPresentationProvider(PAPER_LIBRARY_KIND, "com.destroystokyo.paper", "paper-api") {
+    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.PAPER_ICON
+}
+
+class PaperPresentationProvider :
+    MavenLibraryPresentationProvider(PAPER_LIBRARY_KIND, "io.papermc.paper", "paper-api", false) {
     override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.PAPER_ICON
 }

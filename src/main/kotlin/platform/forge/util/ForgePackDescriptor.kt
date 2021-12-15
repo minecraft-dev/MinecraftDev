@@ -38,6 +38,7 @@ data class ForgePackDescriptor(val format: Int, val comment: String) {
                 " Note: we require v6 pack meta for all mods."
         )
         val FORMAT_7 = ForgePackDescriptor(7, "")
+        val FORMAT_8 = ForgePackDescriptor(8, "")
 
         // See https://minecraft.gamepedia.com/Tutorials/Creating_a_resource_pack#.22pack_format.22
         fun forMcVersion(version: SemanticVersion): ForgePackDescriptor? = when {
@@ -45,7 +46,8 @@ data class ForgePackDescriptor(val format: Int, val comment: String) {
             version <= MinecraftVersions.MC1_14_4 -> FORMAT_4
             version <= MinecraftVersions.MC1_16_1 -> FORMAT_5
             version < MinecraftVersions.MC1_17 -> FORMAT_6
-            version >= MinecraftVersions.MC1_17 -> FORMAT_7
+            version < MinecraftVersions.MC1_18 -> FORMAT_7
+            version >= MinecraftVersions.MC1_18 -> FORMAT_8
             else -> null
         }
     }
