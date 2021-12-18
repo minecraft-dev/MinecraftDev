@@ -19,7 +19,12 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.3.0"
+    val ijPluginVersion = if (System.getProperty("mcdev.localdev").toBoolean()) {
+        "1.1.3"
+    } else {
+        "1.3.0"
+    }
+    id("org.jetbrains.intellij") version ijPluginVersion
     id("org.cadixdev.licenser") version "0.6.1"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
