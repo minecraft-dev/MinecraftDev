@@ -15,7 +15,7 @@ import java.io.DataOutputStream
 open class TagCompound(val tagMap: Map<String, NbtTag>) : NbtTag {
     // If a tag doesn't have a name this will throw a NPE
     // but all tags should have names in a compound
-    override val payloadSize = tagMap.entries.sumBy { 2 + it.key.toByteArray().size + it.value.payloadSize }
+    override val payloadSize = tagMap.entries.sumOf { 2 + it.key.toByteArray().size + it.value.payloadSize }
     override val typeId = NbtTypeId.COMPOUND
 
     override fun write(stream: DataOutputStream) {

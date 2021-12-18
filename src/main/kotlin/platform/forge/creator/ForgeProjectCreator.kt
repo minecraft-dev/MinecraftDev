@@ -35,6 +35,7 @@ import java.nio.file.Path
 import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import java.nio.file.StandardOpenOption.WRITE
+import java.util.Locale
 
 class Fg2ProjectCreator(
     private val rootDirectory: Path,
@@ -118,7 +119,7 @@ open class Fg3ProjectCreator(
 
     protected fun transformModName(modName: String?): String {
         modName ?: return "examplemod"
-        return modName.toLowerCase().replace(" ", "")
+        return modName.lowercase(Locale.ENGLISH).replace(" ", "")
     }
 
     protected fun createGradleFiles(hasData: Boolean): GradleFiles<String> {

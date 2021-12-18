@@ -436,7 +436,7 @@ abstract class DynamicSelectorParser(id: String, vararg aliases: String) : Mixin
 
 class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
     override fun parseDynamic(args: String, context: PsiElement): MixinSelector? {
-        val descAnnotation = findDescAnnotation(args.toLowerCase(Locale.ROOT), context) ?: return null
+        val descAnnotation = findDescAnnotation(args.lowercase(Locale.ENGLISH), context) ?: return null
         return descSelectorFromAnnotation(descAnnotation)
     }
 
@@ -445,7 +445,7 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
             // explicit id
             forEachDescAnnotationOwner(context) { annotationOwner ->
                 findDescAnnotations(annotationOwner) { desc ->
-                    val descId = desc.findAttributeValue("id")?.constantStringValue?.toLowerCase(Locale.ROOT)
+                    val descId = desc.findAttributeValue("id")?.constantStringValue?.lowercase(Locale.ENGLISH)
                     if (descId == id) {
                         return desc
                     }
@@ -461,14 +461,14 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
                 if (coordinate.isNotEmpty()) {
                     for (owner in childOwners) {
                         findDescAnnotations(owner) { desc ->
-                            val descId = desc.findAttributeValue("id")?.constantStringValue?.toLowerCase(Locale.ROOT)
+                            val descId = desc.findAttributeValue("id")?.constantStringValue?.lowercase(Locale.ENGLISH)
                             if (descId == coordinate) {
                                 return desc
                             }
                         }
                     }
                 }
-                val nextCoordinate = getCoordinate(annotationOwner)?.toLowerCase(Locale.ROOT)
+                val nextCoordinate = getCoordinate(annotationOwner)?.lowercase(Locale.ENGLISH)
                 if (nextCoordinate != null) {
                     coordinate = if (coordinate.isEmpty()) {
                         nextCoordinate

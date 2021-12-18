@@ -75,7 +75,7 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
             ?.split(',')
             ?.mapNotNull {
                 try {
-                    ExpandCondition.valueOf(it.toUpperCase(Locale.ROOT))
+                    ExpandCondition.valueOf(it.uppercase(Locale.ENGLISH))
                 } catch (e: IllegalArgumentException) {
                     null
                 }

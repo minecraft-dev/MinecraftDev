@@ -363,7 +363,7 @@ class CreateEntryPointStep(
         editor: Editor,
         side: String
     ) {
-        val capsSide = side.toUpperCase(Locale.ROOT)
+        val capsSide = side.uppercase(Locale.ENGLISH)
         var needsInterfaceFix = false
         for (eps in entryPointsByInterface) {
             if (eps.value.all { it.category == side }) {

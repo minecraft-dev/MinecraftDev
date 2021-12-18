@@ -56,7 +56,7 @@ object TranslationFiles {
             file.fileType in listOf(LangFileType, JsonFileType.INSTANCE)
 
     fun getLocale(file: VirtualFile?) =
-        file?.nameWithoutExtension?.toLowerCase(Locale.ROOT)
+        file?.nameWithoutExtension?.lowercase(Locale.ENGLISH)
 
     tailrec fun seekTranslation(element: PsiElement): PsiNamedElement? {
         return toTranslation(element)?.let { element as? PsiNamedElement }
@@ -123,7 +123,7 @@ object TranslationFiles {
             DataManager.getInstance().dataContextFromFocusAsync.onSuccess {
                 JBPopupFactory.getInstance()
                     .createPopupChooserBuilder(domains)
-                    .setTitle("Choose resource domain")
+                    .setTitle("Choose Resource Domain")
                     .setAdText(
                         "There are multiple resource domains with localization files, choose one for this translation."
                     )
@@ -216,8 +216,7 @@ object TranslationFiles {
 
         for (entry in entries) {
             when (entry) {
-                is FileEntry.Comment -> {
-                }
+                is FileEntry.Comment -> {}
                 is FileEntry.Translation -> {
                     result.append("$indent\"${StringUtil.escapeStringCharacters(entry.key)}\": ")
                     result.append("\"${StringUtil.escapeStringCharacters(entry.text)}\",\n")

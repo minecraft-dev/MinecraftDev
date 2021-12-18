@@ -42,9 +42,9 @@ class MavenBuildSystem(
         val project = module.project
         val pomText = BuildSystemTemplate.applyPom(project)
 
-        val baseName = artifactId.toLowerCase(Locale.ENGLISH)
+        val baseName = artifactId.lowercase(Locale.ENGLISH)
         val moduleNames = mutableListOf("$baseName-common")
-        moduleNames += types.map { "$baseName-${it.name.toLowerCase(Locale.ENGLISH)}" }
+        moduleNames += types.map { "$baseName-${it.name.lowercase(Locale.ENGLISH)}" }
 
         return listOf(
             BasicMavenStep(

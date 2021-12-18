@@ -14,7 +14,7 @@ import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.32"
+    kotlin("jvm") version "1.6.10"
     java
     mcdev
     groovy
@@ -50,6 +50,12 @@ val testLibs: Configuration by configurations.creating {
 
 group = "com.demonwav.minecraft-dev"
 version = "$ideaVersionName-$coreVersion"
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
 
 val gradleToolingExtensionSourceSet: SourceSet = sourceSets.create("gradle-tooling-extension") {
     configurations.named(compileOnlyConfigurationName) {
@@ -159,7 +165,7 @@ java {
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.compilerArgs = listOf("-proc:none")
-    options.release.set(8)
+    options.release.set(11)
 }
 
 tasks.withType<KotlinCompile>().configureEach {
@@ -193,7 +199,7 @@ tasks.processResources {
 }
 
 tasks.test {
-    dependsOn(testLibs)
+    dependsOn(tasks.jar, testLibs)
     useJUnitPlatform()
     doFirst {
         testLibs.resolvedConfiguration.resolvedArtifacts.forEach {
@@ -201,18 +207,25 @@ tasks.test {
         }
     }
     systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
-    if (JavaVersion.current().isJava9Compatible) {
-        jvmArgs(
-            "--add-opens", "java.base/java.io=ALL-UNNAMED",
-            "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-            "--add-opens", "java.desktop/sun.awt=ALL-UNNAMED",
-            "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
-            "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
-            "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
-            "--add-opens", "java.desktop/sun.font=ALL-UNNAMED",
-            "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED"
-        )
-    }
+
+    jvmArgs(
+        "--add-opens", "java.base/java.io=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang.ref=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util.concurrent.locks=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
+        "--add-opens", "java.base/sun.nio.fs=ALL-UNNAMED",
+        "--add-opens", "java.desktop/java.awt.event=ALL-UNNAMED",
+        "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
+        "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
+        "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
+        "--add-opens", "java.desktop/sun.awt=ALL-UNNAMED",
+        "--add-opens", "java.desktop/sun.font=ALL-UNNAMED",
+        "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED",
+    )
 }
 
 idea {
@@ -346,10 +359,10 @@ tasks.buildSearchableOptions {
         "--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED",
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "--add-opens=java.base/java.util=ALL-UNNAMED",
-        "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
         "--add-opens=java.desktop/java.awt.event=ALL-UNNAMED",
-        "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
+        "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
         "--add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
+        "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
         "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
         "--add-opens=java.desktop/sun.font=ALL-UNNAMED",
         "--add-opens=java.desktop/sun.swing=ALL-UNNAMED"

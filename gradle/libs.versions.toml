@@ -1,5 +1,5 @@
 [versions]
-coroutines = "1.4.3"
+coroutines = "1.5.2"
 junit = "5.7.1"
 asm = "9.2"
 
