@@ -78,19 +78,28 @@ dependencies {
     implementation(files(gradleToolingExtensionJar))
 
     implementation(libs.templateMakerFabric)
-
-    implementation("org.ow2.asm:asm:9.2")
-    implementation("org.ow2.asm:asm-tree:9.2")
-    implementation("org.ow2.asm:asm-analysis:9.2")
+    implementation(libs.bundles.asm)
 
     jflex(libs.jflex.lib)
-    jflexSkeleton("${libs.jflex.skeleton.text()}@skeleton")
+    jflexSkeleton(libs.jflex.skeleton) {
+        artifact {
+            extension = "skeleton"
+        }
+    }
     grammarKit(libs.grammarKit)
 
     testLibs(libs.test.mockJdk)
     testLibs(libs.test.mixin)
-    testLibs("${libs.test.spongeapi.text()}:shaded")
-    testLibs("${libs.test.nbt.text()}@nbt")
+    testLibs(libs.test.spongeapi) {
+        artifact {
+            classifier = "shaded"
+        }
+    }
+    testLibs(libs.test.nbt) {
+        artifact {
+            extension = "nbt"
+        }
+    }
     testLibs(project(":mixin-test-data"))
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
@@ -349,11 +358,4 @@ tasks.buildSearchableOptions {
     if (OperatingSystem.current().isMacOsX) {
         jvmArgs("--add-opens=java.desktop/com.apple.eawt.event=ALL-UNNAMED")
     }
-}
-
-// version catalogs still have rough edges as it's still experimental
-// this lets us get around some of that while still getting the benefits of using catalogs
-fun Provider<MinimalExternalModuleDependency>.text(): String {
-    val dep = get()
-    return "${dep.module.group}:${dep.module.name}:${dep.versionConstraint}"
 }
