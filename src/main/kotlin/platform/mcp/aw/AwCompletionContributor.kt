@@ -65,6 +65,7 @@ object AwHeaderCompletionProvider : CompletionProvider<CompletionParameters>() {
     ) {
         if (parameters.position.prevLeaf(true) == null) {
             result.addElement(LookupElementBuilder.create("accessWidener v1 named"))
+            result.addElement(LookupElementBuilder.create("accessWidener v2 named"))
         }
     }
 }
@@ -85,8 +86,14 @@ object AwAccessCompletionProvider : CompletionProvider<CompletionParameters>() {
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
-        val elements = listOf("accessible", "extendable", "mutable")
-            .map { LookupElementBuilder.create(it).withInsertHandler(::insertWhitespace) }
+        val elements = listOf(
+            "accessible",
+            "transitive-accessible",
+            "extendable",
+            "transitive-extendable",
+            "mutable",
+            "transitive-mutable"
+        ).map { LookupElementBuilder.create(it).withInsertHandler(::insertWhitespace) }
         result.addAllElements(elements)
     }
 }
