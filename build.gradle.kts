@@ -175,6 +175,17 @@ tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
+// Compile classes to be loaded into the Gradle VM to Java 5 to match Groovy
+// This is for maximum compatibility, these classes will be loaded into every Gradle
+// import on all projects, so we don't want to break that with an incompatible class version.
+tasks.named(gradleToolingExtensionSourceSet.compileJavaTaskName, JavaCompile::class) {
+    val java7Compiler = javaToolchains.compilerFor { languageVersion.set(JavaLanguageVersion.of(7)) }
+    javaCompiler.set(java7Compiler)
+    options.release.set(null as Int?)
+    sourceCompatibility = "1.5"
+    targetCompatibility = "1.5"
+    options.bootstrapClasspath = files(java7Compiler.map { it.metadata.installationPath.file("jre/lib/rt.jar") })
+}
 tasks.withType<GroovyCompile>().configureEach {
     options.compilerArgs = listOf("-proc:none")
     sourceCompatibility = "1.5"
