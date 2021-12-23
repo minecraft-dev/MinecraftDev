@@ -23,6 +23,7 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.vfs.VfsUtil
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.Locale
 
 class MinecraftProjectCreator {
 
@@ -116,7 +117,7 @@ class MinecraftProjectCreator {
                     for (config in configs) {
                         val log = newLog(config, workLog)
 
-                        val dirName = config.type.normalName.toLowerCase()
+                        val dirName = config.type.normalName.lowercase(Locale.ENGLISH)
                         val newArtifactId = "${build.artifactId}-$dirName"
                         val dir = Files.createDirectories(root.resolve(newArtifactId))
 

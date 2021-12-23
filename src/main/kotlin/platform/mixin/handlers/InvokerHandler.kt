@@ -17,6 +17,7 @@ import com.demonwav.mcdev.platform.mixin.util.findMethod
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.decapitalize
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.fullQualifiedName
@@ -75,7 +76,7 @@ class InvokerHandler : MixinMemberAnnotationHandler {
             return "<init>"
         }
         val name = result.groupValues[2]
-        if (name.toUpperCase(Locale.ROOT) != name) {
+        if (name.uppercase(Locale.ENGLISH) != name) {
             return name.decapitalize()
         }
         return name

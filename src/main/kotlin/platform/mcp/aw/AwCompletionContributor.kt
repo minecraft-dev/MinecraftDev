@@ -18,7 +18,6 @@ import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.completion.InsertionContext
-import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.application.runReadAction
 import com.intellij.patterns.PlatformPatterns
@@ -43,7 +42,7 @@ class AwCompletionContributor : CompletionContributor() {
     }
 }
 
-private fun insertWhitespace(context: InsertionContext, item: LookupElement) {
+private fun insertWhitespace(context: InsertionContext) {
     PsiDocumentManager.getInstance(context.project)
         .doPostponedOperationsAndUnblockDocument(context.document)
     context.document.insertString(context.editor.caretModel.offset, " ")
@@ -65,6 +64,7 @@ object AwHeaderCompletionProvider : CompletionProvider<CompletionParameters>() {
     ) {
         if (parameters.position.prevLeaf(true) == null) {
             result.addElement(LookupElementBuilder.create("accessWidener v1 named"))
+            result.addElement(LookupElementBuilder.create("accessWidener v2 named"))
         }
     }
 }
@@ -85,8 +85,14 @@ object AwAccessCompletionProvider : CompletionProvider<CompletionParameters>() {
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
-        val elements = listOf("accessible", "extendable", "mutable")
-            .map { LookupElementBuilder.create(it).withInsertHandler(::insertWhitespace) }
+        val elements = listOf(
+            "accessible",
+            "transitive-accessible",
+            "extendable",
+            "transitive-extendable",
+            "mutable",
+            "transitive-mutable"
+        ).map { LookupElementBuilder.create(it).withInsertHandler { ctx, _ -> insertWhitespace(ctx) } }
         result.addAllElements(elements)
     }
 }
@@ -101,7 +107,7 @@ object AwTargetCompletionProvider : CompletionProvider<CompletionParameters>() {
         val text = parameters.position
             .prevLeaf { it.elementType == AwTypes.ACCESS_ELEMENT || it.elementType == AwTypes.CRLF }?.text
         val elements = AwAnnotator.compatibleByAccessMap.get(text)
-            .map { LookupElementBuilder.create(it).withInsertHandler(::insertWhitespace) }
+            .map { LookupElementBuilder.create(it).withInsertHandler { ctx, _ -> insertWhitespace(ctx) } }
         result.addAllElements(elements)
     }
 }

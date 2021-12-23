@@ -158,6 +158,9 @@ inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElem
 inline fun <reified T : PsiElement> PsiElement.childrenOfType(): Collection<T> =
     PsiTreeUtil.findChildrenOfType(this, T::class.java)
 
+inline fun <reified T : PsiElement> PsiElement.childOfType(): T? =
+    PsiTreeUtil.findChildOfType(this, T::class.java)
+
 fun <T : Any> Sequence<T>.filter(filter: ElementFilter?, context: PsiElement): Sequence<T> {
     filter ?: return this
     return filter { filter.isAcceptable(it, context) }

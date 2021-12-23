@@ -30,7 +30,7 @@ object AnonymousFeedback {
     data class FeedbackData(val url: String, val token: Int, val isDuplicate: Boolean)
 
     private const val authedUrl = "https://www.denwav.dev/errorReport"
-    private const val baseUrl = "https://api.github.com/repos/minecraft-dev/MinecraftDev/issues"
+    private const val baseUrl = "https://api.github.com/repos/minecraft-dev/mcdev-error-report/issues"
 
     fun sendFeedback(
         factory: HttpConnectionFactory,

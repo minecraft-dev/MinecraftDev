@@ -22,9 +22,6 @@ class ErrorData(var throwable: Throwable?, val lastAction: String?) {
 
     var message: String? = null
         get() = field ?: throwable?.message
-        set(value) {
-            field = value
-        }
 
     var description: String? = null
     var pluginName: String? = null

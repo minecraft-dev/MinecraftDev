@@ -27,7 +27,9 @@ class AwColorSettingsPage : ColorSettingsPage {
         # https://www.fabricmc.net/wiki/tutorial:accesswideners
         
         extendable class net/minecraft/world/item/crafting/Ingredient
+        transitive-extendable class net/minecraft/world/item/crafting/Ingredient
         accessible class net/minecraft/world/entity/monster/Phantom${'$'}AttackPhase
+        transitive-accessible class net/minecraft/world/entity/monster/Phantom${'$'}AttackPhase
         extendable method net/minecraft/server/players/IpBanList getIpFromAddress (Ljava/net/SocketAddress;)Ljava/lang/String;
         extendable method net/minecraft/world/item/crafting/Ingredient <init> (Ljava/util/stream/Stream;)V
         accessible field net/minecraft/world/item/crafting/Ingredient values [Lnet/minecraft/world/item/crafting/Ingredient${'$'}Value;

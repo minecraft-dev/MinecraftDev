@@ -1,6 +1,7 @@
 [versions]
-coroutines = "1.4.3"
+coroutines = "1.5.2"
 junit = "5.7.1"
+asm = "9.2"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -17,10 +18,14 @@ grammarKit = "org.jetbrains.idea:grammar-kit:1.5.1"
 gradleToolingExtension = "com.jetbrains.intellij.gradle:gradle-tooling-extension:212.4746.92"
 annotations = "org.jetbrains:annotations:20.1.0"
 
+asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
+asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
+asm-analysis = { module = "org.ow2.asm:asm-analysis", version.ref = "asm" }
+
 # Testing
 test-mockJdk = "org.jetbrains.idea:mock-jdk:1.7-4d76c50"
-test-mixin = "org.spongepowered:mixin:0.8-SNAPSHOT"
-test-spongeapi = "org.spongepowered:spongeapi:7.0.0"
+test-mixin = "org.spongepowered:mixin:0.8.5"
+test-spongeapi = "org.spongepowered:spongeapi:7.4.0"
 test-nbt = "com.demonwav.mcdev:all-types-nbt:1.0"
 
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
@@ -28,3 +33,4 @@ junit-entine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref 
 
 [bundles]
 coroutines = ["coroutines-core", "coroutines-swing"]
+asm = ["asm", "asm-tree", "asm-analysis"]

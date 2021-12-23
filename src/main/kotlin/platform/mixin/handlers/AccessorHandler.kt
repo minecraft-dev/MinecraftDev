@@ -16,6 +16,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.findFieldByName
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceField
 import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.decapitalize
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotation
 import com.intellij.psi.PsiAnnotation
@@ -73,7 +74,7 @@ class AccessorHandler : MixinMemberAnnotationHandler {
         val result = PATTERN.matchEntire(memberName) ?: return null
         val prefix = result.groupValues[1]
         var name = result.groupValues[2]
-        if (name.toUpperCase(Locale.ROOT) != name) {
+        if (name.uppercase(Locale.ENGLISH) != name) {
             name = name.decapitalize()
         }
         val type = if (prefix == "set") {

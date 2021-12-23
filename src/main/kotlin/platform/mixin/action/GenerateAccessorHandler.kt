@@ -17,6 +17,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
+import com.demonwav.mcdev.util.capitalize
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.fullQualifiedName
@@ -341,6 +342,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
 
             override fun getItemText(item: PsiClass): String {
                 // keep adding packages from the full qualified name until our name is unique
+                @Suppress("DialogTitleCapitalization")
                 val parts = item.qualifiedName?.split(".") ?: return "null"
                 var name = ""
                 for (part in parts.asReversed()) {
@@ -477,8 +479,8 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
     }
 
     private class HeaderPanel : JComponent() {
-        val gettersCheckbox = JBCheckBox("Generate Getter Accessors")
-        val settersCheckbox = JBCheckBox("Generate Setter Accessors")
+        val gettersCheckbox = JBCheckBox("Generate getter accessors")
+        val settersCheckbox = JBCheckBox("Generate setter accessors")
 
         init {
             gettersCheckbox.isSelected = true
