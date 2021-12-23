@@ -14,12 +14,17 @@ import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.32"
+    kotlin("jvm") version "1.6.10"
     java
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.3.0"
+    val ijPluginVersion = if (System.getProperty("mcdev.localdev").toBoolean()) {
+        "1.1.3"
+    } else {
+        "1.3.0"
+    }
+    id("org.jetbrains.intellij") version ijPluginVersion
     id("org.cadixdev.licenser") version "0.6.1"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
@@ -46,6 +51,12 @@ val testLibs: Configuration by configurations.creating {
 group = "com.demonwav.minecraft-dev"
 version = "$ideaVersionName-$coreVersion"
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
 val gradleToolingExtensionSourceSet: SourceSet = sourceSets.create("gradle-tooling-extension") {
     configurations.named(compileOnlyConfigurationName) {
         extendsFrom(gradleToolingExtension)
@@ -57,17 +68,8 @@ val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSource
 }
 
 repositories {
-    mavenCentral()
     maven("https://repo.denwav.dev/repository/maven-public/")
-    maven("https://repo.spongepowered.org/maven")
-    if (!ideaVersion.endsWith("SNAPSHOT")) {
-        maven("https://www.jetbrains.com/intellij-repository/releases")
-    } else {
-        maven("https://www.jetbrains.com/intellij-repository/snapshots")
-    }
-    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
-    maven("https://repo.gradle.org/gradle/libs-releases-local/")
-    maven("https://maven.extracraftx.com")
+    mavenCentral()
 }
 
 dependencies {
@@ -82,19 +84,28 @@ dependencies {
     implementation(files(gradleToolingExtensionJar))
 
     implementation(libs.templateMakerFabric)
-
-    implementation("org.ow2.asm:asm:9.2")
-    implementation("org.ow2.asm:asm-tree:9.2")
-    implementation("org.ow2.asm:asm-analysis:9.2")
+    implementation(libs.bundles.asm)
 
     jflex(libs.jflex.lib)
-    jflexSkeleton("${libs.jflex.skeleton.text()}@skeleton")
+    jflexSkeleton(libs.jflex.skeleton) {
+        artifact {
+            extension = "skeleton"
+        }
+    }
     grammarKit(libs.grammarKit)
 
     testLibs(libs.test.mockJdk)
     testLibs(libs.test.mixin)
-    testLibs("${libs.test.spongeapi.text()}:shaded")
-    testLibs("${libs.test.nbt.text()}@nbt")
+    testLibs(libs.test.spongeapi) {
+        artifact {
+            classifier = "shaded"
+        }
+    }
+    testLibs(libs.test.nbt) {
+        artifact {
+            extension = "nbt"
+        }
+    }
     testLibs(project(":mixin-test-data"))
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
@@ -155,7 +166,7 @@ java {
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.compilerArgs = listOf("-proc:none")
-    options.release.set(8)
+    options.release.set(11)
 }
 
 tasks.withType<KotlinCompile>().configureEach {
@@ -165,6 +176,18 @@ tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
+// Compile classes to be loaded into the Gradle VM to Java 5 to match Groovy
+// This is for maximum compatibility, these classes will be loaded into every Gradle import on all
+// projects (not just Minecraft), so we don't want to break that with an incompatible class version.
+tasks.named(gradleToolingExtensionSourceSet.compileJavaTaskName, JavaCompile::class) {
+    val java7Compiler = javaToolchains.compilerFor { languageVersion.set(JavaLanguageVersion.of(8)) }
+    javaCompiler.set(java7Compiler)
+    options.release.set(null as Int?)
+    sourceCompatibility = "1.5"
+    targetCompatibility = "1.5"
+    options.bootstrapClasspath = files(java7Compiler.map { it.metadata.installationPath.file("jre/lib/rt.jar") })
+    options.compilerArgs = listOf("-Xlint:-options")
+}
 tasks.withType<GroovyCompile>().configureEach {
     options.compilerArgs = listOf("-proc:none")
     sourceCompatibility = "1.5"
@@ -189,7 +212,7 @@ tasks.processResources {
 }
 
 tasks.test {
-    dependsOn(testLibs)
+    dependsOn(tasks.jar, testLibs)
     useJUnitPlatform()
     doFirst {
         testLibs.resolvedConfiguration.resolvedArtifacts.forEach {
@@ -197,18 +220,25 @@ tasks.test {
         }
     }
     systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
-    if (JavaVersion.current().isJava9Compatible) {
-        jvmArgs(
-            "--add-opens", "java.base/java.io=ALL-UNNAMED",
-            "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-            "--add-opens", "java.desktop/sun.awt=ALL-UNNAMED",
-            "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
-            "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
-            "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
-            "--add-opens", "java.desktop/sun.font=ALL-UNNAMED",
-            "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED"
-        )
-    }
+
+    jvmArgs(
+        "--add-opens", "java.base/java.io=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang.ref=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util.concurrent.locks=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
+        "--add-opens", "java.base/sun.nio.fs=ALL-UNNAMED",
+        "--add-opens", "java.desktop/java.awt.event=ALL-UNNAMED",
+        "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
+        "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
+        "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
+        "--add-opens", "java.desktop/sun.awt=ALL-UNNAMED",
+        "--add-opens", "java.desktop/sun.font=ALL-UNNAMED",
+        "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED",
+    )
 }
 
 idea {
@@ -342,10 +372,10 @@ tasks.buildSearchableOptions {
         "--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED",
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "--add-opens=java.base/java.util=ALL-UNNAMED",
-        "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
         "--add-opens=java.desktop/java.awt.event=ALL-UNNAMED",
-        "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
+        "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
         "--add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
+        "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
         "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
         "--add-opens=java.desktop/sun.font=ALL-UNNAMED",
         "--add-opens=java.desktop/sun.swing=ALL-UNNAMED"
@@ -354,11 +384,4 @@ tasks.buildSearchableOptions {
     if (OperatingSystem.current().isMacOsX) {
         jvmArgs("--add-opens=java.desktop/com.apple.eawt.event=ALL-UNNAMED")
     }
-}
-
-// version catalogs still have rough edges as it's still experimental
-// this lets us get around some of that while still getting the benefits of using catalogs
-fun Provider<MinimalExternalModuleDependency>.text(): String {
-    val dep = get()
-    return "${dep.module.group}:${dep.module.name}:${dep.versionConstraint}"
 }

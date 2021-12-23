@@ -42,10 +42,10 @@ class ModifyArgHandler : InjectorAnnotationHandler() {
         var validFullSignature: String? = null
         val insns = resolveInstructions(annotation, targetClass, targetMethod).ifEmpty { return emptyList() }
         for (insn in insns) {
-            if (insn !is MethodInsnNode) return null
+            if (insn.insn !is MethodInsnNode) return null
 
             // normalize return type so whole signature matches
-            val desc = insn.desc.replaceAfterLast(')', "V")
+            val desc = insn.insn.desc.replaceAfterLast(')', "V")
 
             if (index == null) {
                 val validArgTypes = Type.getArgumentTypes(desc).mapTo(mutableListOf()) { it.descriptor }

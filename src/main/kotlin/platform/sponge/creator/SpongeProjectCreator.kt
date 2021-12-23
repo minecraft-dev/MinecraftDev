@@ -43,6 +43,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.EnumSet
+import java.util.Locale
 
 sealed class SpongeProjectCreator<T : BuildSystem>(
     protected val rootDirectory: Path,
@@ -184,7 +185,7 @@ class SpongeMainClassModifyStep(
             val psiClass = psiFile.classes[0]
 
             val annotationString = StringBuilder("@Plugin(")
-            annotationString + "\nid = ${escape(buildSystem.artifactId.toLowerCase())}"
+            annotationString + "\nid = ${escape(buildSystem.artifactId.lowercase(Locale.ENGLISH))}"
             annotationString + ",\nname = ${escape(config.pluginName)}"
             if (buildSystem.type != BuildSystemType.GRADLE) {
                 // SpongeGradle will automatically set the Gradle version as plugin version

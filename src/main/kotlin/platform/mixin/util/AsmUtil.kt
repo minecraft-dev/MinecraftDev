@@ -53,6 +53,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiModifier
+import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiType
@@ -80,21 +81,26 @@ import org.objectweb.asm.tree.VarInsnNode
 
 private val LOGGER = Logger.getInstance("AsmUtil")
 
-private val MODIFIER_TO_ACCESS_FLAG = mapOf<@PsiModifier.ModifierConstant String, Int>(
-    PsiModifier.PUBLIC to Opcodes.ACC_PUBLIC,
-    PsiModifier.PROTECTED to Opcodes.ACC_PROTECTED,
-    PsiModifier.PRIVATE to Opcodes.ACC_PRIVATE,
-    PsiModifier.STATIC to Opcodes.ACC_STATIC,
-    PsiModifier.ABSTRACT to Opcodes.ACC_ABSTRACT,
-    PsiModifier.FINAL to Opcodes.ACC_FINAL,
-    PsiModifier.NATIVE to Opcodes.ACC_NATIVE,
-    PsiModifier.SYNCHRONIZED to Opcodes.ACC_SYNCHRONIZED,
-    PsiModifier.STRICTFP to Opcodes.ACC_STRICT,
-    PsiModifier.TRANSIENT to Opcodes.ACC_TRANSIENT,
-    PsiModifier.VOLATILE to Opcodes.ACC_VOLATILE,
-    PsiModifier.OPEN to Opcodes.ACC_OPEN,
-    PsiModifier.TRANSITIVE to Opcodes.ACC_TRANSITIVE,
+private val MODIFIER_TO_ACCESS_FLAG = mapOf(
+    entry(PsiModifier.PUBLIC, Opcodes.ACC_PUBLIC),
+    entry(PsiModifier.PROTECTED, Opcodes.ACC_PROTECTED),
+    entry(PsiModifier.PRIVATE, Opcodes.ACC_PRIVATE),
+    entry(PsiModifier.STATIC, Opcodes.ACC_STATIC),
+    entry(PsiModifier.ABSTRACT, Opcodes.ACC_ABSTRACT),
+    entry(PsiModifier.FINAL, Opcodes.ACC_FINAL),
+    entry(PsiModifier.NATIVE, Opcodes.ACC_NATIVE),
+    entry(PsiModifier.SYNCHRONIZED, Opcodes.ACC_SYNCHRONIZED),
+    entry(PsiModifier.STRICTFP, Opcodes.ACC_STRICT),
+    entry(PsiModifier.TRANSIENT, Opcodes.ACC_TRANSIENT),
+    entry(PsiModifier.VOLATILE, Opcodes.ACC_VOLATILE),
+    entry(PsiModifier.OPEN, Opcodes.ACC_OPEN),
+    entry(PsiModifier.TRANSITIVE, Opcodes.ACC_TRANSITIVE),
 )
+
+// Kotlin 1.6.0 understands TYPE_USE now so won't allow the @ModifierConstant annotation in the map definition anymore
+private fun entry(@PsiModifier.ModifierConstant modifierConstant: String, access: Int): Pair<String, Int> {
+    return modifierConstant to access
+}
 
 @PsiUtil.AccessLevel
 private fun accessLevelFromFlags(access: Int): Int {
@@ -115,9 +121,11 @@ fun Type.toPsiType(elementFactory: PsiElementFactory, context: PsiElement? = nul
     return elementFactory.createTypeFromText(className.replace('$', '.'), context)
 }
 
+private fun hasAccess(access: Int, flag: Int) = (access and flag) != 0
+
 // ClassNode
 
-fun ClassNode.hasAccess(flag: Int) = (this.access and flag) != 0
+fun ClassNode.hasAccess(flag: Int) = hasAccess(this.access, flag)
 
 fun ClassNode.hasModifier(@PsiModifier.ModifierConstant modifier: String) = hasModifier(this.access, modifier)
 
@@ -405,7 +413,7 @@ private fun addConstructorToFakeClass(clazz: ClassNode) {
 
 // FieldNode
 
-fun FieldNode.hasAccess(flag: Int) = (this.access and flag) != 0
+fun FieldNode.hasAccess(flag: Int) = hasAccess(this.access, flag)
 
 @PsiUtil.AccessLevel
 val FieldNode.accessLevel
@@ -471,11 +479,7 @@ fun FieldNode.findOrConstructSourceField(
     )
     psiField.realName = this.name
     val modifierList = psiField.modifierList!!
-    modifierList.setModifierProperty(PsiModifier.PUBLIC, hasAccess(Opcodes.ACC_PUBLIC))
-    modifierList.setModifierProperty(PsiModifier.PROTECTED, hasAccess(Opcodes.ACC_PROTECTED))
-    modifierList.setModifierProperty(PsiModifier.PRIVATE, hasAccess(Opcodes.ACC_PRIVATE))
-    modifierList.setModifierProperty(PsiModifier.STATIC, hasAccess(Opcodes.ACC_STATIC))
-    modifierList.setModifierProperty(PsiModifier.FINAL, hasAccess(Opcodes.ACC_FINAL))
+    setBaseModifierProperties(modifierList, access)
     modifierList.setModifierProperty(PsiModifier.VOLATILE, hasAccess(Opcodes.ACC_VOLATILE))
     modifierList.setModifierProperty(PsiModifier.TRANSIENT, hasAccess(Opcodes.ACC_TRANSIENT))
     return containingClass
@@ -513,7 +517,7 @@ fun FieldInsnNode.fakeResolve(): ClassAndFieldNode {
 
 // MethodNode
 
-fun MethodNode.hasAccess(flag: Int) = (this.access and flag) != 0
+fun MethodNode.hasAccess(flag: Int) = hasAccess(this.access, flag)
 
 @PsiUtil.AccessLevel
 val MethodNode.accessLevel
@@ -827,15 +831,19 @@ fun MethodNode.findOrConstructSourceMethod(
     }
 
     val modifierList = psiMethod.modifierList
-    modifierList.setModifierProperty(PsiModifier.PUBLIC, hasAccess(Opcodes.ACC_PUBLIC))
-    modifierList.setModifierProperty(PsiModifier.PROTECTED, hasAccess(Opcodes.ACC_PROTECTED))
-    modifierList.setModifierProperty(PsiModifier.PRIVATE, hasAccess(Opcodes.ACC_PRIVATE))
-    modifierList.setModifierProperty(PsiModifier.STATIC, hasAccess(Opcodes.ACC_STATIC))
-    modifierList.setModifierProperty(PsiModifier.FINAL, hasAccess(Opcodes.ACC_FINAL))
+    setBaseModifierProperties(modifierList, access)
     modifierList.setModifierProperty(PsiModifier.SYNCHRONIZED, hasAccess(Opcodes.ACC_SYNCHRONIZED))
     modifierList.setModifierProperty(PsiModifier.NATIVE, hasAccess(Opcodes.ACC_NATIVE))
 
     return psiMethod
+}
+
+private fun setBaseModifierProperties(modifierList: PsiModifierList, access: Int) {
+    modifierList.setModifierProperty(PsiModifier.PUBLIC, hasAccess(access, Opcodes.ACC_PUBLIC))
+    modifierList.setModifierProperty(PsiModifier.PROTECTED, hasAccess(access, Opcodes.ACC_PROTECTED))
+    modifierList.setModifierProperty(PsiModifier.PRIVATE, hasAccess(access, Opcodes.ACC_PRIVATE))
+    modifierList.setModifierProperty(PsiModifier.STATIC, hasAccess(access, Opcodes.ACC_STATIC))
+    modifierList.setModifierProperty(PsiModifier.FINAL, hasAccess(access, Opcodes.ACC_FINAL))
 }
 
 /**

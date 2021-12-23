@@ -20,6 +20,7 @@ import com.intellij.psi.JVMElementFactories
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import java.awt.Color
+import java.util.Locale
 import kotlin.math.round
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UElement
@@ -216,7 +217,7 @@ fun ULiteralExpression.setColor(value: Int) {
     val sourcePsi = this.sourcePsi ?: return
     sourcePsi.containingFile.runWriteAction {
         JVMElementFactories.requireFactory(sourcePsi.language, sourcePsi.project)
-            .createExpressionFromText("0x" + Integer.toHexString(value).toUpperCase(), sourcePsi)
+            .createExpressionFromText("0x" + Integer.toHexString(value).uppercase(Locale.ENGLISH), sourcePsi)
             .let(sourcePsi::replace)
     }
 }

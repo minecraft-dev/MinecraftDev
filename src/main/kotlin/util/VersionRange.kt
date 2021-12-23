@@ -45,7 +45,7 @@ data class VersionRange(val lower: SemanticVersion, val upper: SemanticVersion? 
      */
     fun intersect(other: VersionRange): VersionRange? {
         val highestLowerBound = maxOf(this.lower, other.lower)
-        val lowestUpperBound = minOf(this.upper, other.upper, Comparator.nullsLast(Comparator.naturalOrder()))
+        val lowestUpperBound = minOf(this.upper, other.upper, nullsLast())
         if (lowestUpperBound != null && highestLowerBound > lowestUpperBound) {
             return null
         }
