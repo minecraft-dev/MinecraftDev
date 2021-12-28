@@ -61,7 +61,6 @@ class MinecraftClassCreateAction :
             builder.addKind("Item", icon, MinecraftTemplates.FORGE_ITEM_TEMPLATE)
             builder.addKind("Packet", icon, MinecraftTemplates.FORGE_PACKET_TEMPLATE)
             builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_ENCHANTMENT_TEMPLATE)
-
         }
         if (isFabric) {
             val icon = PlatformAssets.FABRIC_ICON
