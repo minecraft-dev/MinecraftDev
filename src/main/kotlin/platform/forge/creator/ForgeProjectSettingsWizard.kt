@@ -88,7 +88,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     private val forgeVersionBoxListener = ActionListener {
         val selectedVersion = forgeVersionBox.selectedItem as? SemanticVersion ?: return@ActionListener
         val supportedMixinVersion = selectedVersion >= SemanticVersion.release(31, 2, 45)
-        val mcpMappingsVersion = selectedVersion <= SemanticVersion.release(36, 0, 48)
+        val mcpMappingsVersion = selectedVersion <= SemanticVersion.release(37, 0, 0)
 
         mixinsCheckbox.isEnabled = supportedMixinVersion
         if (!supportedMixinVersion) {
