@@ -97,7 +97,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
 
         mcpVersionBox.isEnabled = mcpMappingsVersion
         mcpWarning.isVisible = mcpMappingsVersion
-        if(mcpMappingsVersion) {
+        if (mcpMappingsVersion) {
             mcpBoxActionListener.actionPerformed(null)
         }
     }
