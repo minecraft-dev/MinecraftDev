@@ -154,6 +154,17 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
                 forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_BLOCK_TEMPLATE))
                 forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_ITEM_TEMPLATE))
             }
+            FileTemplateGroupDescriptor("Forge 1.17+", PlatformAssets.FORGE_ICON).let { forgeSkeletonGroup ->
+                skeletonGroup.addTemplate(forgeSkeletonGroup)
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_1_17_ENCHANTMENT_TEMPLATE))
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_1_17_PACKET_TEMPLATE))
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_1_17_BLOCK_TEMPLATE))
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_1_17_ITEM_TEMPLATE))
+            }
+            FileTemplateGroupDescriptor("Forge 1.18+", PlatformAssets.FORGE_ICON).let { forgeSkeletonGroup ->
+                skeletonGroup.addTemplate(forgeSkeletonGroup)
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_1_18_PACKET_TEMPLATE))
+            }
             FileTemplateGroupDescriptor("Fabric", PlatformAssets.FABRIC_ICON).let { fabricSkeletonGroup ->
                 skeletonGroup.addTemplate(fabricSkeletonGroup)
                 fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_BLOCK_TEMPLATE))
@@ -262,6 +273,13 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FORGE_ITEM_TEMPLATE = "ForgeItem.java"
         const val FORGE_PACKET_TEMPLATE = "ForgePacket.java"
         const val FORGE_ENCHANTMENT_TEMPLATE = "ForgeEnchantment.java"
+
+        const val FORGE_1_17_BLOCK_TEMPLATE = "ForgeBlock (1.17+).java"
+        const val FORGE_1_17_ITEM_TEMPLATE = "ForgeItem (1.17+).java"
+        const val FORGE_1_17_PACKET_TEMPLATE = "ForgePacket (1.17+).java"
+        const val FORGE_1_17_ENCHANTMENT_TEMPLATE = "ForgeEnchantment (1.17+).java"
+
+        const val FORGE_1_18_PACKET_TEMPLATE = "ForgePacket (1.18+).java"
 
         const val FABRIC_BLOCK_TEMPLATE = "FabricBlock.java"
         const val FABRIC_ITEM_TEMPLATE = "FabricItem.java"
