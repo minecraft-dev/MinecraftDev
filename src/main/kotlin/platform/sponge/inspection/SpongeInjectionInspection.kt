@@ -316,10 +316,16 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
             "org.spongepowered.api.event.EventManager",
             "org.spongepowered.api.network.ChannelRegistrar",
             "org.slf4j.Logger",
+            "org.apache.logging.log4j.Logger",
+            // API 8 (plugin-spi)
+            "org.spongepowered.plugin.PluginContainer",
             // https://github.com/SpongePowered/SpongeCommon/blob/855ffc1/src/main/java/org/spongepowered/common/inject/SpongeModule.java
             "java.io.File",
             "java.nio.file.Path",
             "ninja.leaping.configurate.loader.ConfigurationLoader",
+            // Configurate 4
+            "org.spongepowered.configurate.reference.ConfigurationReference",
+            "org.spongepowered.configurate.loader.ConfigurationLoader",
 
             "ninja.leaping.configurate.objectmapping.GuiceObjectMapperFactory",
             "com.google.inject.Injector",
