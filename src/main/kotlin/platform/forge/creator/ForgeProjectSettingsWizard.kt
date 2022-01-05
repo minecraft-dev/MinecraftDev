@@ -88,7 +88,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     private val forgeVersionBoxListener = ActionListener {
         val selectedVersion = forgeVersionBox.selectedItem as? SemanticVersion ?: return@ActionListener
         val supportedMixinVersion = selectedVersion >= SemanticVersion.release(31, 2, 45)
-        val mcpMappingsVersion = selectedVersion <= SemanticVersion.release(37, 0, 0)
+        val mcpMappingsVersion = selectedVersion <= SemanticVersion.release(36, 0, 0)
 
         mixinsCheckbox.isEnabled = supportedMixinVersion
         if (!supportedMixinVersion) {
@@ -182,7 +182,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         conf.updateUrl = this.updateUrlField.text
 
         conf.mcVersion = this.version ?: SemanticVersion.release()
-        conf.mcpVersion = if (conf.mcVersion >= MinecraftVersions.MC1_17) {
+        conf.mcpVersion = if (conf.mcVersion >= MinecraftVersions.MC1_16_5) {
             McpVersionPair("official_" + conf.mcVersion, conf.mcVersion)
         } else {
             (this.mcpVersionBox.selectedItem as McpVersionEntry).versionPair
