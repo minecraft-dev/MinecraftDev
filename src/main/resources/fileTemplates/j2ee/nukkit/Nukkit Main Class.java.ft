@@ -1,0 +1,21 @@
+package ${PACKAGE};
+
+import cn.nukkit.plugin.PluginBase;
+
+public final class ${CLASS_NAME} extends PluginBase {
+
+    @Override
+    public void onLoad() {
+        // Plugin load logic
+    }
+
+    @Override
+    public void onEnable() {
+        // Plugin startup logic
+    }
+
+    @Override
+    public void onDisable() {
+        //Plugin shutdown logic
+    }
+}

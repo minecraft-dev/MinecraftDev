@@ -184,6 +184,16 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
     }
 
     companion object {
+
+        const val NUKKIT_MAIN_CLASS_TEMPLATE = "Nukkit Main Class.java"
+        const val NUKKIT_PLUGIN_YML_TEMPLATE = "Nukkit plugin.yml"
+        const val NUKKIT_BUILD_GRADLE_TEMPLATE = "Nukkit build.gradle"
+        const val NUKKIT_SUBMODULE_BUILD_GRADLE_TEMPLATE = "Nukkit Submodule build.gradle"
+        const val NUKKIT_GRADLE_PROPERTIES_TEMPLATE = "Nukkit gradle.properties"
+        const val NUKKIT_SETTINGS_GRADLE_TEMPLATE = "Nukkit settings.gradle"
+        const val NUKKIT_POM_TEMPLATE = "Nukkit pom.xml"
+        const val NUKKIT_SUBMODULE_POM_TEMPLATE = "Nukkit Submodule pom.xml"
+
         const val BUKKIT_MAIN_CLASS_TEMPLATE = "Bukkit Main Class.java"
         const val BUKKIT_PLUGIN_YML_TEMPLATE = "Bukkit plugin.yml"
         const val BUKKIT_BUILD_GRADLE_TEMPLATE = "Bukkit build.gradle"

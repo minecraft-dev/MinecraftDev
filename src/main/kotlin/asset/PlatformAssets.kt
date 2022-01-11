@@ -56,4 +56,7 @@ object PlatformAssets : Assets() {
     val MCP_ICON_2X = loadIcon("/assets/icons/platform/MCP@2x.png")
     val MCP_ICON_DARK = loadIcon("/assets/icons/platform/MCP_dark.png")
     val MCP_ICON_2X_DARK = loadIcon("/assets/icons/platform/MCP@2x_dark.png")
+
+    val NUKKIT_ICON = loadIcon("/assets/icons/platform/NUKKIT.png")
+    val NUKKIT_ICON_2Z = loadIcon("/assets/icons/platform/NUKKIT@2x.png")
 }

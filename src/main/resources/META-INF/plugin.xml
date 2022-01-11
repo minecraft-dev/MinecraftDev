@@ -211,6 +211,13 @@
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.bukkit.framework.PaperPresentationProvider" />
         <!--endregion-->
 
+        <!-- region NUKKIT-->
+        <!---->
+
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.nukkit.NukkitFileIconProvider"/>
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.nukkit.framework.NukkitPresentationProvider"/>
+        <!--endregion-->
+
         <!--region SPONGE-->
         <!---->
 

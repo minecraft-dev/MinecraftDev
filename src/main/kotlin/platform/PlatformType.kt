@@ -32,6 +32,8 @@ import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
+import com.demonwav.mcdev.platform.nukkit.NukkitModuleType
+import com.demonwav.mcdev.platform.nukkit.framework.NUKKIT_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.velocity.VelocityModuleType
@@ -57,7 +59,8 @@ enum class PlatformType(
     LITELOADER(LiteLoaderModuleType, "LiteLoader"),
     MIXIN(MixinModuleType, "Mixin"),
     MCP(McpModuleType, "MCP"),
-    ADVENTURE(AdventureModuleType, "Adventure");
+    ADVENTURE(AdventureModuleType, "Adventure"),
+    NUKKIT(NukkitModuleType, "Nukkit");
 
     private val children = mutableListOf<PlatformType>()
 
@@ -88,6 +91,7 @@ enum class PlatformType(
             WATERFALL_LIBRARY_KIND -> WATERFALL
             VELOCITY_LIBRARY_KIND -> VELOCITY
             ADVENTURE_LIBRARY_KIND -> ADVENTURE
+            NUKKIT_LIBRARY_KIND -> NUKKIT
             else -> null
         }
     }

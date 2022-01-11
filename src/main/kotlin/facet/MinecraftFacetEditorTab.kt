@@ -49,6 +49,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     private lateinit var velocityAutoCheckBox: JCheckBox
     private lateinit var adventureEnabledCheckBox: JCheckBox
     private lateinit var adventureAutoCheckBox: JCheckBox
+    private lateinit var nukkitEnabledCheckBox: JCheckBox
+    private lateinit var nukkitAutoCheckBox: JCheckBox
 
     private lateinit var spongeIcon: JLabel
     private lateinit var mcpIcon: JLabel
@@ -68,7 +70,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             bungeecordEnabledCheckBox,
             waterfallEnabledCheckBox,
             velocityEnabledCheckBox,
-            adventureEnabledCheckBox
+            adventureEnabledCheckBox,
+            nukkitEnabledCheckBox
         )
     }
 
@@ -86,7 +89,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             bungeecordAutoCheckBox,
             waterfallAutoCheckBox,
             velocityAutoCheckBox,
-            adventureAutoCheckBox
+            adventureAutoCheckBox,
+            nukkitAutoCheckBox
         )
     }
 
@@ -151,6 +155,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
 
         bungeecordEnabledCheckBox.addActionListener { unique(bungeecordEnabledCheckBox, waterfallEnabledCheckBox) }
         waterfallEnabledCheckBox.addActionListener { unique(waterfallEnabledCheckBox, bungeecordEnabledCheckBox) }
+
+        nukkitAutoCheckBox.addActionListener { unique(nukkitEnabledCheckBox) }
 
         return panel
     }
@@ -275,6 +281,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         private const val WATERFALL = BUNGEECORD + 1
         private const val VELOCITY = WATERFALL + 1
         private const val ADVENTURE = VELOCITY + 1
+        private const val NUKKIT = ADVENTURE + 1
 
         private val platformTypes = arrayOf(
             PlatformType.BUKKIT,
@@ -289,7 +296,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             PlatformType.BUNGEECORD,
             PlatformType.WATERFALL,
             PlatformType.VELOCITY,
-            PlatformType.ADVENTURE
+            PlatformType.ADVENTURE,
+            PlatformType.NUKKIT
         )
 
         private val indexes = intArrayOf(
@@ -305,7 +313,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             BUNGEECORD,
             WATERFALL,
             VELOCITY,
-            ADVENTURE
+            ADVENTURE,
+            NUKKIT
         )
     }
 }
