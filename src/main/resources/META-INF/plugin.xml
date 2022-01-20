@@ -256,6 +256,10 @@
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.fabric.reference.FabricReferenceContributor" />
         <!--endregion-->
 
+        <!--region ARCHITECTURY-->
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.architectury.framework.ArchitecturyPresentationProvider" />
+        <!--endregion-->
+
         <!--region LITELOADER -->
         <!---->
 

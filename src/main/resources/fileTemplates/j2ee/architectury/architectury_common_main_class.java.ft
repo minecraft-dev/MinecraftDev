@@ -1,0 +1,10 @@
+package ${PACKAGE_NAME};
+
+public class ${CLASS_NAME}
+{
+	public static final String MOD_ID = "${ARTIFACT_ID}";
+
+	public static void init() {
+		
+	}
+}

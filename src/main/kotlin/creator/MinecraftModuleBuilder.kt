@@ -12,6 +12,7 @@ package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.MinecraftModuleType
+import com.demonwav.mcdev.platform.architectury.creator.ArchitecturyProjectSettingsWizard
 import com.demonwav.mcdev.platform.bukkit.creator.BukkitProjectSettingsWizard
 import com.demonwav.mcdev.platform.bungeecord.creator.BungeeCordProjectSettingsWizard
 import com.demonwav.mcdev.platform.fabric.creator.FabricProjectSettingsWizard
@@ -110,6 +111,7 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
             SpongeProjectSettingsWizard(creator),
             ForgeProjectSettingsWizard(creator),
             FabricProjectSettingsWizard(creator),
+            ArchitecturyProjectSettingsWizard(creator),
             LiteLoaderProjectSettingsWizard(creator),
             VelocityProjectSettingsWizard(creator),
             BungeeCordProjectSettingsWizard(creator)

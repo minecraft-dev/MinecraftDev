@@ -12,6 +12,8 @@ package com.demonwav.mcdev.platform
 
 import com.demonwav.mcdev.platform.adventure.AdventureModuleType
 import com.demonwav.mcdev.platform.adventure.framework.ADVENTURE_LIBRARY_KIND
+import com.demonwav.mcdev.platform.architectury.ArchitecturyModuleType
+import com.demonwav.mcdev.platform.architectury.framework.ARCHITECTURY_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType
@@ -50,6 +52,7 @@ enum class PlatformType(
     PAPER(PaperModuleType, "Paper", "paper.json", SPIGOT),
     FORGE(ForgeModuleType, "Forge"),
     FABRIC(FabricModuleType, "Fabric"),
+    ARCHITECTURY(ArchitecturyModuleType, "Architectury"),
     SPONGE(SpongeModuleType, "Sponge"),
     BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord_v2.json"),
     WATERFALL(WaterfallModuleType, "Waterfall", "waterfall.json", BUNGEECORD),
@@ -81,6 +84,7 @@ enum class PlatformType(
             SPONGE_LIBRARY_KIND -> SPONGE
             FORGE_LIBRARY_KIND -> FORGE
             FABRIC_LIBRARY_KIND -> FABRIC
+            ARCHITECTURY_LIBRARY_KIND -> ARCHITECTURY
             LITELOADER_LIBRARY_KIND -> LITELOADER
             MCP_LIBRARY_KIND -> MCP
             MIXIN_LIBRARY_KIND -> MIXIN
