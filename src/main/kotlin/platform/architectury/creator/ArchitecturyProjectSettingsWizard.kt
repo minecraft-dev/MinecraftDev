@@ -112,7 +112,7 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
             modNameField.isEditable = false
         }
 
-        title.icon = PlatformAssets.FORGE_ICON_2X
+        title.icon = PlatformAssets.ARCHITECTURY_ICON_2X
         title.text = "<html><font size=\"5\">Architectury Settings</font></html>"
 
         minecraftVersionLabel.text = "Minecraft Version"

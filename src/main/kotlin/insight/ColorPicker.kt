@@ -80,7 +80,7 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) 
 
         init {
             title = "Choose Color"
-            setResizable(true)
+            isResizable = true
 
             init()
         }

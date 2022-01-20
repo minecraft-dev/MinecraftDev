@@ -18,5 +18,5 @@ import com.demonwav.mcdev.platform.PlatformType
 class ArchitecturyModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
     override val moduleType = ArchitecturyModuleType
     override val type = PlatformType.ARCHITECTURY
-    override val icon = PlatformAssets.MCP_ICON
+    override val icon = PlatformAssets.ARCHITECTURY_ICON
 }

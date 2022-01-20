@@ -20,13 +20,14 @@ import java.util.jar.JarFile
 class ArchitecturyPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(
     ARCHITECTURY_LIBRARY_KIND
 ) {
-    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.MCP_ICON
+    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.ARCHITECTURY_ICON
     override fun detect(classesRoots: MutableList<VirtualFile>): LibraryVersionProperties? {
         return when (isCommon(classesRoots)) {
             true -> LibraryVersionProperties()
             false -> null
         }
     }
+
     fun isCommon(classesRoots: MutableList<VirtualFile>): Boolean {
         for (classesRoot in classesRoots) {
             if (classesRoot.name.endsWith(".jar")) {

@@ -108,11 +108,13 @@ private fun findShadowTargetsDeep(psiClass: PsiClass, start: PsiClass): Sequence
 sealed class MixinTargetMember(val mixin: PsiClass?) {
     abstract val access: Int
 }
+
 class FieldTargetMember(val classAndField: ClassAndFieldNode, mixin: PsiClass? = null) : MixinTargetMember(mixin) {
     constructor(clazz: ClassNode, field: FieldNode) : this(ClassAndFieldNode(clazz, field))
 
     override val access = classAndField.field.access
 }
+
 class MethodTargetMember(val classAndMethod: ClassAndMethodNode, mixin: PsiClass? = null) : MixinTargetMember(mixin) {
     constructor(clazz: ClassNode, method: MethodNode) : this(ClassAndMethodNode(clazz, method))
 

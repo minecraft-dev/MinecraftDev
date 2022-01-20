@@ -22,7 +22,7 @@ object ArchitecturyModuleType : AbstractModuleType<ArchitecturyModule>("", "") {
     val LISTENER_ANNOTATIONS = emptyList<String>()
 
     override val platformType = PlatformType.ARCHITECTURY
-    override val icon = PlatformAssets.MCP_ICON
+    override val icon = PlatformAssets.ARCHITECTURY_ICON
     override val id = ID
     override val ignoredAnnotations = IGNORED_ANNOTATIONS
     override val listenerAnnotations = LISTENER_ANNOTATIONS

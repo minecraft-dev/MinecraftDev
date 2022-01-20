@@ -75,7 +75,13 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
         }
         forgeModCheckBox.addActionListener { toggle(forgeModCheckBox, liteLoaderModCheckBox, architecturyModCheckBox) }
         fabricModCheckBox.addActionListener { toggle(fabricModCheckBox, architecturyModCheckBox) }
-        architecturyModCheckBox.addActionListener { toggle(architecturyModCheckBox, fabricModCheckBox, forgeModCheckBox) }
+        architecturyModCheckBox.addActionListener {
+            toggle(
+                architecturyModCheckBox,
+                fabricModCheckBox,
+                forgeModCheckBox
+            )
+        }
         liteLoaderModCheckBox.addActionListener { toggle(liteLoaderModCheckBox, forgeModCheckBox) }
         bungeeCordPluginCheckBox.addActionListener { toggle(bungeeCordPluginCheckBox, waterfallPluginCheckBox) }
         waterfallPluginCheckBox.addActionListener { toggle(waterfallPluginCheckBox, bungeeCordPluginCheckBox) }

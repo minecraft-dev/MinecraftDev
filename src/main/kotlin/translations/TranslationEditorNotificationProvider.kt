@@ -44,7 +44,7 @@ class TranslationEditorNotificationProvider :
         val missingTranslations = getMissingTranslations(project, file)
         if (missingTranslations.any()) {
             val panel = InfoPanel()
-            panel.setText("Translation file doesn't match default one (${TranslationConstants.DEFAULT_LOCALE} locale).")
+            panel.text = "Translation file doesn't match default one (${TranslationConstants.DEFAULT_LOCALE} locale)."
             panel.createActionLabel(
                 "Add missing default entries (won't reflect changes in original English localization)"
             ) {
