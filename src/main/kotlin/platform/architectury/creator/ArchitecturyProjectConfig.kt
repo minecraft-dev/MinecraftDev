@@ -45,6 +45,9 @@ class ArchitecturyProjectConfig : ProjectConfig(), GradleCreator {
             else -> "me.shedaniel.architectury"
         }
     var modRepo: String? = null
+    fun hasRepo() = !modRepo.isNullOrBlank()
+    var modIssue: String? = null
+    fun hasIssue() = !modIssue.isNullOrBlank()
     var mixins = false
     var license: License? = null
 

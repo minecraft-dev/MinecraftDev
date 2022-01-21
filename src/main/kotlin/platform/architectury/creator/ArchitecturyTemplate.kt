@@ -158,6 +158,7 @@ object ArchitecturyTemplate : BaseTemplate() {
             "ARTIFACT_ID" to buildSystem.artifactId,
             "MOD_NAME" to config.pluginName,
             "FORGE_SPEC_VERSION" to config.forgeVersion.parts[0].versionString,
+            "ARCHITECTURY_API_VERSION" to config.architecturyApiVersion.toString(),
             "MC_VERSION" to config.mcVersion.toString(),
             "MC_NEXT_VERSION" to "1.$nextMcVersion",
             "LICENSE" to config.license.toString()
@@ -165,6 +166,12 @@ object ArchitecturyTemplate : BaseTemplate() {
         props["DESCRIPTION"] = config.description ?: ""
         if (config.hasAuthors()) {
             props["AUTHOR_LIST"] = config.authors.joinToString(", ")
+        }
+        if (config.hasWebsite()) {
+            props["WEBSITE"] = config.website.toString()
+        }
+        if (config.hasIssue()) {
+            props["ISSUE"] = config.modIssue.toString()
         }
 
         return project.applyTemplate(MinecraftTemplates.ARCHITECTURY_FORGE_MODS_TOML_TEMPLATE, props)

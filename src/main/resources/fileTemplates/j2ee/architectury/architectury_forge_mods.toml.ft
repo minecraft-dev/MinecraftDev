@@ -11,7 +11,11 @@ loaderVersion="[${FORGE_SPEC_VERSION},)" #mandatory This is typically bumped eve
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
 license="${LICENSE}"
 # A URL to refer people to when problems occur with this mod
+#if (${ISSUE})
+issueTrackerURL="${ISSUE}"
+#else
 #issueTrackerURL="http://my.issue.tracker/" #optional
+#end
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
 # The modid of the mod
@@ -29,9 +33,13 @@ updateJSONURL="${UPDATE_URL}" #optional
 #updateJSONURL="http://myurl.me/" #optional
 #end
 # A URL for the "homepage" for this mod, displayed in the mod UI
+#if (${WEBSITE})
+displayURL="${WEBSITE}"
+#else
 #displayURL="http://example.com/" #optional
+#end
 # A file name (in the root of the mod JAR) containing a logo for display
-#logoFile="${ARTIFACT_ID}.png" #optional
+logoFile="icon.png" #optional
 # A text field displayed in the mod UI
 #credits="Thanks for this example mod goes to Java" #optional
 # A text field displayed in the mod UI
@@ -64,3 +72,10 @@ ${DESCRIPTION}
    versionRange="[${MC_VERSION},${MC_NEXT_VERSION})"
    ordering="NONE"
    side="BOTH"
+
+[[dependencies.${ARTIFACT_ID}]]
+   modId = "architectury"
+   mandatory = true
+   versionRange = "[${ARCHITECTURY_API_VERSION},)"
+   ordering = "AFTER"
+   side = "BOTH"

@@ -19,6 +19,7 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.fabric.EntryPoint
@@ -41,8 +42,12 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiFileFactory
+import java.io.IOException
+import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.SimpleFileVisitor
+import java.nio.file.attribute.BasicFileAttributes
 
 class ArchitecturyProjectCreator(
     private val rootDirectory: Path,
@@ -97,6 +102,8 @@ class ArchitecturyProjectCreator(
             ),
             GradleWrapperStep(project, rootDirectory, buildSystem),
             GenRunsStep(project, rootDirectory),
+            GradleGitignoreStep(project, rootDirectory),
+            CleanUpStep(rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
         )
         return steps
@@ -123,6 +130,31 @@ class ArchitecturyProjectCreator(
                 settings.vmOptions = "-Xmx1G"
             }
             indicator.text2 = null
+        }
+    }
+
+    class CleanUpStep(
+        private val rootDirectory: Path
+    ) : CreatorStep {
+        override fun runStep(indicator: ProgressIndicator) {
+            Files.walkFileTree(rootDirectory.resolve("src"),
+                object : SimpleFileVisitor<Path>() {
+                    @Throws(IOException::class)
+                    override fun postVisitDirectory(
+                        dir: Path, exc: IOException
+                    ): FileVisitResult {
+                        Files.delete(dir)
+                        return FileVisitResult.CONTINUE
+                    }
+
+                    @Throws(IOException::class)
+                    override fun visitFile(
+                        file: Path, attrs: BasicFileAttributes
+                    ): FileVisitResult {
+                        Files.delete(file)
+                        return FileVisitResult.CONTINUE
+                    }
+                })
         }
     }
 }
@@ -376,6 +408,10 @@ class ArchitecturyFabricProjectCreator(
                         val repo = config.modRepo
                         if (!repo.isNullOrBlank()) {
                             properties += "repo" to repo
+                        }
+                        val issues = config.modIssue
+                        if (!issues.isNullOrBlank()) {
+                            properties += "issues" to issues
                         }
                         for (i in properties.indices) {
                             if (i != 0) {

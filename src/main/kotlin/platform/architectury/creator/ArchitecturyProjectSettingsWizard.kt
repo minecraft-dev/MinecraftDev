@@ -55,6 +55,8 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
     @ValidatedField(LIST)
     private lateinit var authorsField: JTextField
     private lateinit var websiteField: JTextField
+    private lateinit var repositoryField: JTextField
+    private lateinit var issueField: JTextField
     private lateinit var licenseBox: JComboBox<License>
     private lateinit var mixinsCheckbox: JCheckBox
     private lateinit var minecraftVersionBox: JComboBox<SemanticVersion>
@@ -173,6 +175,9 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
         conf.pluginName = this.modNameField.text
         conf.description = this.descriptionField.text
         conf.website = this.websiteField.text
+
+        conf.modRepo = this.repositoryField.text
+        conf.modRepo = this.issueField.text
 
         conf.setAuthors(this.authorsField.text)
 
