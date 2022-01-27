@@ -42,12 +42,9 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiFileFactory
-import java.io.IOException
-import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
-import java.nio.file.attribute.BasicFileAttributes
+import org.gradle.internal.impldep.org.apache.commons.io.FileUtils
 
 class ArchitecturyProjectCreator(
     private val rootDirectory: Path,
@@ -137,24 +134,7 @@ class ArchitecturyProjectCreator(
         private val rootDirectory: Path
     ) : CreatorStep {
         override fun runStep(indicator: ProgressIndicator) {
-            Files.walkFileTree(rootDirectory.resolve("src"),
-                object : SimpleFileVisitor<Path>() {
-                    @Throws(IOException::class)
-                    override fun postVisitDirectory(
-                        dir: Path, exc: IOException
-                    ): FileVisitResult {
-                        Files.delete(dir)
-                        return FileVisitResult.CONTINUE
-                    }
-
-                    @Throws(IOException::class)
-                    override fun visitFile(
-                        file: Path, attrs: BasicFileAttributes
-                    ): FileVisitResult {
-                        Files.delete(file)
-                        return FileVisitResult.CONTINUE
-                    }
-                })
+            FileUtils.deleteDirectory(rootDirectory.resolve("src").toFile())
         }
     }
 }
