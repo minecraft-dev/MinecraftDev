@@ -246,8 +246,8 @@ class VelocityDependenciesSetup(
     override fun runStep(indicator: ProgressIndicator) {
         buildSystem.repositories.add(
             BuildRepository(
-                "velocitypowered-repo",
-                "https://nexus.velocitypowered.com/repository/maven-public/"
+                "papermc-repo",
+                "https://papermc.io/repo/repository/maven-public/"
             )
         )
 
