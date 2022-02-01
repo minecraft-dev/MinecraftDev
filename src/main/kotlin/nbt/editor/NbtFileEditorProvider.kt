@@ -65,6 +65,7 @@ private class NbtFileEditor(
 ) : FileEditor {
 
     private var editor: FileEditor? = null
+    private val editorCheckedDisposable = Disposer.newCheckedDisposable()
     private val component = JPanel(BorderLayout())
 
     init {
@@ -83,6 +84,7 @@ private class NbtFileEditor(
         editor?.let { editor ->
             try {
                 Disposer.register(this, editor)
+                Disposer.register(editor, editorCheckedDisposable)
             } catch (e: IncorrectOperationException) {
                 // The editor can be disposed really quickly when opening a large number of NBT files
                 // Since everything happens basically at the same time, calling Disposer.isDisposed right before
@@ -140,7 +142,7 @@ private class NbtFileEditor(
     override fun toString() = editor.toString()
 
     private inline fun <T : Any?> FileEditor?.exec(action: FileEditor.() -> T): T? {
-        if (editor?.let { ed -> Disposer.isDisposed(ed) } == true) {
+        if (editor == null || editorCheckedDisposable.isDisposed) {
             return null
         }
         return this?.action()

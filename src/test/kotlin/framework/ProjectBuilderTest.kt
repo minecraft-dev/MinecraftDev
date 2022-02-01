@@ -35,7 +35,7 @@ abstract class ProjectBuilderTest(descriptor: LightProjectDescriptor? = null) {
 
     init {
         val lightFixture = IdeaTestFixtureFactory.getFixtureFactory()
-            .createLightFixtureBuilder(descriptor)
+            .createLightFixtureBuilder(descriptor, "mcdev_test_project")
             .fixture
 
         // This is a poorly named class - it actually means create a temp dir test fixture _in-memory_

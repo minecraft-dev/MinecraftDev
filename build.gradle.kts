@@ -69,6 +69,7 @@ val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSource
 
 repositories {
     maven("https://repo.denwav.dev/repository/maven-public/")
+    maven("https://www.jetbrains.com/intellij-repository/snapshots")
     mavenCentral()
 }
 
@@ -154,7 +155,7 @@ tasks.publishPlugin {
 }
 
 tasks.runPluginVerifier {
-    ideVersions.addAll("IC-2021.3")
+    ideVersions.addAll("IC-2022.1")
 }
 
 java {
@@ -180,11 +181,9 @@ tasks.withType<KotlinCompile>().configureEach {
 // This is for maximum compatibility, these classes will be loaded into every Gradle import on all
 // projects (not just Minecraft), so we don't want to break that with an incompatible class version.
 tasks.named(gradleToolingExtensionSourceSet.compileJavaTaskName, JavaCompile::class) {
-    val java7Compiler = javaToolchains.compilerFor { languageVersion.set(JavaLanguageVersion.of(8)) }
+    val java7Compiler = javaToolchains.compilerFor { languageVersion.set(JavaLanguageVersion.of(11)) }
     javaCompiler.set(java7Compiler)
-    options.release.set(null as Int?)
-    sourceCompatibility = "1.5"
-    targetCompatibility = "1.5"
+    options.release.set(6)
     options.bootstrapClasspath = files(java7Compiler.map { it.metadata.installationPath.file("jre/lib/rt.jar") })
     options.compilerArgs = listOf("-Xlint:-options")
 }
