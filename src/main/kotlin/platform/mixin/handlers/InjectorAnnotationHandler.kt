@@ -156,9 +156,10 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
             targetMethod: MethodNode
         ): List<Parameter> {
             val numLocalsToDrop = if (targetMethod.hasAccess(Opcodes.ACC_STATIC)) 0 else 1
+            val localVariables = targetMethod.localVariables?.sortedBy { it.index }
             return targetMethod.getGenericParameterTypes(clazz, project).asSequence().withIndex()
                 .map { (index, type) ->
-                    val name = targetMethod.localVariables
+                    val name = localVariables
                         ?.getOrNull(index + numLocalsToDrop)
                         ?.name
                         ?.toJavaIdentifier()

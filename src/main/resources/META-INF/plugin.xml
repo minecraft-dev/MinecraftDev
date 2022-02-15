@@ -399,6 +399,13 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.SuperfluousFormatInspection"/>
+        <localInspection displayName="Entity class does not match this entity class"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.inspection.WrongEntityDataParameterClassInspection"/>
         <!--endregion-->
 
         <!--region BUKKIT INSPECTIONS-->
