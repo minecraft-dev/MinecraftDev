@@ -1,13 +1,3 @@
-/*
- * Minecraft Dev for IntelliJ
- *
- * https://minecraftdev.org
- *
- * Copyright (c) 2021 minecraft-dev
- *
- * MIT License
- */
-
 package com.demonwav.mcdev.json
 
 import com.demonwav.mcdev.util.mcDomain
@@ -32,7 +22,10 @@ class SchemaProviderFactory : JsonSchemaProviderFactory {
 
 class SoundsSchemaProvider : JsonSchemaFileProvider {
     companion object {
-        val FILE = JsonSchemaProviderFactory.getResourceFile(SchemaProviderFactory::class.java, "/jsonSchemas/sounds.schema.json")
+        val FILE: VirtualFile = JsonSchemaProviderFactory.getResourceFile(
+            SchemaProviderFactory::class.java,
+            "/jsonSchemas/sounds.schema.json"
+        )
     }
 
     override fun getName() = "Minecraft Sounds JSON"
@@ -46,7 +39,10 @@ class SoundsSchemaProvider : JsonSchemaFileProvider {
 
 class PathBasedSchemaProvider(name: String, schema: String, private val path: String) : JsonSchemaFileProvider {
     private val _name = name
-    private val file = JsonSchemaProviderFactory.getResourceFile(SchemaProviderFactory::class.java, "/jsonSchemas/$schema.schema.json")
+    private val file = JsonSchemaProviderFactory.getResourceFile(
+        SchemaProviderFactory::class.java,
+        "/jsonSchemas/$schema.schema.json"
+    )
 
     override fun getName() = this._name
 
