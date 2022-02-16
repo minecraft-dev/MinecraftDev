@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Minecraft Advancement JSON",
+  "type": "object",
+  "properties": {
+    "display": {
+      "type": "object",
+      "properties": {
+        "icon": {
+          "type": "object",
+          "properties": {
+            "item": { "type": "string" },
+            "data": { "type": "integer", "minimum": 0, "maximum": 32767 }
+          },
+          "required": [ "item" ]
+        },
+        "title": { "$ref": "common.json#/textComponent" },
+        "frame": {
+          "anyOf": [
+            { "type": "string" },
+            { "enum": [ "task", "goal", "challenge" ], "default": "task" }
+          ]
+        },
+        "background": { "type": "string" },
+        "description": { "$ref": "common.json#/textComponent" },
+        "show_toast": { "type": "boolean" },
+        "announce_to_chat": { "type": "boolean" },
+        "hidden": { "type": "boolean" }
+      },
+      "required": [ "title", "description", "icon" ]
+    },
+    "parent": { "type": "string" },
+    "criteria": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/trigger" },
+      "minProperties": 1
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": "string", "minLength": 1 }
+      }
+    },
+    "rewards": {
+      "type": "object",
+      "properties": {
+        "recipes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "loot": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "experience": { "type": "integer" },
+        "function": { "type": "string" }
+      }
+    }
+  },
+  "require": [ "criteria" ],
+  "definitions": {
+    "trigger": {
+      "type": "object",
+      "properties": {
+        "trigger": {
+          "anyOf": [
+            { "type": "string" },
+            {
+              "type": "string",
+              "enum": [
+                "minecraft:bred_animals",
+                "minecraft:brewed_potion",
+                "minecraft:changed_dimension",
+                "minecraft:channeled_lightning",
+                "minecraft:construct_beacon",
+                "minecraft:consume_item",
+                "minecraft:cured_zombie_villager",
+                "minecraft:effects_changed",
+                "minecraft:enchanted_item",
+                "minecraft:enter_block",
+                "minecraft:entity_hurt_player",
+                "minecraft:entity_killed_player",
+                "minecraft:filled_bucket",
+                "minecraft:fishing_rod_hooked",
+                "minecraft:impossible",
+                "minecraft:inventory_changed",
+                "minecraft:item_durability_changed",
+                "minecraft:levitation",
+                "minecraft:location",
+                "minecraft:nether_travel",
+                "minecraft:nether_travel",
+                "minecraft:placed_block",
+                "minecraft:player_hurt_entity",
+                "minecraft:player_killed_entity",
+                "minecraft:recipe_unlocked",
+                "minecraft:slept_in_bed",
+                "minecraft:summoned_entity",
+                "minecraft:tame_animal",
+                "minecraft:tick",
+                "minecraft:used_ender_eye",
+                "minecraft:used_totem",
+                "minecraft:villager_trade"
+              ]
+            }
+          ]
+        }
+      },
+      "required": [ "trigger" ]
+    }
+  }
+}
