@@ -25,6 +25,10 @@
           "additionalProperties": false,
           "required": [ "axis" ]
         },
+        "shade": {
+          "type": "boolean",
+          "default": true
+        },
         "faces": {
           "type": "object",
           "patternProperties": {
