@@ -6,7 +6,10 @@
     "type": "object",
     "properties": {
       "category": { "type": "string" },
-      "replace": { "type": "boolean" },
+      "replace": {
+        "type": "boolean",
+        "default": false
+      },
       "subtitle": { "type": "string" },
       "sounds": {
         "type": "array",
