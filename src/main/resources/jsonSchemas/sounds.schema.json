@@ -35,6 +35,14 @@
                   "type": "boolean",
                   "default": false
                 },
+                "attenuation_distance": {
+                  "type": "number",
+                  "default": 16
+                },
+                "preload": {
+                  "type": "boolean",
+                  "default": false
+                },
                 "type": {
                   "enum": ["sound", "event"],
                   "default": "sound"
