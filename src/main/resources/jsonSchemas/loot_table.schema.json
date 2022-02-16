@@ -1,0 +1,210 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Minecraft Loot Table JSON",
+  "type": "object",
+  "properties": {
+    "pools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "conditions": { "$ref": "#/definitions/conditions" },
+          "rolls": { "$ref": "common.schema.json#/integerRange" },
+          "bonusRolls": { "$ref": "common.schema.json#/integerRange" },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "conditions": { "$ref": "#/definitions/conditions" },
+                "type": { "type": "string" },
+                "weight": { "type": "number" },
+                "quality": { "type": "number" }
+              },
+              "required": [ "type" ],
+              "anyOf": [
+                {
+                  "allOf": [
+                    { "properties": { "type": { "enum": [ "item" ] } } },
+                    {
+                      "properties": {
+                        "name": { "type": "string" },
+                        "functions": { "$ref": "#/definitions/functions" }
+                      },
+                      "required": [ "name" ]
+                    }
+                  ]
+                },
+                {
+                  "allOf": [
+                    { "properties": { "type": { "enum": [ "loot_table" ] } } },
+                    {
+                      "properties": {
+                        "name": { "type": "string" }
+                      },
+                      "required": [ "name" ]
+                    }
+                  ]
+                },
+                { }
+              ]
+            }
+          }
+        },
+        "required": [ "entries" ]
+      }
+    }
+  },
+  "definitions": {
+    "conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "condition": {
+            "anyOf": [
+              { "type": "string" },
+              {
+                "type": "string",
+                "enum": [
+                  "entity_properties",
+                  "entity_scores",
+                  "killed_by_player",
+                  "random_chance",
+                  "random_chance_with_looting"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [ "condition" ],
+        "anyOf": [
+          {
+            "allOf": [
+              { "properties": { "condition": { "enum": [ "entity_properties" ] } } },
+              { "$ref": "loot_table_conditions.schema.json#/entityProperties" }
+            ]
+          },
+          {
+            "allOf": [
+              { "properties": { "condition": { "enum": [ "entity_scores" ] } } },
+              { "$ref": "loot_table_conditions.schema.json#/entityScores" }
+            ]
+          },
+          {
+            "allOf": [
+              { "properties": { "condition": { "enum": [ "killed_by_player" ] } } },
+              { "$ref": "loot_table_conditions.schema.json#/killedByPlayer" }
+            ]
+          },
+          {
+            "allOf": [
+              { "properties": { "condition": { "enum": [ "random_chance" ] } } },
+              { "$ref": "loot_table_conditions.schema.json#/randomChance" }
+            ]
+          },
+          {
+            "allOf": [
+              { "properties": { "condition": { "enum": [ "random_chance_with_looting" ] } } },
+              { "$ref": "loot_table_conditions.schema.json#/randomChanceWithLooting" }
+            ]
+          },
+          { }
+        ]
+      }
+    },
+    "functions": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/function" }
+    },
+    "function": {
+      "type": "object",
+      "properties": {
+        "function": {
+          "anyOf": [
+            { "type": "string" },
+            {
+              "type": "string",
+              "enum": [
+                "enchant_randomly",
+                "enchant_with_levels",
+                "exploration_map",
+                "furnace_smelt",
+                "looting_enchant",
+                "set_attributes",
+                "set_count",
+                "set_damage",
+                "set_data",
+                "set_nbt"
+              ]
+            }
+          ]
+        },
+        "conditions": { "$ref": "#/definitions/conditions" }
+      },
+      "required": [ "function" ],
+      "anyOf": [
+        {
+          "allOf": [
+            { "properties": { "function": { "enum": [ "enchant_randomly" ] } } },
+            { "$ref": "loot_table_functions.schema.json#/enchantRandomly" }
+          ]
+        },
+        {
+          "allOf": [
+            { "properties": { "function": { "enum": [ "enchant_with_levels" ] } } },
+            { "$ref": "loot_table_functions.schema.json#/enchantWithLevels" }
+          ]
+        },
+        {
+          "allOf": [
+            { "properties": { "function": { "enum": [ "exploration_map" ] } } },
+            { "$ref": "loot_table_functions.schema.json#/explorationMap" }
+          ]
+        },
+        {
+          "allOf": [
+            { "properties": { "function": { "enum": [ "furnace_smelt" ] } } }
+          ]
+        },
+        {
+          "allOf": [
+            { "properties": { "function": { "enum": [ "looting_enchant" ] } } },
+            { "$ref": "loot_table_functions.schema.json#/lootingEnchant" }
+          ]
+        },
+        {
+          "allOf": [
+            { "properties": { "function": { "enum": [ "set_attributes" ] } } },
+            { "$ref": "loot_table_functions.schema.json#/setAttributes" }
+          ]
+        },
+        {
+          "allOf": [
+            { "properties": { "function": { "enum": [ "set_count" ] } } },
+            { "$ref": "loot_table_functions.schema.json#/setCount" }
+          ]
+        },
+        {
+          "allOf": [
+            { "properties": { "function": { "enum": [ "set_damage" ] } } },
+            { "$ref": "loot_table_functions.schema.json#/setDamage" }
+          ]
+        },
+        {
+          "allOf": [
+            { "properties": { "function": { "enum": [ "set_data" ] } } },
+            { "$ref": "loot_table_functions.schema.json#/setData" }
+          ]
+        },
+        {
+          "allOf": [
+            { "properties": { "function": { "enum": [ "set_nbt" ] } } },
+            { "$ref": "loot_table_functions.schema.json#/setNbt" }
+          ]
+        },
+        { }
+      ]
+    }
+  }
+}

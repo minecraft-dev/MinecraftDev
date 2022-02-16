@@ -861,6 +861,10 @@
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleProjectResolverExtension"/>
     </extensions>
 
+    <extensions defaultExtensionNs="JavaScript.JsonSchema">
+        <ProviderFactory implementation="com.demonwav.mcdev.json.SchemaProviderFactory"/>
+    </extensions>
+
     <applicationListeners>
         <listener class="com.demonwav.mcdev.translations.TranslationFileListener"
                   topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>

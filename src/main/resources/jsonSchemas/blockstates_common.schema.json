@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Minecraft Blockstates JSON",
+  "baseVariant": {
+    "type": "object",
+    "properties": {
+      "model": { "type": "string" },
+      "textures": {
+        "type": "object",
+        "additionalProperties": { "type": "string" }
+      },
+      "x": {
+        "type": "number",
+        "multipleOf": 22.5
+      },
+      "y": {
+        "type": "number",
+        "multipleOf": 22.5
+      },
+      "uvlock": { "type": "boolean" }
+    }
+  }
+}

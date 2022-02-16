@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "elements": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "properties": {
+        "from": { "$ref": "#/elementCoord" },
+        "to": { "$ref": "#/elementCoord" },
+        "rotation": {
+          "type": "object",
+          "properties": {
+            "origin": { "$ref": "#/elementCoord" },
+            "axis": {
+              "type": "string",
+              "enum": [ "x", "y", "z" ]
+            },
+            "angle": {
+              "type": "number",
+              "multipleOf": 22.5,
+              "minimum": -45,
+              "maximum": 45
+            }
+          },
+          "additionalProperties": false,
+          "required": [ "axis" ]
+        },
+        "faces": {
+          "type": "object",
+          "patternProperties": {
+            "down|up|north|south|west|east": {
+              "type": "object",
+              "properties": {
+                "uv": {
+                  "type": "array",
+                  "minItems": 4,
+                  "maxItems": 4,
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "texture": {
+                  "type": "string",
+                  "pattern": "^#.*?"
+                },
+                "cullface": {
+                  "type": "string",
+                  "enum": [ "down", "up", "north", "south", "west", "east" ]
+                },
+                "rotation": {
+                  "type": "integer",
+                  "enum": [ 0, 90, 180, 270 ]
+                },
+                "tintindex": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [ "from", "to" ]
+    }
+  },
+  "elementCoord": {
+    "type": "array",
+    "minItems": 3,
+    "maxItems": 3,
+    "items": {
+      "type": "number",
+      "minimum": -16,
+      "maximum": 32
+    }
+  },
+  "transforms": {
+    "type": "object",
+    "patternProperties": {
+      "(third|first)person_(left|right)hand": { "$ref": "#/transform" },
+      "gui|head|ground|fixed": { "$ref": "#/transform" }
+    },
+    "additionalProperties": false
+  },
+  "transform": {
+    "type": "object",
+    "properties": {
+      "rotation": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": { "type": "number" }
+      },
+      "translation": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": { "type": "number", "minimum": -80, "maximum": 80 }
+      },
+      "scale": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": { "type": "number", "minimum": -4, "maximum": 4 }
+      }
+    },
+    "additionalProperties": false
+  }
+}

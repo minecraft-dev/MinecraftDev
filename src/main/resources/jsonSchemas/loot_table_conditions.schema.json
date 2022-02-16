@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "entityProperties": {
+    "properties": {
+      "entity": {
+        "type": "string",
+        "enum": [ "this", "killer", "killer_player" ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "on_fire": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "entityScores": {
+    "properties": {
+      "entity": {
+        "type": "string",
+        "enum": [ "this", "killer", "killer_player" ]
+      },
+      "scores": {
+        "type": "object",
+        "additionalProperties": { "$ref": "common.schema.json#/integerRange" }
+      }
+    }
+  },
+  "killedByPlayer": {
+    "properties": {
+      "on_fire": { "type": "inverse" }
+    }
+  },
+  "randomChance": {
+    "properties": {
+      "chance": { "type": "number", "minimum": 0, "maximum": 1 }
+    }
+  },
+  "randomChanceWithLooting": {
+    "properties": {
+      "chance": { "type": "number", "minimum": 0, "maximum": 1 },
+      "looting_multiplier": { "type": "number" }
+    }
+  }
+}
