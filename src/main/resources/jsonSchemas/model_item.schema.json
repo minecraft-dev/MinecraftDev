@@ -10,6 +10,10 @@
         "type": "string"
       }
     },
+    "gui_light": {
+      "enum": ["front", "side"],
+      "default": "side"
+    },
     "elements": { "$ref": "model_common.schema.json#/elements" },
     "display": { "$ref": "model_common.schema.json#/transforms" },
     "overrides": {
