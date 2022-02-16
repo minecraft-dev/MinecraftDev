@@ -8,7 +8,6 @@
  * MIT License
  */
 
-
 package com.demonwav.mcdev.json
 
 import com.demonwav.mcdev.util.mcDomain
@@ -27,6 +26,7 @@ class SchemaProviderFactory : JsonSchemaProviderFactory {
             PathBasedSchemaProvider("Minecraft Item Model JSON", "model_item", "models/item/"),
             PathBasedSchemaProvider("Minecraft Block Model JSON", "model_block", "models/block/"),
             PathBasedSchemaProvider("Minecraft Loot Table JSON", "loot_table", "loot_tables/"),
+            PathBasedSchemaProvider("Minecraft Tag JSON", "tags", "tags/"),
             PathBasedSchemaProvider("Minecraft Advancement JSON", "advancement", "advancements/")
         )
 }
