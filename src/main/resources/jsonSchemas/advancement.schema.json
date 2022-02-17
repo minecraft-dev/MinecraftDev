@@ -10,7 +10,7 @@
           "type": "object",
           "properties": {
             "item": { "type": "string" },
-            "data": { "type": "integer", "minimum": 0, "maximum": 32767 }
+            "nbt": { "type": "string" }
           },
           "required": [ "item" ]
         },
