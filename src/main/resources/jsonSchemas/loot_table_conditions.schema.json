@@ -7,7 +7,7 @@
       }
     }
   },
-  "entity_properties": {
+  "entityProperties": {
     "properties": {
       "entity": {
         "type": "string",
@@ -21,7 +21,7 @@
       }
     }
   },
-  "entity_scores": {
+  "entityScores": {
     "properties": {
       "entity": {
         "type": "string",
@@ -33,23 +33,44 @@
       }
     }
   },
-  "killed_by_player": {
+  "locationCheck": {
+    "properties": {
+      "offsetX": { "type": "number" },
+      "offsetY": { "type": "number" },
+      "offsetZ": { "type": "number" }
+    }
+  },
+  "inverted": {
+    "properties": {
+      "term": {
+        "type": "object"
+      }
+    }
+  },
+  "killedByPlayer": {
     "properties": {
       "on_fire": { "type": "inverse" }
     }
   },
-  "random_chance": {
+  "randomChance": {
     "properties": {
       "chance": { "type": "number", "minimum": 0, "maximum": 1 }
     }
   },
-  "random_chance_with_looting": {
+  "randomChanceWithLooting": {
     "properties": {
       "chance": { "type": "number", "minimum": 0, "maximum": 1 },
       "looting_multiplier": { "type": "number" }
     }
   },
-  "survives_explosion": {},
+  "reference": {
+    "properties": {
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  "survivesExplosion": {},
   "value_check": {
     "properties": {
       "value": {
@@ -65,6 +86,9 @@
             "type": "integer"
           }
         }
+      },
+      "range": {
+        "type": "integer"
       }
     }
   },
