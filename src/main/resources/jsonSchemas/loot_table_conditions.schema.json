@@ -1,5 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "block_state_property": {
+    "properties": {
+      "block": {
+        "type": "string"
+      }
+    }
+  },
   "entityProperties": {
     "properties": {
       "entity": {
@@ -26,6 +33,20 @@
       }
     }
   },
+  "locationCheck": {
+    "properties": {
+      "offsetX": { "type": "number" },
+      "offsetY": { "type": "number" },
+      "offsetZ": { "type": "number" }
+    }
+  },
+  "inverted": {
+    "properties": {
+      "term": {
+        "type": "object"
+      }
+    }
+  },
   "killedByPlayer": {
     "properties": {
       "on_fire": { "type": "inverse" }
@@ -40,6 +61,45 @@
     "properties": {
       "chance": { "type": "number", "minimum": 0, "maximum": 1 },
       "looting_multiplier": { "type": "number" }
+    }
+  },
+  "reference": {
+    "properties": {
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  "survivesExplosion": {},
+  "value_check": {
+    "properties": {
+      "value": {
+        "type": "integer"
+      },
+      "range": {
+        "type": "object",
+        "properties": {
+          "min": {
+            "type": "integer"
+          },
+          "max": {
+            "type": "integer"
+          }
+        }
+      },
+      "range": {
+        "type": "integer"
+      }
+    }
+  },
+  "weather_check": {
+    "properties": {
+      "raining": {
+        "type": "boolean"
+      },
+      "thundering": {
+        "type": "boolean"
+      }
     }
   }
 }

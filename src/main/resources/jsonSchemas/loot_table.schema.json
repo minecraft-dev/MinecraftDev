@@ -3,21 +3,28 @@
   "title": "Minecraft Loot Table JSON",
   "type": "object",
   "properties": {
+    "type": { "type": "string" },
     "pools": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
           "conditions": { "$ref": "#/definitions/conditions" },
+          "functions": { "$ref": "#/definitions/functions" },
           "rolls": { "$ref": "common.schema.json#/integerRange" },
-          "bonusRolls": { "$ref": "common.schema.json#/integerRange" },
+          "bonus_rolls": { "$ref": "common.schema.json#/integerRange" },
           "entries": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
                 "conditions": { "$ref": "#/definitions/conditions" },
-                "type": { "type": "string" },
+                "functions": { "$ref": "#/definitions/functions" },
+                "type": {
+                  "type": "string",
+                  "enum": [ "item", "tag", "loot_table", "group", "alternatives", "sequence", "dynamic", "empty" ]
+                },
+                "expand": { "type": "boolean" },
                 "weight": { "type": "number" },
                 "quality": { "type": "number" }
               },
