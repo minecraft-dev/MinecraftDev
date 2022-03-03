@@ -64,7 +64,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             #if (${GAME_TEST_FRAMEWORK})
-                property 'forge.enabledGameTestNamespaces', '${MOD_NAME}'
+                property 'forge.enabledGameTestNamespaces', '${ARTIFACT_ID}'
             #end
 
             mods {
@@ -90,7 +90,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             #if (${GAME_TEST_FRAMEWORK})
-                property 'forge.enabledGameTestNamespaces', '${MOD_NAME}'
+                property 'forge.enabledGameTestNamespaces', '${ARTIFACT_ID}'
             #end
 
             mods {
@@ -117,7 +117,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', '${MOD_NAME}'
+            property 'forge.enabledGameTestNamespaces', '${ARTIFACT_ID}'
 
             mods {
                 ${MOD_NAME} {
