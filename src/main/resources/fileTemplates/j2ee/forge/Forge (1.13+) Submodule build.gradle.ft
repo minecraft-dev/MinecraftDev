@@ -64,7 +64,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             #if (${GAME_TEST_FRAMEWORK})
-                property 'forge.enabledGameTestNamespaces', '${ARTIFACT_ID}'
+            property 'forge.enabledGameTestNamespaces', '${ARTIFACT_ID}'
             #end
 
             mods {
@@ -90,7 +90,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             #if (${GAME_TEST_FRAMEWORK})
-                property 'forge.enabledGameTestNamespaces', '${ARTIFACT_ID}'
+            property 'forge.enabledGameTestNamespaces', '${ARTIFACT_ID}'
             #end
 
             mods {
