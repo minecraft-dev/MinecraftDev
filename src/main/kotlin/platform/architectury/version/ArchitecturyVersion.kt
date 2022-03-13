@@ -69,10 +69,7 @@ class ArchitecturyVersion private constructor(val versions: List<String>) {
                             continue
                         }
                         val version = versionEvent.asCharacters().data
-                        // val index = version.indexOf('-')
-                        // if (index == -1) {
-                        //     continue
-                        // }
+               
 
                         result += version
                     }
