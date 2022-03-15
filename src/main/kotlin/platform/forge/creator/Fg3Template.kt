@@ -112,6 +112,9 @@ object Fg3Template : BaseTemplate() {
         if (config.mixins) {
             props["MIXINS"] = "true"
         }
+        if (config.forgeVersion >= SemanticVersion.release(39, 0, 88)) {
+            props["GAME_TEST_FRAMEWORK"] = "true"
+        }
 
         return project.applyTemplate(FG3_BUILD_GRADLE_TEMPLATE, props)
     }
