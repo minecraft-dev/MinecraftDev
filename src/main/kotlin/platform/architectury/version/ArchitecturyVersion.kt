@@ -69,7 +69,6 @@ class ArchitecturyVersion private constructor(val versions: List<String>) {
                             continue
                         }
                         val version = versionEvent.asCharacters().data
-               
 
                         result += version
                     }
