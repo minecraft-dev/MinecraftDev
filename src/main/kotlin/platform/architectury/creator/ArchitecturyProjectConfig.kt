@@ -48,6 +48,8 @@ class ArchitecturyProjectConfig : ProjectConfig(), GradleCreator {
     fun hasRepo() = !modRepo.isNullOrBlank()
     var modIssue: String? = null
     fun hasIssue() = !modIssue.isNullOrBlank()
+    var fabricApi = true
+    var architecturyApi = true
     var mixins = false
     var license: License? = null
 

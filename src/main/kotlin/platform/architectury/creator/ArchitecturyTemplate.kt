@@ -39,6 +39,12 @@ object ArchitecturyTemplate : BaseTemplate() {
             "LOOM_VERSION" to config.loomVersion.toString(),
             "JAVA_VERSION" to config.javaVersion.feature
         )
+        if (config.fabricApi) {
+            props["FABRIC_API"] = "true"
+        }
+        if (config.architecturyApi) {
+            props["ARCHITECTURY_API"] = "true"
+        }
         return applyTemplate(templateName, props)
     }
 

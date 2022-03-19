@@ -59,6 +59,8 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
     private lateinit var issueField: JTextField
     private lateinit var licenseBox: JComboBox<License>
     private lateinit var mixinsCheckbox: JCheckBox
+    private lateinit var architecturyCheckbox: JCheckBox
+    private lateinit var fabricCheckbox: JCheckBox
     private lateinit var minecraftVersionBox: JComboBox<SemanticVersion>
     private lateinit var forgeVersionBox: JComboBox<SemanticVersion>
     private lateinit var fabricVersionBox: JComboBox<SemanticVersion>
@@ -199,6 +201,8 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
             conf.architecturyApiVersion = version
         }
 
+        conf.fabricApi = fabricCheckbox.isSelected
+        conf.architecturyApi = architecturyCheckbox.isSelected
         conf.mixins = mixinsCheckbox.isSelected
         conf.license = licenseBox.selectedItem as? License ?: License.ALL_RIGHTS_RESERVED
     }
@@ -208,6 +212,16 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
         setForgeVersion(data)
         forgeVersionBox.addActionListener(forgeVersionBoxListener)
         forgeVersionBoxListener.actionPerformed(null)
+
+        fabricCheckbox.addActionListener {
+            if (fabricCheckbox.isSelected) {
+                architecturyCheckbox.isEnabled = true
+            }
+            else {
+                architecturyCheckbox.isEnabled = false
+                architecturyCheckbox.isSelected = false
+            }
+        }
 
         setFabricVersion(data)
         setFabricApiVersion(data)

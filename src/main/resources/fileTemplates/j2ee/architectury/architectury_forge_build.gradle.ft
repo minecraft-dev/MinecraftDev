@@ -24,8 +24,10 @@ configurations {
 
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
+#if (${ARCHITECTURY_API})
     // Remove the next line if you don't want to depend on the API
     modApi "${ARCHITECTURY_GROUP}:architectury-forge:${rootProject.architectury_version}"
+#end
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
