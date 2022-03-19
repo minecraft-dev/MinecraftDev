@@ -109,7 +109,7 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
     }
 
     override fun updateStep() {
-        val (conf, buildSystem) = modUpdateStep<ArchitecturyProjectConfig>(creator, modNameField) ?: return
+        val (conf) = modUpdateStep<ArchitecturyProjectConfig>(creator, modNameField) ?: return
         config = conf
 
         if (creator.configs.indexOf(conf) != 0) {

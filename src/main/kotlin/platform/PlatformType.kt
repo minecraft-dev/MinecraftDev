@@ -50,9 +50,9 @@ enum class PlatformType(
     BUKKIT(BukkitModuleType, "Bukkit", "bukkit.json"),
     SPIGOT(SpigotModuleType, "Spigot", "spigot.json", BUKKIT),
     PAPER(PaperModuleType, "Paper", "paper.json", SPIGOT),
+    ARCHITECTURY(ArchitecturyModuleType, "Architectury"),
     FORGE(ForgeModuleType, "Forge"),
     FABRIC(FabricModuleType, "Fabric"),
-    ARCHITECTURY(ArchitecturyModuleType, "Architectury"),
     SPONGE(SpongeModuleType, "Sponge"),
     BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord_v2.json"),
     WATERFALL(WaterfallModuleType, "Waterfall", "waterfall.json", BUNGEECORD),
@@ -82,9 +82,9 @@ enum class PlatformType(
             SPIGOT_LIBRARY_KIND -> SPIGOT
             PAPER_LIBRARY_KIND -> PAPER
             SPONGE_LIBRARY_KIND -> SPONGE
+            ARCHITECTURY_LIBRARY_KIND -> ARCHITECTURY
             FORGE_LIBRARY_KIND -> FORGE
             FABRIC_LIBRARY_KIND -> FABRIC
-            ARCHITECTURY_LIBRARY_KIND -> ARCHITECTURY
             LITELOADER_LIBRARY_KIND -> LITELOADER
             MCP_LIBRARY_KIND -> MCP
             MIXIN_LIBRARY_KIND -> MIXIN

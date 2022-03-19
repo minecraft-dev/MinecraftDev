@@ -68,6 +68,26 @@ object ArchitecturyTemplate : BaseTemplate() {
         )
     }
 
+    fun applyMultiModuleBuildGradle(
+        project: Project,
+        buildSystem: BuildSystem,
+        config: ArchitecturyProjectConfig
+    ): String {
+        return project.applyGradleTemplate(MinecraftTemplates.ARCHITECTURY_SUBMODULE_BUILD_GRADLE_TEMPLATE, buildSystem, config)
+    }
+
+    fun applyMultiModuleGradleProp(
+        project: Project,
+        buildSystem: BuildSystem,
+        config: ArchitecturyProjectConfig
+    ): String {
+        return project.applyGradleTemplate(
+            MinecraftTemplates.ARCHITECTURY_SUBMODULE_GRADLE_PROPERTIES_TEMPLATE,
+            buildSystem,
+            config
+        )
+    }
+
     fun applySettingsGradle(
         project: Project,
         buildSystem: BuildSystem,
@@ -198,7 +218,7 @@ object ArchitecturyTemplate : BaseTemplate() {
         buildSystem: BuildSystem,
         config: ArchitecturyProjectConfig
     ): String {
-        val packageName = buildSystem.groupId.toPackageName()
+        val packageName = buildSystem.groupId.toPackageName() + "." + buildSystem.artifactId
         val props = mapOf(
             "PACKAGE_NAME" to packageName,
             "JAVA_VERSION" to config.javaVersion.feature
@@ -211,7 +231,7 @@ object ArchitecturyTemplate : BaseTemplate() {
         buildSystem: BuildSystem,
         config: ArchitecturyProjectConfig
     ): String {
-        val packageName = buildSystem.groupId.toPackageName()
+        val packageName = buildSystem.groupId.toPackageName() + "." + buildSystem.artifactId
         val props = mapOf(
             "PACKAGE_NAME" to packageName,
             "JAVA_VERSION" to config.javaVersion.feature
@@ -224,7 +244,7 @@ object ArchitecturyTemplate : BaseTemplate() {
         buildSystem: BuildSystem,
         config: ArchitecturyProjectConfig
     ): String {
-        val packageName = buildSystem.groupId.toPackageName()
+        val packageName = buildSystem.groupId.toPackageName() + "." + buildSystem.artifactId
         val props = mapOf(
             "PACKAGE_NAME" to packageName,
             "JAVA_VERSION" to config.javaVersion.feature

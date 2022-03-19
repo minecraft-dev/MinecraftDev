@@ -254,6 +254,8 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
 
         const val ARCHITECTURY_BUILD_GRADLE_TEMPLATE = "architectury_build.gradle"
         const val ARCHITECTURY_GRADLE_PROPERTIES_TEMPLATE = "architectury_gradle.properties"
+        const val ARCHITECTURY_SUBMODULE_BUILD_GRADLE_TEMPLATE = "architectury_submodule_build.gradle"
+        const val ARCHITECTURY_SUBMODULE_GRADLE_PROPERTIES_TEMPLATE = "architectury_submodule_gradle.properties"
         const val ARCHITECTURY_SETTINGS_GRADLE_TEMPLATE = "architectury_settings.gradle"
         const val ARCHITECTURY_COMMON_BUILD_GRADLE_TEMPLATE = "architectury_common_build.gradle"
         const val ARCHITECTURY_COMMON_MAIN_CLASS_TEMPLATE = "architectury_common_main_class.java"
