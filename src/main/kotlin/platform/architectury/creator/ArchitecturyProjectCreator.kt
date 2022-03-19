@@ -236,7 +236,7 @@ class ArchitecturyForgeProjectCreator(
         return BasicJavaClassStep(
             project,
             buildSystem,
-            buildSystem.groupId + ".forge." + config.pluginName.replace(" ", "") + "Forge",
+            buildSystem.groupId + "." + buildSystem.artifactId +".forge." + config.pluginName.replace(" ", "") + "Forge",
             ArchitecturyTemplate.applyForgeMainClass(
                 project,
                 buildSystem,
@@ -320,7 +320,7 @@ class ArchitecturyFabricProjectCreator(
         return BasicJavaClassStep(
             project,
             buildSystem,
-            buildSystem.groupId + ".fabric." + config.pluginName.replace(" ", "") + "Fabric",
+            buildSystem.groupId + "." + buildSystem.artifactId + ".fabric." + config.pluginName.replace(" ", "") + "Fabric",
             ArchitecturyTemplate.applyFabricMainClass(
                 project,
                 buildSystem,
@@ -408,7 +408,7 @@ class ArchitecturyFabricProjectCreator(
                             EntryPoint(
                                 "main",
                                 EntryPoint.Type.CLASS,
-                                buildSystem.groupId + ".fabric." + config.pluginName.replace(" ", "") + "Fabric",
+                                buildSystem.groupId + "." + buildSystem.artifactId + ".fabric." + config.pluginName.replace(" ", "") + "Fabric",
                                 FabricConstants.MOD_INITIALIZER
                             )
                         )

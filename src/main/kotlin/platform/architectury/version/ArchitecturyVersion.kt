@@ -10,45 +10,40 @@
 
 package com.demonwav.mcdev.platform.architectury.version
 
-import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.intellij.openapi.diagnostic.Logger
+import com.jetbrains.rd.util.first
+import com.jetbrains.rd.util.getOrCreate
 import java.io.IOException
 import java.net.URL
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
-class ArchitecturyVersion private constructor(val versions: List<String>) {
+class ArchitecturyVersion private constructor(val versions: Map<SemanticVersion, List<SemanticVersion>>) {
 
     fun getArchitecturyVersions(mcVersion: SemanticVersion): List<SemanticVersion> {
-        return versions.asSequence()
-            .filter {
-                it.startsWith(
-                    when {
-                        mcVersion < MinecraftVersions.MC1_17 -> "1"
-                        mcVersion >= MinecraftVersions.MC1_17 && mcVersion < MinecraftVersions.MC1_18 -> "2"
-                        mcVersion >= MinecraftVersions.MC1_18 -> "3"
-                        else -> "0"
-                    }
-                )
-            }
-            .mapNotNull {
-                try {
-                    SemanticVersion.parse(it)
-                } catch (ignore: Exception) {
-                    null
-                }
-            }
+        return versions[mcVersion]!!.asSequence()
             .sortedDescending()
             .take(50)
             .toList()
+
     }
 
+
+
     companion object {
+        private fun findMcVersion(architecturyVersion: SemanticVersion): SemanticVersion {
+            val meta = Json.parseToJsonElement(URL("https://gist.githubusercontent.com/shedaniel/4a37f350a6e49545347cb798dbfa72b3/raw/architectury.json").readText()).jsonObject
+            return SemanticVersion.parse(meta["versions"]!!.jsonObject.filter { it.value.jsonObject["api"]!!.jsonObject["filter"]!!.jsonPrimitive.content.toRegex().matches(architecturyVersion.toString())}.first().key)
+        }
         fun downloadData(): ArchitecturyVersion? {
             try {
                 val url1 = URL("https://maven.architectury.dev/dev/architectury/architectury/maven-metadata.xml")
                 val url2 = URL("https://maven.architectury.dev/me/shedaniel/architectury/maven-metadata.xml")
-                val result = mutableListOf<String>()
+                val result = mutableMapOf<SemanticVersion, MutableList<SemanticVersion>>()
                 url1.openStream().use { stream ->
                     val inputFactory = XMLInputFactory.newInstance()
 
@@ -69,8 +64,11 @@ class ArchitecturyVersion private constructor(val versions: List<String>) {
                             continue
                         }
                         val version = versionEvent.asCharacters().data
-
-                        result += version
+                        if (result.containsKey(findMcVersion(SemanticVersion.parse(version)))) {
+                            result[findMcVersion(SemanticVersion.parse(version))]!!.add(SemanticVersion.parse(version))
+                        } else {
+                            result[findMcVersion(SemanticVersion.parse(version))] = mutableListOf(SemanticVersion.parse(version))
+                        }
                     }
                 }
                 url2.openStream().use { stream ->
@@ -93,12 +91,12 @@ class ArchitecturyVersion private constructor(val versions: List<String>) {
                             continue
                         }
                         val version = versionEvent.asCharacters().data
-                        // val index = version.indexOf('-')
-                        // if (index == -1) {
-                        //     continue
-                        // }
 
-                        result += version
+                        if (result.containsKey(findMcVersion(SemanticVersion.parse(version)))) {
+                            result[findMcVersion(SemanticVersion.parse(version))]!!.add(SemanticVersion.parse(version))
+                        } else {
+                            result[findMcVersion(SemanticVersion.parse(version))] = mutableListOf(SemanticVersion.parse(version))
+                        }
                     }
                 }
 

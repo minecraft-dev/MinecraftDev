@@ -284,7 +284,7 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
         minecraftVersionBox.removeActionListener(minecraftBoxActionListener)
         minecraftVersionBox.removeAllItems()
 
-        minecraftVersionBox.model = CollectionComboBoxModel(vers.forgeVersion.sortedMcVersions)
+        minecraftVersionBox.model = CollectionComboBoxModel(vers.forgeVersion.sortedMcVersions.filter { it >= SemanticVersion.release(1, 16) })
         minecraftVersionBox.selectedIndex = data.mcSelectedIndex
         minecraftVersionBox.addActionListener(minecraftBoxActionListener)
     }
