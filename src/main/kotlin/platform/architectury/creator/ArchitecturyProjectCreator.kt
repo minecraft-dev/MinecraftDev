@@ -294,7 +294,14 @@ class ArchitecturyForgeProjectCreator(
         return BasicJavaClassStep(
             project,
             buildSystem,
-            buildSystem.groupId + "." + buildSystem.artifactId +".forge." + config.pluginName.replace(" ", "") + "Forge",
+            buildString {
+                append(buildSystem.groupId)
+                append(".")
+                append(buildSystem.artifactId)
+                append(".forge.")
+                append(config.pluginName.replace(" ", ""))
+                append("Forge")
+            },
             ArchitecturyTemplate.applyForgeMainClass(
                 project,
                 buildSystem,
@@ -393,7 +400,14 @@ class ArchitecturyFabricProjectCreator(
         return BasicJavaClassStep(
             project,
             buildSystem,
-            buildSystem.groupId + "." + buildSystem.artifactId + ".fabric." + config.pluginName.replace(" ", "") + "Fabric",
+            buildString {
+                append(buildSystem.groupId)
+                append(".")
+                append(buildSystem.artifactId)
+                append(".fabric.")
+                append(config.pluginName.replace(" ", ""))
+                append("Fabric")
+            },
             ArchitecturyTemplate.applyFabricMainClass(
                 project,
                 buildSystem,
@@ -481,7 +495,14 @@ class ArchitecturyFabricProjectCreator(
                             EntryPoint(
                                 "main",
                                 EntryPoint.Type.CLASS,
-                                buildSystem.groupId + "." + buildSystem.artifactId + ".fabric." + config.pluginName.replace(" ", "") + "Fabric",
+                                buildString {
+                                    append(buildSystem.groupId)
+                                    append(".")
+                                    append(buildSystem.artifactId)
+                                    append(".fabric.")
+                                    append(config.pluginName.replace(" ", ""))
+                                    append("Fabric")
+                                },
                                 FabricConstants.MOD_INITIALIZER
                             )
                         )

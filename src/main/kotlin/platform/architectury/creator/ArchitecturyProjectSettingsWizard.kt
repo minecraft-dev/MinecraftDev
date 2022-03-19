@@ -216,8 +216,7 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
         fabricCheckbox.addActionListener {
             if (fabricCheckbox.isSelected) {
                 architecturyCheckbox.isEnabled = true
-            }
-            else {
+            } else {
                 architecturyCheckbox.isEnabled = false
                 architecturyCheckbox.isSelected = false
             }
@@ -298,7 +297,9 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
         minecraftVersionBox.removeActionListener(minecraftBoxActionListener)
         minecraftVersionBox.removeAllItems()
 
-        minecraftVersionBox.model = CollectionComboBoxModel(vers.forgeVersion.sortedMcVersions.filter { it >= SemanticVersion.release(1, 16) })
+        minecraftVersionBox.model = CollectionComboBoxModel(
+            vers.forgeVersion.sortedMcVersions.filter { it >= SemanticVersion.release(1, 16) }
+        )
         minecraftVersionBox.selectedIndex = data.mcSelectedIndex
         minecraftVersionBox.addActionListener(minecraftBoxActionListener)
     }

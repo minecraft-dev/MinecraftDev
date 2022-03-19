@@ -73,7 +73,11 @@ object ArchitecturyTemplate : BaseTemplate() {
         buildSystem: BuildSystem,
         config: ArchitecturyProjectConfig
     ): String {
-        return project.applyGradleTemplate(MinecraftTemplates.ARCHITECTURY_SUBMODULE_BUILD_GRADLE_TEMPLATE, buildSystem, config)
+        return project.applyGradleTemplate(
+            MinecraftTemplates.ARCHITECTURY_SUBMODULE_BUILD_GRADLE_TEMPLATE,
+            buildSystem,
+            config
+        )
     }
 
     fun applyMultiModuleGradleProp(

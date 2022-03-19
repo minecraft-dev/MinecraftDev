@@ -11,9 +11,7 @@
 package com.demonwav.mcdev.platform.architectury.version
 
 import com.demonwav.mcdev.util.SemanticVersion
-import com.intellij.openapi.diagnostic.Logger
 import com.jetbrains.rd.util.first
-import com.jetbrains.rd.util.getOrCreate
 import java.io.IOException
 import java.net.URL
 import javax.xml.stream.XMLInputFactory
@@ -29,15 +27,24 @@ class ArchitecturyVersion private constructor(val versions: Map<SemanticVersion,
             .sortedDescending()
             .take(50)
             .toList()
-
     }
-
-
 
     companion object {
         private fun findMcVersion(architecturyVersion: SemanticVersion): SemanticVersion {
-            val meta = Json.parseToJsonElement(URL("https://gist.githubusercontent.com/shedaniel/4a37f350a6e49545347cb798dbfa72b3/raw/architectury.json").readText()).jsonObject
-            return SemanticVersion.parse(meta["versions"]!!.jsonObject.filter { it.value.jsonObject["api"]!!.jsonObject["filter"]!!.jsonPrimitive.content.toRegex().matches(architecturyVersion.toString())}.first().key)
+            val meta = Json.parseToJsonElement(
+                URL(
+                    "https://gist.githubusercontent.com" +
+                        "/shedaniel/4a37f350a6e49545347cb798dbfa72b3" +
+                        "/raw/architectury.json"
+                ).readText()
+            ).jsonObject
+            return SemanticVersion.parse(
+                meta["versions"]!!.jsonObject.filter {
+                    it.value.jsonObject["api"]!!.jsonObject["filter"]!!.jsonPrimitive.content.toRegex().matches(
+                        architecturyVersion.toString()
+                    )
+                }.first().key
+            )
         }
         fun downloadData(): ArchitecturyVersion? {
             try {
@@ -67,7 +74,9 @@ class ArchitecturyVersion private constructor(val versions: Map<SemanticVersion,
                         if (result.containsKey(findMcVersion(SemanticVersion.parse(version)))) {
                             result[findMcVersion(SemanticVersion.parse(version))]!!.add(SemanticVersion.parse(version))
                         } else {
-                            result[findMcVersion(SemanticVersion.parse(version))] = mutableListOf(SemanticVersion.parse(version))
+                            result[findMcVersion(SemanticVersion.parse(version))] = mutableListOf(
+                                SemanticVersion.parse(version)
+                            )
                         }
                     }
                 }
@@ -95,7 +104,9 @@ class ArchitecturyVersion private constructor(val versions: Map<SemanticVersion,
                         if (result.containsKey(findMcVersion(SemanticVersion.parse(version)))) {
                             result[findMcVersion(SemanticVersion.parse(version))]!!.add(SemanticVersion.parse(version))
                         } else {
-                            result[findMcVersion(SemanticVersion.parse(version))] = mutableListOf(SemanticVersion.parse(version))
+                            result[findMcVersion(SemanticVersion.parse(version))] = mutableListOf(
+                                SemanticVersion.parse(version)
+                            )
                         }
                     }
                 }
