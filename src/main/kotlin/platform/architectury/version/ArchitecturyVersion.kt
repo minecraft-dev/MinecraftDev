@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.platform.architectury.version
 
 import com.demonwav.mcdev.util.SemanticVersion
+import com.intellij.util.castSafelyTo
 import com.jetbrains.rd.util.first
 import java.io.IOException
 import java.net.URL
@@ -23,7 +24,29 @@ import kotlinx.serialization.json.jsonPrimitive
 class ArchitecturyVersion private constructor(val versions: Map<SemanticVersion, List<SemanticVersion>>) {
 
     fun getArchitecturyVersions(mcVersion: SemanticVersion): List<SemanticVersion> {
-        return versions[mcVersion]!!.asSequence()
+        val roundedVersion = Json.parseToJsonElement(
+            URL(
+                "https://gist.githubusercontent.com" +
+                    "/shedaniel/4a37f350a6e49545347cb798dbfa72b3" +
+                    "/raw/architectury.json"
+            ).readText()
+        ).jsonObject["versions"]!!.jsonObject.map { SemanticVersion.parse(it.key) }
+            .windowed(2, 1).toMutableList().let {
+                it.add(
+                    listOf(
+                        it.last().last(),
+                        SemanticVersion.release(
+                            (
+                                it.last().last().take(2)
+                                    .parts[0]
+                                    .castSafelyTo<SemanticVersion.Companion.VersionPart.ReleasePart>()!!
+                                )
+                                .version + 1
+                        )
+                    )
+                ); it
+            }.find { mcVersion >= it[0] && mcVersion < it[1] }!!.first()
+        return versions[roundedVersion]!!.asSequence()
             .sortedDescending()
             .take(50)
             .toList()
