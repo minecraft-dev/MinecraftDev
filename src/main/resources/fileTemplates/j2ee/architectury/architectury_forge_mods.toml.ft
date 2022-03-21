@@ -72,10 +72,11 @@ ${DESCRIPTION}
    versionRange="[${MC_VERSION},${MC_NEXT_VERSION})"
    ordering="NONE"
    side="BOTH"
-
+#if (${ARCHITECTURY_API})
 [[dependencies.${ARTIFACT_ID}]]
    modId = "architectury"
    mandatory = true
    versionRange = "[${ARCHITECTURY_API_VERSION},)"
    ordering = "AFTER"
    side = "BOTH"
+#end

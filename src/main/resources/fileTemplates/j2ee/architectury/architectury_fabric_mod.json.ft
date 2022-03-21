@@ -22,8 +22,12 @@
 #end
   "depends": {
     "fabricloader": ">=${FABRIC_LOADER_VERSION}",
+#if (${FABRIC_API})
     "fabric": ">=${FABRIC_API_VERSION}",
-    "minecraft": ">=${MC_VERSION}",
-    "architectury": ">=${ARCHITECTURY_API_VERSION}"
+#end
+#if (${ARCHITECTURY_API})
+    "architectury": ">=${ARCHITECTURY_API_VERSION}",
+#end
+    "minecraft": ">=${MC_VERSION}"
   }
 }
