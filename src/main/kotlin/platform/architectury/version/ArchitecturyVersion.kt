@@ -11,8 +11,6 @@
 package com.demonwav.mcdev.platform.architectury.version
 
 import com.demonwav.mcdev.util.SemanticVersion
-import com.intellij.util.castSafelyTo
-import com.jetbrains.rd.util.first
 import java.io.IOException
 import java.net.URL
 import javax.xml.stream.XMLInputFactory
@@ -21,124 +19,89 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-class ArchitecturyVersion private constructor(val versions: Map<SemanticVersion, List<SemanticVersion>>) {
+class ArchitecturyVersion private constructor(
+    val versions: Map<SemanticVersion, List<SemanticVersion>>,
+    private val mcVersions: MutableList<List<SemanticVersion>>
+) {
 
     fun getArchitecturyVersions(mcVersion: SemanticVersion): List<SemanticVersion> {
-        val roundedVersion = Json.parseToJsonElement(
-            URL(
-                "https://gist.githubusercontent.com" +
-                    "/shedaniel/4a37f350a6e49545347cb798dbfa72b3" +
-                    "/raw/architectury.json"
-            ).readText()
-        ).jsonObject["versions"]!!.jsonObject.map { SemanticVersion.parse(it.key) }
-            .windowed(2, 1).toMutableList().let {
-                it.add(
-                    listOf(
-                        it.last().last(),
-                        SemanticVersion.release(
-                            (
-                                it.last().last().take(2)
-                                    .parts[0]
-                                    .castSafelyTo<SemanticVersion.Companion.VersionPart.ReleasePart>()!!
-                                )
-                                .version + 1
-                        )
-                    )
-                ); it
-            }.find { mcVersion >= it[0] && mcVersion < it[1] }!!.first()
-        return versions[roundedVersion]!!.asSequence()
-            .sortedDescending()
-            .take(50)
-            .toList()
+        val roundedVersion = mcVersions.find { mcVersion >= it[0] && mcVersion < it[1] }?.first()
+        return try {
+            versions[roundedVersion]?.asSequence()
+                ?.sortedDescending()
+                ?.take(50)
+                ?.toList() ?: throw IOException("Could not find any architectury versions for $mcVersion")
+        } catch (e: IOException) {
+            e.printStackTrace()
+            emptyList()
+        }
     }
 
     companion object {
-        private fun findMcVersion(architecturyVersion: SemanticVersion): SemanticVersion {
-            val meta = Json.parseToJsonElement(
-                URL(
-                    "https://gist.githubusercontent.com" +
-                        "/shedaniel/4a37f350a6e49545347cb798dbfa72b3" +
-                        "/raw/architectury.json"
-                ).readText()
-            ).jsonObject
-            return SemanticVersion.parse(
-                meta["versions"]!!.jsonObject.filter {
-                    it.value.jsonObject["api"]!!.jsonObject["filter"]!!.jsonPrimitive.content.toRegex().matches(
-                        architecturyVersion.toString()
-                    )
-                }.first().key
-            )
-        }
+        private val updateUrl = URL(
+            "https://gist.githubusercontent.com" +
+                "/shedaniel/4a37f350a6e49545347cb798dbfa72b3" +
+                "/raw/architectury.json"
+        )
+
         fun downloadData(): ArchitecturyVersion? {
             try {
-                val url1 = URL("https://maven.architectury.dev/dev/architectury/architectury/maven-metadata.xml")
-                val url2 = URL("https://maven.architectury.dev/me/shedaniel/architectury/maven-metadata.xml")
-                val result = mutableMapOf<SemanticVersion, MutableList<SemanticVersion>>()
-                url1.openStream().use { stream ->
-                    val inputFactory = XMLInputFactory.newInstance()
-
-                    @Suppress("UNCHECKED_CAST")
-                    val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
-                    for (event in reader) {
-                        if (!event.isStartElement) {
-                            continue
-                        }
-                        val start = event.asStartElement()
-                        val name = start.name.localPart
-                        if (name != "version") {
-                            continue
-                        }
-
-                        val versionEvent = reader.next()
-                        if (!versionEvent.isCharacters) {
-                            continue
-                        }
-                        val version = versionEvent.asCharacters().data
-                        if (result.containsKey(findMcVersion(SemanticVersion.parse(version)))) {
-                            result[findMcVersion(SemanticVersion.parse(version))]!!.add(SemanticVersion.parse(version))
-                        } else {
-                            result[findMcVersion(SemanticVersion.parse(version))] = mutableListOf(
-                                SemanticVersion.parse(version)
+                val meta = Json.parseToJsonElement(updateUrl.readText())
+                val versions = mutableMapOf<SemanticVersion, MutableList<SemanticVersion>>()
+                val mcVersions = meta.jsonObject["versions"]?.jsonObject?.map { SemanticVersion.parse(it.key) }
+                    ?.windowed(2, 1)?.toMutableList().also {
+                        it?.add(
+                            listOf(
+                                it.last().last(),
+                                SemanticVersion.parse(
+                                    when (val part = it.last().last().parts.getOrNull(1)) {
+                                        is SemanticVersion.Companion.VersionPart.ReleasePart ->
+                                            (part.version + 1).toString()
+                                        null -> "?"
+                                        else -> part.versionString
+                                    }
+                                )
                             )
-                        }
-                    }
-                }
-                url2.openStream().use { stream ->
-                    val inputFactory = XMLInputFactory.newInstance()
+                        )
+                    } ?: throw IOException("Could not find any minecraft versions")
 
-                    @Suppress("UNCHECKED_CAST")
-                    val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
-                    for (event in reader) {
-                        if (!event.isStartElement) {
-                            continue
-                        }
-                        val start = event.asStartElement()
-                        val name = start.name.localPart
-                        if (name != "version") {
-                            continue
-                        }
+                meta.jsonObject["versions"]?.jsonObject?.forEach {
+                    val mcVersion = SemanticVersion.parse(it.key)
+                    URL(
+                        it.value.jsonObject["api"]?.jsonObject?.get("pom")?.jsonPrimitive?.content ?: throw IOException(
+                            "Could not find pom for $mcVersion"
+                        )
+                    )
+                        .openStream().use { stream ->
+                            val inputFactory = XMLInputFactory.newInstance()
 
-                        val versionEvent = reader.next()
-                        if (!versionEvent.isCharacters) {
-                            continue
-                        }
-                        val version = versionEvent.asCharacters().data
+                            @Suppress("UNCHECKED_CAST")
+                            val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
+                            for (event in reader) {
+                                if (!event.isStartElement) {
+                                    continue
+                                }
+                                val start = event.asStartElement()
+                                val name = start.name.localPart
+                                if (name != "version") {
+                                    continue
+                                }
 
-                        if (result.containsKey(findMcVersion(SemanticVersion.parse(version)))) {
-                            result[findMcVersion(SemanticVersion.parse(version))]!!.add(SemanticVersion.parse(version))
-                        } else {
-                            result[findMcVersion(SemanticVersion.parse(version))] = mutableListOf(
-                                SemanticVersion.parse(version)
-                            )
+                                val versionEvent = reader.next()
+                                if (!versionEvent.isCharacters) {
+                                    continue
+                                }
+                                val version = versionEvent.asCharacters().data
+                                versions.getOrPut(mcVersion) { mutableListOf() }.add(SemanticVersion.parse(version))
+                            }
                         }
-                    }
                 }
 
-                return ArchitecturyVersion(result)
+                return ArchitecturyVersion(versions, mcVersions)
             } catch (e: IOException) {
                 e.printStackTrace()
+                return null
             }
-            return null
         }
     }
 }

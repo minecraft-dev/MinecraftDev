@@ -179,7 +179,7 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
         conf.website = this.websiteField.text
 
         conf.modRepo = this.repositoryField.text
-        conf.modRepo = this.issueField.text
+        conf.modIssue = this.issueField.text
 
         conf.setAuthors(this.authorsField.text)
 

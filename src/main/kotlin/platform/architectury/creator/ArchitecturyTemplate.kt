@@ -281,7 +281,7 @@ object ArchitecturyTemplate : BaseTemplate() {
         packageName: String,
         className: String
     ): String {
-        val props = mapOf(
+        val props = mutableMapOf(
             "PACKAGE_NAME" to packageName,
             "CLASS_NAME" to className,
             "ARTIFACT_ID" to buildSystem.artifactId,
@@ -289,6 +289,10 @@ object ArchitecturyTemplate : BaseTemplate() {
             "MOD_VERSION" to buildSystem.version,
             "ARCHITECTURY_PACKAGE" to config.architecturyPackage
         )
+
+        if (config.architecturyApi) {
+            props["ARCHITECTURY_API"] = "true"
+        }
 
         return project.applyTemplate(MinecraftTemplates.ARCHITECTURY_FORGE_MAIN_CLASS_TEMPLATE, props)
     }

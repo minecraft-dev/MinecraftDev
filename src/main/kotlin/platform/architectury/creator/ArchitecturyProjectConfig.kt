@@ -36,12 +36,12 @@ class ArchitecturyProjectConfig : ProjectConfig(), GradleCreator {
     private var gradleVersion = SemanticVersion.release()
     val architecturyGroup: String
         get() = when {
-            mcVersion >= MinecraftVersions.MC1_17 -> "dev.architectury"
+            architecturyApiVersion >= SemanticVersion.release(2, 0, 10) -> "dev.architectury"
             else -> "me.shedaniel"
         }
     val architecturyPackage: String
         get() = when {
-            mcVersion >= MinecraftVersions.MC1_17 -> "dev.architectury"
+            architecturyApiVersion >= SemanticVersion.release(2, 0, 10) -> "dev.architectury"
             else -> "me.shedaniel.architectury"
         }
     var modRepo: String? = null
