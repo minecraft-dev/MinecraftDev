@@ -92,7 +92,12 @@ class ArchitecturyVersion private constructor(
                                     continue
                                 }
                                 val version = versionEvent.asCharacters().data
-                                versions.getOrPut(mcVersion) { mutableListOf() }.add(SemanticVersion.parse(version))
+                                val regex = it.value.jsonObject["api"]?.jsonObject?.get("filter")
+                                    ?.jsonPrimitive?.content?.toRegex()
+                                    ?: throw IOException("Could not find filter for $mcVersion")
+                                if (regex.matches(version)) {
+                                    versions.getOrPut(mcVersion) { mutableListOf() }.add(SemanticVersion.parse(version))
+                                }
                             }
                         }
                 }

@@ -1,4 +1,5 @@
 package ${PACKAGE_NAME}.forge;
+
 #if (${ARCHITECTURY_API})
 import ${ARCHITECTURY_PACKAGE}.platform.forge.EventBuses;
 #end
