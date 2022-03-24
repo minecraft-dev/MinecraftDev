@@ -12,7 +12,9 @@ package com.demonwav.mcdev.facet
 
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.architectury.framework.ARCHITECTURY_LIBRARY_KIND
+import com.demonwav.mcdev.platform.architectury.framework.ArchitecturyGradleData
 import com.demonwav.mcdev.platform.fabric.framework.FABRIC_LIBRARY_KIND
+import com.demonwav.mcdev.platform.mcp.gradle.tooling.archloom.ArchitecturyModel
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.runWriteTaskLater
@@ -31,6 +33,7 @@ import com.intellij.openapi.roots.libraries.LibraryProperties
 import com.intellij.openapi.roots.ui.configuration.libraries.LibraryPresentationManager
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.util.Key
+import org.jetbrains.plugins.gradle.util.GradleUtil
 
 class MinecraftFacetDetector : StartupActivity {
     companion object {
@@ -175,7 +178,10 @@ class MinecraftFacetDetector : StartupActivity {
                     }
                     return@forEach true
                 }
-            if (module.name.matches(Regex("\\w+\\.common\\.(main|test)"))) {
+
+            val architecturyGradleData = GradleUtil.findGradleModuleData(module)?.children
+                ?.find { it.key == ArchitecturyGradleData.KEY }?.data as? ArchitecturyGradleData
+            if (architecturyGradleData?.moduleType == ArchitecturyModel.ModuleType.COMMON) {
                 platformKinds.add(ARCHITECTURY_LIBRARY_KIND)
                 platformKinds.removeIf { it == FABRIC_LIBRARY_KIND }
             }
