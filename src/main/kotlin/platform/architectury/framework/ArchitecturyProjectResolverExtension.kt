@@ -7,6 +7,7 @@
  *
  * MIT License
  */
+
 package com.demonwav.mcdev.platform.architectury.framework
 
 import com.demonwav.mcdev.platform.mcp.gradle.tooling.archloom.ArchitecturyModel
