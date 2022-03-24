@@ -54,17 +54,21 @@ class ArchitecturyVersion private constructor(
                             listOf(
                                 it.last().last(),
                                 SemanticVersion.parse(
-                                    when (val part = it.last().last().parts.getOrNull(1)) {
-                                        is SemanticVersion.Companion.VersionPart.ReleasePart ->
-                                            (part.version + 1).toString()
-                                        null -> "?"
-                                        else -> part.versionString
+                                    buildString {
+                                        append("1.")
+                                        append(
+                                            when (val part = it.last().last().parts.getOrNull(1)) {
+                                                is SemanticVersion.Companion.VersionPart.ReleasePart ->
+                                                    (part.version + 1).toString()
+                                                null -> "?"
+                                                else -> part.versionString
+                                            }
+                                        )
                                     }
                                 )
                             )
                         )
                     } ?: throw IOException("Could not find any minecraft versions")
-
                 meta.jsonObject["versions"]?.jsonObject?.forEach {
                     val mcVersion = SemanticVersion.parse(it.key)
                     URL(

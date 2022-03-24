@@ -21,14 +21,8 @@ class ArchitecturyPresentationProvider : LibraryPresentationProvider<LibraryVers
     ARCHITECTURY_LIBRARY_KIND
 ) {
     override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.ARCHITECTURY_ICON
-    override fun detect(classesRoots: MutableList<VirtualFile>): LibraryVersionProperties? {
-        return when (isCommon(classesRoots)) {
-            true -> LibraryVersionProperties()
-            false -> null
-        }
-    }
 
-    fun isCommon(classesRoots: MutableList<VirtualFile>): Boolean {
+    override fun detect(classesRoots: MutableList<VirtualFile>): LibraryVersionProperties? {
         for (classesRoot in classesRoots) {
             if (classesRoot.name.endsWith(".jar")) {
                 runCatching {
@@ -37,11 +31,11 @@ class ArchitecturyPresentationProvider : LibraryPresentationProvider<LibraryVers
                         it.name == "architectury.common.json"
                     }
                     if (isArchitecturyLib) {
-                        return true
+                        return LibraryVersionProperties()
                     }
                 }
             }
         }
-        return false
+        return null
     }
 }

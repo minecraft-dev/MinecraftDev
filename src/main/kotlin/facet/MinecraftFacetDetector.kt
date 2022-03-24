@@ -11,6 +11,8 @@
 package com.demonwav.mcdev.facet
 
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.architectury.framework.ARCHITECTURY_LIBRARY_KIND
+import com.demonwav.mcdev.platform.fabric.framework.FABRIC_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.runWriteTaskLater
@@ -173,7 +175,10 @@ class MinecraftFacetDetector : StartupActivity {
                     }
                     return@forEach true
                 }
-
+            if (module.name.matches(Regex("\\w+\\.common\\.(main|test)"))) {
+                platformKinds.add(ARCHITECTURY_LIBRARY_KIND)
+                platformKinds.removeIf { it == FABRIC_LIBRARY_KIND }
+            }
             return platformKinds.mapNotNull { kind -> PlatformType.fromLibraryKind(kind) }.toSet()
         }
     }
