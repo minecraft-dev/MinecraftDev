@@ -15,6 +15,7 @@ import java.io.IOException
 import java.net.URL
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
+import kotlin.streams.asStream
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -69,7 +70,7 @@ class ArchitecturyVersion private constructor(
                             )
                         )
                     } ?: throw IOException("Could not find any minecraft versions")
-                meta.jsonObject["versions"]?.jsonObject?.forEach {
+                meta.jsonObject["versions"]?.jsonObject?.asSequence()?.asStream()?.parallel()?.forEach {
                     val mcVersion = SemanticVersion.parse(it.key)
                     URL(
                         it.value.jsonObject["api"]?.jsonObject?.get("pom")?.jsonPrimitive?.content ?: throw IOException(
@@ -106,7 +107,7 @@ class ArchitecturyVersion private constructor(
                         }
                 }
 
-                return ArchitecturyVersion(versions, mcVersions)
+                return ArchitecturyVersion(versions.toSortedMap(), mcVersions)
             } catch (e: IOException) {
                 e.printStackTrace()
                 return null

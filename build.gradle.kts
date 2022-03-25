@@ -298,15 +298,7 @@ license {
 ktlint {
     enableExperimentalRules.set(true)
 }
-// fun String.execute(currentWorkingDir: File = file("./")): InputStreamReader {
-//    val byteOut = ByteArrayOutputStream()
-//    project.exec {
-//        workingDir = currentWorkingDir
-//        commandLine = this@execute.split("\\s".toRegex())
-//        standardOutput = byteOut
-//    }
-//    return InputStreamReader(ByteArrayInputStream(byteOut.toByteArray()))
-// }
+
 tasks.register("format") {
     group = "minecraft"
     description = "Formats source code according to project style"
