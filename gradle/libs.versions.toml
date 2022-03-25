@@ -17,6 +17,7 @@ grammarKit = "org.jetbrains.idea:grammar-kit:1.5.1"
 # Gradle Tooling
 gradleToolingExtension = "com.jetbrains.intellij.gradle:gradle-tooling-extension:211.6693.111"
 annotations = "org.jetbrains:annotations:20.1.0"
+groovy = "org.codehaus.groovy:groovy-all:2.5.11"
 
 asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
