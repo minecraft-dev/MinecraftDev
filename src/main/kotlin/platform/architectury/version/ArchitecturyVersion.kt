@@ -15,7 +15,11 @@ import java.io.IOException
 import java.net.URL
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
-import kotlin.streams.asStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -45,9 +49,9 @@ class ArchitecturyVersion private constructor(
                 "/raw/architectury.json"
         )
 
-        fun downloadData(): ArchitecturyVersion? {
+        suspend fun downloadData(): ArchitecturyVersion? = coroutineScope {
             try {
-                val meta = Json.parseToJsonElement(updateUrl.readText())
+                val meta = withContext(Dispatchers.IO) { Json.parseToJsonElement(updateUrl.readText()) }
                 val versions = mutableMapOf<SemanticVersion, MutableList<SemanticVersion>>()
                 val mcVersions = meta.jsonObject["versions"]?.jsonObject?.map { SemanticVersion.parse(it.key) }
                     ?.windowed(2, 1)?.toMutableList().also {
@@ -70,47 +74,51 @@ class ArchitecturyVersion private constructor(
                             )
                         )
                     } ?: throw IOException("Could not find any minecraft versions")
-                meta.jsonObject["versions"]?.jsonObject?.asSequence()?.asStream()?.parallel()?.forEach {
-                    val mcVersion = SemanticVersion.parse(it.key)
-                    URL(
-                        it.value.jsonObject["api"]?.jsonObject?.get("pom")?.jsonPrimitive?.content ?: throw IOException(
-                            "Could not find pom for $mcVersion"
+                meta.jsonObject["versions"]?.jsonObject?.asSequence()?.map {
+                    async(Dispatchers.IO) {
+                        val mcVersion = SemanticVersion.parse(it.key)
+                        URL(
+                            it.value.jsonObject["api"]?.jsonObject?.get("pom")?.jsonPrimitive?.content
+                                ?: throw IOException(
+                                    "Could not find pom for $mcVersion"
+                                )
                         )
-                    )
-                        .openStream().use { stream ->
-                            val inputFactory = XMLInputFactory.newInstance()
+                            .openStream().use { stream ->
+                                val inputFactory = XMLInputFactory.newInstance()
 
-                            @Suppress("UNCHECKED_CAST")
-                            val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
-                            for (event in reader) {
-                                if (!event.isStartElement) {
-                                    continue
-                                }
-                                val start = event.asStartElement()
-                                val name = start.name.localPart
-                                if (name != "version") {
-                                    continue
-                                }
+                                @Suppress("UNCHECKED_CAST")
+                                val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
+                                for (event in reader) {
+                                    if (!event.isStartElement) {
+                                        continue
+                                    }
+                                    val start = event.asStartElement()
+                                    val name = start.name.localPart
+                                    if (name != "version") {
+                                        continue
+                                    }
 
-                                val versionEvent = reader.next()
-                                if (!versionEvent.isCharacters) {
-                                    continue
-                                }
-                                val version = versionEvent.asCharacters().data
-                                val regex = it.value.jsonObject["api"]?.jsonObject?.get("filter")
-                                    ?.jsonPrimitive?.content?.toRegex()
-                                    ?: throw IOException("Could not find filter for $mcVersion")
-                                if (regex.matches(version)) {
-                                    versions.getOrPut(mcVersion) { mutableListOf() }.add(SemanticVersion.parse(version))
+                                    val versionEvent = reader.next()
+                                    if (!versionEvent.isCharacters) {
+                                        continue
+                                    }
+                                    val version = versionEvent.asCharacters().data
+                                    val regex = it.value.jsonObject["api"]?.jsonObject?.get("filter")
+                                        ?.jsonPrimitive?.content?.toRegex()
+                                        ?: throw IOException("Could not find filter for $mcVersion")
+                                    if (regex.matches(version)) {
+                                        versions.getOrPut(mcVersion) { mutableListOf() }
+                                            .add(SemanticVersion.parse(version))
+                                    }
                                 }
                             }
-                        }
-                }
+                    }
+                }?.asSequence()?.toList()?.awaitAll()
 
-                return ArchitecturyVersion(versions.toSortedMap(), mcVersions)
+                return@coroutineScope ArchitecturyVersion(versions.toSortedMap(), mcVersions)
             } catch (e: IOException) {
                 e.printStackTrace()
-                return null
+                return@coroutineScope null
             }
         }
     }
