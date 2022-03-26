@@ -15,7 +15,10 @@ import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
+import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.util.MinecraftTemplates
+import com.demonwav.mcdev.util.MinecraftVersions
+import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.findModule
 import com.intellij.codeInsight.daemon.JavaErrorBundle
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil
@@ -50,17 +53,31 @@ class MinecraftClassCreateAction :
         builder.setTitle(CAPTION)
         builder.setValidator(ClassInputValidator(project, directory))
 
-        val module = directory.findModule()
-        val isForge = module?.let { MinecraftFacet.getInstance(it, ForgeModuleType) } != null
-        val isFabric = module?.let { MinecraftFacet.getInstance(it, FabricModuleType) } != null
+        val module = directory.findModule() ?: return
+        val isForge = MinecraftFacet.getInstance(module, ForgeModuleType) != null
+        val isFabric = MinecraftFacet.getInstance(module, FabricModuleType) != null
+        val mcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()
+            ?.minecraftVersion?.let(SemanticVersion::parse)
 
-        if (isForge) {
+        if (isForge && mcVersion != null) {
             val icon = PlatformAssets.FORGE_ICON
 
-            builder.addKind("Block", icon, MinecraftTemplates.FORGE_BLOCK_TEMPLATE)
-            builder.addKind("Item", icon, MinecraftTemplates.FORGE_ITEM_TEMPLATE)
-            builder.addKind("Packet", icon, MinecraftTemplates.FORGE_PACKET_TEMPLATE)
-            builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_ENCHANTMENT_TEMPLATE)
+            if (mcVersion < MinecraftVersions.MC1_17) {
+                builder.addKind("Block", icon, MinecraftTemplates.FORGE_BLOCK_TEMPLATE)
+                builder.addKind("Item", icon, MinecraftTemplates.FORGE_ITEM_TEMPLATE)
+                builder.addKind("Packet", icon, MinecraftTemplates.FORGE_PACKET_TEMPLATE)
+                builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_ENCHANTMENT_TEMPLATE)
+            } else if (mcVersion < MinecraftVersions.MC1_18) {
+                builder.addKind("Block", icon, MinecraftTemplates.FORGE_1_17_BLOCK_TEMPLATE)
+                builder.addKind("Item", icon, MinecraftTemplates.FORGE_1_17_ITEM_TEMPLATE)
+                builder.addKind("Packet", icon, MinecraftTemplates.FORGE_1_17_PACKET_TEMPLATE)
+                builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_1_17_ENCHANTMENT_TEMPLATE)
+            } else {
+                builder.addKind("Block", icon, MinecraftTemplates.FORGE_1_17_BLOCK_TEMPLATE)
+                builder.addKind("Item", icon, MinecraftTemplates.FORGE_1_17_ITEM_TEMPLATE)
+                builder.addKind("Packet", icon, MinecraftTemplates.FORGE_1_18_PACKET_TEMPLATE)
+                builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_1_17_ENCHANTMENT_TEMPLATE)
+            }
         }
         if (isFabric) {
             val icon = PlatformAssets.FABRIC_ICON
@@ -73,11 +90,11 @@ class MinecraftClassCreateAction :
 
     override fun isAvailable(dataContext: DataContext): Boolean {
         val psi = dataContext.getData(CommonDataKeys.PSI_ELEMENT)
-        val isModModule = psi?.findModule()?.let {
-            MinecraftFacet.getInstance(it, FabricModuleType, ForgeModuleType)
-        } != null
+        val module = psi?.findModule() ?: return false
+        val isModModule = MinecraftFacet.getInstance(module, FabricModuleType, ForgeModuleType) != null
+        val hasMcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()?.minecraftVersion != null
 
-        return isModModule && super.isAvailable(dataContext)
+        return isModModule && hasMcVersion && super.isAvailable(dataContext)
     }
 
     override fun checkPackageExists(directory: PsiDirectory): Boolean {

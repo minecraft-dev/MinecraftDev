@@ -1,0 +1,10 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+#parse("File Header.java")
+
+import net.minecraft.world.item.Item;
+
+public class ${NAME} extends Item {
+    public ${NAME}(Properties properties) {
+		super(properties);
+    }
+}

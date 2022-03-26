@@ -202,7 +202,8 @@ class MinecraftFacet(
     fun findFile(path: String, type: SourceType): VirtualFile? {
         try {
             return findFile0(path, type)
-        } catch (ignored: RefreshRootsException) {}
+        } catch (ignored: RefreshRootsException) {
+        }
 
         updateRoots()
 

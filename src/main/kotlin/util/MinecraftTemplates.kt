@@ -154,6 +154,17 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
                 forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_BLOCK_TEMPLATE))
                 forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_ITEM_TEMPLATE))
             }
+            FileTemplateGroupDescriptor("Forge 1.17+", PlatformAssets.FORGE_ICON).let { forgeSkeletonGroup ->
+                skeletonGroup.addTemplate(forgeSkeletonGroup)
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_1_17_ENCHANTMENT_TEMPLATE))
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_1_17_PACKET_TEMPLATE))
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_1_17_BLOCK_TEMPLATE))
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_1_17_ITEM_TEMPLATE))
+            }
+            FileTemplateGroupDescriptor("Forge 1.18+", PlatformAssets.FORGE_ICON).let { forgeSkeletonGroup ->
+                skeletonGroup.addTemplate(forgeSkeletonGroup)
+                forgeSkeletonGroup.addTemplate(FileTemplateDescriptor(FORGE_1_18_PACKET_TEMPLATE))
+            }
             FileTemplateGroupDescriptor("Fabric", PlatformAssets.FABRIC_ICON).let { fabricSkeletonGroup ->
                 skeletonGroup.addTemplate(fabricSkeletonGroup)
                 fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_BLOCK_TEMPLATE))
@@ -241,6 +252,25 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FABRIC_SUBMODULE_BUILD_GRADLE_TEMPLATE = "fabric_submodule_build.gradle"
         const val FABRIC_SUBMODULE_GRADLE_PROPERTIES_TEMPLATE = "fabric_submodule_gradle.properties"
 
+        const val ARCHITECTURY_BUILD_GRADLE_TEMPLATE = "architectury_build.gradle"
+        const val ARCHITECTURY_GRADLE_PROPERTIES_TEMPLATE = "architectury_gradle.properties"
+        const val ARCHITECTURY_SUBMODULE_BUILD_GRADLE_TEMPLATE = "architectury_submodule_build.gradle"
+        const val ARCHITECTURY_SUBMODULE_GRADLE_PROPERTIES_TEMPLATE = "architectury_submodule_gradle.properties"
+        const val ARCHITECTURY_SETTINGS_GRADLE_TEMPLATE = "architectury_settings.gradle"
+        const val ARCHITECTURY_COMMON_BUILD_GRADLE_TEMPLATE = "architectury_common_build.gradle"
+        const val ARCHITECTURY_COMMON_MAIN_CLASS_TEMPLATE = "architectury_common_main_class.java"
+        const val ARCHITECTURY_COMMON_MIXINS_JSON_TEMPLATE = "architectury_common_mixins.json"
+        const val ARCHITECTURY_FABRIC_BUILD_GRADLE_TEMPLATE = "architectury_fabric_build.gradle"
+        const val ARCHITECTURY_FABRIC_MAIN_CLASS_TEMPLATE = "architectury_fabric_main_class.java"
+        const val ARCHITECTURY_FABRIC_MIXINS_JSON_TEMPLATE = "architectury_fabric_mixins.json"
+        const val ARCHITECTURY_FABRIC_MOD_JSON_TEMPLATE = "architectury_fabric_mod.json"
+        const val ARCHITECTURY_FORGE_BUILD_GRADLE_TEMPLATE = "architectury_forge_build.gradle"
+        const val ARCHITECTURY_FORGE_GRADLE_PROPERTIES_TEMPLATE = "architectury_forge_gradle.properties"
+        const val ARCHITECTURY_FORGE_MAIN_CLASS_TEMPLATE = "architectury_forge_main_class.java"
+        const val ARCHITECTURY_FORGE_MIXINS_JSON_TEMPLATE = "architectury_forge_mixins.json"
+        const val ARCHITECTURY_FORGE_MODS_TOML_TEMPLATE = "architectury_forge_mods.toml"
+        const val ARCHITECTURY_FORGE_PACK_MCMETA_TEMPLATE = "architectury_forge_pack.mcmeta"
+
         const val LITELOADER_MAIN_CLASS_TEMPLATE = "LiteLoader Main Class.java"
         const val LITELOADER_BUILD_GRADLE_TEMPLATE = "LiteLoader build.gradle"
         const val LITELOADER_SUBMODULE_BUILD_GRADLE_TEMPLATE = "LiteLoader Submodule build.gradle"
@@ -262,6 +292,13 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FORGE_ITEM_TEMPLATE = "ForgeItem.java"
         const val FORGE_PACKET_TEMPLATE = "ForgePacket.java"
         const val FORGE_ENCHANTMENT_TEMPLATE = "ForgeEnchantment.java"
+
+        const val FORGE_1_17_BLOCK_TEMPLATE = "ForgeBlock (1.17+).java"
+        const val FORGE_1_17_ITEM_TEMPLATE = "ForgeItem (1.17+).java"
+        const val FORGE_1_17_PACKET_TEMPLATE = "ForgePacket (1.17+).java"
+        const val FORGE_1_17_ENCHANTMENT_TEMPLATE = "ForgeEnchantment (1.17+).java"
+
+        const val FORGE_1_18_PACKET_TEMPLATE = "ForgePacket (1.18+).java"
 
         const val FABRIC_BLOCK_TEMPLATE = "FabricBlock.java"
         const val FABRIC_ITEM_TEMPLATE = "FabricItem.java"

@@ -12,7 +12,7 @@ Minecraft Development for IntelliJ
         <td colspan="2"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
     </tr>
     <tr>
-        <td align="right" rowspan="4"><b>Nightly Builds</b></td>
+        <td align="right" rowspan="5"><b>Nightly Builds</b></td>
         <td align="left">2021.1</td>
         <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20211"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20211)/statusIcon.svg" alt="2021.1 Nightly Status" /></a></td>
     </tr>
@@ -22,7 +22,11 @@ Minecraft Development for IntelliJ
     </tr>
     <tr>
         <td align="left">2021.3</td>
-        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20213"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20213)/statusIcon.svg" alt="2021.3 EAP Nightly Status" /></a></td>
+        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20213"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20213)/statusIcon.svg" alt="2021.3 Nightly Status" /></a></td>
+    </tr>
+    <tr>
+        <td align="left">2022.1</td>
+        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20221"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20221)/statusIcon.svg" alt="2022.1 EAP Nightly Status" /></a></td>
     </tr>
     <tr>
         <td align="right"><b>OS Tests</b></td>
@@ -132,6 +136,7 @@ Supported Platforms
 
 - [![Bukkit Icon](src/main/resources/assets/icons/platform/Bukkit.png?raw=true) **Bukkit**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse) ([![Spigot Icon](src/main/resources/assets/icons/platform/Spigot.png?raw=true) Spigot](https://spigotmc.org/) and [![Paper Icon](src/main/resources/assets/icons/platform/Paper.png?raw=true) Paper](https://papermc.io/))
 - [![Sponge Icon](src/main/resources/assets/icons/platform/Sponge_dark.png?raw=true) **Sponge**](https://www.spongepowered.org/)
+- [![Architectury Icon](src/main/resources/assets/icons/platform/Architectury.png?raw=true) **Architectury**](https://github.com/architectury/architectury-api)
 - [![Forge Icon](src/main/resources/assets/icons/platform/Forge.png?raw=true) **Minecraft Forge**](https://forums.minecraftforge.net/)
 - [![Fabric Icon](src/main/resources/assets/icons/platform/Fabric.png?raw=true) **Fabric**](https://fabricmc.net)
 - [![LiteLoader Icon](src/main/resources/assets/icons/platform/LiteLoader.png?raw=true) **LiteLoader**](http://www.liteloader.com/)

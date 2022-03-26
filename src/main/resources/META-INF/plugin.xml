@@ -268,6 +268,10 @@
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.fabric.reference.FabricReferenceContributor" />
         <!--endregion-->
 
+        <!--region ARCHITECTURY-->
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.architectury.framework.ArchitecturyPresentationProvider" />
+        <!--endregion-->
+
         <!--region LITELOADER -->
         <!---->
 
@@ -418,6 +422,13 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.SuperfluousFormatInspection"/>
+        <localInspection displayName="Entity class does not match this entity class"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.inspection.WrongEntityDataParameterClassInspection"/>
         <!--endregion-->
 
         <!--region BUKKIT INSPECTIONS-->
@@ -871,6 +882,7 @@
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleProjectResolverExtension"/>
+        <projectResolve implementation="com.demonwav.mcdev.platform.architectury.framework.ArchitecturyProjectResolverExtension"/>
     </extensions>
 
     <applicationListeners>
