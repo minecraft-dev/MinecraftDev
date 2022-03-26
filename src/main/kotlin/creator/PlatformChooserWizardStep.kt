@@ -13,6 +13,7 @@ package com.demonwav.mcdev.creator
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.architectury.creator.ArchitecturyProjectConfig
 import com.demonwav.mcdev.platform.bukkit.creator.BukkitProjectConfig
 import com.demonwav.mcdev.platform.bungeecord.creator.BungeeCordProjectConfig
 import com.demonwav.mcdev.platform.fabric.creator.FabricProjectConfig
@@ -43,6 +44,7 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
     private lateinit var spongePluginCheckBox: JCheckBox
     private lateinit var forgeModCheckBox: JCheckBox
     private lateinit var fabricModCheckBox: JCheckBox
+    private lateinit var architecturyModCheckBox: JCheckBox
     private lateinit var bungeeCordPluginCheckBox: JCheckBox
     private lateinit var waterfallPluginCheckBox: JCheckBox
     private lateinit var velocityPluginCheckBox: JCheckBox
@@ -71,7 +73,15 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
                 spigotPluginCheckBox
             )
         }
-        forgeModCheckBox.addActionListener { toggle(forgeModCheckBox, liteLoaderModCheckBox) }
+        forgeModCheckBox.addActionListener { toggle(forgeModCheckBox, liteLoaderModCheckBox, architecturyModCheckBox) }
+        fabricModCheckBox.addActionListener { toggle(fabricModCheckBox, architecturyModCheckBox) }
+        architecturyModCheckBox.addActionListener {
+            toggle(
+                architecturyModCheckBox,
+                fabricModCheckBox,
+                forgeModCheckBox
+            )
+        }
         liteLoaderModCheckBox.addActionListener { toggle(liteLoaderModCheckBox, forgeModCheckBox) }
         bungeeCordPluginCheckBox.addActionListener { toggle(bungeeCordPluginCheckBox, waterfallPluginCheckBox) }
         waterfallPluginCheckBox.addActionListener { toggle(waterfallPluginCheckBox, bungeeCordPluginCheckBox) }
@@ -120,6 +130,7 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
             spongePluginCheckBox.isSelected ||
             forgeModCheckBox.isSelected ||
             fabricModCheckBox.isSelected ||
+            architecturyModCheckBox.isSelected ||
             liteLoaderModCheckBox.isSelected ||
             bungeeCordPluginCheckBox.isSelected ||
             waterfallPluginCheckBox.isSelected ||
@@ -150,6 +161,10 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
 
         if (fabricModCheckBox.isSelected) {
             result += FabricProjectConfig()
+        }
+
+        if (architecturyModCheckBox.isSelected) {
+            result += ArchitecturyProjectConfig()
         }
 
         if (liteLoaderModCheckBox.isSelected) {

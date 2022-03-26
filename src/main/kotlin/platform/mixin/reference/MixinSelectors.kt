@@ -98,6 +98,7 @@ interface MixinSelector {
         val desc = field.descriptor ?: return false
         return matchField(fqn.replace('.', '/'), field.name, desc)
     }
+
     fun matchField(field: FieldNode, qualifier: ClassNode): Boolean {
         return matchField(qualifier.name, field.name, field.desc)
     }
@@ -107,6 +108,7 @@ interface MixinSelector {
         val desc = method.descriptor ?: return false
         return matchMethod(fqn.replace('.', '/'), method.internalName, desc)
     }
+
     fun matchMethod(method: MethodNode, qualifier: ClassNode): Boolean {
         return matchMethod(qualifier.name, method.name, method.desc)
     }

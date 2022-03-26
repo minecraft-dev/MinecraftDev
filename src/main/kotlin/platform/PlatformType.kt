@@ -12,6 +12,8 @@ package com.demonwav.mcdev.platform
 
 import com.demonwav.mcdev.platform.adventure.AdventureModuleType
 import com.demonwav.mcdev.platform.adventure.framework.ADVENTURE_LIBRARY_KIND
+import com.demonwav.mcdev.platform.architectury.ArchitecturyModuleType
+import com.demonwav.mcdev.platform.architectury.framework.ARCHITECTURY_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType
@@ -48,6 +50,7 @@ enum class PlatformType(
     BUKKIT(BukkitModuleType, "Bukkit", "bukkit.json"),
     SPIGOT(SpigotModuleType, "Spigot", "spigot.json", BUKKIT),
     PAPER(PaperModuleType, "Paper", "paper.json", SPIGOT),
+    ARCHITECTURY(ArchitecturyModuleType, "Architectury"),
     FORGE(ForgeModuleType, "Forge"),
     FABRIC(FabricModuleType, "Fabric"),
     SPONGE(SpongeModuleType, "Sponge"),
@@ -79,6 +82,7 @@ enum class PlatformType(
             SPIGOT_LIBRARY_KIND -> SPIGOT
             PAPER_LIBRARY_KIND -> PAPER
             SPONGE_LIBRARY_KIND -> SPONGE
+            ARCHITECTURY_LIBRARY_KIND -> ARCHITECTURY
             FORGE_LIBRARY_KIND -> FORGE
             FABRIC_LIBRARY_KIND -> FABRIC
             LITELOADER_LIBRARY_KIND -> LITELOADER
