@@ -35,6 +35,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     private lateinit var forgeAutoCheckBox: JCheckBox
     private lateinit var fabricEnabledCheckBox: JCheckBox
     private lateinit var fabricAutoCheckBox: JCheckBox
+    private lateinit var architecturyEnabledCheckBox: JCheckBox
+    private lateinit var architecturyAutoCheckBox: JCheckBox
     private lateinit var liteloaderEnabledCheckBox: JCheckBox
     private lateinit var liteloaderAutoCheckBox: JCheckBox
     private lateinit var mcpEnabledCheckBox: JCheckBox
@@ -62,6 +64,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             spongeEnabledCheckBox,
             forgeEnabledCheckBox,
             fabricEnabledCheckBox,
+            architecturyEnabledCheckBox,
             liteloaderEnabledCheckBox,
             mcpEnabledCheckBox,
             mixinEnabledCheckBox,
@@ -80,6 +83,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             spongeAutoCheckBox,
             forgeAutoCheckBox,
             fabricAutoCheckBox,
+            architecturyAutoCheckBox,
             liteloaderAutoCheckBox,
             mcpAutoCheckBox,
             mixinAutoCheckBox,
@@ -142,10 +146,43 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             )
         }
 
-        forgeEnabledCheckBox.addActionListener { also(forgeEnabledCheckBox, mcpEnabledCheckBox) }
+        forgeEnabledCheckBox.addActionListener {
+            also(forgeEnabledCheckBox, mcpEnabledCheckBox)
+            unique(forgeEnabledCheckBox, architecturyEnabledCheckBox)
+        }
         fabricEnabledCheckBox.addActionListener {
             also(fabricEnabledCheckBox, mixinEnabledCheckBox, mcpEnabledCheckBox)
+            unique(fabricEnabledCheckBox, architecturyEnabledCheckBox)
         }
+        architecturyEnabledCheckBox.addActionListener {
+            unique(
+                architecturyEnabledCheckBox,
+                fabricEnabledCheckBox,
+                forgeEnabledCheckBox
+            )
+        }
+
+        forgeAutoCheckBox.addActionListener {
+            all(forgeAutoCheckBox, fabricAutoCheckBox, architecturyAutoCheckBox)(
+                FABRIC,
+                ARCHITECTURY
+            )
+        }
+
+        fabricAutoCheckBox.addActionListener {
+            all(fabricAutoCheckBox, forgeAutoCheckBox, architecturyAutoCheckBox)(
+                FORGE,
+                ARCHITECTURY
+            )
+        }
+
+        architecturyAutoCheckBox.addActionListener {
+            all(architecturyAutoCheckBox, forgeAutoCheckBox, fabricAutoCheckBox)(
+                FORGE,
+                FABRIC
+            )
+        }
+
         liteloaderEnabledCheckBox.addActionListener { also(liteloaderEnabledCheckBox, mcpEnabledCheckBox) }
         mixinEnabledCheckBox.addActionListener { also(mixinEnabledCheckBox, mcpEnabledCheckBox) }
 
@@ -268,7 +305,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         private const val SPONGE = PAPER + 1
         private const val FORGE = SPONGE + 1
         private const val FABRIC = FORGE + 1
-        private const val LITELOADER = FABRIC + 1
+        private const val ARCHITECTURY = FABRIC + 1
+        private const val LITELOADER = ARCHITECTURY + 1
         private const val MCP = LITELOADER + 1
         private const val MIXIN = MCP + 1
         private const val BUNGEECORD = MIXIN + 1
@@ -283,6 +321,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             PlatformType.SPONGE,
             PlatformType.FORGE,
             PlatformType.FABRIC,
+            PlatformType.ARCHITECTURY,
             PlatformType.LITELOADER,
             PlatformType.MCP,
             PlatformType.MIXIN,
@@ -299,6 +338,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             SPONGE,
             FORGE,
             FABRIC,
+            ARCHITECTURY,
             LITELOADER,
             MCP,
             MIXIN,

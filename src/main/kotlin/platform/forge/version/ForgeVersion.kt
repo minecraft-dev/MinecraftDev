@@ -37,7 +37,7 @@ class ForgeVersion private constructor(val versions: List<String>) {
     fun getForgeVersions(mcVersion: SemanticVersion): List<SemanticVersion> {
         val versionText = mcVersion.toString()
         return versions.asSequence()
-            .filter { it.startsWith(versionText) }
+            .filter { it.substringBefore('-') == versionText }
             .mapNotNull {
                 try {
                     SemanticVersion.parse(it.substringAfter('-'))

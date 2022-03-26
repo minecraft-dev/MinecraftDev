@@ -28,6 +28,7 @@ interface MixinAnnotationHandler {
         val containingClass = annotation.findContainingClass() ?: return emptyList()
         return containingClass.mixinTargets.flatMap { resolveTarget(annotation, it) }
     }
+
     fun resolveTarget(annotation: PsiAnnotation, targetClass: ClassNode): List<MixinTargetMember>
 
     fun isUnresolved(annotation: PsiAnnotation): InsnResolutionInfo.Failure? {
@@ -36,12 +37,14 @@ interface MixinAnnotationHandler {
             .mapNotNull { isUnresolved(annotation, it) }
             .reduceOrNull(InsnResolutionInfo.Failure::combine)
     }
+
     fun isUnresolved(annotation: PsiAnnotation, targetClass: ClassNode): InsnResolutionInfo.Failure?
 
     fun resolveForNavigation(annotation: PsiAnnotation): List<PsiElement> {
         val containingClass = annotation.findContainingClass() ?: return emptyList()
         return containingClass.mixinTargets.flatMap { resolveForNavigation(annotation, it) }
     }
+
     fun resolveForNavigation(annotation: PsiAnnotation, targetClass: ClassNode): List<PsiElement>
 
     fun createUnresolvedMessage(annotation: PsiAnnotation): String?
@@ -49,6 +52,7 @@ interface MixinAnnotationHandler {
     companion object {
         private val COLLECTOR =
             KeyedExtensionCollector<MixinAnnotationHandler, String>("com.demonwav.minecraft-dev.mixinAnnotationHandler")
+
         fun forMixinAnnotation(qualifiedName: String): MixinAnnotationHandler? {
             return COLLECTOR.findSingle(qualifiedName)
         }
