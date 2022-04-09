@@ -48,6 +48,7 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
     override fun getGroupName() = MinecraftModuleType.NAME
     override fun getWeight() = BUILD_SYSTEM_WEIGHT - 1
     override fun getBuilderId() = "MINECRAFT_MODULE"
+
     override fun isAvailable() = true // TODO: use the new project wizard system
 
     override fun setupRootModel(modifiableRootModel: ModifiableRootModel) {
