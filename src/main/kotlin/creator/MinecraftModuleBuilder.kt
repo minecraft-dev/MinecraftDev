@@ -25,7 +25,6 @@ import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.module.JavaModuleType
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.project.DumbAwareRunnable
 import com.intellij.openapi.project.DumbService
@@ -49,6 +48,7 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
     override fun getGroupName() = MinecraftModuleType.NAME
     override fun getWeight() = BUILD_SYSTEM_WEIGHT - 1
     override fun getBuilderId() = "MINECRAFT_MODULE"
+    override fun isAvailable() = true // TODO: use the new project wizard system
 
     override fun setupRootModel(modifiableRootModel: ModifiableRootModel) {
         val project = modifiableRootModel.project
@@ -98,7 +98,7 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
         return path to vFile
     }
 
-    override fun getModuleType(): ModuleType<*> = JavaModuleType.getModuleType()
+    override fun getModuleType(): ModuleType<*> = MinecraftModuleType.instance
     override fun getParentGroup() = MinecraftModuleType.NAME
 
     override fun createWizardSteps(
