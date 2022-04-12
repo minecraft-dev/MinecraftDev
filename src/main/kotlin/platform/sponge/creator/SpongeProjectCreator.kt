@@ -26,7 +26,6 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleSetupStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
-import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
 import com.demonwav.mcdev.util.runWriteAction
@@ -74,7 +73,7 @@ class SpongeMavenCreator(
     config: SpongeProjectConfig
 ) : SpongeProjectCreator<MavenBuildSystem>(rootDirectory, rootModule, buildSystem, config) {
 
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+    override fun getSteps(): Iterable<CreatorStep> {
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
         val pomText = SpongeTemplate.applyPom(project)
@@ -89,30 +88,6 @@ class SpongeMavenCreator(
             BasicMavenFinalizerStep(rootModule, rootDirectory)
         )
     }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        val depStep = setupDependencyStep()
-        val commonDepStep = CommonModuleDependencyStep(buildSystem)
-        val (mainClassStep, modifyStep) = setupMainClassSteps()
-
-        val pomText = SpongeTemplate.applySubPom(project)
-        val mavenStep = BasicMavenStep(
-            project = project,
-            rootDirectory = rootDirectory,
-            buildSystem = buildSystem,
-            config = config,
-            pomText = pomText,
-            parts = listOf(
-                BasicMavenStep.setupDirs(),
-                BasicMavenStep.setupSubCore(buildSystem.parentOrError.artifactId),
-                BasicMavenStep.setupSubName(config.type),
-                BasicMavenStep.setupInfo(),
-                BasicMavenStep.setupDependencies()
-            )
-        )
-        val licenseStep = LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", "))
-        return listOf(depStep, commonDepStep, mavenStep, mainClassStep, modifyStep, licenseStep)
-    }
 }
 
 class SpongeGradleCreator(
@@ -122,7 +97,7 @@ class SpongeGradleCreator(
     config: SpongeProjectConfig
 ) : SpongeProjectCreator<GradleBuildSystem>(rootDirectory, rootModule, buildSystem, config) {
 
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+    override fun getSteps(): Iterable<CreatorStep> {
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
         val buildText = SpongeTemplate.applyBuildGradle(project, buildSystem)
@@ -140,22 +115,6 @@ class SpongeGradleCreator(
             GradleGitignoreStep(project, rootDirectory),
             LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", ")),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
-        )
-    }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        val (mainClassStep, modifyStep) = setupMainClassSteps()
-
-        val buildText = SpongeTemplate.applySubBuildGradle(project, buildSystem)
-        val files = GradleFiles(buildText, null, null)
-
-        return listOf(
-            setupDependencyStep(),
-            CreateDirectoriesStep(buildSystem, rootDirectory),
-            GradleSetupStep(project, rootDirectory, buildSystem, files),
-            mainClassStep,
-            modifyStep,
-            LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", "))
         )
     }
 }

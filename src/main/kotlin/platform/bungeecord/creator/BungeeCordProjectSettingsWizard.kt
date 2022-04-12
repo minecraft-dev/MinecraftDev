@@ -19,7 +19,6 @@ import com.demonwav.mcdev.creator.ValidatedFieldType.LIST
 import com.demonwav.mcdev.creator.ValidatedFieldType.NON_BLANK
 import com.demonwav.mcdev.creator.getVersionSelector
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.util.firstOfType
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -67,7 +66,7 @@ class BungeeCordProjectSettingsWizard(
     }
 
     override fun updateStep() {
-        config = creator.configs.firstOfType()
+        config = creator.config as? BungeeCordProjectConfig
         if (config == null) {
             return
         }
@@ -102,7 +101,7 @@ class BungeeCordProjectSettingsWizard(
     }
 
     override fun isStepVisible(): Boolean {
-        return creator.configs.any { it is BungeeCordProjectConfig }
+        return creator.config is BungeeCordProjectConfig
     }
 
     override fun updateDataModel() {

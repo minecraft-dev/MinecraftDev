@@ -17,7 +17,6 @@ import com.demonwav.mcdev.creator.ValidatedField
 import com.demonwav.mcdev.creator.ValidatedFieldType.CLASS_NAME
 import com.demonwav.mcdev.creator.ValidatedFieldType.LIST
 import com.demonwav.mcdev.creator.ValidatedFieldType.NON_BLANK
-import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.version.ForgeVersion
 import com.demonwav.mcdev.platform.mcp.McpVersionPair
 import com.demonwav.mcdev.platform.mcp.version.McpVersion
@@ -126,15 +125,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
         val (conf, buildSystem) = modUpdateStep<ForgeProjectConfig>(creator, modNameField) ?: return
         config = conf
 
-        if (creator.configs.indexOf(conf) != 0) {
-            modNameField.isEditable = false
-        }
-
         mainClassField.text = generateClassName(buildSystem, modNameField.text)
-
-        if (creator.configs.size > 1) {
-            mainClassField.text = mainClassField.text + PlatformType.FORGE.normalName
-        }
 
         title.icon = PlatformAssets.FORGE_ICON_2X
         title.text = "<html><font size=\"5\">Forge Settings</font></html>"
@@ -163,7 +154,7 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     }
 
     override fun isStepVisible(): Boolean {
-        return creator.configs.any { it is ForgeProjectConfig }
+        return creator.config is ForgeProjectConfig
     }
 
     override fun onStepLeaving() {

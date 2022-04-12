@@ -24,6 +24,6 @@ inline fun <reified T : ProjectConfig> modUpdateStep(
 
     modNameField.text = WordUtils.capitalize(buildSystem.artifactId.replace('-', ' '))
 
-    val config = creator.configs.firstOfType<T>() ?: return null
+    val config = creator.config as? T ?: return null
     return config to buildSystem
 }

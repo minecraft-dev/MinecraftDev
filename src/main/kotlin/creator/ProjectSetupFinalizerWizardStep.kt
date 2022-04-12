@@ -14,7 +14,6 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleCreator
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.VersionRange
-import com.demonwav.mcdev.util.until
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphPropertyImpl.Companion.graphProperty
@@ -24,7 +23,6 @@ import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ui.configuration.JdkComboBox
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
-import com.intellij.openapi.ui.MultiLineLabelUI
 import com.intellij.ui.SortedComboBoxModel
 import com.intellij.ui.components.Label
 import com.intellij.ui.layout.Row
@@ -32,6 +30,7 @@ import com.intellij.ui.layout.RowBuilder
 import com.intellij.ui.layout.panel
 import com.intellij.util.ui.UIUtil
 import javax.swing.JComponent
+import org.gradle.util.GradleVersion
 
 class ProjectSetupFinalizerWizardStep(
     val creator: MinecraftProjectCreator,
@@ -136,8 +135,8 @@ class JdkProjectSetupFinalizer : ProjectSetupFinalizer {
     private var minimumVersion: JavaSdkVersion = JavaSdkVersion.JDK_1_8
 
     private fun highestJDKVersionRequired(creator: MinecraftProjectCreator): JavaSdkVersion? {
-        val highestJavaVersionRequired = creator.configs.maxOfOrNull { it.javaVersion } ?: return null
-        return JavaSdkVersion.fromJavaVersion(highestJavaVersionRequired).also {
+        val javaVersionRequired = creator.config?.javaVersion ?: return null
+        return JavaSdkVersion.fromJavaVersion(javaVersionRequired).also {
             minimumVersion = it ?: JavaSdkVersion.JDK_1_8
         }
     }
@@ -208,25 +207,17 @@ class JdkProjectSetupFinalizer : ProjectSetupFinalizer {
 
 class GradleProjectSetupFinalizer : ProjectSetupFinalizer {
 
-    private val errorLabel = Label("", fontColor = UIUtil.FontColor.BRIGHTER)
-        .apply {
-            icon = UIUtil.getErrorIcon()
-            setUI(MultiLineLabelUI())
-            isVisible = false
-        }
     private val model = SortedComboBoxModel<SemanticVersion>(Comparator.naturalOrder())
 
     private val propertyGraph = PropertyGraph("GradleProjectSetupFinalizer graph")
     var gradleVersion: SemanticVersion by propertyGraph.graphProperty { SemanticVersion.release() }
-    private var configs: Collection<ProjectConfig> = emptyList()
-    private var incompatibleConfigs: List<ProjectConfig> = emptyList()
+    private var config: ProjectConfig? = null
 
     private var gradleVersionRange: VersionRange? = null
 
     override val title: String = "Gradle"
 
     override fun RowBuilder.buildComponent(creator: MinecraftProjectCreator, context: WizardContext) {
-        row(errorLabel) {}
         row("Gradle version:") {
             comboBox(model, ::gradleVersion)
                 .enabled(false) // TODO load compatible Gradle versions list
@@ -239,59 +230,27 @@ class GradleProjectSetupFinalizer : ProjectSetupFinalizer {
     }
 
     override fun validateConfigs(creator: MinecraftProjectCreator, context: WizardContext): Boolean {
-        configs = creator.configs
-        incompatibleConfigs = emptyList()
+        config = creator.config
 
         if (creator.buildSystem !is GradleBuildSystem) {
-            updateUi()
             return true
         }
 
-        val incompatibleConfigs = mutableListOf<ProjectConfig>()
-        val range = creator.configs.fold(SemanticVersion.release() until null) { acc, config ->
-            val range = (config as? GradleCreator)?.compatibleGradleVersions ?: return@fold acc
-            val intersection = acc.intersect(range)
-            if (intersection == null) {
-                incompatibleConfigs.add(config)
-                return@fold acc
-            }
-            intersection
-        }
+        val range = (creator.config as? GradleCreator)?.compatibleGradleVersions
         gradleVersionRange = range
-        this.incompatibleConfigs = incompatibleConfigs
-        updateUi()
 
-        // TODO get the compatible versions available if possible
-        gradleVersion = range.lower
+        gradleVersion = range?.upper ?: SemanticVersion.parse(GradleVersion.current().version)
         model.clear()
         model.add(gradleVersion)
         model.selectedItem = gradleVersion
-        return this.incompatibleConfigs.isEmpty()
-    }
-
-    private fun updateUi() {
-        if (incompatibleConfigs.isEmpty()) {
-            errorLabel.text = ""
-            errorLabel.isVisible = false
-            return
-        }
-
-        val problemsList = incompatibleConfigs.joinToString(separator = "") { config ->
-            val configName = config.javaClass.simpleName.removeSuffix("ProjectConfig")
-            val compatibleGradleVersions = (config as GradleCreator).compatibleGradleVersions
-            "\n- $configName requires $compatibleGradleVersions"
-        }
-        val compatibleConfigsList = configs.subtract(incompatibleConfigs)
-            .joinToString { it.javaClass.simpleName.removeSuffix("ProjectConfig") }
-        errorLabel.text = "$compatibleConfigsList require Gradle $gradleVersionRange but:$problemsList"
-        errorLabel.isVisible = true
+        return true
     }
 
     override fun validateChanges(creator: MinecraftProjectCreator, context: WizardContext): Boolean {
         if (creator.buildSystem !is GradleBuildSystem) {
             return true
         }
-        return gradleVersionRange != null && incompatibleConfigs.isEmpty() && gradleVersion.parts.isNotEmpty()
+        return gradleVersionRange != null && gradleVersion.parts.isNotEmpty()
     }
 
     override fun apply(creator: MinecraftProjectCreator, context: WizardContext) {

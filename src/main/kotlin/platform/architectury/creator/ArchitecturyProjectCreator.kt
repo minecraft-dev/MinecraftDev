@@ -14,7 +14,6 @@ import com.demonwav.mcdev.creator.BaseProjectCreator
 import com.demonwav.mcdev.creator.BasicJavaClassStep
 import com.demonwav.mcdev.creator.CreateDirectoriesStep
 import com.demonwav.mcdev.creator.CreatorStep
-import com.demonwav.mcdev.creator.PostMultiModuleAware
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
@@ -51,7 +50,7 @@ class ArchitecturyProjectCreator(
     private val rootModule: Module,
     private val buildSystem: GradleBuildSystem,
     private val config: ArchitecturyProjectConfig
-) : BaseProjectCreator(rootModule, buildSystem), PostMultiModuleAware {
+) : BaseProjectCreator(rootModule, buildSystem) {
 
     private val commonModule: Module = project.runWriteTaskInSmartMode {
         ModuleManager.getInstance(rootModule.project)
@@ -66,26 +65,26 @@ class ArchitecturyProjectCreator(
             .newModule(rootDirectory.resolve("fabric"), ModuleType.get(rootModule).id)
     }
 
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+    override fun getSteps(): Iterable<CreatorStep> {
         val steps = mutableListOf<CreatorStep>()
         steps += ArchitecturyCommonProjectCreator(
             rootDirectory.resolve("common"),
             commonModule,
             buildSystem,
             config
-        ).getSingleModuleSteps()
+        ).getSteps()
         steps += ArchitecturyForgeProjectCreator(
             rootDirectory.resolve("forge"),
             forgeModule,
             buildSystem,
             config
-        ).getSingleModuleSteps()
+        ).getSteps()
         steps += ArchitecturyFabricProjectCreator(
             rootDirectory.resolve("fabric"),
             fabricModule,
             buildSystem,
             config
-        ).getSingleModuleSteps()
+        ).getSteps()
         steps += listOf(
             SimpleGradleSetupStep(
                 project,
@@ -104,47 +103,6 @@ class ArchitecturyProjectCreator(
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
         )
         return steps
-    }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        val steps = mutableListOf<CreatorStep>()
-        steps += ArchitecturyCommonProjectCreator(
-            rootDirectory.resolve("common"),
-            commonModule,
-            buildSystem,
-            config
-        ).getMultiModuleSteps(projectBaseDir)
-        steps += ArchitecturyForgeProjectCreator(
-            rootDirectory.resolve("forge"),
-            forgeModule,
-            buildSystem,
-            config
-        ).getMultiModuleSteps(projectBaseDir)
-        steps += ArchitecturyFabricProjectCreator(
-            rootDirectory.resolve("fabric"),
-            fabricModule,
-            buildSystem,
-            config
-        ).getMultiModuleSteps(projectBaseDir)
-        steps += listOf(
-            SimpleGradleSetupStep(
-                project,
-                rootDirectory,
-                buildSystem,
-                GradleFiles(
-                    ArchitecturyTemplate.applyMultiModuleBuildGradle(project, buildSystem, config),
-                    ArchitecturyTemplate.applyMultiModuleGradleProp(project, buildSystem, config),
-                    ArchitecturyTemplate.applySettingsGradle(project, buildSystem, config)
-                )
-            ),
-            GenRunsStep(project, rootDirectory),
-            CleanUpStep(rootDirectory)
-        )
-        return steps
-    }
-
-    override fun getPostMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        return listOf()
     }
 
     class GenRunsStep(
@@ -177,8 +135,8 @@ class ArchitecturyCommonProjectCreator(
     rootModule: Module,
     private val buildSystem: GradleBuildSystem,
     private val config: ArchitecturyProjectConfig
-) : BaseProjectCreator(rootModule, buildSystem), PostMultiModuleAware {
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+) : BaseProjectCreator(rootModule, buildSystem) {
+    override fun getSteps(): Iterable<CreatorStep> {
         return listOf(
             CreateDirectoriesStep(buildSystem, rootDirectory),
             ArchitecturyCommonMixinStep(project, buildSystem, config),
@@ -190,24 +148,6 @@ class ArchitecturyCommonProjectCreator(
             ),
             setupMainClassStep()
         )
-    }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        return listOf(
-            CreateDirectoriesStep(buildSystem, rootDirectory),
-            ArchitecturyCommonMixinStep(project, buildSystem, config),
-            SimpleGradleSetupStep(
-                project,
-                rootDirectory,
-                buildSystem,
-                GradleFiles(ArchitecturyTemplate.applyCommonBuildGradle(project, buildSystem, config), null, null)
-            ),
-            setupMainClassStep()
-        )
-    }
-
-    override fun getPostMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        return listOf()
     }
 
     private fun setupMainClassStep(): BasicJavaClassStep {
@@ -247,8 +187,8 @@ class ArchitecturyForgeProjectCreator(
     rootModule: Module,
     private val buildSystem: GradleBuildSystem,
     private val config: ArchitecturyProjectConfig
-) : BaseProjectCreator(rootModule, buildSystem), PostMultiModuleAware {
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+) : BaseProjectCreator(rootModule, buildSystem) {
+    override fun getSteps(): Iterable<CreatorStep> {
         return listOf(
             CreateDirectoriesStep(buildSystem, rootDirectory),
             ArchitecturyForgeMixinStep(project, buildSystem, config),
@@ -265,29 +205,6 @@ class ArchitecturyForgeProjectCreator(
             ),
             setupMainClassStep()
         )
-    }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        return listOf(
-            CreateDirectoriesStep(buildSystem, rootDirectory),
-            ArchitecturyForgeMixinStep(project, buildSystem, config),
-            ArchitecturyForgeResourcesStep(project, buildSystem, config),
-            SimpleGradleSetupStep(
-                project,
-                rootDirectory,
-                buildSystem,
-                GradleFiles(
-                    ArchitecturyTemplate.applyForgeBuildGradle(project, buildSystem, config),
-                    ArchitecturyTemplate.applyForgeGradleProp(project, buildSystem, config),
-                    null
-                )
-            ),
-            setupMainClassStep()
-        )
-    }
-
-    override fun getPostMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        return listOf()
     }
 
     private fun setupMainClassStep(): BasicJavaClassStep {
@@ -353,8 +270,8 @@ class ArchitecturyFabricProjectCreator(
     rootModule: Module,
     private val buildSystem: GradleBuildSystem,
     private val config: ArchitecturyProjectConfig
-) : BaseProjectCreator(rootModule, buildSystem), PostMultiModuleAware {
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+) : BaseProjectCreator(rootModule, buildSystem) {
+    override fun getSteps(): Iterable<CreatorStep> {
         return listOf(
             CreateDirectoriesStep(buildSystem, rootDirectory),
             ArchitecturyFabricMixinStep(project, buildSystem, config),
@@ -371,29 +288,6 @@ class ArchitecturyFabricProjectCreator(
             ),
             setupMainClassStep()
         )
-    }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        return listOf(
-            CreateDirectoriesStep(buildSystem, rootDirectory),
-            ArchitecturyFabricMixinStep(project, buildSystem, config),
-            ArchitecturyFabricResourcesStep(project, buildSystem, config),
-            SimpleGradleSetupStep(
-                project,
-                rootDirectory,
-                buildSystem,
-                GradleFiles(
-                    ArchitecturyTemplate.applyFabricBuildGradle(project, buildSystem, config),
-                    null,
-                    null
-                )
-            ),
-            setupMainClassStep()
-        )
-    }
-
-    override fun getPostMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        return listOf()
     }
 
     private fun setupMainClassStep(): BasicJavaClassStep {

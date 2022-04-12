@@ -66,14 +66,6 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
         val name = WordUtils.capitalize(buildSystem.artifactId.replace('-', ' '))
         pluginNameField.text = name
 
-        if (creator.configs.indexOf(config) != 0) {
-            pluginNameField.isEditable = false
-        }
-
         mainClassField.text = generateClassName(buildSystem, name)
-
-        if (creator.configs.size > 1) {
-            mainClassField.text = mainClassField.text + config.type.normalName
-        }
     }
 }
