@@ -21,15 +21,13 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.vfs.VfsUtil
-import java.nio.file.Files
 import java.nio.file.Path
-import java.util.Locale
 
 class MinecraftProjectCreator {
 
     var buildSystem: BuildSystem? = null
 
-    val configs = LinkedHashSet<ProjectConfig>()
+    var config: ProjectConfig? = null
 
     fun create(root: Path, module: Module) {
         val build = buildSystem ?: throw IllegalStateException("buildSystem not initialized")
@@ -94,67 +92,16 @@ class MinecraftProjectCreator {
                     VfsUtil.markDirtyAndRefresh(false, true, true, root.virtualFileOrError)
                 }
 
-                build.configure(configs, root)
+                val config = this@MinecraftProjectCreator.config ?: return
 
-                if (configs.size == 1) {
-                    val config = configs.first()
-                    val log = newLog(config, workLog)
-                    if (!build.buildCreator(config, root, module).getSingleModuleSteps().run(indicator, log)) {
-                        return
-                    }
-                    config.type.type.performCreationSettingSetup(module.project)
-                    CreatorStep.runAllReformats()
-                } else {
-                    val types = configs.map { it.type }
-                    newLog(build.javaClass.name + "::multiModuleBaseSteps", workLog).let { log ->
-                        if (!build.multiModuleBaseSteps(module, types, root).run(indicator, log)) {
-                            return
-                        }
-                    }
+                build.configure(config, root)
 
-                    val postMultiModuleAwares = mutableListOf<PostMultiModuleAware>()
-
-                    for (config in configs) {
-                        val log = newLog(config, workLog)
-
-                        val dirName = config.type.normalName.lowercase(Locale.ENGLISH)
-                        val newArtifactId = "${build.artifactId}-$dirName"
-                        val dir = Files.createDirectories(root.resolve(newArtifactId))
-
-                        val newBuild = build.createSub(newArtifactId)
-                        val creator = newBuild.buildCreator(config, dir, module)
-                        if (!creator.getMultiModuleSteps(root).run(indicator, log)) {
-                            return
-                        }
-                        config.type.type.performCreationSettingSetup(module.project)
-                        if (creator is PostMultiModuleAware) {
-                            postMultiModuleAwares += creator
-                        }
-                    }
-
-                    val commonArtifactId = "${build.artifactId}-common"
-                    val commonDir = Files.createDirectories(root.resolve(commonArtifactId))
-                    val commonBuild = build.createSub(commonArtifactId)
-
-                    newLog(commonBuild.javaClass.name + "::multiModuleCommonSteps", workLog).let { log ->
-                        if (!commonBuild.multiModuleCommonSteps(module, commonDir).run(indicator, log)) {
-                            return
-                        }
-                    }
-
-                    CreatorStep.runAllReformats()
-
-                    newLog(build.javaClass.name + "::multiModuleBaseFinalizer", workLog).let { log ->
-                        build.multiModuleBaseFinalizer(module, root).run(indicator, log)
-                    }
-
-                    for (postMultiModuleAware in postMultiModuleAwares) {
-                        val log = newLog(postMultiModuleAware, workLog)
-                        if (!postMultiModuleAware.getPostMultiModuleSteps(root).run(indicator, log)) {
-                            return
-                        }
-                    }
+                val log = newLog(config, workLog)
+                if (!build.buildCreator(config, root, module).getSteps().run(indicator, log)) {
+                    return
                 }
+                config.type.type.performCreationSettingSetup(module.project)
+                CreatorStep.runAllReformats()
 
                 // Tell IntelliJ about everything we've done
                 invokeLater {

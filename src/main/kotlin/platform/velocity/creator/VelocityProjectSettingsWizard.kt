@@ -17,7 +17,6 @@ import com.demonwav.mcdev.creator.ValidatedFieldType.CLASS_NAME
 import com.demonwav.mcdev.creator.ValidatedFieldType.LIST
 import com.demonwav.mcdev.creator.ValidatedFieldType.NON_BLANK
 import com.demonwav.mcdev.creator.getVersionSelector
-import com.demonwav.mcdev.util.firstOfType
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -62,7 +61,7 @@ class VelocityProjectSettingsWizard(private val creator: MinecraftProjectCreator
     }
 
     override fun updateStep() {
-        config = creator.configs.firstOfType()
+        config = creator.config as? VelocityProjectConfig
         if (config == null) {
             return
         }
@@ -85,7 +84,7 @@ class VelocityProjectSettingsWizard(private val creator: MinecraftProjectCreator
     }
 
     override fun isStepVisible(): Boolean {
-        return creator.configs.any { it is VelocityProjectConfig }
+        return creator.config is VelocityProjectConfig
     }
 
     override fun updateDataModel() {

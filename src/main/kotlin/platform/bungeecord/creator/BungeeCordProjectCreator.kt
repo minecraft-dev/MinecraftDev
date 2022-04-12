@@ -25,7 +25,6 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleSetupStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
-import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
 import com.demonwav.mcdev.platform.PlatformType
@@ -65,7 +64,7 @@ class BungeeCordMavenCreator(
     config: BungeeCordProjectConfig
 ) : BungeeCordProjectCreator<MavenBuildSystem>(rootDirectory, rootModule, buildSystem, config) {
 
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+    override fun getSteps(): Iterable<CreatorStep> {
         val pomText = BungeeCordTemplate.applyPom(project)
         return listOf(
             setupDependencyStep(),
@@ -76,30 +75,6 @@ class BungeeCordMavenCreator(
             BasicMavenFinalizerStep(rootModule, rootDirectory)
         )
     }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        val depStep = setupDependencyStep()
-        val commonDepStep = CommonModuleDependencyStep(buildSystem)
-        val mainClassStep = setupMainClassStep()
-        val ymlStep = setupYmlStep()
-
-        val pomText = BungeeCordTemplate.applySubPom(project)
-        val mavenStep = BasicMavenStep(
-            project = project,
-            rootDirectory = rootDirectory,
-            buildSystem = buildSystem,
-            config = config,
-            pomText = pomText,
-            parts = listOf(
-                BasicMavenStep.setupDirs(),
-                BasicMavenStep.setupSubCore(buildSystem.parentOrError.artifactId),
-                BasicMavenStep.setupSubName(config.type),
-                BasicMavenStep.setupInfo(),
-                BasicMavenStep.setupDependencies()
-            )
-        )
-        return listOf(depStep, commonDepStep, mavenStep, mainClassStep, ymlStep)
-    }
 }
 
 class BungeeCordGradleCreator(
@@ -109,7 +84,7 @@ class BungeeCordGradleCreator(
     config: BungeeCordProjectConfig
 ) : BungeeCordProjectCreator<GradleBuildSystem>(rootDirectory, rootModule, buildSystem, config) {
 
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+    override fun getSteps(): Iterable<CreatorStep> {
         val buildText = BungeeCordTemplate.applyBuildGradle(project, buildSystem)
         val projectText = BungeeCordTemplate.applyGradleProp(project)
         val settingsText = BungeeCordTemplate.applySettingsGradle(project, buildSystem.artifactId)
@@ -124,19 +99,6 @@ class BungeeCordGradleCreator(
             GradleWrapperStep(project, rootDirectory, buildSystem),
             GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
-        )
-    }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        val buildText = BungeeCordTemplate.applySubBuildGradle(project, buildSystem)
-        val files = GradleFiles(buildText, null, null)
-
-        return listOf(
-            setupDependencyStep(),
-            CreateDirectoriesStep(buildSystem, rootDirectory),
-            GradleSetupStep(project, rootDirectory, buildSystem, files),
-            setupMainClassStep(),
-            setupYmlStep()
         )
     }
 }
