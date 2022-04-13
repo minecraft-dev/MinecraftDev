@@ -33,9 +33,6 @@
     ]]>
     </change-notes>
 
-    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="212.4746.92" until-build="212.*"/>
-
     <extensionPoints>
         <extensionPoint name="mixinSelectorParser" interface="com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser" dynamic="true" />
         <extensionPoint name="mixinAnnotationHandler" beanClass="com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandlerInfo" dynamic="true">
