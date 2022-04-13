@@ -57,7 +57,6 @@ abstract class MinecraftModuleWizardStep : ModuleWizardStep() {
 
     protected fun basicUpdateStep(
         creator: MinecraftProjectCreator,
-        config: ProjectConfig,
         pluginNameField: JTextField,
         mainClassField: JTextField
     ) {

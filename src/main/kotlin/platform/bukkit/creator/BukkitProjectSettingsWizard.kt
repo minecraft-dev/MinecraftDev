@@ -74,7 +74,7 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         }
         val conf = config ?: return
 
-        basicUpdateStep(creator, conf, pluginNameField, mainClassField)
+        basicUpdateStep(creator, pluginNameField, mainClassField)
 
         when (conf.type) {
             PlatformType.BUKKIT -> {

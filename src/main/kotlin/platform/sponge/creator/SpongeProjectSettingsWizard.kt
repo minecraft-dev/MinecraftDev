@@ -80,9 +80,8 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         if (config == null) {
             return
         }
-        val conf = config ?: return
 
-        basicUpdateStep(creator, conf, pluginNameField, mainClassField)
+        basicUpdateStep(creator, pluginNameField, mainClassField)
 
         if (UIUtil.isUnderDarcula()) {
             title.icon = PlatformAssets.SPONGE_ICON_2X_DARK

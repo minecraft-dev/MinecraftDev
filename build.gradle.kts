@@ -14,7 +14,7 @@ import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.6.20"
     java
     mcdev
     groovy
@@ -22,7 +22,7 @@ plugins {
     val ijPluginVersion = if (System.getProperty("mcdev.localdev").toBoolean()) {
         "1.1.3"
     } else {
-        "1.3.0"
+        "1.5.2"
     }
     id("org.jetbrains.intellij") version ijPluginVersion
     id("org.cadixdev.licenser") version "0.6.1"
@@ -106,7 +106,7 @@ dependencies {
             extension = "nbt"
         }
     }
-    testLibs(project(":mixin-test-data"))
+    testLibs(projects.mixinTestData)
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.buildNumber.substring(intellij.type.length + 1)) }
@@ -153,7 +153,7 @@ tasks.publishPlugin {
 }
 
 tasks.runPluginVerifier {
-    ideVersions.addAll("IC-2020.1.3", "IC-2020.1.4")
+    ideVersions.addAll("IC-$ideaVersionName")
 }
 
 java {
@@ -171,7 +171,7 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
-        freeCompilerArgs = listOf("-Xjvm-default=enable")
+        freeCompilerArgs = listOf("-Xjvm-default=all")
     }
 }
 

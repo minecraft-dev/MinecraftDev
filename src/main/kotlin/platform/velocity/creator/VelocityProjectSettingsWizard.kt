@@ -67,7 +67,7 @@ class VelocityProjectSettingsWizard(private val creator: MinecraftProjectCreator
         }
         val conf = config ?: return
 
-        basicUpdateStep(creator, conf, pluginNameField, mainClassField)
+        basicUpdateStep(creator, pluginNameField, mainClassField)
 
         if (versionsLoaded) {
             return

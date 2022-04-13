@@ -72,7 +72,7 @@ class BungeeCordProjectSettingsWizard(
         }
         val conf = config ?: return
 
-        basicUpdateStep(creator, conf, pluginNameField, mainClassField)
+        basicUpdateStep(creator, pluginNameField, mainClassField)
 
         when (conf.type) {
             PlatformType.BUNGEECORD -> {
