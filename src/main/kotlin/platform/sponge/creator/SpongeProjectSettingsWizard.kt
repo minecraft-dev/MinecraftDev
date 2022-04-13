@@ -21,7 +21,6 @@ import com.demonwav.mcdev.platform.sponge.SpongeVersion
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.SemanticVersion
-import com.demonwav.mcdev.util.firstOfType
 import com.intellij.ui.EnumComboBoxModel
 import com.intellij.util.text.nullize
 import com.intellij.util.ui.UIUtil
@@ -77,13 +76,12 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun updateStep() {
-        config = creator.configs.firstOfType()
+        config = creator.config as? SpongeProjectConfig
         if (config == null) {
             return
         }
-        val conf = config ?: return
 
-        basicUpdateStep(creator, conf, pluginNameField, mainClassField)
+        basicUpdateStep(creator, pluginNameField, mainClassField)
 
         if (UIUtil.isUnderDarcula()) {
             title.icon = PlatformAssets.SPONGE_ICON_2X_DARK
@@ -109,7 +107,7 @@ class SpongeProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun isStepVisible(): Boolean {
-        return creator.configs.any { it is SpongeProjectConfig }
+        return creator.config is SpongeProjectConfig
     }
 
     override fun updateDataModel() {

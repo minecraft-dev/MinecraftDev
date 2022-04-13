@@ -27,7 +27,7 @@ abstract class ModuleDebugRunConfigurationExtension : RunConfigurationExtension(
         return configuration is ModuleBasedConfiguration<*, *>
     }
 
-    override fun <T : RunConfigurationBase<*>?> updateJavaParameters(
+    override fun <T : RunConfigurationBase<*>> updateJavaParameters(
         configuration: T,
         params: JavaParameters,
         runnerSettings: RunnerSettings?
@@ -54,5 +54,5 @@ abstract class ModuleDebugRunConfigurationExtension : RunConfigurationExtension(
     override fun readExternal(runConfiguration: RunConfigurationBase<*>, element: Element) {}
 
     override fun getEditorTitle(): String? = null
-    override fun <P : RunConfigurationBase<*>?> createEditor(configuration: P): SettingsEditor<P>? = null
+    override fun <P : RunConfigurationBase<*>> createEditor(configuration: P): SettingsEditor<P>? = null
 }

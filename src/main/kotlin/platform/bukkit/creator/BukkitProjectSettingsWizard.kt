@@ -20,7 +20,6 @@ import com.demonwav.mcdev.creator.ValidatedFieldType.NON_BLANK
 import com.demonwav.mcdev.creator.getVersionSelector
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder
-import com.demonwav.mcdev.util.firstOfType
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -65,17 +64,17 @@ class BukkitProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun isStepVisible(): Boolean {
-        return creator.configs.any { it is BukkitProjectConfig }
+        return creator.config is BukkitProjectConfig
     }
 
     override fun updateStep() {
-        config = creator.configs.firstOfType()
+        config = creator.config as? BukkitProjectConfig
         if (config == null) {
             return
         }
         val conf = config ?: return
 
-        basicUpdateStep(creator, conf, pluginNameField, mainClassField)
+        basicUpdateStep(creator, pluginNameField, mainClassField)
 
         when (conf.type) {
             PlatformType.BUKKIT -> {

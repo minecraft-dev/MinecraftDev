@@ -134,7 +134,7 @@ class MinecraftFacetDetector : StartupActivity {
                             LibraryDetectionManager.getInstance().processProperties(
                                 libraryFiles,
                                 object : LibraryDetectionManager.LibraryPropertiesProcessor {
-                                    override fun <P : LibraryProperties<*>?> processProperties(
+                                    override fun <P : LibraryProperties<*>> processProperties(
                                         kind: LibraryKind,
                                         properties: P
                                     ): Boolean {

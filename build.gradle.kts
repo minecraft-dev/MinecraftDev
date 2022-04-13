@@ -14,17 +14,12 @@ import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.6.20"
     java
     mcdev
     groovy
     idea
-    val ijPluginVersion = if (System.getProperty("mcdev.localdev").toBoolean()) {
-        "1.1.3"
-    } else {
-        "1.3.0"
-    }
-    id("org.jetbrains.intellij") version ijPluginVersion
+    id("org.jetbrains.intellij") version "1.5.2"
     id("org.cadixdev.licenser") version "0.6.1"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
@@ -41,9 +36,7 @@ val jflex by configurations
 val jflexSkeleton by configurations
 val grammarKit by configurations
 
-val gradleToolingExtension: Configuration by configurations.creating {
-    extendsFrom(idea)
-}
+val gradleToolingExtension: Configuration by configurations.creating
 val testLibs: Configuration by configurations.creating {
     isTransitive = false
 }
@@ -107,13 +100,13 @@ dependencies {
             extension = "nbt"
         }
     }
-    testLibs(project(":mixin-test-data"))
+    testLibs(projects.mixinTestData)
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellij.ideaDependency.get().buildNumber.substring(intellij.type.get().length + 1)) }
+    gradleToolingExtension(libs.groovy)
     gradleToolingExtension(libs.gradleToolingExtension)
     gradleToolingExtension(libs.annotations)
-    gradleToolingExtension(libs.groovy)
 
     testImplementation(libs.junit.api)
     testRuntimeOnly(libs.junit.entine)
@@ -155,7 +148,7 @@ tasks.publishPlugin {
 }
 
 tasks.runPluginVerifier {
-    ideVersions.addAll("IC-2022.1")
+    ideVersions.addAll("IC-$ideaVersionName")
 }
 
 java {
@@ -173,7 +166,7 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
-        freeCompilerArgs = listOf("-Xjvm-default=enable")
+        freeCompilerArgs = listOf("-Xjvm-default=all")
     }
 }
 

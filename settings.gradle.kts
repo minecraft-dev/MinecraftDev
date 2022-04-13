@@ -12,6 +12,6 @@ rootProject.name = "MinecraftDev"
 
 gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS_FULL
 
-enableFeaturePreview("VERSION_CATALOGS")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include("mixin-test-data")

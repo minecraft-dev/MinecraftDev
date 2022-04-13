@@ -39,8 +39,10 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
         buildSystemBox.removeAllItems()
         buildSystemBox.isEnabled = true
 
+        val creatorConfig = creator.config ?: return
+
         val types = BuildSystemType.values().filter { type ->
-            creator.configs.all { type.creatorType.isInstance(it) }
+            type.creatorType.isInstance(creatorConfig)
         }
 
         for (type in types) {
@@ -59,26 +61,7 @@ class BuildSystemWizardStep(private val creator: MinecraftProjectCreator) : Modu
 
         buildSystemBox.selectedIndex = 0
 
-        // We prefer Gradle, so if it's included, choose it
-        // If Gradle is not included, luck of the draw
-        if (creator.configs.any { it.preferredBuildSystem == BuildSystemType.GRADLE }) {
-            buildSystemBox.selectedItem = BuildSystemType.GRADLE
-            return
-        }
-
-        val counts = creator.configs.asSequence()
-            .mapNotNull { it.preferredBuildSystem }
-            .groupingBy { it }
-            .eachCount()
-
-        val maxValue = counts.maxByOrNull { it.value }?.value ?: return
-        counts.asSequence()
-            .filter { it.value == maxValue }
-            .map { it.key }
-            .firstOrNull()
-            ?.let { mostPopularType ->
-                buildSystemBox.selectedItem = mostPopularType
-            }
+        creatorConfig.preferredBuildSystem?.let { buildSystemBox.selectedItem = it }
     }
 
     override fun updateDataModel() {

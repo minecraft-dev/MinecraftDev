@@ -12,6 +12,7 @@ package com.demonwav.mcdev.creator.buildsystem.gradle
 
 import com.demonwav.mcdev.creator.CreateDirectoriesStep
 import com.demonwav.mcdev.creator.CreatorStep
+import com.demonwav.mcdev.creator.ProjectConfig
 import com.demonwav.mcdev.creator.ProjectCreator
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemTemplate
@@ -78,11 +79,9 @@ class GradleBuildSystem(
         return obj.buildGradleCreator(rootDirectory, module, this)
     }
 
-    override fun configure(list: Collection<Any>, rootDirectory: Path) {
-        for (obj in list) {
-            if (obj is GradleCreator) {
-                obj.configureRootGradle(rootDirectory, this)
-            }
+    override fun configure(config: ProjectConfig, rootDirectory: Path) {
+        if (config is GradleCreator) {
+            config.configureRootGradle(rootDirectory, this)
         }
     }
 

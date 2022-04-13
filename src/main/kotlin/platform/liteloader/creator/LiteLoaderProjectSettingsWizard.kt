@@ -21,7 +21,6 @@ import com.demonwav.mcdev.platform.liteloader.version.LiteLoaderVersion
 import com.demonwav.mcdev.platform.mcp.version.McpVersion
 import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry
 import com.demonwav.mcdev.util.SemanticVersion
-import com.demonwav.mcdev.util.firstOfType
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.ui.popup.Balloon
@@ -167,20 +166,18 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
     }
 
     override fun isStepVisible(): Boolean {
-        return creator.configs.any { it is LiteLoaderProjectConfig }
+        return creator.config is LiteLoaderProjectConfig
     }
 
     override fun updateStep() {
-        config = creator.configs.firstOfType()
-        val conf = config ?: return
+        config = creator.config as? LiteLoaderProjectConfig
+        if (config == null) {
+            return
+        }
 
         val buildSystem = creator.buildSystem ?: return
 
         modNameField.text = WordUtils.capitalizeFully(buildSystem.artifactId.replace('-', ' '))
-
-        if (creator.configs.indexOf(conf) != 0) {
-            modNameField.isEditable = false
-        }
 
         mainClassField.document.removeDocumentListener(listener)
         mainClassField.text = generateClassName(buildSystem, modNameField.text) { name -> LITEMOD + name }
