@@ -27,7 +27,6 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleSetupStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
-import com.demonwav.mcdev.creator.buildsystem.maven.CommonModuleDependencyStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenGitignoreStep
 import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
@@ -74,7 +73,7 @@ class VelocityMavenCreator(
     buildSystem: MavenBuildSystem,
     config: VelocityProjectConfig
 ) : VelocityProjectCreator<MavenBuildSystem>(rootDirectory, rootModule, buildSystem, config) {
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+    override fun getSteps(): Iterable<CreatorStep> {
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
         val pomText = VelocityTemplate.applyPom(project, config)
@@ -88,29 +87,6 @@ class VelocityMavenCreator(
             BasicMavenFinalizerStep(rootModule, rootDirectory)
         )
     }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        val depStep = setupDependencyStep()
-        val commonDepStep = CommonModuleDependencyStep(buildSystem)
-        val (mainClassStep, modifyStep) = setupMainClassSteps()
-
-        val pomText = VelocityTemplate.applySubPom(project, config)
-        val mavenStep = BasicMavenStep(
-            project,
-            rootDirectory,
-            buildSystem,
-            config,
-            pomText,
-            listOf(
-                BasicMavenStep.setupDirs(),
-                BasicMavenStep.setupSubCore(buildSystem.parentOrError.artifactId),
-                BasicMavenStep.setupSubName(config.type),
-                BasicMavenStep.setupInfo(),
-                BasicMavenStep.setupDependencies()
-            )
-        )
-        return listOf(depStep, commonDepStep, mavenStep, mainClassStep, modifyStep)
-    }
 }
 
 class VelocityGradleCreator(
@@ -122,7 +98,7 @@ class VelocityGradleCreator(
 
     private val ideaExtPlugin = GradlePlugin("org.jetbrains.gradle.plugin.idea-ext", "1.0.1")
 
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+    override fun getSteps(): Iterable<CreatorStep> {
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
         val buildText = VelocityTemplate.applyBuildGradle(project, buildSystem, config)
@@ -141,24 +117,6 @@ class VelocityGradleCreator(
             GradleWrapperStep(project, rootDirectory, buildSystem),
             GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
-        )
-    }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        val (mainClassStep, modifyStep) = setupMainClassSteps()
-
-        val buildText = VelocityTemplate.applySubBuildGradle(project, buildSystem)
-        val propText = VelocityTemplate.applyGradleProp(project, config.javaVersion.feature)
-        val files = GradleFiles(buildText, propText, null)
-
-        return listOf(
-            setupDependencyStep(),
-            CreateDirectoriesStep(buildSystem, rootDirectory),
-            GradleSetupStep(project, rootDirectory, buildSystem, files),
-            AddGradlePluginStep(project, projectBaseDir, listOf(ideaExtPlugin)),
-            mainClassStep,
-            modifyStep,
-            buildConstantsStep()
         )
     }
 

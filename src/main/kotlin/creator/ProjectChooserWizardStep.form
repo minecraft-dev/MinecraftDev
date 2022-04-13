@@ -28,7 +28,7 @@
         <properties/>
         <border type="empty"/>
         <children>
-          <grid id="c580e" binding="chooserPanel" layout-manager="GridLayoutManager" row-count="12" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
+          <grid id="c580e" layout-manager="GridLayoutManager" row-count="12" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="5" vgap="5">
             <margin top="2" left="10" bottom="10" right="10"/>
             <constraints/>
             <properties/>
@@ -98,7 +98,7 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="1a539" class="javax.swing.JCheckBox" binding="bukkitPluginCheckBox" default-binding="true">
+              <component id="1a539" class="com.intellij.ui.components.JBRadioButton" binding="bukkitPluginButton">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -106,7 +106,7 @@
                   <text value="Bukkit Plugin"/>
                 </properties>
               </component>
-              <component id="1a691" class="javax.swing.JCheckBox" binding="spigotPluginCheckBox" default-binding="true">
+              <component id="1a691" class="com.intellij.ui.components.JBRadioButton" binding="spigotPluginButton">
                 <constraints>
                   <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -114,7 +114,7 @@
                   <text value="Spigot Plugin"/>
                 </properties>
               </component>
-              <component id="24d89" class="javax.swing.JCheckBox" binding="paperPluginCheckBox">
+              <component id="24d89" class="com.intellij.ui.components.JBRadioButton" binding="paperPluginButton">
                 <constraints>
                   <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -122,7 +122,7 @@
                   <text value="Paper Plugin"/>
                 </properties>
               </component>
-              <component id="657b2" class="javax.swing.JCheckBox" binding="spongePluginCheckBox">
+              <component id="657b2" class="com.intellij.ui.components.JBRadioButton" binding="spongePluginButton">
                 <constraints>
                   <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -130,7 +130,7 @@
                   <text value="Sponge Plugin"/>
                 </properties>
               </component>
-              <component id="d9577" class="javax.swing.JCheckBox" binding="forgeModCheckBox">
+              <component id="d9577" class="com.intellij.ui.components.JBRadioButton" binding="forgeModButton">
                 <constraints>
                   <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -138,7 +138,7 @@
                   <text value="Forge Mod"/>
                 </properties>
               </component>
-              <component id="51426" class="javax.swing.JCheckBox" binding="bungeeCordPluginCheckBox">
+              <component id="51426" class="com.intellij.ui.components.JBRadioButton" binding="bungeeCordPluginButton">
                 <constraints>
                   <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -155,7 +155,7 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="5a8c1" class="javax.swing.JCheckBox" binding="liteLoaderModCheckBox" default-binding="true">
+              <component id="5a8c1" class="com.intellij.ui.components.JBRadioButton" binding="liteLoaderModButton">
                 <constraints>
                   <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -185,7 +185,7 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="55507" class="javax.swing.JCheckBox" binding="waterfallPluginCheckBox">
+              <component id="55507" class="com.intellij.ui.components.JBRadioButton" binding="waterfallPluginButton">
                 <constraints>
                   <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -193,7 +193,7 @@
                   <text value="Waterfall Plugin"/>
                 </properties>
               </component>
-              <component id="93e0" class="javax.swing.JCheckBox" binding="velocityPluginCheckBox">
+              <component id="93e0" class="com.intellij.ui.components.JBRadioButton" binding="velocityPluginButton">
                 <constraints>
                   <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -215,7 +215,7 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="40b19" class="javax.swing.JCheckBox" binding="fabricModCheckBox">
+              <component id="40b19" class="com.intellij.ui.components.JBRadioButton" binding="fabricModButton">
                 <constraints>
                   <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -232,7 +232,7 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="d3acf" class="javax.swing.JCheckBox" binding="architecturyModCheckBox">
+              <component id="d3acf" class="com.intellij.ui.components.JBRadioButton" binding="architecturyModButton">
                 <constraints>
                   <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -247,7 +247,7 @@
     </children>
   </grid>
   <buttonGroups>
-    <group name="buttonGroup1">
+    <group name="projectButtons" bound="true">
       <member id="dd3ac"/>
       <member id="46880"/>
       <member id="c6c2d"/>
@@ -258,6 +258,17 @@
       <member id="c6c2d"/>
       <member id="69a73"/>
       <member id="dd3ac"/>
+      <member id="1a539"/>
+      <member id="1a691"/>
+      <member id="24d89"/>
+      <member id="657b2"/>
+      <member id="d9577"/>
+      <member id="51426"/>
+      <member id="5a8c1"/>
+      <member id="55507"/>
+      <member id="93e0"/>
+      <member id="40b19"/>
+      <member id="d3acf"/>
     </group>
   </buttonGroups>
 </form>

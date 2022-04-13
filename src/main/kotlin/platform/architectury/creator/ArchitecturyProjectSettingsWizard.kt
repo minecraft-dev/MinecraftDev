@@ -112,10 +112,6 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
         val (conf) = modUpdateStep<ArchitecturyProjectConfig>(creator, modNameField) ?: return
         config = conf
 
-        if (creator.configs.indexOf(conf) != 0) {
-            modNameField.isEditable = false
-        }
-
         title.icon = PlatformAssets.ARCHITECTURY_ICON_2X
         title.text = "<html><font size=\"5\">Architectury Settings</font></html>"
 
@@ -164,7 +160,7 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
     }
 
     override fun isStepVisible(): Boolean {
-        return creator.configs.any { it is ArchitecturyProjectConfig }
+        return creator.config is ArchitecturyProjectConfig
     }
 
     override fun onStepLeaving() {

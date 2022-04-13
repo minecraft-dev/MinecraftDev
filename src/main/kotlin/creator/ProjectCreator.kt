@@ -12,7 +12,6 @@ package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.intellij.openapi.module.Module
-import java.nio.file.Path
 
 /**
  * This class represents a specific configuration for a project to be created. Typically these configurations represent
@@ -35,13 +34,7 @@ interface ProjectCreator {
      * Returns the [CreatorStep]s which should be executed in order to create the project configuration represented by
      * this [ProjectCreator].
      */
-    fun getSingleModuleSteps(): Iterable<CreatorStep>
-
-    /**
-     * Returns the [CreatorStep]s which should be executed in order to create the submodule project configuration
-     * represented by this [ProjectCreator].
-     */
-    fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep>
+    fun getSteps(): Iterable<CreatorStep>
 }
 
 typealias JavaClassTextMapper = (packageName: String, className: String) -> String
@@ -68,17 +61,4 @@ abstract class BaseProjectCreator(
         val packageName = text.substring(0, index)
         return packageName to className
     }
-}
-
-/**
- * Implement this interface on your [ProjectCreator] if you need to do extra setup work after all modules are built
- * and the project is imported, e.g. if some of the creation needs to be done in smart mode. Only gets used in
- * multi-project builds; single-module builds are expected to run these tasks themselves in the correct order, such
- * that they happen after the project is imported.
- *
- * Note: just because this interface can be used to utilize smart mode, doesn't mean that the steps will be called in
- * smart mode. If a step needs smart mode, it should wait for it itself.
- */
-interface PostMultiModuleAware {
-    fun getPostMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep>
 }

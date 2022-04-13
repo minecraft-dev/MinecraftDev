@@ -37,7 +37,7 @@ class LiteLoaderProjectCreator(
         }
     }
 
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+    override fun getSteps(): Iterable<CreatorStep> {
         val buildText = LiteLoaderTemplate.applyBuildGradle(project, buildSystem, config.mcVersion)
         val propText = LiteLoaderTemplate.applyGradleProp(project, config)
         val settingsText = LiteLoaderTemplate.applySettingsGradle(project, buildSystem.artifactId)
@@ -55,23 +55,6 @@ class LiteLoaderProjectCreator(
             SetupDecompWorkspaceStep(project, rootDirectory),
             GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
-        )
-    }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        val buildText = LiteLoaderTemplate.applySubBuildGradle(project, buildSystem, config.mcVersion)
-        val propText = LiteLoaderTemplate.applyGradleProp(project, config)
-        val files = GradleFiles(buildText, propText, null)
-
-        return listOf(
-            SimpleGradleSetupStep(
-                project,
-                rootDirectory,
-                buildSystem,
-                files
-            ),
-            setupMainClassStep(),
-            SetupDecompWorkspaceStep(project, rootDirectory)
         )
     }
 }

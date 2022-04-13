@@ -51,7 +51,7 @@ class Fg2ProjectCreator(
         }
     }
 
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+    override fun getSteps(): Iterable<CreatorStep> {
         val buildText = Fg2Template.applyBuildGradle(project, buildSystem, mcVersion)
         val propText = Fg2Template.applyGradleProp(project, config)
         val settingsText = Fg2Template.applySettingsGradle(project, buildSystem.artifactId)
@@ -71,25 +71,6 @@ class Fg2ProjectCreator(
             GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem),
             ForgeRunConfigsStep(buildSystem, rootDirectory, config, CreatedModuleType.SINGLE)
-        )
-    }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        val buildText = Fg2Template.applySubBuildGradle(project, buildSystem, mcVersion)
-        val propText = Fg2Template.applyGradleProp(project, config)
-        val files = GradleFiles(buildText, propText, null)
-
-        return listOf(
-            SimpleGradleSetupStep(
-                project,
-                rootDirectory,
-                buildSystem,
-                files
-            ),
-            setupMainClassStep(),
-            McmodInfoStep(project, buildSystem, config),
-            SetupDecompWorkspaceStep(project, rootDirectory),
-            ForgeRunConfigsStep(buildSystem, projectBaseDir, config, CreatedModuleType.MULTI)
         )
     }
 
@@ -130,7 +111,7 @@ open class Fg3ProjectCreator(
         return GradleFiles(buildText, propText, settingsText)
     }
 
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+    override fun getSteps(): Iterable<CreatorStep> {
         val files = createGradleFiles(hasData = true)
         val steps = mutableListOf(
             SimpleGradleSetupStep(
@@ -147,32 +128,6 @@ open class Fg3ProjectCreator(
             LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", ")),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem),
             ForgeRunConfigsStep(buildSystem, rootDirectory, config, CreatedModuleType.SINGLE)
-        )
-
-        if (config.mixins) {
-            steps += MixinConfigStep(project, buildSystem)
-        }
-
-        return steps
-    }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        val modName = transformModName(config.pluginName)
-        val buildText = Fg3Template.applySubBuildGradle(project, buildSystem, config, modName, hasData = true)
-        val files = GradleFiles(buildText, null, null)
-
-        val steps = mutableListOf(
-            SimpleGradleSetupStep(
-                project,
-                rootDirectory,
-                buildSystem,
-                files
-            ),
-            setupMainClassStep(),
-            Fg3ProjectFilesStep(project, buildSystem, config),
-            Fg3CompileJavaStep(project, rootDirectory),
-            LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", ")),
-            ForgeRunConfigsStep(buildSystem, projectBaseDir, config, CreatedModuleType.MULTI)
         )
 
         if (config.mixins) {
@@ -200,7 +155,7 @@ class Fg3Mc112ProjectCreator(
         }
     }
 
-    override fun getSingleModuleSteps(): Iterable<CreatorStep> {
+    override fun getSteps(): Iterable<CreatorStep> {
         val files = createGradleFiles(hasData = false)
 
         return listOf(
@@ -217,25 +172,6 @@ class Fg3Mc112ProjectCreator(
             GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem),
             ForgeRunConfigsStep(buildSystem, rootDirectory, config, CreatedModuleType.SINGLE)
-        )
-    }
-
-    override fun getMultiModuleSteps(projectBaseDir: Path): Iterable<CreatorStep> {
-        val modName = transformModName(config.pluginName)
-        val buildText = Fg3Template.applySubBuildGradle(project, buildSystem, config, modName, hasData = false)
-        val files = GradleFiles(buildText, null, null)
-
-        return listOf(
-            SimpleGradleSetupStep(
-                project,
-                rootDirectory,
-                buildSystem,
-                files
-            ),
-            setupMainClassStep(),
-            McmodInfoStep(project, buildSystem, config),
-            Fg3CompileJavaStep(project, rootDirectory),
-            ForgeRunConfigsStep(buildSystem, projectBaseDir, config, CreatedModuleType.MULTI)
         )
     }
 }

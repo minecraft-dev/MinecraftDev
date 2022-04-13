@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.architectury.creator.ArchitecturyProjectConfig
 import com.demonwav.mcdev.platform.bukkit.creator.BukkitProjectConfig
@@ -22,70 +21,32 @@ import com.demonwav.mcdev.platform.liteloader.creator.LiteLoaderProjectConfig
 import com.demonwav.mcdev.platform.sponge.creator.SpongeProjectConfig
 import com.demonwav.mcdev.platform.velocity.creator.VelocityProjectConfig
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
-import com.intellij.openapi.ui.popup.Balloon
-import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.ui.LightColors
-import com.intellij.ui.awt.RelativePoint
+import com.intellij.ui.components.JBRadioButton
 import com.intellij.util.ui.UIUtil
-import javax.swing.JCheckBox
+import javax.swing.ButtonGroup
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 
 class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : ModuleWizardStep() {
 
-    private lateinit var chooserPanel: JPanel
     private lateinit var panel: JPanel
 
+    private lateinit var projectButtons: ButtonGroup
     private lateinit var spongeIcon: JLabel
-    private lateinit var bukkitPluginCheckBox: JCheckBox
-    private lateinit var spigotPluginCheckBox: JCheckBox
-    private lateinit var paperPluginCheckBox: JCheckBox
-    private lateinit var spongePluginCheckBox: JCheckBox
-    private lateinit var forgeModCheckBox: JCheckBox
-    private lateinit var fabricModCheckBox: JCheckBox
-    private lateinit var architecturyModCheckBox: JCheckBox
-    private lateinit var bungeeCordPluginCheckBox: JCheckBox
-    private lateinit var waterfallPluginCheckBox: JCheckBox
-    private lateinit var velocityPluginCheckBox: JCheckBox
-    private lateinit var liteLoaderModCheckBox: JCheckBox
+    private lateinit var bukkitPluginButton: JBRadioButton
+    private lateinit var spigotPluginButton: JBRadioButton
+    private lateinit var paperPluginButton: JBRadioButton
+    private lateinit var spongePluginButton: JBRadioButton
+    private lateinit var forgeModButton: JBRadioButton
+    private lateinit var fabricModButton: JBRadioButton
+    private lateinit var architecturyModButton: JBRadioButton
+    private lateinit var bungeeCordPluginButton: JBRadioButton
+    private lateinit var waterfallPluginButton: JBRadioButton
+    private lateinit var velocityPluginButton: JBRadioButton
+    private lateinit var liteLoaderModButton: JBRadioButton
 
     override fun getComponent(): JComponent {
-        // Set types
-        bukkitPluginCheckBox.addActionListener {
-            toggle(
-                bukkitPluginCheckBox,
-                spigotPluginCheckBox,
-                paperPluginCheckBox
-            )
-        }
-        spigotPluginCheckBox.addActionListener {
-            toggle(
-                spigotPluginCheckBox,
-                bukkitPluginCheckBox,
-                paperPluginCheckBox
-            )
-        }
-        paperPluginCheckBox.addActionListener {
-            toggle(
-                paperPluginCheckBox,
-                bukkitPluginCheckBox,
-                spigotPluginCheckBox
-            )
-        }
-        forgeModCheckBox.addActionListener { toggle(forgeModCheckBox, liteLoaderModCheckBox, architecturyModCheckBox) }
-        fabricModCheckBox.addActionListener { toggle(fabricModCheckBox, architecturyModCheckBox) }
-        architecturyModCheckBox.addActionListener {
-            toggle(
-                architecturyModCheckBox,
-                fabricModCheckBox,
-                forgeModCheckBox
-            )
-        }
-        liteLoaderModCheckBox.addActionListener { toggle(liteLoaderModCheckBox, forgeModCheckBox) }
-        bungeeCordPluginCheckBox.addActionListener { toggle(bungeeCordPluginCheckBox, waterfallPluginCheckBox) }
-        waterfallPluginCheckBox.addActionListener { toggle(waterfallPluginCheckBox, bungeeCordPluginCheckBox) }
-
         if (UIUtil.isUnderDarcula()) {
             spongeIcon.icon = PlatformAssets.SPONGE_ICON_2X_DARK
         } else {
@@ -95,94 +56,35 @@ class PlatformChooserWizardStep(private val creator: MinecraftProjectCreator) : 
         return panel
     }
 
-    private fun toggle(one: JCheckBox, vararg others: JCheckBox) {
-        if (one.isSelected) {
-            others.forEach { it.isSelected = false }
-        }
-    }
-
     override fun updateDataModel() {
-        creator.configs.clear()
-        creator.configs.addAll(buildConfigs())
+        creator.config = buildConfig()
     }
 
     override fun validate(): Boolean {
-        val currentConfigs = buildConfigs()
-        val validBuildSystemTypes = BuildSystemType.values()
-            .count { type -> currentConfigs.all { type.creatorType.isInstance(it) } }
-
-        if (validBuildSystemTypes == 0) {
-            val message = "This project configuration is not valid, please choose a different set of platforms"
-            val balloon = JBPopupFactory.getInstance()
-                .createHtmlTextBalloonBuilder(message, null, LightColors.RED, null)
-                .setHideOnAction(true)
-                .setHideOnClickOutside(true)
-                .setHideOnKeyOutside(true)
-                .createBalloon()
-
-            balloon.show(RelativePoint.getSouthOf(chooserPanel), Balloon.Position.atRight)
-            return false
+        updateDataModel()
+        val isValid = projectButtons.selection != null
+        if (isValid && creator.config == null) {
+            throw IllegalStateException(
+                "A project button does not have an associated config! Make sure to add your button to buildConfig()"
+            )
         }
-
-        return bukkitPluginCheckBox.isSelected ||
-            spigotPluginCheckBox.isSelected ||
-            paperPluginCheckBox.isSelected ||
-            spongePluginCheckBox.isSelected ||
-            forgeModCheckBox.isSelected ||
-            fabricModCheckBox.isSelected ||
-            architecturyModCheckBox.isSelected ||
-            liteLoaderModCheckBox.isSelected ||
-            bungeeCordPluginCheckBox.isSelected ||
-            waterfallPluginCheckBox.isSelected ||
-            velocityPluginCheckBox.isSelected
+        return isValid
     }
 
-    private fun buildConfigs(): LinkedHashSet<ProjectConfig> {
-        val result = LinkedHashSet<ProjectConfig>()
-        if (bukkitPluginCheckBox.isSelected) {
-            result += BukkitProjectConfig(PlatformType.BUKKIT)
+    private fun buildConfig(): ProjectConfig? {
+        return when {
+            bukkitPluginButton.isSelected -> BukkitProjectConfig(PlatformType.BUKKIT)
+            spigotPluginButton.isSelected -> BukkitProjectConfig(PlatformType.SPIGOT)
+            paperPluginButton.isSelected -> BukkitProjectConfig(PlatformType.PAPER)
+            spongePluginButton.isSelected -> SpongeProjectConfig()
+            forgeModButton.isSelected -> ForgeProjectConfig()
+            fabricModButton.isSelected -> FabricProjectConfig()
+            architecturyModButton.isSelected -> ArchitecturyProjectConfig()
+            liteLoaderModButton.isSelected -> LiteLoaderProjectConfig()
+            bungeeCordPluginButton.isSelected -> BungeeCordProjectConfig(PlatformType.BUNGEECORD)
+            waterfallPluginButton.isSelected -> BungeeCordProjectConfig(PlatformType.WATERFALL)
+            velocityPluginButton.isSelected -> VelocityProjectConfig()
+            else -> null
         }
-
-        if (spigotPluginCheckBox.isSelected) {
-            result += BukkitProjectConfig(PlatformType.SPIGOT)
-        }
-
-        if (paperPluginCheckBox.isSelected) {
-            result += BukkitProjectConfig(PlatformType.PAPER)
-        }
-
-        if (spongePluginCheckBox.isSelected) {
-            result += SpongeProjectConfig()
-        }
-
-        if (forgeModCheckBox.isSelected) {
-            result += ForgeProjectConfig()
-        }
-
-        if (fabricModCheckBox.isSelected) {
-            result += FabricProjectConfig()
-        }
-
-        if (architecturyModCheckBox.isSelected) {
-            result += ArchitecturyProjectConfig()
-        }
-
-        if (liteLoaderModCheckBox.isSelected) {
-            result += LiteLoaderProjectConfig()
-        }
-
-        if (bungeeCordPluginCheckBox.isSelected) {
-            result += BungeeCordProjectConfig(PlatformType.BUNGEECORD)
-        }
-
-        if (waterfallPluginCheckBox.isSelected) {
-            result += BungeeCordProjectConfig(PlatformType.WATERFALL)
-        }
-
-        if (velocityPluginCheckBox.isSelected) {
-            result += VelocityProjectConfig()
-        }
-
-        return result
     }
 }

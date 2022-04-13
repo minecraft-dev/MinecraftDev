@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.creator.buildsystem
 
 import com.demonwav.mcdev.creator.CreatorStep
+import com.demonwav.mcdev.creator.ProjectConfig
 import com.demonwav.mcdev.creator.ProjectCreator
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleCreator
@@ -37,7 +38,7 @@ abstract class BuildSystem(
     abstract val type: BuildSystemType
 
     abstract fun buildCreator(obj: Any, rootDirectory: Path, module: Module): ProjectCreator
-    open fun configure(list: Collection<Any>, rootDirectory: Path) {}
+    open fun configure(config: ProjectConfig, rootDirectory: Path) {}
 
     var repositories: MutableList<BuildRepository> = mutableListOf()
     var dependencies: MutableList<BuildDependency> = mutableListOf()
