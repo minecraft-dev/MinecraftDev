@@ -62,7 +62,6 @@ val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSource
 
 repositories {
     maven("https://repo.denwav.dev/repository/maven-public/")
-    maven("https://www.jetbrains.com/intellij-repository/snapshots")
     mavenCentral()
 }
 
