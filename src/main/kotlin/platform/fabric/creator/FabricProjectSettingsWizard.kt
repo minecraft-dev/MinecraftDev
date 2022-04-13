@@ -16,7 +16,6 @@ import com.demonwav.mcdev.creator.MinecraftProjectCreator
 import com.demonwav.mcdev.creator.ValidatedField
 import com.demonwav.mcdev.creator.ValidatedFieldType.LIST
 import com.demonwav.mcdev.creator.ValidatedFieldType.NON_BLANK
-import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
@@ -142,16 +141,9 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
         val (conf, buildSystem) = modUpdateStep<FabricProjectConfig>(creator, modNameField) ?: return
         config = conf
 
-        if (creator.configs.indexOf(conf) != 0) {
-            modNameField.isEditable = false
-        }
-
         if (!initializedEntryPointsTable) {
             val packageName = "${buildSystem.groupId.toPackageName()}.${buildSystem.artifactId.toPackageName()}"
-            var className = buildSystem.artifactId.replace('-', ' ').let { WordUtils.capitalize(it) }.replace(" ", "")
-            if (creator.configs.size > 1) {
-                className += PlatformType.FABRIC.normalName
-            }
+            val className = buildSystem.artifactId.replace('-', ' ').let { WordUtils.capitalize(it) }.replace(" ", "")
             entryPoints.add(
                 EntryPoint(
                     "main",
@@ -204,7 +196,7 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     }
 
     override fun isStepVisible(): Boolean {
-        return creator.configs.any { it is FabricProjectConfig }
+        return creator.config is FabricProjectConfig
     }
 
     override fun onStepLeaving() {
