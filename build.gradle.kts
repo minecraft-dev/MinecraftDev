@@ -11,6 +11,8 @@
 import org.cadixdev.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
 import org.gradle.internal.os.OperatingSystem
+import org.jetbrains.gradle.ext.settings
+import org.jetbrains.gradle.ext.taskTriggers
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -20,21 +22,13 @@ plugins {
     groovy
     idea
     id("org.jetbrains.intellij") version "1.5.2"
-    id("org.cadixdev.licenser") version "0.6.1"
+    id("org.cadixdev.licenser")
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
 
-val ideaVersion: String by project
 val ideaVersionName: String by project
 val coreVersion: String by project
-val downloadIdeaSources: String by project
 val pluginTomlVersion: String by project
-
-// configurations
-val idea by configurations
-val jflex by configurations
-val jflexSkeleton by configurations
-val grammarKit by configurations
 
 val gradleToolingExtension: Configuration by configurations.creating
 val testLibs: Configuration by configurations.creating {
@@ -113,7 +107,7 @@ dependencies {
 
 intellij {
     // IntelliJ IDEA dependency
-    version.set(ideaVersion)
+    version.set(providers.gradleProperty("ideaVersion"))
     // Bundled plugin dependencies
     plugins.addAll(
         "java",
@@ -130,7 +124,7 @@ intellij {
     pluginName.set("Minecraft Development")
     updateSinceUntilBuild.set(true)
 
-    downloadSources.set(downloadIdeaSources.toBoolean())
+    downloadSources.set(providers.gradleProperty("downloadIdeaSources").map { it.toBoolean() })
 
     sandboxDir.set(layout.projectDirectory.dir(".sandbox").toString())
 }
@@ -233,6 +227,7 @@ tasks.test {
 }
 
 idea {
+    project.settings.taskTriggers.afterSync("generate")
     module {
         generatedSourceDirs.add(file("build/gen"))
         excludeDirs.add(file(intellij.sandboxDir.get()))
@@ -244,25 +239,10 @@ license {
     style["flex"] = HeaderStyle.BLOCK_COMMENT.format
     style["bnf"] = HeaderStyle.BLOCK_COMMENT.format
 
-    include(
-        "**/*.java",
-        "**/*.kt",
-        "**/*.kts",
-        "**/*.groovy",
-        "**/*.gradle",
-        "**/*.xml",
-        "**/*.properties",
-        "**/*.html",
-        "**/*.flex",
-        "**/*.bnf"
-    )
-    exclude(
-        "com/demonwav/mcdev/platform/mcp/at/gen/**",
-        "com/demonwav/mcdev/platform/mcp/aw/gen/**",
-        "com/demonwav/mcdev/nbt/lang/gen/**",
-        "com/demonwav/mcdev/platform/mixin/invalidInjectorMethodSignature/*.java",
-        "com/demonwav/mcdev/translations/lang/gen/**"
-    )
+    val endings = listOf("java", "kt", "kts", "groovy", "gradle.kts", "xml", "properties", "html", "flex", "bnf")
+    include(endings.map { "**/*.$it" })
+
+    exclude("com/demonwav/mcdev/platform/mixin/invalidInjectorMethodSignature/*.java")
 
     tasks {
         register("gradle") {
