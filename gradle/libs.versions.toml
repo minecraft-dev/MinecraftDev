@@ -7,7 +7,7 @@ asm = "9.2"
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
-templateMakerFabric = "com.extracraftx.minecraft:TemplateMakerFabric:0.4.0"
+templateMakerFabric = "com.extracraftx.minecraft:TemplateMakerFabric:0.4.1"
 
 # GrammarKit
 jflex-lib = "org.jetbrains.idea:jflex:1.7.0-b7f882a"
