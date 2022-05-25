@@ -55,6 +55,7 @@ val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSource
 }
 
 repositories {
+    mavenLocal()
     maven("https://repo.denwav.dev/repository/maven-public/")
     mavenCentral()
 }
