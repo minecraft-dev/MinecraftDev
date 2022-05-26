@@ -61,7 +61,7 @@ import com.intellij.psi.impl.compiled.ClsElementImpl
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiUtil
 import com.intellij.refactoring.util.LambdaRefactoringUtil
-import com.intellij.refactoring.util.RefactoringUtil
+import com.intellij.util.CommonJavaRefactoringUtil
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import org.objectweb.asm.ClassReader
@@ -812,11 +812,11 @@ fun MethodNode.findOrConstructSourceMethod(
     when (sourceElement) {
         is PsiLambdaExpression -> {
             val copy = sourceElement.copy() as PsiLambdaExpression
-            psiMethod.body?.replace(RefactoringUtil.expandExpressionLambdaToCodeBlock(copy))
+            psiMethod.body?.replace(CommonJavaRefactoringUtil.expandExpressionLambdaToCodeBlock(copy))
         }
         is PsiMethodReferenceExpression -> {
             LambdaRefactoringUtil.createLambda(sourceElement, true)?.let {
-                psiMethod.body?.replace(RefactoringUtil.expandExpressionLambdaToCodeBlock(it))
+                psiMethod.body?.replace(CommonJavaRefactoringUtil.expandExpressionLambdaToCodeBlock(it))
             }
         }
     }

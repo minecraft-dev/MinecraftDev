@@ -16,7 +16,6 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.VersionRange
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
-import com.intellij.openapi.observable.properties.GraphPropertyImpl.Companion.graphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.JavaSdkVersion
@@ -25,9 +24,10 @@ import com.intellij.openapi.roots.ui.configuration.JdkComboBox
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.ui.SortedComboBoxModel
 import com.intellij.ui.components.Label
-import com.intellij.ui.layout.Row
-import com.intellij.ui.layout.RowBuilder
-import com.intellij.ui.layout.panel
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
 import javax.swing.JComponent
 import org.gradle.util.GradleVersion
@@ -46,9 +46,11 @@ class ProjectSetupFinalizerWizardStep(
         panel {
             row(Label("<html><font size=\"6\">Project finalization</size></html>")) {}
             finalizers.forEach { finalizer ->
-                val row = titledRow("<html><font size=\"5\">${finalizer.title}</size></html>") {
-                    with(finalizer) {
-                        buildComponent(creator, context)
+                val row = row("<html><font size=\"5\">${finalizer.title}</size></html>") {
+                    panel {
+                        with(finalizer) {
+                            buildComponent(creator, context)
+                        }
                     }
                 }
                 finalizersWithRow[finalizer] = row
@@ -66,9 +68,9 @@ class ProjectSetupFinalizerWizardStep(
             if (finalizer.isApplicable(creator, context)) {
                 applicableFinalizers.add(finalizer)
                 finalizer.validateConfigs(creator, context)
-                row.visible = true
+                row.visible(true)
             } else {
-                row.visible = false
+                row.visible(false)
             }
         }
     }
@@ -89,7 +91,7 @@ interface ProjectSetupFinalizer {
     /**
      * Builds the component to display in a titled row ([title])
      */
-    fun RowBuilder.buildComponent(creator: MinecraftProjectCreator, context: WizardContext)
+    fun Panel.buildComponent(creator: MinecraftProjectCreator, context: WizardContext)
 
     /**
      * Whether this finalizer makes sense to appear in the given context.
@@ -148,7 +150,7 @@ class JdkProjectSetupFinalizer : ProjectSetupFinalizer {
 
     override val title: String = "JDK"
 
-    override fun RowBuilder.buildComponent(creator: MinecraftProjectCreator, context: WizardContext) {
+    override fun Panel.buildComponent(creator: MinecraftProjectCreator, context: WizardContext) {
         row(errorLabel) {}
         jdkBox = JdkComboBox(
             context.project,
@@ -163,11 +165,14 @@ class JdkProjectSetupFinalizer : ProjectSetupFinalizer {
             jdkBox.selectedIndex = 0
         }
         row("JDK version:") {
-            component(jdkBox).constraints(grow)
+            cell(jdkBox)
         }
     }
 
-    override fun isApplicable(creator: MinecraftProjectCreator, context: WizardContext) = true
+    override fun isApplicable(creator: MinecraftProjectCreator, context: WizardContext): Boolean {
+        reloadJdkBox(context)
+        return true
+    }
 
     private fun reloadJdkBox(context: WizardContext) {
         sdksModel.syncSdks()
@@ -189,6 +194,11 @@ class JdkProjectSetupFinalizer : ProjectSetupFinalizer {
     override fun validateConfigs(creator: MinecraftProjectCreator, context: WizardContext): Boolean {
         val projectJdk = context.projectJdk ?: return true
         val usingCompatibleJdk = isUsingCompatibleJdk(creator, projectJdk)
+        if (!usingCompatibleJdk) {
+            jdkBox.setInvalidJdk(projectJdk.name)
+        } else {
+            jdkBox.selectedJdk = sdksModel.findSdk(projectJdk.name)
+        }
         updateUi(usingCompatibleJdk)
         return usingCompatibleJdk
     }
@@ -210,16 +220,18 @@ class GradleProjectSetupFinalizer : ProjectSetupFinalizer {
     private val model = SortedComboBoxModel<SemanticVersion>(Comparator.naturalOrder())
 
     private val propertyGraph = PropertyGraph("GradleProjectSetupFinalizer graph")
-    var gradleVersion: SemanticVersion by propertyGraph.graphProperty { SemanticVersion.release() }
+    var gradleVersionProperty = propertyGraph.lazyProperty { SemanticVersion.release() }
+    var gradleVersion: SemanticVersion by gradleVersionProperty
     private var config: ProjectConfig? = null
 
     private var gradleVersionRange: VersionRange? = null
 
     override val title: String = "Gradle"
 
-    override fun RowBuilder.buildComponent(creator: MinecraftProjectCreator, context: WizardContext) {
+    override fun Panel.buildComponent(creator: MinecraftProjectCreator, context: WizardContext) {
         row("Gradle version:") {
-            comboBox(model, ::gradleVersion)
+            comboBox(model)
+                .bindItem(gradleVersionProperty)
                 .enabled(false) // TODO load compatible Gradle versions list
         }
     }
@@ -250,7 +262,7 @@ class GradleProjectSetupFinalizer : ProjectSetupFinalizer {
         if (creator.buildSystem !is GradleBuildSystem) {
             return true
         }
-        return gradleVersionRange != null && gradleVersion.parts.isNotEmpty()
+        return gradleVersionRange == null || gradleVersion.parts.isNotEmpty()
     }
 
     override fun apply(creator: MinecraftProjectCreator, context: WizardContext) {
