@@ -24,7 +24,7 @@ fun getDataFromActionEvent(e: AnActionEvent): ActionData? {
     fun findModuleForLibrary(file: PsiFile): Module? {
         val virtualFile = file.virtualFile ?: return null
 
-        val index = ProjectFileIndex.SERVICE.getInstance(file.project)
+        val index = ProjectFileIndex.getInstance(file.project)
 
         if (!index.isInLibrarySource(virtualFile) && !index.isInLibraryClasses(virtualFile)) {
             return null

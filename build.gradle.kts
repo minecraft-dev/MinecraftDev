@@ -21,7 +21,7 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.5.2"
+    id("org.jetbrains.intellij") version "1.6.0"
     id("org.cadixdev.licenser")
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
@@ -142,12 +142,6 @@ tasks.publishPlugin {
 
 tasks.runPluginVerifier {
     ideVersions.addAll("IC-$ideaVersionName")
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
-    }
 }
 
 tasks.withType<JavaCompile>().configureEach {
