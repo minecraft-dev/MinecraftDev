@@ -115,7 +115,7 @@ class BungeeCordDependenciesStep(
                 buildSystem.repositories.add(
                     BuildRepository(
                         "papermc-repo",
-                        "https://papermc.io/repo/repository/maven-public/"
+                        "https://repo.papermc.io/repository/maven-public/"
                     )
                 )
                 buildSystem.dependencies.add(

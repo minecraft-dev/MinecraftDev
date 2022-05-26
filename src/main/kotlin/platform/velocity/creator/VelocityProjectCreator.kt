@@ -205,7 +205,7 @@ class VelocityDependenciesSetup(
         buildSystem.repositories.add(
             BuildRepository(
                 "papermc-repo",
-                "https://papermc.io/repo/repository/maven-public/"
+                "https://repo.papermc.io/repository/maven-public/"
             )
         )
 
