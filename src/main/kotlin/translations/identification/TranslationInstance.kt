@@ -116,7 +116,8 @@ data class TranslationInstance(
             TranslationFunction(
                 MemberReference(
                     TranslationConstants.CREATE_COMPONENT_TRANSLATION,
-                    "(Lnet/minecraft/commands/CommandSource;Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/BaseComponent;",
+                    "(Lnet/minecraft/commands/CommandSource;Ljava/lang/String;" +
+                        "[Ljava/lang/Object;)Lnet/minecraft/network/chat/BaseComponent;",
                     TranslationConstants.TEXT_COMPONENT_HELPER
                 ),
                 1,
@@ -204,7 +205,8 @@ data class TranslationInstance(
             TranslationFunction(
                 MemberReference(
                     TranslationConstants.CONSTRUCTOR,
-                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;" +
+                        "Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
                     TranslationConstants.KEY_MAPPING
                 ),
                 0,
@@ -214,7 +216,8 @@ data class TranslationInstance(
             TranslationFunction(
                 MemberReference(
                     TranslationConstants.CONSTRUCTOR,
-                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;" +
+                        "Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
                     TranslationConstants.KEY_MAPPING
                 ),
                 4,
@@ -224,7 +227,8 @@ data class TranslationInstance(
             TranslationFunction(
                 MemberReference(
                     TranslationConstants.CONSTRUCTOR,
-                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;" +
+                        "Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
                     TranslationConstants.KEY_MAPPING
                 ),
                 0,
@@ -234,7 +238,8 @@ data class TranslationInstance(
             TranslationFunction(
                 MemberReference(
                     TranslationConstants.CONSTRUCTOR,
-                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;" +
+                        "Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
                     TranslationConstants.KEY_MAPPING
                 ),
                 3,
@@ -244,7 +249,9 @@ data class TranslationInstance(
             TranslationFunction(
                 MemberReference(
                     TranslationConstants.CONSTRUCTOR,
-                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lnet/minecraftforge/client/settings/KeyModifier;Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;" +
+                        "Lnet/minecraftforge/client/settings/KeyModifier;" +
+                        "Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
                     TranslationConstants.KEY_MAPPING
                 ),
                 0,
@@ -254,7 +261,9 @@ data class TranslationInstance(
             TranslationFunction(
                 MemberReference(
                     TranslationConstants.CONSTRUCTOR,
-                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lnet/minecraftforge/client/settings/KeyModifier;Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;" +
+                        "Lnet/minecraftforge/client/settings/KeyModifier;" +
+                        "Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
                     TranslationConstants.KEY_MAPPING
                 ),
                 5,
@@ -264,7 +273,9 @@ data class TranslationInstance(
             TranslationFunction(
                 MemberReference(
                     TranslationConstants.CONSTRUCTOR,
-                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lnet/minecraftforge/client/settings/KeyModifier;Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;" +
+                        "Lnet/minecraftforge/client/settings/KeyModifier;" +
+                        "Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
                     TranslationConstants.KEY_MAPPING
                 ),
                 0,
@@ -274,7 +285,9 @@ data class TranslationInstance(
             TranslationFunction(
                 MemberReference(
                     TranslationConstants.CONSTRUCTOR,
-                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lnet/minecraftforge/client/settings/KeyModifier;Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;" +
+                        "Lnet/minecraftforge/client/settings/KeyModifier;" +
+                        "Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
                     TranslationConstants.KEY_MAPPING
                 ),
                 4,
