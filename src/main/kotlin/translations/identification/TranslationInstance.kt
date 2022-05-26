@@ -46,6 +46,27 @@ data class TranslationInstance(
             ),
             TranslationFunction(
                 MemberReference(
+                    TranslationConstants.GET,
+                    "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;",
+                    TranslationConstants.I18N_CLIENT_LANG_CLASS
+                ),
+                0,
+                formatting = true,
+                obfuscatedName = true
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.EXISTS,
+                    "(Ljava/lang/String;)Z",
+                    TranslationConstants.I18N_CLIENT_LANG_CLASS
+                ),
+                0,
+                formatting = false,
+                obfuscatedName = true,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETERS
+            ),
+            TranslationFunction(
+                MemberReference(
                     TranslationConstants.TRANSLATE_TO_LOCAL,
                     "(Ljava/lang/String;)Ljava/lang/String;",
                     TranslationConstants.I18N_COMMON_CLASS
@@ -72,7 +93,35 @@ data class TranslationInstance(
                 ),
                 0,
                 formatting = true,
-                foldParameters = true
+                foldParameters = TranslationFunction.FoldingScope.PARAMETERS
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;)V",
+                    TranslationConstants.TRANSLATABLE_COMPONENT
+                ),
+                0,
+                formatting = false,
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;[Ljava/lang/Object;)V",
+                    TranslationConstants.TRANSLATABLE_COMPONENT
+                ),
+                0,
+                formatting = true,
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CREATE_COMPONENT_TRANSLATION,
+                    "(Lnet/minecraft/commands/CommandSource;Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/BaseComponent;",
+                    TranslationConstants.TEXT_COMPONENT_HELPER
+                ),
+                1,
+                formatting = true,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETERS,
             ),
             TranslationFunction(
                 MemberReference(
@@ -82,7 +131,7 @@ data class TranslationInstance(
                 ),
                 0,
                 formatting = true,
-                foldParameters = true
+                foldParameters = TranslationFunction.FoldingScope.PARAMETERS
             ),
             TranslationFunction(
                 MemberReference(
@@ -93,7 +142,7 @@ data class TranslationInstance(
                 0,
                 formatting = false,
                 setter = true,
-                foldParameters = true,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETERS,
                 prefix = "tile.",
                 suffix = ".name",
                 obfuscatedName = true
@@ -107,11 +156,142 @@ data class TranslationInstance(
                 0,
                 formatting = false,
                 setter = true,
-                foldParameters = true,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETERS,
                 prefix = "item.",
                 suffix = ".name",
                 obfuscatedName = true
-            )
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;ILjava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                0,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;ILjava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                2,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                0,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                3,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                0,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                4,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                0,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                3,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lnet/minecraftforge/client/settings/KeyModifier;Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                0,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lnet/minecraftforge/client/settings/KeyModifier;Lcom/mojang/blaze3d/platform/InputConstants\$Type;ILjava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                5,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lnet/minecraftforge/client/settings/KeyModifier;Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                0,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.CONSTRUCTOR,
+                    "(Ljava/lang/String;Lnet/minecraftforge/client/settings/IKeyConflictContext;Lnet/minecraftforge/client/settings/KeyModifier;Lcom/mojang/blaze3d/platform/InputConstants\$Key;Ljava/lang/String;)V",
+                    TranslationConstants.KEY_MAPPING
+                ),
+                4,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.INPUT_CONSTANTS_KEY_GET_KEY,
+                    "(Ljava/lang/String;)Lcom/mojang/blaze3d/platform/InputConstants\$Key;",
+                    TranslationConstants.INPUT_CONSTANTS_KEY
+                ),
+                0,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER,
+                obfuscatedName = true
+            ),
         )
 
         fun find(element: PsiElement): TranslationInstance? =
