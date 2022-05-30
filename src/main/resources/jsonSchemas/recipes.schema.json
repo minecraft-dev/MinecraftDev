@@ -195,23 +195,16 @@
       },
       "then": {
         "$ref": "#/definitions/tagsCommonToAllRecipes",
-        "oneOf": [
-          {
+        "properties": {
+          "ingredient": {
             "$ref": "#/definitions/item"
           },
-          {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/item"
-            }
-          }
-        ],
-        "properties": {
           "result": {
             "type": "string"
           },
           "count": {
-            "type": "integer"
+            "type": "integer",
+            "default": 1
           }
         }
       }
@@ -291,6 +284,9 @@
         "minecraft:smoking",
         "minecraft:stonecutting"
       ]
+    },
+    "group": {
+      "type": "string"
     }
   }
 }
