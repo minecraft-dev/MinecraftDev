@@ -1,0 +1,296 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Minecraft Recipes JSON",
+  "type": "object",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "minecraft:blasting"
+          }
+        }
+      },
+      "then": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/tagsCommonToAllRecipes"
+          },
+          {
+            "$ref": "#/definitions/tagsCommonToAllCookingRecipes"
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "minecraft:campfire_cooking"
+          }
+        }
+      },
+      "then": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/tagsCommonToAllRecipes"
+          },
+          {
+            "$ref": "#/definitions/tagsCommonToAllCookingRecipes"
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "minecraft:crafting_shaped"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "pattern": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 3
+            },
+            "maxItems": 3
+          },
+          "key": {
+            "additionalProperties": {
+              "type": ["object", "array"],
+              "properties": {
+                "item": {
+                  "type": "string"
+                },
+                "tag": {
+                  "type": "string"
+                }
+              },
+              "items": {
+                "properties": {
+                  "item": {
+                    "type": "string"
+                  },
+                  "tag": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "result": {
+            "$ref": "#/definitions/result"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "minecraft:crafting_shapeless"
+          }
+        }
+      },
+      "then": {
+        "$ref": "#/definitions/tagsCommonToAllRecipes",
+        "properties": {
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "$ref": "#/definitions/ingredient"
+                },
+                {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 9,
+                  "items": {
+                    "$ref": "#/definitions/ingredient"
+                  }
+                }
+              ]
+            }
+          },
+          "result": {
+            "$ref": "#/definitions/result"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "minecraft:smelting"
+          }
+        }
+      },
+      "then": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/tagsCommonToAllRecipes"
+          },
+          {
+            "$ref": "#/definitions/tagsCommonToAllCookingRecipes"
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "minecraft:smithing"
+          }
+        }
+      },
+      "then": {
+        "$ref": "#/definitions/tagsCommonToAllRecipes",
+        "properties": {
+          "base": {
+            "$ref": "#/definitions/item"
+          },
+          "addition": {
+            "$ref": "#/definitions/item"
+          },
+          "result": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "minecraft:smoking"
+          }
+        }
+      },
+      "then": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/tagsCommonToAllRecipes"
+          },
+          {
+            "$ref": "#/definitions/tagsCommonToAllCookingRecipes"
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "minecraft:stonecutting"
+          }
+        }
+      },
+      "then": {
+        "$ref": "#/definitions/tagsCommonToAllRecipes",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/item"
+          },
+          {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/item"
+            }
+          }
+        ],
+        "properties": {
+          "result": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "item": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        }
+      }
+    },
+    "ingredient": {
+      "type": "object",
+      "$ref": "#/definitions/item"
+    },
+    "tagsCommonToAllRecipes": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        }
+      }
+    },
+    "tagsCommonToAllCookingRecipes": {
+      "type": "object",
+      "properties": {
+        "ingredient": {
+          "type": ["object", "array"],
+          "$ref": "#/definitions/ingredient",
+          "items": {
+            "$ref": "#/definitions/ingredient"
+          }
+        },
+        "result": {
+          "type": "string"
+        },
+        "experience": {
+          "type": "number"
+        },
+        "cookingtime": {
+          "type": "integer"
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "default": 1
+        },
+        "item": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "minecraft:blasting",
+        "minecraft:campfire_cooking",
+        "minecraft:crafting_shaped",
+        "minecraft:crafting_shapeless",
+        "minecraft:smelting",
+        "minecraft:smithing",
+        "minecraft:smoking",
+        "minecraft:stonecutting"
+      ]
+    }
+  }
+}

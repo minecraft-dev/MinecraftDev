@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2021 minecraft-dev
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.json
 
 import com.demonwav.mcdev.util.mcDomain
@@ -17,6 +27,7 @@ class SchemaProviderFactory : JsonSchemaProviderFactory {
             PathBasedSchemaProvider("Minecraft Block Model JSON", "model_block", "models/block/"),
             PathBasedSchemaProvider("Minecraft Loot Table JSON", "loot_table", "loot_tables/"),
             PathBasedSchemaProvider("Minecraft Tag JSON", "tags", "tags/"),
+            PathBasedSchemaProvider("Minecraft Recipes JSON", "recipes", "recipes/"),
             PathBasedSchemaProvider("Minecraft Particle JSON", "particles", "particles/"),
             PathBasedSchemaProvider("Minecraft Advancement JSON", "advancement", "advancements/")
         )
