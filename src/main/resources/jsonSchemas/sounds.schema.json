@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Minecraft Sounds JSON",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "properties": {
+      "category": { "type": "string" },
+      "replace": {
+        "type": "boolean",
+        "default": false
+      },
+      "subtitle": { "type": "string" },
+      "sounds": {
+        "type": "array",
+        "items": {
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "volume": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 1
+                },
+                "pitch": {
+                  "type": "number",
+                  "default": 1
+                },
+                "weight": {
+                  "type": "number",
+                  "default": 1
+                },
+                "stream": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "attenuation_distance": {
+                  "type": "number",
+                  "default": 16
+                },
+                "preload": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "type": {
+                  "enum": ["sound", "event"],
+                  "default": "sound"
+                }
+              }
+            }
+          ]
+        },
+        "uniqueItems": true
+      }
+    }
+  }
+}
