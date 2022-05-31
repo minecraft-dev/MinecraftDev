@@ -104,7 +104,6 @@ class TinyUnscrambler : UnscrambleSupport<TinyUnscrambler.SettingsComponent> {
             ?: settings?.mappingsBoxModel?.let { mappings -> mappings.selectedItem?.let(mappings::getValue) }
             ?: return null
 
-        println("mappingsFile $mappingsFile")
         val interToNamed = mutableMapOf<String, String>()
         val visitor = object : MappingVisitor {
             var interNsIndex = -1

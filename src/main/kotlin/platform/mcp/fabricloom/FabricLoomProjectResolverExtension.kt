@@ -35,7 +35,6 @@ class FabricLoomProjectResolverExtension : AbstractProjectResolverExtension() {
                 FabricLoomData.Decompiler(name, taskName, sourcesPath)
             }
             val data = FabricLoomData(ideModule.data, loomData.tinyMappings, decompileTasksNames)
-            println("Loaded $data")
             ideModule.createChild(FabricLoomData.KEY, data)
         }
 
