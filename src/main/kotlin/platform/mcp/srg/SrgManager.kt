@@ -20,6 +20,7 @@ import java.nio.file.Paths
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import kotlin.io.path.absolutePathString
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.rejectedPromise
 import org.jetbrains.concurrency.runAsync
@@ -48,7 +49,7 @@ class SrgManager(val file: String, val srgType: SrgType) {
         srgMap = if (file.isNotBlank()) {
             val path = Paths.get(file)
             if (Files.notExists(path)) {
-                rejectedPromise("No mapping data available")
+                rejectedPromise("No mapping data available at " + path.absolutePathString())
             } else {
                 runAsync {
                     // Load SRG map from files
@@ -57,7 +58,7 @@ class SrgManager(val file: String, val srgType: SrgType) {
             }
         } else {
             // Path to SRG files is unknown
-            rejectedPromise("No mapping data available")
+            rejectedPromise("No mapping data available: file path is blank")
         }
     }
 
