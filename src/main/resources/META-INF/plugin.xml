@@ -314,6 +314,7 @@
         <moduleService serviceImplementation="com.demonwav.mcdev.platform.mcp.McpModuleSettings"/>
 
         <gotoSymbolContributor implementation="com.demonwav.mcdev.platform.mcp.navigation.SrgMemberChooseByNameContributor" />
+        <unscrambleSupport implementation="com.demonwav.mcdev.platform.mcp.fabricloom.TinyUnscrambler"/>
         <unscrambleSupport implementation="com.demonwav.mcdev.platform.mcp.srg.McpUnscrambler"/>
         <!--endregion-->
 
