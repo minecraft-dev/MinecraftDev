@@ -12,14 +12,20 @@
         }
       },
       "then": {
-        "anyOf": [
-          {
-            "$ref": "#/definitions/tagsCommonToAllRecipes"
+        "properties": {
+          "ingredient": {
+            "$ref": "#/definitions/item"
           },
-          {
-            "$ref": "#/definitions/tagsCommonToAllCookingRecipes"
+          "result": {
+            "type": "string"
+          },
+          "experience": {
+            "type": "number"
+          },
+          "cookingtime": {
+            "type": "integer"
           }
-        ]
+        }
       }
     },
     {
@@ -31,14 +37,20 @@
         }
       },
       "then": {
-        "anyOf": [
-          {
-            "$ref": "#/definitions/tagsCommonToAllRecipes"
+        "properties": {
+          "ingredient": {
+            "$ref": "#/definitions/item"
           },
-          {
-            "$ref": "#/definitions/tagsCommonToAllCookingRecipes"
+          "result": {
+            "type": "string"
+          },
+          "experience": {
+            "type": "number"
+          },
+          "cookingtime": {
+            "type": "integer"
           }
-        ]
+        }
       }
     },
     {
@@ -133,14 +145,20 @@
         }
       },
       "then": {
-        "anyOf": [
-          {
-            "$ref": "#/definitions/tagsCommonToAllRecipes"
+        "properties": {
+          "ingredient": {
+            "$ref": "#/definitions/item"
           },
-          {
-            "$ref": "#/definitions/tagsCommonToAllCookingRecipes"
+          "result": {
+            "type": "string"
+          },
+          "experience": {
+            "type": "number"
+          },
+          "cookingtime": {
+            "type": "integer"
           }
-        ]
+        }
       }
     },
     {
@@ -175,14 +193,20 @@
         }
       },
       "then": {
-        "anyOf": [
-          {
-            "$ref": "#/definitions/tagsCommonToAllRecipes"
+        "properties": {
+          "ingredient": {
+            "$ref": "#/definitions/item"
           },
-          {
-            "$ref": "#/definitions/tagsCommonToAllCookingRecipes"
+          "result": {
+            "type": "string"
+          },
+          "experience": {
+            "type": "number"
+          },
+          "cookingtime": {
+            "type": "integer"
           }
-        ]
+        }
       }
     },
     {
@@ -234,27 +258,6 @@
         },
         "group": {
           "type": "string"
-        }
-      }
-    },
-    "tagsCommonToAllCookingRecipes": {
-      "type": "object",
-      "properties": {
-        "ingredient": {
-          "type": ["object", "array"],
-          "$ref": "#/definitions/ingredient",
-          "items": {
-            "$ref": "#/definitions/ingredient"
-          }
-        },
-        "result": {
-          "type": "string"
-        },
-        "experience": {
-          "type": "number"
-        },
-        "cookingtime": {
-          "type": "integer"
         }
       }
     },
