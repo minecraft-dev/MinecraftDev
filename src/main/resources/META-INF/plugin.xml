@@ -280,11 +280,14 @@
         <!---->
 
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleDataService"/>
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.mcp.framework.McpPresentationProvider" />
 
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mcp.debug.McpRunConfigurationExtension"/>
 
+        <attachSourcesProvider implementation="com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomDecompileSourceProvider" />
         <attachSourcesProvider implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleDecompileSourceProvider" />
 
         <!-- access transformer file type -->
@@ -878,6 +881,7 @@
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleProjectResolverExtension"/>
+        <projectResolve implementation="com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomProjectResolverExtension"/>
         <projectResolve implementation="com.demonwav.mcdev.platform.architectury.framework.ArchitecturyProjectResolverExtension"/>
     </extensions>
 
