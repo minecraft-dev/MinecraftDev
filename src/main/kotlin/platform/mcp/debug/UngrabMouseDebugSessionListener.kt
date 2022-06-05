@@ -85,7 +85,10 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl) : X
             return null
         }
 
-        val minecraftClass = findClass("net.minecraft.client.Minecraft", "net.minecraft.client.MinecraftClient") ?: return
+        val minecraftClass = findClass(
+            "net.minecraft.client.Minecraft",
+            "net.minecraft.client.MinecraftClient"
+        ) ?: return
         val minecraftGetter = minecraftClass.methodByName(
             "getInstance" to "()Lnet/minecraft/client/Minecraft;",
             "getInstance" to "()Lnet/minecraft/client/MinecraftClient;"
