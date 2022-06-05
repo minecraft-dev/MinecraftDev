@@ -19,20 +19,17 @@ import com.intellij.debugger.engine.DebugProcessImpl
 import com.intellij.debugger.engine.DebugProcessListener
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModulePointer
-import com.intellij.openapi.module.ModulePointerManager
 
 class McpRunConfigurationExtension : ModuleDebugRunConfigurationExtension() {
 
     override fun attachToProcess(handler: ProcessHandler, module: Module) {
         if (MinecraftFacet.getInstance(module)?.isOfType(McpModuleType) == true) {
-            val modulePointer = ModulePointerManager.getInstance(module.project).create(module)
             DebuggerManager.getInstance(module.project)
-                .addDebugProcessListener(handler, MyProcessListener(modulePointer))
+                .addDebugProcessListener(handler, MyProcessListener())
         }
     }
 
-    private inner class MyProcessListener(private val modulePointer: ModulePointer) : DebugProcessListener {
+    private inner class MyProcessListener : DebugProcessListener {
 
         override fun processAttached(process: DebugProcess) {
             if (process !is DebugProcessImpl) {
@@ -40,7 +37,7 @@ class McpRunConfigurationExtension : ModuleDebugRunConfigurationExtension() {
             }
 
             // Add session listener
-            process.xdebugProcess?.session?.addSessionListener(UngrabMouseDebugSessionListener(process, modulePointer))
+            process.xdebugProcess?.session?.addSessionListener(UngrabMouseDebugSessionListener(process))
 
             // We don't need any further events
             process.removeDebugProcessListener(this)
