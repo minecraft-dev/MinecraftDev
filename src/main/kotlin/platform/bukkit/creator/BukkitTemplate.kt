@@ -15,6 +15,7 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.platform.BaseTemplate
+import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.BukkitLikeConfiguration
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder
@@ -55,7 +56,8 @@ object BukkitTemplate : BaseTemplate() {
         val props = mapOf(
             "GROUP_ID" to buildSystem.groupId,
             "PLUGIN_VERSION" to buildSystem.version,
-            "JAVA_VERSION" to config.javaVersion.feature
+            "JAVA_VERSION" to config.javaVersion.feature,
+            "IS_PAPER" to (config.platformType == PlatformType.PAPER)
         )
 
         return project.applyTemplate(BUKKIT_BUILD_GRADLE_TEMPLATE, props)

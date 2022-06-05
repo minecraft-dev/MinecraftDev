@@ -33,6 +33,7 @@ class BukkitProjectConfig(override var type: PlatformType) :
     override lateinit var mainClass: String
 
     var loadOrder: LoadOrder = LoadOrder.POSTWORLD
+    var platformType: PlatformType = type
     var minecraftVersion: String = ""
     val semanticMinecraftVersion: SemanticVersion
         get() = if (minecraftVersion.isBlank()) SemanticVersion.release() else SemanticVersion.parse(minecraftVersion)
