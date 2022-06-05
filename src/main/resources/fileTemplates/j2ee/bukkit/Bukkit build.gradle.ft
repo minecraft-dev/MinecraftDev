@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    #if (${IS_PAPER})
+    #if(${PLATFORM_TYPE} == "Paper")
     id("xyz.jpenilla.run-paper") version "1.0.6"
     #end
 }
@@ -31,7 +31,7 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
-#if (${IS_PAPER})
+#if(${PLATFORM_TYPE} == "Paper")
 tasks {
     runServer {
         // Configure the Minecraft version for our task.

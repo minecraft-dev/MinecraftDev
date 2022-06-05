@@ -57,7 +57,7 @@ object BukkitTemplate : BaseTemplate() {
             "GROUP_ID" to buildSystem.groupId,
             "PLUGIN_VERSION" to buildSystem.version,
             "JAVA_VERSION" to config.javaVersion.feature,
-            "IS_PAPER" to (config.platformType == PlatformType.PAPER)
+            "PLATFORM_TYPE" to config.platformType.normalName
         )
 
         return project.applyTemplate(BUKKIT_BUILD_GRADLE_TEMPLATE, props)
