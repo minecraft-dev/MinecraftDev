@@ -15,7 +15,6 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.platform.BaseTemplate
-import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.BukkitLikeConfiguration
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder
