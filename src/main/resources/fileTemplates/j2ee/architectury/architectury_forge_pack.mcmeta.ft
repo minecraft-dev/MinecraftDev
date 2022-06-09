@@ -7,5 +7,9 @@
         #else
         "pack_format": ${PACK_FORMAT}
         #end
+        #if (${FORGE_DATA})
+        ,"forge:resource_pack_format": ${FORGE_DATA.resourcePackFormat},
+        "forge:data_pack_format": ${FORGE_DATA.dataPackFormat}
+        #end
     }
 }
