@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.architectury.creator
 
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.BaseTemplate
+import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.MinecraftTemplates
@@ -207,11 +208,17 @@ object ArchitecturyTemplate : BaseTemplate() {
         return project.applyTemplate(MinecraftTemplates.ARCHITECTURY_FORGE_MODS_TOML_TEMPLATE, props)
     }
 
-    fun applyPackMcmeta(project: Project, artifactId: String, pack: ForgePackDescriptor): String {
+    fun applyPackMcmeta(
+        project: Project,
+        artifactId: String,
+        pack: ForgePackDescriptor,
+        additionalData: ForgePackAdditionalData?
+    ): String {
         val props = mapOf(
             "ARTIFACT_ID" to artifactId,
             "PACK_FORMAT" to pack.format.toString(),
-            "PACK_COMMENT" to pack.comment
+            "PACK_COMMENT" to pack.comment,
+            "FORGE_DATA" to additionalData,
         )
 
         return project.applyTemplate(MinecraftTemplates.ARCHITECTURY_FORGE_PACK_MCMETA_TEMPLATE, props)

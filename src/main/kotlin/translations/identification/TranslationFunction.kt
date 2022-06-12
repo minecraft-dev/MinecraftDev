@@ -27,7 +27,7 @@ class TranslationFunction(
     val matchedIndex: Int,
     val formatting: Boolean,
     val setter: Boolean = false,
-    val foldParameters: Boolean = false,
+    val foldParameters: FoldingScope = FoldingScope.CALL,
     val prefix: String = "",
     val suffix: String = "",
     val obfuscatedName: Boolean = false
@@ -86,5 +86,11 @@ class TranslationFunction(
     companion object {
         val NUMBER_FORMATTING_PATTERN = Regex("%(\\d+\\$)?[\\d.]*[df]")
         val STRING_FORMATTING_PATTERN = Regex("[^%]?%(?:\\d+\\$)?s")
+    }
+
+    enum class FoldingScope {
+        CALL,
+        PARAMETER,
+        PARAMETERS
     }
 }

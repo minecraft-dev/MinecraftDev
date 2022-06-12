@@ -10,24 +10,22 @@
 
 package com.demonwav.mcdev.platform.mcp.debug
 
-import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.fabric.FabricModuleType
-import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.intellij.debugger.engine.DebugProcessImpl
 import com.intellij.debugger.engine.evaluation.EvaluationContextImpl
 import com.intellij.debugger.jdi.VirtualMachineProxyImpl
-import com.intellij.openapi.module.ModulePointer
 import com.intellij.xdebugger.XDebugSessionListener
 import com.sun.jdi.BooleanValue
 import com.sun.jdi.ClassType
+import com.sun.jdi.Field
+import com.sun.jdi.Method
 import com.sun.jdi.ObjectReference
+import com.sun.jdi.ReferenceType
 
-class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl, private val modulePointer: ModulePointer) :
-    XDebugSessionListener {
+class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl) : XDebugSessionListener {
 
     private fun ungrabMouse() {
         val suspendContextImpl = process.debuggerContext.suspendContext ?: return
-        if (suspendContextImpl.thread?.isAtBreakpoint != true) {
+        if (suspendContextImpl.thread?.isSuspended != true) {
             return
         }
 
@@ -66,26 +64,35 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl, pri
         debugProcess: DebugProcessImpl,
         evaluationContext: EvaluationContextImpl
     ) {
-        val isFabric = modulePointer.module?.let { MinecraftFacet.getInstance(it, FabricModuleType) } != null
-        val srgMap = modulePointer.module?.let { module ->
-            MinecraftFacet.getInstance(module, McpModuleType)?.srgManager?.srgMapNow
+        fun findClass(vararg names: String): ClassType? {
+            for (name in names) {
+                (virtualMachine.classesByName(name)?.singleOrNull() as? ClassType)?.let { return it }
+            }
+            return null
         }
 
-        fun mapping(mcp: String, yarn: String): String {
-            return if (isFabric) yarn else mcp
+        fun ClassType.fieldByName(vararg names: String): Field? {
+            for (name in names) {
+                this.fieldByName(name)?.let { return it }
+            }
+            return null
         }
 
-        fun mapping(srg: String, mcp: String, yarn: String): String {
-            return if (isFabric) yarn else srgMap?.getMcpClass(srg) ?: mcp
+        fun ReferenceType.methodByName(vararg names: Pair<String, String>): Method? {
+            for ((name, signature) in names) {
+                this.methodsByName(name, signature)?.singleOrNull()?.let { return it }
+            }
+            return null
         }
 
-        val minecraftClass = virtualMachine.classesByName(
-            mapping("net.minecraft.client.Minecraft", "net.minecraft.client.MinecraftClient")
-        )?.singleOrNull() as? ClassType ?: return
-        val minecraftGetter = minecraftClass.methodsByName(
-            mapping("func_71410_x", "getInstance", "getInstance"),
-            mapping("()Lnet/minecraft/client/Minecraft;", "()Lnet/minecraft/client/MinecraftClient;")
-        )?.singleOrNull() ?: return
+        val minecraftClass = findClass(
+            "net.minecraft.client.Minecraft",
+            "net.minecraft.client.MinecraftClient"
+        ) ?: return
+        val minecraftGetter = minecraftClass.methodByName(
+            "getInstance" to "()Lnet/minecraft/client/Minecraft;",
+            "getInstance" to "()Lnet/minecraft/client/MinecraftClient;"
+        ) ?: return
         val minecraft = debugProcess.invokeMethod(
             evaluationContext,
             minecraftClass,
@@ -93,14 +100,16 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl, pri
             emptyList()
         ) as? ObjectReference ?: return
 
-        val mouseHelperField = minecraftClass.fieldByName(mapping("field_71417_B", "mouseHelper", "mouse")) ?: return
+        val mouseHelperField = minecraftClass.fieldByName("mouseHandler", "mouse", "mouseHelper") ?: return
         val mouseHelper = minecraft.getValue(mouseHelperField) as? ObjectReference ?: return
 
-        val grabMouse = mouseHelper.referenceType()
-            .methodsByName(mapping("func_198032_j", "ungrabMouse", "unlockCursor"), "()V")
-            ?.singleOrNull() ?: return
+        val ungrabMouse = mouseHelper.referenceType().methodByName(
+            "releaseMouse" to "()V",
+            "unlockCursor" to "()V",
+            "ungrabMouse" to "()V"
+        ) ?: return
 
-        debugProcess.invokeMethod(evaluationContext, mouseHelper, grabMouse, emptyList())
+        debugProcess.invokeMethod(evaluationContext, mouseHelper, ungrabMouse, emptyList())
     }
 
     override fun sessionPaused() {

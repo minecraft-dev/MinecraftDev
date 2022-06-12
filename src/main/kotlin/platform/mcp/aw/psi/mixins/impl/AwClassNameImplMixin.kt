@@ -19,6 +19,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
+import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.util.IncorrectOperationException
 
 abstract class AwClassNameImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AwClassNameMixin {
@@ -28,7 +29,7 @@ abstract class AwClassNameImplMixin(node: ASTNode) : ASTWrapperPsiElement(node),
     override fun getReference(): PsiReference? = this
 
     override fun resolve(): PsiElement? {
-        return cached { findQualifiedClass(text.replace('/', '.'), this) }
+        return cached(PsiModificationTracker.MODIFICATION_COUNT) { findQualifiedClass(text.replace('/', '.'), this) }
     }
 
     override fun getRangeInElement(): TextRange = TextRange(0, text.length)

@@ -24,12 +24,18 @@ import com.intellij.openapi.project.Project
 
 object SpongeTemplate : BaseTemplate() {
 
-    fun applyPom(project: Project): String {
-        return project.applyTemplate(SPONGE_POM_TEMPLATE, BasicMavenStep.pluginVersions)
+    fun applyPom(project: Project, config: SpongeProjectConfig): String {
+        val props = BasicMavenStep.pluginVersions.toMutableMap()
+        props["JAVA_VERSION"] = config.javaVersion.toString()
+
+        return project.applyTemplate(SPONGE_POM_TEMPLATE, props)
     }
 
-    fun applySubPom(project: Project): String {
-        return project.applyTemplate(SPONGE_SUBMODULE_POM_TEMPLATE, BasicMavenStep.pluginVersions)
+    fun applySubPom(project: Project, config: SpongeProjectConfig): String {
+        val props = BasicMavenStep.pluginVersions.toMutableMap()
+        props["JAVA_VERSION"] = config.javaVersion.toString()
+
+        return project.applyTemplate(SPONGE_SUBMODULE_POM_TEMPLATE, props)
     }
 
     fun applyMainClass(

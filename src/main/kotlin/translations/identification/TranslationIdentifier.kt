@@ -49,11 +49,16 @@ abstract class TranslationIdentifier<T : PsiElement> {
                         val entries = TranslationIndex.getAllDefaultEntries(project).merge("")
                         val translation = entries[translationKey.full]?.text
                         if (translation != null) {
+                            val foldingElement = when (function.foldParameters) {
+                                TranslationFunction.FoldingScope.CALL -> call
+                                TranslationFunction.FoldingScope.PARAMETER -> element
+                                TranslationFunction.FoldingScope.PARAMETERS -> container
+                            }
                             try {
                                 val (formatted, superfluousParams) = function.format(translation, call)
                                     ?: (translation to -1)
                                 return TranslationInstance(
-                                    if (function.foldParameters) container else call,
+                                    foldingElement,
                                     function.matchedIndex,
                                     referenceElement,
                                     translationKey,
@@ -63,7 +68,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                 )
                             } catch (ignored: MissingFormatArgumentException) {
                                 return TranslationInstance(
-                                    if (function.foldParameters) container else call,
+                                    foldingElement,
                                     function.matchedIndex,
                                     referenceElement,
                                     translationKey,

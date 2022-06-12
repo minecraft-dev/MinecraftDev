@@ -28,27 +28,42 @@ class OverwriteAuthorInspection : OverwriteInspection() {
     override fun visitOverwrite(holder: ProblemsHolder, method: PsiMethod, overwrite: PsiAnnotation) {
         val javadoc = method.docComment
         if (javadoc == null) {
-            registerMissingTag(holder, method)
+            registerMissingTags(holder, method)
             return
         }
 
-        val tag = javadoc.findTagByName("author")
-        if (tag == null) {
-            registerMissingTag(holder, javadoc)
+        val authorTag = javadoc.findTagByName("author")
+        if (authorTag == null) {
+            registerMissingTag(holder, javadoc, "author")
+        }
+
+        val reasonTag = javadoc.findTagByName("reason")
+        if (reasonTag == null) {
+            registerMissingTag(holder, javadoc, "reason")
         }
     }
 
-    private fun registerMissingTag(holder: ProblemsHolder, element: PsiElement) {
+    private fun registerMissingTag(holder: ProblemsHolder, element: PsiElement, tag: String) {
         holder.registerProblem(
             element,
-            "@Overwrite methods must have an associated JavaDoc with a filled in @author tag",
-            QuickFix
+            "@Overwrite methods must have an associated JavaDoc with a filled in @$tag tag",
+            QuickFix(tag)
         )
     }
 
-    private object QuickFix : LocalQuickFix {
+    private fun registerMissingTags(holder: ProblemsHolder, element: PsiElement) {
+        holder.registerProblem(
+            element,
+            "@Overwrite methods must have an associated JavaDoc with filled in @author and @reason tags",
+            QuickFix()
+        )
+    }
 
-        override fun getFamilyName() = "Add @author Javadoc tag"
+    private class QuickFix(val tag: String? = null) : LocalQuickFix {
+
+        override fun getFamilyName() = "Add missing Javadoc tag"
+
+        override fun getName(): String = if (tag == null) "Add all missing Javadoc tags" else "Add @$tag Javadoc tag"
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val element = descriptor.psiElement
@@ -58,14 +73,15 @@ class OverwriteAuthorInspection : OverwriteInspection() {
             if (javadoc == null) {
                 // Create new Javadoc comment
                 method.addBefore(
-                    JavaPsiFacade.getElementFactory(project).createDocCommentFromText("/**\n * @author \n */"),
+                    JavaPsiFacade.getElementFactory(project)
+                        .createDocCommentFromText("/**\n * @author \n * @reason \n */"),
                     method.modifierList
                 )
                 return
             }
 
             // Create new Javadoc tag
-            val tag = JavaPsiFacade.getElementFactory(project).createDocTagFromText("@author")
+            val tag = JavaPsiFacade.getElementFactory(project).createDocTagFromText("@$tag")
             javadoc.addAfter(tag, null)
         }
     }

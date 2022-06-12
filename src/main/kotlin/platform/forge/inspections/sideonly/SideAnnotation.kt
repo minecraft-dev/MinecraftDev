@@ -50,6 +50,12 @@ data class SideAnnotation(
                 "CLIENT",
                 "DEDICATED_SERVER"
             ),
+            SideAnnotation(
+                "net.fabricmc.api.Environment",
+                "net.fabricmc.api.EnvType",
+                "CLIENT",
+                "SERVER"
+            ),
         )
     }
 }
