@@ -91,11 +91,11 @@ class MinecraftClassCreateAction :
     override fun isAvailable(dataContext: DataContext): Boolean {
         val psi = dataContext.getData(CommonDataKeys.PSI_ELEMENT)
         val module = psi?.findModule() ?: return false
-        val isModModule = MinecraftFacet.getInstance(module, FabricModuleType, ForgeModuleType) != null
-        val isForge = MinecraftFacet.getInstance(module, ForgeModuleType) != null
+        val isFabricMod = MinecraftFacet.getInstance(module, FabricModuleType) != null
+        val isForgeMod = MinecraftFacet.getInstance(module, ForgeModuleType) != null
         val hasMcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()?.minecraftVersion != null
 
-        return if (isForge) isModModule && hasMcVersion && super.isAvailable(dataContext) else isModModule && super.isAvailable(dataContext)
+        return (isFabricMod || isForgeMod && hasMcVersion) && super.isAvailable(dataContext)
     }
 
     override fun checkPackageExists(directory: PsiDirectory): Boolean {
