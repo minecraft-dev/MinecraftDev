@@ -1,0 +1,14 @@
+name: Feature request
+description: Suggest a new feature
+labels: ["type: bug", "status: unverified"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **DO NOT REQUEST SUPPORT FOR OLDER VERSIONS OF MINECRAFT.**
+  - type: textarea
+    attributes:
+      label: Description of the suggestion
+      description: Please try to avoid vague requests. The more details you can give regarding what the feature request is, how it should work, and why it would be useful, the easier it will be to implement. Feel free to be vague if you have a general idea that something might be cool, but these are less likely to be prioritized and may be denied more often.
+    validations:
+      required: true

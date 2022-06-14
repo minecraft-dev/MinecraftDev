@@ -1,0 +1,50 @@
+name: Bug report
+description: Create a bug report
+labels: ["type: bug", "status: unverified"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **DO NOT REQUEST SUPPORT FOR OLDER VERSIONS OF MINECRAFT.**
+  - type: input
+    attributes:
+      label: Minecraft Development for IntelliJ plugin version
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: IntelliJ version
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Operating System
+      options:
+        - Windows
+        - MacOS
+        - Linux
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Target platform
+      multiple: true
+      options:
+        - Bukkit
+        - Spigot
+        - Paper
+        - Sponge
+        - Forge
+        - Fabric
+        - Architectury
+        - LiteLoader
+        - Velocity
+        - BungeeCord
+        - Waterfall
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Description
+    validations:
+      required: true
