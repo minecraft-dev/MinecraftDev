@@ -4,7 +4,7 @@ import org.spongepowered.plugin.metadata.model.PluginDependency
 plugins {
     `java-library`
     id("com.github.johnrengelman.shadow")
-    id("org.spongepowered.gradle.plugin") version "2.0.0"
+    id("org.spongepowered.gradle.plugin") version "2.0.2"
 }
 
 repositories {
@@ -57,7 +57,7 @@ sponge {
     }
 }
 
-val javaTarget = 8 // Sponge targets a minimum of Java 8
+val javaTarget = ${JAVA_VERSION} // Sponge targets a minimum of Java ${JAVA_VERSION}
 java {
     sourceCompatibility = JavaVersion.toVersion(javaTarget)
     targetCompatibility = JavaVersion.toVersion(javaTarget)

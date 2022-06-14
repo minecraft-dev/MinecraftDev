@@ -34,21 +34,28 @@ object McpModelFG3Handler : McpModelDataHandler {
     ) {
         val data = resolverCtx.getExtraProject(gradleModule, McpModelFG3::class.java) ?: return
 
-        var version: String? = null
+        var mcVersion: String? = null
+        var forgeVersion: String? = null
         for (minecraftDepVersion in data.minecraftDepVersions) {
             val index = minecraftDepVersion.indexOf('-')
             if (index == -1) {
                 continue
             }
-            version = minecraftDepVersion.substring(0, minecraftDepVersion.indexOf('-'))
+            mcVersion = minecraftDepVersion.substring(0, index)
+
+            val forgeVersionEnd = minecraftDepVersion.indexOf('_')
+            if (forgeVersionEnd != -1) {
+                forgeVersion = minecraftDepVersion.substring(index + 1, forgeVersionEnd)
+            }
             break
         }
 
         val state = McpModuleSettings.State(
-            version,
+            mcVersion,
             data.mcpVersion,
             data.taskOutputLocation.absolutePath,
-            SrgType.TSRG
+            SrgType.TSRG,
+            forgeVersion
         )
 
         val gradleProjectPath = gradleModule.gradleProject.projectIdentifier.projectPath

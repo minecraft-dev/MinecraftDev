@@ -25,7 +25,8 @@ class McpModuleSettings : PersistentStateComponent<McpModuleSettings.State> {
         var minecraftVersion: String? = null,
         var mcpVersion: String? = null,
         var mappingFile: String? = null,
-        var srgType: SrgType? = null
+        var srgType: SrgType? = null,
+        var platformVersion: String? = null
     )
 
     private var state: State = State(srgType = SrgType.SRG)

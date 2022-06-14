@@ -24,6 +24,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
+import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.runGradleTaskAndWait
 import com.demonwav.mcdev.util.runWriteAction
@@ -253,7 +254,9 @@ class ArchitecturyForgeProjectCreator(
         override fun runStep(indicator: ProgressIndicator) {
             val modsTomlText = ArchitecturyTemplate.applyModsToml(project, buildSystem, config)
             val packDescriptor = ForgePackDescriptor.forMcVersion(config.mcVersion) ?: ForgePackDescriptor.FORMAT_3
-            val packMcmetaText = ArchitecturyTemplate.applyPackMcmeta(project, buildSystem.artifactId, packDescriptor)
+            val additionalData = ForgePackAdditionalData.forMcVersion(config.mcVersion)
+            val packMcmetaText =
+                ArchitecturyTemplate.applyPackMcmeta(project, buildSystem.artifactId, packDescriptor, additionalData)
             val dir = buildSystem.dirsOrError.resourceDirectory
             runWriteTask {
                 CreatorStep.writeTextToFile(project, dir, ForgeConstants.PACK_MCMETA, packMcmetaText)

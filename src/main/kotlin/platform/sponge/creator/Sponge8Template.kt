@@ -64,6 +64,7 @@ object Sponge8Template : BaseTemplate() {
         config: SpongeProjectConfig
     ): String {
         val props = mutableMapOf(
+            "JAVA_VERSION" to config.javaVersion.feature,
             "GROUP_ID" to buildSystem.groupId,
             "PLUGIN_ID" to buildSystem.artifactId,
             "PLUGIN_VERSION" to buildSystem.version,
@@ -98,6 +99,7 @@ object Sponge8Template : BaseTemplate() {
         config: SpongeProjectConfig
     ): String {
         val props = mutableMapOf(
+            "JAVA_VERSION" to config.javaVersion.feature,
             "PLUGIN_ID" to buildSystem.parentOrError.artifactId,
             "SPONGEAPI_VERSION" to config.spongeApiVersion,
             "LICENSE" to config.license,
