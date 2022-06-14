@@ -74,6 +74,7 @@ mandatory=true
             """
 [[mods]]
 modId="examplemod"
+displayTest="<error descr="DisplayTest IGNORE_SERV does not exist">IGNORE_SERV</error>"
 [[dependencies.examplemod]]
 modId="forge"
 ordering="<error descr="Order BEFO does not exist">BEFO</error>"

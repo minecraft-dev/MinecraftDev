@@ -25,7 +25,7 @@ class VanillaGradleProjectResolverExtension : AbstractProjectResolverExtension()
 
     override fun populateModuleExtraModels(gradleModule: IdeaModule, ideModule: DataNode<ModuleData>) {
         val vgData = resolverCtx.getExtraProject(gradleModule, VanillaGradleModel::class.java)
-        if (vgData != null) {
+        if (vgData != null && vgData.hasVanillaGradle()) {
             val gradleProjectPath = gradleModule.gradleProject.projectIdentifier.projectPath
             val suffix = if (gradleProjectPath.endsWith(':')) "" else ":"
             val decompileTaskName = gradleProjectPath + suffix + "decompile"

@@ -61,7 +61,7 @@ class Sponge8MavenCreator(
         val mainClassStep = setupMainClassStep()
         val pluginsJsonStep = CreatePluginsJsonStep(project, buildSystem, config)
 
-        val pomText = SpongeTemplate.applyPom(project)
+        val pomText = SpongeTemplate.applyPom(project, config)
 
         return listOf(
             setupDependencyStep(),

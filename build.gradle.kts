@@ -56,6 +56,11 @@ val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSource
 
 repositories {
     maven("https://repo.denwav.dev/repository/maven-public/")
+    maven("https://maven.fabricmc.net/") {
+        content {
+            includeModule("net.fabricmc", "mapping-io")
+        }
+    }
     mavenCentral()
 }
 
@@ -71,6 +76,7 @@ dependencies {
     implementation(files(gradleToolingExtensionJar))
 
     implementation(libs.templateMakerFabric)
+    implementation(libs.mappingIo)
     implementation(libs.bundles.asm)
 
     jflex(libs.jflex.lib)

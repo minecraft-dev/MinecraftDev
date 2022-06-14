@@ -15,6 +15,8 @@ import com.demonwav.mcdev.toml.TomlElementVisitor
 import com.demonwav.mcdev.toml.platform.forge.ModsTomlSchema
 import com.demonwav.mcdev.toml.stringValue
 import com.demonwav.mcdev.toml.tomlType
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.findMcpModule
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemDescriptor
@@ -63,6 +65,22 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                     if (!ForgeConstants.MOD_ID_REGEX.matches(modId)) {
                         val endOffset = if (value.text.endsWith('"')) modId.length + 1 else modId.length
                         holder.registerProblem(value, TextRange(1, endOffset), "Mod ID is invalid")
+                    }
+                }
+                "displayTest" -> {
+                    val value = keyValue.value ?: return
+                    val test = value.stringValue() ?: return
+                    if (test !in ForgeConstants.DISPLAY_TESTS) {
+                        val endOffset = if (value.text.endsWith('"')) test.length + 1 else test.length
+                        holder.registerProblem(value, TextRange(1, endOffset), "DisplayTest $test does not exist")
+                    }
+
+                    val forgeVersion = runCatching {
+                        keyValue.findMcpModule()?.getSettings()?.platformVersion?.let(SemanticVersion::parse)
+                    }.getOrNull()
+                    val minVersion = ForgeConstants.DISPLAY_TEST_MANIFEST_VERSION
+                    if (forgeVersion != null && forgeVersion < minVersion) {
+                        holder.registerProblem(keyValue.key, "DisplayTest is only available since $minVersion")
                     }
                 }
                 "side" -> {

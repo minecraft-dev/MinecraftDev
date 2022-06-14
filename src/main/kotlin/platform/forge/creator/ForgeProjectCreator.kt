@@ -22,6 +22,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
+import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
@@ -88,7 +89,9 @@ open class Fg3ProjectCreator(
 
     private fun setupMainClassStep(): BasicJavaClassStep {
         return createJavaClassStep(config.mainClass) { packageName, className ->
-            if (config.mcVersion >= MinecraftVersions.MC1_18) {
+            if (config.mcVersion >= MinecraftVersions.MC1_19) {
+                Fg3Template.apply1_19MainClass(project, buildSystem, config, packageName, className)
+            } else if (config.mcVersion >= MinecraftVersions.MC1_18) {
                 Fg3Template.apply1_18MainClass(project, buildSystem, config, packageName, className)
             } else if (config.mcVersion >= MinecraftVersions.MC1_17) {
                 Fg3Template.apply1_17MainClass(project, buildSystem, config, packageName, className)
@@ -138,7 +141,7 @@ open class Fg3ProjectCreator(
     }
 
     companion object {
-        val FG5_WRAPPER_VERSION = SemanticVersion.release(7, 3)
+        val FG5_WRAPPER_VERSION = SemanticVersion.release(7, 4, 2)
     }
 }
 
@@ -216,7 +219,9 @@ class Fg3ProjectFilesStep(
     override fun runStep(indicator: ProgressIndicator) {
         val modsTomlText = Fg3Template.applyModsToml(project, buildSystem, config)
         val packDescriptor = ForgePackDescriptor.forMcVersion(config.mcVersion) ?: ForgePackDescriptor.FORMAT_3
-        val packMcmetaText = Fg3Template.applyPackMcmeta(project, buildSystem.artifactId, packDescriptor)
+        val additionalData = ForgePackAdditionalData.forMcVersion(config.mcVersion)
+        val packMcmetaText =
+            Fg3Template.applyPackMcmeta(project, buildSystem.artifactId, packDescriptor, additionalData)
         val dir = buildSystem.dirsOrError.resourceDirectory
         runWriteTask {
             CreatorStep.writeTextToFile(project, dir, ForgeConstants.PACK_MCMETA, packMcmetaText)

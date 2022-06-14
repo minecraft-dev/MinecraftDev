@@ -42,6 +42,7 @@ class ModsTomlCompletionContributor : CompletionContributor() {
         extend(CompletionType.BASIC, inModsTomlKey(), ModsTomlKeyCompletionProvider)
         extendKnownValues("modLoader", "javafml")
         extendKnownValues("version", ForgeConstants.KNOWN_SUBSTITUTIONS)
+        extendKnownValues("displayTest", ForgeConstants.DISPLAY_TESTS)
         extendKnownValues("ordering", ForgeConstants.DEPENDENCY_ORDER)
         extendKnownValues("side", ForgeConstants.DEPENDENCY_SIDES)
         extendBooleanValues("showAsResourcePack")

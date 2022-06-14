@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mcp.util
 object McpConstants {
 
     const val TEXT_FORMATTING = "net.minecraft.util.text.TextFormatting"
+    const val CHAT_FORMATTING = "net.minecraft.ChatFormatting"
     const val ENTITY = "net.minecraft.entity.Entity"
     const val ENTITY_FX = "net.minecraft.client.particle.EntityFX"
     const val WORLD = "net.minecraft.world.World"

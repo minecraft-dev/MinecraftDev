@@ -76,7 +76,7 @@ class SpongeMavenCreator(
     override fun getSteps(): Iterable<CreatorStep> {
         val (mainClassStep, modifyStep) = setupMainClassSteps()
 
-        val pomText = SpongeTemplate.applyPom(project)
+        val pomText = SpongeTemplate.applyPom(project, config)
 
         return listOf(
             setupDependencyStep(),

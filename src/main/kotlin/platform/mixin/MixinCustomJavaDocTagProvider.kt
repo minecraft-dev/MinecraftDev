@@ -41,12 +41,16 @@ class MixinCustomJavaDocTagProvider : CustomJavadocTagProvider {
             override fun getName() = "author"
 
             override fun checkTagValue(value: PsiDocTagValue?): String? {
-                return "The @author JavaDoc tag must be filled in.".takeIf { value?.text?.trim().isNullOrEmpty() }
+                return "The @author JavaDoc tag must be filled in.".takeIf { value?.text.isNullOrBlank() }
             }
         }
 
         object Reason : InjectorTag() {
             override fun getName() = "reason"
+
+            override fun checkTagValue(value: PsiDocTagValue?): String? {
+                return "The @reason JavaDoc tag must be filled in.".takeIf { value?.text.isNullOrBlank() }
+            }
         }
     }
 }

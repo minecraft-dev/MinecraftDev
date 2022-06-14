@@ -90,6 +90,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_17_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_18_MAIN_CLASS_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_19_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_BUILD_GRADLE_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_GRADLE_PROPERTIES_TEMPLATE))
@@ -236,6 +237,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FG3_MAIN_CLASS_TEMPLATE = "Forge (1.13+) Main Class.java"
         const val FG3_1_17_MAIN_CLASS_TEMPLATE = "Forge (1.17+) Main Class.java"
         const val FG3_1_18_MAIN_CLASS_TEMPLATE = "Forge (1.18+) Main Class.java"
+        const val FG3_1_19_MAIN_CLASS_TEMPLATE = "Forge (1.19+) Main Class.java"
         const val FG3_BUILD_GRADLE_TEMPLATE = "Forge (1.13+) build.gradle"
         const val FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE = "Forge (1.13+) Submodule build.gradle"
         const val FG3_GRADLE_PROPERTIES_TEMPLATE = "Forge (1.13+) gradle.properties"

@@ -12,6 +12,8 @@ package com.demonwav.mcdev.platform.architectury.creator
 
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.platform.BaseTemplate
+import com.demonwav.mcdev.platform.forge.util.ForgeConstants
+import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.MinecraftTemplates
@@ -177,6 +179,7 @@ object ArchitecturyTemplate : BaseTemplate() {
     }
 
     fun applyModsToml(project: Project, buildSystem: BuildSystem, config: ArchitecturyProjectConfig): String {
+        val hasDisplayTestInManifest = config.forgeVersion >= ForgeConstants.DISPLAY_TEST_MANIFEST_VERSION
         val nextMcVersion = when (val part = config.mcVersion.parts.getOrNull(1)) {
             // Mimics the code used to get the next Minecraft version in Forge's MDK
             // https://github.com/MinecraftForge/MinecraftForge/blob/0ff8a596fc1ef33d4070be89dd5cb4851f93f731/build.gradle#L884
@@ -187,6 +190,7 @@ object ArchitecturyTemplate : BaseTemplate() {
         val props = mutableMapOf(
             "ARTIFACT_ID" to buildSystem.artifactId,
             "MOD_NAME" to config.pluginName,
+            "DISPLAY_TEST" to hasDisplayTestInManifest,
             "FORGE_SPEC_VERSION" to config.forgeVersion.parts[0].versionString,
             "ARCHITECTURY_API_VERSION" to config.architecturyApiVersion.toString(),
             "MC_VERSION" to config.mcVersion.toString(),
@@ -207,11 +211,17 @@ object ArchitecturyTemplate : BaseTemplate() {
         return project.applyTemplate(MinecraftTemplates.ARCHITECTURY_FORGE_MODS_TOML_TEMPLATE, props)
     }
 
-    fun applyPackMcmeta(project: Project, artifactId: String, pack: ForgePackDescriptor): String {
+    fun applyPackMcmeta(
+        project: Project,
+        artifactId: String,
+        pack: ForgePackDescriptor,
+        additionalData: ForgePackAdditionalData?
+    ): String {
         val props = mapOf(
             "ARTIFACT_ID" to artifactId,
             "PACK_FORMAT" to pack.format.toString(),
-            "PACK_COMMENT" to pack.comment
+            "PACK_COMMENT" to pack.comment,
+            "FORGE_DATA" to additionalData,
         )
 
         return project.applyTemplate(MinecraftTemplates.ARCHITECTURY_FORGE_PACK_MCMETA_TEMPLATE, props)

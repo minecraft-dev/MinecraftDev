@@ -60,6 +60,7 @@ class ModsTomlCompletionTest : BasePlatformTestCase() {
             "logoBlur",
             "credits",
             "authors",
+            "displayTest",
             "description"
         )
     }
@@ -87,6 +88,18 @@ class ModsTomlCompletionTest : BasePlatformTestCase() {
     @DisplayName("Boolean Value")
     fun booleanValue() {
         myFixture.testCompletionVariants("boolean/mods.toml", "true", "false")
+    }
+
+    @Test
+    @DisplayName("Display Test Value")
+    fun displayTestValue() {
+        myFixture.testCompletionVariants(
+            "displayTestValue/mods.toml",
+            "MATCH_VERSION",
+            "IGNORE_SERVER_VERSION",
+            "IGNORE_ALL_VERSION",
+            "NONE"
+        )
     }
 
     @Test
