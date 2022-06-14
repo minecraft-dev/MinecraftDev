@@ -25,6 +25,10 @@ Minecraft Development for IntelliJ
         <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20221"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20221)/statusIcon.svg" alt="2022.1 Nightly Status" /></a></td>
     </tr>
     <tr>
+        <td align="left">2022.2</td>
+        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20222"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20222)/statusIcon.svg" alt="2022.2 Nightly Status" /></a></td>
+    </tr>
+    <tr>
         <td align="right"><b>OS Tests</b></td>
         <td align="left" colspan="2">
             <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Test%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/Test/badge.svg?branch=dev&event=push" alt="GitHub Action Status" /></a>
