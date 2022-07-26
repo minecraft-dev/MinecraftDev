@@ -18,8 +18,6 @@ import com.intellij.ide.projectView.ProjectViewNodeDecorator
 import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.roots.ModuleRootManager
-import com.intellij.packageDependencies.ui.PackageDependenciesNode
-import com.intellij.ui.ColoredTreeCellRenderer
 
 /**
  * This class sets the icons for the modules in the project view.
@@ -51,6 +49,4 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
         val facet = MinecraftFacet.getInstance(module) ?: return
         data.setIcon(facet.icon ?: return)
     }
-
-    override fun decorate(node: PackageDependenciesNode, cellRenderer: ColoredTreeCellRenderer) {}
 }
