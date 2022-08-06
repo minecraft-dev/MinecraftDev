@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.platform.mcp.fabricloom
 
+import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.runGradleTaskWithCallback
 import com.intellij.codeInsight.AttachSourcesProvider
@@ -36,7 +37,23 @@ class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
         val loomData = GradleUtil.findGradleModuleData(module)?.children
             ?.find { it.key == FabricLoomData.KEY }?.data as? FabricLoomData
             ?: return emptyList()
-        return loomData.decompileTasks.map(::DecompileAction)
+
+        var env = "single"
+
+        if (loomData.splitMinecraftJar) {
+            env = if (isClientClass(psiFile)) "client" else "common"
+        }
+
+        val decompileTasks = loomData.decompileTasks[env] ?: return emptyList()
+        return decompileTasks.map(::DecompileAction)
+    }
+
+    private fun isClientClass(psiFile: PsiJavaFile): Boolean {
+        return psiFile.classes.any { clazz ->
+            val environment = clazz.getAnnotation(FabricConstants.ENVIRONMENT_ANNOTATION)
+            val value = environment?.findDeclaredAttributeValue("value")?.text
+            return value == FabricConstants.ENV_TYPE_CLIENT
+        }
     }
 
     private class DecompileAction(val decompiler: FabricLoomData.Decompiler) :
