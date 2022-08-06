@@ -10,7 +10,8 @@
 
 package com.demonwav.mcdev.platform.mcp.fabricloom
 
-import com.demonwav.mcdev.platform.fabric.util.FabricConstants
+import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
+import com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyUtil
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.runGradleTaskWithCallback
 import com.intellij.codeInsight.AttachSourcesProvider
@@ -38,10 +39,12 @@ class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
             ?.find { it.key == FabricLoomData.KEY }?.data as? FabricLoomData
             ?: return emptyList()
 
-        var env = "single"
-
-        if (loomData.splitMinecraftJar) {
-            env = if (isClientClass(psiFile)) "client" else "common"
+        val env = if (!loomData.splitMinecraftJar) {
+            "single"
+        } else if (isClientClass(psiFile)) {
+            "client"
+        } else {
+            "common"
         }
 
         val decompileTasks = loomData.decompileTasks[env] ?: return emptyList()
@@ -49,10 +52,8 @@ class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
     }
 
     private fun isClientClass(psiFile: PsiJavaFile): Boolean {
-        return psiFile.classes.any { clazz ->
-            val environment = clazz.getAnnotation(FabricConstants.ENVIRONMENT_ANNOTATION)
-            val value = environment?.findDeclaredAttributeValue("value")?.text
-            return value == FabricConstants.ENV_TYPE_CLIENT
+        return psiFile.classes.any { psiClass ->
+            return SideOnlyUtil.getSideForClass(psiClass).second == Side.CLIENT
         }
     }
 
