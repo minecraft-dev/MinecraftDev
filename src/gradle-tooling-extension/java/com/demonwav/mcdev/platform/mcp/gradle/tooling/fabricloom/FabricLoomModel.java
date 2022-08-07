@@ -11,11 +11,23 @@
 package com.demonwav.mcdev.platform.mcp.gradle.tooling.fabricloom;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 public interface FabricLoomModel {
 
     File getTinyMappings();
 
-    Map<String, String> getDecompilers();
+    Map<String, List<DecompilerModel>> getDecompilers();
+
+    boolean getSplitMinecraftJar();
+
+    interface DecompilerModel {
+
+        String getName();
+
+        String getTaskName();
+
+        String getSourcesPath();
+    }
 }
