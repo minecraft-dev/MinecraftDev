@@ -92,4 +92,6 @@ class InvokerHandler : MixinMemberAnnotationHandler {
             canDecompile = false
         ).createSmartPointer()
     }
+
+    override val isEntryPoint = false
 }

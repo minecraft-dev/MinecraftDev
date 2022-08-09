@@ -32,6 +32,8 @@ class OverwriteHandler : MixinMemberAnnotationHandler {
         return "Unresolved method ${method.name} in target class"
     }
 
+    override val isEntryPoint = true
+
     companion object {
         fun getInstance(): OverwriteHandler? {
             return MixinAnnotationHandler.forMixinAnnotation(OVERWRITE) as? OverwriteHandler

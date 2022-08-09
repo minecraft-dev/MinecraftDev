@@ -118,6 +118,8 @@ class ShadowHandler : MixinMemberAnnotationHandler {
         return (member.name ?: return null).removePrefix(prefix)
     }
 
+    override val isEntryPoint = false
+
     companion object {
         fun getInstance(): ShadowHandler? {
             return MixinAnnotationHandler.forMixinAnnotation(SHADOW) as? ShadowHandler

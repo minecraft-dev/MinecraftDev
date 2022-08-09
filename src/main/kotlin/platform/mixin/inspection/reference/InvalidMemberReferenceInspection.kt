@@ -50,7 +50,7 @@ class InvalidMemberReferenceInspection : MixinInspection() {
 
             // Check if valid annotation
             val qualifiedName = pair.annotationFromNameValuePair?.qualifiedName ?: return
-            if (!resolver.isValidAnnotation(qualifiedName)) {
+            if (!resolver.isValidAnnotation(qualifiedName, pair.project)) {
                 return
             }
 
