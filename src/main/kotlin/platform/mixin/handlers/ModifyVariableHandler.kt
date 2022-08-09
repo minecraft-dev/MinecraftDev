@@ -132,7 +132,7 @@ class ModifyVariableInfo(
                 }
                 val ordinal = ordinals[local.desc] ?: 0
                 ordinals[local.desc!!] = ordinal + 1
-                if (ordinal == ordinal && (!matchType || typeDesc == null || local.desc == typeDesc)) {
+                if (ordinal == this.ordinal && (!matchType || typeDesc == null || local.desc == typeDesc)) {
                     result += local
                 }
             }

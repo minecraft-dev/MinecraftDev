@@ -173,13 +173,20 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
             canDecompile = true
         ) ?: return emptyList()
 
+        val constantInjectionPoint = InjectionPoint.byAtCode("CONSTANT") as? ConstantInjectionPoint
+            ?: return emptyList()
+
         return constantInfos.asSequence().flatMap { modifyConstantInfo ->
             val collectVisitor = ConstantInjectionPoint.MyCollectVisitor(
                 annotation.project,
                 CollectVisitor.Mode.MATCH_ALL,
                 modifyConstantInfo.constantInfo
             )
-            InjectionPoint.addStandardFilters(modifyConstantInfo.constantAnnotation, targetClass, collectVisitor)
+            constantInjectionPoint.addStandardFilters(
+                modifyConstantInfo.constantAnnotation,
+                targetClass,
+                collectVisitor
+            )
             collectVisitor.visit(targetMethod)
             val bytecodeResults = collectVisitor.result
 
@@ -199,13 +206,19 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
         mode: CollectVisitor.Mode
     ): List<CollectVisitor.Result<*>> {
         val constantInfos = getConstantInfos(annotation) ?: return emptyList()
+        val constantInjectionPoint = InjectionPoint.byAtCode("CONSTANT") as? ConstantInjectionPoint
+            ?: return emptyList()
         return constantInfos.asSequence().flatMap { modifyConstantInfo ->
             val collectVisitor = ConstantInjectionPoint.MyCollectVisitor(
                 annotation.project,
                 mode,
                 modifyConstantInfo.constantInfo
             )
-            InjectionPoint.addStandardFilters(modifyConstantInfo.constantAnnotation, targetClass, collectVisitor)
+            constantInjectionPoint.addStandardFilters(
+                modifyConstantInfo.constantAnnotation,
+                targetClass,
+                collectVisitor
+            )
             collectVisitor.visit(targetMethod)
             collectVisitor.result.asSequence()
         }.sortedBy { targetMethod.instructions.indexOf(it.insn) }.toList()
@@ -217,13 +230,19 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
         targetMethod: MethodNode
     ): InsnResolutionInfo.Failure? {
         val constantInfos = getConstantInfos(annotation) ?: return InsnResolutionInfo.Failure()
+        val constantInjectionPoint = InjectionPoint.byAtCode("CONSTANT") as? ConstantInjectionPoint
+            ?: return null
         return constantInfos.asSequence().mapNotNull { modifyConstantInfo ->
             val collectVisitor = ConstantInjectionPoint.MyCollectVisitor(
                 annotation.project,
                 CollectVisitor.Mode.MATCH_FIRST,
                 modifyConstantInfo.constantInfo
             )
-            InjectionPoint.addStandardFilters(modifyConstantInfo.constantAnnotation, targetClass, collectVisitor)
+            constantInjectionPoint.addStandardFilters(
+                modifyConstantInfo.constantAnnotation,
+                targetClass,
+                collectVisitor
+            )
             collectVisitor.visit(targetMethod)
             if (collectVisitor.result.isEmpty()) {
                 collectVisitor.filterToBlame
