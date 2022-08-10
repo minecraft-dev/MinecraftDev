@@ -10,24 +10,38 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_INJECTORS
+import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.insideAnnotationAttribute
+import com.intellij.openapi.project.Project
 import com.intellij.patterns.ElementPattern
+import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.PsiJavaPatterns
 import com.intellij.patterns.StandardPatterns
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteral
+import com.intellij.util.ProcessingContext
 
 object MethodReference : AbstractMethodReference() {
     val ELEMENT_PATTERN: ElementPattern<PsiLiteral> =
-        PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationParam(
-            StandardPatterns.string().oneOf(METHOD_INJECTORS),
+        PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationAttribute(
+            PsiJavaPatterns.psiAnnotation().with(
+                object : PatternCondition<PsiAnnotation>("injector") {
+                    override fun accepts(t: PsiAnnotation, context: ProcessingContext?): Boolean {
+                        val qName = t.qualifiedName ?: return false
+                        return MixinAnnotationHandler.forMixinAnnotation(qName, t.project) is InjectorAnnotationHandler
+                    }
+                }
+            ),
             "method"
         )
 
     override val description = "method '%s' in target class"
 
-    override fun isValidAnnotation(name: String) = name in METHOD_INJECTORS
+    override fun isValidAnnotation(name: String, project: Project) =
+        MixinAnnotationHandler.forMixinAnnotation(name, project) is InjectorAnnotationHandler
 
     override fun parseSelector(context: PsiElement): MixinSelector? {
         return parseMixinSelector(context)

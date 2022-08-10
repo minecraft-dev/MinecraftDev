@@ -146,6 +146,8 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
 
     open val allowCoerce = false
 
+    override val isEntryPoint = true
+
     data class InsnResult(val method: ClassAndMethodNode, val result: CollectVisitor.Result<*>)
 
     companion object {
@@ -180,4 +182,14 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
             }
         }
     }
+}
+
+object DefaultInjectorAnnotationHandler : InjectorAnnotationHandler() {
+    override fun expectedMethodSignature(
+        annotation: PsiAnnotation,
+        targetClass: ClassNode,
+        targetMethod: MethodNode
+    ) = null
+
+    override val isSoft = true
 }

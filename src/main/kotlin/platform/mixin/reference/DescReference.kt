@@ -18,6 +18,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.patterns.ElementPattern
 import com.intellij.patterns.PsiJavaPatterns
@@ -42,7 +43,7 @@ object DescReference : AbstractMethodReference() {
 
     override val description = "method '%s'"
 
-    override fun isValidAnnotation(name: String) = name == DESC
+    override fun isValidAnnotation(name: String, project: Project) = name == DESC
 
     override fun parseSelector(context: PsiElement): DescSelector? {
         val annotation = context.parentOfType<PsiAnnotation>() ?: return null // @Desc

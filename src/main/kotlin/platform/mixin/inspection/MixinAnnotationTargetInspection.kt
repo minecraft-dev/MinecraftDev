@@ -34,7 +34,7 @@ class MixinAnnotationTargetInspection : MixinInspection() {
                     var parentAnnotation = annotation.parentOfType<PsiAnnotation>()
                     while (parentAnnotation != null) {
                         val parentQName = parentAnnotation.qualifiedName ?: return
-                        if (MixinAnnotationHandler.forMixinAnnotation(parentQName) != null) {
+                        if (MixinAnnotationHandler.forMixinAnnotation(parentQName, parentAnnotation.project) != null) {
                             break
                         }
                         parentAnnotation = parentAnnotation.parentOfType()
@@ -43,7 +43,8 @@ class MixinAnnotationTargetInspection : MixinInspection() {
                         return
                     }
                     val parentQName = parentAnnotation.qualifiedName ?: return
-                    val handler = MixinAnnotationHandler.forMixinAnnotation(parentQName) ?: return
+                    val handler = MixinAnnotationHandler.forMixinAnnotation(parentQName, parentAnnotation.project)
+                        ?: return
                     val targets = handler.resolveTarget(parentAnnotation).ifEmpty { return }
                     val failure = targets.asSequence()
                         .mapNotNull {
@@ -65,7 +66,7 @@ class MixinAnnotationTargetInspection : MixinInspection() {
                         addProblem(annotation, "Could not resolve @At target", failure)
                     }
                 } else {
-                    val handler = MixinAnnotationHandler.forMixinAnnotation(qName) ?: return
+                    val handler = MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project) ?: return
                     val failure = handler.isUnresolved(annotation)
                     if (failure != null) {
                         val message = handler.createUnresolvedMessage(annotation) ?: return

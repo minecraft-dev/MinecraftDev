@@ -46,7 +46,7 @@ class UnresolvedReferenceInspection : MixinInspection() {
 
             // Check if valid annotation
             val qualifiedName = pair.annotationFromNameValuePair?.qualifiedName ?: return
-            val resolver = resolvers.firstOrNull { it.isValidAnnotation(qualifiedName) } ?: return
+            val resolver = resolvers.firstOrNull { it.isValidAnnotation(qualifiedName, pair.project) } ?: return
 
             val value = pair.value ?: return
             if (value is PsiArrayInitializerMemberValue) {

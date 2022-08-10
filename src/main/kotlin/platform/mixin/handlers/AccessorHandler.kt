@@ -96,6 +96,8 @@ class AccessorHandler : MixinMemberAnnotationHandler {
         ).createSmartPointer()
     }
 
+    override val isEntryPoint = false
+
     data class AccessorInfo(val name: String, val type: AccessorType)
 
     enum class AccessorType(val allowGetters: Boolean, val allowSetters: Boolean) {
