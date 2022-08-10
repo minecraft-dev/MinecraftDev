@@ -34,7 +34,10 @@ class MixinEntryPoint : EntryPointWithVisibilityLevel() {
     // TODO: support more handlers than the builtin
     // need to find a way to access the project for that
     override fun getIgnoreAnnotations() =
-        MixinAnnotationHandler.getBuiltinHandlers().map { (name, _) -> name }.toTypedArray()
+        MixinAnnotationHandler.getBuiltinHandlers()
+            .filter { (_, handler) -> handler.isEntryPoint }
+            .map { (name, _) -> name }
+            .toTypedArray()
 
     override fun isEntryPoint(element: PsiElement): Boolean {
         if (element !is PsiMethod) {
