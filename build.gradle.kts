@@ -14,6 +14,7 @@ import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.gradle.ext.settings
 import org.jetbrains.gradle.ext.taskTriggers
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 
 plugins {
     kotlin("jvm") version "1.7.10"
@@ -23,7 +24,7 @@ plugins {
     idea
     id("org.jetbrains.intellij") version "1.8.0"
     id("org.cadixdev.licenser")
-    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
 
 val ideaVersionName: String by project
@@ -275,8 +276,8 @@ license {
     }
 }
 
-ktlint {
-    enableExperimentalRules.set(true)
+tasks.withType<BaseKtLintCheckTask>().configureEach {
+    workerMaxHeapSize.set("512m")
 }
 
 tasks.register("format") {
