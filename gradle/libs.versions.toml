@@ -1,7 +1,7 @@
 [versions]
-coroutines = "1.5.2"
-junit = "5.7.1"
-asm = "9.2"
+coroutines = "1.6.3"
+junit = "5.9.0"
+asm = "9.3"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -17,8 +17,8 @@ grammarKit = "org.jetbrains.idea:grammar-kit:1.5.1"
 
 # Gradle Tooling
 gradleToolingExtension = "com.jetbrains.intellij.gradle:gradle-tooling-extension:212.4746.92"
-annotations = "org.jetbrains:annotations:20.1.0"
-groovy = "org.codehaus.groovy:groovy-all:2.5.11"
+annotations = "org.jetbrains:annotations:23.0.0"
+groovy = "org.codehaus.groovy:groovy-all:2.5.18"
 
 asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
