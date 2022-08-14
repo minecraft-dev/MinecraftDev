@@ -112,6 +112,33 @@ dependencies {
     testRuntimeOnly(libs.junit.entine)
 }
 
+val artifactType = Attribute.of("artifactType", String::class.java)
+val filtered = Attribute.of("filtered", Boolean::class.javaObjectType)
+
+dependencies {
+    attributesSchema {
+        attribute(filtered)
+    }
+    artifactTypes.getByName("jar") {
+        attributes.attribute(filtered, false)
+    }
+
+    registerTransform(Filter::class) {
+        from.attribute(filtered, false).attribute(artifactType, "jar")
+        to.attribute(filtered, true).attribute(artifactType, "jar")
+
+        parameters {
+            ideaVersion.set(providers.gradleProperty("ideaVersion"))
+            ideaVersionName.set(providers.gradleProperty("ideaVersionName"))
+            depsFile.set(layout.projectDirectory.file(".gradle/intellij-deps.json"))
+        }
+    }
+}
+
+configurations.compileClasspath {
+    attributes.attribute(filtered, true)
+}
+
 intellij {
     // IntelliJ IDEA dependency
     version.set(providers.gradleProperty("ideaVersion"))
@@ -240,6 +267,8 @@ idea {
     module {
         generatedSourceDirs.add(file("build/gen"))
         excludeDirs.add(file(intellij.sandboxDir.get()))
+        isDownloadJavadoc = true
+        isDownloadSources = true
     }
 }
 

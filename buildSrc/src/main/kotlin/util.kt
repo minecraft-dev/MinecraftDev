@@ -95,3 +95,6 @@ fun Project.parser(bnf: String, pack: String): TaskDelegate<JavaExec> {
         )
     }
 }
+
+data class DepList(val intellijVersion: String, val intellijVersionName: String, val deps: List<Dep>)
+data class Dep(val groupId: String, val artifactId: String, val version: String)

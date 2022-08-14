@@ -5,6 +5,7 @@ asm = "9.3"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
 coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
 templateMakerFabric = "com.extracraftx.minecraft:TemplateMakerFabric:0.4.1"
@@ -34,5 +35,5 @@ junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "jun
 junit-entine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 
 [bundles]
-coroutines = ["coroutines-core", "coroutines-swing"]
+coroutines = ["coroutines-core", "coroutines-jdk8", "coroutines-swing"]
 asm = ["asm", "asm-tree", "asm-analysis"]
