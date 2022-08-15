@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -117,6 +117,8 @@ class ShadowHandler : MixinMemberAnnotationHandler {
             ?: MixinConstants.DEFAULT_SHADOW_PREFIX
         return (member.name ?: return null).removePrefix(prefix)
     }
+
+    override val isEntryPoint = false
 
     companion object {
         fun getInstance(): ShadowHandler? {

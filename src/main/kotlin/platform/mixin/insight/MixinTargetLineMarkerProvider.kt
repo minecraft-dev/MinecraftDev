@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -55,7 +55,7 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
 
         val (handler, annotation) = element.annotations.mapFirstNotNull { annotation ->
             annotation.qualifiedName?.let { qName ->
-                MixinAnnotationHandler.forMixinAnnotation(qName)?.let { it to annotation }
+                MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project)?.let { it to annotation }
             }
         } ?: return null
         if (handler.isUnresolved(annotation) != null) {

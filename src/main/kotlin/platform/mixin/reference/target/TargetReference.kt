@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -21,6 +21,7 @@ import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.insideAnnotationAttribute
 import com.demonwav.mcdev.util.reference.PolyReferenceResolver
 import com.demonwav.mcdev.util.reference.completeToLiteral
+import com.intellij.openapi.project.Project
 import com.intellij.patterns.ElementPattern
 import com.intellij.patterns.PsiJavaPatterns
 import com.intellij.patterns.StandardPatterns
@@ -46,7 +47,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
     override val description: String
         get() = "target reference '%s'"
 
-    override fun isValidAnnotation(name: String) = name == AT
+    override fun isValidAnnotation(name: String, project: Project) = name == AT
 
     fun resolveTarget(context: PsiElement): PsiMember? {
         val selector = parseMixinSelector(context) ?: return null
@@ -57,19 +58,22 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
      * Null is returned when no parent annotation handler could be found, in which case we shouldn't mark this
      * reference as unresolved.
      */
-    private fun getTargets(at: PsiAnnotation): List<ClassAndMethodNode>? {
+    private fun getTargets(at: PsiAnnotation, forUnresolved: Boolean): List<ClassAndMethodNode>? {
         val (handler, annotation) = generateSequence(at.parent) { it.parent }
             .filterIsInstance<PsiAnnotation>()
             .mapNotNull { annotation ->
                 val qName = annotation.qualifiedName ?: return@mapNotNull null
-                MixinAnnotationHandler.forMixinAnnotation(qName)?.let { it to annotation }
+                MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project)?.let { it to annotation }
             }.firstOrNull() ?: return null
+        if (forUnresolved && handler.isSoft) {
+            return null
+        }
         return handler.resolveTarget(annotation).mapNotNull { (it as? MethodTargetMember)?.classAndMethod }
     }
 
     override fun isUnresolved(context: PsiElement): Boolean {
         val at = context.parentOfType<PsiAnnotation>() ?: return true
-        val targets = getTargets(at)?.ifEmpty { return true } ?: return false
+        val targets = getTargets(at, true)?.ifEmpty { return true } ?: return false
         return targets.all {
             val failure = AtResolver(at, it.clazz, it.method).isUnresolved()
             // leave it if there is a filter to blame, the target reference was at least resolved
@@ -79,7 +83,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
     fun resolveNavigationTargets(context: PsiElement): Array<PsiElement>? {
         val at = context.parentOfType<PsiAnnotation>() ?: return null
-        val targets = getTargets(at) ?: return null
+        val targets = getTargets(at, false) ?: return null
         return targets.flatMap { AtResolver(at, it.clazz, it.method).resolveNavigationTargets() }.toTypedArray()
     }
 
@@ -90,7 +94,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
     override fun collectVariants(context: PsiElement): Array<Any> {
         val at = context.parentOfType<PsiAnnotation>() ?: return ArrayUtilRt.EMPTY_OBJECT_ARRAY
-        val targets = getTargets(at) ?: return ArrayUtilRt.EMPTY_OBJECT_ARRAY
+        val targets = getTargets(at, false) ?: return ArrayUtilRt.EMPTY_OBJECT_ARRAY
         return targets.flatMap { target ->
             AtResolver(at, target.clazz, target.method).collectTargetVariants { builder ->
                 builder.completeToLiteral(context)

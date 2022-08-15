@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -31,6 +31,8 @@ class OverwriteHandler : MixinMemberAnnotationHandler {
         val method = annotation.parentOfType<PsiMethod>() ?: return null
         return "Unresolved method ${method.name} in target class"
     }
+
+    override val isEntryPoint = true
 
     companion object {
         fun getInstance(): OverwriteHandler? {

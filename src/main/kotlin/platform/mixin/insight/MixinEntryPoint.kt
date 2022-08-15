@@ -3,14 +3,16 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mixin.insight
 
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
+import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInspection.reference.RefElement
 import com.intellij.codeInspection.visibility.EntryPointWithVisibilityLevel
 import com.intellij.psi.PsiElement
@@ -29,25 +31,44 @@ class MixinEntryPoint : EntryPointWithVisibilityLevel() {
     override fun getDisplayName() = "Mixin injectors"
     override fun getTitle() = "Suggest private visibility level for Mixin injectors"
 
-    override fun getIgnoreAnnotations() = MixinConstants.Annotations.ENTRY_POINTS
+    // TODO: support more handlers than the builtin
+    // need to find a way to access the project for that
+    override fun getIgnoreAnnotations() =
+        MixinAnnotationHandler.getBuiltinHandlers()
+            .filter { (_, handler) -> handler.isEntryPoint }
+            .map { (name, _) -> name }
+            .toTypedArray()
 
     override fun isEntryPoint(element: PsiElement): Boolean {
-        val modifierList = (element as? PsiMethod)?.modifierList ?: return false
-        return MixinConstants.Annotations.ENTRY_POINTS.any {
-            modifierList.findAnnotation(it) != null
+        if (element !is PsiMethod) {
+            return false
         }
+        val project = element.project
+        for (annotation in element.annotations) {
+            val qName = annotation.qualifiedName ?: continue
+            val handler = MixinAnnotationHandler.forMixinAnnotation(qName, project)
+            if (handler != null && handler.isEntryPoint) {
+                return true
+            }
+        }
+        return false
     }
 
     override fun isEntryPoint(refElement: RefElement, psiElement: PsiElement) = isEntryPoint(psiElement)
 
     override fun getMinVisibilityLevel(member: PsiMember): Int {
-        if (member !is PsiMethod) return -1
-        val modifierList = member.modifierList
-        return if (MixinConstants.Annotations.METHOD_INJECTORS.any { modifierList.findAnnotation(it) != null }) {
-            PsiUtil.ACCESS_LEVEL_PRIVATE
-        } else {
-            -1
+        if (member !is PsiMethod) {
+            return -1
         }
+        val project = member.project
+        for (annotation in member.annotations) {
+            val qName = annotation.qualifiedName ?: continue
+            val handler = MixinAnnotationHandler.forMixinAnnotation(qName, project)
+            if (handler is InjectorAnnotationHandler) {
+                return PsiUtil.ACCESS_LEVEL_PRIVATE
+            }
+        }
+        return -1
     }
 
     override fun isSelected() = MIXIN_ENTRY_POINT

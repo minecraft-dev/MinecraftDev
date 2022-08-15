@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -57,6 +57,7 @@ val UMethod.uastEventParameterPair: Pair<UParameter, UClass>?
     get() {
         val firstParameter = this.uastParameters.firstOrNull()
             ?: return null // Listeners must have at least a single parameter
+
         // Get the type of the parameter so we can start resolving it
 
         @Suppress("UElementAsPsi") // UVariable overrides getType so it should be fine to use on UElements...

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -50,7 +50,7 @@ class InvalidMemberReferenceInspection : MixinInspection() {
 
             // Check if valid annotation
             val qualifiedName = pair.annotationFromNameValuePair?.qualifiedName ?: return
-            if (!resolver.isValidAnnotation(qualifiedName)) {
+            if (!resolver.isValidAnnotation(qualifiedName, pair.project)) {
                 return
             }
 

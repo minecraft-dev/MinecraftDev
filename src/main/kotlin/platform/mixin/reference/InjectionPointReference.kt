@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -44,7 +44,7 @@ object InjectionPointReference : ReferenceResolver(), MixinReference {
     override val description: String
         get() = "injection point type '%s'"
 
-    override fun isValidAnnotation(name: String) = name == AT
+    override fun isValidAnnotation(name: String, project: Project) = name == AT
 
     override fun resolveReference(context: PsiElement): PsiElement? {
         // Remove slice selectors from the injection point type

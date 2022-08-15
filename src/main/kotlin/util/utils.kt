@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -13,8 +13,10 @@ package com.demonwav.mcdev.util
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.intellij.lang.java.lexer.JavaLexer
+import com.intellij.openapi.application.AppUIExecutor
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.impl.coroutineDispatchingContext
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.module.Module
@@ -32,6 +34,8 @@ import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import java.util.Locale
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.runBlocking
 
 inline fun <T : Any?> runWriteTask(crossinline func: () -> T): T {
     return invokeAndWait {
@@ -87,6 +91,10 @@ fun invokeLater(expired: Condition<*>, func: () -> Unit) {
 
 fun invokeLaterAny(func: () -> Unit) {
     ApplicationManager.getApplication().invokeLater(func, ModalityState.any())
+}
+
+fun <T> edtCoroutineScope(block: suspend CoroutineScope.() -> T): T {
+    return runBlocking(AppUIExecutor.onUiThread().coroutineDispatchingContext(), block)
 }
 
 inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =

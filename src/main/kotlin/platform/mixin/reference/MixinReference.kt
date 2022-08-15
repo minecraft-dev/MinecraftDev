@@ -3,13 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 
 interface MixinReference {
@@ -18,5 +19,5 @@ interface MixinReference {
 
     fun isUnresolved(context: PsiElement): Boolean
 
-    fun isValidAnnotation(name: String): Boolean
+    fun isValidAnnotation(name: String, project: Project): Boolean
 }
