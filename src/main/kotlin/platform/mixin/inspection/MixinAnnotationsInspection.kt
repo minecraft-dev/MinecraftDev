@@ -3,14 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MIXIN_ANNOTATIONS
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInspection.ProblemsHolder
@@ -31,7 +31,7 @@ class MixinAnnotationsInspection : MixinInspection() {
 
         override fun visitAnnotation(annotation: PsiAnnotation) {
             val qualifiedName = annotation.qualifiedName ?: return
-            if (qualifiedName !in MIXIN_ANNOTATIONS) {
+            if (MixinAnnotationHandler.forMixinAnnotation(qualifiedName, annotation.project) == null) {
                 return
             }
 

@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -30,15 +30,50 @@ class FabricLoomModelBuilderImpl implements ModelBuilderService {
         }
 
         def loomExtension = project.extensions.getByName('loom')
-        def tinyMappings = loomExtension.mappingsProvider.tinyMappings.toFile().getAbsoluteFile()
-        def decompilers = loomExtension.decompilerOptions.collectEntries {
-            def task = project.tasks.getByName('genSourcesWith' + it.name.capitalize())
-            def sourcesPath = task.runtimeJar.get().getAsFile().getAbsolutePath().dropRight(4) + "-sources.jar"
-            [it.name, sourcesPath]
+
+        try {
+            return build(project, loomExtension)
+        } catch (GroovyRuntimeException ignored) {
+            // Must be using an older loom version, fallback.
+            return buildLegacy(project, loomExtension)
+        }
+    }
+
+    FabricLoomModel build(Project project, Object loomExtension) {
+        def tinyMappings = loomExtension.mappingsFile
+        def splitMinecraftJar = loomExtension.areEnvironmentSourceSetsSplit()
+
+        def decompilers = [:]
+
+        if (splitMinecraftJar) {
+            decompilers << ["common": getDecompilers(loomExtension, false)]
+            decompilers << ["client": getDecompilers(loomExtension, true)]
+        } else {
+            decompilers << ["single": getDecompilers(loomExtension, false)]
         }
 
         //noinspection GroovyAssignabilityCheck
-        return new FabricLoomModelImpl(tinyMappings, decompilers)
+        return new FabricLoomModelImpl(tinyMappings, decompilers, splitMinecraftJar)
+    }
+
+    List<FabricLoomModelImpl.DecompilerModelImpl> getDecompilers(Object loomExtension, boolean client) {
+        loomExtension.decompilerOptions.collect {
+            def task = loomExtension.getDecompileTask(it, client)
+            def sourcesPath = task.outputJar.get().getAsFile().getAbsolutePath()
+            new FabricLoomModelImpl.DecompilerModelImpl(name: it.name, taskName: task.name, sourcesPath: sourcesPath)
+        }
+    }
+
+    FabricLoomModel buildLegacy(Project project, Object loomExtension) {
+        def tinyMappings = loomExtension.mappingsProvider.tinyMappings.toFile().getAbsoluteFile()
+        def decompilers = loomExtension.decompilerOptions.collect {
+            def task = project.tasks.getByName('genSourcesWith' + it.name.capitalize())
+            def sourcesPath = task.runtimeJar.get().getAsFile().getAbsolutePath().dropRight(4) + "-sources.jar"
+            new FabricLoomModelImpl.DecompilerModelImpl(name: it.name, taskName: task.name, sourcesPath: sourcesPath)
+        }
+
+        //noinspection GroovyAssignabilityCheck
+        return new FabricLoomModelImpl(tinyMappings, ["single": decompilers], false)
     }
 
     @Override

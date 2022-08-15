@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -92,4 +92,6 @@ class InvokerHandler : MixinMemberAnnotationHandler {
             canDecompile = false
         ).createSmartPointer()
     }
+
+    override val isEntryPoint = false
 }

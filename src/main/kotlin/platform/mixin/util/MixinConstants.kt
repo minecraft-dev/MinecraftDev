@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -37,6 +37,7 @@ object MixinConstants {
 
     object Annotations {
         const val ACCESSOR = "org.spongepowered.asm.mixin.gen.Accessor"
+        const val ANNOTATION_TYPE = "org.spongepowered.asm.mixin.injection.struct.InjectionInfo.AnnotationType"
         const val AT = "org.spongepowered.asm.mixin.injection.At"
         const val AT_CODE = "org.spongepowered.asm.mixin.injection.InjectionPoint.AtCode"
         const val COERCE = "org.spongepowered.asm.mixin.injection.Coerce"
@@ -63,34 +64,5 @@ object MixinConstants {
         const val MODIFY_VARIABLE = "org.spongepowered.asm.mixin.injection.ModifyVariable"
         const val REDIRECT = "org.spongepowered.asm.mixin.injection.Redirect"
         const val SURROGATE = "org.spongepowered.asm.mixin.injection.Surrogate"
-
-        val METHOD_INJECTORS = listOf(INJECT, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT)
-        val ENTRY_POINTS =
-            arrayOf(INJECT, MODIFY_ARG, MODIFY_ARGS, MODIFY_CONSTANT, MODIFY_VARIABLE, REDIRECT, SURROGATE, OVERWRITE)
-        val MIXIN_ANNOTATIONS = setOf(
-            ACCESSOR,
-            AT,
-            DEBUG,
-            DYNAMIC,
-            FINAL,
-            IMPLEMENTS,
-            INTERFACE,
-            INTRINSIC,
-            MIXIN,
-            MUTABLE,
-            OVERWRITE,
-            SHADOW,
-            SLICE,
-            SOFT_OVERRIDE,
-            UNIQUE,
-            INJECT,
-            INVOKER,
-            MODIFY_ARG,
-            MODIFY_ARGS,
-            MODIFY_CONSTANT,
-            MODIFY_VARIABLE,
-            REDIRECT,
-            SURROGATE
-        )
     }
 }

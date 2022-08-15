@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -13,6 +13,7 @@ package com.demonwav.mcdev.util
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.intellij.lang.java.lexer.JavaLexer
+import com.intellij.openapi.application.AppUIExecutor
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.runReadAction
@@ -32,6 +33,7 @@ import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import java.util.Locale
+import kotlin.math.min
 
 inline fun <T : Any?> runWriteTask(crossinline func: () -> T): T {
     return invokeAndWait {
@@ -89,6 +91,10 @@ fun invokeLaterAny(func: () -> Unit) {
     ApplicationManager.getApplication().invokeLater(func, ModalityState.any())
 }
 
+fun <T> invokeEdt(block: () -> T): T {
+    return AppUIExecutor.onUiThread().submit(block).get()
+}
+
 inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
     applyWriteAction { func() }
 
@@ -124,7 +130,7 @@ inline fun <T : Collection<*>> T.ifEmpty(func: () -> Unit): T {
 }
 
 inline fun <T : Collection<*>?> T.ifNullOrEmpty(func: () -> Unit): T {
-    if (this == null || isEmpty()) {
+    if (isNullOrEmpty()) {
         func()
     }
     return this
@@ -253,7 +259,7 @@ fun String.getSimilarity(text: String, bonus: Int = 0): Int {
         return 100_000 + bonus // lowercase exact match
     }
 
-    val distance = Math.min(lowerCaseThis.length, lowerCaseText.length)
+    val distance = min(lowerCaseThis.length, lowerCaseText.length)
     for (i in 0 until distance) {
         if (lowerCaseThis[i] != lowerCaseText[i]) {
             return i + bonus

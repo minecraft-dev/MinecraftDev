@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -14,16 +14,17 @@ import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.gradle.ext.settings
 import org.jetbrains.gradle.ext.taskTriggers
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 
 plugins {
-    kotlin("jvm") version "1.6.20"
+    kotlin("jvm") version "1.7.10"
     java
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.7.0"
+    id("org.jetbrains.intellij") version "1.8.0"
     id("org.cadixdev.licenser")
-    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
 
 val ideaVersionName: String by project
@@ -109,6 +110,34 @@ dependencies {
 
     testImplementation(libs.junit.api)
     testRuntimeOnly(libs.junit.entine)
+    testRuntimeOnly(libs.junit.platform.launcher)
+}
+
+val artifactType = Attribute.of("artifactType", String::class.java)
+val filtered = Attribute.of("filtered", Boolean::class.javaObjectType)
+
+dependencies {
+    attributesSchema {
+        attribute(filtered)
+    }
+    artifactTypes.getByName("jar") {
+        attributes.attribute(filtered, false)
+    }
+
+    registerTransform(Filter::class) {
+        from.attribute(filtered, false).attribute(artifactType, "jar")
+        to.attribute(filtered, true).attribute(artifactType, "jar")
+
+        parameters {
+            ideaVersion.set(providers.gradleProperty("ideaVersion"))
+            ideaVersionName.set(providers.gradleProperty("ideaVersionName"))
+            depsFile.set(layout.projectDirectory.file(".gradle/intellij-deps.json"))
+        }
+    }
+}
+
+configurations.compileClasspath {
+    attributes.attribute(filtered, true)
 }
 
 intellij {
@@ -231,6 +260,8 @@ idea {
     module {
         generatedSourceDirs.add(file("build/gen"))
         excludeDirs.add(file(intellij.sandboxDir.get()))
+        isDownloadJavadoc = true
+        isDownloadSources = true
     }
 }
 
@@ -267,8 +298,8 @@ license {
     }
 }
 
-ktlint {
-    enableExperimentalRules.set(true)
+tasks.withType<BaseKtLintCheckTask>().configureEach {
+    workerMaxHeapSize.set("512m")
 }
 
 tasks.register("format") {

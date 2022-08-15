@@ -3,13 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.bytecode
@@ -29,11 +30,13 @@ import com.demonwav.mcdev.util.toResolveResults
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiArrayInitializerMemberValue
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.ResolveResult
+import com.intellij.psi.util.parentOfType
 import com.intellij.util.ArrayUtil
 import org.objectweb.asm.tree.ClassNode
 
@@ -59,6 +62,14 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
     }
 
     override fun isUnresolved(context: PsiElement): Boolean {
+        // check if the annotation handler is soft
+        val annotationQName = context.parentOfType<PsiAnnotation>()?.qualifiedName
+        if (annotationQName != null &&
+            MixinAnnotationHandler.forMixinAnnotation(annotationQName, context.project)?.isSoft == true
+        ) {
+            return false
+        }
+
         val stringValue = context.constantStringValue ?: return false
         val targetMethodInfo = parseSelector(stringValue, context) ?: return false
         val targets = getTargets(context) ?: return false
