@@ -110,6 +110,7 @@ dependencies {
 
     testImplementation(libs.junit.api)
     testRuntimeOnly(libs.junit.entine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 val artifactType = Attribute.of("artifactType", String::class.java)

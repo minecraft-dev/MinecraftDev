@@ -1,6 +1,7 @@
 [versions]
 coroutines = "1.6.3"
 junit = "5.9.0"
+junit-platform = "1.9.0"
 asm = "9.3"
 
 [libraries]
@@ -33,6 +34,7 @@ test-nbt = "com.demonwav.mcdev:all-types-nbt:1.0"
 
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-entine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
 
 [bundles]
 coroutines = ["coroutines-core", "coroutines-jdk8", "coroutines-swing"]
