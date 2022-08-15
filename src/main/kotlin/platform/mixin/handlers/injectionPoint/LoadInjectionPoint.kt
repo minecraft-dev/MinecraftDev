@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.handlers.ModifyVariableInfo
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
+import com.demonwav.mcdev.platform.mixin.util.AsmDfaUtil
 import com.demonwav.mcdev.platform.mixin.util.LocalVariables
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MODIFY_VARIABLE
 import com.demonwav.mcdev.util.constantValue
@@ -75,6 +76,32 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
         result: CollectVisitor.Result<PsiElement>
     ): LookupElementBuilder? {
         return null
+    }
+
+    override fun addOrdinalFilter(at: PsiAnnotation, targetClass: ClassNode, collectVisitor: CollectVisitor<*>) {
+        val ordinal = at.findDeclaredAttributeValue("ordinal")?.constantValue as? Int ?: return
+        if (ordinal < 0) return
+
+        // Replace the ordinal filter with one that takes into account the type of the local variable being modified.
+        // Fixes otherwise incorrect results for completion.
+        val project = at.project
+        val ordinals = mutableMapOf<String, Int>()
+        collectVisitor.addResultFilter("ordinal") { result, method ->
+            result.originalInsn as? VarInsnNode
+                ?: throw IllegalStateException("AbstractLoadInjectionPoint returned non-var insn")
+            val localInsn = if (store) { result.originalInsn.next } else { result.originalInsn }
+            val localType = AsmDfaUtil.getLocalVariableType(
+                project,
+                targetClass,
+                method,
+                localInsn,
+                result.originalInsn.`var`
+            ) ?: return@addResultFilter true
+            val desc = localType.descriptor
+            val ord = ordinals[desc] ?: 0
+            ordinals[desc] = ord + 1
+            ord == ordinal
+        }
     }
 
     private class MyNavigationVisitor(

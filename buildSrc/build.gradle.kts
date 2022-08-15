@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -18,6 +18,6 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.google.code.gson:gson:2.9.1")
     implementation("org.cadixdev.licenser:org.cadixdev.licenser.gradle.plugin:0.6.1")
 }

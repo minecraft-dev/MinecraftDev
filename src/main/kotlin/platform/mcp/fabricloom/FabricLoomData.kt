@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -19,7 +19,8 @@ import java.io.File
 data class FabricLoomData(
     val module: ModuleData,
     val tinyMappings: File?,
-    val decompileTasks: Set<Decompiler>
+    val decompileTasks: Map<String, Set<Decompiler>>,
+    val splitMinecraftJar: Boolean
 ) : AbstractExternalEntityData(module.owner) {
 
     data class Decompiler(val name: String, val taskName: String, val sourcesPath: String)

@@ -3,15 +3,14 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
 
 package com.demonwav.mcdev.framework
 
-import com.intellij.openapi.util.Ref
-import com.intellij.testFramework.runInEdtAndWait
+import com.demonwav.mcdev.util.edtCoroutineScope
 import java.lang.reflect.Method
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.InvocationInterceptor
@@ -51,15 +50,11 @@ class EdtInterceptor : InvocationInterceptor {
             return
         }
 
-        val ref = Ref<Throwable>()
-        runInEdtAndWait {
-            try {
+        val thrown = edtCoroutineScope {
+            runCatching {
                 invocation.proceed()
-            } catch (t: Throwable) {
-                ref.set(t)
-            }
+            }.exceptionOrNull()
         }
-        val thrown = ref.get()
         if (thrown != null) {
             throw thrown
         }

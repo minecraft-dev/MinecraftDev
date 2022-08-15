@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -11,13 +11,24 @@
 package com.demonwav.mcdev.platform.mixin.handlers
 
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
+import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.resolveClass
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.extensions.RequiredElement
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.KeyedExtensionCollector
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.searches.AnnotatedElementsSearch
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
+import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.serviceContainer.BaseKeyedLazyInstance
 import com.intellij.util.KeyedLazyInstance
 import com.intellij.util.xmlb.annotations.Attribute
@@ -49,12 +60,56 @@ interface MixinAnnotationHandler {
 
     fun createUnresolvedMessage(annotation: PsiAnnotation): String?
 
-    companion object {
-        private val COLLECTOR =
-            KeyedExtensionCollector<MixinAnnotationHandler, String>("com.demonwav.minecraft-dev.mixinAnnotationHandler")
+    /**
+     * Returns true if we don't actually know the implementation of the annotation, and we're just making
+     * a guess. Prevents unresolved errors but still attempts navigation
+     */
+    val isSoft: Boolean get() = false
 
-        fun forMixinAnnotation(qualifiedName: String): MixinAnnotationHandler? {
-            return COLLECTOR.findSingle(qualifiedName)
+    /**
+     * Returns whether elements annotated with this annotation should be considered "entry points",
+     * i.e. not reported as unused
+     */
+    val isEntryPoint: Boolean
+
+    companion object {
+        private val EP_NAME = ExtensionPointName<KeyedLazyInstance<MixinAnnotationHandler>>(
+            "com.demonwav.minecraft-dev.mixinAnnotationHandler"
+        )
+        private val COLLECTOR = KeyedExtensionCollector<MixinAnnotationHandler, String>(EP_NAME)
+
+        fun getBuiltinHandlers(): Sequence<Pair<String, MixinAnnotationHandler>> =
+            EP_NAME.extensions.asSequence().map { it.key to it.instance }
+
+        fun forMixinAnnotation(qualifiedName: String, project: Project? = null): MixinAnnotationHandler? {
+            val extension = COLLECTOR.findSingle(qualifiedName)
+            if (extension != null) {
+                return extension
+            }
+
+            if (project != null) {
+                val extraMixinAnnotations = CachedValuesManager.getManager(project).getCachedValue(project) {
+                    val result = JavaPsiFacade.getInstance(project)
+                        .findClass(MixinConstants.Annotations.ANNOTATION_TYPE, GlobalSearchScope.allScope(project))
+                        ?.let { annotationType ->
+                            AnnotatedElementsSearch.searchPsiClasses(
+                                annotationType,
+                                GlobalSearchScope.allScope(project)
+                            ).mapNotNull { injectionInfoClass ->
+                                injectionInfoClass.findAnnotation(MixinConstants.Annotations.ANNOTATION_TYPE)
+                                    ?.findAttributeValue("value")
+                                    ?.resolveClass()
+                                    ?.qualifiedName
+                            }.toSet()
+                        } ?: emptySet()
+                    CachedValueProvider.Result(result, PsiModificationTracker.MODIFICATION_COUNT)
+                }
+                if (extraMixinAnnotations != null && qualifiedName in extraMixinAnnotations) {
+                    return DefaultInjectorAnnotationHandler
+                }
+            }
+
+            return null
         }
     }
 }

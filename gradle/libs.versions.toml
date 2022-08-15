@@ -1,10 +1,11 @@
 [versions]
-coroutines = "1.5.2"
-junit = "5.7.1"
-asm = "9.2"
+coroutines = "1.6.3"
+junit = "5.9.0"
+asm = "9.3"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
 coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
 templateMakerFabric = "com.extracraftx.minecraft:TemplateMakerFabric:0.4.1"
@@ -17,8 +18,8 @@ grammarKit = "org.jetbrains.idea:grammar-kit:1.5.1"
 
 # Gradle Tooling
 gradleToolingExtension = "com.jetbrains.intellij.gradle:gradle-tooling-extension:213.5744.223"
-annotations = "org.jetbrains:annotations:20.1.0"
-groovy = "org.codehaus.groovy:groovy-all:2.5.14"
+annotations = "org.jetbrains:annotations:23.0.0"
+groovy = "org.codehaus.groovy:groovy-all:2.5.18"
 
 asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
@@ -34,5 +35,5 @@ junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "jun
 junit-entine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 
 [bundles]
-coroutines = ["coroutines-core", "coroutines-swing"]
+coroutines = ["coroutines-core", "coroutines-jdk8", "coroutines-swing"]
 asm = ["asm", "asm-tree", "asm-analysis"]

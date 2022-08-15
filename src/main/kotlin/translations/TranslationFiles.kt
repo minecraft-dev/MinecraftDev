@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -291,8 +291,8 @@ object TranslationFiles {
                 when {
                     child is LangEntry ->
                         elements.add(Key(Regex.escape(child.key).toRegex()))
-                    child.node.elementType == LangTypes.LINE_ENDING
-                        && child.prevSibling.node.elementType == LangTypes.LINE_ENDING ->
+                    child.node.elementType == LangTypes.LINE_ENDING &&
+                        child.prevSibling.node.elementType == LangTypes.LINE_ENDING ->
                         elements.add(EmptyLine)
                 }
             }

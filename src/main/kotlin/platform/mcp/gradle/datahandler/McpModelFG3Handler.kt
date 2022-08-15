@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -44,7 +44,7 @@ object McpModelFG3Handler : McpModelDataHandler {
             mcVersion = minecraftDepVersion.substring(0, index)
 
             val forgeVersionEnd = minecraftDepVersion.indexOf('_')
-            if (forgeVersionEnd != -1) {
+            if (forgeVersionEnd != -1 && forgeVersionEnd > index) {
                 forgeVersion = minecraftDepVersion.substring(index + 1, forgeVersionEnd)
             }
             break

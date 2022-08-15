@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -95,6 +95,8 @@ class AccessorHandler : MixinMemberAnnotationHandler {
             canDecompile = false
         ).createSmartPointer()
     }
+
+    override val isEntryPoint = false
 
     data class AccessorInfo(val name: String, val type: AccessorType)
 

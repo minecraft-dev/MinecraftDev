@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2021 minecraft-dev
+ * Copyright (c) 2022 minecraft-dev
  *
  * MIT License
  */
@@ -28,12 +28,9 @@ val jsonFile = file("$projectDir/$fileName")
 val ideaVersion: String by project
 val ideaVersionName: String by project
 
-data class DepList(val intellijVersion: String, val intellijVersionName: String, val deps: List<Dep>)
-data class Dep(val groupId: String, val artifactId: String, val version: String)
-
 if (jsonFile.exists()) {
     val deps: DepList = jsonFile.bufferedReader().use { reader ->
-        Gson().fromJson(reader, object : TypeToken<DepList>() {}.type)
+        Gson().fromJson(reader, DepList::class.java)
     }
     if (ideaVersion != deps.intellijVersion || ideaVersionName != deps.intellijVersionName) {
         println("IntelliJ library sources file definition is out of date, deleting")
