@@ -59,8 +59,12 @@ object TranslationFiles {
         file?.nameWithoutExtension?.lowercase(Locale.ENGLISH)
 
     tailrec fun seekTranslation(element: PsiElement): PsiNamedElement? {
-        return toTranslation(element)?.let { element as? PsiNamedElement }
-            ?: seekTranslation(element.parent ?: return null)
+        // don't use elvis here, K2 doesn't think it's a tail recursive call if you do
+        val res = toTranslation(element)?.let { element as? PsiNamedElement }
+        if (res != null) {
+            return res
+        }
+        return seekTranslation(element.parent ?: return null)
     }
 
     fun toTranslation(element: PsiElement): Translation? =
