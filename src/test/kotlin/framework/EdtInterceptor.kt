@@ -10,7 +10,7 @@
 
 package com.demonwav.mcdev.framework
 
-import com.demonwav.mcdev.util.edtCoroutineScope
+import com.demonwav.mcdev.util.invokeEdt
 import java.lang.reflect.Method
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.InvocationInterceptor
@@ -50,7 +50,7 @@ class EdtInterceptor : InvocationInterceptor {
             return
         }
 
-        val thrown = edtCoroutineScope {
+        val thrown = invokeEdt {
             runCatching {
                 invocation.proceed()
             }.exceptionOrNull()
