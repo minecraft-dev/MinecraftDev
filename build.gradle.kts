@@ -236,6 +236,8 @@ tasks.test {
     systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
 
     jvmArgs(
+        "-Dsun.io.useCanonCaches=false",
+        "-Dsun.io.useCanonPrefixCache=false",
         "--add-opens", "java.base/java.io=ALL-UNNAMED",
         "--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED",
         "--add-opens", "java.base/java.lang.ref=ALL-UNNAMED",
