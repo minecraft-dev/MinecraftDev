@@ -73,4 +73,4 @@ fun isValidClassName(className: String): Boolean {
     return true
 }
 
-private val listPattern = Regex("""(\s*(\w+)\s*(,\s*\w+\s*)*,?|\[?\s*(\w+)\s*(,\s*\w+\s*)*])?""")
+private val listPattern = Regex("""(\s*((\w|\s)+)\s*(,\s*(\w|\s)+\s*)*,?|\[\s*((\w|\s)+)\s*(,\s*(\w|\s)+\s*)*])?""")
