@@ -79,7 +79,7 @@ class MinecraftModuleBuilder : JavaModuleBuilder() {
         }
 
         if (!project.isInitialized) {
-            StartupManager.getInstance(project).registerPostStartupActivity(r)
+            StartupManager.getInstance(project).runAfterOpened(r)
             return
         }
 

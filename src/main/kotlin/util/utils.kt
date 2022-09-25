@@ -218,7 +218,7 @@ fun Module.findChildren(): Set<Module> {
             }
 
             val path = manager.getModuleGroupPath(m) ?: continue
-            val namedModule = path.last()?.let { manager.findModuleByName(it) } ?: continue
+            val namedModule = manager.findModuleByName(path.last()) ?: continue
 
             if (namedModule != this) {
                 continue

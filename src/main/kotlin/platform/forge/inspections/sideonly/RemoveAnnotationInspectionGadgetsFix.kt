@@ -13,16 +13,17 @@ package com.demonwav.mcdev.platform.forge.inspections.sideonly
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotation
-import com.intellij.structuralsearch.plugin.util.SmartPsiPointer
+import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.refactoring.suggested.createSmartPointer
 import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
 class RemoveAnnotationInspectionGadgetsFix(element: PsiAnnotation, private val name: String) : InspectionGadgetsFix() {
 
-    private val pointer: SmartPsiPointer = SmartPsiPointer(element)
+    private val pointer: SmartPsiElementPointer<PsiAnnotation> = element.createSmartPointer()
 
     override fun doFix(project: Project, descriptor: ProblemDescriptor) {
-        (pointer.element as? PsiAnnotation)?.delete()
+        pointer.element?.delete()
     }
 
     @Nls
