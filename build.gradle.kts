@@ -194,7 +194,8 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
-        freeCompilerArgs = listOf("-Xuse-k2", "-Xjvm-default=all", "-Xjdk-release=11")
+        // K2 causes the following error: https://youtrack.jetbrains.com/issue/KT-52786
+        freeCompilerArgs = listOf(/*"-Xuse-k2", */"-Xjvm-default=all", "-Xjdk-release=11")
         kotlinDaemonJvmArguments.add("-Xmx1G")
     }
 }
