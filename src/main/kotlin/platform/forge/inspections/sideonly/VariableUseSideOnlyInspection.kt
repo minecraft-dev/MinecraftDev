@@ -33,8 +33,8 @@ class VariableUseSideOnlyInspection : BaseInspection() {
 
     override fun buildVisitor(): BaseInspectionVisitor {
         return object : BaseInspectionVisitor() {
-            override fun visitReferenceExpression(expression: PsiReferenceExpression?) {
-                if (!SideOnlyUtil.beginningCheck(expression!!)) {
+            override fun visitReferenceExpression(expression: PsiReferenceExpression) {
+                if (!SideOnlyUtil.beginningCheck(expression)) {
                     return
                 }
 

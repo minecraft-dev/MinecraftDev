@@ -618,15 +618,15 @@ private fun findAssociatedLambda(psiClass: PsiClass, clazz: ClassNode, lambdaMet
         var result: PsiElement? = null
         parent.accept(
             object : JavaRecursiveElementWalkingVisitor() {
-                override fun visitAnonymousClass(aClass: PsiAnonymousClass?) {
+                override fun visitAnonymousClass(aClass: PsiAnonymousClass) {
                     // skip anonymous classes
                 }
 
-                override fun visitClass(aClass: PsiClass?) {
+                override fun visitClass(aClass: PsiClass) {
                     // skip inner classes
                 }
 
-                override fun visitLambdaExpression(expression: PsiLambdaExpression?) {
+                override fun visitLambdaExpression(expression: PsiLambdaExpression) {
                     if (i++ == index) {
                         result = expression
                         stopWalking()

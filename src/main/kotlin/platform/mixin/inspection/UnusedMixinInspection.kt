@@ -39,8 +39,8 @@ class UnusedMixinInspection : MixinInspection() {
     override fun buildVisitor(holder: ProblemsHolder) = Visitor(holder)
 
     class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
-        override fun visitClass(clazz: PsiClass?) {
-            val module = clazz?.findModule() ?: return
+        override fun visitClass(clazz: PsiClass) {
+            val module = clazz.findModule() ?: return
             if (clazz.isMixin) {
                 for (config in MixinModule.getMixinConfigs(module.project, GlobalSearchScope.moduleScope(module))) {
                     if (config.qualifiedMixins.any { it == clazz.fullQualifiedName }) {

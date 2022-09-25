@@ -278,15 +278,15 @@ object LocalVariables {
                     super.visitForeachStatement(statement)
                 }
 
-                override fun visitClass(aClass: PsiClass?) {
+                override fun visitClass(aClass: PsiClass) {
                     // don't recurse into classes
                 }
 
-                override fun visitMethod(method: PsiMethod?) {
+                override fun visitMethod(method: PsiMethod) {
                     // don't recurse into methods
                 }
 
-                override fun visitLambdaExpression(expression: PsiLambdaExpression?) {
+                override fun visitLambdaExpression(expression: PsiLambdaExpression) {
                     // don't recurse into lambdas
                 }
             }

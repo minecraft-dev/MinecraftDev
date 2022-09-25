@@ -35,11 +35,8 @@ class WrongEntityDataParameterClassInspection : AbstractBaseJavaLocalInspectionT
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = Visitor(holder)
 
     class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
-        override fun visitMethodCallExpression(expression: PsiMethodCallExpression?) {
+        override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
             super.visitMethodCallExpression(expression)
-            if (expression == null) {
-                return
-            }
 
             val method = expression.resolveMethod() ?: return
             val className = method.containingClass?.fullQualifiedName ?: return
