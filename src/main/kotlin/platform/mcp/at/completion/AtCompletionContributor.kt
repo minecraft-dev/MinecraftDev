@@ -204,7 +204,7 @@ class AtCompletionContributor : CompletionContributor() {
 
         val entry = memberName.parent as? AtEntry ?: return
 
-        val entryClass = entry.className.classNameValue ?: return
+        val entryClass = entry.className?.classNameValue ?: return
 
         val module = ModuleUtilCore.findModuleForPsiElement(memberName) ?: return
         val project = module.project
