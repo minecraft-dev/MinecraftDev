@@ -59,8 +59,12 @@ object TranslationFiles {
         file?.nameWithoutExtension?.lowercase(Locale.ENGLISH)
 
     tailrec fun seekTranslation(element: PsiElement): PsiNamedElement? {
-        return toTranslation(element)?.let { element as? PsiNamedElement }
-            ?: seekTranslation(element.parent ?: return null)
+        // don't use elvis here, K2 doesn't think it's a tail recursive call if you do
+        val res = toTranslation(element)?.let { element as? PsiNamedElement }
+        if (res != null) {
+            return res
+        }
+        return seekTranslation(element.parent ?: return null)
     }
 
     fun toTranslation(element: PsiElement): Translation? =
@@ -188,6 +192,9 @@ object TranslationFiles {
                 is FileEntry.Comment -> result.append("# ${entry.text}\n")
                 is FileEntry.Translation -> result.append("${entry.key}=${entry.text}\n")
                 FileEntry.EmptyLine -> result.append('\n')
+                // TODO: IntelliJ shows a false error here without the `else`. The compiler doesn't care because
+                //  FileEntry is a sealed class. When this bug in IntelliJ is fixed, remove this `else`.
+                else -> {}
             }
         }
 
@@ -222,6 +229,9 @@ object TranslationFiles {
                     result.append("\"${StringUtil.escapeStringCharacters(entry.text)}\",\n")
                 }
                 FileEntry.EmptyLine -> result.append('\n')
+                // TODO: IntelliJ shows a false error here without the `else`. The compiler doesn't care because
+                //  FileEntry is a sealed class. When this bug in IntelliJ is fixed, remove this `else`.
+                else -> {}
             }
         }
 
