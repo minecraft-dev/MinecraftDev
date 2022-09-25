@@ -22,7 +22,7 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.8.0"
+    id("org.jetbrains.intellij") version "1.9.0"
     id("org.cadixdev.licenser")
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
@@ -188,7 +188,9 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
-        freeCompilerArgs = listOf("-Xjvm-default=all")
+        // K2 causes the following error: https://youtrack.jetbrains.com/issue/KT-52786
+        freeCompilerArgs = listOf(/*"-Xuse-k2", */"-Xjvm-default=all", "-Xjdk-release=11")
+        kotlinDaemonJvmArguments.add("-Xmx1G")
     }
 }
 

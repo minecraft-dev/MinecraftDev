@@ -12,7 +12,7 @@ Minecraft Development for IntelliJ
         <td colspan="2"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
     </tr>
     <tr>
-        <td align="right" rowspan="4"><b>Nightly Builds</b></td>
+        <td align="right" rowspan="5"><b>Nightly Builds</b></td>
         <td align="left">2021.2</td>
         <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20212"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20212)/statusIcon.svg" alt="2021.2 Nightly Status" /></a></td>
     </tr>
@@ -29,6 +29,10 @@ Minecraft Development for IntelliJ
         <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20222"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20222)/statusIcon.svg" alt="2022.2 Nightly Status" /></a></td>
     </tr>
     <tr>
+        <td align="left">2022.3</td>
+        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20223"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20223)/statusIcon.svg" alt="2022.3 Nightly Status" /></a></td>
+    </tr>
+    <tr>
         <td align="right"><b>OS Tests</b></td>
         <td align="left" colspan="2">
             <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Test%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/Test/badge.svg?branch=dev&event=push" alt="GitHub Action Status" /></a>
@@ -36,7 +40,7 @@ Minecraft Development for IntelliJ
     </tr>
 </table>
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.5.19-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.5.20-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 <a href="https://discord.gg/j6UNcfr"><img src="https://i.imgur.com/JXu9C1G.png" height="48px"></img></a>

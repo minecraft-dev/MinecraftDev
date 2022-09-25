@@ -13,7 +13,6 @@ package com.demonwav.mcdev.nbt.lang.colors
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttByte
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttDouble
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttFloat
-import com.demonwav.mcdev.nbt.lang.gen.psi.NbttInt
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttLong
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttShort
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttString
@@ -70,12 +69,11 @@ class NbttAnnotator : Annotator {
 
     private fun annotateTypes(element: PsiElement, holder: AnnotationHolder) {
         when (element) {
-            is NbttByte -> holder.newAnnotation(HighlightSeverity.INFORMATION, "byte").range(element).create()
-            is NbttShort -> holder.newAnnotation(HighlightSeverity.INFORMATION, "short").range(element).create()
-            is NbttInt -> holder.newAnnotation(HighlightSeverity.INFORMATION, "int").range(element).create()
-            is NbttLong -> holder.newAnnotation(HighlightSeverity.INFORMATION, "long").range(element).create()
-            is NbttFloat -> holder.newAnnotation(HighlightSeverity.INFORMATION, "float").range(element).create()
-            is NbttDouble -> holder.newAnnotation(HighlightSeverity.INFORMATION, "double").range(element).create()
+            is NbttByte -> holder.newAnnotation(HighlightSeverity.INFORMATION, "Type: byte").range(element).create()
+            is NbttShort -> holder.newAnnotation(HighlightSeverity.INFORMATION, "Type: short").range(element).create()
+            is NbttLong -> holder.newAnnotation(HighlightSeverity.INFORMATION, "Type: long").range(element).create()
+            is NbttFloat -> holder.newAnnotation(HighlightSeverity.INFORMATION, "Type: float").range(element).create()
+            is NbttDouble -> holder.newAnnotation(HighlightSeverity.INFORMATION, "Type: double").range(element).create()
         }
     }
 }
