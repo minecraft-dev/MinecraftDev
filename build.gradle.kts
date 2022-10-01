@@ -195,7 +195,7 @@ tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
         freeCompilerArgs = listOf("-Xuse-k2", "-Xjvm-default=all", "-Xjdk-release=11")
-        kotlinDaemonJvmArguments.add("-Xmx1G")
+        kotlinDaemonJvmArguments.add("-Xmx2G")
     }
 }
 
