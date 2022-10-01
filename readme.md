@@ -9,7 +9,7 @@ Minecraft Development for IntelliJ
     </tr>
     <tr>
         <td align="right"><b>Main Build</b></td>
-        <td colspan="2"><a href="https://ci.demonwav.com/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://tc.demonwav.com/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
+        <td colspan="2"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
     </tr>
     <tr>
         <td align="right" rowspan="5"><b>Nightly Builds</b></td>
