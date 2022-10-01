@@ -190,7 +190,7 @@ tasks.withType<KotlinCompile>().configureEach {
         jvmTarget = JavaVersion.VERSION_17.toString()
         // K2 causes the following error: https://youtrack.jetbrains.com/issue/KT-52786
         freeCompilerArgs = listOf(/*"-Xuse-k2", */"-Xjvm-default=all", "-Xjdk-release=17")
-        kotlinDaemonJvmArguments.add("-Xmx1G")
+        kotlinDaemonJvmArguments.add("-Xmx2G")
     }
 }
 
