@@ -44,6 +44,11 @@ java {
         languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
+kotlin {
+    jvmToolchain {
+        languageVersion.set(java.toolchain.languageVersion.get())
+    }
+}
 
 val gradleToolingExtensionSourceSet: SourceSet = sourceSets.create("gradle-tooling-extension") {
     configurations.named(compileOnlyConfigurationName) {
