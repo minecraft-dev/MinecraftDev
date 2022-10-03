@@ -19,7 +19,7 @@ object NbtFileType : FileType {
     override fun getIcon() = PlatformAssets.MINECRAFT_ICON
     override fun getCharset(file: VirtualFile, content: ByteArray): String? = null
     override fun getName() = "NBT"
-    override fun getDescription() = "Named Binary Tag"
+    override fun getDescription() = "NBT"
     override fun isBinary() = true
     override fun isReadOnly() = false
 }
