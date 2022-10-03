@@ -127,7 +127,7 @@ object SideOnlyUtil {
      * @return a pair of the first sided annotation found on the given element with its side value.
      * `null` is returned if no known side annotation was found. Side might be [Side.INVALID] but never [Side.NONE].
      */
-    fun findSide(element: PsiModifierListOwner): Pair<SideAnnotation, Side>? {
+    private fun findSide(element: PsiModifierListOwner): Pair<SideAnnotation, Side>? {
         for (sideAnnotation in SideAnnotation.KNOWN_ANNOTATIONS) {
             val annotation = element.findAnnotation(sideAnnotation.annotationName)
                 ?: continue
