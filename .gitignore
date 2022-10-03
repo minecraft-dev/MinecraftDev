@@ -1,8 +1,10 @@
-.idea/
 .idea_modules/
 *.iml
 *.ipr
 *.iws
+
+.idea/*
+!.idea/icon.png
 
 **/out/
 **/build/

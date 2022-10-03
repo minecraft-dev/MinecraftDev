@@ -364,7 +364,7 @@ tasks.register("cleanSandbox", Delete::class) {
 }
 
 tasks.runIde {
-    maxHeapSize = "2G"
+    maxHeapSize = "4G"
 
     jvmArgs("--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED")
     System.getProperty("debug")?.let {

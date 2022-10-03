@@ -83,7 +83,7 @@ fun indent(sb: StringBuilder, indentLevel: Int) {
     }
 
     for (i in 0 until indentLevel) {
-        sb.append("    ")
+        sb.append("\t")
     }
 }
 

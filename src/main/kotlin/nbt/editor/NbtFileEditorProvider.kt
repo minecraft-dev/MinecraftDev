@@ -12,9 +12,19 @@ package com.demonwav.mcdev.nbt.editor
 
 import com.demonwav.mcdev.nbt.NbtVirtualFile
 import com.demonwav.mcdev.nbt.filetype.NbtFileType
+import com.demonwav.mcdev.nbt.lang.NbttFile
+import com.demonwav.mcdev.util.invokeAndWait
 import com.demonwav.mcdev.util.invokeLater
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.ide.actions.SaveAllAction
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.AnActionResult
+import com.intellij.openapi.actionSystem.ex.AnActionListener
+import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.command.UndoConfirmationPolicy
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.fileEditor.FileEditor
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorPolicy
 import com.intellij.openapi.fileEditor.FileEditorState
 import com.intellij.openapi.fileEditor.FileEditorStateLevel
@@ -26,29 +36,34 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiManager
+import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.util.IncorrectOperationException
 import java.awt.BorderLayout
 import java.beans.PropertyChangeListener
 import javax.swing.JPanel
+import org.jetbrains.concurrency.runAsync
 
 class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
     override fun getEditorTypeId() = EDITOR_TYPE_ID
     override fun accept(project: Project, file: VirtualFile) = file.fileType == NbtFileType
     override fun getPolicy() = FileEditorPolicy.NONE
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {
-        val fileEditor = NbtFileEditor(file) { nbtFile -> super.createEditor(project, nbtFile) }
+        val fileEditor = NbtFileEditor(file) { nbtFile ->
+            invokeAndWait {
+                super.createEditor(project, nbtFile)
+            }
+        }
 
-        ApplicationManager.getApplication().executeOnPooledThread {
+        runAsync {
             val nbtFile = NbtVirtualFile(file, project)
 
             if (NonProjectFileWritingAccessProvider.isWriteAccessAllowed(file, project)) {
                 NonProjectFileWritingAccessProvider.allowWriting(listOf(nbtFile))
             }
 
-            invokeLater {
-                fileEditor.ready(nbtFile)
-            }
+            fileEditor.ready(nbtFile, project)
         }
 
         return fileEditor
@@ -74,12 +89,18 @@ private class NbtFileEditor(
         component.add(loading, BorderLayout.CENTER)
     }
 
-    fun ready(nbtFile: NbtVirtualFile) {
+    fun ready(nbtFile: NbtVirtualFile, project: Project) {
+        if (project.isDisposed) {
+            return
+        }
+
         component.removeAll()
 
         val toolbar = NbtToolbar(nbtFile)
         nbtFile.toolbar = toolbar
-        editor = editorProvider(nbtFile)
+        editor = invokeAndWait {
+            editorProvider(nbtFile)
+        }
         editor?.let { editor ->
             try {
                 Disposer.register(this, editor)
@@ -90,9 +111,42 @@ private class NbtFileEditor(
                 Disposer.dispose(this)
                 return@let
             }
-            component.add(toolbar.panel, BorderLayout.NORTH)
-            component.add(editor.component, BorderLayout.CENTER)
+            invokeLater {
+                component.add(toolbar.panel, BorderLayout.NORTH)
+                component.add(editor.component, BorderLayout.CENTER)
+            }
         }
+
+        // This can be null if the file is too big to be parsed as a psi file
+        val psiFile = runReadAction {
+            PsiManager.getInstance(project).findFile(nbtFile) as? NbttFile
+        } ?: return
+
+        WriteCommandAction.writeCommandAction(psiFile)
+            .shouldRecordActionForActiveDocument(false)
+            .withUndoConfirmationPolicy(UndoConfirmationPolicy.DO_NOT_REQUEST_CONFIRMATION)
+            .run<Throwable> {
+                CodeStyleManager.getInstance(project).reformat(psiFile, true)
+            }
+
+        project.messageBus.connect(this).subscribe(
+            AnActionListener.TOPIC,
+            object : AnActionListener {
+                override fun afterActionPerformed(action: AnAction, event: AnActionEvent, result: AnActionResult) {
+                    if (action !is SaveAllAction) {
+                        return
+                    }
+
+                    val selectedEditor = FileEditorManager.getInstance(project).selectedEditor ?: return
+
+                    if (selectedEditor !is NbtFileEditor || selectedEditor.editor != editor) {
+                        return
+                    }
+
+                    nbtFile.writeFile(this)
+                }
+            }
+        )
     }
 
     override fun isModified() = editor.exec { isModified } ?: false
