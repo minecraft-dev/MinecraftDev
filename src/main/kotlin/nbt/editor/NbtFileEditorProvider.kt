@@ -13,12 +13,14 @@ package com.demonwav.mcdev.nbt.editor
 import com.demonwav.mcdev.nbt.NbtVirtualFile
 import com.demonwav.mcdev.nbt.filetype.NbtFileType
 import com.demonwav.mcdev.nbt.lang.NbttFile
+import com.demonwav.mcdev.util.invokeAndWait
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.ide.actions.SaveAllAction
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionResult
 import com.intellij.openapi.actionSystem.ex.AnActionListener
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.fileEditor.FileEditor
@@ -48,7 +50,11 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
     override fun accept(project: Project, file: VirtualFile) = file.fileType == NbtFileType
     override fun getPolicy() = FileEditorPolicy.NONE
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {
-        val fileEditor = NbtFileEditor(file) { nbtFile -> super.createEditor(project, nbtFile) }
+        val fileEditor = NbtFileEditor(file) { nbtFile ->
+            invokeAndWait {
+                super.createEditor(project, nbtFile)
+            }
+        }
 
         runAsync {
             val nbtFile = NbtVirtualFile(file, project)
@@ -57,9 +63,7 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
                 NonProjectFileWritingAccessProvider.allowWriting(listOf(nbtFile))
             }
 
-            invokeLater {
-                fileEditor.ready(nbtFile, project)
-            }
+            fileEditor.ready(nbtFile, project)
         }
 
         return fileEditor
@@ -94,7 +98,9 @@ private class NbtFileEditor(
 
         val toolbar = NbtToolbar(nbtFile)
         nbtFile.toolbar = toolbar
-        editor = editorProvider(nbtFile)
+        editor = invokeAndWait {
+            editorProvider(nbtFile)
+        }
         editor?.let { editor ->
             try {
                 Disposer.register(this, editor)
@@ -105,12 +111,17 @@ private class NbtFileEditor(
                 Disposer.dispose(this)
                 return@let
             }
-            component.add(toolbar.panel, BorderLayout.NORTH)
-            component.add(editor.component, BorderLayout.CENTER)
+            invokeLater {
+                component.add(toolbar.panel, BorderLayout.NORTH)
+                component.add(editor.component, BorderLayout.CENTER)
+            }
         }
 
         // This can be null if the file is too big to be parsed as a psi file
-        val psiFile = PsiManager.getInstance(project).findFile(nbtFile) as? NbttFile ?: return
+        val psiFile = runReadAction {
+            PsiManager.getInstance(project).findFile(nbtFile) as? NbttFile
+        } ?: return
+
         WriteCommandAction.writeCommandAction(psiFile)
             .shouldRecordActionForActiveDocument(false)
             .withUndoConfirmationPolicy(UndoConfirmationPolicy.DO_NOT_REQUEST_CONFIRMATION)
