@@ -17,7 +17,7 @@ object AwFileType : LanguageFileType(AwLanguage) {
 
     override fun getName() = "Access Widener"
 
-    override fun getDescription() = "Access Widener File"
+    override fun getDescription() = "Access widener"
 
     override fun getDefaultExtension() = "accesswidener"
 

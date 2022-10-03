@@ -132,6 +132,7 @@
         <fileEditorProvider implementation="com.demonwav.mcdev.nbt.editor.NbtFileEditorProvider" />
 
         <notificationGroup id="NBT Save Error" displayType="STICKY_BALLOON"/>
+        <notificationGroup id="NBT Save Success" displayType="STICKY_BALLOON"/>
 
         <!-- Text representation of NBT -->
         <fileType name="NBTT" language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttFileType" fieldName="INSTANCE" extensions="nbtt" />
