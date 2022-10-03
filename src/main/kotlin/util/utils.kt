@@ -34,6 +34,8 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import java.util.Locale
 import kotlin.math.min
+import org.jetbrains.concurrency.Promise
+import org.jetbrains.concurrency.runAsync
 
 inline fun <T : Any?> runWriteTask(crossinline func: () -> T): T {
     return invokeAndWait {
@@ -104,6 +106,12 @@ inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T
     val document = documentManager.getDocument(this) ?: return result
     documentManager.doPostponedOperationsAndUnblockDocument(document)
     return result
+}
+
+inline fun <T> runReadActionAsync(crossinline runnable: () -> T): Promise<T> {
+    return runAsync {
+        runReadAction(runnable)
+    }
 }
 
 fun waitForAllSmart() {

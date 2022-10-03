@@ -14,7 +14,7 @@ import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.openapi.fileTypes.LanguageFileType
 
 object LangFileType : LanguageFileType(MCLangLanguage) {
-    const val FILE_EXTENSION = "lang"
+    private const val FILE_EXTENSION = "lang"
 
     override fun getIcon() = PlatformAssets.MINECRAFT_ICON
     override fun getName() = "MCLang"

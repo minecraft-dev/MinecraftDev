@@ -33,11 +33,13 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                     CodeStyleSettingsCustomizableOptions.getInstance().WRAPPING_BRACES,
                     arrayOf(
                         "Do not wrap",
-                        "Wrap always"
+                        "Wrap as needed",
+                        "Wrap always",
                     ),
                     intArrayOf(
                         CommonCodeStyleSettings.DO_NOT_WRAP,
-                        CommonCodeStyleSettings.WRAP_ALWAYS
+                        CommonCodeStyleSettings.WRAP_AS_NEEDED,
+                        CommonCodeStyleSettings.WRAP_ALWAYS,
                     )
                 )
                 consumer.showCustomOption(
@@ -47,14 +49,17 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                     CodeStyleSettingsCustomizableOptions.getInstance().WRAPPING_BRACES,
                     arrayOf(
                         "Do not wrap",
-                        "Wrap always"
+                        "Wrap as needed",
+                        "Wrap always",
                     ),
                     intArrayOf(
                         CommonCodeStyleSettings.DO_NOT_WRAP,
-                        CommonCodeStyleSettings.WRAP_ALWAYS
+                        CommonCodeStyleSettings.WRAP_AS_NEEDED,
+                        CommonCodeStyleSettings.WRAP_ALWAYS,
                     )
                 )
             }
+
             SettingsType.SPACING_SETTINGS -> {
                 consumer.showStandardOptions(
                     "SPACE_WITHIN_BRACKETS",
@@ -78,12 +83,13 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                 consumer.renameStandardOption("SPACE_WITHIN_BRACKETS", "List brackets")
                 consumer.renameStandardOption("SPACE_WITHIN_PARENTHESES", "Array parentheses")
             }
+
             else -> {
             }
         }
     }
 
-    override fun getIndentOptionsEditor(): IndentOptionsEditor? = SmartIndentOptionsEditor()
+    override fun getIndentOptionsEditor(): IndentOptionsEditor = SmartIndentOptionsEditor()
 
     override fun getLanguage() = NbttLanguage
 
@@ -92,27 +98,26 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
         indentOptions: CommonCodeStyleSettings.IndentOptions
     ) {
         commonSettings.RIGHT_MARGIN = 150
+        indentOptions.USE_TAB_CHARACTER = true
+        indentOptions.TAB_SIZE = 4
+        indentOptions.INDENT_SIZE = indentOptions.TAB_SIZE
         indentOptions.CONTINUATION_INDENT_SIZE = indentOptions.INDENT_SIZE
     }
 }
 
-@Suppress("SameParameterValue")
-private fun sample(@Language("NBTT") code: String) = code.trim()
-
-private val SAMPLE = sample(
-    """
+@Language("NBTT")
+private const val SAMPLE = """
 "": {
-    list: [
-        {
-            "created-on": 1264099775885L
-            "name": "Compound tag #0"
-        },
-        {
-            primitive list: [ 0B, 1B, false, true, 14B, ]
-            array: ints(1, 3, 4)
-            number: 1264099775885L
-        },
-    ]
+	list: [
+		{
+			"created-on": 1264099775885L
+			"name": "Compound tag #0"
+		},
+		{
+			primitive list: [ 0B, 1B, false, true, 14B, ]
+			array: ints(1, 3, 4)
+			number: 1264099775885L
+		},
+	]
 }
 """
-)
