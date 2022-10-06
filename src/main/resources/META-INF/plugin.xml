@@ -575,6 +575,13 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mcp.inspections.StackEmptyInspection"/>
+        <localInspection displayName="Duplicate access widener"
+                         groupName="MCP"
+                         language="Access Widener"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.DuplicateAwEntryInspection"/>
         <!--endregion-->
 
         <!--region MIXIN INSPECTIONS-->
