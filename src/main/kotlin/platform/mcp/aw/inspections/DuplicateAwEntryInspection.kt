@@ -5,10 +5,10 @@ import com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwEntryMixin
 import com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwMemberNameMixin
 import com.demonwav.mcdev.util.childOfType
 import com.intellij.codeInspection.*
-import com.intellij.psi.*
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiNamedElement
 import com.jetbrains.rd.util.getOrCreate
-import com.siyeh.ig.BaseInspection
-import com.siyeh.ig.BaseInspectionVisitor
 import org.jetbrains.plugins.groovy.codeInspection.fixes.RemoveElementQuickFix
 
 class DuplicateAwEntryInspection : LocalInspectionTool() {
