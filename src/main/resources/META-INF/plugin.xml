@@ -981,5 +981,10 @@
                 text="Minecraft Class" description="Create skeleton classes used in Minecraft Mods">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
         </action>
+        <action class="com.demonwav.mcdev.platform.mcp.actions.CopyAwAction" id="CopyAWAction"
+                text="AW Entry"
+                description="Copy the reference to clipboard in Access Widener format">
+            <add-to-group relative-to-action="CopyATAction" anchor="after" group-id="Copy.Paste.Special"/>
+        </action>
     </actions>
 </idea-plugin>

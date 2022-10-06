@@ -40,14 +40,14 @@ abstract class AwMemberNameImplMixin(node: ASTNode) : ASTWrapperPsiElement(node)
 
     override fun resolve(): PsiElement? = cached(PsiModificationTracker.MODIFICATION_COUNT) {
         val entry = this.parentOfType<AwEntryMixin>() ?: return@cached null
-		val owner = entry.targetClassName?.replace('/', '.')
-		return@cached when (entry) {
+        val owner = entry.targetClassName?.replace('/', '.')
+        return@cached when (entry) {
             is AwMethodEntry -> {
                 val name = entry.methodName ?: return@cached null
-				val desc = entry.methodDescriptor
+                val desc = entry.methodDescriptor
                 MemberReference(name, desc, owner).resolveMember(project, resolveScope)
-					// fallback if descriptor is invalid
-					?: MemberReference(name, null, owner).resolveMember(project, resolveScope)
+                    // fallback if descriptor is invalid
+                    ?: MemberReference(name, null, owner).resolveMember(project, resolveScope)
             }
             is AwFieldEntry -> {
                 val name = entry.fieldName ?: return@cached null
