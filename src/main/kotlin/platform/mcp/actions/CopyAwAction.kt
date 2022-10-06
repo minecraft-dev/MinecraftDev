@@ -14,6 +14,7 @@ import com.demonwav.mcdev.util.*
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.wm.WindowManager
@@ -75,16 +76,16 @@ class CopyAwAction : AnAction() {
         val statusBar = WindowManager.getInstance().getStatusBar(project)
 
         invokeLater {
-			/*val element = getDataFromActionEvent(e)?.element
+			val element = getDataFromActionEvent(e)?.element
 			val editor = getDataFromActionEvent(e)?.editor
-			val at = if(element != null && editor != null)
-					RelativePoint(
-						editor.contentComponent,
-						editor.visualPositionToXY(editor.offsetToVisualPosition(element.textRange.endOffset))
-					)
-				else
-					RelativePoint.getCenterOf(statusBar.component)*/
-            balloon.show(RelativePoint.getCenterOf(statusBar.component), Balloon.Position.atRight)
+			val at = if(element != null && editor != null) {
+				val pos = editor.offsetToVisualPosition(element.textRange.endOffset - element.textLength / 2)
+				RelativePoint(
+					editor.contentComponent,
+					editor.visualPositionToXY(VisualPosition(pos.line + 1, pos.column))
+				)
+			} else RelativePoint.getCenterOf(statusBar.component)
+            balloon.show(at, Balloon.Position.below)
         }
     }
 
