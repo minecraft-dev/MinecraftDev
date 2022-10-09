@@ -10,17 +10,21 @@
 
 package com.demonwav.mcdev.platform.mcp.actions
 
-import com.demonwav.mcdev.util.*
+import com.demonwav.mcdev.platform.mcp.actions.SrgActionBase.Companion.showBalloon
+import com.demonwav.mcdev.platform.mcp.actions.SrgActionBase.Companion.showSuccessBalloon
+import com.demonwav.mcdev.util.descriptor
+import com.demonwav.mcdev.util.getDataFromActionEvent
+import com.demonwav.mcdev.util.internalName
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.VisualPosition
-import com.intellij.openapi.ui.popup.Balloon
-import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.openapi.wm.WindowManager
-import com.intellij.psi.*
-import com.intellij.ui.LightColors
-import com.intellij.ui.awt.RelativePoint
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiField
+import com.intellij.psi.PsiIdentifier
+import com.intellij.psi.PsiMember
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiReference
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 
@@ -47,13 +51,15 @@ class CopyAwAction : AnAction() {
                 copyToClipboard(data.editor, element, text)
             }
             is PsiField -> {
-                val containing = target.containingClass?.internalName ?: return showBalloon("Could not get owner of field", e)
+                val containing = target.containingClass?.internalName
+                    ?: return showBalloon("Could not get owner of field", e)
                 val desc = target.type.descriptor
                 val text = "accessible field $containing ${target.name} $desc"
                 copyToClipboard(data.editor, element, text)
             }
             is PsiMethod -> {
-                val containing = target.containingClass?.internalName ?: return showBalloon("Could not get owner of method", e)
+                val containing = target.containingClass?.internalName
+                    ?: return showBalloon("Could not get owner of method", e)
                 val desc = target.descriptor ?: return showBalloon("Could not get descriptor of method", e)
                 val text = "accessible method $containing ${target.name} $desc"
                 copyToClipboard(data.editor, element, text)
@@ -62,56 +68,10 @@ class CopyAwAction : AnAction() {
         }
     }
 
-    // TODO: deduplicate code with SrgActionBase
-
-    private fun showBalloon(message: String, e: AnActionEvent) {
-        val balloon = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder(message, null, LightColors.YELLOW, null)
-            .setHideOnAction(true)
-            .setHideOnClickOutside(true)
-            .setHideOnKeyOutside(true)
-            .createBalloon()
-
-        val project = e.project ?: return
-        val statusBar = WindowManager.getInstance().getStatusBar(project)
-
-        invokeLater {
-			val element = getDataFromActionEvent(e)?.element
-			val editor = getDataFromActionEvent(e)?.editor
-			val at = if(element != null && editor != null) {
-				val pos = editor.offsetToVisualPosition(element.textRange.endOffset - element.textLength / 2)
-				RelativePoint(
-					editor.contentComponent,
-					editor.visualPositionToXY(VisualPosition(pos.line + 1, pos.column))
-				)
-			} else RelativePoint.getCenterOf(statusBar.component)
-            balloon.show(at, Balloon.Position.below)
-        }
-    }
-
     private fun copyToClipboard(editor: Editor, element: PsiElement, text: String) {
         val stringSelection = StringSelection(text)
         val clpbrd = Toolkit.getDefaultToolkit().systemClipboard
         clpbrd.setContents(stringSelection, null)
         showSuccessBalloon(editor, element, "Copied: \"$text\"")
-    }
-
-    private fun showSuccessBalloon(editor: Editor, element: PsiElement, text: String) {
-        val balloon = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder(text, null, LightColors.SLIGHTLY_GREEN, null)
-            .setHideOnAction(true)
-            .setHideOnClickOutside(true)
-            .setHideOnKeyOutside(true)
-            .createBalloon()
-
-        invokeLater {
-            balloon.show(
-                RelativePoint(
-                    editor.contentComponent,
-                    editor.visualPositionToXY(editor.offsetToVisualPosition(element.textRange.endOffset))
-                ),
-                Balloon.Position.below
-            )
-        }
     }
 }
