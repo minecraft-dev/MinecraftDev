@@ -311,6 +311,7 @@
         <typedHandler implementation="com.demonwav.mcdev.platform.mcp.aw.AwTypedHandlerDelegate" />
         <annotator language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwAnnotator"/>
         <completion.contributor language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwCompletionContributor"/>
+        <codeInsight.unresolvedReferenceQuickFixProvider implementation="com.demonwav.mcdev.platform.mcp.aw.fixes.CopyAwAccessibleEntryFix$Provider"/>
 
         <moduleService serviceImplementation="com.demonwav.mcdev.platform.mcp.McpModuleSettings"/>
 
