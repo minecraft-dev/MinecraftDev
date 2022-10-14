@@ -308,7 +308,6 @@
         <lang.syntaxHighlighterFactory language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.aw.AwColorSettingsPage" />
         <lang.commenter language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwCommenter" />
-        <typedHandler implementation="com.demonwav.mcdev.platform.mcp.aw.AwTypedHandlerDelegate" />
         <annotator language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwAnnotator"/>
         <completion.contributor language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwCompletionContributor"/>
         <codeInsight.unresolvedReferenceQuickFixProvider implementation="com.demonwav.mcdev.platform.mcp.aw.fixes.CopyAwAccessibleEntryFix$Provider"/>
