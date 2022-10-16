@@ -93,8 +93,8 @@ method_desc ::= OPEN_PAREN desc_element* CLOSE_PAREN desc_element
 field_desc ::= desc_element
 
 desc_element ::= PRIMITIVE | CLASS_VALUE {
-	mixin= "com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwDescElementImplMixin"
-	implements= "com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwDescElementMixin"
+    mixin= "com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwDescElementImplMixin"
+    implements= "com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwDescElementMixin"
     methods=[
         primitive="PRIMITIVE"
         classValue="CLASS_VALUE"
