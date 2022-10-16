@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.mcp.aw.fixes
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.mcp.actions.CopyAwAction
+import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.util.findModule
 import com.intellij.codeInsight.daemon.QuickFixActionRegistrar
 import com.intellij.codeInsight.intention.IntentionAction
@@ -29,8 +30,8 @@ class CopyAwAccessibleEntryFix(val target: PsiElement, val element: PsiElement) 
 
         override fun registerFixes(ref: PsiJavaCodeReferenceElement, registrar: QuickFixActionRegistrar) {
             val module = ref.findModule() ?: return
-            val isFabric = MinecraftFacet.getInstance(module, FabricModuleType) != null
-            if (!isFabric) {
+            val isApplicable = MinecraftFacet.getInstance(module, FabricModuleType, SpongeModuleType) != null
+            if (!isApplicable) {
                 return
             }
 
