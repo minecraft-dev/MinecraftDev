@@ -85,6 +85,8 @@ dependencies {
     implementation(libs.mappingIo)
     implementation(libs.bundles.asm)
 
+    implementation(libs.bundles.fuel)
+
     jflex(libs.jflex.lib)
     jflexSkeleton(libs.jflex.skeleton) {
         artifact {

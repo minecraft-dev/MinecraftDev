@@ -21,6 +21,7 @@ import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.modUpdateStep
 import com.demonwav.mcdev.util.toPackageName
 import com.extracraftx.minecraft.templatemakerfabric.data.DataProvider
@@ -46,7 +47,7 @@ import javax.swing.table.AbstractTableModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
@@ -284,17 +285,23 @@ class FabricProjectSettingsWizard(private val creator: MinecraftProjectCreator) 
     private suspend fun downloadVersions(): DataProvider? = coroutineScope {
         // prefetch the data
         val dataProvider = DataProvider()
-        val minecraftVersionJob = async(Dispatchers.IO) { runCatching { dataProvider.minecraftVersions }.getOrNull() }
-        val fabricApiVersionJob = async(Dispatchers.IO) { runCatching { dataProvider.fabricApiVersions }.getOrNull() }
-        val yarnVersionJob = async(Dispatchers.IO) { runCatching { dataProvider.yarnVersions }.getOrNull() }
-        val loomVersionJob = async(Dispatchers.IO) { runCatching { dataProvider.loomVersions }.getOrNull() }
-        val loaderVersionJob = async(Dispatchers.IO) { runCatching { dataProvider.loaderVersions }.getOrNull() }
+        val minecraftVersionJob = asyncIO { runCatching { dataProvider.minecraftVersions }.getOrNull() }
+        val fabricApiVersionJob = asyncIO { runCatching { dataProvider.fabricApiVersions }.getOrNull() }
+        val yarnVersionJob = asyncIO { runCatching { dataProvider.yarnVersions }.getOrNull() }
+        val loomVersionJob = asyncIO { runCatching { dataProvider.loomVersions }.getOrNull() }
+        val loaderVersionJob = asyncIO { runCatching { dataProvider.loaderVersions }.getOrNull() }
 
-        minecraftVersionJob.await() ?: return@coroutineScope null
-        fabricApiVersionJob.await() ?: return@coroutineScope null
-        yarnVersionJob.await() ?: return@coroutineScope null
-        loomVersionJob.await() ?: return@coroutineScope null
-        loaderVersionJob.await() ?: return@coroutineScope null
+        val results = listOf(
+            minecraftVersionJob,
+            fabricApiVersionJob,
+            yarnVersionJob,
+            loomVersionJob,
+            loaderVersionJob,
+        ).awaitAll()
+
+        if (results.any { it == null }) {
+            return@coroutineScope null
+        }
 
         return@coroutineScope dataProvider
     }
