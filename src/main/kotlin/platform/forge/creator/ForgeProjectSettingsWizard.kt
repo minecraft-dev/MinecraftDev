@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.modUpdateStep
 import com.intellij.ui.CollectionComboBoxModel
 import com.intellij.ui.EnumComboBoxModel
@@ -39,7 +40,6 @@ import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
@@ -230,8 +230,8 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
     }
 
     private suspend fun downloadVersions() = coroutineScope {
-        val mcpVersionJob = async(Dispatchers.IO) { McpVersion.downloadData() }
-        val forgeVersionJob = async(Dispatchers.IO) { ForgeVersion.downloadData() }
+        val mcpVersionJob = asyncIO { McpVersion.downloadData() }
+        val forgeVersionJob = asyncIO { ForgeVersion.downloadData() }
 
         versions = ForgeVersions(
             mcpVersionJob.await() ?: return@coroutineScope,
@@ -244,8 +244,8 @@ class ForgeProjectSettingsWizard(private val creator: MinecraftProjectCreator) :
 
         val selectedVersion = version ?: vers.forgeVersion.sortedMcVersions.firstOrNull() ?: return@coroutineScope null
 
-        val mcpVersionListJob = async(Dispatchers.IO) { vers.mcpVersion.getMcpVersionList(selectedVersion) }
-        val forgeVersionsJob = async(Dispatchers.IO) { vers.forgeVersion.getForgeVersions(selectedVersion) }
+        val mcpVersionListJob = asyncIO { vers.mcpVersion.getMcpVersionList(selectedVersion) }
+        val forgeVersionsJob = asyncIO { vers.forgeVersion.getForgeVersions(selectedVersion) }
 
         val mcpVersionList = mcpVersionListJob.await()
         val forgeVersions = forgeVersionsJob.await()

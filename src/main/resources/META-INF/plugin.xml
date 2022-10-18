@@ -308,9 +308,9 @@
         <lang.syntaxHighlighterFactory language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.aw.AwColorSettingsPage" />
         <lang.commenter language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwCommenter" />
-        <typedHandler implementation="com.demonwav.mcdev.platform.mcp.aw.AwTypedHandlerDelegate" />
         <annotator language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwAnnotator"/>
         <completion.contributor language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwCompletionContributor"/>
+        <codeInsight.unresolvedReferenceQuickFixProvider implementation="com.demonwav.mcdev.platform.mcp.aw.fixes.CopyAwAccessibleEntryFix$Provider"/>
 
         <moduleService serviceImplementation="com.demonwav.mcdev.platform.mcp.McpModuleSettings"/>
 
@@ -575,6 +575,13 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mcp.inspections.StackEmptyInspection"/>
+        <localInspection displayName="Duplicate access widener"
+                         groupName="MCP"
+                         language="Access Widener"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.DuplicateAwEntryInspection"/>
         <!--endregion-->
 
         <!--region MIXIN INSPECTIONS-->
@@ -980,6 +987,11 @@
         <action class="com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction" id="CreateMinecraftClass"
                 text="Minecraft Class" description="Create skeleton classes used in Minecraft Mods">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile" />
+        </action>
+        <action class="com.demonwav.mcdev.platform.mcp.actions.CopyAwAction" id="CopyAWAction"
+                text="AW Entry"
+                description="Copy the reference to clipboard in Access Widener format">
+            <add-to-group relative-to-action="CopyATAction" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
     </actions>
 </idea-plugin>

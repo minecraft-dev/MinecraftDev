@@ -22,7 +22,9 @@ import com.demonwav.mcdev.platform.architectury.version.FabricVersion
 import com.demonwav.mcdev.platform.forge.version.ForgeVersion
 import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.modUpdateStep
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.ui.CollectionComboBoxModel
 import com.intellij.ui.EnumComboBoxModel
 import java.awt.event.ActionListener
@@ -37,7 +39,7 @@ import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
@@ -234,6 +236,7 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
                 updateMcForm(data)
             }
         } catch (e: Exception) {
+            LOGGER.error("Failed to update versions form", e)
             error()
         }
 
@@ -250,9 +253,9 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
     }
 
     private suspend fun downloadVersions() = coroutineScope {
-        val fabricVersionJob = async(Dispatchers.IO) { FabricVersion.downloadData() }
-        val forgeVersionJob = async(Dispatchers.IO) { ForgeVersion.downloadData() }
-        val architecturyApiVersionJob = async(Dispatchers.IO) { ArchitecturyVersion.downloadData() }
+        val fabricVersionJob = asyncIO { FabricVersion.downloadData() }
+        val forgeVersionJob = asyncIO { ForgeVersion.downloadData() }
+        val architecturyApiVersionJob = asyncIO { ArchitecturyVersion.downloadData() }
 
         versions = ArchitecturyVersions(
             fabricVersionJob.await() ?: return@coroutineScope,
@@ -262,29 +265,42 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
     }
 
     private suspend fun updateForm(): Data? = coroutineScope {
-        val vers = versions ?: return@coroutineScope null
+        try {
+            val vers = versions ?: return@coroutineScope null
 
-        val selectedVersion = version ?: vers.forgeVersion.sortedMcVersions.firstOrNull() ?: return@coroutineScope null
+            val selectedVersion = version ?: vers.forgeVersion.sortedMcVersions.firstOrNull()
+                ?: return@coroutineScope null
 
-        val fabricVersionsJob = async(Dispatchers.IO) { vers.fabricVersion.getFabricVersions(selectedVersion) }
-        val forgeVersionsJob = async(Dispatchers.IO) { vers.forgeVersion.getForgeVersions(selectedVersion) }
-        val fabricApiVersionsJob = async(Dispatchers.IO) { vers.fabricVersion.getFabricApiVersions(selectedVersion) }
-        val architecturyApiVersionsJob = async(Dispatchers.IO) {
-            vers.architecturyVersion.getArchitecturyVersions(
-                selectedVersion
-            )
+            val fabricVersionsJob = asyncIO { vers.fabricVersion.getFabricVersions(selectedVersion) }
+            val forgeVersionsJob = asyncIO { vers.forgeVersion.getForgeVersions(selectedVersion) }
+            val fabricApiVersionsJob = asyncIO { vers.fabricVersion.getFabricApiVersions(selectedVersion) }
+            val architecturyApiVersionsJob = asyncIO {
+                vers.architecturyVersion.getArchitecturyVersions(selectedVersion)
+            }
+
+            // awaitAll is better than calling .await() individually
+            val (
+                fabricVersions,
+                forgeVersions,
+                fabricApiVersions,
+                architecturyApiVersions,
+            ) = listOf(
+                fabricVersionsJob,
+                forgeVersionsJob,
+                fabricApiVersionsJob,
+                architecturyApiVersionsJob
+            ).awaitAll()
+
+            val data = Data(0, fabricVersions, 0, forgeVersions, 0, fabricApiVersions, 0, architecturyApiVersions, 0)
+
+            mcVersionUpdate(data)
+
+            return@coroutineScope data
+        } catch (e: Exception) {
+            // log error manually - something is weird about intellij & coroutine exception handling
+            LOGGER.error("Error while updating Architectury form version fields", e)
+            return@coroutineScope null
         }
-
-        val fabricVersions = fabricVersionsJob.await()
-        val forgeVersions = forgeVersionsJob.await()
-        val fabricApiVersions = fabricApiVersionsJob.await()
-        val architecturyApiVersions = architecturyApiVersionsJob.await()
-
-        val data = Data(0, fabricVersions, 0, forgeVersions, 0, fabricApiVersions, 0, architecturyApiVersions, 0)
-
-        mcVersionUpdate(data)
-
-        return@coroutineScope data
     }
 
     private fun updateMcForm(data: Data) {
@@ -293,9 +309,16 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
         minecraftVersionBox.removeActionListener(minecraftBoxActionListener)
         minecraftVersionBox.removeAllItems()
 
-        minecraftVersionBox.model = CollectionComboBoxModel(
-            vers.forgeVersion.sortedMcVersions.filter { it >= SemanticVersion.release(1, 16) }
-        )
+        // make copy, so the next 2 operations don't mess up the map
+        val mcVersions = vers.architecturyVersion.versions.keys.toCollection(LinkedHashSet())
+        mcVersions.retainAll(vers.forgeVersion.sortedMcVersions.toSet())
+        // Fabric also targets preview versions which aren't semver
+        // The other option would be to try to parse all of them and catching any exceptions
+        // But exceptions are slow, so this should be more efficient
+        val fabricMcVersions = vers.fabricVersion.versions.minecraftVersions.mapTo(HashSet()) { it.name }
+        mcVersions.retainAll { fabricMcVersions.contains(it.toString()) }
+
+        minecraftVersionBox.model = CollectionComboBoxModel(mcVersions.sortedDescending())
         minecraftVersionBox.selectedIndex = data.mcSelectedIndex
         minecraftVersionBox.addActionListener(minecraftBoxActionListener)
     }
@@ -311,4 +334,8 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
         val architecturyApiVersions: List<SemanticVersion>,
         val architecturyApiSelectedIndex: Int
     )
+
+    companion object {
+        val LOGGER = Logger.getInstance(ArchitecturyProjectSettingsWizard::class.java)
+    }
 }

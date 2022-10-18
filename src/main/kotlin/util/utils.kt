@@ -34,6 +34,7 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import java.util.Locale
 import kotlin.math.min
+import kotlin.reflect.KClass
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.runAsync
 
@@ -242,6 +243,7 @@ fun Module.findChildren(): Set<Module> {
 // Using the ugly TypeToken approach we can use any complex generic signature, including
 // nested generics
 inline fun <reified T : Any> Gson.fromJson(text: String): T = fromJson(text, object : TypeToken<T>() {}.type)
+fun <T : Any> Gson.fromJson(text: String, type: KClass<T>): T = fromJson(text, type.java)
 
 fun <K> Map<K, *>.containsAllKeys(vararg keys: K) = keys.all { this.containsKey(it) }
 

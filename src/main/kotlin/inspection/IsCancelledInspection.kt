@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nls
 
 class IsCancelledInspection : BaseInspection() {
     @Nls
-    override fun getDisplayName() = "Useless event is cancelled check"
+    override fun getDisplayName() = "Useless event isCancelled check"
 
     override fun getStaticDescription(): String = "Reports useless event cancellation checks"
 

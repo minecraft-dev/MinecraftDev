@@ -26,10 +26,10 @@ data class SpongeVersion(var versions: LinkedHashMap<String, String>, var select
     }
 
     companion object {
-        fun downloadData(): SpongeVersion? {
+        suspend fun downloadData(): SpongeVersion? {
             return try {
                 val text = getText("sponge_v2.json")
-                Gson().fromJson(text)
+                Gson().fromJson(text, SpongeVersion::class)
             } catch (e: Exception) {
                 null
             }
