@@ -34,7 +34,7 @@ class NewExpressionSideOnlyInspection : BaseInspection() {
             "use @SideOnly annotated classes either."
     }
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
+    override fun buildFix(vararg infos: Any?): InspectionGadgetsFix? {
         val annotation = infos[0] as? PsiAnnotation ?: return null
 
         return if (annotation.isWritable) {
@@ -80,8 +80,7 @@ class NewExpressionSideOnlyInspection : BaseInspection() {
 
                 var classAnnotated = false
 
-                if (containingClassSide !== Side.NONE && containingClassSide !== Side.INVALID
-                ) {
+                if (containingClassSide !== Side.NONE && containingClassSide !== Side.INVALID) {
                     if (containingClassSide !== classSide) {
                         registerError(expression, offender.getAnnotation(classAnnotation.annotationName))
                     }

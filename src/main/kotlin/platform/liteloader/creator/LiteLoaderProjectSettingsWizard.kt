@@ -21,6 +21,7 @@ import com.demonwav.mcdev.platform.liteloader.version.LiteLoaderVersion
 import com.demonwav.mcdev.platform.mcp.version.McpVersion
 import com.demonwav.mcdev.platform.mcp.version.McpVersionEntry
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.ui.popup.Balloon
@@ -40,7 +41,7 @@ import javax.swing.text.AbstractDocument
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
@@ -209,11 +210,12 @@ class LiteLoaderProjectSettingsWizard(private val creator: MinecraftProjectCreat
 
         val version = minecraftVersionBox.selectedItem as? SemanticVersion
 
-        val mcpVersionJob = async(Dispatchers.IO) { McpVersion.downloadData() }
-        val liteloaderVersionJob = async(Dispatchers.IO) { LiteLoaderVersion.downloadData() }
+        val mcpVersionJob = asyncIO { McpVersion.downloadData() }
+        val liteloaderVersionJob = asyncIO { LiteLoaderVersion.downloadData() }
 
-        val mcpVersion = mcpVersionJob.await() ?: return@launch
-        val liteloaderVersion = liteloaderVersionJob.await() ?: return@launch
+        val (mcpVersionObj, liteloaderVersionObj) = listOf(mcpVersionJob, liteloaderVersionJob).awaitAll()
+        val mcpVersion = mcpVersionObj as McpVersion? ?: return@launch
+        val liteloaderVersion = liteloaderVersionObj as LiteLoaderVersion? ?: return@launch
 
         val data = withContext(Dispatchers.IO) {
             val listVersion = version ?: liteloaderVersion.sortedMcVersions.first()
