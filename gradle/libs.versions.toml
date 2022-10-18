@@ -27,7 +27,6 @@ asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
 asm-analysis = { module = "org.ow2.asm:asm-analysis", version.ref = "asm" }
 
 fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
-fuel-json = { module = "com.github.kittinunf.fuel:fuel-json", version.ref = "fuel" }
 fuel-coroutines = { module = "com.github.kittinunf.fuel:fuel-coroutines", version.ref = "fuel" }
 
 # Testing
@@ -42,4 +41,4 @@ junit-entine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref 
 [bundles]
 coroutines = ["coroutines-core", "coroutines-jdk8", "coroutines-swing"]
 asm = ["asm", "asm-tree", "asm-analysis"]
-fuel = ["fuel", "fuel-json", "fuel-coroutines"]
+fuel = ["fuel", "fuel-coroutines"]

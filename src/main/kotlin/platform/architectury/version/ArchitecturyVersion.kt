@@ -27,7 +27,8 @@ class ArchitecturyVersion private constructor(
 
     fun getArchitecturyVersions(mcVersion: SemanticVersion): List<SemanticVersion> {
         return try {
-            val architecturyVersions = versions[mcVersion] ?: throw IOException("Could not find any architectury versions for $mcVersion")
+            val architecturyVersions = versions[mcVersion]
+                ?: throw IOException("Could not find any architectury versions for $mcVersion")
             architecturyVersions.take(50)
         } catch (e: IOException) {
             e.printStackTrace()
@@ -40,7 +41,6 @@ class ArchitecturyVersion private constructor(
         val versionNumber: String,
         @SerializedName("game_versions")
         val gameVersions: List<String>,
-        val loaders: List<String>,
     )
 
     companion object {
