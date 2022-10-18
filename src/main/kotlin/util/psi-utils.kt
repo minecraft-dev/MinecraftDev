@@ -63,11 +63,11 @@ fun PsiElement.findContainingClass(): PsiClass? = findParent(resolveReferences =
 
 fun PsiElement.findReferencedClass(): PsiClass? = findParent(resolveReferences = true)
 
-fun PsiElement.findReferencedMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = true)
+fun PsiElement.findReferencedMember(): PsiMember? = findParent(resolveReferences = true) { it is PsiClass }
 
-fun PsiElement.findContainingMember(): PsiMember? = findParent({ it is PsiClass }, resolveReferences = false)
+fun PsiElement.findContainingMember(): PsiMember? = findParent(resolveReferences = false) { it is PsiClass }
 
-fun PsiElement.findContainingMethod(): PsiMethod? = findParent({ it is PsiClass }, resolveReferences = false)
+fun PsiElement.findContainingMethod(): PsiMethod? = findParent(resolveReferences = false) { it is PsiClass }
 
 private val PsiElement.ancestors: Sequence<PsiElement>
     get() = generateSequence(this) { if (it is PsiFile) null else it.parent }
@@ -75,12 +75,12 @@ private val PsiElement.ancestors: Sequence<PsiElement>
 fun PsiElement.isAncestorOf(child: PsiElement): Boolean = child.ancestors.contains(this)
 
 private inline fun <reified T : PsiElement> PsiElement.findParent(resolveReferences: Boolean): T? {
-    return findParent({ false }, resolveReferences)
+    return findParent(resolveReferences) { false }
 }
 
 private inline fun <reified T : PsiElement> PsiElement.findParent(
+    resolveReferences: Boolean,
     stop: (PsiElement) -> Boolean,
-    resolveReferences: Boolean
 ): T? {
     var el: PsiElement = this
 
@@ -251,6 +251,7 @@ val PsiElement.mcVersion: SemanticVersion?
         }
     }
 
+@Suppress("PrivatePropertyName")
 private val REAL_NAME_KEY = Key<String>("mcdev.real_name")
 
 var PsiMember.realName: String?

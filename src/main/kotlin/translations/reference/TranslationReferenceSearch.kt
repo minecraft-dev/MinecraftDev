@@ -25,29 +25,30 @@ class TranslationReferenceSearch : QueryExecutor<PsiReference, ReferencesSearch.
     override fun execute(parameters: ReferencesSearch.SearchParameters, consumer: Processor<in PsiReference>): Boolean {
         val entry = parameters.elementToSearch
 
-        val key = runReadAction { TranslationFiles.toTranslation(entry)?.key }
+        val key = runReadAction { TranslationFiles.toTranslation(entry)?.key } ?: return true
 
-        if (key != null) {
-            fun <A> power(start: List<A>): Set<List<A>> {
-                tailrec fun pwr(s: List<A>, acc: Set<List<A>>): Set<List<A>> =
-                    if (s.isEmpty()) {
-                        acc
-                    } else {
-                        pwr(s.takeLast(s.size - 1), acc + acc.map { it + s.first() })
-                    }
-                return pwr(start, setOf(emptyList()))
-            }
+        fun <A> power(start: List<A>): Set<List<A>> {
+            tailrec fun pwr(s: List<A>, acc: Set<List<A>>): Set<List<A>> =
+                if (s.isEmpty()) {
+                    acc
+                } else {
+                    pwr(s.takeLast(s.size - 1), acc + acc.map { it + s.first() })
+                }
+            return pwr(start, setOf(emptyList()))
+        }
 
-            val model = FindModel()
-            model.customScope = parameters.effectiveSearchScope
-            model.isCaseSensitive = true
-            model.searchContext = FindModel.SearchContext.IN_STRING_LITERALS
-            model.isRegularExpressions = true
-            // Enables custom translations functions (for auto-prefixing calls, for instance)
-            model.stringToFind = power(key.split('.'))
-                .map { it.joinToString(".") }
-                .filter { it.isNotEmpty() }
-                .joinToString("|") { "(${Regex.escape(it)})" }
+        val model = FindModel()
+        model.customScope = parameters.effectiveSearchScope
+        model.isCaseSensitive = true
+        model.searchContext = FindModel.SearchContext.IN_STRING_LITERALS
+        model.isRegularExpressions = true
+        // Enables custom translations functions (for auto-prefixing calls, for instance)
+        model.stringToFind = power(key.split('.'))
+            .map { it.joinToString(".") }
+            .filter { it.isNotEmpty() }
+            .joinToString("|") { "(${Regex.escape(it)})" }
+
+        runReadAction {
             FindInProjectUtil.findUsages(
                 model,
                 parameters.project,
