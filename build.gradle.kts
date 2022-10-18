@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 
 plugins {
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm") version "1.7.20"
     java
     mcdev
     groovy
@@ -84,6 +84,8 @@ dependencies {
     implementation(libs.templateMakerFabric)
     implementation(libs.mappingIo)
     implementation(libs.bundles.asm)
+
+    implementation(libs.bundles.fuel)
 
     jflex(libs.jflex.lib)
     jflexSkeleton(libs.jflex.skeleton) {

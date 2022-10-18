@@ -19,6 +19,7 @@ import com.demonwav.mcdev.util.invokeLater
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.wm.WindowManager
@@ -63,38 +64,49 @@ abstract class SrgActionBase : AnAction() {
 
     abstract fun withSrgTarget(parent: PsiElement, srgMap: McpSrgMap, e: AnActionEvent, data: ActionData)
 
-    protected fun showBalloon(message: String, e: AnActionEvent) {
-        val balloon = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder(message, null, LightColors.YELLOW, null)
-            .setHideOnAction(true)
-            .setHideOnClickOutside(true)
-            .setHideOnKeyOutside(true)
-            .createBalloon()
+    companion object {
+        fun showBalloon(message: String, e: AnActionEvent) {
+            val balloon = JBPopupFactory.getInstance()
+                .createHtmlTextBalloonBuilder(message, null, LightColors.YELLOW, null)
+                .setHideOnAction(true)
+                .setHideOnClickOutside(true)
+                .setHideOnKeyOutside(true)
+                .createBalloon()
 
-        val project = e.project ?: return
-        val statusBar = WindowManager.getInstance().getStatusBar(project)
+            val project = e.project ?: return
+            val statusBar = WindowManager.getInstance().getStatusBar(project)
 
-        invokeLater {
-            balloon.show(RelativePoint.getCenterOf(statusBar.component), Balloon.Position.atRight)
+            invokeLater {
+                val element = getDataFromActionEvent(e)?.element
+                val editor = getDataFromActionEvent(e)?.editor
+                val at = if (element != null && editor != null) {
+                    val pos = editor.offsetToVisualPosition(element.textRange.endOffset - element.textLength / 2)
+                    RelativePoint(
+                        editor.contentComponent,
+                        editor.visualPositionToXY(VisualPosition(pos.line + 1, pos.column))
+                    )
+                } else RelativePoint.getCenterOf(statusBar.component)
+                balloon.show(at, Balloon.Position.below)
+            }
         }
-    }
 
-    protected fun showSuccessBalloon(editor: Editor, element: PsiElement, text: String) {
-        val balloon = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder(text, null, LightColors.SLIGHTLY_GREEN, null)
-            .setHideOnAction(true)
-            .setHideOnClickOutside(true)
-            .setHideOnKeyOutside(true)
-            .createBalloon()
+        fun showSuccessBalloon(editor: Editor, element: PsiElement, text: String) {
+            val balloon = JBPopupFactory.getInstance()
+                .createHtmlTextBalloonBuilder(text, null, LightColors.SLIGHTLY_GREEN, null)
+                .setHideOnAction(true)
+                .setHideOnClickOutside(true)
+                .setHideOnKeyOutside(true)
+                .createBalloon()
 
-        invokeLater {
-            balloon.show(
-                RelativePoint(
+            invokeLater {
+                val pos = editor.offsetToVisualPosition(element.textRange.endOffset - element.textLength / 2)
+                val at = RelativePoint(
                     editor.contentComponent,
-                    editor.visualPositionToXY(editor.offsetToVisualPosition(element.textRange.endOffset))
-                ),
-                Balloon.Position.atRight
-            )
+                    editor.visualPositionToXY(VisualPosition(pos.line + 1, pos.column))
+                )
+
+                balloon.show(at, Balloon.Position.below)
+            }
         }
     }
 }

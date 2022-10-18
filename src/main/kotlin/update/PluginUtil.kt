@@ -25,4 +25,7 @@ object PluginUtil {
 
     val pluginVersion: String
         get() = plugin.version
+
+    val useragent: String
+        get() = "github_org/minecraft-dev/$pluginVersion"
 }

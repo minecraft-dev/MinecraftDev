@@ -10,10 +10,13 @@
 
 package com.demonwav.mcdev.platform.forge.version
 
+import com.demonwav.mcdev.creator.selectProxy
+import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.sortVersions
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.requests.suspendable
 import java.io.IOException
-import java.net.URL
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
 
@@ -51,11 +54,19 @@ class ForgeVersion private constructor(val versions: List<String>) {
     }
 
     companion object {
-        fun downloadData(): ForgeVersion? {
+        suspend fun downloadData(): ForgeVersion? {
             try {
-                val url = URL("https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml")
+                val url = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml"
+                val manager = FuelManager()
+                manager.proxy = selectProxy(url)
+
+                val response = manager.get(url)
+                    .header("User-Agent", PluginUtil.useragent)
+                    .suspendable()
+                    .await()
+
                 val result = mutableListOf<String>()
-                url.openStream().use { stream ->
+                response.body().toStream().use { stream ->
                     val inputFactory = XMLInputFactory.newInstance()
 
                     @Suppress("UNCHECKED_CAST")
