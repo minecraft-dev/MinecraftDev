@@ -3,7 +3,35 @@
   "title": "Minecraft Loot Table JSON",
   "type": "object",
   "properties": {
-    "type": { "type": "string" },
+    "type": {
+      "type": "string",
+      "enum": [
+        "minecraft:empty",
+        "empty",
+        "minecraft:entity",
+        "entity",
+        "minecraft:block",
+        "block",
+        "minecraft:chest",
+        "chest",
+        "minecraft:fishing",
+        "fishing",
+        "minecraft:gift",
+        "gift",
+        "minecraft:advancement_reward",
+        "advancement_reward",
+        "minecraft:barter",
+        "barter",
+        "minecraft:command",
+        "command",
+        "minecraft:selector",
+        "selector",
+        "minecraft:advancement_entity",
+        "advancement_entity",
+        "minecraft:generic",
+        "generic"
+      ]
+    },
     "pools": {
       "type": "array",
       "items": {
