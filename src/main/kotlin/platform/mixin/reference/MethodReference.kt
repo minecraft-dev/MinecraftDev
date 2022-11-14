@@ -26,16 +26,19 @@ import com.intellij.util.ProcessingContext
 
 object MethodReference : AbstractMethodReference() {
     val ELEMENT_PATTERN: ElementPattern<PsiLiteral> =
-        PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationAttribute(
-            PsiJavaPatterns.psiAnnotation().with(
-                object : PatternCondition<PsiAnnotation>("injector") {
-                    override fun accepts(t: PsiAnnotation, context: ProcessingContext?): Boolean {
-                        val qName = t.qualifiedName ?: return false
-                        return MixinAnnotationHandler.forMixinAnnotation(qName, t.project) is InjectorAnnotationHandler
+        PsiJavaPatterns.psiLiteral(StandardPatterns.string()).withAncestor(
+            1,
+            PsiJavaPatterns.psiElement().insideAnnotationAttribute(
+                PsiJavaPatterns.psiAnnotation().with(
+                    object : PatternCondition<PsiAnnotation>("injector") {
+                        override fun accepts(t: PsiAnnotation, context: ProcessingContext?): Boolean {
+                            val qName = t.qualifiedName ?: return false
+                            return isValidAnnotation(qName, t.project)
+                        }
                     }
-                }
-            ),
-            "method"
+                ),
+                "method"
+            )
         )
 
     override val description = "method '%s' in target class"
