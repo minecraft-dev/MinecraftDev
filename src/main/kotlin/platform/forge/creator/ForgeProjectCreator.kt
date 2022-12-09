@@ -89,7 +89,9 @@ open class Fg3ProjectCreator(
 
     private fun setupMainClassStep(): BasicJavaClassStep {
         return createJavaClassStep(config.mainClass) { packageName, className ->
-            if (config.mcVersion >= MinecraftVersions.MC1_19) {
+            if (config.mcVersion >= MinecraftVersions.MC1_19_3) {
+                Fg3Template.apply1_19_3MainClass(project, buildSystem, config, packageName, className)
+            } else if (config.mcVersion >= MinecraftVersions.MC1_19) {
                 Fg3Template.apply1_19MainClass(project, buildSystem, config, packageName, className)
             } else if (config.mcVersion >= MinecraftVersions.MC1_18) {
                 Fg3Template.apply1_18MainClass(project, buildSystem, config, packageName, className)
