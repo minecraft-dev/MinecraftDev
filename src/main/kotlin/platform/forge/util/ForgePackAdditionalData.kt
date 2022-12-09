@@ -17,11 +17,13 @@ data class ForgePackAdditionalData(val resourcePackFormat: Int, val dataPackForm
     companion object {
         val FORMAT_1_18 = ForgePackAdditionalData(8, 9)
         val FORMAT_1_19 = ForgePackAdditionalData(9, 10)
+        val FORMAT_1_19_3 = ForgePackAdditionalData(12, 10)
 
         fun forMcVersion(version: SemanticVersion): ForgePackAdditionalData? = when {
             version < MinecraftVersions.MC1_18 -> null
             version < MinecraftVersions.MC1_19 -> FORMAT_1_18
-            else -> FORMAT_1_19
+            version < MinecraftVersions.MC1_19_3 -> FORMAT_1_19
+            else -> FORMAT_1_19_3
         }
     }
 }
