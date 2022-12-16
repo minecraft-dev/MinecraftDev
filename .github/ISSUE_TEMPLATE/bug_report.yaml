@@ -1,0 +1,48 @@
+name: Bug report
+description: Create a bug report
+labels: ["status: unverified", "type: bug"]
+body:
+  - type: markdown
+    attributes:
+      value: DO NOT REQUEST SUPPORT FOR OLDER VERSIONS OF MINECRAFT.
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Minecraft Development for IntelliJ plugin version
+    validations:
+      required: true
+  - type: input
+    id: intellij-version
+    attributes:
+      label: IntelliJ version
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating System
+    validations:
+      required: true
+  - type: dropdown
+    id: target-platform
+    attributes:
+      label: Target platform
+      multiple: true
+      options:
+        - Bukkit
+        - Spigot
+        - Paper
+        - Sponge
+        - Architectury
+        - Minecraft Forge
+        - Fabric
+        - Lite Loader
+        - Velocity
+        - Mixins
+        - BungeeCord
+        - Waterfall
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: Always include a stack trace if there is one. Otherwise, the more information you can provide in terms of how to reproduce the problem, the more likely it'll be fixed. If there is something specific about your project, a link to the GitHub project can be very helpful.
