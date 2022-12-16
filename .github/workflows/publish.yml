@@ -13,7 +13,16 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           java-version: 11
-          cache: 'gradle'
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/jdks
+            ~/.gradle/native
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', 'gradle/**', 'gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
       - name: Setup publish token
         env:
           JETBRAINS_TOKEN: ${{ secrets.JETBRAINS_TOKEN }}
