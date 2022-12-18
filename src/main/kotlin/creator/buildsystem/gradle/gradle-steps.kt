@@ -338,7 +338,7 @@ class GradleWrapperStep(
 
 // Show the background processes window for setup tasks
 private fun showProgress(project: Project) {
-    if (!UISettings.instance.showStatusBar || UISettings.instance.presentationMode) {
+    if (!UISettings.getInstance().showStatusBar || UISettings.getInstance().presentationMode) {
         return
     }
 

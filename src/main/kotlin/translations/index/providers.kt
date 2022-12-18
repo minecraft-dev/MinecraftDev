@@ -14,6 +14,7 @@ import com.demonwav.mcdev.translations.Translation
 import com.demonwav.mcdev.translations.lang.LangFile
 import com.demonwav.mcdev.translations.lang.LangFileType
 import com.demonwav.mcdev.translations.lang.gen.psi.LangEntry
+import com.demonwav.mcdev.util.childrenOfType
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import com.intellij.json.JsonFileType
@@ -30,7 +31,6 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.util.indexing.FileContent
-import org.jetbrains.plugins.groovy.lang.psi.util.childrenOfType
 
 interface TranslationProvider {
     fun map(domain: String, input: FileContent): TranslationIndexEntry?

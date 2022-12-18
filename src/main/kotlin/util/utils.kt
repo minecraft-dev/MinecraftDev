@@ -25,6 +25,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.roots.libraries.LibraryKind
+import com.intellij.openapi.roots.libraries.LibraryKindRegistry
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Ref
@@ -32,6 +33,7 @@ import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import java.util.Locale
+import kotlin.math.min
 import kotlin.reflect.KClass
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.runAsync
@@ -137,7 +139,7 @@ inline fun <T : Collection<*>> T.ifEmpty(func: () -> Unit): T {
 }
 
 inline fun <T : Collection<*>?> T.ifNullOrEmpty(func: () -> Unit): T {
-    if (this == null || isEmpty()) {
+    if (isNullOrEmpty()) {
         func()
     }
     return this
@@ -267,7 +269,7 @@ fun String.getSimilarity(text: String, bonus: Int = 0): Int {
         return 100_000 + bonus // lowercase exact match
     }
 
-    val distance = Math.min(lowerCaseThis.length, lowerCaseText.length)
+    val distance = min(lowerCaseThis.length, lowerCaseText.length)
     for (i in 0 until distance) {
         if (lowerCaseThis[i] != lowerCaseText[i]) {
             return i + bonus
@@ -330,7 +332,7 @@ inline fun <reified T> Iterable<*>.firstOfType(): T? {
     return this.firstOrNull { it is T } as? T
 }
 
-fun libraryKind(id: String): LibraryKind = LibraryKind.findById(id) ?: LibraryKind.create(id)
+fun libraryKind(id: String): LibraryKind = LibraryKindRegistry.getInstance().findKindById(id) ?: LibraryKind.create(id)
 
 fun String.capitalize(): String =
     replaceFirstChar {

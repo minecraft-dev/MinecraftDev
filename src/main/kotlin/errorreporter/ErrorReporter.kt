@@ -16,8 +16,8 @@ import com.intellij.diagnostic.LogMessage
 import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.idea.IdeaLogger
+import com.intellij.notification.BrowseNotificationAction
 import com.intellij.notification.NotificationGroupManager
-import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter
@@ -96,29 +96,33 @@ class ErrorReporter : ErrorReportSubmitter() {
                 }
 
                 val message = if (!isDuplicate) {
-                    "<html>Created Issue #$token successfully. <a href=\"$htmlUrl\">View issue.</a></html>"
+                    "<html>Created Issue #$token successfully."
                 } else {
-                    "<html>Commented on existing Issue #$token successfully. " +
-                        "<a href=\"$htmlUrl\">View comment.</a></html>"
+                    "<html>Commented on existing Issue #$token successfully."
+                }
+                val actionText = if (!isDuplicate) {
+                    "View issue"
+                } else {
+                    "View comment"
                 }
 
                 NotificationGroupManager.getInstance().getNotificationGroup("Error Report").createNotification(
                     DiagnosticBundle.message("error.report.title"),
                     message,
                     NotificationType.INFORMATION
-                ).setListener(NotificationListener.URL_OPENING_LISTENER).setImportant(false).notify(project)
+                ).addAction(BrowseNotificationAction(actionText, htmlUrl)).setImportant(false).notify(project)
 
                 val reportInfo = SubmittedReportInfo(htmlUrl, "Issue #$token", type)
                 consumer.consume(reportInfo)
             },
             { e ->
-                val message = "<html>Error Submitting Issue: ${e.message}<br>Consider opening an issue on " +
-                    "<a href=\"$baseUrl\">the GitHub issue tracker.</a></html>"
+                val message = "<html>Error Submitting Issue: ${e.message}</html>."
+                val actionText = "Open an issue on the GitHub issue tracker"
                 NotificationGroupManager.getInstance().getNotificationGroup("Error Report").createNotification(
                     DiagnosticBundle.message("error.report.title"),
                     message,
                     NotificationType.ERROR,
-                ).setListener(NotificationListener.URL_OPENING_LISTENER).setImportant(false).notify(project)
+                ).addAction(BrowseNotificationAction(actionText, baseUrl)).setImportant(false).notify(project)
 
                 consumer.consume(SubmittedReportInfo(null, null, SubmittedReportInfo.SubmissionStatus.FAILED))
             }

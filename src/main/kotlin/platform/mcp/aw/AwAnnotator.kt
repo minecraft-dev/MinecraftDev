@@ -51,8 +51,8 @@ class AwAnnotator : Annotator {
 
     companion object {
 
-        val compatibleByAccessMap = HashMultimap.create<String, String>()!!
-        val compatibleByTargetMap = HashMultimap.create<String, String>()!!
+        val compatibleByAccessMap = HashMultimap.create<String, String>()
+        val compatibleByTargetMap = HashMultimap.create<String, String>()
 
         init {
             compatibleByAccessMap.putAll("accessible", setOf("class", "method", "field"))

@@ -1,6 +1,7 @@
 [versions]
 coroutines = "1.6.4"
 junit = "5.9.0"
+junit-platform = "1.9.0"
 asm = "9.3"
 fuel = "2.3.1"
 
@@ -18,7 +19,7 @@ jflex-skeleton = "org.jetbrains.idea:jflex:1.7.0-c1fdf11"
 grammarKit = "org.jetbrains.idea:grammar-kit:1.5.1"
 
 # Gradle Tooling
-gradleToolingExtension = "com.jetbrains.intellij.gradle:gradle-tooling-extension:212.4746.92"
+gradleToolingExtension = "com.jetbrains.intellij.gradle:gradle-tooling-extension:221.5080.210"
 annotations = "org.jetbrains:annotations:23.0.0"
 groovy = "org.codehaus.groovy:groovy-all:2.5.18"
 
@@ -37,6 +38,7 @@ test-nbt = "com.demonwav.mcdev:all-types-nbt:1.0"
 
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-entine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
 
 [bundles]
 coroutines = ["coroutines-core", "coroutines-jdk8", "coroutines-swing"]

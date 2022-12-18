@@ -12,7 +12,6 @@ package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.platform.PlatformType
-import com.intellij.util.containers.isNullOrEmpty
 import com.intellij.util.lang.JavaVersion
 
 private val bracketRegex = Regex("[\\[\\]]")
@@ -53,8 +52,8 @@ abstract class ProjectConfig {
             return false
         }
 
-        list?.removeIf(String::isBlank)
+        list.removeIf(String::isBlank)
 
-        return list?.size != 0
+        return list.size != 0
     }
 }
