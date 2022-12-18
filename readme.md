@@ -8,8 +8,8 @@ Minecraft Development for IntelliJ
         <td align="center" colspan="3"><b>Build Status</b></td>
     </tr>
     <tr>
-        <td align="left">2021.3</td>
-        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20213"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20213)/statusIcon.svg" alt="2021.3 Nightly Status" /></a></td>
+        <td align="right"><b>Main Build</b></td>
+        <td colspan="2"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
     </tr>
     <tr>
         <td align="left">2022.1</td>
