@@ -17,7 +17,6 @@ import com.intellij.openapi.module.ModuleTypeManager
 
 class MinecraftModuleType : JavaModuleType() {
 
-    override fun createModuleBuilder() = MinecraftModuleBuilder()
     override fun getIcon() = PlatformAssets.MINECRAFT_ICON
     override fun getNodeIcon(isOpened: Boolean) = PlatformAssets.MINECRAFT_ICON
     override fun getName() = NAME

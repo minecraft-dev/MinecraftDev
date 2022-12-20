@@ -24,7 +24,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradlePlugin
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleSetupStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStepOld
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
@@ -114,7 +114,7 @@ class VelocityGradleCreator(
             mainClassStep,
             modifyStep,
             buildConstantsStep(),
-            GradleWrapperStep(project, rootDirectory, buildSystem),
+            GradleWrapperStepOld(project, rootDirectory, buildSystem),
             GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
         )

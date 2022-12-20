@@ -10,33 +10,247 @@
 
 package com.demonwav.mcdev.platform.forge.creator
 
-import com.demonwav.mcdev.creator.BaseProjectCreator
-import com.demonwav.mcdev.creator.BasicJavaClassStep
-import com.demonwav.mcdev.creator.CreatorStep
-import com.demonwav.mcdev.creator.LicenseStep
+import com.demonwav.mcdev.creator.*
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
-import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.*
+import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
-import com.demonwav.mcdev.util.MinecraftVersions
-import com.demonwav.mcdev.util.SemanticVersion
-import com.demonwav.mcdev.util.runGradleTaskAndWait
-import com.demonwav.mcdev.util.runWriteTask
+import com.demonwav.mcdev.platform.forge.version.ForgeVersion
+import com.demonwav.mcdev.util.*
+import com.intellij.ide.projectWizard.generators.AssetsNewProjectWizardStep
+import com.intellij.ide.wizard.NewProjectWizardBaseData
+import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.ide.wizard.chain
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.util.lang.JavaVersion
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import java.nio.file.StandardOpenOption.WRITE
+import java.time.ZonedDateTime
 import java.util.Locale
+import kotlinx.coroutines.coroutineScope
+
+private val minSupportedMcVersion = MinecraftVersions.MC1_16_5
+
+class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersion>(parent) {
+    override val description = "fetch Forge versions"
+
+    override suspend fun computeData() = coroutineScope {
+        asyncIO { ForgeVersion.downloadData() }.await()
+    }
+
+    override fun createStep(data: ForgeVersion) = ForgeMcVersionStep(this, data)
+        .chain(
+            ::ModNameStep,
+            ::MainClassStep,
+            ::UseMixinsStep,
+            ::LicenseStep,
+            ::ForgeOptionalSettingsStep,
+            ::ForgeGradleFilesStep,
+            ::GradleWrapperStep,
+            ::ForgeProjectFilesStep,
+            ::ForgeCompileJavaStep,
+            ::GradleImportStep,
+        )
+
+    class Factory : ModPlatformStep.Factory {
+        override val name = "Forge"
+        override fun createStep(parent: ModPlatformStep) = ForgePlatformStep(parent)
+    }
+}
+
+class ForgeMcVersionStep(parent: NewProjectWizardStep, private val forgeVersionData: ForgeVersion) : AbstractSelectVersionThenForkStep(parent, forgeVersionData.sortedMcVersions.filter { it >= minSupportedMcVersion }) {
+    override val label = "Minecraft Version:"
+
+    override fun initStep(version: SemanticVersion) = ForgeVersionStep(this, forgeVersionData.getForgeVersions(version))
+
+    override fun setupProject(project: Project) {
+        data.putUserData(KEY, SemanticVersion.tryParse(step))
+        super.setupProject(project)
+    }
+
+    companion object {
+        val KEY = Key.create<SemanticVersion>("${ForgeMcVersionStep::class.java.name}.version")
+    }
+}
+
+class ForgeVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>) : AbstractSelectVersionStep(parent, versions) {
+    override val label = "Forge Version:"
+
+    override fun setupProject(project: Project) {
+        data.putUserData(KEY, SemanticVersion.tryParse(version))
+    }
+
+    companion object {
+        val KEY = Key.create<SemanticVersion>("${ForgeVersionStep::class.java.name}.version")
+    }
+}
+
+class ForgeOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsibleStep(parent) {
+    override val title = "Optional Settings"
+
+    override fun createStep() = DescriptionStep(this).chain(::AuthorsStep, ::WebsiteStep, ::UpdateUrlStep)
+}
+
+class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AssetsNewProjectWizardStep(parent) {
+    private fun transformModName(modName: String): String {
+        return modName.lowercase(Locale.ENGLISH).replace(" ", "")
+    }
+
+    override fun setupAssets(project: Project) {
+        outputDirectory = context.projectFileDirectory
+
+        val mcVersion = data.getUserData(ForgeMcVersionStep.KEY) ?: return
+        val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
+        val modName = transformModName(data.getUserData(ModNameStep.KEY) ?: return)
+        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val javaVersion = context.projectJdk.versionString?.let(JavaVersion::parse)
+        val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
+        val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
+
+        addTemplateProperties(
+            "MOD_NAME" to modName,
+            "MCP_CHANNEL" to "official",
+            "MCP_VERSION" to mcVersion,
+            "MCP_MC_VERSION" to mcVersion,
+            "FORGE_VERSION" to "$mcVersion-$forgeVersion",
+            "GROUP_ID" to buildSystemProps.groupId,
+            "ARTIFACT_ID" to buildSystemProps.artifactId,
+            "MOD_VERSION" to buildSystemProps.version,
+            "HAS_DATA" to "true",
+        )
+
+        if (javaVersion != null) {
+            addTemplateProperties("JAVA_VERSION" to javaVersion.feature)
+        }
+
+        if (authors.isNotEmpty()) {
+            addTemplateProperties("AUTHOR_LIST" to authors.joinToString(", "))
+        }
+
+        if (useMixins) {
+            addTemplateProperties("MIXINS" to "true")
+        }
+
+        if (forgeVersion >= SemanticVersion.release(39, 0, 88)) {
+            addTemplateProperties("GAME_TEST_FRAMEWORK" to "true")
+        }
+
+        if (mcVersion <= MinecraftVersions.MC1_16_5) {
+            addTemplateProperties(
+                "MCP_CHANNEL" to "snapshot",
+                "MCP_VERSION" to "20210309",
+            )
+        }
+
+        addTemplates(
+            project,
+            "build.gradle" to MinecraftTemplates.FG3_BUILD_GRADLE_TEMPLATE,
+            "gradle.properties" to MinecraftTemplates.FG3_GRADLE_PROPERTIES_TEMPLATE,
+            "settings.gradle" to MinecraftTemplates.FG3_SETTINGS_GRADLE_TEMPLATE,
+        )
+
+        addGradleWrapperProperties(project)
+    }
+}
+
+class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AssetsNewProjectWizardStep(parent) {
+    override fun setupAssets(project: Project) {
+        outputDirectory = context.projectFileDirectory
+
+        val mcVersion = data.getUserData(ForgeMcVersionStep.KEY) ?: return
+        val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
+        val (mainPackageName, mainClassName) = splitPackage(data.getUserData(MainClassStep.KEY) ?: return)
+        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val modName = data.getUserData(ModNameStep.KEY) ?: return
+        val license = data.getUserData(LicenseStep.KEY) ?: return
+        val description = data.getUserData(DescriptionStep.KEY) ?: ""
+        val updateUrl = data.getUserData(UpdateUrlStep.KEY) ?: ""
+        val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
+
+        val nextMcVersion = when (val part = mcVersion.parts.getOrNull(1)) {
+            // Mimics the code used to get the next Minecraft version in Forge's MDK
+            // https://github.com/MinecraftForge/MinecraftForge/blob/0ff8a596fc1ef33d4070be89dd5cb4851f93f731/build.gradle#L884
+            is SemanticVersion.Companion.VersionPart.ReleasePart -> (part.version + 1).toString()
+            null -> "?"
+            else -> part.versionString
+        }
+
+        val packDescriptor = ForgePackDescriptor.forMcVersion(mcVersion) ?: ForgePackDescriptor.FORMAT_3
+        val additionalPackData = ForgePackAdditionalData.forMcVersion(mcVersion)
+
+        addTemplateProperties(
+            "PACKAGE_NAME" to mainPackageName,
+            "CLASS_NAME" to mainClassName,
+            "ARTIFACT_ID" to buildSystemProps.artifactId,
+            "MOD_NAME" to modName,
+            "MOD_VERSION" to buildSystemProps.version,
+            "DISPLAY_TEST" to (forgeVersion >= ForgeConstants.DISPLAY_TEST_MANIFEST_VERSION),
+            "FORGE_SPEC_VERSION" to forgeVersion.parts[0].versionString,
+            "MC_VERSION" to mcVersion,
+            "MC_NEXT_VERSION" to "1.$nextMcVersion",
+            "LICENSE" to license,
+            "DESCRIPTION" to description,
+            "PACK_FORMAT" to packDescriptor.format,
+            "PACK_COMMENT" to packDescriptor.comment,
+            "FORGE_DATA" to (additionalPackData ?: ""),
+            "YEAR" to ZonedDateTime.now().year,
+        )
+
+        if (updateUrl.isNotBlank()) {
+            addTemplateProperties("UPDATE_URL" to updateUrl)
+        }
+
+        if (authors.isNotEmpty()) {
+            addTemplateProperties("AUTHOR_LIST" to authors.joinToString(", "))
+        }
+        addTemplateProperties("AUTHOR" to authors.joinToString(", "))
+
+        val mainClassTemplate = when {
+            mcVersion >= MinecraftVersions.MC1_19_3 -> MinecraftTemplates.FG3_1_19_3_MAIN_CLASS_TEMPLATE
+            mcVersion >= MinecraftVersions.MC1_19 -> MinecraftTemplates.FG3_1_19_MAIN_CLASS_TEMPLATE
+            mcVersion >= MinecraftVersions.MC1_18 -> MinecraftTemplates.FG3_1_18_MAIN_CLASS_TEMPLATE
+            mcVersion >= MinecraftVersions.MC1_17 -> MinecraftTemplates.FG3_1_17_MAIN_CLASS_TEMPLATE
+            else -> MinecraftTemplates.FG3_MAIN_CLASS_TEMPLATE
+        }
+
+        addTemplates(
+            project,
+            "src/main/java/${mainPackageName.replace('.', '/')}/$mainClassName.java" to mainClassTemplate,
+            "src/main/resources/pack.mcmeta" to MinecraftTemplates.PACK_MCMETA_TEMPLATE,
+            "src/main/resources/META-INF/mods.toml" to MinecraftTemplates.MODS_TOML_TEMPLATE,
+            "LICENSE" to "${license.id}.txt",
+            ".gitignore" to MinecraftTemplates.GRADLE_GITIGNORE_TEMPLATE,
+        )
+
+        WriteAction.runAndWait<Throwable> {
+            val dir = VfsUtil.createDirectoryIfMissing(LocalFileSystem.getInstance(), "$outputDirectory/.gradle")
+                ?: throw IllegalStateException("Unable to create .gradle directory")
+            val file = dir.findOrCreateChildData(this, MAGIC_RUN_CONFIGS_FILE)
+            val fileContents = buildSystemProps.artifactId + "\n" +
+                mcVersion + "\n" +
+                forgeVersion + "\n" +
+                "genIntellijRuns"
+            VfsUtil.saveText(file, fileContents)
+        }
+    }
+}
+
+class ForgeCompileJavaStep(parent: NewProjectWizardStep) : AbstractRunGradleTaskStep(parent) {
+    override val title = "Setting up classpath"
+    override val task = "compileJava"
+}
 
 class Fg2ProjectCreator(
     private val rootDirectory: Path,
@@ -66,7 +280,7 @@ class Fg2ProjectCreator(
                 files
             ),
             setupMainClassStep(),
-            GradleWrapperStep(project, rootDirectory, buildSystem),
+            GradleWrapperStepOld(project, rootDirectory, buildSystem),
             McmodInfoStep(project, buildSystem, config),
             SetupDecompWorkspaceStep(project, rootDirectory),
             GradleGitignoreStep(project, rootDirectory),
@@ -126,11 +340,11 @@ open class Fg3ProjectCreator(
                 files
             ),
             setupMainClassStep(),
-            GradleWrapperStep(project, rootDirectory, buildSystem),
+            GradleWrapperStepOld(project, rootDirectory, buildSystem),
             Fg3ProjectFilesStep(project, buildSystem, config),
             Fg3CompileJavaStep(project, rootDirectory),
             GradleGitignoreStep(project, rootDirectory),
-            LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", ")),
+            LicenseStepOld(project, rootDirectory, config.license, config.authors.joinToString(", ")),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem),
             ForgeRunConfigsStep(buildSystem, rootDirectory, config, CreatedModuleType.SINGLE)
         )
@@ -171,7 +385,7 @@ class Fg3Mc112ProjectCreator(
                 files
             ),
             setupMainClassStep(),
-            GradleWrapperStep(project, rootDirectory, buildSystem),
+            GradleWrapperStepOld(project, rootDirectory, buildSystem),
             McmodInfoStep(project, buildSystem, config),
             Fg3CompileJavaStep(project, rootDirectory),
             GradleGitignoreStep(project, rootDirectory),
@@ -276,7 +490,7 @@ class ForgeRunConfigsStep(
     override fun runStep(indicator: ProgressIndicator) {
         val gradleDir = rootDirectory.resolve(".gradle")
         Files.createDirectories(gradleDir)
-        val hello = gradleDir.resolve(HELLO)
+        val hello = gradleDir.resolve(MAGIC_RUN_CONFIGS_FILE)
 
         val task = if (createdModuleType == CreatedModuleType.MULTI) {
             ":${buildSystem.artifactId}:genIntellijRuns"
@@ -299,8 +513,6 @@ class ForgeRunConfigsStep(
 
         Files.write(hello, fileContents.toByteArray(Charsets.UTF_8), CREATE, TRUNCATE_EXISTING, WRITE)
     }
-
-    companion object {
-        const val HELLO = ".hello_from_mcdev"
-    }
 }
+
+const val MAGIC_RUN_CONFIGS_FILE = ".hello_from_mcdev"

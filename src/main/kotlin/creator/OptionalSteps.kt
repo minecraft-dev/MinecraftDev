@@ -1,0 +1,92 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2022 minecraft-dev
+ *
+ * MIT License
+ */
+
+package com.demonwav.mcdev.creator
+
+import com.intellij.ide.wizard.AbstractNewProjectWizardStep
+import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.bindText
+
+abstract class AbstractOptionalStringStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
+    protected abstract val label: String
+
+    val valueProperty = propertyGraph.property("")
+    var value by valueProperty
+
+    override fun setupUI(builder: Panel) {
+        with(builder) {
+            row(label) {
+                textField().bindText(valueProperty)
+            }
+        }
+    }
+}
+
+class DescriptionStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
+    override val label = "Description:"
+
+    override fun setupProject(project: Project) {
+        data.putUserData(KEY, value)
+    }
+
+    companion object {
+        val KEY = Key.create<String>("${DescriptionStep::class.java.name}.description")
+    }
+}
+
+class AuthorsStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
+    override val label = "Authors:"
+
+    override fun setupProject(project: Project) {
+        data.putUserData(KEY, parseAuthors(value))
+    }
+
+    companion object {
+        val KEY = Key.create<List<String>>("${AuthorsStep::class.java.name}.authors")
+
+        private val bracketRegex = Regex("[\\[\\]]")
+        private val commaRegex = Regex("\\s*,\\s*")
+
+        private fun parseAuthors(string: String): List<String> {
+            return if (string.isNotBlank()) {
+                string.trim().replace(bracketRegex, "").split(commaRegex).toList()
+            } else {
+                emptyList()
+            }
+        }
+    }
+}
+
+class WebsiteStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
+    override val label = "Website:"
+
+    override fun setupProject(project: Project) {
+        data.putUserData(KEY, value)
+    }
+
+    companion object {
+        val KEY = Key.create<String>("${WebsiteStep::class.java.name}.website")
+    }
+}
+
+class UpdateUrlStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
+    override val label = "Update URL:"
+
+    override fun setupProject(project: Project) {
+        data.putUserData(KEY, value)
+    }
+
+    companion object {
+        val KEY = Key.create<String>("${UpdateUrlStep::class.java.name}.updateUrl")
+    }
+}

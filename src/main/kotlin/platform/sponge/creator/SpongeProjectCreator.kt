@@ -13,7 +13,7 @@ package com.demonwav.mcdev.platform.sponge.creator
 import com.demonwav.mcdev.creator.BaseProjectCreator
 import com.demonwav.mcdev.creator.CreateDirectoriesStep
 import com.demonwav.mcdev.creator.CreatorStep
-import com.demonwav.mcdev.creator.LicenseStep
+import com.demonwav.mcdev.creator.LicenseStepOld
 import com.demonwav.mcdev.creator.buildsystem.BuildDependency
 import com.demonwav.mcdev.creator.buildsystem.BuildRepository
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
@@ -23,7 +23,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleSetupStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStepOld
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
@@ -84,7 +84,7 @@ class SpongeMavenCreator(
             mainClassStep,
             modifyStep,
             MavenGitignoreStep(project, rootDirectory),
-            LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", ")),
+            LicenseStepOld(project, rootDirectory, config.license, config.authors.joinToString(", ")),
             BasicMavenFinalizerStep(rootModule, rootDirectory)
         )
     }
@@ -111,9 +111,9 @@ class SpongeGradleCreator(
             GradleSetupStep(project, rootDirectory, buildSystem, files),
             mainClassStep,
             modifyStep,
-            GradleWrapperStep(project, rootDirectory, buildSystem),
+            GradleWrapperStepOld(project, rootDirectory, buildSystem),
             GradleGitignoreStep(project, rootDirectory),
-            LicenseStep(project, rootDirectory, config.license, config.authors.joinToString(", ")),
+            LicenseStepOld(project, rootDirectory, config.license, config.authors.joinToString(", ")),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
         )
     }

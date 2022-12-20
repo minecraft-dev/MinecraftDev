@@ -19,8 +19,9 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStepOld
 import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
+import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
@@ -30,6 +31,7 @@ import com.demonwav.mcdev.util.runGradleTaskAndWait
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.runWriteTaskInSmartMode
+import com.intellij.ide.projectWizard.generators.AssetsNewProjectWizardStep
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi.JsonArray
 import com.intellij.json.psi.JsonElementGenerator
@@ -45,6 +47,17 @@ import com.intellij.psi.PsiFileFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import org.gradle.internal.impldep.org.apache.commons.io.FileUtils
+
+class ArchitecturyPlatformStep(parent: ModPlatformStep) : AssetsNewProjectWizardStep(parent) {
+    override fun setupAssets(project: Project) {
+        TODO("Not yet implemented")
+    }
+
+    class Factory : ModPlatformStep.Factory {
+        override val name = "Architectury"
+        override fun createStep(parent: ModPlatformStep) = ArchitecturyPlatformStep(parent)
+    }
+}
 
 class ArchitecturyProjectCreator(
     private val rootDirectory: Path,
@@ -97,7 +110,7 @@ class ArchitecturyProjectCreator(
                     ArchitecturyTemplate.applySettingsGradle(project, buildSystem, config)
                 )
             ),
-            GradleWrapperStep(project, rootDirectory, buildSystem),
+            GradleWrapperStepOld(project, rootDirectory, buildSystem),
             GenRunsStep(project, rootDirectory),
             GradleGitignoreStep(project, rootDirectory),
             CleanUpStep(rootDirectory),

@@ -11,16 +11,18 @@
 package com.demonwav.mcdev.platform.fabric.creator
 
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.creator.AbstractLatentStep
 import com.demonwav.mcdev.creator.BaseProjectCreator
 import com.demonwav.mcdev.creator.CreatorStep
-import com.demonwav.mcdev.creator.LicenseStep
+import com.demonwav.mcdev.creator.LicenseStepOld
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStepOld
 import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
+import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.util.addAnnotation
@@ -35,6 +37,7 @@ import com.demonwav.mcdev.util.virtualFile
 import com.intellij.codeInsight.daemon.impl.quickfix.CreateFromUsageUtils
 import com.intellij.codeInsight.generation.OverrideImplementUtil
 import com.intellij.codeInsight.generation.PsiMethodMember
+import com.intellij.ide.projectWizard.generators.AssetsNewProjectWizardStep
 import com.intellij.ide.util.EditorHelper
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi.JsonArray
@@ -59,6 +62,22 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Locale
 
+class FabricPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Unit>(parent) {
+    override val description = "download Fabric stuff"
+    override suspend fun computeData() {}
+
+    override fun createStep(data: Unit) = object : AssetsNewProjectWizardStep(this@FabricPlatformStep) {
+        override fun setupAssets(project: Project) {
+            TODO("Not yet implemented")
+        }
+    }
+
+    class Factory : ModPlatformStep.Factory {
+        override val name = "Fabric"
+        override fun createStep(parent: ModPlatformStep) = FabricPlatformStep(parent)
+    }
+}
+
 class FabricProjectCreator(
     private val rootDirectory: Path,
     private val rootModule: Module,
@@ -74,14 +93,14 @@ class FabricProjectCreator(
 
         val steps = mutableListOf(
             SimpleGradleSetupStep(project, rootDirectory, buildSystem, files),
-            GradleWrapperStep(project, rootDirectory, buildSystem)
+            GradleWrapperStepOld(project, rootDirectory, buildSystem)
         )
         if (config.genSources) {
             steps += GenSourcesStep(project, rootDirectory)
         }
         steps += GradleGitignoreStep(project, rootDirectory)
         config.license?.let {
-            steps += LicenseStep(project, rootDirectory, it, config.authors.joinToString(", "))
+            steps += LicenseStepOld(project, rootDirectory, it, config.authors.joinToString(", "))
         }
         steps += BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
         if (config.mixins) {

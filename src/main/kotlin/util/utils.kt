@@ -29,6 +29,7 @@ import com.intellij.openapi.roots.libraries.LibraryKindRegistry
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Ref
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
@@ -303,6 +304,9 @@ fun String.toJavaIdentifier(allowDollars: Boolean = true): String {
         }
         .joinToString("")
 }
+
+fun String.toJavaClassName() = StringUtil.capitalizeWords(this, true)
+    .replace(" ", "").toJavaIdentifier(allowDollars = false)
 
 fun String.toPackageName(): String {
     if (this.isEmpty()) {

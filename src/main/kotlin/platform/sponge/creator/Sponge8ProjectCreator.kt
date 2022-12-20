@@ -20,7 +20,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleSetupStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStepOld
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.maven.BasicMavenStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
@@ -109,7 +109,7 @@ class Sponge8GradleCreator(
             CreateDirectoriesStep(buildSystem, rootDirectory),
             GradleSetupStep(project, rootDirectory, buildSystem, files, true),
             mainClassStep,
-            GradleWrapperStep(project, rootDirectory, buildSystem),
+            GradleWrapperStepOld(project, rootDirectory, buildSystem),
             GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem, "runServer")
         )

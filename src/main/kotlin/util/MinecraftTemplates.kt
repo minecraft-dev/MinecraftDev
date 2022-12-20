@@ -145,6 +145,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             group.addTemplate(commonGroup)
             commonGroup.addTemplate(FileTemplateDescriptor(GRADLE_GITIGNORE_TEMPLATE))
             commonGroup.addTemplate(FileTemplateDescriptor(MAVEN_GITIGNORE_TEMPLATE))
+            commonGroup.addTemplate(FileTemplateDescriptor(GRADLE_WRAPPER_PROPERTIES))
         }
 
         FileTemplateGroupDescriptor("Skeletons", GeneralAssets.MC_TEMPLATE).let { skeletonGroup ->
@@ -289,6 +290,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
 
         const val MIXIN_OVERWRITE_FALLBACK = "Mixin Overwrite Fallback.java"
 
+        const val GRADLE_WRAPPER_PROPERTIES = "MinecraftDev gradle-wrapper.properties"
         const val GRADLE_GITIGNORE_TEMPLATE = "Gradle.gitignore"
         const val MAVEN_GITIGNORE_TEMPLATE = "Maven.gitignore"
 

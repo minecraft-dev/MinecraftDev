@@ -57,7 +57,7 @@ class GradleBuildSystem(
 
         return listOf(
             GradleSetupStep(project, rootDirectory, this, files),
-            GradleWrapperStep(project, rootDirectory, this)
+            GradleWrapperStepOld(project, rootDirectory, this)
         )
     }
 

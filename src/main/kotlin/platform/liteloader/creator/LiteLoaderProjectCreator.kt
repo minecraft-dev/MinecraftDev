@@ -17,7 +17,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStepOld
 import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
 import com.demonwav.mcdev.platform.forge.creator.SetupDecompWorkspaceStep
 import com.intellij.openapi.module.Module
@@ -51,7 +51,7 @@ class LiteLoaderProjectCreator(
                 files
             ),
             setupMainClassStep(),
-            GradleWrapperStep(project, rootDirectory, buildSystem),
+            GradleWrapperStepOld(project, rootDirectory, buildSystem),
             SetupDecompWorkspaceStep(project, rootDirectory),
             GradleGitignoreStep(project, rootDirectory),
             BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)

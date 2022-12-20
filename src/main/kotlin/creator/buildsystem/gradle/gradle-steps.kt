@@ -12,22 +12,24 @@ package com.demonwav.mcdev.creator.buildsystem.gradle
 
 import com.demonwav.mcdev.creator.CreatorStep
 import com.demonwav.mcdev.creator.CreatorStep.Companion.writeText
-import com.demonwav.mcdev.creator.buildsystem.BuildSystem
-import com.demonwav.mcdev.creator.buildsystem.BuildSystemTemplate
-import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
-import com.demonwav.mcdev.creator.buildsystem.DirectorySet
-import com.demonwav.mcdev.util.ifNotEmpty
-import com.demonwav.mcdev.util.invokeLater
-import com.demonwav.mcdev.util.runGradleTaskAndWait
-import com.demonwav.mcdev.util.runWriteAction
-import com.demonwav.mcdev.util.runWriteTask
-import com.demonwav.mcdev.util.virtualFileOrError
+import com.demonwav.mcdev.creator.addTemplates
+import com.demonwav.mcdev.creator.buildsystem.*
+import com.demonwav.mcdev.creator.findStep
+import com.demonwav.mcdev.util.*
+import com.demonwav.mcdev.util.MinecraftTemplates.Companion.GRADLE_WRAPPER_PROPERTIES
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.execution.RunManager
+import com.intellij.ide.projectWizard.generators.AssetsNewProjectWizardStep
 import com.intellij.ide.ui.UISettings
+import com.intellij.ide.wizard.AbstractNewProjectWizardStep
+import com.intellij.ide.wizard.NewProjectWizardBaseData
+import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.ex.StatusBarEx
 import com.intellij.psi.PsiElement
@@ -48,6 +50,95 @@ import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.GroovyPsiElementFactory
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlock
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression
+
+val DEFAULT_GRADLE_VERSION = SemanticVersion.release(7, 3, 3)
+val GRADLE_VERSION_KEY = Key.create<SemanticVersion>("mcdev.gradleVersion")
+
+fun AssetsNewProjectWizardStep.addGradleWrapperProperties(project: Project) {
+    val gradleVersion = data.getUserData(GRADLE_VERSION_KEY) ?: DEFAULT_GRADLE_VERSION
+    addTemplateProperties("GRADLE_WRAPPER_VERSION" to gradleVersion)
+    addTemplates(project, "gradle/wrapper/gradle-wrapper.properties" to GRADLE_WRAPPER_PROPERTIES)
+}
+
+abstract class AbstractRunGradleTaskStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
+    abstract val title: String
+    abstract val task: String
+
+    override fun setupProject(project: Project) {
+        val outputDirectory = context.projectFileDirectory
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, title) {
+            override fun run(indicator: ProgressIndicator) {
+                indicator.text = this@AbstractRunGradleTaskStep.title
+                indicator.text2 = "Running Gradle task: '$task'"
+                runGradleTaskAndWait(project, Path.of(outputDirectory)) { settings ->
+                    settings.taskNames = listOf(task)
+                }
+                indicator.text2 = null
+            }
+        })
+    }
+}
+
+class GradleWrapperStep(parent: NewProjectWizardStep) : AbstractRunGradleTaskStep(parent) {
+    override val title = "Setting up Gradle Wrapper"
+    override val task = "wrapper"
+}
+
+open class GradleImportStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
+    open val additionalRunTasks = emptyList<String>()
+
+    override fun setupProject(project: Project) {
+        val rootDirectory = Path.of(context.projectFileDirectory)
+        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+
+        // Tell IntelliJ to import this project
+        rootDirectory.virtualFileOrError.refresh(false, true)
+
+        invokeLater(project.disposed) {
+            val path = rootDirectory.toAbsolutePath().toString()
+            if (canLinkAndRefreshGradleProject(path, project, false)) {
+                linkAndRefreshGradleProject(path, project)
+                showProgress(project)
+            }
+        }
+
+        // Set up the run config
+        // Get the gradle external task type, this is what sets it as a gradle task
+        addRunTaskConfiguration(project, rootDirectory, buildSystemProps, "build")
+        for (tasks in additionalRunTasks) {
+            addRunTaskConfiguration(project, rootDirectory, buildSystemProps, tasks)
+        }
+    }
+
+    private fun addRunTaskConfiguration(project: Project, rootDirectory: Path, buildSystemProps: BuildSystemPropertiesStep<*>, task: String) {
+        val gradleType = GradleExternalTaskConfigurationType.getInstance()
+
+        val runManager = RunManager.getInstance(project)
+        val runConfigName = buildSystemProps.artifactId + ' ' + task
+
+        val runConfiguration = GradleRunConfiguration(project, gradleType.factory, runConfigName)
+
+        // Set relevant gradle values
+        runConfiguration.settings.externalProjectPath = rootDirectory.toAbsolutePath().toString()
+        runConfiguration.settings.executionName = runConfigName
+        runConfiguration.settings.taskNames = listOf(task)
+
+        runConfiguration.isAllowRunningInParallel = false
+
+        val settings = runManager.createConfiguration(
+            runConfiguration,
+            gradleType.factory
+        )
+
+        settings.isActivateToolWindowBeforeRun = true
+        settings.storeInLocalWorkspace()
+
+        runManager.addConfiguration(settings)
+        if (runManager.selectedConfiguration == null) {
+            runManager.selectedConfiguration = settings
+        }
+    }
+}
 
 class SimpleGradleSetupStep(
     private val project: Project,
@@ -309,7 +400,7 @@ class BasicGradleFinalizerStep(
     }
 }
 
-class GradleWrapperStep(
+class GradleWrapperStepOld(
     private val project: Project,
     private val rootDirectory: Path,
     private val buildSystem: GradleBuildSystem
