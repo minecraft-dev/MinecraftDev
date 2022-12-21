@@ -12,6 +12,7 @@ package com.demonwav.mcdev.creator
 
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.ui.dsl.builder.Panel
@@ -19,8 +20,13 @@ import com.intellij.ui.dsl.builder.bindText
 
 abstract class AbstractOptionalStringStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
     protected abstract val label: String
+    protected open val bindToStorage = false
 
-    val valueProperty = propertyGraph.property("")
+    val valueProperty = propertyGraph.property("").apply {
+        if (bindToStorage) {
+            bindStorage("${this@AbstractOptionalStringStep.javaClass.name}.value")
+        }
+    }
     var value by valueProperty
 
     override fun setupUI(builder: Panel) {
@@ -46,6 +52,7 @@ class DescriptionStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep
 
 class AuthorsStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
     override val label = "Authors:"
+    override val bindToStorage = true
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, parseAuthors(value))
@@ -69,6 +76,7 @@ class AuthorsStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(par
 
 class WebsiteStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
     override val label = "Website:"
+    override val bindToStorage = true
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, value)
