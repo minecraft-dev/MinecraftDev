@@ -17,13 +17,15 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
+import com.intellij.openapi.ui.validation.validationErrorFor
 import com.intellij.ui.JBColor
-import com.intellij.ui.components.JBLabel
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.AsyncProcessIcon
 import java.awt.event.HierarchyEvent
+import javax.swing.JLabel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,7 +57,14 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
             }.await()
             invokeLater {
                 if (result == null) {
-                    placeholder.component = JBLabel("Unable to $description").also { it.foreground = JBColor.RED }
+                    placeholder.component = panel {
+                        row {
+                            val label = label("Unable to $description")
+                                .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+                                .validation(validationErrorFor<JLabel> { "Unable to $description" })
+                            label.component.foreground = JBColor.RED
+                        }
+                    }
                 } else {
                     val s = createStep(result)
                     step = s
@@ -88,6 +97,10 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                         }
                     }
                 })
+                    .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+                    .validation(validationErrorFor<AsyncProcessIcon> {
+                        "Haven't finished $description"
+                    })
             }
         }
     }
