@@ -71,12 +71,13 @@ class MinecraftClassCreateAction :
                 builder.addKind("Block", icon, MinecraftTemplates.FORGE_1_17_BLOCK_TEMPLATE)
                 builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_1_17_ENCHANTMENT_TEMPLATE)
                 builder.addKind("Item", icon, MinecraftTemplates.FORGE_1_17_ITEM_TEMPLATE)
+                builder.addKind("Mob Effect", icon, MinecraftTemplates.FORGE_1_17_MOB_EFFECT_TEMPLATE)
                 builder.addKind("Packet", icon, MinecraftTemplates.FORGE_1_17_PACKET_TEMPLATE)
             } else {
                 builder.addKind("Block", icon, MinecraftTemplates.FORGE_1_17_BLOCK_TEMPLATE)
                 builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_1_17_ENCHANTMENT_TEMPLATE)
                 builder.addKind("Item", icon, MinecraftTemplates.FORGE_1_17_ITEM_TEMPLATE)
-                builder.addKind("Mob Effect", icon, MinecraftTemplates.FORGE_1_18_MOB_EFFECT_TEMPLATE)
+                builder.addKind("Mob Effect", icon, MinecraftTemplates.FORGE_1_17_MOB_EFFECT_TEMPLATE)
                 builder.addKind("Packet", icon, MinecraftTemplates.FORGE_1_18_PACKET_TEMPLATE)
             }
         }
