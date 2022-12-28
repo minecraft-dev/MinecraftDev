@@ -64,27 +64,28 @@ class MinecraftClassCreateAction :
 
             if (mcVersion < MinecraftVersions.MC1_17) {
                 builder.addKind("Block", icon, MinecraftTemplates.FORGE_BLOCK_TEMPLATE)
+                builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_ENCHANTMENT_TEMPLATE)
                 builder.addKind("Item", icon, MinecraftTemplates.FORGE_ITEM_TEMPLATE)
                 builder.addKind("Packet", icon, MinecraftTemplates.FORGE_PACKET_TEMPLATE)
-                builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_ENCHANTMENT_TEMPLATE)
             } else if (mcVersion < MinecraftVersions.MC1_18) {
                 builder.addKind("Block", icon, MinecraftTemplates.FORGE_1_17_BLOCK_TEMPLATE)
+                builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_1_17_ENCHANTMENT_TEMPLATE)
                 builder.addKind("Item", icon, MinecraftTemplates.FORGE_1_17_ITEM_TEMPLATE)
                 builder.addKind("Packet", icon, MinecraftTemplates.FORGE_1_17_PACKET_TEMPLATE)
-                builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_1_17_ENCHANTMENT_TEMPLATE)
             } else {
                 builder.addKind("Block", icon, MinecraftTemplates.FORGE_1_17_BLOCK_TEMPLATE)
-                builder.addKind("Item", icon, MinecraftTemplates.FORGE_1_17_ITEM_TEMPLATE)
-                builder.addKind("Packet", icon, MinecraftTemplates.FORGE_1_18_PACKET_TEMPLATE)
                 builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_1_17_ENCHANTMENT_TEMPLATE)
+                builder.addKind("Item", icon, MinecraftTemplates.FORGE_1_17_ITEM_TEMPLATE)
+                builder.addKind("Mob Effect", icon, MinecraftTemplates.FORGE_1_18_MOB_EFFECT_TEMPLATE)
+                builder.addKind("Packet", icon, MinecraftTemplates.FORGE_1_18_PACKET_TEMPLATE)
             }
         }
         if (isFabric) {
             val icon = PlatformAssets.FABRIC_ICON
 
             builder.addKind("Block", icon, MinecraftTemplates.FABRIC_BLOCK_TEMPLATE)
-            builder.addKind("Item", icon, MinecraftTemplates.FABRIC_ITEM_TEMPLATE)
             builder.addKind("Enchantment", icon, MinecraftTemplates.FABRIC_ENCHANTMENT_TEMPLATE)
+            builder.addKind("Item", icon, MinecraftTemplates.FABRIC_ITEM_TEMPLATE)
         }
     }
 

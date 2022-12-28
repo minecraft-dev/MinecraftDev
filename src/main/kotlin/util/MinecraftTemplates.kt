@@ -304,6 +304,8 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
 
         const val FORGE_1_18_PACKET_TEMPLATE = "ForgePacket (1.18+).java"
 
+        const val FORGE_1_18_MOB_EFFECT_TEMPLATE = "ForgeMobEffect (1.18+).java"
+
         const val FABRIC_BLOCK_TEMPLATE = "FabricBlock.java"
         const val FABRIC_ITEM_TEMPLATE = "FabricItem.java"
         const val FABRIC_ENCHANTMENT_TEMPLATE = "FabricEnchantment.java"
