@@ -58,6 +58,7 @@ class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersi
             ::ForgeGradleFilesStep,
             ::GradleWrapperStep,
             ::ForgeProjectFilesStep,
+            ::ForgeMixinsJsonStep,
             ::ForgeCompileJavaStep,
             ::GradleImportStep,
         )
@@ -241,6 +242,23 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjec
                 forgeVersion + "\n" +
                 "genIntellijRuns"
             VfsUtil.saveText(file, fileContents)
+        }
+    }
+}
+
+// Needs to be a separate step from above because of PACKAGE_NAME being different
+class ForgeMixinsJsonStep(parent: NewProjectWizardStep) : FixedAssetsNewProjectWizardStep(parent) {
+    override fun setupAssets(project: Project) {
+        outputDirectory = context.projectFileDirectory
+
+        val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
+        if (useMixins) {
+            val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+            addTemplateProperties(
+                "PACKAGE_NAME" to "${buildSystemProps.groupId}.${buildSystemProps.artifactId}.mixin",
+                "ARTIFACT_ID" to buildSystemProps.artifactId,
+            )
+            addTemplates(project, "src/main/resources/${buildSystemProps.artifactId}.mixins.json" to MinecraftTemplates.FORGE_MIXINS_JSON_TEMPLATE)
         }
     }
 }

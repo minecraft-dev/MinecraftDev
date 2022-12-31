@@ -160,3 +160,20 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> T1.chain(f1: (T1) -> T2, f2: 
     val s10 = f10(s9)
     return stepSequence(this, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10)
 }
+
+fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> T1.chain(f1: (T1) -> T2, f2: (T2) -> T3, f3: (T3) -> T4, f4: (T4) -> T5, f5: (T5) -> T6, f6: (T6) -> T7, f7: (T7) -> T8, f8: (T8) -> T9, f9: (T9) -> T10, f10: (T10) -> T11, f11: (T11) -> T12): NewProjectWizardStep
+        where T1 : NewProjectWizardStep, T2 : NewProjectWizardStep, T3 : NewProjectWizardStep, T4 : NewProjectWizardStep, T5 : NewProjectWizardStep, T6 : NewProjectWizardStep, T7 : NewProjectWizardStep, T8: NewProjectWizardStep, T9: NewProjectWizardStep, T10: NewProjectWizardStep, T11: NewProjectWizardStep, T12: NewProjectWizardStep {
+
+    val s1 = f1(this)
+    val s2 = f2(s1)
+    val s3 = f3(s2)
+    val s4 = f4(s3)
+    val s5 = f5(s4)
+    val s6 = f6(s5)
+    val s7 = f7(s6)
+    val s8 = f8(s7)
+    val s9 = f9(s8)
+    val s10 = f10(s9)
+    val s11 = f11(s10)
+    return stepSequence(this, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11)
+}
