@@ -66,39 +66,39 @@ class ArchitecturyProjectCreator(
     private val config: ArchitecturyProjectConfig
 ) : BaseProjectCreator(rootModule, buildSystem) {
 
-    private val commonModule: Module = project.runWriteTaskInSmartMode {
-        ModuleManager.getInstance(rootModule.project)
-            .newModule(rootDirectory.resolve("common"), ModuleType.get(rootModule).id)
-    }
-    private val forgeModule: Module = project.runWriteTaskInSmartMode {
-        ModuleManager.getInstance(rootModule.project)
-            .newModule(rootDirectory.resolve("forge"), ModuleType.get(rootModule).id)
-    }
-    private val fabricModule: Module = project.runWriteTaskInSmartMode {
-        ModuleManager.getInstance(rootModule.project)
-            .newModule(rootDirectory.resolve("fabric"), ModuleType.get(rootModule).id)
-    }
+//    private val commonModule: Module = project.runWriteTaskInSmartMode {
+//        ModuleManager.getInstance(rootModule.project)
+//            .newModule(rootDirectory.resolve("common"), ModuleType.get(rootModule).id)
+//    }
+//    private val forgeModule: Module = project.runWriteTaskInSmartMode {
+//        ModuleManager.getInstance(rootModule.project)
+//            .newModule(rootDirectory.resolve("forge"), ModuleType.get(rootModule).id)
+//    }
+//    private val fabricModule: Module = project.runWriteTaskInSmartMode {
+//        ModuleManager.getInstance(rootModule.project)
+//            .newModule(rootDirectory.resolve("fabric"), ModuleType.get(rootModule).id)
+//    }
 
     override fun getSteps(): Iterable<CreatorStep> {
         val steps = mutableListOf<CreatorStep>()
-        steps += ArchitecturyCommonProjectCreator(
-            rootDirectory.resolve("common"),
-            commonModule,
-            buildSystem,
-            config
-        ).getSteps()
-        steps += ArchitecturyForgeProjectCreator(
-            rootDirectory.resolve("forge"),
-            forgeModule,
-            buildSystem,
-            config
-        ).getSteps()
-        steps += ArchitecturyFabricProjectCreator(
-            rootDirectory.resolve("fabric"),
-            fabricModule,
-            buildSystem,
-            config
-        ).getSteps()
+//        steps += ArchitecturyCommonProjectCreator(
+//            rootDirectory.resolve("common"),
+//            commonModule,
+//            buildSystem,
+//            config
+//        ).getSteps()
+//        steps += ArchitecturyForgeProjectCreator(
+//            rootDirectory.resolve("forge"),
+//            forgeModule,
+//            buildSystem,
+//            config
+//        ).getSteps()
+//        steps += ArchitecturyFabricProjectCreator(
+//            rootDirectory.resolve("fabric"),
+//            fabricModule,
+//            buildSystem,
+//            config
+//        ).getSteps()
         steps += listOf(
             SimpleGradleSetupStep(
                 project,

@@ -12,6 +12,7 @@ package com.demonwav.mcdev.creator.buildsystem.gradle
 
 import com.demonwav.mcdev.creator.CreatorStep
 import com.demonwav.mcdev.creator.CreatorStep.Companion.writeText
+import com.demonwav.mcdev.creator.FixedAssetsNewProjectWizardStep
 import com.demonwav.mcdev.creator.addTemplates
 import com.demonwav.mcdev.creator.buildsystem.*
 import com.demonwav.mcdev.creator.findStep
@@ -19,10 +20,8 @@ import com.demonwav.mcdev.util.*
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.GRADLE_WRAPPER_PROPERTIES
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.execution.RunManager
-import com.intellij.ide.projectWizard.generators.AssetsNewProjectWizardStep
 import com.intellij.ide.ui.UISettings
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
-import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
@@ -54,7 +53,7 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrRefere
 val DEFAULT_GRADLE_VERSION = SemanticVersion.release(7, 3, 3)
 val GRADLE_VERSION_KEY = Key.create<SemanticVersion>("mcdev.gradleVersion")
 
-fun AssetsNewProjectWizardStep.addGradleWrapperProperties(project: Project) {
+fun FixedAssetsNewProjectWizardStep.addGradleWrapperProperties(project: Project) {
     val gradleVersion = data.getUserData(GRADLE_VERSION_KEY) ?: DEFAULT_GRADLE_VERSION
     addTemplateProperties("GRADLE_WRAPPER_VERSION" to gradleVersion)
     addTemplates(project, "gradle/wrapper/gradle-wrapper.properties" to GRADLE_WRAPPER_PROPERTIES)

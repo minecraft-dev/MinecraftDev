@@ -20,8 +20,6 @@ import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.platform.forge.version.ForgeVersion
 import com.demonwav.mcdev.util.*
-import com.intellij.ide.projectWizard.generators.AssetsNewProjectWizardStep
-import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
 import com.intellij.openapi.application.WriteAction
@@ -70,7 +68,7 @@ class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersi
     }
 }
 
-class ForgeMcVersionStep(parent: NewProjectWizardStep, private val forgeVersionData: ForgeVersion) : AbstractSelectVersionThenForkStep(parent, forgeVersionData.sortedMcVersions.filter { it >= minSupportedMcVersion }) {
+class ForgeMcVersionStep(parent: NewProjectWizardStep, private val forgeVersionData: ForgeVersion) : AbstractSelectVersionThenForkStep<SemanticVersion>(parent, forgeVersionData.sortedMcVersions.filter { it >= minSupportedMcVersion }) {
     override val label = "Minecraft Version:"
 
     override fun initStep(version: SemanticVersion) = ForgeVersionStep(this, forgeVersionData.getForgeVersions(version))
@@ -85,7 +83,7 @@ class ForgeMcVersionStep(parent: NewProjectWizardStep, private val forgeVersionD
     }
 }
 
-class ForgeVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>) : AbstractSelectVersionStep(parent, versions) {
+class ForgeVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
     override val label = "Forge Version:"
 
     override fun setupProject(project: Project) {
@@ -103,7 +101,7 @@ class ForgeOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsi
     override fun createStep() = DescriptionStep(this).chain(::AuthorsStep, ::WebsiteStep, ::UpdateUrlStep)
 }
 
-class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AssetsNewProjectWizardStep(parent) {
+class ForgeGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjectWizardStep(parent) {
     private fun transformModName(modName: String): String {
         return modName.lowercase(Locale.ENGLISH).replace(" ", "")
     }
@@ -165,7 +163,7 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AssetsNewProjectWizar
     }
 }
 
-class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AssetsNewProjectWizardStep(parent) {
+class ForgeProjectFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjectWizardStep(parent) {
     override fun setupAssets(project: Project) {
         outputDirectory = context.projectFileDirectory
 

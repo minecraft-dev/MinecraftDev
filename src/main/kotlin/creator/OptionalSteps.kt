@@ -15,8 +15,10 @@ import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.columns
 
 abstract class AbstractOptionalStringStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
     protected abstract val label: String
@@ -32,7 +34,9 @@ abstract class AbstractOptionalStringStep(parent: NewProjectWizardStep) : Abstra
     override fun setupUI(builder: Panel) {
         with(builder) {
             row(label) {
-                textField().bindText(valueProperty)
+                textField()
+                    .bindText(valueProperty)
+                    .columns(COLUMNS_LARGE)
             }
         }
     }
@@ -84,6 +88,18 @@ class WebsiteStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(par
 
     companion object {
         val KEY = Key.create<String>("${WebsiteStep::class.java.name}.website")
+    }
+}
+
+class RepositoryStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
+    override val label = "Repository:"
+
+    override fun setupProject(project: Project) {
+        data.putUserData(KEY, value)
+    }
+
+    companion object {
+        val KEY = Key.create<String>("${RepositoryStep::class.java.name}.repository")
     }
 }
 

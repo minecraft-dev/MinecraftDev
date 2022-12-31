@@ -51,30 +51,25 @@ fun runWriteTaskLater(func: () -> Unit) {
     }
 }
 
-inline fun <T : Any?> Project.runWriteTaskInSmartMode(crossinline func: () -> T): T {
-    if (ApplicationManager.getApplication().isReadAccessAllowed) {
-        return runWriteTask { func() }
-    }
-
+inline fun Project.runWriteTaskInSmartMode(crossinline func: () -> Unit) {
     val dumbService = DumbService.getInstance(this)
-    val ref = Ref<T>()
-    while (true) {
-        dumbService.waitForSmartMode()
-        val success = runWriteTask {
+    lateinit var runnable: Runnable
+    runnable = Runnable {
+        if (isDisposed) {
+            throw ProcessCanceledException()
+        }
+        runWriteTask {
             if (isDisposed) {
                 throw ProcessCanceledException()
             }
             if (dumbService.isDumb) {
-                return@runWriteTask false
+                dumbService.runWhenSmart(runnable)
+            } else {
+                func()
             }
-            ref.set(func())
-            return@runWriteTask true
-        }
-        if (success) {
-            break
         }
     }
-    return ref.get()
+    dumbService.runWhenSmart(runnable)
 }
 
 fun <T : Any?> invokeAndWait(func: () -> T): T {

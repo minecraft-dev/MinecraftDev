@@ -51,40 +51,13 @@ class MinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {
     override fun getBuilderId() = "MINECRAFT_MODULE"
     override fun getDescription() = "Create a new Minecraft project"
 
-//    override fun setupRootModel(modifiableRootModel: ModifiableRootModel) {
-//        val project = modifiableRootModel.project
-//        val (root, vFile) = createAndGetRoot()
-//        modifiableRootModel.addContentEntry(vFile)
-//
-//        if (moduleJdk != null) {
-//            modifiableRootModel.sdk = moduleJdk
-//        } else {
-//            modifiableRootModel.inheritSdk()
-//        }
-//
-//        val r = DumbAwareRunnable {
-//            creator.create(root, modifiableRootModel.module)
-//        }
-//
-//        if (project.isDisposed) {
-//            return
-//        }
-//
-//        if (
-//            ApplicationManager.getApplication().isUnitTestMode ||
-//            ApplicationManager.getApplication().isHeadlessEnvironment
-//        ) {
-//            r.run()
-//            return
-//        }
-//
-//        if (!project.isInitialized) {
-//            StartupManager.getInstance(project).registerPostStartupActivity(r)
-//            return
-//        }
-//
-//        DumbService.getInstance(project).runWhenSmart(r)
-//    }
+    override fun setupRootModel(modifiableRootModel: ModifiableRootModel) {
+        if (moduleJdk != null) {
+            modifiableRootModel.sdk = moduleJdk
+        } else {
+            modifiableRootModel.inheritSdk()
+        }
+    }
 
     private fun createAndGetRoot(): Pair<Path, VirtualFile> {
         val temp = contentEntryPath ?: throw IllegalStateException("Failed to get content entry path")

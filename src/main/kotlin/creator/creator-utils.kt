@@ -11,18 +11,17 @@
 package com.demonwav.mcdev.creator
 
 import com.intellij.ide.fileTemplates.FileTemplateManager
-import com.intellij.ide.projectWizard.generators.AssetsNewProjectWizardStep
 import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.stepSequence
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 
-fun AssetsNewProjectWizardStep.addTemplates(project: Project, vararg templates: Pair<String, String>) {
+fun FixedAssetsNewProjectWizardStep.addTemplates(project: Project, vararg templates: Pair<String, String>) {
     addTemplates(project, templates.toMap())
 }
 
-fun AssetsNewProjectWizardStep.addTemplates(project: Project, templates: Map<String, String>) {
+fun FixedAssetsNewProjectWizardStep.addTemplates(project: Project, templates: Map<String, String>) {
     val manager = FileTemplateManager.getInstance(project)
     addAssets(templates.map { (path, template) -> GeneratorTemplateFile(path, manager.getJ2eeTemplate(template)) })
 }
