@@ -45,36 +45,41 @@ class ArchitecturyVersion private constructor(
 
     companion object {
 
-        suspend fun downloadData(): ArchitecturyVersion {
-            val url = "https://api.modrinth.com/v2/project/architectury-api/version"
-            val manager = FuelManager()
-            manager.proxy = selectProxy(url)
+        suspend fun downloadData(): ArchitecturyVersion? {
+            try {
+                val url = "https://api.modrinth.com/v2/project/architectury-api/version"
+                val manager = FuelManager()
+                manager.proxy = selectProxy(url)
 
-            val response = manager.get(url)
-                .header("User-Agent", PluginUtil.useragent)
-                .suspendable()
-                .awaitString()
+                val response = manager.get(url)
+                    .header("User-Agent", PluginUtil.useragent)
+                    .suspendable()
+                    .awaitString()
 
-            val data = Gson().fromJson<List<ModrinthVersionApi>>(response)
+                val data = Gson().fromJson<List<ModrinthVersionApi>>(response)
 
-            val apiVersionMap = HashMap<SemanticVersion, HashSet<SemanticVersion>>()
+                val apiVersionMap = HashMap<SemanticVersion, HashSet<SemanticVersion>>()
 
-            for (version in data) {
-                val apiVersion = SemanticVersion.parse(version.versionNumber.substringBeforeLast('+'))
+                for (version in data) {
+                    val apiVersion = SemanticVersion.parse(version.versionNumber.substringBeforeLast('+'))
 
-                for (gameVersion in version.gameVersions) {
-                    val parsed = SemanticVersion.parse(gameVersion)
-                    val set = apiVersionMap.computeIfAbsent(parsed) { HashSet() }
-                    set += apiVersion
+                    for (gameVersion in version.gameVersions) {
+                        val parsed = SemanticVersion.tryParse(gameVersion) ?: continue
+                        val set = apiVersionMap.computeIfAbsent(parsed) { HashSet() }
+                        set += apiVersion
+                    }
                 }
-            }
 
-            val apiVersionMapList = HashMap<SemanticVersion, List<SemanticVersion>>()
-            for ((mcVersion, archList) in apiVersionMap.entries) {
-                apiVersionMapList[mcVersion] = archList.sortedDescending()
-            }
+                val apiVersionMapList = HashMap<SemanticVersion, List<SemanticVersion>>()
+                for ((mcVersion, archList) in apiVersionMap.entries) {
+                    apiVersionMapList[mcVersion] = archList.sortedDescending()
+                }
 
-            return ArchitecturyVersion(apiVersionMapList)
+                return ArchitecturyVersion(apiVersionMapList)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return null
+            }
         }
     }
 }

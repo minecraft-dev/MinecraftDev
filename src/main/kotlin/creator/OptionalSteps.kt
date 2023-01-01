@@ -103,6 +103,18 @@ class RepositoryStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(
     }
 }
 
+class IssueTrackerStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
+    override val label = "Issue Tracker:"
+
+    override fun setupProject(project: Project) {
+        data.putUserData(KEY, value)
+    }
+
+    companion object {
+        val KEY = Key.create<String>("${IssueTrackerStep::class.java.name}.issueTracker")
+    }
+}
+
 class UpdateUrlStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
     override val label = "Update URL:"
 

@@ -10,28 +10,27 @@
 
 package com.demonwav.mcdev.platform.architectury.creator
 
-import com.demonwav.mcdev.creator.BaseProjectCreator
-import com.demonwav.mcdev.creator.BasicJavaClassStep
-import com.demonwav.mcdev.creator.CreateDirectoriesStep
-import com.demonwav.mcdev.creator.CreatorStep
+import com.demonwav.mcdev.creator.*
 import com.demonwav.mcdev.creator.buildsystem.BuildSystem
-import com.demonwav.mcdev.creator.buildsystem.gradle.BasicGradleFinalizerStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleFiles
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleGitignoreStep
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStepOld
-import com.demonwav.mcdev.creator.buildsystem.gradle.SimpleGradleSetupStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.*
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
+import com.demonwav.mcdev.platform.architectury.version.ArchitecturyVersion
 import com.demonwav.mcdev.platform.fabric.EntryPoint
+import com.demonwav.mcdev.platform.fabric.creator.FabricApiVersionStep
+import com.demonwav.mcdev.platform.fabric.creator.FabricLoaderVersionStep
+import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
+import com.demonwav.mcdev.platform.fabric.util.FabricVersions
+import com.demonwav.mcdev.platform.forge.creator.ForgeVersionStep
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
-import com.demonwav.mcdev.util.runGradleTaskAndWait
-import com.demonwav.mcdev.util.runWriteAction
-import com.demonwav.mcdev.util.runWriteTask
-import com.demonwav.mcdev.util.runWriteTaskInSmartMode
+import com.demonwav.mcdev.platform.forge.version.ForgeVersion
+import com.demonwav.mcdev.util.*
 import com.intellij.ide.projectWizard.generators.AssetsNewProjectWizardStep
+import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.ide.wizard.chain
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi.JsonArray
 import com.intellij.json.psi.JsonElementGenerator
@@ -40,22 +39,198 @@ import com.intellij.json.psi.JsonObject
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleType
+import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiFileFactory
+import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.bindSelected
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlinx.coroutines.coroutineScope
 import org.gradle.internal.impldep.org.apache.commons.io.FileUtils
 
-class ArchitecturyPlatformStep(parent: ModPlatformStep) : AssetsNewProjectWizardStep(parent) {
-    override fun setupAssets(project: Project) {
-        TODO("Not yet implemented")
+class ArchitecturyVersionData(
+    val forgeVersions: ForgeVersion,
+    val fabricVersions: FabricVersions,
+    val fabricApiVersions: FabricApiVersions,
+    val architecturyVersions: ArchitecturyVersion,
+)
+
+private val NewProjectWizardStep.architecturyGroup: String get() {
+    val apiVersion = data.getUserData(ArchitecturyApiVersionStep.KEY)
+    return when {
+        apiVersion == null || apiVersion >= SemanticVersion.release(2, 0, 10) -> "dev.architectury"
+        else -> "me.shedaniel"
+    }
+}
+
+private val NewProjectWizardStep.architecturyPackage: String get() {
+    val apiVersion = data.getUserData(ArchitecturyApiVersionStep.KEY)
+    return when {
+        apiVersion == null || apiVersion >= SemanticVersion.release(2, 0, 10) -> "dev.architectury"
+        else -> "me.shedaniel.architectury"
+    }
+}
+
+class ArchitecturyPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ArchitecturyVersionData>(parent) {
+    override val description = "download Forge, Fabric and Architectury versions"
+
+    override suspend fun computeData() = coroutineScope {
+        val forgeJob = asyncIO { ForgeVersion.downloadData() }
+        val fabricJob = asyncIO { FabricVersions.downloadData() }
+        val fabricApiJob = asyncIO { FabricApiVersions.downloadData() }
+        val archJob = asyncIO { ArchitecturyVersion.downloadData() }
+
+        val forge = forgeJob.await() ?: return@coroutineScope null
+        val fabric = fabricJob.await() ?: return@coroutineScope null
+        val fabricApi = fabricApiJob.await() ?: return@coroutineScope null
+        val arch = archJob.await() ?: return@coroutineScope null
+
+        ArchitecturyVersionData(forge, fabric, fabricApi, arch)
+    }
+
+    override fun createStep(data: ArchitecturyVersionData): NewProjectWizardStep {
+        val mcVersions = data.architecturyVersions.versions.keys.intersect(data.forgeVersions.sortedMcVersions.toSet())
+            .intersect(data.fabricVersions.game.mapNotNullTo(mutableSetOf()) { SemanticVersion.tryParse(it.version) })
+        return ArchitecturyMcVersionStep(this, mcVersions.toList(), data).chain(
+            ::UseMixinsStep,
+            ::ModNameStep,
+            ::LicenseStep,
+            ::ArchitecturyOptionalSettingsStep,
+            ::ArchitecturyGradleFilesStep,
+            ::GradleWrapperStep,
+            ::GradleImportStep,
+        )
     }
 
     class Factory : ModPlatformStep.Factory {
         override val name = "Architectury"
         override fun createStep(parent: ModPlatformStep) = ArchitecturyPlatformStep(parent)
+    }
+}
+
+class ArchitecturyMcVersionStep(parent: NewProjectWizardStep, mcVersions: List<SemanticVersion>, private val versionData: ArchitecturyVersionData) : AbstractSelectVersionThenForkStep<SemanticVersion>(parent, mcVersions) {
+    override val label = "Minecraft Version:"
+
+    override fun initStep(version: SemanticVersion) = ForgeVersionStep(this, versionData.forgeVersions.getForgeVersions(version)).chain(
+        { parent -> FabricLoaderVersionStep(parent, versionData.fabricVersions.loader) },
+        { parent ->
+            val versionStr = version.toString()
+            val apiVersions = versionData.fabricApiVersions.versions.filter { versionStr in it.gameVersions }.map { it.version }
+            if (apiVersions.isEmpty()) {
+                FabricApiVersionStep(parent, versionData.fabricApiVersions.versions.map { it.version }, false)
+            } else {
+                FabricApiVersionStep(parent, apiVersions, true)
+            }
+        },
+        { parent -> ArchitecturyApiVersionStep(parent, versionData.architecturyVersions.getArchitecturyVersions(version)) }
+    )
+
+    override fun setupProject(project: Project) {
+        data.putUserData(KEY, SemanticVersion.tryParse(step))
+        super.setupProject(project)
+    }
+
+    companion object {
+        val KEY = Key.create<SemanticVersion>("${ArchitecturyMcVersionStep::class.java.name}.version")
+    }
+}
+
+class ArchitecturyApiVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
+    override val label = "Architectury API Version:"
+
+    private val useArchitecturyApiProperty = propertyGraph.property(true)
+        .bindBooleanStorage("${javaClass.name}.useArchitecturyApi")
+    private var useArchitecturyApi by useArchitecturyApiProperty
+
+    override fun setupRow(builder: Row) {
+        super.setupRow(builder)
+
+        with(builder) {
+            checkBox("Use Architectury API")
+                .bindSelected(useArchitecturyApiProperty)
+        }
+
+        useArchitecturyApiProperty.afterChange { versionBox.isEnabled = useArchitecturyApi }
+        versionBox.isEnabled = useArchitecturyApi
+    }
+
+    override fun setupProject(project: Project) {
+        if (useArchitecturyApi) {
+            data.putUserData(KEY, SemanticVersion.tryParse(version))
+        }
+    }
+
+    companion object {
+        val KEY = Key.create<SemanticVersion>("${ArchitecturyApiVersionStep::class.java.name}.version")
+    }
+}
+
+class ArchitecturyOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsibleStep(parent) {
+    override val title = "Optional Settings"
+
+    override fun createStep() = DescriptionStep(this).chain(
+        ::AuthorsStep,
+        ::WebsiteStep,
+        ::RepositoryStep,
+        ::IssueTrackerStep,
+    )
+}
+
+class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjectWizardStep(parent) {
+    override fun setupAssets(project: Project) {
+        outputDirectory = context.projectFileDirectory
+
+        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val modName = data.getUserData(ModNameStep.KEY) ?: return
+        val mcVersion = data.getUserData(ArchitecturyMcVersionStep.KEY) ?: return
+        val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
+        val fabricLoaderVersion = data.getUserData(FabricLoaderVersionStep.KEY) ?: return
+        val fabricApiVersion = data.getUserData(FabricApiVersionStep.KEY)
+        val archApiVersion = data.getUserData(ArchitecturyApiVersionStep.KEY)
+        val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
+
+        addTemplateProperties(
+            "GROUP_ID" to buildSystemProps.groupId,
+            "ARTIFACT_ID" to buildSystemProps.artifactId,
+            "MOD_NAME" to modName,
+            "VERSION" to buildSystemProps.version,
+            "MC_VERSION" to mcVersion,
+            "FORGE_VERSION" to forgeVersion,
+            "FABRIC_LOADER_VERSION" to fabricLoaderVersion,
+            "ARCHITECTURY_GROUP" to architecturyGroup,
+            "JAVA_VERSION" to javaVersion
+        )
+
+        if (fabricApiVersion != null) {
+            addTemplateProperties(
+                "FABRIC_API_VERSION" to fabricApiVersion,
+                "FABRIC_API" to "true",
+            )
+        }
+
+        if (archApiVersion != null) {
+            addTemplateProperties(
+                "ARCHITECTURY_API_VERSION" to archApiVersion,
+                "ARCHITECTURY_API" to "true",
+            )
+        }
+
+        addTemplates(
+            project,
+            "build.gradle" to MinecraftTemplates.ARCHITECTURY_BUILD_GRADLE_TEMPLATE,
+            "gradle.properties" to MinecraftTemplates.ARCHITECTURY_GRADLE_PROPERTIES_TEMPLATE,
+            "settings.gradle" to MinecraftTemplates.ARCHITECTURY_SETTINGS_GRADLE_TEMPLATE,
+            "common/build.gradle" to MinecraftTemplates.ARCHITECTURY_COMMON_BUILD_GRADLE_TEMPLATE,
+            "forge/build.gradle" to MinecraftTemplates.ARCHITECTURY_FORGE_BUILD_GRADLE_TEMPLATE,
+            "forge/gradle.properties" to MinecraftTemplates.ARCHITECTURY_FORGE_GRADLE_PROPERTIES_TEMPLATE,
+            "fabric/build.gradle" to MinecraftTemplates.ARCHITECTURY_FABRIC_BUILD_GRADLE_TEMPLATE,
+        )
+
+        addGradleWrapperProperties(project)
     }
 }
 
