@@ -22,7 +22,7 @@ modId="${ARTIFACT_ID}" #mandatory
 version="${file.jarVersion}" #mandatory
 # A display name for the mod
 displayName="${MOD_NAME}" #mandatory
-# A URL to query for updates for this mod. See the JSON update specification <here>
+# A URL to query for updates for this mod. See the JSON update specification https://docs.minecraftforge.net/en/latest/misc/updatechecker/
 #if (${UPDATE_URL})
 updateJSONURL="${UPDATE_URL}" #optional
 #else
