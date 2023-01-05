@@ -91,6 +91,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_17_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_18_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_19_MAIN_CLASS_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_19_3_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_BUILD_GRADLE_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_GRADLE_PROPERTIES_TEMPLATE))
@@ -238,6 +239,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FG3_1_17_MAIN_CLASS_TEMPLATE = "Forge (1.17+) Main Class.java"
         const val FG3_1_18_MAIN_CLASS_TEMPLATE = "Forge (1.18+) Main Class.java"
         const val FG3_1_19_MAIN_CLASS_TEMPLATE = "Forge (1.19+) Main Class.java"
+        const val FG3_1_19_3_MAIN_CLASS_TEMPLATE = "Forge (1.19.3+) Main Class.java"
         const val FG3_BUILD_GRADLE_TEMPLATE = "Forge (1.13+) build.gradle"
         const val FG3_SUBMODULE_BUILD_GRADLE_TEMPLATE = "Forge (1.13+) Submodule build.gradle"
         const val FG3_GRADLE_PROPERTIES_TEMPLATE = "Forge (1.13+) gradle.properties"
@@ -299,6 +301,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FORGE_1_17_ITEM_TEMPLATE = "ForgeItem (1.17+).java"
         const val FORGE_1_17_PACKET_TEMPLATE = "ForgePacket (1.17+).java"
         const val FORGE_1_17_ENCHANTMENT_TEMPLATE = "ForgeEnchantment (1.17+).java"
+        const val FORGE_1_17_MOB_EFFECT_TEMPLATE = "ForgeMobEffect (1.17+).java"
 
         const val FORGE_1_18_PACKET_TEMPLATE = "ForgePacket (1.18+).java"
 

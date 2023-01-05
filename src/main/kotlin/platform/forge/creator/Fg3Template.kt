@@ -17,6 +17,7 @@ import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_1_17_MAIN_CLASS_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_1_18_MAIN_CLASS_TEMPLATE
+import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_1_19_3_MAIN_CLASS_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_1_19_MAIN_CLASS_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FG3_GRADLE_PROPERTIES_TEMPLATE
@@ -103,6 +104,24 @@ object Fg3Template : BaseTemplate() {
         )
 
         return project.applyTemplate(FG3_1_19_MAIN_CLASS_TEMPLATE, props)
+    }
+
+    fun apply1_19_3MainClass(
+        project: Project,
+        buildSystem: BuildSystem,
+        config: ForgeProjectConfig,
+        packageName: String,
+        className: String
+    ): String {
+        val props = mapOf(
+            "PACKAGE_NAME" to packageName,
+            "CLASS_NAME" to className,
+            "ARTIFACT_ID" to buildSystem.artifactId,
+            "MOD_NAME" to config.pluginName,
+            "MOD_VERSION" to buildSystem.version
+        )
+
+        return project.applyTemplate(FG3_1_19_3_MAIN_CLASS_TEMPLATE, props)
     }
 
     fun applyBuildGradle(
@@ -205,6 +224,11 @@ object Fg3Template : BaseTemplate() {
         config.updateUrl?.let { url ->
             if (url.isNotBlank()) {
                 props["UPDATE_URL"] = url
+            }
+        }
+        config.website?.let { url ->
+            if (url.isNotBlank()) {
+                props["WEBSITE"] = url
             }
         }
         if (config.hasAuthors()) {
