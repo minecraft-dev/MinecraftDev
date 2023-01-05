@@ -226,6 +226,11 @@ object Fg3Template : BaseTemplate() {
                 props["UPDATE_URL"] = url
             }
         }
+        config.website?.let { url ->
+            if (url.isNotBlank()) {
+                props["WEBSITE"] = url
+            }
+        }
         if (config.hasAuthors()) {
             props["AUTHOR_LIST"] = config.authors.joinToString(", ")
         }
