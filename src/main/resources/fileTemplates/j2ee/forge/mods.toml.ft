@@ -29,7 +29,11 @@ updateJSONURL="${UPDATE_URL}" #optional
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 #end
 # A URL for the "homepage" for this mod, displayed in the mod UI
+#if (${WEBSITE})
+displayURL="${WEBSITE}" #optional
+#else
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
+#end
 # A file name (in the root of the mod JAR) containing a logo for display
 #logoFile="${ARTIFACT_ID}.png" #optional
 # A text field displayed in the mod UI
