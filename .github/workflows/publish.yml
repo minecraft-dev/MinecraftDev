@@ -3,6 +3,10 @@ on:
   push:
     tags:
       - '*'
+    paths-ignore:
+      - 'readme.md'
+      - '.github/**'
+      - '!.github/workflows/**'
 
 jobs:
   publish:

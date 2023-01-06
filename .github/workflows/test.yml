@@ -2,8 +2,16 @@ name: Test
 on:
   push:
     branches: ['*']
+    paths-ignore:
+      - 'readme.md'
+      - '.github/**'
+      - '!.github/workflows/**'
   pull_request:
     branches: ['*']
+    paths-ignore:
+      - 'readme.md'
+      - '.github/**'
+      - '!.github/workflows/**'
 
 jobs:
   build:
