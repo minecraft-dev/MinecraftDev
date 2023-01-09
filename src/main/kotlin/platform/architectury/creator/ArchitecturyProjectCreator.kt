@@ -180,10 +180,10 @@ class ArchitecturyOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractC
     )
 }
 
-class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjectWizardStep(parent) {
-    override fun setupAssets(project: Project) {
-        outputDirectory = context.projectFileDirectory
+class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
+    override val description = "Creating Gradle files"
 
+    override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val modName = data.getUserData(ModNameStep.KEY) ?: return
         val mcVersion = data.getUserData(ArchitecturyMcVersionStep.KEY) ?: return
@@ -193,7 +193,7 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNew
         val archApiVersion = data.getUserData(ArchitecturyApiVersionStep.KEY)
         val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
 
-        addTemplateProperties(
+        assets.addTemplateProperties(
             "GROUP_ID" to buildSystemProps.groupId,
             "ARTIFACT_ID" to buildSystemProps.artifactId,
             "MOD_NAME" to modName,
@@ -206,20 +206,20 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNew
         )
 
         if (fabricApiVersion != null) {
-            addTemplateProperties(
+            assets.addTemplateProperties(
                 "FABRIC_API_VERSION" to fabricApiVersion,
                 "FABRIC_API" to "true",
             )
         }
 
         if (archApiVersion != null) {
-            addTemplateProperties(
+            assets.addTemplateProperties(
                 "ARCHITECTURY_API_VERSION" to archApiVersion,
                 "ARCHITECTURY_API" to "true",
             )
         }
 
-        addTemplates(
+        assets.addTemplates(
             project,
             "build.gradle" to MinecraftTemplates.ARCHITECTURY_BUILD_GRADLE_TEMPLATE,
             "gradle.properties" to MinecraftTemplates.ARCHITECTURY_GRADLE_PROPERTIES_TEMPLATE,
@@ -230,7 +230,7 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNew
             "fabric/build.gradle" to MinecraftTemplates.ARCHITECTURY_FABRIC_BUILD_GRADLE_TEMPLATE,
         )
 
-        addGradleWrapperProperties(project)
+        assets.addGradleWrapperProperties(project)
     }
 }
 

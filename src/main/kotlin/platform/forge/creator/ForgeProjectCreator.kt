@@ -102,14 +102,14 @@ class ForgeOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsi
     override fun createStep() = DescriptionStep(this).chain(::AuthorsStep, ::WebsiteStep, ::UpdateUrlStep)
 }
 
-class ForgeGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjectWizardStep(parent) {
+class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
+    override val description = "Creating Gradle files"
+
     private fun transformModName(modName: String): String {
         return modName.lowercase(Locale.ENGLISH).replace(" ", "")
     }
 
     override fun setupAssets(project: Project) {
-        outputDirectory = context.projectFileDirectory
-
         val mcVersion = data.getUserData(ForgeMcVersionStep.KEY) ?: return
         val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
         val modName = transformModName(data.getUserData(ModNameStep.KEY) ?: return)
@@ -118,7 +118,7 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProject
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
 
-        addTemplateProperties(
+        assets.addTemplateProperties(
             "MOD_NAME" to modName,
             "MCP_CHANNEL" to "official",
             "MCP_VERSION" to mcVersion,
@@ -131,43 +131,43 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProject
         )
 
         if (javaVersion != null) {
-            addTemplateProperties("JAVA_VERSION" to javaVersion.feature)
+            assets.addTemplateProperties("JAVA_VERSION" to javaVersion.feature)
         }
 
         if (authors.isNotEmpty()) {
-            addTemplateProperties("AUTHOR_LIST" to authors.joinToString(", "))
+            assets.addTemplateProperties("AUTHOR_LIST" to authors.joinToString(", "))
         }
 
         if (useMixins) {
-            addTemplateProperties("MIXINS" to "true")
+            assets.addTemplateProperties("MIXINS" to "true")
         }
 
         if (forgeVersion >= SemanticVersion.release(39, 0, 88)) {
-            addTemplateProperties("GAME_TEST_FRAMEWORK" to "true")
+            assets.addTemplateProperties("GAME_TEST_FRAMEWORK" to "true")
         }
 
         if (mcVersion <= MinecraftVersions.MC1_16_5) {
-            addTemplateProperties(
+            assets.addTemplateProperties(
                 "MCP_CHANNEL" to "snapshot",
                 "MCP_VERSION" to "20210309",
             )
         }
 
-        addTemplates(
+        assets.addTemplates(
             project,
             "build.gradle" to MinecraftTemplates.FG3_BUILD_GRADLE_TEMPLATE,
             "gradle.properties" to MinecraftTemplates.FG3_GRADLE_PROPERTIES_TEMPLATE,
             "settings.gradle" to MinecraftTemplates.FG3_SETTINGS_GRADLE_TEMPLATE,
         )
 
-        addGradleWrapperProperties(project)
+        assets.addGradleWrapperProperties(project)
     }
 }
 
-class ForgeProjectFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjectWizardStep(parent) {
-    override fun setupAssets(project: Project) {
-        outputDirectory = context.projectFileDirectory
+class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
+    override val description = "Creating Forge project files"
 
+    override fun setupAssets(project: Project) {
         val mcVersion = data.getUserData(ForgeMcVersionStep.KEY) ?: return
         val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
         val (mainPackageName, mainClassName) = splitPackage(data.getUserData(MainClassStep.KEY) ?: return)
@@ -189,7 +189,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjec
         val packDescriptor = ForgePackDescriptor.forMcVersion(mcVersion) ?: ForgePackDescriptor.FORMAT_3
         val additionalPackData = ForgePackAdditionalData.forMcVersion(mcVersion)
 
-        addTemplateProperties(
+        assets.addTemplateProperties(
             "PACKAGE_NAME" to mainPackageName,
             "CLASS_NAME" to mainClassName,
             "ARTIFACT_ID" to buildSystemProps.artifactId,
@@ -208,13 +208,13 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjec
         )
 
         if (updateUrl.isNotBlank()) {
-            addTemplateProperties("UPDATE_URL" to updateUrl)
+            assets.addTemplateProperties("UPDATE_URL" to updateUrl)
         }
 
         if (authors.isNotEmpty()) {
-            addTemplateProperties("AUTHOR_LIST" to authors.joinToString(", "))
+            assets.addTemplateProperties("AUTHOR_LIST" to authors.joinToString(", "))
         }
-        addTemplateProperties("AUTHOR" to authors.joinToString(", "))
+        assets.addTemplateProperties("AUTHOR" to authors.joinToString(", "))
 
         val mainClassTemplate = when {
             mcVersion >= MinecraftVersions.MC1_19_3 -> MinecraftTemplates.FG3_1_19_3_MAIN_CLASS_TEMPLATE
@@ -224,7 +224,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjec
             else -> MinecraftTemplates.FG3_MAIN_CLASS_TEMPLATE
         }
 
-        addTemplates(
+        assets.addTemplates(
             project,
             "src/main/java/${mainPackageName.replace('.', '/')}/$mainClassName.java" to mainClassTemplate,
             "src/main/resources/pack.mcmeta" to MinecraftTemplates.PACK_MCMETA_TEMPLATE,
@@ -234,7 +234,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjec
         )
 
         WriteAction.runAndWait<Throwable> {
-            val dir = VfsUtil.createDirectoryIfMissing(LocalFileSystem.getInstance(), "$outputDirectory/.gradle")
+            val dir = VfsUtil.createDirectoryIfMissing(LocalFileSystem.getInstance(), "${assets.outputDirectory}/.gradle")
                 ?: throw IllegalStateException("Unable to create .gradle directory")
             val file = dir.findOrCreateChildData(this, MAGIC_RUN_CONFIGS_FILE)
             val fileContents = buildSystemProps.artifactId + "\n" +
@@ -247,24 +247,23 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjec
 }
 
 // Needs to be a separate step from above because of PACKAGE_NAME being different
-class ForgeMixinsJsonStep(parent: NewProjectWizardStep) : FixedAssetsNewProjectWizardStep(parent) {
-    override fun setupAssets(project: Project) {
-        outputDirectory = context.projectFileDirectory
+class ForgeMixinsJsonStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
+    override val description = "Creating mixins json"
 
+    override fun setupAssets(project: Project) {
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
         if (useMixins) {
             val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-            addTemplateProperties(
+            assets.addTemplateProperties(
                 "PACKAGE_NAME" to "${buildSystemProps.groupId}.${buildSystemProps.artifactId}.mixin",
                 "ARTIFACT_ID" to buildSystemProps.artifactId,
             )
-            addTemplates(project, "src/main/resources/${buildSystemProps.artifactId}.mixins.json" to MinecraftTemplates.FORGE_MIXINS_JSON_TEMPLATE)
+            assets.addTemplates(project, "src/main/resources/${buildSystemProps.artifactId}.mixins.json" to MinecraftTemplates.FORGE_MIXINS_JSON_TEMPLATE)
         }
     }
 }
 
 class ForgeCompileJavaStep(parent: NewProjectWizardStep) : AbstractRunGradleTaskStep(parent) {
-    override val title = "Setting up classpath"
     override val task = "compileJava"
 }
 

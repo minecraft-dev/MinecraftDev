@@ -71,6 +71,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.time.ZonedDateTime
 import java.util.Locale
+import java.util.concurrent.CountDownLatch
 import kotlinx.coroutines.coroutineScope
 
 class FabricPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Pair<FabricVersions, FabricApiVersions>>(parent) {
@@ -95,6 +96,7 @@ class FabricPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Pair<Fabr
                 ::GradleWrapperStep,
                 ::FabricDumbModeFilesStep,
                 ::GradleImportStep,
+                ::WaitForSmartModeStep,
                 ::FabricSmartModeFilesStep,
             )
     }
@@ -285,10 +287,10 @@ class FabricOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollaps
     override fun createStep() = DescriptionStep(this).chain(::AuthorsStep, ::WebsiteStep, ::RepositoryStep)
 }
 
-class FabricGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjectWizardStep(parent) {
-    override fun setupAssets(project: Project) {
-        outputDirectory = context.projectFileDirectory
+class FabricGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
+    override val description = "Creating Gradle files"
 
+    override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val mcVersion = data.getUserData(FabricMcVersionStep.KEY) ?: return
         val yarnVersion = data.getUserData(FabricYarnVersionStep.KEY) ?: return
@@ -297,7 +299,7 @@ class FabricGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjec
         val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
         val apiVersion = data.getUserData(FabricApiVersionStep.KEY)
 
-        addTemplateProperties(
+        assets.addTemplateProperties(
             "GROUP_ID" to buildSystemProps.groupId,
             "ARTIFACT_ID" to buildSystemProps.artifactId,
             "VERSION" to buildSystemProps.version,
@@ -309,24 +311,24 @@ class FabricGradleFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjec
         )
 
         if (apiVersion != null) {
-            addTemplateProperties("API_VERSION" to apiVersion)
+            assets.addTemplateProperties("API_VERSION" to apiVersion)
         }
 
-        addTemplates(
+        assets.addTemplates(
             project,
             "build.gradle" to FABRIC_BUILD_GRADLE_TEMPLATE,
             "gradle.properties" to FABRIC_GRADLE_PROPERTIES_TEMPLATE,
             "settings.gradle" to FABRIC_SETTINGS_GRADLE_TEMPLATE,
         )
 
-        addGradleWrapperProperties(project)
+        assets.addGradleWrapperProperties(project)
     }
 }
 
-class FabricDumbModeFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjectWizardStep(parent) {
-    override fun setupAssets(project: Project) {
-        outputDirectory = context.projectFileDirectory
+class FabricDumbModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
+    override val description = "Adding Fabric project files (phase 1)"
 
+    override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
         val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
@@ -335,32 +337,32 @@ class FabricDumbModeFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProj
 
         if (useMixins) {
             val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}.mixin"
-            addTemplateProperties(
+            assets.addTemplateProperties(
                 "PACKAGE_NAME" to packageName,
                 "JAVA_VERSION" to javaVersion,
             )
-            addTemplates(project, "src/main/resources/${buildSystemProps.artifactId}.mixins.json" to FABRIC_MIXINS_JSON_TEMPLATE)
+            assets.addTemplates(project, "src/main/resources/${buildSystemProps.artifactId}.mixins.json" to FABRIC_MIXINS_JSON_TEMPLATE)
         }
 
-        addTemplateProperties(
+        assets.addTemplateProperties(
             "YEAR" to ZonedDateTime.now().year,
             "AUTHOR" to authors.joinToString(", "),
         )
-        addTemplates(project, "LICENSE" to "${license.id}.txt")
+        assets.addTemplates(project, "LICENSE" to "${license.id}.txt")
 
-        addAssets(
+        assets.addAssets(
             GeneratorEmptyDirectory("src/main/java"),
             GeneratorEmptyDirectory("src/main/resources"),
         )
     }
 }
 
-class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewProjectWizardStep(parent) {
+class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
+    override val description = "Adding Fabric project files (phase 2)"
+
     private lateinit var entryPoints: List<EntryPoint>
 
     override fun setupAssets(project: Project) {
-        outputDirectory = context.projectFileDirectory
-
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val modName = data.getUserData(ModNameStep.KEY) ?: return
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
@@ -383,7 +385,7 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewPro
             EntryPoint("client", EntryPoint.Type.CLASS, "$packageName.client.${modName.toJavaClassName()}Client", FabricConstants.CLIENT_MOD_INITIALIZER),
         ) // TODO: un-hardcode?
 
-        addTemplateProperties(
+        assets.addTemplateProperties(
             "ARTIFACT_ID" to buildSystemProps.artifactId,
             "MOD_NAME" to StringUtil.escapeStringCharacters(modName),
             "MOD_DESCRIPTION" to StringUtil.escapeStringCharacters(description),
@@ -395,14 +397,14 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewPro
         )
 
         if (apiVersion != null) {
-            addTemplateProperties("API_VERSION" to apiVersion)
+            assets.addTemplateProperties("API_VERSION" to apiVersion)
         }
 
         if (useMixins) {
-            addTemplateProperties("MIXINS" to "true")
+            assets.addTemplateProperties("MIXINS" to "true")
         }
 
-        addTemplates(project, "src/main/resources/fabric.mod.json" to FABRIC_MOD_JSON_TEMPLATE)
+        assets.addTemplates(project, "src/main/resources/fabric.mod.json" to FABRIC_MOD_JSON_TEMPLATE)
     }
 
     private fun fixupFabricModJson(project: Project) {
@@ -528,14 +530,20 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : FixedAssetsNewPro
         }
     }
 
-    override fun setupProject(project: Project) {
-        super.setupProject(project)
-        runWhenCreated(project) {
+    override fun perform(project: Project) {
+        super.perform(project)
+        val latch = CountDownLatch(1)
+        assets.runWhenCreated(project) {
             project.runWriteTaskInSmartMode {
-                fixupFabricModJson(project)
-                createEntryPoints(project)
+                try {
+                    fixupFabricModJson(project)
+                    createEntryPoints(project)
+                } finally {
+                    latch.countDown()
+                }
             }
         }
+        latch.await()
     }
 }
 

@@ -10,12 +10,9 @@
 
 package com.demonwav.mcdev.creator.buildsystem.gradle
 
-import com.demonwav.mcdev.creator.CreatorStep
+import com.demonwav.mcdev.creator.*
 import com.demonwav.mcdev.creator.CreatorStep.Companion.writeText
-import com.demonwav.mcdev.creator.FixedAssetsNewProjectWizardStep
-import com.demonwav.mcdev.creator.addTemplates
 import com.demonwav.mcdev.creator.buildsystem.*
-import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.util.*
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.GRADLE_WRAPPER_PROPERTIES
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
@@ -23,11 +20,13 @@ import com.intellij.execution.RunManager
 import com.intellij.ide.ui.UISettings
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.ex.StatusBarEx
@@ -40,6 +39,7 @@ import java.nio.file.Path
 import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import java.nio.file.StandardOpenOption.WRITE
+import java.util.concurrent.CountDownLatch
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
@@ -59,45 +59,45 @@ fun FixedAssetsNewProjectWizardStep.addGradleWrapperProperties(project: Project)
     addTemplates(project, "gradle/wrapper/gradle-wrapper.properties" to GRADLE_WRAPPER_PROPERTIES)
 }
 
-abstract class AbstractRunGradleTaskStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
-    abstract val title: String
+abstract class AbstractRunGradleTaskStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
     abstract val task: String
+    override val description get() = "Running Gradle task: '$task'"
 
-    override fun setupProject(project: Project) {
+    override fun perform(project: Project) {
         val outputDirectory = context.projectFileDirectory
-        ProgressManager.getInstance().run(object : Task.Backgroundable(project, title) {
-            override fun run(indicator: ProgressIndicator) {
-                indicator.text = this@AbstractRunGradleTaskStep.title
-                indicator.text2 = "Running Gradle task: '$task'"
-                runGradleTaskAndWait(project, Path.of(outputDirectory)) { settings ->
-                    settings.taskNames = listOf(task)
-                }
-                indicator.text2 = null
-            }
-        })
+        runGradleTaskAndWait(project, Path.of(outputDirectory)) { settings ->
+            settings.taskNames = listOf(task)
+        }
     }
 }
 
 class GradleWrapperStep(parent: NewProjectWizardStep) : AbstractRunGradleTaskStep(parent) {
-    override val title = "Setting up Gradle Wrapper"
     override val task = "wrapper"
 }
 
-open class GradleImportStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
+open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
+    override val description = "Importing Gradle project"
+
     open val additionalRunTasks = emptyList<String>()
 
-    override fun setupProject(project: Project) {
+    override fun perform(project: Project) {
         val rootDirectory = Path.of(context.projectFileDirectory)
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
 
         // Tell IntelliJ to import this project
         rootDirectory.virtualFileOrError.refresh(false, true)
 
+        val latch = CountDownLatch(1)
+
         invokeLater(project.disposed) {
             val path = rootDirectory.toAbsolutePath().toString()
             if (canLinkAndRefreshGradleProject(path, project, false)) {
                 linkAndRefreshGradleProject(path, project)
                 showProgress(project)
+            }
+
+            StartupManager.getInstance(project).runAfterOpened {
+                latch.countDown()
             }
         }
 
@@ -106,6 +106,10 @@ open class GradleImportStep(parent: NewProjectWizardStep) : AbstractNewProjectWi
         addRunTaskConfiguration(project, rootDirectory, buildSystemProps, "build")
         for (tasks in additionalRunTasks) {
             addRunTaskConfiguration(project, rootDirectory, buildSystemProps, tasks)
+        }
+
+        if (!ApplicationManager.getApplication().isDispatchThread) {
+            latch.await()
         }
     }
 

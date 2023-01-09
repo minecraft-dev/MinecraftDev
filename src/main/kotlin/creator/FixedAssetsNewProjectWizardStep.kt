@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.creator
 
-import com.demonwav.mcdev.util.invokeLater
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.ide.projectWizard.generators.AssetsNewProjectWizardStep
@@ -76,7 +75,7 @@ abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : A
         }
     }
 
-    protected fun runWhenCreated(project: Project, action: () -> Unit) {
+    fun runWhenCreated(project: Project, action: () -> Unit) {
         if (ApplicationManager.getApplication().isUnitTestMode) {
             action()
         } else {
