@@ -177,6 +177,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
         val updateUrl = data.getUserData(UpdateUrlStep.KEY) ?: ""
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
+        val website = data.getUserData(WebsiteStep.KEY) ?: ""
 
         val nextMcVersion = when (val part = mcVersion.parts.getOrNull(1)) {
             // Mimics the code used to get the next Minecraft version in Forge's MDK
@@ -215,6 +216,10 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             assets.addTemplateProperties("AUTHOR_LIST" to authors.joinToString(", "))
         }
         assets.addTemplateProperties("AUTHOR" to authors.joinToString(", "))
+
+        if (website.isNotBlank()) {
+            assets.addTemplateProperties("WEBSITE" to website)
+        }
 
         val mainClassTemplate = when {
             mcVersion >= MinecraftVersions.MC1_19_3 -> MinecraftTemplates.FG3_1_19_3_MAIN_CLASS_TEMPLATE
