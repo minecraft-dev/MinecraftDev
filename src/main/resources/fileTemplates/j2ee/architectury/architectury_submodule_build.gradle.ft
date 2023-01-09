@@ -40,7 +40,7 @@ allprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-        options.release = ${JAVA_VERSION}
+        options.release.set(${JAVA_VERSION})
     }
 
     java {

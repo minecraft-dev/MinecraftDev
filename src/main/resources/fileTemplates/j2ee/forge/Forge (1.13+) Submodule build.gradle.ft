@@ -226,7 +226,7 @@ jar {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.release = ${JAVA_VERSION}
+    options.release.set(${JAVA_VERSION})
 }
 
 jar.finalizedBy('reobfJar')
