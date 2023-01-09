@@ -35,7 +35,6 @@ class ErrorReporter : ErrorReportSubmitter() {
         "Key com.demonwav.mcdev.translations.TranslationFoldingSettings duplicated",
         "Inspection #EntityConstructor has no description"
     )
-    private val baseUrl = "https://github.com/minecraft-dev/mcdev-error-report/issues"
     override fun getReportActionText() = "Report to Minecraft Dev GitHub Issue Tracker"
 
     override fun submit(
@@ -118,11 +117,12 @@ class ErrorReporter : ErrorReportSubmitter() {
             { e ->
                 val message = "<html>Error Submitting Issue: ${e.message}</html>."
                 val actionText = "Open an issue on the GitHub issue tracker"
+                val userUrl = "https://github.com/minecraft-dev/MinecraftDev/issues"
                 NotificationGroupManager.getInstance().getNotificationGroup("Error Report").createNotification(
                     DiagnosticBundle.message("error.report.title"),
                     message,
                     NotificationType.ERROR,
-                ).addAction(BrowseNotificationAction(actionText, baseUrl)).setImportant(false).notify(project)
+                ).addAction(BrowseNotificationAction(actionText, userUrl)).setImportant(false).notify(project)
 
                 consumer.consume(SubmittedReportInfo(null, null, SubmittedReportInfo.SubmissionStatus.FAILED))
             }
