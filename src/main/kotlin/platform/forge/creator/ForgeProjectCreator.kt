@@ -118,6 +118,8 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
 
+        data.putUserData(GRADLE_VERSION_KEY, Fg3ProjectCreator.FG5_WRAPPER_VERSION)
+
         assets.addTemplateProperties(
             "MOD_NAME" to modName,
             "MCP_CHANNEL" to "official",
