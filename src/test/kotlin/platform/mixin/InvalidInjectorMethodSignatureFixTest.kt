@@ -31,6 +31,10 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
     fun simpleCase() = doTest("simpleCase")
 
     @Test
+    @DisplayName("Simple case with MixinExtras Sugar")
+    fun simpleCaseWithMixinExtrasSugar() = doTest("simpleCaseWithMixinExtrasSugar")
+
+    @Test
     @DisplayName("With captured locals")
     fun withCapturedLocals() = doTest("withCapturedLocals")
 
