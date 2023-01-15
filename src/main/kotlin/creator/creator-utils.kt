@@ -16,6 +16,7 @@ import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.stepSequence
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import java.time.ZonedDateTime
 
 fun FixedAssetsNewProjectWizardStep.addTemplates(project: Project, vararg templates: Pair<String, String>) {
     addTemplates(project, templates.toMap())
@@ -24,6 +25,16 @@ fun FixedAssetsNewProjectWizardStep.addTemplates(project: Project, vararg templa
 fun FixedAssetsNewProjectWizardStep.addTemplates(project: Project, templates: Map<String, String>) {
     val manager = FileTemplateManager.getInstance(project)
     addAssets(templates.map { (path, template) -> GeneratorTemplateFile(path, manager.getJ2eeTemplate(template)) })
+}
+
+fun FixedAssetsNewProjectWizardStep.addLicense(project: Project) {
+    val license = data.getUserData(LicenseStep.KEY) ?: return
+    val authors = data.getUserData(AuthorsStep.KEY) ?: return
+    addTemplateProperties(
+        "YEAR" to ZonedDateTime.now().year,
+        "AUTHOR" to authors.joinToString(", "),
+    )
+    addTemplates(project, "LICENSE" to "${license.id}.txt")
 }
 
 fun splitPackage(text: String): Pair<String, String> {

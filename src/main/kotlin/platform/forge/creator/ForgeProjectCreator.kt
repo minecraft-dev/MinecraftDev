@@ -207,7 +207,6 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             "PACK_FORMAT" to packDescriptor.format,
             "PACK_COMMENT" to packDescriptor.comment,
             "FORGE_DATA" to (additionalPackData ?: ""),
-            "YEAR" to ZonedDateTime.now().year,
         )
 
         if (updateUrl.isNotBlank()) {
@@ -217,7 +216,6 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         if (authors.isNotEmpty()) {
             assets.addTemplateProperties("AUTHOR_LIST" to authors.joinToString(", "))
         }
-        assets.addTemplateProperties("AUTHOR" to authors.joinToString(", "))
 
         if (website.isNotBlank()) {
             assets.addTemplateProperties("WEBSITE" to website)
@@ -236,9 +234,10 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             "src/main/java/${mainPackageName.replace('.', '/')}/$mainClassName.java" to mainClassTemplate,
             "src/main/resources/pack.mcmeta" to MinecraftTemplates.PACK_MCMETA_TEMPLATE,
             "src/main/resources/META-INF/mods.toml" to MinecraftTemplates.MODS_TOML_TEMPLATE,
-            "LICENSE" to "${license.id}.txt",
             ".gitignore" to MinecraftTemplates.GRADLE_GITIGNORE_TEMPLATE,
         )
+
+        assets.addLicense(project)
 
         WriteAction.runAndWait<Throwable> {
             val dir = VfsUtil.createDirectoryIfMissing(LocalFileSystem.getInstance(), "${assets.outputDirectory}/.gradle")

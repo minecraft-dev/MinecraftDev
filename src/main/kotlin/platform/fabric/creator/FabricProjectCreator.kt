@@ -332,8 +332,6 @@ class FabricDumbModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
         val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
-        val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
-        val license = data.getUserData(LicenseStep.KEY) ?: return
 
         if (useMixins) {
             val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}.mixin"
@@ -344,11 +342,7 @@ class FabricDumbModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
             assets.addTemplates(project, "src/main/resources/${buildSystemProps.artifactId}.mixins.json" to FABRIC_MIXINS_JSON_TEMPLATE)
         }
 
-        assets.addTemplateProperties(
-            "YEAR" to ZonedDateTime.now().year,
-            "AUTHOR" to authors.joinToString(", "),
-        )
-        assets.addTemplates(project, "LICENSE" to "${license.id}.txt")
+        assets.addLicense(project)
 
         assets.addAssets(
             GeneratorEmptyDirectory("src/main/java"),
