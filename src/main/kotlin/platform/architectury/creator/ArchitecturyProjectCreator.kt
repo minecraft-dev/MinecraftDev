@@ -11,9 +11,9 @@
 package com.demonwav.mcdev.platform.architectury.creator
 
 import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.BuildSystem
-import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.*
 import com.demonwav.mcdev.creator.buildsystem.gradle.*
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.platform.architectury.version.ArchitecturyVersion
 import com.demonwav.mcdev.platform.fabric.EntryPoint
@@ -98,13 +98,12 @@ class ArchitecturyPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Arc
             ::ModNameStep,
             ::LicenseStep,
             ::ArchitecturyOptionalSettingsStep,
-            ::ArchitecturyGradleFilesStep,
-            ::GradleWrapperStep,
+            ::ArchitecturyBuildSystemStep,
             ::ArchitecturyProjectFilesStep,
             ::ArchitecturyCommonMainClassStep,
             ::ArchitecturyForgeMainClassStep,
             ::ArchitecturyFabricMainClassStep,
-            ::GradleImportStep,
+            ::ArchitecturyPostBuildSystemStep,
         )
     }
 
@@ -398,6 +397,26 @@ class ArchitecturyFabricMainClassStep(parent: NewProjectWizardStep) : Architectu
     override val template = MinecraftTemplates.ARCHITECTURY_FABRIC_MAIN_CLASS_TEMPLATE
 
     override fun getClassName(packageName: String, className: String) = "$packageName.fabric.${className}Fabric"
+}
+
+class ArchitecturyBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemStep(parent) {
+    override val platformName = "Architectury"
+}
+
+class ArchitecturyPostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(parent, ArchitecturyBuildSystemStep::class.java) {
+    override val step = BuildSystemSupport.POST_STEP
+}
+
+class ArchitecturyGradleSupport : BuildSystemSupport {
+    override val preferred = true
+
+    override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
+        return when (step) {
+            BuildSystemSupport.PRE_STEP -> ArchitecturyGradleFilesStep(parent).chain(::GradleWrapperStep)
+            BuildSystemSupport.POST_STEP -> GradleImportStep(parent)
+            else -> EmptyStep(parent)
+        }
+    }
 }
 
 class ArchitecturyProjectCreator(

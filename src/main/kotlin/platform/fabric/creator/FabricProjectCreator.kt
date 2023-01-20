@@ -12,9 +12,9 @@ package com.demonwav.mcdev.platform.fabric.creator
 
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.BuildSystem
-import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.*
 import com.demonwav.mcdev.creator.buildsystem.gradle.*
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
@@ -60,7 +60,6 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.stubs.StubIndex
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Row
@@ -69,7 +68,6 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.util.IncorrectOperationException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.time.ZonedDateTime
 import java.util.Locale
 import java.util.concurrent.CountDownLatch
 import kotlinx.coroutines.coroutineScope
@@ -92,10 +90,9 @@ class FabricPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Pair<Fabr
                 ::ModNameStep,
                 ::LicenseStep,
                 ::FabricOptionalSettingsStep,
-                ::FabricGradleFilesStep,
-                ::GradleWrapperStep,
+                ::FabricBuildSystemStep,
                 ::FabricDumbModeFilesStep,
-                ::GradleImportStep,
+                ::FabricPostBuildSystemStep,
                 ::WaitForSmartModeStep,
                 ::FabricSmartModeFilesStep,
             )
@@ -538,6 +535,26 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
             }
         }
         latch.await()
+    }
+}
+
+class FabricBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemStep(parent) {
+    override val platformName = "Fabric"
+}
+
+class FabricPostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(parent, FabricBuildSystemStep::class.java) {
+    override val step = BuildSystemSupport.POST_STEP
+}
+
+class FabricGradleSupport : BuildSystemSupport {
+    override val preferred = true
+
+    override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
+        return when (step) {
+            BuildSystemSupport.PRE_STEP -> FabricGradleFilesStep(parent).chain(::GradleWrapperStep)
+            BuildSystemSupport.POST_STEP -> GradleImportStep(parent)
+            else -> EmptyStep(parent)
+        }
     }
 }
 

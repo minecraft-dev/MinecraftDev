@@ -11,9 +11,9 @@
 package com.demonwav.mcdev.platform.forge.creator
 
 import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.BuildSystem
-import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.*
 import com.demonwav.mcdev.creator.buildsystem.gradle.*
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
@@ -35,7 +35,6 @@ import java.nio.file.Path
 import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import java.nio.file.StandardOpenOption.WRITE
-import java.time.ZonedDateTime
 import java.util.Locale
 import kotlinx.coroutines.coroutineScope
 
@@ -55,12 +54,11 @@ class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersi
             ::UseMixinsStep,
             ::LicenseStep,
             ::ForgeOptionalSettingsStep,
-            ::ForgeGradleFilesStep,
-            ::GradleWrapperStep,
+            ::ForgeBuildSystemStep,
             ::ForgeProjectFilesStep,
             ::ForgeMixinsJsonStep,
             ::ForgeCompileJavaStep,
-            ::GradleImportStep,
+            ::ForgePostBuildSystemStep,
         )
 
     class Factory : ModPlatformStep.Factory {
@@ -271,6 +269,26 @@ class ForgeMixinsJsonStep(parent: NewProjectWizardStep) : AbstractLongRunningAss
 
 class ForgeCompileJavaStep(parent: NewProjectWizardStep) : AbstractRunGradleTaskStep(parent) {
     override val task = "compileJava"
+}
+
+class ForgeBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemStep(parent) {
+    override val platformName = "Forge"
+}
+
+class ForgePostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(parent, ForgeBuildSystemStep::class.java) {
+    override val step = BuildSystemSupport.POST_STEP
+}
+
+class ForgeGradleSupport : BuildSystemSupport {
+    override val preferred = true
+
+    override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
+        return when (step) {
+            BuildSystemSupport.PRE_STEP -> ForgeGradleFilesStep(parent).chain(::GradleWrapperStep)
+            BuildSystemSupport.POST_STEP -> GradleImportStep(parent)
+            else -> EmptyStep(parent)
+        }
+    }
 }
 
 class Fg2ProjectCreator(

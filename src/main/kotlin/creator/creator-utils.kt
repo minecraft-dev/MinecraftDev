@@ -12,6 +12,7 @@ package com.demonwav.mcdev.creator
 
 import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.ide.starters.local.GeneratorTemplateFile
+import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.stepSequence
 import com.intellij.openapi.project.Project
@@ -48,7 +49,7 @@ private val stepClassToKey = mutableMapOf<Class<*>, Key<*>>()
 
 @Suppress("UNCHECKED_CAST")
 @PublishedApi
-internal fun <T: NewProjectWizardStep> getOrCreateClassKey(clazz: Class<T>) = stepClassToKey.computeIfAbsent(clazz) {
+internal fun <T: NewProjectWizardStep> getOrCreateClassKey(clazz: Class<out T>) = stepClassToKey.computeIfAbsent(clazz) {
     Key.create<T>(it.name)
 } as Key<T>
 
@@ -56,17 +57,21 @@ private val stepClassToWhenAvailableKey = mutableMapOf<Class<*>, Key<*>>()
 
 @Suppress("UNCHECKED_CAST")
 @PublishedApi
-internal fun <T: NewProjectWizardStep> getWhenAvailableKey(clazz: Class<T>) = stepClassToWhenAvailableKey[clazz] as Key<MutableList<(T) -> Unit>>?
+internal fun <T: NewProjectWizardStep> getWhenAvailableKey(clazz: Class<out T>) = stepClassToWhenAvailableKey[clazz] as Key<MutableList<(T) -> Unit>>?
 
 @Suppress("UNCHECKED_CAST")
 @PublishedApi
-internal fun <T: NewProjectWizardStep> getOrCreateWhenAvailableKey(clazz: Class<T>) = stepClassToWhenAvailableKey.computeIfAbsent(clazz) {
+internal fun <T: NewProjectWizardStep> getOrCreateWhenAvailableKey(clazz: Class<out T>) = stepClassToWhenAvailableKey.computeIfAbsent(clazz) {
     Key.create<T>(it.name)
 } as Key<MutableList<(T) -> Unit>>
 
 inline fun <reified T: NewProjectWizardStep> T.storeToData() {
-    data.putUserData(getOrCreateClassKey(T::class.java), this)
-    getWhenAvailableKey(T::class.java)?.let { whenAvailableKey ->
+    storeToData(T::class.java)
+}
+
+fun <T: NewProjectWizardStep> T.storeToData(clazz: Class<out T>) {
+    data.putUserData(getOrCreateClassKey(clazz), this)
+    getWhenAvailableKey(clazz)?.let { whenAvailableKey ->
         data.getUserData(whenAvailableKey)?.let { whenAvailable ->
             for (func in whenAvailable) {
                 func(this)
@@ -77,7 +82,11 @@ inline fun <reified T: NewProjectWizardStep> T.storeToData() {
 }
 
 inline fun <reified T: NewProjectWizardStep> NewProjectWizardStep.findStep(): T {
-    return data.getUserData(getOrCreateClassKey(T::class.java)) ?: throw IllegalStateException("Could not find required step ${T::class.java.name}")
+    return findStep(T::class.java)
+}
+
+fun <T: NewProjectWizardStep> NewProjectWizardStep.findStep(clazz: Class<out T>): T {
+    return data.getUserData(getOrCreateClassKey(clazz)) ?: throw IllegalStateException("Could not find required step ${clazz.name}")
 }
 
 inline fun <reified T: NewProjectWizardStep> NewProjectWizardStep.whenStepAvailable(noinline func: (T) -> Unit) {
@@ -90,6 +99,8 @@ inline fun <reified T: NewProjectWizardStep> NewProjectWizardStep.whenStepAvaila
         whenAvailable += func
     }
 }
+
+class EmptyStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent)
 
 fun <T1, T2, T3, T4, T5, T6> T1.chain(f1: (T1) -> T2, f2: (T2) -> T3, f3: (T3) -> T4, f4: (T4) -> T5, f5: (T5) -> T6): NewProjectWizardStep
     where T1 : NewProjectWizardStep, T2 : NewProjectWizardStep, T3 : NewProjectWizardStep, T4 : NewProjectWizardStep, T5 : NewProjectWizardStep, T6 : NewProjectWizardStep {
