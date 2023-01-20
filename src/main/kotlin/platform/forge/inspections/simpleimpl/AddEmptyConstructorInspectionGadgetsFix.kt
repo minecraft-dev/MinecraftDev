@@ -22,7 +22,7 @@ class AddEmptyConstructorInspectionGadgetsFix(element: PsiClass, private val nam
 
     private val pointer: SmartPsiElementPointer<PsiClass> = element.createSmartPointer()
 
-    override fun doFix(project: Project, descriptor: ProblemDescriptor?) {
+    override fun doFix(project: Project, descriptor: ProblemDescriptor) {
         val clazz = pointer.element ?: return
         clazz.addBefore(JavaPsiFacade.getElementFactory(project).createConstructor(), clazz.methods[0])
     }
