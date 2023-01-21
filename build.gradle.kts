@@ -22,7 +22,7 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.9.0"
+    id("org.jetbrains.intellij") version "1.12.0"
     id("org.cadixdev.licenser")
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
@@ -249,27 +249,6 @@ tasks.test {
         }
     }
     systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
-
-    jvmArgs(
-        "-Dsun.io.useCanonCaches=false",
-        "-Dsun.io.useCanonPrefixCache=false",
-        "--add-opens", "java.base/java.io=ALL-UNNAMED",
-        "--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED",
-        "--add-opens", "java.base/java.lang.ref=ALL-UNNAMED",
-        "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
-        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-        "--add-opens", "java.base/java.util.concurrent.atomic=ALL-UNNAMED",
-        "--add-opens", "java.base/java.util.concurrent.locks=ALL-UNNAMED",
-        "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
-        "--add-opens", "java.base/sun.nio.fs=ALL-UNNAMED",
-        "--add-opens", "java.desktop/java.awt.event=ALL-UNNAMED",
-        "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
-        "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
-        "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
-        "--add-opens", "java.desktop/sun.awt=ALL-UNNAMED",
-        "--add-opens", "java.desktop/sun.font=ALL-UNNAMED",
-        "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED",
-    )
 }
 
 idea {
@@ -372,7 +351,6 @@ tasks.register("cleanSandbox", Delete::class) {
 tasks.runIde {
     maxHeapSize = "4G"
 
-    jvmArgs("--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED")
     System.getProperty("debug")?.let {
         systemProperty("idea.ProcessCanceledException", "disabled")
         systemProperty("idea.debug.mode", "true")
