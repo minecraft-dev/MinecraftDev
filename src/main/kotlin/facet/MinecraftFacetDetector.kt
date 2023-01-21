@@ -163,8 +163,8 @@ class MinecraftFacetDetector : StartupActivity {
                     if (m.name.startsWith("SpongeAPI", ignoreCase = true)) {
                         // We don't want want to add parent modules in module groups
                         val moduleManager = ModuleManager.getInstance(m.project)
-                        val groupPath = moduleManager.getModuleGroupPath(m)
-                        if (groupPath == null) {
+                        val groupPath = moduleManager.getModuleGrouper(null).getGroupPath(m)
+                        if (groupPath.isEmpty()) {
                             platformKinds.add(SPONGE_LIBRARY_KIND)
                             return@forEach true
                         }
