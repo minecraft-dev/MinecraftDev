@@ -30,11 +30,13 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.codeStyle.CodeStyleManager
+import com.intellij.psi.xml.XmlTag
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.EnumSet
 import java.util.Locale
+import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
 
 class SpongePlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<SpongeVersion>(parent) {
     override val description = "download Sponge versions"
@@ -178,7 +180,7 @@ class SpongeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
 class SpongeMavenSupport : BuildSystemSupport {
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> SpongeMavenFilesStep(parent)
+            BuildSystemSupport.PRE_STEP -> SpongeMavenFilesStep(parent).chain(::SpongePatchPomStep)
             BuildSystemSupport.POST_STEP -> MavenImportStep(parent).chain(::ReformatPomStep)
             else -> EmptyStep(parent)
         }
@@ -191,9 +193,17 @@ class SpongeMavenFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
     override fun setupAssets(project: Project) {
         assets.addDefaultMavenProperties()
         val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
+        assets.addTemplateProperties("JAVA_VERSION" to javaVersion)
+        assets.addTemplates(project, "pom.xml" to MinecraftTemplates.SPONGE_POM_TEMPLATE)
+    }
+}
+
+class SpongePatchPomStep(parent: NewProjectWizardStep) : AbstractPatchPomStep(parent) {
+    override fun patchPom(model: MavenDomProjectModel, root: XmlTag) {
+        super.patchPom(model, root)
         val spongeApiVersion = data.getUserData(SpongeApiVersionStep.KEY) ?: return
-        val templateProperties = mapOf("JAVA_VERSION" to javaVersion)
-        assets.addPatchedPomXml(project, MinecraftTemplates.SPONGE_POM_TEMPLATE, templateProperties, defaultPomPatchers + setupDependencies(
+        setupDependencies(
+            model,
             listOf(BuildRepository(
                 "spongepowered-repo",
                 "https://repo.spongepowered.org/maven/",
@@ -205,7 +215,7 @@ class SpongeMavenFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
                 spongeApiVersion.toString(),
                 mavenScope = "provided"
             ))
-        ))
+        )
     }
 }
 

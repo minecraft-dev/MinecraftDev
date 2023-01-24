@@ -16,13 +16,15 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.*
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.execution.RunManager
-import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.lang.xml.XMLLanguage
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.xml.XmlFile
@@ -51,88 +53,96 @@ fun FixedAssetsNewProjectWizardStep.addDefaultMavenProperties() {
     addTemplateProperties(pluginVersions)
 }
 
-typealias PomPatcher = FixedAssetsNewProjectWizardStep.(MavenDomProjectModel, XmlTag) -> Unit
+abstract class AbstractPatchPomStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
+    override val description = "Patching pom.xml"
 
-val setupCore: PomPatcher = { model, _ ->
-    val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-    model.groupId.value = buildSystemProps.groupId
-    model.artifactId.value = buildSystemProps.artifactId
-    model.version.value = buildSystemProps.version
-}
-
-val setupName: PomPatcher = patcher@{ model, _ ->
-    val name = data.getUserData(AbstractModNameStep.KEY) ?: return@patcher
-    model.name.value = name
-}
-
-val setupInfo: PomPatcher = { _, root ->
-    val website = data.getUserData(WebsiteStep.KEY)
-    val description = data.getUserData(DescriptionStep.KEY)
-
-    val properties = root.findFirstSubTag("properties")
-    if (!website.isNullOrBlank()) {
-        val url = root.createChildTag("url", null, website, false)
-        root.addAfter(url, properties)
+    open fun patchPom(model: MavenDomProjectModel, root: XmlTag) {
+        setupCore(model)
+        setupName(model)
+        setupInfo(root)
     }
 
-    if (!description.isNullOrBlank()) {
-        val descriptionTag = root.createChildTag("description", null, description, false)
-        root.addBefore(descriptionTag, properties)
+    protected fun setupCore(model: MavenDomProjectModel) {
+        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        model.groupId.value = buildSystemProps.groupId
+        model.artifactId.value = buildSystemProps.artifactId
+        model.version.value = buildSystemProps.version
     }
-}
 
-fun setupDependencies(repositories: List<BuildRepository>, dependencies: List<BuildDependency>): PomPatcher = { model, _ ->
-    for ((id, url, types) in repositories) {
-        if (!types.contains(BuildSystemType.MAVEN)) {
-            continue
+    protected fun setupName(model: MavenDomProjectModel) {
+        val name = data.getUserData(AbstractModNameStep.KEY) ?: return
+        model.name.value = name
+    }
+
+    protected fun setupInfo(root: XmlTag) {
+        val website = data.getUserData(WebsiteStep.KEY)
+        val description = data.getUserData(DescriptionStep.KEY)
+
+        val properties = root.findFirstSubTag("properties")
+        if (!website.isNullOrBlank()) {
+            val url = root.createChildTag("url", null, website, false)
+            root.addAfter(url, properties)
         }
-        val repository = model.repositories.addRepository()
-        repository.id.value = id
-        repository.url.value = url
-    }
 
-    for ((depGroupId, depArtifactId, depVersion, scope) in dependencies) {
-        if (scope == null) {
-            continue
+        if (!description.isNullOrBlank()) {
+            val descriptionTag = root.createChildTag("description", null, description, false)
+            root.addBefore(descriptionTag, properties)
         }
-        val dependency = model.dependencies.addDependency()
-        dependency.groupId.value = depGroupId
-        dependency.artifactId.value = depArtifactId
-        dependency.version.value = depVersion
-        dependency.scope.value = scope
     }
-}
 
-val defaultPomPatchers = arrayOf(setupCore, setupName, setupInfo)
+    protected fun setupDependencies(model: MavenDomProjectModel, repositories: List<BuildRepository>, dependencies: List<BuildDependency>) {
+        for ((id, url, types) in repositories) {
+            if (!types.contains(BuildSystemType.MAVEN)) {
+                continue
+            }
+            val repository = model.repositories.addRepository()
+            repository.id.value = id
+            repository.url.value = url
+        }
 
-fun FixedAssetsNewProjectWizardStep.addPatchedPomXml(
-    project: Project,
-    templateName: String,
-    templateProperties: Map<String, Any>,
-    patchers: Array<PomPatcher> = defaultPomPatchers
-) {
-    val templateManager = FileTemplateManager.getInstance(project)
-    val template = templateManager.getJ2eeTemplate(templateName)
-    val pomText = template.getText(pluginVersions + templateProperties)
+        for ((depGroupId, depArtifactId, depVersion, scope) in dependencies) {
+            if (scope == null) {
+                continue
+            }
+            val dependency = model.dependencies.addDependency()
+            dependency.groupId.value = depGroupId
+            dependency.artifactId.value = depArtifactId
+            dependency.version.value = depVersion
+            dependency.scope.value = scope
+        }
+    }
 
-    runWriteTask {
-        val pomPsi = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, pomText) as? XmlFile
-            ?: return@runWriteTask
-
-        pomPsi.name = "pom.xml"
-
-        pomPsi.runWriteAction {
-            val manager = DomManager.getDomManager(project)
-            val mavenProjectXml = manager.getFileElement(pomPsi, MavenDomProjectModel::class.java)?.rootElement
-                ?: return@runWriteAction
-
-            val root = pomPsi.rootTag ?: return@runWriteAction
-
-            for (patcher in patchers) {
-                this.patcher(mavenProjectXml, root)
+    override fun perform(project: Project) {
+        invokeAndWait {
+            if (project.isDisposed) {
+                return@invokeAndWait
             }
 
-            addAssets(GeneratorFile("pom.xml", pomPsi.text))
+            runWriteTask {
+                val pomFile = VfsUtil.findFile(Path.of(context.projectFileDirectory, "pom.xml"), true)
+                    ?: return@runWriteTask
+                val pomPsi = PsiManager.getInstance(project).findFile(pomFile) as? XmlFile ?: return@runWriteTask
+
+                pomPsi.name = "pom.xml"
+
+                NonProjectFileWritingAccessProvider.disableChecksDuring {
+                    pomPsi.runWriteAction {
+                        val manager = DomManager.getDomManager(project)
+                        val mavenProjectXml =
+                            manager.getFileElement(pomPsi, MavenDomProjectModel::class.java)?.rootElement
+                                ?: return@runWriteAction
+
+                        val root = pomPsi.rootTag ?: return@runWriteAction
+
+                        patchPom(mavenProjectXml, root)
+
+                        // The maven importer requires that the document is saved to disk
+                        val document = PsiDocumentManager.getInstance(project).getDocument(pomPsi)
+                            ?: return@runWriteAction
+                        FileDocumentManager.getInstance().saveDocument(document)
+                    }
+                }
+            }
         }
     }
 }
