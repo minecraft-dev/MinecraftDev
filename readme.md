@@ -136,3 +136,5 @@ Supported Platforms
 - [![Fabric Icon](src/main/resources/assets/icons/platform/Fabric.png?raw=true) **Fabric**](https://fabricmc.net)
 - [![Mixins Icon](src/main/resources/assets/icons/platform/Mixins_dark.png?raw=true) **Mixins**](https://github.com/SpongePowered/Mixin)
 - [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/) ([![Waterfall Icon](src/main/resources/assets/icons/platform/Waterfall.png?raw=true) Waterfall](https://github.com/PaperMC/Waterfall))
+- [![Velocity Icon](src/main/resources/assets/icons/platform/Velocity.png?raw=true) **Velocity**](https://velocitypowered.com/)
+- [![Adventure Icon](src/main/resources/assets/icons/platform/Adventure.png?raw=true) **Adventure**](https://kyori.net/)
