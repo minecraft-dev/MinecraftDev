@@ -355,7 +355,7 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
 
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-        val modName = data.getUserData(ModNameStep.KEY) ?: return
+        val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
         val environment = data.getUserData(FabricEnvironmentStep.KEY) ?: Side.NONE
         val envName = when (environment) {

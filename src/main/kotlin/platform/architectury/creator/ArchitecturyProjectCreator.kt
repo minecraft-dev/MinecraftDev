@@ -186,7 +186,7 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
 
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-        val modName = data.getUserData(ModNameStep.KEY) ?: return
+        val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val mcVersion = data.getUserData(ArchitecturyMcVersionStep.KEY) ?: return
         val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
         val fabricLoaderVersion = data.getUserData(FabricLoaderVersionStep.KEY) ?: return
@@ -244,7 +244,7 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
         val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
         val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}"
         val mcVersion = data.getUserData(ArchitecturyMcVersionStep.KEY) ?: return
-        val modName = data.getUserData(ModNameStep.KEY) ?: return
+        val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
         val fabricLoaderVersion = data.getUserData(FabricLoaderVersionStep.KEY) ?: return
         val fabricApiVersion = data.getUserData(FabricApiVersionStep.KEY)
@@ -356,7 +356,7 @@ abstract class ArchitecturyMainClassStep(parent: NewProjectWizardStep, phase: In
 
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-        val modName = data.getUserData(ModNameStep.KEY) ?: return
+        val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val useArchApi = data.getUserData(ArchitecturyApiVersionStep.KEY) != null
 
         val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}"

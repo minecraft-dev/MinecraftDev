@@ -110,7 +110,7 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
     override fun setupAssets(project: Project) {
         val mcVersion = data.getUserData(ForgeMcVersionStep.KEY) ?: return
         val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
-        val modName = transformModName(data.getUserData(ModNameStep.KEY) ?: return)
+        val modName = transformModName(data.getUserData(AbstractModNameStep.KEY) ?: return)
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val javaVersion = context.projectJdk.versionString?.let(JavaVersion::parse)
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
@@ -172,7 +172,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
         val (mainPackageName, mainClassName) = splitPackage(data.getUserData(MainClassStep.KEY) ?: return)
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-        val modName = data.getUserData(ModNameStep.KEY) ?: return
+        val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val license = data.getUserData(LicenseStep.KEY) ?: return
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
         val updateUrl = data.getUserData(UpdateUrlStep.KEY) ?: ""

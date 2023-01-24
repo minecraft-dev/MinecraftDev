@@ -23,7 +23,7 @@ import com.intellij.ui.dsl.builder.bindText
 class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
     private fun suggestMainClassName() = findStep<BuildSystemPropertiesStep<*>>().groupId.toPackageName() +
         ".${findStep<BuildSystemPropertiesStep<*>>().artifactId.toPackageName()}" +
-        ".${findStep<ModNameStep>().name.toJavaClassName()}"
+        ".${findStep<AbstractModNameStep>().name.toJavaClassName()}"
 
     val classNameProperty = propertyGraph.lazyProperty(::suggestMainClassName)
     var className by classNameProperty
@@ -32,7 +32,7 @@ class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
             buildSystemStep.groupIdProperty.afterChange { className = suggestMainClassName() }
             buildSystemStep.artifactIdProperty.afterChange { className = suggestMainClassName() }
         }
-        whenStepAvailable<ModNameStep> { modNameStep ->
+        whenStepAvailable<AbstractModNameStep> { modNameStep ->
             modNameStep.nameProperty.afterChange { className = suggestMainClassName() }
         }
     }

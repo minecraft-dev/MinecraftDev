@@ -39,13 +39,23 @@ abstract class AbstractLongRunningStep(parent: NewProjectWizardStep) : AbstractN
     private fun startTaskQueue(project: Project, queue: TaskQueue) {
         ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Your project is being created") {
             override fun run(indicator: ProgressIndicator) {
+                if (project.isDisposed) {
+                    return
+                }
+
                 indicator.text = "Your project is being created"
                 var currentQueue = queue
                 while (true) {
                     while (true) {
                         val task = currentQueue.poll() ?: break
                         indicator.text2 = task.description
+                        if (project.isDisposed) {
+                            return
+                        }
                         task.perform(project)
+                        if (project.isDisposed) {
+                            return
+                        }
                     }
                     if ((data as UserDataHolderEx).replace(TASK_QUEUE_KEY, currentQueue, null)) {
                         break

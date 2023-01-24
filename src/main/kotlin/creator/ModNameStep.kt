@@ -19,7 +19,7 @@ import com.intellij.openapi.ui.validation.CHECK_NON_EMPTY
 import com.intellij.openapi.util.Key
 import com.intellij.ui.dsl.builder.*
 
-class ModNameStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
+abstract class AbstractModNameStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
     private val baseData = data.getUserData(NewProjectWizardBaseData.KEY) ?: throw IllegalStateException("Mod name step created without base step")
     val nameProperty = propertyGraph.property(baseData.name)
     var name by nameProperty
@@ -28,9 +28,11 @@ class ModNameStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(p
         storeToData()
     }
 
+    abstract val label: String
+
     override fun setupUI(builder: Panel) {
         with(builder) {
-            row("Mod Name:") {
+            row(label) {
                 textField()
                     .bindText(nameProperty)
                     .columns(COLUMNS_MEDIUM)
@@ -45,6 +47,14 @@ class ModNameStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(p
     }
 
     companion object {
-        val KEY = Key.create<String>("${ModNameStep::class.java.name}.name")
+        val KEY = Key.create<String>("${AbstractModNameStep::class.java.name}.name")
     }
+}
+
+class ModNameStep(parent: NewProjectWizardStep) : AbstractModNameStep(parent) {
+    override val label = "Mod Name:"
+}
+
+class PluginNameStep(parent: NewProjectWizardStep) : AbstractModNameStep(parent) {
+    override val label = "Plugin Name:"
 }

@@ -68,7 +68,7 @@ class AuthorsStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(par
         private val bracketRegex = Regex("[\\[\\]]")
         private val commaRegex = Regex("\\s*,\\s*")
 
-        private fun parseAuthors(string: String): List<String> {
+        fun parseAuthors(string: String): List<String> {
             return if (string.isNotBlank()) {
                 string.trim().replace(bracketRegex, "").split(commaRegex).toList()
             } else {

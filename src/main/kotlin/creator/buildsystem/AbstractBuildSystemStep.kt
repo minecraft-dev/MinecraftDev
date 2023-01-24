@@ -38,7 +38,7 @@ abstract class AbstractBuildSystemStep(parent: NewProjectWizardStep) : AbstractN
     abstract val platformName: String
 
     override val self get() = this
-    override val label = if (steps.size > 1) "Build System:" else EMPTY_LABEL
+    override val label get() = if (steps.size > 1) "Build System:" else EMPTY_LABEL
 
     override fun initSteps(): LinkedHashMap<String, NewProjectWizardStep> {
         context.putUserData(PLATFORM_NAME_KEY, platformName)

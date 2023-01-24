@@ -61,6 +61,8 @@
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.fabric.creator.FabricPlatformStep$Factory" />
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyPlatformStep$Factory" />
 
+        <pluginPlatformWizard implementation="com.demonwav.mcdev.platform.sponge.creator.SpongePlatformStep$Factory" />
+
         <projectSetupFinalizer implementation="com.demonwav.mcdev.creator.JdkProjectSetupFinalizer$Factory" />
         <projectSetupFinalizer implementation="com.demonwav.mcdev.creator.GradleProjectSetupFinalizer$Factory" />
 
@@ -70,6 +72,8 @@
         <buildSystemSupport platform="Forge" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.forge.creator.ForgeGradleSupport" />
         <buildSystemSupport platform="Fabric" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.fabric.creator.FabricGradleSupport" />
         <buildSystemSupport platform="Architectury" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyGradleSupport" />
+        <buildSystemSupport platform="Sponge" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.sponge.creator.SpongeGradleSupport" />
+        <buildSystemSupport platform="Sponge" buildSystem="Maven" implementation="com.demonwav.mcdev.platform.sponge.creator.SpongeMavenSupport" />
 
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />

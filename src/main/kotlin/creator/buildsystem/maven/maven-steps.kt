@@ -10,26 +10,19 @@
 
 package com.demonwav.mcdev.creator.buildsystem.maven
 
-import com.demonwav.mcdev.creator.CreatorStep
-import com.demonwav.mcdev.creator.MinecraftProjectCreator
-import com.demonwav.mcdev.creator.ProjectConfig
-import com.demonwav.mcdev.creator.buildsystem.BuildDependency
-import com.demonwav.mcdev.creator.buildsystem.BuildSystem
-import com.demonwav.mcdev.creator.buildsystem.BuildSystemTemplate
-import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
-import com.demonwav.mcdev.creator.buildsystem.DirectorySet
-import com.demonwav.mcdev.creator.getVersionJson
+import com.demonwav.mcdev.creator.*
+import com.demonwav.mcdev.creator.buildsystem.*
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.util.invokeLater
-import com.demonwav.mcdev.util.runWriteAction
-import com.demonwav.mcdev.util.runWriteTask
-import com.demonwav.mcdev.util.virtualFile
+import com.demonwav.mcdev.util.*
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.execution.RunManager
+import com.intellij.ide.fileTemplates.FileTemplateManager
+import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.lang.xml.XMLLanguage
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.xml.XmlFile
@@ -40,11 +33,132 @@ import java.nio.file.Path
 import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import java.nio.file.StandardOpenOption.WRITE
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters
 import org.jetbrains.idea.maven.project.MavenProjectsManager
+import org.jetbrains.idea.maven.project.importing.MavenImportingManager
+
+private val pluginVersions by lazy {
+    runBlocking {
+        getVersionJson<Map<String, String>>("maven.json")
+    }
+}
+
+fun FixedAssetsNewProjectWizardStep.addDefaultMavenProperties() {
+    addTemplateProperties(pluginVersions)
+}
+
+typealias PomPatcher = FixedAssetsNewProjectWizardStep.(MavenDomProjectModel, XmlTag) -> Unit
+
+val setupCore: PomPatcher = { model, _ ->
+    val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+    model.groupId.value = buildSystemProps.groupId
+    model.artifactId.value = buildSystemProps.artifactId
+    model.version.value = buildSystemProps.version
+}
+
+val setupName: PomPatcher = patcher@{ model, _ ->
+    val name = data.getUserData(AbstractModNameStep.KEY) ?: return@patcher
+    model.name.value = name
+}
+
+val setupInfo: PomPatcher = { _, root ->
+    val website = data.getUserData(WebsiteStep.KEY)
+    val description = data.getUserData(DescriptionStep.KEY)
+
+    val properties = root.findFirstSubTag("properties")
+    if (!website.isNullOrBlank()) {
+        val url = root.createChildTag("url", null, website, false)
+        root.addAfter(url, properties)
+    }
+
+    if (!description.isNullOrBlank()) {
+        val descriptionTag = root.createChildTag("description", null, description, false)
+        root.addBefore(descriptionTag, properties)
+    }
+}
+
+fun setupDependencies(repositories: List<BuildRepository>, dependencies: List<BuildDependency>): PomPatcher = { model, _ ->
+    for ((id, url, types) in repositories) {
+        if (!types.contains(BuildSystemType.MAVEN)) {
+            continue
+        }
+        val repository = model.repositories.addRepository()
+        repository.id.value = id
+        repository.url.value = url
+    }
+
+    for ((depGroupId, depArtifactId, depVersion, scope) in dependencies) {
+        if (scope == null) {
+            continue
+        }
+        val dependency = model.dependencies.addDependency()
+        dependency.groupId.value = depGroupId
+        dependency.artifactId.value = depArtifactId
+        dependency.version.value = depVersion
+        dependency.scope.value = scope
+    }
+}
+
+val defaultPomPatchers = arrayOf(setupCore, setupName, setupInfo)
+
+fun FixedAssetsNewProjectWizardStep.addPatchedPomXml(
+    project: Project,
+    templateName: String,
+    templateProperties: Map<String, Any>,
+    patchers: Array<PomPatcher> = defaultPomPatchers
+) {
+    val templateManager = FileTemplateManager.getInstance(project)
+    val template = templateManager.getJ2eeTemplate(templateName)
+    val pomText = template.getText(pluginVersions + templateProperties)
+
+    runWriteTask {
+        val pomPsi = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, pomText) as? XmlFile
+            ?: return@runWriteTask
+
+        pomPsi.name = "pom.xml"
+
+        pomPsi.runWriteAction {
+            val manager = DomManager.getDomManager(project)
+            val mavenProjectXml = manager.getFileElement(pomPsi, MavenDomProjectModel::class.java)?.rootElement
+                ?: return@runWriteAction
+
+            val root = pomPsi.rootTag ?: return@runWriteAction
+
+            for (patcher in patchers) {
+                this.patcher(mavenProjectXml, root)
+            }
+
+            addAssets(GeneratorFile("pom.xml", pomPsi.text))
+        }
+    }
+}
+
+class ReformatPomStep(parent: NewProjectWizardStep) : AbstractReformatFilesStep(parent) {
+    override fun addFilesToReformat() {
+        addFileToReformat("pom.xml")
+    }
+}
+
+class MavenImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
+    override val description = "Importing Maven project"
+
+    override fun perform(project: Project) {
+        val pomFile = VfsUtil.findFile(Path.of(context.projectFileDirectory).resolve("pom.xml"), true)
+            ?: return
+        val promise = invokeAndWait {
+            if (project.isDisposed) {
+                return@invokeAndWait null
+            }
+            MavenImportingManager.getInstance(project).linkAndImportFile(pomFile)
+        } ?: return
+
+        promise.blockingGet(Int.MAX_VALUE, TimeUnit.SECONDS)
+    }
+}
 
 typealias MavenStepFunc = (BasicMavenStep, MavenDomProjectModel, XmlTag) -> Unit
 
