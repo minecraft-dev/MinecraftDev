@@ -18,28 +18,35 @@ import com.demonwav.mcdev.util.MinecraftTemplates.Companion.GRADLE_WRAPPER_PROPE
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.execution.RunManager
 import com.intellij.ide.ui.UISettings
-import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.lang.properties.psi.PropertiesFile
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.text.StringUtil
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.ex.StatusBarEx
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
+import java.lang.StringBuilder
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import java.nio.file.StandardOpenOption.WRITE
 import java.util.concurrent.CountDownLatch
+import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.psiUtil.getCallNameExpression
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
@@ -49,6 +56,8 @@ import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.GroovyPsiElementFactory
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlock
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression
+import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.path.GrMethodCallExpression
+import org.jetbrains.plugins.groovy.lang.psi.api.util.GrStatementOwner
 
 val DEFAULT_GRADLE_VERSION = SemanticVersion.release(7, 3, 3)
 val GRADLE_VERSION_KEY = Key.create<SemanticVersion>("mcdev.gradleVersion")
@@ -73,6 +82,227 @@ abstract class AbstractRunGradleTaskStep(parent: NewProjectWizardStep) : Abstrac
 
 class GradleWrapperStep(parent: NewProjectWizardStep) : AbstractRunGradleTaskStep(parent) {
     override val task = "wrapper"
+}
+
+abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
+    override val description = "Patching Gradle files"
+
+    abstract fun patch(project: Project, gradleFiles: GradleFiles)
+
+    protected fun addRepositories(project: Project, buildGradle: GradleFile?, repositories: List<BuildRepository>) {
+        if (buildGradle == null || repositories.isEmpty()) {
+            return
+        }
+
+        buildGradle.psi.runWriteAction {
+            when (buildGradle) {
+                is GroovyGradleFile -> {
+                    val reposBlock = findOrCreateGroovyBlock(project, buildGradle.psi, "repositories")
+                    val elementFactory = GroovyPsiElementFactory.getInstance(project)
+                    for (repo in repositories) {
+                        if (BuildSystemType.GRADLE !in repo.buildSystems) {
+                            continue
+                        }
+                        val mavenBlock =
+                            elementFactory.createStatementFromText("maven {\n}", reposBlock) as GrMethodCallExpression
+                        val mavenClosure = mavenBlock.closureArguments[0]
+                        if (repo.id.isNotBlank()) {
+                            val idStatement =
+                                elementFactory.createStatementFromText("name = ${makeStringLiteral(repo.id)}")
+                            mavenClosure.addStatementBefore(idStatement, null)
+                        }
+                        val urlStatement =
+                            elementFactory.createStatementFromText("url = ${makeStringLiteral(repo.url)}")
+                        mavenClosure.addStatementBefore(urlStatement, null)
+                        reposBlock.addStatementBefore(mavenBlock, null)
+                    }
+                }
+
+                is KotlinGradleFile -> {
+                    val script = buildGradle.psi.script?.blockExpression ?: return@runWriteAction
+                    val reposBlock = findOrCreateKotlinBlock(project, script, "repositories")
+                    val elementFactory = KtPsiFactory(project)
+                    for (repo in repositories) {
+                        if (BuildSystemType.GRADLE !in repo.buildSystems) {
+                            continue
+                        }
+                        val mavenBlock = elementFactory.createExpression("maven {\n}") as KtCallExpression
+                        val mavenLambda = mavenBlock.lambdaArguments[0].getLambdaExpression()!!.bodyExpression!!
+                        if (repo.id.isNotBlank()) {
+                            val idStatement = elementFactory.createAssignment("name = ${makeStringLiteral(repo.id)}")
+                            mavenLambda.addBefore(idStatement, mavenLambda.rBrace)
+                        }
+                        val urlStatement = elementFactory.createAssignment("url = uri(${makeStringLiteral(repo.url)})")
+                        mavenLambda.addBefore(urlStatement, mavenLambda.rBrace)
+                        reposBlock.addBefore(mavenBlock, reposBlock.rBrace)
+                    }
+                }
+            }
+        }
+    }
+
+    protected fun addDependencies(project: Project, buildGradle: GradleFile?, dependencies: List<BuildDependency>) {
+        if (buildGradle == null || dependencies.isEmpty()) {
+            return
+        }
+
+        buildGradle.psi.runWriteAction {
+            when (buildGradle) {
+                is GroovyGradleFile -> {
+                    val depsBlock = findOrCreateGroovyBlock(project, buildGradle.psi, "dependencies")
+                    val elementFactory = GroovyPsiElementFactory.getInstance(project)
+                    for (dep in dependencies) {
+                        val gradleConfig = dep.gradleConfiguration ?: continue
+                        val stmt = elementFactory.createStatementFromText(
+                            "$gradleConfig \"${escapeGString(dep.groupId)}:${
+                                escapeGString(dep.artifactId)
+                            }:${escapeGString(dep.version)}\"", depsBlock
+                        )
+                        depsBlock.addStatementBefore(stmt, null)
+                    }
+                }
+
+                is KotlinGradleFile -> {
+                    val script = buildGradle.psi.script?.blockExpression ?: return@runWriteAction
+                    val depsBlock = findOrCreateKotlinBlock(project, script, "dependencies")
+                    val elementFactory = KtPsiFactory(project)
+                    for (dep in dependencies) {
+                        val gradleConfig = dep.gradleConfiguration ?: continue
+                        val stmt = elementFactory.createExpression(
+                            "$gradleConfig(\"${escapeGString(dep.groupId)}:${
+                                escapeGString(dep.artifactId)
+                            }:${escapeGString(dep.version)}\")"
+                        )
+                        depsBlock.addBefore(stmt, depsBlock.rBrace)
+                    }
+                }
+            }
+        }
+    }
+
+    protected fun makeStringLiteral(str: String): String {
+        return "\"${escapeGString(str)}\""
+    }
+
+    private fun escapeGString(str: String): String {
+        return StringUtil.escapeStringCharacters(str.length, str, "\"\$", StringBuilder()).toString()
+    }
+
+    protected fun findGroovyBlock(element: GrStatementOwner, name: String): GrClosableBlock? {
+        return element.statements
+            .mapFirstNotNull { call ->
+                if (call is GrMethodCallExpression && call.callReference?.methodName == name) {
+                    call.closureArguments.firstOrNull()
+                } else {
+                    null
+                }
+            }
+    }
+
+    protected fun findOrCreateGroovyBlock(project: Project, element: GrStatementOwner, name: String): GrClosableBlock {
+        findGroovyBlock(element, name)?.let { return it }
+        val block = GroovyPsiElementFactory.getInstance(project).createStatementFromText("$name {\n}", element)
+        return (element.addStatementBefore(block, null) as GrMethodCallExpression).closureArguments.first()
+    }
+
+    protected fun findKotlinBlock(element: KtBlockExpression, name: String): KtBlockExpression? {
+        return element.childrenOfType<KtScriptInitializer>()
+            .flatMap { it.childrenOfType<KtCallExpression>() }
+            .mapFirstNotNull { call ->
+                if ((call.calleeExpression as? KtNameReferenceExpression)?.getReferencedName() == name) {
+                    call.lambdaArguments.firstOrNull()?.getLambdaExpression()?.bodyExpression
+                } else {
+                    null
+                }
+            }
+    }
+
+    protected fun findOrCreateKotlinBlock(project: Project, element: KtBlockExpression, name: String): KtBlockExpression {
+        findKotlinBlock(element, name)?.let { return it }
+        val block = KtPsiFactory(project).createExpression("$name {\n}")
+        return (element.addBefore(block, element.rBrace) as KtCallExpression).lambdaArguments.first().getLambdaExpression()!!.bodyExpression!!
+    }
+
+    protected fun KtPsiFactory.createAssignment(text: String): KtBinaryExpression {
+        return this.createBlock(text).firstStatement as KtBinaryExpression
+    }
+
+    override fun perform(project: Project) {
+        invokeAndWait {
+            if (project.isDisposed) {
+                return@invokeAndWait
+            }
+
+            runWriteTask {
+                val rootDir = VfsUtil.findFile(Path.of(context.projectFileDirectory), true)
+                    ?: return@runWriteTask
+                val gradleFiles = GradleFiles(project, rootDir)
+                NonProjectFileWritingAccessProvider.disableChecksDuring {
+                    patch(project, gradleFiles)
+                    gradleFiles.commit()
+                }
+            }
+        }
+    }
+
+    class GradleFiles(
+        private val project: Project,
+        private val rootDir: VirtualFile
+    ) {
+        private val lazyBuildGradle = lazy {
+            val file = rootDir.findChild("build.gradle") ?: rootDir.findChild("build.gradle.kts")
+                ?: return@lazy null
+            makeGradleFile(file)
+        }
+        private val lazySettingsGradle = lazy {
+            val file = rootDir.findChild("settings.gradle") ?: rootDir.findChild("settings.gradle.kts")
+                ?: return@lazy null
+            makeGradleFile(file)
+        }
+        private val lazyGradleProperties = lazy {
+            val file = rootDir.findChild("gradle.properties") ?: return@lazy null
+            PsiManager.getInstance(project).findFile(file) as? PropertiesFile
+        }
+
+        val buildGradle by lazyBuildGradle
+        val settingsGradle by lazySettingsGradle
+        val gradleProperties by lazyGradleProperties
+
+        private fun makeGradleFile(virtualFile: VirtualFile): GradleFile? {
+            val psi = PsiManager.getInstance(project).findFile(virtualFile) ?: return null
+            return when (psi) {
+                is GroovyFile -> GroovyGradleFile(psi)
+                is KtFile -> KotlinGradleFile(psi)
+                else -> null
+            }
+        }
+
+        fun commit() {
+            val files = mutableListOf<PsiFile>()
+            if (lazyBuildGradle.isInitialized()) {
+                buildGradle?.psi?.let { files += it }
+            }
+            if (lazySettingsGradle.isInitialized()) {
+                settingsGradle?.psi?.let { files += it }
+            }
+            if (lazyGradleProperties.isInitialized()) {
+                (gradleProperties as? PsiFile)?.let { files += it }
+            }
+
+            val psiDocumentManager = PsiDocumentManager.getInstance(project)
+            val fileDocumentManager = FileDocumentManager.getInstance()
+            for (file in files) {
+                val document = psiDocumentManager.getDocument(file) ?: continue
+                fileDocumentManager.saveDocument(document)
+            }
+        }
+    }
+
+    sealed class GradleFile {
+        abstract val psi: PsiFile
+    }
+    class GroovyGradleFile(override val psi: GroovyFile) : GradleFile()
+    class KotlinGradleFile(override val psi: KtFile) : GradleFile()
 }
 
 open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
@@ -140,6 +370,13 @@ open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningS
         if (runManager.selectedConfiguration == null) {
             runManager.selectedConfiguration = settings
         }
+    }
+}
+
+class ReformatBuildGradleStep(parent: NewProjectWizardStep) : AbstractReformatFilesStep(parent) {
+    override fun addFilesToReformat() {
+        addFileToReformat("build.gradle")
+        addFileToReformat("build.gradle.kts")
     }
 }
 

@@ -156,10 +156,11 @@ intellij {
         "maven",
         "gradle",
         "Groovy",
+        "Kotlin",
         "org.toml.lang:$pluginTomlVersion",
         "ByteCodeViewer",
-        // needed dependencies for unit tests
         "properties",
+        // needed dependencies for unit tests
         "junit"
     )
 

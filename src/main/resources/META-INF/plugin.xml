@@ -13,7 +13,9 @@
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.idea.maven</depends>
     <depends>com.intellij.gradle</depends>
+    <depends>org.jetbrains.kotlin</depends>
     <depends>org.intellij.groovy</depends>
+    <depends>com.intellij.properties</depends>
     <depends>ByteCodeViewer</depends>
     <depends optional="true" config-file="toml-support.xml">org.toml.lang</depends>
 
@@ -37,6 +39,7 @@
         <extensionPoint name="platformTypeWizard" interface="com.demonwav.mcdev.creator.platformtype.PlatformTypeStep$Factory" dynamic="true" />
         <extensionPoint name="modPlatformWizard" interface="com.demonwav.mcdev.creator.platformtype.ModPlatformStep$Factory" dynamic="true" />
         <extensionPoint name="pluginPlatformWizard" interface="com.demonwav.mcdev.creator.platformtype.PluginPlatformStep$Factory" dynamic="true" />
+        <extensionPoint name="bukkitPlatformWizard" interface="com.demonwav.mcdev.platform.bukkit.creator.BukkitPlatformStep$Factory" dynamic="true" />
         <extensionPoint name="projectSetupFinalizer" interface="com.demonwav.mcdev.creator.ProjectSetupFinalizer$Factory" dynamic="true" />
 
         <extensionPoint name="buildSystemWizard" interface="com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep$Factory" dynamic="true" />
@@ -62,6 +65,10 @@
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyPlatformStep$Factory" />
 
         <pluginPlatformWizard implementation="com.demonwav.mcdev.platform.sponge.creator.SpongePlatformStep$Factory" />
+        <pluginPlatformWizard implementation="com.demonwav.mcdev.platform.bukkit.creator.BukkitPlatformStep$PlatformFactory" />
+
+        <bukkitPlatformWizard implementation="com.demonwav.mcdev.platform.bukkit.creator.SpigotPlatformStep$Factory" />
+        <bukkitPlatformWizard implementation="com.demonwav.mcdev.platform.bukkit.creator.PaperPlatformStep$Factory" />
 
         <projectSetupFinalizer implementation="com.demonwav.mcdev.creator.JdkProjectSetupFinalizer$Factory" />
         <projectSetupFinalizer implementation="com.demonwav.mcdev.creator.GradleProjectSetupFinalizer$Factory" />
@@ -74,6 +81,8 @@
         <buildSystemSupport platform="Architectury" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyGradleSupport" />
         <buildSystemSupport platform="Sponge" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.sponge.creator.SpongeGradleSupport" />
         <buildSystemSupport platform="Sponge" buildSystem="Maven" implementation="com.demonwav.mcdev.platform.sponge.creator.SpongeMavenSupport" />
+        <buildSystemSupport platform="Bukkit" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.bukkit.creator.BukkitGradleSupport" />
+        <buildSystemSupport platform="Bukkit" buildSystem="Maven" implementation="com.demonwav.mcdev.platform.bukkit.creator.BukkitMavenSupport" />
 
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />

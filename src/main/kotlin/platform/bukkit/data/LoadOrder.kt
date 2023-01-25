@@ -10,7 +10,9 @@
 
 package com.demonwav.mcdev.platform.bukkit.data
 
-enum class LoadOrder {
-    STARTUP,
-    POSTWORLD
+enum class LoadOrder(private val myName: String) {
+    STARTUP("Startup"),
+    POSTWORLD("Post World");
+
+    override fun toString() = myName
 }
