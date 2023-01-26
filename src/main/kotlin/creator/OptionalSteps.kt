@@ -126,3 +126,15 @@ class UpdateUrlStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(p
         val KEY = Key.create<String>("${UpdateUrlStep::class.java.name}.updateUrl")
     }
 }
+
+class DependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
+    override val label = "Depend:"
+
+    override fun setupProject(project: Project) {
+        data.putUserData(KEY, AuthorsStep.parseAuthors(value))
+    }
+
+    companion object {
+        val KEY = Key.create<List<String>>("${DependStep::class.java.name}.depend")
+    }
+}

@@ -66,6 +66,7 @@
 
         <pluginPlatformWizard implementation="com.demonwav.mcdev.platform.sponge.creator.SpongePlatformStep$Factory" />
         <pluginPlatformWizard implementation="com.demonwav.mcdev.platform.bukkit.creator.BukkitPlatformStep$PlatformFactory" />
+        <pluginPlatformWizard implementation="com.demonwav.mcdev.platform.velocity.creator.VelocityPlatformStep$Factory" />
 
         <bukkitPlatformWizard implementation="com.demonwav.mcdev.platform.bukkit.creator.SpigotPlatformStep$Factory" />
         <bukkitPlatformWizard implementation="com.demonwav.mcdev.platform.bukkit.creator.PaperPlatformStep$Factory" />
@@ -83,6 +84,8 @@
         <buildSystemSupport platform="Sponge" buildSystem="Maven" implementation="com.demonwav.mcdev.platform.sponge.creator.SpongeMavenSupport" />
         <buildSystemSupport platform="Bukkit" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.bukkit.creator.BukkitGradleSupport" />
         <buildSystemSupport platform="Bukkit" buildSystem="Maven" implementation="com.demonwav.mcdev.platform.bukkit.creator.BukkitMavenSupport" />
+        <buildSystemSupport platform="Velocity" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.velocity.creator.VelocityGradleSupport" />
+        <buildSystemSupport platform="Velocity" buildSystem="Maven" implementation="com.demonwav.mcdev.platform.velocity.creator.VelocityMavenSupport" />
 
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />

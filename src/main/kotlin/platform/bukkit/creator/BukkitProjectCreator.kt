@@ -66,7 +66,7 @@ abstract class AbstractBukkitPlatformStep(parent: BukkitPlatformStep, private va
         }
     }
 
-    override fun createStep(data: PlatformVersion) = BukkitMcVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse)).chain(
+    override fun createStep(data: PlatformVersion) = SimpleMcVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse)).chain(
         ::PluginNameStep,
         ::MainClassStep,
         ::BukkitOptionalSettingsStep,
@@ -89,18 +89,6 @@ abstract class AbstractBukkitPlatformStep(parent: BukkitPlatformStep, private va
     }
 }
 
-class BukkitMcVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
-    override val label = "Minecraft Version:"
-
-    override fun setupProject(project: Project) {
-        data.putUserData(KEY, SemanticVersion.tryParse(version))
-    }
-
-    companion object {
-        val KEY = Key.create<SemanticVersion>("${BukkitMcVersionStep::class.java.name}.version")
-    }
-}
-
 class BukkitOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsibleStep(parent) {
     override val title = "Optional Settings"
 
@@ -110,7 +98,7 @@ class BukkitOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollaps
         ::BukkitLogPrefixStep,
         ::BukkitLoadOrderStep,
         ::BukkitLoadBeforeStep,
-        ::BukkitDependStep,
+        ::DependStep,
         ::BukkitSoftDependStep,
     )
 }
@@ -166,18 +154,6 @@ class BukkitLoadBeforeStep(parent: NewProjectWizardStep) : AbstractOptionalStrin
     }
 }
 
-class BukkitDependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
-    override val label = "Depend:"
-
-    override fun setupProject(project: Project) {
-        data.putUserData(KEY, AuthorsStep.parseAuthors(value))
-    }
-
-    companion object {
-        val KEY = Key.create<List<String>>("${BukkitDependStep::class.java.name}.depend")
-    }
-}
-
 class BukkitSoftDependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
     override val label = "Soft Depend:"
 
@@ -200,12 +176,12 @@ class BukkitProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunning
         val prefix = data.getUserData(BukkitLogPrefixStep.KEY) ?: ""
         val loadOrder = data.getUserData(BukkitLoadOrderStep.KEY) ?: return
         val loadBefore = data.getUserData(BukkitLoadBeforeStep.KEY) ?: emptyList()
-        val deps = data.getUserData(BukkitDependStep.KEY) ?: emptyList()
+        val deps = data.getUserData(DependStep.KEY) ?: emptyList()
         val softDeps = data.getUserData(BukkitSoftDependStep.KEY) ?: emptyList()
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
         val website = data.getUserData(WebsiteStep.KEY) ?: ""
-        val mcVersion = data.getUserData(BukkitMcVersionStep.KEY) ?: return
+        val mcVersion = data.getUserData(SimpleMcVersionStep.KEY) ?: return
 
         val (packageName, className) = splitPackage(mainClass)
 
@@ -308,7 +284,7 @@ class BukkitGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
 class BukkitPatchBuildGradleStep(parent: NewProjectWizardStep) : AbstractPatchGradleFilesStep(parent) {
     override fun patch(project: Project, gradleFiles: GradleFiles) {
         val platform = data.getUserData(AbstractBukkitPlatformStep.KEY) ?: return
-        val mcVersion = data.getUserData(BukkitMcVersionStep.KEY) ?: return
+        val mcVersion = data.getUserData(SimpleMcVersionStep.KEY) ?: return
         val repositories = platform.getRepositories(mcVersion)
         val dependencies = platform.getDependencies(mcVersion)
         addRepositories(project, gradleFiles.buildGradle, repositories)
@@ -342,7 +318,7 @@ class BukkitPatchPomStep(parent: NewProjectWizardStep) : AbstractPatchPomStep(pa
     override fun patchPom(model: MavenDomProjectModel, root: XmlTag) {
         super.patchPom(model, root)
         val platform = data.getUserData(AbstractBukkitPlatformStep.KEY) ?: return
-        val mcVersion = data.getUserData(BukkitMcVersionStep.KEY) ?: return
+        val mcVersion = data.getUserData(SimpleMcVersionStep.KEY) ?: return
         val repositories = platform.getRepositories(mcVersion)
         val dependencies = platform.getDependencies(mcVersion)
         setupDependencies(model, repositories, dependencies)

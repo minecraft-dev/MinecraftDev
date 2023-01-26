@@ -180,6 +180,48 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
         }
     }
 
+    protected fun addPlugins(project: Project, buildGradle: GradleFile?, plugins: List<GradlePlugin>) {
+        if (buildGradle == null || plugins.isEmpty()) {
+            return
+        }
+
+        buildGradle.psi.runWriteAction {
+            fun makePluginStatement(plugin: GradlePlugin, kotlin: Boolean): String {
+                return buildString {
+                    if (kotlin) {
+                        append("id(${makeStringLiteral(plugin.id)})")
+                    } else {
+                        append("id ${makeStringLiteral(plugin.id)}")
+                    }
+                    plugin.version?.let { append(" version ${makeStringLiteral(it)}") }
+                    if (!plugin.apply) {
+                        append(" apply false")
+                    }
+                }
+            }
+
+            when (buildGradle) {
+                is GroovyGradleFile -> {
+                    val pluginsBlock = findOrCreateGroovyBlock(project, buildGradle.psi, "plugins", first = true)
+                    val elementFactory = GroovyPsiElementFactory.getInstance(project)
+                    for (plugin in plugins) {
+                        val stmt = elementFactory.createStatementFromText(makePluginStatement(plugin, false))
+                        pluginsBlock.addStatementBefore(stmt, null)
+                    }
+                }
+                is KotlinGradleFile -> {
+                    val script = buildGradle.psi.script?.blockExpression ?: return@runWriteAction
+                    val pluginsBlock = findOrCreateKotlinBlock(project, script, "plugins", first = true)
+                    val elementFactory = KtPsiFactory(project)
+                    for (plugin in plugins) {
+                        val stmt = elementFactory.createExpression(makePluginStatement(plugin, true))
+                        pluginsBlock.addBefore(stmt, pluginsBlock.rBrace)
+                    }
+                }
+            }
+        }
+    }
+
     protected fun makeStringLiteral(str: String): String {
         return "\"${escapeGString(str)}\""
     }
@@ -199,10 +241,15 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
             }
     }
 
-    protected fun findOrCreateGroovyBlock(project: Project, element: GrStatementOwner, name: String): GrClosableBlock {
+    protected fun findOrCreateGroovyBlock(project: Project, element: GrStatementOwner, name: String, first: Boolean = false): GrClosableBlock {
         findGroovyBlock(element, name)?.let { return it }
         val block = GroovyPsiElementFactory.getInstance(project).createStatementFromText("$name {\n}", element)
-        return (element.addStatementBefore(block, null) as GrMethodCallExpression).closureArguments.first()
+        val anchor = if (first) {
+            element.statements.firstOrNull()
+        } else {
+            null
+        }
+        return (element.addStatementBefore(block, anchor) as GrMethodCallExpression).closureArguments.first()
     }
 
     protected fun findKotlinBlock(element: KtBlockExpression, name: String): KtBlockExpression? {
@@ -217,10 +264,15 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
             }
     }
 
-    protected fun findOrCreateKotlinBlock(project: Project, element: KtBlockExpression, name: String): KtBlockExpression {
+    protected fun findOrCreateKotlinBlock(project: Project, element: KtBlockExpression, name: String, first: Boolean = false): KtBlockExpression {
         findKotlinBlock(element, name)?.let { return it }
         val block = KtPsiFactory(project).createExpression("$name {\n}")
-        return (element.addBefore(block, element.rBrace) as KtCallExpression).lambdaArguments.first().getLambdaExpression()!!.bodyExpression!!
+        val addedBlock = if (first) {
+            element.addAfter(block, element.lBrace)
+        } else {
+            element.addBefore(block, element.rBrace)
+        }
+        return (addedBlock as KtCallExpression).lambdaArguments.first().getLambdaExpression()!!.bodyExpression!!
     }
 
     protected fun KtPsiFactory.createAssignment(text: String): KtBinaryExpression {
