@@ -19,7 +19,10 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindItem
 
-abstract class AbstractSelectVersionStep<T: Comparable<T>>(parent: NewProjectWizardStep, val versions: List<T>) : AbstractNewProjectWizardStep(parent) {
+abstract class AbstractSelectVersionStep<T : Comparable<T>>(
+    parent: NewProjectWizardStep,
+    val versions: List<T>
+) : AbstractNewProjectWizardStep(parent) {
     protected abstract val label: String
 
     val versionProperty = propertyGraph.property("")

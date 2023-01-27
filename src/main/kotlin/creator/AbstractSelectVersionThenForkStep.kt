@@ -17,7 +17,10 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindItem
 
-abstract class AbstractSelectVersionThenForkStep<T: Comparable<T>>(parent: NewProjectWizardStep, private val versions: List<T>) : AbstractNewProjectWizardMultiStepBase(parent) {
+abstract class AbstractSelectVersionThenForkStep<T : Comparable<T>>(
+    parent: NewProjectWizardStep,
+    private val versions: List<T>
+) : AbstractNewProjectWizardMultiStepBase(parent) {
     protected lateinit var versionBox: ComboBox<String>
 
     override fun setupSwitcherUi(builder: Row) {
@@ -43,5 +46,5 @@ abstract class AbstractSelectVersionThenForkStep<T: Comparable<T>>(parent: NewPr
 
     override fun initSteps() = versions.associate { it.toString() to initStep(it) }
 
-    abstract fun initStep(version: T) : NewProjectWizardStep
+    abstract fun initStep(version: T): NewProjectWizardStep
 }

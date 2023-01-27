@@ -23,9 +23,10 @@ import com.intellij.openapi.util.Key
 import com.intellij.ui.dsl.builder.EMPTY_LABEL
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Row
-import kotlin.reflect.KClass
 
-abstract class AbstractBuildSystemStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardMultiStep<AbstractBuildSystemStep, AbstractBuildSystemStep.Factory>(parent, EP_NAME) {
+abstract class AbstractBuildSystemStep(
+    parent: NewProjectWizardStep
+) : AbstractNewProjectWizardMultiStep<AbstractBuildSystemStep, AbstractBuildSystemStep.Factory>(parent, EP_NAME) {
     companion object {
         private val PLATFORM_NAME_KEY = Key.create<String>("mcdev.platformName")
         val EP_NAME = ExtensionPointName<Factory>("com.demonwav.minecraft-dev.buildSystemWizard")
@@ -92,7 +93,10 @@ class MavenBuildSystem : AbstractBuildSystemStep.Factory {
     override val name = "Maven"
 }
 
-abstract class AbstractRunBuildSystemStep(parent: NewProjectWizardStep, private val buildSystemStepClass: Class<out AbstractBuildSystemStep>) : AbstractNewProjectWizardStep(parent) {
+abstract class AbstractRunBuildSystemStep(
+    parent: NewProjectWizardStep,
+    private val buildSystemStepClass: Class<out AbstractBuildSystemStep>
+) : AbstractNewProjectWizardStep(parent) {
     abstract val step: String
 
     override fun setupProject(project: Project) {

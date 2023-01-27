@@ -90,17 +90,23 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
         }
         placeholder.component = panel {
             row(description.capitalize()) {
-                cell(AsyncProcessIcon("${javaClass}.computeData").also { component ->
-                    component.addHierarchyListener { event ->
-                        if ((event.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong()) != 0L && component.isShowing) {
-                            doComputeData(placeholder)
+                cell(
+                    AsyncProcessIcon("$javaClass.computeData").also { component ->
+                        component.addHierarchyListener { event ->
+                            val hasShowingChanged =
+                                (event.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong()) != 0L
+                            if (hasShowingChanged && component.isShowing) {
+                                doComputeData(placeholder)
+                            }
                         }
                     }
-                })
+                )
                     .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
-                    .validation(validationErrorFor<AsyncProcessIcon> {
-                        "Haven't finished $description"
-                    })
+                    .validation(
+                        validationErrorFor<AsyncProcessIcon> {
+                            "Haven't finished $description"
+                        }
+                    )
             }
         }
     }

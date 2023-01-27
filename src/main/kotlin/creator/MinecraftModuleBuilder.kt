@@ -16,7 +16,10 @@ import com.demonwav.mcdev.creator.platformtype.PlatformTypeStep
 import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.intellij.ide.projectWizard.ProjectSettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
-import com.intellij.ide.wizard.*
+import com.intellij.ide.wizard.AbstractNewProjectWizardBuilder
+import com.intellij.ide.wizard.NewProjectWizardBaseStep
+import com.intellij.ide.wizard.RootNewProjectWizardStep
+import com.intellij.ide.wizard.chain
 import com.intellij.openapi.roots.ModifiableRootModel
 
 class MinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {
@@ -36,8 +39,12 @@ class MinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {
     }
 
     override fun getParentGroup() = MinecraftModuleType.NAME
-    override fun createStep(context: WizardContext) = RootNewProjectWizardStep(context)
-        .chain(::NewProjectWizardBaseStep, ::PlatformTypeStep, ::BuildSystemPropertiesStep, ::ProjectSetupFinalizerWizardStep)
+    override fun createStep(context: WizardContext) = RootNewProjectWizardStep(context).chain(
+        ::NewProjectWizardBaseStep,
+        ::PlatformTypeStep,
+        ::BuildSystemPropertiesStep,
+        ::ProjectSetupFinalizerWizardStep,
+    )
 
     override fun getIgnoredSteps() = listOf(ProjectSettingsStep::class.java)
 }

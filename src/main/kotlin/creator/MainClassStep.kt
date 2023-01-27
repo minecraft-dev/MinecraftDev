@@ -38,7 +38,7 @@ class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
     }
 
     override fun setupUI(builder: Panel) {
-        with (builder) {
+        with(builder) {
             row("Main Class:") {
                 textField()
                     .bindText(classNameProperty)

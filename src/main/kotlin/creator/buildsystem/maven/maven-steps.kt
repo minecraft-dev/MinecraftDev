@@ -10,9 +10,21 @@
 
 package com.demonwav.mcdev.creator.buildsystem.maven
 
-import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.*
-import com.demonwav.mcdev.util.*
+import com.demonwav.mcdev.creator.AbstractLongRunningStep
+import com.demonwav.mcdev.creator.AbstractModNameStep
+import com.demonwav.mcdev.creator.AbstractReformatFilesStep
+import com.demonwav.mcdev.creator.DescriptionStep
+import com.demonwav.mcdev.creator.FixedAssetsNewProjectWizardStep
+import com.demonwav.mcdev.creator.WebsiteStep
+import com.demonwav.mcdev.creator.buildsystem.BuildDependency
+import com.demonwav.mcdev.creator.buildsystem.BuildRepository
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
+import com.demonwav.mcdev.creator.findStep
+import com.demonwav.mcdev.creator.getVersionJson
+import com.demonwav.mcdev.util.invokeAndWait
+import com.demonwav.mcdev.util.runWriteAction
+import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
@@ -76,7 +88,11 @@ abstract class AbstractPatchPomStep(parent: NewProjectWizardStep) : AbstractLong
         }
     }
 
-    protected fun setupDependencies(model: MavenDomProjectModel, repositories: List<BuildRepository>, dependencies: List<BuildDependency>) {
+    protected fun setupDependencies(
+        model: MavenDomProjectModel,
+        repositories: List<BuildRepository>,
+        dependencies: List<BuildDependency>
+    ) {
         for ((id, url, types) in repositories) {
             if (!types.contains(BuildSystemType.MAVEN)) {
                 continue

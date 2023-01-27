@@ -10,11 +10,43 @@
 
 package com.demonwav.mcdev.platform.bukkit.creator
 
-import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.*
-import com.demonwav.mcdev.creator.buildsystem.gradle.*
-import com.demonwav.mcdev.creator.buildsystem.maven.*
+import com.demonwav.mcdev.creator.AbstractCollapsibleStep
+import com.demonwav.mcdev.creator.AbstractLatentStep
+import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.AbstractModNameStep
+import com.demonwav.mcdev.creator.AbstractOptionalStringStep
+import com.demonwav.mcdev.creator.AuthorsStep
+import com.demonwav.mcdev.creator.DependStep
+import com.demonwav.mcdev.creator.DescriptionStep
+import com.demonwav.mcdev.creator.EmptyStep
+import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
+import com.demonwav.mcdev.creator.MainClassStep
+import com.demonwav.mcdev.creator.PlatformVersion
+import com.demonwav.mcdev.creator.PluginNameStep
+import com.demonwav.mcdev.creator.SimpleMcVersionStep
+import com.demonwav.mcdev.creator.SoftDependStep
+import com.demonwav.mcdev.creator.WebsiteStep
+import com.demonwav.mcdev.creator.addTemplates
+import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.AbstractRunBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.BuildDependency
+import com.demonwav.mcdev.creator.buildsystem.BuildRepository
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
+import com.demonwav.mcdev.creator.buildsystem.gradle.AbstractPatchGradleFilesStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleImportStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.ReformatBuildGradleStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.addGradleWrapperProperties
+import com.demonwav.mcdev.creator.buildsystem.maven.AbstractPatchPomStep
+import com.demonwav.mcdev.creator.buildsystem.maven.MavenImportStep
+import com.demonwav.mcdev.creator.buildsystem.maven.ReformatPomStep
+import com.demonwav.mcdev.creator.buildsystem.maven.addDefaultMavenProperties
+import com.demonwav.mcdev.creator.chain
+import com.demonwav.mcdev.creator.findStep
+import com.demonwav.mcdev.creator.getVersionSelector
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
+import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType
 import com.demonwav.mcdev.platform.bukkit.data.LoadOrder
@@ -22,7 +54,11 @@ import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
-import com.intellij.ide.wizard.*
+import com.intellij.ide.wizard.AbstractNewProjectWizardMultiStep
+import com.intellij.ide.wizard.AbstractNewProjectWizardStep
+import com.intellij.ide.wizard.NewProjectWizardMultiStepFactory
+import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.ide.wizard.chain
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.observable.util.transform
@@ -33,7 +69,9 @@ import com.intellij.ui.dsl.builder.Panel
 import kotlinx.coroutines.coroutineScope
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
 
-class BukkitPlatformStep(parent: PluginPlatformStep) : AbstractNewProjectWizardMultiStep<BukkitPlatformStep, BukkitPlatformStep.Factory>(parent, EP_NAME) {
+class BukkitPlatformStep(
+    parent: PluginPlatformStep
+) : AbstractNewProjectWizardMultiStep<BukkitPlatformStep, BukkitPlatformStep.Factory>(parent, EP_NAME) {
     companion object {
         val EP_NAME = ExtensionPointName<Factory>("com.demonwav.minecraft-dev.bukkitPlatformWizard")
     }
@@ -50,7 +88,10 @@ class BukkitPlatformStep(parent: PluginPlatformStep) : AbstractNewProjectWizardM
     interface Factory : NewProjectWizardMultiStepFactory<BukkitPlatformStep>
 }
 
-abstract class AbstractBukkitPlatformStep(parent: BukkitPlatformStep, private val platform: PlatformType) : AbstractLatentStep<PlatformVersion>(parent) {
+abstract class AbstractBukkitPlatformStep(
+    parent: BukkitPlatformStep,
+    private val platform: PlatformType
+) : AbstractLatentStep<PlatformVersion>(parent) {
     override val description = "download versions"
 
     override suspend fun computeData() = coroutineScope {
@@ -61,14 +102,15 @@ abstract class AbstractBukkitPlatformStep(parent: BukkitPlatformStep, private va
         }
     }
 
-    override fun createStep(data: PlatformVersion) = SimpleMcVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse)).chain(
-        ::PluginNameStep,
-        ::MainClassStep,
-        ::BukkitOptionalSettingsStep,
-        ::BukkitBuildSystemStep,
-        ::BukkitProjectFilesStep,
-        ::BukkitPostBuildSystemStep,
-    )
+    override fun createStep(data: PlatformVersion) =
+        SimpleMcVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse)).chain(
+            ::PluginNameStep,
+            ::MainClassStep,
+            ::BukkitOptionalSettingsStep,
+            ::BukkitBuildSystemStep,
+            ::BukkitProjectFilesStep,
+            ::BukkitPostBuildSystemStep,
+        )
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, this)
@@ -228,14 +270,19 @@ class BukkitBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemS
     override val platformName = "Bukkit"
 }
 
-class BukkitPostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(parent, BukkitBuildSystemStep::class.java) {
+class BukkitPostBuildSystemStep(
+    parent: NewProjectWizardStep
+) : AbstractRunBuildSystemStep(parent, BukkitBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }
 
 class BukkitGradleSupport : BuildSystemSupport {
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> BukkitGradleFilesStep(parent).chain(::BukkitPatchBuildGradleStep, ::GradleWrapperStep)
+            BuildSystemSupport.PRE_STEP -> BukkitGradleFilesStep(parent).chain(
+                ::BukkitPatchBuildGradleStep,
+                ::GradleWrapperStep
+            )
             BuildSystemSupport.POST_STEP -> GradleImportStep(parent).chain(::ReformatBuildGradleStep)
             else -> EmptyStep(parent)
         }

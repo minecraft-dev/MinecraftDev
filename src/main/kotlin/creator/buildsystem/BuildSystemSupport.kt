@@ -20,11 +20,13 @@ import com.intellij.util.xmlb.annotations.Attribute
 
 interface BuildSystemSupport {
     companion object {
-        private val EP_NAME = ExtensionPointName<KeyedLazyInstance<BuildSystemSupport>>("com.demonwav.minecraft-dev.buildSystemSupport")
+        private val EP_NAME = ExtensionPointName<KeyedLazyInstance<BuildSystemSupport>>(
+            "com.demonwav.minecraft-dev.buildSystemSupport"
+        )
         private val COLLECTOR = KeyedExtensionCollector<BuildSystemSupport, Pair<String, String>>(EP_NAME)
 
-        fun getInstance(platform: String, buildSystem: String): BuildSystemSupport?
-            = COLLECTOR.findSingle(platform to buildSystem)
+        fun getInstance(platform: String, buildSystem: String): BuildSystemSupport? =
+            COLLECTOR.findSingle(platform to buildSystem)
 
         const val PRE_STEP = "pre"
         const val POST_STEP = "post"

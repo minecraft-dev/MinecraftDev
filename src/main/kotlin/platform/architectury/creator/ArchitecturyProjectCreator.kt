@@ -10,9 +10,33 @@
 
 package com.demonwav.mcdev.platform.architectury.creator
 
-import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.*
-import com.demonwav.mcdev.creator.buildsystem.gradle.*
+import com.demonwav.mcdev.creator.AbstractCollapsibleStep
+import com.demonwav.mcdev.creator.AbstractLatentStep
+import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.AbstractModNameStep
+import com.demonwav.mcdev.creator.AbstractSelectVersionStep
+import com.demonwav.mcdev.creator.AbstractSelectVersionThenForkStep
+import com.demonwav.mcdev.creator.AuthorsStep
+import com.demonwav.mcdev.creator.DescriptionStep
+import com.demonwav.mcdev.creator.EmptyStep
+import com.demonwav.mcdev.creator.IssueTrackerStep
+import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
+import com.demonwav.mcdev.creator.LicenseStep
+import com.demonwav.mcdev.creator.ModNameStep
+import com.demonwav.mcdev.creator.RepositoryStep
+import com.demonwav.mcdev.creator.UseMixinsStep
+import com.demonwav.mcdev.creator.WebsiteStep
+import com.demonwav.mcdev.creator.addLicense
+import com.demonwav.mcdev.creator.addTemplates
+import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.AbstractRunBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleImportStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.addGradleWrapperProperties
+import com.demonwav.mcdev.creator.chain
+import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.platform.architectury.version.ArchitecturyVersion
 import com.demonwav.mcdev.platform.fabric.creator.FabricApiVersionStep
@@ -24,7 +48,11 @@ import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.platform.forge.version.ForgeVersion
-import com.demonwav.mcdev.util.*
+import com.demonwav.mcdev.util.MinecraftTemplates
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.asyncIO
+import com.demonwav.mcdev.util.toJavaClassName
+import com.demonwav.mcdev.util.toPackageName
 import com.intellij.ide.starters.local.GeneratorEmptyDirectory
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
@@ -98,22 +126,31 @@ class ArchitecturyPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Arc
     }
 }
 
-class ArchitecturyMcVersionStep(parent: NewProjectWizardStep, mcVersions: List<SemanticVersion>, private val versionData: ArchitecturyVersionData) : AbstractSelectVersionThenForkStep<SemanticVersion>(parent, mcVersions) {
+class ArchitecturyMcVersionStep(
+    parent: NewProjectWizardStep,
+    mcVersions: List<SemanticVersion>,
+    private val versionData: ArchitecturyVersionData
+) : AbstractSelectVersionThenForkStep<SemanticVersion>(parent, mcVersions) {
     override val label = "Minecraft Version:"
 
-    override fun initStep(version: SemanticVersion) = ForgeVersionStep(this, versionData.forgeVersions.getForgeVersions(version)).chain(
-        { parent -> FabricLoaderVersionStep(parent, versionData.fabricVersions.loader) },
-        { parent ->
-            val versionStr = version.toString()
-            val apiVersions = versionData.fabricApiVersions.versions.filter { versionStr in it.gameVersions }.map { it.version }
-            if (apiVersions.isEmpty()) {
-                FabricApiVersionStep(parent, versionData.fabricApiVersions.versions.map { it.version }, false)
-            } else {
-                FabricApiVersionStep(parent, apiVersions, true)
+    override fun initStep(version: SemanticVersion) =
+        ForgeVersionStep(this, versionData.forgeVersions.getForgeVersions(version)).chain(
+            { parent -> FabricLoaderVersionStep(parent, versionData.fabricVersions.loader) },
+            { parent ->
+                val versionStr = version.toString()
+                val apiVersions = versionData.fabricApiVersions.versions
+                    .filter { versionStr in it.gameVersions }
+                    .map { it.version }
+                if (apiVersions.isEmpty()) {
+                    FabricApiVersionStep(parent, versionData.fabricApiVersions.versions.map { it.version }, false)
+                } else {
+                    FabricApiVersionStep(parent, apiVersions, true)
+                }
+            },
+            { parent ->
+                ArchitecturyApiVersionStep(parent, versionData.architecturyVersions.getArchitecturyVersions(version))
             }
-        },
-        { parent -> ArchitecturyApiVersionStep(parent, versionData.architecturyVersions.getArchitecturyVersions(version)) }
-    )
+        )
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, SemanticVersion.tryParse(step))
@@ -125,7 +162,10 @@ class ArchitecturyMcVersionStep(parent: NewProjectWizardStep, mcVersions: List<S
     }
 }
 
-class ArchitecturyApiVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
+class ArchitecturyApiVersionStep(
+    parent: NewProjectWizardStep,
+    versions: List<SemanticVersion>
+) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
     override val label = "Architectury API Version:"
 
     private val useArchitecturyApiProperty = propertyGraph.property(true)
@@ -313,11 +353,14 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
             assets.addTemplateProperties(
                 "MIXINS" to "true"
             )
+            val commonMixinsFile = "common/src/main/resources/${buildSystemProps.artifactId}.mixins.json"
+            val forgeMixinsFile = "forge/src/main/resources/${buildSystemProps.artifactId}.mixins.json"
+            val fabricMixinsFile = "fabric/src/main/resources/${buildSystemProps.artifactId}.mixins.json"
             assets.addTemplates(
                 project,
-                "common/src/main/resources/${buildSystemProps.artifactId}.mixins.json" to MinecraftTemplates.ARCHITECTURY_COMMON_MIXINS_JSON_TEMPLATE,
-                "forge/src/main/resources/${buildSystemProps.artifactId}.mixins.json" to MinecraftTemplates.ARCHITECTURY_FORGE_MIXINS_JSON_TEMPLATE,
-                "fabric/src/main/resources/${buildSystemProps.artifactId}.mixins.json" to MinecraftTemplates.ARCHITECTURY_FABRIC_MIXINS_JSON_TEMPLATE,
+                commonMixinsFile to MinecraftTemplates.ARCHITECTURY_COMMON_MIXINS_JSON_TEMPLATE,
+                forgeMixinsFile to MinecraftTemplates.ARCHITECTURY_FORGE_MIXINS_JSON_TEMPLATE,
+                fabricMixinsFile to MinecraftTemplates.ARCHITECTURY_FABRIC_MIXINS_JSON_TEMPLATE,
             )
         }
 
@@ -332,7 +375,10 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
     }
 }
 
-abstract class ArchitecturyMainClassStep(parent: NewProjectWizardStep, phase: Int) : AbstractLongRunningAssetsStep(parent) {
+abstract class ArchitecturyMainClassStep(
+    parent: NewProjectWizardStep,
+    phase: Int
+) : AbstractLongRunningAssetsStep(parent) {
     abstract val projectDir: String
     abstract val template: String
     abstract fun getClassName(packageName: String, className: String): String
@@ -388,7 +434,9 @@ class ArchitecturyBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildS
     override val platformName = "Architectury"
 }
 
-class ArchitecturyPostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(parent, ArchitecturyBuildSystemStep::class.java) {
+class ArchitecturyPostBuildSystemStep(
+    parent: NewProjectWizardStep
+) : AbstractRunBuildSystemStep(parent, ArchitecturyBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }
 

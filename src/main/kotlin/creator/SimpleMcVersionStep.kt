@@ -15,7 +15,10 @@ import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 
-class SimpleMcVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
+class SimpleMcVersionStep(
+    parent: NewProjectWizardStep,
+    versions: List<SemanticVersion>
+) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
     override val label = "Minecraft Version:"
 
     override fun setupProject(project: Project) {

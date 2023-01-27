@@ -10,8 +10,6 @@
 
 package com.demonwav.mcdev.creator
 
-import com.demonwav.mcdev.util.SemanticVersion
-import com.demonwav.mcdev.util.VersionRange
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
@@ -26,7 +24,6 @@ import com.intellij.openapi.roots.ui.configuration.JdkComboBox
 import com.intellij.openapi.roots.ui.configuration.sdkComboBox
 import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
 import com.intellij.openapi.ui.validation.validationErrorFor
-import com.intellij.ui.SortedComboBoxModel
 import com.intellij.ui.dsl.builder.Panel
 import javax.swing.JPanel
 
@@ -58,9 +55,11 @@ class ProjectSetupFinalizerWizardStep(parent: NewProjectWizardStep) : AbstractNe
             builder.row {
                 cell(JPanel())
                     .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
-                    .validation(validationErrorFor<JPanel> {
-                        finalizers.mapFirstNotNull(ProjectSetupFinalizer::validate)
-                    })
+                    .validation(
+                        validationErrorFor<JPanel> {
+                            finalizers.mapFirstNotNull(ProjectSetupFinalizer::validate)
+                        }
+                    )
             }
         }
     }
@@ -93,7 +92,9 @@ interface ProjectSetupFinalizer : NewProjectWizardStep {
     }
 }
 
-class JdkProjectSetupFinalizer(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent), ProjectSetupFinalizer {
+class JdkProjectSetupFinalizer(
+    parent: NewProjectWizardStep
+) : AbstractNewProjectWizardStep(parent), ProjectSetupFinalizer {
     private val sdkProperty: GraphProperty<Sdk?> = propertyGraph.property(null)
     private var sdk by sdkProperty
     private var sdkComboBox: JdkComboBox? = null
@@ -115,10 +116,13 @@ class JdkProjectSetupFinalizer(parent: NewProjectWizardStep) : AbstractNewProjec
     override fun setupUI(builder: Panel) {
         with(builder) {
             row("JDK Version:") {
-                val sdkComboBox = sdkComboBox(context, sdkProperty, "${javaClass.name}.sdk", sdkFilter = sdkFilter@{ sdk ->
-                    val version = sdk.versionString?.let(JavaSdkVersion::fromVersionString) ?: return@sdkFilter true
-                    version >= minVersion
-                })
+                val sdkComboBox = sdkComboBox(
+                    context, sdkProperty, "${javaClass.name}.sdk",
+                    sdkFilter = sdkFilter@{ sdk ->
+                        val version = sdk.versionString?.let(JavaSdkVersion::fromVersionString) ?: return@sdkFilter true
+                        version >= minVersion
+                    }
+                )
                 this@JdkProjectSetupFinalizer.sdkComboBox = sdkComboBox.component
             }
         }

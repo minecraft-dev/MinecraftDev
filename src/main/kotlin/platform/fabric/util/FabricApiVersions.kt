@@ -51,7 +51,8 @@ class FabricApiVersions(val versions: List<Version>) {
                                 continue@versionLoop
                             }
                         }
-                        val versionNumber = version["version_number"]?.asString?.let(SemanticVersion::tryParse) ?: return null
+                        val versionNumber = version["version_number"]?.asString?.let(SemanticVersion::tryParse)
+                            ?: return null
                         val gameVersions = version["game_versions"]?.asJsonArray ?: return null
                         val gameVersionsList = mutableListOf<String>()
                         for (gameVer in gameVersions) {

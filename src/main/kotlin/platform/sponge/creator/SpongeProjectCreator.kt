@@ -10,13 +10,42 @@
 
 package com.demonwav.mcdev.platform.sponge.creator
 
-import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.*
-import com.demonwav.mcdev.creator.buildsystem.gradle.*
-import com.demonwav.mcdev.creator.buildsystem.maven.*
+import com.demonwav.mcdev.creator.AbstractCollapsibleStep
+import com.demonwav.mcdev.creator.AbstractLatentStep
+import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.AbstractModNameStep
+import com.demonwav.mcdev.creator.AbstractOptionalStringStep
+import com.demonwav.mcdev.creator.AbstractSelectVersionStep
+import com.demonwav.mcdev.creator.AuthorsStep
+import com.demonwav.mcdev.creator.DescriptionStep
+import com.demonwav.mcdev.creator.EmptyStep
+import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
+import com.demonwav.mcdev.creator.LicenseStep
+import com.demonwav.mcdev.creator.MainClassStep
+import com.demonwav.mcdev.creator.PluginNameStep
+import com.demonwav.mcdev.creator.WebsiteStep
+import com.demonwav.mcdev.creator.addTemplates
+import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.AbstractRunBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.BuildDependency
+import com.demonwav.mcdev.creator.buildsystem.BuildRepository
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleImportStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.addGradleWrapperProperties
+import com.demonwav.mcdev.creator.buildsystem.maven.AbstractPatchPomStep
+import com.demonwav.mcdev.creator.buildsystem.maven.MavenImportStep
+import com.demonwav.mcdev.creator.buildsystem.maven.ReformatPomStep
+import com.demonwav.mcdev.creator.buildsystem.maven.addDefaultMavenProperties
+import com.demonwav.mcdev.creator.chain
+import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
+import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.platform.sponge.SpongeVersion
-import com.demonwav.mcdev.util.*
+import com.demonwav.mcdev.util.MinecraftTemplates
+import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
@@ -48,7 +77,10 @@ class SpongePlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Sponge
     }
 }
 
-class SpongeApiVersionStep(parent: NewProjectWizardStep, data: SpongeVersion) : AbstractSelectVersionStep<SemanticVersion>(parent, data.versions.keys.mapNotNull(SemanticVersion::tryParse)) {
+class SpongeApiVersionStep(
+    parent: NewProjectWizardStep,
+    data: SpongeVersion
+) : AbstractSelectVersionStep<SemanticVersion>(parent, data.versions.keys.mapNotNull(SemanticVersion::tryParse)) {
     override val label = "Sponge API Version:"
 
     override fun setupProject(project: Project) {
@@ -94,9 +126,10 @@ class SpongeMainClassStep(parent: NewProjectWizardStep) : AbstractLongRunningAss
             "PACKAGE" to packageName,
             "CLASS_NAME" to className,
         )
+        val mainClassFile = "src/main/java/${packageName.replace('.', '/')}/$className.java"
         assets.addTemplates(
             project,
-            "src/main/java/${packageName.replace('.', '/')}/$className.java" to MinecraftTemplates.SPONGE8_MAIN_CLASS_TEMPLATE,
+            mainClassFile to MinecraftTemplates.SPONGE8_MAIN_CLASS_TEMPLATE,
         )
     }
 }
@@ -105,7 +138,9 @@ class SpongeBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemS
     override val platformName = "Sponge"
 }
 
-class SpongePostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(parent, SpongeBuildSystemStep::class.java) {
+class SpongePostBuildSystemStep(
+    parent: NewProjectWizardStep
+) : AbstractRunBuildSystemStep(parent, SpongeBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }
 
@@ -192,17 +227,21 @@ class SpongePatchPomStep(parent: NewProjectWizardStep) : AbstractPatchPomStep(pa
         val spongeApiVersion = data.getUserData(SpongeApiVersionStep.KEY) ?: return
         setupDependencies(
             model,
-            listOf(BuildRepository(
-                "spongepowered-repo",
-                "https://repo.spongepowered.org/maven/",
-                buildSystems = EnumSet.of(BuildSystemType.MAVEN)
-            )),
-            listOf(BuildDependency(
-                "org.spongepowered",
-                "spongeapi",
-                spongeApiVersion.toString(),
-                mavenScope = "provided"
-            ))
+            listOf(
+                BuildRepository(
+                    "spongepowered-repo",
+                    "https://repo.spongepowered.org/maven/",
+                    buildSystems = EnumSet.of(BuildSystemType.MAVEN)
+                )
+            ),
+            listOf(
+                BuildDependency(
+                    "org.spongepowered",
+                    "spongeapi",
+                    spongeApiVersion.toString(),
+                    mavenScope = "provided"
+                )
+            )
         )
     }
 }

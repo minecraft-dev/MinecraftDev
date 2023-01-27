@@ -11,21 +11,53 @@
 package com.demonwav.mcdev.platform.fabric.creator
 
 import com.demonwav.mcdev.asset.MCDevBundle
-import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.*
-import com.demonwav.mcdev.creator.buildsystem.gradle.*
+import com.demonwav.mcdev.creator.AbstractCollapsibleStep
+import com.demonwav.mcdev.creator.AbstractLatentStep
+import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.AbstractModNameStep
+import com.demonwav.mcdev.creator.AbstractSelectVersionStep
+import com.demonwav.mcdev.creator.AbstractSelectVersionThenForkStep
+import com.demonwav.mcdev.creator.AuthorsStep
+import com.demonwav.mcdev.creator.DescriptionStep
+import com.demonwav.mcdev.creator.EmptyStep
+import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
+import com.demonwav.mcdev.creator.LicenseStep
+import com.demonwav.mcdev.creator.ModNameStep
+import com.demonwav.mcdev.creator.RepositoryStep
+import com.demonwav.mcdev.creator.UseMixinsStep
+import com.demonwav.mcdev.creator.WaitForSmartModeStep
+import com.demonwav.mcdev.creator.WebsiteStep
+import com.demonwav.mcdev.creator.addLicense
+import com.demonwav.mcdev.creator.addTemplates
+import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.AbstractRunBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleImportStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.addGradleWrapperProperties
+import com.demonwav.mcdev.creator.chain
+import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.platform.fabric.EntryPoint
 import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.fabric.util.FabricVersions
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
-import com.demonwav.mcdev.util.*
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_BUILD_GRADLE_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_GRADLE_PROPERTIES_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_MIXINS_JSON_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_MOD_JSON_TEMPLATE
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.FABRIC_SETTINGS_GRADLE_TEMPLATE
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.addImplements
+import com.demonwav.mcdev.util.addMethod
+import com.demonwav.mcdev.util.asyncIO
+import com.demonwav.mcdev.util.invokeLater
+import com.demonwav.mcdev.util.runWriteAction
+import com.demonwav.mcdev.util.runWriteTaskInSmartMode
+import com.demonwav.mcdev.util.toJavaClassName
+import com.demonwav.mcdev.util.toPackageName
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.codeInsight.generation.OverrideImplementUtil
 import com.intellij.ide.starters.local.GeneratorEmptyDirectory
@@ -60,7 +92,9 @@ import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
 import kotlinx.coroutines.coroutineScope
 
-class FabricPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Pair<FabricVersions, FabricApiVersions>>(parent) {
+class FabricPlatformStep(
+    parent: ModPlatformStep
+) : AbstractLatentStep<Pair<FabricVersions, FabricApiVersions>>(parent) {
     override val description = "download Fabric versions"
 
     override suspend fun computeData() = coroutineScope {
@@ -97,8 +131,16 @@ class FabricMcVersion(private val ordinal: Int, val version: String) : Comparabl
     override fun compareTo(other: FabricMcVersion) = ordinal.compareTo(other.ordinal)
 }
 
-class FabricMcVersionStep(parent: NewProjectWizardStep, private val fabricVersions: FabricVersions, private val apiVersions: FabricApiVersions)
-    : AbstractSelectVersionThenForkStep<FabricMcVersion>(parent, fabricVersions.game.mapIndexed { index, version -> FabricMcVersion(fabricVersions.game.size - 1 - index, version.version) }) {
+class FabricMcVersionStep(
+    parent: NewProjectWizardStep,
+    private val fabricVersions: FabricVersions,
+    private val apiVersions: FabricApiVersions
+) : AbstractSelectVersionThenForkStep<FabricMcVersion>(
+    parent,
+    fabricVersions.game.mapIndexed { index, version ->
+        FabricMcVersion(fabricVersions.game.size - 1 - index, version.version)
+    }
+) {
     override val label = "Minecraft Version:"
     private val showSnapshotsProperty = propertyGraph.property(false)
         .bindBooleanStorage("${javaClass.name}.showSnapshots")
@@ -134,7 +176,9 @@ class FabricMcVersionStep(parent: NewProjectWizardStep, private val fabricVersio
     override fun initStep(version: FabricMcVersion) = FabricLoaderVersionStep(this, fabricVersions.loader)
         .chain(
             { parent ->
-                val filteredVersions = fabricVersions.mappings.mapNotNull { mapping -> mapping.version.takeIf { mapping.gameVersion == version.version } }
+                val filteredVersions = fabricVersions.mappings.mapNotNull { mapping ->
+                    mapping.version.takeIf { mapping.gameVersion == version.version }
+                }
                 if (filteredVersions.isEmpty()) {
                     FabricYarnVersionStep(parent, fabricVersions.mappings.map { mapping -> mapping.version }, false)
                 } else {
@@ -142,7 +186,9 @@ class FabricMcVersionStep(parent: NewProjectWizardStep, private val fabricVersio
                 }
             },
             { parent ->
-                val filteredVersions = apiVersions.versions.mapNotNull { api -> api.version.takeIf { version.version in api.gameVersions } }
+                val filteredVersions = apiVersions.versions.mapNotNull { api ->
+                    api.version.takeIf { version.version in api.gameVersions }
+                }
                 if (filteredVersions.isEmpty()) {
                     FabricApiVersionStep(parent, apiVersions.versions.map { api -> api.version }, false)
                 } else {
@@ -161,8 +207,8 @@ class FabricMcVersionStep(parent: NewProjectWizardStep, private val fabricVersio
     }
 }
 
-class FabricLoaderVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>)
-    : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
+class FabricLoaderVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>) :
+    AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
     override val label = "Loader Version:"
 
     override fun setupProject(project: Project) {
@@ -174,8 +220,12 @@ class FabricLoaderVersionStep(parent: NewProjectWizardStep, versions: List<Seman
     }
 }
 
-class FabricYarnVersionStep(parent: NewProjectWizardStep, versions: List<FabricVersions.YarnVersion>, private val isMatched: Boolean)
-    : AbstractSelectVersionStep<FabricVersions.YarnVersion>(parent, versions) {
+class FabricYarnVersionStep(
+    parent: NewProjectWizardStep,
+    versions: List<FabricVersions.YarnVersion>,
+    private val isMatched: Boolean
+) :
+    AbstractSelectVersionStep<FabricVersions.YarnVersion>(parent, versions) {
     override val label = "Yarn Version:"
 
     override fun setupRow(builder: Row) {
@@ -194,8 +244,12 @@ class FabricYarnVersionStep(parent: NewProjectWizardStep, versions: List<FabricV
     }
 }
 
-class FabricApiVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>, private val isMatched: Boolean)
-    : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
+class FabricApiVersionStep(
+    parent: NewProjectWizardStep,
+    versions: List<SemanticVersion>,
+    private val isMatched: Boolean
+) :
+    AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
     override val label = "Fabric API Version:"
 
     private val useFabricApiProperty = propertyGraph.property(true)
@@ -240,19 +294,21 @@ class FabricEnvironmentStep(parent: NewProjectWizardStep) : AbstractNewProjectWi
         with(builder) {
             row("Environment:") {
                 comboBox(listOf("Both", "Client", "Server"))
-                    .bindItem(environmentProperty.transform({
-                        when (it) {
-                            Side.CLIENT -> "Client"
-                            Side.SERVER -> "Server"
-                            else -> "Both"
-                        }
-                    }, {
-                        when (it) {
-                            "Client" -> Side.CLIENT
-                            "Server" -> Side.SERVER
-                            else -> Side.NONE
-                        }
-                    }))
+                    .bindItem(
+                        environmentProperty.transform({
+                            when (it) {
+                                Side.CLIENT -> "Client"
+                                Side.SERVER -> "Server"
+                                else -> "Both"
+                            }
+                        }, {
+                            when (it) {
+                                "Client" -> Side.CLIENT
+                                "Server" -> Side.SERVER
+                                else -> Side.NONE
+                            }
+                        })
+                    )
             }
         }
     }
@@ -319,12 +375,14 @@ class FabricDumbModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
         val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
 
         if (useMixins) {
-            val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}.mixin"
+            val packageName =
+                "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}.mixin"
             assets.addTemplateProperties(
                 "PACKAGE_NAME" to packageName,
                 "JAVA_VERSION" to javaVersion,
             )
-            assets.addTemplates(project, "src/main/resources/${buildSystemProps.artifactId}.mixins.json" to FABRIC_MIXINS_JSON_TEMPLATE)
+            val mixinsJsonFile = "src/main/resources/${buildSystemProps.artifactId}.mixins.json"
+            assets.addTemplates(project, mixinsJsonFile to FABRIC_MIXINS_JSON_TEMPLATE)
         }
 
         assets.addLicense(project)
@@ -359,9 +417,11 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
 
         val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}"
+        val mainClassName = "$packageName.${modName.toJavaClassName()}"
+        val clientClassName = "$packageName.client.${modName.toJavaClassName()}Client"
         entryPoints = listOf(
-            EntryPoint("main", EntryPoint.Type.CLASS, "$packageName.${modName.toJavaClassName()}", FabricConstants.MOD_INITIALIZER),
-            EntryPoint("client", EntryPoint.Type.CLASS, "$packageName.client.${modName.toJavaClassName()}Client", FabricConstants.CLIENT_MOD_INITIALIZER),
+            EntryPoint("main", EntryPoint.Type.CLASS, mainClassName, FabricConstants.MOD_INITIALIZER),
+            EntryPoint("client", EntryPoint.Type.CLASS, clientClassName, FabricConstants.CLIENT_MOD_INITIALIZER),
         ) // TODO: un-hardcode?
 
         assets.addTemplateProperties(
@@ -465,7 +525,10 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
 
         for (entryPoint in entryPoints) {
             // find the class, and create it if it doesn't exist
-            val clazz = JavaPsiFacade.getInstance(project).findClass(entryPoint.className, GlobalSearchScope.projectScope(project)) ?: run {
+            val clazz = JavaPsiFacade.getInstance(project).findClass(
+                entryPoint.className,
+                GlobalSearchScope.projectScope(project)
+            ) ?: run {
                 val packageName = entryPoint.className.substringBeforeLast('.', missingDelimiterValue = "")
                 val className = entryPoint.className.substringAfterLast('.')
 
@@ -530,7 +593,9 @@ class FabricBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemS
     override val platformName = "Fabric"
 }
 
-class FabricPostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(parent, FabricBuildSystemStep::class.java) {
+class FabricPostBuildSystemStep(
+    parent: NewProjectWizardStep
+) : AbstractRunBuildSystemStep(parent, FabricBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }
 

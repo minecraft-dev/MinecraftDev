@@ -10,10 +10,25 @@
 
 package com.demonwav.mcdev.creator.buildsystem.gradle
 
-import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.*
-import com.demonwav.mcdev.util.*
+import com.demonwav.mcdev.creator.AbstractLongRunningStep
+import com.demonwav.mcdev.creator.AbstractReformatFilesStep
+import com.demonwav.mcdev.creator.FixedAssetsNewProjectWizardStep
+import com.demonwav.mcdev.creator.addTemplates
+import com.demonwav.mcdev.creator.buildsystem.BuildDependency
+import com.demonwav.mcdev.creator.buildsystem.BuildRepository
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
+import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.GRADLE_WRAPPER_PROPERTIES
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.childrenOfType
+import com.demonwav.mcdev.util.invokeAndWait
+import com.demonwav.mcdev.util.invokeLater
+import com.demonwav.mcdev.util.mapFirstNotNull
+import com.demonwav.mcdev.util.runGradleTaskAndWait
+import com.demonwav.mcdev.util.runWriteAction
+import com.demonwav.mcdev.util.runWriteTask
+import com.demonwav.mcdev.util.virtualFileOrError
 import com.intellij.execution.RunManager
 import com.intellij.ide.ui.UISettings
 import com.intellij.ide.wizard.NewProjectWizardStep
@@ -32,10 +47,15 @@ import com.intellij.openapi.wm.ex.StatusBarEx
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
-import java.lang.StringBuilder
 import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
-import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.KtBinaryExpression
+import org.jetbrains.kotlin.psi.KtBlockExpression
+import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtNameReferenceExpression
+import org.jetbrains.kotlin.psi.KtPsiFactory
+import org.jetbrains.kotlin.psi.KtScriptInitializer
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
@@ -142,8 +162,9 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
                         val gradleConfig = dep.gradleConfiguration ?: continue
                         val stmt = elementFactory.createStatementFromText(
                             "$gradleConfig \"${escapeGString(dep.groupId)}:${
-                                escapeGString(dep.artifactId)
-                            }:${escapeGString(dep.version)}\"", depsBlock
+                            escapeGString(dep.artifactId)
+                            }:${escapeGString(dep.version)}\"",
+                            depsBlock
                         )
                         depsBlock.addStatementBefore(stmt, null)
                     }
@@ -157,7 +178,7 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
                         val gradleConfig = dep.gradleConfiguration ?: continue
                         val stmt = elementFactory.createExpression(
                             "$gradleConfig(\"${escapeGString(dep.groupId)}:${
-                                escapeGString(dep.artifactId)
+                            escapeGString(dep.artifactId)
                             }:${escapeGString(dep.version)}\")"
                         )
                         depsBlock.addBefore(stmt, depsBlock.rBrace)
@@ -228,7 +249,12 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
             }
     }
 
-    protected fun findOrCreateGroovyBlock(project: Project, element: GrStatementOwner, name: String, first: Boolean = false): GrClosableBlock {
+    protected fun findOrCreateGroovyBlock(
+        project: Project,
+        element: GrStatementOwner,
+        name: String,
+        first: Boolean = false
+    ): GrClosableBlock {
         findGroovyBlock(element, name)?.let { return it }
         val block = GroovyPsiElementFactory.getInstance(project).createStatementFromText("$name {\n}", element)
         val anchor = if (first) {
@@ -251,7 +277,12 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
             }
     }
 
-    protected fun findOrCreateKotlinBlock(project: Project, element: KtBlockExpression, name: String, first: Boolean = false): KtBlockExpression {
+    protected fun findOrCreateKotlinBlock(
+        project: Project,
+        element: KtBlockExpression,
+        name: String,
+        first: Boolean = false
+    ): KtBlockExpression {
         findKotlinBlock(element, name)?.let { return it }
         val block = KtPsiFactory(project).createExpression("$name {\n}")
         val addedBlock = if (first) {
@@ -382,7 +413,12 @@ open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningS
         }
     }
 
-    private fun addRunTaskConfiguration(project: Project, rootDirectory: Path, buildSystemProps: BuildSystemPropertiesStep<*>, task: String) {
+    private fun addRunTaskConfiguration(
+        project: Project,
+        rootDirectory: Path,
+        buildSystemProps: BuildSystemPropertiesStep<*>,
+        task: String
+    ) {
         val gradleType = GradleExternalTaskConfigurationType.getInstance()
 
         val runManager = RunManager.getInstance(project)

@@ -10,15 +10,44 @@
 
 package com.demonwav.mcdev.platform.forge.creator
 
-import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.*
-import com.demonwav.mcdev.creator.buildsystem.gradle.*
+import com.demonwav.mcdev.creator.AbstractCollapsibleStep
+import com.demonwav.mcdev.creator.AbstractLatentStep
+import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.AbstractModNameStep
+import com.demonwav.mcdev.creator.AbstractSelectVersionStep
+import com.demonwav.mcdev.creator.AbstractSelectVersionThenForkStep
+import com.demonwav.mcdev.creator.AuthorsStep
+import com.demonwav.mcdev.creator.DescriptionStep
+import com.demonwav.mcdev.creator.EmptyStep
+import com.demonwav.mcdev.creator.LicenseStep
+import com.demonwav.mcdev.creator.MainClassStep
+import com.demonwav.mcdev.creator.ModNameStep
+import com.demonwav.mcdev.creator.UpdateUrlStep
+import com.demonwav.mcdev.creator.UseMixinsStep
+import com.demonwav.mcdev.creator.WebsiteStep
+import com.demonwav.mcdev.creator.addLicense
+import com.demonwav.mcdev.creator.addTemplates
+import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.AbstractRunBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
+import com.demonwav.mcdev.creator.buildsystem.gradle.AbstractRunGradleTaskStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GRADLE_VERSION_KEY
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleImportStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.addGradleWrapperProperties
+import com.demonwav.mcdev.creator.chain
+import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
+import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.platform.forge.version.ForgeVersion
-import com.demonwav.mcdev.util.*
+import com.demonwav.mcdev.util.MinecraftTemplates
+import com.demonwav.mcdev.util.MinecraftVersions
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.asyncIO
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
 import com.intellij.openapi.application.WriteAction
@@ -60,7 +89,13 @@ class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersi
     }
 }
 
-class ForgeMcVersionStep(parent: NewProjectWizardStep, private val forgeVersionData: ForgeVersion) : AbstractSelectVersionThenForkStep<SemanticVersion>(parent, forgeVersionData.sortedMcVersions.filter { it >= minSupportedMcVersion }) {
+class ForgeMcVersionStep(
+    parent: NewProjectWizardStep,
+    private val forgeVersionData: ForgeVersion
+) : AbstractSelectVersionThenForkStep<SemanticVersion>(
+    parent,
+    forgeVersionData.sortedMcVersions.filter { it >= minSupportedMcVersion }
+) {
     override val label = "Minecraft Version:"
 
     override fun initStep(version: SemanticVersion) = ForgeVersionStep(this, forgeVersionData.getForgeVersions(version))
@@ -75,7 +110,10 @@ class ForgeMcVersionStep(parent: NewProjectWizardStep, private val forgeVersionD
     }
 }
 
-class ForgeVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
+class ForgeVersionStep(
+    parent: NewProjectWizardStep,
+    versions: List<SemanticVersion>
+) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
     override val label = "Forge Version:"
 
     override fun setupProject(project: Project) {
@@ -231,7 +269,10 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         assets.addLicense(project)
 
         WriteAction.runAndWait<Throwable> {
-            val dir = VfsUtil.createDirectoryIfMissing(LocalFileSystem.getInstance(), "${assets.outputDirectory}/.gradle")
+            val dir = VfsUtil.createDirectoryIfMissing(
+                LocalFileSystem.getInstance(),
+                "${assets.outputDirectory}/.gradle"
+            )
                 ?: throw IllegalStateException("Unable to create .gradle directory")
             val file = dir.findOrCreateChildData(this, MAGIC_RUN_CONFIGS_FILE)
             val fileContents = buildSystemProps.artifactId + "\n" +
@@ -255,7 +296,8 @@ class ForgeMixinsJsonStep(parent: NewProjectWizardStep) : AbstractLongRunningAss
                 "PACKAGE_NAME" to "${buildSystemProps.groupId}.${buildSystemProps.artifactId}.mixin",
                 "ARTIFACT_ID" to buildSystemProps.artifactId,
             )
-            assets.addTemplates(project, "src/main/resources/${buildSystemProps.artifactId}.mixins.json" to MinecraftTemplates.FORGE_MIXINS_JSON_TEMPLATE)
+            val mixinsJsonFile = "src/main/resources/${buildSystemProps.artifactId}.mixins.json"
+            assets.addTemplates(project, mixinsJsonFile to MinecraftTemplates.FORGE_MIXINS_JSON_TEMPLATE)
         }
     }
 }
@@ -268,7 +310,9 @@ class ForgeBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemSt
     override val platformName = "Forge"
 }
 
-class ForgePostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(parent, ForgeBuildSystemStep::class.java) {
+class ForgePostBuildSystemStep(
+    parent: NewProjectWizardStep
+) : AbstractRunBuildSystemStep(parent, ForgeBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }
 

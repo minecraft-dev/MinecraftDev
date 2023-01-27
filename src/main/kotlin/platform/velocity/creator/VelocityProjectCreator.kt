@@ -10,14 +10,48 @@
 
 package com.demonwav.mcdev.platform.velocity.creator
 
-import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.*
-import com.demonwav.mcdev.creator.buildsystem.gradle.*
-import com.demonwav.mcdev.creator.buildsystem.maven.*
+import com.demonwav.mcdev.creator.AbstractCollapsibleStep
+import com.demonwav.mcdev.creator.AbstractLatentStep
+import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.AbstractLongRunningStep
+import com.demonwav.mcdev.creator.AbstractModNameStep
+import com.demonwav.mcdev.creator.AbstractSelectVersionStep
+import com.demonwav.mcdev.creator.AuthorsStep
+import com.demonwav.mcdev.creator.DependStep
+import com.demonwav.mcdev.creator.DescriptionStep
+import com.demonwav.mcdev.creator.EmptyStep
+import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
+import com.demonwav.mcdev.creator.MainClassStep
+import com.demonwav.mcdev.creator.PlatformVersion
+import com.demonwav.mcdev.creator.PluginNameStep
+import com.demonwav.mcdev.creator.WebsiteStep
+import com.demonwav.mcdev.creator.addTemplates
+import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.AbstractRunBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.BuildDependency
+import com.demonwav.mcdev.creator.buildsystem.BuildRepository
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
+import com.demonwav.mcdev.creator.buildsystem.gradle.AbstractPatchGradleFilesStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleImportStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradlePlugin
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.ReformatBuildGradleStep
+import com.demonwav.mcdev.creator.buildsystem.maven.AbstractPatchPomStep
+import com.demonwav.mcdev.creator.buildsystem.maven.MavenImportStep
+import com.demonwav.mcdev.creator.buildsystem.maven.ReformatPomStep
+import com.demonwav.mcdev.creator.chain
+import com.demonwav.mcdev.creator.findStep
+import com.demonwav.mcdev.creator.getVersionSelector
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
+import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
-import com.demonwav.mcdev.util.*
+import com.demonwav.mcdev.util.MinecraftTemplates
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.asyncIO
+import com.demonwav.mcdev.util.runWriteAction
+import com.demonwav.mcdev.util.runWriteTaskInSmartMode
 import com.intellij.ide.wizard.NewProjectWizardBaseData.Companion.baseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
@@ -45,14 +79,15 @@ class VelocityPlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Plat
         }
     }
 
-    override fun createStep(data: PlatformVersion) = VelocityVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse)).chain(
-        ::PluginNameStep,
-        ::MainClassStep,
-        ::VelocityOptionalSettingsStep,
-        ::VelocityBuildSystemStep,
-        ::VelocityProjectFilesStep,
-        ::VelocityPostBuildSystemStep,
-    )
+    override fun createStep(data: PlatformVersion) =
+        VelocityVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse)).chain(
+            ::PluginNameStep,
+            ::MainClassStep,
+            ::VelocityOptionalSettingsStep,
+            ::VelocityBuildSystemStep,
+            ::VelocityProjectFilesStep,
+            ::VelocityPostBuildSystemStep,
+        )
 
     class Factory : PluginPlatformStep.Factory {
         override val name = "Velocity"
@@ -61,7 +96,10 @@ class VelocityPlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Plat
     }
 }
 
-class VelocityVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
+class VelocityVersionStep(
+    parent: NewProjectWizardStep,
+    versions: List<SemanticVersion>
+) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
     override val label = "Velocity Version:"
 
     override fun setupProject(project: Project) {
@@ -118,7 +156,10 @@ class VelocityProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
     }
 }
 
-class VelocityModifyMainClassStep(parent: NewProjectWizardStep, private val isGradle: Boolean) : AbstractLongRunningStep(parent) {
+class VelocityModifyMainClassStep(
+    parent: NewProjectWizardStep,
+    private val isGradle: Boolean
+) : AbstractLongRunningStep(parent) {
     override val description = "Patching main class"
 
     override fun perform(project: Project) {
@@ -132,8 +173,10 @@ class VelocityModifyMainClassStep(parent: NewProjectWizardStep, private val isGr
         val dependencies = data.getUserData(DependStep.KEY) ?: emptyList()
 
         project.runWriteTaskInSmartMode {
-            val mainClassVirtualFile = VfsUtil.findFile(Path.of(mainClassFile), true) ?: return@runWriteTaskInSmartMode
-            val mainClassPsi = PsiManager.getInstance(project).findFile(mainClassVirtualFile) as? PsiJavaFile ?: return@runWriteTaskInSmartMode
+            val mainClassVirtualFile = VfsUtil.findFile(Path.of(mainClassFile), true)
+                ?: return@runWriteTaskInSmartMode
+            val mainClassPsi = PsiManager.getInstance(project).findFile(mainClassVirtualFile) as? PsiJavaFile
+                ?: return@runWriteTaskInSmartMode
 
             val psiClass = mainClassPsi.classes[0]
             val annotation = buildString {
@@ -189,15 +232,24 @@ class VelocityBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSyste
     override val platformName = "Velocity"
 }
 
-class VelocityPostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(parent, VelocityBuildSystemStep::class.java) {
+class VelocityPostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(
+    parent,
+    VelocityBuildSystemStep::class.java
+) {
     override val step = BuildSystemSupport.POST_STEP
 }
 
 class VelocityGradleSupport : BuildSystemSupport {
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> VelocityGradleFilesStep(parent).chain(::VelocityPatchGradleFilesStep, ::GradleWrapperStep)
-            BuildSystemSupport.POST_STEP -> GradleImportStep(parent).chain(::ReformatBuildGradleStep, { VelocityModifyMainClassStep(it, true) })
+            BuildSystemSupport.PRE_STEP -> VelocityGradleFilesStep(parent).chain(
+                ::VelocityPatchGradleFilesStep,
+                ::GradleWrapperStep
+            )
+            BuildSystemSupport.POST_STEP -> GradleImportStep(parent).chain(
+                ::ReformatBuildGradleStep,
+                { VelocityModifyMainClassStep(it, true) }
+            )
             else -> EmptyStep(parent)
         }
     }
@@ -223,12 +275,13 @@ class VelocityGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
             "PACKAGE" to mainPackage,
         )
 
+        val buildConstantsJava = "src/main/java/${mainPackage.replace('.', '/')}/BuildConstants.java"
         assets.addTemplates(
             project,
             "build.gradle" to MinecraftTemplates.VELOCITY_BUILD_GRADLE_TEMPLATE,
             "gradle.properties" to MinecraftTemplates.VELOCITY_GRADLE_PROPERTIES_TEMPLATE,
             "settings.gradle" to MinecraftTemplates.VELOCITY_SETTINGS_GRADLE_TEMPLATE,
-            "src/main/java/${mainPackage.replace('.', '/')}/BuildConstants.java" to MinecraftTemplates.VELOCITY_BUILD_CONSTANTS_TEMPLATE,
+            buildConstantsJava to MinecraftTemplates.VELOCITY_BUILD_CONSTANTS_TEMPLATE,
         )
     }
 }
@@ -237,29 +290,40 @@ class VelocityPatchGradleFilesStep(parent: NewProjectWizardStep) : AbstractPatch
     override fun patch(project: Project, gradleFiles: GradleFiles) {
         val velocityApiVersion = data.getUserData(VelocityVersionStep.KEY) ?: return
 
-        addPlugins(project, gradleFiles.buildGradle, listOf(
-            GradlePlugin("org.jetbrains.gradle.plugin.idea-ext", "1.0.1")
-        ))
-        addRepositories(project, gradleFiles.buildGradle, listOf(
-            BuildRepository(
-                "papermc-repo",
-                "https://repo.papermc.io/repository/maven-public/"
+        addPlugins(
+            project, gradleFiles.buildGradle,
+            listOf(
+                GradlePlugin("org.jetbrains.gradle.plugin.idea-ext", "1.0.1")
             )
-        ))
-        addDependencies(project, gradleFiles.buildGradle, listOf(
-            BuildDependency(
-                "com.velocitypowered",
-                "velocity-api",
-                velocityApiVersion.toString(),
-                gradleConfiguration = "compileOnly"
-            ),
-            BuildDependency(
-                "com.velocitypowered",
-                if (velocityApiVersion >= VelocityConstants.API_4) "velocity-annotation-processor" else "velocity-api",
-                velocityApiVersion.toString(),
-                gradleConfiguration = "annotationProcessor"
-            ),
-        ))
+        )
+        addRepositories(
+            project, gradleFiles.buildGradle,
+            listOf(
+                BuildRepository(
+                    "papermc-repo",
+                    "https://repo.papermc.io/repository/maven-public/"
+                )
+            )
+        )
+        val annotationArtifactId =
+            if (velocityApiVersion >= VelocityConstants.API_4) "velocity-annotation-processor" else "velocity-api"
+        addDependencies(
+            project, gradleFiles.buildGradle,
+            listOf(
+                BuildDependency(
+                    "com.velocitypowered",
+                    "velocity-api",
+                    velocityApiVersion.toString(),
+                    gradleConfiguration = "compileOnly"
+                ),
+                BuildDependency(
+                    "com.velocitypowered",
+                    annotationArtifactId,
+                    velocityApiVersion.toString(),
+                    gradleConfiguration = "annotationProcessor"
+                ),
+            )
+        )
     }
 }
 
@@ -267,7 +331,10 @@ class VelocityMavenSupport : BuildSystemSupport {
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
             BuildSystemSupport.PRE_STEP -> VelocityMavenFilesStep(parent).chain(::VelocityPatchPomStep)
-            BuildSystemSupport.POST_STEP -> MavenImportStep(parent).chain(::ReformatPomStep, { VelocityModifyMainClassStep(it, false) })
+            BuildSystemSupport.POST_STEP -> MavenImportStep(parent).chain(
+                ::ReformatPomStep,
+                { VelocityModifyMainClassStep(it, false) }
+            )
             else -> EmptyStep(parent)
         }
     }
@@ -294,6 +361,8 @@ class VelocityPatchPomStep(parent: NewProjectWizardStep) : AbstractPatchPomStep(
 
         val velocityApiVersion = data.getUserData(VelocityVersionStep.KEY) ?: return
 
+        val annotationArtifactId =
+            if (velocityApiVersion >= VelocityConstants.API_4) "velocity-annotation-processor" else "velocity-api"
         setupDependencies(
             model,
             listOf(
@@ -311,7 +380,7 @@ class VelocityPatchPomStep(parent: NewProjectWizardStep) : AbstractPatchPomStep(
                 ),
                 BuildDependency(
                     "com.velocitypowered",
-                    if (velocityApiVersion >= VelocityConstants.API_4) "velocity-annotation-processor" else "velocity-api",
+                    annotationArtifactId,
                     velocityApiVersion.toString(),
                     mavenScope = if (velocityApiVersion >= VelocityConstants.API_4) "provided" else null,
                 )

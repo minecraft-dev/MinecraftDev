@@ -17,10 +17,15 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
 import com.intellij.openapi.ui.validation.CHECK_NON_EMPTY
 import com.intellij.openapi.util.Key
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.COLUMNS_MEDIUM
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.columns
+import com.intellij.ui.dsl.builder.textValidation
 
 abstract class AbstractModNameStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
-    private val baseData = data.getUserData(NewProjectWizardBaseData.KEY) ?: throw IllegalStateException("Mod name step created without base step")
+    private val baseData = data.getUserData(NewProjectWizardBaseData.KEY)
+        ?: throw IllegalStateException("Mod name step created without base step")
     val nameProperty = propertyGraph.property(baseData.name)
     var name by nameProperty
     init {

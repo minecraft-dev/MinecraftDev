@@ -14,7 +14,9 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardMultiStep
 import com.intellij.ide.wizard.NewProjectWizardMultiStepFactory
 import com.intellij.openapi.extensions.ExtensionPointName
 
-class ModPlatformStep(parent: PlatformTypeStep) : AbstractNewProjectWizardMultiStep<ModPlatformStep, ModPlatformStep.Factory>(parent, EP_NAME) {
+class ModPlatformStep(
+    parent: PlatformTypeStep
+) : AbstractNewProjectWizardMultiStep<ModPlatformStep, ModPlatformStep.Factory>(parent, EP_NAME) {
     companion object {
         val EP_NAME = ExtensionPointName<Factory>("com.demonwav.minecraft-dev.modPlatformWizard")
     }

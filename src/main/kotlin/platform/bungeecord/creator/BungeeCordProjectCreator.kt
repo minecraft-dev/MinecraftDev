@@ -10,11 +10,40 @@
 
 package com.demonwav.mcdev.platform.bungeecord.creator
 
-import com.demonwav.mcdev.creator.*
-import com.demonwav.mcdev.creator.buildsystem.*
-import com.demonwav.mcdev.creator.buildsystem.gradle.*
-import com.demonwav.mcdev.creator.buildsystem.maven.*
+import com.demonwav.mcdev.creator.AbstractCollapsibleStep
+import com.demonwav.mcdev.creator.AbstractLatentStep
+import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.AbstractModNameStep
+import com.demonwav.mcdev.creator.AuthorsStep
+import com.demonwav.mcdev.creator.DependStep
+import com.demonwav.mcdev.creator.DescriptionStep
+import com.demonwav.mcdev.creator.EmptyStep
+import com.demonwav.mcdev.creator.MainClassStep
+import com.demonwav.mcdev.creator.PlatformVersion
+import com.demonwav.mcdev.creator.PluginNameStep
+import com.demonwav.mcdev.creator.SimpleMcVersionStep
+import com.demonwav.mcdev.creator.SoftDependStep
+import com.demonwav.mcdev.creator.addTemplates
+import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.AbstractRunBuildSystemStep
+import com.demonwav.mcdev.creator.buildsystem.BuildDependency
+import com.demonwav.mcdev.creator.buildsystem.BuildRepository
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
+import com.demonwav.mcdev.creator.buildsystem.gradle.AbstractPatchGradleFilesStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleImportStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.ReformatBuildGradleStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.addGradleWrapperProperties
+import com.demonwav.mcdev.creator.buildsystem.maven.AbstractPatchPomStep
+import com.demonwav.mcdev.creator.buildsystem.maven.MavenImportStep
+import com.demonwav.mcdev.creator.buildsystem.maven.ReformatPomStep
+import com.demonwav.mcdev.creator.buildsystem.maven.addDefaultMavenProperties
+import com.demonwav.mcdev.creator.chain
+import com.demonwav.mcdev.creator.findStep
+import com.demonwav.mcdev.creator.getVersionSelector
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
+import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.SemanticVersion
@@ -31,7 +60,9 @@ import com.intellij.psi.xml.XmlTag
 import kotlinx.coroutines.coroutineScope
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
 
-class BungeePlatformStep(parent: PluginPlatformStep) : AbstractNewProjectWizardMultiStep<BungeePlatformStep, BungeePlatformStep.Factory>(parent, EP_NAME) {
+class BungeePlatformStep(
+    parent: PluginPlatformStep
+) : AbstractNewProjectWizardMultiStep<BungeePlatformStep, BungeePlatformStep.Factory>(parent, EP_NAME) {
     companion object {
         val EP_NAME = ExtensionPointName<Factory>("com.demonwav.minecraft-dev.bungeePlatformWizard")
     }
@@ -48,7 +79,10 @@ class BungeePlatformStep(parent: PluginPlatformStep) : AbstractNewProjectWizardM
     interface Factory : NewProjectWizardMultiStepFactory<BungeePlatformStep>
 }
 
-abstract class AbstractBungeePlatformStep(parent: BungeePlatformStep, private val platform: PlatformType) : AbstractLatentStep<PlatformVersion>(parent) {
+abstract class AbstractBungeePlatformStep(
+    parent: BungeePlatformStep,
+    private val platform: PlatformType
+) : AbstractLatentStep<PlatformVersion>(parent) {
     override val description = "download versions"
 
     override suspend fun computeData() = coroutineScope {
@@ -59,14 +93,15 @@ abstract class AbstractBungeePlatformStep(parent: BungeePlatformStep, private va
         }
     }
 
-    override fun createStep(data: PlatformVersion) = SimpleMcVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse)).chain(
-        ::PluginNameStep,
-        ::MainClassStep,
-        ::BungeeOptionalSettingsStep,
-        ::BungeeBuildSystemStep,
-        ::BungeeProjectFilesStep,
-        ::BungeePostBuildSystemStep,
-    )
+    override fun createStep(data: PlatformVersion) =
+        SimpleMcVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse)).chain(
+            ::PluginNameStep,
+            ::MainClassStep,
+            ::BungeeOptionalSettingsStep,
+            ::BungeeBuildSystemStep,
+            ::BungeeProjectFilesStep,
+            ::BungeePostBuildSystemStep,
+        )
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, this)
@@ -150,14 +185,19 @@ class BungeeBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemS
     override val platformName = "BungeeCord"
 }
 
-class BungeePostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(parent, BungeeBuildSystemStep::class.java) {
+class BungeePostBuildSystemStep(
+    parent: NewProjectWizardStep
+) : AbstractRunBuildSystemStep(parent, BungeeBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }
 
 class BungeeGradleSupport : BuildSystemSupport {
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> BungeeGradleFilesStep(parent).chain(::BungeePatchBuildGradleStep, ::GradleWrapperStep)
+            BuildSystemSupport.PRE_STEP -> BungeeGradleFilesStep(parent).chain(
+                ::BungeePatchBuildGradleStep,
+                ::GradleWrapperStep
+            )
             BuildSystemSupport.POST_STEP -> GradleImportStep(parent).chain(::ReformatBuildGradleStep)
             else -> EmptyStep(parent)
         }
