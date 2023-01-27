@@ -77,7 +77,6 @@
         <bungeePlatformWizard implementation="com.demonwav.mcdev.platform.bungeecord.creator.WaterfallPlatformStep$Factory" />
 
         <projectSetupFinalizer implementation="com.demonwav.mcdev.creator.JdkProjectSetupFinalizer$Factory" />
-        <projectSetupFinalizer implementation="com.demonwav.mcdev.creator.GradleProjectSetupFinalizer$Factory" />
 
         <buildSystemWizard implementation="com.demonwav.mcdev.creator.buildsystem.GradleBuildSystem" />
         <buildSystemWizard implementation="com.demonwav.mcdev.creator.buildsystem.MavenBuildSystem" />

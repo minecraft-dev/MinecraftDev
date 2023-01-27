@@ -28,8 +28,6 @@ import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.fabric.framework.FABRIC_LIBRARY_KIND
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.forge.framework.FORGE_LIBRARY_KIND
-import com.demonwav.mcdev.platform.liteloader.LiteLoaderModuleType
-import com.demonwav.mcdev.platform.liteloader.framework.LITELOADER_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
@@ -42,25 +40,23 @@ import com.intellij.openapi.roots.libraries.LibraryKind
 
 enum class PlatformType(
     val type: AbstractModuleType<*>,
-    val normalName: String,
     val versionJson: String? = null,
     private val parent: PlatformType? = null
 ) {
 
-    BUKKIT(BukkitModuleType, "Bukkit", "bukkit.json"),
-    SPIGOT(SpigotModuleType, "Spigot", "spigot.json", BUKKIT),
-    PAPER(PaperModuleType, "Paper", "paper.json", SPIGOT),
-    ARCHITECTURY(ArchitecturyModuleType, "Architectury"),
-    FORGE(ForgeModuleType, "Forge"),
-    FABRIC(FabricModuleType, "Fabric"),
-    SPONGE(SpongeModuleType, "Sponge"),
-    BUNGEECORD(BungeeCordModuleType, "BungeeCord", "bungeecord_v2.json"),
-    WATERFALL(WaterfallModuleType, "Waterfall", "waterfall.json", BUNGEECORD),
-    VELOCITY(VelocityModuleType, "Velocity", "velocity.json"),
-    LITELOADER(LiteLoaderModuleType, "LiteLoader"),
-    MIXIN(MixinModuleType, "Mixin"),
-    MCP(McpModuleType, "MCP"),
-    ADVENTURE(AdventureModuleType, "Adventure");
+    BUKKIT(BukkitModuleType, "bukkit.json"),
+    SPIGOT(SpigotModuleType, "spigot.json", BUKKIT),
+    PAPER(PaperModuleType, "paper.json", SPIGOT),
+    ARCHITECTURY(ArchitecturyModuleType),
+    FORGE(ForgeModuleType),
+    FABRIC(FabricModuleType),
+    SPONGE(SpongeModuleType),
+    BUNGEECORD(BungeeCordModuleType, "bungeecord_v2.json"),
+    WATERFALL(WaterfallModuleType, "waterfall.json", BUNGEECORD),
+    VELOCITY(VelocityModuleType, "velocity.json"),
+    MIXIN(MixinModuleType),
+    MCP(McpModuleType),
+    ADVENTURE(AdventureModuleType);
 
     private val children = mutableListOf<PlatformType>()
 
@@ -85,7 +81,6 @@ enum class PlatformType(
             ARCHITECTURY_LIBRARY_KIND -> ARCHITECTURY
             FORGE_LIBRARY_KIND -> FORGE
             FABRIC_LIBRARY_KIND -> FABRIC
-            LITELOADER_LIBRARY_KIND -> LITELOADER
             MCP_LIBRARY_KIND -> MCP
             MIXIN_LIBRARY_KIND -> MIXIN
             BUNGEECORD_LIBRARY_KIND -> BUNGEECORD

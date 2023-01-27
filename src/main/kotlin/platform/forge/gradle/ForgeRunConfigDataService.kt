@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.forge.gradle
 
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
-import com.demonwav.mcdev.platform.forge.creator.ForgeRunConfigsStep
 import com.demonwav.mcdev.platform.forge.creator.MAGIC_RUN_CONFIGS_FILE
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.invokeAndWait

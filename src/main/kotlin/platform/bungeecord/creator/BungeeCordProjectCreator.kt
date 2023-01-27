@@ -13,15 +13,9 @@ package com.demonwav.mcdev.platform.bungeecord.creator
 import com.demonwav.mcdev.creator.*
 import com.demonwav.mcdev.creator.buildsystem.*
 import com.demonwav.mcdev.creator.buildsystem.gradle.*
-import com.demonwav.mcdev.creator.buildsystem.gradle.GradleBuildSystem
 import com.demonwav.mcdev.creator.buildsystem.maven.*
-import com.demonwav.mcdev.creator.buildsystem.maven.MavenBuildSystem
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.platform.bukkit.creator.AbstractBukkitPlatformStep
-import com.demonwav.mcdev.platform.bukkit.creator.BukkitDependenciesStep
-import com.demonwav.mcdev.platform.bukkit.creator.BukkitPlatformStep
-import com.demonwav.mcdev.platform.bukkit.creator.BukkitProjectFilesStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
@@ -31,12 +25,9 @@ import com.intellij.ide.wizard.NewProjectWizardMultiStepFactory
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
 import com.intellij.openapi.extensions.ExtensionPointName
-import com.intellij.openapi.module.Module
-import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.xml.XmlTag
-import java.nio.file.Path
 import kotlinx.coroutines.coroutineScope
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
 
@@ -284,127 +275,5 @@ class WaterfallPlatformStep(parent: BungeePlatformStep) : AbstractBungeePlatform
         override val name = "Waterfall"
 
         override fun createStep(parent: BungeePlatformStep) = WaterfallPlatformStep(parent)
-    }
-}
-
-sealed class BungeeCordProjectCreator<T : BuildSystem>(
-    protected val rootDirectory: Path,
-    protected val rootModule: Module,
-    protected val buildSystem: T,
-    protected val config: BungeeCordProjectConfig
-) : BaseProjectCreator(rootModule, buildSystem) {
-
-    protected fun setupMainClassStep(): BasicJavaClassStep {
-        return createJavaClassStep(config.mainClass) { packageName, className ->
-            BungeeCordTemplate.applyMainClass(project, packageName, className)
-        }
-    }
-
-    protected fun setupDependencyStep(): BungeeCordDependenciesStep {
-        val mcVersion = config.minecraftVersion
-        return BungeeCordDependenciesStep(buildSystem, config.type, mcVersion)
-    }
-
-    protected fun setupYmlStep(): BungeeYmlStep {
-        return BungeeYmlStep(project, buildSystem, config)
-    }
-}
-
-class BungeeCordMavenCreator(
-    rootDirectory: Path,
-    rootModule: Module,
-    buildSystem: MavenBuildSystem,
-    config: BungeeCordProjectConfig
-) : BungeeCordProjectCreator<MavenBuildSystem>(rootDirectory, rootModule, buildSystem, config) {
-
-    override fun getSteps(): Iterable<CreatorStep> {
-        val pomText = BungeeCordTemplate.applyPom(project)
-        return listOf(
-            setupDependencyStep(),
-            BasicMavenStep(project, rootDirectory, buildSystem, config, pomText),
-            setupMainClassStep(),
-            setupYmlStep(),
-            MavenGitignoreStep(project, rootDirectory),
-            BasicMavenFinalizerStep(rootModule, rootDirectory)
-        )
-    }
-}
-
-class BungeeCordGradleCreator(
-    rootDirectory: Path,
-    rootModule: Module,
-    buildSystem: GradleBuildSystem,
-    config: BungeeCordProjectConfig
-) : BungeeCordProjectCreator<GradleBuildSystem>(rootDirectory, rootModule, buildSystem, config) {
-
-    override fun getSteps(): Iterable<CreatorStep> {
-        val buildText = BungeeCordTemplate.applyBuildGradle(project, buildSystem)
-        val projectText = BungeeCordTemplate.applyGradleProp(project)
-        val settingsText = BungeeCordTemplate.applySettingsGradle(project, buildSystem.artifactId)
-        val files = GradleFiles(buildText, projectText, settingsText)
-
-        return listOf(
-            setupDependencyStep(),
-            CreateDirectoriesStep(buildSystem, rootDirectory),
-            GradleSetupStep(project, rootDirectory, buildSystem, files),
-            setupMainClassStep(),
-            setupYmlStep(),
-            GradleWrapperStepOld(project, rootDirectory, buildSystem),
-            GradleGitignoreStep(project, rootDirectory),
-            BasicGradleFinalizerStep(rootModule, rootDirectory, buildSystem)
-        )
-    }
-}
-
-class BungeeCordDependenciesStep(
-    buildSystem: BuildSystem,
-    type: PlatformType,
-    mcVersion: String
-) : BukkitDependenciesStep(buildSystem, type, mcVersion) {
-    override fun runStep(indicator: ProgressIndicator) {
-        addSonatype(buildSystem.repositories)
-        when (type) {
-            PlatformType.WATERFALL -> {
-                buildSystem.repositories.add(
-                    BuildRepository(
-                        "papermc-repo",
-                        "https://repo.papermc.io/repository/maven-public/"
-                    )
-                )
-                buildSystem.dependencies.add(
-                    BuildDependency(
-                        "io.github.waterfallmc",
-                        "waterfall-api",
-                        "$mcVersion-SNAPSHOT",
-                        mavenScope = "provided",
-                        gradleConfiguration = "compileOnly"
-                    )
-                )
-            }
-            PlatformType.BUNGEECORD -> {
-                buildSystem.dependencies.add(
-                    BuildDependency(
-                        "net.md-5",
-                        "bungeecord-api",
-                        mcVersion,
-                        mavenScope = "provided",
-                        gradleConfiguration = "compileOnly"
-                    )
-                )
-            }
-            else -> {
-            }
-        }
-    }
-}
-
-class BungeeYmlStep(
-    private val project: Project,
-    private val buildSystem: BuildSystem,
-    private val config: BungeeCordProjectConfig
-) : CreatorStep {
-    override fun runStep(indicator: ProgressIndicator) {
-        val text = BungeeCordTemplate.applyBungeeYml(project, config, buildSystem)
-        CreatorStep.writeTextToFile(project, buildSystem.dirsOrError.resourceDirectory, "bungee.yml", text)
     }
 }

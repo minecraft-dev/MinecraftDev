@@ -306,8 +306,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         private const val FORGE = SPONGE + 1
         private const val FABRIC = FORGE + 1
         private const val ARCHITECTURY = FABRIC + 1
-        private const val LITELOADER = ARCHITECTURY + 1
-        private const val MCP = LITELOADER + 1
+        private const val MCP = ARCHITECTURY + 1
         private const val MIXIN = MCP + 1
         private const val BUNGEECORD = MIXIN + 1
         private const val WATERFALL = BUNGEECORD + 1
@@ -322,7 +321,6 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             PlatformType.FORGE,
             PlatformType.FABRIC,
             PlatformType.ARCHITECTURY,
-            PlatformType.LITELOADER,
             PlatformType.MCP,
             PlatformType.MIXIN,
             PlatformType.BUNGEECORD,
@@ -339,7 +337,6 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             FORGE,
             FABRIC,
             ARCHITECTURY,
-            LITELOADER,
             MCP,
             MIXIN,
             BUNGEECORD,
