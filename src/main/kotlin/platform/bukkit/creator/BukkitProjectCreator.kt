@@ -99,7 +99,7 @@ class BukkitOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollaps
         ::BukkitLoadOrderStep,
         ::BukkitLoadBeforeStep,
         ::DependStep,
-        ::BukkitSoftDependStep,
+        ::SoftDependStep,
     )
 }
 
@@ -154,18 +154,6 @@ class BukkitLoadBeforeStep(parent: NewProjectWizardStep) : AbstractOptionalStrin
     }
 }
 
-class BukkitSoftDependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
-    override val label = "Soft Depend:"
-
-    override fun setupProject(project: Project) {
-        data.putUserData(KEY, AuthorsStep.parseAuthors(value))
-    }
-
-    companion object {
-        val KEY = Key.create<List<String>>("${BukkitSoftDependStep::class.java.name}.softDepend")
-    }
-}
-
 class BukkitProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
     override val description = "Creating project files"
 
@@ -177,7 +165,7 @@ class BukkitProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunning
         val loadOrder = data.getUserData(BukkitLoadOrderStep.KEY) ?: return
         val loadBefore = data.getUserData(BukkitLoadBeforeStep.KEY) ?: emptyList()
         val deps = data.getUserData(DependStep.KEY) ?: emptyList()
-        val softDeps = data.getUserData(BukkitSoftDependStep.KEY) ?: emptyList()
+        val softDeps = data.getUserData(SoftDependStep.KEY) ?: emptyList()
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
         val website = data.getUserData(WebsiteStep.KEY) ?: ""

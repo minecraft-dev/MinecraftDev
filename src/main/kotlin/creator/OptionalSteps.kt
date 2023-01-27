@@ -138,3 +138,15 @@ class DependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(pare
         val KEY = Key.create<List<String>>("${DependStep::class.java.name}.depend")
     }
 }
+
+class SoftDependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
+    override val label = "Soft Depend:"
+
+    override fun setupProject(project: Project) {
+        data.putUserData(KEY, AuthorsStep.parseAuthors(value))
+    }
+
+    companion object {
+        val KEY = Key.create<List<String>>("${SoftDependStep::class.java.name}.depend")
+    }
+}
