@@ -29,7 +29,7 @@ import kotlin.reflect.KClass
 private const val CLOUDFLARE_BASE_URL = "https://minecraftdev.org/versions/"
 private const val GITHUB_BASE_URL = "https://raw.githubusercontent.com/minecraft-dev/minecraftdev.org/master/versions/"
 
-val PLATFORM_VERSION_LOGGER = Logger.getInstance("MDev.PlatformVersion")
+val PLATFORM_VERSION_LOGGER = Logger.getInstance("com.demonwav.mcdev.creator.PlatformVersion")
 
 suspend fun getVersionSelector(type: PlatformType): PlatformVersion {
     val versionJson = type.versionJson ?: throw UnsupportedOperationException("Incorrect platform type: $type")

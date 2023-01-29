@@ -55,6 +55,7 @@ import com.intellij.psi.PsiForeachStatement
 import com.intellij.psi.PsiLambdaExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
+import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiStatement
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiVariable
@@ -299,7 +300,10 @@ object LocalVariables {
             // longs and doubles take two slots
             is PsiVariable -> if (element.isDoubleSlot) 2 else 1
             // arrays have copy of array, length and index variables, iterables have the iterator variable
-            is PsiForeachStatement -> if (element.iterationParameter.type is PsiArrayType) 3 else 1
+            is PsiForeachStatement -> {
+                val param = element.iterationDeclaration as? PsiParameter
+                if (param?.type is PsiArrayType) 3 else 1
+            }
             else -> 0
         }
     }

@@ -10,7 +10,6 @@
 
 import org.cadixdev.gradle.licenser.header.HeaderStyle
 import org.gradle.internal.jvm.Jvm
-import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.gradle.ext.settings
 import org.jetbrains.gradle.ext.taskTriggers
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -22,7 +21,7 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.9.0"
+    id("org.jetbrains.intellij") version "1.12.0"
     id("org.cadixdev.licenser")
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
@@ -247,22 +246,6 @@ tasks.test {
     jvmArgs(
         "-Dsun.io.useCanonCaches=false",
         "-Dsun.io.useCanonPrefixCache=false",
-        "--add-opens", "java.base/java.io=ALL-UNNAMED",
-        "--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED",
-        "--add-opens", "java.base/java.lang.ref=ALL-UNNAMED",
-        "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
-        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-        "--add-opens", "java.base/java.util.concurrent.atomic=ALL-UNNAMED",
-        "--add-opens", "java.base/java.util.concurrent.locks=ALL-UNNAMED",
-        "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
-        "--add-opens", "java.base/sun.nio.fs=ALL-UNNAMED",
-        "--add-opens", "java.desktop/java.awt.event=ALL-UNNAMED",
-        "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
-        "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
-        "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
-        "--add-opens", "java.desktop/sun.awt=ALL-UNNAMED",
-        "--add-opens", "java.desktop/sun.font=ALL-UNNAMED",
-        "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED",
     )
 }
 
@@ -379,22 +362,4 @@ tasks.runIde {
 tasks.buildSearchableOptions {
     // not working atm
     enabled = false
-    // https://youtrack.jetbrains.com/issue/IDEA-210683
-    jvmArgs(
-        "--illegal-access=deny",
-        "--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED",
-        "--add-opens=java.base/java.lang=ALL-UNNAMED",
-        "--add-opens=java.base/java.util=ALL-UNNAMED",
-        "--add-opens=java.desktop/java.awt.event=ALL-UNNAMED",
-        "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
-        "--add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
-        "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
-        "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
-        "--add-opens=java.desktop/sun.font=ALL-UNNAMED",
-        "--add-opens=java.desktop/sun.swing=ALL-UNNAMED"
-    )
-
-    if (OperatingSystem.current().isMacOsX) {
-        jvmArgs("--add-opens=java.desktop/com.apple.eawt.event=ALL-UNNAMED")
-    }
 }
