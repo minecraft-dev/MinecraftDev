@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2022 minecraft-dev
+ * Copyright (c) 2023 minecraft-dev
  *
  * MIT License
  */
@@ -19,6 +19,7 @@ import com.github.kittinunf.fuel.core.requests.suspendable
 import com.github.kittinunf.fuel.coroutines.awaitString
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import com.intellij.openapi.diagnostic.logger
 import java.io.IOException
 
 class ArchitecturyVersion private constructor(
@@ -44,6 +45,7 @@ class ArchitecturyVersion private constructor(
     )
 
     companion object {
+        private val LOGGER = logger<ArchitecturyVersion>()
 
         suspend fun downloadData(): ArchitecturyVersion? {
             try {
@@ -77,7 +79,7 @@ class ArchitecturyVersion private constructor(
 
                 return ArchitecturyVersion(apiVersionMapList)
             } catch (e: IOException) {
-                e.printStackTrace()
+                LOGGER.error("Failed to retrieve Architectury version data", e)
             }
             return null
         }
