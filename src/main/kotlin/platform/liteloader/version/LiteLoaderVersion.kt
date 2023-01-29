@@ -19,7 +19,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.requests.suspendable
 import com.github.kittinunf.fuel.coroutines.awaitString
 import com.google.gson.Gson
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import java.io.IOException
 
 class LiteLoaderVersion private constructor(private var map: Map<*, *>) {
@@ -33,7 +33,7 @@ class LiteLoaderVersion private constructor(private var map: Map<*, *>) {
     }
 
     companion object {
-        private val LOGGER = Logger.getInstance(LiteLoaderVersion::class.java)
+        private val LOGGER = logger<LiteLoaderVersion>()
 
         suspend fun downloadData(): LiteLoaderVersion? {
             try {

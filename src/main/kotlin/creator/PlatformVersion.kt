@@ -18,7 +18,7 @@ import com.github.kittinunf.fuel.core.requests.suspendable
 import com.github.kittinunf.fuel.coroutines.awaitString
 import com.google.gson.Gson
 import com.intellij.openapi.diagnostic.Attachment
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.proxy.CommonProxy
 import java.io.IOException
 import java.net.Proxy
@@ -29,7 +29,7 @@ import kotlin.reflect.KClass
 private const val CLOUDFLARE_BASE_URL = "https://minecraftdev.org/versions/"
 private const val GITHUB_BASE_URL = "https://raw.githubusercontent.com/minecraft-dev/minecraftdev.org/master/versions/"
 
-val PLATFORM_VERSION_LOGGER = Logger.getInstance("MDev.PlatformVersion")
+val PLATFORM_VERSION_LOGGER = logger<PlatformVersion>()
 
 suspend fun getVersionSelector(type: PlatformType): PlatformVersion {
     val versionJson = type.versionJson ?: throw UnsupportedOperationException("Incorrect platform type: $type")

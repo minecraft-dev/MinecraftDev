@@ -16,6 +16,7 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.sortVersions
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.requests.suspendable
+import com.intellij.openapi.diagnostic.logger
 import java.io.IOException
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
@@ -54,6 +55,8 @@ class ForgeVersion private constructor(val versions: List<String>) {
     }
 
     companion object {
+        private val LOGGER = logger<ForgeVersion>()
+
         suspend fun downloadData(): ForgeVersion? {
             try {
                 val url = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml"
@@ -97,7 +100,7 @@ class ForgeVersion private constructor(val versions: List<String>) {
 
                 return ForgeVersion(result)
             } catch (e: IOException) {
-                e.printStackTrace()
+                LOGGER.error("Failed to retrieve Forge version data", e)
             }
             return null
         }

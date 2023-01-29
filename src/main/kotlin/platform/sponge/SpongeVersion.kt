@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.sponge
 import com.demonwav.mcdev.creator.getText
 import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
+import com.intellij.openapi.diagnostic.logger
 import javax.swing.JComboBox
 
 data class SpongeVersion(var versions: LinkedHashMap<String, String>, var selectedIndex: Int) {
@@ -26,11 +27,14 @@ data class SpongeVersion(var versions: LinkedHashMap<String, String>, var select
     }
 
     companion object {
+        private val LOGGER = logger<SpongeVersion>()
+
         suspend fun downloadData(): SpongeVersion? {
             return try {
                 val text = getText("sponge_v2.json")
                 Gson().fromJson(text, SpongeVersion::class)
             } catch (e: Exception) {
+                LOGGER.error("Failed to download Sponge version json", e)
                 null
             }
         }

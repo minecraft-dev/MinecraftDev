@@ -249,6 +249,7 @@ tasks.test {
         }
     }
     systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
+    jvmArgs("--illegal-access=deny")
 }
 
 idea {

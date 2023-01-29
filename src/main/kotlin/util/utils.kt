@@ -18,6 +18,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -32,6 +33,7 @@ import com.intellij.openapi.util.Ref
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
+import java.lang.invoke.MethodHandles
 import java.util.Locale
 import kotlin.math.min
 import kotlin.reflect.KClass
@@ -344,3 +346,8 @@ fun String.capitalize(): String =
     }
 
 fun String.decapitalize(): String = replaceFirstChar { it.lowercase(Locale.ENGLISH) }
+
+// Bit of a hack, but this allows us to get the class object for top level declarations without having to
+// put the whole class name in as a string (easier to refactor, etc.)
+@Suppress("NOTHING_TO_INLINE") // In order for this to work this function must be `inline`
+inline fun loggerForTopLevel() = Logger.getInstance(MethodHandles.lookup().lookupClass())
