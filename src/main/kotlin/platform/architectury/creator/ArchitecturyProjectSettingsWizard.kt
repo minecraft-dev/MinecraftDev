@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2022 minecraft-dev
+ * Copyright (c) 2023 minecraft-dev
  *
  * MIT License
  */
@@ -24,7 +24,7 @@ import com.demonwav.mcdev.util.License
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.modUpdateStep
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.ui.CollectionComboBoxModel
 import com.intellij.ui.EnumComboBoxModel
 import java.awt.event.ActionListener
@@ -260,7 +260,7 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
         versions = ArchitecturyVersions(
             fabricVersionJob.await() ?: return@coroutineScope,
             forgeVersionJob.await() ?: return@coroutineScope,
-            architecturyApiVersionJob.await() ?: return@coroutineScope
+            architecturyApiVersionJob.await() ?: return@coroutineScope,
         )
     }
 
@@ -336,6 +336,6 @@ class ArchitecturyProjectSettingsWizard(private val creator: MinecraftProjectCre
     )
 
     companion object {
-        val LOGGER = Logger.getInstance(ArchitecturyProjectSettingsWizard::class.java)
+        private val LOGGER = logger<ArchitecturyProjectSettingsWizard>()
     }
 }

@@ -43,6 +43,8 @@ body:
         - Waterfall
     validations:
       required: false
-  - type: markdown
+  - type: textarea
+    id: description
     attributes:
-      value: Always include a stack trace if there is one. Otherwise, the more information you can provide in terms of how to reproduce the problem, the more likely it'll be fixed. If there is something specific about your project, a link to the GitHub project can be very helpful.
+      label: Description of the bug
+      description: Always include a stack trace if there is one. Otherwise, the more information you can provide in terms of how to reproduce the problem, the more likely it'll be fixed. If there is something specific about your project, a link to the GitHub project can be very helpful.
