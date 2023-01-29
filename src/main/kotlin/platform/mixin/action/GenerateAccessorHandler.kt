@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2022 minecraft-dev
+ * Copyright (c) 2023 minecraft-dev
  *
  * MIT License
  */
@@ -40,7 +40,7 @@ import com.intellij.ide.util.MemberChooser
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -68,8 +68,9 @@ import org.jetbrains.java.generate.exception.GenerateCodeException
 
 class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/Invoker") {
 
-    private val log =
-        Logger.getInstance("#com.demonwav.mcdev.platform.mixin.action.GenerateAccessorHandler")
+    companion object {
+        private val log = logger<GenerateAccessorHandler>()
+    }
 
     private var generateGetters = false
     private var generateSetters = false
@@ -149,11 +150,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
         if (aClass.fields.any { canHaveAccessor(it) }) {
             return true
         }
-        if (aClass.methods.any { canHaveInvoker(it) }) {
-            return true
-        }
-
-        return false
+        return aClass.methods.any { canHaveInvoker(it) }
     }
 
     override fun getAllOriginalMembers(aClass: PsiClass?): Array<ClassMember> {

@@ -3,11 +3,12 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2022 minecraft-dev
+ * Copyright (c) 2023 minecraft-dev
  *
  * MIT License
  */
 
+import java.io.ByteArrayOutputStream
 import org.cadixdev.gradle.licenser.LicenseExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
@@ -30,6 +31,7 @@ fun Project.lexer(flex: String, pack: String): TaskDelegate<JavaExec> {
         val src = layout.projectDirectory.file("src/main/grammars/$flex.flex")
         val dst = layout.buildDirectory.dir("gen/$pack")
         val output = layout.buildDirectory.file("gen/$pack/$flex.java")
+        val logOutout = layout.buildDirectory.file("logs/generate$flex.log")
 
         val jflex by project.configurations
         val jflexSkeleton by project.configurations
@@ -37,7 +39,11 @@ fun Project.lexer(flex: String, pack: String): TaskDelegate<JavaExec> {
         classpath = jflex
         mainClass.set("jflex.Main")
 
-        doFirst {
+        val taskOutput = ByteArrayOutputStream()
+        standardOutput = taskOutput
+        errorOutput = taskOutput
+
+                        doFirst {
             args(
                 "--skel", jflexSkeleton.singleFile.absolutePath,
                 "-d", dst.get().asFile.absolutePath,
@@ -46,6 +52,11 @@ fun Project.lexer(flex: String, pack: String): TaskDelegate<JavaExec> {
 
             // Delete current lexer
             project.delete(output)
+            logOutout.get().asFile.parentFile.mkdirs()
+        }
+
+        doLast {
+            logOutout.get().asFile.writeBytes(taskOutput.toByteArray())
         }
 
         inputs.files(src, jflexSkeleton)
@@ -64,12 +75,13 @@ fun Project.parser(bnf: String, pack: String): TaskDelegate<JavaExec> {
         val dst = dstRoot.map { it.dir(pack) }
         val psiDir = dst.map { it.dir("psi") }
         val parserDir = dst.map { it.dir("parser") }
+        val logOutout = layout.buildDirectory.file("logs/generate$bnf.log")
 
         val grammarKit by project.configurations
 
-        doFirst {
-            project.delete(psiDir, parserDir)
-        }
+        val taskOutput = ByteArrayOutputStream()
+        standardOutput = taskOutput
+        errorOutput = taskOutput
 
         classpath = grammarKit
         mainClass.set("org.intellij.grammar.Main")
@@ -83,7 +95,12 @@ fun Project.parser(bnf: String, pack: String): TaskDelegate<JavaExec> {
         }
 
         doFirst {
+            project.delete(psiDir, parserDir)
             args(dstRoot.get().asFile, src.asFile)
+            logOutout.get().asFile.parentFile.mkdirs()
+        }
+        doLast {
+            logOutout.get().asFile.writeBytes(taskOutput.toByteArray())
         }
 
         inputs.file(src)
