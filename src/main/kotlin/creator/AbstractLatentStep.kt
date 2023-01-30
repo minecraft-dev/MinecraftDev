@@ -13,13 +13,16 @@ package com.demonwav.mcdev.creator
 import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.capitalize
 import com.demonwav.mcdev.util.invokeLater
+import com.demonwav.mcdev.util.onHidden
 import com.demonwav.mcdev.util.onShown
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
 import com.intellij.openapi.ui.validation.validationErrorFor
+import com.intellij.openapi.util.Disposer
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
@@ -41,12 +44,23 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
 
     protected abstract val description: String
 
-    private fun doComputeData(placeholder: Placeholder) {
+    private fun doComputeData(placeholder: Placeholder, lifetime: Disposable) {
         if (hasComputedData) {
             return
         }
         hasComputedData = true
+
+        var disposed = false
+        Disposer.register(lifetime) {
+            hasComputedData = false
+            disposed = true
+        }
+
         CoroutineScope(Dispatchers.Swing).launch {
+            if (disposed) {
+                return@launch
+            }
+
             val result = asyncIO {
                 try {
                     computeData()
@@ -55,7 +69,16 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                     null
                 }
             }.await()
+
+            if (disposed) {
+                return@launch
+            }
+
             invokeLater {
+                if (disposed) {
+                    return@invokeLater
+                }
+
                 if (result == null) {
                     placeholder.component = panel {
                         row {
@@ -92,8 +115,17 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
             row(description.capitalize()) {
                 cell(
                     AsyncProcessIcon("$javaClass.computeData").also { component ->
+                        var lifetime: Disposable? = null
                         component.onShown {
-                            doComputeData(placeholder)
+                            lifetime?.let(Disposer::dispose)
+                            lifetime = Disposer.newDisposable().also { lifetime ->
+                                Disposer.register(context.disposable, lifetime)
+                                doComputeData(placeholder, lifetime)
+                            }
+                        }
+                        component.onHidden {
+                            lifetime?.let(Disposer::dispose)
+                            lifetime = null
                         }
                     }
                 )
