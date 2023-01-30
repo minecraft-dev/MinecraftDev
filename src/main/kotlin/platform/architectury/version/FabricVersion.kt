@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2022 minecraft-dev
+ * Copyright (c) 2023 minecraft-dev
  *
  * MIT License
  */
@@ -13,6 +13,7 @@ package com.demonwav.mcdev.platform.architectury.version
 import com.demonwav.mcdev.util.SemanticVersion
 import com.extracraftx.minecraft.templatemakerfabric.data.DataProvider
 import com.extracraftx.minecraft.templatemakerfabric.data.holders.LoaderVersion
+import com.intellij.openapi.diagnostic.logger
 import java.io.IOException
 
 class FabricVersion private constructor(val versions: DataProvider) {
@@ -45,6 +46,7 @@ class FabricVersion private constructor(val versions: DataProvider) {
     }
 
     companion object {
+        private val LOGGER = logger<FabricVersion>()
         private val dataProvider: DataProvider = DataProvider()
 
         fun downloadData(): FabricVersion? {
@@ -55,7 +57,7 @@ class FabricVersion private constructor(val versions: DataProvider) {
                 dataProvider.fabricApiVersions
                 return FabricVersion(dataProvider)
             } catch (e: IOException) {
-                e.printStackTrace()
+                LOGGER.error("Failed to retrieve Fabric version data", e)
             }
             return null
         }

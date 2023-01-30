@@ -3,7 +3,7 @@
  *
  * https://minecraftdev.org
  *
- * Copyright (c) 2022 minecraft-dev
+ * Copyright (c) 2023 minecraft-dev
  *
  * MIT License
  */
@@ -11,7 +11,7 @@
 package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.util.internalName
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClassType
@@ -28,7 +28,7 @@ import org.objectweb.asm.tree.analysis.Frame
 import org.objectweb.asm.tree.analysis.SimpleVerifier
 
 object AsmDfaUtil {
-    private val LOGGER = Logger.getInstance(AsmDfaUtil::class.java)
+    private val LOGGER = thisLogger()
 
     fun analyzeMethod(project: Project, clazz: ClassNode, method: MethodNode): Array<Frame<BasicValue>?>? {
         return method.cached(clazz, project) {
