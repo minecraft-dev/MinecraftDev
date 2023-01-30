@@ -47,6 +47,7 @@ import com.demonwav.mcdev.platform.sponge.SpongeVersion
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.onShown
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
@@ -91,7 +92,9 @@ class SpongeApiVersionStep(
         versionProperty.afterChange {
             applyJdkVersion()
         }
-        applyJdkVersion()
+        versionBox.onShown {
+            applyJdkVersion()
+        }
     }
 
     override fun setupProject(project: Project) {
@@ -101,10 +104,11 @@ class SpongeApiVersionStep(
 
     private fun applyJdkVersion() {
         SemanticVersion.tryParse(version)?.let { version ->
-            findStep<JdkProjectSetupFinalizer>().preferredJdk = when {
+            val preferredJdk = when {
                 version >= SpongeConstants.API9 -> JavaSdkVersion.JDK_17
                 else -> JavaSdkVersion.JDK_1_8
             }
+            findStep<JdkProjectSetupFinalizer>().setPreferredJdk(preferredJdk, "Sponge $version")
         }
     }
 

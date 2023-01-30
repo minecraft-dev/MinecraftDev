@@ -102,13 +102,17 @@ class JdkProjectSetupFinalizer(
     private var sdk by sdkProperty
     private var sdkComboBox: JdkComboBoxWithPreference? = null
     private var preferredJdkLabel: Placeholder? = null
+    private var preferredJdkReason = "these settings"
 
     var preferredJdk: JavaSdkVersion = JavaSdkVersion.JDK_17
-        set(value) {
-            field = value
-            sdkComboBox?.setPreferredJdk(value)
-            updatePreferredJdkLabel()
-        }
+        private set
+
+    fun setPreferredJdk(value: JavaSdkVersion, reason: String) {
+        preferredJdk = value
+        preferredJdkReason = reason
+        sdkComboBox?.setPreferredJdk(value)
+        updatePreferredJdkLabel()
+    }
 
     init {
         storeToData()
@@ -125,7 +129,7 @@ class JdkProjectSetupFinalizer(
             preferredJdkLabel?.component = null
         } else {
             preferredJdkLabel?.component =
-                JLabel("Selected JDK does not match platform preferred JDK version ${preferredJdk.description}")
+                JLabel("Java ${preferredJdk.description} is recommended for $preferredJdkReason")
                     .also { it.foreground = JBColor.YELLOW }
         }
     }

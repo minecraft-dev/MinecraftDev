@@ -12,6 +12,7 @@ package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.onShown
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
@@ -28,7 +29,9 @@ class SimpleMcVersionStep(
         versionProperty.afterChange {
             applyJdkVersion()
         }
-        applyJdkVersion()
+        versionBox.onShown {
+            applyJdkVersion()
+        }
     }
 
     override fun setupProject(project: Project) {
@@ -38,7 +41,10 @@ class SimpleMcVersionStep(
 
     private fun applyJdkVersion() {
         val version = SemanticVersion.tryParse(version) ?: return
-        findStep<JdkProjectSetupFinalizer>().preferredJdk = MinecraftVersions.requiredJavaVersion(version)
+        findStep<JdkProjectSetupFinalizer>().setPreferredJdk(
+            MinecraftVersions.requiredJavaVersion(version),
+            "Minecraft $version"
+        )
     }
 
     companion object {
@@ -55,7 +61,9 @@ abstract class AbstractSelectMcVersionThenForkStep<T : Comparable<T>>(
         stepProperty.afterChange {
             applyJdkVersion()
         }
-        applyJdkVersion()
+        versionBox.onShown {
+            applyJdkVersion()
+        }
     }
 
     override fun setupProject(project: Project) {
@@ -65,6 +73,9 @@ abstract class AbstractSelectMcVersionThenForkStep<T : Comparable<T>>(
 
     private fun applyJdkVersion() {
         val version = SemanticVersion.tryParse(step) ?: return
-        findStep<JdkProjectSetupFinalizer>().preferredJdk = MinecraftVersions.requiredJavaVersion(version)
+        findStep<JdkProjectSetupFinalizer>().setPreferredJdk(
+            MinecraftVersions.requiredJavaVersion(version),
+            "Minecraft $step"
+        )
     }
 }

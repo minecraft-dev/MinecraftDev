@@ -50,6 +50,7 @@ import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
+import com.demonwav.mcdev.util.onShown
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTaskInSmartMode
 import com.intellij.ide.wizard.NewProjectWizardBaseData.Companion.baseData
@@ -109,7 +110,9 @@ class VelocityVersionStep(
         versionProperty.afterChange {
             applyJdkVersion()
         }
-        applyJdkVersion()
+        versionBox.onShown {
+            applyJdkVersion()
+        }
     }
 
     override fun setupProject(project: Project) {
@@ -119,10 +122,11 @@ class VelocityVersionStep(
 
     private fun applyJdkVersion() {
         SemanticVersion.tryParse(version)?.let { version ->
-            findStep<JdkProjectSetupFinalizer>().preferredJdk = when {
+            val preferredJdk = when {
                 version >= SemanticVersion.release(3) -> JavaSdkVersion.JDK_11
                 else -> JavaSdkVersion.JDK_1_8
             }
+            findStep<JdkProjectSetupFinalizer>().setPreferredJdk(preferredJdk, "Velocity $version")
         }
     }
 

@@ -13,6 +13,7 @@ package com.demonwav.mcdev.creator
 import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.capitalize
 import com.demonwav.mcdev.util.invokeLater
+import com.demonwav.mcdev.util.onShown
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.diagnostic.logger
@@ -24,7 +25,6 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.AsyncProcessIcon
-import java.awt.event.HierarchyEvent
 import javax.swing.JLabel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -92,12 +92,8 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
             row(description.capitalize()) {
                 cell(
                     AsyncProcessIcon("$javaClass.computeData").also { component ->
-                        component.addHierarchyListener { event ->
-                            val hasShowingChanged =
-                                (event.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong()) != 0L
-                            if (hasShowingChanged && component.isShowing) {
-                                doComputeData(placeholder)
-                            }
+                        component.onShown {
+                            doComputeData(placeholder)
                         }
                     }
                 )
