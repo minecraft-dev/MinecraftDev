@@ -18,13 +18,16 @@ import com.intellij.ide.wizard.stepSequence
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.roots.ui.configuration.JdkComboBox
 import com.intellij.openapi.roots.ui.configuration.sdkComboBox
 import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
 import com.intellij.openapi.ui.validation.validationErrorFor
+import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.Placeholder
+import javax.swing.JLabel
 import javax.swing.JPanel
 
 class ProjectSetupFinalizerWizardStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
@@ -97,41 +100,44 @@ class JdkProjectSetupFinalizer(
 ) : AbstractNewProjectWizardStep(parent), ProjectSetupFinalizer {
     private val sdkProperty: GraphProperty<Sdk?> = propertyGraph.property(null)
     private var sdk by sdkProperty
-    private var sdkComboBox: JdkComboBox? = null
+    private var sdkComboBox: JdkComboBoxWithPreference? = null
+    private var preferredJdkLabel: Placeholder? = null
 
-    private var theMinVersion = JavaSdkVersion.JDK_17
-    var minVersion
-        get() = theMinVersion
-        set(version) {
-            if (version != theMinVersion) {
-                theMinVersion = version
-                sdkComboBox?.reloadModel()
-            }
+    var preferredJdk: JavaSdkVersion = JavaSdkVersion.JDK_17
+        set(value) {
+            field = value
+            sdkComboBox?.setPreferredJdk(value)
+            updatePreferredJdkLabel()
         }
 
     init {
         storeToData()
+
+        sdkProperty.afterChange {
+            updatePreferredJdkLabel()
+        }
+    }
+
+    private fun updatePreferredJdkLabel() {
+        val sdk = this.sdk ?: return
+        val version = JavaSdk.getInstance().getVersion(sdk) ?: return
+        if (version == preferredJdk) {
+            preferredJdkLabel?.component = null
+        } else {
+            preferredJdkLabel?.component =
+                JLabel("Selected JDK does not match platform preferred JDK version ${preferredJdk.description}")
+                    .also { it.foreground = JBColor.YELLOW }
+        }
     }
 
     override fun setupUI(builder: Panel) {
         with(builder) {
-            row("JDK Version:") {
-                val sdkComboBox = sdkComboBox(
-                    context, sdkProperty, "${javaClass.name}.sdk",
-                    sdkFilter = sdkFilter@{ sdk ->
-                        val version = sdk.versionString?.let(JavaSdkVersion::fromVersionString) ?: return@sdkFilter true
-                        version >= minVersion
-                    }
-                )
+            row("JDK:") {
+                val sdkComboBox = jdkComboBoxWithPreference(context, sdkProperty, "${javaClass.name}.sdk")
                 this@JdkProjectSetupFinalizer.sdkComboBox = sdkComboBox.component
+                this@JdkProjectSetupFinalizer.preferredJdkLabel = placeholder()
+                updatePreferredJdkLabel()
             }
-        }
-    }
-
-    override fun setupProject(project: Project) {
-        val sdk = sdk
-        if (sdk != null) {
-            context.projectJdk = sdk
         }
     }
 

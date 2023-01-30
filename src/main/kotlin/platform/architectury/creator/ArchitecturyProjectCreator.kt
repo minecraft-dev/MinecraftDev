@@ -14,8 +14,8 @@ import com.demonwav.mcdev.creator.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.AbstractLatentStep
 import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.AbstractModNameStep
+import com.demonwav.mcdev.creator.AbstractSelectMcVersionThenForkStep
 import com.demonwav.mcdev.creator.AbstractSelectVersionStep
-import com.demonwav.mcdev.creator.AbstractSelectVersionThenForkStep
 import com.demonwav.mcdev.creator.AuthorsStep
 import com.demonwav.mcdev.creator.DescriptionStep
 import com.demonwav.mcdev.creator.EmptyStep
@@ -130,7 +130,7 @@ class ArchitecturyMcVersionStep(
     parent: NewProjectWizardStep,
     mcVersions: List<SemanticVersion>,
     private val versionData: ArchitecturyVersionData
-) : AbstractSelectVersionThenForkStep<SemanticVersion>(parent, mcVersions) {
+) : AbstractSelectMcVersionThenForkStep<SemanticVersion>(parent, mcVersions) {
     override val label = "Minecraft Version:"
 
     override fun initStep(version: SemanticVersion) =
@@ -217,7 +217,7 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
         val fabricLoaderVersion = data.getUserData(FabricLoaderVersionStep.KEY) ?: return
         val fabricApiVersion = data.getUserData(FabricApiVersionStep.KEY)
         val archApiVersion = data.getUserData(ArchitecturyApiVersionStep.KEY)
-        val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
+        val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
 
         assets.addTemplateProperties(
             "GROUP_ID" to buildSystemProps.groupId,
@@ -266,7 +266,7 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
-        val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
+        val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}"
         val mcVersion = data.getUserData(ArchitecturyMcVersionStep.KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return

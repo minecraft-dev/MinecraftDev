@@ -14,8 +14,8 @@ import com.demonwav.mcdev.creator.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.AbstractLatentStep
 import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.AbstractModNameStep
+import com.demonwav.mcdev.creator.AbstractSelectMcVersionThenForkStep
 import com.demonwav.mcdev.creator.AbstractSelectVersionStep
-import com.demonwav.mcdev.creator.AbstractSelectVersionThenForkStep
 import com.demonwav.mcdev.creator.AuthorsStep
 import com.demonwav.mcdev.creator.DescriptionStep
 import com.demonwav.mcdev.creator.EmptyStep
@@ -92,7 +92,7 @@ class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersi
 class ForgeMcVersionStep(
     parent: NewProjectWizardStep,
     private val forgeVersionData: ForgeVersion
-) : AbstractSelectVersionThenForkStep<SemanticVersion>(
+) : AbstractSelectMcVersionThenForkStep<SemanticVersion>(
     parent,
     forgeVersionData.sortedMcVersions.filter { it >= minSupportedMcVersion }
 ) {

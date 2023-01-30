@@ -56,6 +56,7 @@ import com.intellij.ide.wizard.NewProjectWizardBaseData.Companion.baseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtil
@@ -64,6 +65,7 @@ import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.xml.XmlTag
+import com.intellij.ui.dsl.builder.Panel
 import java.nio.file.Path
 import kotlinx.coroutines.coroutineScope
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
@@ -102,8 +104,26 @@ class VelocityVersionStep(
 ) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
     override val label = "Velocity Version:"
 
+    override fun setupUI(builder: Panel) {
+        super.setupUI(builder)
+        versionProperty.afterChange {
+            applyJdkVersion()
+        }
+        applyJdkVersion()
+    }
+
     override fun setupProject(project: Project) {
         data.putUserData(KEY, SemanticVersion.tryParse(version))
+        applyJdkVersion()
+    }
+
+    private fun applyJdkVersion() {
+        SemanticVersion.tryParse(version)?.let { version ->
+            findStep<JdkProjectSetupFinalizer>().preferredJdk = when {
+                version >= SemanticVersion.release(3) -> JavaSdkVersion.JDK_11
+                else -> JavaSdkVersion.JDK_1_8
+            }
+        }
     }
 
     companion object {
@@ -261,7 +281,7 @@ class VelocityGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
     override fun setupAssets(project: Project) {
         val projectName = baseData.name
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-        val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
+        val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val mainClass = data.getUserData(MainClassStep.KEY) ?: return
         val (mainPackage, _) = splitPackage(mainClass)
 
@@ -344,7 +364,7 @@ class VelocityMavenFilesStep(parent: NewProjectWizardStep) : AbstractLongRunning
     override val description = "Creating Maven files"
 
     override fun setupAssets(project: Project) {
-        val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
+        val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         assets.addTemplateProperties(
             "JAVA_VERSION" to javaVersion,
         )

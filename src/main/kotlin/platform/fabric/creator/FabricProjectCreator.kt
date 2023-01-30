@@ -15,8 +15,8 @@ import com.demonwav.mcdev.creator.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.AbstractLatentStep
 import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.AbstractModNameStep
+import com.demonwav.mcdev.creator.AbstractSelectMcVersionThenForkStep
 import com.demonwav.mcdev.creator.AbstractSelectVersionStep
-import com.demonwav.mcdev.creator.AbstractSelectVersionThenForkStep
 import com.demonwav.mcdev.creator.AuthorsStep
 import com.demonwav.mcdev.creator.DescriptionStep
 import com.demonwav.mcdev.creator.EmptyStep
@@ -135,7 +135,7 @@ class FabricMcVersionStep(
     parent: NewProjectWizardStep,
     private val fabricVersions: FabricVersions,
     private val apiVersions: FabricApiVersions
-) : AbstractSelectVersionThenForkStep<FabricMcVersion>(
+) : AbstractSelectMcVersionThenForkStep<FabricMcVersion>(
     parent,
     fabricVersions.game.mapIndexed { index, version ->
         FabricMcVersion(fabricVersions.game.size - 1 - index, version.version)
@@ -337,7 +337,7 @@ class FabricGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         val yarnVersion = data.getUserData(FabricYarnVersionStep.KEY) ?: return
         val loaderVersion = data.getUserData(FabricLoaderVersionStep.KEY) ?: return
         val loomVersion = "1.0-SNAPSHOT" // TODO
-        val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
+        val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val apiVersion = data.getUserData(FabricApiVersionStep.KEY)
 
         assets.addTemplateProperties(
@@ -372,7 +372,7 @@ class FabricDumbModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
-        val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
+        val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
 
         if (useMixins) {
             val packageName =
@@ -411,7 +411,7 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
         }
         val loaderVersion = data.getUserData(FabricLoaderVersionStep.KEY) ?: return
         val mcVersion = data.getUserData(FabricMcVersionStep.KEY) ?: return
-        val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
+        val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val license = data.getUserData(LicenseStep.KEY) ?: return
         val apiVersion = data.getUserData(FabricApiVersionStep.KEY)
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false

@@ -44,14 +44,17 @@ import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
 import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.platform.sponge.SpongeVersion
+import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.util.Key
 import com.intellij.psi.xml.XmlTag
+import com.intellij.ui.dsl.builder.Panel
 import java.util.EnumSet
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
 
@@ -83,8 +86,26 @@ class SpongeApiVersionStep(
 ) : AbstractSelectVersionStep<SemanticVersion>(parent, data.versions.keys.mapNotNull(SemanticVersion::tryParse)) {
     override val label = "Sponge API Version:"
 
+    override fun setupUI(builder: Panel) {
+        super.setupUI(builder)
+        versionProperty.afterChange {
+            applyJdkVersion()
+        }
+        applyJdkVersion()
+    }
+
     override fun setupProject(project: Project) {
         data.putUserData(KEY, SemanticVersion.tryParse(version))
+        applyJdkVersion()
+    }
+
+    private fun applyJdkVersion() {
+        SemanticVersion.tryParse(version)?.let { version ->
+            findStep<JdkProjectSetupFinalizer>().preferredJdk = when {
+                version >= SpongeConstants.API9 -> JavaSdkVersion.JDK_17
+                else -> JavaSdkVersion.JDK_1_8
+            }
+        }
     }
 
     companion object {
@@ -161,7 +182,7 @@ class SpongeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
 
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-        val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
+        val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val spongeVersion = data.getUserData(SpongeApiVersionStep.KEY) ?: return
         val license = data.getUserData(LicenseStep.KEY) ?: return
         val pluginName = data.getUserData(AbstractModNameStep.KEY) ?: return
@@ -215,7 +236,7 @@ class SpongeMavenFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
 
     override fun setupAssets(project: Project) {
         assets.addDefaultMavenProperties()
-        val javaVersion = findStep<JdkProjectSetupFinalizer>().minVersion.ordinal
+        val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         assets.addTemplateProperties("JAVA_VERSION" to javaVersion)
         assets.addTemplates(project, "pom.xml" to MinecraftTemplates.SPONGE_POM_TEMPLATE)
     }
