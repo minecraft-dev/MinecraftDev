@@ -14,9 +14,9 @@ import com.demonwav.mcdev.creator.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.AbstractLatentStep
 import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.AbstractModNameStep
-import com.demonwav.mcdev.creator.AbstractOptionalStringStep
 import com.demonwav.mcdev.creator.AbstractSelectVersionStep
 import com.demonwav.mcdev.creator.AuthorsStep
+import com.demonwav.mcdev.creator.DependStep
 import com.demonwav.mcdev.creator.DescriptionStep
 import com.demonwav.mcdev.creator.EmptyStep
 import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
@@ -24,6 +24,7 @@ import com.demonwav.mcdev.creator.LicenseStep
 import com.demonwav.mcdev.creator.MainClassStep
 import com.demonwav.mcdev.creator.PluginNameStep
 import com.demonwav.mcdev.creator.WebsiteStep
+import com.demonwav.mcdev.creator.addLicense
 import com.demonwav.mcdev.creator.addTemplates
 import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep
 import com.demonwav.mcdev.creator.buildsystem.AbstractRunBuildSystemStep
@@ -32,8 +33,10 @@ import com.demonwav.mcdev.creator.buildsystem.BuildRepository
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
+import com.demonwav.mcdev.creator.buildsystem.gradle.GRADLE_VERSION_KEY
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleImportStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
+import com.demonwav.mcdev.creator.buildsystem.gradle.ReformatBuildGradleStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.addGradleWrapperProperties
 import com.demonwav.mcdev.creator.buildsystem.maven.AbstractPatchPomStep
 import com.demonwav.mcdev.creator.buildsystem.maven.MavenImportStep
@@ -48,6 +51,7 @@ import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.onShown
+import com.intellij.ide.starters.local.GeneratorEmptyDirectory
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
@@ -70,7 +74,7 @@ class SpongePlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Sponge
         ::LicenseStep,
         ::SpongeOptionalSettingsStep,
         ::SpongeBuildSystemStep,
-        ::SpongeMainClassStep,
+        ::SpongeProjectFilesStep,
         ::SpongePostBuildSystemStep,
     )
 
@@ -123,23 +127,11 @@ class SpongeOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollaps
     override fun createStep() = DescriptionStep(this).chain(
         ::AuthorsStep,
         ::WebsiteStep,
-        ::SpongeDependStep,
+        ::DependStep,
     )
 }
 
-class SpongeDependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
-    override val label = "Depend:"
-
-    override fun setupProject(project: Project) {
-        data.putUserData(KEY, value)
-    }
-
-    companion object {
-        val KEY = Key.create<String>("${SpongeDependStep::class.java.name}.depend")
-    }
-}
-
-class SpongeMainClassStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
+class SpongeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
     override val description = "Creating project files"
 
     override fun setupAssets(project: Project) {
@@ -156,6 +148,7 @@ class SpongeMainClassStep(parent: NewProjectWizardStep) : AbstractLongRunningAss
             project,
             mainClassFile to MinecraftTemplates.SPONGE8_MAIN_CLASS_TEMPLATE,
         )
+        assets.addLicense(project)
     }
 }
 
@@ -175,7 +168,7 @@ class SpongeGradleSupport : BuildSystemSupport {
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
             BuildSystemSupport.PRE_STEP -> SpongeGradleFilesStep(parent).chain(::GradleWrapperStep)
-            BuildSystemSupport.POST_STEP -> GradleImportStep(parent)
+            BuildSystemSupport.POST_STEP -> SpongeGradleImportStep(parent).chain(::ReformatBuildGradleStep)
             else -> EmptyStep(parent)
         }
     }
@@ -185,6 +178,8 @@ class SpongeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
     override val description = "Creating Gradle files"
 
     override fun setupAssets(project: Project) {
+        data.putUserData(GRADLE_VERSION_KEY, SemanticVersion.release(7, 4, 2))
+
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val spongeVersion = data.getUserData(SpongeApiVersionStep.KEY) ?: return
@@ -194,7 +189,7 @@ class SpongeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
         val website = data.getUserData(WebsiteStep.KEY) ?: ""
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
-        val dependencies = data.getUserData(SpongeDependStep.KEY)?.let(AuthorsStep::parseAuthors) ?: emptyList()
+        val dependencies = data.getUserData(DependStep.KEY) ?: emptyList()
         val baseData = data.getUserData(NewProjectWizardBaseData.KEY) ?: return
 
         assets.addTemplateProperties(
@@ -207,12 +202,18 @@ class SpongeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             "LICENSE" to license.id,
             "PLUGIN_NAME" to pluginName,
             "MAIN_CLASS" to mainClass,
-            "DESCRIPTION" to description,
-            "WEBSITE" to website,
             "AUTHORS" to authors,
             "DEPENDENCIES" to dependencies,
             "PROJECT_NAME" to baseData.name,
         )
+
+        if (description.isNotBlank()) {
+            assets.addTemplateProperties("DESCRIPTION" to description)
+        }
+
+        if (website.isNotBlank()) {
+            assets.addTemplateProperties("WEBSITE" to website)
+        }
 
         assets.addTemplates(
             project,
@@ -222,14 +223,26 @@ class SpongeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         )
 
         assets.addGradleWrapperProperties(project)
+
+        assets.addAssets(
+            GeneratorEmptyDirectory("src/main/java"),
+            GeneratorEmptyDirectory("src/main/resources"),
+        )
     }
+}
+
+class SpongeGradleImportStep(parent: NewProjectWizardStep) : GradleImportStep(parent) {
+    override val additionalRunTasks = listOf("runServer")
 }
 
 class SpongeMavenSupport : BuildSystemSupport {
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
             BuildSystemSupport.PRE_STEP -> SpongeMavenFilesStep(parent).chain(::SpongePatchPomStep)
-            BuildSystemSupport.POST_STEP -> MavenImportStep(parent).chain(::ReformatPomStep)
+            BuildSystemSupport.POST_STEP -> SpongeMavenProjectFilesStep(parent).chain(
+                ::MavenImportStep,
+                ::ReformatPomStep
+            )
             else -> EmptyStep(parent)
         }
     }
@@ -243,6 +256,40 @@ class SpongeMavenFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         assets.addTemplateProperties("JAVA_VERSION" to javaVersion)
         assets.addTemplates(project, "pom.xml" to MinecraftTemplates.SPONGE_POM_TEMPLATE)
+    }
+}
+
+class SpongeMavenProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
+    override val description = "Creating Maven project files"
+
+    override fun setupAssets(project: Project) {
+        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val mainClass = data.getUserData(MainClassStep.KEY) ?: return
+        val spongeApiVersion = data.getUserData(SpongeApiVersionStep.KEY) ?: return
+        val license = data.getUserData(LicenseStep.KEY) ?: return
+        val pluginName = data.getUserData(AbstractModNameStep.KEY) ?: return
+        val description = data.getUserData(DescriptionStep.KEY) ?: ""
+        val website = data.getUserData(WebsiteStep.KEY) ?: ""
+        val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
+        val dependencies = data.getUserData(DependStep.KEY) ?: emptyList()
+
+        assets.addTemplateProperties(
+            "PLUGIN_ID" to buildSystemProps.artifactId,
+            "VERSION_PLACEHOLDER" to "\${version}",
+            "SPONGEAPI_VERSION" to spongeApiVersion,
+            "LICENSE" to license.id,
+            "PLUGIN_NAME" to pluginName,
+            "MAIN_CLASS" to mainClass,
+            "DESCRIPTION" to description,
+            "WEBSITE" to website,
+            "AUTHORS" to authors,
+            "DEPENDENCIES" to dependencies,
+        )
+        assets.addTemplates(
+            project,
+            "src/main/resources/META-INF/sponge_plugins.json" to MinecraftTemplates.SPONGE8_PLUGINS_JSON_TEMPLATE,
+        )
+        assets.addLicense(project)
     }
 }
 
