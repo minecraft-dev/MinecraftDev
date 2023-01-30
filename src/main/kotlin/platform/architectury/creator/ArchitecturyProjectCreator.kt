@@ -225,7 +225,7 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
             "MOD_NAME" to modName,
             "VERSION" to buildSystemProps.version,
             "MC_VERSION" to mcVersion,
-            "FORGE_VERSION" to forgeVersion,
+            "FORGE_VERSION" to "$mcVersion-$forgeVersion",
             "FABRIC_LOADER_VERSION" to fabricLoaderVersion,
             "ARCHITECTURY_GROUP" to architecturyGroup,
             "JAVA_VERSION" to javaVersion
@@ -353,7 +353,7 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
             assets.addTemplateProperties(
                 "MIXINS" to "true"
             )
-            val commonMixinsFile = "common/src/main/resources/${buildSystemProps.artifactId}.mixins.json"
+            val commonMixinsFile = "common/src/main/resources/${buildSystemProps.artifactId}-common.mixins.json"
             val forgeMixinsFile = "forge/src/main/resources/${buildSystemProps.artifactId}.mixins.json"
             val fabricMixinsFile = "fabric/src/main/resources/${buildSystemProps.artifactId}.mixins.json"
             assets.addTemplates(
