@@ -24,7 +24,9 @@ import com.demonwav.mcdev.creator.LicenseStep
 import com.demonwav.mcdev.creator.MainClassStep
 import com.demonwav.mcdev.creator.PluginNameStep
 import com.demonwav.mcdev.creator.WebsiteStep
+import com.demonwav.mcdev.creator.addGradleGitignore
 import com.demonwav.mcdev.creator.addLicense
+import com.demonwav.mcdev.creator.addMavenGitignore
 import com.demonwav.mcdev.creator.addTemplates
 import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep
 import com.demonwav.mcdev.creator.buildsystem.AbstractRunBuildSystemStep
@@ -44,6 +46,7 @@ import com.demonwav.mcdev.creator.buildsystem.maven.ReformatPomStep
 import com.demonwav.mcdev.creator.buildsystem.maven.addDefaultMavenProperties
 import com.demonwav.mcdev.creator.chain
 import com.demonwav.mcdev.creator.findStep
+import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
 import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.platform.sponge.SpongeVersion
@@ -228,6 +231,10 @@ class SpongeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             GeneratorEmptyDirectory("src/main/java"),
             GeneratorEmptyDirectory("src/main/resources"),
         )
+
+        if (gitEnabled) {
+            assets.addGradleGitignore(project)
+        }
     }
 }
 
@@ -256,6 +263,9 @@ class SpongeMavenFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         assets.addTemplateProperties("JAVA_VERSION" to javaVersion)
         assets.addTemplates(project, "pom.xml" to MinecraftTemplates.SPONGE_POM_TEMPLATE)
+        if (gitEnabled) {
+            assets.addMavenGitignore(project)
+        }
     }
 }
 

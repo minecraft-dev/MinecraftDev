@@ -160,6 +160,7 @@ intellij {
         "org.toml.lang:$pluginTomlVersion",
         "ByteCodeViewer",
         "properties",
+//        "Git4Idea",
         // needed dependencies for unit tests
         "junit"
     )

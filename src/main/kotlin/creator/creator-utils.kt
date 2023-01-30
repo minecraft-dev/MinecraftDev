@@ -10,14 +10,30 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.util.MinecraftTemplates
 import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
+import com.intellij.ide.wizard.GitNewProjectWizardData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.stepSequence
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import java.time.ZonedDateTime
+
+var NewProjectWizardStep.gitEnabled
+    get() = data.getUserData(GitNewProjectWizardData.KEY)!!.git
+    set(value) {
+        data.getUserData(GitNewProjectWizardData.KEY)!!.git = value
+    }
+
+fun FixedAssetsNewProjectWizardStep.addGradleGitignore(project: Project) {
+    addTemplates(project, ".gitignore" to MinecraftTemplates.GRADLE_GITIGNORE_TEMPLATE)
+}
+
+fun FixedAssetsNewProjectWizardStep.addMavenGitignore(project: Project) {
+    addTemplates(project, ".gitignore" to MinecraftTemplates.MAVEN_GITIGNORE_TEMPLATE)
+}
 
 fun FixedAssetsNewProjectWizardStep.addTemplates(project: Project, vararg templates: Pair<String, String>) {
     addTemplates(project, templates.toMap())

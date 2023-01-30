@@ -25,6 +25,7 @@ import com.demonwav.mcdev.creator.ModNameStep
 import com.demonwav.mcdev.creator.UpdateUrlStep
 import com.demonwav.mcdev.creator.UseMixinsStep
 import com.demonwav.mcdev.creator.WebsiteStep
+import com.demonwav.mcdev.creator.addGradleGitignore
 import com.demonwav.mcdev.creator.addLicense
 import com.demonwav.mcdev.creator.addTemplates
 import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep
@@ -38,6 +39,7 @@ import com.demonwav.mcdev.creator.buildsystem.gradle.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.gradle.addGradleWrapperProperties
 import com.demonwav.mcdev.creator.chain
 import com.demonwav.mcdev.creator.findStep
+import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
@@ -192,6 +194,10 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         )
 
         assets.addGradleWrapperProperties(project)
+
+        if (gitEnabled) {
+            assets.addGradleGitignore(project)
+        }
     }
 }
 

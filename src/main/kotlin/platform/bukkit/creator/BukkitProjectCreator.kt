@@ -26,6 +26,8 @@ import com.demonwav.mcdev.creator.PluginNameStep
 import com.demonwav.mcdev.creator.SimpleMcVersionStep
 import com.demonwav.mcdev.creator.SoftDependStep
 import com.demonwav.mcdev.creator.WebsiteStep
+import com.demonwav.mcdev.creator.addGradleGitignore
+import com.demonwav.mcdev.creator.addMavenGitignore
 import com.demonwav.mcdev.creator.addTemplates
 import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep
 import com.demonwav.mcdev.creator.buildsystem.AbstractRunBuildSystemStep
@@ -45,6 +47,7 @@ import com.demonwav.mcdev.creator.buildsystem.maven.addDefaultMavenProperties
 import com.demonwav.mcdev.creator.chain
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.getVersionSelector
+import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
 import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.platform.PlatformType
@@ -308,6 +311,10 @@ class BukkitGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             "settings.gradle" to MinecraftTemplates.BUKKIT_SETTINGS_GRADLE_TEMPLATE,
         )
         assets.addGradleWrapperProperties(project)
+
+        if (gitEnabled) {
+            assets.addGradleGitignore(project)
+        }
     }
 }
 
@@ -341,6 +348,9 @@ class BukkitMavenFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         data.putUserData(BukkitProjectFilesStep.VERSION_REF_KEY, "\${project.version}")
         assets.addDefaultMavenProperties()
         assets.addTemplates(project, "pom.xml" to MinecraftTemplates.BUKKIT_POM_TEMPLATE)
+        if (gitEnabled) {
+            assets.addMavenGitignore(project)
+        }
     }
 }
 

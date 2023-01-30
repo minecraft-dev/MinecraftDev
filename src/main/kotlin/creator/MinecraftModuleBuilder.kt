@@ -17,6 +17,7 @@ import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.intellij.ide.projectWizard.ProjectSettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.ide.wizard.AbstractNewProjectWizardBuilder
+import com.intellij.ide.wizard.GitNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardBaseStep
 import com.intellij.ide.wizard.RootNewProjectWizardStep
 import com.intellij.ide.wizard.chain
@@ -41,7 +42,8 @@ class MinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {
     override fun getParentGroup() = MinecraftModuleType.NAME
     override fun createStep(context: WizardContext) = RootNewProjectWizardStep(context).chain(
         ::NewProjectWizardBaseStep,
-        ::PlatformTypeStep,
+        ::GitNewProjectWizardStep,
+        PlatformTypeStep::create,
         ::BuildSystemPropertiesStep,
         ::ProjectSetupFinalizerWizardStep,
     )
