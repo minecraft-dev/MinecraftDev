@@ -69,11 +69,11 @@
         <pluginPlatformWizard implementation="com.demonwav.mcdev.platform.velocity.creator.VelocityPlatformStep$Factory" />
         <pluginPlatformWizard implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeePlatformStep$PlatformFactory" />
 
-        <bukkitPlatformWizard implementation="com.demonwav.mcdev.platform.bukkit.creator.SpigotPlatformStep$Factory" />
         <bukkitPlatformWizard implementation="com.demonwav.mcdev.platform.bukkit.creator.PaperPlatformStep$Factory" />
+        <bukkitPlatformWizard implementation="com.demonwav.mcdev.platform.bukkit.creator.SpigotPlatformStep$Factory" />
 
-        <bungeePlatformWizard implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeeMainPlatformStep$Factory" />
         <bungeePlatformWizard implementation="com.demonwav.mcdev.platform.bungeecord.creator.WaterfallPlatformStep$Factory" />
+        <bungeePlatformWizard implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeeMainPlatformStep$Factory" />
 
         <projectSetupFinalizer implementation="com.demonwav.mcdev.creator.JdkProjectSetupFinalizer$Factory" />
 
