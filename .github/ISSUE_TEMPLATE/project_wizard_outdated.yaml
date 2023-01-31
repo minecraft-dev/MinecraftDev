@@ -1,10 +1,10 @@
-name: Bug report
-description: Create a bug report
+name: Project Wizard Outdated
+description: The Minecraft project wizard is outdated
 labels: ["status: unverified", "type: bug"]
 body:
   - type: markdown
     attributes:
-      value: DO NOT REQUEST SUPPORT FOR OLDER VERSIONS OF MINECRAFT.
+      value: PLEASE DO NOT USE THIS TEMPLATE FOR FEATURE REQUESTS.
   - type: input
     id: plugin-version
     attributes:
@@ -29,7 +29,6 @@ body:
       label: Target platform
       multiple: true
       options:
-        - Bukkit
         - Spigot
         - Paper
         - Sponge
@@ -37,13 +36,12 @@ body:
         - Minecraft Forge
         - Fabric
         - Velocity
-        - Mixins
         - BungeeCord
         - Waterfall
     validations:
-      required: false
+      required: true
   - type: textarea
     id: description
     attributes:
-      label: Description of the bug
-      description: Always include a stack trace if there is one. Otherwise, the more information you can provide in terms of how to reproduce the problem, the more likely it'll be fixed. If there is something specific about your project, a link to the GitHub project can be very helpful.
+      label: Additional description
+      description: If the issue isn't obvious, please be as detailed as you can.

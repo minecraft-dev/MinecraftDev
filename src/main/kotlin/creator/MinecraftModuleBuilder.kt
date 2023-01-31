@@ -46,6 +46,7 @@ class MinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {
         PlatformTypeStep::create,
         ::BuildSystemPropertiesStep,
         ::ProjectSetupFinalizerWizardStep,
+        ::TemplateOutdatedStep,
     )
 
     override fun getIgnoredSteps() = listOf(ProjectSettingsStep::class.java)
