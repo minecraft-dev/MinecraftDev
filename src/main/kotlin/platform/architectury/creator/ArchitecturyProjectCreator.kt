@@ -13,9 +13,8 @@ package com.demonwav.mcdev.platform.architectury.creator
 import com.demonwav.mcdev.creator.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.AbstractLatentStep
 import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.AbstractMcVersionChainStep
 import com.demonwav.mcdev.creator.AbstractModNameStep
-import com.demonwav.mcdev.creator.AbstractSelectMcVersionThenForkStep
-import com.demonwav.mcdev.creator.AbstractSelectVersionStep
 import com.demonwav.mcdev.creator.AuthorsStep
 import com.demonwav.mcdev.creator.DescriptionStep
 import com.demonwav.mcdev.creator.EmptyStep
@@ -41,11 +40,8 @@ import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.platform.architectury.version.ArchitecturyVersion
-import com.demonwav.mcdev.platform.fabric.creator.FabricApiVersionStep
-import com.demonwav.mcdev.platform.fabric.creator.FabricLoaderVersionStep
 import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
 import com.demonwav.mcdev.platform.fabric.util.FabricVersions
-import com.demonwav.mcdev.platform.forge.creator.ForgeVersionStep
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
@@ -53,16 +49,24 @@ import com.demonwav.mcdev.platform.forge.version.ForgeVersion
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
+import com.demonwav.mcdev.util.bindEnabled
 import com.demonwav.mcdev.util.toJavaClassName
 import com.demonwav.mcdev.util.toPackageName
 import com.intellij.ide.starters.local.GeneratorEmptyDirectory
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
 import com.intellij.openapi.observable.util.bindBooleanStorage
+import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Key
+import com.intellij.ui.JBColor
+import com.intellij.ui.dsl.builder.Cell
+import com.intellij.ui.dsl.builder.EMPTY_LABEL
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.util.IncorrectOperationException
 import kotlinx.coroutines.coroutineScope
 
 class ArchitecturyVersionData(
@@ -73,7 +77,7 @@ class ArchitecturyVersionData(
 )
 
 private val NewProjectWizardStep.architecturyGroup: String get() {
-    val apiVersion = data.getUserData(ArchitecturyApiVersionStep.KEY)
+    val apiVersion = data.getUserData(ArchitecturyVersionChainStep.ARCHITECTURY_API_VERSION_KEY)
     return when {
         apiVersion == null || apiVersion >= SemanticVersion.release(2, 0, 10) -> "dev.architectury"
         else -> "me.shedaniel"
@@ -81,7 +85,7 @@ private val NewProjectWizardStep.architecturyGroup: String get() {
 }
 
 private val NewProjectWizardStep.architecturyPackage: String get() {
-    val apiVersion = data.getUserData(ArchitecturyApiVersionStep.KEY)
+    val apiVersion = data.getUserData(ArchitecturyVersionChainStep.ARCHITECTURY_API_VERSION_KEY)
     return when {
         apiVersion == null || apiVersion >= SemanticVersion.release(2, 0, 10) -> "dev.architectury"
         else -> "me.shedaniel.architectury"
@@ -106,9 +110,7 @@ class ArchitecturyPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Arc
     }
 
     override fun createStep(data: ArchitecturyVersionData): NewProjectWizardStep {
-        val mcVersions = data.architecturyVersions.versions.keys.intersect(data.forgeVersions.sortedMcVersions.toSet())
-            .intersect(data.fabricVersions.game.mapNotNullTo(mutableSetOf()) { SemanticVersion.tryParse(it.version) })
-        return ArchitecturyMcVersionStep(this, mcVersions.toList(), data).chain(
+        return ArchitecturyVersionChainStep(this, data).chain(
             ::UseMixinsStep,
             ::ModNameStep,
             ::LicenseStep,
@@ -128,72 +130,110 @@ class ArchitecturyPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Arc
     }
 }
 
-class ArchitecturyMcVersionStep(
+class ArchitecturyVersionChainStep(
     parent: NewProjectWizardStep,
-    mcVersions: List<SemanticVersion>,
     private val versionData: ArchitecturyVersionData
-) : AbstractSelectMcVersionThenForkStep<SemanticVersion>(parent, mcVersions) {
-    override val label = "Minecraft Version:"
+) : AbstractMcVersionChainStep(
+    parent,
+    "Forge Version:",
+    "Fabric Loader Version:",
+    "Fabric API Version:",
+    "Architectury API Version:",
+) {
+    companion object {
+        private const val FORGE_VERSION = 1
+        private const val FABRIC_LOADER_VERSION = 2
+        private const val FABRIC_API_VERSION = 3
+        private const val ARCHITECTURY_API_VERSION = 4
 
-    override fun initStep(version: SemanticVersion) =
-        ForgeVersionStep(this, versionData.forgeVersions.getForgeVersions(version)).chain(
-            { parent -> FabricLoaderVersionStep(parent, versionData.fabricVersions.loader) },
-            { parent ->
-                val versionStr = version.toString()
+        val MC_VERSION_KEY =
+            Key.create<SemanticVersion>("${ArchitecturyVersionChainStep::class.java.name}.mcVersion")
+        val FORGE_VERSION_KEY =
+            Key.create<SemanticVersion>("${ArchitecturyVersionChainStep::class.java.name}.forgeVersion")
+        val FABRIC_LOADER_VERSION_KEY =
+            Key.create<SemanticVersion>("${ArchitecturyVersionChainStep::class.java.name}.fabricLoaderVersion")
+        val FABRIC_API_VERSION_KEY =
+            Key.create<SemanticVersion>("${ArchitecturyVersionChainStep::class.java.name}.fabricApiVersion")
+        val ARCHITECTURY_API_VERSION_KEY =
+            Key.create<SemanticVersion>("${ArchitecturyVersionChainStep::class.java.name}.architecturyApiVersion")
+    }
+
+    private val mcVersions by lazy {
+        versionData.architecturyVersions.versions.keys
+            .intersect(versionData.forgeVersions.sortedMcVersions.toSet())
+            .intersect(
+                versionData.fabricVersions.game.mapNotNullTo(mutableSetOf()) {
+                    SemanticVersion.tryParse(it.version)
+                }
+            )
+            .toList()
+    }
+
+    private val useFabricApiProperty = propertyGraph.property(true)
+        .bindBooleanStorage("${javaClass.name}.useFabricApi")
+    private var useFabricApi by useFabricApiProperty
+
+    private val useArchApiProperty = propertyGraph.property(true)
+        .bindBooleanStorage("${javaClass.name}.useArchApi")
+    private var useArchApi by useArchApiProperty
+
+    override fun createComboBox(row: Row, index: Int, items: List<Comparable<*>>): Cell<ComboBox<Comparable<*>>> {
+        return when (index) {
+            FABRIC_API_VERSION -> {
+                val comboBox = super.createComboBox(row, index, items).bindEnabled(useFabricApiProperty)
+                row.checkBox("Use Fabric API").bindSelected(useFabricApiProperty)
+                row.label(EMPTY_LABEL).bindText(
+                    getVersionProperty(MINECRAFT_VERSION).transform { mcVersion ->
+                        val versionStr = mcVersion.toString()
+                        val matched = versionData.fabricApiVersions.versions.any { versionStr in it.gameVersions }
+                        if (matched) {
+                            EMPTY_LABEL
+                        } else {
+                            "Unable to match API versions to Minecraft version"
+                        }
+                    }
+                ).bindEnabled(useFabricApiProperty).component.foreground = JBColor.YELLOW
+                comboBox
+            }
+            ARCHITECTURY_API_VERSION -> {
+                val comboBox = super.createComboBox(row, index, items).bindEnabled(useArchApiProperty)
+                row.checkBox("Use Architectury API").bindSelected(useArchApiProperty)
+                comboBox
+            }
+            else -> super.createComboBox(row, index, items)
+        }
+    }
+
+    override fun getAvailableVersions(versionsAbove: List<Comparable<*>>): List<Comparable<*>> {
+        val mcVersion by lazy { versionsAbove[MINECRAFT_VERSION] as SemanticVersion }
+
+        return when (versionsAbove.size) {
+            MINECRAFT_VERSION -> mcVersions
+            FORGE_VERSION -> versionData.forgeVersions.getForgeVersions(mcVersion)
+            FABRIC_LOADER_VERSION -> versionData.fabricVersions.loader
+            FABRIC_API_VERSION -> {
+                val versionStr = mcVersion.toString()
                 val apiVersions = versionData.fabricApiVersions.versions
                     .filter { versionStr in it.gameVersions }
                     .map { it.version }
-                if (apiVersions.isEmpty()) {
-                    FabricApiVersionStep(parent, versionData.fabricApiVersions.versions.map { it.version }, false)
-                } else {
-                    FabricApiVersionStep(parent, apiVersions, true)
-                }
-            },
-            { parent ->
-                ArchitecturyApiVersionStep(parent, versionData.architecturyVersions.getArchitecturyVersions(version))
+                apiVersions.ifEmpty { versionData.fabricApiVersions.versions.map { it.version } }
             }
-        )
+            ARCHITECTURY_API_VERSION -> versionData.architecturyVersions.getArchitecturyVersions(mcVersion)
+            else -> throw IncorrectOperationException()
+        }
+    }
 
     override fun setupProject(project: Project) {
-        data.putUserData(KEY, SemanticVersion.tryParse(step))
         super.setupProject(project)
-    }
-
-    companion object {
-        val KEY = Key.create<SemanticVersion>("${ArchitecturyMcVersionStep::class.java.name}.version")
-    }
-}
-
-class ArchitecturyApiVersionStep(
-    parent: NewProjectWizardStep,
-    versions: List<SemanticVersion>
-) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
-    override val label = "Architectury API Version:"
-
-    private val useArchitecturyApiProperty = propertyGraph.property(true)
-        .bindBooleanStorage("${javaClass.name}.useArchitecturyApi")
-    private var useArchitecturyApi by useArchitecturyApiProperty
-
-    override fun setupRow(builder: Row) {
-        super.setupRow(builder)
-
-        with(builder) {
-            checkBox("Use Architectury API")
-                .bindSelected(useArchitecturyApiProperty)
+        data.putUserData(MC_VERSION_KEY, getVersion(MINECRAFT_VERSION) as SemanticVersion)
+        data.putUserData(FORGE_VERSION_KEY, getVersion(FORGE_VERSION) as SemanticVersion)
+        data.putUserData(FABRIC_LOADER_VERSION_KEY, getVersion(FABRIC_LOADER_VERSION) as SemanticVersion)
+        if (useFabricApi) {
+            data.putUserData(FABRIC_API_VERSION_KEY, getVersion(FABRIC_API_VERSION) as SemanticVersion)
         }
-
-        useArchitecturyApiProperty.afterChange { versionBox.isEnabled = useArchitecturyApi }
-        versionBox.isEnabled = useArchitecturyApi
-    }
-
-    override fun setupProject(project: Project) {
-        if (useArchitecturyApi) {
-            data.putUserData(KEY, SemanticVersion.tryParse(version))
+        if (useArchApi) {
+            data.putUserData(ARCHITECTURY_API_VERSION_KEY, getVersion(ARCHITECTURY_API_VERSION) as SemanticVersion)
         }
-    }
-
-    companion object {
-        val KEY = Key.create<SemanticVersion>("${ArchitecturyApiVersionStep::class.java.name}.version")
     }
 }
 
@@ -214,11 +254,11 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
-        val mcVersion = data.getUserData(ArchitecturyMcVersionStep.KEY) ?: return
-        val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
-        val fabricLoaderVersion = data.getUserData(FabricLoaderVersionStep.KEY) ?: return
-        val fabricApiVersion = data.getUserData(FabricApiVersionStep.KEY)
-        val archApiVersion = data.getUserData(ArchitecturyApiVersionStep.KEY)
+        val mcVersion = data.getUserData(ArchitecturyVersionChainStep.MC_VERSION_KEY) ?: return
+        val forgeVersion = data.getUserData(ArchitecturyVersionChainStep.FORGE_VERSION_KEY) ?: return
+        val fabricLoaderVersion = data.getUserData(ArchitecturyVersionChainStep.FABRIC_LOADER_VERSION_KEY) ?: return
+        val fabricApiVersion = data.getUserData(ArchitecturyVersionChainStep.FABRIC_API_VERSION_KEY)
+        val archApiVersion = data.getUserData(ArchitecturyVersionChainStep.ARCHITECTURY_API_VERSION_KEY)
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
 
         assets.addTemplateProperties(
@@ -274,12 +314,12 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}"
-        val mcVersion = data.getUserData(ArchitecturyMcVersionStep.KEY) ?: return
+        val mcVersion = data.getUserData(ArchitecturyVersionChainStep.MC_VERSION_KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
-        val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
-        val fabricLoaderVersion = data.getUserData(FabricLoaderVersionStep.KEY) ?: return
-        val fabricApiVersion = data.getUserData(FabricApiVersionStep.KEY)
-        val archApiVersion = data.getUserData(ArchitecturyApiVersionStep.KEY)
+        val forgeVersion = data.getUserData(ArchitecturyVersionChainStep.FORGE_VERSION_KEY) ?: return
+        val fabricLoaderVersion = data.getUserData(ArchitecturyVersionChainStep.FABRIC_LOADER_VERSION_KEY) ?: return
+        val fabricApiVersion = data.getUserData(ArchitecturyVersionChainStep.FABRIC_API_VERSION_KEY)
+        val archApiVersion = data.getUserData(ArchitecturyVersionChainStep.ARCHITECTURY_API_VERSION_KEY)
         val license = data.getUserData(LicenseStep.KEY) ?: return
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val website = data.getUserData(WebsiteStep.KEY) ?: ""
@@ -394,7 +434,7 @@ abstract class ArchitecturyMainClassStep(
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
-        val useArchApi = data.getUserData(ArchitecturyApiVersionStep.KEY) != null
+        val useArchApi = data.getUserData(ArchitecturyVersionChainStep.ARCHITECTURY_API_VERSION_KEY) != null
 
         val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}"
         val className = modName.toJavaClassName()

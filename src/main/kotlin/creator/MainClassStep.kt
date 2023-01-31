@@ -17,8 +17,10 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.columns
 
 class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
     private fun suggestMainClassName() = findStep<BuildSystemPropertiesStep<*>>().groupId.toPackageName() +
@@ -41,6 +43,7 @@ class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
         with(builder) {
             row("Main Class:") {
                 textField()
+                    .columns(COLUMNS_LARGE)
                     .bindText(classNameProperty)
             }
         }

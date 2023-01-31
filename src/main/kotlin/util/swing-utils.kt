@@ -10,8 +10,12 @@
 
 package com.demonwav.mcdev.util
 
+import com.intellij.openapi.observable.properties.ObservableProperty
+import com.intellij.openapi.observable.util.bindEnabled
+import com.intellij.ui.dsl.builder.Cell
 import java.awt.Component
 import java.awt.event.HierarchyEvent
+import javax.swing.JComponent
 
 fun Component.onShown(func: (HierarchyEvent) -> Unit) {
     addHierarchyListener { event ->
@@ -27,4 +31,11 @@ fun Component.onHidden(func: (HierarchyEvent) -> Unit) {
             func(event)
         }
     }
+}
+
+fun <T : JComponent> Cell<T>.bindEnabled(property: ObservableProperty<Boolean>): Cell<T> {
+    applyToComponent {
+        bindEnabled(property)
+    }
+    return this
 }

@@ -14,9 +14,8 @@ import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.AbstractLatentStep
 import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.AbstractMcVersionChainStep
 import com.demonwav.mcdev.creator.AbstractModNameStep
-import com.demonwav.mcdev.creator.AbstractSelectMcVersionThenForkStep
-import com.demonwav.mcdev.creator.AbstractSelectVersionStep
 import com.demonwav.mcdev.creator.AuthorsStep
 import com.demonwav.mcdev.creator.DescriptionStep
 import com.demonwav.mcdev.creator.EmptyStep
@@ -55,6 +54,7 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.addMethod
 import com.demonwav.mcdev.util.asyncIO
+import com.demonwav.mcdev.util.bindEnabled
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTaskInSmartMode
@@ -75,6 +75,7 @@ import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.text.StringUtil
@@ -85,10 +86,13 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.ui.JBColor
+import com.intellij.ui.dsl.builder.Cell
+import com.intellij.ui.dsl.builder.EMPTY_LABEL
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.bindText
 import com.intellij.util.IncorrectOperationException
 import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
@@ -107,7 +111,7 @@ class FabricPlatformStep(
 
     override fun createStep(data: Pair<FabricVersions, FabricApiVersions>): NewProjectWizardStep {
         val (fabricVersions, apiVersions) = data
-        return FabricMcVersionStep(this, fabricVersions, apiVersions)
+        return FabricVersionChainStep(this, fabricVersions, apiVersions)
             .chain(
                 ::FabricEnvironmentStep,
                 ::UseMixinsStep,
@@ -128,160 +132,140 @@ class FabricPlatformStep(
     }
 }
 
-class FabricMcVersion(private val ordinal: Int, val version: String) : Comparable<FabricMcVersion> {
+class FabricMcVersion(
+    private val ordinal: Int,
+    val version: String,
+    val stable: Boolean,
+) : Comparable<FabricMcVersion> {
     override fun toString() = version
     override fun compareTo(other: FabricMcVersion) = ordinal.compareTo(other.ordinal)
 }
 
-class FabricMcVersionStep(
+class FabricVersionChainStep(
     parent: NewProjectWizardStep,
     private val fabricVersions: FabricVersions,
     private val apiVersions: FabricApiVersions
-) : AbstractSelectMcVersionThenForkStep<FabricMcVersion>(
-    parent,
-    fabricVersions.game.mapIndexed { index, version ->
-        FabricMcVersion(fabricVersions.game.size - 1 - index, version.version)
+) : AbstractMcVersionChainStep(parent, "Loader Version:", "Yarn Version:", "API Version:") {
+    companion object {
+        private const val LOADER_VERSION = 1
+        private const val YARN_VERSION = 2
+        private const val API_VERSION = 3
+
+        val MC_VERSION_KEY = Key.create<String>("${FabricVersionChainStep::class.java.name}.mcVersion")
+        val LOADER_VERSION_KEY = Key.create<SemanticVersion>("${FabricVersionChainStep::class.java.name}.loaderVersion")
+        val YARN_VERSION_KEY = Key.create<String>("${FabricVersionChainStep::class.java.name}.yarnVersion")
+        val API_VERSION_KEY = Key.create<SemanticVersion>("${FabricVersionChainStep::class.java.name}.apiVersion")
     }
-) {
-    override val label = "Minecraft Version:"
+
     private val showSnapshotsProperty = propertyGraph.property(false)
         .bindBooleanStorage("${javaClass.name}.showSnapshots")
     private var showSnapshots by showSnapshotsProperty
+
+    private val useApiProperty = propertyGraph.property(true)
+        .bindBooleanStorage("${javaClass.name}.useApi")
+    private var useApi by useApiProperty
+
     init {
         showSnapshotsProperty.afterChange { updateVersionBox() }
     }
 
-    override fun setupSwitcherUi(builder: Row) {
-        super.setupSwitcherUi(builder)
-
-        with(builder) {
-            checkBox("Show snapshots")
-                .bindSelected(showSnapshotsProperty)
+    private val mcVersions by lazy {
+        fabricVersions.game.mapIndexed { index, version ->
+            FabricMcVersion(fabricVersions.game.size - 1 - index, version.version, version.stable)
         }
+    }
 
+    override fun createComboBox(row: Row, index: Int, items: List<Comparable<*>>): Cell<ComboBox<Comparable<*>>> {
+        return when (index) {
+            MINECRAFT_VERSION -> {
+                val comboBox = super.createComboBox(row, index, items)
+                row.checkBox("Show snapshots").bindSelected(showSnapshotsProperty)
+                comboBox
+            }
+            YARN_VERSION -> {
+                val comboBox = super.createComboBox(row, index, items)
+                row.label(EMPTY_LABEL).bindText(
+                    getVersionProperty(MINECRAFT_VERSION).transform { mcVersion ->
+                        mcVersion as FabricMcVersion
+                        val matched = fabricVersions.mappings.any { it.gameVersion == mcVersion.version }
+                        if (matched) {
+                            EMPTY_LABEL
+                        } else {
+                            "Unable to match Yarn versions to Minecraft version"
+                        }
+                    }
+                ).component.foreground = JBColor.YELLOW
+                comboBox
+            }
+            API_VERSION -> {
+                val comboBox = super.createComboBox(row, index, items).bindEnabled(useApiProperty)
+                row.checkBox("Use Fabric API").bindSelected(useApiProperty)
+                row.label(EMPTY_LABEL).bindText(
+                    getVersionProperty(MINECRAFT_VERSION).transform { mcVersion ->
+                        mcVersion as FabricMcVersion
+                        val matched = apiVersions.versions.any { mcVersion.version in it.gameVersions }
+                        if (matched) {
+                            EMPTY_LABEL
+                        } else {
+                            "Unable to match API versions to Minecraft version"
+                        }
+                    }
+                ).bindEnabled(useApiProperty).component.foreground = JBColor.YELLOW
+                comboBox
+            }
+            else -> super.createComboBox(row, index, items)
+        }
+    }
+
+    override fun getAvailableVersions(versionsAbove: List<Comparable<*>>): List<Comparable<*>> {
+        return when (versionsAbove.size) {
+            MINECRAFT_VERSION -> mcVersions
+            LOADER_VERSION -> fabricVersions.loader
+            YARN_VERSION -> {
+                val mcVersion = versionsAbove[MINECRAFT_VERSION] as FabricMcVersion
+                val filteredVersions = fabricVersions.mappings.mapNotNull { mapping ->
+                    mapping.version.takeIf { mapping.gameVersion == mcVersion.version }
+                }
+                filteredVersions.ifEmpty { fabricVersions.mappings.map { it.version } }
+            }
+            API_VERSION -> {
+                val mcVersion = versionsAbove[MINECRAFT_VERSION] as FabricMcVersion
+                val filteredVersions = apiVersions.versions.mapNotNull { api ->
+                    api.version.takeIf { mcVersion.version in api.gameVersions }
+                }
+                filteredVersions.ifEmpty { apiVersions.versions.map { it.version } }
+            }
+            else -> throw IncorrectOperationException()
+        }
+    }
+
+    override fun setupUI(builder: Panel) {
+        super.setupUI(builder)
         if (!showSnapshots) {
             updateVersionBox()
         }
     }
 
     private fun updateVersionBox() {
+        val versionBox = getVersionBox(MINECRAFT_VERSION) ?: return
         val selectedItem = versionBox.selectedItem
         versionBox.removeAllItems()
-        for (gameVer in fabricVersions.game) {
+        for (gameVer in mcVersions) {
             if (showSnapshots || gameVer.stable) {
-                versionBox.addItem(gameVer.version)
+                versionBox.addItem(gameVer)
             }
         }
         versionBox.selectedItem = selectedItem
     }
 
-    override fun initStep(version: FabricMcVersion) = FabricLoaderVersionStep(this, fabricVersions.loader)
-        .chain(
-            { parent ->
-                val filteredVersions = fabricVersions.mappings.mapNotNull { mapping ->
-                    mapping.version.takeIf { mapping.gameVersion == version.version }
-                }
-                if (filteredVersions.isEmpty()) {
-                    FabricYarnVersionStep(parent, fabricVersions.mappings.map { mapping -> mapping.version }, false)
-                } else {
-                    FabricYarnVersionStep(parent, filteredVersions, true)
-                }
-            },
-            { parent ->
-                val filteredVersions = apiVersions.versions.mapNotNull { api ->
-                    api.version.takeIf { version.version in api.gameVersions }
-                }
-                if (filteredVersions.isEmpty()) {
-                    FabricApiVersionStep(parent, apiVersions.versions.map { api -> api.version }, false)
-                } else {
-                    FabricApiVersionStep(parent, filteredVersions, true)
-                }
-            },
-        )
-
     override fun setupProject(project: Project) {
-        data.putUserData(KEY, step)
         super.setupProject(project)
-    }
-
-    companion object {
-        val KEY = Key.create<String>("${FabricMcVersionStep::class.java.name}.version")
-    }
-}
-
-class FabricLoaderVersionStep(parent: NewProjectWizardStep, versions: List<SemanticVersion>) :
-    AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
-    override val label = "Loader Version:"
-
-    override fun setupProject(project: Project) {
-        data.putUserData(KEY, SemanticVersion.tryParse(version))
-    }
-
-    companion object {
-        val KEY = Key.create<SemanticVersion>("${FabricLoaderVersionStep::class.java.name}.version")
-    }
-}
-
-class FabricYarnVersionStep(
-    parent: NewProjectWizardStep,
-    versions: List<FabricVersions.YarnVersion>,
-    private val isMatched: Boolean
-) :
-    AbstractSelectVersionStep<FabricVersions.YarnVersion>(parent, versions) {
-    override val label = "Yarn Version:"
-
-    override fun setupRow(builder: Row) {
-        super.setupRow(builder)
-        if (!isMatched) {
-            builder.label("Unable to match Yarn versions to Minecraft version").component.foreground = JBColor.YELLOW
+        data.putUserData(MC_VERSION_KEY, (getVersion(MINECRAFT_VERSION) as FabricMcVersion).version)
+        data.putUserData(LOADER_VERSION_KEY, getVersion(LOADER_VERSION) as SemanticVersion)
+        data.putUserData(YARN_VERSION_KEY, (getVersion(YARN_VERSION) as FabricVersions.YarnVersion).name)
+        if (useApi) {
+            data.putUserData(API_VERSION_KEY, getVersion(API_VERSION) as SemanticVersion)
         }
-    }
-
-    override fun setupProject(project: Project) {
-        data.putUserData(KEY, version)
-    }
-
-    companion object {
-        val KEY = Key.create<String>("${FabricYarnVersionStep::class.java.name}.version")
-    }
-}
-
-class FabricApiVersionStep(
-    parent: NewProjectWizardStep,
-    versions: List<SemanticVersion>,
-    private val isMatched: Boolean
-) :
-    AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
-    override val label = "Fabric API Version:"
-
-    private val useFabricApiProperty = propertyGraph.property(true)
-        .bindBooleanStorage("${javaClass.name}.useFabricApi")
-    private var useFabricApi by useFabricApiProperty
-
-    override fun setupRow(builder: Row) {
-        super.setupRow(builder)
-
-        with(builder) {
-            checkBox("Use Fabric API")
-                .bindSelected(useFabricApiProperty)
-
-            if (!isMatched) {
-                label("Unable to match API versions to Minecraft version").component.foreground = JBColor.YELLOW
-            }
-        }
-
-        useFabricApiProperty.afterChange { versionBox.isEnabled = useFabricApi }
-        versionBox.isEnabled = useFabricApi
-    }
-
-    override fun setupProject(project: Project) {
-        if (useFabricApi) {
-            data.putUserData(KEY, SemanticVersion.tryParse(version))
-        }
-    }
-
-    companion object {
-        val KEY = Key.create<SemanticVersion>("${FabricApiVersionStep::class.java.name}.version")
     }
 }
 
@@ -335,12 +319,12 @@ class FabricGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
 
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-        val mcVersion = data.getUserData(FabricMcVersionStep.KEY) ?: return
-        val yarnVersion = data.getUserData(FabricYarnVersionStep.KEY) ?: return
-        val loaderVersion = data.getUserData(FabricLoaderVersionStep.KEY) ?: return
+        val mcVersion = data.getUserData(FabricVersionChainStep.MC_VERSION_KEY) ?: return
+        val yarnVersion = data.getUserData(FabricVersionChainStep.YARN_VERSION_KEY) ?: return
+        val loaderVersion = data.getUserData(FabricVersionChainStep.LOADER_VERSION_KEY) ?: return
         val loomVersion = "1.0-SNAPSHOT" // TODO
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
-        val apiVersion = data.getUserData(FabricApiVersionStep.KEY)
+        val apiVersion = data.getUserData(FabricVersionChainStep.API_VERSION_KEY)
 
         assets.addTemplateProperties(
             "GROUP_ID" to buildSystemProps.groupId,
@@ -415,11 +399,11 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
             Side.SERVER -> "server"
             else -> "*"
         }
-        val loaderVersion = data.getUserData(FabricLoaderVersionStep.KEY) ?: return
-        val mcVersion = data.getUserData(FabricMcVersionStep.KEY) ?: return
+        val loaderVersion = data.getUserData(FabricVersionChainStep.LOADER_VERSION_KEY) ?: return
+        val mcVersion = data.getUserData(FabricVersionChainStep.MC_VERSION_KEY) ?: return
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val license = data.getUserData(LicenseStep.KEY) ?: return
-        val apiVersion = data.getUserData(FabricApiVersionStep.KEY)
+        val apiVersion = data.getUserData(FabricVersionChainStep.API_VERSION_KEY)
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
 
         val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}"

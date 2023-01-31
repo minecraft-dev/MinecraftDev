@@ -13,9 +13,8 @@ package com.demonwav.mcdev.platform.forge.creator
 import com.demonwav.mcdev.creator.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.AbstractLatentStep
 import com.demonwav.mcdev.creator.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.AbstractMcVersionChainStep
 import com.demonwav.mcdev.creator.AbstractModNameStep
-import com.demonwav.mcdev.creator.AbstractSelectMcVersionThenForkStep
-import com.demonwav.mcdev.creator.AbstractSelectVersionStep
 import com.demonwav.mcdev.creator.AuthorsStep
 import com.demonwav.mcdev.creator.DescriptionStep
 import com.demonwav.mcdev.creator.EmptyStep
@@ -57,6 +56,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.util.IncorrectOperationException
 import com.intellij.util.lang.JavaVersion
 import java.util.Locale
 import kotlinx.coroutines.coroutineScope
@@ -71,7 +71,7 @@ class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersi
         asyncIO { ForgeVersion.downloadData() }.await()
     }
 
-    override fun createStep(data: ForgeVersion) = ForgeMcVersionStep(this, data)
+    override fun createStep(data: ForgeVersion) = ForgeVersionChainStep(this, data)
         .chain(
             ::ModNameStep,
             ::MainClassStep,
@@ -91,39 +91,29 @@ class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersi
     }
 }
 
-class ForgeMcVersionStep(
+class ForgeVersionChainStep(
     parent: NewProjectWizardStep,
     private val forgeVersionData: ForgeVersion
-) : AbstractSelectMcVersionThenForkStep<SemanticVersion>(
-    parent,
-    forgeVersionData.sortedMcVersions.filter { it >= minSupportedMcVersion }
-) {
-    override val label = "Minecraft Version:"
+) : AbstractMcVersionChainStep(parent, "Forge Version:") {
+    companion object {
+        private const val FORGE_VERSION = 1
 
-    override fun initStep(version: SemanticVersion) = ForgeVersionStep(this, forgeVersionData.getForgeVersions(version))
+        val MC_VERSION_KEY = Key.create<SemanticVersion>("${ForgeVersionChainStep::class.java}.mcVersion")
+        val FORGE_VERSION_KEY = Key.create<SemanticVersion>("${ForgeVersionChainStep::class.java}.forgeVersion")
+    }
+
+    override fun getAvailableVersions(versionsAbove: List<Comparable<*>>): List<Comparable<*>> {
+        return when (versionsAbove.size) {
+            MINECRAFT_VERSION -> forgeVersionData.sortedMcVersions.filter { it >= minSupportedMcVersion }
+            FORGE_VERSION -> forgeVersionData.getForgeVersions(versionsAbove[MINECRAFT_VERSION] as SemanticVersion)
+            else -> throw IncorrectOperationException()
+        }
+    }
 
     override fun setupProject(project: Project) {
-        data.putUserData(KEY, SemanticVersion.tryParse(step))
         super.setupProject(project)
-    }
-
-    companion object {
-        val KEY = Key.create<SemanticVersion>("${ForgeMcVersionStep::class.java.name}.version")
-    }
-}
-
-class ForgeVersionStep(
-    parent: NewProjectWizardStep,
-    versions: List<SemanticVersion>
-) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
-    override val label = "Forge Version:"
-
-    override fun setupProject(project: Project) {
-        data.putUserData(KEY, SemanticVersion.tryParse(version))
-    }
-
-    companion object {
-        val KEY = Key.create<SemanticVersion>("${ForgeVersionStep::class.java.name}.version")
+        data.putUserData(MC_VERSION_KEY, getVersion(MINECRAFT_VERSION) as SemanticVersion)
+        data.putUserData(FORGE_VERSION_KEY, getVersion(FORGE_VERSION) as SemanticVersion)
     }
 }
 
@@ -141,8 +131,8 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
     }
 
     override fun setupAssets(project: Project) {
-        val mcVersion = data.getUserData(ForgeMcVersionStep.KEY) ?: return
-        val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
+        val mcVersion = data.getUserData(ForgeVersionChainStep.MC_VERSION_KEY) ?: return
+        val forgeVersion = data.getUserData(ForgeVersionChainStep.FORGE_VERSION_KEY) ?: return
         val modName = transformModName(data.getUserData(AbstractModNameStep.KEY) ?: return)
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val javaVersion = context.projectJdk.versionString?.let(JavaVersion::parse)
@@ -205,8 +195,8 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
     override val description = "Creating Forge project files"
 
     override fun setupAssets(project: Project) {
-        val mcVersion = data.getUserData(ForgeMcVersionStep.KEY) ?: return
-        val forgeVersion = data.getUserData(ForgeVersionStep.KEY) ?: return
+        val mcVersion = data.getUserData(ForgeVersionChainStep.MC_VERSION_KEY) ?: return
+        val forgeVersion = data.getUserData(ForgeVersionChainStep.FORGE_VERSION_KEY) ?: return
         val (mainPackageName, mainClassName) = splitPackage(data.getUserData(MainClassStep.KEY) ?: return)
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return

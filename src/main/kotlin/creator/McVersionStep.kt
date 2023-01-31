@@ -52,16 +52,20 @@ class SimpleMcVersionStep(
     }
 }
 
-abstract class AbstractSelectMcVersionThenForkStep<T : Comparable<T>>(
+abstract class AbstractMcVersionChainStep(
     parent: NewProjectWizardStep,
-    versions: List<T>
-) : AbstractSelectVersionThenForkStep<T>(parent, versions) {
+    vararg otherLabels: String
+) : AbstractVersionChainStep(parent, *(listOf("Minecraft Version:") + otherLabels).toTypedArray()) {
+    companion object {
+        const val MINECRAFT_VERSION = 0
+    }
+
     override fun setupUI(builder: Panel) {
         super.setupUI(builder)
-        stepProperty.afterChange {
+        getVersionProperty(MINECRAFT_VERSION).afterChange {
             applyJdkVersion()
         }
-        versionBox.onShown {
+        getVersionBox(MINECRAFT_VERSION)!!.onShown {
             applyJdkVersion()
         }
     }
@@ -72,10 +76,10 @@ abstract class AbstractSelectMcVersionThenForkStep<T : Comparable<T>>(
     }
 
     private fun applyJdkVersion() {
-        val version = SemanticVersion.tryParse(step) ?: return
+        val version = SemanticVersion.tryParse(getVersion(MINECRAFT_VERSION).toString()) ?: return
         findStep<JdkProjectSetupFinalizer>().setPreferredJdk(
             MinecraftVersions.requiredJavaVersion(version),
-            "Minecraft $step"
+            "Minecraft ${getVersion(MINECRAFT_VERSION)}"
         )
     }
 }
