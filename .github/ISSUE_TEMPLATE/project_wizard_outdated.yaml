@@ -4,7 +4,7 @@ labels: ["status: unverified", "type: bug"]
 body:
   - type: markdown
     attributes:
-      value: PLEASE DO NOT USE THIS TEMPLATE FOR FEATURE REQUESTS.
+      value: PLEASE DO NOT USE THIS TEMPLATE FOR FEATURE REQUESTS, INCLUDING REQUESTS FOR NEW PLATFORMS.
   - type: input
     id: plugin-version
     attributes:
