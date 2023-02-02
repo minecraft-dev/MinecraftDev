@@ -13,6 +13,7 @@ package com.demonwav.mcdev.creator
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.platformtype.PlatformTypeStep
+import com.demonwav.mcdev.creator.step.TemplateOutdatedStep
 import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.intellij.ide.projectWizard.ProjectSettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
@@ -20,7 +21,6 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardBuilder
 import com.intellij.ide.wizard.GitNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardBaseStep
 import com.intellij.ide.wizard.RootNewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.roots.ModifiableRootModel
 
 class MinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {

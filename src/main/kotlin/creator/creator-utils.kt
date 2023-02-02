@@ -10,6 +10,9 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.creator.step.AuthorsStep
+import com.demonwav.mcdev.creator.step.FixedAssetsNewProjectWizardStep
+import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.ide.starters.local.GeneratorTemplateFile
