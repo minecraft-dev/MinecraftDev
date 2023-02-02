@@ -21,7 +21,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.roots.ui.configuration.sdkComboBox
 import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
 import com.intellij.openapi.ui.validation.validationErrorFor
 import com.intellij.ui.JBColor
@@ -73,8 +72,11 @@ class ProjectSetupFinalizerWizardStep(parent: NewProjectWizardStep) : AbstractNe
 }
 
 /**
- * Used to adjust project configurations before project creation begins, or simply display a summary.
- * Can also block project creation if problems are found with the configurations (such as version incompatibilities.)
+ * A step applied after all other steps for all Minecraft project creators. These steps can also block project creation
+ * by providing extra validations.
+ *
+ * To add custom project setup finalizers, register a [Factory] to the
+ * `com.demonwav.minecraft-dev.projectSetupFinalizer` extension point.
  */
 interface ProjectSetupFinalizer : NewProjectWizardStep {
     companion object {
@@ -82,11 +84,9 @@ interface ProjectSetupFinalizer : NewProjectWizardStep {
     }
 
     /**
-     * Validates the existing [ProjectConfig]s of this wizard. You can also initialize
+     * Validates the existing settings of this wizard.
      *
-     * Finalizers are expected to display errors in their own component.
-     *
-     * @return `true` if the project setup is valid, `false` otherwise.
+     * @return `null` if the settings are valid, or an error message if they are invalid.
      */
     fun validate(): String? = null
 

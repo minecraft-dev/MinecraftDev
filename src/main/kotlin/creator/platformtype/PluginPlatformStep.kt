@@ -14,6 +14,12 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardMultiStep
 import com.intellij.ide.wizard.NewProjectWizardMultiStepFactory
 import com.intellij.openapi.extensions.ExtensionPointName
 
+/**
+ * The step to select a mod platform.
+ *
+ * To add custom mod platforms, register a [Factory] to the `com.demonwav.minecraft-dev.pluginPlatformWizard` extension
+ * point.
+ */
 class PluginPlatformStep(
     parent: PlatformTypeStep
 ) : AbstractNewProjectWizardMultiStep<PluginPlatformStep, PluginPlatformStep.Factory>(parent, EP_NAME) {

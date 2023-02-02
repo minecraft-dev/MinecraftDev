@@ -34,6 +34,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 
+/**
+ * Used for when a long-running task is required to fully construct the wizard steps, for example when downloading
+ * Minecraft versions.
+ */
 abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
     companion object {
         private val LOGGER = logger<AbstractLatentStep<*>>()
@@ -42,6 +46,14 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
     private var hasComputedData = false
     private var step: NewProjectWizardStep? = null
 
+    /**
+     * Description of this step displayed to the user.
+     *
+     * This should be in sentence case starting with a lower case letter, and starting with a verb in the present tense,
+     * like a Git commit message.
+     *
+     * For example, "download Minecraft versions" would be an appropriate description.
+     */
     protected abstract val description: String
 
     private fun doComputeData(placeholder: Placeholder, lifetime: Disposable) {

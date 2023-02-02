@@ -22,7 +22,17 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 private typealias TaskQueue = ConcurrentLinkedQueue<AbstractLongRunningStep>
 
+/**
+ * Creator steps that either take a long time to complete, or need to be run after other steps that take a long time to
+ * complete.
+ *
+ * These steps show an indeterminate progress bar to the user while they are running.
+ */
 abstract class AbstractLongRunningStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
+
+    /**
+     * The text to display on the progress bar
+     */
     abstract val description: String
 
     abstract fun perform(project: Project)
