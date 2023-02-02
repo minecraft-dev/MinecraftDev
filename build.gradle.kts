@@ -81,7 +81,6 @@ dependencies {
 
     implementation(files(gradleToolingExtensionJar))
 
-    implementation(libs.templateMakerFabric)
     implementation(libs.mappingIo)
     implementation(libs.bundles.asm)
 
@@ -160,7 +159,6 @@ intellij {
         "org.toml.lang:$pluginTomlVersion",
         "ByteCodeViewer",
         "properties",
-//        "Git4Idea",
         // needed dependencies for unit tests
         "junit"
     )
