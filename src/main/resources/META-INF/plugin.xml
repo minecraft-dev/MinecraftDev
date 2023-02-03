@@ -351,6 +351,7 @@
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mixin.reference.target.TargetGTDHandler" order="first"/>
         <completion.confidence language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionConfidence"
                                order="before javaSkipAutopopupInStrings"/>
+        <weigher key="completion" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionWeigher" id="mcdev.mixin" order="first"/>
 
         <!-- Mixin configuration -->
         <fileType name="Mixin Configuration" language="JSON" implementationClass="com.demonwav.mcdev.platform.mixin.config.MixinConfigFileType" fieldName="INSTANCE" />
