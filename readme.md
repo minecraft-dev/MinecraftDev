@@ -142,3 +142,4 @@ Supported Platforms
 - [![MCP Icon](src/main/resources/assets/icons/platform/MCP.png?raw=true) **MCP**](http://www.modcoderpack.com/)
 - [![Mixins Icon](src/main/resources/assets/icons/platform/Mixins_dark.png?raw=true) **Mixins**](https://github.com/SpongePowered/Mixin)
 - [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/) ([![Waterfall Icon](src/main/resources/assets/icons/platform/Waterfall.png?raw=true) Waterfall](https://github.com/PaperMC/Waterfall))
+- [![Velocity Icon](src/main/resources/assets/icons/platform/Velocity.png?raw=true) **Velocity**](https://github.com/PaperMC/Velocity)
