@@ -10,7 +10,10 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.creator.updateWhenChanged
+import com.intellij.ide.users.LocalUserSettings
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
+import com.intellij.ide.wizard.NewProjectWizardBaseData.Companion.baseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.project.Project
@@ -39,6 +42,40 @@ abstract class AbstractOptionalStringStep(parent: NewProjectWizardStep) : Abstra
                     .columns(COLUMNS_LARGE)
             }
         }
+    }
+}
+
+abstract class AbstractOptionalStringBasedOnProjectNameStep(
+    parent: NewProjectWizardStep
+) : AbstractOptionalStringStep(parent) {
+    private val formatProperty = propertyGraph.property("").bindStorage("${javaClass.name}.format")
+    var format by formatProperty
+
+    init {
+        if (format.isNotEmpty()) {
+            value = suggestValue()
+        }
+        valueProperty.updateWhenChanged(formatProperty, ::suggestValue)
+        valueProperty.updateWhenChanged(baseData.nameProperty, ::suggestValue)
+        formatProperty.updateWhenChanged(valueProperty, ::suggestFormat)
+    }
+
+    private fun suggestValue() = format.replace(PROJECT_NAME_PLACEHOLDER, baseData.name)
+
+    private fun suggestFormat(): String {
+        val index = value.indexOf(baseData.name)
+        if (index == -1) {
+            return value
+        }
+        if (value.indexOf(baseData.name, startIndex = index + baseData.name.length) != -1) {
+            // don't change format if there are multiple instances of the project name
+            return format
+        }
+        return value.replace(baseData.name, PROJECT_NAME_PLACEHOLDER)
+    }
+
+    companion object {
+        const val PROJECT_NAME_PLACEHOLDER = "{PROJECT_NAME}"
     }
 }
 
@@ -91,8 +128,14 @@ class WebsiteStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(par
     }
 }
 
-class RepositoryStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
+class RepositoryStep(parent: NewProjectWizardStep) : AbstractOptionalStringBasedOnProjectNameStep(parent) {
     override val label = "Repository:"
+
+    init {
+        if (format.isEmpty()) {
+            format = "https://github.com/${LocalUserSettings.userName}/$PROJECT_NAME_PLACEHOLDER"
+        }
+    }
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, value)
@@ -103,8 +146,14 @@ class RepositoryStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(
     }
 }
 
-class IssueTrackerStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
+class IssueTrackerStep(parent: NewProjectWizardStep) : AbstractOptionalStringBasedOnProjectNameStep(parent) {
     override val label = "Issue Tracker:"
+
+    init {
+        if (format.isEmpty()) {
+            format = "https://${LocalUserSettings.userName}/$PROJECT_NAME_PLACEHOLDER/issues"
+        }
+    }
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, value)

@@ -12,6 +12,7 @@ package com.demonwav.mcdev.creator.step
 
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.findStep
+import com.demonwav.mcdev.creator.updateWhenChanged
 import com.demonwav.mcdev.creator.whenStepAvailable
 import com.demonwav.mcdev.util.toJavaClassName
 import com.demonwav.mcdev.util.toPackageName
@@ -29,15 +30,26 @@ class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
         ".${findStep<BuildSystemPropertiesStep<*>>().artifactId.toPackageName()}" +
         ".${findStep<AbstractModNameStep>().name.toJavaClassName()}"
 
+    private fun suggestGroupId(): String {
+        val parts = className.split('.').dropLast(2)
+        return if (parts.isEmpty()) {
+            findStep<BuildSystemPropertiesStep<*>>().groupId
+        } else {
+            parts.joinToString(".")
+        }
+    }
+
     val classNameProperty = propertyGraph.lazyProperty(::suggestMainClassName)
     var className by classNameProperty
     init {
         whenStepAvailable<BuildSystemPropertiesStep<*>> { buildSystemStep ->
-            buildSystemStep.groupIdProperty.afterChange { className = suggestMainClassName() }
-            buildSystemStep.artifactIdProperty.afterChange { className = suggestMainClassName() }
+            classNameProperty.updateWhenChanged(buildSystemStep.groupIdProperty, ::suggestMainClassName)
+            classNameProperty.updateWhenChanged(buildSystemStep.artifactIdProperty, ::suggestMainClassName)
+
+            buildSystemStep.groupIdProperty.updateWhenChanged(classNameProperty, ::suggestGroupId)
         }
         whenStepAvailable<AbstractModNameStep> { modNameStep ->
-            modNameStep.nameProperty.afterChange { className = suggestMainClassName() }
+            classNameProperty.updateWhenChanged(modNameStep.nameProperty, ::suggestMainClassName)
         }
     }
 

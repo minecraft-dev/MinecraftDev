@@ -20,8 +20,11 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.GitNewProjectWizardData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.stepSequence
+import com.intellij.openapi.observable.properties.ObservableMutableProperty
+import com.intellij.openapi.observable.properties.ObservableProperty
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.RecursionManager
 import java.time.ZonedDateTime
 
 var NewProjectWizardStep.gitEnabled
@@ -121,6 +124,17 @@ inline fun <reified T : NewProjectWizardStep> NewProjectWizardStep.whenStepAvail
         val whenAvailable = data.getUserData(whenAvailableKey)
             ?: mutableListOf<(T) -> Unit>().also { data.putUserData(whenAvailableKey, it) }
         whenAvailable += func
+    }
+}
+
+private val updateWhenChangedGuard =
+    RecursionManager.createGuard<ObservableMutableProperty<*>>("mcdev.updateWhenChangedGuard")
+
+fun <T> ObservableMutableProperty<T>.updateWhenChanged(dependency: ObservableProperty<*>, suggestor: () -> T) {
+    dependency.afterChange {
+        updateWhenChangedGuard.doPreventingRecursion(this, false) {
+            set(suggestor())
+        }
     }
 }
 
