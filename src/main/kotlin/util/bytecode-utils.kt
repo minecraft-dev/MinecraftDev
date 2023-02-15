@@ -17,10 +17,12 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.TypeConversionUtil
+import org.jetbrains.plugins.groovy.lang.resolve.processors.inference.type
 
 private const val INTERNAL_CONSTRUCTOR_NAME = "<init>"
 
@@ -149,6 +151,13 @@ val PsiMethod.descriptor: String?
 @Throws(ClassNameResolutionFailedException::class)
 private fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
     builder.append('(')
+    if (isConstructor) {
+        containingClass?.let { containingClass ->
+            if (containingClass.hasModifierProperty(PsiModifier.STATIC)) return@let
+            val outerClass = containingClass.containingClass
+            outerClass?.type()?.appendDescriptor(builder)
+        }
+    }
     for (parameter in parameterList.parameters) {
         parameter.type.appendDescriptor(builder)
     }

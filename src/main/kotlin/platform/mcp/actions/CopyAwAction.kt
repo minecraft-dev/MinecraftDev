@@ -68,7 +68,7 @@ class CopyAwAction : AnAction() {
                     val containing = target.containingClass?.internalName
                         ?: return maybeShow("Could not get owner of method", e)
                     val desc = target.descriptor ?: return maybeShow("Could not get descriptor of method", e)
-                    val text = "accessible method $containing ${target.name} $desc"
+                    val text = "accessible method $containing ${target.internalName} $desc"
                     copyToClipboard(editor, element, text)
                 }
                 else -> maybeShow("Invalid element", e)

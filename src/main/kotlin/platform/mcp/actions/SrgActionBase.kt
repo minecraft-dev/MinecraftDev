@@ -29,6 +29,7 @@ import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiReference
 import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
+import org.apache.commons.lang.StringEscapeUtils
 
 abstract class SrgActionBase : AnAction() {
 
@@ -91,8 +92,9 @@ abstract class SrgActionBase : AnAction() {
         }
 
         fun showSuccessBalloon(editor: Editor, element: PsiElement, text: String) {
+            val escapedText = StringEscapeUtils.escapeHtml(text)
             val balloon = JBPopupFactory.getInstance()
-                .createHtmlTextBalloonBuilder(text, null, LightColors.SLIGHTLY_GREEN, null)
+                .createHtmlTextBalloonBuilder(escapedText, null, LightColors.SLIGHTLY_GREEN, null)
                 .setHideOnAction(true)
                 .setHideOnClickOutside(true)
                 .setHideOnKeyOutside(true)
