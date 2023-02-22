@@ -35,6 +35,8 @@ import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.util.Key
 import com.intellij.ui.dsl.builder.Panel
 
+private val MIN_SPONGE_VERSION = SpongeConstants.API8
+
 class SpongePlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<SpongeVersion>(parent) {
     override val description = "download Sponge versions"
 
@@ -60,7 +62,10 @@ class SpongePlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Sponge
 class SpongeApiVersionStep(
     parent: NewProjectWizardStep,
     data: SpongeVersion
-) : AbstractSelectVersionStep<SemanticVersion>(parent, data.versions.keys.mapNotNull(SemanticVersion::tryParse)) {
+) : AbstractSelectVersionStep<SemanticVersion>(
+    parent,
+    data.versions.keys.mapNotNull(SemanticVersion::tryParse).filter { it >= MIN_SPONGE_VERSION }
+) {
     override val label = "Sponge API Version:"
 
     override fun setupUI(builder: Panel) {
