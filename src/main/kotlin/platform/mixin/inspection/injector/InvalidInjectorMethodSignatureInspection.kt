@@ -20,6 +20,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.COERCE
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.platform.mixin.util.isAssignable
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
+import com.demonwav.mcdev.platform.mixin.util.isMixinExtrasSugar
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.synchronize
@@ -232,11 +233,12 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             allowCoerce: Boolean
         ): CheckResult {
             val parameters = parameterList.parameters
+            val parametersWithoutSugar = parameters.dropLastWhile { it.isMixinExtrasSugar }.toTypedArray()
             var pos = 0
 
             for (group in expected) {
                 // Check if parameter group matches
-                if (group.match(parameters, pos, allowCoerce)) {
+                if (group.match(parametersWithoutSugar, pos, allowCoerce)) {
                     pos += group.size
                 } else if (group.required != ParameterGroup.RequiredLevel.OPTIONAL) {
                     return if (group.required == ParameterGroup.RequiredLevel.ERROR_IF_ABSENT) {
@@ -244,6 +246,15 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                     } else {
                         CheckResult.WARNING
                     }
+                }
+            }
+
+            // Sugars are valid on any injector and should be ignored, as long as they're at the end.
+            while (pos < parameters.size) {
+                if (parameters[pos].isMixinExtrasSugar) {
+                    pos++
+                } else {
+                    break
                 }
             }
 
@@ -288,6 +299,11 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                 return@dropWhile fqname != MixinConstants.Classes.CALLBACK_INFO &&
                     fqname != MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
             }.drop(1) // the first element in the list is the CallbackInfo but we don't want it
+                .takeWhile { !it.isMixinExtrasSugar }
+
+            // We want to preserve sugars, and while we're at it, we might as well move them all to the end
+            val sugars = parameters.parameters.filter { it.isMixinExtrasSugar }
+
             val newParams = expected.flatMapTo(mutableListOf()) {
                 if (it.default) {
                     it.parameters.mapIndexed { i: Int, p: Parameter ->
@@ -302,8 +318,9 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                     emptyList()
                 }
             }
-            // Restore the captured locals before applying the fix
+            // Restore the captured locals and sugars before applying the fix
             newParams.addAll(locals)
+            newParams.addAll(sugars)
             parameters.synchronize(newParams)
         }
     }
