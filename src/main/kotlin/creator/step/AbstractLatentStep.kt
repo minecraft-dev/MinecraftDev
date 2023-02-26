@@ -20,15 +20,15 @@ import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
-import com.intellij.openapi.ui.validation.validationErrorFor
+import com.intellij.openapi.ui.validation.DialogValidation
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.AsyncProcessIcon
-import javax.swing.JLabel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -96,7 +96,7 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                         row {
                             val label = label("Unable to $description")
                                 .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
-                                .validation(validationErrorFor<JLabel> { "Unable to $description" })
+                                .validation(DialogValidation { ValidationInfo("Unable to $description") })
                             label.component.foreground = JBColor.RED
                         }
                     }
@@ -142,11 +142,7 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                     }
                 )
                     .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
-                    .validation(
-                        validationErrorFor<AsyncProcessIcon> {
-                            "Haven't finished $description"
-                        }
-                    )
+                    .validation(DialogValidation { ValidationInfo("Haven't finished $description") })
             }
         }
     }

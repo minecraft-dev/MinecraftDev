@@ -21,8 +21,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
-import com.intellij.openapi.ui.validation.validationErrorFor
+import com.intellij.openapi.ui.validation.DialogValidation
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
@@ -58,8 +59,8 @@ class ProjectSetupFinalizerWizardStep(parent: NewProjectWizardStep) : AbstractNe
                 cell(JPanel())
                     .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
                     .validation(
-                        validationErrorFor<JPanel> {
-                            finalizers.mapFirstNotNull(ProjectSetupFinalizer::validate)
+                        DialogValidation {
+                            finalizers.mapFirstNotNull(ProjectSetupFinalizer::validate)?.let(::ValidationInfo)
                         }
                     )
             }
