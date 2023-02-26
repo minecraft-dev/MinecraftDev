@@ -30,6 +30,7 @@ import com.intellij.openapi.roots.libraries.LibraryKindRegistry
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Ref
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
@@ -52,30 +53,25 @@ fun runWriteTaskLater(func: () -> Unit) {
     }
 }
 
-inline fun <T : Any?> Project.runWriteTaskInSmartMode(crossinline func: () -> T): T {
-    if (ApplicationManager.getApplication().isReadAccessAllowed) {
-        return runWriteTask { func() }
-    }
-
+inline fun Project.runWriteTaskInSmartMode(crossinline func: () -> Unit) {
     val dumbService = DumbService.getInstance(this)
-    val ref = Ref<T>()
-    while (true) {
-        dumbService.waitForSmartMode()
-        val success = runWriteTask {
+    lateinit var runnable: Runnable
+    runnable = Runnable {
+        if (isDisposed) {
+            throw ProcessCanceledException()
+        }
+        runWriteTask {
             if (isDisposed) {
                 throw ProcessCanceledException()
             }
             if (dumbService.isDumb) {
-                return@runWriteTask false
+                dumbService.runWhenSmart(runnable)
+            } else {
+                func()
             }
-            ref.set(func())
-            return@runWriteTask true
-        }
-        if (success) {
-            break
         }
     }
-    return ref.get()
+    dumbService.runWhenSmart(runnable)
 }
 
 fun <T : Any?> invokeAndWait(func: () -> T): T {
@@ -309,6 +305,9 @@ fun String.toJavaIdentifier(allowDollars: Boolean = true): String {
         }
         .joinToString("")
 }
+
+fun String.toJavaClassName() = StringUtil.capitalizeWords(this, true)
+    .replace(" ", "").toJavaIdentifier(allowDollars = false)
 
 fun String.toPackageName(): String {
     if (this.isEmpty()) {
