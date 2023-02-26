@@ -30,6 +30,7 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiDisjunctionType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIntersectionType
+import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
@@ -119,6 +120,11 @@ val PsiClass.isAccessorMixin: Boolean
 
         val targets = mixinTargets
         return targets.isNotEmpty() && !targets.any { it.hasAccess(Opcodes.ACC_INTERFACE) }
+    }
+
+val PsiParameter.isMixinExtrasSugar: Boolean
+    get() {
+        return annotations.any { it.qualifiedName?.contains(".mixinextras.sugar.") == true }
     }
 
 fun callbackInfoType(project: Project): PsiType =

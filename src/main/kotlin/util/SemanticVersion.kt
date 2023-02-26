@@ -86,6 +86,14 @@ class SemanticVersion(
          */
         fun release(vararg parts: Int) = SemanticVersion(parts.map { ReleasePart(it, it.toString()) })
 
+        fun tryParse(value: String): SemanticVersion? {
+            return try {
+                parse(value)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
+
         /**
          * Parses a version string into a comparable representation.
          * @throws IllegalArgumentException if any part of the version string cannot be parsed as integer or split into text parts.
