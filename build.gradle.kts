@@ -81,7 +81,6 @@ dependencies {
 
     implementation(files(gradleToolingExtensionJar))
 
-    implementation(libs.templateMakerFabric)
     implementation(libs.mappingIo)
     implementation(libs.bundles.asm)
 
@@ -156,10 +155,11 @@ intellij {
         "maven",
         "gradle",
         "Groovy",
+        "Kotlin",
         "org.toml.lang:$pluginTomlVersion",
         "ByteCodeViewer",
-        // needed dependencies for unit tests
         "properties",
+        // needed dependencies for unit tests
         "junit"
     )
 

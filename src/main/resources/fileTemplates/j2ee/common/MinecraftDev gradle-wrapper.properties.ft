@@ -1,0 +1,1 @@
+distributionUrl=https\://services.gradle.org/distributions/gradle-${GRADLE_WRAPPER_VERSION}-bin.zip

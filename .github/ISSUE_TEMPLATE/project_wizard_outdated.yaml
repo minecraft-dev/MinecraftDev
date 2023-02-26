@@ -1,0 +1,47 @@
+name: Project Wizard Outdated
+description: The Minecraft project wizard is outdated
+labels: ["status: unverified", "type: bug"]
+body:
+  - type: markdown
+    attributes:
+      value: PLEASE DO NOT USE THIS TEMPLATE FOR FEATURE REQUESTS, INCLUDING REQUESTS FOR NEW PLATFORMS.
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Minecraft Development for IntelliJ plugin version
+    validations:
+      required: true
+  - type: input
+    id: intellij-version
+    attributes:
+      label: IntelliJ version
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating System
+    validations:
+      required: true
+  - type: dropdown
+    id: target-platform
+    attributes:
+      label: Target platform
+      multiple: true
+      options:
+        - Spigot
+        - Paper
+        - Sponge
+        - Architectury
+        - Minecraft Forge
+        - Fabric
+        - Velocity
+        - BungeeCord
+        - Waterfall
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Additional description
+      description: If the issue isn't obvious, please be as detailed as you can.

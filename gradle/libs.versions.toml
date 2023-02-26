@@ -10,7 +10,6 @@ coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", ve
 coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
 coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
-templateMakerFabric = "com.extracraftx.minecraft:TemplateMakerFabric:0.4.1"
 mappingIo = "net.fabricmc:mapping-io:0.2.1"
 
 # GrammarKit
