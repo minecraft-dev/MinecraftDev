@@ -39,7 +39,6 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Key
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Cell
-import com.intellij.ui.dsl.builder.EMPTY_LABEL
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
@@ -136,12 +135,12 @@ class ArchitecturyVersionChainStep(
             FABRIC_API_VERSION -> {
                 val comboBox = super.createComboBox(row, index, items).bindEnabled(useFabricApiProperty)
                 row.checkBox("Use Fabric API").bindSelected(useFabricApiProperty)
-                row.label(EMPTY_LABEL).bindText(
+                row.label("").bindText(
                     getVersionProperty(MINECRAFT_VERSION).transform { mcVersion ->
                         val versionStr = mcVersion.toString()
                         val matched = versionData.fabricApiVersions.versions.any { versionStr in it.gameVersions }
                         if (matched) {
-                            EMPTY_LABEL
+                            ""
                         } else {
                             "Unable to match API versions to Minecraft version"
                         }

@@ -40,7 +40,6 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Key
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Cell
-import com.intellij.ui.dsl.builder.EMPTY_LABEL
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindItem
@@ -126,12 +125,12 @@ class FabricVersionChainStep(
             }
             YARN_VERSION -> {
                 val comboBox = super.createComboBox(row, index, items)
-                row.label(EMPTY_LABEL).bindText(
+                row.label("").bindText(
                     getVersionProperty(MINECRAFT_VERSION).transform { mcVersion ->
                         mcVersion as FabricMcVersion
                         val matched = fabricVersions.mappings.any { it.gameVersion == mcVersion.version }
                         if (matched) {
-                            EMPTY_LABEL
+                            ""
                         } else {
                             "Unable to match Yarn versions to Minecraft version"
                         }
@@ -142,12 +141,12 @@ class FabricVersionChainStep(
             API_VERSION -> {
                 val comboBox = super.createComboBox(row, index, items).bindEnabled(useApiProperty)
                 row.checkBox("Use Fabric API").bindSelected(useApiProperty)
-                row.label(EMPTY_LABEL).bindText(
+                row.label("").bindText(
                     getVersionProperty(MINECRAFT_VERSION).transform { mcVersion ->
                         mcVersion as FabricMcVersion
                         val matched = apiVersions.versions.any { mcVersion.version in it.gameVersions }
                         if (matched) {
-                            EMPTY_LABEL
+                            ""
                         } else {
                             "Unable to match API versions to Minecraft version"
                         }
