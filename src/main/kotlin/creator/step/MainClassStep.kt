@@ -26,9 +26,18 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 
 class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
-    private fun suggestMainClassName() = findStep<BuildSystemPropertiesStep<*>>().groupId.toPackageName() +
-        ".${findStep<BuildSystemPropertiesStep<*>>().artifactId.toPackageName()}" +
-        ".${findStep<AbstractModNameStep>().name.toJavaClassName()}"
+    private fun suggestMainClassName(): String {
+        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+
+        if (buildSystemProps.artifactId.contains('.')) {
+            // if the artifact id is invalid, don't confuse ourselves by copying its dots
+            return className
+        }
+
+        return buildSystemProps.groupId.toPackageName() +
+            ".${buildSystemProps.artifactId.toPackageName()}" +
+            ".${findStep<AbstractModNameStep>().name.toJavaClassName()}"
+    }
 
     private fun suggestGroupId(): String {
         val parts = className.split('.').dropLast(2)
