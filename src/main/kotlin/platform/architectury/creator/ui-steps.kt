@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.platform.architectury.creator
 
-import com.demonwav.mcdev.creator.chain
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.creator.step.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.step.AbstractLatentStep
@@ -20,6 +19,7 @@ import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.IssueTrackerStep
 import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.ModNameStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.RepositoryStep
 import com.demonwav.mcdev.creator.step.UseMixinsStep
 import com.demonwav.mcdev.creator.step.WebsiteStep
@@ -31,7 +31,6 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.bindEnabled
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.project.Project
@@ -63,18 +62,17 @@ class ArchitecturyPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Arc
     }
 
     override fun createStep(data: ArchitecturyVersionData): NewProjectWizardStep {
-        return ArchitecturyVersionChainStep(this, data).chain(
-            ::UseMixinsStep,
-            ::ModNameStep,
-            ::LicenseStep,
-            ::ArchitecturyOptionalSettingsStep,
-            ::ArchitecturyBuildSystemStep,
-            ::ArchitecturyProjectFilesStep,
-            ::ArchitecturyCommonMainClassStep,
-            ::ArchitecturyForgeMainClassStep,
-            ::ArchitecturyFabricMainClassStep,
-            ::ArchitecturyPostBuildSystemStep,
-        )
+        return ArchitecturyVersionChainStep(this, data)
+            .nextStep(::UseMixinsStep)
+            .nextStep(::ModNameStep)
+            .nextStep(::LicenseStep)
+            .nextStep(::ArchitecturyOptionalSettingsStep)
+            .nextStep(::ArchitecturyBuildSystemStep)
+            .nextStep(::ArchitecturyProjectFilesStep)
+            .nextStep(::ArchitecturyCommonMainClassStep)
+            .nextStep(::ArchitecturyForgeMainClassStep)
+            .nextStep(::ArchitecturyFabricMainClassStep)
+            .nextStep(::ArchitecturyPostBuildSystemStep)
     }
 
     class Factory : ModPlatformStep.Factory {
@@ -193,10 +191,9 @@ class ArchitecturyVersionChainStep(
 class ArchitecturyOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsibleStep(parent) {
     override val title = "Optional Settings"
 
-    override fun createStep() = DescriptionStep(this).chain(
-        ::AuthorsStep,
-        ::WebsiteStep,
-        ::RepositoryStep,
-        ::IssueTrackerStep,
-    )
+    override fun createStep() = DescriptionStep(this)
+        .nextStep(::AuthorsStep)
+        .nextStep(::WebsiteStep)
+        .nextStep(::RepositoryStep)
+        .nextStep(::IssueTrackerStep)
 }

@@ -12,7 +12,6 @@ package com.demonwav.mcdev.platform.velocity.creator
 
 import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
 import com.demonwav.mcdev.creator.PlatformVersion
-import com.demonwav.mcdev.creator.chain
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.getVersionSelector
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
@@ -23,6 +22,7 @@ import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DependStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.MainClassStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.PluginNameStep
 import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.platform.PlatformType
@@ -30,7 +30,6 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.onShown
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.util.Key
@@ -49,14 +48,13 @@ class VelocityPlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Plat
     }
 
     override fun createStep(data: PlatformVersion) =
-        VelocityVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse)).chain(
-            ::PluginNameStep,
-            ::MainClassStep,
-            ::VelocityOptionalSettingsStep,
-            ::VelocityBuildSystemStep,
-            ::VelocityProjectFilesStep,
-            ::VelocityPostBuildSystemStep,
-        )
+        VelocityVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse))
+            .nextStep(::PluginNameStep)
+            .nextStep(::MainClassStep)
+            .nextStep(::VelocityOptionalSettingsStep)
+            .nextStep(::VelocityBuildSystemStep)
+            .nextStep(::VelocityProjectFilesStep)
+            .nextStep(::VelocityPostBuildSystemStep)
 
     class Factory : PluginPlatformStep.Factory {
         override val name = "Velocity"
@@ -104,9 +102,8 @@ class VelocityVersionStep(
 class VelocityOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsibleStep(parent) {
     override val title = "Optional Settings"
 
-    override fun createStep() = DescriptionStep(this).chain(
-        ::AuthorsStep,
-        ::WebsiteStep,
-        ::DependStep,
-    )
+    override fun createStep() = DescriptionStep(this)
+        .nextStep(::AuthorsStep)
+        .nextStep(::WebsiteStep)
+        .nextStep(::DependStep)
 }
