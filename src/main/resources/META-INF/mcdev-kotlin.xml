@@ -1,0 +1,15 @@
+<!--
+    Minecraft Dev for IntelliJ
+
+    https://minecraftdev.org
+
+    Copyright (c) 2023 minecraft-dev
+
+    MIT License
+-->
+
+<idea-plugin>
+    <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
+        <gradleFileType implementation="com.demonwav.mcdev.creator.buildsystem.KotlinGradleFile$Type" />
+    </extensions>
+</idea-plugin>
