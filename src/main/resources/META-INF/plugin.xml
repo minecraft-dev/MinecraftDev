@@ -13,7 +13,7 @@
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.idea.maven</depends>
     <depends>com.intellij.gradle</depends>
-    <depends>org.jetbrains.kotlin</depends>
+    <depends optional="true" config-file="mcdev-kotlin.xml">org.jetbrains.kotlin</depends>
     <depends>org.intellij.groovy</depends>
     <depends>com.intellij.properties</depends>
     <depends>ByteCodeViewer</depends>
@@ -46,6 +46,8 @@
         <extensionPoint name="buildSystemSupport" beanClass="com.demonwav.mcdev.creator.buildsystem.BuildSystemSupportEntry" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport"/>
         </extensionPoint>
+
+        <extensionPoint name="gradleFileType" interface="com.demonwav.mcdev.creator.buildsystem.GradleFile$Type" dynamic="true" />
 
         <extensionPoint name="mixinSelectorParser" interface="com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser" dynamic="true" />
         <extensionPoint name="mixinAnnotationHandler" beanClass="com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandlerInfo" dynamic="true">
@@ -91,6 +93,8 @@
         <buildSystemSupport platform="Velocity" buildSystem="Maven" implementation="com.demonwav.mcdev.platform.velocity.creator.VelocityMavenSupport" />
         <buildSystemSupport platform="BungeeCord" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeeGradleSupport" />
         <buildSystemSupport platform="BungeeCord" buildSystem="Maven" implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeeMavenSupport" />
+
+        <gradleFileType implementation="com.demonwav.mcdev.creator.buildsystem.GroovyGradleFile$Type" />
 
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />
