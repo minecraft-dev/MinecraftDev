@@ -34,6 +34,7 @@ import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.chain
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.bindStorage
+import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
@@ -107,6 +108,10 @@ class FabricVersionChainStep(
         .bindBooleanStorage("${javaClass.name}.useApi")
     private var useApi by useApiProperty
 
+    private val useOfficialMappingsProperty = propertyGraph.property(false)
+        .bindBooleanStorage("${javaClass.name}.useOfficialMappings")
+    private var useOfficialMappings by useOfficialMappingsProperty
+
     init {
         showSnapshotsProperty.afterChange { updateVersionBox() }
     }
@@ -125,7 +130,8 @@ class FabricVersionChainStep(
                 comboBox
             }
             YARN_VERSION -> {
-                val comboBox = super.createComboBox(row, index, items)
+                val comboBox = super.createComboBox(row, index, items).bindEnabled(useOfficialMappingsProperty.not())
+                row.checkBox("Use Official Mappings").bindSelected(useOfficialMappingsProperty)
                 row.label(EMPTY_LABEL).bindText(
                     getVersionProperty(MINECRAFT_VERSION).transform { mcVersion ->
                         mcVersion as FabricMcVersion
@@ -136,7 +142,7 @@ class FabricVersionChainStep(
                             "Unable to match Yarn versions to Minecraft version"
                         }
                     },
-                ).component.foreground = JBColor.YELLOW
+                ).bindEnabled(useOfficialMappingsProperty.not()).component.foreground = JBColor.YELLOW
                 comboBox
             }
             API_VERSION -> {
