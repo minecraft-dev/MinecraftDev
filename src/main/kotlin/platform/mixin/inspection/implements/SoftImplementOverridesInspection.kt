@@ -30,7 +30,7 @@ class SoftImplementOverridesInspection : MixinInspection() {
             if (method.isSoftImplementMissingParent()) {
                 holder.registerProblem(
                     method.nameIdentifier ?: method,
-                    "Method does not soft-implement a method from its interfaces"
+                    "Method does not soft-implement a method from its interfaces",
                 )
             }
         }

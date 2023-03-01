@@ -36,7 +36,7 @@ class EmptyImplementsTest : BaseMixinTest() {
 
                     }
                     """,
-                    configure = false
+                    configure = false,
                 )
             }
         }
@@ -69,7 +69,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-            """
+            """,
         )
     }
 
@@ -89,7 +89,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-            """
+            """,
         )
     }
 
@@ -112,7 +112,7 @@ class EmptyImplementsTest : BaseMixinTest() {
             class EmptyImplementsMixin {
 
             }
-            """
+            """,
         )
     }
 }

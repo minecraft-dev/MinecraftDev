@@ -29,7 +29,6 @@ import com.intellij.psi.PsiForeachStatement
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiSwitchLabelStatementBase
 import com.intellij.psi.util.PsiUtil
-import java.lang.IllegalArgumentException
 import java.util.Locale
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
@@ -92,7 +91,7 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
-        targetClass: PsiClass
+        targetClass: PsiClass,
     ): NavigationVisitor? {
         val constantInfo = getConstantInfo(at) ?: return null
         return MyNavigationVisitor(constantInfo)
@@ -102,7 +101,7 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
-        mode: CollectVisitor.Mode
+        mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiElement>? {
         val constantInfo = getConstantInfo(at) ?: return null
         return MyCollectVisitor(at.project, mode, constantInfo)
@@ -110,7 +109,7 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
 
     override fun createLookup(
         targetClass: ClassNode,
-        result: CollectVisitor.Result<PsiElement>
+        result: CollectVisitor.Result<PsiElement>,
     ): LookupElementBuilder? {
         return null
     }
@@ -125,7 +124,7 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
     }
 
     class MyNavigationVisitor(
-        private val constantInfo: ConstantInfo
+        private val constantInfo: ConstantInfo,
     ) : NavigationVisitor() {
         override fun visitForeachStatement(statement: PsiForeachStatement) {
             if (statement.iteratedValue?.type is PsiArrayType) {
@@ -197,7 +196,7 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
     class MyCollectVisitor(
         private val project: Project,
         mode: Mode,
-        private val constantInfo: ConstantInfo
+        private val constantInfo: ConstantInfo,
     ) : CollectVisitor<PsiElement>(mode) {
         override fun accept(methodNode: MethodNode) {
             val elementFactory = JavaPsiFacade.getElementFactory(project)

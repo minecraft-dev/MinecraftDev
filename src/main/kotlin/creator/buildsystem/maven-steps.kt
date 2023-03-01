@@ -87,7 +87,7 @@ abstract class AbstractPatchPomStep(parent: NewProjectWizardStep) : AbstractLong
     protected fun setupDependencies(
         model: MavenDomProjectModel,
         repositories: List<BuildRepository>,
-        dependencies: List<BuildDependency>
+        dependencies: List<BuildDependency>,
     ) {
         for ((id, url, types) in repositories) {
             if (!types.contains(BuildSystemType.MAVEN)) {

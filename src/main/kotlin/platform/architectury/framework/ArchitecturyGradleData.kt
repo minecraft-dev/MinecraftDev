@@ -18,7 +18,7 @@ import com.intellij.openapi.externalSystem.model.project.ModuleData
 
 data class ArchitecturyGradleData(
     val module: ModuleData,
-    val moduleType: ArchitecturyModel.ModuleType
+    val moduleType: ArchitecturyModel.ModuleType,
 ) : AbstractExternalEntityData(module.owner) {
     companion object {
         val KEY = Key.create(ArchitecturyGradleData::class.java, ProjectKeys.TASK.processingWeight + 1)

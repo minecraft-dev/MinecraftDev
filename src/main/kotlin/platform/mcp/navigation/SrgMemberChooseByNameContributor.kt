@@ -54,7 +54,7 @@ class SrgMemberChooseByNameContributor : ChooseByNameContributor {
         name: String,
         pattern: String,
         project: Project,
-        includeNonProjectItems: Boolean
+        includeNonProjectItems: Boolean,
     ): Array<NavigationItem> {
         if (!includeNonProjectItems || srgMap == null || module == null) {
             return emptyArray()

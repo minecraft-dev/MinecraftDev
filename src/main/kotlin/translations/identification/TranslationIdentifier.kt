@@ -37,7 +37,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
             project: Project,
             element: PsiExpression,
             container: PsiElement,
-            referenceElement: PsiElement
+            referenceElement: PsiElement,
         ): TranslationInstance? {
             if (container is PsiExpressionList && container.parent is PsiCallExpression) {
                 val call = container.parent as PsiCallExpression
@@ -64,7 +64,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                     translationKey,
                                     formatted,
                                     if (superfluousParams >= 0) FormattingError.SUPERFLUOUS else null,
-                                    superfluousParams
+                                    superfluousParams,
                                 )
                             } catch (ignored: MissingFormatArgumentException) {
                                 return TranslationInstance(
@@ -73,7 +73,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                     referenceElement,
                                     translationKey,
                                     translation,
-                                    FormattingError.MISSING
+                                    FormattingError.MISSING,
                                 )
                             }
                         } else {
@@ -82,7 +82,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                 function.matchedIndex,
                                 referenceElement,
                                 translationKey,
-                                null
+                                null,
                             )
                         }
                     }

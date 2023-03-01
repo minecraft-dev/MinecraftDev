@@ -49,8 +49,8 @@ object EntryPointReference : PsiReferenceProvider() {
                     element,
                     range.cutOut(TextRange.from(cursor, clazzPart.length)),
                     innerClassDepth,
-                    false
-                )
+                    false,
+                ),
             )
             cursor += clazzPart.length
         }
@@ -61,8 +61,8 @@ object EntryPointReference : PsiReferenceProvider() {
                     element,
                     range.cutOut(TextRange.from(cursor, methodParts[1].length)),
                     innerClassDepth,
-                    true
-                )
+                    true,
+                ),
             )
         }
         return references.toTypedArray()
@@ -71,7 +71,7 @@ object EntryPointReference : PsiReferenceProvider() {
     private fun resolveReference(
         element: JsonStringLiteral,
         innerClassDepth: Int,
-        isMethodReference: Boolean
+        isMethodReference: Boolean,
     ): Array<PsiElement> {
         val strReference = element.value
         val methodParts = strReference.split("::", limit = 2)
@@ -81,7 +81,9 @@ object EntryPointReference : PsiReferenceProvider() {
         if (innerClassDepth >= clazzParts.size ||
             innerClassDepth + 1 < clazzParts.size &&
             isMethodReference
-        ) throw IncorrectOperationException("Invalid reference")
+        ) {
+            throw IncorrectOperationException("Invalid reference")
+        }
         var clazz = JavaPsiFacade.getInstance(element.project).findClass(clazzParts[0], element.resolveScope)
             ?: return PsiElement.EMPTY_ARRAY
         // if class is inner class, then a dot "." was used as separator instead of a dollar sign "$", this does not work to reference an inner class
@@ -112,7 +114,7 @@ object EntryPointReference : PsiReferenceProvider() {
         element: JsonStringLiteral,
         range: TextRange,
         private val innerClassDepth: Int,
-        private val isMethodReference: Boolean
+        private val isMethodReference: Boolean,
     ) :
         PsiReferenceBase<JsonStringLiteral>(element, range),
         PsiPolyVariantReference,

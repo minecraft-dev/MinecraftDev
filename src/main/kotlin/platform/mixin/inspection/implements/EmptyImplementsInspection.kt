@@ -37,7 +37,7 @@ class EmptyImplementsInspection : MixinInspection() {
                 holder.registerProblem(
                     annotation,
                     "@Implements is redundant",
-                    RemoveAnnotationQuickFix(annotation, null)
+                    RemoveAnnotationQuickFix(annotation, null),
                 )
             }
         }

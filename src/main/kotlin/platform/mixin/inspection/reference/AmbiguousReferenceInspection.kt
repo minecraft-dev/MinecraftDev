@@ -34,7 +34,7 @@ class AmbiguousReferenceInspection : MixinAnnotationAttributeInspection("method"
     override fun visitAnnotationAttribute(
         annotation: PsiAnnotation,
         value: PsiAnnotationMemberValue,
-        holder: ProblemsHolder
+        holder: ProblemsHolder,
     ) {
         val qName = annotation.qualifiedName ?: return
         val handler = MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project)
@@ -57,7 +57,7 @@ class AmbiguousReferenceInspection : MixinAnnotationAttributeInspection("method"
         holder.registerProblem(
             value,
             "Ambiguous reference to method '${ambiguousReference.name}' in target class",
-            QuickFix
+            QuickFix,
         )
     }
 

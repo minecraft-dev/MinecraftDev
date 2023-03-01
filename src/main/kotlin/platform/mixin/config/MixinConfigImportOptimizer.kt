@@ -106,7 +106,7 @@ class MixinConfigImportOptimizer : ImportOptimizer {
         private val file: JsonFile,
         private val mixins: JsonArray?,
         private val server: JsonArray?,
-        private val client: JsonArray?
+        private val client: JsonArray?,
     ) : Runnable {
 
         override fun run() {

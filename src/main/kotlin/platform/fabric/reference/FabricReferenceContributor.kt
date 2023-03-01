@@ -28,24 +28,24 @@ class FabricReferenceContributor : PsiReferenceContributor() {
             PlatformPatterns.psiElement(JsonArray::class.java)
                 .withSuperParent(
                     2,
-                    PlatformPatterns.psiElement(JsonObject::class.java).isPropertyValue("entrypoints")
-                )
+                    PlatformPatterns.psiElement(JsonObject::class.java).isPropertyValue("entrypoints"),
+                ),
         )
         registrar.registerReferenceProvider(entryPointPattern, EntryPointReference)
 
         val mixinConfigPattern = stringInModJson.withParent(
-            PlatformPatterns.psiElement(JsonArray::class.java).isPropertyValue("mixins")
+            PlatformPatterns.psiElement(JsonArray::class.java).isPropertyValue("mixins"),
         )
         registrar.registerReferenceProvider(mixinConfigPattern, ResourceFileReference("mixin config '%s'"))
 
         registrar.registerReferenceProvider(
             stringInModJson.isPropertyValue("accessWidener"),
-            ResourceFileReference("access widener '%s'")
+            ResourceFileReference("access widener '%s'"),
         )
 
         registrar.registerReferenceProvider(
             stringInModJson.isPropertyValue("icon"),
-            ResourceFileReference("icon '%s'")
+            ResourceFileReference("icon '%s'"),
         )
 
         registrar.registerReferenceProvider(stringInModJson.isPropertyValue("license"), LicenseReference)

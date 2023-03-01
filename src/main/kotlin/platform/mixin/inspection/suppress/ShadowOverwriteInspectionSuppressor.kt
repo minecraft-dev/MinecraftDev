@@ -26,7 +26,7 @@ class ShadowOverwriteInspectionSuppressor : InspectionSuppressor {
         "SameParameterValue",
         "Guava",
         VisibilityInspection.SHORT_NAME,
-        "MethodMayBeStatic"
+        "MethodMayBeStatic",
     )
 
     override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {

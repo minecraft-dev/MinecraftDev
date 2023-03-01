@@ -40,7 +40,7 @@ interface TranslationProvider {
     companion object {
         val INSTANCES = mapOf(
             JsonFileType.INSTANCE to JsonTranslationProvider,
-            LangFileType to LangTranslationProvider
+            LangFileType to LangTranslationProvider,
         )
     }
 }
@@ -67,12 +67,12 @@ object JsonTranslationProvider : TranslationProvider {
         val psiFile = PsiManager.getInstance(project).findFile(file) as? JsonFile ?: return emptyList()
         return CachedValuesManager.getCachedValue(
             psiFile,
-            Key<CachedValue<List<JsonProperty>>>("translation_lookup.$key")
+            Key<CachedValue<List<JsonProperty>>>("translation_lookup.$key"),
         ) {
             val value = psiFile.topLevelValue as? JsonObject
             CachedValueProvider.Result.create(
                 value?.propertyList?.filter { it.name == key } ?: emptyList(),
-                PsiModificationTracker.MODIFICATION_COUNT
+                PsiModificationTracker.MODIFICATION_COUNT,
             )
         }
     }
@@ -94,11 +94,11 @@ object LangTranslationProvider : TranslationProvider {
         val psiFile = PsiManager.getInstance(project).findFile(file) as? LangFile ?: return emptyList()
         return CachedValuesManager.getCachedValue(
             psiFile,
-            Key("translation_lookup.$key")
+            Key("translation_lookup.$key"),
         ) {
             CachedValueProvider.Result.create(
                 psiFile.childrenOfType<LangEntry>().filter { it.key == key },
-                PsiModificationTracker.MODIFICATION_COUNT
+                PsiModificationTracker.MODIFICATION_COUNT,
             )
         }
     }

@@ -75,7 +75,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_CLASS_VAR_IN_CROSS_ANNOTATED_CLASS_METHOD,
                                 elementAnnotation.renderSide(elementSide),
                                 classAnnotation.renderSide(classSide),
-                                declaration.getAnnotation(elementAnnotation.annotationName)
+                                declaration.getAnnotation(elementAnnotation.annotationName),
                             )
                         } else {
                             registerError(
@@ -83,7 +83,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_VAR_IN_CROSS_ANNOTATED_CLASS_METHOD,
                                 elementAnnotation.renderSide(elementSide),
                                 classAnnotation.renderSide(classSide),
-                                declaration.getAnnotation(elementAnnotation.annotationName)
+                                declaration.getAnnotation(elementAnnotation.annotationName),
                             )
                         }
                     }
@@ -104,7 +104,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                     Error.ANNOTATED_CLASS_VAR_IN_UNANNOTATED_METHOD,
                                     elementAnnotation.renderSide(elementSide),
                                     null,
-                                    declaration.getAnnotation(elementAnnotation.annotationName)
+                                    declaration.getAnnotation(elementAnnotation.annotationName),
                                 )
                             } else {
                                 registerError(
@@ -112,7 +112,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                     Error.ANNOTATED_VAR_IN_UNANNOTATED_METHOD,
                                     elementAnnotation.renderSide(elementSide),
                                     null,
-                                    declaration.getAnnotation(elementAnnotation.annotationName)
+                                    declaration.getAnnotation(elementAnnotation.annotationName),
                                 )
                             }
                         }
@@ -123,7 +123,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_CLASS_VAR_IN_CROSS_ANNOTATED_METHOD,
                                 elementAnnotation.renderSide(elementSide),
                                 methodAnnotation.renderSide(methodSide),
-                                declaration.getAnnotation(elementAnnotation.annotationName)
+                                declaration.getAnnotation(elementAnnotation.annotationName),
                             )
                         } else {
                             registerError(
@@ -131,7 +131,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_VAR_IN_CROSS_ANNOTATED_METHOD,
                                 elementAnnotation.renderSide(elementSide),
                                 methodAnnotation.renderSide(methodSide),
-                                declaration.getAnnotation(elementAnnotation.annotationName)
+                                declaration.getAnnotation(elementAnnotation.annotationName),
                             )
                         }
                     }
@@ -175,7 +175,7 @@ class VariableUseSideOnlyInspection : BaseInspection() {
                 return "Variable declared in a class annotated with ${infos[0]}" +
                     " cannot be referenced in a class annotated with ${infos[1]}."
             }
-        };
+        }, ;
 
         abstract fun getErrorString(vararg infos: Any): String
     }

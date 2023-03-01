@@ -131,7 +131,7 @@ fun LookupElementBuilder.completeToLiteral(context: PsiElement): LookupElementBu
 private class ReplaceElementWithLiteral(
     private val editor: Editor,
     private val file: PsiFile,
-    private val text: String
+    private val text: String,
 ) : Runnable {
 
     override fun run() {
@@ -145,8 +145,8 @@ private class ReplaceElementWithLiteral(
                 element.replace(
                     JavaPsiFacade.getElementFactory(element.project).createExpressionFromText(
                         "\"$text\"",
-                        element.parent
-                    )
+                        element.parent,
+                    ),
                 )
             }
         }

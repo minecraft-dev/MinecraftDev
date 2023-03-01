@@ -38,7 +38,7 @@ import org.objectweb.asm.tree.ClassNode
 object DescReference : AbstractMethodReference() {
     val ELEMENT_PATTERN: ElementPattern<PsiLiteral> =
         PsiJavaPatterns.psiLiteral(StandardPatterns.string()).insideAnnotationParam(
-            StandardPatterns.string().equalTo(DESC)
+            StandardPatterns.string().equalTo(DESC),
         )
 
     override val description = "method '%s'"
@@ -59,7 +59,7 @@ object DescReference : AbstractMethodReference() {
     override fun addCompletionInfo(
         builder: LookupElementBuilder,
         context: PsiElement,
-        targetMethodInfo: MemberReference
+        targetMethodInfo: MemberReference,
     ): LookupElementBuilder {
         return builder.withInsertHandler { insertionContext, _ ->
             insertionContext.laterRunnable =
@@ -72,11 +72,11 @@ object DescReference : AbstractMethodReference() {
     private class CompleteDescReference(
         private val editor: Editor,
         private val file: PsiFile,
-        private val targetMethodInfo: MemberReference
+        private val targetMethodInfo: MemberReference,
     ) : Runnable {
         private fun PsiElementFactory.createAnnotationMemberValueFromText(
             text: String,
-            context: PsiElement?
+            context: PsiElement?,
         ): PsiAnnotationMemberValue {
             val annotation = this.createAnnotationFromText("@Foo($text)", context)
             return annotation.findDeclaredAttributeValue("value")!!
@@ -97,8 +97,8 @@ object DescReference : AbstractMethodReference() {
                         "value",
                         elementFactory.createExpressionFromText(
                             "\"${StringUtil.escapeStringCharacters(targetMethodInfo.name)}\"",
-                            descAnnotation
-                        )
+                            descAnnotation,
+                        ),
                     )
                     val desc = targetMethodInfo.descriptor ?: return@runWriteAction
                     val argTypes = Type.getArgumentTypes(desc)
@@ -114,7 +114,7 @@ object DescReference : AbstractMethodReference() {
                         }
                         descAnnotation.setDeclaredAttributeValue(
                             "args",
-                            elementFactory.createAnnotationMemberValueFromText(argsText, descAnnotation)
+                            elementFactory.createAnnotationMemberValueFromText(argsText, descAnnotation),
                         )
                     } else {
                         descAnnotation.setDeclaredAttributeValue("desc", null)
@@ -125,8 +125,8 @@ object DescReference : AbstractMethodReference() {
                             "ret",
                             elementFactory.createAnnotationMemberValueFromText(
                                 "${returnType.className.replace('$', '.')}.class",
-                                descAnnotation
-                            )
+                                descAnnotation,
+                            ),
                         )
                     } else {
                         descAnnotation.setDeclaredAttributeValue("ret", null)

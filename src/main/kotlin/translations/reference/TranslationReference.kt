@@ -38,14 +38,14 @@ class TranslationReference(
     private val renameHandler: (element: PsiElement, range: TextRange, newName: String) -> PsiElement =
         { elem, range, newName ->
             ElementManipulators.getManipulator(elem).handleContentChange(elem, range, newName)!!
-        }
+        },
 ) : PsiReferenceBase.Poly<PsiElement>(element, textRange, false), PsiPolyVariantReference {
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         val project = myElement.project
         val entries = TranslationInverseIndex.findElements(
             key.full,
             GlobalSearchScope.allScope(project),
-            TranslationConstants.DEFAULT_LOCALE
+            TranslationConstants.DEFAULT_LOCALE,
         )
         return entries.mapToArray(::PsiElementResolveResult)
     }

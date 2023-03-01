@@ -26,7 +26,7 @@ import org.toml.lang.psi.TomlTable
 // https://github.com/intellij-rust/intellij-rust/blob/42d0981d45e8830aa5efe82c45688bab8223201c/toml/src/main/kotlin/org/rust/toml/completion/RsTomlKeysCompletionProvider.kt
 class TomlSchema private constructor(
     val topLevelEntries: Set<TomlSchemaEntry>,
-    private val tables: List<TomlTableSchema>
+    private val tables: List<TomlTableSchema>,
 ) {
 
     fun topLevelKeys(isArray: Boolean): Set<String> =
@@ -88,12 +88,12 @@ private fun TomlElement.getComments(): List<String> {
 data class TomlSchemaEntry(
     val key: String,
     val description: List<String>,
-    val type: TomlValueType?
+    val type: TomlValueType?,
 )
 
 class TomlTableSchema(
     val name: String,
     val isArray: Boolean,
     val entries: Set<TomlSchemaEntry>,
-    val description: List<String>
+    val description: List<String>,
 )

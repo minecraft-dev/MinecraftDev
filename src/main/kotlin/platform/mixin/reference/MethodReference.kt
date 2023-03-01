@@ -35,10 +35,10 @@ object MethodReference : AbstractMethodReference() {
                             val qName = t.qualifiedName ?: return false
                             return isValidAnnotation(qName, t.project)
                         }
-                    }
+                    },
                 ),
-                "method"
-            )
+                "method",
+            ),
         )
 
     override val description = "method '%s' in target class"

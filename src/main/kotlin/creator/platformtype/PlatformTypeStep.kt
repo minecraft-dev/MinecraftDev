@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator.platformtype
 
+import com.demonwav.mcdev.creator.platformtype.PlatformTypeStep.Factory
 import com.intellij.ide.wizard.AbstractNewProjectWizardMultiStep
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardMultiStepFactory
@@ -23,7 +24,7 @@ import com.intellij.openapi.extensions.ExtensionPointName
  * point.
  */
 class PlatformTypeStep private constructor(
-    parent: NewProjectWizardStep
+    parent: NewProjectWizardStep,
 ) : AbstractNewProjectWizardMultiStep<PlatformTypeStep, PlatformTypeStep.Factory>(parent, EP_NAME),
     NewProjectWizardBaseData by parent as NewProjectWizardBaseData {
     companion object {

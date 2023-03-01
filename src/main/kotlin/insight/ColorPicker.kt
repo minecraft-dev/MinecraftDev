@@ -63,7 +63,7 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) 
                         chosenColor = entry.key
                         dialog.close(0)
                     }
-                }
+                },
             )
 
             val constraints = GridBagConstraints()

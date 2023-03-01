@@ -50,7 +50,7 @@ class SpongeBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemS
 }
 
 class SpongePostBuildSystemStep(
-    parent: NewProjectWizardStep
+    parent: NewProjectWizardStep,
 ) : AbstractRunBuildSystemStep(parent, SpongeBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }

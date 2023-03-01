@@ -21,18 +21,12 @@ import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassObjectAccessExpression
-import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiExpressionList
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiReference
-import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.PsiSubstitutor
-import com.intellij.psi.ResolveResult
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.MethodSignatureUtil
@@ -48,9 +42,12 @@ object ReflectedMethodReference : PsiReferenceProvider() {
         return arrayOf(Reference(element as PsiLiteral))
     }
 
-    class Reference(element: PsiLiteral) : PsiReferenceBase.Poly<PsiLiteral>(element) {
+    class Reference(element: PsiLiteral) : ReflectedMemberReferenceBasePoly(element) {
         val methodName
             get() = element.constantStringValue ?: ""
+
+        override val memberName: String
+            get() = methodName
 
         val expressionList
             get() = element.parent as PsiExpressionList
@@ -89,7 +86,7 @@ object ReflectedMethodReference : PsiReferenceProvider() {
                                     val elementFactory = JavaPsiFacade.getElementFactory(context.project)
                                     val srgLiteral = elementFactory.createExpressionFromText(
                                         "\"${srgMethod.name}\"",
-                                        params
+                                        params,
                                     )
 
                                     if (params.expressionCount > 1) {
@@ -103,14 +100,14 @@ object ReflectedMethodReference : PsiReferenceProvider() {
                                     }
                                     val returnTypeRef = elementFactory.createExpressionFromText(
                                         "$returnType.class",
-                                        params
+                                        params,
                                     )
                                     params.add(returnTypeRef)
 
                                     for (paramType in paramTypes) {
                                         val paramTypeRef = elementFactory.createExpressionFromText(
                                             "$paramType.class",
-                                            params
+                                            params,
                                         )
                                         params.add(paramTypeRef)
                                     }
@@ -125,28 +122,6 @@ object ReflectedMethodReference : PsiReferenceProvider() {
                     }
                 }
                 .toTypedArray()
-        }
-
-        override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-            val typeClass = findReferencedClass() ?: return arrayOf()
-
-            val name = methodName
-            val srgManager = element.findModule()?.let { MinecraftFacet.getInstance(it) }
-                ?.getModuleOfType(McpModuleType)?.srgManager
-            val srgMap = srgManager?.srgMapNow
-            val mcpName = srgMap?.mapMcpToSrgName(name) ?: name
-
-            return typeClass.allMethods.asSequence()
-                .filter { it.name == mcpName }
-                .map(::PsiElementResolveResult)
-                .toTypedArray()
-        }
-
-        private fun findReferencedClass(): PsiClass? {
-            val callParams = element.parent as? PsiExpressionList
-            val classRef = callParams?.expressions?.first() as? PsiClassObjectAccessExpression
-            val type = classRef?.operand?.type as? PsiClassType
-            return type?.resolve()
         }
     }
 }

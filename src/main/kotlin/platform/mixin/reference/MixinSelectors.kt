@@ -131,7 +131,7 @@ interface MixinSelector {
 
     fun resolve(
         project: Project,
-        scope: GlobalSearchScope = GlobalSearchScope.allScope(project)
+        scope: GlobalSearchScope = GlobalSearchScope.allScope(project),
     ): Pair<PsiClass, PsiMember>? {
         return resolve(project, scope, ::Pair)
     }
@@ -142,7 +142,7 @@ interface MixinSelector {
 
     fun resolveAsm(
         project: Project,
-        scope: GlobalSearchScope = GlobalSearchScope.allScope(project)
+        scope: GlobalSearchScope = GlobalSearchScope.allScope(project),
     ): MixinTargetMember? {
         val owner = this.owner ?: return null
 
@@ -306,7 +306,7 @@ class MixinRegexParser : MixinSelectorParser {
             namePattern,
             descPattern,
             ownerPattern.getConstantString(),
-            descPattern.getConstantString()
+            descPattern.getConstantString(),
         )
     }
 
@@ -345,7 +345,7 @@ private class MixinRegexSelector(
     val namePattern: Regex,
     val descPattern: Regex,
     override val owner: String?,
-    descriptor: String?
+    descriptor: String?,
 ) : MixinSelector {
     override fun matchField(owner: String, name: String, desc: String): Boolean {
         return ownerPattern.containsMatchIn(owner) &&
@@ -517,7 +517,7 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
                 element,
                 PsiAnnotation::class.java,
                 PsiMethod::class.java,
-                PsiClass::class.java
+                PsiClass::class.java,
             )
         }
     }
@@ -566,7 +566,7 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
             val ret = descAnnotation.findAttributeValue("ret")?.resolveType() ?: PsiType.VOID
             val desc = Type.getMethodDescriptor(
                 Type.getType(ret.descriptor),
-                *argTypes.mapToArray { Type.getType(it.descriptor) }
+                *argTypes.mapToArray { Type.getType(it.descriptor) },
             )
 
             return DescSelector(owners, name, desc)
@@ -577,7 +577,7 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
 data class DescSelector(
     val owners: Set<String>,
     val name: String,
-    override val methodDescriptor: String
+    override val methodDescriptor: String,
 ) : MixinSelector {
     override fun matchField(owner: String, name: String, desc: String): Boolean {
         return this.owners.contains(owner) && this.name == name && this.fieldDescriptor.substringBefore("(") == desc

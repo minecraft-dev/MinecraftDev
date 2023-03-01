@@ -25,7 +25,7 @@ class UnqualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection(
     override fun visitAnnotationAttribute(
         annotation: PsiAnnotation,
         value: PsiAnnotationMemberValue,
-        holder: ProblemsHolder
+        holder: ProblemsHolder,
     ) {
         // Check if the specified target reference uses member descriptors
         if (!AtResolver.usesMemberReference(annotation)) {

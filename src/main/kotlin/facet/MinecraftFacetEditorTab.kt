@@ -71,7 +71,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             bungeecordEnabledCheckBox,
             waterfallEnabledCheckBox,
             velocityEnabledCheckBox,
-            adventureEnabledCheckBox
+            adventureEnabledCheckBox,
         )
     }
 
@@ -90,7 +90,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             bungeecordAutoCheckBox,
             waterfallAutoCheckBox,
             velocityAutoCheckBox,
-            adventureAutoCheckBox
+            adventureAutoCheckBox,
         )
     }
 
@@ -109,40 +109,40 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             unique(
                 bukkitEnabledCheckBox,
                 spigotEnabledCheckBox,
-                paperEnabledCheckBox
+                paperEnabledCheckBox,
             )
         }
         spigotEnabledCheckBox.addActionListener {
             unique(
                 spigotEnabledCheckBox,
                 bukkitEnabledCheckBox,
-                paperEnabledCheckBox
+                paperEnabledCheckBox,
             )
         }
         paperEnabledCheckBox.addActionListener {
             unique(
                 paperEnabledCheckBox,
                 bukkitEnabledCheckBox,
-                spigotEnabledCheckBox
+                spigotEnabledCheckBox,
             )
         }
 
         bukkitAutoCheckBox.addActionListener {
             all(bukkitAutoCheckBox, spigotAutoCheckBox, paperAutoCheckBox)(
                 SPIGOT,
-                PAPER
+                PAPER,
             )
         }
         spigotAutoCheckBox.addActionListener {
             all(spigotAutoCheckBox, bukkitAutoCheckBox, paperAutoCheckBox)(
                 BUKKIT,
-                PAPER
+                PAPER,
             )
         }
         paperAutoCheckBox.addActionListener {
             all(paperAutoCheckBox, bukkitAutoCheckBox, spigotAutoCheckBox)(
                 BUKKIT,
-                SPIGOT
+                SPIGOT,
             )
         }
 
@@ -158,28 +158,28 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             unique(
                 architecturyEnabledCheckBox,
                 fabricEnabledCheckBox,
-                forgeEnabledCheckBox
+                forgeEnabledCheckBox,
             )
         }
 
         forgeAutoCheckBox.addActionListener {
             all(forgeAutoCheckBox, fabricAutoCheckBox, architecturyAutoCheckBox)(
                 FABRIC,
-                ARCHITECTURY
+                ARCHITECTURY,
             )
         }
 
         fabricAutoCheckBox.addActionListener {
             all(fabricAutoCheckBox, forgeAutoCheckBox, architecturyAutoCheckBox)(
                 FORGE,
-                ARCHITECTURY
+                ARCHITECTURY,
             )
         }
 
         architecturyAutoCheckBox.addActionListener {
             all(architecturyAutoCheckBox, forgeAutoCheckBox, fabricAutoCheckBox)(
                 FORGE,
-                FABRIC
+                FABRIC,
             )
         }
 
@@ -226,7 +226,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     }
 
     private inline fun runOnAll(
-        run: (JCheckBox, JCheckBox, PlatformType, MutableMap<PlatformType, Boolean>, Set<PlatformType>) -> Unit
+        run: (JCheckBox, JCheckBox, PlatformType, MutableMap<PlatformType, Boolean>, Set<PlatformType>) -> Unit,
     ) {
         val state = configuration.state
         for (i in indexes) {
@@ -235,7 +235,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
                 autoCheckBoxArray[i],
                 platformTypes[i],
                 state.userChosenTypes,
-                state.autoDetectTypes
+                state.autoDetectTypes,
             )
         }
     }
@@ -326,7 +326,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             PlatformType.BUNGEECORD,
             PlatformType.WATERFALL,
             PlatformType.VELOCITY,
-            PlatformType.ADVENTURE
+            PlatformType.ADVENTURE,
         )
 
         private val indexes = intArrayOf(
@@ -342,7 +342,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             BUNGEECORD,
             WATERFALL,
             VELOCITY,
-            ADVENTURE
+            ADVENTURE,
         )
     }
 }

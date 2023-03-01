@@ -61,7 +61,7 @@ class TinyUnscrambler : UnscrambleSupport<TinyUnscrambler.SettingsComponent> {
                     Dimension(-1, -1),
                     Dimension(-1, -1),
                     Dimension(-1, -1),
-                )
+                ),
             )
             add(
                 mappingsBox,
@@ -77,7 +77,7 @@ class TinyUnscrambler : UnscrambleSupport<TinyUnscrambler.SettingsComponent> {
                     Dimension(-1, -1),
                     Dimension(-1, -1),
                     Dimension(-1, -1),
-                )
+                ),
             )
         }
     }

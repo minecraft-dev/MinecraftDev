@@ -23,7 +23,7 @@ import com.intellij.psi.PsiFile
 
 object TranslationSorter {
     private val ascendingComparator = compareBy<Translation, Iterable<String>>(
-        naturalOrder<String>().lexicographical()
+        naturalOrder<String>().lexicographical(),
     ) { it.key.split('.') }
 
     private val descendingComparator = ascendingComparator.reversed()
@@ -52,20 +52,20 @@ object TranslationSorter {
                     project,
                     locale,
                     it.sortedWith(ascendingComparator),
-                    keepComments
+                    keepComments,
                 )
                 Ordering.DESCENDING -> TranslationFiles.buildFileEntries(
                     project,
                     locale,
                     it.sortedWith(descendingComparator),
-                    keepComments
+                    keepComments,
                 )
                 Ordering.TEMPLATE -> sortByTemplate(
                     project,
                     locale,
                     TemplateManager.getProjectTemplate(project),
                     it,
-                    keepComments
+                    keepComments,
                 )
                 else -> sortByTemplate(
                     project,
@@ -73,7 +73,7 @@ object TranslationSorter {
                     TranslationFiles.buildSortingTemplateFromDefault(file, domain)
                         ?: throw IllegalStateException("Could not generate template from default translation file"),
                     it,
-                    keepComments
+                    keepComments,
                 )
             }
         }
@@ -88,7 +88,7 @@ object TranslationSorter {
         locale: String,
         template: Template,
         entries: Sequence<Translation>,
-        keepComments: Int
+        keepComments: Int,
     ) = sequence {
         val tmp = entries.toMutableList()
 
@@ -103,8 +103,8 @@ object TranslationSorter {
                             project,
                             locale,
                             toWrite.sortedWith(ascendingComparator),
-                            keepComments
-                        )
+                            keepComments,
+                        ),
                     )
                     tmp.removeAll(toWrite)
                 }
@@ -117,8 +117,8 @@ object TranslationSorter {
                     project,
                     locale,
                     tmp.sortedWith(ascendingComparator).asSequence(),
-                    keepComments
-                )
+                    keepComments,
+                ),
             )
         }
     }

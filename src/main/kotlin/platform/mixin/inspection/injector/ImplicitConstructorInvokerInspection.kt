@@ -36,7 +36,7 @@ class ImplicitConstructorInvokerInspection : MixinInspection() {
                         holder.registerProblem(
                             invokerAnnotation.nameReferenceElement ?: return,
                             "Implicit constructor invokers should be explicit (fails outside of dev)",
-                            ImplicitConstructorInvokerQuickFix(invokerAnnotation)
+                            ImplicitConstructorInvokerQuickFix(invokerAnnotation),
                         )
                     }
                 }
@@ -47,7 +47,7 @@ class ImplicitConstructorInvokerInspection : MixinInspection() {
     override fun getStaticDescription() = "Implicit constructor invoker (fails outside of dev)"
 
     private class ImplicitConstructorInvokerQuickFix(
-        annotation: PsiAnnotation
+        annotation: PsiAnnotation,
     ) : LocalQuickFixOnPsiElement(annotation) {
         override fun getFamilyName() = "Make constructor invoker explicit"
         override fun getText() = "Make constructor invoker explicit"

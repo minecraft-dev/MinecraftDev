@@ -43,7 +43,7 @@ class MinecraftClassCreateAction :
         CAPTION,
         "Class generation for modders",
         GeneralAssets.MC_TEMPLATE,
-        JavaModuleSourceRootTypes.SOURCES
+        JavaModuleSourceRootTypes.SOURCES,
     ),
     DumbAware {
 
@@ -117,7 +117,7 @@ class MinecraftClassCreateAction :
 
     private class ClassInputValidator(
         private val project: Project,
-        private val directory: PsiDirectory
+        private val directory: PsiDirectory,
     ) : InputValidatorEx {
         override fun getErrorText(inputString: String): String? {
             if (inputString.isNotEmpty() && !PsiNameHelper.getInstance(project).isQualifiedName(inputString)) {

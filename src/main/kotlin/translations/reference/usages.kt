@@ -47,7 +47,7 @@ class JsonFindUsagesProvider : TranslationFindUsagesProvider() {
             JsonLexer(),
             TokenSet.create(JsonElementTypes.DOUBLE_QUOTED_STRING, JsonElementTypes.SINGLE_QUOTED_STRING),
             TokenSet.create(JsonElementTypes.BLOCK_COMMENT, JsonElementTypes.LINE_COMMENT),
-            TokenSet.EMPTY
+            TokenSet.EMPTY,
         )
 }
 
@@ -57,6 +57,6 @@ class LangFindUsagesProvider : TranslationFindUsagesProvider() {
             LangLexerAdapter(),
             TokenSet.create(LangTypes.KEY),
             TokenSet.create(LangTypes.COMMENT),
-            TokenSet.EMPTY
+            TokenSet.EMPTY,
         )
 }

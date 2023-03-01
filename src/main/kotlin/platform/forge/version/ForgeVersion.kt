@@ -32,7 +32,7 @@ class ForgeVersion private constructor(val versions: List<String>) {
                         return null
                     }
                     return version.substring(0, index)
-                }
+                },
             ).distinct()
             .toList()
         return@lazy sortVersions(unsortedVersions)

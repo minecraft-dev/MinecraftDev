@@ -20,6 +20,7 @@ import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.addImplements
+import com.demonwav.mcdev.util.createVoidMethodWithParameterType
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.nullable
@@ -27,13 +28,10 @@ import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
-import com.intellij.psi.PsiType
-import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
@@ -66,7 +64,7 @@ class BukkitModule<out T : AbstractModuleType<*>> constructor(facet: MinecraftFa
         containingClass: PsiClass,
         chosenClass: PsiClass,
         chosenName: String,
-        data: GenerationData?
+        data: GenerationData?,
     ): PsiMethod? {
         val bukkitData = data as BukkitGenerationData
 
@@ -75,7 +73,7 @@ class BukkitModule<out T : AbstractModuleType<*>> constructor(facet: MinecraftFa
             chosenName,
             project,
             BukkitConstants.HANDLER_ANNOTATION,
-            bukkitData.isIgnoreCanceled
+            bukkitData.isIgnoreCanceled,
         ) ?: return null
 
         if (bukkitData.eventPriority != "NORMAL") {
@@ -85,7 +83,7 @@ class BukkitModule<out T : AbstractModuleType<*>> constructor(facet: MinecraftFa
             val value = JavaPsiFacade.getElementFactory(project)
                 .createExpressionFromText(
                     BukkitConstants.EVENT_PRIORITY_CLASS + "." + bukkitData.eventPriority,
-                    annotation
+                    annotation,
                 )
 
             annotation.setDeclaredAttributeValue("priority", value)
@@ -147,10 +145,10 @@ class BukkitModule<out T : AbstractModuleType<*>> constructor(facet: MinecraftFa
                 expression.replace(
                     JavaPsiFacade.getElementFactory(project).createExpressionFromText(
                         "false",
-                        expression
-                    )
+                        expression,
+                    ),
                 )
-            }
+            },
         )
     }
 
@@ -180,19 +178,9 @@ class BukkitModule<out T : AbstractModuleType<*>> constructor(facet: MinecraftFa
             chosenName: String,
             project: Project,
             annotationName: String,
-            setIgnoreCancelled: Boolean
+            setIgnoreCancelled: Boolean,
         ): PsiMethod? {
-            val newMethod = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)
-
-            val list = newMethod.parameterList
-            val qName = chosenClass.qualifiedName ?: return null
-            val parameter = JavaPsiFacade.getElementFactory(project)
-                .createParameter(
-                    "event",
-                    PsiClassType.getTypeByName(qName, project, GlobalSearchScope.allScope(project))
-                )
-            list.add(parameter)
-
+            val newMethod = createVoidMethodWithParameterType(project, chosenName, chosenClass) ?: return null
             val modifierList = newMethod.modifierList
             val annotation = modifierList.addAnnotation(annotationName)
 

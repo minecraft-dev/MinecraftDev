@@ -36,7 +36,7 @@ class TranslationEditorNotificationProvider : EditorNotificationProvider {
 
     override fun collectNotificationData(
         project: Project,
-        file: VirtualFile
+        file: VirtualFile,
     ): Function<in FileEditor, out JComponent?> = Function { createNotificationPanel(file, project) }
 
     private fun createNotificationPanel(file: VirtualFile, project: Project): InfoPanel? {
@@ -50,7 +50,7 @@ class TranslationEditorNotificationProvider : EditorNotificationProvider {
             val panel = InfoPanel()
             panel.setText("Translation file doesn't match default one (${TranslationConstants.DEFAULT_LOCALE} locale).")
             panel.createActionLabel(
-                "Add missing default entries (won't reflect changes in original English localization)"
+                "Add missing default entries (won't reflect changes in original English localization)",
             ) {
                 val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
                 psi.applyWriteAction {
@@ -70,7 +70,7 @@ class TranslationEditorNotificationProvider : EditorNotificationProvider {
                     project,
                     "Would you like to sort all translations now?",
                     "Sort Translations",
-                    Messages.getQuestionIcon()
+                    Messages.getQuestionIcon(),
                 )
                 if (sort == Messages.YES) {
                     TranslationSorter.query(project, psi, Ordering.LIKE_DEFAULT)

@@ -47,7 +47,7 @@ abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
         for (l in listOfNotNull(mixinLibrary, testDataLibrary)) {
             ModuleRootModificationUtil.updateModel(module) { model ->
                 model.removeOrderEntry(
-                    model.findLibraryOrderEntry(l) ?: throw IllegalStateException("Library not found")
+                    model.findLibraryOrderEntry(l) ?: throw IllegalStateException("Library not found"),
                 )
             }
 

@@ -45,7 +45,7 @@ class FindMixinsAction : AnAction() {
         fun findMixins(
             clazz: PsiClass,
             project: Project,
-            indicator: ProgressIndicator? = null
+            indicator: ProgressIndicator? = null,
         ): List<PsiClass>? {
             return clazz.cached(PsiModificationTracker.MODIFICATION_COUNT) {
                 val targetInternalName = clazz.fullQualifiedName?.replace('.', '/')
@@ -53,13 +53,13 @@ class FindMixinsAction : AnAction() {
 
                 val mixinAnnotation = JavaPsiFacade.getInstance(project).findClass(
                     MixinConstants.Annotations.MIXIN,
-                    GlobalSearchScope.allScope(project)
+                    GlobalSearchScope.allScope(project),
                 ) ?: return@cached null
 
                 // Check all classes with the Mixin annotation
                 val classes = AnnotatedElementsSearch.searchPsiClasses(
                     mixinAnnotation,
-                    GlobalSearchScope.projectScope(project)
+                    GlobalSearchScope.projectScope(project),
                 )
                     .filter {
                         indicator?.text = "Checking ${it.name}..."

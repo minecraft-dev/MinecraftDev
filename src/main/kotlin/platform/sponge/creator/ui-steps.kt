@@ -61,10 +61,10 @@ class SpongePlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Sponge
 
 class SpongeApiVersionStep(
     parent: NewProjectWizardStep,
-    data: SpongeVersion
+    data: SpongeVersion,
 ) : AbstractSelectVersionStep<SemanticVersion>(
     parent,
-    data.versions.keys.mapNotNull(SemanticVersion::tryParse).filter { it >= MIN_SPONGE_VERSION }
+    data.versions.keys.mapNotNull(SemanticVersion::tryParse).filter { it >= MIN_SPONGE_VERSION },
 ) {
     override val label = "Sponge API Version:"
 

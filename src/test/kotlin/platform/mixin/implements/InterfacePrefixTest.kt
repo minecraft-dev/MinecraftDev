@@ -35,7 +35,7 @@ class InterfacePrefixTest : BaseMixinTest() {
 
                     }
                     """,
-                    configure = false
+                    configure = false,
                 )
 
                 java(
@@ -55,7 +55,7 @@ class InterfacePrefixTest : BaseMixinTest() {
                     class InterfacePrefixMixin {
 
                     }
-                    """
+                    """,
                 )
             }
         }

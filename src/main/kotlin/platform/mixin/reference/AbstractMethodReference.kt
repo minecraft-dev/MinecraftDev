@@ -112,7 +112,7 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
 
     private fun resolve(
         targets: Collection<ClassNode>,
-        selector: MixinSelector
+        selector: MixinSelector,
     ): Sequence<ClassAndMethodNode> {
         return targets.asSequence()
             .flatMap { target -> target.findMethods(selector).map { ClassAndMethodNode(target, it) } }
@@ -135,7 +135,7 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
             val targetReference = parseSelector(method, context) ?: return@flatMap emptySequence()
             if (targetReference is MemberReference && targetReference.descriptor == null && isAmbiguous(
                     targets,
-                    targetReference
+                    targetReference,
                 )
             ) {
                 return@flatMap emptySequence()
@@ -150,7 +150,7 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
                 it.clazz,
                 context.project,
                 scope = context.resolveScope,
-                canDecompile = true
+                canDecompile = true,
             )
         }?.toTypedArray()
     }
@@ -161,7 +161,7 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
                 it.clazz,
                 context.project,
                 scope = context.resolveScope,
-                canDecompile = false
+                canDecompile = false,
             )
         }?.toResolveResults() ?: ResolveResult.EMPTY_ARRAY
     }
@@ -227,7 +227,7 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
     private fun createLookup(
         context: PsiElement,
         methods: Sequence<ClassAndMethodNode>,
-        uniqueMethods: Set<String>
+        uniqueMethods: Set<String>,
     ): Array<Any> {
         return methods
             .map { m ->
@@ -241,13 +241,13 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
                     m.clazz,
                     context.project,
                     scope = context.resolveScope,
-                    canDecompile = false
+                    canDecompile = false,
                 )
                 val builder = JavaLookupElementBuilder.forMethod(
                     sourceMethod,
                     targetMethodInfo.toMixinString(),
                     PsiSubstitutor.EMPTY,
-                    null
+                    null,
                 )
                     .withPresentableText(m.method.name)
                 addCompletionInfo(builder, context, targetMethodInfo)
@@ -259,7 +259,7 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
     open fun addCompletionInfo(
         builder: LookupElementBuilder,
         context: PsiElement,
-        targetMethodInfo: MemberReference
+        targetMethodInfo: MemberReference,
     ): LookupElementBuilder {
         return builder.completeToLiteral(context)
     }

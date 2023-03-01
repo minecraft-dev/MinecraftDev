@@ -25,6 +25,6 @@ fun PsiElement.findSpongeColor(): Pair<Color, UElement>? =
         arrayOf(
             "com.flowpowered.math.vector.Vector3d",
             "com.flowpowered.math.vector.Vector3f",
-            "com.flowpowered.math.vector.Vector3i"
-        )
+            "com.flowpowered.math.vector.Vector3i",
+        ),
     )

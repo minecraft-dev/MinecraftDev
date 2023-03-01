@@ -41,7 +41,7 @@ import com.intellij.openapi.roots.libraries.LibraryKind
 enum class PlatformType(
     val type: AbstractModuleType<*>,
     val versionJson: String? = null,
-    private val parent: PlatformType? = null
+    private val parent: PlatformType? = null,
 ) {
 
     BUKKIT(BukkitModuleType, "bukkit.json"),
@@ -56,7 +56,8 @@ enum class PlatformType(
     VELOCITY(VelocityModuleType, "velocity.json"),
     MIXIN(MixinModuleType),
     MCP(McpModuleType),
-    ADVENTURE(AdventureModuleType);
+    ADVENTURE(AdventureModuleType),
+    ;
 
     private val children = mutableListOf<PlatformType>()
 

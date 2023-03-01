@@ -21,17 +21,17 @@ class ReflectionReferenceContributor : PsiReferenceContributor() {
             PsiJavaPatterns.psiLiteral(StandardPatterns.string())
                 .and(
                     PsiJavaPatterns.psiElement()
-                        .methodCallParameter(PsiJavaPatterns.psiMethod().withName("findField"))
+                        .methodCallParameter(PsiJavaPatterns.psiMethod().withName("findField")),
                 ),
-            ReflectedFieldReference
+            ReflectedFieldReference,
         )
         registrar.registerReferenceProvider(
             PsiJavaPatterns.psiLiteral(StandardPatterns.string())
                 .and(
                     PsiJavaPatterns.psiElement()
-                        .methodCallParameter(PsiJavaPatterns.psiMethod().withName("findMethod"))
+                        .methodCallParameter(PsiJavaPatterns.psiMethod().withName("findMethod")),
                 ),
-            ReflectedMethodReference
+            ReflectedMethodReference,
         )
     }
 }

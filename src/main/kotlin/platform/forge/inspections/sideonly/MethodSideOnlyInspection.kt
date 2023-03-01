@@ -72,7 +72,7 @@ class MethodSideOnlyInspection : BaseInspection() {
                         Error.RETURN_TYPE_ON_WRONG_METHOD,
                         methodAnnotation.renderSide(methodSide),
                         returnAnnotation.renderSide(returnSide),
-                        method.getAnnotation(methodAnnotation.annotationName)
+                        method.getAnnotation(methodAnnotation.annotationName),
                     )
                 }
 
@@ -88,7 +88,7 @@ class MethodSideOnlyInspection : BaseInspection() {
                                 Error.METHOD_IN_WRONG_CLASS,
                                 methodAnnotation.renderSide(methodSide),
                                 classAnnotation.renderSide(classSide),
-                                method.getAnnotation(methodAnnotation.annotationName)
+                                method.getAnnotation(methodAnnotation.annotationName),
                             )
                         }
                         if (returnAnnotation != null && returnSide !== Side.NONE && returnSide !== Side.INVALID) {
@@ -98,7 +98,7 @@ class MethodSideOnlyInspection : BaseInspection() {
                                     Error.RETURN_TYPE_IN_WRONG_CLASS,
                                     classAnnotation.renderSide(classSide),
                                     returnAnnotation.renderSide(returnSide),
-                                    method.getAnnotation(methodAnnotation.annotationName)
+                                    method.getAnnotation(methodAnnotation.annotationName),
                                 )
                             }
                         }
@@ -127,7 +127,7 @@ class MethodSideOnlyInspection : BaseInspection() {
                 return "Method in a class annotated with " + infos[0] +
                     " cannot return a type annotated with " + infos[1] + "."
             }
-        };
+        }, ;
 
         abstract fun getErrorString(vararg infos: Any): String
     }

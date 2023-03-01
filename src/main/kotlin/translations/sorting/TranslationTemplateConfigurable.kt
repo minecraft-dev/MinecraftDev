@@ -69,7 +69,7 @@ class TranslationTemplateConfigurable(private val project: Project) : Configurab
         val editorColorsScheme = EditorColorsManager.getInstance().globalScheme
         val highlighter = LexerEditorHighlighter(
             LangSyntaxHighlighter(TranslationTemplateLexerAdapter()),
-            editorColorsScheme
+            editorColorsScheme,
         )
         (templateEditor as EditorEx).highlighter = highlighter
         templateEditor.settings.isLineNumbersShown = true

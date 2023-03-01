@@ -38,7 +38,7 @@ object TinySrgParser : SrgParser {
             classMapBuilder.build(),
             fieldMapBuilder.build(),
             methodMapBuilder.build(),
-            srgNames
+            srgNames,
         )
     }
 
@@ -47,7 +47,7 @@ object TinySrgParser : SrgParser {
         classMapBuilder: ImmutableBiMap.Builder<String, String>,
         fieldMapBuilder: ImmutableBiMap.Builder<MemberReference, MemberReference>,
         methodMapBuilder: ImmutableBiMap.Builder<MemberReference, MemberReference>,
-        srgNames: HashMap<String, String>
+        srgNames: HashMap<String, String>,
     ) {
         var classRef: Pair<String, String>? = null
 
@@ -93,7 +93,7 @@ object TinySrgParser : SrgParser {
         classMapBuilder: ImmutableBiMap.Builder<String, String>,
         fieldMapBuilder: ImmutableBiMap.Builder<MemberReference, MemberReference>,
         methodMapBuilder: ImmutableBiMap.Builder<MemberReference, MemberReference>,
-        srgNames: HashMap<String, String>
+        srgNames: HashMap<String, String>,
     ) {
         val visitor = object : MappingVisitor {
             var namedNsIndex = -1

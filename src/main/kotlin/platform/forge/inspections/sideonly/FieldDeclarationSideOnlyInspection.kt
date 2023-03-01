@@ -68,7 +68,7 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
                             Error.CLASS_CROSS_ANNOTATED,
                             fieldAnnotation.renderSide(fieldSide),
                             classAnnotation.renderSide(classSide),
-                            field.getAnnotation(fieldAnnotation.annotationName)
+                            field.getAnnotation(fieldAnnotation.annotationName),
                         )
                     } else if (classSide !== Side.NONE) {
                         registerFieldError(field, Error.CLASS_UNANNOTATED, fieldAnnotation, null, field)
@@ -98,7 +98,7 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
                         Error.FIELD_CROSS_ANNOTATED,
                         fieldClassAnnotation.renderSide(fieldClassSide),
                         fieldAnnotation.renderSide(fieldSide),
-                        field.getAnnotation(fieldAnnotation.annotationName)
+                        field.getAnnotation(fieldAnnotation.annotationName),
                     )
                 }
             }
@@ -120,7 +120,7 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
             override fun getErrorString(vararg infos: Any): String {
                 return "Field with type annotation ${infos[0]} cannot be declared as ${infos[1]}."
             }
-        };
+        }, ;
 
         abstract fun getErrorString(vararg infos: Any): String
     }

@@ -37,7 +37,7 @@ class VelocityMavenSupport : BuildSystemSupport {
             BuildSystemSupport.PRE_STEP -> VelocityMavenFilesStep(parent).chain(::VelocityPatchPomStep)
             BuildSystemSupport.POST_STEP -> MavenImportStep(parent).chain(
                 ::ReformatPomStep,
-                { VelocityModifyMainClassStep(it, false) }
+                { VelocityModifyMainClassStep(it, false) },
             )
             else -> EmptyStep(parent)
         }
@@ -75,8 +75,8 @@ class VelocityPatchPomStep(parent: NewProjectWizardStep) : AbstractPatchPomStep(
             listOf(
                 BuildRepository(
                     "papermc-repo",
-                    "https://repo.papermc.io/repository/maven-public/"
-                )
+                    "https://repo.papermc.io/repository/maven-public/",
+                ),
             ),
             listOf(
                 BuildDependency(
@@ -90,8 +90,8 @@ class VelocityPatchPomStep(parent: NewProjectWizardStep) : AbstractPatchPomStep(
                     annotationArtifactId,
                     velocityApiVersion.toString(),
                     mavenScope = if (velocityApiVersion >= VelocityConstants.API_4) "provided" else null,
-                )
-            )
+                ),
+            ),
         )
     }
 }

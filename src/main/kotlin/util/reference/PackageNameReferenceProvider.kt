@@ -40,7 +40,7 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
     protected open fun resolve(
         qualifiedName: String,
         element: PsiElement,
-        facade: JavaPsiFacade
+        facade: JavaPsiFacade,
     ): Array<ResolveResult> {
         facade.findPackage(qualifiedName)?.let { return arrayOf(PsiElementResolveResult(it)) }
         return ResolveResult.EMPTY_ARRAY
@@ -55,7 +55,7 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
     protected inline fun collectPackageChildren(
         context: PsiPackage,
         classes: Iterable<PsiClass>,
-        classFunc: (PsiClass) -> Any?
+        classFunc: (PsiClass) -> Any?,
     ): Array<Any> {
         val parentPackage = context.qualifiedName
         val subPackageStart = parentPackage.length + 1

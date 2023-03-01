@@ -25,7 +25,7 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Row
 
 abstract class AbstractBuildSystemStep(
-    parent: NewProjectWizardStep
+    parent: NewProjectWizardStep,
 ) : AbstractNewProjectWizardMultiStep<AbstractBuildSystemStep, AbstractBuildSystemStep.Factory>(parent, EP_NAME) {
     companion object {
         private val PLATFORM_NAME_KEY = Key.create<String>("mcdev.platformName")
@@ -95,7 +95,7 @@ class MavenBuildSystem : AbstractBuildSystemStep.Factory {
 
 abstract class AbstractRunBuildSystemStep(
     parent: NewProjectWizardStep,
-    private val buildSystemStepClass: Class<out AbstractBuildSystemStep>
+    private val buildSystemStepClass: Class<out AbstractBuildSystemStep>,
 ) : AbstractNewProjectWizardStep(parent) {
     abstract val step: String
 

@@ -40,11 +40,11 @@ class VelocityGradleSupport : BuildSystemSupport {
         return when (step) {
             BuildSystemSupport.PRE_STEP -> VelocityGradleFilesStep(parent).chain(
                 ::VelocityPatchGradleFilesStep,
-                ::GradleWrapperStep
+                ::GradleWrapperStep,
             )
             BuildSystemSupport.POST_STEP -> GradleImportStep(parent).chain(
                 ::ReformatBuildGradleStep,
-                { VelocityModifyMainClassStep(it, true) }
+                { VelocityModifyMainClassStep(it, true) },
             )
             else -> EmptyStep(parent)
         }
@@ -91,38 +91,41 @@ class VelocityPatchGradleFilesStep(parent: NewProjectWizardStep) : AbstractPatch
         val velocityApiVersion = data.getUserData(VelocityVersionStep.KEY) ?: return
 
         addPlugins(
-            project, gradleFiles.buildGradle,
+            project,
+            gradleFiles.buildGradle,
             listOf(
-                GradlePlugin("org.jetbrains.gradle.plugin.idea-ext", "1.0.1")
-            )
+                GradlePlugin("org.jetbrains.gradle.plugin.idea-ext", "1.0.1"),
+            ),
         )
         addRepositories(
-            project, gradleFiles.buildGradle,
+            project,
+            gradleFiles.buildGradle,
             listOf(
                 BuildRepository(
                     "papermc-repo",
-                    "https://repo.papermc.io/repository/maven-public/"
-                )
-            )
+                    "https://repo.papermc.io/repository/maven-public/",
+                ),
+            ),
         )
         val annotationArtifactId =
             if (velocityApiVersion >= VelocityConstants.API_4) "velocity-annotation-processor" else "velocity-api"
         addDependencies(
-            project, gradleFiles.buildGradle,
+            project,
+            gradleFiles.buildGradle,
             listOf(
                 BuildDependency(
                     "com.velocitypowered",
                     "velocity-api",
                     velocityApiVersion.toString(),
-                    gradleConfiguration = "compileOnly"
+                    gradleConfiguration = "compileOnly",
                 ),
                 BuildDependency(
                     "com.velocitypowered",
                     annotationArtifactId,
                     velocityApiVersion.toString(),
-                    gradleConfiguration = "annotationProcessor"
+                    gradleConfiguration = "annotationProcessor",
                 ),
-            )
+            ),
         )
     }
 }

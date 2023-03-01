@@ -18,18 +18,16 @@ import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.generation.SpongeGenerationData
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
+import com.demonwav.mcdev.util.createVoidMethodWithParameterType
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
 import com.intellij.lang.jvm.JvmModifier
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
-import com.intellij.psi.PsiType
-import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
@@ -51,19 +49,9 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         containingClass: PsiClass,
         chosenClass: PsiClass,
         chosenName: String,
-        data: GenerationData?
+        data: GenerationData?,
     ): PsiMethod? {
-        val method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)
-        val parameterList = method.parameterList
-
-        val qName = chosenClass.qualifiedName ?: return null
-        val parameter = JavaPsiFacade.getElementFactory(project)
-            .createParameter(
-                "event",
-                PsiClassType.getTypeByName(qName, project, GlobalSearchScope.allScope(project))
-            )
-
-        parameterList.add(parameter)
+        val method = createVoidMethodWithParameterType(project, chosenName, chosenClass) ?: return null
         val modifierList = method.modifierList
 
         val listenerAnnotation = modifierList.addAnnotation("org.spongepowered.api.event.Listener")
@@ -82,7 +70,7 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
             val value = JavaPsiFacade.getElementFactory(project)
                 .createExpressionFromText(
                     "org.spongepowered.api.event.Order." + generationData.eventOrder,
-                    listenerAnnotation
+                    listenerAnnotation,
                 )
 
             listenerAnnotation.setDeclaredAttributeValue<PsiAnnotationMemberValue>("order", value)
@@ -95,10 +83,9 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         val identifier = element?.toUElementOfType<UIdentifier>()
             ?: return false
 
-        val psiClass = identifier.uastParent as? UClass
-            ?: return false
+        val psiClass = identifier.uastParent as? UClass ?: return false
 
-        if (psiClass.hasModifier(JvmModifier.ABSTRACT)) {
+        if (psiClass.javaPsi.hasModifier(JvmModifier.ABSTRACT)) {
             return false
         }
 
@@ -122,8 +109,7 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
                 return null
             }
 
-            val sub = text.substring(text.lastIndexOf('.') + 1)
-            when (sub) {
+            when (text.substring(text.lastIndexOf('.') + 1)) {
                 "TRUE" -> true
                 "FALSE" -> false
                 else -> return null
@@ -154,9 +140,9 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
             fix = {
                 expression.replace(
                     JavaPsiFacade.getElementFactory(project)
-                        .createExpressionFromText(if (isCancelled) "true" else "false", expression)
+                        .createExpressionFromText(if (isCancelled) "true" else "false", expression),
                 )
-            }
+            },
         )
     }
 }

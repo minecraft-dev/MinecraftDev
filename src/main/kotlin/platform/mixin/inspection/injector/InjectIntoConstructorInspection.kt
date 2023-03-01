@@ -67,7 +67,7 @@ class InjectIntoConstructorInspection : MixinInspection() {
                     if (instructions.any { it.insn.opcode != Opcodes.RETURN }) {
                         holder.registerProblem(
                             problemElement,
-                            "Cannot inject into constructors at non-return instructions"
+                            "Cannot inject into constructors at non-return instructions",
                         )
                         return
                     }

@@ -30,7 +30,7 @@ class TranslationFunction(
     val foldParameters: FoldingScope = FoldingScope.CALL,
     val prefix: String = "",
     val suffix: String = "",
-    val obfuscatedName: Boolean = false
+    val obfuscatedName: Boolean = false,
 ) {
     private fun getMethod(context: PsiElement): PsiMethod? {
         var reference = memberReference
@@ -91,6 +91,6 @@ class TranslationFunction(
     enum class FoldingScope {
         CALL,
         PARAMETER,
-        PARAMETERS
+        PARAMETERS,
     }
 }

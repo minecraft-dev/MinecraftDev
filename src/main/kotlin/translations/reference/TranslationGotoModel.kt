@@ -26,19 +26,19 @@ class TranslationGotoModel(project: Project, private val prefix: String, private
     ContributorsBasedGotoByModel(
         project,
         arrayOf(
-            ChooseByNameContributor.SYMBOL_EP_NAME.findExtensionOrFail(TranslationGotoSymbolContributor::class.java)
-        )
+            ChooseByNameContributor.SYMBOL_EP_NAME.findExtensionOrFail(TranslationGotoSymbolContributor::class.java),
+        ),
     ) {
     override fun acceptItem(item: NavigationItem?): Boolean {
         return TranslationFiles.getLocale(
-            (item as PsiElement).containingFile?.virtualFile
+            (item as PsiElement).containingFile?.virtualFile,
         ) == TranslationConstants.DEFAULT_LOCALE
     }
 
     override fun getElementsByName(
         name: String,
         parameters: FindSymbolParameters,
-        canceled: ProgressIndicator
+        canceled: ProgressIndicator,
     ): Array<Any> {
         val superResult = super.getElementsByName(name, parameters, canceled).asSequence()
         val result = TreeSet<PsiNamedElement> { o1, o2 ->
@@ -48,7 +48,7 @@ class TranslationGotoModel(project: Project, private val prefix: String, private
             superResult.map { it as PsiNamedElement }.filter {
                 val key = it.name ?: return@filter false
                 key.startsWith(prefix) && key.endsWith(suffix)
-            }
+            },
         )
         return result.toArray()
     }

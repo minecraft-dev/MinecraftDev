@@ -47,7 +47,7 @@ class StaticMemberInspection : MixinInspection() {
                 holder.registerProblem(
                     member,
                     "Public static members are not allowed in Mixin classes",
-                    QuickFixFactory.getInstance().createModifierListFix(member, PsiModifier.PRIVATE, true, false)
+                    QuickFixFactory.getInstance().createModifierListFix(member, PsiModifier.PRIVATE, true, false),
                 )
             }
         }

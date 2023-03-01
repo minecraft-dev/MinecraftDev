@@ -54,7 +54,7 @@ class ModsTomlCompletionContributor : CompletionContributor() {
         extend(
             CompletionType.BASIC,
             inModsTomlValueWithKey(key),
-            ModsTomlKnownStringValuesCompletionProvider(values)
+            ModsTomlKnownStringValuesCompletionProvider(values),
         )
 
     private fun extendKnownValues(key: String, vararg values: String) =
@@ -69,7 +69,7 @@ object ModsTomlKeyCompletionProvider : CompletionProvider<CompletionParameters>(
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
-        result: CompletionResultSet
+        result: CompletionResultSet,
     ) {
         val schema = ModsTomlSchema.get(parameters.position.project)
 
@@ -110,13 +110,13 @@ class ModsTomlKnownStringValuesCompletionProvider(private val knownValues: Set<S
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
-        result: CompletionResultSet
+        result: CompletionResultSet,
     ) {
         val keyValue = getClosestKeyValueAncestor(parameters.position) ?: return
         result.addAllElements(
             knownValues.map {
                 LookupElementBuilder.create(it).withInsertHandler(TomlStringValueInsertionHandler(keyValue))
-            }
+            },
         )
     }
 }
@@ -125,7 +125,7 @@ object ModsTomlBooleanCompletionProvider : CompletionProvider<CompletionParamete
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
-        result: CompletionResultSet
+        result: CompletionResultSet,
     ) {
         // Make sure we do not complete after an existing value
         getClosestKeyValueAncestor(parameters.position) ?: return

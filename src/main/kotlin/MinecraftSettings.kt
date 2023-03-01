@@ -24,7 +24,7 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         var isShowEventListenerGutterIcons: Boolean = true,
         var isShowChatColorGutterIcons: Boolean = true,
         var isShowChatColorUnderlines: Boolean = false,
-        var underlineType: UnderlineType = UnderlineType.DOTTED
+        var underlineType: UnderlineType = UnderlineType.DOTTED,
     )
 
     private var state = State()
@@ -81,7 +81,8 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         DOTTED("Dotted", EffectType.BOLD_DOTTED_LINE),
         BOXED("Boxed", EffectType.BOXED),
         ROUNDED_BOXED("Rounded Boxed", EffectType.ROUNDED_BOX),
-        WAVED("Waved", EffectType.WAVE_UNDERSCORE);
+        WAVED("Waved", EffectType.WAVE_UNDERSCORE),
+        ;
 
         override fun toString(): String {
             return regular

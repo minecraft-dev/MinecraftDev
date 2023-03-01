@@ -52,7 +52,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
-        targetClass: PsiClass
+        targetClass: PsiClass,
     ): NavigationVisitor? {
         val opcode = (at.findDeclaredAttributeValue("opcode")?.constantValue as? Int)
             ?.takeIf { it in VALID_OPCODES } ?: -1
@@ -65,7 +65,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
-        mode: CollectVisitor.Mode
+        mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiField>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, at.project, MemberReference(""), -1, null, 8)
@@ -82,7 +82,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         return JavaLookupElementBuilder.forField(
             m,
             m.getQualifiedMemberReference(owner).toMixinString(),
-            null
+            null,
         )
             .setBoldIfInClass(m, targetClass)
             .withPresentableText(m.name)
@@ -93,7 +93,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         private val targetClass: PsiClass,
         private val selector: MixinSelector,
         private val opcode: Int,
-        private val arrayAccess: ArrayAccessType?
+        private val arrayAccess: ArrayAccessType?,
     ) : NavigationVisitor() {
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
             if (expression !is PsiMethodReferenceExpression) {
@@ -103,7 +103,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
                     (expression.resolve() as? PsiField)?.let { resolved ->
                         var matches = selector.matchField(
                             resolved,
-                            QualifiedMember.resolveQualifier(expression) ?: targetClass
+                            QualifiedMember.resolveQualifier(expression) ?: targetClass,
                         )
                         if (matches && opcode != -1) {
                             // check if we match the opcode
@@ -157,7 +157,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         private val selector: MixinSelector,
         private val opcode: Int,
         private val arrayAccess: ArrayAccessType?,
-        private val fuzz: Int
+        private val fuzz: Int,
     ) : CollectVisitor<PsiField>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return
@@ -180,7 +180,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
                 val psiField = fieldNode.field.findOrConstructSourceField(
                     fieldNode.clazz,
                     project,
-                    canDecompile = false
+                    canDecompile = false,
                 )
                 addResult(actualInsn, psiField, qualifier = insn.owner.replace('/', '.'))
             }

@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.creator.ProjectSetupFinalizer.Factory
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
@@ -60,7 +61,7 @@ class ProjectSetupFinalizerWizardStep(parent: NewProjectWizardStep) : AbstractNe
                     .validation(
                         validationErrorFor<JPanel> {
                             finalizers.mapFirstNotNull(ProjectSetupFinalizer::validate)
-                        }
+                        },
                     )
             }
         }
@@ -96,7 +97,7 @@ interface ProjectSetupFinalizer : NewProjectWizardStep {
 }
 
 class JdkProjectSetupFinalizer(
-    parent: NewProjectWizardStep
+    parent: NewProjectWizardStep,
 ) : AbstractNewProjectWizardStep(parent), ProjectSetupFinalizer {
     private val sdkProperty: GraphProperty<Sdk?> = propertyGraph.property(null)
     private var sdk by sdkProperty

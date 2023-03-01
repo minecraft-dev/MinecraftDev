@@ -57,7 +57,7 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
             return getEntries(
                 GlobalSearchScope.fileScope(project, file),
                 TranslationFiles.getLocale(file) ?: return emptySequence(),
-                file.mcDomain
+                file.mcDomain,
             ).flatten()
         }
 
@@ -66,7 +66,7 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
             return getEntries(
                 GlobalSearchScope.fileScope(file),
                 TranslationFiles.getLocale(virtualFile) ?: return emptySequence(),
-                virtualFile.mcDomain
+                virtualFile.mcDomain,
             ).flatten()
         }
 
@@ -80,7 +80,7 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
             FileBasedIndex.getInstance().getValues(
                 TranslationIndex.NAME,
                 locale,
-                scope
+                scope,
             ).asSequence()
                 .filter { domain == null || it.sourceDomain == domain }
 

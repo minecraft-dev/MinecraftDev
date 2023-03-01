@@ -117,7 +117,7 @@ fun findQualifiedClass(fullQualifiedName: String, context: PsiElement): PsiClass
 fun findQualifiedClass(
     project: Project,
     fullQualifiedName: String,
-    scope: GlobalSearchScope = GlobalSearchScope.allScope(project)
+    scope: GlobalSearchScope = GlobalSearchScope.allScope(project),
 ): PsiClass? {
     return findQualifiedClass(fullQualifiedName) { name ->
         JavaPsiFacade.getInstance(project).findClass(name, scope)
@@ -126,7 +126,7 @@ fun findQualifiedClass(
 
 fun findQualifiedClass(
     fullQualifiedName: String,
-    outerResolver: (String) -> PsiClass?
+    outerResolver: (String) -> PsiClass?,
 ): PsiClass? {
     var innerPos = fullQualifiedName.indexOf('$')
     if (innerPos == -1) {
@@ -232,7 +232,7 @@ fun PsiClass.findMatchingMethod(
     pattern: PsiMethod,
     checkBases: Boolean,
     name: String = pattern.name,
-    constructor: Boolean = pattern.isConstructor
+    constructor: Boolean = pattern.isConstructor,
 ): PsiMethod? {
     return findMethodsByName(name, checkBases).firstOrNull { it.isMatchingMethod(pattern, constructor) }
 }
@@ -241,7 +241,7 @@ fun PsiClass.findMatchingMethods(
     pattern: PsiMethod,
     checkBases: Boolean,
     name: String = pattern.name,
-    constructor: Boolean = pattern.isConstructor
+    constructor: Boolean = pattern.isConstructor,
 ): List<PsiMethod> {
     return findMethodsByName(name, checkBases).filter { it.isMatchingMethod(pattern, constructor) }
 }
@@ -250,7 +250,7 @@ inline fun PsiClass.findMatchingMethods(
     pattern: PsiMethod,
     checkBases: Boolean,
     name: String,
-    func: (PsiMethod) -> Unit
+    func: (PsiMethod) -> Unit,
 ) {
     for (method in findMethodsByName(name, checkBases)) {
         if (method.isMatchingMethod(pattern)) {
@@ -279,7 +279,7 @@ fun PsiField.isMatchingField(pattern: PsiField): Boolean {
 
 private fun areReallyOnlyParametersErasureEqual(
     parameterList1: PsiParameterList,
-    parameterList2: PsiParameterList
+    parameterList2: PsiParameterList,
 ): Boolean {
     // Similar to MethodSignatureUtil.areParametersErasureEqual, but doesn't check method name
     if (parameterList1.parametersCount != parameterList2.parametersCount) {

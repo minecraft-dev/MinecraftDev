@@ -35,7 +35,7 @@ class MixinInnerClassInspection : MixinInspection() {
                 if (outerClass is PsiAnonymousClass && outerClass.parentOfType<PsiClass>()?.isMixin == true) {
                     holder.registerProblem(
                         psiClass,
-                        "Inner class not allowed inside anonymous classes inside mixins"
+                        "Inner class not allowed inside anonymous classes inside mixins",
                     )
                 }
 
@@ -49,7 +49,7 @@ class MixinInnerClassInspection : MixinInspection() {
                     holder.registerProblem(
                         psiClass.modifierList!!,
                         "@Mixin inner class must be static",
-                        QuickFixFactory.getInstance().createModifierListFix(psiClass, PsiModifier.STATIC, true, false)
+                        QuickFixFactory.getInstance().createModifierListFix(psiClass, PsiModifier.STATIC, true, false),
                     )
                 }
             } else {

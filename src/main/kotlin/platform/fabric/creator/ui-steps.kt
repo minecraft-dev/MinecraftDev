@@ -50,7 +50,7 @@ import com.intellij.util.IncorrectOperationException
 import kotlinx.coroutines.coroutineScope
 
 class FabricPlatformStep(
-    parent: ModPlatformStep
+    parent: ModPlatformStep,
 ) : AbstractLatentStep<Pair<FabricVersions, FabricApiVersions>>(parent) {
     override val description = "download Fabric versions"
 
@@ -86,7 +86,7 @@ class FabricPlatformStep(
 class FabricVersionChainStep(
     parent: NewProjectWizardStep,
     private val fabricVersions: FabricVersions,
-    private val apiVersions: FabricApiVersions
+    private val apiVersions: FabricApiVersions,
 ) : AbstractMcVersionChainStep(parent, "Loader Version:", "Yarn Version:", "API Version:") {
     companion object {
         private const val LOADER_VERSION = 1
@@ -135,7 +135,7 @@ class FabricVersionChainStep(
                         } else {
                             "Unable to match Yarn versions to Minecraft version"
                         }
-                    }
+                    },
                 ).component.foreground = JBColor.YELLOW
                 comboBox
             }
@@ -151,7 +151,7 @@ class FabricVersionChainStep(
                         } else {
                             "Unable to match API versions to Minecraft version"
                         }
-                    }
+                    },
                 ).bindEnabled(useApiProperty).component.foreground = JBColor.YELLOW
                 comboBox
             }
@@ -235,7 +235,7 @@ class FabricEnvironmentStep(parent: NewProjectWizardStep) : AbstractNewProjectWi
                                 "Server" -> Side.SERVER
                                 else -> Side.NONE
                             }
-                        })
+                        },),
                     )
             }
         }
@@ -256,6 +256,6 @@ class FabricOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollaps
     override fun createStep() = DescriptionStep(this).chain(
         ::AuthorsStep,
         ::WebsiteStep,
-        ::RepositoryStep
+        ::RepositoryStep,
     )
 }

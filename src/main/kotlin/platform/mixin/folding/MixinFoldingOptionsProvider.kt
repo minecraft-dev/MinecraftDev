@@ -23,28 +23,28 @@ class MixinFoldingOptionsProvider :
         checkBox(
             "Target descriptors",
             { settings.state.foldTargetDescriptors },
-            { b -> settings.state.foldTargetDescriptors = b }
+            { b -> settings.state.foldTargetDescriptors = b },
         )
         checkBox("Object casts", { settings.state.foldObjectCasts }, { b -> settings.state.foldObjectCasts = b })
         checkBox(
             "Invoker casts",
             { settings.state.foldInvokerCasts },
-            { b -> settings.state.foldInvokerCasts = b }
+            { b -> settings.state.foldInvokerCasts = b },
         )
         checkBox(
             "Invoker method calls",
             { settings.state.foldInvokerMethodCalls },
-            { b -> settings.state.foldInvokerMethodCalls = b }
+            { b -> settings.state.foldInvokerMethodCalls = b },
         )
         checkBox(
             "Accessor casts",
             { settings.state.foldAccessorCasts },
-            { b -> settings.state.foldAccessorCasts = b }
+            { b -> settings.state.foldAccessorCasts = b },
         )
         checkBox(
             "Accessor method calls",
             { settings.state.foldAccessorMethodCalls },
-            { b -> settings.state.foldAccessorMethodCalls = b }
+            { b -> settings.state.foldAccessorMethodCalls = b },
         )
     }
 }

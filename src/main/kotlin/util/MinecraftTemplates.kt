@@ -82,7 +82,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             group.addTemplate(fabricGroup)
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_BUILD_GRADLE_TEMPLATE, PlatformAssets.FABRIC_ICON))
             fabricGroup.addTemplate(
-                FileTemplateDescriptor(FABRIC_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.FABRIC_ICON)
+                FileTemplateDescriptor(FABRIC_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.FABRIC_ICON),
             )
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MIXINS_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MOD_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))

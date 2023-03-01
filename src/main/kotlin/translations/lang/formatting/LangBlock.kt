@@ -40,7 +40,7 @@ class LangBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, private val s
                     child,
                     Wrap.createWrap(WrapType.NONE, false),
                     Alignment.createAlignment(),
-                    spacingBuilder
+                    spacingBuilder,
                 )
                 blocks.add(block)
             }

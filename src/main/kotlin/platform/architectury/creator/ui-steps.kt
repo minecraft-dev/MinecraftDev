@@ -86,7 +86,7 @@ class ArchitecturyPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Arc
 
 class ArchitecturyVersionChainStep(
     parent: NewProjectWizardStep,
-    private val versionData: ArchitecturyVersionData
+    private val versionData: ArchitecturyVersionData,
 ) : AbstractMcVersionChainStep(
     parent,
     "Forge Version:",
@@ -118,7 +118,7 @@ class ArchitecturyVersionChainStep(
             .intersect(
                 versionData.fabricVersions.game.mapNotNullTo(mutableSetOf()) {
                     SemanticVersion.tryParse(it.version)
-                }
+                },
             )
             .toList()
     }
@@ -145,7 +145,7 @@ class ArchitecturyVersionChainStep(
                         } else {
                             "Unable to match API versions to Minecraft version"
                         }
-                    }
+                    },
                 ).bindEnabled(useFabricApiProperty).component.foreground = JBColor.YELLOW
                 comboBox
             }

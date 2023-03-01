@@ -28,7 +28,7 @@ import org.jetbrains.plugins.gradle.util.GradleUtil
 class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
     override fun getActions(
         orderEntries: List<LibraryOrderEntry>,
-        psiFile: PsiFile
+        psiFile: PsiFile,
     ): Collection<AttachSourcesProvider.AttachSourcesAction> {
         if (psiFile !is PsiJavaFile || !psiFile.packageName.startsWith("net.minecraft")) {
             return emptyList()
@@ -82,7 +82,7 @@ class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
                 project,
                 Paths.get(projectPath),
                 { settings -> settings.taskNames = listOf(decompiler.taskName) },
-                taskCallback
+                taskCallback,
             )
             return callback
         }

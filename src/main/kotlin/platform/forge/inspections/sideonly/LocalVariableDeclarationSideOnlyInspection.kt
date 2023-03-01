@@ -39,7 +39,7 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
         return if (annotation.isWritable) {
             RemoveAnnotationInspectionGadgetsFix(
                 annotation,
-                "Remove @SideOnly annotation from variable class declaration"
+                "Remove @SideOnly annotation from variable class declaration",
             )
         } else {
             null
@@ -78,7 +78,7 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
                             Error.VAR_CROSS_ANNOTATED_CLASS,
                             variableAnnotation.renderSide(variableSide),
                             containingClassAnnotation.renderSide(containingClassSide),
-                            variableClass.getAnnotation(variableAnnotation.annotationName)
+                            variableClass.getAnnotation(variableAnnotation.annotationName),
                         )
                     }
                     classAnnotated = true
@@ -96,7 +96,7 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
                                 Error.VAR_UNANNOTATED_METHOD,
                                 variableAnnotation.renderSide(variableSide),
                                 methodAnnotation.renderSide(methodSide),
-                                variableClass.getAnnotation(variableAnnotation.annotationName)
+                                variableClass.getAnnotation(variableAnnotation.annotationName),
                             )
                         }
                     } else {
@@ -105,7 +105,7 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
                             Error.VAR_CROSS_ANNOTATED_METHOD,
                             variableAnnotation.renderSide(variableSide),
                             methodAnnotation.renderSide(methodSide),
-                            variableClass.getAnnotation(variableAnnotation.annotationName)
+                            variableClass.getAnnotation(variableAnnotation.annotationName),
                         )
                     }
                 }
@@ -131,7 +131,7 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
                 return "A local variable whose class is annotated with ${infos[0]} " +
                     "cannot be used in an un-annotated method."
             }
-        };
+        }, ;
 
         abstract fun getErrorString(vararg infos: Any): String
     }

@@ -110,8 +110,8 @@ class AtCompletionContributor : CompletionContributor() {
                     kindResult.addElement(
                         PrioritizedLookupElement.withPriority(
                             LookupElementBuilder.create(name).withIcon(PlatformIcons.CLASS_ICON),
-                            1.0 + name.getValue(beginning)
-                        )
+                            1.0 + name.getValue(beginning),
+                        ),
                     )
                 }
             }
@@ -131,8 +131,8 @@ class AtCompletionContributor : CompletionContributor() {
                 result.addElement(
                     PrioritizedLookupElement.withPriority(
                         LookupElementBuilder.create(name).withIcon(PlatformIcons.CLASS_ICON),
-                        1.0
-                    )
+                        1.0,
+                    ),
                 )
             }
 
@@ -143,8 +143,8 @@ class AtCompletionContributor : CompletionContributor() {
                 result.addElement(
                     PrioritizedLookupElement.withPriority(
                         LookupElementBuilder.create(name).withIcon(PlatformIcons.CLASS_ICON),
-                        1.0
-                    )
+                        1.0,
+                    ),
                 )
             }
             return
@@ -171,8 +171,8 @@ class AtCompletionContributor : CompletionContributor() {
             result.addElement(
                 PrioritizedLookupElement.withPriority(
                     LookupElementBuilder.create(name).withIcon(PlatformIcons.CLASS_ICON),
-                    1.0
-                )
+                    1.0,
+                ),
             )
         }
         used.clear() // help GC
@@ -191,8 +191,8 @@ class AtCompletionContributor : CompletionContributor() {
             result.addElement(
                 PrioritizedLookupElement.withPriority(
                     LookupElementBuilder.create(name).withIcon(PlatformIcons.PACKAGE_ICON),
-                    0.0
-                )
+                    0.0,
+                ),
             )
         }
     }
@@ -232,8 +232,8 @@ class AtCompletionContributor : CompletionContributor() {
                             currentElement.replace(
                                 AtElementFactory.createFieldName(
                                     context.project,
-                                    memberReference.name
-                                )
+                                    memberReference.name,
+                                ),
                             )
 
                             // TODO: Fix visibility decrease
@@ -243,8 +243,8 @@ class AtCompletionContributor : CompletionContributor() {
                             context.document.insertString(context.editor.caretModel.offset, comment)
                             context.editor.caretModel.moveCaretRelatively(comment.length, 0, false, false, false)
                         },
-                    1.0
-                )
+                    1.0,
+                ),
             )
         }
 
@@ -287,8 +287,8 @@ class AtCompletionContributor : CompletionContributor() {
                             currentElement.replace(
                                 AtElementFactory.createFunction(
                                     project,
-                                    memberReference.name + memberReference.descriptor
-                                )
+                                    memberReference.name + memberReference.descriptor,
+                                ),
                             )
 
                             // TODO: Fix visibility decreases
@@ -298,8 +298,8 @@ class AtCompletionContributor : CompletionContributor() {
                             context.document.insertString(context.editor.caretModel.offset, comment)
                             context.editor.caretModel.moveCaretRelatively(comment.length, 0, false, false, false)
                         },
-                    0.0
-                )
+                    0.0,
+                ),
             )
         }
     }

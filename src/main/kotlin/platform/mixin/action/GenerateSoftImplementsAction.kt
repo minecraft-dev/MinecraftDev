@@ -83,14 +83,14 @@ class GenerateSoftImplementsAction : MixinCodeInsightAction() {
                         method,
                         it.substitutor,
                         chooser.isCopyJavadoc,
-                        false
+                        false,
                     )
                         .map { m ->
                             // Apply prefix
                             m.name = prefix + m.name
                             OverrideImplementUtil.createGenerationInfo(m)
                         }
-                }
+                },
             ).firstOrNull()?.positionCaret(editor, true)
         }
     }

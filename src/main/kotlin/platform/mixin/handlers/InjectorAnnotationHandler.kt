@@ -74,7 +74,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
     protected open fun isUnresolved(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
-        targetMethod: MethodNode
+        targetMethod: MethodNode,
     ): InsnResolutionInfo.Failure? {
         return annotation.findAttributeValue("at")?.findAnnotations()
             .ifNullOrEmpty { return InsnResolutionInfo.Failure() }!!
@@ -92,7 +92,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
     protected open fun resolveForNavigation(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
-        targetMethod: MethodNode
+        targetMethod: MethodNode,
     ): List<PsiElement> {
         return annotation.findAttributeValue("at")?.findAnnotations()
             .ifNullOrEmpty { return emptyList() }!!
@@ -118,7 +118,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
-        mode: CollectVisitor.Mode = CollectVisitor.Mode.MATCH_ALL
+        mode: CollectVisitor.Mode = CollectVisitor.Mode.MATCH_ALL,
     ): List<CollectVisitor.Result<*>> {
         return annotation.findAttributeValue("at")?.findAnnotations()
             .ifNullOrEmpty { return emptyList() }!!
@@ -133,7 +133,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
     abstract fun expectedMethodSignature(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
-        targetMethod: MethodNode
+        targetMethod: MethodNode,
     ): List<MethodSignature>?
 
     open fun isInsnAllowed(insn: AbstractInsnNode): Boolean {
@@ -155,7 +155,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         protected fun collectTargetMethodParameters(
             project: Project,
             clazz: ClassNode,
-            targetMethod: MethodNode
+            targetMethod: MethodNode,
         ): List<Parameter> {
             val numLocalsToDrop = if (targetMethod.hasAccess(Opcodes.ACC_STATIC)) 0 else 1
             val localVariables = targetMethod.localVariables?.sortedBy { it.index }
@@ -188,7 +188,7 @@ object DefaultInjectorAnnotationHandler : InjectorAnnotationHandler() {
     override fun expectedMethodSignature(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
-        targetMethod: MethodNode
+        targetMethod: MethodNode,
     ) = null
 
     override val isSoft = true

@@ -26,7 +26,7 @@ class MixinCompletionConfidence : CompletionConfidence() {
         .inside(
             false,
             PsiJavaPatterns.psiAnnotation().qName(StandardPatterns.string().startsWith(MixinConstants.PACKAGE)),
-            PlatformPatterns.psiFile()
+            PlatformPatterns.psiFile(),
         )!!
 
     override fun shouldSkipAutopopup(element: PsiElement, psiFile: PsiFile, offset: Int): ThreeState {

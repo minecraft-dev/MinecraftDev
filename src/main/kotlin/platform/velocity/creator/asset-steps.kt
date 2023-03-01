@@ -69,14 +69,14 @@ class VelocityProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
 
         assets.addTemplates(
             project,
-            "src/main/java/${mainClass.replace('.', '/')}.java" to template
+            "src/main/java/${mainClass.replace('.', '/')}.java" to template,
         )
     }
 }
 
 class VelocityModifyMainClassStep(
     parent: NewProjectWizardStep,
-    private val isGradle: Boolean
+    private val isGradle: Boolean,
 ) : AbstractLongRunningStep(parent) {
     override val description = "Patching main class"
 
@@ -152,7 +152,7 @@ class VelocityBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSyste
 
 class VelocityPostBuildSystemStep(parent: NewProjectWizardStep) : AbstractRunBuildSystemStep(
     parent,
-    VelocityBuildSystemStep::class.java
+    VelocityBuildSystemStep::class.java,
 ) {
     override val step = BuildSystemSupport.POST_STEP
 }

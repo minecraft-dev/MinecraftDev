@@ -57,8 +57,8 @@ sealed class TranslationCompletionContributor : CompletionContributor() {
             prefixResult.addElement(
                 PrioritizedLookupElement.withPriority(
                     LookupElementBuilder.create(key).withIcon(PlatformAssets.MINECRAFT_ICON),
-                    1.0 + key.getSimilarity(text)
-                )
+                    1.0 + key.getSimilarity(text),
+                ),
             )
         }
     }

@@ -63,7 +63,7 @@ class UnresolvedReferenceInspection : MixinInspection() {
                 holder.registerProblem(
                     value,
                     "Cannot resolve ${resolver.description}".format(value.constantStringValue),
-                    ProblemHighlightType.LIKE_UNKNOWN_SYMBOL
+                    ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
                 )
             }
         }

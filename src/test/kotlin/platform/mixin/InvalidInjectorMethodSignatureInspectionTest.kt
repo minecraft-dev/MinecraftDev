@@ -55,7 +55,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
                 private void redirectMethod2() {
                 }
             }
-            """
+            """,
         )
     }
 
@@ -91,7 +91,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
                 private void injectCtor<error descr="Method parameters do not match expected parameters for Inject">(String string, CallbackInfo ci)</error> {
                 }
             }
-            """
+            """,
         )
     }
 
@@ -127,7 +127,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
                 private void injectCtor(String string, CallbackInfo ci) {
                 }
             }
-            """
+            """,
         )
     }
 }

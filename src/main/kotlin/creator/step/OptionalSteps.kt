@@ -46,7 +46,7 @@ abstract class AbstractOptionalStringStep(parent: NewProjectWizardStep) : Abstra
 }
 
 abstract class AbstractOptionalStringBasedOnProjectNameStep(
-    parent: NewProjectWizardStep
+    parent: NewProjectWizardStep,
 ) : AbstractOptionalStringStep(parent) {
     private val formatProperty = propertyGraph.property("").bindStorage("${javaClass.name}.format")
     var format by formatProperty

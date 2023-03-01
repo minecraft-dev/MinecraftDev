@@ -67,7 +67,7 @@ class InnerClassTest : BaseMixinTest() {
                         }</error>
 
                     }
-                    """
+                    """,
                 )
             }
         }

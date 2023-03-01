@@ -12,7 +12,8 @@ package com.demonwav.mcdev.nbt.editor
 
 enum class CompressionSelection(private val selectionName: String) {
     GZIP("GZipped"),
-    UNCOMPRESSED("Uncompressed");
+    UNCOMPRESSED("Uncompressed"),
+    ;
 
     override fun toString() = selectionName
 }

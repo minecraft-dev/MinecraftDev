@@ -48,7 +48,7 @@ class SpongeMavenSupport : BuildSystemSupport {
             BuildSystemSupport.PRE_STEP -> SpongeMavenFilesStep(parent).chain(::SpongePatchPomStep)
             BuildSystemSupport.POST_STEP -> SpongeMavenProjectFilesStep(parent).chain(
                 ::MavenImportStep,
-                ::ReformatPomStep
+                ::ReformatPomStep,
             )
             else -> EmptyStep(parent)
         }
@@ -113,17 +113,17 @@ class SpongePatchPomStep(parent: NewProjectWizardStep) : AbstractPatchPomStep(pa
                 BuildRepository(
                     "spongepowered-repo",
                     "https://repo.spongepowered.org/maven/",
-                    buildSystems = EnumSet.of(BuildSystemType.MAVEN)
-                )
+                    buildSystems = EnumSet.of(BuildSystemType.MAVEN),
+                ),
             ),
             listOf(
                 BuildDependency(
                     "org.spongepowered",
                     "spongeapi",
                     spongeApiVersion.toString(),
-                    mavenScope = "provided"
-                )
-            )
+                    mavenScope = "provided",
+                ),
+            ),
         )
     }
 }

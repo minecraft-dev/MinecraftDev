@@ -24,7 +24,7 @@ class InterfaceIsInterfaceInspection : MixinAnnotationAttributeInspection(INTERF
     override fun visitAnnotationAttribute(
         annotation: PsiAnnotation,
         value: PsiAnnotationMemberValue,
-        holder: ProblemsHolder
+        holder: ProblemsHolder,
     ) {
         val psiClass = value.resolveClass() ?: return
         if (!psiClass.isInterface) {

@@ -123,10 +123,14 @@ class MethodTargetMember(val classAndMethod: ClassAndMethodNode, mixin: PsiClass
 
 private fun Sequence<MixinTargetMember>.filterAccessible(
     psiClass: PsiClass,
-    target: PsiClass
+    target: PsiClass,
 ): Sequence<MixinTargetMember> {
-    return if (psiClass equivalentTo target) this else filter {
-        (it.access and (Opcodes.ACC_PUBLIC or Opcodes.ACC_PROTECTED)) != 0
+    return if (psiClass equivalentTo target) {
+        this
+    } else {
+        filter {
+            (it.access and (Opcodes.ACC_PUBLIC or Opcodes.ACC_PROTECTED)) != 0
+        }
     }
 }
 

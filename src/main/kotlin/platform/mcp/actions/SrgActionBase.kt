@@ -84,9 +84,11 @@ abstract class SrgActionBase : AnAction() {
                     val pos = editor.offsetToVisualPosition(element.textRange.endOffset - element.textLength / 2)
                     RelativePoint(
                         editor.contentComponent,
-                        editor.visualPositionToXY(VisualPosition(pos.line + 1, pos.column))
+                        editor.visualPositionToXY(VisualPosition(pos.line + 1, pos.column)),
                     )
-                } else RelativePoint.getCenterOf(statusBar.component)
+                } else {
+                    RelativePoint.getCenterOf(statusBar.component)
+                }
                 balloon.show(at, Balloon.Position.below)
             }
         }
@@ -104,7 +106,7 @@ abstract class SrgActionBase : AnAction() {
                 val pos = editor.offsetToVisualPosition(element.textRange.endOffset - element.textLength / 2)
                 val at = RelativePoint(
                     editor.contentComponent,
-                    editor.visualPositionToXY(VisualPosition(pos.line + 1, pos.column))
+                    editor.visualPositionToXY(VisualPosition(pos.line + 1, pos.column)),
                 )
 
                 balloon.show(at, Balloon.Position.below)

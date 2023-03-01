@@ -58,7 +58,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             color: Color,
             map: Map<String, Color>,
             colorName: String,
-            workElement: UElement
+            workElement: UElement,
         ) : super(
             element,
             element.textRange,
@@ -78,7 +78,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                 }
             },
             GutterIconRenderer.Alignment.RIGHT,
-            { "$colorName color indicator" }
+            { "$colorName color indicator" },
         ) {
             this.color = color
         }
@@ -90,7 +90,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             FunctionUtil.nullConstant<Any, String>(),
             handler,
             GutterIconRenderer.Alignment.RIGHT,
-            { "color indicator" }
+            { "color indicator" },
         ) {
             this.color = color
         }
@@ -113,7 +113,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
     class CommonColorInfo(
         element: PsiElement,
         color: Color,
-        workElement: UElement
+        workElement: UElement,
     ) : ColorLineMarkerProvider.ColorInfo(
         element,
         color,
@@ -140,7 +140,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                 is ULiteralExpression -> workElement.setColor(c.rgb and 0xFFFFFF)
                 is UCallExpression -> workElement.setColor(c.red, c.green, c.blue)
             }
-        }
+        },
     )
 
     abstract class CommonLineMarkerProvider : LineMarkerProvider {

@@ -60,7 +60,7 @@ object AwHeaderCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
-        result: CompletionResultSet
+        result: CompletionResultSet,
     ) {
         if (parameters.position.prevLeaf(true) == null) {
             result.addElement(LookupElementBuilder.create("accessWidener v1 named"))
@@ -74,7 +74,7 @@ object AwNamespaceCompletionProvider : CompletionProvider<CompletionParameters>(
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
-        result: CompletionResultSet
+        result: CompletionResultSet,
     ) = result.addAllElements(listOf("named", "intermediary").map(LookupElementBuilder::create))
 }
 
@@ -83,7 +83,7 @@ object AwAccessCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
-        result: CompletionResultSet
+        result: CompletionResultSet,
     ) {
         val elements = listOf(
             "accessible",
@@ -91,7 +91,7 @@ object AwAccessCompletionProvider : CompletionProvider<CompletionParameters>() {
             "extendable",
             "transitive-extendable",
             "mutable",
-            "transitive-mutable"
+            "transitive-mutable",
         ).map { LookupElementBuilder.create(it).withInsertHandler { ctx, _ -> insertWhitespace(ctx) } }
         result.addAllElements(elements)
     }
@@ -102,7 +102,7 @@ object AwTargetCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
-        result: CompletionResultSet
+        result: CompletionResultSet,
     ) {
         val text = parameters.position
             .prevLeaf { it.elementType == AwTypes.ACCESS_ELEMENT || it.elementType == AwTypes.CRLF }?.text
