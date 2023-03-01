@@ -20,10 +20,10 @@ import com.demonwav.mcdev.creator.buildsystem.ReformatPomStep
 import com.demonwav.mcdev.creator.buildsystem.addDefaultMavenProperties
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.SimpleMcVersionStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 import com.intellij.psi.xml.XmlTag
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
@@ -33,8 +33,8 @@ class BungeeMavenSupport : BuildSystemSupport {
 
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> BungeeMavenFilesStep(parent).chain(::BungeePatchPomStep)
-            BuildSystemSupport.POST_STEP -> MavenImportStep(parent).chain(::ReformatPomStep)
+            BuildSystemSupport.PRE_STEP -> BungeeMavenFilesStep(parent).nextStep(::BungeePatchPomStep)
+            BuildSystemSupport.POST_STEP -> MavenImportStep(parent).nextStep(::ReformatPomStep)
             else -> EmptyStep(parent)
         }
     }

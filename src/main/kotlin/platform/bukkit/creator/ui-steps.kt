@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.bukkit.creator
 import com.demonwav.mcdev.creator.PlatformVersion
 import com.demonwav.mcdev.creator.buildsystem.BuildDependency
 import com.demonwav.mcdev.creator.buildsystem.BuildRepository
-import com.demonwav.mcdev.creator.chain
 import com.demonwav.mcdev.creator.getVersionSelector
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
 import com.demonwav.mcdev.creator.step.AbstractCollapsibleStep
@@ -23,6 +22,7 @@ import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DependStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.MainClassStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.PluginNameStep
 import com.demonwav.mcdev.creator.step.SimpleMcVersionStep
 import com.demonwav.mcdev.creator.step.SoftDependStep
@@ -76,14 +76,13 @@ abstract class AbstractBukkitPlatformStep(
     }
 
     override fun createStep(data: PlatformVersion) =
-        SimpleMcVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse)).chain(
-            ::PluginNameStep,
-            ::MainClassStep,
-            ::BukkitOptionalSettingsStep,
-            ::BukkitBuildSystemStep,
-            ::BukkitProjectFilesStep,
-            ::BukkitPostBuildSystemStep,
-        )
+        SimpleMcVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse))
+            .nextStep(::PluginNameStep)
+            .nextStep(::MainClassStep)
+            .nextStep(::BukkitOptionalSettingsStep)
+            .nextStep(::BukkitBuildSystemStep)
+            .nextStep(::BukkitProjectFilesStep)
+            .nextStep(::BukkitPostBuildSystemStep)
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, this)
@@ -102,15 +101,14 @@ abstract class AbstractBukkitPlatformStep(
 class BukkitOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsibleStep(parent) {
     override val title = "Optional Settings"
 
-    override fun createStep() = DescriptionStep(this).chain(
-        ::AuthorsStep,
-        ::WebsiteStep,
-        ::BukkitLogPrefixStep,
-        ::BukkitLoadOrderStep,
-        ::BukkitLoadBeforeStep,
-        ::DependStep,
-        ::SoftDependStep,
-    )
+    override fun createStep() = DescriptionStep(this)
+        .nextStep(::AuthorsStep)
+        .nextStep(::WebsiteStep)
+        .nextStep(::BukkitLogPrefixStep)
+        .nextStep(::BukkitLoadOrderStep)
+        .nextStep(::BukkitLoadBeforeStep)
+        .nextStep(::DependStep)
+        .nextStep(::SoftDependStep)
 }
 
 class BukkitLogPrefixStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {

@@ -13,6 +13,7 @@ package com.demonwav.mcdev.creator
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.platformtype.PlatformTypeStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.TemplateOutdatedStep
 import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.intellij.ide.projectWizard.ProjectSettingsStep
@@ -40,14 +41,14 @@ class MinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {
     }
 
     override fun getParentGroup() = MinecraftModuleType.NAME
-    override fun createStep(context: WizardContext) = RootNewProjectWizardStep(context).chain(
-        ::NewProjectWizardBaseStep,
-        ::GitNewProjectWizardStep,
-        PlatformTypeStep::create,
-        ::BuildSystemPropertiesStep,
-        ::ProjectSetupFinalizerWizardStep,
-        ::TemplateOutdatedStep,
-    )
+
+    override fun createStep(context: WizardContext) = RootNewProjectWizardStep(context)
+        .nextStep(::NewProjectWizardBaseStep)
+        .nextStep(::GitNewProjectWizardStep)
+        .nextStep(PlatformTypeStep::create)
+        .nextStep(::BuildSystemPropertiesStep)
+        .nextStep(::ProjectSetupFinalizerWizardStep)
+        .nextStep(::TemplateOutdatedStep)
 
     override fun getIgnoredSteps() = listOf(ProjectSettingsStep::class.java)
 }
