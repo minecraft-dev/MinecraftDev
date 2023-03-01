@@ -52,8 +52,8 @@ class ShadowFieldPrefixInspection : MixinInspection() {
                     "Cannot use prefix for @Shadow fields",
                     QuickFixFactory.getInstance().createRenameElementFix(
                         field,
-                        fieldName.removePrefix(DEFAULT_SHADOW_PREFIX)
-                    )
+                        fieldName.removePrefix(DEFAULT_SHADOW_PREFIX),
+                    ),
                 )
             }
         }

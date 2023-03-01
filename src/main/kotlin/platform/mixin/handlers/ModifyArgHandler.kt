@@ -34,7 +34,7 @@ class ModifyArgHandler : InjectorAnnotationHandler() {
     override fun expectedMethodSignature(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
-        targetMethod: MethodNode
+        targetMethod: MethodNode,
     ): List<MethodSignature>? {
         val index = annotation.findDeclaredAttributeValue("index")?.constantValue as? Int
         val validSingleArgTypes = mutableSetOf<String>()
@@ -59,7 +59,7 @@ class ModifyArgHandler : InjectorAnnotationHandler() {
                 if (validSingleArgTypes.isEmpty()) {
                     validSingleArgTypes.addAll(validArgTypes)
                 } else {
-                    validSingleArgTypes.retainAll(validArgTypes)
+                    validSingleArgTypes.retainAll(validArgTypes.toSet())
                     if (validSingleArgTypes.isEmpty()) {
                         return listOf()
                     }
@@ -100,11 +100,11 @@ class ModifyArgHandler : InjectorAnnotationHandler() {
                 listOf(
                     ParameterGroup(
                         listOf(
-                            sanitizedParameter(psiType, psiParameter?.name)
-                        )
-                    )
+                            sanitizedParameter(psiType, psiParameter?.name),
+                        ),
+                    ),
                 ),
-                psiType
+                psiType,
             )
             if (validFullSignature != null) {
                 val fullParamGroup = ParameterGroup(
@@ -112,13 +112,13 @@ class ModifyArgHandler : InjectorAnnotationHandler() {
                         val psiParam = paramList?.let { bytecodeMethod.getParameter(bytecodeClass, index, it) }
                         sanitizedParameter(
                             psiParam?.type ?: argType.toPsiType(elementFactory),
-                            psiParam?.name
+                            psiParam?.name,
                         )
-                    }
+                    },
                 )
                 listOf(
                     singleSignature,
-                    MethodSignature(listOf(fullParamGroup), psiType)
+                    MethodSignature(listOf(fullParamGroup), psiType),
                 )
             } else {
                 listOf(singleSignature)

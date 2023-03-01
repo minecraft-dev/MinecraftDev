@@ -32,13 +32,13 @@ import org.objectweb.asm.Opcodes
 
 class InjectIntoConstructorInspection : MixinInspection() {
     @JvmField
-    var ALLOW_ON_FABRIC = true
+    var allowOnFabric = true
 
     override fun createOptionsPanel(): JComponent {
         val panel = JPanel(FlowLayout(FlowLayout.LEFT))
-        val checkbox = JCheckBox("Allow @Inject into constructors in Fabric", ALLOW_ON_FABRIC)
+        val checkbox = JCheckBox("Allow @Inject into constructors in Fabric", allowOnFabric)
         checkbox.addActionListener {
-            ALLOW_ON_FABRIC = checkbox.isSelected
+            allowOnFabric = checkbox.isSelected
         }
         panel.add(checkbox)
         return panel
@@ -47,7 +47,7 @@ class InjectIntoConstructorInspection : MixinInspection() {
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
         val isFabric = holder.file.findModule()?.let { MinecraftFacet.getInstance(it) }?.isOfType(FabricModuleType)
             ?: false
-        if (isFabric && ALLOW_ON_FABRIC) {
+        if (isFabric && allowOnFabric) {
             return PsiElementVisitor.EMPTY_VISITOR
         }
 
@@ -67,7 +67,7 @@ class InjectIntoConstructorInspection : MixinInspection() {
                     if (instructions.any { it.insn.opcode != Opcodes.RETURN }) {
                         holder.registerProblem(
                             problemElement,
-                            "Cannot inject into constructors at non-return instructions"
+                            "Cannot inject into constructors at non-return instructions",
                         )
                         return
                     }

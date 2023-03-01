@@ -30,7 +30,7 @@ data class MemberReference(
     val descriptor: String? = null,
     override val owner: String? = null,
     val matchAllNames: Boolean = false,
-    val matchAllDescs: Boolean = false
+    val matchAllDescs: Boolean = false,
 ) : Serializable, MixinSelector {
 
     init {

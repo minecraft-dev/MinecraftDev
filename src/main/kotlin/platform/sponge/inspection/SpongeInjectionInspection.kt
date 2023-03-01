@@ -101,7 +101,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                         annotation.parameterList,
                         "Constructor injection cannot be optional.",
                         ProblemHighlightType.GENERIC_ERROR,
-                        RemoveAnnotationParameters(annotation, "Remove 'optional' parameter")
+                        RemoveAnnotationParameters(annotation, "Remove 'optional' parameter"),
                     )
                 }
             }
@@ -115,7 +115,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                 holder.registerProblem(
                     typeElement,
                     "Primitive types cannot be injected by Sponge.",
-                    ProblemHighlightType.GENERIC_ERROR
+                    ProblemHighlightType.GENERIC_ERROR,
                 )
                 return
             }
@@ -129,7 +129,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                     typeElement,
                     "${classType.presentableText} cannot be injected by Sponge.",
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                    AddToKnownInjectableTypes(name)
+                    AddToKnownInjectableTypes(name),
                 )
                 return
             }
@@ -143,7 +143,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
         private fun checkAssetId(
             name: String,
             variable: PsiVariable,
-            annotationsOwner: PsiModifierListOwner
+            annotationsOwner: PsiModifierListOwner,
         ) {
             if (name != "org.spongepowered.api.asset.Asset") {
                 return
@@ -155,7 +155,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                     variable.nameIdentifier ?: variable,
                     "Injected Assets must be annotated with @AssetId.",
                     ProblemHighlightType.GENERIC_ERROR,
-                    AddAnnotationFix(SpongeConstants.ASSET_ID_ANNOTATION, annotationsOwner)
+                    AddAnnotationFix(SpongeConstants.ASSET_ID_ANNOTATION, annotationsOwner),
                 )
             } else {
                 variable.findModule()?.let { module ->
@@ -173,7 +173,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                         holder.registerProblem(
                             assetPathAttributeValue,
                             "AssetId must reference a file.",
-                            ProblemHighlightType.GENERIC_ERROR
+                            ProblemHighlightType.GENERIC_ERROR,
                         )
                         return@let
                     }
@@ -189,7 +189,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             assetPathAttributeValue,
                             "Asset '$assetPath' does not exist.",
                             ProblemHighlightType.GENERIC_ERROR,
-                            fix
+                            fix,
                         )
                     }
                 }
@@ -200,7 +200,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
             variable: PsiVariable,
             name: String,
             classType: PsiClassReferenceType,
-            annotationsOwner: PsiModifierListOwner
+            annotationsOwner: PsiModifierListOwner,
         ) {
             val configDir = variable.getAnnotation(SpongeConstants.CONFIG_DIR_ANNOTATION)
             val defaultConfig = variable.getAnnotation(SpongeConstants.DEFAULT_CONFIG_ANNOTATION)
@@ -214,7 +214,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             "@ConfigDir and @DefaultConfig cannot be used on the same field.",
                             ProblemHighlightType.GENERIC_ERROR,
                             quickFixFactory.createDeleteFix(configDir, "Remove @ConfigDir"),
-                            quickFixFactory.createDeleteFix(defaultConfig, "Remove @DefaultConfig")
+                            quickFixFactory.createDeleteFix(defaultConfig, "Remove @DefaultConfig"),
                         )
                     } else if (configDir == null && defaultConfig == null) {
                         holder.registerProblem(
@@ -222,7 +222,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             "An injected ${classType.name} must be annotated with either @ConfigDir or @DefaultConfig.",
                             ProblemHighlightType.GENERIC_ERROR,
                             AddAnnotationFix(SpongeConstants.CONFIG_DIR_ANNOTATION, annotationsOwner),
-                            AddAnnotationFix(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner)
+                            AddAnnotationFix(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner),
                         )
                     }
                 }
@@ -232,7 +232,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             variable.nameIdentifier ?: variable,
                             "Injected ConfigurationLoader must be annotated with @DefaultConfig.",
                             ProblemHighlightType.GENERIC_ERROR,
-                            AddAnnotationFix(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner)
+                            AddAnnotationFix(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner),
                         )
                     }
 
@@ -241,7 +241,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             configDir,
                             "Injected ConfigurationLoader cannot be annotated with @ConfigDir.",
                             ProblemHighlightType.GENERIC_ERROR,
-                            QuickFixFactory.getInstance().createDeleteFix(configDir, "Remove @ConfigDir")
+                            QuickFixFactory.getInstance().createDeleteFix(configDir, "Remove @ConfigDir"),
                         )
                     }
 
@@ -251,7 +251,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             ref,
                             "Injected ConfigurationLoader must have a generic parameter.",
                             ProblemHighlightType.GENERIC_ERROR,
-                            MissingConfLoaderTypeParamFix(ref)
+                            MissingConfLoaderTypeParamFix(ref),
                         )
                     } else {
                         classType.parameters.firstOrNull()?.let { param ->
@@ -264,7 +264,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                                     "Injected ConfigurationLoader generic parameter must be " +
                                         "CommentedConfigurationNode.",
                                     ProblemHighlightType.GENERIC_ERROR,
-                                    WrongConfLoaderTypeParamFix(ref)
+                                    WrongConfLoaderTypeParamFix(ref),
                                 )
                             }
                         }
@@ -277,7 +277,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             configDir,
                             "${classType.name} cannot be annotated with @ConfigDir.",
                             ProblemHighlightType.GENERIC_ERROR,
-                            quickFixFactory.createDeleteFix(configDir, "Remove @ConfigDir")
+                            quickFixFactory.createDeleteFix(configDir, "Remove @ConfigDir"),
                         )
                     }
 
@@ -286,7 +286,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             defaultConfig,
                             "${classType.name} cannot be annotated with @DefaultConfig.",
                             ProblemHighlightType.GENERIC_ERROR,
-                            quickFixFactory.createDeleteFix(defaultConfig, "Remove @DefaultConfig")
+                            quickFixFactory.createDeleteFix(defaultConfig, "Remove @DefaultConfig"),
                         )
                     }
                 }
@@ -333,7 +333,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
             "org.spongepowered.api.asset.Asset",
 
             "org.bstats.sponge.MetricsLite2.Factory",
-            "org.bstats.sponge.Metrics2.Factory"
+            "org.bstats.sponge.Metrics2.Factory",
         )
 
         val serializedDefaultInjectableTypes: String = formatString(defaultInjectableTypes)
@@ -362,7 +362,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val newRef = JavaPsiFacade.getElementFactory(project).createReferenceFromText(
                 "ninja.leaping.configurate.commented.CommentedConfigurationNode",
-                startElement
+                startElement,
             )
             startElement.replace(newRef)
         }
@@ -378,7 +378,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
             val newRef = JavaPsiFacade.getElementFactory(project).createReferenceFromText(
                 "ninja.leaping.configurate.loader.ConfigurationLoader" +
                     "<ninja.leaping.configurate.commented.CommentedConfigurationNode>",
-                startElement
+                startElement,
             )
             startElement.replace(newRef)
         }
@@ -388,7 +388,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
         private val assetPath: String,
         private val module: Module,
         private val pluginId: String,
-        directory: PsiDirectory
+        directory: PsiDirectory,
     ) : LocalQuickFix {
 
         private val dirPointer = directory.createSmartPointer()
@@ -409,7 +409,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                 module,
                 "assets.$pluginId$assetDir",
                 dirPointer.element,
-                false
+                false,
             )
             val createdFile = runWriteAction {
                 createdDir?.createFile(fileName)
@@ -432,7 +432,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
         val chooserList = UiUtils.createTreeClassChooserList(
             injectableTypesList,
             "Injectable types",
-            "Choose injectable type"
+            "Choose injectable type",
         )
         UiUtils.setComponentSize(chooserList, 7, 25)
         return chooserList

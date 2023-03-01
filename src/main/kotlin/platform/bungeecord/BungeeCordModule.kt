@@ -73,14 +73,14 @@ class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, typ
         containingClass: PsiClass,
         chosenClass: PsiClass,
         chosenName: String,
-        data: GenerationData?
+        data: GenerationData?,
     ): PsiMethod? {
         val method = BukkitModule.generateBukkitStyleEventListenerMethod(
             chosenClass,
             chosenName,
             project,
             BungeeCordConstants.HANDLER_ANNOTATION,
-            false
+            false,
         ) ?: return null
 
         val generationData = data as BungeeCordGenerationData? ?: return method
@@ -95,7 +95,7 @@ class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, typ
         val value = JavaPsiFacade.getElementFactory(project)
             .createExpressionFromText(
                 BungeeCordConstants.EVENT_PRIORITY_CLASS + "." + generationData.eventPriority,
-                annotation
+                annotation,
             )
 
         annotation.setDeclaredAttributeValue("priority", value)

@@ -17,7 +17,8 @@ enum class Side {
     CLIENT,
     SERVER,
     NONE,
-    INVALID;
+    INVALID,
+    ;
 
     companion object {
         val KEY = Key<Side>("MC_DEV_SIDE")

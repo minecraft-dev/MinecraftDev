@@ -75,7 +75,7 @@ class SidedProxyAnnotator : Annotator {
                 text = JavaConstantExpressionEvaluator.computeConstantExpression(
                     resolve.initializer,
                     null,
-                    false
+                    false,
                 ) as? String ?: return
             } else {
                 return

@@ -63,7 +63,7 @@ class MixinTargetDescriptorFoldingBuilder : CustomFoldingBuilder() {
         descriptors: MutableList<FoldingDescriptor>,
         root: PsiElement,
         document: Document,
-        quick: Boolean
+        quick: Boolean,
     ) {
         if (root !is PsiJavaFile || !MixinModuleType.isInModule(root)) {
             return

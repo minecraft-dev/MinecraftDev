@@ -43,7 +43,7 @@ import com.intellij.ui.dsl.builder.Panel
 import kotlinx.coroutines.coroutineScope
 
 class BukkitPlatformStep(
-    parent: PluginPlatformStep
+    parent: PluginPlatformStep,
 ) : AbstractNewProjectWizardMultiStep<BukkitPlatformStep, BukkitPlatformStep.Factory>(parent, EP_NAME) {
     companion object {
         val EP_NAME = ExtensionPointName<Factory>("com.demonwav.minecraft-dev.bukkitPlatformWizard")
@@ -63,7 +63,7 @@ class BukkitPlatformStep(
 
 abstract class AbstractBukkitPlatformStep(
     parent: BukkitPlatformStep,
-    private val platform: PlatformType
+    private val platform: PlatformType,
 ) : AbstractLatentStep<PlatformVersion>(parent) {
     override val description = "download versions"
 

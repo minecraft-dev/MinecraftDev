@@ -14,5 +14,5 @@ enum class SourceType {
     SOURCE,
     RESOURCE,
     TEST_SOURCE,
-    TEST_RESOURCE
+    TEST_RESOURCE,
 }

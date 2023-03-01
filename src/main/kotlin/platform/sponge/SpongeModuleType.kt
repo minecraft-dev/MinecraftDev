@@ -26,7 +26,7 @@ object SpongeModuleType : AbstractModuleType<SpongeModule>("org.spongepowered", 
     private val IGNORED_ANNOTATIONS = listOf(
         SpongeConstants.LISTENER_ANNOTATION,
         SpongeConstants.PLUGIN_ANNOTATION,
-        SpongeConstants.JVM_PLUGIN_ANNOTATION
+        SpongeConstants.JVM_PLUGIN_ANNOTATION,
     )
     private val LISTENER_ANNOTATIONS = listOf(SpongeConstants.LISTENER_ANNOTATION)
 

@@ -54,7 +54,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
-        targetClass: PsiClass
+        targetClass: PsiClass,
     ): NavigationVisitor? {
         val info = getModifyVariableInfo(at, null) ?: return null
         return MyNavigationVisitor(info, store)
@@ -64,7 +64,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
-        mode: CollectVisitor.Mode
+        mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiElement>? {
         val module = at.findModule() ?: return null
         val info = getModifyVariableInfo(at, mode) ?: return null
@@ -73,7 +73,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
 
     override fun createLookup(
         targetClass: ClassNode,
-        result: CollectVisitor.Result<PsiElement>
+        result: CollectVisitor.Result<PsiElement>,
     ): LookupElementBuilder? {
         return null
     }
@@ -95,7 +95,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
                 targetClass,
                 method,
                 localInsn,
-                result.originalInsn.`var`
+                result.originalInsn.`var`,
             ) ?: return@addResultFilter true
             val desc = localType.descriptor
             val ord = ordinals[desc] ?: 0
@@ -106,7 +106,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
 
     private class MyNavigationVisitor(
         private val info: ModifyVariableInfo,
-        private val store: Boolean
+        private val store: Boolean,
     ) : NavigationVisitor() {
         override fun visitThisExpression(expression: PsiThisExpression) {
             super.visitThisExpression(expression)
@@ -187,25 +187,15 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
         }
 
         private fun checkImplicitLocalsPre(location: PsiElement) {
-            val localsHere = LocalVariables.guessLocalsAt(location, info.argsOnly, true)
-            val localIndex = LocalVariables.guessLocalVariableIndex(location) ?: return
-            val localCount = LocalVariables.getLocalVariableSize(location)
-            for (i in localIndex until (localIndex + localCount)) {
-                val local = localsHere.firstOrNull { it.index == i } ?: continue
-                if (store) {
-                    repeat(local.implicitStoreCountBefore) {
-                        addLocalUsage(location, local.name, localsHere)
-                    }
-                } else {
-                    repeat(local.implicitLoadCountBefore) {
-                        addLocalUsage(location, local.name, localsHere)
-                    }
-                }
-            }
+            checkImplicitLocals(location, true)
         }
 
         private fun checkImplicitLocalsPost(location: PsiElement) {
-            val localsHere = LocalVariables.guessLocalsAt(location, info.argsOnly, false)
+            checkImplicitLocals(location, false)
+        }
+
+        private fun checkImplicitLocals(location: PsiElement, isPre: Boolean) {
+            val localsHere = LocalVariables.guessLocalsAt(location, info.argsOnly, isPre)
             val localIndex = LocalVariables.guessLocalVariableIndex(location) ?: return
             val localCount = LocalVariables.getLocalVariableSize(location)
             for (i in localIndex until (localIndex + localCount)) {
@@ -230,7 +220,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
         private fun addLocalUsage(
             location: PsiElement,
             name: String,
-            localsHere: List<LocalVariables.SourceLocalVariable>
+            localsHere: List<LocalVariables.SourceLocalVariable>,
         ) {
             if (info.ordinal != null) {
                 val local = localsHere.asSequence().filter {
@@ -277,7 +267,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
         private val targetClass: ClassNode,
         mode: Mode,
         private val info: ModifyVariableInfo,
-        private val store: Boolean
+        private val store: Boolean,
     ) : CollectVisitor<PsiElement>(mode) {
         override fun accept(methodNode: MethodNode) {
             var opcode = when (info.type) {

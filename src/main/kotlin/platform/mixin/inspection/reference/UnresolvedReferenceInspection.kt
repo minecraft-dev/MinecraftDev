@@ -36,8 +36,7 @@ class UnresolvedReferenceInspection : MixinInspection() {
     private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
 
         override fun visitNameValuePair(pair: PsiNameValuePair) {
-            val name = pair.name ?: PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME
-            val resolvers: Array<MixinReference> = when (name) {
+            val resolvers: Array<MixinReference> = when (pair.name ?: PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME) {
                 "method" -> arrayOf(MethodReference)
                 "target" -> arrayOf(TargetReference)
                 "value" -> arrayOf(InjectionPointReference, DescReference)
@@ -63,7 +62,7 @@ class UnresolvedReferenceInspection : MixinInspection() {
                 holder.registerProblem(
                     value,
                     "Cannot resolve ${resolver.description}".format(value.constantStringValue),
-                    ProblemHighlightType.LIKE_UNKNOWN_SYMBOL
+                    ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
                 )
             }
         }

@@ -38,7 +38,10 @@ class NewExpressionSideOnlyInspection : BaseInspection() {
         val annotation = infos[0] as? PsiAnnotation ?: return null
 
         return if (annotation.isWritable) {
-            RemoveAnnotationInspectionGadgetsFix(annotation, "Remove @SideOnly annotation from class declaration")
+            RemoveAnnotationInspectionGadgetsFix(
+                annotation.qualifiedName ?: return null,
+                "Remove @SideOnly annotation from class declaration"
+            )
         } else {
             null
         }
@@ -67,6 +70,7 @@ class NewExpressionSideOnlyInspection : BaseInspection() {
                     }
                 }
 
+                @Suppress("KotlinConstantConditions") // kotlin is wrong
                 if (classAnnotation == null || classSide == Side.NONE || offender == null) {
                     return
                 }

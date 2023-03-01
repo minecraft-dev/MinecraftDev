@@ -47,7 +47,7 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl) : X
         mouseClass: ClassType,
         virtualMachine: VirtualMachineProxyImpl,
         debugProcess: DebugProcessImpl,
-        evaluationContext: EvaluationContextImpl
+        evaluationContext: EvaluationContextImpl,
     ) {
         val isGrabbed = mouseClass.methodsByName("isGrabbed", "()Z")?.singleOrNull() ?: return
         val setGrabbed = mouseClass.methodsByName("setGrabbed", "(Z)V")?.singleOrNull() ?: return
@@ -62,7 +62,7 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl) : X
     private fun ungrab3(
         virtualMachine: VirtualMachineProxyImpl,
         debugProcess: DebugProcessImpl,
-        evaluationContext: EvaluationContextImpl
+        evaluationContext: EvaluationContextImpl,
     ) {
         fun findClass(vararg names: String): ClassType? {
             for (name in names) {
@@ -87,17 +87,17 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl) : X
 
         val minecraftClass = findClass(
             "net.minecraft.client.Minecraft",
-            "net.minecraft.client.MinecraftClient"
+            "net.minecraft.client.MinecraftClient",
         ) ?: return
         val minecraftGetter = minecraftClass.methodByName(
             "getInstance" to "()Lnet/minecraft/client/Minecraft;",
-            "getInstance" to "()Lnet/minecraft/client/MinecraftClient;"
+            "getInstance" to "()Lnet/minecraft/client/MinecraftClient;",
         ) ?: return
         val minecraft = debugProcess.invokeMethod(
             evaluationContext,
             minecraftClass,
             minecraftGetter,
-            emptyList()
+            emptyList(),
         ) as? ObjectReference ?: return
 
         val mouseHelperField = minecraftClass.fieldByName("mouseHandler", "mouse", "mouseHelper") ?: return
@@ -106,7 +106,7 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl) : X
         val ungrabMouse = mouseHelper.referenceType().methodByName(
             "releaseMouse" to "()V",
             "unlockCursor" to "()V",
-            "ungrabMouse" to "()V"
+            "ungrabMouse" to "()V",
         ) ?: return
 
         debugProcess.invokeMethod(evaluationContext, mouseHelper, ungrabMouse, emptyList())

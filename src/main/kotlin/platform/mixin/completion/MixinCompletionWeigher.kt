@@ -25,7 +25,7 @@ class MixinCompletionWeigher : CompletionWeigher() {
         .inside(
             false,
             PsiJavaPatterns.psiAnnotation().qName(MixinConstants.Annotations.MIXIN),
-            PlatformPatterns.psiFile()
+            PlatformPatterns.psiFile(),
         )!!
 
     override fun weigh(element: LookupElement, location: CompletionLocation): Int {

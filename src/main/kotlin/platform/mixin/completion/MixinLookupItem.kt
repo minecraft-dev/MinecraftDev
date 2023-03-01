@@ -51,7 +51,7 @@ private class MixinMethodLookupItem(private val shadow: MethodTargetMember, priv
             val psiMethod = shadow.classAndMethod.method.findOrConstructSourceMethod(
                 shadow.classAndMethod.clazz,
                 project,
-                canDecompile = false
+                canDecompile = false,
             )
             return MixinMethodLookupItem(shadow, psiMethod)
         }
@@ -60,7 +60,7 @@ private class MixinMethodLookupItem(private val shadow: MethodTargetMember, priv
 
 private class MixinFieldLookupItem(
     private val shadow: FieldTargetMember,
-    private val field: PsiField
+    private val field: PsiField,
 ) : VariableLookupItem(field) {
 
     override fun handleInsert(context: InsertionContext) {
@@ -78,7 +78,7 @@ private class MixinFieldLookupItem(
             val psiField = shadow.classAndField.field.findOrConstructSourceField(
                 shadow.classAndField.clazz,
                 project,
-                canDecompile = false
+                canDecompile = false,
             )
             return MixinFieldLookupItem(shadow, psiField)
         }
@@ -100,7 +100,7 @@ private fun insertShadow(context: InsertionContext, shadow: MixinTargetMember, e
         context.setLaterRunnable {
             HintManager.getInstance().showInformationHint(
                 context.editor,
-                "Added @Shadow for '${element.name}' to super Mixin ${mixinClass.shortName}"
+                "Added @Shadow for '${element.name}' to super Mixin ${mixinClass.shortName}",
             )
         }
     }

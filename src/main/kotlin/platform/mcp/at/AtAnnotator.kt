@@ -73,8 +73,8 @@ class AtAnnotator : Annotator {
                     null,
                     AtSyntaxHighlighter.ELEMENT_NAME.defaultAttributes.foregroundColor,
                     EffectType.BOLD_LINE_UNDERSCORE,
-                    Font.PLAIN
-                )
+                    Font.PLAIN,
+                ),
             )
             .create()
     }

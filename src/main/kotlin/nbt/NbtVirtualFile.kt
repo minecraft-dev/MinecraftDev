@@ -85,7 +85,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
                     "Error saving NBT file",
                     "The file is not recognised as a NBTT file. This might be caused by wrong file type associations," +
                         " or the file could be too large.",
-                    NotificationType.WARNING
+                    NotificationType.WARNING,
                 ).notify(project)
                 return@runReadActionAsync
             }
@@ -97,7 +97,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
                     "NBT Save Error",
                     "Error saving NBT file",
                     "Due to errors in the text representation, ${backingFile.name} could not be saved.",
-                    NotificationType.WARNING
+                    NotificationType.WARNING,
                 ).notify(project)
                 return@runReadActionAsync
             }
@@ -118,7 +118,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
                     "NBT Save Success",
                     "Saved NBT file successfully",
                     "${backingFile.name} was saved successfully.",
-                    NotificationType.INFORMATION
+                    NotificationType.INFORMATION,
                 ).notify(project)
             }
         }

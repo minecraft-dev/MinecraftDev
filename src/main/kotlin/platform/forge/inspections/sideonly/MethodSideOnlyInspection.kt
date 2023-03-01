@@ -28,7 +28,7 @@ class MethodSideOnlyInspection : BaseInspection() {
         return error.getErrorString(*SideOnlyUtil.getSubArray(infos))
     }
 
-    override fun getStaticDescription(): String? {
+    override fun getStaticDescription(): String {
         return "A method in a class annotated for one side cannot be declared as being in the other side. " +
             "For example, a class which is annotated as @SideOnly(Side.SERVER) cannot contain a method which " +
             "is annotated as @SideOnly(Side.CLIENT). Since a class that is annotated with @SideOnly brings " +
@@ -40,7 +40,10 @@ class MethodSideOnlyInspection : BaseInspection() {
         val annotation = infos[3] as PsiAnnotation
 
         return if (annotation.isWritable && error === Error.METHOD_IN_WRONG_CLASS) {
-            RemoveAnnotationInspectionGadgetsFix(annotation, "Remove @SideOnly annotation from method")
+            RemoveAnnotationInspectionGadgetsFix(
+                annotation.qualifiedName ?: return null,
+                "Remove @SideOnly annotation from method"
+            )
         } else {
             null
         }
@@ -72,7 +75,7 @@ class MethodSideOnlyInspection : BaseInspection() {
                         Error.RETURN_TYPE_ON_WRONG_METHOD,
                         methodAnnotation.renderSide(methodSide),
                         returnAnnotation.renderSide(returnSide),
-                        method.getAnnotation(methodAnnotation.annotationName)
+                        method.getAnnotation(methodAnnotation.annotationName),
                     )
                 }
 
@@ -88,7 +91,7 @@ class MethodSideOnlyInspection : BaseInspection() {
                                 Error.METHOD_IN_WRONG_CLASS,
                                 methodAnnotation.renderSide(methodSide),
                                 classAnnotation.renderSide(classSide),
-                                method.getAnnotation(methodAnnotation.annotationName)
+                                method.getAnnotation(methodAnnotation.annotationName),
                             )
                         }
                         if (returnAnnotation != null && returnSide !== Side.NONE && returnSide !== Side.INVALID) {
@@ -98,7 +101,7 @@ class MethodSideOnlyInspection : BaseInspection() {
                                     Error.RETURN_TYPE_IN_WRONG_CLASS,
                                     classAnnotation.renderSide(classSide),
                                     returnAnnotation.renderSide(returnSide),
-                                    method.getAnnotation(methodAnnotation.annotationName)
+                                    method.getAnnotation(methodAnnotation.annotationName),
                                 )
                             }
                         }
@@ -127,7 +130,7 @@ class MethodSideOnlyInspection : BaseInspection() {
                 return "Method in a class annotated with " + infos[0] +
                     " cannot return a type annotated with " + infos[1] + "."
             }
-        };
+        }, ;
 
         abstract fun getErrorString(vararg infos: Any): String
     }

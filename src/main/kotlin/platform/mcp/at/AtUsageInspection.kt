@@ -26,7 +26,7 @@ import com.intellij.psi.search.searches.ReferencesSearch
 
 class AtUsageInspection : LocalInspectionTool() {
 
-    override fun getStaticDescription(): String? {
+    override fun getStaticDescription(): String {
         return "The declared access transformer is never used"
     }
 
@@ -48,7 +48,7 @@ class AtUsageInspection : LocalInspectionTool() {
                 val psi = when (member) {
                     is AtFunction ->
                         reference.resolveMember(element.project) ?: srgMap.getMcpMethod(reference)?.resolveMember(
-                            element.project
+                            element.project,
                         ) ?: return
                     is AtFieldName ->
                         reference.resolveMember(element.project)
@@ -62,7 +62,7 @@ class AtUsageInspection : LocalInspectionTool() {
                     ?: holder.registerProblem(
                         element,
                         "Access Transformer entry is never used",
-                        ProblemHighlightType.LIKE_UNUSED_SYMBOL
+                        ProblemHighlightType.LIKE_UNUSED_SYMBOL,
                     )
             }
         }

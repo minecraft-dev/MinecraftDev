@@ -62,7 +62,7 @@ private class VersionProperties(
                         }
                     } ?: run {
                         versionProperties[j].set(
-                            preferredVersion ?: step.getAvailableVersions(versionsAboveChild).first()
+                            preferredVersion ?: step.getAvailableVersions(versionsAboveChild).first(),
                         )
                     }
 
@@ -128,13 +128,13 @@ private class VersionProperties(
  */
 abstract class AbstractVersionChainStep(
     parent: NewProjectWizardStep,
-    private vararg val labels: String
+    private vararg val labels: String,
 ) : AbstractNewProjectWizardStep(parent) {
     private val versionProperties by lazy {
         val versionProperties = mutableListOf<ObservableMutableProperty<Comparable<*>>>()
         for (i in labels.indices) {
             versionProperties += propertyGraph.property(
-                getAvailableVersions(versionProperties.map(ObservableMutableProperty<Comparable<*>>::get)).first()
+                getAvailableVersions(versionProperties.map(ObservableMutableProperty<Comparable<*>>::get)).first(),
             )
         }
         val preferredVersions = labels.indices.map { mutableMapOf<List<Comparable<*>>, Comparable<*>>() }
@@ -165,11 +165,12 @@ abstract class AbstractVersionChainStep(
             for ((i, label) in labels.withIndex()) {
                 row(label) {
                     val comboBox = createComboBox(
-                        this, i,
+                        this,
+                        i,
                         getAvailableVersions(
                             versionProperties.versionProperties
-                                .take(i).map(ObservableMutableProperty<Comparable<*>>::get)
-                        ).sortedDescending()
+                                .take(i).map(ObservableMutableProperty<Comparable<*>>::get),
+                        ).sortedDescending(),
                     ).bindItem(versionProperties.versionProperties[i])
                     comboBoxes += comboBox.component
                 }
@@ -184,7 +185,7 @@ private typealias PreferredVersionStateValue = List<Map<List<String>, String>>
 @Service
 @State(
     name = "PreferredVersions",
-    storages = [Storage("mcdev.CreatorPreferredVersions.xml", roamingType = RoamingType.DISABLED)]
+    storages = [Storage("mcdev.CreatorPreferredVersions.xml", roamingType = RoamingType.DISABLED)],
 )
 class PreferredVersionStateComponent : PersistentStateComponent<MutableMap<String, PreferredVersionStateValue>> {
     private var state = mutableMapOf<String, PreferredVersionStateValue>()

@@ -33,7 +33,7 @@ class InvalidMemberReferenceInspection : MixinInspection() {
         |Reports invalid usages of member references in Mixin annotations. Two different formats are supported by Mixin:
         | - Lcom/example/ExampleClass;execute(II)V
         | - com.example.ExampleClass.execute(II)V
-    """.trimMargin()
+        """.trimMargin()
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 

@@ -37,7 +37,7 @@ data class Template(val elements: List<TemplateElement>) {
                     }
                 } else {
                     listOf()
-                }
+                },
             )
 
         private val keyRegex = Regex("([?!]?[+*]?)([^+*!?]*)([?!]?[+*]?)")

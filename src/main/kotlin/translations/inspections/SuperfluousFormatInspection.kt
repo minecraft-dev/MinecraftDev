@@ -56,9 +56,9 @@ class SuperfluousFormatInspection : TranslationInspection() {
                     RemoveArgumentsQuickFix(
                         SmartPointerManager.getInstance(holder.project)
                             .createSmartPsiElementPointer(result.foldingElement),
-                        result.superfluousVarargStart
+                        result.superfluousVarargStart,
                     ),
-                    ChangeTranslationQuickFix("Use a different translation")
+                    ChangeTranslationQuickFix("Use a different translation"),
                 )
             }
         }
@@ -66,20 +66,20 @@ class SuperfluousFormatInspection : TranslationInspection() {
         private fun registerProblem(
             expression: PsiExpression,
             result: TranslationInstance,
-            vararg quickFixes: LocalQuickFix
+            vararg quickFixes: LocalQuickFix,
         ) {
             holder.registerProblem(
                 expression,
                 "There are missing formatting arguments to satisfy '${result.text}'",
                 ProblemHighlightType.GENERIC_ERROR,
-                *quickFixes
+                *quickFixes,
             )
         }
     }
 
     private class RemoveArgumentsQuickFix(
         private val call: SmartPsiElementPointer<PsiCall>,
-        private val position: Int
+        private val position: Int,
     ) : LocalQuickFix {
         override fun getName() = "Remove superfluous arguments"
 

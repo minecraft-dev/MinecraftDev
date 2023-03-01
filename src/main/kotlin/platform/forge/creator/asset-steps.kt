@@ -133,7 +133,7 @@ class ForgeBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemSt
 }
 
 class ForgePostBuildSystemStep(
-    parent: NewProjectWizardStep
+    parent: NewProjectWizardStep,
 ) : AbstractRunBuildSystemStep(parent, ForgeBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }

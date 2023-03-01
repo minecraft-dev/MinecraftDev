@@ -55,7 +55,7 @@ private fun findLibrary(name: String): VirtualFile? {
                 it.children
                 it.refresh(false, false)
                 true
-            }
+            },
         )
     }
     return fsRoot

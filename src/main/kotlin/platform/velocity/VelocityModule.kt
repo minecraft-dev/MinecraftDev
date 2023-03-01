@@ -18,14 +18,12 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.velocity.generation.VelocityGenerationData
 import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
 import com.demonwav.mcdev.platform.velocity.util.VelocityConstants.SUBSCRIBE_ANNOTATION
+import com.demonwav.mcdev.util.createVoidMethodWithParameterType
 import com.intellij.lang.jvm.JvmModifier
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiType
-import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
@@ -41,19 +39,9 @@ class VelocityModule(facet: MinecraftFacet) : AbstractModule(facet) {
         containingClass: PsiClass,
         chosenClass: PsiClass,
         chosenName: String,
-        data: GenerationData?
+        data: GenerationData?,
     ): PsiMethod? {
-        val method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)
-        val parameterList = method.parameterList
-
-        val qName = chosenClass.qualifiedName ?: return null
-        val parameter = JavaPsiFacade.getElementFactory(project)
-            .createParameter(
-                "event",
-                PsiClassType.getTypeByName(qName, project, GlobalSearchScope.allScope(project))
-            )
-
-        parameterList.add(parameter)
+        val method = createVoidMethodWithParameterType(project, chosenName, chosenClass) ?: return null
         val modifierList = method.modifierList
 
         val subscribeAnnotation = modifierList.addAnnotation(SUBSCRIBE_ANNOTATION)
@@ -64,7 +52,7 @@ class VelocityModule(facet: MinecraftFacet) : AbstractModule(facet) {
             val value = JavaPsiFacade.getElementFactory(project)
                 .createExpressionFromText(
                     "com.velocitypowered.api.event.PostOrder." + generationData.eventOrder,
-                    subscribeAnnotation
+                    subscribeAnnotation,
                 )
 
             subscribeAnnotation.setDeclaredAttributeValue("order", value)

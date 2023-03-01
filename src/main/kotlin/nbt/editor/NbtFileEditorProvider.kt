@@ -76,7 +76,7 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
 
 private class NbtFileEditor(
     private val file: VirtualFile,
-    private val editorProvider: (NbtVirtualFile) -> FileEditor
+    private val editorProvider: (NbtVirtualFile) -> FileEditor,
 ) : FileEditor {
 
     private var editor: FileEditor? = null
@@ -147,7 +147,7 @@ private class NbtFileEditor(
 
                     nbtFile.writeFile(this)
                 }
-            }
+            },
         )
     }
 

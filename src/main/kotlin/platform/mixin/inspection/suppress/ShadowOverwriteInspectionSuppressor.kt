@@ -21,14 +21,6 @@ import com.intellij.psi.PsiMethod
 
 class ShadowOverwriteInspectionSuppressor : InspectionSuppressor {
 
-    private val SUPPRESSED_INSPECTIONS = setOf(
-        "UnusedReturnValue",
-        "SameParameterValue",
-        "Guava",
-        VisibilityInspection.SHORT_NAME,
-        "MethodMayBeStatic"
-    )
-
     override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {
         if (toolId !in SUPPRESSED_INSPECTIONS) {
             return false
@@ -40,4 +32,14 @@ class ShadowOverwriteInspectionSuppressor : InspectionSuppressor {
 
     override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> =
         SuppressQuickFix.EMPTY_ARRAY
+
+    companion object {
+        private val SUPPRESSED_INSPECTIONS = setOf(
+            "UnusedReturnValue",
+            "SameParameterValue",
+            "Guava",
+            VisibilityInspection.SHORT_NAME,
+            "MethodMayBeStatic",
+        )
+    }
 }

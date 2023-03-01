@@ -47,7 +47,7 @@ class OverwriteAuthorInspection : OverwriteInspection() {
         holder.registerProblem(
             element,
             "@Overwrite methods must have an associated JavaDoc with a filled in @$tag tag",
-            QuickFix(tag)
+            QuickFix(tag),
         )
     }
 
@@ -55,7 +55,7 @@ class OverwriteAuthorInspection : OverwriteInspection() {
         holder.registerProblem(
             element,
             "@Overwrite methods must have an associated JavaDoc with filled in @author and @reason tags",
-            QuickFix()
+            QuickFix(),
         )
     }
 
@@ -75,7 +75,7 @@ class OverwriteAuthorInspection : OverwriteInspection() {
                 method.addBefore(
                     JavaPsiFacade.getElementFactory(project)
                         .createDocCommentFromText("/**\n * @author \n * @reason \n */"),
-                    method.modifierList
+                    method.modifierList,
                 )
                 return
             }

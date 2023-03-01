@@ -50,22 +50,22 @@ class BungeeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunning
 
         if (authors.isNotEmpty()) {
             assets.addTemplateProperties(
-                "AUTHOR" to authors.joinToString(", ")
+                "AUTHOR" to authors.joinToString(", "),
             )
         }
         if (description.isNotBlank()) {
             assets.addTemplateProperties(
-                "DESCRIPTION" to description
+                "DESCRIPTION" to description,
             )
         }
         if (depend.isNotEmpty()) {
             assets.addTemplateProperties(
-                "DEPEND" to depend
+                "DEPEND" to depend,
             )
         }
         if (softDepend.isNotEmpty()) {
             assets.addTemplateProperties(
-                "SOFT_DEPEND" to softDepend
+                "SOFT_DEPEND" to softDepend,
             )
         }
 
@@ -86,7 +86,7 @@ class BungeeBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemS
 }
 
 class BungeePostBuildSystemStep(
-    parent: NewProjectWizardStep
+    parent: NewProjectWizardStep,
 ) : AbstractRunBuildSystemStep(parent, BungeeBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }

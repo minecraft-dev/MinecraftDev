@@ -86,7 +86,9 @@ abstract class ClassNameReferenceProvider : PackageNameReferenceProvider() {
             }
 
             basePackage.length + 1
-        } else 0
+        } else {
+            0
+        }
 
         val end = packageName.indexOf('.', start)
         return if (end == -1) {

@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.creator.platformtype
 
+import com.demonwav.mcdev.creator.platformtype.ModPlatformStep.Factory
 import com.intellij.ide.wizard.AbstractNewProjectWizardMultiStep
 import com.intellij.ide.wizard.NewProjectWizardMultiStepFactory
 import com.intellij.openapi.extensions.ExtensionPointName
@@ -21,8 +22,8 @@ import com.intellij.openapi.extensions.ExtensionPointName
  * point.
  */
 class ModPlatformStep(
-    parent: PlatformTypeStep
-) : AbstractNewProjectWizardMultiStep<ModPlatformStep, ModPlatformStep.Factory>(parent, EP_NAME) {
+    parent: PlatformTypeStep,
+) : AbstractNewProjectWizardMultiStep<ModPlatformStep, Factory>(parent, EP_NAME) {
     companion object {
         val EP_NAME = ExtensionPointName<Factory>("com.demonwav.minecraft-dev.modPlatformWizard")
     }

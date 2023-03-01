@@ -36,25 +36,25 @@ data class SideAnnotation(
                 "net.minecraftforge.fml.relauncher.SideOnly",
                 "net.minecraftforge.fml.relauncher.Side",
                 "CLIENT",
-                "SERVER"
+                "SERVER",
             ),
             SideAnnotation(
                 "cpw.mods.fml.relauncher.SideOnly",
                 "cpw.mods.fml.relauncher.Side",
                 "CLIENT",
-                "SERVER"
+                "SERVER",
             ),
             SideAnnotation(
                 "net.minecraftforge.api.distmarker.OnlyIn",
                 "net.minecraftforge.api.distmarker.Dist",
                 "CLIENT",
-                "DEDICATED_SERVER"
+                "DEDICATED_SERVER",
             ),
             SideAnnotation(
                 "net.fabricmc.api.Environment",
                 "net.fabricmc.api.EnvType",
                 "CLIENT",
-                "SERVER"
+                "SERVER",
             ),
         )
     }

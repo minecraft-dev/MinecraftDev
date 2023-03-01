@@ -57,7 +57,7 @@ class UnusedMixinInspection : MixinInspection() {
                 val bestQuickFixConfig = MixinModule.getBestWritableConfigForMixinClass(
                     module.project,
                     GlobalSearchScope.moduleScope(module),
-                    clazz.fullQualifiedName ?: ""
+                    clazz.fullQualifiedName ?: "",
                 )
                 val problematicElement = clazz.nameIdentifier
                 if (problematicElement != null) {
@@ -84,7 +84,7 @@ class UnusedMixinInspection : MixinInspection() {
     private class QuickFix(
         private val quickFixFile: VirtualFile,
         private val qualifiedName: String,
-        private val side: Side
+        private val side: Side,
     ) : LocalQuickFix {
 
         private val sideDisplayName = when (side) {

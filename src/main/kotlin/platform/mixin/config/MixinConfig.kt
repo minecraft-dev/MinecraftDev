@@ -112,31 +112,28 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
         get() = FullyQualifiedMixinList(MixinList("server"))
 
     private fun deleteCommaAround(element: PsiElement) {
-        // Delete the comma before, if it exists
-        var elem = element.prevSibling
-        while (elem != null) {
-            if (elem.node.elementType === JsonElementTypes.COMMA || (elem is PsiErrorElement && elem.text == ",")) {
-                elem.delete()
-                return
-            } else if (elem is PsiComment || elem is PsiWhiteSpace) {
-                elem = elem.prevSibling
-            } else {
-                break
+        fun deleteComma(element: PsiElement?): Boolean {
+            var elem = element
+            while (elem != null) {
+                if (elem.node.elementType === JsonElementTypes.COMMA || (elem is PsiErrorElement && elem.text == ",")) {
+                    elem.delete()
+                    return true
+                } else if (elem is PsiComment || elem is PsiWhiteSpace) {
+                    elem = elem.prevSibling
+                } else {
+                    return false
+                }
             }
+            return false
+        }
+
+        // Delete the comma before, if it exists
+        if (deleteComma(element.prevSibling)) {
+            return
         }
 
         // If it didn't exist, delete the comma after if it exists
-        elem = element.nextSibling
-        while (elem != null) {
-            if (elem.node.elementType === JsonElementTypes.COMMA || (elem is PsiErrorElement && elem.text == ",")) {
-                elem.delete()
-                return
-            } else if (elem is PsiComment || elem is PsiWhiteSpace) {
-                elem = elem.nextSibling
-            } else {
-                break
-            }
-        }
+        deleteComma(element.nextSibling)
     }
 
     private fun reformat() {

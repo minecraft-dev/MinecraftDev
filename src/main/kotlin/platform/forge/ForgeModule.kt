@@ -21,6 +21,7 @@ import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.mcp.McpModuleSettings
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.SourceType
+import com.demonwav.mcdev.util.createVoidMethodWithParameterType
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.nullable
 import com.demonwav.mcdev.util.runWriteTaskLater
@@ -32,11 +33,9 @@ import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
-import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedElementsSearch
 import org.jetbrains.uast.UClass
@@ -117,7 +116,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
             return formatWrongEventMessage(
                 ForgeConstants.EVENTBUS_EVENT,
                 ForgeConstants.EVENTBUS_SUBSCRIBE_EVENT_ANNOTATION,
-                ForgeConstants.EVENTBUS_EVENT == eventClass.qualifiedName
+                ForgeConstants.EVENTBUS_EVENT == eventClass.qualifiedName,
             )
         }
 
@@ -127,14 +126,14 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
             return formatWrongEventMessage(
                 ForgeConstants.FML_EVENT,
                 ForgeConstants.SUBSCRIBE_EVENT_ANNOTATION,
-                ForgeConstants.EVENT == eventClass.qualifiedName
+                ForgeConstants.EVENT == eventClass.qualifiedName,
             )
         }
 
         return formatWrongEventMessage(
             ForgeConstants.EVENT,
             ForgeConstants.EVENT_HANDLER_ANNOTATION,
-            ForgeConstants.FML_EVENT == eventClass.qualifiedName
+            ForgeConstants.FML_EVENT == eventClass.qualifiedName,
         )
     }
 
@@ -152,21 +151,11 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         containingClass: PsiClass,
         chosenClass: PsiClass,
         chosenName: String,
-        data: GenerationData?
+        data: GenerationData?,
     ): PsiMethod? {
         val isFmlEvent = chosenClass.extendsOrImplements(ForgeConstants.FML_EVENT)
 
-        val method = JavaPsiFacade.getElementFactory(project).createMethod(chosenName, PsiType.VOID)
-        val parameterList = method.parameterList
-
-        val qName = chosenClass.qualifiedName ?: return null
-        val parameter = JavaPsiFacade.getElementFactory(project)
-            .createParameter(
-                "event",
-                PsiClassType.getTypeByName(qName, project, GlobalSearchScope.allScope(project))
-            )
-
-        parameterList.add(parameter)
+        val method = createVoidMethodWithParameterType(project, chosenName, chosenClass) ?: return null
         val modifierList = method.modifierList
 
         if (isFmlEvent) {

@@ -10,20 +10,22 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.demonwav.mcdev.util.findAnnotation
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.SmartPsiElementPointer
-import com.intellij.refactoring.suggested.createSmartPointer
+import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.util.findParentOfType
 import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
-class RemoveAnnotationInspectionGadgetsFix(element: PsiAnnotation, private val name: String) : InspectionGadgetsFix() {
-
-    private val pointer: SmartPsiElementPointer<PsiAnnotation> = element.createSmartPointer()
+class RemoveAnnotationInspectionGadgetsFix(
+    private val annotationName: String,
+    private val name: String
+) : InspectionGadgetsFix() {
 
     override fun doFix(project: Project, descriptor: ProblemDescriptor) {
-        pointer.element?.delete()
+        val decl = descriptor.psiElement.findParentOfType<PsiModifierListOwner>() ?: return
+        decl.findAnnotation(annotationName)?.delete()
     }
 
     @Nls

@@ -60,8 +60,8 @@ class NbttFoldingBuilder : FoldingBuilder {
                         list.add(
                             FoldingDescriptor(
                                 node,
-                                TextRange(lbrace.textRange.endOffset, rbrace.textRange.startOffset)
-                            )
+                                TextRange(lbrace.textRange.endOffset, rbrace.textRange.startOffset),
+                            ),
                         )
                     }
                 }
@@ -74,8 +74,8 @@ class NbttFoldingBuilder : FoldingBuilder {
                         list.add(
                             FoldingDescriptor(
                                 node,
-                                TextRange(lbracket.textRange.endOffset, rbracket.textRange.startOffset)
-                            )
+                                TextRange(lbracket.textRange.endOffset, rbracket.textRange.startOffset),
+                            ),
                         )
                     }
                 }
@@ -88,8 +88,8 @@ class NbttFoldingBuilder : FoldingBuilder {
                         list.add(
                             FoldingDescriptor(
                                 node,
-                                TextRange(lparen.textRange.endOffset, rparen.textRange.startOffset)
-                            )
+                                TextRange(lparen.textRange.endOffset, rparen.textRange.startOffset),
+                            ),
                         )
                     }
                 }
@@ -100,9 +100,7 @@ class NbttFoldingBuilder : FoldingBuilder {
     }
 
     override fun isCollapsedByDefault(node: ASTNode): Boolean {
-        val psi = node.psi
-
-        val size = when (psi) {
+        val size = when (val psi = node.psi) {
             is NbttByteArray -> psi.getByteList().size
             is NbttIntArray -> psi.getIntList().size
             is NbttLongArray -> psi.getLongList().size

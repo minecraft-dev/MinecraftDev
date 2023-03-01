@@ -54,7 +54,7 @@ abstract class OuterClassTest : ProjectBuilderTest() {
                         public C doSomething() {}
                     }
                 }
-            """
+            """,
             ).toPsiFile<PsiJavaFile>().classes.single()
         }
 

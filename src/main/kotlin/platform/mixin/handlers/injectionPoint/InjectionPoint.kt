@@ -13,6 +13,8 @@ package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.SHIFT
+import com.demonwav.mcdev.platform.mixin.util.fakeResolve
+import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.equivalentTo
@@ -25,6 +27,7 @@ import com.demonwav.mcdev.util.shortName
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.extensions.RequiredElement
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.KeyedExtensionCollector
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.JavaRecursiveElementVisitor
@@ -48,6 +51,7 @@ import com.intellij.util.xmlb.annotations.Attribute
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
+import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 
 abstract class InjectionPoint<T : PsiElement> {
@@ -65,21 +69,21 @@ abstract class InjectionPoint<T : PsiElement> {
     abstract fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
-        targetClass: PsiClass
+        targetClass: PsiClass,
     ): NavigationVisitor?
 
     abstract fun doCreateCollectVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
-        mode: CollectVisitor.Mode
+        mode: CollectVisitor.Mode,
     ): CollectVisitor<T>?
 
     fun createCollectVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
-        mode: CollectVisitor.Mode
+        mode: CollectVisitor.Mode,
     ): CollectVisitor<T>? {
         return doCreateCollectVisitor(at, target, targetClass, mode)?.also {
             addFilters(at, targetClass, it)
@@ -146,7 +150,7 @@ abstract class InjectionPoint<T : PsiElement> {
             sliceAt: PsiAnnotation?,
             selector: SliceSelector,
             insns: InsnList,
-            method: MethodNode
+            method: MethodNode,
         ): Int? {
             return sliceAt?.let {
                 val results = AtResolver(sliceAt, targetClass, method).resolveInstructions()
@@ -224,19 +228,19 @@ abstract class QualifiedInjectionPoint<T : PsiMember> : InjectionPoint<T>() {
 
     final override fun createLookup(
         targetClass: ClassNode,
-        result: CollectVisitor.Result<T>
+        result: CollectVisitor.Result<T>,
     ): LookupElementBuilder {
         return qualifyLookup(
             createLookup(targetClass, result.target, result.qualifier ?: targetClass.name),
             targetClass,
-            result.target
+            result.target,
         )
     }
 
     private fun qualifyLookup(
         builder: LookupElementBuilder,
         targetClass: ClassNode,
-        m: T
+        m: T,
     ): LookupElementBuilder {
         val owner = m.containingClass ?: return builder
         return if (targetClass.name == owner.fullQualifiedName?.replace('.', '/')) {
@@ -255,7 +259,7 @@ abstract class AbstractMethodInjectionPoint : QualifiedInjectionPoint<PsiMethod>
             m,
             m.getQualifiedMemberReference(owner).toMixinString(),
             PsiSubstitutor.EMPTY,
-            null
+            null,
         )
             .setBoldIfInClass(m, targetClass)
             .withPresentableText(m.internalName) // Display internal name (e.g. <init> for constructors)
@@ -350,7 +354,7 @@ abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
     protected fun addResult(
         insn: AbstractInsnNode,
         element: T,
-        qualifier: String? = null
+        qualifier: String? = null,
     ) {
         // apply shift.
         // being able to break out of the shift loops is important to prevent IDE freezes in case of large shift bys.
@@ -390,6 +394,7 @@ abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
         }
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     protected fun stopWalking() {
         throw StopWalkingException()
     }
@@ -405,10 +410,31 @@ abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
         val originalInsn: AbstractInsnNode,
         val insn: AbstractInsnNode,
         val target: T,
-        val qualifier: String? = null
+        val qualifier: String? = null,
     )
 
     enum class Mode { MATCH_ALL, MATCH_FIRST, COMPLETION }
+}
+
+fun nodeMatchesSelector(
+    insn: MethodInsnNode,
+    mode: CollectVisitor.Mode,
+    selector: MixinSelector,
+    project: Project,
+): PsiMethod? {
+    if (mode != CollectVisitor.Mode.COMPLETION) {
+        if (!selector.matchMethod(insn.owner, insn.name, insn.desc)) {
+            return null
+        }
+    }
+
+    val fakeMethod = insn.fakeResolve()
+
+    return fakeMethod.method.findOrConstructSourceMethod(
+        fakeMethod.clazz,
+        project,
+        canDecompile = false,
+    )
 }
 
 typealias CollectResultFilter<T> = (CollectVisitor.Result<T>, MethodNode) -> Boolean

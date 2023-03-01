@@ -27,27 +27,31 @@ import org.jetbrains.plugins.groovy.codeInspection.fixes.RemoveElementQuickFix
 class DuplicateAwEntryInspection : LocalInspectionTool() {
 
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor>? {
-        if (file !is AwFile)
+        if (file !is AwFile) {
             return null
+        }
         val collected = HashMap<Pair<PsiElement, String>, MutableList<AwEntryMixin>>()
         file.entries.forEach {
             val target = it.childOfType<AwMemberNameMixin>()?.resolve()
             val accessKind = it.accessKind
-            if (target != null && accessKind != null)
+            if (target != null && accessKind != null) {
                 (collected.getOrCreate(Pair(target, accessKind)) { ArrayList() }) += it
+            }
         }
         val problems = ArrayList<ProblemDescriptor>()
         collected.forEach { (sort, matches) ->
-            if (sort.first is PsiNamedElement)
-                if (matches.size > 1)
+            if (sort.first is PsiNamedElement) {
+                if (matches.size > 1) {
                     for (match in matches)
                         problems += manager.createProblemDescriptor(
                             match,
                             "Duplicate entry for \"${sort.second}  ${(sort.first as PsiNamedElement).name}\"",
                             RemoveElementQuickFix("Remove duplicate"),
                             ProblemHighlightType.WARNING,
-                            isOnTheFly
+                            isOnTheFly,
                         )
+                }
+            }
         }
         return problems.toTypedArray()
     }

@@ -112,7 +112,7 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                 val isDeclaredId = keySegment.containingFile.children
                     .filterIsInstance<TomlArrayTable>()
                     .filter { it.header.key?.name == "mods" }
-                    .any { it.entries.find { it.key.text == "modId" }?.value?.stringValue() == targetId }
+                    .any { it.entries.find { entry -> entry.key.text == "modId" }?.value?.stringValue() == targetId }
                 if (!isDeclaredId) {
                     holder.registerProblem(keySegment, "Mod $targetId is not declared in this file")
                 }

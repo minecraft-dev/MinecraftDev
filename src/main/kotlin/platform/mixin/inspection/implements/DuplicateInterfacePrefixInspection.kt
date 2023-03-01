@@ -26,7 +26,7 @@ class DuplicateInterfacePrefixInspection : MixinAnnotationAttributeInspection(IM
     override fun visitAnnotationAttribute(
         annotation: PsiAnnotation,
         value: PsiAnnotationMemberValue,
-        holder: ProblemsHolder
+        holder: ProblemsHolder,
     ) {
         val interfaces = value.findAnnotations().ifEmpty { return }
 

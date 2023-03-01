@@ -30,7 +30,7 @@ object McpModelFG3Handler : McpModelDataHandler {
     override fun build(
         gradleModule: IdeaModule,
         node: DataNode<ModuleData>,
-        resolverCtx: ProjectResolverContext
+        resolverCtx: ProjectResolverContext,
     ) {
         val data = resolverCtx.getExtraProject(gradleModule, McpModelFG3::class.java) ?: return
 
@@ -55,7 +55,7 @@ object McpModelFG3Handler : McpModelDataHandler {
             data.mcpVersion,
             data.taskOutputLocation.absolutePath,
             SrgType.TSRG,
-            forgeVersion
+            forgeVersion,
         )
 
         val gradleProjectPath = gradleModule.gradleProject.projectIdentifier.projectPath

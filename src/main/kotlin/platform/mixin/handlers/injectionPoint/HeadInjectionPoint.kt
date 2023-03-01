@@ -27,7 +27,7 @@ class HeadInjectionPoint : InjectionPoint<PsiElement>() {
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
-        mode: CollectVisitor.Mode
+        mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiElement> {
         return MyCollectVisitor(at.project, targetClass, mode)
     }
@@ -35,14 +35,14 @@ class HeadInjectionPoint : InjectionPoint<PsiElement>() {
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
-        targetClass: PsiClass
+        targetClass: PsiClass,
     ): NavigationVisitor {
         return MyNavigationVisitor()
     }
 
     override fun createLookup(
         targetClass: ClassNode,
-        result: CollectVisitor.Result<PsiElement>
+        result: CollectVisitor.Result<PsiElement>,
     ): LookupElementBuilder? {
         return null
     }
@@ -50,7 +50,7 @@ class HeadInjectionPoint : InjectionPoint<PsiElement>() {
     private class MyCollectVisitor(
         private val project: Project,
         private val clazz: ClassNode,
-        mode: Mode
+        mode: Mode,
     ) : CollectVisitor<PsiElement>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return

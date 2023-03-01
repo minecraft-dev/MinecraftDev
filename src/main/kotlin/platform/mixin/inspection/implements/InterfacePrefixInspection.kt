@@ -25,7 +25,7 @@ class InterfacePrefixInspection : MixinAnnotationAttributeInspection(INTERFACE, 
     override fun visitAnnotationAttribute(
         annotation: PsiAnnotation,
         value: PsiAnnotationMemberValue,
-        holder: ProblemsHolder
+        holder: ProblemsHolder,
     ) {
         val prefix = value.constantStringValue ?: return
         if (!prefix.endsWith('$')) {

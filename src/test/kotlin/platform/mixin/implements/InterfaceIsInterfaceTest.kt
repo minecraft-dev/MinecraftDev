@@ -35,7 +35,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
 
                     }
                     """,
-                    configure = false
+                    configure = false,
                 )
 
                 java(
@@ -47,7 +47,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
 
                     }
                     """,
-                    configure = false
+                    configure = false,
                 )
 
                 java(
@@ -67,7 +67,7 @@ class InterfaceIsInterfaceTest : BaseMixinTest() {
                     class InterfaceIsInterfaceMixin {
 
                     }
-                    """
+                    """,
                 )
             }
         }

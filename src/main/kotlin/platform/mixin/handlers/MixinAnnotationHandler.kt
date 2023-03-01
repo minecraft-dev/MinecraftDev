@@ -74,7 +74,7 @@ interface MixinAnnotationHandler {
 
     companion object {
         private val EP_NAME = ExtensionPointName<KeyedLazyInstance<MixinAnnotationHandler>>(
-            "com.demonwav.minecraft-dev.mixinAnnotationHandler"
+            "com.demonwav.minecraft-dev.mixinAnnotationHandler",
         )
         private val COLLECTOR = KeyedExtensionCollector<MixinAnnotationHandler, String>(EP_NAME)
 
@@ -94,7 +94,7 @@ interface MixinAnnotationHandler {
                         ?.let { annotationType ->
                             AnnotatedElementsSearch.searchPsiClasses(
                                 annotationType,
-                                GlobalSearchScope.allScope(project)
+                                GlobalSearchScope.allScope(project),
                             ).mapNotNull { injectionInfoClass ->
                                 injectionInfoClass.findAnnotation(MixinConstants.Annotations.ANNOTATION_TYPE)
                                     ?.findAttributeValue("value")

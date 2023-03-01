@@ -20,7 +20,7 @@ class EventGenerationDialog(
     editor: Editor,
     private val panel: EventGenerationPanel,
     className: String,
-    defaultListenerName: String
+    defaultListenerName: String,
 ) : DialogWrapper(editor.component, false) {
 
     private val wizard: EventListenerWizard = EventListenerWizard(panel.panel, className, defaultListenerName)

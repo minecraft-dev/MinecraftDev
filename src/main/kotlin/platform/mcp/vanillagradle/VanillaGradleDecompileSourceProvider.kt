@@ -30,7 +30,7 @@ import org.jetbrains.plugins.gradle.util.GradleUtil
 class VanillaGradleDecompileSourceProvider : AttachSourcesProvider {
     override fun getActions(
         orderEntries: List<LibraryOrderEntry>,
-        psiFile: PsiFile
+        psiFile: PsiFile,
     ): Collection<AttachSourcesProvider.AttachSourcesAction> {
         if (psiFile !is PsiJavaFile || !psiFile.packageName.startsWith("net.minecraft")) {
             return emptyList()
@@ -64,10 +64,10 @@ class VanillaGradleDecompileSourceProvider : AttachSourcesProvider {
 
                                 override fun onFailure(errorMessage: String, errorDetails: String?) {
                                     callback.reject(
-                                        if (errorDetails == null) errorMessage else "$errorMessage: $errorDetails"
+                                        if (errorDetails == null) errorMessage else "$errorMessage: $errorDetails",
                                     )
                                 }
-                            }
+                            },
                         )
                     ExternalSystemUtil.refreshProject(projectPath, importSpec)
                 }
@@ -78,7 +78,7 @@ class VanillaGradleDecompileSourceProvider : AttachSourcesProvider {
                 project,
                 Paths.get(projectPath),
                 { settings -> settings.taskNames = listOf(decompileTaskName) },
-                taskCallback
+                taskCallback,
             )
             return callback
         }

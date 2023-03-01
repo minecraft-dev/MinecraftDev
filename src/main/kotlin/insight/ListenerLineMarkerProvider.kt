@@ -63,7 +63,7 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
             element,
             element.textRange,
             icon,
-            createHandler()
+            createHandler(),
         )
     }
 
@@ -80,11 +80,11 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
     override fun getName() = "Event Listener line marker"
     override fun getIcon() = GeneralAssets.LISTENER
 
-    private class EventLineMarkerInfo constructor(
+    private class EventLineMarkerInfo(
         element: PsiElement,
         range: TextRange,
         icon: Icon,
-        handler: GutterIconNavigationHandler<PsiElement>
+        handler: GutterIconNavigationHandler<PsiElement>,
     ) : MergeableLineMarkerInfo<PsiElement>(
         element,
         range,
@@ -92,7 +92,7 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
         Function { "Go to Event declaration" },
         handler,
         GutterIconRenderer.Alignment.RIGHT,
-        { "event listener indicator" }
+        { "event listener indicator" },
     ) {
 
         override fun canMergeWith(info: MergeableLineMarkerInfo<*>): Boolean {

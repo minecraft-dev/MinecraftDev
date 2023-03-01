@@ -14,8 +14,6 @@ import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
-import com.demonwav.mcdev.platform.mixin.util.fakeResolve
-import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.platform.mixin.util.shortName
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
@@ -58,7 +56,7 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
-        targetClass: PsiClass
+        targetClass: PsiClass,
     ): NavigationVisitor? {
         return getTarget(at, target)?.let { MyNavigationVisitor(it) }
     }
@@ -67,7 +65,7 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
-        mode: CollectVisitor.Mode
+        mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiMember>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, at.project, MemberReference(""))
@@ -87,7 +85,7 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
                     target,
                     target.getQualifiedMemberReference(result.qualifier).toMixinString(),
                     PsiSubstitutor.EMPTY,
-                    null
+                    null,
                 )
                     .setBoldIfInClass(target, targetClass)
                     .withPresentableText(ownerName + "." + target.internalName)
@@ -98,7 +96,7 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
     }
 
     private class MyNavigationVisitor(
-        private val selector: MixinSelector
+        private val selector: MixinSelector,
     ) : NavigationVisitor() {
         override fun visitNewExpression(expression: PsiNewExpression) {
             val anonymousName = expression.anonymousClass?.fullQualifiedName?.replace('.', '/')
@@ -110,7 +108,7 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
                 val bytecodeArgTypes = if (thisType != null) listOf(thisType) + argTypes else argTypes
                 val methodDesc = Type.getMethodDescriptor(
                     Type.VOID_TYPE,
-                    *bytecodeArgTypes.mapToArray { Type.getType(it) }
+                    *bytecodeArgTypes.mapToArray { Type.getType(it) },
                 )
                 if (selector.matchMethod(anonymousName, "<init>", methodDesc)) {
                     addResult(expression)
@@ -131,7 +129,7 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
     private class MyCollectVisitor(
         mode: Mode,
         private val project: Project,
-        private val selector: MixinSelector
+        private val selector: MixinSelector,
     ) : CollectVisitor<PsiMember>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return
@@ -139,21 +137,12 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
                 if (insn !is TypeInsnNode) return@forEachRemaining
                 if (insn.opcode != Opcodes.NEW) return@forEachRemaining
                 val initCall = findInitCall(insn) ?: return@forEachRemaining
-                if (mode != Mode.COMPLETION) {
-                    if (!selector.matchMethod(initCall.owner, initCall.name, initCall.desc)) {
-                        return@forEachRemaining
-                    }
-                }
 
-                val targetMethod = initCall.fakeResolve()
+                val sourceMethod = nodeMatchesSelector(initCall, mode, selector, project) ?: return@forEachRemaining
                 addResult(
                     insn,
-                    targetMethod.method.findOrConstructSourceMethod(
-                        targetMethod.clazz,
-                        project,
-                        canDecompile = false
-                    ),
-                    qualifier = insn.desc.replace('/', '.')
+                    sourceMethod,
+                    qualifier = initCall.owner.replace('/', '.'),
                 )
             }
         }

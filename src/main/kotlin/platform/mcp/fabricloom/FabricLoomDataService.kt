@@ -26,7 +26,7 @@ class FabricLoomDataService : AbstractProjectDataService<FabricLoomData, Module>
         toImport: Collection<DataNode<FabricLoomData>>,
         projectData: ProjectData?,
         project: Project,
-        modelsProvider: IdeModifiableModelsProvider
+        modelsProvider: IdeModifiableModelsProvider,
     ) {
         // Dummy service to enable platform-side DataNodes cache
     }

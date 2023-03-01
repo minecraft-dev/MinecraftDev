@@ -57,7 +57,7 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
             return getEntries(
                 GlobalSearchScope.fileScope(project, file),
                 TranslationFiles.getLocale(file) ?: return emptySequence(),
-                file.mcDomain
+                file.mcDomain,
             ).flatten()
         }
 
@@ -66,22 +66,18 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
             return getEntries(
                 GlobalSearchScope.fileScope(file),
                 TranslationFiles.getLocale(virtualFile) ?: return emptySequence(),
-                virtualFile.mcDomain
+                virtualFile.mcDomain,
             ).flatten()
         }
 
         fun getAllDefaultEntries(project: Project, domain: String? = null) =
             getEntries(GlobalSearchScope.allScope(project), TranslationConstants.DEFAULT_LOCALE, domain)
 
-        fun getProjectDefaultEntries(project: Project, domain: String? = null) =
+        private fun getProjectDefaultEntries(project: Project, domain: String? = null) =
             getEntries(GlobalSearchScope.projectScope(project), TranslationConstants.DEFAULT_LOCALE, domain)
 
         fun getEntries(scope: GlobalSearchScope, locale: String, domain: String? = null) =
-            FileBasedIndex.getInstance().getValues(
-                TranslationIndex.NAME,
-                locale,
-                scope
-            ).asSequence()
+            FileBasedIndex.getInstance().getValues(NAME, locale, scope,).asSequence()
                 .filter { domain == null || it.sourceDomain == domain }
 
         private fun Sequence<TranslationIndexEntry>.flatten() = this.flatMap { it.translations.asSequence() }
@@ -108,7 +104,7 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
     private object Indexer : DataIndexer<String, TranslationIndexEntry, FileContent> {
         override fun map(inputData: FileContent): MutableMap<String, TranslationIndexEntry> {
             val domain = inputData.file.mcDomain ?: return mutableMapOf()
-            val entry = TranslationProvider.INSTANCES[inputData.fileType]?.map(domain, inputData)
+            val entry = TranslationProvider.INSTANCES[inputData.fileType.name]?.map(domain, inputData)
                 ?: return mutableMapOf()
             val locale = TranslationFiles.getLocale(inputData.file) ?: return mutableMapOf()
             return mutableMapOf(locale to entry)

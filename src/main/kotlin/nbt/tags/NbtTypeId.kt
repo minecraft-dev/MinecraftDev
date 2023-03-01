@@ -25,7 +25,8 @@ enum class NbtTypeId(val typeIdByte: Byte, val tagName: String, val tagClass: KC
     LIST(9, "TAG_List", TagList::class),
     COMPOUND(10, "TAG_Compound", TagCompound::class),
     INT_ARRAY(11, "TAG_Int_Array", TagIntArray::class),
-    LONG_ARRAY(12, "TAG_Long_Array", TagLongArray::class);
+    LONG_ARRAY(12, "TAG_Long_Array", TagLongArray::class),
+    ;
 
     companion object {
         fun getById(id: Byte) = values().firstOrNull { it.typeIdByte == id }

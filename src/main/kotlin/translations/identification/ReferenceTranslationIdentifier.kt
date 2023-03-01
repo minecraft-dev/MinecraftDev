@@ -40,9 +40,9 @@ class ReferenceTranslationIdentifier : TranslationIdentifier<PsiReferenceExpress
                     key = result.key.copy(
                         infix = result.key.infix.replace(
                             CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED,
-                            ""
-                        )
-                    )
+                            "",
+                        ),
+                    ),
                 )
             }
         }

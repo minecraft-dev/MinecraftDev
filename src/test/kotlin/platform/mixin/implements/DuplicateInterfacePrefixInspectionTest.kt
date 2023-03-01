@@ -36,7 +36,7 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
 
                     }
                     """,
-                    configure = false
+                    configure = false,
                 )
 
                 java(
@@ -48,7 +48,7 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
 
                     }
                     """,
-                    configure = false
+                    configure = false,
                 )
             }
         }
@@ -84,7 +84,7 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
             class DuplicateInterfacePrefixMixin {
 
             }
-            """
+            """,
         )
     }
 
@@ -107,7 +107,7 @@ class DuplicateInterfacePrefixInspectionTest : BaseMixinTest() {
             class DuplicateInterfacePrefixMixin {
 
             }
-            """
+            """,
         )
     }
 }

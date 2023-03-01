@@ -30,7 +30,8 @@ val TomlValue.tomlType: TomlValueType?
         TomlElementTypes.BOOLEAN -> TomlValueType.BooleanType
         TomlElementTypes.NUMBER -> TomlValueType.NumberType
         TomlElementTypes.BASIC_STRING, TomlElementTypes.LITERAL_STRING,
-        TomlElementTypes.MULTILINE_BASIC_STRING, TomlElementTypes.MULTILINE_LITERAL_STRING -> TomlValueType.StringType
+        TomlElementTypes.MULTILINE_BASIC_STRING, TomlElementTypes.MULTILINE_LITERAL_STRING,
+        -> TomlValueType.StringType
         TomlElementTypes.DATE_TIME -> TomlValueType.DateType
         else -> null
     }

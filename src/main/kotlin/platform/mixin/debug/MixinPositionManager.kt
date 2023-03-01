@@ -61,7 +61,7 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
                 ?: DebuggerUtils.findClass(
                     className,
                     debugProcess.project,
-                    debugProcess.searchScope
+                    debugProcess.searchScope,
                 )?.navigationElement?.containingFile
 
             if (psiFile != null) {
@@ -104,13 +104,13 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
     override fun createPrepareRequest(requestor: ClassPrepareRequestor, position: SourcePosition): ClassPrepareRequest {
         throw UnsupportedOperationException(
             "This class implements MultiRequestPositionManager, " +
-                "corresponding createPrepareRequests version should be used"
+                "corresponding createPrepareRequests version should be used",
         )
     }
 
     override fun createPrepareRequests(
         requestor: ClassPrepareRequestor,
-        position: SourcePosition
+        position: SourcePosition,
     ): List<ClassPrepareRequest> {
         return runReadAction {
             findMatchingClasses(position)
