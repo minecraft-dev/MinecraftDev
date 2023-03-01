@@ -141,7 +141,7 @@ abstract class AbstractVersionChainStep(
         VersionProperties(this, versionProperties.toTypedArray(), preferredVersions.toTypedArray())
     }
 
-    internal var comboBoxes: Array<ComboBox<Comparable<*>>>? = null
+    internal var comboBoxes: Array<VersionChainComboBox>? = null
 
     abstract fun getAvailableVersions(versionsAbove: List<Comparable<*>>): List<Comparable<*>>
 
@@ -152,15 +152,15 @@ abstract class AbstractVersionChainStep(
     fun getVersionBox(index: Int) = comboBoxes?.let { it[index] }
 
     open fun setSelectableItems(index: Int, items: List<Comparable<*>>) {
-        getVersionBox(index)!!.model = CollectionComboBoxModel(items)
+        getVersionBox(index)!!.setSelectableItems(items)
     }
 
-    open fun createComboBox(row: Row, index: Int, items: List<Comparable<*>>): Cell<ComboBox<Comparable<*>>> {
-        return row.comboBox(items)
+    open fun createComboBox(row: Row, index: Int, items: List<Comparable<*>>): Cell<VersionChainComboBox> {
+        return row.cell(VersionChainComboBox(items))
     }
 
     override fun setupUI(builder: Panel) {
-        val comboBoxes = mutableListOf<ComboBox<Comparable<*>>>()
+        val comboBoxes = mutableListOf<VersionChainComboBox>()
         with(builder) {
             for ((i, label) in labels.withIndex()) {
                 row(label) {
@@ -177,6 +177,21 @@ abstract class AbstractVersionChainStep(
             }
         }
         this.comboBoxes = comboBoxes.toTypedArray()
+    }
+}
+
+class VersionChainComboBox(items: List<Comparable<*>>) : ComboBox<Comparable<*>>() {
+    init {
+        setSelectableItems(items)
+    }
+
+    fun setSelectableItems(items: List<Comparable<*>>) {
+        val currentItem = selectedItem
+        model = CollectionComboBoxModel(items)
+        if (selectedItem != currentItem) {
+            // changing the model doesn't fire item change, which we want to receive
+            selectedItemChanged()
+        }
     }
 }
 

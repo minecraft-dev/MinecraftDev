@@ -14,18 +14,8 @@ import com.demonwav.mcdev.creator.getText
 import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
 import com.intellij.openapi.diagnostic.logger
-import javax.swing.JComboBox
 
 data class SpongeVersion(var versions: LinkedHashMap<String, String>, var selectedIndex: Int) {
-
-    fun set(combo: JComboBox<String>) {
-        combo.removeAllItems()
-        for ((key, _) in this.versions) {
-            combo.addItem(key)
-        }
-        combo.selectedIndex = this.selectedIndex
-    }
-
     companion object {
         private val LOGGER = logger<SpongeVersion>()
 
