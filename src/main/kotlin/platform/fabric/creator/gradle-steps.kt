@@ -50,7 +50,7 @@ class FabricGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         val loomVersion = "1.0-SNAPSHOT" // TODO
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val apiVersion = data.getUserData(FabricVersionChainStep.API_VERSION_KEY)
-        val officialMappings = data.getUserData(FabricVersionChainStep.OFFICIAL_MAPPINGS_KEY)
+        val officialMappings = data.getUserData(FabricVersionChainStep.OFFICIAL_MAPPINGS_KEY) ?: false
 
         assets.addTemplateProperties(
             "GROUP_ID" to buildSystemProps.groupId,
@@ -67,7 +67,7 @@ class FabricGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             assets.addTemplateProperties("API_VERSION" to apiVersion)
         }
 
-        if (officialMappings == true) {
+        if (officialMappings) {
             assets.addTemplateProperties("OFFICIAL_MAPPINGS" to "true")
         }
 
