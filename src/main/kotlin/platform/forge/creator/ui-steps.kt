@@ -64,7 +64,7 @@ class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersi
 
 class ForgeVersionChainStep(
     parent: NewProjectWizardStep,
-    private val forgeVersionData: ForgeVersion
+    private val forgeVersionData: ForgeVersion,
 ) : AbstractMcVersionChainStep(parent, "Forge Version:") {
     companion object {
         private const val FORGE_VERSION = 1
@@ -94,6 +94,6 @@ class ForgeOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsi
     override fun createStep() = DescriptionStep(this).chain(
         ::AuthorsStep,
         ::WebsiteStep,
-        ::UpdateUrlStep
+        ::UpdateUrlStep,
     )
 }

@@ -35,7 +35,7 @@ class BukkitGradleSupport : BuildSystemSupport {
         return when (step) {
             BuildSystemSupport.PRE_STEP -> BukkitGradleFilesStep(parent).chain(
                 ::BukkitPatchBuildGradleStep,
-                ::GradleWrapperStep
+                ::GradleWrapperStep,
             )
             BuildSystemSupport.POST_STEP -> GradleImportStep(parent).chain(::ReformatBuildGradleStep)
             else -> EmptyStep(parent)

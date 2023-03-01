@@ -79,14 +79,14 @@ object InjectionPointReference : ReferenceResolver(), MixinReference {
                 .map {
                     PrioritizedLookupElement.withPriority(
                         LookupElementBuilder.create(it).completeToLiteral(context),
-                        1.0
+                        1.0,
                     )
                 } +
                 getCustomInjectionPointInheritors(context.project).asSequence()
                     .map {
                         PrioritizedLookupElement.withPriority(
                             LookupElementBuilder.create(it).completeToLiteral(context),
-                            0.0
+                            0.0,
                         )
                     }
             ).toTypedArray()
@@ -103,12 +103,12 @@ object InjectionPointReference : ReferenceResolver(), MixinReference {
                     .findClass(SELECTOR, GlobalSearchScope.allScope(project))
                     ?: return@getCachedValue CachedValueProvider.Result(
                         emptyList(),
-                        PsiModificationTracker.MODIFICATION_COUNT
+                        PsiModificationTracker.MODIFICATION_COUNT,
                     )
                 val enumConstants = selectorClass.fields.mapNotNull { (it as? PsiEnumConstant)?.name }
                 CachedValueProvider.Result(enumConstants, PsiModificationTracker.MODIFICATION_COUNT)
             },
-            false
+            false,
         )
     }
 
@@ -123,7 +123,7 @@ object InjectionPointReference : ReferenceResolver(), MixinReference {
                     .findClass(INJECTION_POINT, GlobalSearchScope.allScope(project))
                     ?: return@getCachedValue CachedValueProvider.Result(
                         emptyList(),
-                        PsiModificationTracker.MODIFICATION_COUNT
+                        PsiModificationTracker.MODIFICATION_COUNT,
                     )
                 val inheritors = ClassInheritorsSearch.search(injectionPointClass).mapNotNull { c ->
                     if (c.qualifiedName == INJECTION_POINT) return@mapNotNull null
@@ -140,7 +140,7 @@ object InjectionPointReference : ReferenceResolver(), MixinReference {
                 }
                 CachedValueProvider.Result(inheritors, PsiModificationTracker.MODIFICATION_COUNT)
             },
-            false
+            false,
         )
     }
 

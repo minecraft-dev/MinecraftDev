@@ -30,7 +30,7 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
-        targetClass: PsiClass
+        targetClass: PsiClass,
     ): NavigationVisitor? {
         return target?.let { MyNavigationVisitor(targetClass, it, AtResolver.getArgs(at)["ldc"]) }
     }
@@ -39,7 +39,7 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
-        mode: CollectVisitor.Mode
+        mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiMethod>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, at.project, MemberReference(""), null)
@@ -50,7 +50,7 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
     private class MyNavigationVisitor(
         private val targetClass: PsiClass,
         private val selector: MixinSelector,
-        private val ldc: String?
+        private val ldc: String?,
     ) : NavigationVisitor() {
         private fun isConstantStringMethodCall(expression: PsiMethodCallExpression): Boolean {
             // Must return void
@@ -62,7 +62,7 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
             val argumentTypes = arguments.expressionTypes
             val javaStringType = PsiType.getJavaLangString(
                 expression.manager,
-                expression.resolveScope
+                expression.resolveScope,
             )
 
             if (argumentTypes.size != 1 || argumentTypes[0] != javaStringType) {
@@ -80,7 +80,7 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
                 expression.resolveMethod()?.let { method ->
                     val matches = selector.matchMethod(
                         method,
-                        QualifiedMember.resolveQualifier(expression.methodExpression) ?: targetClass
+                        QualifiedMember.resolveQualifier(expression.methodExpression) ?: targetClass,
                     )
                     if (matches) {
                         addResult(expression)
@@ -96,7 +96,7 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
         mode: Mode,
         private val project: Project,
         private val selector: MixinSelector,
-        private val ldc: String?
+        private val ldc: String?,
     ) : CollectVisitor<PsiMethod>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return
@@ -136,9 +136,9 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
                 fakeMethod.method.findOrConstructSourceMethod(
                     fakeMethod.clazz,
                     project,
-                    canDecompile = false
+                    canDecompile = false,
                 ),
-                qualifier = insn.owner.replace('/', '.')
+                qualifier = insn.owner.replace('/', '.'),
             )
         }
     }

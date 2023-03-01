@@ -45,7 +45,7 @@ private fun extractVarArgs(
     type: PsiType,
     elements: List<PsiExpression>,
     allowReferences: Boolean,
-    allowTranslations: Boolean
+    allowTranslations: Boolean,
 ): Array<String?> {
     tailrec fun resolveReference(expression: PsiExpression): Array<String?> {
         if (expression is PsiTypeCastExpression && expression.operand != null) {

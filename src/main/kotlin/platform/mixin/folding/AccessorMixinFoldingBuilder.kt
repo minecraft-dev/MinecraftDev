@@ -102,7 +102,7 @@ class AccessorMixinFoldingBuilder : CustomFoldingBuilder() {
         descriptors: MutableList<FoldingDescriptor>,
         root: PsiElement,
         document: Document,
-        quick: Boolean
+        quick: Boolean,
     ) {
         if (root !is PsiJavaFile || !MixinModuleType.isInModule(root)) {
             return
@@ -146,8 +146,8 @@ class AccessorMixinFoldingBuilder : CustomFoldingBuilder() {
                 descriptors.add(
                     FoldingDescriptor(
                         identifier.node,
-                        identifier.textRange
-                    )
+                        identifier.textRange,
+                    ),
                 )
             }
 
@@ -174,15 +174,15 @@ class AccessorMixinFoldingBuilder : CustomFoldingBuilder() {
                 descriptors.add(
                     FoldingDescriptor(
                         parenthetical.node,
-                        parenthetical.textRange
-                    )
+                        parenthetical.textRange,
+                    ),
                 )
             }
         }
 
         private fun foldAccessorMethodCall(
             expression: PsiMethodCallExpression,
-            identifier: PsiIdentifier
+            identifier: PsiIdentifier,
         ) {
             val argumentList = expression.argumentList
             val openParen = argumentList.firstChild
@@ -202,23 +202,23 @@ class AccessorMixinFoldingBuilder : CustomFoldingBuilder() {
                 FoldingDescriptor(
                     openParen.node,
                     openParen.textRange,
-                    group
-                )
+                    group,
+                ),
             )
             descriptors.add(
                 FoldingDescriptor(
                     closeParen.node,
                     closeParen.textRange,
-                    group
-                )
+                    group,
+                ),
             )
 
             descriptors.add(
                 FoldingDescriptor(
                     identifier.node,
                     identifier.textRange,
-                    group
-                )
+                    group,
+                ),
             )
         }
     }

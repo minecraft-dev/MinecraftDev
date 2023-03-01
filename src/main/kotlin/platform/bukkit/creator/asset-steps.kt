@@ -110,7 +110,7 @@ class BukkitBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemS
 }
 
 class BukkitPostBuildSystemStep(
-    parent: NewProjectWizardStep
+    parent: NewProjectWizardStep,
 ) : AbstractRunBuildSystemStep(parent, BukkitBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }

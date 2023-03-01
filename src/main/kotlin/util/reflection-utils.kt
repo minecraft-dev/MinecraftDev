@@ -27,7 +27,7 @@ fun Any.invokeDeclaredMethod(
     name: String,
     params: Array<Class<*>>,
     args: Array<Any?>,
-    owner: Class<*> = javaClass
+    owner: Class<*> = javaClass,
 ): Any? {
     return runCatching {
         val method = owner.getDeclaredMethod(name, *params)

@@ -12,5 +12,6 @@ package com.demonwav.mcdev.platform.mcp.srg
 
 enum class SrgType(val srgParser: SrgParser) {
     SRG(StandardSrgParser),
-    TSRG(TinySrgParser);
+    TSRG(TinySrgParser),
+    ;
 }

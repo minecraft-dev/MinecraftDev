@@ -15,12 +15,11 @@ import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.MinecraftTemplates.Companion.MIXIN_OVERWRITE_FALLBACK
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.generationInfoFromMethod
 import com.demonwav.mcdev.util.ifEmpty
-import com.demonwav.mcdev.util.realName
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.generation.GenerateMembersUtil
 import com.intellij.codeInsight.generation.OverrideImplementUtil
-import com.intellij.codeInsight.generation.PsiGenerationInfo
 import com.intellij.codeInsight.generation.PsiMethodMember
 import com.intellij.codeInsight.hint.HintManager
 import com.intellij.ide.fileTemplates.FileTemplateManager
@@ -28,7 +27,6 @@ import com.intellij.ide.util.MemberChooser
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMember
@@ -46,8 +44,8 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
                     classAndMethodNode.method.findOrConstructSourceMethod(
                         classAndMethodNode.clazz,
                         project,
-                        canDecompile = true
-                    )
+                        canDecompile = true,
+                    ),
                 )
             }?.toTypedArray() ?: return
 
@@ -98,7 +96,7 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
                         newMethod,
                         method,
                         psiClass,
-                        FileTemplateManager.getInstance(project).getCodeTemplate(MIXIN_OVERWRITE_FALLBACK)
+                        FileTemplateManager.getInstance(project).getCodeTemplate(MIXIN_OVERWRITE_FALLBACK),
                     )
                 }
 
@@ -106,16 +104,7 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
 
                 // Add @Overwrite annotation
                 val annotation = newMethod.modifierList.addAnnotation(MixinConstants.Annotations.OVERWRITE)
-                val realName = method.realName
-                if (realName != null && realName != method.name) {
-                    val elementFactory = JavaPsiFacade.getElementFactory(project)
-                    val value = elementFactory.createExpressionFromText(
-                        "\"${StringUtil.escapeStringCharacters(realName)}\"",
-                        annotation
-                    )
-                    annotation.setDeclaredAttributeValue("aliases", value)
-                }
-                PsiGenerationInfo(newMethod)
+                generationInfoFromMethod(method, annotation, newMethod)
             }
 
             // Insert new methods

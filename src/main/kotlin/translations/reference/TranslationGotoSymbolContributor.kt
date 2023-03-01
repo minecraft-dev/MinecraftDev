@@ -40,7 +40,7 @@ class TranslationGotoSymbolContributor : ChooseByNameContributor {
         name: String,
         pattern: String,
         project: Project,
-        includeNonProjectItems: Boolean
+        includeNonProjectItems: Boolean,
     ): Array<NavigationItem> {
         val scope = if (includeNonProjectItems) {
             GlobalSearchScope.allScope(project)

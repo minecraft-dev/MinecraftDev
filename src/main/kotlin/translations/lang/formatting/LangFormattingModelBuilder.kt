@@ -30,9 +30,9 @@ class LangFormattingModelBuilder : FormattingModelBuilder {
                 formattingContext.node,
                 Wrap.createWrap(WrapType.NONE, false),
                 Alignment.createAlignment(),
-                createSpaceBuilder(formattingContext.codeStyleSettings)
+                createSpaceBuilder(formattingContext.codeStyleSettings),
             ),
-            formattingContext.codeStyleSettings
+            formattingContext.codeStyleSettings,
         )
     }
 

@@ -44,7 +44,7 @@ class ModsTomlValidationInspectionTest : BasePlatformTestCase() {
             """
 [[mods]]
 modId="<error descr="Mod ID is invalid">invalid id</error>"
-            """
+            """,
         )
     }
 
@@ -63,7 +63,7 @@ logoBlur=<error descr="Wrong value type, expected boolean">"true"</error>
 modId="forge"
 versionRange=<error descr="Wrong value type, expected string">35</error>
 mandatory=true
-            """
+            """,
         )
     }
 
@@ -82,7 +82,7 @@ side="CLIENT"
 modId="minecraft"
 ordering="NONE"
 side="<error descr="Side UP does not exist">UP</error>"
-            """
+            """,
         )
     }
 
@@ -96,7 +96,7 @@ modId="examplemod1"
 [[mods]]
 modId="examplemod2"
 [[dependencies.<error descr="Mod examplemod3 is not declared in this file">examplemod3</error>]]
-            """
+            """,
         )
     }
 }

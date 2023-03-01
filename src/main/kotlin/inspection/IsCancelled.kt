@@ -16,7 +16,7 @@ import com.siyeh.ig.InspectionGadgetsFix
 
 class IsCancelled(
     fix: (ProblemDescriptor) -> Unit,
-    val errorString: String
+    val errorString: String,
 ) {
     val buildFix: InspectionGadgetsFix
 

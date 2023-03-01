@@ -53,7 +53,7 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                 modifierList.findKeyword(currentModifier) ?: nameIdentifier,
                 "$currentModifier @Overwrite cannot reduce visibility of " +
                     "${PsiUtil.getAccessModifier(targetAccessLevel)} target method",
-                QuickFixFactory.getInstance().createModifierListFix(modifierList, targetModifier, true, false)
+                QuickFixFactory.getInstance().createModifierListFix(modifierList, targetModifier, true, false),
             )
         }
 
@@ -82,7 +82,7 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                 holder.registerProblem(
                     marker,
                     message,
-                    QuickFixFactory.getInstance().createModifierListFix(modifierList, modifier, targetModifier, false)
+                    QuickFixFactory.getInstance().createModifierListFix(modifierList, modifier, targetModifier, false),
                 )
             }
         }
@@ -101,13 +101,13 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                         nameIdentifier,
                         "Missing @${internalNameToShortName(internalName)} annotation",
                         ProblemHighlightType.WARNING,
-                        AddAnnotationFix(qualifiedName, method, targetAnnPsi.parameterList.attributes)
+                        AddAnnotationFix(qualifiedName, method, targetAnnPsi.parameterList.attributes),
                     )
                 } else {
                     holder.registerProblem(
                         nameIdentifier,
                         "Missing @${internalNameToShortName(internalName)} annotation",
-                        ProblemHighlightType.WARNING
+                        ProblemHighlightType.WARNING,
                     )
                 }
             }

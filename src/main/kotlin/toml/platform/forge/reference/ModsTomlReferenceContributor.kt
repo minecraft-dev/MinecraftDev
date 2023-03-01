@@ -85,13 +85,11 @@ class ModsTomlDependencyIdReference(keySegment: TomlKeySegment) : PsiReferenceBa
     override fun resolve(): PsiElement? {
         val referencedId = element.text
         return element.containingFile.childrenOfType<TomlArrayTable>()
-            .filter { it.header.key?.segments?.firstOrNull()?.text == "mods" }
-            .mapNotNull { table ->
+            .filter { it.header.key?.segments?.firstOrNull()?.text == "mods" }.firstNotNullOfOrNull { table ->
                 table.entries.find {
                     it.key.text == "modId" && it.value?.stringValue() == referencedId
                 }?.value
             }
-            .firstOrNull()
     }
 
     override fun getVariants(): Array<Any> =

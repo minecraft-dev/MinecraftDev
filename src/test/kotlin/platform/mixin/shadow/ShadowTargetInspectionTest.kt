@@ -56,7 +56,7 @@ class ShadowTargetInspectionTest : BaseMixinTest() {
 
                     @Shadow protected String twoIssues;
                 }
-                """
+                """,
             )
         }
 

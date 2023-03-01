@@ -22,9 +22,9 @@ class LiteralTranslationIdentifier : TranslationIdentifier<PsiLiteralExpression>
                 key = result.key.copy(
                     infix = result.key.infix.replace(
                         CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED,
-                        ""
-                    )
-                )
+                        "",
+                    ),
+                ),
             )
         }
         return null

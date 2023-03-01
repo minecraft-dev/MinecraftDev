@@ -30,7 +30,7 @@ abstract class ModuleDebugRunConfigurationExtension : RunConfigurationExtension(
     override fun <T : RunConfigurationBase<*>> updateJavaParameters(
         configuration: T,
         params: JavaParameters,
-        runnerSettings: RunnerSettings?
+        runnerSettings: RunnerSettings?,
     ) {
     }
 
@@ -39,7 +39,7 @@ abstract class ModuleDebugRunConfigurationExtension : RunConfigurationExtension(
     override fun attachToProcess(
         configuration: RunConfigurationBase<*>,
         handler: ProcessHandler,
-        runnerSettings: RunnerSettings?
+        runnerSettings: RunnerSettings?,
     ) {
         // Check if we are in a debug run
         if (runnerSettings !is DebuggingRunnerData) {

@@ -24,7 +24,7 @@ import java.util.jar.Attributes.Name.IMPLEMENTATION_VERSION
 abstract class ManifestLibraryPresentationProvider(
     kind: LibraryKind,
     private val title: String,
-    private val startsWith: Boolean = false
+    private val startsWith: Boolean = false,
 ) :
     LibraryPresentationProvider<LibraryVersionProperties>(kind) {
 
@@ -55,7 +55,7 @@ abstract class MavenLibraryPresentationProvider(
     kind: LibraryKind,
     private val groupId: String,
     private val artifactId: String,
-    private val strict: Boolean = true
+    private val strict: Boolean = true,
 ) :
     LibraryPresentationProvider<LibraryVersionProperties>(kind) {
 

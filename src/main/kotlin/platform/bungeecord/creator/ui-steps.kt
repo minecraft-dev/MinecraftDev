@@ -38,7 +38,7 @@ import com.intellij.openapi.util.Key
 import kotlinx.coroutines.coroutineScope
 
 class BungeePlatformStep(
-    parent: PluginPlatformStep
+    parent: PluginPlatformStep,
 ) : AbstractNewProjectWizardMultiStep<BungeePlatformStep, BungeePlatformStep.Factory>(parent, EP_NAME) {
     companion object {
         val EP_NAME = ExtensionPointName<Factory>("com.demonwav.minecraft-dev.bungeePlatformWizard")
@@ -58,7 +58,7 @@ class BungeePlatformStep(
 
 abstract class AbstractBungeePlatformStep(
     parent: BungeePlatformStep,
-    private val platform: PlatformType
+    private val platform: PlatformType,
 ) : AbstractLatentStep<PlatformVersion>(parent) {
     override val description = "download versions"
 

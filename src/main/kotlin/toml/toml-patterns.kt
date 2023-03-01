@@ -25,13 +25,17 @@ inline fun <reified E : PsiElement> inModsToml(): PsiElementPattern.Capture<E> =
 fun <E : PsiElement> inModsToml(clazz: Class<E>): PsiElementPattern.Capture<E> =
     PlatformPatterns.psiElement(clazz).inVirtualFile(VirtualFilePattern().withName(ForgeConstants.MODS_TOML))
 
-fun inModsTomlKey() = inModsToml<PsiElement>().withParent(TomlKeySegment::class.java)
+fun inModsTomlKey(): PsiElementPattern.Capture<PsiElement> =
+    inModsToml<PsiElement>().withParent(TomlKeySegment::class.java)
 
-fun tomlKeyValue(key: String) = PlatformPatterns.psiElement(TomlKeyValue::class.java)
-    .withChild(PlatformPatterns.psiElement(TomlKey::class.java).withText(key))
+fun tomlKeyValue(key: String): PsiElementPattern.Capture<TomlKeyValue> =
+    PlatformPatterns.psiElement(TomlKeyValue::class.java)
+        .withChild(PlatformPatterns.psiElement(TomlKey::class.java).withText(key))
 
-fun inModsTomlValueWithKey(key: String) = inModsToml<PsiElement>().inside(tomlKeyValue(key))
+fun inModsTomlValueWithKey(key: String): PsiElementPattern.Capture<PsiElement> =
+    inModsToml<PsiElement>().inside(tomlKeyValue(key))
 
-fun inDependenciesHeaderId() = inModsToml<PsiElement>().inside(PlatformPatterns.psiElement(TomlTableHeader::class.java))
-    // [[dependencies.<caret>]]
-    .afterLeaf(PlatformPatterns.psiElement().withText(".").afterLeaf("dependencies"))
+fun inDependenciesHeaderId(): PsiElementPattern.Capture<PsiElement> =
+    inModsToml<PsiElement>().inside(PlatformPatterns.psiElement(TomlTableHeader::class.java))
+        // [[dependencies.<caret>]]
+        .afterLeaf(PlatformPatterns.psiElement().withText(".").afterLeaf("dependencies"))

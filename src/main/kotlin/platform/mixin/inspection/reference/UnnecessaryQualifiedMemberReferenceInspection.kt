@@ -33,7 +33,7 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
     override fun visitAnnotationAttribute(
         annotation: PsiAnnotation,
         value: PsiAnnotationMemberValue,
-        holder: ProblemsHolder
+        holder: ProblemsHolder,
     ) {
         val qName = annotation.qualifiedName ?: return
         if (MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project) !is InjectorAnnotationHandler) {
@@ -52,7 +52,7 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
             holder.registerProblem(
                 value,
                 "Unnecessary qualified reference to '${selector.displayName}' in target class",
-                QuickFix(selector)
+                QuickFix(selector),
             )
         }
     }
@@ -65,7 +65,7 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
             val element = descriptor.psiElement
             element.replace(
                 JavaPsiFacade.getElementFactory(project)
-                    .createExpressionFromText("\"${reference.withoutOwner.toMixinString()}\"", element)
+                    .createExpressionFromText("\"${reference.withoutOwner.toMixinString()}\"", element),
             )
         }
     }

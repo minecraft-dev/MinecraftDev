@@ -59,7 +59,7 @@ class SpongeLoggingInspection : AbstractBaseJavaLocalInspectionTool() {
             holder.registerProblem(
                 element,
                 "Sponge plugins should use ${Constants.SLF4J_LOGGER} rather than ${Constants.JAVA_UTIL_LOGGER}.",
-                ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+                ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
             )
         }
     }

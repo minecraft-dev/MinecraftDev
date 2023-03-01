@@ -11,8 +11,6 @@
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
-import com.demonwav.mcdev.platform.mixin.util.fakeResolve
-import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.MemberReference
 import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
@@ -33,7 +31,7 @@ class MethodInjectionPoint : AbstractMethodInjectionPoint() {
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
-        targetClass: PsiClass
+        targetClass: PsiClass,
     ): NavigationVisitor? {
         return target?.let { MyNavigationVisitor(targetClass, it) }
     }
@@ -42,7 +40,7 @@ class MethodInjectionPoint : AbstractMethodInjectionPoint() {
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
-        mode: CollectVisitor.Mode
+        mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiMethod>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
             return MyCollectVisitor(mode, at.project, MemberReference(""))
@@ -52,7 +50,7 @@ class MethodInjectionPoint : AbstractMethodInjectionPoint() {
 
     private class MyNavigationVisitor(
         private val targetClass: PsiClass,
-        private val selector: MixinSelector
+        private val selector: MixinSelector,
     ) : NavigationVisitor() {
 
         private fun visitMethodUsage(method: PsiMethod, qualifier: PsiClass?, expression: PsiElement) {
@@ -132,28 +130,20 @@ class MethodInjectionPoint : AbstractMethodInjectionPoint() {
     private class MyCollectVisitor(
         mode: Mode,
         private val project: Project,
-        private val selector: MixinSelector
+        private val selector: MixinSelector,
     ) : CollectVisitor<PsiMethod>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return
             insns.iterator().forEachRemaining { insn ->
-                if (insn !is MethodInsnNode) return@forEachRemaining
-
-                if (mode != Mode.COMPLETION) {
-                    if (!selector.matchMethod(insn.owner, insn.name, insn.desc)) {
-                        return@forEachRemaining
-                    }
+                if (insn !is MethodInsnNode) {
+                    return@forEachRemaining
                 }
 
-                val fakeMethod = insn.fakeResolve()
+                val sourceMethod = nodeMatchesSelector(insn, mode, selector, project) ?: return@forEachRemaining
                 addResult(
                     insn,
-                    fakeMethod.method.findOrConstructSourceMethod(
-                        fakeMethod.clazz,
-                        project,
-                        canDecompile = false
-                    ),
-                    qualifier = insn.owner.replace('/', '.')
+                    sourceMethod,
+                    qualifier = insn.owner.replace('/', '.'),
                 )
             }
         }

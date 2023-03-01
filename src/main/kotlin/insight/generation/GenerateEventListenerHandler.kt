@@ -48,7 +48,7 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase(MCDevBundle.mess
         var data: GenerationData?,
         var chosenClass: PsiClass,
         var chosenName: String,
-        var relevantModule: AbstractModule
+        var relevantModule: AbstractModule,
     )
 
     private var data: GenerateData? = null
@@ -65,7 +65,7 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase(MCDevBundle.mess
                 RefactoringBundle.message("choose.destination.class"),
                 GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(moduleForPsiElement, false),
                 { aClass1 -> isSuperEventListenerAllowed(aClass1, facet) },
-                null
+                null,
             )
 
         chooser.showDialog()
@@ -81,7 +81,7 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase(MCDevBundle.mess
             editor,
             relevantModule.moduleType.getEventGenerationPanel(chosenClass),
             chosenClassName,
-            relevantModule.moduleType.getDefaultListenerName(chosenClass)
+            relevantModule.moduleType.getDefaultListenerName(chosenClass),
         )
 
         val okay = generationDialog.showAndGet()
@@ -97,7 +97,7 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase(MCDevBundle.mess
 
         val method = PsiTreeUtil.getParentOfType(
             aClass.containingFile.findElementAt(editor.caretModel.offset),
-            PsiMethod::class.java
+            PsiMethod::class.java,
         )
 
         this.data = GenerateData(
@@ -108,7 +108,7 @@ class GenerateEventListenerHandler : GenerateMembersHandlerBase(MCDevBundle.mess
             dialogDAta,
             chosenClass,
             chosenName,
-            relevantModule
+            relevantModule,
         )
 
         return DUMMY_RESULT

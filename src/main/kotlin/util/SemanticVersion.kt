@@ -22,7 +22,7 @@ import java.net.URLDecoder
  */
 class SemanticVersion(
     val parts: List<VersionPart>,
-    private val buildMetadata: String = ""
+    private val buildMetadata: String = "",
 ) : Comparable<SemanticVersion> {
 
     private fun createVersionString(): String {
@@ -73,7 +73,7 @@ class SemanticVersion(
         val TEXT_PRIORITIES = mapOf(
             "snapshot" to 0,
             "rc" to 1,
-            "pre" to 1
+            "pre" to 1,
         )
 
         /**
@@ -105,7 +105,7 @@ class SemanticVersion(
                 } else {
                     throw IllegalArgumentException(
                         "Failed to parse version part as integer: $part " +
-                            "(whole version text: $value)"
+                            "(whole version text: $value)",
                     )
                 }
 
@@ -114,7 +114,7 @@ class SemanticVersion(
                 versionPart: String,
                 preReleasePart: String,
                 separator: Char,
-                versionString: String
+                versionString: String,
             ): VersionPart {
                 val version = parseInt(versionPart)
                 if (!preReleasePart.contains('.')) {
@@ -204,7 +204,7 @@ class SemanticVersion(
                 val version: Int,
                 val separator: Char,
                 val subParts: List<VersionPart>,
-                override val versionString: String
+                override val versionString: String,
             ) : VersionPart() {
 
                 override fun compareTo(other: VersionPart): Int =

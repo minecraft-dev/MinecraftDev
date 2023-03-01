@@ -47,7 +47,7 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
             { "Go to target class" },
             this,
             GutterIconRenderer.Alignment.LEFT,
-            { "mixin target class indicator" }
+            { "mixin target class indicator" },
         )
     }
 
@@ -62,7 +62,7 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
                 targets.toTypedArray(),
                 "Choose target class of $name",
                 null,
-                PsiClassListCellRenderer()
+                PsiClassListCellRenderer(),
             )
         }
     }

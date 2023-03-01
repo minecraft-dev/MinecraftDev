@@ -59,7 +59,7 @@ abstract class AbstractModule(protected val facet: MinecraftFacet) {
         containingClass: PsiClass,
         chosenClass: PsiClass,
         chosenName: String,
-        data: GenerationData?
+        data: GenerationData?,
     ): PsiMethod? = null
 
     open fun shouldShowPluginIcon(element: PsiElement?) = false

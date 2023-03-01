@@ -40,7 +40,7 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                         CommonCodeStyleSettings.DO_NOT_WRAP,
                         CommonCodeStyleSettings.WRAP_AS_NEEDED,
                         CommonCodeStyleSettings.WRAP_ALWAYS,
-                    )
+                    ),
                 )
                 consumer.showCustomOption(
                     NbttCodeStyleSettings::class.java,
@@ -56,7 +56,7 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                         CommonCodeStyleSettings.DO_NOT_WRAP,
                         CommonCodeStyleSettings.WRAP_AS_NEEDED,
                         CommonCodeStyleSettings.WRAP_ALWAYS,
-                    )
+                    ),
                 )
             }
 
@@ -65,19 +65,19 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                     "SPACE_WITHIN_BRACKETS",
                     "SPACE_WITHIN_PARENTHESES",
                     "SPACE_BEFORE_COMMA",
-                    "SPACE_AFTER_COMMA"
+                    "SPACE_AFTER_COMMA",
                 )
                 consumer.showCustomOption(
                     NbttCodeStyleSettings::class.java,
                     "SPACE_BEFORE_COLON",
                     "Space before colon",
-                    CodeStyleSettingsCustomizableOptions.getInstance().SPACES_AROUND_OPERATORS
+                    CodeStyleSettingsCustomizableOptions.getInstance().SPACES_AROUND_OPERATORS,
                 )
                 consumer.showCustomOption(
                     NbttCodeStyleSettings::class.java,
                     "SPACE_AFTER_COLON",
                     "Space after colon",
-                    CodeStyleSettingsCustomizableOptions.getInstance().SPACES_AROUND_OPERATORS
+                    CodeStyleSettingsCustomizableOptions.getInstance().SPACES_AROUND_OPERATORS,
                 )
 
                 consumer.renameStandardOption("SPACE_WITHIN_BRACKETS", "List brackets")
@@ -95,7 +95,7 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
 
     override fun customizeDefaults(
         commonSettings: CommonCodeStyleSettings,
-        indentOptions: CommonCodeStyleSettings.IndentOptions
+        indentOptions: CommonCodeStyleSettings.IndentOptions,
     ) {
         commonSettings.RIGHT_MARGIN = 150
         indentOptions.USE_TAB_CHARACTER = true

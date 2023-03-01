@@ -70,8 +70,8 @@ class ShadowModifiersInspection : MixinInspection() {
                         shadowModifierList,
                         PsiModifier.STATIC,
                         targetStatic,
-                        false
-                    )
+                        false,
+                    ),
                 )
             }
 
@@ -85,7 +85,8 @@ class ShadowModifiersInspection : MixinInspection() {
                     shadowModifierList.findKeyword(shadowModifier) ?: annotation,
                     "Invalid access modifiers, has: $shadowModifier, but target member has: " +
                         PsiUtil.getAccessModifier(targetAccessLevel),
-                    QuickFixFactory.getInstance().createModifierListFix(shadowModifierList, targetModifier, true, false)
+                    QuickFixFactory.getInstance()
+                        .createModifierListFix(shadowModifierList, targetModifier, true, false)
                 )
             }
 
@@ -102,13 +103,13 @@ class ShadowModifiersInspection : MixinInspection() {
                     holder.registerProblem(
                         annotation,
                         "@Shadow for final member should be annotated as @Final",
-                        AddAnnotationFix(FINAL, member)
+                        AddAnnotationFix(FINAL, member),
                     )
                 } else {
                     holder.registerProblem(
                         shadowFinal!!,
                         "Target method is not final",
-                        RemoveAnnotationQuickFix(shadowFinal, member)
+                        RemoveAnnotationQuickFix(shadowFinal, member),
                     )
                 }
             }

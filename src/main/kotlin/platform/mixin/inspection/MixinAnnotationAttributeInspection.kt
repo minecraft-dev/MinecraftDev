@@ -20,7 +20,7 @@ import com.intellij.psi.PsiNameValuePair
 
 abstract class MixinAnnotationAttributeInspection(
     private val annotation: String?,
-    private val attribute: String?
+    private val attribute: String?,
 ) : MixinInspection() {
 
     constructor(attribute: String?) : this(null, attribute)
@@ -28,7 +28,7 @@ abstract class MixinAnnotationAttributeInspection(
     protected abstract fun visitAnnotationAttribute(
         annotation: PsiAnnotation,
         value: PsiAnnotationMemberValue,
-        holder: ProblemsHolder
+        holder: ProblemsHolder,
     )
 
     final override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)

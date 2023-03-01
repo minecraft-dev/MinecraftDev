@@ -136,7 +136,7 @@ class MinecraftFacetDetector : StartupActivity {
                                 object : LibraryDetectionManager.LibraryPropertiesProcessor {
                                     override fun <P : LibraryProperties<*>> processProperties(
                                         kind: LibraryKind,
-                                        properties: P
+                                        properties: P,
                                     ): Boolean {
                                         return if (properties is LibraryVersionProperties) {
                                             libraryVersions[kind] = properties.versionString ?: return true
@@ -145,7 +145,7 @@ class MinecraftFacetDetector : StartupActivity {
                                             true
                                         }
                                     }
-                                }
+                                },
                             )
                             platformKinds.add(kind)
                         }

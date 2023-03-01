@@ -17,7 +17,7 @@ abstract class BaseTemplate {
 
     protected fun Project.applyTemplate(
         templateName: String,
-        properties: Map<String, *>? = null
+        properties: Map<String, *>? = null,
     ): String {
         val manager = FileTemplateManager.getInstance(this)
         val template = manager.getJ2eeTemplate(templateName)

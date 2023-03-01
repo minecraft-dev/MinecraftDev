@@ -34,7 +34,7 @@ class JavaReferenceContributor : PsiReferenceContributor() {
                 object : PsiReferenceProvider() {
                     override fun getReferencesByElement(
                         element: PsiElement,
-                        context: ProcessingContext
+                        context: ProcessingContext,
                     ): Array<PsiReference> {
                         val result = identifier.identifyUnsafe(element)
                         if (result != null) {
@@ -43,13 +43,13 @@ class JavaReferenceContributor : PsiReferenceContributor() {
                                 TranslationReference(
                                     referenceElement,
                                     TextRange(1, referenceElement.textLength - 1),
-                                    result.key
-                                )
+                                    result.key,
+                                ),
                             )
                         }
                         return emptyArray()
                     }
-                }
+                },
             )
         }
     }
@@ -62,7 +62,7 @@ class JsonReferenceContributor : PsiReferenceContributor() {
             object : PsiReferenceProvider() {
                 override fun getReferencesByElement(
                     element: PsiElement,
-                    context: ProcessingContext
+                    context: ProcessingContext,
                 ): Array<PsiReference> {
                     if (!TranslationFiles.isTranslationFile(element.containingFile?.virtualFile)) {
                         return arrayOf()
@@ -76,13 +76,13 @@ class JsonReferenceContributor : PsiReferenceContributor() {
                         TranslationReference(
                             element,
                             nameTextRange.shiftRight(1).grown(-2),
-                            TranslationInstance.Key("", entry.name, "")
+                            TranslationInstance.Key("", entry.name, ""),
                         ) { elem, _, newName ->
                             (elem as JsonProperty).setName(newName)
-                        }
+                        },
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -94,18 +94,18 @@ class LangReferenceContributor : PsiReferenceContributor() {
             object : PsiReferenceProvider() {
                 override fun getReferencesByElement(
                     element: PsiElement,
-                    context: ProcessingContext
+                    context: ProcessingContext,
                 ): Array<PsiReference> {
                     val entry = element as LangEntry
                     return arrayOf(
                         TranslationReference(
                             element,
                             TextRange(0, entry.key.length),
-                            TranslationInstance.Key("", entry.key, "")
-                        )
+                            TranslationInstance.Key("", entry.key, ""),
+                        ),
                     )
                 }
-            }
+            },
         )
     }
 }

@@ -20,10 +20,11 @@ import com.demonwav.mcdev.util.mcDomain
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
+import java.util.TreeSet
 
 object TranslationSorter {
     private val ascendingComparator = compareBy<Translation, Iterable<String>>(
-        naturalOrder<String>().lexicographical()
+        naturalOrder<String>().lexicographical(),
     ) { it.key.split('.') }
 
     private val descendingComparator = ascendingComparator.reversed()
@@ -51,21 +52,21 @@ object TranslationSorter {
                 Ordering.ASCENDING -> TranslationFiles.buildFileEntries(
                     project,
                     locale,
-                    it.sortedWith(ascendingComparator),
-                    keepComments
+                    it.sortedWith(ascendingComparator).asIterable(),
+                    keepComments,
                 )
                 Ordering.DESCENDING -> TranslationFiles.buildFileEntries(
                     project,
                     locale,
-                    it.sortedWith(descendingComparator),
-                    keepComments
+                    it.sortedWith(descendingComparator).asIterable(),
+                    keepComments,
                 )
                 Ordering.TEMPLATE -> sortByTemplate(
                     project,
                     locale,
                     TemplateManager.getProjectTemplate(project),
                     it,
-                    keepComments
+                    keepComments,
                 )
                 else -> sortByTemplate(
                     project,
@@ -73,7 +74,7 @@ object TranslationSorter {
                     TranslationFiles.buildSortingTemplateFromDefault(file, domain)
                         ?: throw IllegalStateException("Could not generate template from default translation file"),
                     it,
-                    keepComments
+                    keepComments,
                 )
             }
         }
@@ -88,7 +89,7 @@ object TranslationSorter {
         locale: String,
         template: Template,
         entries: Sequence<Translation>,
-        keepComments: Int
+        keepComments: Int,
     ) = sequence {
         val tmp = entries.toMutableList()
 
@@ -97,14 +98,14 @@ object TranslationSorter {
                 is Comment -> yield(TranslationFiles.FileEntry.Comment(elem.text))
                 EmptyLine -> yield(TranslationFiles.FileEntry.EmptyLine)
                 is Key -> {
-                    val toWrite = tmp.asSequence().filter { elem.matcher.matches(it.key) }
+                    val toWrite = tmp.filterTo(TreeSet(ascendingComparator)) { elem.matcher.matches(it.key) }
                     yieldAll(
                         TranslationFiles.buildFileEntries(
                             project,
                             locale,
-                            toWrite.sortedWith(ascendingComparator),
-                            keepComments
-                        )
+                            toWrite,
+                            keepComments,
+                        ),
                     )
                     tmp.removeAll(toWrite)
                 }
@@ -116,9 +117,9 @@ object TranslationSorter {
                 TranslationFiles.buildFileEntries(
                     project,
                     locale,
-                    tmp.sortedWith(ascendingComparator).asSequence(),
-                    keepComments
-                )
+                    tmp.sortedWith(ascendingComparator),
+                    keepComments,
+                ),
             )
         }
     }

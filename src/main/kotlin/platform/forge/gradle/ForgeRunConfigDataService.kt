@@ -49,7 +49,7 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
         toImport: Collection<DataNode<ProjectData>>,
         projectData: ProjectData?,
         project: Project,
-        modelsProvider: IdeModifiableModelsProvider
+        modelsProvider: IdeModifiableModelsProvider,
     ) {
         if (projectData == null || projectData.owner != GradleConstants.SYSTEM_ID) {
             return
@@ -88,7 +88,7 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
     private fun manualCreate(
         project: Project,
         moduleMap: Map<String, Module>,
-        module: Module
+        module: Module,
     ) {
         invokeLater {
             val mainModule = findMainModule(moduleMap, module)
@@ -137,7 +137,7 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
         moduleMap: Map<String, Module>,
         module: Module,
         task: String,
-        hasData: Boolean
+        hasData: Boolean,
     ) {
         val mainModule = findMainModule(moduleMap, module)
 
@@ -155,7 +155,7 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
 
                     cleanupGeneratedRuns(project, mainModule, hasData)
                 }
-            }
+            },
         )
     }
 

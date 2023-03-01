@@ -89,7 +89,7 @@ class GotoAtEntryAction : AnAction() {
                         LocalSearchScope(file),
                         text,
                         UsageSearchContext.ANY,
-                        true
+                        true,
                     )
 
                 if (found) {

@@ -35,7 +35,7 @@ class LangCommenterTest : CommenterTest() {
         """
         #test.key1=value1
         test.k<caret>ey2=value2
-        """
+        """,
     )
 
     @Test
@@ -52,7 +52,7 @@ class LangCommenterTest : CommenterTest() {
         #test.<selection>key2=value2
         #test</selection>.key3=value3
         test.key4=value4
-        """
+        """,
     )
 
     @Test
@@ -69,7 +69,7 @@ class LangCommenterTest : CommenterTest() {
         test.key2=value2
         test.key3=value3
         #tes<caret>t.key4=value4
-        """
+        """,
     )
 
     @Test
@@ -86,6 +86,6 @@ class LangCommenterTest : CommenterTest() {
         test.key2=</selection>value2
         #test.key3=value3
         test.key4=value4
-        """
+        """,
     )
 }

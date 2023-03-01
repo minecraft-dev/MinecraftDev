@@ -36,7 +36,7 @@ class UnresolvedReferenceInspection : MixinConfigInspection() {
                         literal,
                         "Cannot resolve ${reference.description}".format(reference.canonicalText),
                         ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
-                        reference.rangeInElement
+                        reference.rangeInElement,
                     )
                 }
             }

@@ -21,7 +21,7 @@ class VelocityEventGenerationPanel(chosenClass: PsiClass) : EventGenerationPanel
     private lateinit var parentPanel: JPanel
     private lateinit var eventOrderComboBox: JComboBox<String>
 
-    override val panel: JPanel?
+    override val panel: JPanel
         get() {
             // Not static because the form builder is not reliable
             eventOrderComboBox.addItem("FIRST")
@@ -35,7 +35,7 @@ class VelocityEventGenerationPanel(chosenClass: PsiClass) : EventGenerationPanel
             return parentPanel
         }
 
-    override fun gatherData(): GenerationData? {
+    override fun gatherData(): GenerationData {
         return VelocityGenerationData(eventOrderComboBox.selectedItem as String)
     }
 }

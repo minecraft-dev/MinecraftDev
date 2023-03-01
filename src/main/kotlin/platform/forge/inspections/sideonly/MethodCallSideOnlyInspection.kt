@@ -41,7 +41,10 @@ class MethodCallSideOnlyInspection : BaseInspection() {
         val annotation = infos[3] as PsiAnnotation
 
         return if (annotation.isWritable) {
-            RemoveAnnotationInspectionGadgetsFix(annotation, "Remove @SideOnly annotation from method declaration")
+            RemoveAnnotationInspectionGadgetsFix(
+                annotation.qualifiedName ?: return null,
+                "Remove @SideOnly annotation from method declaration"
+            )
         } else {
             null
         }
@@ -114,7 +117,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_CLASS_METHOD_IN_CROSS_ANNOTATED_CLASS_METHOD,
                                 elementAnnotation.renderSide(elementSide),
                                 classAnnotation.renderSide(classSide),
-                                declaration.getAnnotation(elementAnnotation.annotationName)
+                                declaration.getAnnotation(elementAnnotation.annotationName),
                             )
                         } else {
                             registerError(
@@ -122,7 +125,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_METHOD_IN_CROSS_ANNOTATED_CLASS_METHOD,
                                 elementAnnotation.renderSide(elementSide),
                                 classAnnotation.renderSide(classSide),
-                                declaration.getAnnotation(elementAnnotation.annotationName)
+                                declaration.getAnnotation(elementAnnotation.annotationName),
                             )
                         }
                     }
@@ -143,7 +146,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                     Error.ANNOTATED_CLASS_METHOD_IN_UNANNOTATED_METHOD,
                                     elementAnnotation.renderSide(elementSide),
                                     null,
-                                    declaration.getAnnotation(elementAnnotation.annotationName)
+                                    declaration.getAnnotation(elementAnnotation.annotationName),
                                 )
                             } else {
                                 registerError(
@@ -151,7 +154,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                     Error.ANNOTATED_METHOD_IN_UNANNOTATED_METHOD,
                                     elementAnnotation.renderSide(elementSide),
                                     null,
-                                    declaration.getAnnotation(elementAnnotation.annotationName)
+                                    declaration.getAnnotation(elementAnnotation.annotationName),
                                 )
                             }
                         }
@@ -162,7 +165,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_CLASS_METHOD_IN_CROSS_ANNOTATED_METHOD,
                                 elementAnnotation.renderSide(elementSide),
                                 methodAnnotation.renderSide(methodSide),
-                                declaration.getAnnotation(elementAnnotation.annotationName)
+                                declaration.getAnnotation(elementAnnotation.annotationName),
                             )
                         } else {
                             registerError(
@@ -170,7 +173,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                                 Error.ANNOTATED_METHOD_IN_CROSS_ANNOTATED_METHOD,
                                 elementAnnotation.renderSide(elementSide),
                                 methodAnnotation.renderSide(methodSide),
-                                declaration.getAnnotation(elementAnnotation.annotationName)
+                                declaration.getAnnotation(elementAnnotation.annotationName),
                             )
                         }
                     }
@@ -214,7 +217,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
                 return "Method declared in a class annotated with " + infos[0] +
                     " cannot be referenced in a class annotated with " + infos[1] + "."
             }
-        };
+        }, ;
 
         abstract fun getErrorString(vararg infos: Any): String
     }

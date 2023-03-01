@@ -92,7 +92,7 @@ class AccessorHandler : MixinMemberAnnotationHandler {
             targetMember.classAndField.clazz,
             method.project,
             method.resolveScope,
-            canDecompile = false
+            canDecompile = false,
         ).createSmartPointer()
     }
 
@@ -103,6 +103,7 @@ class AccessorHandler : MixinMemberAnnotationHandler {
     enum class AccessorType(val allowGetters: Boolean, val allowSetters: Boolean) {
         GETTER(true, false),
         SETTER(false, true),
-        UNKNOWN(true, true);
+        UNKNOWN(true, true),
+        ;
     }
 }

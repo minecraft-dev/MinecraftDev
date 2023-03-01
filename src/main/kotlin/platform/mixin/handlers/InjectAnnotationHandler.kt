@@ -36,7 +36,7 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
     override fun expectedMethodSignature(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
-        targetMethod: MethodNode
+        targetMethod: MethodNode,
     ): List<MethodSignature> {
         val returnType = targetMethod.getGenericReturnType(targetClass, annotation.project)
 
@@ -47,8 +47,8 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
             ParameterGroup(
                 collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
                 required = ParameterGroup.RequiredLevel.OPTIONAL,
-                default = true
-            )
+                default = true,
+            ),
         )
 
         // Callback info (required)
@@ -60,11 +60,11 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
                     } else {
                         Parameter(
                             "cir",
-                            callbackInfoReturnableType(annotation.project, annotation, returnType)!!
+                            callbackInfoReturnableType(annotation.project, annotation, returnType)!!,
                         )
-                    }
-                )
-            )
+                    },
+                ),
+            ),
         )
 
         // Captured locals (only if local capture is enabled)
@@ -78,7 +78,7 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
                     val locals = LocalVariables.getLocals(module, targetClass, targetMethod, insn.insn)
                         ?.drop(
                             Type.getArgumentTypes(targetMethod.desc).size +
-                                if (targetMethod.hasAccess(Opcodes.ACC_STATIC)) 0 else 1
+                                if (targetMethod.hasAccess(Opcodes.ACC_STATIC)) 0 else 1,
                         )
                         ?.filterNotNull()
                         ?.filter { it.desc != null }
@@ -110,8 +110,8 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
                             localParams,
                             default = true,
                             required = requiredLevel,
-                            isVarargs = true
-                        )
+                            isVarargs = true,
+                        ),
                     )
                 }
             }

@@ -24,9 +24,9 @@ import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
 
 abstract class BaseMinecraftTest(
-    vararg platformTypes: PlatformType
+    vararg platformTypes: PlatformType,
 ) : ProjectBuilderTest(
-    getProjectDescriptor(platformTypes)
+    getProjectDescriptor(platformTypes),
 ) {
     protected open val resourcePath = "src/test/resources"
     protected open val packagePath = "com/demonwav/mcdev"

@@ -56,14 +56,14 @@ class TranslationSortOrderDialog(excludeDefaultOption: Boolean, defaultSelection
                 override fun windowClosing(e: WindowEvent?) {
                     onCancel()
                 }
-            }
+            },
         )
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
             { onCancel() },
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-            JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+            JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT,
         )
     }
 
@@ -82,7 +82,7 @@ class TranslationSortOrderDialog(excludeDefaultOption: Boolean, defaultSelection
             value: Any?,
             index: Int,
             isSelected: Boolean,
-            cellHasFocus: Boolean
+            cellHasFocus: Boolean,
         ): Component {
             val displayValue = (value as? Ordering)?.text
             return super.getListCellRendererComponent(list, displayValue, index, isSelected, cellHasFocus)

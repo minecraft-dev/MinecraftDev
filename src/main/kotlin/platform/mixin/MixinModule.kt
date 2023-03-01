@@ -50,7 +50,7 @@ class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
         fun getMixinConfigs(
             project: Project,
-            scope: GlobalSearchScope
+            scope: GlobalSearchScope,
         ): Collection<MixinConfig> {
             return FileTypeIndex.getFiles(mixinFileType, scope)
                 .mapNotNull {
@@ -61,7 +61,7 @@ class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
         fun getAllMixinClasses(
             project: Project,
-            scope: GlobalSearchScope
+            scope: GlobalSearchScope,
         ): Collection<PsiClass> {
             return getMixinConfigs(project, scope).asSequence()
                 .flatMap { (it.qualifiedMixins + it.qualifiedClient + it.qualifiedServer).asSequence() }
@@ -75,7 +75,7 @@ class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
         fun getBestWritableConfigForMixinClass(
             project: Project,
             scope: GlobalSearchScope,
-            mixinClassName: String
+            mixinClassName: String,
         ): MixinConfig? {
             return getMixinConfigs(project, scope)
                 .filter { it.isWritable && mixinClassName.startsWith("${it.pkg}.") }

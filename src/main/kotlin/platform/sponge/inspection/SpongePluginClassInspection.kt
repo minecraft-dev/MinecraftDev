@@ -66,7 +66,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                         injectAnno,
                         "There can only be one injected constructor.",
                         quickFixFactory.createDeleteFix(injectAnno, "Remove this @Inject"),
-                        quickFixFactory.createDeleteFix(injectedMethod, "Remove this injected constructor")
+                        quickFixFactory.createDeleteFix(injectedMethod, "Remove this injected constructor"),
                     )
                 }
             }
@@ -80,7 +80,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                         classIdentifier,
                         "Plugin class must have an empty constructor or an @Inject constructor.",
                         ProblemHighlightType.GENERIC_ERROR,
-                        AddDefaultConstructorFix(aClass)
+                        AddDefaultConstructorFix(aClass),
                     )
                 }
             }
@@ -94,7 +94,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                         ProblemHighlightType.GENERIC_ERROR,
                         ModifierFix(emptyCtor, PsiModifier.PACKAGE_LOCAL, true, false),
                         ModifierFix(emptyCtor, PsiModifier.PROTECTED, true, false),
-                        ModifierFix(emptyCtor, PsiModifier.PUBLIC, true, false)
+                        ModifierFix(emptyCtor, PsiModifier.PUBLIC, true, false),
                     )
                 }
             }
@@ -108,7 +108,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                 holder.registerProblem(
                     pluginIdValue,
                     "Plugin IDs should be lowercase, and only contain characters from a-z, dashes or underscores," +
-                        " start with a lowercase letter, and not exceed 64 characters."
+                        " start with a lowercase letter, and not exceed 64 characters.",
                 )
             }
         }

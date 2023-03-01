@@ -55,7 +55,7 @@ class MixinSuperClassInspection : MixinInspection() {
                         reportSuperClass(
                             psiClass,
                             "Cannot find '${superClass.shortName}' " +
-                                "in the hierarchy of target class '${targetClass.shortName}'"
+                                "in the hierarchy of target class '${targetClass.shortName}'",
                         )
                     }
                 }
@@ -69,7 +69,7 @@ class MixinSuperClassInspection : MixinInspection() {
                     ) {
                         reportSuperClass(
                             psiClass,
-                            "Cannot find '${targetClass.shortName}' in the hierarchy of the super mixin"
+                            "Cannot find '${targetClass.shortName}' in the hierarchy of the super mixin",
                         )
                     }
                 }

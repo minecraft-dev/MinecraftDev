@@ -31,7 +31,7 @@ class CopyAtAction : SrgActionBase() {
                 copyToClipboard(
                     data.editor,
                     data.element,
-                    classSrg + " " + srg.name + " # " + parent.name
+                    classSrg + " " + srg.name + " # " + parent.name,
                 )
             }
             is PsiMethod -> {
@@ -41,7 +41,7 @@ class CopyAtAction : SrgActionBase() {
                 copyToClipboard(
                     data.editor,
                     data.element,
-                    classSrg + " " + srg.name + srg.descriptor + " # " + parent.name
+                    classSrg + " " + srg.name + srg.descriptor + " # " + parent.name,
                 )
             }
             is PsiClass -> {

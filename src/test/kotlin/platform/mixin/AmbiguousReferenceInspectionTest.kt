@@ -51,7 +51,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-            """
+            """,
         )
     }
 
@@ -74,7 +74,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-            """
+            """,
         )
     }
 
@@ -97,7 +97,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-            """
+            """,
         )
     }
 
@@ -120,7 +120,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-            """
+            """,
         )
     }
 
@@ -143,7 +143,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-            """
+            """,
         )
     }
 }

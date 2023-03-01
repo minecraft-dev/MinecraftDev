@@ -70,14 +70,14 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
             { "Go to the $simpleName target" },
             MixinGutterIconNavigationHandler(identifier.createSmartPointer(), annotation.createSmartPointer(), handler),
             GutterIconRenderer.Alignment.LEFT,
-            { "mixin $simpleName target indicator" }
+            { "mixin $simpleName target indicator" },
         )
     }
 
     private class MixinGutterIconNavigationHandler(
         private val identifierPointer: SmartPsiElementPointer<PsiIdentifier>,
         private val annotationPointer: SmartPsiElementPointer<PsiAnnotation>,
-        private val handler: MixinAnnotationHandler
+        private val handler: MixinAnnotationHandler,
     ) : GutterIconNavigationHandler<PsiIdentifier> {
         override fun navigate(e: MouseEvent, elt: PsiIdentifier) {
             val element = identifierPointer.element ?: return
@@ -92,7 +92,7 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
                     if (editor != null) {
                         HintManager.getInstance().showErrorHint(
                             editor,
-                            "Cannot find corresponding element in source code"
+                            "Cannot find corresponding element in source code",
                         )
                     }
                 }

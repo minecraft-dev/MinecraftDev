@@ -230,7 +230,9 @@ fun PsiElement.findMcpModule() = this.cached {
             ?: return@cached null
         ModuleManager.getInstance(project).modules.asSequence()
             .filter { OrderEntryUtil.findLibraryOrderEntry(ModuleRootManager.getInstance(it), library) != null }
-    } else sequenceOf(this.findModule())
+    } else {
+        sequenceOf(this.findModule())
+    }
 
     modules.mapNotNull { it?.findMcpModule() }.firstOrNull()
 }

@@ -26,7 +26,7 @@ class NbttFormattingModelBuilder : FormattingModelBuilder {
         return FormattingModelProvider.createFormattingModelForPsiFile(
             formattingContext.containingFile,
             block,
-            formattingContext.codeStyleSettings
+            formattingContext.codeStyleSettings,
         )
     }
 

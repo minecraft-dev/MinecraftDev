@@ -20,11 +20,11 @@ class SpigotPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformSte
     override fun getRepositories(mcVersion: SemanticVersion) = listOf(
         BuildRepository(
             "spigotmc-repo",
-            "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+            "https://hub.spigotmc.org/nexus/content/repositories/snapshots/",
         ),
         BuildRepository(
             "sonatype",
-            "https://oss.sonatype.org/content/groups/public/"
+            "https://oss.sonatype.org/content/groups/public/",
         ),
     )
 
@@ -35,7 +35,7 @@ class SpigotPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformSte
             "$mcVersion-R0.1-SNAPSHOT",
             mavenScope = "provided",
             gradleConfiguration = "compileOnly",
-        )
+        ),
     )
 
     class Factory : BukkitPlatformStep.Factory {
@@ -49,11 +49,11 @@ class PaperPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformStep
     override fun getRepositories(mcVersion: SemanticVersion) = listOf(
         BuildRepository(
             "papermc-repo",
-            "https://repo.papermc.io/repository/maven-public/"
+            "https://repo.papermc.io/repository/maven-public/",
         ),
         BuildRepository(
             "sonatype",
-            "https://oss.sonatype.org/content/groups/public/"
+            "https://oss.sonatype.org/content/groups/public/",
         ),
     )
 
@@ -68,8 +68,8 @@ class PaperPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformStep
                 "paper-api",
                 "$mcVersion-R0.1-SNAPSHOT",
                 mavenScope = "provided",
-                gradleConfiguration = "compileOnly"
-            )
+                gradleConfiguration = "compileOnly",
+            ),
         )
     }
 

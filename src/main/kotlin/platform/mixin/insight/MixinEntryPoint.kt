@@ -12,6 +12,7 @@ package com.demonwav.mcdev.platform.mixin.insight
 
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.util.isMixinEntryPoint
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInspection.reference.RefElement
 import com.intellij.codeInspection.visibility.EntryPointWithVisibilityLevel
@@ -25,7 +26,7 @@ import org.jdom.Element
 class MixinEntryPoint : EntryPointWithVisibilityLevel() {
 
     @JvmField
-    var MIXIN_ENTRY_POINT = true
+    var mixinEntryPoint = true
 
     override fun getId() = "mixin"
     override fun getDisplayName() = "Mixin injectors"
@@ -39,20 +40,7 @@ class MixinEntryPoint : EntryPointWithVisibilityLevel() {
             .map { (name, _) -> name }
             .toTypedArray()
 
-    override fun isEntryPoint(element: PsiElement): Boolean {
-        if (element !is PsiMethod) {
-            return false
-        }
-        val project = element.project
-        for (annotation in element.annotations) {
-            val qName = annotation.qualifiedName ?: continue
-            val handler = MixinAnnotationHandler.forMixinAnnotation(qName, project)
-            if (handler != null && handler.isEntryPoint) {
-                return true
-            }
-        }
-        return false
-    }
+    override fun isEntryPoint(element: PsiElement) = isMixinEntryPoint(element)
 
     override fun isEntryPoint(refElement: RefElement, psiElement: PsiElement) = isEntryPoint(psiElement)
 
@@ -71,9 +59,9 @@ class MixinEntryPoint : EntryPointWithVisibilityLevel() {
         return -1
     }
 
-    override fun isSelected() = MIXIN_ENTRY_POINT
+    override fun isSelected() = mixinEntryPoint
     override fun setSelected(selected: Boolean) {
-        MIXIN_ENTRY_POINT = selected
+        mixinEntryPoint = selected
     }
 
     override fun readExternal(element: Element) = XmlSerializer.serializeInto(this, element)

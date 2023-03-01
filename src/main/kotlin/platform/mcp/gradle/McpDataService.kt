@@ -28,7 +28,7 @@ class McpDataService : AbstractProjectDataService<McpModelData, Module>() {
         toImport: Collection<DataNode<McpModelData>>,
         projectData: ProjectData?,
         project: Project,
-        modelsProvider: IdeModifiableModelsProvider
+        modelsProvider: IdeModifiableModelsProvider,
     ) {
         if (projectData == null || toImport.isEmpty()) {
             return

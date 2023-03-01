@@ -25,7 +25,7 @@ object McpModelFG2Handler : McpModelDataHandler {
     override fun build(
         gradleModule: IdeaModule,
         node: DataNode<ModuleData>,
-        resolverCtx: ProjectResolverContext
+        resolverCtx: ProjectResolverContext,
     ) {
         val data = resolverCtx.getExtraProject(gradleModule, McpModelFG2::class.java) ?: return
 
@@ -33,14 +33,14 @@ object McpModelFG2Handler : McpModelDataHandler {
             data.minecraftVersion,
             data.mcpVersion,
             data.mappingFiles.find { it.endsWith("mcp-srg.srg") },
-            SrgType.SRG
+            SrgType.SRG,
         )
 
         val modelData = McpModelData(
             node.data,
             state,
             null,
-            null
+            null,
         )
 
         node.createChild(
@@ -51,11 +51,11 @@ object McpModelFG2Handler : McpModelDataHandler {
                     data.minecraftVersion,
                     data.mcpVersion,
                     data.mappingFiles.find { it.endsWith("mcp-srg.srg") },
-                    SrgType.SRG
+                    SrgType.SRG,
                 ),
                 null,
-                null
-            )
+                null,
+            ),
         )
 
         for (child in node.children) {

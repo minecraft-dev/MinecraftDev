@@ -9,11 +9,13 @@
  */
 
 import org.cadixdev.gradle.licenser.header.HeaderStyle
+import org.cadixdev.gradle.licenser.tasks.LicenseUpdate
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.gradle.ext.settings
 import org.jetbrains.gradle.ext.taskTriggers
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 
 plugins {
     kotlin("jvm") version "1.8.0"
@@ -21,7 +23,7 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.12.0"
+    id("org.jetbrains.intellij") version "1.13.0"
     id("org.cadixdev.licenser")
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
@@ -275,7 +277,7 @@ license {
                 fileTree(project.projectDir) {
                     include("*.gradle.kts", "gradle.properties")
                     exclude("**/buildSrc/**", "**/build/**")
-                }
+                },
             )
         }
         register("buildSrc") {
@@ -283,7 +285,7 @@ license {
                 project.fileTree(project.projectDir.resolve("buildSrc")) {
                     include("**/*.kt", "**/*.kts")
                     exclude("**/build/**")
-                }
+                },
             )
         }
         register("grammars") {
@@ -292,6 +294,9 @@ license {
     }
 }
 
+ktlint {
+    disabledRules.add("filename")
+}
 tasks.withType<BaseKtLintCheckTask>().configureEach {
     workerMaxHeapSize.set("512m")
 }
@@ -299,9 +304,7 @@ tasks.withType<BaseKtLintCheckTask>().configureEach {
 tasks.register("format") {
     group = "minecraft"
     description = "Formats source code according to project style"
-    val licenseFormat by tasks.existing
-    val ktlintFormat by tasks.existing
-    dependsOn(licenseFormat, ktlintFormat)
+    dependsOn(tasks.withType<LicenseUpdate>(), tasks.withType<KtLintFormatTask>())
 }
 
 val generateAtLexer by lexer("AtLexer", "com/demonwav/mcdev/platform/mcp/at/gen")
@@ -331,7 +334,7 @@ val generate by tasks.registering {
         generateNbttParser,
         generateLangLexer,
         generateLangParser,
-        generateTranslationTemplateLexer
+        generateTranslationTemplateLexer,
     )
 }
 

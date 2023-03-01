@@ -74,7 +74,8 @@ abstract class AbstractLongRunningStep(parent: NewProjectWizardStep) : AbstractN
                 }
                 indicator.text2 = null
             }
-        })
+        },
+        )
     }
 
     companion object {

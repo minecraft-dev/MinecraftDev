@@ -160,7 +160,7 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
                             "$gradleConfig \"${escapeGString(dep.groupId)}:${
                             escapeGString(dep.artifactId)
                             }:${escapeGString(dep.version)}\"",
-                            depsBlock
+                            depsBlock,
                         )
                         depsBlock.addStatementBefore(stmt, null)
                     }
@@ -175,7 +175,7 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
                         val stmt = elementFactory.createExpression(
                             "$gradleConfig(\"${escapeGString(dep.groupId)}:${
                             escapeGString(dep.artifactId)
-                            }:${escapeGString(dep.version)}\")"
+                            }:${escapeGString(dep.version)}\")",
                         )
                         depsBlock.addBefore(stmt, depsBlock.rBrace)
                     }
@@ -249,7 +249,7 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
         project: Project,
         element: GrStatementOwner,
         name: String,
-        first: Boolean = false
+        first: Boolean = false,
     ): GrClosableBlock {
         findGroovyBlock(element, name)?.let { return it }
         val block = GroovyPsiElementFactory.getInstance(project).createStatementFromText("$name {\n}", element)
@@ -277,7 +277,7 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
         project: Project,
         element: KtBlockExpression,
         name: String,
-        first: Boolean = false
+        first: Boolean = false,
     ): KtBlockExpression {
         findKotlinBlock(element, name)?.let { return it }
         val block = KtPsiFactory(project).createExpression("$name {\n}")
@@ -313,7 +313,7 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
 
     class GradleFiles(
         private val project: Project,
-        private val rootDir: VirtualFile
+        private val rootDir: VirtualFile,
     ) {
         private val lazyBuildGradle = lazy {
             val file = rootDir.findChild("build.gradle") ?: rootDir.findChild("build.gradle.kts")
@@ -413,7 +413,7 @@ open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningS
         project: Project,
         rootDirectory: Path,
         buildSystemProps: BuildSystemPropertiesStep<*>,
-        task: String
+        task: String,
     ) {
         val gradleType = GradleExternalTaskConfigurationType.getInstance()
 
@@ -431,7 +431,7 @@ open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningS
 
         val settings = runManager.createConfiguration(
             runConfiguration,
-            gradleType.factory
+            gradleType.factory,
         )
 
         settings.isActivateToolWindowBeforeRun = true

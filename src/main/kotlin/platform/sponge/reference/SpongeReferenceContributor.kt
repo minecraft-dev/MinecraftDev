@@ -46,7 +46,7 @@ class SpongeReferenceContributor : PsiReferenceContributor() {
             PlatformPatterns.psiElement(PsiLanguageInjectionHost::class.java)
                 .and(FilterPattern(GetterAnnotationFilter)),
             UastGetterEventListenerReferenceResolver,
-            PsiReferenceRegistrar.HIGHER_PRIORITY
+            PsiReferenceRegistrar.HIGHER_PRIORITY,
         )
     }
 }

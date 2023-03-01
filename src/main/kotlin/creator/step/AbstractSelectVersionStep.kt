@@ -21,7 +21,7 @@ import com.intellij.ui.dsl.builder.bindItem
 
 abstract class AbstractSelectVersionStep<T : Comparable<T>>(
     parent: NewProjectWizardStep,
-    val versions: List<T>
+    val versions: List<T>,
 ) : AbstractNewProjectWizardStep(parent) {
     protected abstract val label: String
 

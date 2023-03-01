@@ -20,7 +20,7 @@ class EdtInterceptor : InvocationInterceptor {
     override fun interceptBeforeEachMethod(
         invocation: InvocationInterceptor.Invocation<Void>,
         invocationContext: ReflectiveInvocationContext<Method>,
-        extensionContext: ExtensionContext
+        extensionContext: ExtensionContext,
     ) {
         exec(invocation, invocationContext)
     }
@@ -28,7 +28,7 @@ class EdtInterceptor : InvocationInterceptor {
     override fun interceptAfterEachMethod(
         invocation: InvocationInterceptor.Invocation<Void>,
         invocationContext: ReflectiveInvocationContext<Method>,
-        extensionContext: ExtensionContext
+        extensionContext: ExtensionContext,
     ) {
         exec(invocation, invocationContext)
     }
@@ -36,14 +36,14 @@ class EdtInterceptor : InvocationInterceptor {
     override fun interceptTestMethod(
         invocation: InvocationInterceptor.Invocation<Void>,
         invocationContext: ReflectiveInvocationContext<Method>,
-        extensionContext: ExtensionContext
+        extensionContext: ExtensionContext,
     ) {
         exec(invocation, invocationContext)
     }
 
     private fun exec(
         invocation: InvocationInterceptor.Invocation<Void>,
-        invocationContext: ReflectiveInvocationContext<Method>
+        invocationContext: ReflectiveInvocationContext<Method>,
     ) {
         if (invocationContext.executable.getAnnotation(NoEdt::class.java) != null) {
             invocation.proceed()
