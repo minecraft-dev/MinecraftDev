@@ -68,7 +68,7 @@ class FabricGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         }
 
         if (officialMappings == true) {
-            assets.addTemplateProperties("OFFICIAL_MAPPINGS" to officialMappings)
+            assets.addTemplateProperties("OFFICIAL_MAPPINGS" to "true")
         }
 
         assets.addTemplates(
