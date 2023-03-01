@@ -30,13 +30,13 @@ import com.demonwav.mcdev.creator.step.DependStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.MainClassStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.starters.local.GeneratorEmptyDirectory
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 
 class SpongeGradleSupport : BuildSystemSupport {
@@ -44,8 +44,8 @@ class SpongeGradleSupport : BuildSystemSupport {
 
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> SpongeGradleFilesStep(parent).chain(::GradleWrapperStep)
-            BuildSystemSupport.POST_STEP -> SpongeGradleImportStep(parent).chain(::ReformatBuildGradleStep)
+            BuildSystemSupport.PRE_STEP -> SpongeGradleFilesStep(parent).nextStep(::GradleWrapperStep)
+            BuildSystemSupport.POST_STEP -> SpongeGradleImportStep(parent).nextStep(::ReformatBuildGradleStep)
             else -> EmptyStep(parent)
         }
     }

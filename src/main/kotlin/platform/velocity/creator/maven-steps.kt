@@ -23,10 +23,10 @@ import com.demonwav.mcdev.creator.buildsystem.ReformatPomStep
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 import com.intellij.psi.xml.XmlTag
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
@@ -34,11 +34,10 @@ import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
 class VelocityMavenSupport : BuildSystemSupport {
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> VelocityMavenFilesStep(parent).chain(::VelocityPatchPomStep)
-            BuildSystemSupport.POST_STEP -> MavenImportStep(parent).chain(
-                ::ReformatPomStep,
-                { VelocityModifyMainClassStep(it, false) },
-            )
+            BuildSystemSupport.PRE_STEP -> VelocityMavenFilesStep(parent).nextStep(::VelocityPatchPomStep)
+            BuildSystemSupport.POST_STEP -> MavenImportStep(parent)
+                .nextStep(::ReformatPomStep)
+                .nextStep { VelocityModifyMainClassStep(it, false) }
             else -> EmptyStep(parent)
         }
     }

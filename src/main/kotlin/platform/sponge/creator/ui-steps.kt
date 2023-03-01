@@ -11,7 +11,6 @@
 package com.demonwav.mcdev.platform.sponge.creator
 
 import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
-import com.demonwav.mcdev.creator.chain
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
 import com.demonwav.mcdev.creator.step.AbstractCollapsibleStep
@@ -22,6 +21,7 @@ import com.demonwav.mcdev.creator.step.DependStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.MainClassStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.PluginNameStep
 import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.platform.sponge.SpongeVersion
@@ -29,7 +29,6 @@ import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.onShown
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.util.Key
@@ -42,15 +41,14 @@ class SpongePlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Sponge
 
     override suspend fun computeData() = SpongeVersion.downloadData()
 
-    override fun createStep(data: SpongeVersion) = SpongeApiVersionStep(this, data).chain(
-        ::PluginNameStep,
-        ::MainClassStep,
-        ::LicenseStep,
-        ::SpongeOptionalSettingsStep,
-        ::SpongeBuildSystemStep,
-        ::SpongeProjectFilesStep,
-        ::SpongePostBuildSystemStep,
-    )
+    override fun createStep(data: SpongeVersion) = SpongeApiVersionStep(this, data)
+        .nextStep(::PluginNameStep)
+        .nextStep(::MainClassStep)
+        .nextStep(::LicenseStep)
+        .nextStep(::SpongeOptionalSettingsStep)
+        .nextStep(::SpongeBuildSystemStep)
+        .nextStep(::SpongeProjectFilesStep)
+        .nextStep(::SpongePostBuildSystemStep)
 
     class Factory : PluginPlatformStep.Factory {
         override val name = "Sponge"
@@ -101,9 +99,8 @@ class SpongeApiVersionStep(
 class SpongeOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsibleStep(parent) {
     override val title = "Optional Settings"
 
-    override fun createStep() = DescriptionStep(this).chain(
-        ::AuthorsStep,
-        ::WebsiteStep,
-        ::DependStep,
-    )
+    override fun createStep() = DescriptionStep(this)
+        .nextStep(::AuthorsStep)
+        .nextStep(::WebsiteStep)
+        .nextStep(::DependStep)
 }

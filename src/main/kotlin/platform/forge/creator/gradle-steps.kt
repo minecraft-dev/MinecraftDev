@@ -25,12 +25,12 @@ import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.UseMixinsStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -47,8 +47,8 @@ class ForgeGradleSupport : BuildSystemSupport {
 
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> ForgeGradleFilesStep(parent).chain(::GradleWrapperStep)
-            BuildSystemSupport.POST_STEP -> ForgeCompileJavaStep(parent).chain(::GradleImportStep)
+            BuildSystemSupport.PRE_STEP -> ForgeGradleFilesStep(parent).nextStep(::GradleWrapperStep)
+            BuildSystemSupport.POST_STEP -> ForgeCompileJavaStep(parent).nextStep(::GradleImportStep)
             else -> EmptyStep(parent)
         }
     }

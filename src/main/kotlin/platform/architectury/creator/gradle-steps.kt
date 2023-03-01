@@ -23,10 +23,10 @@ import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 
 private val NewProjectWizardStep.architecturyGroup: String get() {
@@ -42,7 +42,7 @@ class ArchitecturyGradleSupport : BuildSystemSupport {
 
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> ArchitecturyGradleFilesStep(parent).chain(::GradleWrapperStep)
+            BuildSystemSupport.PRE_STEP -> ArchitecturyGradleFilesStep(parent).nextStep(::GradleWrapperStep)
             BuildSystemSupport.POST_STEP -> GradleImportStep(parent)
             else -> EmptyStep(parent)
         }
